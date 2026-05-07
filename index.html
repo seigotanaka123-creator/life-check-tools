@@ -14,6 +14,8 @@
   <title>暮らし診断ツール | 買い物・仕事・疲れ・習慣を整える無料診断集</title>
   <meta name="description" content="暮らし診断、買い物診断、仕事の悩み診断、疲れや習慣の見直しに使える無料診断ツール集です。今の状態に合うnote記事の入口を探せます。">
   <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/">
+  <link rel="alternate" hreflang="ja" href="https://seigotanaka123-creator.github.io/life-check-tools/">
+  <link rel="alternate" hreflang="en" href="https://seigotanaka123-creator.github.io/life-check-tools/en/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="暮らし診断ツール">
   <meta property="og:title" content="暮らし診断ツール | 買い物・仕事・疲れ・習慣を整える無料診断集">
@@ -131,6 +133,20 @@
       font-weight: 700;
       text-decoration: none;
     }
+    .language-link {
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      margin: 0 0 14px;
+      padding: 5px 12px;
+      border: 1px solid rgba(47, 111, 100, .22);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
     .tools {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
@@ -233,6 +249,7 @@
   </div>
 </header>
 <main>
+  <a class="language-link" href="en/">English version</a>
   <nav class="category-nav" aria-label="テーマ">
     <a href="fatigue-reset-diagnosis.html">疲れ</a>
     <a href="life-reset-diagnosis.html">暮らし</a>
