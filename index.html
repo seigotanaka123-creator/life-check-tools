@@ -79,6 +79,8 @@
       font-size: clamp(28px, 4.4vw, 46px);
       line-height: 1.25;
       letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
     }
     .no-break { white-space: nowrap; }
     header p {
@@ -173,6 +175,8 @@
       color: var(--text);
       font-size: 18px;
       line-height: 1.45;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
     }
     .card span {
       display: block;
@@ -238,21 +242,21 @@
     <a href="writing-habit-diagnosis.html">書く習慣</a>
   </nav>
   <section class="tools" aria-label="無料診断ツール">
-    <a class="card" href="fatigue-reset-diagnosis.html"><div><span class="tag">疲れ</span><strong>疲れの整え方タイプ診断</strong><span>睡眠、週末、静かな習慣、頑張り方の見直しなど、今の疲れに近い回復の入口を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="life-reset-diagnosis.html"><div><span class="tag">暮らし</span><strong>暮らしの整え方タイプ診断</strong><span>収納、掃除、断捨離、部屋づくり、日常の簡略化など、暮らしを整える方向を見つけます。</span></div><em>診断する</em></a>
-    <a class="card" href="mood-fulfillment-diagnosis.html"><div><span class="tag">気持ち</span><strong>気持ちの満たし方タイプ診断</strong><span>寂しさ、ご褒美、小さな幸せ、好きなものとの付き合い方を整理できます。</span></div><em>診断する</em></a>
-    <a class="card" href="self-time-diagnosis.html"><div><span class="tag">自分時間</span><strong>自分時間のつくり方診断</strong><span>時間がない、始められない、続かない悩みに合わせて、自分時間の作り方を探します。</span></div><em>診断する</em></a>
-    <a class="card" href="appearance-style-diagnosis.html"><div><span class="tag">見た目</span><strong>垢抜け・見た目の整え方診断</strong><span>服、髪、色、小物、骨格診断など、どこから整えるとよいかを整理します。</span></div><em>診断する</em></a>
-    <a class="card" href="work-worry-diagnosis.html"><div><span class="tag">仕事</span><strong>仕事の悩み整理診断</strong><span>新生活、転職、面接、チームづくりなど、仕事の悩みに合う記事を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="parenting-health-diagnosis.html"><div><span class="tag">子育て・健康</span><strong>子育てと健康の不安整理診断</strong><span>子育て、自分のケア、歯医者、視力など、今の不安に近い入口を選べます。</span></div><em>診断する</em></a>
-    <a class="card" href="writing-habit-diagnosis.html"><div><span class="tag">発信</span><strong>書く習慣・発信タイプ診断</strong><span>書く、続ける、発信する、運営改善するための次の一歩を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="spending-type-diagnosis.html"><div><span class="tag">買い物</span><strong>無駄な出費タイプ診断</strong><span>買い物で後悔しやすい判断のクセを確認できます。</span></div><em>診断する</em></a>
-    <a class="card" href="buy-before-checklist.html"><div><span class="tag">買う前</span><strong>買う前チェックリスト</strong><span>買う前に必要性、使う場面、代替案を整理できます。</span></div><em>チェックする</em></a>
-    <a class="card" href="replacement-checklist.html"><div><span class="tag">買い替え</span><strong>買い替え判断チェックリスト</strong><span>買い替えるか、待つか、使い方を見直すかを確認できます。</span></div><em>チェックする</em></a>
+    <a class="card" href="fatigue-reset-diagnosis.html"><div><span class="tag">疲れ</span><strong>疲れの整え方<span class="no-break">タイプ診断</span></strong><span>睡眠、週末、静かな習慣、頑張り方の見直しなど、今の疲れに近い回復の入口を探せます。</span></div><em>診断する</em></a>
+    <a class="card" href="life-reset-diagnosis.html"><div><span class="tag">暮らし</span><strong>暮らしの整え方<span class="no-break">タイプ診断</span></strong><span>収納、掃除、断捨離、部屋づくり、日常の簡略化など、暮らしを整える方向を見つけます。</span></div><em>診断する</em></a>
+    <a class="card" href="mood-fulfillment-diagnosis.html"><div><span class="tag">気持ち</span><strong>気持ちの満たし方<span class="no-break">タイプ診断</span></strong><span>寂しさ、ご褒美、小さな幸せ、好きなものとの付き合い方を整理できます。</span></div><em>診断する</em></a>
+    <a class="card" href="self-time-diagnosis.html"><div><span class="tag">自分時間</span><strong>自分時間の<span class="no-break">つくり方診断</span></strong><span>時間がない、始められない、続かない悩みに合わせて、自分時間の作り方を探します。</span></div><em>診断する</em></a>
+    <a class="card" href="appearance-style-diagnosis.html"><div><span class="tag">見た目</span><strong>垢抜け・見た目の<span class="no-break">整え方診断</span></strong><span>服、髪、色、小物、骨格診断など、どこから整えるとよいかを整理します。</span></div><em>診断する</em></a>
+    <a class="card" href="work-worry-diagnosis.html"><div><span class="tag">仕事</span><strong>仕事の悩み<span class="no-break">整理診断</span></strong><span>新生活、転職、面接、チームづくりなど、仕事の悩みに合う記事を探せます。</span></div><em>診断する</em></a>
+    <a class="card" href="parenting-health-diagnosis.html"><div><span class="tag">子育て・健康</span><strong>子育てと健康の不安<span class="no-break">整理診断</span></strong><span>子育て、自分のケア、歯医者、視力など、今の不安に近い入口を選べます。</span></div><em>診断する</em></a>
+    <a class="card" href="writing-habit-diagnosis.html"><div><span class="tag">発信</span><strong>書く習慣・発信<span class="no-break">タイプ診断</span></strong><span>書く、続ける、発信する、運営改善するための次の一歩を探せます。</span></div><em>診断する</em></a>
+    <a class="card" href="spending-type-diagnosis.html"><div><span class="tag">買い物</span><strong>無駄な出費<span class="no-break">タイプ診断</span></strong><span>買い物で後悔しやすい判断のクセを確認できます。</span></div><em>診断する</em></a>
+    <a class="card" href="buy-before-checklist.html"><div><span class="tag">買う前</span><strong>買う前<span class="no-break">チェックリスト</span></strong><span>買う前に必要性、使う場面、代替案を整理できます。</span></div><em>チェックする</em></a>
+    <a class="card" href="replacement-checklist.html"><div><span class="tag">買い替え</span><strong>買い替え判断<span class="no-break">チェックリスト</span></strong><span>買い替えるか、待つか、使い方を見直すかを確認できます。</span></div><em>チェックする</em></a>
   </section>
   <section class="section" aria-labelledby="about-heading">
     <h2 id="about-heading">このサイトの使い方</h2>
-    <p>暮らし診断、買い物診断、仕事の悩み診断、疲れの整え方診断などから、気になるテーマを選んでください。近い答えを選ぶと、今の状態に合いそうなnote記事が表示されます。</p>
+    <p>暮らし診断、買い物診断、仕事の悩み診断、疲れの整え方診断などから、気になるテーマを選んでください。<br>近い答えを選ぶと、今の状態に合いそうなnote記事が表示されます。</p>
   </section>
 </main>
 </body>

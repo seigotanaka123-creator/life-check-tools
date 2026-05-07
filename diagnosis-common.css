@@ -42,6 +42,10 @@ header a {
   text-decoration: none;
 }
 h1 { margin: 22px 0 10px; font-size: clamp(27px, 5vw, 44px); line-height: 1.28; letter-spacing: 0; }
+.lead, h1 {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 .lead, .small-note { color: var(--muted); }
 .lead { max-width: 720px; }
 main::before {
