@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>無駄な出費タイプ診断 | 買い物のクセを見直す無料ツール</title>
+  <meta name="description" content="買い物や買い替えで出費が増えやすい判断のクセを確認できる無料診断ツールです。無駄な出費や買い物の後悔を減らしたい人に向いています。">
+  <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/spending-type-diagnosis.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="暮らし診断ツール">
+  <meta property="og:title" content="無駄な出費タイプ診断 | 買い物のクセを見直す無料ツール">
+  <meta property="og:description" content="買い物や買い替えで出費が増えやすい判断のクセを確認できる無料診断ツールです。無駄な出費や買い物の後悔を減らしたい人に向いています。">
+  <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/spending-type-diagnosis.html">
+  <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="無駄な出費タイプ診断 | 買い物のクセを見直す無料ツール">
+  <meta name="twitter:description" content="買い物や買い替えで出費が増えやすい判断のクセを確認できる無料診断ツールです。無駄な出費や買い物の後悔を減らしたい人に向いています。">
+  <meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
+  <link rel="alternate" hreflang="ja" href="https://seigotanaka123-creator.github.io/life-check-tools/spending-type-diagnosis.html">
+  <style>
+    :root {
+      --text: #222;
+      --muted: #666;
+      --line: #e8e1d8;
+      --soft: #faf7f2;
+      --accent: #6f5a3f;
+      --accent-dark: #4f3f2d;
+      --warn: #8a5a2b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    header {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 18px;
+    }
+
+    header a {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin: 18px 0 8px;
+      font-size: clamp(24px, 5vw, 40px);
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.35;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto 56px;
+      padding: 0 20px;
+    }
+
+    .progress {
+      height: 8px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 20px 0 24px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 0.2s ease;
+    }
+
+    .question {
+      border-top: 1px solid var(--line);
+      padding: 24px 0 8px;
+    }
+
+    .question h2 {
+      margin: 0 0 16px;
+      font-size: clamp(19px, 4vw, 26px);
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .choice {
+      width: 100%;
+      min-height: 84px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .choice:hover,
+    .choice.is-selected {
+      border-color: var(--accent);
+      background: #f6efe6;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    button.action,
+    a.action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.secondary,
+    a.secondary {
+      background: #fff;
+      color: var(--accent-dark);
+      border-color: var(--line);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .result {
+      display: none;
+      border-top: 1px solid var(--line);
+      padding-top: 26px;
+    }
+
+    .result.is-visible { display: block; }
+
+    .result h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 5vw, 36px);
+      line-height: 1.35;
+    }
+
+    .result p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .box {
+      padding: 16px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent-dark);
+    }
+
+    .note-cta { background:#fffaf1; border-color:#eadcc4; }
+    .note-cta strong { display:block; margin-bottom:8px; }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .small-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 18px;
+    }
+
+    @media (max-width: 720px) {
+      .nav {
+        align-items: stretch;
+        flex-direction: column-reverse;
+      }
+
+      button.action,
+      a.action {
+        width: 100%;
+      }
+    }
+      .seo-section {
+      margin-top: 34px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+    .seo-section h2 {
+      margin: 0 0 12px;
+      font-size: clamp(20px, 4vw, 28px);
+      line-height: 1.45;
+    }
+    .seo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .seo-box {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+    .seo-box h3 { margin: 0 0 8px; font-size: 17px; }
+    .seo-box p, .seo-box ul { margin: 0; color: var(--muted); }
+    .seo-box ul { padding-left: 20px; }
+      .related-tools {
+      margin-top: 34px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line, #e6e2dc);
+    }
+    .related-tools h2 {
+      margin: 0 0 12px;
+      font-size: clamp(20px, 4vw, 28px);
+      line-height: 1.45;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .related-card {
+      display: block;
+      padding: 16px;
+      border: 1px solid var(--line, #e6e2dc);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text, #222);
+      text-decoration: none;
+    }
+    .related-card:hover {
+      border-color: var(--accent, #2f6f73);
+      background: var(--soft, #f8f6f1);
+    }
+    .related-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent, #2f6f73);
+      font-size: 16px;
+    }
+    .related-card span {
+      display: block;
+      color: var(--muted, #666);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">← 画像まとめへ戻る</a>
+  <h1>無駄な出費タイプ診断</h1>
+  <p class="lead">質問に答えると、お金が出ていきやすい判断のクセが分かります。</p>
+</header>
+
+<main>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <section id="quiz" class="question" aria-live="polite">
+    <h2 id="questionText"></h2>
+    <div id="choices" class="choices"></div>
+    <div class="nav">
+      <button id="backButton" class="action secondary" type="button">戻る</button>
+      <button id="nextButton" class="action" type="button" disabled>次へ</button>
+    </div>
+  </section>
+
+  <section id="result" class="result" aria-live="polite">
+    <h2 id="resultTitle"></h2>
+    <p id="resultLead"></p>
+
+    <div class="summary">
+      <div class="box">
+        <strong>出費が増えやすい場面</strong>
+        <div id="resultRisk"></div>
+      </div>
+      <div class="box">
+        <strong>今日からできる対策</strong>
+        <div id="resultAction"></div>
+      </div>
+    </div>
+
+    <div class="box note-cta"><strong>この結果に近い人へ</strong><div id="resultReading"></div></div>
+
+    <div class="links">
+      <a id="resultLink" class="action" href="https://note.com/cheeky_guppy1145">関連noteで詳しく読む</a>
+      <button id="restartButton" class="action secondary" type="button">もう一度診断する</button>
+    </div>
+    <p class="small-note">この診断は、買い物や買い替えで迷ったときの考え方を整理するためのものです。</p>
+  </section>
+  <section class="seo-section" aria-labelledby="about-tool">
+    <h2 id="about-tool">この診断で分かること</h2>
+    <p>買い物や買い替えで出費が増えやすい判断のクセを、質問に答えながら確認できます。安さにつられる、比較しすぎる、まだ使えるから先延ばしにするなど、自分の傾向を見直すきっかけになります。</p>
+    <div class="seo-grid">
+      <div class="seo-box">
+        <h3>こんな人におすすめ</h3>
+        <ul>
+          <li>無駄な出費を減らしたい人</li>
+          <li>買い物の後悔を減らしたい人</li>
+          <li>買う前に判断を整理したい人</li>
+        </ul>
+      </div>
+      <div class="seo-box">
+        <h3>使い方</h3>
+        <p>普段の買い物に近い選択肢を選ぶと、出費が増えやすい場面と最初に試したい対策が表示されます。大きな買い物の前の確認にも使えます。</p>
+      </div>
+    </div>
+  </section>  <section class="related-tools" aria-labelledby="related-tools-heading">
+    <h2 id="related-tools-heading">次に使える無料ツール</h2>
+    <div class="related-grid">
+      <a class="related-card" href="buy-before-checklist.html"><strong>買う前チェックリスト</strong><span>買う前に、必要性・使う場面・代替案を整理できます。</span></a>
+      <a class="related-card" href="replacement-checklist.html"><strong>買い替え判断チェックリスト</strong><span>買い替えるべきか、今あるもので足りるかを確認できます。</span></a>
+    </div>
+  </section></main>
+
+<script>
+    const links = {
+    postpone: "https://note.com/cheeky_guppy1145/n/n7e706c86f2d1",
+    bargain: "https://note.com/cheeky_guppy1145/m/m035f260922c2",
+    overthink: "https://note.com/cheeky_guppy1145/n/nad22a0c3ed65",
+    stress: "https://note.com/cheeky_guppy1145/n/na3b0aaf22450",
+    mood: "https://note.com/cheeky_guppy1145/m/m035f260922c2"
+  };
+
+  const results = {
+    postpone: {
+      title: "まだ使えるから先延ばしタイプ",
+      lead: "壊れていないものを買い替えることに抵抗があり、小さな使いにくさを長く抱えやすいタイプです。節約上手に見えますが、時間や集中力を少しずつ失っていることがあります。",
+      risk: "動作が遅いもの、使いにくい日用品、古い家電などをそのまま使い続ける場面。目に見える支出は減っても、見えない損失が増えやすいです。",
+      action: "買い替えるかどうかを、気分ではなく「週に何回ストレスを感じるか」で見てみましょう。回数で見ると判断しやすくなります。",
+      reading: "まだ使えるから先延ばしにしがちな人へ。買い替え判断や、見えない不便を減らす考え方をnoteで詳しく読めます。",
+      url: links.postpone
+    },
+    bargain: {
+      title: "安いから買ってしまうタイプ",
+      lead: "割引やセールを見ると、必要かどうかより先にお得感で判断しやすいタイプです。1つ1つは小さくても、積み重なると大きな出費になります。",
+      risk: "セール品、まとめ買い、送料無料までの追加購入、限定キャンペーンなど。買った瞬間は得をした気がしても、使わないものが残りやすいです。",
+      action: "買う前に「定価でも欲しいか」「今週使うか」を確認しましょう。どちらも弱いなら、いったん保留で大丈夫です。",
+      reading: "安さにつられて買いやすい人へ。買う前の判断軸や、満足度の高いお金の使い方をnoteで整理できます。",
+      url: links.bargain
+    },
+    overthink: {
+      title: "調べすぎて決められないタイプ",
+      lead: "失敗したくない気持ちが強く、比較やレビュー確認に時間を使いやすいタイプです。慎重さは強みですが、決めるまでの疲れが増えやすくなります。",
+      risk: "スマホ、家電、サブスク、服、日用品など、選択肢が多い買い物。比較し続けるほど、何が大事か分からなくなりやすいです。",
+      action: "比較する前に条件を3つだけ決めましょう。価格、使う頻度、譲れない機能など、先に基準を作ると迷いが減ります。",
+      reading: "比較しすぎて疲れやすい人へ。判断基準の作り方や、迷う時間を減らす考え方をnoteで読めます。",
+      url: links.overthink
+    },
+    stress: {
+      title: "小さなストレスを見過ごすタイプ",
+      lead: "毎日の小さな不便に慣れてしまい、ストレスを感じていることに気づきにくいタイプです。生活を整える余地がまだ残っています。",
+      risk: "開けにくい収納、使いにくい道具、動線の悪い配置、疲れる習慣など。お金の問題に見えなくても、生活の満足度を下げやすいです。",
+      action: "1日の中で「少し面倒」と思った場面を3つだけメモしてみましょう。買うより先に、配置や使い方を変えるだけで改善することもあります。",
+      reading: "小さなストレスを見過ごしやすい人へ。暮らしを軽くする工夫や、見えない損失を減らす考え方をnoteで読めます。",
+      url: links.stress
+    },
+    mood: {
+      title: "その場の気分で買うタイプ",
+      lead: "疲れた日や気分を変えたいときに、買い物で整えようとしやすいタイプです。悪いことではありませんが、あとから後悔する買い物も混ざりやすくなります。",
+      risk: "夜のネットショッピング、疲れた日のご褒美買い、SNSで見たものの即購入など。気分が落ち着いたあとに必要性が下がることがあります。",
+      action: "欲しいと思ったら、すぐ買わずに翌朝もう一度見てみましょう。時間を置いても欲しいものは、満足度が高くなりやすいです。",
+      reading: "気分で買いやすい人へ。衝動を整える考え方や、感情に流されない買い物のヒントをnoteで読めます。",
+      url: links.mood
+    }
+  };
+
+  const questions = [
+    {
+      text: "買い替えや買い物で一番よくある悩みは？",
+      choices: [
+        { label: "まだ使える気がして決められない", scores: { postpone: 4 } },
+        { label: "安いとつい買いたくなる", scores: { bargain: 4 } },
+        { label: "調べるほど迷ってしまう", scores: { overthink: 4 } },
+        { label: "疲れていると買い物したくなる", scores: { mood: 4 } }
+      ]
+    },
+    {
+      text: "買ったあとに後悔しやすいのはどれですか？",
+      choices: [
+        { label: "もっと早く買えばよかったと思う", scores: { postpone: 3, stress: 1 } },
+        { label: "安かったけれど結局あまり使わない", scores: { bargain: 3, mood: 1 } },
+        { label: "比較に時間を使いすぎたと思う", scores: { overthink: 4 } },
+        { label: "その時の気分で買っただけだった", scores: { mood: 4 } }
+      ]
+    },
+    {
+      text: "今の生活で減らしたいものは？",
+      choices: [
+        { label: "小さな使いにくさ", scores: { stress: 3, postpone: 1 } },
+        { label: "なんとなく買う出費", scores: { bargain: 2, mood: 2 } },
+        { label: "迷っている時間", scores: { overthink: 3, postpone: 1 } },
+        { label: "買った後の後悔", scores: { mood: 2, bargain: 2 } }
+      ]
+    },
+    {
+      text: "買う前に一番気にしやすいことは？",
+      choices: [
+        { label: "今あるものを捨てるのがもったいない", scores: { postpone: 4 } },
+        { label: "損しない価格かどうか", scores: { bargain: 3, overthink: 1 } },
+        { label: "レビューや比較で間違えないこと", scores: { overthink: 4 } },
+        { label: "今の気分が少し楽になること", scores: { mood: 4 } }
+      ]
+    },
+    {
+      text: "あなたに一番必要そうな判断軸は？",
+      choices: [
+        { label: "いつ手放すかを決める基準", scores: { postpone: 3, stress: 1 } },
+        { label: "本当に必要か見分ける基準", scores: { bargain: 3, mood: 1 } },
+        { label: "選択肢を絞る基準", scores: { overthink: 4 } },
+        { label: "日々のストレスに気づく基準", scores: { stress: 4 } }
+      ]
+    }
+  ];
+
+  let current = 0;
+  const answers = [];
+
+  const quiz = document.getElementById("quiz");
+  const result = document.getElementById("result");
+  const questionText = document.getElementById("questionText");
+  const choicesEl = document.getElementById("choices");
+  const backButton = document.getElementById("backButton");
+  const nextButton = document.getElementById("nextButton");
+  const progressBar = document.getElementById("progressBar");
+
+  function renderQuestion() {
+    const q = questions[current];
+    questionText.textContent = q.text;
+    choicesEl.innerHTML = "";
+    q.choices.forEach((choice, index) => {
+      const button = document.createElement("button");
+      button.className = "choice" + (answers[current] === index ? " is-selected" : "");
+      button.type = "button";
+      button.textContent = choice.label;
+      button.addEventListener("click", () => {
+        answers[current] = index;
+        nextButton.disabled = false;
+        renderQuestion();
+      });
+      choicesEl.appendChild(button);
+    });
+    backButton.disabled = current === 0;
+    nextButton.disabled = answers[current] === undefined;
+    nextButton.textContent = current === questions.length - 1 ? "結果を見る" : "次へ";
+    progressBar.style.width = `${(current / questions.length) * 100}%`;
+  }
+
+  function calculateResult() {
+    const scores = Object.fromEntries(Object.keys(results).map(key => [key, 0]));
+    answers.forEach((answerIndex, questionIndex) => {
+      const choice = questions[questionIndex].choices[answerIndex];
+      Object.entries(choice.scores).forEach(([key, value]) => {
+        scores[key] += value;
+      });
+    });
+    return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  }
+
+  function showResult() {
+    const data = results[calculateResult()];
+    document.getElementById("resultTitle").textContent = data.title;
+    document.getElementById("resultLead").textContent = data.lead;
+    document.getElementById("resultRisk").textContent = data.risk;
+    document.getElementById("resultAction").textContent = data.action;
+    document.getElementById("resultReading").textContent = data.reading;
+    document.getElementById("resultLink").href = data.url;
+    quiz.style.display = "none";
+    result.classList.add("is-visible");
+    progressBar.style.width = "100%";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  nextButton.addEventListener("click", () => {
+    if (answers[current] === undefined) return;
+    if (current === questions.length - 1) {
+      showResult();
+      return;
+    }
+    current += 1;
+    renderQuestion();
+  });
+
+  backButton.addEventListener("click", () => {
+    if (current === 0) return;
+    current -= 1;
+    renderQuestion();
+  });
+
+  document.getElementById("restartButton").addEventListener("click", () => {
+    current = 0;
+    answers.length = 0;
+    result.classList.remove("is-visible");
+    quiz.style.display = "block";
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  renderQuestion();
+</script>
+</body>
+</html>
+
+
+

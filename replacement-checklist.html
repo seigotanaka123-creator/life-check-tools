@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>買い替え判断チェックリスト | まだ使えるか迷った時の無料ツール</title>
+  <meta name="description" content="まだ使えるものを買い替えるべきか、様子見か、使い方を見直すべきかを整理できる無料チェックリストです。">
+  <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/replacement-checklist.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="暮らし診断ツール">
+  <meta property="og:title" content="買い替え判断チェックリスト | まだ使えるか迷った時の無料ツール">
+  <meta property="og:description" content="まだ使えるものを買い替えるべきか、様子見か、使い方を見直すべきかを整理できる無料チェックリストです。">
+  <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/replacement-checklist.html">
+  <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-replacement-checklist.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="買い替え判断チェックリスト | まだ使えるか迷った時の無料ツール">
+  <meta name="twitter:description" content="まだ使えるものを買い替えるべきか、様子見か、使い方を見直すべきかを整理できる無料チェックリストです。">
+  <meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-replacement-checklist.png">
+  <link rel="alternate" hreflang="ja" href="https://seigotanaka123-creator.github.io/life-check-tools/replacement-checklist.html">
+  <style>
+    :root {
+      --text: #222;
+      --muted: #666;
+      --line: #e5e2dc;
+      --soft: #f8f7f4;
+      --accent: #3f6556;
+      --accent-dark: #2f4d42;
+      --warn: #8b5c2f;
+      --danger: #8a3d35;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    header {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 20px 18px;
+    }
+
+    header a {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin: 18px 0 8px;
+      font-size: clamp(24px, 5vw, 40px);
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.35;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 920px;
+      margin: 0 auto 56px;
+      padding: 0 20px;
+    }
+
+    .intro {
+      margin: 20px 0 22px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--muted);
+    }
+
+    .item-name {
+      margin: 22px 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .item-name label {
+      font-weight: 600;
+    }
+
+    .item-name input {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .check:hover {
+      border-color: var(--accent);
+      background: #f2f7f4;
+    }
+
+    .check input {
+      width: 20px;
+      height: 20px;
+      margin: 5px 0 0;
+      accent-color: var(--accent);
+    }
+
+    .check strong {
+      display: block;
+      line-height: 1.5;
+    }
+
+    .check span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0 0;
+    }
+
+    button.action,
+    a.action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.secondary,
+    a.secondary {
+      background: #fff;
+      color: var(--accent-dark);
+      border-color: var(--line);
+    }
+
+    .result {
+      display: none;
+      margin-top: 28px;
+      border-top: 1px solid var(--line);
+      padding-top: 26px;
+    }
+
+    .result.is-visible { display: block; }
+
+    .result h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 5vw, 36px);
+      line-height: 1.35;
+    }
+
+    .note-cta { margin:18px 0; padding:16px; border:1px solid #eadcc4; border-radius:8px; background:#fffaf1; }
+    .note-cta strong { display:block; margin-bottom:8px; }
+    .result p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .score-line {
+      margin: 18px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      font-weight: 600;
+    }
+
+    .boxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .box {
+      padding: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent-dark);
+    }
+
+    .small-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 18px;
+    }
+
+    @media (max-width: 720px) {
+      .actions {
+        flex-direction: column;
+      }
+
+      button.action,
+      a.action {
+        width: 100%;
+      }
+    }
+      .seo-section {
+      margin-top: 34px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+    .seo-section h2 {
+      margin: 0 0 12px;
+      font-size: clamp(20px, 4vw, 28px);
+      line-height: 1.45;
+    }
+    .seo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .seo-box {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+    .seo-box h3 { margin: 0 0 8px; font-size: 17px; }
+    .seo-box p, .seo-box ul { margin: 0; color: var(--muted); }
+    .seo-box ul { padding-left: 20px; }
+      .related-tools {
+      margin-top: 34px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line, #e6e2dc);
+    }
+    .related-tools h2 {
+      margin: 0 0 12px;
+      font-size: clamp(20px, 4vw, 28px);
+      line-height: 1.45;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .related-card {
+      display: block;
+      padding: 16px;
+      border: 1px solid var(--line, #e6e2dc);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text, #222);
+      text-decoration: none;
+    }
+    .related-card:hover {
+      border-color: var(--accent, #2f6f73);
+      background: var(--soft, #f8f6f1);
+    }
+    .related-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent, #2f6f73);
+      font-size: 16px;
+    }
+    .related-card span {
+      display: block;
+      color: var(--muted, #666);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">← 画像まとめへ戻る</a>
+  <h1>買い替え判断チェックリスト</h1>
+  <p class="lead">「まだ使えるけど、買い替えるべき？」をシンプルに確認できます。</p>
+</header>
+
+<main>
+  <div class="intro">
+    買い替えたいものを1つ思い浮かべて、当てはまる項目にチェックしてください。スマホ、家電、服、日用品などに使えます。
+  </div>
+
+  <div class="item-name">
+    <label for="itemName">迷っているもの</label>
+    <input id="itemName" type="text" placeholder="例：スマホ、掃除機、バッグ、イヤホン">
+  </div>
+
+  <form id="checklist" class="checklist">
+    <label class="check">
+      <input type="checkbox" value="2">
+      <span><strong>使うたびに少しストレスを感じる</strong><span>遅い、重い、使いにくい、手間が増えるなど。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="2">
+      <span><strong>週に3回以上、不便だと思う場面がある</strong><span>たまにではなく、生活の中で何度も出てくる不便です。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="2">
+      <span><strong>時間や集中力を奪われている</strong><span>待ち時間、探す時間、やり直しが増えている状態です。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="2">
+      <span><strong>修理や手入れの手間が増えている</strong><span>使うより直す・整えるほうに時間がかかっている場合です。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="1">
+      <span><strong>似た用途のものを買い足しそうになっている</strong><span>本体を買い替えず、周辺の出費でごまかしている可能性があります。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="1">
+      <span><strong>今のものを使うと気分が下がる</strong><span>見た目、古さ、使い心地が小さな不満になっている状態です。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="1">
+      <span><strong>新しいものに変えると使う頻度が上がりそう</strong><span>買い替えによって生活の質が上がる可能性があります。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="-2">
+      <span><strong>不便はあるけれど、使う頻度はかなり低い</strong><span>たまにしか使わないものは、買い替えより様子見が合うこともあります。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="-2">
+      <span><strong>置き場所や使い方を変えれば改善しそう</strong><span>買う前に、配置や収納で解決できるか確認すると安心です。</span></span>
+    </label>
+    <label class="check">
+      <input type="checkbox" value="-1">
+      <span><strong>欲しい理由がセールや気分に寄っている</strong><span>必要性よりも、その場の勢いが強い場合は少し待つのがおすすめです。</span></span>
+    </label>
+  </form>
+
+  <div class="actions">
+    <button id="calculateButton" class="action" type="button">結果を見る</button>
+    <button id="resetButton" class="action secondary" type="button">リセット</button>
+  </div>
+
+  <section id="result" class="result" aria-live="polite">
+    <h2 id="resultTitle"></h2>
+    <p id="resultLead"></p>
+    <div id="scoreLine" class="score-line"></div>
+    <div class="boxes">
+      <div class="box">
+        <strong>まず見るポイント</strong>
+        <div id="resultPoint"></div>
+      </div>
+      <div class="box">
+        <strong>次にすること</strong>
+        <div id="resultAction"></div>
+      </div>
+    </div>
+    <div class="note-cta"><strong>この結果に近い人へ</strong><p id="resultReading"></p></div>
+    <div class="actions">
+      <a id="resultLink" class="action" href="https://note.com/cheeky_guppy1145/n/n7e706c86f2d1">関連noteで詳しく読む</a>
+      <a class="action secondary" href="spending-type-diagnosis.html">無駄な出費タイプ診断も見る</a>
+    </div>
+    <p class="small-note">このチェックリストは、買い物の判断を整理するためのものです。高額な契約や専門的な判断が必要なものは、必要に応じて専門家にも確認してください。</p>
+  </section>
+  <section class="seo-section" aria-labelledby="about-tool">
+    <h2 id="about-tool">このチェックリストで分かること</h2>
+    <p>まだ使えるものを買い替えるべきか、もう少し様子を見るべきか、使い方や置き場所を見直すべきかを整理できます。価格だけでなく、日々の不便さや時間のロスも含めて判断しやすくなります。</p>
+    <div class="seo-grid">
+      <div class="seo-box">
+        <h3>こんな人におすすめ</h3>
+        <ul>
+          <li>買い替えのタイミングに迷っている人</li>
+          <li>まだ使えるものを買うべきか悩む人</li>
+          <li>家電や日用品の出費を整理したい人</li>
+        </ul>
+      </div>
+      <div class="seo-box">
+        <h3>使い方</h3>
+        <p>買い替えを考えているものを思い浮かべながら、当てはまる項目にチェックしてください。結果を見て、購入・保留・使い方の見直しを判断できます。</p>
+      </div>
+    </div>
+  </section>  <section class="related-tools" aria-labelledby="related-tools-heading">
+    <h2 id="related-tools-heading">次に使える無料ツール</h2>
+    <div class="related-grid">
+      <a class="related-card" href="buy-before-checklist.html"><strong>買う前チェックリスト</strong><span>新しく買う前に、今買う理由と待つ理由を整理できます。</span></a>
+      <a class="related-card" href="spending-type-diagnosis.html"><strong>無駄な出費タイプ診断</strong><span>買い替えや買い物で出費が増えやすいクセを確認できます。</span></a>
+    </div>
+  </section></main>
+
+<script>
+  const articleUrl = "https://note.com/cheeky_guppy1145/n/n7e706c86f2d1";
+  const magazineUrl = "https://note.com/cheeky_guppy1145/m/m035f260922c2";
+
+  const checks = Array.from(document.querySelectorAll('#checklist input[type="checkbox"]'));
+  const itemName = document.getElementById('itemName');
+  const result = document.getElementById('result');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultLead = document.getElementById('resultLead');
+  const scoreLine = document.getElementById('scoreLine');
+  const resultPoint = document.getElementById('resultPoint');
+  const resultAction = document.getElementById('resultAction');
+  const resultLink = document.getElementById('resultLink');
+  const resultReading = document.getElementById('resultReading');
+
+  function selectedScore() {
+    return checks.reduce((sum, input) => sum + (input.checked ? Number(input.value) : 0), 0);
+  }
+
+  function selectedCount() {
+    return checks.filter(input => input.checked).length;
+  }
+
+  function labelName() {
+    const value = itemName.value.trim();
+    return value ? `「${value}」` : 'そのもの';
+  }
+
+  function showResult() {
+    const score = selectedScore();
+    const count = selectedCount();
+    const name = labelName();
+    scoreLine.textContent = `チェック数：${count}個 / 判断スコア：${score}`;
+
+    if (score >= 7) {
+      resultTitle.textContent = '買い替えを前向きに検討してよい状態です';
+      resultLead.textContent = `${name}は、使い続けることで時間・集中力・満足度を少しずつ失っている可能性があります。`;
+      resultPoint.textContent = '価格だけでなく、今の不便がどれくらい毎日に影響しているかを見てください。見えない損失が大きいなら、買い替えは浪費ではなく改善になります。';
+      resultAction.textContent = '予算、必要な機能、使う頻度を先に決めてから候補を3つまでに絞りましょう。勢いではなく、条件で選ぶのがコツです。';
+      resultLink.href = articleUrl;
+    } else if (score >= 3) {
+      resultTitle.textContent = '様子見しつつ、買い替え条件を決める状態です';
+      resultLead.textContent = `${name}は、今すぐ買い替えなくてもよい一方で、放置すると不満が増える可能性があります。`;
+      resultPoint.textContent = 'いつ買い替えるかを感覚で決めるのではなく、「週に何回不便を感じたら買い替える」など条件を決めておくと迷いが減ります。';
+      resultAction.textContent = '1〜2週間だけ不便を記録してみましょう。回数が多いなら買い替え、少ないなら様子見で十分です。';
+      resultLink.href = articleUrl;
+    } else {
+      resultTitle.textContent = '今は買い替えより、使い方の見直しが合いそうです';
+      resultLead.textContent = `${name}は、買い替える前に配置・使い方・手入れで改善できる余地がありそうです。`;
+      resultPoint.textContent = '不便の原因が「もの」そのものなのか、「置き場所」「使うタイミング」「習慣」なのかを分けて考えると、無駄な出費を防ぎやすくなります。';
+      resultAction.textContent = 'まずは置き場所を変える、使う手順を減らす、手入れするなど、買わずにできる改善を1つ試してみましょう。';
+      resultLink.href = magazineUrl;
+    }
+
+    result.classList.add('is-visible');
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('calculateButton').addEventListener('click', showResult);
+  document.getElementById('resetButton').addEventListener('click', () => {
+    checks.forEach(input => { input.checked = false; });
+    itemName.value = '';
+    result.classList.remove('is-visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
+

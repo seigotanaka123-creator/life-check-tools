@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://seigotanaka123-creator.github.io/life-check-tools/sitemap.xml
