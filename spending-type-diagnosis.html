@@ -303,6 +303,45 @@
       font-size: 13px;
       line-height: 1.8;
     }
+    body {
+      background:
+        linear-gradient(180deg, #f0f7f3 0, #fbfaf7 280px),
+        #fbfaf7;
+    }
+
+    header a {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      padding: 3px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .74);
+      font-weight: 700;
+    }
+
+    .question,
+    .result {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 16px 38px rgba(47, 44, 38, .08);
+    }
+
+    .choice {
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .choice:hover,
+    .choice.is-selected {
+      transform: translateY(-1px);
+    }
+
+    .result-box,
+    .article-box {
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
