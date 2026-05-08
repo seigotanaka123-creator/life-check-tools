@@ -65,6 +65,7 @@
       gap: 28px;
       align-items: end;
     }
+    .hero > * { min-width: 0; }
     .eyebrow {
       display: inline-flex;
       margin: 0 0 12px;
@@ -91,6 +92,7 @@
       margin: 0;
       color: var(--muted);
       font-size: 16px;
+      overflow-wrap: anywhere;
     }
     .summary {
       display: grid;
@@ -110,6 +112,7 @@
       padding-bottom: 8px;
       color: var(--muted);
       font-size: 14px;
+      min-width: 0;
     }
     .summary div:last-child { border-bottom: 0; padding-bottom: 0; }
     .summary strong { color: var(--text); font-size: 18px; }
@@ -148,7 +151,9 @@
       background: rgba(255, 255, 255, .76);
       box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
     }
+    .language-panel > * { min-width: 0; }
     .language-panel p {
+      flex: 1 1 220px;
       margin: 0;
       color: var(--muted);
       font-size: 14px;
@@ -250,13 +255,25 @@
       max-width: 820px;
       margin: 0;
       color: var(--muted);
+      overflow-wrap: anywhere;
     }
-    @media (max-width: 760px) {
+    @media (max-width: 900px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+      }
       header { padding-top: 32px; }
       .hero { grid-template-columns: 1fr; gap: 18px; }
       .summary { box-shadow: none; }
+      .summary div { display: block; }
+      .summary strong { display: block; margin-top: 2px; }
       .tools { grid-template-columns: 1fr; }
       .card { min-height: 0; }
+      header p { font-size: 15px; }
+      .language-link { white-space: normal; text-align: center; }
     }
   </style>
 </head>
@@ -266,7 +283,7 @@
     <div>
       <p class="eyebrow">無料診断ツール集</p>
       <h1>暮らし・仕事・買い物・見た目など<br>今の悩みに合う読みものを<br><span class="no-break">診断から探す。</span></h1>
-      <p>疲れ、習慣、見た目、子育て、発信まで、今の状態に近い無料診断を選ぶだけで、<br>読みたいnote記事の入口へ進めます。</p>
+      <p>疲れ、習慣、見た目、子育て、発信まで。<br>今の状態に近い診断から、読みたいnote記事へ進めます。</p>
     </div>
     <aside class="summary" aria-label="サイト概要">
       <div><span>診断数</span><strong>11</strong></div>
@@ -277,7 +294,7 @@
 </header>
 <main>
   <aside class="language-panel" aria-label="English version">
-    <p><strong>English version is available</strong> Lifestyle tools and Japan Travel Tips for first-time visitors.</p>
+    <p><strong>English version is available</strong> Lifestyle tools and Japan Travel Tips.</p>
     <a class="language-link" href="en/">Open English version</a>
   </aside>
   <nav class="category-nav" aria-label="テーマ">
@@ -289,12 +306,12 @@
     <a href="writing-habit-diagnosis.html">書く習慣</a>
   </nav>
   <section class="tools" aria-label="無料診断ツール">
-    <a class="card" href="fatigue-reset-diagnosis.html"><div><span class="tag">疲れ</span><strong>疲れの整え方<span class="no-break">タイプ診断</span></strong><span>睡眠、週末、静かな習慣、頑張り方の見直しなど、今の疲れに近い回復の入口を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="life-reset-diagnosis.html"><div><span class="tag">暮らし</span><strong>暮らしの整え方<span class="no-break">タイプ診断</span></strong><span>収納、掃除、断捨離、部屋づくり、日常の簡略化など、暮らしを整える方向を見つけます。</span></div><em>診断する</em></a>
-    <a class="card" href="mood-fulfillment-diagnosis.html"><div><span class="tag">気持ち</span><strong>気持ちの満たし方<span class="no-break">タイプ診断</span></strong><span>寂しさ、ご褒美、小さな幸せ、好きなものとの付き合い方を整理できます。</span></div><em>診断する</em></a>
-    <a class="card" href="self-time-diagnosis.html"><div><span class="tag">自分時間</span><strong>自分時間の<span class="no-break">つくり方診断</span></strong><span>時間がない、始められない、続かない悩みに合わせて、自分時間の作り方を探します。</span></div><em>診断する</em></a>
-    <a class="card" href="appearance-style-diagnosis.html"><div><span class="tag">見た目</span><strong>垢抜け・見た目の<span class="no-break">整え方診断</span></strong><span>服、髪、色、小物、骨格診断など、どこから整えるとよいかを整理します。</span></div><em>診断する</em></a>
-    <a class="card" href="work-worry-diagnosis.html"><div><span class="tag">仕事</span><strong>仕事の悩み<span class="no-break">整理診断</span></strong><span>新生活、転職、面接、チームづくりなど、仕事の悩みに合う記事を探せます。</span></div><em>診断する</em></a>
+    <a class="card" href="fatigue-reset-diagnosis.html"><div><span class="tag">疲れ</span><strong>疲れの整え方<span class="no-break">タイプ診断</span></strong><span>睡眠、週末、静かな習慣など、回復の入口を探せます。</span></div><em>診断する</em></a>
+    <a class="card" href="life-reset-diagnosis.html"><div><span class="tag">暮らし</span><strong>暮らしの整え方<span class="no-break">タイプ診断</span></strong><span>収納、掃除、断捨離など、暮らしを整える方向を見つけます。</span></div><em>診断する</em></a>
+    <a class="card" href="mood-fulfillment-diagnosis.html"><div><span class="tag">気持ち</span><strong>気持ちの満たし方<span class="no-break">タイプ診断</span></strong><span>寂しさ、ご褒美、小さな幸せとの付き合い方を整理できます。</span></div><em>診断する</em></a>
+    <a class="card" href="self-time-diagnosis.html"><div><span class="tag">自分時間</span><strong>自分時間の<span class="no-break">つくり方診断</span></strong><span>時間がない、続かない悩みに合わせて入口を探します。</span></div><em>診断する</em></a>
+    <a class="card" href="appearance-style-diagnosis.html"><div><span class="tag">見た目</span><strong>垢抜け・見た目の<span class="no-break">整え方診断</span></strong><span>服、髪、色、小物など、整える入口を探します。</span></div><em>診断する</em></a>
+    <a class="card" href="work-worry-diagnosis.html"><div><span class="tag">仕事</span><strong>仕事の悩み<span class="no-break">整理診断</span></strong><span>新生活、転職、面接など、仕事の悩みに合う記事を探せます。</span></div><em>診断する</em></a>
     <a class="card" href="parenting-health-diagnosis.html"><div><span class="tag">子育て・健康</span><strong>子育てと健康の不安<span class="no-break">整理診断</span></strong><span>子育て、自分のケア、歯医者、視力など、今の不安に近い入口を選べます。</span></div><em>診断する</em></a>
     <a class="card" href="writing-habit-diagnosis.html"><div><span class="tag">発信</span><strong>書く習慣・発信<span class="no-break">タイプ診断</span></strong><span>書く、続ける、発信する、運営改善するための次の一歩を探せます。</span></div><em>診断する</em></a>
     <a class="card" href="spending-type-diagnosis.html"><div><span class="tag">買い物</span><strong>無駄な出費<span class="no-break">タイプ診断</span></strong><span>買い物で後悔しやすい判断のクセを確認できます。</span></div><em>診断する</em></a>
