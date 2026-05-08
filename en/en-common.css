@@ -119,6 +119,9 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   margin: 0 0 18px;
   color: var(--muted);
 }
+.section-action {
+  margin-top: 18px;
+}
 .card {
   display: flex;
   min-width: 0;
