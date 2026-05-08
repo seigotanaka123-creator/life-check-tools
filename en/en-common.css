@@ -309,6 +309,43 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   font-weight: 700;
   text-underline-offset: 4px;
 }
+.link-panel {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+.link-panel h2,
+.link-panel h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.link-panel p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.link-list a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
 .small-note { color: var(--muted); font-size: 13px; }
 @media (max-width: 760px) {
   header, main { padding-left: 16px; padding-right: 16px; }

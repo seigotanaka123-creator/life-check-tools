@@ -78,6 +78,17 @@ function initQuiz(config) {
     document.getElementById("resultAction").textContent = data.action;
     document.getElementById("resultArticles").innerHTML = data.articles.map(renderArticle).join("");
     noteLink.href = NOTE_PROFILE_URL;
+    const related = document.getElementById("relatedLinks");
+    if (related) {
+      related.innerHTML = `
+        <h3>Explore more</h3>
+        <p>Try another tool or browse travel guides for first-time visitors to Japan.</p>
+        <ul class="link-list">
+          <li><a href="index.html">Life Check Tools</a></li>
+          <li><a href="japan-travel-tips.html">Japan Travel Tips</a></li>
+        </ul>
+      `;
+    }
   }
 
   nextButton.addEventListener("click", () => {
