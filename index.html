@@ -43,6 +43,7 @@
       --shadow: 0 18px 44px rgba(47, 44, 38, .08);
     }
     * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
     body {
       margin: 0;
       color: var(--text);
@@ -100,6 +101,7 @@
       background: rgba(255, 255, 255, .78);
       box-shadow: var(--shadow);
     }
+    .summary, .card, .language-panel { min-width: 0; }
     .summary div {
       display: flex;
       justify-content: space-between;
@@ -133,19 +135,43 @@
       font-weight: 700;
       text-decoration: none;
     }
+    .language-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
+    }
+    .language-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .language-panel strong {
+      display: block;
+      color: var(--text);
+      font-size: 15px;
+    }
     .language-link {
       display: inline-flex;
-      min-height: 36px;
+      min-height: 38px;
       align-items: center;
-      margin: 0 0 14px;
-      padding: 5px 12px;
-      border: 1px solid rgba(47, 111, 100, .22);
+      padding: 6px 13px;
+      border: 1px solid rgba(47, 111, 100, .28);
       border-radius: 999px;
       background: var(--paper);
       color: var(--accent);
       font-size: 13px;
       font-weight: 700;
       text-decoration: none;
+      white-space: nowrap;
     }
     .tools {
       display: grid;
@@ -199,6 +225,7 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.7;
+      overflow-wrap: anywhere;
     }
     .card em {
       display: block;
@@ -249,7 +276,10 @@
   </div>
 </header>
 <main>
-  <a class="language-link" href="en/">English version</a>
+  <aside class="language-panel" aria-label="English version">
+    <p><strong>English version is available</strong> Lifestyle tools and Japan Travel Tips for first-time visitors.</p>
+    <a class="language-link" href="en/">Open English version</a>
+  </aside>
   <nav class="category-nav" aria-label="テーマ">
     <a href="fatigue-reset-diagnosis.html">疲れ</a>
     <a href="life-reset-diagnosis.html">暮らし</a>
