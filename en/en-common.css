@@ -164,13 +164,23 @@ h1 {
 }
 .article-card {
   display: block;
-  padding: 16px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--paper);
   color: var(--text);
   text-decoration: none;
   box-shadow: 0 10px 24px rgba(47, 44, 38, .04);
+}
+.article-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--soft);
+}
+.article-card div {
+  padding: 14px 16px 16px;
 }
 .article-card:hover {
   border-color: rgba(47, 111, 100, .55);
