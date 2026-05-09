@@ -86,6 +86,73 @@ const ARTICLE_URLS = {
   "日常で役立つ知識（誰でも使える内容）": "https://note.com/cheeky_guppy1145/n/n435fc178ad69"
 };
 
+const RELATED_TOOLS = {
+  "fatigue-reset-diagnosis.html": {
+    text: "疲れを整えたあとに、暮らしや自分時間も見直せます。",
+    links: [
+      ["暮らしの整え方診断", "life-reset-diagnosis.html"],
+      ["自分時間のつくり方診断", "self-time-diagnosis.html"],
+      ["気持ちの満たし方診断", "mood-fulfillment-diagnosis.html"]
+    ]
+  },
+  "life-reset-diagnosis.html": {
+    text: "暮らしの流れを整えたい時は、買い物や疲れの診断も役立ちます。",
+    links: [
+      ["買う前チェックリスト", "buy-before-checklist.html"],
+      ["無駄な出費タイプ診断", "spending-type-diagnosis.html"],
+      ["疲れの整え方診断", "fatigue-reset-diagnosis.html"]
+    ]
+  },
+  "mood-fulfillment-diagnosis.html": {
+    text: "気持ちの整え方に近いテーマも、続けて確認できます。",
+    links: [
+      ["自分時間のつくり方診断", "self-time-diagnosis.html"],
+      ["疲れの整え方診断", "fatigue-reset-diagnosis.html"],
+      ["暮らしの整え方診断", "life-reset-diagnosis.html"]
+    ]
+  },
+  "self-time-diagnosis.html": {
+    text: "時間や習慣を整えたい時は、仕事や疲れの悩みも一緒に見直せます。",
+    links: [
+      ["仕事の悩み整理診断", "work-worry-diagnosis.html"],
+      ["疲れの整え方診断", "fatigue-reset-diagnosis.html"],
+      ["書く習慣・発信診断", "writing-habit-diagnosis.html"]
+    ]
+  },
+  "appearance-style-diagnosis.html": {
+    text: "見た目を整えたあとに、気持ちや暮らしの整え方も見直せます。",
+    links: [
+      ["気持ちの満たし方診断", "mood-fulfillment-diagnosis.html"],
+      ["暮らしの整え方診断", "life-reset-diagnosis.html"],
+      ["買う前チェックリスト", "buy-before-checklist.html"]
+    ]
+  },
+  "work-worry-diagnosis.html": {
+    text: "仕事の悩みを整理したあとに、疲れや自分時間も整えられます。",
+    links: [
+      ["自分時間のつくり方診断", "self-time-diagnosis.html"],
+      ["疲れの整え方診断", "fatigue-reset-diagnosis.html"],
+      ["書く習慣・発信診断", "writing-habit-diagnosis.html"]
+    ]
+  },
+  "parenting-health-diagnosis.html": {
+    text: "子育てや健康の不安がある時は、自分の時間や疲れも一緒に確認できます。",
+    links: [
+      ["自分時間のつくり方診断", "self-time-diagnosis.html"],
+      ["疲れの整え方診断", "fatigue-reset-diagnosis.html"],
+      ["気持ちの満たし方診断", "mood-fulfillment-diagnosis.html"]
+    ]
+  },
+  "writing-habit-diagnosis.html": {
+    text: "書く習慣を整えたい時は、時間や仕事の悩みも近いテーマです。",
+    links: [
+      ["自分時間のつくり方診断", "self-time-diagnosis.html"],
+      ["仕事の悩み整理診断", "work-worry-diagnosis.html"],
+      ["暮らしの整え方診断", "life-reset-diagnosis.html"]
+    ]
+  }
+};
+
 const config = window.DIAGNOSIS_CONFIG;
 let current = 0;
 const answers = [];
@@ -128,6 +195,22 @@ function renderArticle(article) {
   return `<li><a href="${url}">${safeTitle}</a></li>`;
 }
 
+function renderRelatedPanel(heading = "関連する無料診断") {
+  const page = location.pathname.split("/").pop();
+  const related = RELATED_TOOLS[page];
+  if (!related) return "";
+  const links = related.links
+    .map(([label, href]) => `<li><a href="${href}">${escapeHtml(label)}</a></li>`)
+    .join("");
+  return `
+    <section class="related-panel" aria-label="${heading}">
+      <h2>${heading}</h2>
+      <p>${escapeHtml(related.text)}</p>
+      <ul class="related-list">${links}</ul>
+    </section>
+  `;
+}
+
 function renderQuestion() {
   const question = config.questions[current];
   questionText.textContent = question.text;
@@ -167,6 +250,8 @@ function showResult() {
   document.getElementById("resultArticles").innerHTML = data.articles.map(renderArticle).join("");
   document.getElementById("noteLink").href = data.url || NOTE_PROFILE_URL;
   document.getElementById("noteLink").textContent = data.url ? "おすすめ記事を読む" : "noteで記事を探す";
+  const resultRelated = result.querySelector(".related-panel");
+  if (!resultRelated) result.insertAdjacentHTML("beforeend", renderRelatedPanel("次に見る無料診断"));
   quiz.style.display = "none";
   result.classList.add("is-visible");
   progressBar.style.width = "100%";
@@ -198,4 +283,5 @@ document.getElementById("restartButton").addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+result.insertAdjacentHTML("afterend", renderRelatedPanel());
 renderQuestion();

@@ -141,6 +141,44 @@ main::before {
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
 }
+.related-panel {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+.related-panel h2,
+.related-panel h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.related-panel p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+.related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.related-list a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
 .progress { height: 9px; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; margin: 18px 0 24px; }
 .progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s ease; }
 @media (max-width: 640px) {
