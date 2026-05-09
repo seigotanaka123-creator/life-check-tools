@@ -179,6 +179,56 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   font-weight: 700;
   text-decoration: none;
 }
+.purpose-guide {
+  margin-top: 24px;
+}
+.purpose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.purpose-card {
+  display: flex;
+  min-width: 0;
+  min-height: 178px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(47, 44, 38, .04);
+}
+.purpose-card:hover {
+  border-color: rgba(47, 111, 100, .55);
+  box-shadow: var(--shadow);
+}
+.purpose-card span {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--soft-gold);
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+.purpose-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+  line-height: 1.45;
+}
+.purpose-card em {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.6;
+}
 .travel-spotlight {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
