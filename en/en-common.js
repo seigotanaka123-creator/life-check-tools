@@ -82,10 +82,11 @@ function initQuiz(config) {
     if (related) {
       related.innerHTML = `
         <h3>Explore more</h3>
-        <p>Try another tool or browse travel guides for first-time visitors to Japan.</p>
+        <p>Try another free quiz or open the Japan travel guide for first-time visitors.</p>
         <ul class="link-list">
           <li><a href="index.html">Life Check Tools</a></li>
-          <li><a href="japan-travel-tips.html">Japan Travel Tips</a></li>
+          <li><a href="japan-travel-tips.html">Japan Travel Guide</a></li>
+          <li><a href="shopping-regret-checklist.html">Shopping Regret Checklist</a></li>
         </ul>
       `;
     }
