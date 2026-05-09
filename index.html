@@ -178,6 +178,60 @@
       text-decoration: none;
       white-space: nowrap;
     }
+    .travel-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin: 0 0 18px;
+      padding: 18px;
+      border: 1px solid rgba(154, 91, 66, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff8e8 0%, #ffffff 68%);
+      box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
+    }
+    .travel-panel > * { min-width: 0; }
+    .travel-panel .tag {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 8px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #fff4dc;
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .travel-panel strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 19px;
+      line-height: 1.45;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .travel-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+    .travel-link {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 14px;
+      border: 1px solid rgba(154, 91, 66, .28);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
     .tools {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
@@ -274,6 +328,8 @@
       .card { min-height: 0; }
       header p { font-size: 15px; }
       .language-link { white-space: normal; text-align: center; }
+      .travel-panel { grid-template-columns: 1fr; }
+      .travel-link { width: 100%; white-space: normal; text-align: center; }
     }
   </style>
 </head>
@@ -296,6 +352,14 @@
   <aside class="language-panel" aria-label="English version">
     <p><strong>English version is available</strong> Lifestyle tools and Japan Travel Tips.</p>
     <a class="language-link" href="en/">Open English version</a>
+  </aside>
+  <aside class="travel-panel" aria-label="Japan Travel guide">
+    <div>
+      <span class="tag">Japan Travel</span>
+      <strong>日本旅行向け英語ガイド</strong>
+      <p>食べもの、マナー、観光地、お土産、便利な日本語など、海外の読者向けの記事をまとめています。</p>
+    </div>
+    <a class="travel-link" href="en/japan-travel-tips.html">Japan Travel Guideを見る</a>
   </aside>
   <nav class="category-nav" aria-label="テーマ">
     <a href="fatigue-reset-diagnosis.html">疲れ</a>
