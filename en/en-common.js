@@ -85,7 +85,7 @@ function initQuiz(config) {
         <p>Try another free quiz or open the Japan travel guide for first-time visitors.</p>
         <ul class="link-list">
           <li><a href="index.html">Life Check Tools</a></li>
-          <li><a href="japan-travel-tips.html">Japan Travel Guide</a></li>
+          <li><a href="japan-travel-tips.html#basics">Japan Travel Basics</a></li>
           <li><a href="shopping-regret-checklist.html">Shopping Regret Checklist</a></li>
         </ul>
       `;
