@@ -128,6 +128,44 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
 .section-action {
   margin-top: 18px;
 }
+.travel-spotlight {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 0 0 24px;
+  padding: 18px;
+  border: 1px solid rgba(154, 91, 66, .2);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff8e8 0%, #fff 70%);
+  box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
+}
+.travel-spotlight > * { min-width: 0; }
+.travel-spotlight .tag {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--soft-gold);
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+.travel-spotlight strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 19px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.travel-spotlight p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
 .card {
   display: flex;
   min-width: 0;
@@ -362,6 +400,7 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   .card { min-height: 0; }
   .actions { flex-direction: column; }
   .button { width: 100%; }
+  .travel-spotlight { grid-template-columns: 1fr; }
   h1 { font-size: clamp(25px, 7.2vw, 32px); }
   header > h1 { font-size: clamp(24px, 6.5vw, 30px); }
   .lead { max-width: 100%; font-size: 15px; }
