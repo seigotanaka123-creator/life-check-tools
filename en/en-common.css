@@ -7,6 +7,7 @@
   --accent: #2f6f64;
   --accent-2: #9a5b42;
   --soft: #edf6f2;
+  --soft-gold: #fff1d2;
   --shadow: 0 16px 38px rgba(47, 44, 38, .08);
 }
 * { box-sizing: border-box; }
@@ -182,10 +183,16 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
 .purpose-guide {
   margin-top: 24px;
 }
+.purpose-guide h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.35;
+}
 .purpose-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
+  margin-bottom: 18px;
 }
 .purpose-card {
   display: flex;
