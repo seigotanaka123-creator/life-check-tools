@@ -347,8 +347,16 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   text-decoration: none;
 }
 .small-note { color: var(--muted); font-size: 13px; }
-@media (max-width: 760px) {
-  header, main { padding-left: 16px; padding-right: 16px; }
+@media (max-width: 900px) {
+  header,
+  main {
+    width: 100%;
+    max-width: 390px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
   .hero { grid-template-columns: 1fr; gap: 18px; }
   .tools { grid-template-columns: 1fr; }
   .card { min-height: 0; }
