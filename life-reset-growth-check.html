@@ -72,6 +72,29 @@
       font-size: 13px;
       font-weight: 700;
     }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
     h1 {
       margin: 0 0 12px;
       font-size: clamp(28px, 5vw, 44px);
@@ -305,9 +328,13 @@
 <body>
 <header>
   <div>
-    <p class="eyebrow">記事専用チェックツール</p>
-    <h1>暮らしリセット成長チェック</h1>
-    <p class="lead">「乱れた暮らしを整える方法」を読んだあとに、今日できそうなことを選んでみてください。できた項目に応じて、今の整い具合と自分に合う整え方タイプが表示されます。</p>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">暮らしリセット成長チェック</h1>
+    <p class="lead" id="pageLead">「乱れた暮らしを整える方法」を読んだあとに、今日できそうなことを選んでみてください。できた項目に応じて、今の整い具合と自分に合う整え方タイプが表示されます。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
   </div>
   <aside class="hero-art" aria-label="成長イラスト">
     <div id="heroArt"></div>
@@ -315,8 +342,8 @@
 </header>
 <main>
   <section class="panel">
-    <h2>今日できたことを選んでください</h2>
-    <p>全部できなくて大丈夫です。ひとつでも選べたら、今日の暮らしは少し整い始めています。</p>
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日の暮らしは少し整い始めています。</p>
     <div class="status" aria-live="polite">
       <div class="status-art" id="statusArt"></div>
       <div>
@@ -330,18 +357,18 @@
   </section>
 
   <section class="panel">
-    <h2>今日の結果</h2>
+    <h2 id="resultHeading">今日の結果</h2>
     <div class="result-grid">
       <div class="box">
         <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
         <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
       </div>
       <div class="box">
-        <strong>次の小さな一歩</strong>
+        <strong id="nextHeading">次の小さな一歩</strong>
         <span id="nextAction">目に入った場所から、物をひとつだけ戻してみてください。</span>
       </div>
     </div>
-    <div class="quiet">
+    <div class="quiet" id="quietText">
       このチェックは、点数を競うためのものではありません。今日できたことを見える形にして、また必要なときに記事へ戻りやすくするための小さな道具です。
     </div>
     <div class="actions">
@@ -351,102 +378,99 @@
 </main>
 
 <script>
-const checks = [
-  {
-    text: "物をひとつ元の場所に戻した",
-    hint: "机、床、バッグ、玄関など、目に入った場所で大丈夫です。",
-    type: "space"
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "暮らしリセット成長チェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "暮らしリセット成長チェック",
+    pageLead: "「乱れた暮らしを整える方法」を読んだあとに、今日できそうなことを選んでみてください。できた項目に応じて、今の整い具合と自分に合う整え方タイプが表示されます。",
+    checkHeading: "今日できたことを選んでください",
+    checkLead: "全部できなくて大丈夫です。ひとつでも選べたら、今日の暮らしは少し整い始めています。",
+    resultHeading: "今日の結果",
+    nextHeading: "次の小さな一歩",
+    quietText: "このチェックは、点数を競うためのものではありません。今日できたことを見える形にして、また必要なときに記事へ戻りやすくするための小さな道具です。",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "今日の整え方タイプ：これからタイプ",
+    defaultTypeText: "気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。",
+    checks: [
+      { text: "物をひとつ元の場所に戻した", hint: "机、床、バッグ、玄関など、目に入った場所で大丈夫です。", type: "space" },
+      { text: "ゴミをひとつ捨てた", hint: "レシート、空き箱、古いメモなど、小さなものでOKです。", type: "space" },
+      { text: "完璧にやろうとしなかった", hint: "全部やるより、今日できる範囲で止められたら十分です。", type: "rest" },
+      { text: "やらないことをひとつ決めた", hint: "大掃除しない、全部片付けない、比べないなどで大丈夫です。", type: "review" },
+      { text: "整った場所をひとつ見つけた", hint: "できていない場所ではなく、少し良くなった場所を見ます。", type: "rest" },
+      { text: "整えるタイミングをひとつ決めた", hint: "寝る前、帰宅後、朝起きたあとなど、行動にくっつけます。", type: "habit" },
+      { text: "明日もできる最低ラインを決めた", hint: "物を1つ戻す、ゴミを1つ捨てるなど、疲れた日でもできる形にします。", type: "habit" }
+    ],
+    stages: [
+      { name: "たね", title: "まず気づけた日", lead: "まだチェックが少なくても大丈夫です。整えたいと思えた時点で、暮らしのたねは置けています。", action: "今日は目に入った物をひとつだけ戻すところから始めてみてください。", art: "seed" },
+      { name: "めばえ", title: "小さく動き出した日", lead: "ひとつでもできたなら十分です。暮らしの流れが、ほんの少し戻り始めています。", action: "同じことを明日もひとつだけ繰り返せる形にしてみましょう。", art: "sprout" },
+      { name: "若葉", title: "整う感覚が見えてきた日", lead: "できたことが複数あります。完璧ではなくても、自分で選んで動けた日です。", action: "整った場所をひとつ見て、ここは少し良くなったと確認してください。", art: "leaf" },
+      { name: "小さな木", title: "自分に合う形が育ってきた日", lead: "整える行動がかなり形になっています。無理を増やさず、続けやすい形を守る段階です。", action: "明日も続けるために、最低ラインをひとつだけ決めておきましょう。", art: "tree" },
+      { name: "花と実り", title: "今日の暮らしがしっかり育った日", lead: "かなり良い流れです。花が咲いて実がなるように、今日の小さな行動が安心感につながっています。", action: "全部を毎日続けようとせず、今日よかった行動をひとつだけ明日に残しましょう。", art: "bloom" }
+    ],
+    types: {
+      space: { title: "今日の整え方タイプ：空間すっきりタイプ", text: "目に見える場所から整えると流れが戻りやすいタイプです。机、床、バッグ、玄関など、小さな場所から始めるのが合っています。" },
+      rest: { title: "今日の整え方タイプ：休ませて整えるタイプ", text: "頑張るより、自分を責めないことが効くタイプです。できていない場所より、少し整った場所を見ると続きやすくなります。" },
+      habit: { title: "今日の整え方タイプ：習慣づくりタイプ", text: "やる気より、タイミングや最低ラインを決めると続きやすいタイプです。小さく固定すると暮らしに残りやすくなります。" },
+      review: { title: "今日の整え方タイプ：見直し上手タイプ", text: "やることを増やすより、やらないことを決めると軽くなりやすいタイプです。負担をひとつ減らすことが整える一歩になります。" }
+    }
   },
-  {
-    text: "ゴミをひとつ捨てた",
-    hint: "レシート、空き箱、古いメモなど、小さなものでOKです。",
-    type: "space"
-  },
-  {
-    text: "完璧にやろうとしなかった",
-    hint: "全部やるより、今日できる範囲で止められたら十分です。",
-    type: "rest"
-  },
-  {
-    text: "やらないことをひとつ決めた",
-    hint: "大掃除しない、全部片付けない、比べないなどで大丈夫です。",
-    type: "review"
-  },
-  {
-    text: "整った場所をひとつ見つけた",
-    hint: "できていない場所ではなく、少し良くなった場所を見ます。",
-    type: "rest"
-  },
-  {
-    text: "整えるタイミングをひとつ決めた",
-    hint: "寝る前、帰宅後、朝起きたあとなど、行動にくっつけます。",
-    type: "habit"
-  },
-  {
-    text: "明日もできる最低ラインを決めた",
-    hint: "物を1つ戻す、ゴミを1つ捨てるなど、疲れた日でもできる形にします。",
-    type: "habit"
-  }
-];
-
-const stages = [
-  {
-    name: "たね",
-    title: "まず気づけた日",
-    lead: "まだチェックが少なくても大丈夫です。整えたいと思えた時点で、暮らしのたねは置けています。",
-    action: "今日は目に入った物をひとつだけ戻すところから始めてみてください。",
-    art: "seed"
-  },
-  {
-    name: "めばえ",
-    title: "小さく動き出した日",
-    lead: "ひとつでもできたなら十分です。暮らしの流れが、ほんの少し戻り始めています。",
-    action: "同じことを明日もひとつだけ繰り返せる形にしてみましょう。",
-    art: "sprout"
-  },
-  {
-    name: "若葉",
-    title: "整う感覚が見えてきた日",
-    lead: "できたことが複数あります。完璧ではなくても、自分で選んで動けた日です。",
-    action: "整った場所をひとつ見て、ここは少し良くなったと確認してください。",
-    art: "leaf"
-  },
-  {
-    name: "小さな木",
-    title: "自分に合う形が育ってきた日",
-    lead: "整える行動がかなり形になっています。無理を増やさず、続けやすい形を守る段階です。",
-    action: "明日も続けるために、最低ラインをひとつだけ決めておきましょう。",
-    art: "tree"
-  },
-  {
-    name: "花と実り",
-    title: "今日の暮らしがしっかり育った日",
-    lead: "かなり良い流れです。花が咲いて実がなるように、今日の小さな行動が安心感につながっています。",
-    action: "全部を毎日続けようとせず、今日よかった行動をひとつだけ明日に残しましょう。",
-    art: "bloom"
-  }
-];
-
-const types = {
-  space: {
-    title: "今日の整え方タイプ：空間すっきりタイプ",
-    text: "目に見える場所から整えると流れが戻りやすいタイプです。机、床、バッグ、玄関など、小さな場所から始めるのが合っています。"
-  },
-  rest: {
-    title: "今日の整え方タイプ：休ませて整えるタイプ",
-    text: "頑張るより、自分を責めないことが効くタイプです。できていない場所より、少し整った場所を見ると続きやすくなります。"
-  },
-  habit: {
-    title: "今日の整え方タイプ：習慣づくりタイプ",
-    text: "やる気より、タイミングや最低ラインを決めると続きやすいタイプです。小さく固定すると暮らしに残りやすくなります。"
-  },
-  review: {
-    title: "今日の整え方タイプ：見直し上手タイプ",
-    text: "やることを増やすより、やらないことを決めると軽くなりやすいタイプです。負担をひとつ減らすことが整える一歩になります。"
+  en: {
+    htmlLang: "en",
+    title: "Life Reset Growth Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "Life Reset Growth Check",
+    pageLead: "After reading the article, choose what you were able to do today. Your current reset stage and the style that fits you best will appear as you check items.",
+    checkHeading: "Choose what you did today",
+    checkLead: "You do not need to do everything. Even one small check means your day has started to reset.",
+    resultHeading: "Today's Result",
+    nextHeading: "A Small Next Step",
+    quietText: "This check is not about scoring yourself. It is a small tool to make today's tiny actions visible, so you can return to the article when you need it.",
+    reset: "Reset checks",
+    defaultTypeTitle: "Your reset style: just getting started",
+    defaultTypeText: "Choose one item that feels possible today, and your best reset style will appear here.",
+    checks: [
+      { text: "I put one thing back where it belongs", hint: "A desk, floor, bag, or entryway is enough. Start with what you can see.", type: "space" },
+      { text: "I threw away one small piece of clutter", hint: "A receipt, empty box, old memo, or anything small is fine.", type: "space" },
+      { text: "I did not try to do it perfectly", hint: "Stopping at what you can do today is already enough.", type: "rest" },
+      { text: "I chose one thing not to do today", hint: "No big cleaning, no doing everything, no comparing your home to someone else's.", type: "review" },
+      { text: "I noticed one spot that felt a little better", hint: "Look at what improved, not only at what is still unfinished.", type: "rest" },
+      { text: "I chose one timing cue for resetting", hint: "Before bed, after coming home, or after waking up. Attach it to something you already do.", type: "habit" },
+      { text: "I set a minimum line for tomorrow", hint: "Something small enough for a tired day, like putting one thing back.", type: "habit" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of noticing", lead: "Even if you checked only a little, it is okay. Wanting to reset is already the first seed.", action: "Start by putting one visible thing back where it belongs.", art: "seed" },
+      { name: "Sprout", title: "A small movement began", lead: "One small action is enough. Your day has started to move in a calmer direction.", action: "Try repeating the same tiny action tomorrow.", art: "sprout" },
+      { name: "Young Leaves", title: "A reset rhythm is appearing", lead: "You checked several things. It does not need to be perfect. You chose to move today.", action: "Look at one place that feels a little better and let yourself notice it.", art: "leaf" },
+      { name: "Small Tree", title: "Your own reset shape is growing", lead: "Your reset actions are taking shape. The next step is to keep it gentle and sustainable.", action: "Choose one minimum line you can keep even on a tired day.", art: "tree" },
+      { name: "Bloom and Fruit", title: "Today's reset has grown well", lead: "This is a good flow. Like flowers and fruit, today's tiny actions can become a sense of ease.", action: "Do not try to repeat everything tomorrow. Keep just one action that felt good.", art: "bloom" }
+    ],
+    types: {
+      space: { title: "Your reset style: visible-space reset", text: "You reset best by starting with what you can see. A desk, floor, bag, or entryway is a good place to begin." },
+      rest: { title: "Your reset style: gentle rest reset", text: "You reset best by not blaming yourself. Notice what improved instead of only what is unfinished." },
+      habit: { title: "Your reset style: small-routine reset", text: "You reset best with timing cues and minimum lines. Make the action small and easy to repeat." },
+      review: { title: "Your reset style: lighten-the-load reset", text: "You reset best by removing one burden. Choosing what not to do can be the action that makes life lighter." }
+    }
   }
 };
 
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
 const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
 const stageName = document.getElementById("stageName");
 const stageTitle = document.getElementById("stageTitle");
 const stageLead = document.getElementById("stageLead");
@@ -552,6 +576,29 @@ function renderChecks() {
   });
 }
 
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
 function updateResult() {
   const selected = [...checksNode.querySelectorAll("input:checked")]
     .map(input => checks[Number(input.value)]);
@@ -566,8 +613,8 @@ function updateResult() {
 
   const typeKey = bestType(selected);
   if (!typeKey) {
-    typeTitle.textContent = "今日の整え方タイプ：これからタイプ";
-    typeText.textContent = "気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。";
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
     return;
   }
   typeTitle.textContent = types[typeKey].title;
@@ -583,8 +630,10 @@ resetButton.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-renderChecks();
-updateResult();
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
 </script>
 </body>
 </html>
