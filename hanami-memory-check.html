@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>花見を特別な1日にする整え方チェック | One Coin Books</title>
+  <meta name="description" content="「花見を特別な1日にする方法」を読んだあとに使える、記事専用の花見チェックツールです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="花見を特別な1日にする整え方チェック | One Coin Books">
+  <meta property="og:description" content="花見を記憶に残る時間へ近づけるためのチェックツールです。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(231, 183, 95, .16), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">花見を特別な1日にする整え方チェック</h1>
+    <p class="lead" id="pageLead">「花見を特別な1日にする方法」を読んだあとに、今年の花見を記憶に残る時間へ近づけるためのチェックです。期待、心が動く瞬間、余韻、景色を味わう時間から、花見の整え方が見えてきます。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="節約チェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今年の花見で意識できそうなものを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつ選ぶだけでも、なんとなく終わる花見から、あとで思い出したくなる花見へ近づけます。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">見える化前</span>
+        <strong id="stageTitle">まず気づけた段階</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の節約の整い具合が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の花見タイプ：これからタイプ</strong>
+        <span id="typeText">気になる項目をひとつ選ぶと、今年の花見に合う整え方が表示されます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは支出をざっくり書き出して、AIに見直しポイントを聞いてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、完璧な花見を計画するためのものではありません。春の空気をちゃんと味わい、無理なく記憶に残る時間を作るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  "ja": {
+    "htmlLang": "ja",
+    "title": "花見を特別な1日にする整え方チェック | One Coin Books",
+    "eyebrow": "記事専用チェックツール",
+    "pageTitle": "花見を特別な1日にする整え方チェック",
+    "pageLead": "「花見を特別な1日にする方法」を読んだあとに、今年の花見を記憶に残る時間へ近づけるためのチェックです。期待、心が動く瞬間、余韻、景色を味わう時間から、花見の整え方が見えてきます。",
+    "checkHeading": "今年の花見で意識できそうなものを選んでください",
+    "checkLead": "全部できなくて大丈夫です。ひとつ選ぶだけでも、なんとなく終わる花見から、あとで思い出したくなる花見へ近づけます。",
+    "resultHeading": "今日の結果",
+    "nextHeading": "次の小さな一歩",
+    "quietText": "このチェックは、完璧な花見を計画するためのものではありません。春の空気をちゃんと味わい、無理なく記憶に残る時間を作るための小さな道具です。",
+    "reset": "チェックをリセット",
+    "defaultTypeTitle": "今日の花見タイプ：これからタイプ",
+    "defaultTypeText": "気になる項目をひとつ選ぶと、今年の花見に合う整え方が表示されます。",
+    "checks": [
+      {
+        "text": "花見の前に少し楽しみを作れた",
+        "hint": "春っぽい飲み物、好きなお菓子、1枚だけちゃんと写真を撮るなど、小さな期待で十分です。",
+        "type": "expectation"
+      },
+      {
+        "text": "場所取りだけで満足しすぎないように意識した",
+        "hint": "いい場所はスタート地点です。そこでどんな時間を過ごすかを見る意識です。",
+        "type": "time"
+      },
+      {
+        "text": "心が動く瞬間をひとつ作ろうとした",
+        "hint": "乾杯、夕方の桜を見る時間、今日よかったねの一言など、小さな特別感です。",
+        "type": "moment"
+      },
+      {
+        "text": "写真を撮る時間と景色を見る時間を分けた",
+        "hint": "最初に撮ったら、少しスマホを置いて空や桜や会話を味わう意識です。",
+        "type": "taste"
+      },
+      {
+        "text": "予定を詰め込みすぎないようにした",
+        "hint": "効率よく回るより、一つの場所でちゃんと過ごす余白を残す考え方です。",
+        "type": "space"
+      },
+      {
+        "text": "映えだけを追いすぎないようにした",
+        "hint": "投稿するためだけではなく、その場にいた感覚を残す意識です。",
+        "type": "taste"
+      },
+      {
+        "text": "一緒にいる人が過ごしやすい空気を少し意識した",
+        "hint": "話題を軽く振る、静かな人にも少し目を向けるなど、小さな空気づくりです。",
+        "type": "people"
+      },
+      {
+        "text": "頑張って盛り上げすぎないようにした",
+        "hint": "無理に楽しくしようとせず、自然に笑える空気を大切にする意識です。",
+        "type": "people"
+      },
+      {
+        "text": "帰り道や終わり方まで少し味わえた",
+        "hint": "片付け後の静けさ、帰り道、また来年も来たいねの一言など、余韻を残す意識です。",
+        "type": "afterglow"
+      },
+      {
+        "text": "完璧より、ちゃんと楽しめたかを大切にできた",
+        "hint": "少し寒い、風が強い、予定通りにいかないことも思い出になります。",
+        "type": "relax"
+      },
+      {
+        "text": "誰と過ごすかに合わせて整え方を変えられた",
+        "hint": "友達、職場、デートなど、相手に合わせてテーマ・安心感・静かな時間を調整する意識です。",
+        "type": "scene"
+      },
+      {
+        "text": "春をちゃんと感じる時間を作れた",
+        "hint": "桜の揺れ、風、空、温かい飲み物など、その場にいる感覚を味わえた状態です。",
+        "type": "taste"
+      }
+    ],
+    "stages": [
+      {
+        "name": "たね",
+        "title": "春を味わう前の段階",
+        "lead": "まだチェックが少なくても大丈夫です。花見を特別にする最初の一歩は、完璧な計画ではなく、少し意識を向けることです。",
+        "action": "まずは、今年の花見でひとつだけ楽しみにしたいことを決めてみてください。",
+        "art": "seed"
+      },
+      {
+        "name": "めばえ",
+        "title": "少し楽しみが芽生えた日",
+        "lead": "ひとつでも選べたなら十分です。なんとなく集まるだけではなく、春を少し味わう準備ができ始めています。",
+        "action": "次は、写真を撮る時間と景色を見る時間を分けることだけ意識してみましょう。",
+        "art": "sprout"
+      },
+      {
+        "name": "若葉",
+        "title": "記憶に残る瞬間が育ち始めた日",
+        "lead": "期待、心が動く瞬間、景色を味わう時間のどこかに意識が向いています。花見がただのイベントから体験に近づいています。",
+        "action": "当日は、乾杯・夕方の桜・最後の一言など、心が動く瞬間をひとつ作ってみてください。",
+        "art": "leaves"
+      },
+      {
+        "name": "小さな木",
+        "title": "花見の時間が整い始めた日",
+        "lead": "余白、人との空気、終わり方まで見られています。あとから思い出しやすい花見の土台ができています。",
+        "action": "終わる前に、今日よかったことをひとつだけ言葉にしてみてください。",
+        "art": "tree"
+      },
+      {
+        "name": "花と実り",
+        "title": "思い出したくなる春に近づいた日",
+        "lead": "とても良い状態です。場所や写真だけでなく、その日の空気や余韻まで残る花見に近づいています。",
+        "action": "全部を完璧にしようとせず、いちばん心に残りそうな時間を大切にしてください。",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "expectation": {
+        "title": "今日の花見タイプ：期待づくりタイプ",
+        "text": "当日前から少し楽しみを作ると満足度が上がりやすいタイプです。大げさな企画ではなく、春っぽい持ち物や小さなテーマが合っています。"
+      },
+      "time": {
+        "title": "今日の花見タイプ：過ごし方重視タイプ",
+        "text": "場所だけでなく、そこでどう過ごすかを見ると記憶に残りやすいタイプです。いい場所を確保したあとに、時間の使い方を少し整えるのが合っています。"
+      },
+      "moment": {
+        "title": "今日の花見タイプ：心が動く瞬間タイプ",
+        "text": "小さな特別感があると、その日が記憶に残りやすいタイプです。乾杯、写真、夕方の桜、今日よかったねの一言が効きます。"
+      },
+      "taste": {
+        "title": "今日の花見タイプ：味わう時間タイプ",
+        "text": "写真や記録より、その場にいる感覚を大切にすると満足しやすいタイプです。スマホを置いて空気・風・桜を見る時間が合っています。"
+      },
+      "space": {
+        "title": "今日の花見タイプ：余白づくりタイプ",
+        "text": "予定を詰め込みすぎない方が花見を楽しめるタイプです。効率よりも、一つの場所でちゃんと過ごす時間が記憶に残りやすくなります。"
+      },
+      "people": {
+        "title": "今日の花見タイプ：空気づくりタイプ",
+        "text": "一緒にいる人が過ごしやすい空気を少し整えると満足度が上がりやすいタイプです。盛り上げすぎず、自然な安心感を大切にできます。"
+      },
+      "afterglow": {
+        "title": "今日の花見タイプ：余韻づくりタイプ",
+        "text": "終わり方を少し整えると記憶に残りやすいタイプです。帰り道、最後の一言、写真を見返す時間が余韻になります。"
+      },
+      "relax": {
+        "title": "今日の花見タイプ：力を抜くタイプ",
+        "text": "ちゃんと楽しもうと頑張りすぎない方が春を味わえるタイプです。少し不完全な出来事も思い出として残せます。"
+      },
+      "scene": {
+        "title": "今日の花見タイプ：場面別調整タイプ",
+        "text": "友達・職場・デートなど、相手に合わせて整え方を変えると心地よくなりやすいタイプです。軽いテーマ、安心感、静かな時間を使い分けられます。"
+      }
+    }
+  },
+  "en": {
+    "htmlLang": "en",
+    "title": "Hanami Memory Check | One Coin Books",
+    "eyebrow": "Reader bonus tool",
+    "pageTitle": "Hanami Memory Check",
+    "pageLead": "After reading the article, check how to make your cherry blossom viewing day more memorable. This tool helps you create gentle expectation, meaningful moments, afterglow, and time to truly taste spring.",
+    "checkHeading": "Choose what you can try for this hanami",
+    "checkLead": "You do not need to do everything. Even one check can help a hanami feel less like something that just happened and more like a day you want to remember.",
+    "resultHeading": "Today's Result",
+    "nextHeading": "A Small Next Step",
+    "quietText": "This check is not for planning a perfect event. It is a small tool for feeling spring more clearly and making the day memorable without forcing it.",
+    "reset": "Reset checks",
+    "defaultTypeTitle": "Your hanami style: just getting started",
+    "defaultTypeText": "Choose one item that feels close to you, and your way of arranging the day will appear here.",
+    "checks": [
+      {
+        "text": "I created a small thing to look forward to before hanami",
+        "hint": "A spring drink, favorite snack, or one proper photo is enough.",
+        "type": "expectation"
+      },
+      {
+        "text": "I remembered that getting a good spot is only the start",
+        "hint": "A good spot matters, but the time spent there matters more.",
+        "type": "time"
+      },
+      {
+        "text": "I tried to create one memorable moment",
+        "hint": "A toast, evening blossoms, or saying this was nice can be enough.",
+        "type": "moment"
+      },
+      {
+        "text": "I separated photo time from scenery time",
+        "hint": "Take photos first, then put the phone down and feel the sky, blossoms, and conversation.",
+        "type": "taste"
+      },
+      {
+        "text": "I avoided overpacking the schedule",
+        "hint": "Instead of visiting many places efficiently, leave room to stay and feel one place.",
+        "type": "space"
+      },
+      {
+        "text": "I did not chase only photogenic moments",
+        "hint": "The point is not only posting, but remembering that you were there.",
+        "type": "taste"
+      },
+      {
+        "text": "I paid a little attention to everyone feeling comfortable",
+        "hint": "A light topic, including quiet people, or gentle attention to the mood.",
+        "type": "people"
+      },
+      {
+        "text": "I did not try too hard to make it exciting",
+        "hint": "Natural laughter often remains more than forced excitement.",
+        "type": "people"
+      },
+      {
+        "text": "I tasted the walk home or the ending a little",
+        "hint": "The quiet after cleanup, the way home, or one soft phrase can create afterglow.",
+        "type": "afterglow"
+      },
+      {
+        "text": "I cared more about enjoying it than making it perfect",
+        "hint": "Cold wind, small accidents, or imperfection can become memories too.",
+        "type": "relax"
+      },
+      {
+        "text": "I adjusted the mood depending on who I was with",
+        "hint": "Friends, coworkers, or a date may need different levels of theme, safety, or quietness.",
+        "type": "scene"
+      },
+      {
+        "text": "I made time to actually feel spring",
+        "hint": "Blossoms moving, wind, sky, and a warm drink can help you feel present.",
+        "type": "taste"
+      }
+    ],
+    "stages": [
+      {
+        "name": "Seed",
+        "title": "Before tasting spring",
+        "lead": "Even a few checks are enough. A memorable hanami starts not with a perfect plan, but with a little attention.",
+        "action": "First, decide one small thing you want to look forward to this hanami.",
+        "art": "seed"
+      },
+      {
+        "name": "Sprout",
+        "title": "A little anticipation is growing",
+        "lead": "One check is already enough. You are preparing to feel spring instead of just gathering casually.",
+        "action": "Next, try separating photo time from scenery time.",
+        "art": "sprout"
+      },
+      {
+        "name": "Young Leaves",
+        "title": "Memorable moments are beginning to grow",
+        "lead": "You are paying attention to expectation, moments, or tasting the scenery. Hanami is becoming an experience, not just an event.",
+        "action": "On the day, create one small moment: a toast, evening blossoms, or one soft phrase.",
+        "art": "leaves"
+      },
+      {
+        "name": "Small Tree",
+        "title": "The hanami day is taking shape",
+        "lead": "You are seeing space, people, and the ending. The day is becoming easier to remember afterward.",
+        "action": "Before leaving, put one good thing about the day into words.",
+        "art": "tree"
+      },
+      {
+        "name": "Bloom and Fruit",
+        "title": "A spring day worth remembering is forming",
+        "lead": "This is a very good state. The memory can hold not only place and photos, but also air, feeling, and afterglow.",
+        "action": "Do not make everything perfect. Keep the one moment that will stay with you.",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "expectation": {
+        "title": "Your hanami style: gentle anticipation",
+        "text": "You enjoy the day more when there is a small thing to look forward to. A light theme or spring item fits you well."
+      },
+      "time": {
+        "title": "Your hanami style: how-time-is-spent",
+        "text": "You remember the day better when you focus on how time is spent, not only where you sit."
+      },
+      "moment": {
+        "title": "Your hanami style: memorable moment",
+        "text": "One small special moment can make the day last. A toast, photo, evening blossoms, or soft phrase works well."
+      },
+      "taste": {
+        "title": "Your hanami style: tasting the moment",
+        "text": "You feel satisfied when you put the phone down and actually sense the air, wind, blossoms, and conversation."
+      },
+      "space": {
+        "title": "Your hanami style: leaving room",
+        "text": "You enjoy hanami more when the schedule is not too full. Staying in one place can leave a stronger memory."
+      },
+      "people": {
+        "title": "Your hanami style: gentle mood maker",
+        "text": "You help make the day better by noticing whether people feel comfortable, without forcing excitement."
+      },
+      "afterglow": {
+        "title": "Your hanami style: afterglow",
+        "text": "The ending matters for you. The walk home, one phrase, or looking back at the day can make it memorable."
+      },
+      "relax": {
+        "title": "Your hanami style: relaxed enjoyment",
+        "text": "You enjoy spring better when you do not try too hard to make it perfect. Imperfect moments can become memories."
+      },
+      "scene": {
+        "title": "Your hanami style: scene-aware",
+        "text": "You can make the day better by adjusting the mood for friends, coworkers, or a date."
+      }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <ellipse class="piece" cx="100" cy="132" rx="24" ry="30" fill="#c99261"/>
+      <path class="piece piece-2" d="M91 122c8-10 19-14 31-12" fill="none" stroke="#f7dfbd" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-3" cx="73" cy="111" r="8" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="133" cy="120" r="7" fill="#8db8ca"/>
+    </svg>`;
+  const memo = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="memo">
+      <rect x="50" y="42" width="100" height="122" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece" d="M72 78h56M72 102h44M72 126h62" stroke="#8db8ca" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-2" cx="134" cy="64" r="13" fill="#e7b75f"/>
+      <path class="piece piece-3" d="M69 147c15-13 33-10 45 0" fill="none" stroke="#6fae72" stroke-width="6" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaves = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="156" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 156c2-34 2-58 1-84" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 99c-35-28-61 5-36 24 18 14 34-4 36-24z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 92c34-31 64 3 36 23-19 15-34-2-36-23z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M101 123c-24-16-43 6-24 19 13 9 24-3 24-19z" fill="#8fcf93"/>
+      <circle class="piece piece-3" cx="124" cy="72" r="7" fill="#e7b75f"/>
+    </svg>`;
+  const wallet = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="wallet">
+      <rect class="piece" x="42" y="70" width="116" height="78" rx="12" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece piece-2" d="M55 76l72-31 16 35" fill="#d9c2a4"/>
+      <rect x="104" y="94" width="45" height="32" rx="9" fill="#8db8ca"/>
+      <circle cx="121" cy="110" r="5" fill="#fff"/>
+      <circle class="piece piece-3" cx="68" cy="96" r="12" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="85" cy="116" r="10" fill="#6fae72"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="saving foundation">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="122" cy="105" r="8" fill="#e7b75f"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="room to breathe">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="90" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="125" cy="111" r="10" fill="#e88963"/>
+      <g class="piece piece-2">
+        <circle cx="73" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="64" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="82" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="73" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="73" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+    </svg>`;
+  return { seed, memo, sprout, leaves, wallet, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { expectation: 0, time: 0, moment: 0, taste: 0, space: 0, people: 0, afterglow: 0, relax: 0, scene: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
