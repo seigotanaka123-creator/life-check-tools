@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>AIで暮らしを楽にする活用チェック | One Coin Books</title>
+  <meta name="description" content="「AIで暮らしを楽にする20の使い方」を読んだあとに使える、記事専用のAI活用チェックツールです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="AIで暮らしを楽にする活用チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、暮らしを少し楽にするためのAI活用タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(231, 183, 95, .16), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">AIで暮らしを楽にする活用チェック</h1>
+    <p class="lead" id="pageLead">「AIで暮らしを楽にする20の使い方」を読んだあとに、今日どこでAIを頼れそうか確認できるチェックです。考える負担・家事・時間・お金・気持ち・習慣の中から、自分に合う使い方が見えてきます。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="節約チェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日、試せそうなものを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつ選ぶだけでも、AIを「難しいもの」ではなく「少し頼れるもの」として日常に入れるきっかけになります。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">見える化前</span>
+        <strong id="stageTitle">まず気づけた段階</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の節約の整い具合が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日のAI活用タイプ：これからタイプ</strong>
+        <span id="typeText">気になる項目をひとつ選ぶと、今の自分に合うAIの頼り方が表示されます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは支出をざっくり書き出して、AIに見直しポイントを聞いてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、AIを完璧に使いこなすためのものではありません。日々の小さな負担を少し軽くして、自分の時間と気持ちに余白を戻すための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  "ja": {
+    "htmlLang": "ja",
+    "title": "AIで暮らしを楽にする活用チェック | One Coin Books",
+    "eyebrow": "記事専用チェックツール",
+    "pageTitle": "AIで暮らしを楽にする活用チェック",
+    "pageLead": "「AIで暮らしを楽にする20の使い方」を読んだあとに、今日どこでAIを頼れそうか確認できるチェックです。考える負担・家事・時間・お金・気持ち・習慣の中から、自分に合う使い方が見えてきます。",
+    "checkHeading": "今日、試せそうなものを選んでください",
+    "checkLead": "全部できなくて大丈夫です。ひとつ選ぶだけでも、AIを「難しいもの」ではなく「少し頼れるもの」として日常に入れるきっかけになります。",
+    "resultHeading": "今日の結果",
+    "nextHeading": "次の小さな一歩",
+    "quietText": "このチェックは、AIを完璧に使いこなすためのものではありません。日々の小さな負担を少し軽くして、自分の時間と気持ちに余白を戻すための小さな道具です。",
+    "reset": "チェックをリセット",
+    "defaultTypeTitle": "今日のAI活用タイプ：これからタイプ",
+    "defaultTypeText": "気になる項目をひとつ選ぶと、今の自分に合うAIの頼り方が表示されます。",
+    "checks": [
+      {
+        "text": "AIにひとつ相談してみた",
+        "hint": "難しい質問でなくて大丈夫です。今日の困りごとをひとつ投げるだけでも十分です。",
+        "type": "task"
+      },
+      {
+        "text": "今日やることをAIに整理してもらった",
+        "hint": "優先順位や、今日やること・明日でもいいことに分けてもらうと、頭の中が軽くなります。",
+        "type": "task"
+      },
+      {
+        "text": "献立や買い物リストをAIに考えてもらった",
+        "hint": "冷蔵庫の中身や予算をざっくり伝えるだけでも、考える負担を減らせます。",
+        "type": "home"
+      },
+      {
+        "text": "掃除や片付けの順番をAIに決めてもらった",
+        "hint": "10分でできる範囲や、どこから始めるかを決めてもらうと動き出しやすくなります。",
+        "type": "home"
+      },
+      {
+        "text": "予定やスキマ時間の使い方をAIに整理してもらった",
+        "hint": "詰め込みすぎを防いだり、5分でできることを見つけたりする使い方です。",
+        "type": "time"
+      },
+      {
+        "text": "支出や買い物判断をAIに整理してもらった",
+        "hint": "買うべきか迷うものや、なんとなく増えた支出を冷静に見直しやすくなります。",
+        "type": "money"
+      },
+      {
+        "text": "モヤモヤした気持ちをAIに言葉にしてもらった",
+        "hint": "きれいに書かなくて大丈夫です。ばらばらの気持ちを一度外に出すだけでも整理しやすくなります。",
+        "type": "mind"
+      },
+      {
+        "text": "続けたい習慣の小さなステップをAIに考えてもらった",
+        "hint": "最初の1週間だけ、失敗しても戻れる形で考えてもらうと続けやすくなります。",
+        "type": "habit"
+      },
+      {
+        "text": "個人情報や重要な判断をそのまま任せすぎないようにした",
+        "hint": "住所、電話番号、パスワード、カード情報などは入れず、お金・健康・法律は必要に応じて公式情報も確認します。",
+        "type": "safe"
+      }
+    ],
+    "stages": [
+      {
+        "name": "たね",
+        "title": "少し頼ってみる前の段階",
+        "lead": "まだチェックが少なくても大丈夫です。AIは使いこなすものではなく、まず少し頼ってみるものです。",
+        "action": "まずは『今日やることを整理してください』と1回だけ送ってみてください。",
+        "art": "memo"
+      },
+      {
+        "name": "めばえ",
+        "title": "AIにひとつ頼れた日",
+        "lead": "ひとつでも選べたなら十分です。暮らしの中の小さな負担を、自分だけで抱え込まない感覚が始まっています。",
+        "action": "次は、献立・予定・気持ちのどれか1つをAIに整理してもらいましょう。",
+        "art": "sprout"
+      },
+      {
+        "name": "若葉",
+        "title": "考える負担が少し軽くなった日",
+        "lead": "AIを、特別な道具ではなく日常の小さな補助として使い始めています。考える前の重さが少し減ってきています。",
+        "action": "よく疲れる場面を1つ選び、そこだけAIに任せる形を作ってみてください。",
+        "art": "wallet"
+      },
+      {
+        "name": "小さな木",
+        "title": "日常の手間を少し渡せた日",
+        "lead": "タスク、家事、時間、お金、気持ちのどこかで、AIを実用的に使えています。生活に余白を作る土台ができ始めています。",
+        "action": "今日いちばん楽になった使い方を、明日も同じ形で1回だけ使ってみてください。",
+        "art": "tree"
+      },
+      {
+        "name": "花と実り",
+        "title": "暮らしに余白が戻り始めた日",
+        "lead": "とても良い状態です。AIに任せるところと、自分で決めるところのバランスが見えてきています。",
+        "action": "全部続けようとせず、いちばん助かった使い方を暮らしの定番にしてください。",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "task": {
+        "title": "今日のAI活用タイプ：頭の中整理タイプ",
+        "text": "やることや考えを並べてもらうと楽になりやすいタイプです。朝や作業前に、優先順位をAIに整理してもらう使い方が合っています。"
+      },
+      "home": {
+        "title": "今日のAI活用タイプ：家事ラク化タイプ",
+        "text": "献立、買い物、掃除、片付けなど、生活の手間を減らす使い方が合っています。『何からやるか』をAIに決めてもらうと動き出しやすくなります。"
+      },
+      "time": {
+        "title": "今日のAI活用タイプ：時間整えタイプ",
+        "text": "予定を詰め込みすぎない形に整えると楽になりやすいタイプです。休憩込みのスケジュールや、5分でできることを聞く使い方が向いています。"
+      },
+      "money": {
+        "title": "今日のAI活用タイプ：お金見直しタイプ",
+        "text": "支出や買い物判断を感情だけで決めず、整理してから考える使い方が合っています。無理な節約より、見直せる場所を見つける方向が向いています。"
+      },
+      "mind": {
+        "title": "今日のAI活用タイプ：気持ち整理タイプ",
+        "text": "言葉にならないモヤモヤを一度外に出すと楽になりやすいタイプです。きれいに書かず、思いつくまま送って整理してもらう使い方が合っています。"
+      },
+      "habit": {
+        "title": "今日のAI活用タイプ：習慣づくりタイプ",
+        "text": "大きく変えるより、小さく始める形が合っています。最初の1週間だけ、失敗しても戻れるステップをAIに考えてもらうと続けやすくなります。"
+      },
+      "safe": {
+        "title": "今日のAI活用タイプ：安全活用タイプ",
+        "text": "便利さと安全さのバランスを大切にできるタイプです。個人情報を入れすぎず、重要な判断はAIだけで決めない形が安心です。"
+      }
+    }
+  },
+  "en": {
+    "htmlLang": "en",
+    "title": "AI Daily Life Ease Check | One Coin Books",
+    "eyebrow": "Reader bonus tool",
+    "pageTitle": "AI Daily Life Ease Check",
+    "pageLead": "After reading the article, choose where AI could help you today. You will see which kind of AI support fits your daily life best.",
+    "checkHeading": "Choose what you can try today",
+    "checkLead": "You do not need to do everything. Even one check can help AI feel less difficult and more like a small daily support.",
+    "resultHeading": "Today's Result",
+    "nextHeading": "A Small Next Step",
+    "quietText": "This check is not for mastering AI perfectly. It is a small tool for reducing everyday thinking load and bringing a little room back to your day.",
+    "reset": "Reset checks",
+    "defaultTypeTitle": "Your AI use style: just getting started",
+    "defaultTypeText": "Choose one item that feels possible, and your best AI support style will appear here.",
+    "checks": [
+      {
+        "text": "I asked AI about one thing",
+        "hint": "It does not need to be a difficult prompt. One small everyday problem is enough.",
+        "type": "task"
+      },
+      {
+        "text": "I asked AI to organize today's tasks",
+        "hint": "Ask it to separate what to do today, what can wait, and what may not be necessary.",
+        "type": "task"
+      },
+      {
+        "text": "I asked AI for meal ideas or a shopping list",
+        "hint": "Rough ingredients or budget are enough to reduce meal-planning stress.",
+        "type": "home"
+      },
+      {
+        "text": "I asked AI to decide a cleaning or tidying order",
+        "hint": "A 10-minute plan or a starting point can make it easier to move.",
+        "type": "home"
+      },
+      {
+        "text": "I asked AI to organize my schedule or small gaps of time",
+        "hint": "This helps prevent overpacking the day and find small actions that fit.",
+        "type": "time"
+      },
+      {
+        "text": "I asked AI to organize spending or a buying decision",
+        "hint": "It can help you review expenses or compare reasons before buying.",
+        "type": "money"
+      },
+      {
+        "text": "I asked AI to put my unclear feelings into words",
+        "hint": "You do not need polished writing. Messy thoughts are fine.",
+        "type": "mind"
+      },
+      {
+        "text": "I asked AI to make a tiny first step for a habit",
+        "hint": "A first-week plan that allows mistakes is easier to keep.",
+        "type": "habit"
+      },
+      {
+        "text": "I avoided sharing personal information or relying on AI for major decisions",
+        "hint": "Avoid addresses, phone numbers, passwords, and card details. For money, health, or law, also check official sources when needed.",
+        "type": "safe"
+      }
+    ],
+    "stages": [
+      {
+        "name": "Seed",
+        "title": "Before asking for help",
+        "lead": "Even a few checks are enough. AI is not something you must master first; it can start as one small support.",
+        "action": "Start by sending: Please organize what I need to do today.",
+        "art": "memo"
+      },
+      {
+        "name": "Sprout",
+        "title": "You asked AI for one thing",
+        "lead": "One check is already enough. You are beginning to hand over a small part of your daily load.",
+        "action": "Next, ask AI to organize either meals, schedule, or feelings.",
+        "art": "sprout"
+      },
+      {
+        "name": "Young Leaves",
+        "title": "Your thinking load is lighter",
+        "lead": "You are starting to use AI as a practical daily support, not a special tool.",
+        "action": "Choose one situation that often tires you and let AI help only there.",
+        "art": "wallet"
+      },
+      {
+        "name": "Small Tree",
+        "title": "You handed over a daily task",
+        "lead": "You are using AI in tasks, home life, time, money, feelings, or habits. A little room is forming.",
+        "action": "Repeat the one AI use that helped most tomorrow.",
+        "art": "tree"
+      },
+      {
+        "name": "Bloom and Fruit",
+        "title": "More room is returning to your day",
+        "lead": "This is a very good state. You are learning what to ask AI and what to decide yourself.",
+        "action": "Do not try to keep everything. Make the easiest AI use part of your routine.",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "task": {
+        "title": "Your AI use style: thought organizer",
+        "text": "You benefit from having tasks and thoughts arranged clearly. Asking AI for priorities in the morning or before work may fit you well."
+      },
+      "home": {
+        "title": "Your AI use style: home task helper",
+        "text": "Meal ideas, shopping lists, cleaning, and tidying are good fits. Ask AI what to do first when starting feels heavy."
+      },
+      "time": {
+        "title": "Your AI use style: time organizer",
+        "text": "You benefit from a schedule that does not overpack your day. Ask AI for plans that include breaks and small actions."
+      },
+      "money": {
+        "title": "Your AI use style: spending reviewer",
+        "text": "You may benefit from organizing expenses and buying decisions before acting. The goal is gentle review, not harsh saving."
+      },
+      "mind": {
+        "title": "Your AI use style: feeling organizer",
+        "text": "You benefit from putting unclear feelings into words. Messy notes are enough for AI to help you sort what is tiring you."
+      },
+      "habit": {
+        "title": "Your AI use style: habit starter",
+        "text": "You do better with very small steps than big changes. Ask AI for a first-week plan that lets you restart easily."
+      },
+      "safe": {
+        "title": "Your AI use style: safe user",
+        "text": "You are mindful of privacy and important decisions. This balanced use makes AI easier to bring into daily life safely."
+      }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const memo = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="memo">
+      <rect x="50" y="42" width="100" height="122" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece" d="M72 78h56M72 102h44M72 126h62" stroke="#8db8ca" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-2" cx="134" cy="64" r="13" fill="#e7b75f"/>
+      <path class="piece piece-3" d="M69 147c15-13 33-10 45 0" fill="none" stroke="#6fae72" stroke-width="6" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const wallet = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="wallet">
+      <rect class="piece" x="42" y="70" width="116" height="78" rx="12" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece piece-2" d="M55 76l72-31 16 35" fill="#d9c2a4"/>
+      <rect x="104" y="94" width="45" height="32" rx="9" fill="#8db8ca"/>
+      <circle cx="121" cy="110" r="5" fill="#fff"/>
+      <circle class="piece piece-3" cx="68" cy="96" r="12" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="85" cy="116" r="10" fill="#6fae72"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="saving foundation">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="122" cy="105" r="8" fill="#e7b75f"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="room to breathe">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="90" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="125" cy="111" r="10" fill="#e88963"/>
+      <g class="piece piece-2">
+        <circle cx="73" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="64" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="82" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="73" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="73" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+    </svg>`;
+  return { memo, sprout, wallet, tree, bloom }[kind] || memo;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { task: 0, home: 0, time: 0, money: 0, mind: 0, habit: 0, safe: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
