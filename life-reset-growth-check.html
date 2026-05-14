@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>暮らしリセット成長チェック | One Coin Books</title>
+  <meta name="description" content="「乱れた暮らしを整える方法」を読んだあとに使える、記事専用の暮らしリセット成長チェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="暮らしリセット成長チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今日の整い具合と自分に合う整え方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --leaf-dark: #4e8a65;
+      --petal: #f2a9b7;
+      --gold: #e7b75f;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 78% 118px, rgba(242, 169, 183, .16), transparent 210px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 218px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 112px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .flower { transform-origin: 100px 100px; animation: bloom .7s ease-out both; }
+    .leaf-left { transform-origin: 102px 148px; animation: leafIn .5s ease-out both; }
+    .leaf-right { transform-origin: 98px 140px; animation: leafIn .5s .05s ease-out both; }
+    .fruit { animation: fruitDrop .55s ease-out both; }
+    @keyframes bloom {
+      from { transform: scale(.72); opacity: .2; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes leafIn {
+      from { transform: scale(.5) rotate(-8deg); opacity: .2; }
+      to { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes fruitDrop {
+      from { transform: translateY(-8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 82px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow">記事専用チェックツール</p>
+    <h1>暮らしリセット成長チェック</h1>
+    <p class="lead">「乱れた暮らしを整える方法」を読んだあとに、今日できそうなことを選んでみてください。できた項目に応じて、今の整い具合と自分に合う整え方タイプが表示されます。</p>
+  </div>
+  <aside class="hero-art" aria-label="成長イラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2>今日できたことを選んでください</h2>
+    <p>全部できなくて大丈夫です。ひとつでも選べたら、今日の暮らしは少し整い始めています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2>今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong>次の小さな一歩</strong>
+        <span id="nextAction">目に入った場所から、物をひとつだけ戻してみてください。</span>
+      </div>
+    </div>
+    <div class="quiet">
+      このチェックは、点数を競うためのものではありません。今日できたことを見える形にして、また必要なときに記事へ戻りやすくするための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const checks = [
+  {
+    text: "物をひとつ元の場所に戻した",
+    hint: "机、床、バッグ、玄関など、目に入った場所で大丈夫です。",
+    type: "space"
+  },
+  {
+    text: "ゴミをひとつ捨てた",
+    hint: "レシート、空き箱、古いメモなど、小さなものでOKです。",
+    type: "space"
+  },
+  {
+    text: "完璧にやろうとしなかった",
+    hint: "全部やるより、今日できる範囲で止められたら十分です。",
+    type: "rest"
+  },
+  {
+    text: "やらないことをひとつ決めた",
+    hint: "大掃除しない、全部片付けない、比べないなどで大丈夫です。",
+    type: "review"
+  },
+  {
+    text: "整った場所をひとつ見つけた",
+    hint: "できていない場所ではなく、少し良くなった場所を見ます。",
+    type: "rest"
+  },
+  {
+    text: "整えるタイミングをひとつ決めた",
+    hint: "寝る前、帰宅後、朝起きたあとなど、行動にくっつけます。",
+    type: "habit"
+  },
+  {
+    text: "明日もできる最低ラインを決めた",
+    hint: "物を1つ戻す、ゴミを1つ捨てるなど、疲れた日でもできる形にします。",
+    type: "habit"
+  }
+];
+
+const stages = [
+  {
+    name: "たね",
+    title: "まず気づけた日",
+    lead: "まだチェックが少なくても大丈夫です。整えたいと思えた時点で、暮らしのたねは置けています。",
+    action: "今日は目に入った物をひとつだけ戻すところから始めてみてください。",
+    art: "seed"
+  },
+  {
+    name: "めばえ",
+    title: "小さく動き出した日",
+    lead: "ひとつでもできたなら十分です。暮らしの流れが、ほんの少し戻り始めています。",
+    action: "同じことを明日もひとつだけ繰り返せる形にしてみましょう。",
+    art: "sprout"
+  },
+  {
+    name: "若葉",
+    title: "整う感覚が見えてきた日",
+    lead: "できたことが複数あります。完璧ではなくても、自分で選んで動けた日です。",
+    action: "整った場所をひとつ見て、ここは少し良くなったと確認してください。",
+    art: "leaf"
+  },
+  {
+    name: "小さな木",
+    title: "自分に合う形が育ってきた日",
+    lead: "整える行動がかなり形になっています。無理を増やさず、続けやすい形を守る段階です。",
+    action: "明日も続けるために、最低ラインをひとつだけ決めておきましょう。",
+    art: "tree"
+  },
+  {
+    name: "花と実り",
+    title: "今日の暮らしがしっかり育った日",
+    lead: "かなり良い流れです。花が咲いて実がなるように、今日の小さな行動が安心感につながっています。",
+    action: "全部を毎日続けようとせず、今日よかった行動をひとつだけ明日に残しましょう。",
+    art: "bloom"
+  }
+];
+
+const types = {
+  space: {
+    title: "今日の整え方タイプ：空間すっきりタイプ",
+    text: "目に見える場所から整えると流れが戻りやすいタイプです。机、床、バッグ、玄関など、小さな場所から始めるのが合っています。"
+  },
+  rest: {
+    title: "今日の整え方タイプ：休ませて整えるタイプ",
+    text: "頑張るより、自分を責めないことが効くタイプです。できていない場所より、少し整った場所を見ると続きやすくなります。"
+  },
+  habit: {
+    title: "今日の整え方タイプ：習慣づくりタイプ",
+    text: "やる気より、タイミングや最低ラインを決めると続きやすいタイプです。小さく固定すると暮らしに残りやすくなります。"
+  },
+  review: {
+    title: "今日の整え方タイプ：見直し上手タイプ",
+    text: "やることを増やすより、やらないことを決めると軽くなりやすいタイプです。負担をひとつ減らすことが整える一歩になります。"
+  }
+};
+
+const checksNode = document.getElementById("checks");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  if (kind === "seed") return `
+    <svg viewBox="0 0 200 200" role="img" aria-label="土の中のたね">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  if (kind === "sprout") return `
+    <svg viewBox="0 0 200 200" role="img" aria-label="めばえ">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="leaf-left" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="leaf-right" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  if (kind === "leaf") return `
+    <svg viewBox="0 0 200 200" role="img" aria-label="若葉">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="leaf-left" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="leaf-right" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="leaf-left" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  if (kind === "tree") return `
+    <svg viewBox="0 0 200 200" role="img" aria-label="小さな木">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="leaf-left" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="leaf-right" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="leaf-left" cx="105" cy="50" r="31" fill="#8fcf86"/>
+      <circle cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  return `
+    <svg viewBox="0 0 200 200" role="img" aria-label="花と果実が実った木">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="leaf-left" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="leaf-right" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="leaf-left" cx="102" cy="48" r="35" fill="#8fcf86"/>
+      <circle cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="flower">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <g class="flower">
+        <circle cx="125" cy="58" r="8" fill="#f6d36f"/>
+        <circle cx="116" cy="58" r="8" fill="#f2a9b7"/>
+        <circle cx="134" cy="58" r="8" fill="#f2a9b7"/>
+        <circle cx="125" cy="49" r="8" fill="#f7bdc8"/>
+        <circle cx="125" cy="67" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="fruit" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="fruit" cx="124" cy="110" r="10" fill="#e88963"/>
+      <circle class="fruit" cx="76" cy="116" r="8" fill="#e88963"/>
+    </svg>`;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 5) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { space: 0, rest: 0, habit: 0, review: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = "今日の整え方タイプ：これからタイプ";
+    typeText.textContent = "気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。";
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+renderChecks();
+updateResult();
+</script>
+</body>
+</html>
