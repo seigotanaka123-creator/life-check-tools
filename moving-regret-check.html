@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>引っ越し後悔防止チェック | One Coin Books</title>
+  <meta name="description" content="「引っ越しで後悔しない方法」を読んだあとに使える、記事専用の後悔防止チェックツールです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="引っ越し後悔防止チェック | One Coin Books">
+  <meta property="og:description" content="確認できた項目を選ぶと、引っ越し準備の安心度と見落としやすいタイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --sky: #8db8ca;
+      --leaf: #6fae72;
+      --gold: #e7b75f;
+      --brick: #c98566;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(141, 184, 202, .18), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">引っ越し後悔防止チェック</h1>
+    <p class="lead" id="pageLead">「引っ越しで後悔しない方法」を読んだあとに、確認できたことを選んでみてください。準備の安心度と、見落としやすいポイントが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="準備イラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">確認できたことを選んでください</h2>
+    <p id="checkLead">全部できていなくても大丈夫です。選んだ項目から、今どこまで後悔を減らせているかを見ていきます。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">下見前</span>
+        <strong id="stageTitle">まず基準を持つ段階</strong>
+        <span id="stageLead">チェックを入れると、ここに今の準備段階が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">見落としやすいタイプ：これから確認タイプ</strong>
+        <span id="typeText">気になる項目を選ぶと、次に重点的に見た方がいいポイントが表示されます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは「譲れない条件」と「妥協できる条件」を分けてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、完璧な物件を探すためではなく、住んでからの小さな後悔を減らすための道具です。気になる物件を比べるときに、また必要なところだけ見返してください。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "引っ越し後悔防止チェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "引っ越し後悔防止チェック",
+    pageLead: "「引っ越しで後悔しない方法」を読んだあとに、確認できたことを選んでみてください。準備の安心度と、見落としやすいポイントが分かります。",
+    checkHeading: "確認できたことを選んでください",
+    checkLead: "全部できていなくても大丈夫です。選んだ項目から、今どこまで後悔を減らせているかを見ていきます。",
+    resultHeading: "今日の結果",
+    nextHeading: "次の小さな一歩",
+    quietText: "このチェックは、完璧な物件を探すためではなく、住んでからの小さな後悔を減らすための道具です。気になる物件を比べるときに、また必要なところだけ見返してください。",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "見落としやすいタイプ：これから確認タイプ",
+    defaultTypeText: "気になる項目を選ぶと、次に重点的に見た方がいいポイントが表示されます。",
+    checks: [
+      { text: "絶対譲れない条件と、妥協できる条件を分けた", hint: "家賃、音、通勤時間、日当たりなどを先に整理します。", type: "condition" },
+      { text: "朝・帰宅後・休日の生活イメージを考えた", hint: "物件ではなく、そこで暮らす一日を想像します。", type: "flow" },
+      { text: "窓を閉めた状態と開けた状態で音を確認した", hint: "車、人通り、近隣施設、上階や隣の音を見ます。", type: "environment" },
+      { text: "家具を置いたあとの生活動線を想像した", hint: "玄関、キッチン、洗濯、ベッド周りの動きやすさを見ます。", type: "flow" },
+      { text: "スーパーやコンビニまでの距離と営業時間を確認した", hint: "雨の日や仕事帰りでも使いやすいかを見ます。", type: "environment" },
+      { text: "コンセントの位置と数を確認した", hint: "ベッド横、デスク、キッチン家電の置き場所を想像します。", type: "facility" },
+      { text: "ゴミ出しルールとゴミ置き場を確認した", hint: "曜日、分別、距離、清潔さは毎週の負担に関わります。", type: "facility" },
+      { text: "共用部や周辺の管理状態を見た", hint: "郵便受け、廊下、階段、自転車置き場、周辺の雰囲気を見ます。", type: "environment" },
+      { text: "契約前に初期費用や契約内容を確認した", hint: "あとで困らないように、費用と条件を一度落ち着いて見ます。", type: "contract" }
+    ],
+    stages: [
+      { name: "下見前", title: "まず基準を持つ段階", lead: "まだチェックが少なくても大丈夫です。条件だけでなく、暮らし方を見る意識が出てきています。", action: "まずは譲れない条件と妥協できる条件を分けてみてください。", art: "map" },
+      { name: "準備の芽", title: "選ぶ基準が見え始めた段階", lead: "少しずつ確認できています。勢いだけで決める前に、生活のイメージが入ってきています。", action: "次は、内見で音・動線・収納のどれか一つを重点的に見てみましょう。", art: "key" },
+      { name: "安心準備中", title: "住んだ後の不便を減らせている段階", lead: "かなり実用的な確認ができています。住み始めてから効いてくるポイントに目が向いています。", action: "候補物件を比べるときは、毎日使う場所と毎日感じるストレスを軸に見てください。", art: "room" },
+      { name: "暮らしの土台", title: "後悔しにくい選び方に近づいている段階", lead: "生活動線、周辺環境、設備面まで見られています。かなり落ち着いた判断に近づいています。", action: "契約前に、初期費用・ネット環境・ゴミ出しルールだけもう一度確認しましょう。", art: "house" },
+      { name: "安心の新生活", title: "後悔を減らす準備が整っている段階", lead: "とても良い準備です。完璧な部屋でなくても、自分の暮らしに合う選び方ができています。", action: "最後は一晩置いて、焦りではなく納得で選べているか確認してみてください。", art: "home" }
+    ],
+    types: {
+      condition: { title: "見落としやすいタイプ：条件整理タイプ", text: "条件が多くなりやすいタイプです。譲れない条件と妥協できる条件を分けると、迷いが減ります。" },
+      flow: { title: "見落としやすいタイプ：生活動線タイプ", text: "広さや見た目より、毎日の動きやすさを見た方が満足度が上がりやすいタイプです。" },
+      environment: { title: "見落としやすいタイプ：周辺環境タイプ", text: "音、買い物、夜の雰囲気、共用部など、部屋の外側を見るほど後悔を減らせるタイプです。" },
+      facility: { title: "見落としやすいタイプ：設備確認タイプ", text: "コンセント、ネット、ゴミ出し、収納など、毎日使う設備を細かく見ると安心しやすいタイプです。" },
+      contract: { title: "見落としやすいタイプ：契約確認タイプ", text: "最後の確認で差が出るタイプです。初期費用や契約条件を一度落ち着いて見直すと安心です。" }
+    }
+  },
+  en: {
+    htmlLang: "en",
+    title: "Moving Regret Prevention Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "Moving Regret Prevention Check",
+    pageLead: "After reading the article, choose what you have already checked. You will see your preparation stage and the points you may be most likely to overlook.",
+    checkHeading: "Choose what you have checked",
+    checkLead: "You do not need to complete everything. The checked items show how much future regret you have already reduced.",
+    resultHeading: "Today's Result",
+    nextHeading: "A Small Next Step",
+    quietText: "This check is not for finding a perfect apartment. It is a small tool for reducing the quiet regrets that can appear after moving in.",
+    reset: "Reset checks",
+    defaultTypeTitle: "Possible blind spot: just getting started",
+    defaultTypeText: "Choose the items that apply, and your next important checking point will appear here.",
+    checks: [
+      { text: "I separated must-have conditions from flexible conditions", hint: "Rent, noise, commute time, sunlight, and other priorities become easier to compare.", type: "condition" },
+      { text: "I imagined my morning, after-work, and weekend routines", hint: "Think about the day you will live there, not only the property itself.", type: "flow" },
+      { text: "I checked noise with windows open and closed", hint: "Listen for traffic, people, nearby facilities, neighbors, and upstairs noise.", type: "environment" },
+      { text: "I imagined the room after placing furniture", hint: "Check movement from the entrance, kitchen, laundry area, and bed.", type: "flow" },
+      { text: "I checked distance and opening hours for stores", hint: "Think about rainy days, evenings after work, and carrying heavy items.", type: "environment" },
+      { text: "I checked outlet locations and quantity", hint: "Imagine where your bed, desk, and kitchen appliances will go.", type: "facility" },
+      { text: "I checked garbage rules and the garbage area", hint: "Days, sorting rules, distance, and cleanliness can affect weekly stress.", type: "facility" },
+      { text: "I looked at shared spaces and the neighborhood condition", hint: "Mailboxes, hallways, stairs, bicycle parking, and nearby streets reveal a lot.", type: "environment" },
+      { text: "I reviewed initial costs and contract details", hint: "Before signing, calmly check costs, rules, and conditions.", type: "contract" }
+    ],
+    stages: [
+      { name: "Before Viewing", title: "You are setting your criteria", lead: "Even a few checks are enough to begin. You are starting to look beyond conditions and into real daily life.", action: "Start by separating must-have conditions from flexible ones.", art: "map" },
+      { name: "First Preparation", title: "Your selection criteria are appearing", lead: "You are checking more calmly. Before deciding too quickly, your daily-life image is getting clearer.", action: "At the viewing, focus on one of these first: noise, movement flow, or storage.", art: "key" },
+      { name: "Careful Checking", title: "You are reducing daily inconveniences", lead: "You are checking practical points that matter after moving in. This lowers the chance of quiet regret.", action: "When comparing options, focus on places you use every day and stress you may feel every day.", art: "room" },
+      { name: "Solid Foundation", title: "You are close to a regret-resistant choice", lead: "You are checking movement flow, surroundings, and facilities. Your decision is becoming calmer and stronger.", action: "Before signing, recheck initial costs, internet setup, and garbage rules.", art: "house" },
+      { name: "Ready for Home", title: "Your preparation is in good shape", lead: "This is strong preparation. The room does not need to be perfect if it fits your real life.", action: "Sleep on the decision once, and make sure you are choosing from clarity rather than pressure.", art: "home" }
+    ],
+    types: {
+      condition: { title: "Possible blind spot: condition sorting", text: "You may have many conditions. Separating must-haves from flexible points will reduce confusion." },
+      flow: { title: "Possible blind spot: daily movement flow", text: "Instead of only size or appearance, checking how you move every day will help satisfaction." },
+      environment: { title: "Possible blind spot: surrounding environment", text: "Noise, stores, nighttime atmosphere, and shared spaces are important to check beyond the room itself." },
+      facility: { title: "Possible blind spot: everyday facilities", text: "Outlets, internet, garbage rules, and storage are small details that affect daily comfort." },
+      contract: { title: "Possible blind spot: contract review", text: "The final review matters. Calmly checking costs and contract terms can prevent avoidable stress." }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const map = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="map and home search">
+      <rect x="34" y="54" width="132" height="92" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path d="M70 58v84M115 58v84M39 94h122" stroke="#e2ddd2" stroke-width="3"/>
+      <path class="piece" d="M63 116c18-24 42-6 56-32 8-15 25-19 38-11" fill="none" stroke="#8db8ca" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-2" cx="80" cy="104" r="8" fill="#c98566"/>
+      <path class="piece piece-3" d="M133 96l19 15v25h-38v-25z" fill="#6fae72"/>
+      <path d="M129 118h8v18h-8z" fill="#fff"/>
+    </svg>`;
+  const key = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="key and checklist">
+      <rect x="42" y="48" width="116" height="104" rx="12" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path d="M66 78h54M66 104h68M66 130h46" stroke="#d9c2a4" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece" cx="75" cy="86" r="18" fill="none" stroke="#e7b75f" stroke-width="8"/>
+      <path class="piece piece-2" d="M90 99l42 42M121 130l11-11M132 141l11-11" stroke="#e7b75f" stroke-width="8" stroke-linecap="round"/>
+    </svg>`;
+  const room = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="room layout">
+      <rect x="40" y="48" width="120" height="104" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <rect class="piece" x="55" y="62" width="42" height="32" rx="5" fill="#8db8ca"/>
+      <rect class="piece piece-2" x="108" y="64" width="36" height="58" rx="5" fill="#d9c2a4"/>
+      <path class="piece piece-3" d="M58 124c28-20 46 18 82-6" fill="none" stroke="#6fae72" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="142" cy="136" r="7" fill="#c98566"/>
+    </svg>`;
+  const house = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="solid home foundation">
+      <rect x="40" y="142" width="120" height="16" rx="8" fill="#d9c2a4"/>
+      <path class="piece" d="M55 93l45-36 45 36v54H55z" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece piece-2" d="M48 95l52-43 52 43" fill="none" stroke="#c98566" stroke-width="9" stroke-linecap="round"/>
+      <rect x="86" y="112" width="22" height="35" rx="3" fill="#8db8ca"/>
+      <rect x="118" y="108" width="20" height="18" rx="3" fill="#6fae72"/>
+    </svg>`;
+  const home = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="comfortable new home">
+      <rect x="35" y="150" width="130" height="16" rx="8" fill="#d9c2a4"/>
+      <path class="piece" d="M54 94l46-38 46 38v57H54z" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece piece-2" d="M45 96l55-46 55 46" fill="none" stroke="#c98566" stroke-width="9" stroke-linecap="round"/>
+      <rect x="84" y="116" width="24" height="35" rx="4" fill="#8db8ca"/>
+      <rect x="119" y="109" width="22" height="20" rx="4" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="64" cy="130" r="11" fill="#e7b75f"/>
+      <path class="piece piece-3" d="M142 137c11-18 26-4 17 10-9 15-24 5-17-10z" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="103" cy="75" r="7" fill="#f2c8b8"/>
+    </svg>`;
+  return { map, key, room, house, home }[kind] || map;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 4) return 2;
+  if (count <= 7) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { condition: 0, flow: 0, environment: 0, facility: 0, contract: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
