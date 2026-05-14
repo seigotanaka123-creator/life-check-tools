@@ -436,7 +436,7 @@ const i18n = {
         "title": "少し頼ってみる前の段階",
         "lead": "まだチェックが少なくても大丈夫です。AIは使いこなすものではなく、まず少し頼ってみるものです。",
         "action": "まずは『今日やることを整理してください』と1回だけ送ってみてください。",
-        "art": "memo"
+        "art": "seed"
       },
       {
         "name": "めばえ",
@@ -450,7 +450,7 @@ const i18n = {
         "title": "考える負担が少し軽くなった日",
         "lead": "AIを、特別な道具ではなく日常の小さな補助として使い始めています。考える前の重さが少し減ってきています。",
         "action": "よく疲れる場面を1つ選び、そこだけAIに任せる形を作ってみてください。",
-        "art": "wallet"
+        "art": "leaves"
       },
       {
         "name": "小さな木",
@@ -565,7 +565,7 @@ const i18n = {
         "title": "Before asking for help",
         "lead": "Even a few checks are enough. AI is not something you must master first; it can start as one small support.",
         "action": "Start by sending: Please organize what I need to do today.",
-        "art": "memo"
+        "art": "seed"
       },
       {
         "name": "Sprout",
@@ -579,7 +579,7 @@ const i18n = {
         "title": "Your thinking load is lighter",
         "lead": "You are starting to use AI as a practical daily support, not a special tool.",
         "action": "Choose one situation that often tires you and let AI help only there.",
-        "art": "wallet"
+        "art": "leaves"
       },
       {
         "name": "Small Tree",
@@ -657,6 +657,14 @@ const nextAction = document.getElementById("nextAction");
 const resetButton = document.getElementById("resetButton");
 
 function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <ellipse class="piece" cx="100" cy="132" rx="24" ry="30" fill="#c99261"/>
+      <path class="piece piece-2" d="M91 122c8-10 19-14 31-12" fill="none" stroke="#f7dfbd" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-3" cx="73" cy="111" r="8" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="133" cy="120" r="7" fill="#8db8ca"/>
+    </svg>`;
   const memo = `
     <svg viewBox="0 0 200 200" role="img" aria-label="memo">
       <rect x="50" y="42" width="100" height="122" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
@@ -671,6 +679,15 @@ function art(kind) {
       <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
       <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
       <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaves = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="156" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 156c2-34 2-58 1-84" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 99c-35-28-61 5-36 24 18 14 34-4 36-24z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 92c34-31 64 3 36 23-19 15-34-2-36-23z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M101 123c-24-16-43 6-24 19 13 9 24-3 24-19z" fill="#8fcf93"/>
+      <circle class="piece piece-3" cx="124" cy="72" r="7" fill="#e7b75f"/>
     </svg>`;
   const wallet = `
     <svg viewBox="0 0 200 200" role="img" aria-label="wallet">
@@ -707,7 +724,7 @@ function art(kind) {
         <circle cx="73" cy="77" r="8" fill="#f7bdc8"/>
       </g>
     </svg>`;
-  return { memo, sprout, wallet, tree, bloom }[kind] || memo;
+  return { seed, memo, sprout, leaves, wallet, tree, bloom }[kind] || seed;
 }
 
 function stageIndex(count) {
