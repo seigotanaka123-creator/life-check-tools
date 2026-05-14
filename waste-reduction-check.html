@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>無駄を減らす暮らしの整え方チェック | One Coin Books</title>
+  <meta name="description" content="「無駄を減らす方法」を読んだあとに使える、記事専用のリソース整理チェックツールです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="無駄を減らす暮らしの整え方チェック | One Coin Books">
+  <meta property="og:description" content="精神・時間・お金の無駄を見つけ、余白を作るためのチェックツールです。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(231, 183, 95, .16), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">無駄を減らす暮らしの整え方チェック</h1>
+    <p class="lead" id="pageLead">「無駄を減らす方法」を読んだあとに、精神・時間・お金のどこで消耗しているかを確認できるチェックです。何を増やすかではなく、何を減らすかを見つけるために使えます。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="節約チェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今の暮らしに近いものを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつ選ぶだけでも、無意識に使っているリソースに気づき、余白を作るきっかけになります。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">見える化前</span>
+        <strong id="stageTitle">まず気づけた段階</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の節約の整い具合が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になる項目をひとつ選ぶと、今の自分に合う無駄の減らし方が表示されます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは支出をざっくり書き出して、AIに見直しポイントを聞いてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、生活を切り詰めるためのものではありません。自分の時間・気持ち・お金を、本当に大切なことへ戻していくための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  "ja": {
+    "htmlLang": "ja",
+    "title": "無駄を減らす暮らしの整え方チェック | One Coin Books",
+    "eyebrow": "記事専用チェックツール",
+    "pageTitle": "無駄を減らす暮らしの整え方チェック",
+    "pageLead": "「無駄を減らす方法」を読んだあとに、精神・時間・お金のどこで消耗しているかを確認できるチェックです。何を増やすかではなく、何を減らすかを見つけるために使えます。",
+    "checkHeading": "今の暮らしに近いものを選んでください",
+    "checkLead": "全部できなくて大丈夫です。ひとつ選ぶだけでも、無意識に使っているリソースに気づき、余白を作るきっかけになります。",
+    "resultHeading": "今日の結果",
+    "nextHeading": "次の小さな一歩",
+    "quietText": "このチェックは、生活を切り詰めるためのものではありません。自分の時間・気持ち・お金を、本当に大切なことへ戻していくための小さな道具です。",
+    "reset": "チェックをリセット",
+    "defaultTypeTitle": "今日の整え方タイプ：これからタイプ",
+    "defaultTypeText": "気になる項目をひとつ選ぶと、今の自分に合う無駄の減らし方が表示されます。",
+    "checks": [
+      {
+        "text": "考えても変わらないことを考え続けていないか見直せた",
+        "hint": "他人の感情、過去、未来の不確定なことなど、コントロールしにくいものを切り分けます。",
+        "type": "mind"
+      },
+      {
+        "text": "情報を取りすぎていないか確認した",
+        "hint": "SNS、ニュース、比較しやすい情報などで思考が疲れていないかを見ます。",
+        "type": "mind"
+      },
+      {
+        "text": "完璧を求めすぎていないか気づけた",
+        "hint": "60点でも進める、少しできれば十分、という余地を作ります。",
+        "type": "mind"
+      },
+      {
+        "text": "なんとなくスマホを見る時間に気づけた",
+        "hint": "少しだけのつもりが時間を使っていないか、無意識の時間を見直します。",
+        "type": "time"
+      },
+      {
+        "text": "本当に必要な予定か考えられた",
+        "hint": "乗り気でない予定や断れずに入れた予定が、余白を減らしていないかを見ます。",
+        "type": "time"
+      },
+      {
+        "text": "やらないことをひとつ決めた",
+        "hint": "新しく増やすより、寝る前のSNSや不要な情報収集など、減らすものを決めます。",
+        "type": "reduce"
+      },
+      {
+        "text": "空白の時間を少し残せた",
+        "hint": "予定を入れない時間、ぼーっとする時間、何もしない時間を残せた状態です。",
+        "type": "space"
+      },
+      {
+        "text": "目的のない支出に気づけた",
+        "hint": "なんとなく買う、セールだから買う、暇だから見る、という支出を見直します。",
+        "type": "money"
+      },
+      {
+        "text": "感情で買っていないか一度止まれた",
+        "hint": "疲れ、不安、比較、寂しさを埋めるための買い物になっていないかを見ます。",
+        "type": "money"
+      },
+      {
+        "text": "固定費やサブスクをひとつ見直せた",
+        "hint": "使っていないサービスや、なんとなく払い続けているものを確認します。",
+        "type": "money"
+      },
+      {
+        "text": "自分が本当に望んでいることか考えられた",
+        "hint": "嫌われたくないから、周りに合わせて、比較されないために、という消耗を見直します。",
+        "type": "value"
+      },
+      {
+        "text": "本当に大切なことを少し残せた",
+        "hint": "全部を頑張るのではなく、大切にしたい時間・気持ち・お金の使い方を残す意識です。",
+        "type": "value"
+      }
+    ],
+    "stages": [
+      {
+        "name": "たね",
+        "title": "余白を作る前の段階",
+        "lead": "まだチェックが少なくても大丈夫です。無駄を減らすことは、我慢ではなく、自分のリソースに気づくところから始まります。",
+        "action": "まずは、精神・時間・お金のうち一番疲れているものをひとつ選んでみてください。",
+        "art": "seed"
+      },
+      {
+        "name": "めばえ",
+        "title": "無意識の消耗に気づけた日",
+        "lead": "ひとつでも選べたなら十分です。なんとなく使っていた時間や気力、お金に少し意識が戻ってきています。",
+        "action": "次は、今日やらないことをひとつだけ決めてみましょう。",
+        "art": "sprout"
+      },
+      {
+        "name": "若葉",
+        "title": "減らす視点が育ち始めた日",
+        "lead": "頑張って増やすより、少し減らす方向に意識が向いています。余白を作る準備ができ始めています。",
+        "action": "スマホ、予定、情報、買い物の中から、ひとつだけ減らすものを選んでください。",
+        "art": "leaves"
+      },
+      {
+        "name": "小さな木",
+        "title": "暮らしの余白が育ち始めた日",
+        "lead": "精神・時間・お金のどこかで無駄な消耗を減らせています。自分で選べている感覚が少し戻ってきています。",
+        "action": "今日軽くなった感覚があれば、明日も同じ減らし方を1回だけ試してみてください。",
+        "art": "tree"
+      },
+      {
+        "name": "花と実り",
+        "title": "大切なことに戻る余白ができた日",
+        "lead": "とても良い状態です。何かを増やさなくても、本当に大切なものを残す感覚ができています。",
+        "action": "全部を整えようとせず、今の自分に一番効いた『やらないこと』を定番にしてください。",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "mind": {
+        "title": "今日の整え方タイプ：精神の無駄リセットタイプ",
+        "text": "考えすぎ、情報の取りすぎ、完璧主義で消耗しやすいタイプです。まずは考えても変わらないことを区切り、情報を少し減らすのが合っています。"
+      },
+      "time": {
+        "title": "今日の整え方タイプ：時間の無意識リセットタイプ",
+        "text": "なんとなくスマホを見る、予定を入れすぎるなど、時間が少しずつ消えやすいタイプです。何に使わないかを決めると余白が戻りやすくなります。"
+      },
+      "reduce": {
+        "title": "今日の整え方タイプ：やらないこと決めタイプ",
+        "text": "新しく頑張るより、やめることを決めると整いやすいタイプです。寝る前のSNS、不要な情報収集、無理な予定などをひとつ減らすのが向いています。"
+      },
+      "space": {
+        "title": "今日の整え方タイプ：余白づくりタイプ",
+        "text": "空白の時間があるほど回復しやすいタイプです。何もしない時間や予定を入れない日を、無駄ではなく必要な余白として残すのが合っています。"
+      },
+      "money": {
+        "title": "今日の整え方タイプ：お金の無駄見直しタイプ",
+        "text": "感情や惰性でお金を使いやすいタイプです。買う前に理由を言葉にする、固定費をひとつ見直す、一晩置く、が役に立ちます。"
+      },
+      "value": {
+        "title": "今日の整え方タイプ：大切なことに戻るタイプ",
+        "text": "周りに合わせることや本当は望んでいないことにリソースを使いやすいタイプです。自分が本当に残したいものを見ると整いやすくなります。"
+      }
+    }
+  },
+  "en": {
+    "htmlLang": "en",
+    "title": "Waste Reduction Life Check | One Coin Books",
+    "eyebrow": "Reader bonus tool",
+    "pageTitle": "Waste Reduction Life Check",
+    "pageLead": "After reading the article, check where your mental energy, time, and money may be leaking. This tool helps you find what to reduce instead of what to add.",
+    "checkHeading": "Choose what feels close to your life now",
+    "checkLead": "You do not need to do everything. Even one check can help you notice unconscious use of your resources and create a little space.",
+    "resultHeading": "Today's Result",
+    "nextHeading": "A Small Next Step",
+    "quietText": "This check is not for cutting your life down harshly. It is a small tool for returning your time, energy, and money to what matters to you.",
+    "reset": "Reset checks",
+    "defaultTypeTitle": "Your reduction style: just getting started",
+    "defaultTypeText": "Choose one item that feels close to you, and your way of reducing waste will appear here.",
+    "checks": [
+      {
+        "text": "I noticed whether I kept thinking about things I cannot change",
+        "hint": "Other people's feelings, the past, and uncertain futures are hard to control.",
+        "type": "mind"
+      },
+      {
+        "text": "I checked whether I was taking in too much information",
+        "hint": "Social media, news, and comparison-heavy content can tire your mind.",
+        "type": "mind"
+      },
+      {
+        "text": "I noticed if I was asking too much perfection of myself",
+        "hint": "Moving forward at 60 percent can be enough.",
+        "type": "mind"
+      },
+      {
+        "text": "I noticed time spent scrolling without intention",
+        "hint": "Small unconscious minutes can become a large amount of time.",
+        "type": "time"
+      },
+      {
+        "text": "I asked whether a plan was truly necessary",
+        "hint": "Some plans reduce space because they were accepted without wanting them.",
+        "type": "time"
+      },
+      {
+        "text": "I decided one thing not to do",
+        "hint": "Instead of adding more, decide one thing to reduce, such as bedtime scrolling.",
+        "type": "reduce"
+      },
+      {
+        "text": "I left a little blank space in my day",
+        "hint": "Time without plans, doing nothing, or simply resting can be necessary space.",
+        "type": "space"
+      },
+      {
+        "text": "I noticed spending without a clear purpose",
+        "hint": "Buying because of a sale, boredom, or habit can be reviewed.",
+        "type": "money"
+      },
+      {
+        "text": "I paused before buying from emotion",
+        "hint": "Check whether fatigue, anxiety, comparison, or loneliness is driving the purchase.",
+        "type": "money"
+      },
+      {
+        "text": "I reviewed one fixed cost or subscription",
+        "hint": "Look at services you do not use or keep paying for out of habit.",
+        "type": "money"
+      },
+      {
+        "text": "I asked whether this is something I truly want",
+        "hint": "Notice energy spent because of fear of dislike, comparison, or other people's standards.",
+        "type": "value"
+      },
+      {
+        "text": "I kept a little room for what truly matters",
+        "hint": "Instead of doing everything, you protected time, energy, or money for what you value.",
+        "type": "value"
+      }
+    ],
+    "stages": [
+      {
+        "name": "Seed",
+        "title": "Before space begins",
+        "lead": "Even a few checks are enough. Reducing waste starts by noticing your resources, not by forcing deprivation.",
+        "action": "First, choose which resource feels most tired: mind, time, or money.",
+        "art": "seed"
+      },
+      {
+        "name": "Sprout",
+        "title": "You noticed unconscious drain",
+        "lead": "One check is already enough. Awareness is returning to time, energy, or money that was being used without intention.",
+        "action": "Next, decide one thing not to do today.",
+        "art": "sprout"
+      },
+      {
+        "name": "Young Leaves",
+        "title": "The reducing mindset is growing",
+        "lead": "You are beginning to look at what to reduce instead of what to add. Space is starting to become possible.",
+        "action": "Choose one thing to reduce from phone, plans, information, or shopping.",
+        "art": "leaves"
+      },
+      {
+        "name": "Small Tree",
+        "title": "More room is growing in your life",
+        "lead": "You are reducing unnecessary drain in your mind, time, or money. A sense of choosing for yourself is returning.",
+        "action": "If something felt lighter today, repeat that small reduction tomorrow.",
+        "art": "tree"
+      },
+      {
+        "name": "Bloom and Fruit",
+        "title": "Space for what matters is returning",
+        "lead": "This is a very good state. You are learning that you do not need to add more to keep what matters.",
+        "action": "Do not fix everything. Keep the one not-to-do rule that helped most.",
+        "art": "bloom"
+      }
+    ],
+    "types": {
+      "mind": {
+        "title": "Your reduction style: mental noise reset",
+        "text": "You may be drained by overthinking, too much information, or perfectionism. Cut off what you cannot control and reduce input a little."
+      },
+      "time": {
+        "title": "Your reduction style: unconscious time reset",
+        "text": "Time may disappear through scrolling, plans, or low-priority tasks. Deciding what not to spend time on can bring space back."
+      },
+      "reduce": {
+        "title": "Your reduction style: not-to-do list",
+        "text": "You may improve faster by deciding what to stop rather than adding new effort. Choose one unnecessary habit to reduce."
+      },
+      "space": {
+        "title": "Your reduction style: creating blank space",
+        "text": "You recover through open space. Time without plans or action is not waste; it can be the room you need."
+      },
+      "money": {
+        "title": "Your reduction style: spending review",
+        "text": "Money may leak through emotion or habit. Naming the reason before buying and reviewing one fixed cost can help."
+      },
+      "value": {
+        "title": "Your reduction style: returning to values",
+        "text": "You may spend resources on things you do not truly want. Noticing what you want to keep helps your life feel chosen again."
+      }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <ellipse class="piece" cx="100" cy="132" rx="24" ry="30" fill="#c99261"/>
+      <path class="piece piece-2" d="M91 122c8-10 19-14 31-12" fill="none" stroke="#f7dfbd" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-3" cx="73" cy="111" r="8" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="133" cy="120" r="7" fill="#8db8ca"/>
+    </svg>`;
+  const memo = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="memo">
+      <rect x="50" y="42" width="100" height="122" rx="10" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece" d="M72 78h56M72 102h44M72 126h62" stroke="#8db8ca" stroke-width="6" stroke-linecap="round"/>
+      <circle class="piece piece-2" cx="134" cy="64" r="13" fill="#e7b75f"/>
+      <path class="piece piece-3" d="M69 147c15-13 33-10 45 0" fill="none" stroke="#6fae72" stroke-width="6" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaves = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="156" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 156c2-34 2-58 1-84" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 99c-35-28-61 5-36 24 18 14 34-4 36-24z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 92c34-31 64 3 36 23-19 15-34-2-36-23z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M101 123c-24-16-43 6-24 19 13 9 24-3 24-19z" fill="#8fcf93"/>
+      <circle class="piece piece-3" cx="124" cy="72" r="7" fill="#e7b75f"/>
+    </svg>`;
+  const wallet = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="wallet">
+      <rect class="piece" x="42" y="70" width="116" height="78" rx="12" fill="#fff" stroke="#e2ddd2" stroke-width="4"/>
+      <path class="piece piece-2" d="M55 76l72-31 16 35" fill="#d9c2a4"/>
+      <rect x="104" y="94" width="45" height="32" rx="9" fill="#8db8ca"/>
+      <circle cx="121" cy="110" r="5" fill="#fff"/>
+      <circle class="piece piece-3" cx="68" cy="96" r="12" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="85" cy="116" r="10" fill="#6fae72"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="saving foundation">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="122" cy="105" r="8" fill="#e7b75f"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="room to breathe">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <circle class="piece piece-3" cx="90" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="125" cy="111" r="10" fill="#e88963"/>
+      <g class="piece piece-2">
+        <circle cx="73" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="64" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="82" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="73" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="73" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+    </svg>`;
+  return { seed, memo, sprout, leaves, wallet, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { mind: 0, time: 0, reduce: 0, space: 0, money: 0, value: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
