@@ -1,0 +1,651 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>買い替えタイミング判断チェック | One Coin Books</title>
+  <meta name="description" content="まだ使えるものを買い替えるべきか、頻度・ストレス・改善度から整理するチェックツールです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="買い替えタイミング判断チェック | One Coin Books">
+  <meta property="og:description" content="まだ使えるものを買い替えるべきか、頻度・ストレス・改善度から整理するチェックツールです。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "買い替えタイミング判断チェック | One Coin Books",
+    description: "まだ使えるものを買い替えるべきか、頻度・ストレス・改善度から整理するチェックツールです。",
+    pageTitle: "買い替えタイミング判断チェック",
+    pageLead: "まだ使えるけれど使いにくいものを、今買い替えるべきかどうか整理する小さなチェックです。できた項目を選ぶと、今の見極め具合と自分に合う判断タイプが分かります。",
+    langLabel: "Language",
+    noteLabel: "Note",
+    quietTitle: "買わないことも、使い続けることも、どちらもコストになります",
+    quietText: "このチェックは、買い替えをすすめるためのものではありません。頻度・ストレス・改善度を見ながら、感情ではなく状態で判断するための道具です。",
+    checklistTitle: "できたことにチェックしてください",
+    checklistLead: "全部できなくて大丈夫です。気になるものを一つ思い浮かべながら、当てはまる項目を選んでください。",
+    checks: [
+      { text: "その物をどれくらいの頻度で使っているか確認できた", hint: "毎日使うものほど、少しの不便でも影響が大きくなります。", type: "frequency" },
+      { text: "使うたびにストレスがあるか見られた", hint: "たまにではなく、繰り返し気になるかを見ることが大切です。", type: "stress" },
+      { text: "時間や手間が増えていないか考えられた", hint: "待ち時間、探す時間、やり直しなどの見えないコストを確認できています。", type: "time" },
+      { text: "『まだ使える』と『快適に使えている』を分けて考えられた", hint: "使えることと、満足して使えていることは別です。", type: "comfort" },
+      { text: "慣れているだけで我慢していないか確認できた", hint: "不便に慣れているだけの場合、買い替えで大きく楽になることがあります。", type: "habit" },
+      { text: "買い替えた場合の改善度を想像できた", hint: "どれくらいラクになるか、効率が上がるかを具体的に見られています。", type: "improvement" },
+      { text: "他に明らかに良い選択肢があるか確認できた", hint: "性能・軽さ・使いやすさなど、比較できる候補が見えています。", type: "option" },
+      { text: "感情ではなく状態で判断しようとできた", hint: "もったいない、欲しい、面倒などの感情から少し距離を取れています。", type: "objective" },
+      { text: "判断を先送りしていること自体のコストに気づけた", hint: "迷い続ける時間やストレスも、見えないコストの一つです。", type: "delay" },
+      { text: "今の自分にとって納得できる選択を考えられた", hint: "正解より、その時点で納得できる判断を大切にできています。", type: "納得" }
+    ],
+    stages: [
+      { name: "たね", title: "判断のたねを置けた日", lead: "まだ買い替えるか決まっていなくても大丈夫です。なんとなく迷う状態から、判断軸で見ようとできた時点で、たねは置けています。", action: "まずは、その物をどれくらい使っているかだけ確認してみてください。", art: "seed" },
+      { name: "めばえ", title: "見えないコストに気づけた日", lead: "ひとつでも選べたなら十分です。お金だけでなく、時間やストレスもコストとして見始めています。", action: "次は、使うたびに感じる小さな不便を一つだけ書き出してみましょう。", art: "sprout" },
+      { name: "若葉", title: "買い替え判断の軸が見えた日", lead: "頻度・ストレス・改善度のどれかを整理できています。若葉のように、判断の軸が育ち始めています。", action: "『まだ使える』と『快適に使えている』を分けて考えてみてください。", art: "leaf" },
+      { name: "小さな木", title: "納得できる見極めが育った日", lead: "感情だけでなく、状態や改善度を見ながら判断できています。買う・買わないのどちらも選びやすくなっています。", action: "買い替えた場合に何が一番改善するか、一つだけ決めてください。", art: "tree" },
+      { name: "花と実り", title: "後悔しにくい判断に近づいた日", lead: "今日の見極めはかなり整理されています。早すぎる買い替えも、遅すぎる先送りも避けやすい状態です。", action: "今買う・保留する・候補だけ調べるのどれにするか、一つ選んでください。", art: "bloom" }
+    ],
+    types: {
+      frequency: { title: "判断タイプ：使用頻度チェックタイプ", text: "まず使用頻度を見ると判断しやすいタイプです。毎日使うものなら、少しの改善でも生活全体への影響が大きくなります。" },
+      stress: { title: "判断タイプ：ストレス蓄積タイプ", text: "使うたびの小さな不満が判断材料になりやすいタイプです。繰り返し感じるストレスは、買い替えを検討するサインです。" },
+      time: { title: "判断タイプ：時間コスト確認タイプ", text: "待ち時間や手間を見える化すると整いやすいタイプです。お金以外に失っている時間も判断に入れてください。" },
+      comfort: { title: "判断タイプ：快適さ分離タイプ", text: "『使える』と『快適』を分けると判断しやすいタイプです。まだ使えるだけで続けていないか確認しましょう。" },
+      habit: { title: "判断タイプ：慣れた不便見直しタイプ", text: "不便に慣れて我慢しやすいタイプです。慣れているだけで最適ではないものは、見直す価値があります。" },
+      improvement: { title: "判断タイプ：改善度重視タイプ", text: "買い替え後の変化を想像すると判断しやすいタイプです。明確にラクになるなら、買い替え価値は高くなります。" },
+      option: { title: "判断タイプ：選択肢比較タイプ", text: "候補を比べると判断しやすいタイプです。明らかに良い選択肢があるかどうかを確認すると迷いが減ります。" },
+      objective: { title: "判断タイプ：状態判断タイプ", text: "感情より状態で見ると整いやすいタイプです。もったいない、欲しい、面倒という気持ちから少し距離を取りましょう。" },
+      delay: { title: "判断タイプ：先送りコスト確認タイプ", text: "迷い続けること自体が負担になりやすいタイプです。保留する場合も、いつ見直すか決めておくと楽になります。" },
+      納得: { title: "判断タイプ：納得優先タイプ", text: "正解より納得感を大切にすると判断しやすいタイプです。その時点で理由を持って選べたなら十分です。" }
+    },
+    resultTitle: "今日の買い替え見極め度",
+    typeTitle: "今のあなたに合いそうな判断タイプ",
+    nextTitle: "次の小さな一歩",
+    shareTitle: "結果をコピー",
+    shareButton: "結果をコピーする",
+    copied: "コピーしました",
+    reset: "リセット"
+  },
+  en: {
+    title: "Replacement Timing Decision Check | One Coin Books",
+    description: "A simple check tool for deciding whether it is time to replace something by looking at frequency, stress, and improvement.",
+    pageTitle: "Replacement Timing Decision Check",
+    pageLead: "Use this small check to decide whether an item that still works should be replaced now. Choose what you managed to clarify and see your current decision stage and judgment type.",
+    langLabel: "Language",
+    noteLabel: "Note",
+    quietTitle: "Not buying and continuing to use something both have costs",
+    quietText: "This check does not push you to replace things. It helps you look at frequency, stress, and improvement so you can decide by condition, not just emotion.",
+    checklistTitle: "Check what you managed to clarify",
+    checklistLead: "You do not need to check everything. Think of one item and choose what applies.",
+    checks: [
+      { text: "I checked how often I use the item", hint: "The more often you use it, the more small inconveniences matter.", type: "frequency" },
+      { text: "I checked whether it causes stress each time", hint: "Repeated stress matters more than a one-time annoyance.", type: "stress" },
+      { text: "I considered whether it costs extra time or effort", hint: "Waiting, searching, and redoing are hidden costs.", type: "time" },
+      { text: "I separated 'still usable' from 'comfortable to use'", hint: "Being usable and being satisfying are different things.", type: "comfort" },
+      { text: "I checked whether I am just used to the inconvenience", hint: "Sometimes replacement helps because you were adapting to discomfort.", type: "habit" },
+      { text: "I imagined how much replacement would improve things", hint: "You looked at how much easier or more efficient life might become.", type: "improvement" },
+      { text: "I checked whether there is a clearly better option", hint: "You can compare options by performance, lightness, or ease of use.", type: "option" },
+      { text: "I tried to judge by condition, not emotion", hint: "You stepped back from feelings like waste, desire, or hassle.", type: "objective" },
+      { text: "I noticed the cost of delaying the decision", hint: "Continuing to wonder can also cost time and energy.", type: "delay" },
+      { text: "I considered a choice I can accept right now", hint: "You valued a reasonable decision over a perfect one.", type: "納得" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of placing decision seeds", lead: "Even if you have not decided yet, it is okay. The seed is there once you move from vague hesitation to decision criteria.", action: "First, check how often you use the item.", art: "seed" },
+      { name: "Sprout", title: "A day when hidden costs became visible", lead: "One check is enough. You are starting to see time and stress as costs, not only money.", action: "Write down one small inconvenience you feel each time you use it.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when replacement criteria appeared", lead: "You clarified frequency, stress, or improvement. The leaves of judgment are beginning to grow.", action: "Separate 'still usable' from 'comfortable to use.'", art: "leaf" },
+      { name: "Small Tree", title: "A day when acceptable judgment grew", lead: "You are deciding by condition and improvement, not only emotion. Both buying and not buying are easier to choose.", action: "Choose the one thing that would improve most if you replaced it.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day closer to regret-resistant judgment", lead: "Your judgment is well organized. You can avoid replacing too early or delaying too long.", action: "Choose one: buy now, hold, or only research candidates.", art: "bloom" }
+    ],
+    types: {
+      frequency: { title: "Decision Type: Usage Frequency", text: "Start with how often you use it. If it is daily, even a small improvement can have a large effect." },
+      stress: { title: "Decision Type: Repeated Stress", text: "Small repeated frustration is your main signal. If it happens every time, replacement may be worth considering." },
+      time: { title: "Decision Type: Time Cost", text: "You decide better when hidden time costs are visible. Waiting and extra steps count too." },
+      comfort: { title: "Decision Type: Usable vs Comfortable", text: "You need to separate 'it still works' from 'it feels good to use.' That distinction matters." },
+      habit: { title: "Decision Type: Used to Inconvenience", text: "You may adapt to inconvenience too easily. If you are only used to it, it may be worth reviewing." },
+      improvement: { title: "Decision Type: Improvement Focus", text: "You judge best by imagining the size of improvement. Clear improvement means higher replacement value." },
+      option: { title: "Decision Type: Option Comparison", text: "You decide better by comparing candidates. Check whether there is a clearly better option." },
+      objective: { title: "Decision Type: Condition-Based", text: "You benefit from stepping back from emotions and looking at the current condition of the item." },
+      delay: { title: "Decision Type: Delay Cost", text: "Ongoing hesitation may itself be a burden. If you hold, choose when you will review it again." },
+      納得: { title: "Decision Type: Acceptance First", text: "You decide best by seeking acceptance, not perfection. A reasoned choice is enough for now." }
+    },
+    resultTitle: "Your current replacement clarity",
+    typeTitle: "Decision type that may fit you",
+    nextTitle: "Next small step",
+    shareTitle: "Copy result",
+    shareButton: "Copy result",
+    copied: "Copied",
+    reset: "Reset"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
