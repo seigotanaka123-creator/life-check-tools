@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>散歩で日常を整えるチェック | One Coin Books</title>
+  <meta name="description" content="「散歩の時間が日常を整える理由」を読んだあとに使える、記事専用の散歩チェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="散歩で日常を整えるチェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の散歩の整い具合と自分に合う歩き方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "散歩で日常を整えるチェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "散歩で日常を整えるチェック",
+    pageLead: "「散歩の時間が日常を整える理由」を読んだあとに、今日できた散歩の整え方を選んでみてください。今の散歩の整い具合と、自分に合う歩き方タイプが分かります。",
+    checkHeading: "今日できた散歩の整え方を選んでください",
+    checkLead: "全部できなくて大丈夫です。外に出る、少し歩く、景色を見る。それだけでも日常は少し整い始めています。",
+    resultHeading: "今日の結果",
+    nextHeading: "次の小さな一歩",
+    quietText: "このチェックは、散歩をちゃんと続けるための採点ではありません。歩くことで、気持ちの重さや頭の詰まりがどれくらいほどけたかを見える形にするための小さな道具です。",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "散歩タイプ：これから外に出るタイプ",
+    defaultTypeText: "気になった項目をひとつ選ぶと、今の自分に合う散歩の整え方が見えてきます。",
+    checks: [
+      { text: "外に出るハードルを少し下げられた", hint: "長く歩く前に、玄関を出る、外の空気に触れるだけでも十分です。", type: "start" },
+      { text: "5分だけでも歩く時間を作れた", hint: "短い時間でも、気持ちの流れを変えるきっかけになります。", type: "small" },
+      { text: "目的を決めずに歩けた", hint: "何かを達成するためではなく、ただ歩く時間にできた状態です。", type: "aimless" },
+      { text: "少しゆっくり歩けた", hint: "急がず歩くことで、頭と心の緊張がほどけやすくなります。", type: "pace" },
+      { text: "空や周りの景色に目を向けられた", hint: "視線を上げるだけで、思考の詰まりが少しゆるみます。", type: "senses" },
+      { text: "呼吸や足音など感覚に意識を向けられた", hint: "五感に戻ることで、今ここにいる感覚が戻りやすくなります。", type: "senses" },
+      { text: "浮かんだ考えを解決せずに流せた", hint: "考えを止めるのではなく、乗らずに流せたら十分です。", type: "flow" },
+      { text: "無理に続けようとしなかった", hint: "毎日や長時間にこだわらず、できるときに少しだけでOKと思えた状態です。", type: "gentle" },
+      { text: "帰宅前や食後など、日常の中に散歩を入れられた", hint: "新しく頑張るより、今ある流れに少し足せると続きやすくなります。", type: "routine" },
+      { text: "少しでも気持ちの変化を感じられた", hint: "軽くなった、落ち着いた、悪くなかった。その小さな変化を拾えたら十分です。", type: "change" }
+    ],
+    stages: [
+      { name: "たね", title: "外に出るきっかけを置けた日", lead: "まだ歩けていなくても大丈夫です。散歩で日常を整えるという選択肢に気づけた時点で、たねは置けています。", action: "まずは玄関を開ける、外の空気に触れるなど、歩く前の小さな一歩だけ決めてみてください。", art: "seed" },
+      { name: "めばえ", title: "少し外の空気に触れられた日", lead: "ひとつでも選べたなら十分です。頑張るためではなく、回復するための時間が少し芽生えています。", action: "次は5分だけ、目的を決めずに歩く時間を作ってみましょう。", art: "sprout" },
+      { name: "若葉", title: "歩くことで気持ちがゆるみ始めた日", lead: "短い散歩やゆっくり歩く感覚を取り入れられています。頭の中の詰まりが少し流れ始めています。", action: "明日は歩くスピードを少し落として、空や景色を一度だけ見てみてください。", art: "leaf" },
+      { name: "小さな木", title: "散歩が日常を整え始めた日", lead: "感覚に戻ること、考えを流すこと、日常に入れることが少しできています。散歩が暮らしの中で育ち始めています。", action: "帰宅前、食後、朝のどこかに、無理なく歩ける小さな置き場所をひとつ決めてみましょう。", art: "tree" },
+      { name: "花と実り", title: "何もない日を少し好きになれた日", lead: "今日の散歩の整い具合はかなり育っています。特別なことがなくても、歩くことで日常の感じ方をやわらかくできています。", action: "全部を続けようとせず、今日いちばん自然にできた歩き方だけを次も残してみてください。", art: "bloom" }
+    ],
+    types: {
+      start: { title: "散歩タイプ：外に出るきっかけタイプ", text: "まず外の空気に触れるだけで整いやすいタイプです。長く歩くより、玄関を出る、近くを一周するくらいの軽さが合っています。" },
+      small: { title: "散歩タイプ：5分リセットタイプ", text: "短い散歩で気持ちの流れが変わりやすいタイプです。長時間より、5分だけ歩く形にすると続けやすくなります。" },
+      aimless: { title: "散歩タイプ：目的なし回復タイプ", text: "何かを達成しようとしない散歩で回復しやすいタイプです。行き先や成果を決めず、ただ歩く時間が合っています。" },
+      pace: { title: "散歩タイプ：ゆっくり歩くタイプ", text: "歩くスピードを落とすことで整いやすいタイプです。急がず歩くほど、頭の中の忙しさがほどけやすくなります。" },
+      senses: { title: "散歩タイプ：景色と感覚タイプ", text: "空、風、足音、呼吸などに意識を向けると整いやすいタイプです。五感に戻ることで日常の感じ方がやわらぎます。" },
+      flow: { title: "散歩タイプ：思考を流すタイプ", text: "考えを解決しようとするより、浮かんだまま流すことで軽くなりやすいタイプです。考えに乗らず歩き続けるのが合っています。" },
+      gentle: { title: "散歩タイプ：ゆるく続けるタイプ", text: "毎日や長時間にこだわらない方が続きやすいタイプです。できるときに少しだけ、途中でやめてもOKの軽さが合っています。" },
+      routine: { title: "散歩タイプ：日常に溶かすタイプ", text: "新しい習慣として頑張るより、帰宅前や食後など今ある流れに足すと続きやすいタイプです。" },
+      change: { title: "散歩タイプ：小さな変化を拾うタイプ", text: "気持ちが少し軽くなった、落ち着いた、悪くなかったという変化を拾うことで散歩が続きやすいタイプです。" }
+    }
+  },
+  en: {
+    htmlLang: "en",
+    title: "Walking Daily Reset Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "Walking Daily Reset Check",
+    pageLead: "After reading the article, choose what you were able to do during your walk today. You will see how your daily reset through walking is growing and which walking style fits you best.",
+    checkHeading: "Choose what you did during your walk today",
+    checkLead: "You do not need to check everything. Going outside, walking a little, or looking at the sky is already a small reset.",
+    resultHeading: "Today's Result",
+    nextHeading: "A Small Next Step",
+    quietText: "This check is not for grading whether you walked properly. It is a small tool for seeing how walking helped loosen heaviness, mental clutter, and daily tension.",
+    reset: "Reset checks",
+    defaultTypeTitle: "Walking style: ready to step outside",
+    defaultTypeText: "Choose one item that feels possible, and your best walking reset style will appear here.",
+    checks: [
+      { text: "I lowered the hurdle to going outside", hint: "Before taking a long walk, simply stepping outside or feeling the air is enough.", type: "start" },
+      { text: "I made even five minutes to walk", hint: "A short walk can still shift the flow of your mood.", type: "small" },
+      { text: "I walked without a clear purpose", hint: "You did not walk to achieve something. You simply gave yourself time to walk.", type: "aimless" },
+      { text: "I walked a little more slowly", hint: "Slowing down helps loosen tension in the mind and body.", type: "pace" },
+      { text: "I looked at the sky or the scenery around me", hint: "Lifting your gaze can soften the feeling of being mentally stuck.", type: "senses" },
+      { text: "I noticed my breath, footsteps, or senses", hint: "Returning to your senses helps you feel present again.", type: "senses" },
+      { text: "I let thoughts pass without solving them", hint: "You did not need to stop your thoughts. Letting them pass without following them is enough.", type: "flow" },
+      { text: "I did not force myself to keep going", hint: "You did not need to walk every day or for a long time. A little when possible was enough.", type: "gentle" },
+      { text: "I placed walking inside my normal day", hint: "Adding a walk before going home, after eating, or during an existing routine makes it easier to continue.", type: "routine" },
+      { text: "I noticed even a small change in my mood", hint: "Lighter, calmer, or simply not bad. Noticing that small shift is enough.", type: "change" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of placing the first reason to step outside", lead: "Even if you have not walked yet, it is okay. Noticing that walking can reset your daily life is the first seed.", action: "Start by deciding one tiny step before walking, such as opening the door or feeling the outside air.", art: "seed" },
+      { name: "Sprout", title: "A day of touching the outside air", lead: "One check is enough. A small recovery time is beginning to grow, not for effort, but for returning to yourself.", action: "Next, try walking for five minutes without deciding a purpose.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when walking began to soften your mood", lead: "You are bringing in short walks and slower steps. The stuck feeling in your mind is beginning to flow.", action: "Tomorrow, slow your pace a little and look once at the sky or scenery.", art: "leaf" },
+      { name: "Small Tree", title: "A day when walking started to reset daily life", lead: "Returning to your senses, letting thoughts pass, and placing walking in your day are beginning to grow into a small rhythm.", action: "Choose one natural place for a walk: before returning home, after a meal, or in the morning.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when an ordinary day became a little easier to like", lead: "Your walking reset is growing well. Even without anything special, walking helped soften how the day felt.", action: "Do not try to keep everything. Keep only the walking style that felt most natural today.", art: "bloom" }
+    ],
+    types: {
+      start: { title: "Walking style: step-outside type", text: "You reset best by simply touching the outside air. A quick step outside or one small loop may fit you better than a long walk." },
+      small: { title: "Walking style: five-minute reset type", text: "Short walks can shift your mood. Keeping it to five minutes may make walking easier to continue." },
+      aimless: { title: "Walking style: no-purpose recovery type", text: "You recover best when walking is not a task. No destination and no result needed; just walking fits you." },
+      pace: { title: "Walking style: slow-walk type", text: "Slowing your pace helps you settle. The less you rush, the easier it becomes for mental busyness to soften." },
+      senses: { title: "Walking style: scenery and senses type", text: "You reset by noticing sky, wind, footsteps, breath, and small sensations. Returning to the senses softens the day." },
+      flow: { title: "Walking style: thought-flow type", text: "You feel lighter when you let thoughts pass instead of solving them. Keep walking without following every thought." },
+      gentle: { title: "Walking style: gentle-continuation type", text: "You do best when you do not force daily or long walks. A little when possible, stopping when needed, fits you." },
+      routine: { title: "Walking style: daily-flow type", text: "You continue more easily by adding walking to an existing flow, such as before going home or after eating." },
+      change: { title: "Walking style: small-shift type", text: "You continue by noticing tiny changes: a little lighter, calmer, or simply okay. Those small shifts matter." }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
