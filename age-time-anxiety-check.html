@@ -1,0 +1,630 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>このままでいいのか不安な時の時間整理チェック | One Coin Books</title>
+  <meta name="description" content="「このままでいいのか不安な時に読む話」を読んだあとに使える、記事専用の時間整理チェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="このままでいいのか不安な時の時間整理チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、年齢や時間への焦りの整い具合と、次にできる小さな一歩が分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">このままでいいのか不安な時の時間整理チェック</h1>
+    <p class="lead" id="pageLead">「このままでいいのか不安な時に読む話」を読んだあとに、今の焦りとの向き合い方を選んでみてください。年齢や時間への不安の整い具合と、次にできる小さな一歩が分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="一日リセットのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "このままでいいのか不安な時の時間整理チェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "このままでいいのか不安な時の時間整理チェック",
+    pageLead: "「このままでいいのか不安な時に読む話」を読んだあとに、今の焦りとの向き合い方を選んでみてください。年齢や時間への不安の整い具合と、次にできる小さな一歩が分かります。",
+    checkHeading: "今できている整理を選んでください",
+    resultLabel: "今の整い具合",
+    typeLabel: "あなたに合う時間整理タイプ",
+    nextLabel: "次の小さな一歩",
+    checkedText: "選択中",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "時間整理タイプ：これから整えるタイプ",
+    defaultTypeText: "気になった項目をひとつ選ぶと、年齢や時間への焦りを軽くする整え方が見えてきます。",
+    checks: [
+      { text: "焦りは遅れではなく、比較のサインかもしれないと思えた", hint: "誰かの一部だけを見て、自分全体を判断していないかに気づけると楽になります。", type: "compare" },
+      { text: "SNSや他人の成果から少し距離を取れた", hint: "見続けるほど焦りが強くなるなら、一度離れることも立派な整理です。", type: "distance" },
+      { text: "見える成果だけで自分を判断しすぎないようにできた", hint: "考え方の変化、失敗からの学び、続けてきた経験もちゃんと積み上がっています。", type: "invisible" },
+      { text: "もう遅い、と決めつけすぎないようにできた", hint: "年齢そのものより、自分の中の基準が焦りを作っていることがあります。", type: "late" },
+      { text: "今できていること・できていないことを少し整理できた", hint: "現在地が見えると、不安は少し扱いやすくなります。完璧に整理しなくても大丈夫です。", type: "current" },
+      { text: "大きく変えようとせず、小さく動くことを考えられた", hint: "焦りが強い時ほど、大きな変化より今日できる小さな一歩が効きます。", type: "small" },
+      { text: "完璧を目指さず、少しずつでいいと思えた", hint: "不安なままでも、少しずつ進めば大丈夫です。焦りをゼロにする必要はありません。", type: "gentle" },
+      { text: "焦りを悪いものではなく、変えたい気持ちの表れとして見られた", hint: "焦りに振り回されるのではなく、進むきっかけとして扱えると整いやすくなります。", type: "signal" }
+    ],
+    stages: [
+      { name: "たね", title: "焦りの正体に気づけた日", lead: "まだ不安が残っていても大丈夫です。焦りをただの遅れではなく、比較や不安のサインとして見られたことが最初のたねです。", action: "まずは、今見すぎている比較対象をひとつだけ減らしてみてください。", art: "seed" },
+      { name: "めばえ", title: "比較から少し離れられた日", lead: "ひとつでもできていれば十分です。他人の成果ではなく、自分の現在地を見る芽が出ています。", action: "今日できていることを、小さくても一つだけ書いてみましょう。", art: "sprout" },
+      { name: "若葉", title: "見えない積み上げを見られた日", lead: "成果だけではなく、経験や変化にも目を向けられています。焦りに飲まれない若葉が育っています。", action: "最近少し変わった考え方や、前より分かるようになったことを一つ残してみてください。", art: "leaf" },
+      { name: "小さな木", title: "現在地を整理できた日", lead: "今できていること、できていないこと、小さく動けることが見え始めています。時間への不安を扱う土台ができています。", action: "大きな目標ではなく、今週できる小さな一歩を一つだけ決めてみましょう。", art: "tree" },
+      { name: "花と実り", title: "自分のペースで進める日", lead: "焦りを消そうとせず、整理しながら進めています。年齢や時間に振り回されず、自分のペースが実り始めています。", action: "このまま完璧を目指さず、今日見えた小さな一歩だけを大切に進めてください。", art: "bloom" }
+    ],
+    types: {
+      compare: { title: "時間整理タイプ：比較リセットタイプ", text: "焦りが強い時ほど、比較の影響を受けやすいタイプです。まずは誰かの成果と自分の現在地を切り離すことが合っています。" },
+      distance: { title: "時間整理タイプ：SNS距離取りタイプ", text: "情報から少し離れると整いやすいタイプです。焦りを増やす情報は、一時的に見ない選択をして大丈夫です。" },
+      invisible: { title: "時間整理タイプ：見えない積み上げ確認タイプ", text: "成果だけでなく、経験や考え方の変化を見ると焦りが軽くなるタイプです。目に見えない成長もちゃんと積み上げです。" },
+      late: { title: "時間整理タイプ：もう遅い解除タイプ", text: "年齢より、自分の中の基準に縛られやすいタイプです。“遅いかどうか”より“ここから何をするか”を見るのが合っています。" },
+      current: { title: "時間整理タイプ：現在地整理タイプ", text: "不安を減らすには、まず今の状態を見える形にするのが合うタイプです。できていること・足りないことを分けるだけで進みやすくなります。" },
+      small: { title: "時間整理タイプ：小さく動くタイプ", text: "大きく変えようとすると止まりやすいタイプです。今日できる小さな一歩に分けることで、焦りを行動に変えやすくなります。" },
+      gentle: { title: "時間整理タイプ：完璧ゆるめタイプ", text: "完璧を目指さないほど進みやすいタイプです。不安があるままでも、少しずつ進めば十分です。" },
+      signal: { title: "時間整理タイプ：焦りをサインに変えるタイプ", text: "焦りを悪者にせず、“何かを変えたい気持ち”として扱うと整いやすいタイプです。振り回されず、きっかけに変えていきましょう。" }
+    }
+  },
+  en: {
+    htmlLang: "en",
+    title: "Age and Time Anxiety Reset Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "Age and Time Anxiety Reset Check",
+    pageLead: "After reading the article, choose how you are handling your anxiety about age and time. You will see your current reset stage and the next small step that fits you.",
+    checkHeading: "Choose what feels true right now",
+    resultLabel: "Current stage",
+    typeLabel: "Your time-anxiety reset style",
+    nextLabel: "Next small step",
+    checkedText: "Selected",
+    reset: "Reset checks",
+    defaultTypeTitle: "Your reset style: just getting started",
+    defaultTypeText: "Choose one item that feels true today, and your best way to ease age and time anxiety will appear here.",
+    checks: [
+      { text: "I could see that anxiety may be a sign of comparison, not proof that I am late", hint: "It helps to notice when you are judging your whole life by one visible part of someone else's.", type: "compare" },
+      { text: "I took some distance from social media or other people's results", hint: "If looking keeps making anxiety stronger, stepping back is a valid reset.", type: "distance" },
+      { text: "I did not judge myself only by visible achievements", hint: "Changes in thinking, lessons from mistakes, and lived experience also count as progress.", type: "invisible" },
+      { text: "I did not decide too quickly that it is already too late", hint: "Often the anxiety comes more from an inner standard than from age itself.", type: "late" },
+      { text: "I organized a little of what I can and cannot do right now", hint: "Seeing your current place makes anxiety easier to handle, even if the list is rough.", type: "current" },
+      { text: "I thought about one small action instead of changing everything", hint: "When anxiety is strong, one small step works better than a huge life change.", type: "small" },
+      { text: "I allowed myself to move gradually, without aiming for perfection", hint: "You do not need to remove all anxiety before moving. Small progress is enough.", type: "gentle" },
+      { text: "I saw anxiety as a sign that I want to change something", hint: "Anxiety does not need to control you. It can become a signal for the next small step.", type: "signal" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day when you noticed what anxiety is", lead: "Even if anxiety remains, seeing it as comparison or uncertainty rather than proof that you are late is the first seed.", action: "Start by reducing one source of comparison you are seeing too often.", art: "seed" },
+      { name: "Sprout", title: "A day when you stepped back from comparison", lead: "One check is enough. A small sprout is appearing: looking at your own current place instead of only others' progress.", action: "Write down one small thing you are already managing today.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when you saw invisible progress", lead: "You are looking beyond visible achievements and noticing experience, learning, and inner change.", action: "Name one way your thinking or understanding has changed recently.", art: "leaf" },
+      { name: "Small Tree", title: "A day when your current place became clearer", lead: "What you can do, what is not ready yet, and what can be started small are becoming clearer. This is a steady base.", action: "Choose one small step you can take this week, not a huge goal.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when you could move at your own pace", lead: "You are not trying to erase all anxiety. You are organizing it and moving at your own pace.", action: "Keep just the small next step you found today, without trying to be perfect.", art: "bloom" }
+    ],
+    types: {
+      compare: { title: "Your style: comparison reset", text: "Your anxiety is likely amplified by comparison. Separating others' visible results from your own current place may help most." },
+      distance: { title: "Your style: social-media distance reset", text: "You reset best by stepping away from information that increases urgency. It is okay to stop looking for a while." },
+      invisible: { title: "Your style: invisible-progress check", text: "You feel steadier when you count experience and inner change, not only visible results. Unseen progress still matters." },
+      late: { title: "Your style: too-late belief reset", text: "You may be carrying a strict inner timeline. Asking what you can do from here works better than judging whether it is too late." },
+      current: { title: "Your style: current-place organizer", text: "You calm anxiety by making the present visible. Separating what is working from what is not makes action easier." },
+      small: { title: "Your style: small-action reset", text: "You move best by shrinking the next step. Huge change can freeze you, while one small step can restart movement." },
+      gentle: { title: "Your style: gentle-progress reset", text: "You do not need perfect confidence to move. Gradual progress while still feeling uncertain is enough." },
+      signal: { title: "Your style: anxiety-as-signal reset", text: "You reset by treating anxiety as a signal, not an enemy. It can point toward one small change instead of controlling you." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { axis: 0, action: 0, space: 0, compare: 0, night: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
