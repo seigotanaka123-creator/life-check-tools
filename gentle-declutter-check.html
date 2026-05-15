@@ -542,10 +542,13 @@ function stageIndex(count) {
 }
 
 function bestType(selected) {
-  const totals = { axis: 0, action: 0, space: 0, compare: 0, night: 0 };
-  selected.forEach(item => totals[item.type] += 1);
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
   const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-  return best[1] === 0 ? null : best[0];
+  return !best ? null : best[0];
 }
 
 function renderChecks() {
@@ -627,4 +630,5 @@ applyLanguage("ja");
 </script>
 </body>
 </html>
+
 
