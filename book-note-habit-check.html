@@ -1,0 +1,651 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "本とnote習慣化チェック | One Coin Books",
+    description: "読書を読んで終わりにせず、noteで小さなアウトプットにつなげるためのチェックツールです。",
+    pageTitle: "本とnote習慣化チェック",
+    pageLead: "本を読んで終わりにせず、気づき・自分への当てはめ・小さなnote発信へつなげるためのチェックです。",
+    langLabel: "Language",
+    sectionTitle: "今日できたことにチェックしてください",
+    sectionLead: "完璧に書かなくて大丈夫です。読書を少しずつ変化につなげるために、できた小さな行動を見てください。",
+    quietTitle: "このツールの使い方",
+    quietText: "このチェックは、読書量や文章力を評価するものではありません。本を読んだ後に、少しだけ自分の言葉へ変えるための道具です。",
+    checks: [
+      { text: "本を全部理解しようとしすぎなかった", hint: "完璧な理解より、ひとつ持ち帰る感覚を持てています。", type: "light" },
+      { text: "印象に残った部分を1つに絞れた", hint: "全部ではなく一つに絞ることで、行動に変えやすくなります。", type: "focus" },
+      { text: "なぜ気になったのかを考えられた", hint: "自分の引っかかりを見ることで、読書が自分ごとになります。", type: "why" },
+      { text: "自分の生活や悩みに当てはめられた", hint: "本の内容を、自分の現実に接続できています。", type: "apply" },
+      { text: "これからどうするかを小さく決めた", hint: "大きな変化ではなく、次の小さな行動に落とし込めています。", type: "action" },
+      { text: "短くてもOKと思えた", hint: "長く書くより、続けられる形を優先できています。", type: "short" },
+      { text: "要約ではなく、自分の変化を書こうとできた", hint: "本の説明ではなく、自分にどう響いたかを見られています。", type: "voice" },
+      { text: "noteを記録として使う意識を持てた", hint: "完成作品ではなく、変化のログとして扱えています。", type: "record" },
+      { text: "書けない日を責めなかった", hint: "続けるために、できない日も含めた設計ができています。", type: "forgive" },
+      { text: "やめても戻ればOKと思えた", hint: "完璧な継続より、戻れる形を大切にできています。", type: "return" }
+    ],
+    stages: [
+      { name: "たね", title: "読後のたねを置けた日", lead: "まだnoteに書けていなくても大丈夫です。読んで終わりにせず、ひとつ持ち帰ろうとできた時点で、変化のたねは置けています。", action: "印象に残った一文や考えを一つだけ選んでみてください。", art: "seed" },
+      { name: "めばえ", title: "自分ごとにできた日", lead: "気になった理由や、自分への当てはめが少し見えています。本の内容が自分の中でめばえ始めています。", action: "『なぜ気になったのか』を一文だけ書いてみましょう。", art: "sprout" },
+      { name: "若葉", title: "小さな行動に変えられた日", lead: "読書の気づきを、これからどうするかに少しつなげられています。若葉のように、変化の形が見え始めています。", action: "今日か明日できる小さな行動を一つだけ決めてください。", art: "leaf" },
+      { name: "小さな木", title: "noteに残す形が育った日", lead: "短くても、自分の言葉で残す意識ができています。読書とnoteをつなぐ小さな木が育っています。", action: "短いメモでもいいので、noteに残す形を一つ作ってみましょう。", art: "tree" },
+      { name: "花と実り", title: "読むだけから変化へ進めた日", lead: "本の気づき、自分への当てはめ、noteで残す流れがかなり整っています。読むだけで終わらない習慣が実り始めています。", action: "今回の気づきを、次の読書でも使えるテンプレとして残しておきましょう。", art: "bloom" }
+    ],
+    types: {
+      light: { title: "習慣タイプ：軽く読むタイプ", text: "全部理解しようとしない方が続きやすいタイプです。一冊から一つ持ち帰れれば十分です。" },
+      focus: { title: "習慣タイプ：一点集中タイプ", text: "気になった部分を一つに絞ると行動につながりやすいタイプです。全部書こうとせず、一つだけ選んでみてください。" },
+      why: { title: "習慣タイプ：引っかかり深掘りタイプ", text: "なぜ気になったのかを見ると、自分の本音や課題に近づきやすいタイプです。理由は一文で十分です。" },
+      apply: { title: "習慣タイプ：自分ごと接続タイプ", text: "本の内容を自分の生活に当てはめると変化しやすいタイプです。自分ならどう使うかを考えてみてください。" },
+      action: { title: "習慣タイプ：小さな行動化タイプ", text: "気づきを小さな行動に変えると続きやすいタイプです。大きな決意ではなく、今日できる一歩に落としてください。" },
+      short: { title: "習慣タイプ：短く続けるタイプ", text: "長く書くより短く残す方が向いているタイプです。短いnoteや一言メモでも、続けば変化になります。" },
+      voice: { title: "習慣タイプ：自分の言葉タイプ", text: "要約より、自分がどう感じたかを書くと深まりやすいタイプです。正しさよりリアルさを大切にしてください。" },
+      record: { title: "習慣タイプ：記録で積み上げるタイプ", text: "noteを完成作品ではなく記録として使うと続きやすいタイプです。過去の自分との変化が見えやすくなります。" },
+      forgive: { title: "習慣タイプ：できない日許可タイプ", text: "書けない日を責めない方が続くタイプです。空いた期間を失敗ではなく休憩として扱ってください。" },
+      return: { title: "習慣タイプ：戻ればOKタイプ", text: "毎日続けるより、戻れる形を大切にできるタイプです。思い出したときに再開できれば十分です。" }
+    },
+    scoreLabel: "チェック数",
+    resultButton: "結果を見る",
+    resetButton: "リセット",
+    resultTitle: "今日の本とnote習慣化度",
+    typeTitle: "今の習慣タイプ",
+    nextTitle: "次の小さな一歩",
+    shareText: "今日の本とnote習慣化度をチェックしました。",
+    footer: "One Coin Books｜日常を少し整えるための小さなチェックツール"
+  },
+  en: {
+    title: "Book and Note Habit Check | One Coin Books",
+    description: "A gentle check tool for turning reading into small notes, personal reflection, and action.",
+    pageTitle: "Book and Note Habit Check",
+    pageLead: "A gentle check for turning reading into insight, personal application, and small note-style output.",
+    langLabel: "Language",
+    sectionTitle: "Check what you were able to do today",
+    sectionLead: "You do not need to write perfectly. Use this to notice small actions that turn reading into change.",
+    quietTitle: "How to use this tool",
+    quietText: "This check does not evaluate how much you read or how well you write. It helps turn what you read into your own words.",
+    checks: [
+      { text: "I did not try to understand the whole book perfectly", hint: "You focused on taking one thing with you rather than perfect understanding.", type: "light" },
+      { text: "I narrowed it down to one memorable part", hint: "Choosing one thing makes it easier to turn reading into action.", type: "focus" },
+      { text: "I thought about why it stood out to me", hint: "Looking at your reaction makes the reading personal.", type: "why" },
+      { text: "I connected it to my life or concerns", hint: "You connected the book's idea to your real situation.", type: "apply" },
+      { text: "I decided one small thing to do next", hint: "You turned the idea into a small action rather than a big change.", type: "action" },
+      { text: "I allowed the output to be short", hint: "You prioritized a sustainable form over long writing.", type: "short" },
+      { text: "I tried to write my own change, not only a summary", hint: "You looked at how it affected you, not only what the book said.", type: "voice" },
+      { text: "I saw note as a place for records", hint: "You treated it as a log of change rather than a finished work.", type: "record" },
+      { text: "I did not blame myself for days I could not write", hint: "You included off days in the design.", type: "forgive" },
+      { text: "I felt it is okay to return after stopping", hint: "You valued returning more than perfect continuation.", type: "return" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of placing the post-reading seed", lead: "Even if you have not posted yet, trying to take one thing with you plants the seed of change.", action: "Choose one sentence or idea that stayed with you.", art: "seed" },
+      { name: "Sprout", title: "A day when the reading became personal", lead: "You saw why it mattered and how it connects to you. The book is beginning to sprout inside your life.", action: "Write one sentence about why it stood out.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when insight became a small action", lead: "You connected reading to what you will do next. The shape of change is beginning to grow.", action: "Choose one small action you can do today or tomorrow.", art: "leaf" },
+      { name: "Small Tree", title: "A day when note output took shape", lead: "You are ready to leave your own words, even briefly. A small tree connecting books and note is growing.", action: "Create one short note or memo from today's reading.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day moving from reading to change", lead: "Insight, personal application, and note output are well aligned. The habit of not stopping at reading is bearing fruit.", action: "Keep today's pattern as a template for your next reading.", art: "bloom" }
+    ],
+    types: {
+      light: { title: "Type: Light Reading", text: "You continue better when you do not try to understand everything. Taking one thing from a book is enough." },
+      focus: { title: "Type: One-Point Focus", text: "You turn reading into action by choosing one memorable part. Do not try to write everything." },
+      why: { title: "Type: Reaction Deepener", text: "You get closer to your real concerns by asking why something stood out. One sentence is enough." },
+      apply: { title: "Type: Personal Application", text: "You change more when you connect ideas to your own life. Ask how you would use it." },
+      action: { title: "Type: Small Action", text: "You continue by turning insight into a small action. Avoid big resolutions; choose one step for today." },
+      short: { title: "Type: Short Output", text: "Short notes suit you better than long writing. A brief note can become change if repeated." },
+      voice: { title: "Type: Own Words", text: "You go deeper by writing what you felt, not only summaries. Value realness over correctness." },
+      record: { title: "Type: Record Builder", text: "You continue by using note as a record, not a finished product. It helps you see change over time." },
+      forgive: { title: "Type: Off-Day Permission", text: "You continue better when you do not blame yourself for missed days. Treat gaps as pauses, not failures." },
+      return: { title: "Type: Return Is Enough", text: "You value returning more than daily perfection. Restarting when you remember is enough." }
+    },
+    scoreLabel: "Checked",
+    resultButton: "Show Result",
+    resetButton: "Reset",
+    resultTitle: "Today's Book and Note Habit Level",
+    typeTitle: "Current Habit Type",
+    nextTitle: "Next Small Step",
+    shareText: "I checked my book and note habit level today.",
+    footer: "One Coin Books | Small check tools for gently organizing daily life"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
