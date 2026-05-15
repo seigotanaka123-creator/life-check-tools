@@ -1,0 +1,628 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>自分時間を取り戻す整え方チェック | One Coin Books</title>
+  <meta name="description" content="「自分時間のつくり方」を読んだあとに使える、記事専用の自分時間チェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="自分時間を取り戻す整え方チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の自分時間の整い具合と、あなたに合う時間の取り戻し方が分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">自分時間を取り戻す整え方チェック</h1>
+    <p class="lead" id="pageLead">「自分時間のつくり方」を読んだあとに、今日できた小さな整え方を選んでみてください。今の自分時間の整い具合と、あなたに合う時間の取り戻し方が分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="一日リセットのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "自分時間を取り戻す整え方チェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "自分時間を取り戻す整え方チェック",
+    pageLead: "「自分時間のつくり方」を読んだあとに、今日できた小さな整え方を選んでみてください。今の自分時間の整い具合と、あなたに合う時間の取り戻し方が分かります。",
+    checkHeading: "今日できたことを選んでください",
+    resultLabel: "今の整い具合",
+    typeLabel: "あなたに合う自分時間タイプ",
+    nextLabel: "次の小さな一歩",
+    checkedText: "選択中",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "自分時間タイプ：これから整えるタイプ",
+    defaultTypeText: "気になった項目をひとつ選ぶと、あなたに合う自分時間の作り方が見えてきます。",
+    checks: [
+      { text: "なんとなくスマホを開く時間に一度気づけた", hint: "やめきれなくても大丈夫です。気づけた時点で、時間の流れを取り戻す入口に立てています。", type: "notice" },
+      { text: "今日の中で5分でも自分のために使えた", hint: "ぼーっとする、お茶を飲む、音楽を聴くなど、意味のあることにしなくて大丈夫です。", type: "small" },
+      { text: "やらなくてもいいことをひとつ減らせた", hint: "惰性の予定、目的のない情報収集、なんとなくの作業を少し減らせたら十分です。", type: "minus" },
+      { text: "迷う時間を減らす工夫ができた", hint: "服・食事・行動の順番などを少し固定できると、時間だけでなく気力も残りやすくなります。", type: "decision" },
+      { text: "自分時間を置くタイミングをひとつ決めた", hint: "朝の飲み物のあと、帰宅後、寝る前など、日常の流れにくっつけるのが続きやすいです。", type: "place" },
+      { text: "30分にこだわらず、10分や5分でもOKにできた", hint: "自分時間はゼロにしないことが大切です。短くても、自分に戻る時間になります。", type: "gentle" },
+      { text: "“意味のある時間”にしようとしすぎなかった", hint: "学びや成果がなくても大丈夫です。なんとなく心地いい時間も、ちゃんと自分時間です。", type: "gentle" },
+      { text: "今日は自分のための時間だった、と少し感じられた", hint: "時間の長さより、自分のために使えた感覚があるかどうかが大切です。", type: "feel" }
+    ],
+    stages: [
+      { name: "たね", title: "時間の流れに気づけた日", lead: "まだ自分時間が少なくても大丈夫です。時間が消えている感覚に気づけたことが、最初のたねになります。", action: "まずは明日、なんとなくスマホを開く前に一度だけ立ち止まってみてください。", art: "seed" },
+      { name: "めばえ", title: "小さな余白が見えた日", lead: "ひとつでもできたなら十分です。忙しい中にも、自分に戻れる小さな余白が見え始めています。", action: "5分だけでいいので、同じタイミングに自分時間を置いてみましょう。", art: "sprout" },
+      { name: "若葉", title: "時間の引き算ができた日", lead: "スマホ・迷い・惰性のどこかを少し減らせています。時間を増やすより、減らす感覚が育っています。", action: "今日減らせたものをひとつだけ、明日もゆるく続けてみてください。", art: "leaf" },
+      { name: "小さな木", title: "自分時間の置き場所ができた日", lead: "自分時間を余りものではなく、意識して置く流れができています。かなり良い整い方です。", action: "朝・帰宅後・寝る前のどこが一番合うか、ひとつ選んで固定してみましょう。", art: "tree" },
+      { name: "花と実り", title: "自分の時間を取り戻せた日", lead: "時間の使い方がしっかり整っています。長さよりも、自分のために使えた感覚が残っている日です。", action: "全部を完璧に続けようとせず、今日いちばん心地よかった自分時間だけを明日に残しましょう。", art: "bloom" }
+    ],
+    types: {
+      notice: { title: "自分時間タイプ：時間の流れに気づくタイプ", text: "まずは、なんとなく消えている時間に気づくことで整いやすいタイプです。スマホを開く前に一呼吸置くだけでも流れが変わります。" },
+      small: { title: "自分時間タイプ：5分余白タイプ", text: "短い時間でも自分に戻れるタイプです。30分を目指すより、5分をゼロにしない方が続きやすいです。" },
+      minus: { title: "自分時間タイプ：引き算タイプ", text: "何かを足すより、やめることを決めると余白が戻りやすいタイプです。惰性のスマホや予定をひとつ減らすのが合っています。" },
+      decision: { title: "自分時間タイプ：迷い減らしタイプ", text: "迷う回数を減らすことで時間と気力が戻るタイプです。服・食事・順番を少し固定すると自分時間が作りやすくなります。" },
+      place: { title: "自分時間タイプ：時間の置き場所タイプ", text: "自分時間を日常の流れに置くと続きやすいタイプです。朝の飲み物のあと、帰宅後、寝る前などにくっつけるのが合っています。" },
+      gentle: { title: "自分時間タイプ：ゆるめるタイプ", text: "完璧に使おうとしないほど整いやすいタイプです。意味のある時間にしようとせず、心地よさを優先して大丈夫です。" },
+      feel: { title: "自分時間タイプ：満足感タイプ", text: "時間の長さより、自分のために使えた感覚が大切なタイプです。終わったあとに少し楽になったかを見てみましょう。" }
+    }
+  },
+  en: {
+    htmlLang: "en",
+    title: "Personal Time Reset Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "Personal Time Reset Check",
+    pageLead: "After reading the article, choose the small ways you protected your own time today. You will see your current reset stage and the personal-time style that fits you best.",
+    checkHeading: "Choose what you did today",
+    resultLabel: "Current stage",
+    typeLabel: "Your personal-time style",
+    nextLabel: "Next small step",
+    checkedText: "Selected",
+    reset: "Reset checks",
+    defaultTypeTitle: "Your personal-time style: just getting started",
+    defaultTypeText: "Choose one item that feels possible today, and your best way to recover personal time will appear here.",
+    checks: [
+      { text: "I noticed one moment when I opened my phone without purpose", hint: "You do not need to stop perfectly. Noticing it is already the first step toward recovering your time.", type: "notice" },
+      { text: "I used even five minutes for myself today", hint: "Doing nothing, drinking tea, or listening to music counts. It does not need to be productive.", type: "small" },
+      { text: "I reduced one thing I did not really need to do", hint: "A passive task, unnecessary information, or an automatic habit can be reduced just a little.", type: "minus" },
+      { text: "I made one choice easier so I spent less time deciding", hint: "Simplifying clothes, meals, or the order of actions can save both time and energy.", type: "decision" },
+      { text: "I chose one place in the day for personal time", hint: "After morning coffee, after getting home, or before bed are easy places to attach the habit.", type: "place" },
+      { text: "I allowed 10 or 5 minutes to be enough", hint: "Personal time does not need to be 30 minutes. Keeping it from becoming zero matters more.", type: "gentle" },
+      { text: "I did not force my personal time to be meaningful", hint: "Learning or improving is not required. A quiet, comfortable moment is enough.", type: "gentle" },
+      { text: "I felt that at least one moment was truly for me", hint: "The feeling that the time belonged to you matters more than the length of time.", type: "feel" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day when you noticed where time goes", lead: "Even if your personal time was small, noticing where time disappeared is already the first seed.", action: "Tomorrow, pause once before opening your phone without purpose.", art: "seed" },
+      { name: "Sprout", title: "A day when a small margin appeared", lead: "One check is enough. You found a small space where you can return to yourself even on a busy day.", action: "Try placing five minutes for yourself at the same timing tomorrow.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when you practiced subtraction", lead: "You reduced a little phone time, hesitation, or passive action. The habit of making room is growing.", action: "Keep just one thing you reduced today and repeat it gently tomorrow.", art: "leaf" },
+      { name: "Small Tree", title: "A day when your personal time found a place", lead: "You are no longer waiting for leftover time. You are starting to place your own time intentionally.", action: "Choose whether morning, after work, or before bed fits you best and keep it small.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when your time returned to you", lead: "Your time is gently reset. What matters is not the length, but the feeling that part of the day belonged to you.", action: "Do not try to keep everything. Carry only the most comfortable personal-time moment into tomorrow.", art: "bloom" }
+    ],
+    types: {
+      notice: { title: "Your style: time-awareness reset", text: "You recover personal time by noticing where it disappears. A single pause before opening your phone can change the flow." },
+      small: { title: "Your style: five-minute margin", text: "Short personal time works well for you. Instead of aiming for 30 minutes, keep five minutes from becoming zero." },
+      minus: { title: "Your style: subtraction reset", text: "You create time by removing rather than adding. Reducing one passive habit or unnecessary plan may work best." },
+      decision: { title: "Your style: fewer-decisions reset", text: "You regain time and energy by reducing small decisions. Simplifying repeated choices can make personal time easier to find." },
+      place: { title: "Your style: time-placement reset", text: "You continue best when personal time is attached to an existing flow, such as after morning coffee, after arriving home, or before bed." },
+      gentle: { title: "Your style: gentle permission reset", text: "You reset best when you lower the pressure. Personal time does not need to be meaningful or perfect to matter." },
+      feel: { title: "Your style: felt-time reset", text: "The feeling that the time was for you matters most. Look at whether you felt a little lighter afterward." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = { axis: 0, action: 0, space: 0, compare: 0, night: 0 };
+  selected.forEach(item => totals[item.type] += 1);
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return best[1] === 0 ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
