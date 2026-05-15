@@ -1,0 +1,633 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>迷わない収納設計チェック | One Coin Books</title>
+  <meta name="description" content="「収納で迷わなくなる方法」を読んだあとに使える、記事専用の収納設計チェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="迷わない収納設計チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の収納の迷いにくさと自分に合う収納設計タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">迷わない収納設計チェック</h1>
+    <p class="lead" id="pageLead">「収納で迷わなくなる方法」を読んだあとに、今できている収納の仕組みを選んでみてください。今の迷いにくさと、自分に合う収納設計タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="収納設計チェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    htmlLang: "ja",
+    title: "迷わない収納設計チェック | One Coin Books",
+    eyebrow: "記事専用チェックツール",
+    pageTitle: "迷わない収納設計チェック",
+    pageLead: "「収納で迷わなくなる方法」を読んだあとに、今できている収納の仕組みを選んでみてください。今の迷いにくさと、自分に合う収納設計タイプが分かります。",
+    checkHeading: "今できている収納の仕組みを選んでください",
+    checkLead: "全部できなくて大丈夫です。ひとつでも選べたら、置き場所で迷わない暮らしに少し近づいています。",
+    resultHeading: "今日の結果",
+    nextHeading: "次の小さな一歩",
+    quietText: "このチェックは、収納の見た目を採点するものではありません。どこに何を置くか迷わない仕組みがどれくらい作れているかを見るための小さな道具です。",
+    reset: "チェックをリセット",
+    defaultTypeTitle: "収納設計タイプ：これから整えるタイプ",
+    defaultTypeText: "気になった項目をひとつ選ぶと、今の部屋に合う収納設計が見えてきます。",
+    checks: [
+      { text: "よく使う物を、使う場所の近くに置けている", hint: "使う場所と収納場所が近いほど、戻す負担は減ります。", type: "place" },
+      { text: "使用頻度で置き場所を分けられている", hint: "毎日使うものは手前、たまに使うものは奥など、頻度に合わせた配置です。", type: "frequency" },
+      { text: "ワンアクションで取れる・戻せる物がある", hint: "フタや箱や重なりを減らして、すぐ取れる状態にできていることです。", type: "action" },
+      { text: "物の定位置が決まっている", hint: "毎回どこに置くか考えなくても戻せる状態です。", type: "fixed" },
+      { text: "一度決めた定位置を変えすぎていない", hint: "場所が頻繁に変わらないことで、迷いが戻りにくくなります。", type: "fixed" },
+      { text: "収納に7〜8割くらいの余白がある", hint: "ぎゅうぎゅうに詰めず、戻しやすい余白を残せている状態です。", type: "space" },
+      { text: "よく使う場所を1ヶ所だけ整えられた", hint: "デスク、玄関、ベッド周りなど、まず一つの場所に絞れていればOKです。", type: "practice" },
+      { text: "使いながら収納を微調整できている", hint: "最初から完璧にせず、1週間使って違和感があれば直す考え方です。", type: "review" }
+    ],
+    stages: [
+      { name: "たね", title: "置き場所を考え始めた日", lead: "まだチェックが少なくても大丈夫です。片づかない理由を、センスではなく置き場所の設計として見られています。", action: "まずは一番よく使う物をひとつだけ、使う場所の近くに置いてみましょう。", art: "seed" },
+      { name: "めばえ", title: "迷わない場所が芽生えた日", lead: "ひとつでも選べたなら十分です。どこに置くか迷わない収納の入口ができ始めています。", action: "次は、その物をワンアクションで戻せるか確認してみてください。", art: "sprout" },
+      { name: "若葉", title: "戻しやすい仕組みが育った日", lead: "いくつかの仕組みができています。使用場所、頻度、定位置のどれかが整い始めています。", action: "よく使う場所を1ヶ所だけ選び、そこに必要な物だけを集めてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "迷いにくい収納が形になった日", lead: "定位置、ワンアクション、余白、見直しのどれかがかなり整っています。散らかりにくい土台ができています。", action: "今日うまくいった定位置を一つだけ固定して、しばらく動かさないようにしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "迷わない収納が実り始めた日", lead: "収納の設計がかなり整っています。片づけを頑張るより、戻しやすい仕組みで自然と整う状態に近づいています。", action: "全部を完璧にしようとせず、今いちばん迷いが減った場所だけを残して育てましょう。", art: "bloom" }
+    ],
+    types: {
+      place: { title: "収納設計タイプ：使用場所優先タイプ", text: "使う場所の近くに置くと整いやすいタイプです。収納の見た目より、使った場所で完結する配置を優先すると迷いが減ります。" },
+      frequency: { title: "収納設計タイプ：使用頻度整理タイプ", text: "使う頻度で場所を分けると整いやすいタイプです。毎日使うものを一番取りやすい場所に置くだけでも、かなり楽になります。" },
+      action: { title: "収納設計タイプ：ワンアクションタイプ", text: "すぐ取れる・すぐ戻せる形が合っているタイプです。フタや箱や重なりを減らすと、片づけのハードルが下がります。" },
+      fixed: { title: "収納設計タイプ：定位置固定タイプ", text: "場所を固定すると迷いが減りやすいタイプです。一度決めた場所を頻繁に変えず、考えなくても戻せる状態を作るのが合っています。" },
+      space: { title: "収納設計タイプ：余白キープタイプ", text: "詰め込みすぎないことで整いやすいタイプです。7〜8割くらいの余白を残すと、取り出しやすさと戻しやすさが保てます。" },
+      practice: { title: "収納設計タイプ：1ヶ所集中タイプ", text: "全部を一気に整えるより、よく使う場所を1ヶ所だけ決めると進みやすいタイプです。小さく始めるほど続きます。" },
+      review: { title: "収納設計タイプ：使いながら調整タイプ", text: "最初から完璧に決めるより、使いながら微調整するのが合っているタイプです。1週間使って違和感を直す形が自然です。" }
+    }
+  },
+  en: {
+    htmlLang: "en",
+    title: "No-More-Storage-Confusion Check | One Coin Books",
+    eyebrow: "Reader bonus tool",
+    pageTitle: "No-More-Storage-Confusion Check",
+    pageLead: "After reading the article, choose which storage systems you already have in place. You will see how easy your storage is to use and which setup style fits you best.",
+    checkHeading: "Choose your current storage systems",
+    checkLead: "You do not need to check everything. Even one check means your room is becoming easier to reset without confusion.",
+    resultHeading: "Today's Result",
+    nextHeading: "A Small Next Step",
+    quietText: "This check is not for grading how your storage looks. It is a small tool for seeing whether you have a system that tells you where things belong.",
+    reset: "Reset checks",
+    defaultTypeTitle: "Storage setup style: just getting started",
+    defaultTypeText: "Choose one item that feels possible, and your best storage setup style will appear here.",
+    checks: [
+      { text: "Frequently used items are near where I use them", hint: "The closer use and storage are, the easier it is to return things.", type: "place" },
+      { text: "Storage places are based on frequency of use", hint: "Daily items are easy to reach, while rarely used items can be farther away.", type: "frequency" },
+      { text: "Some items can be taken out and returned in one action", hint: "Fewer lids, boxes, and stacked items make returning easier.", type: "action" },
+      { text: "My things have fixed places", hint: "You do not need to decide every time where something should go.", type: "fixed" },
+      { text: "I do not change fixed places too often", hint: "Stable locations keep confusion from returning.", type: "fixed" },
+      { text: "My storage has about 20-30% empty space", hint: "Storage that is not packed too tightly is easier to use.", type: "space" },
+      { text: "I organized one frequently used area", hint: "A desk, entryway, or bedside area is enough to begin.", type: "practice" },
+      { text: "I adjust storage while using it", hint: "You do not need perfection at first. Try it for a week and fix what feels awkward.", type: "review" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of beginning to design places", lead: "Even if you checked only a little, it is okay. You are seeing storage as design, not personal sense or talent.", action: "Start by placing one frequently used item near where you use it.", art: "seed" },
+      { name: "Sprout", title: "A day when one clear place appeared", lead: "One check is enough. A storage place that reduces confusion is beginning to grow.", action: "Next, check whether that item can be returned in one action.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when easy-return systems began to grow", lead: "Several systems are in place. Use location, frequency, or fixed places are beginning to work.", action: "Choose one frequently used area and gather only what belongs there.", art: "leaf" },
+      { name: "Small Tree", title: "A day when storage became less confusing", lead: "Fixed places, one-action returns, empty space, or review systems are becoming solid. Your room has a base that is easier to reset.", action: "Keep one fixed place that worked today and avoid changing it for a while.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when clear storage began to bear fruit", lead: "Your storage design is well set up. You are close to a room that stays easier to reset because places are clear.", action: "Do not try to perfect everything. Keep growing only the place where confusion decreased most.", art: "bloom" }
+    ],
+    types: {
+      place: { title: "Storage setup style: use-location type", text: "You reset better when things are stored near where they are used. Let the place of use decide the storage place." },
+      frequency: { title: "Storage setup style: frequency-based type", text: "You reset better when frequently used items are prioritized. Put daily items where they are easiest to reach." },
+      action: { title: "Storage setup style: one-action type", text: "You reset better when items are easy to take and return. Reduce lids, boxes, and stacking where possible." },
+      fixed: { title: "Storage setup style: fixed-place type", text: "You reset better when places stay consistent. Once you decide a location, avoid changing it too often." },
+      space: { title: "Storage setup style: margin-keeping type", text: "You reset better when storage is not packed full. Leaving 20-30% empty space keeps it easy to use." },
+      practice: { title: "Storage setup style: one-area type", text: "You move forward better by choosing one frequently used area instead of organizing everything at once." },
+      review: { title: "Storage setup style: adjust-as-you-use type", text: "You reset better when storage is adjusted through use. Try it for a week and fix what feels awkward." }
+    }
+  }
+};
+
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
