@@ -1,0 +1,637 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>色選びで印象を整えるチェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="色選びで印象を整えるチェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">色選びで印象を整えるチェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "色選びで印象を整えるチェック | One Coin Books",
+    metaDescription: "服・髪・ネイル・部屋の色選びを、色数・トーン・主役・全体感から整えるためのチェックツールです。",
+    pageTitle: "色選びで印象を整えるチェック",
+    pageLead: "服・髪・ネイル・部屋の印象は、センスよりも色の使い方で大きく変わります。できている項目を選ぶと、今の配色の整い度と、あなたが次に見直すとよいポイントが分かります。",
+    langLabel: "Language",
+    progressLabel: "整い度",
+    resultButton: "結果を見る",
+    resetButton: "リセット",
+    checkedText: "選択済み",
+    uncheckedText: "未選択",
+    checks: [
+      { text: "色を3つ以内に絞れている", hint: "色数を減らすことで、服・髪・ネイル・部屋のまとまりが出やすくなります。", type: "colorCount" },
+      { text: "ベースカラーを決めている", hint: "白・黒・ベージュ・グレーなど、土台になる色があると全体が安定します。", type: "base" },
+      { text: "トーンを揃える意識がある", hint: "明るさ・鮮やかさ・くすみ具合が近いと、単体ではなく全体で整って見えます。", type: "tone" },
+      { text: "主役になる色や場所を決めている", hint: "服・髪・ネイルの全部を目立たせず、視線の集まる場所を一つにできます。", type: "focus" },
+      { text: "髪色が全体から浮いていない", hint: "顔に近い髪色が服やネイルと馴染むと、印象の核が整います。", type: "hair" },
+      { text: "ネイルを服や髪の補助役として使えている", hint: "ネイルだけを派手にせず、ベース色やアクセントとして扱えています。", type: "nail" },
+      { text: "迷ったら色を減らす判断ができている", hint: "足すより減らす方が、配色のズレを早く整えられます。", type: "reduce" },
+      { text: "好きな色だけでなく“合う色”も見ている", hint: "部分の好みだけでなく、自分の全体像に合うかで選べています。", type: "fit" },
+      { text: "全体で見て確認している", hint: "服・髪・ネイル・部屋を別々ではなく、同じ画面の中で見られています。", type: "whole" },
+      { text: "使いやすい配色パターンを持っている", hint: "白×黒×ベージュなど、迷ったときに戻れる型があると選ぶ負担が減ります。", type: "pattern" }
+    ],
+    stages: [
+      { name: "たね", title: "色を整えるたねを置けた日", lead: "まだ感覚で選ぶことが多くても大丈夫です。色が印象を作ると気づけた時点で、整えるたねは置けています。", action: "今日は身近な服・髪・ネイル・部屋の中で、使っている色を数えるところから始めましょう。", art: "seed" },
+      { name: "めばえ", title: "色数を減らすめばえが出た日", lead: "色を増やしすぎない意識が出ています。まとまりを作るための最初の感覚が育ち始めています。", action: "次に選ぶときは、まず3色以内に収めることだけ意識してみてください。", art: "sprout" },
+      { name: "若葉", title: "トーンを揃える若葉が育った日", lead: "ベースやトーンを見る力が育っています。単体の可愛さより、全体で馴染むかを判断できる段階です。", action: "今ある組み合わせの中で、明るさやくすみ具合がズレているものを一つだけ見直しましょう。", art: "leaf" },
+      { name: "小さな木", title: "全体で整える小さな木が育った日", lead: "髪・ネイル・服を別々ではなく、全体の印象として見られています。配色の軸が安定してきています。", action: "よく使う配色パターンを一つ決めて、迷ったときの戻り先にしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "印象が自然にまとまる日", lead: "色数・トーン・主役・全体感がかなり整っています。センスに頼らず、仕組みで印象を作れる状態です。", action: "今の整った配色を写真やメモに残し、自分の定番パターンとして育てていきましょう。", art: "bloom" }
+    ],
+    types: {
+      colorCount: { title: "見直しポイント：色数整理タイプ", text: "まずは色を3つ以内に絞ると整いやすいタイプです。迷ったら足すより減らすことを優先しましょう。" },
+      base: { title: "見直しポイント：ベースカラー固定タイプ", text: "土台の色を決めると迷いが減るタイプです。白・黒・ベージュ・グレーなど、戻れる色を一つ持つと安定します。" },
+      tone: { title: "見直しポイント：トーン調整タイプ", text: "色そのものより、明るさやくすみ具合のズレで印象が変わりやすいタイプです。トーン一致を意識しましょう。" },
+      focus: { title: "見直しポイント：主役設計タイプ", text: "全部を目立たせようとして散りやすいタイプです。服・髪・ネイルのどこを主役にするか一つ決めると整います。" },
+      hair: { title: "見直しポイント：髪色なじませタイプ", text: "顔に近い髪色が全体印象を左右しやすいタイプです。服やネイルとのトーン差を見直すと一気にまとまります。" },
+      nail: { title: "見直しポイント：ネイル調整タイプ", text: "ネイルがアクセント以上に主張しやすいタイプです。ベース色に寄せるだけで、全体の浮き感が減ります。" },
+      reduce: { title: "見直しポイント：引き算タイプ", text: "減らすほど整いやすいタイプです。迷ったときは、色・柄・アクセントを一つ減らしてみてください。" },
+      fit: { title: "見直しポイント：似合わせ判断タイプ", text: "好きな色と合う色を分けると整いやすいタイプです。単体の好みより、全体に馴染むかを見てみましょう。" },
+      whole: { title: "見直しポイント：全体確認タイプ", text: "部分ごとは良くても、全体でズレが出やすいタイプです。鏡や写真で全体を一度に見る習慣が効果的です。" },
+      pattern: { title: "見直しポイント：配色パターン化タイプ", text: "迷ったときの型があると一気に楽になるタイプです。失敗しにくい3色セットを自分の定番にしましょう。" }
+    }
+  },
+  en: {
+    title: "Color Coordination Check | One Coin Books",
+    metaDescription: "A simple check tool for organizing clothing, hair, nails, and room colors through color count, tone, focus, and overall balance.",
+    pageTitle: "Color Coordination Check",
+    pageLead: "Your impression changes less from talent and more from how colors are used. Select what already feels true and see your current color balance plus the next small point to adjust.",
+    langLabel: "Language",
+    progressLabel: "Balance",
+    resultButton: "Show result",
+    resetButton: "Reset",
+    checkedText: "Checked",
+    uncheckedText: "Unchecked",
+    checks: [
+      { text: "I keep my colors within three", hint: "Reducing color count makes clothing, hair, nails, and rooms feel more unified.", type: "colorCount" },
+      { text: "I have a base color", hint: "A base such as white, black, beige, or gray stabilizes the whole look.", type: "base" },
+      { text: "I pay attention to matching tones", hint: "Similar brightness, vividness, and mutedness make separate items feel connected.", type: "tone" },
+      { text: "I choose one color or area as the focus", hint: "Instead of making everything stand out, you can guide where the eye goes.", type: "focus" },
+      { text: "My hair color does not feel separate from the whole", hint: "Hair is close to the face, so matching it with clothes and nails anchors the impression.", type: "hair" },
+      { text: "I use nails as support for the whole look", hint: "Nails work well as a base match or small accent rather than a competing main feature.", type: "nail" },
+      { text: "When unsure, I reduce colors", hint: "Subtraction often fixes color mismatch faster than adding more.", type: "reduce" },
+      { text: "I consider what fits, not only what I like", hint: "You look at how a color fits your full image, not only whether it is cute alone.", type: "fit" },
+      { text: "I check the whole impression", hint: "You view clothes, hair, nails, and room elements together instead of separately.", type: "whole" },
+      { text: "I have reliable color patterns", hint: "Having a go-to set such as white, black, and beige reduces decision fatigue.", type: "pattern" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of color balance", lead: "Even if you still choose by feeling, noticing that color shapes impression is already a seed of balance.", action: "Start by counting the colors in your clothes, hair, nails, or room today.", art: "seed" },
+      { name: "Sprout", title: "A day when reducing colors sprouted", lead: "You are beginning to avoid too many colors. The first sense of unity is growing.", action: "Next time you choose, focus only on keeping the palette within three colors.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when tone matching grew", lead: "You are starting to see base colors and tone. You can judge whether things fit together, not only whether each item is nice alone.", action: "Find one current combination where brightness or mutedness feels off and adjust just that.", art: "leaf" },
+      { name: "Small Tree", title: "A day when the whole impression became stable", lead: "You can see hair, nails, and clothing as one impression. Your color axis is becoming steady.", action: "Choose one go-to color pattern and use it as your return point when unsure.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when impression naturally came together", lead: "Color count, tone, focus, and whole balance are well organized. You can create impression through structure, not guesswork.", action: "Save your current balanced palette in a photo or note and grow it as your personal standard.", art: "bloom" }
+    ],
+    types: {
+      colorCount: { title: "Adjustment Point: Color Count Organizer", text: "You will improve fastest by keeping colors within three. When unsure, reduce before adding." },
+      base: { title: "Adjustment Point: Base Color Setter", text: "Choosing one base color will reduce hesitation. Keep a return color such as white, black, beige, or gray." },
+      tone: { title: "Adjustment Point: Tone Matcher", text: "Your impression changes through brightness and mutedness more than hue itself. Match tones first." },
+      focus: { title: "Adjustment Point: Focus Designer", text: "Your look may scatter when everything stands out. Choose one main area among clothes, hair, or nails." },
+      hair: { title: "Adjustment Point: Hair Color Balancer", text: "Hair color strongly affects the face area. Adjusting tone with clothes and nails can quickly unify the whole." },
+      nail: { title: "Adjustment Point: Nail Balance Type", text: "Your nails may be speaking louder than intended. Moving them closer to the base color will reduce separation." },
+      reduce: { title: "Adjustment Point: Subtraction Type", text: "You become more balanced by reducing. Try removing one color, pattern, or accent when unsure." },
+      fit: { title: "Adjustment Point: Fit-Based Chooser", text: "Separate what you like from what fits. Look at how the color sits in the whole image." },
+      whole: { title: "Adjustment Point: Whole-View Checker", text: "Each part may be good alone, but the whole can drift. Use a mirror or photo to check everything together." },
+      pattern: { title: "Adjustment Point: Palette Pattern Type", text: "A reliable pattern makes choosing easier. Create one three-color set that rarely fails for you." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
