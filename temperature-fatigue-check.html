@@ -1,0 +1,639 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>気温に合わせた疲れ対策チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="気温に合わせた疲れ対策チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">気温に合わせた疲れ対策チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "気温に合わせた疲れ対策チェック | One Coin Books",
+    metaDescription: "気温に合わせて服・行動・休み方・環境を整え、無駄な疲れを減らすためのチェックツールです。",
+    pageTitle: "気温に合わせた疲れ対策チェック",
+    pageLead: "今日の気温や自分の状態に合わせて、服・行動・休み方・環境を少し整えられているか確認できます。",
+    introTitle: "気温とのズレで疲れていないか、やさしく確認する",
+    introBody: "できている項目を選ぶと、今の整え度と、次に意識するとよいポイントが分かります。完璧に整える必要はありません。今日は少し違うかもしれないと気づくことから始めてみてください。",
+    checkTitle: "できていることにチェックしてください",
+    checks: [
+      { text: "今日の気温を意識できた", hint: "暑さ・寒さ・気温差を前提に、今日は違う日かもしれないと見られています。", type: "temperature" },
+      { text: "無理を減らせた", hint: "いつも通りに押し切らず、消耗を増やさない選び方ができています。", type: "pace" },
+      { text: "服を調整できた", hint: "羽織り・脱ぎやすさ・少し余裕のある服などで体への負担を減らせています。", type: "clothes" },
+      { text: "行動を調整できた", hint: "暑い日・寒い日・気温差のある日に合わせて、強度や時間帯を変えられています。", type: "action" },
+      { text: "休む時間を取れた", hint: "疲れてからではなく、疲れる前に少し回復する余白を作れています。", type: "rest" },
+      { text: "自分の状態に気づけた", hint: "だるさや集中しにくさを、自分のせいだけにせず状態として見られています。", type: "awareness" },
+      { text: "室温や湿度など環境を整えられた", hint: "部屋の温度・空気・湿度など、体が無理をしにくい環境を作れています。", type: "environment" },
+      { text: "水分を意識できた", hint: "暑さや乾燥による疲れを防ぐために、こまめな水分補給を意識できています。", type: "water" },
+      { text: "いつも通りにこだわりすぎなかった", hint: "昨日できたことが今日できない日もある、と前提を変えられています。", type: "flexible" },
+      { text: "自分を責めなかった", hint: "疲れやすさを気合い不足ではなく、環境とのズレとして扱えています。", type: "kindness" }
+    ],
+    stages: [
+      { name: "たね", title: "気温とのズレに気づくたねを置けた日", lead: "まだ整えられた項目が少なくても大丈夫です。疲れを自分のせいだけにせず、気温の影響かもしれないと気づけた時点で、たねは置けています。", action: "まずは明日の朝、服を選ぶ前に気温を一度だけ確認してみましょう。", art: "seed" },
+      { name: "めばえ", title: "無駄な疲れを減らすめばえが出た日", lead: "気温を意識し、少しだけ服や行動を調整する感覚が生まれています。", action: "暑い日・寒い日・気温差のある日のどれに当てはまるかを見て、今日の行動を一つ軽くしてみましょう。", art: "sprout" },
+      { name: "若葉", title: "気温に合わせる若葉が育った日", lead: "服・行動・休む時間のどこかを調整できていて、疲れを減らす流れができ始めています。", action: "よく疲れる時間帯を一つ選び、その前に水分補給や短い休憩を入れてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "暮らしの調整力が小さな木になった日", lead: "その日の条件に合わせて、無理を減らす判断ができています。いつも通りにこだわりすぎない力が育っています。", action: "気温が大きく変わる日は、予定や作業量を最初から少し軽めに組んでみましょう。", art: "tree" },
+      { name: "花と実り", title: "疲れにくい暮らしが実り始めた日", lead: "気温・服・行動・休み方・環境をバランスよく見られています。頑張るより整える感覚が日常に根づき始めています。", action: "今日うまくいった調整を一つメモして、次に似た気温の日の戻り先にしましょう。", art: "bloom" }
+    ],
+    types: {
+      temperature: { title: "整えポイント：気温確認タイプ", text: "まず気温を見てから動くと楽になるタイプです。朝に気温を確認するだけで、服や予定のズレを減らせます。" },
+      pace: { title: "整えポイント：無理を減らすタイプ", text: "いつも通り頑張ろうとして疲れやすいタイプです。気温がきつい日は、最初から少しペースを落として大丈夫です。" },
+      clothes: { title: "整えポイント：服の調整タイプ", text: "服の選び方で疲れが変わりやすいタイプです。羽織れる・脱げる・締め付けないなど、調整しやすさを優先しましょう。" },
+      action: { title: "整えポイント：行動調整タイプ", text: "行動量や時間帯の調整が効きやすいタイプです。暑い日は朝夕、寒い日は昼など、無理の少ないタイミングに寄せてみましょう。" },
+      rest: { title: "整えポイント：先に休むタイプ", text: "疲れてから休むより、疲れる前に短く休むと整いやすいタイプです。予定に小さな余白を入れておきましょう。" },
+      awareness: { title: "整えポイント：状態に気づくタイプ", text: "だるさや集中しにくさを責めず、状態として見ると楽になるタイプです。今日は違う日かもしれない、という視点を持ちましょう。" },
+      environment: { title: "整えポイント：環境調整タイプ", text: "室温・湿度・空気の影響を受けやすいタイプです。部屋の温度や換気を少し整えるだけでも疲れ方が変わります。" },
+      water: { title: "整えポイント：水分ケアタイプ", text: "水分不足や乾燥で疲れやすいタイプです。喉が渇く前に、少しずつ水分を取る流れを作りましょう。" },
+      flexible: { title: "整えポイント：こだわりを緩めるタイプ", text: "昨日と同じ基準で動こうとして疲れやすいタイプです。気温が違えば動き方も変えていい、と考えてみましょう。" },
+      kindness: { title: "整えポイント：自分を責めないタイプ", text: "不調を自分のせいにしやすいタイプです。まずは環境とのズレかもしれないと捉えるだけで、余計な消耗が減ります。" }
+    },
+    resultTitle: "今日の気温疲れ対策度",
+    resultTypeLabel: "今の整えポイント",
+    retry: "もう一度チェックする",
+    share: "結果をコピー"
+  },
+  en: {
+    title: "Temperature Fatigue Check | One Coin Books",
+    metaDescription: "A gentle checklist for reducing unnecessary fatigue by adjusting clothing, actions, rest, and environment to the temperature.",
+    pageTitle: "Temperature Fatigue Check",
+    pageLead: "Check whether you are gently adjusting your clothing, pace, rest, and surroundings to today's temperature and your condition.",
+    introTitle: "Notice whether temperature mismatch is adding fatigue",
+    introBody: "Select what you are already doing. You will see your current adjustment stage and the next small point to care for. You do not need to do everything perfectly. Start by noticing that today may need a slightly different approach.",
+    checkTitle: "Check what you are doing today",
+    checks: [
+      { text: "I noticed today's temperature", hint: "You are seeing heat, cold, or temperature changes as part of today's conditions.", type: "temperature" },
+      { text: "I reduced unnecessary strain", hint: "You did not force yourself to move exactly as usual when conditions were different.", type: "pace" },
+      { text: "I adjusted my clothing", hint: "Layers, easy adjustments, and comfortable fit helped reduce body stress.", type: "clothes" },
+      { text: "I adjusted my actions", hint: "You changed intensity or timing based on heat, cold, or temperature swings.", type: "action" },
+      { text: "I made time to rest", hint: "You created a little recovery space before becoming fully exhausted.", type: "rest" },
+      { text: "I noticed my condition", hint: "You treated heaviness or low focus as a state, not only as your fault.", type: "awareness" },
+      { text: "I adjusted room temperature or humidity", hint: "You made the space easier for your body by caring for temperature, air, or humidity.", type: "environment" },
+      { text: "I paid attention to hydration", hint: "You supported your body with small, steady hydration.", type: "water" },
+      { text: "I did not cling to the usual way", hint: "You allowed today to be different from yesterday.", type: "flexible" },
+      { text: "I did not blame myself", hint: "You treated fatigue as a possible mismatch with the environment, not a personal failure.", type: "kindness" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of planting awareness of temperature mismatch", lead: "Even if you checked only a few items, noticing that fatigue may be related to temperature is already a seed.", action: "Tomorrow morning, check the temperature once before choosing clothes.", art: "seed" },
+      { name: "Sprout", title: "A day when reducing unnecessary fatigue sprouted", lead: "You are beginning to adjust clothing or actions slightly based on temperature.", action: "Ask whether today is hot, cold, or changeable, then make one action lighter.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when temperature-based adjustment grew", lead: "You are adjusting clothing, actions, or rest, and a lighter rhythm is starting to grow.", action: "Pick one time of day when you often get tired and add water or a short pause before it.", art: "leaf" },
+      { name: "Small Tree", title: "A day when daily adjustment became stable", lead: "You are making choices that reduce strain instead of clinging to the same routine every day.", action: "On days with big temperature changes, plan your workload a little lighter from the start.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when a less tiring life began to bloom", lead: "You are balancing temperature, clothing, actions, rest, and environment. Adjusting instead of forcing is becoming natural.", action: "Write down one adjustment that worked today so you can reuse it on a similar day.", art: "bloom" }
+    ],
+    types: {
+      temperature: { title: "Focus Point: Temperature Awareness", text: "You may benefit most from checking the temperature before acting. One morning check can reduce mismatches in clothing and plans." },
+      pace: { title: "Focus Point: Lowering Strain", text: "You may get tired by trying to keep the usual pace. On tough temperature days, start with a slightly lighter pace." },
+      clothes: { title: "Focus Point: Clothing Adjustment", text: "Your fatigue may shift with clothing choices. Prioritize layers, easy adjustment, and less tightness." },
+      action: { title: "Focus Point: Action Timing", text: "Changing intensity or timing may help. Try mornings or evenings on hot days, and midday on cold days." },
+      rest: { title: "Focus Point: Rest Before Exhaustion", text: "Short rest before exhaustion may help more than waiting until you are fully drained. Add small margins to your day." },
+      awareness: { title: "Focus Point: Noticing Your State", text: "Seeing tiredness as a condition, not a flaw, can make the day easier to handle." },
+      environment: { title: "Focus Point: Environment Setup", text: "Room temperature, humidity, and air can affect your fatigue. Small space adjustments can matter." },
+      water: { title: "Focus Point: Hydration Care", text: "Hydration and dryness may affect your energy. Create a simple flow for small, steady water breaks." },
+      flexible: { title: "Focus Point: Flexible Standards", text: "You may tire yourself by using yesterday's standard today. If the temperature changes, your pace can change too." },
+      kindness: { title: "Focus Point: Self-Kindness", text: "You may blame yourself quickly. Considering environmental mismatch first can reduce unnecessary mental fatigue." }
+    },
+    resultTitle: "Today's Temperature Adjustment Level",
+    resultTypeLabel: "Current focus point",
+    retry: "Check again",
+    share: "Copy result"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
