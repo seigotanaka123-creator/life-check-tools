@@ -1,0 +1,651 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "骨格診断活用チェック | One Coin Books",
+    metaDescription: "骨格診断を知るだけで終わらせず、素材・形・買い物・クローゼット整理に活かすためのチェックツールです。",
+    ogTitle: "骨格診断活用チェック | One Coin Books",
+    pageTitle: "骨格診断活用チェック",
+    pageLead: "服選びの“なんか違う”を、骨格とのズレからやさしく確認できます。",
+    introTitle: "骨格診断を使える基準にできているか確認する",
+    introText: "できている項目を選ぶだけで、骨格診断の活用度・次に整えるポイント・服選びをラクにする小さな一歩が分かります。",
+    checkTitle: "チェック項目",
+    checks: [
+      { text: "骨格セルフチェックを実施した", hint: "体の厚み・重心・肌質・関節の出方を一度確認できています。", type: "selfCheck" },
+      { text: "自分のタイプを把握した", hint: "ストレート・ウェーブ・ナチュラルのうち、ベースになる傾向を持てています。", type: "typeKnow" },
+      { text: "タイプの特徴を理解した", hint: "なぜ似合うのか、なぜ違和感が出るのかを少し説明できます。", type: "feature" },
+      { text: "素材で判断できるようになった", hint: "ハリ・柔らかさ・ラフさなど、素材と骨格の相性を見られています。", type: "material" },
+      { text: "形で判断できるようになった", hint: "直線・曲線・余白・サイズ感を、なんとなくではなく基準として見られています。", type: "shape" },
+      { text: "買い物で活用できている", hint: "手に取る前や試着時に、骨格との相性を確認できています。", type: "shopping" },
+      { text: "違和感を見逃さなくなった", hint: "なんか重い・薄い・浮くなどの感覚を、修正のヒントとして扱えています。", type: "discomfort" },
+      { text: "クローゼットを整理した", hint: "しっくりくる服の共通点を見つけ、合わない服を少し減らせています。", type: "closet" },
+      { text: "自分の基準を持てた", hint: "流行やSNSだけでなく、自分の体に合う条件で選べています。", type: "criteria" },
+      { text: "無駄買いが減った", hint: "かわいいだけで買わず、使えるか・合うかを確認できています。", type: "waste" },
+      { text: "服選びの迷いが減った", hint: "似合う条件が分かり、選ぶ時間や不安が少し軽くなっています。", type: "ease" }
+    ],
+    resultTitle: "診断結果",
+    resultLead: "今のあなたの“骨格診断活用度”はこちらです。",
+    stages: [
+      { name: "たね", title: "似合う基準のたねを置けた日", lead: "まだタイプがはっきりしなくても大丈夫です。なんか違う原因をセンスではなく、骨格とのズレとして見始めた時点で、たねは置けています。", action: "まずは手持ちの服から、しっくりくる1着と違和感のある1着を選んで比べてみましょう。", art: "seed" },
+      { name: "めばえ", title: "骨格の特徴がめばえた日", lead: "自分の体の厚み・重心・質感・骨感に少し目が向いています。服選びを感覚だけでなく、体との相性で見始めています。", action: "次に試着するときは、素材が重いか軽いか、形が直線か曲線かを一つだけ確認してみましょう。", art: "sprout" },
+      { name: "若葉", title: "服選びの基準の若葉が育った日", lead: "素材・形・サイズ感のどこかを基準として見られています。似合う服リストを覚えるより、判断できる力が育っています。", action: "買い物前に、自分が避けたい素材や形を一つだけメモしておきましょう。", art: "leaf" },
+      { name: "小さな木", title: "外さない服選びの小さな木が育った日", lead: "買い物やクローゼット整理に骨格診断を使い始めています。違和感を見逃さず、無駄買いや迷いを減らせる状態に近づいています。", action: "手持ちの“よく着る服”を3つ並べて、共通する素材・形・サイズ感を言葉にしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "骨格を活かした垢ぬけが実り始めた日", lead: "骨格診断を知識ではなく、服選びの基準としてかなり使えています。ズレを減らすことで、自然に整って見える状態が育っています。", action: "今の自分の服選びルールを一文で残し、次の買い物でも同じ基準を使ってみましょう。", art: "bloom" }
+    ],
+    typeTitle: "整えポイント",
+    types: {
+      selfCheck: { title: "整えポイント：セルフチェックタイプ", text: "まだ自分の骨格傾向がぼんやりしやすいタイプです。体の厚み・重心・肌質・関節の出方を7割でいいので確認しましょう。" },
+      typeKnow: { title: "整えポイント：タイプ把握タイプ", text: "タイプ名で止まりやすいタイプです。ストレート・ウェーブ・ナチュラルを、服選びの基準に変えることが大切です。" },
+      feature: { title: "整えポイント：特徴理解タイプ", text: "なぜ似合うかが曖昧になりやすいタイプです。体の特徴と服の構造が合うかどうかで見てみましょう。" },
+      material: { title: "整えポイント：素材判断タイプ", text: "素材との相性で迷いやすいタイプです。ハリ・柔らかさ・厚み・ラフさを見て、骨格に合うか確認しましょう。" },
+      shape: { title: "整えポイント：形判断タイプ", text: "シルエットやサイズ感でズレやすいタイプです。直線、曲線、余白、フィット感を基準にすると判断しやすくなります。" },
+      shopping: { title: "整えポイント：買い物活用タイプ", text: "知識が買い物に結びつきにくいタイプです。手に取る前に素材、試着時に違和感を見る流れを作りましょう。" },
+      discomfort: { title: "整えポイント：違和感活用タイプ", text: "なんか違う感覚を流しやすいタイプです。違和感は失敗ではなく、骨格とのズレを教えてくれるサインです。" },
+      closet: { title: "整えポイント：クローゼット整理タイプ", text: "手持ち服の共通点が見えにくいタイプです。よく着る服と着ない服を比べると、自分の基準が見えてきます。" },
+      criteria: { title: "整えポイント：自分の基準タイプ", text: "流行やSNSに引っ張られやすいタイプです。自分の体に合う素材・形・サイズ感を一つの基準として持ちましょう。" },
+      waste: { title: "整えポイント：無駄買い予防タイプ", text: "かわいい・安い・流行っているで買いやすいタイプです。買う前に“骨格に合うか”“着る場面があるか”を確認しましょう。" },
+      ease: { title: "整えポイント：迷いを減らすタイプ", text: "服選びで迷いやすいタイプです。似合う条件を言葉にしておくと、朝や買い物の判断がかなり軽くなります。" }
+    },
+    shareText: "骨格診断活用チェックをしました。",
+    resetText: "もう一度チェックする",
+    copyText: "結果をコピー",
+    copiedText: "コピーしました"
+  },
+  en: {
+    title: "Body Type Styling Check | One Coin Books",
+    metaDescription: "A checklist for using body type styling as a practical standard for materials, shapes, shopping, and closet editing instead of just knowing your type.",
+    ogTitle: "Body Type Styling Check | One Coin Books",
+    pageTitle: "Body Type Styling Check",
+    pageLead: "Check whether the 'something feels off' in your outfits comes from a mismatch between clothing structure and body type.",
+    introTitle: "Check whether body type knowledge is usable",
+    introText: "Select what applies to see your body type styling stage, next adjustment point, and a small step to make outfit choices easier.",
+    checkTitle: "Checklist",
+    checks: [
+      { text: "I did a body type self-check", hint: "You checked body thickness, balance point, skin texture, and joint visibility.", type: "selfCheck" },
+      { text: "I understand my basic type", hint: "You have a base tendency among straight, wave, or natural.", type: "typeKnow" },
+      { text: "I understand the features of my type", hint: "You can explain a little why something suits you or feels off.", type: "feature" },
+      { text: "I can judge by material", hint: "You can see compatibility through firmness, softness, weight, or roughness.", type: "material" },
+      { text: "I can judge by shape", hint: "You can consider straight lines, curves, space, and fit as criteria.", type: "shape" },
+      { text: "I use it when shopping", hint: "You check body compatibility before picking up or trying on clothes.", type: "shopping" },
+      { text: "I no longer ignore discomfort", hint: "You treat feelings like heavy, thin, or awkward as hints for adjustment.", type: "discomfort" },
+      { text: "I organized my closet", hint: "You found common traits in clothes that feel right and reduced mismatched pieces.", type: "closet" },
+      { text: "I have my own criteria", hint: "You choose by what suits your body, not only trends or social media.", type: "criteria" },
+      { text: "I buy fewer unused clothes", hint: "You check whether an item fits and will actually be used before buying.", type: "waste" },
+      { text: "I feel less lost choosing clothes", hint: "Your suitable conditions are clearer, reducing time and uncertainty.", type: "ease" }
+    ],
+    resultTitle: "Result",
+    resultLead: "Here is your current body type styling usage stage.",
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of suitable criteria", lead: "Even if your type is not fully clear yet, seeing the issue as body-clothing mismatch rather than lack of taste is already a seed.", action: "Choose one outfit that feels right and one that feels off, then compare them.", art: "seed" },
+      { name: "Sprout", title: "A day when body type features began to sprout", lead: "You are starting to notice thickness, balance, texture, and bone structure. You are seeing clothes by body compatibility, not only feeling.", action: "Next time you try something on, check one thing: material weight or whether the shape is straight or curved.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when styling criteria began to grow", lead: "You are beginning to use material, shape, or fit as criteria. This is more useful than memorizing lists of suitable clothes.", action: "Before shopping, write down one material or shape you want to avoid.", art: "leaf" },
+      { name: "Small Tree", title: "A day when reliable outfit choices began to grow", lead: "You are starting to use body type knowledge in shopping and closet editing. Discomfort is becoming a useful signal.", action: "Place three clothes you often wear side by side and name their shared material, shape, or fit.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when body type styling began to bear fruit", lead: "You are using body type diagnosis as a practical clothing standard. By reducing mismatch, your outfits naturally look more polished.", action: "Write one sentence about your current outfit rule and use it in your next shopping decision.", art: "bloom" }
+    ],
+    typeTitle: "Adjustment Point",
+    types: {
+      selfCheck: { title: "Adjustment: Self-check", text: "Your type may still feel vague. Check thickness, balance, texture, and joints roughly enough to use." },
+      typeKnow: { title: "Adjustment: Understanding type", text: "You may stop at the type name. Turn straight, wave, or natural into practical clothing criteria." },
+      feature: { title: "Adjustment: Feature understanding", text: "Why something suits you may be unclear. Look at how body features and clothing structure match." },
+      material: { title: "Adjustment: Material judgment", text: "Material compatibility may be the key. Check firmness, softness, thickness, and roughness." },
+      shape: { title: "Adjustment: Shape judgment", text: "Silhouette and fit may cause mismatch. Use straight lines, curves, space, and fit as criteria." },
+      shopping: { title: "Adjustment: Shopping use", text: "Knowledge may not yet guide purchases. Create a flow: check material before picking up, and discomfort during fitting." },
+      discomfort: { title: "Adjustment: Using discomfort", text: "You may dismiss the 'something is off' feeling. It is a useful sign of mismatch, not failure." },
+      closet: { title: "Adjustment: Closet editing", text: "The patterns in your clothes may be unclear. Compare often-worn and rarely-worn items to find your criteria." },
+      criteria: { title: "Adjustment: Personal criteria", text: "You may be pulled by trends or social media. Hold one criterion based on your own body." },
+      waste: { title: "Adjustment: Preventing wasted purchases", text: "You may buy because something is cute, cheap, or trendy. Before buying, check fit and real use." },
+      ease: { title: "Adjustment: Reducing clothing hesitation", text: "Choosing clothes may still feel tiring. Put your suitable conditions into words to make daily decisions lighter." }
+    },
+    shareText: "I tried the Body Type Styling Check.",
+    resetText: "Check again",
+    copyText: "Copy result",
+    copiedText: "Copied"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
