@@ -1,0 +1,647 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "やりたいことが見える状態チェック | One Coin Books",
+    metaDescription: "やりたいことが分からない時に、考えすぎ・情報過多・比較・違和感・小さな行動を整理し、見える状態を整えるチェックツールです。",
+    pageTitle: "やりたいことが見える状態チェック",
+    pageLead: "やりたいことを無理に探すのではなく、自然と見えやすい状態を整えるためのチェックです。",
+    badge: "探すより、見える状態を整える",
+    introTitle: "今の状態をチェック",
+    intro: "当てはまる項目を選ぶと、今の整い度、強いタイプ、次にできる小さな一歩が表示されます。やりたいことを急いで決めるためではなく、見える状態を作るために使ってください。",
+    checks: [
+      { text: "『やりたいことが分からない状態』を否定していない", hint: "分からないことを責めず、自然な状態として扱えています。", type: "accept" },
+      { text: "考えるだけで止まっていない", hint: "思考で答えを出そうとしすぎず、行動の材料も増やせています。", type: "action" },
+      { text: "小さく試す回数を増やせている", hint: "1回で決めず、試しながら精度を上げる形にできています。", type: "try" },
+      { text: "行動のハードルを下げられている", hint: "迷う前に動けるくらい小さくできています。", type: "hurdle" },
+      { text: "違和感をヒントとして扱えている", hint: "合わない感覚を自己否定ではなく方向修正に使えています。", type: "signal" },
+      { text: "続いたものに目を向けている", hint: "自然に続くものを、やりたいことの手がかりとして見られています。", type: "continue" },
+      { text: "情報の量をコントロールしている", hint: "情報を見すぎて判断基準が外に流れる状態を減らせています。", type: "info" },
+      { text: "比較の頻度を減らしている", hint: "他人との差より、自分の状態や感覚に戻れています。", type: "compare" },
+      { text: "やめる判断ができている", hint: "合わないものを手放し、必要なものが残る状態に近づいています。", type: "stop" },
+      { text: "自分の状態を整える意識がある", hint: "答え探しより、疲れ・余裕・環境を整える視点を持てています。", type: "state" }
+    ],
+    resultTitle: "チェック結果",
+    resultLead: "選んだ項目から、今の“やりたいことが見える状態”を表示します。",
+    emptyTitle: "まだチェックがありません",
+    emptyText: "まずは分からない状態を責めずに、今日できそうな小さな行動を一つ選んでみてください。",
+    scoreLabel: "整い度",
+    stageLabel: "成長段階",
+    typeLabel: "いま強い見つけ方タイプ",
+    nextLabel: "次の小さな一歩",
+    stages: [
+      { name: "たね", title: "見える状態のたねを置けた日", lead: "まだ答えが見えていなくても大丈夫です。分からない状態を責めず、整えれば見えてくると気づけた時点で、たねは置けています。", action: "今日は情報を増やす前に、今の疲れや余裕を一度確認してみましょう。", art: "seed" },
+      { name: "めばえ", title: "小さく試すめばえが出た日", lead: "考えるだけで止まらず、小さく動く視点が出ています。やりたいことが見えるための材料が増え始めています。", action: "気になることを一つだけ、5分で試せる形にしてみてください。", art: "sprout" },
+      { name: "若葉", title: "違和感を使う力が育った日", lead: "違和感や続いたものに目を向けられています。自分に合う方向を見つける若葉が育っています。", action: "最近の違和感を一つ書き出し、“何が合わなかったのか”を一言で残しましょう。", art: "leaf" },
+      { name: "小さな木", title: "選択肢を整える力が育った日", lead: "情報や比較を減らし、やめる判断もできています。見える状態を守る小さな木が育っています。", action: "今日は見る情報を一つ減らし、代わりに小さく試す時間を作ってみましょう。", art: "tree" },
+      { name: "花と実り", title: "自然と方向が見え始めた日", lead: "状態を整え、小さく試し、違和感と継続を手がかりにできています。無理に探さなくても方向が見え始めています。", action: "続いているものを一つ選び、少しだけ時間を増やすか深める形にしてみてください。", art: "bloom" }
+    ],
+    types: {
+      accept: { title: "見つけ方タイプ：状態受け止めタイプ", text: "分からない状態を責めないことが鍵です。まずは“今は見えにくい状態なんだ”と扱ってください。" },
+      action: { title: "見つけ方タイプ：行動材料タイプ", text: "考えるだけでは止まりやすいタイプです。小さな行動で未来の材料を増やしていきましょう。" },
+      try: { title: "見つけ方タイプ：小さく試すタイプ", text: "試す回数を増やすほど見えやすいタイプです。質より回数、5分だけでも十分です。" },
+      hurdle: { title: "見つけ方タイプ：ハードル調整タイプ", text: "動き出しを軽くすると進みやすいタイプです。迷う前にできる小ささまで分解してください。" },
+      signal: { title: "見つけ方タイプ：違和感活用タイプ", text: "違和感を方向修正に使えるタイプです。“合わない”も大切な手がかりとして残しましょう。" },
+      continue: { title: "見つけ方タイプ：続いたもの発見タイプ", text: "自然に続くものから方向が見えやすいタイプです。無理なく続いたものを少し育ててみてください。" },
+      info: { title: "見つけ方タイプ：情報整理タイプ", text: "情報を減らすほど自分の基準が戻りやすいタイプです。見る量を少し絞ると判断しやすくなります。" },
+      compare: { title: "見つけ方タイプ：比較リセットタイプ", text: "比較を減らすことで見えやすくなるタイプです。他人の進み方より、自分の感覚を戻しましょう。" },
+      stop: { title: "見つけ方タイプ：やめる判断タイプ", text: "合わないものを手放すほど精度が上がるタイプです。やめることも前進として扱ってください。" },
+      state: { title: "見つけ方タイプ：状態整えタイプ", text: "答え探しより状態づくりが鍵です。疲れ、余裕、情報量を整えると自然と見えやすくなります。" }
+    }
+  },
+  en: {
+    title: "Finding What You Want Check | One Coin Books",
+    metaDescription: "A checklist for when you do not know what you want, helping organize overthinking, information overload, comparison, discomfort, small experiments, and your current state.",
+    pageTitle: "Finding What You Want Check",
+    pageLead: "A check for creating the state where what you want becomes easier to see, instead of forcing yourself to find an answer.",
+    badge: "Create visibility before searching",
+    introTitle: "Check your current state",
+    intro: "Select what applies. You will see your current clarity stage, strongest type, and a small next step. Use this to create visibility, not to rush a decision.",
+    checks: [
+      { text: "I am not blaming myself for not knowing", hint: "You are treating uncertainty as a natural state.", type: "accept" },
+      { text: "I am not stopping at thinking only", hint: "You are adding action material instead of relying only on thought.", type: "action" },
+      { text: "I increased small experiments", hint: "You are improving accuracy by trying, not deciding in one attempt.", type: "try" },
+      { text: "I lowered the action hurdle", hint: "You made action small enough to move before getting stuck.", type: "hurdle" },
+      { text: "I treated discomfort as a hint", hint: "You used a mismatch as direction correction, not self-blame.", type: "signal" },
+      { text: "I noticed what continued naturally", hint: "You saw natural continuation as a clue to what fits.", type: "continue" },
+      { text: "I controlled information intake", hint: "You reduced outside noise that pulls your standards away from yourself.", type: "info" },
+      { text: "I reduced comparison", hint: "You returned from other people's progress to your own state.", type: "compare" },
+      { text: "I could decide to stop something", hint: "You made room by letting go of what does not fit.", type: "stop" },
+      { text: "I am aware of preparing my state", hint: "You are looking at fatigue, margin, and environment before forcing an answer.", type: "state" }
+    ],
+    resultTitle: "Your Check Result",
+    resultLead: "Based on your selections, this shows how ready your state is for seeing what you want.",
+    emptyTitle: "No checks yet",
+    emptyText: "Start by not blaming yourself for not knowing, then choose one tiny action you can try today.",
+    scoreLabel: "Clarity",
+    stageLabel: "Growth Stage",
+    typeLabel: "Strongest Finding Type",
+    nextLabel: "Small Next Step",
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of visibility", lead: "Even if the answer is not visible yet, realizing that the state can be prepared plants the seed.", action: "Before adding more information, check your fatigue and margin today.", art: "seed" },
+      { name: "Sprout", title: "A day when small experiments sprouted", lead: "You are beginning to move instead of only thinking. New material for clarity is starting to grow.", action: "Turn one thing you are curious about into a five-minute experiment.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when discomfort became useful", lead: "You are noticing discomfort and what continues naturally. Young leaves of fit are growing.", action: "Write one recent discomfort and one sentence about what did not fit.", art: "leaf" },
+      { name: "Small Tree", title: "A day when choices became organized", lead: "You are reducing information and comparison, and you can stop what does not fit. A small tree of clarity is growing.", action: "Reduce one information source today and use that time for a small experiment.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when direction began to appear naturally", lead: "You are preparing your state, experimenting, and using discomfort and continuity as clues. Direction is beginning to bloom.", action: "Pick one thing that continued naturally and grow it slightly deeper or longer.", art: "bloom" }
+    ],
+    types: {
+      accept: { title: "Finding Type: Accepting the State", text: "Your key is not blaming uncertainty. Treat it as a state where things are hard to see." },
+      action: { title: "Finding Type: Action Material", text: "Thinking alone can stop you. Use small actions to gather future material." },
+      try: { title: "Finding Type: Small Experiments", text: "More small trials create more clarity. Prioritize repetitions over quality." },
+      hurdle: { title: "Finding Type: Lower the Hurdle", text: "You move by making the first step lighter. Break it down until you can act before overthinking." },
+      signal: { title: "Finding Type: Discomfort Signal", text: "Discomfort is useful for direction correction. Keep what does not fit as a clue." },
+      continue: { title: "Finding Type: Natural Continuation", text: "Things that continue naturally are strong clues. Grow them slightly instead of forcing something new." },
+      info: { title: "Finding Type: Information Control", text: "Less information helps your own standards return. Narrow what you look at." },
+      compare: { title: "Finding Type: Comparison Reset", text: "Reducing comparison helps clarity. Return from others' paths to your own state." },
+      stop: { title: "Finding Type: Stop and Refine", text: "Letting go improves accuracy. Treat stopping what does not fit as progress." },
+      state: { title: "Finding Type: State Preparation", text: "Your key is preparing your state before seeking answers. Adjust fatigue, margin, and information load." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
