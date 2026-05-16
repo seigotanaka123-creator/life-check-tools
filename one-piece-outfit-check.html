@@ -1,0 +1,637 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ワンピース着回し設計チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="ワンピース着回し設計チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">ワンピース着回し設計チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "ワンピース着回し設計チェック | One Coin Books",
+    metaDescription: "朝の服選びで迷わないために、ワンピースの数・役割・迷ったらこれ・セット化・サイズ素材色を整えるチェックツールです。",
+    pageTitle: "ワンピース着回し設計チェック",
+    pageLead: "朝の服選びは、センスよりも仕組みで軽くできます。できている項目を選ぶと、今の着回し設計度と、次に整えるとよいポイントが分かります。",
+    langLabel: "Language",
+    progressLabel: "設計度",
+    resultButton: "結果を見る",
+    resetButton: "リセット",
+    checkedText: "選択済み",
+    uncheckedText: "未選択",
+    checks: [
+      { text: "ワンピースの数を絞れている", hint: "選択肢を増やしすぎず、朝の判断疲れを減らせています。", type: "count" },
+      { text: "ワンピースごとに役割を決めている", hint: "普段用・外出用・きちんとした日用など、用途で選べる状態です。", type: "role" },
+      { text: "『迷ったらこれ』の1着がある", hint: "安心して選べる定番があることで、朝の迷いを大きく減らせます。", type: "default" },
+      { text: "靴やバッグとのセット化ができている", hint: "ワンピース単体ではなく、コーデ全体を固定化できています。", type: "set" },
+      { text: "サイズ感を意識して選んでいる", hint: "大きすぎず小さすぎず、自然なラインで整える視点があります。", type: "size" },
+      { text: "素材のハリや厚みを見ている", hint: "一枚でも部屋着っぽくならない素材を選ぶ意識があります。", type: "material" },
+      { text: "ベースカラーを軸にしている", hint: "黒・ネイビー・ベージュなど、迷いにくい色を中心にできています。", type: "color" },
+      { text: "朝の判断が減っている", hint: "毎朝考える量が減り、流れで着られる状態に近づいています。", type: "decision" },
+      { text: "迷った日は“楽な方”を選べている", hint: "正解探しより、違和感が少なく過ごせる服を選べています。", type: "easy" },
+      { text: "少し朝に余裕ができている", hint: "服選びの負担が減り、1日の始まりが軽くなっています。", type: "margin" }
+    ],
+    stages: [
+      { name: "たね", title: "朝の迷いを減らすたねを置けた日", lead: "まだ毎朝迷う日があっても大丈夫です。服選びはセンスではなく仕組みで軽くできると気づけた時点で、たねは置けています。", action: "まずは今持っているワンピースを出して、よく着るものを一つ選んでみましょう。", art: "seed" },
+      { name: "めばえ", title: "ワンピース軸のめばえが出た日", lead: "数を絞る、役割を決めるなど、朝の判断を減らす準備が始まっています。", action: "普段用・外出用・きちんとした日用のどれに当てはまるか、1着ずつ役割を書いてみましょう。", art: "sprout" },
+      { name: "若葉", title: "迷わない定番の若葉が育った日", lead: "“迷ったらこれ”やセット化の感覚が育っています。朝の選択がかなり軽くなり始めています。", action: "一番安心して着られるワンピースに、靴とバッグを固定して1セット作ってみましょう。", art: "leaf" },
+      { name: "小さな木", title: "着回し設計の小さな木が育った日", lead: "サイズ・素材・色まで見ながら、ワンピースを仕組みとして使える状態に近づいています。", action: "次に買うなら、ベースカラー・適度なハリ・用途が明確な1着だけを候補にしましょう。", art: "tree" },
+      { name: "花と実り", title: "朝の服選びが軽く実る日", lead: "数・役割・定番・セット化が整い、朝に考えなくても手が動く状態に近づいています。", action: "今できている定番セットを写真やメモに残し、迷った日の戻り先にしましょう。", art: "bloom" }
+    ],
+    types: {
+      count: { title: "整えポイント：数を絞るタイプ", text: "選択肢が多くて迷いやすいタイプです。まずはよく着る3〜5着に絞って、朝の判断を軽くしましょう。" },
+      role: { title: "整えポイント：役割分けタイプ", text: "用途が曖昧で迷いやすいタイプです。普段用・外出用・きちんとした日用など、役割を決めると選びやすくなります。" },
+      default: { title: "整えポイント：定番づくりタイプ", text: "迷ったときの戻り先があると楽になるタイプです。“迷ったらこれ”の1着を決めましょう。" },
+      set: { title: "整えポイント：セット化タイプ", text: "ワンピースだけでなく、靴やバッグまで決めると整いやすいタイプです。1セット作るだけで朝がかなり軽くなります。" },
+      size: { title: "整えポイント：サイズ感タイプ", text: "なんか微妙の原因がサイズに出やすいタイプです。余白がありつつ崩れないラインを意識しましょう。" },
+      material: { title: "整えポイント：素材選びタイプ", text: "素材で部屋着っぽく見えやすいタイプです。薄すぎず、適度にハリのあるものを選ぶと一枚で成立しやすくなります。" },
+      color: { title: "整えポイント：ベースカラータイプ", text: "色で迷いやすいタイプです。黒・ネイビー・ベージュなど、安心して使えるベースカラーを軸にしましょう。" },
+      decision: { title: "整えポイント：判断回数タイプ", text: "朝に考える量が多くて疲れやすいタイプです。前日決める、定位置に置く、セット化するなどで判断を減らしましょう。" },
+      easy: { title: "整えポイント：楽な方を選ぶタイプ", text: "正解を探して迷いやすいタイプです。迷った日は“着ていて楽で違和感が少ない方”を選べば十分です。" },
+      margin: { title: "整えポイント：朝の余裕タイプ", text: "服選びを軽くすることで1日が整いやすいタイプです。少し余った朝時間を、落ち着く行動に使いましょう。" }
+    }
+  },
+  en: {
+    title: "One-Piece Outfit Check | One Coin Books",
+    metaDescription: "A simple check tool for reducing morning outfit decisions by organizing one-piece dresses by count, role, default choice, set outfits, size, material, and color.",
+    pageTitle: "One-Piece Outfit Check",
+    pageLead: "Morning outfit stress can be reduced by structure, not talent. Select what is already true and see your current outfit-design level plus the next point to adjust.",
+    langLabel: "Language",
+    progressLabel: "Design Level",
+    resultButton: "Show result",
+    resetButton: "Reset",
+    checkedText: "Checked",
+    uncheckedText: "Unchecked",
+    checks: [
+      { text: "I have narrowed down my one-piece options", hint: "You are reducing decision fatigue by avoiding too many choices.", type: "count" },
+      { text: "Each dress has a clear role", hint: "You can choose by purpose, such as daily, going out, or slightly formal.", type: "role" },
+      { text: "I have one default dress for uncertain mornings", hint: "A reliable default greatly reduces morning hesitation.", type: "default" },
+      { text: "I have set shoes and bags with the dress", hint: "You are fixing the whole outfit, not only choosing the dress.", type: "set" },
+      { text: "I pay attention to fit", hint: "You notice whether the line feels natural, neither too loose nor too tight.", type: "size" },
+      { text: "I check fabric structure and thickness", hint: "You choose materials that work as a complete outfit, not like loungewear.", type: "material" },
+      { text: "I use base colors as my core", hint: "You rely on easy colors such as black, navy, or beige.", type: "color" },
+      { text: "My morning decisions have decreased", hint: "You are getting closer to choosing by flow instead of thinking every morning.", type: "decision" },
+      { text: "On uncertain days, I choose the easier option", hint: "You choose what feels comfortable and low-friction instead of chasing a perfect answer.", type: "easy" },
+      { text: "I have a little more margin in the morning", hint: "Reducing outfit stress is making the start of your day lighter.", type: "margin" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of easier mornings", lead: "Even if you still hesitate, realizing that outfit choice can be made lighter through structure plants the seed.", action: "Start by taking out your dresses and choosing one you wear often.", art: "seed" },
+      { name: "Sprout", title: "A day when the one-piece axis sprouted", lead: "You are beginning to reduce decisions by narrowing choices and assigning roles.", action: "Write a role for each dress: daily, going out, or slightly formal.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when a reliable default grew", lead: "Your default choice and outfit sets are forming. Morning decisions are starting to feel lighter.", action: "Pick your most reliable dress and fix one pair of shoes and one bag with it.", art: "leaf" },
+      { name: "Small Tree", title: "A day when outfit design grew stable", lead: "You are seeing size, material, and color as part of the system. The dress is becoming a useful structure.", action: "For your next purchase, consider only one dress with a base color, clear role, and enough fabric structure.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when morning outfit choice became light", lead: "Count, roles, default choice, and outfit sets are organized. Your hand can move without overthinking in the morning.", action: "Save your default outfit set in a photo or note as your return point on uncertain mornings.", art: "bloom" }
+    ],
+    types: {
+      count: { title: "Adjustment Point: Narrow the Count", text: "Too many choices may create hesitation. Start with three to five dresses you actually wear." },
+      role: { title: "Adjustment Point: Assign Roles", text: "Unclear purpose makes choosing harder. Give each dress a role such as daily, going out, or formal." },
+      default: { title: "Adjustment Point: Create a Default", text: "A reliable return choice will help. Choose one dress for mornings when you cannot decide." },
+      set: { title: "Adjustment Point: Outfit Set", text: "You will benefit from deciding shoes and bag together with the dress. One fixed set can lighten your morning." },
+      size: { title: "Adjustment Point: Fit", text: "The cause of 'somehow off' may be fit. Look for a line with ease but not collapse." },
+      material: { title: "Adjustment Point: Fabric", text: "Material may make the outfit feel too casual. Choose fabric with enough structure and thickness." },
+      color: { title: "Adjustment Point: Base Color", text: "Color may be creating hesitation. Build around reliable base colors such as black, navy, or beige." },
+      decision: { title: "Adjustment Point: Fewer Decisions", text: "Too much morning thinking can drain you. Decide the night before, keep items visible, or use fixed sets." },
+      easy: { title: "Adjustment Point: Choose Ease", text: "Searching for the perfect choice can keep you stuck. On uncertain days, choose what feels easiest and least uncomfortable." },
+      margin: { title: "Adjustment Point: Morning Margin", text: "Reducing outfit stress can improve the day. Use the saved time for something calming." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
