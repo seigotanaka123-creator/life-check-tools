@@ -1,0 +1,655 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "投稿運営改善チェック | One Coin Books",
+    metaDescription: "投稿しても結果が出ない時に、基本設計・投稿設計・導線設計・改善視点を確認できるチェックツールです。",
+    ogTitle: "投稿運営改善チェック | One Coin Books",
+    pageTitle: "投稿運営改善チェック",
+    pageLead: "投稿しているだけで終わっていないか、認知から行動までの流れをやさしく確認できます。",
+    introTitle: "今の運営の整い方を確認する",
+    introText: "できている項目を選ぶだけで、運営の流れ・次に整えるポイント・結果につなげるための小さな一歩が分かります。",
+    checkTitle: "チェック項目",
+    checks: [
+      { text: "誰に向けた発信か明確", hint: "どんな人に届けたいかが、ぼんやりではなく具体的になっています。", type: "target" },
+      { text: "どんな悩みを解決しているか明確", hint: "相手が抱える悩みや状態を言葉にできています。", type: "problem" },
+      { text: "投稿の目的が決まっている", hint: "認知・共感・信頼・導線など、投稿ごとの役割を意識できています。", type: "purpose" },
+      { text: "投稿が単発で終わっていない", hint: "その場で読まれて終わるだけでなく、次の接点につながる設計があります。", type: "series" },
+      { text: "投稿同士がつながっている", hint: "関連投稿やテーマの流れがあり、点ではなく線として見せられています。", type: "connection" },
+      { text: "シリーズや導線がある", hint: "続けて読みたくなる流れや、次に見る場所が用意されています。", type: "flow" },
+      { text: "投稿からプロフへの流れがある", hint: "投稿を見た人が、自然にプロフィールを見たくなる設計があります。", type: "profileFlow" },
+      { text: "プロフが整っている", hint: "誰向けか、何を発信しているか、どんな価値があるかが伝わります。", type: "profile" },
+      { text: "次の行動が明確", hint: "フォロー・他投稿・商品・リンクなど、読者が次に何をすればいいか分かります。", type: "action" },
+      { text: "見られる工夫がある", hint: "タイトル・冒頭・テーマ選びなど、まず認知されるための工夫があります。", type: "visibility" },
+      { text: "伝わる工夫がある", hint: "抽象だけでなく具体例や共感を入れ、自分ごとにしやすくしています。", type: "clarity" },
+      { text: "継続できる形になっている", hint: "頑張りだけに頼らず、型やテーマで無理なく続けられる状態です。", type: "sustain" }
+    ],
+    resultTitle: "診断結果",
+    resultLead: "今のあなたの“投稿運営改善度”はこちらです。",
+    stages: [
+      { name: "たね", title: "運営改善のたねを置けた日", lead: "まだ投稿が点で終わっていても大丈夫です。結果が出ない原因をセンスではなく、流れの未整理として見られた時点で、たねは置けています。", action: "まずは直近の投稿を一つ選び、“次にどう動いてほしい投稿か”を書いてみましょう。", art: "seed" },
+      { name: "めばえ", title: "投稿の役割がめばえた日", lead: "誰に向けているか、どんな悩みを扱うか、投稿の役割に少し目が向き始めています。投稿して終わりから抜ける準備ができています。", action: "次の投稿は、認知・共感・信頼・導線のどれを目的にするか一つ決めてから作ってみましょう。", art: "sprout" },
+      { name: "若葉", title: "投稿のつながりの若葉が育った日", lead: "投稿同士のつながりやプロフィールへの流れが少し整い始めています。点の投稿が、少しずつ線になり始めています。", action: "関連する過去投稿を一つ添える、またはシリーズ化できるテーマを一つ決めてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "運営の流れの小さな木が育った日", lead: "見られる・伝わる・次につながる流れが育っています。投稿の質だけでなく、運営全体の構造に目を向けられています。", action: "プロフィールを見直し、投稿後に受け皿として機能しているかを確認してみましょう。", art: "tree" },
+      { name: "花と実り", title: "結果につながる運営が実り始めた日", lead: "基本設計・投稿設計・導線設計・改善視点がかなり整っています。同じ投稿努力でも、積み上がる運営に近づいています。", action: "今うまく回っている導線を一つメモし、次の投稿でも再利用できる型にしておきましょう。", art: "bloom" }
+    ],
+    typeTitle: "整えポイント",
+    types: {
+      target: { title: "整えポイント：届ける相手タイプ", text: "誰に向けているかがぼやけやすいタイプです。まずは“どんな状態の人に届けたいか”を一人に絞ると、言葉が強くなります。" },
+      problem: { title: "整えポイント：悩みの明確化タイプ", text: "相手の悩みが広くなりやすいタイプです。読者が今どんなことで困っているかを具体的に言葉にしましょう。" },
+      purpose: { title: "整えポイント：投稿の役割タイプ", text: "投稿ごとの目的が混ざりやすいタイプです。認知・共感・信頼・導線のどれを担う投稿かを先に決めると整います。" },
+      series: { title: "整えポイント：単発脱却タイプ", text: "投稿がその場で終わりやすいタイプです。次に読むものや次に取る行動を用意すると、積み上がる運営になります。" },
+      connection: { title: "整えポイント：投稿同士の接続タイプ", text: "投稿が点在しやすいタイプです。関連テーマやシリーズでつなげると、読者が深く回遊しやすくなります。" },
+      flow: { title: "整えポイント：流れづくりタイプ", text: "読者の進む道が曖昧になりやすいタイプです。投稿から次の投稿、プロフィール、商品までの流れを一度書き出してみましょう。" },
+      profileFlow: { title: "整えポイント：プロフ誘導タイプ", text: "投稿を見た後の移動が起きにくいタイプです。投稿内で“この人の他も見たい”と思える一言や流れを作りましょう。" },
+      profile: { title: "整えポイント：プロフィール受け皿タイプ", text: "プロフィールが受け皿になりにくいタイプです。誰向けか、何が得られるか、次に何をすればいいかを整えましょう。" },
+      action: { title: "整えポイント：次の行動タイプ", text: "読者に何をしてほしいかが曖昧になりやすいタイプです。フォロー、他投稿、商品など、次の一歩を一つだけ明確にしましょう。" },
+      visibility: { title: "整えポイント：見られる工夫タイプ", text: "内容はあっても最初に見られにくいタイプです。タイトル・冒頭・悩みの切り出しを読者目線で整えると届きやすくなります。" },
+      clarity: { title: "整えポイント：伝わる工夫タイプ", text: "正しさや情報量に寄りやすいタイプです。具体例や読者の感情を入れると、自分ごととして伝わりやすくなります。" },
+      sustain: { title: "整えポイント：継続設計タイプ", text: "頑張りに頼りやすいタイプです。投稿の型・テーマ・流れを固定すると、無理なく改善を続けやすくなります。" }
+    },
+    shareText: "投稿運営改善チェックをしました。",
+    resetText: "もう一度チェックする",
+    copyText: "結果をコピー",
+    copiedText: "コピーしました"
+  },
+  en: {
+    title: "Content Operation Improvement Check | One Coin Books",
+    metaDescription: "A checklist for improving content operations when posting does not lead to followers, stable reactions, or sales by checking targeting, post roles, flow, profile, and sustainability.",
+    ogTitle: "Content Operation Improvement Check | One Coin Books",
+    pageTitle: "Content Operation Improvement Check",
+    pageLead: "Check whether your posting ends as isolated content or creates a flow from awareness to action.",
+    introTitle: "Check how your content operation is structured",
+    introText: "Select what applies to see your current operation stage, the next point to improve, and a small step toward results.",
+    checkTitle: "Checklist",
+    checks: [
+      { text: "The target audience is clear", hint: "You know specifically who you want to reach.", type: "target" },
+      { text: "The problem you solve is clear", hint: "You can describe the reader's current pain or situation.", type: "problem" },
+      { text: "Each post has a purpose", hint: "You know whether a post is for awareness, empathy, trust, or direction.", type: "purpose" },
+      { text: "Posts do not end as one-offs", hint: "Each post can lead to another touchpoint or action.", type: "series" },
+      { text: "Posts are connected to each other", hint: "Themes and related posts form a line, not scattered dots.", type: "connection" },
+      { text: "There is a series or flow", hint: "Readers have a reason and path to keep reading.", type: "flow" },
+      { text: "Posts lead naturally to the profile", hint: "A reader who sees a post has a reason to check your profile.", type: "profileFlow" },
+      { text: "The profile is organized", hint: "It clearly says who it is for, what you share, and what value readers get.", type: "profile" },
+      { text: "The next action is clear", hint: "Readers know whether to follow, read another post, check a product, or click a link.", type: "action" },
+      { text: "There are ways to be seen", hint: "Titles, openings, and topics are designed for discovery.", type: "visibility" },
+      { text: "There are ways to be understood", hint: "Examples and empathy help readers make it about themselves.", type: "clarity" },
+      { text: "The operation is sustainable", hint: "Templates, themes, or routines support posting without relying only on effort.", type: "sustain" }
+    ],
+    resultTitle: "Result",
+    resultLead: "Here is your current content operation improvement stage.",
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of operation improvement", lead: "Even if your posts still feel isolated, noticing that the issue is structure rather than talent is already a seed.", action: "Choose one recent post and write what action you wanted readers to take next.", art: "seed" },
+      { name: "Sprout", title: "A day when post roles began to sprout", lead: "You are starting to see who you post for, what problem you address, and what role each post has.", action: "For your next post, choose one purpose: awareness, empathy, trust, or direction.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when post connections began to grow", lead: "Connections between posts and the path to the profile are beginning to form. Dots are becoming a line.", action: "Attach one related post or choose one theme that can become a series.", art: "leaf" },
+      { name: "Small Tree", title: "A day when the operation flow began to grow", lead: "The flow of being seen, understood, and guided forward is taking shape. You are looking at the whole operation, not only post quality.", action: "Review your profile and check whether it works as the receiving point after a post.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when result-focused operation began to bear fruit", lead: "Targeting, post roles, flow, profile, and improvement habits are well organized. Your posting effort is becoming cumulative.", action: "Write down one flow that is working and turn it into a reusable template for the next post.", art: "bloom" }
+    ],
+    typeTitle: "Adjustment Point",
+    types: {
+      target: { title: "Adjustment: Audience clarity", text: "Your audience may be too broad. Narrow it to one type of person and your words will become stronger." },
+      problem: { title: "Adjustment: Problem clarity", text: "The reader's problem may be vague. Put their current struggle into concrete words." },
+      purpose: { title: "Adjustment: Post role", text: "Post purposes may be mixed. Decide whether each post is for awareness, empathy, trust, or direction." },
+      series: { title: "Adjustment: Beyond one-off posts", text: "Posts may end on their own. Prepare the next post or action so content begins to accumulate." },
+      connection: { title: "Adjustment: Connecting posts", text: "Posts may be scattered. Related themes or series help readers move deeper through your content." },
+      flow: { title: "Adjustment: Building flow", text: "The reader path may be unclear. Write the route from post to next post, profile, and offer." },
+      profileFlow: { title: "Adjustment: Profile movement", text: "Readers may not move from posts to your profile. Add reasons in the post that make them want to see more." },
+      profile: { title: "Adjustment: Profile as receiver", text: "Your profile may not receive readers well. Clarify who it is for, what value they get, and what to do next." },
+      action: { title: "Adjustment: Next action", text: "The desired action may be vague. Choose one next step: follow, read another post, check an offer, or click a link." },
+      visibility: { title: "Adjustment: Being seen", text: "The content may be valuable but not noticed. Improve titles, openings, and problem framing from the reader's view." },
+      clarity: { title: "Adjustment: Being understood", text: "You may lean on correctness or information. Add examples and emotions so readers can relate it to themselves." },
+      sustain: { title: "Adjustment: Sustainable operation", text: "You may rely too much on effort. Fixing templates, themes, and flow makes improvement easier to continue." }
+    },
+    shareText: "I tried the Content Operation Improvement Check.",
+    resetText: "Check again",
+    copyText: "Copy result",
+    copiedText: "Copied"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
