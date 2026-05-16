@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "日本旅行フレーズ準備チェック | One Coin Books",
+    description: "日本旅行で使える基本フレーズ、発音、あいさつ、買い物、レストラン、交通、困ったときの言葉を確認するチェックツールです。",
+    ogTitle: "日本旅行フレーズ準備チェック | One Coin Books",
+    ogDescription: "外国人旅行者向けに、日本で安心して行動するための最低限の日本語フレーズを確認できます。",
+    pageTitle: "日本旅行フレーズ準備チェック",
+    lead: "日本旅行中に使える基本の日本語フレーズを、発音・場面・困ったときの言葉まで確認するためのチェックです。",
+    badge: "日本旅行の日本語フレーズ",
+    intro: "できている項目を選ぶと、日本旅行で使う日本語フレーズの準備度と、次に覚えると安心なポイントが分かります。",
+    checks: [
+      { text: "発音の基本を理解した", hint: "a/i/u/e/o の母音をはっきり、ゆっくり読むだけでも通じやすいと理解できています。", type: "pronunciation" },
+      { text: "あいさつを言える", hint: "こんにちは、こんばんは、ありがとうございます、すみませんなどの基本表現を確認できています。", type: "greeting" },
+      { text: "感謝とお願いを言える", hint: "ありがとうございます、お願いします、大丈夫ですなど、日常でよく使う言葉を覚え始めています。", type: "polite" },
+      { text: "お店で使える", hint: "これください、いくらですか、カード使えますか、袋いりませんなどを確認できています。", type: "shopping" },
+      { text: "レストランで使える", hint: "二人です、水をください、おいしいです、お会計お願いしますなどを使う場面が分かっています。", type: "restaurant" },
+      { text: "交通・移動で使える", hint: "駅はどこですか、何番線ですか、この電車は○○に行きますか、などを確認できています。", type: "transport" },
+      { text: "困ったときの言葉を言える", hint: "助けてください、分かりません、ゆっくり話してください、英語話せますかを確認できています。", type: "help" },
+      { text: "最低限の5フレーズを確認した", hint: "すみません、ありがとうございます、これください、分かりません、英語を話せますかを押さえています。", type: "minimum" },
+      { text: "短く分かりやすく伝える意識がある", hint: "長く話すより、短いフレーズをゆっくりはっきり伝える方が安心だと分かっています。", type: "simple" },
+      { text: "翻訳アプリや指差しも使っていいと思えている", hint: "日本語だけで完璧に話そうとせず、必要なときはアプリや指差しで補えると理解できています。", type: "backup" }
+    ],
+    stages: [
+      { name: "たね", title: "日本語フレーズのたねを置けた日", lead: "まだ覚えた言葉が少なくても大丈夫です。日本語はゆっくり・はっきり言えば伝わりやすいと分かった時点で、たねは置けています。", action: "まずは『すみません』と『ありがとうございます』を声に出して一度読んでみましょう。", art: "seed" },
+      { name: "めばえ", title: "基本フレーズのめばえが出た日", lead: "あいさつや感謝の言葉を少し確認できています。旅行中に声をかける最初の安心感が育ち始めています。", action: "こんにちは、すみません、お願いしますの3つを、ゆっくり読む練習をしてみましょう。", art: "sprout" },
+      { name: "若葉", title: "場面別フレーズの若葉が育った日", lead: "お店やレストラン、交通など、旅行中の具体的な場面で使う言葉が見えてきています。", action: "自分が一番不安な場面を一つ選び、その場面のフレーズを2つだけ覚えてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "困ったときも動ける小さな木が育った日", lead: "困ったときに使う言葉や、翻訳アプリで補う考え方まで整ってきています。完璧でなくても行動できる土台があります。", action: "『分かりません』『英語話せますか？』をスマホのメモに保存しておきましょう。", art: "tree" },
+      { name: "花と実り", title: "日本旅行の安心フレーズが実り始めた日", lead: "基本・買い物・食事・移動・困ったときの言葉がかなり整っています。少しの日本語で旅行をスムーズにする準備ができています。", action: "旅行前に最低限の5フレーズだけをスクリーンショットかメモに残して、すぐ見られるようにしましょう。", art: "bloom" }
+    ],
+    types: {
+      pronunciation: { title: "整えポイント：発音の基本タイプ", text: "日本語は母音をはっきり、ゆっくり読むだけでも伝わりやすくなります。完璧な発音より、落ち着いて言うことを意識しましょう。" },
+      greeting: { title: "整えポイント：あいさつタイプ", text: "こんにちは、こんばんは、すみませんは旅行中の入口になる言葉です。まずは声をかけるための言葉から覚えると安心です。" },
+      polite: { title: "整えポイント：感謝とお願いタイプ", text: "ありがとうございます、お願いします、大丈夫ですは人とのやり取りをやわらかくします。短くても十分伝わります。" },
+      shopping: { title: "整えポイント：買い物タイプ", text: "これください、いくらですか、カード使えますかを覚えると、お店でのやり取りがかなり楽になります。" },
+      restaurant: { title: "整えポイント：レストランタイプ", text: "水をください、お会計お願いします、おいしいですはレストランで特に使いやすい言葉です。使えると安心感が上がります。" },
+      transport: { title: "整えポイント：交通・移動タイプ", text: "駅や電車で迷ったときのフレーズを一つでも覚えておくと、移動中の不安が下がります。" },
+      help: { title: "整えポイント：困ったときタイプ", text: "助けてください、分かりません、ゆっくり話してくださいは、困ったときの安全につながる言葉です。スマホに保存しておくのもおすすめです。" },
+      minimum: { title: "整えポイント：最低限5フレーズタイプ", text: "すみません、ありがとうございます、これください、分かりません、英語を話せますか。この5つだけでも旅行中の安心感は大きく変わります。" },
+      simple: { title: "整えポイント：短く伝えるタイプ", text: "長い文を作ろうとしなくて大丈夫です。短いフレーズをゆっくり・はっきり言う方が伝わりやすくなります。" },
+      backup: { title: "整えポイント：補助ツール活用タイプ", text: "言葉に詰まったときは翻訳アプリや指差しで大丈夫です。日本語だけで完璧に対応しようとしなくてOKです。" }
+    },
+    resultPrefix: "あなたの日本旅行フレーズ準備度は",
+    shareText: "日本旅行フレーズ準備チェックをしました。",
+    retry: "もう一度チェックする",
+    langLabel: "English"
+  },
+  en: {
+    title: "Japan Travel Phrase Check | One Coin Books",
+    description: "A practical checklist for basic Japanese pronunciation and useful phrases for greetings, shopping, restaurants, transportation, and emergencies.",
+    ogTitle: "Japan Travel Phrase Check | One Coin Books",
+    ogDescription: "Check whether you know the minimum Japanese phrases that help make travel in Japan smoother and less stressful.",
+    pageTitle: "Japan Travel Phrase Check",
+    lead: "Use this checklist to prepare basic Japanese phrases for travel, including pronunciation, greetings, shopping, restaurants, transportation, and help situations.",
+    badge: "Japanese Phrases for Travel",
+    intro: "Select what you can do to see how ready you are to use simple Japanese during your trip and what to learn next.",
+    checks: [
+      { text: "I understand basic pronunciation", hint: "You know that clear, slow vowels a/i/u/e/o can help Japanese sound more understandable.", type: "pronunciation" },
+      { text: "I can say greetings", hint: "You have checked basic phrases like hello, good evening, thank you, and excuse me.", type: "greeting" },
+      { text: "I can say thanks and please", hint: "You are learning phrases like thank you, please, and it's okay/no thanks.", type: "polite" },
+      { text: "I can use phrases in shops", hint: "You have checked phrases such as I'll take this, how much, can I use a card, and no bag needed.", type: "shopping" },
+      { text: "I can use phrases in restaurants", hint: "You know when to say we are two, water please, delicious, and check please.", type: "restaurant" },
+      { text: "I can use transportation phrases", hint: "You have checked station, platform, train destination, and get-off phrases.", type: "transport" },
+      { text: "I can say words for trouble", hint: "You have checked please help me, I don't understand, please speak slowly, and do you speak English.", type: "help" },
+      { text: "I checked the minimum 5 phrases", hint: "You know excuse me, thank you, I'll take this, I don't understand, and do you speak English.", type: "minimum" },
+      { text: "I know to speak simply and clearly", hint: "You understand that short, slow, clear phrases work better than long sentences.", type: "simple" },
+      { text: "I am okay using translation apps or pointing", hint: "You know you do not need perfect Japanese and can use backup tools when needed.", type: "backup" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of planting Japanese phrase seeds", lead: "Even if you know only a few words, understanding that slow and clear Japanese can work is already a seed.", action: "Say 'sumimasen' and 'arigatou gozaimasu' out loud once.", art: "seed" },
+      { name: "Sprout", title: "A day when basic phrases sprouted", lead: "You have checked a few greetings and polite phrases. The first layer of travel confidence is growing.", action: "Practice konnichiwa, sumimasen, and onegaishimasu slowly.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when situation phrases grew", lead: "You can see phrases for real travel scenes like shops, restaurants, and transportation.", action: "Choose the situation that worries you most and learn two phrases for it.", art: "leaf" },
+      { name: "Small Tree", title: "A day when help phrases became a small tree", lead: "You are preparing words for trouble and backup tools. You do not need perfect Japanese to take action.", action: "Save 'wakarimasen' and 'eigo hanasemasu ka?' in your phone notes.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when travel phrase confidence began to bear fruit", lead: "You have prepared phrases for basics, shopping, food, transportation, and help. A little Japanese can make your trip smoother.", action: "Before your trip, save the minimum 5 phrases as a screenshot or note for quick access.", art: "bloom" }
+    ],
+    types: {
+      pronunciation: { title: "Focus Point: Pronunciation", text: "Japanese is easier when vowels are clear and slow. Perfect pronunciation is not required." },
+      greeting: { title: "Focus Point: Greetings", text: "Konnichiwa, konbanwa, and sumimasen are useful entry phrases for many situations." },
+      polite: { title: "Focus Point: Thanks and Please", text: "Arigatou gozaimasu, onegaishimasu, and daijoubu desu make interactions smoother and kinder." },
+      shopping: { title: "Focus Point: Shopping", text: "Kore kudasai, ikura desu ka, and kaado tsukaemasu ka make shopping easier." },
+      restaurant: { title: "Focus Point: Restaurants", text: "Mizu o kudasai, okaikei onegaishimasu, and oishii desu are especially useful in restaurants." },
+      transport: { title: "Focus Point: Transportation", text: "Knowing one phrase for stations or trains can reduce travel stress a lot." },
+      help: { title: "Focus Point: Help Situations", text: "Tasukete kudasai, wakarimasen, and yukkuri hanashite kudasai are useful safety phrases. Save them on your phone." },
+      minimum: { title: "Focus Point: Minimum 5 Phrases", text: "Sumimasen, arigatou gozaimasu, kore kudasai, wakarimasen, and eigo hanasemasu ka can cover many travel moments." },
+      simple: { title: "Focus Point: Keep It Simple", text: "You do not need long sentences. Short, slow, clear phrases are easier to understand." },
+      backup: { title: "Focus Point: Backup Tools", text: "Translation apps and pointing are completely fine. You do not need to handle everything only in Japanese." }
+    },
+    resultPrefix: "Your Japan travel phrase readiness is",
+    shareText: "I tried the Japan Travel Phrase Check.",
+    retry: "Check again",
+    langLabel: "日本語"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
