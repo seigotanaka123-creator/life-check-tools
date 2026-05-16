@@ -1,0 +1,637 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>自分を後回しにしない順番チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="自分を後回しにしない順番チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">自分を後回しにしない順番チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "自分を後回しにしない順番チェック | One Coin Books",
+    metaDescription: "自分を後回しにしがちな状態を、返事・予定・小さなNO・休む時間・感覚の扱いから整えるチェックツールです。",
+    pageTitle: "自分を後回しにしない順番チェック",
+    pageLead: "自分を大切にすることは、わがままではなく順番を整えることです。できている項目を選ぶと、今の整い度と、次に見直すとよいポイントが分かります。",
+    langLabel: "Language",
+    progressLabel: "整い度",
+    resultButton: "結果を見る",
+    resetButton: "リセット",
+    checkedText: "選択済み",
+    uncheckedText: "未選択",
+    checks: [
+      { text: "すぐに返事をせず、一度考えられている", hint: "頼まれたときに止まることで、自分の余裕や本音を確認できています。", type: "pause" },
+      { text: "自分の予定をひとつ優先できている", hint: "空いた時間ではなく、先に自分の時間を確保する意識があります。", type: "schedule" },
+      { text: "小さなNOをひとつ言えている", hint: "大きく断らなくても、少し減らす・別日にするなどの調整ができています。", type: "no" },
+      { text: "少しでも休む時間を確保できている", hint: "自分のエネルギーを最後に回しすぎない工夫ができています。", type: "rest" },
+      { text: "自分の感覚を無視していない", hint: "疲れや違和感を“気のせい”にせず、サインとして扱えています。", type: "sense" },
+      { text: "無理をひとつ減らせている", hint: "頑張りを増やすのではなく、負担を減らす方向に動けています。", type: "reduce" },
+      { text: "自分を優先することに罪悪感を持ちすぎていない", hint: "自分を整えることが、人にやさしくする土台にもなると理解できています。", type: "guilt" },
+      { text: "予定を詰め込みすぎないようにしている", hint: "余白を残すことで、気持ちや体力の崩れを防げています。", type: "margin" },
+      { text: "周りの反応だけで決めていない", hint: "他人の期待だけでなく、自分の状態も判断材料にできています。", type: "boundary" },
+      { text: "できない日があっても戻ればいいと思えている", hint: "完璧に変えようとせず、少しずつ順番を整える考え方ができています。", type: "return" }
+    ],
+    stages: [
+      { name: "たね", title: "自分を整えるたねを置けた日", lead: "まだ後回しにすることが多くても大丈夫です。順番が少しズレているだけだと気づけた時点で、整えるたねは置けています。", action: "次に何かを頼まれたら、まず“一度考えます”と止まる練習をしてみましょう。", art: "seed" },
+      { name: "めばえ", title: "小さな優先のめばえが出た日", lead: "自分の予定や休む時間を少しずつ扱えるようになっています。自分を最後にしない感覚が芽生えています。", action: "今週、自分のための10分を予定として先に入れてみてください。", art: "sprout" },
+      { name: "若葉", title: "小さなNOの若葉が育った日", lead: "断る・減らす・別日にするなど、無理を減らす選択ができ始めています。", action: "小さな負担を一つ選び、“今回は少し減らす”形にできないか考えてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "自分の感覚を守る小さな木が育った日", lead: "疲れや違和感を無視せず、自分の状態を判断材料にできています。順番が安定し始めています。", action: "今日は“少し疲れているかも”と感じた瞬間に、予定や行動を一つ軽くしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "自分を大切にする順番が実る日", lead: "自分・身近な人・その他の順番が整い、無理なく人にもやさしくできる状態に近づいています。", action: "今の自分に合う“断り方・休み方・優先の仕方”をメモして、定番にしていきましょう。", art: "bloom" }
+    ],
+    types: {
+      pause: { title: "整えポイント：返事を止めるタイプ", text: "すぐ引き受けて疲れやすいタイプです。“一度考えます”を挟むだけで、自分の余裕を守りやすくなります。" },
+      schedule: { title: "整えポイント：自分時間確保タイプ", text: "空いた時間に自分を入れようとして後回しになりやすいタイプです。先に小さな予定として入れるのが効果的です。" },
+      no: { title: "整えポイント：小さなNOタイプ", text: "大きく断るより、小さく調整することから始めると整いやすいタイプです。“減らす・ずらす・今回はやめる”を使いましょう。" },
+      rest: { title: "整えポイント：休む時間タイプ", text: "休みを最後に回しがちなタイプです。短くても休む時間を予定として扱うと、余裕が戻りやすくなります。" },
+      sense: { title: "整えポイント：感覚サインタイプ", text: "疲れや違和感を見過ごしやすいタイプです。小さなサインに気づいた時点で、行動を少し軽くしましょう。" },
+      reduce: { title: "整えポイント：無理を減らすタイプ", text: "頑張りを足すより、負担を一つ減らす方が整いやすいタイプです。“やらないこと”を一つ決めてみてください。" },
+      guilt: { title: "整えポイント：罪悪感ゆるめタイプ", text: "自分を優先すると悪いことをしているように感じやすいタイプです。自分を整えることは、長くやさしくいるための土台です。" },
+      margin: { title: "整えポイント：余白づくりタイプ", text: "予定を詰めるほど自分が後回しになりやすいタイプです。最初から余白を予定に入れておくと安定します。" },
+      boundary: { title: "整えポイント：境界線タイプ", text: "周りの反応で決めすぎてしまうタイプです。相手の都合と自分の状態を分けて考える練習が役立ちます。" },
+      return: { title: "整えポイント：戻る力タイプ", text: "完璧に変えようとして苦しくなりやすいタイプです。できない日があっても、次に一つ戻せば十分です。" }
+    }
+  },
+  en: {
+    title: "Self Priority Check | One Coin Books",
+    metaDescription: "A simple check tool for noticing when you put yourself last and gently restoring order through pauses, boundaries, rest, and small no's.",
+    pageTitle: "Self Priority Check",
+    pageLead: "Taking care of yourself is not selfish. It is about putting things in a sustainable order. Select what is already true and see your current balance plus the next point to adjust.",
+    langLabel: "Language",
+    progressLabel: "Balance",
+    resultButton: "Show result",
+    resetButton: "Reset",
+    checkedText: "Checked",
+    uncheckedText: "Unchecked",
+    checks: [
+      { text: "I can pause before answering", hint: "Pausing before saying yes helps you check your capacity and honest feeling.", type: "pause" },
+      { text: "I prioritize at least one plan for myself", hint: "You are beginning to secure your own time first, not only with leftovers.", type: "schedule" },
+      { text: "I can say one small no", hint: "You can adjust by reducing, moving, or declining something small.", type: "no" },
+      { text: "I secure even a little time to rest", hint: "You are not leaving your energy until the very end.", type: "rest" },
+      { text: "I do not ignore my own signals", hint: "You treat fatigue and discomfort as signals, not as things to dismiss.", type: "sense" },
+      { text: "I have reduced one unreasonable load", hint: "Instead of adding more effort, you are moving toward lowering the burden.", type: "reduce" },
+      { text: "I do not feel too guilty about prioritizing myself", hint: "You understand that caring for yourself also supports kindness toward others.", type: "guilt" },
+      { text: "I avoid overfilling my schedule", hint: "Leaving margin helps prevent emotional and physical depletion.", type: "margin" },
+      { text: "I do not decide only by others' reactions", hint: "You can include your own state, not only other people's expectations.", type: "boundary" },
+      { text: "I know I can return even after an imperfect day", hint: "You are changing the order gradually instead of demanding perfection.", type: "return" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of self-care", lead: "Even if you still put yourself last often, noticing that the order is slightly off plants the seed of change.", action: "The next time someone asks something of you, practice saying, 'Let me think about it first.'", art: "seed" },
+      { name: "Sprout", title: "A day when small priority sprouted", lead: "You are beginning to handle your own plans and rest. The feeling of not leaving yourself last is sprouting.", action: "Put ten minutes for yourself into this week's schedule first.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when small no's grew", lead: "You are starting to choose reducing, postponing, or declining instead of taking on everything.", action: "Choose one small burden and see whether you can reduce it this time.", art: "leaf" },
+      { name: "Small Tree", title: "A day when your signals became protected", lead: "You can notice fatigue and discomfort and use your own state as a decision factor. The order is stabilizing.", action: "When you notice 'I may be tired' today, make one plan or action lighter.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when self-respect order bore fruit", lead: "The order of yourself, close people, and everything else is becoming sustainable. You can be kind without losing yourself.", action: "Write down your own standard ways to decline, rest, and prioritize, and make them your defaults.", art: "bloom" }
+    ],
+    types: {
+      pause: { title: "Adjustment Point: Pause Before Answering", text: "You may tire yourself by saying yes too quickly. Add one pause to protect your capacity." },
+      schedule: { title: "Adjustment Point: Self-Time Scheduling", text: "You may wait for leftover time. Put even a small plan for yourself into the schedule first." },
+      no: { title: "Adjustment Point: Small No", text: "Start with small adjustments rather than big refusals. Reduce, move, or skip one thing." },
+      rest: { title: "Adjustment Point: Rest Time", text: "You may leave rest until last. Treat short rest as a real plan to recover margin." },
+      sense: { title: "Adjustment Point: Body and Feeling Signals", text: "You may overlook fatigue or discomfort. When you notice a small signal, make your action lighter." },
+      reduce: { title: "Adjustment Point: Reduce One Burden", text: "Reducing one load may help more than adding effort. Decide one thing not to do." },
+      guilt: { title: "Adjustment Point: Softening Guilt", text: "Prioritizing yourself can feel wrong, but it is the base for staying kind and steady." },
+      margin: { title: "Adjustment Point: Creating Margin", text: "Overfilled schedules can push you last. Put margin into the plan from the beginning." },
+      boundary: { title: "Adjustment Point: Boundaries", text: "You may decide too much by others' reactions. Practice separating their needs from your current state." },
+      return: { title: "Adjustment Point: Returning Gently", text: "You may suffer by trying to change perfectly. Even after a hard day, returning with one small action is enough." }
+    }
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
