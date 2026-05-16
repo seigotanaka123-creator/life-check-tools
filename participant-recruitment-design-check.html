@@ -1,0 +1,653 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "参加者が集まる募集設計チェック | One Coin Books",
+    description: "ターゲット・悩みの言語化・問題から解決への流れ・未来提示・導線・信頼の積み上げを確認する募集設計チェックツールです。",
+    ogTitle: "参加者が集まる募集設計チェック | One Coin Books",
+    ogDescription: "投稿しても集まらない状態から抜け出し、集まる募集の流れを整えるためのチェックツールです。",
+    pageTitle: "参加者が集まる募集設計チェック",
+    lead: "参加者を無理に集めるのではなく、自然に申し込みたくなる募集の流れを整えるためのチェックです。",
+    badge: "募集設計の整え方",
+    intro: "できている項目を選ぶと、今の募集設計の整い方と、次に見直すと申し込みにつながりやすいポイントが分かります。",
+    checks: [
+      { text: "ターゲットが具体的に決まっている", hint: "誰に向けた募集なのかが明確で、読み手が自分ごとにしやすい状態です。", type: "target" },
+      { text: "相手の悩みがリアルに言語化できている", hint: "読み手が『それ自分のことだ』と思える悩みや状況を言葉にできています。", type: "pain" },
+      { text: "共感から自然に入れている", hint: "いきなり告知ではなく、相手の状況や感情から入る流れが作れています。", type: "empathy" },
+      { text: "問題→解決の流れがある", hint: "なぜ困っているのか、何を整えれば変わるのかが自然につながっています。", type: "flow" },
+      { text: "未来が具体的にイメージできる", hint: "参加した後にどう変わるのか、Before/Afterが読み手の中で想像できる状態です。", type: "future" },
+      { text: "読みやすい構成になっている", hint: "短い文・改行・順番が整っていて、最後まで読まれやすい募集文になっています。", type: "readable" },
+      { text: "無駄な情報が削られている", hint: "伝えたいことを詰め込みすぎず、申し込み判断に必要な情報に絞れています。", type: "trim" },
+      { text: "導線がシンプル", hint: "申し込みまでのリンクや手順が分かりやすく、迷う選択肢が少ない状態です。", type: "path" },
+      { text: "迷わず申し込みできる", hint: "どこから申し込むのか、何をすればいいのかが明確になっています。", type: "action" },
+      { text: "リンクが分かりやすい", hint: "リンクが長文に埋もれず、クリックすべき場所が見つけやすい状態です。", type: "link" },
+      { text: "売り込み感が強すぎない", hint: "押し売りではなく、必要な人が自然に判断できる伝え方になっています。", type: "softSell" },
+      { text: "信頼の積み上げができている", hint: "募集当日だけでなく、普段の発信で価値提供や共感が積み上がっています。", type: "trust" },
+      { text: "募集前の流れが設計されている", hint: "共感・問題の言語化・解決提示・募集の順番で、段階的に関心を育てられています。", type: "preFlow" }
+    ],
+    stages: [
+      { name: "たね", title: "募集のズレに気づくたねを置けた日", lead: "まだ反応が少なくても大丈夫です。人が集まらない原因は価値のなさではなく、募集の設計にあるかもしれないと気づけた時点で、たねは置けています。", action: "まずは今回の募集が『誰に向けたものか』を一人に絞って書いてみましょう。", art: "seed" },
+      { name: "めばえ", title: "相手目線の募集のめばえが出た日", lead: "ターゲットや悩みを少し言葉にできています。告知ではなく、相手の頭の中でストーリーを作る準備が始まっています。", action: "募集文の冒頭を、説明ではなく『こんな悩みありませんか？』から書き直してみましょう。", art: "sprout" },
+      { name: "若葉", title: "問題から解決へつながる若葉が育った日", lead: "共感、問題、解決、未来の流れが少し整っています。読み手が自分に必要かどうかを判断しやすい状態に近づいています。", action: "参加後にどんな状態になるのかを、Before/Afterで一つだけ具体的に書いてみましょう。", art: "leaf" },
+      { name: "小さな木", title: "申し込み導線の小さな木が育った日", lead: "募集文だけでなく、申し込みまでの流れにも目が向いています。迷わず動ける導線が整い始めています。", action: "リンクを一つに絞り、『こちらから申し込み』のように行動を明確にしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "集まる募集設計が実り始めた日", lead: "ターゲット、共感、未来、導線、信頼の流れがかなり整っています。募集が“点”ではなく“構造”として動き始めています。", action: "次回募集前に、共感投稿・問題整理投稿・募集投稿の3つを順番に用意してみましょう。", art: "bloom" }
+    ],
+    types: {
+      target: { title: "整えポイント：ターゲット具体化タイプ", text: "誰に向けているかが曖昧だと、誰にも刺さりにくくなります。まずは一人の具体的な悩みを持つ人に絞ってみましょう。" },
+      pain: { title: "整えポイント：悩みの言語化タイプ", text: "募集は相手の悩みが言葉になった瞬間に読まれやすくなります。相手が普段使う言葉で書くのがポイントです。" },
+      empathy: { title: "整えポイント：共感導入タイプ", text: "いきなり説明するとスルーされやすくなります。まず相手の状況や感情に触れることで、読み始めてもらいやすくなります。" },
+      flow: { title: "整えポイント：問題→解決タイプ", text: "悩みだけでも、説明だけでも動きません。なぜ困るのか、どう変わるのかを自然につなげると申し込みにつながりやすくなります。" },
+      future: { title: "整えポイント：未来提示タイプ", text: "人は参加後の変化が見えたときに動きます。Before/Afterを具体的にすると、行動する理由が強くなります。" },
+      readable: { title: "整えポイント：読みやすさタイプ", text: "読みづらい募集文は内容が良くても届きません。短い文、改行、順番を整えるだけで反応は変わります。" },
+      trim: { title: "整えポイント：情報整理タイプ", text: "伝えたいことを全部入れると、判断しづらくなります。申し込みに必要な情報だけを残す意識が大切です。" },
+      path: { title: "整えポイント：導線シンプルタイプ", text: "選択肢が多いほど人は迷います。申し込みリンクや手順はできるだけシンプルにしましょう。" },
+      action: { title: "整えポイント：行動明確タイプ", text: "興味があっても、次に何をすればいいか分からないと離脱します。行動を一文で明確に伝えましょう。" },
+      link: { title: "整えポイント：リンク視認タイプ", text: "リンクが埋もれるとクリックされません。リンクの位置や見え方を整えるだけでも行動率は変わります。" },
+      softSell: { title: "整えポイント：売り込み感調整タイプ", text: "強く押すほど警戒されることがあります。必要な人が自然に選べるように、共感と理由を先に整えましょう。" },
+      trust: { title: "整えポイント：信頼積み上げタイプ", text: "募集だけで勝負すると売り込み感が強くなります。普段から価値提供や共感を積み上げることが募集の土台になります。" },
+      preFlow: { title: "整えポイント：募集前設計タイプ", text: "募集は当日だけでは決まりません。共感、問題の言語化、解決提示を先に置くと、申し込みが自然になります。" }
+    },
+    resultPrefix: "あなたの募集設計の整い度は",
+    shareText: "参加者が集まる募集設計チェックをしました。",
+    retry: "もう一度チェックする",
+    langLabel: "English"
+  },
+  en: {
+    title: "Participant Recruitment Design Check | One Coin Books",
+    description: "A checklist for improving recruitment design through target clarity, pain language, flow, future image, application path, and trust.",
+    ogTitle: "Participant Recruitment Design Check | One Coin Books",
+    ogDescription: "Check whether your recruitment is designed to help people naturally understand, trust, and apply.",
+    pageTitle: "Participant Recruitment Design Check",
+    lead: "Use this checklist to design recruitment so people can naturally understand, trust, and apply instead of being pushed.",
+    badge: "Recruitment Design",
+    intro: "Select what applies to see how well your recruitment flow is organized and what to improve next.",
+    checks: [
+      { text: "The target is specific", hint: "You know exactly who the offer is for, making it easier for readers to see themselves.", type: "target" },
+      { text: "The participant's pain is realistic", hint: "You can describe the reader's real worries and situation in their own language.", type: "pain" },
+      { text: "It starts naturally with empathy", hint: "You begin from the reader's situation or emotion instead of jumping straight into an announcement.", type: "empathy" },
+      { text: "There is a problem-to-solution flow", hint: "The reason for the problem and how it can change are connected naturally.", type: "flow" },
+      { text: "The future is easy to imagine", hint: "Readers can picture what changes after joining through a clear before/after.", type: "future" },
+      { text: "The structure is easy to read", hint: "Short sentences, line breaks, and order make the recruitment text easy to finish.", type: "readable" },
+      { text: "Unnecessary information is removed", hint: "The message is focused on what is needed to decide whether to apply.", type: "trim" },
+      { text: "The application path is simple", hint: "The link and steps are clear with few choices that cause confusion.", type: "path" },
+      { text: "People can apply without hesitation", hint: "It is clear where to apply and what to do next.", type: "action" },
+      { text: "The link is easy to see", hint: "The application link is not buried in long text and is easy to find.", type: "link" },
+      { text: "It does not feel too pushy", hint: "People who need it can decide naturally without feeling pressured.", type: "softSell" },
+      { text: "Trust is being built", hint: "You build value and empathy through everyday posts, not only on recruitment day.", type: "trust" },
+      { text: "The pre-recruitment flow is designed", hint: "Interest grows step by step through empathy, problem language, solution, then invitation.", type: "preFlow" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of noticing recruitment mismatch", lead: "Even if responses are still low, noticing that the issue may be design, not lack of value, is already a seed.", action: "Write down one specific person this recruitment is for.", art: "seed" },
+      { name: "Sprout", title: "A day when reader-centered recruitment sprouted", lead: "You are beginning to put the target and pain into words. The recruitment story is starting to form in the reader's mind.", action: "Rewrite the opening from explanation into a question like: 'Have you ever struggled with this?'", art: "sprout" },
+      { name: "Young Leaves", title: "A day when problem-to-solution flow grew", lead: "Empathy, problem, solution, and future are becoming more connected, making it easier for readers to decide.", action: "Write one concrete before/after for what changes after joining.", art: "leaf" },
+      { name: "Small Tree", title: "A day when the application path grew", lead: "You are looking not only at the text, but also at the path to application. The next action is becoming easier.", action: "Use one clear link and a phrase like 'Apply here' to make the action obvious.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when recruitment design began to bear fruit", lead: "Target, empathy, future, path, and trust are becoming structured. Recruitment is becoming a flow, not a single post.", action: "Before the next recruitment, prepare three posts in order: empathy, problem, and invitation.", art: "bloom" }
+    ],
+    types: {
+      target: { title: "Focus Point: Specific Target", text: "If the target is vague, the message reaches no one deeply. Start with one specific person and their situation." },
+      pain: { title: "Focus Point: Pain Language", text: "Recruitment becomes readable when the reader's pain is put into words. Use the language they actually use." },
+      empathy: { title: "Focus Point: Empathy Opening", text: "Jumping straight into explanation is easy to skip. Start with the reader's situation or feeling." },
+      flow: { title: "Focus Point: Problem to Solution", text: "Pain alone or explanation alone is not enough. Connect what is wrong and how it can change." },
+      future: { title: "Focus Point: Future Image", text: "People act when they can imagine the change. Make the before/after concrete." },
+      readable: { title: "Focus Point: Readability", text: "Even a good offer can fail if it is hard to read. Short sentences and clear order help." },
+      trim: { title: "Focus Point: Information Trimming", text: "Too much information makes decisions harder. Keep what helps people decide." },
+      path: { title: "Focus Point: Simple Path", text: "More choices create hesitation. Keep application links and steps simple." },
+      action: { title: "Focus Point: Clear Action", text: "Even interested people leave if they do not know what to do next. State the next action clearly." },
+      link: { title: "Focus Point: Visible Link", text: "A hidden link is not clicked. Make the application link easy to find." },
+      softSell: { title: "Focus Point: Gentle Selling", text: "Too much pressure creates resistance. Build empathy and reasons before the invitation." },
+      trust: { title: "Focus Point: Trust Building", text: "Recruitment works better when trust is built before the offer. Everyday value and empathy become the base." },
+      preFlow: { title: "Focus Point: Pre-Recruitment Flow", text: "Recruitment is not decided only on the day. Build empathy, problem awareness, and solution before inviting." }
+    },
+    resultPrefix: "Your recruitment design score is",
+    shareText: "I tried the Participant Recruitment Design Check.",
+    retry: "Check again",
+    langLabel: "日本語"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
