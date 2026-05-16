@@ -1,0 +1,649 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "環境と選び方を整えるチェック | One Coin Books",
+    description: "環境問題を生活の延長として捉え、見えないコスト・選択基準・無理なく続く行動を確認するチェックツールです。",
+    ogTitle: "環境と選び方を整えるチェック | One Coin Books",
+    ogDescription: "日常の選び方を少し整え、環境にも生活にもやさしい行動を見つけるためのチェックツールです。",
+    pageTitle: "環境と選び方を整えるチェック",
+    lead: "環境問題を遠い話で終わらせず、日常の選択・見えないコスト・無理なく続く行動として整えるためのチェックです。",
+    badge: "環境と生活の選択基準",
+    intro: "できている項目を選ぶと、今の選び方の整い方と、日常で次に見直すとよいポイントが分かります。",
+    checks: [
+      { text: "環境問題を生活の延長として捉えられている", hint: "食事・服・買い物・ゴミなど、日常の行動が環境とつながっていると理解できています。", type: "daily" },
+      { text: "見えないコストを意識できている", hint: "お金だけでなく、時間・手間・ストレスもコストとして見られています。", type: "cost" },
+      { text: "情報ではなく構造で理解しようとしている", hint: "ニュースや印象だけでなく、消費・廃棄・選択の流れとして考えられています。", type: "structure" },
+      { text: "自分なりの判断軸を持ち始めている", hint: "なんとなく安い・便利ではなく、自分の基準で選ぼうとできています。", type: "axis" },
+      { text: "長期的な視点で選べている", hint: "すぐ安いかどうかだけでなく、長く使えるか・買い直しが減るかを見られています。", type: "longTerm" },
+      { text: "無理なく続くかを基準にしている", hint: "意識の高さではなく、自分の生活の中で自然に続くかを重視できています。", type: "sustainable" },
+      { text: "無駄に気づけている", hint: "使っていないもの、必要以上に買っているもの、なんとなく続けている習慣に気づけています。", type: "waste" },
+      { text: "一つだけでも行動を変えている", hint: "全部ではなく、まず一つの買い方・使い方・捨て方を変えられています。", type: "oneAction" },
+      { text: "自分に合う形で実践できている", hint: "理想論ではなく、手間やストレスが少ない形に調整できています。", type: "fit" },
+      { text: "無理をしていない", hint: "完璧を目指さず、できる範囲で続ける前提を持てています。", type: "noForce" },
+      { text: "自然に続いている", hint: "頑張らなくても、日常の流れの中で続く行動が少しできています。", type: "continue" },
+      { text: "少しずつ整ってきている実感がある", hint: "選択の迷いや無駄が減り、生活が少し軽くなっている感覚があります。", type: "progress" }
+    ],
+    stages: [
+      { name: "たね", title: "環境を生活の延長で見るたねを置けた日", lead: "まだ大きな行動ができていなくても大丈夫です。環境問題を遠い話ではなく、日常の選択とつながるものとして見始めた時点で、たねは置けています。", action: "まずは今日の買い物やゴミの中で、なんとなく選んでいるものを一つだけ見つけてみましょう。", art: "seed" },
+      { name: "めばえ", title: "見えないコストに気づくめばえが出た日", lead: "安さや便利さだけでなく、時間・手間・ストレスまで含めて選択を見られ始めています。無意識の損に気づく力が育っています。", action: "最近買い直しが多いものを一つ選び、長く使える選択に変えられないか考えてみましょう。", art: "sprout" },
+      { name: "若葉", title: "選択基準の若葉が育った日", lead: "なんとなくではなく、自分なりの判断軸で選ぼうとできています。生活を整えるための基準が少しずつ育っています。", action: "次に何かを買う前に『長く使えるか』『無理なく続くか』『納得して選べるか』を一度だけ確認してみましょう。", art: "leaf" },
+      { name: "小さな木", title: "小さな行動が続く木が育った日", lead: "全部を変えようとせず、一つだけ変える姿勢ができています。無理のない行動が生活の中に根づき始めています。", action: "続いている小さな行動を一つ残し、負担が大きい行動は思い切って軽くしてみましょう。", art: "tree" },
+      { name: "花と実り", title: "環境にも生活にもやさしい選択が実り始めた日", lead: "環境問題を生活の質とつなげて考え、自分に合う形で続ける力がかなり整っています。選び方そのものが少し変わり始めています。", action: "今できている行動を一つ定番化し、迷ったときの自分の選択基準として残しておきましょう。", art: "bloom" }
+    ],
+    types: {
+      daily: { title: "整えポイント：生活との接点タイプ", text: "環境問題は大きな話だけでなく、食事・服・買い物・ゴミとつながっています。まずは自分の日常のどこに接点があるかを見るだけで十分です。" },
+      cost: { title: "整えポイント：見えないコストタイプ", text: "安いものでも、買い直し・管理・処分の手間が増えると負担になります。お金以外のコストも一緒に見てみましょう。" },
+      structure: { title: "整えポイント：構造理解タイプ", text: "情報だけを追うと難しく感じます。消費して、使って、捨てるという流れで見ると、日常に落とし込みやすくなります。" },
+      axis: { title: "整えポイント：判断軸タイプ", text: "なんとなく選ぶほど、満足感は残りにくくなります。自分にとって何を大事にするかを一つ決めてみましょう。" },
+      longTerm: { title: "整えポイント：長期視点タイプ", text: "短期の安さだけでなく、長く使えるか、買い直しが減るかで見ると、環境にも生活にもやさしい選択になりやすいです。" },
+      sustainable: { title: "整えポイント：続く基準タイプ", text: "無理な行動は続きません。意識の高さより、自分の生活の中で自然に続くかを基準にしましょう。" },
+      waste: { title: "整えポイント：無駄の発見タイプ", text: "使っていないものや、なんとなく買っているものに気づくことが第一歩です。気づけただけでも選び方は変わり始めます。" },
+      oneAction: { title: "整えポイント：一つだけ行動タイプ", text: "全部変えようとすると続きません。まず一つだけ買い方・使い方・捨て方を変えるのが現実的です。" },
+      fit: { title: "整えポイント：自分に合う形タイプ", text: "理想の方法より、手間やストレスが少ない方法が続きます。自分用に軽く調整して大丈夫です。" },
+      noForce: { title: "整えポイント：無理しないタイプ", text: "環境への行動は完璧を目指さなくて大丈夫です。できる範囲で続く方が、長く見れば大きな力になります。" },
+      continue: { title: "整えポイント：自然に続くタイプ", text: "日常の流れに入っている行動は強いです。頑張らなくても続いているものを大事にしましょう。" },
+      progress: { title: "整えポイント：整いの実感タイプ", text: "少しでも無駄が減った、迷いが減ったと感じるなら前進しています。その実感を次の選択につなげてみましょう。" }
+    },
+    resultPrefix: "あなたの環境と選び方の整い度は",
+    shareText: "環境と選び方を整えるチェックをしました。",
+    retry: "もう一度チェックする",
+    langLabel: "English"
+  },
+  en: {
+    title: "Environment and Choice Check | One Coin Books",
+    description: "A checklist for connecting environmental issues to daily choices, hidden costs, personal criteria, and sustainable actions.",
+    ogTitle: "Environment and Choice Check | One Coin Books",
+    ogDescription: "Check how your daily choices can become kinder to both your life and the environment.",
+    pageTitle: "Environment and Choice Check",
+    lead: "Use this checklist to connect environmental issues with daily choices, hidden costs, personal criteria, and small actions that can continue.",
+    badge: "Environment and Daily Choices",
+    intro: "Select what applies to see how your choices are becoming more intentional and what to adjust next.",
+    checks: [
+      { text: "I see environmental issues as part of daily life", hint: "You understand that food, clothes, shopping, and waste are connected to the environment.", type: "daily" },
+      { text: "I notice hidden costs", hint: "You see not only money, but also time, effort, and stress as costs.", type: "cost" },
+      { text: "I try to understand structure, not just information", hint: "You think in terms of consumption, use, disposal, and choice.", type: "structure" },
+      { text: "I am starting to have my own criteria", hint: "You try to choose with your own standards rather than just cheap or convenient.", type: "axis" },
+      { text: "I choose with a long-term view", hint: "You consider whether something lasts and reduces repeated buying.", type: "longTerm" },
+      { text: "I use sustainability as a practical standard", hint: "You value whether an action can continue naturally in your life.", type: "sustainable" },
+      { text: "I notice waste", hint: "You notice unused things, overbuying, or habits that continue without reason.", type: "waste" },
+      { text: "I have changed at least one action", hint: "You have changed one way of buying, using, or disposing instead of trying to change everything.", type: "oneAction" },
+      { text: "I practice in a way that fits me", hint: "You adjust actions so they are low-stress and realistic.", type: "fit" },
+      { text: "I am not forcing myself", hint: "You do not aim for perfection and stay within what you can do.", type: "noForce" },
+      { text: "It is continuing naturally", hint: "A small action is becoming part of your daily flow.", type: "continue" },
+      { text: "I feel things are gradually becoming more organized", hint: "You feel less waste, less confusion, or a lighter daily life.", type: "progress" }
+    ],
+    stages: [
+      { name: "Seed", title: "A day of seeing environment as daily life", lead: "Even without big action yet, seeing environmental issues as connected to daily choices is already a seed.", action: "Find one thing today that you usually choose without thinking.", art: "seed" },
+      { name: "Sprout", title: "A day of noticing hidden costs", lead: "You are beginning to see time, effort, and stress in addition to price. This helps reveal unconscious losses.", action: "Choose one item you often replace and consider whether a longer-lasting option would help.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when choice criteria began to grow", lead: "You are starting to choose with your own criteria instead of vague habit. Your standards for organizing life are growing.", action: "Before buying something next time, ask: Will it last? Can I continue this? Do I feel convinced?", art: "leaf" },
+      { name: "Small Tree", title: "A day when small actions began to continue", lead: "You are not trying to change everything. One realistic action is beginning to take root in daily life.", action: "Keep one action that is already continuing, and make any action that feels too heavy lighter.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when kinder choices began to bear fruit", lead: "You are connecting environmental thinking with quality of life and practicing in a way that fits you.", action: "Turn one action that works into your default choice for moments of uncertainty.", art: "bloom" }
+    ],
+    types: {
+      daily: { title: "Focus Point: Daily Connection", text: "Environmental issues are connected to food, clothes, shopping, and waste. Start by noticing where they touch your life." },
+      cost: { title: "Focus Point: Hidden Costs", text: "Cheap items can create extra replacement, management, and disposal costs. Look beyond price alone." },
+      structure: { title: "Focus Point: Structure", text: "Information can feel overwhelming. Seeing the flow of consume, use, and discard makes it easier to act." },
+      axis: { title: "Focus Point: Personal Criteria", text: "Vague choices often leave less satisfaction. Choose one thing you want to value in your decisions." },
+      longTerm: { title: "Focus Point: Long-Term View", text: "Looking at durability and fewer replacements often helps both your life and the environment." },
+      sustainable: { title: "Focus Point: Continuable Standard", text: "Actions that are too hard do not continue. Choose what can fit naturally into your life." },
+      waste: { title: "Focus Point: Noticing Waste", text: "Noticing unused things or vague purchases is the first step. Awareness already changes future choices." },
+      oneAction: { title: "Focus Point: One Action", text: "Changing everything at once rarely lasts. Change one buying, using, or discarding habit first." },
+      fit: { title: "Focus Point: Personal Fit", text: "The best action is one with low stress and low effort. Adjust it for your actual life." },
+      noForce: { title: "Focus Point: No Force", text: "You do not need perfection. A small action that continues is stronger over time." },
+      continue: { title: "Focus Point: Natural Continuation", text: "Actions that fit your daily flow are powerful. Value what already continues without much effort." },
+      progress: { title: "Focus Point: Feeling Organized", text: "If waste or confusion is slightly reduced, you are moving forward. Use that feeling for the next choice." }
+    },
+    resultPrefix: "Your environment and choice readiness is",
+    shareText: "I tried the Environment and Choice Check.",
+    retry: "Check again",
+    langLabel: "日本語"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
