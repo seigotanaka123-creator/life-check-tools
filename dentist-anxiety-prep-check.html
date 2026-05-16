@@ -1,0 +1,643 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>小さな幸せに気づく習慣チェック | One Coin Books</title>
+  <meta name="description" content="「小さな幸せに気づく人の習慣」を読んだあとに使える、記事専用の気づきチェックです。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books">
+  <meta property="og:title" content="小さな幸せに気づく習慣チェック | One Coin Books">
+  <meta property="og:description" content="できた項目を選ぶと、今の感じる力の整い具合と自分に合う小さな幸せの見つけ方タイプが分かります。">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --text: #242321;
+      --muted: #68645d;
+      --line: #e2ddd2;
+      --accent: #2f6f64;
+      --accent-2: #9a5b42;
+      --leaf: #6fae72;
+      --sky: #8db8ca;
+      --gold: #e7b75f;
+      --petal: #f2a9b7;
+      --soft-green: #edf6f2;
+      --soft-gold: #fff4dc;
+      --shadow: 0 18px 44px rgba(47, 44, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.8;
+      background:
+        radial-gradient(circle at 82% 118px, rgba(242, 169, 183, .15), transparent 220px),
+        linear-gradient(180deg, #f0f7f3 0, var(--bg) 330px),
+        var(--bg);
+    }
+    header, main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 26px;
+      align-items: center;
+      padding-top: 42px;
+      padding-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin: 0 0 12px;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .language-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+    .language-switch button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.is-active {
+      border-color: rgba(47, 111, 100, .45);
+      background: var(--soft-green);
+      color: var(--accent);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.28;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .hero-art {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+    .status {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8f4 100%);
+    }
+    .status-art {
+      display: grid;
+      place-items: center;
+      min-height: 106px;
+    }
+    .status-art svg { max-width: 116px; }
+    .badge {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .meter {
+      height: 10px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--sky), var(--leaf), var(--gold), var(--petal));
+      transition: width .2s ease;
+    }
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .check-card {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .check-card:hover,
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .56);
+      background: #f2f8f4;
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.55;
+    }
+    .check-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--accent);
+    }
+    .quiet {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    svg { width: 100%; height: auto; }
+    .piece { animation: pop .42s ease-out both; }
+    .piece-2 { animation-delay: .06s; }
+    .piece-3 { animation-delay: .12s; }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.9); opacity: .2; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 760px) {
+      header,
+      main {
+        width: 100%;
+        max-width: 390px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      header { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; }
+      .hero-art { max-width: 230px; }
+      .panel { padding: 18px; }
+      .status { grid-template-columns: 84px minmax(0, 1fr); }
+      .status-art { min-height: 78px; }
+      .status-art svg { max-width: 84px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
+    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
+    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <div class="language-switch" aria-label="Language">
+      <button class="is-active" id="jaButton" type="button">日本語</button>
+      <button id="enButton" type="button">English</button>
+    </div>
+  </div>
+  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+    <div id="heroArt"></div>
+  </aside>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="checkHeading">今日できたことを選んでください</h2>
+    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <div class="status" aria-live="polite">
+      <div class="status-art" id="statusArt"></div>
+      <div>
+        <span class="badge" id="stageName">たね</span>
+        <strong id="stageTitle">まず気づけた日</strong>
+        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <div class="meter"><span id="meterBar"></span></div>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="resultHeading">今日の結果</h2>
+    <div class="result-grid">
+      <div class="box">
+        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+      </div>
+      <div class="box">
+        <strong id="nextHeading">次の小さな一歩</strong>
+        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+      </div>
+    </div>
+    <div class="quiet" id="quietText">
+      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+    </div>
+    <div class="actions">
+      <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const i18n = {
+  ja: {
+    title: "歯医者の不安を整えるチェック | One Coin Books",
+    metaDescription: "歯医者が怖い人のために、不安の分解・準備・伝え方・小さな行動を確認できるチェックツールです。",
+    ogTitle: "歯医者の不安を整えるチェック | One Coin Books",
+    pageTitle: "歯医者の不安を整えるチェック",
+    pageLead: "歯医者への怖さをなくすのではなく、扱える大きさに整えるためのチェックです。",
+    introTitle: "歯医者への不安の整い方を確認する",
+    introText: "できている項目を選ぶだけで、不安の扱いやすさ・次に整えるポイント・通院へ近づく小さな一歩が分かります。",
+    checkTitle: "チェック項目",
+    checks: [
+      { text: "歯医者が怖い理由を分解できた", hint: "痛み・音・匂い・過去の記憶など、怖さを分けて見られています。", type: "breakdown" },
+      { text: "不安の正体が理解できた", hint: "分からないこと、予測できないこと、コントロールできないことが不安を強めると理解できています。", type: "understand" },
+      { text: "最悪ではなく平均で考えられた", hint: "想像の最大値ではなく、現実的な治療の流れや一般的な負担で考えられています。", type: "average" },
+      { text: "不安を言語化できた", hint: "なんとなく怖いではなく、何が怖いのかを言葉にできています。", type: "words" },
+      { text: "行く前の準備が分かった", hint: "検診だけ・相談だけなど、最初の目的を軽くしてよいと分かっています。", type: "prep" },
+      { text: "怖いと伝えていいと理解した", hint: "我慢せずに怖さを伝えることで、説明や配慮を受けやすくなると分かっています。", type: "tell" },
+      { text: "小さく進めていいと分かった", hint: "一気に治療しなくても、予約・相談・検診など小さな一歩でよいと思えています。", type: "smallStep" },
+      { text: "少しだけ行動のイメージができた", hint: "予約する、場所を見る、問い合わせるなど、次の行動を具体的に想像できています。", type: "image" },
+      { text: "自分のペースでいいと思えた", hint: "怖さが残っていても、自分のペースで進めてよいと受け止められています。", type: "pace" }
+    ],
+    resultTitle: "診断結果",
+    resultLead: "今のあなたの“歯医者への不安の整い方”はこちらです。",
+    stages: [
+      { name: "たね", title: "怖さを分けるたねを置けた日", lead: "まだ怖さが強くても大丈夫です。怠けや意志の弱さではなく、不安の正体が見えにくいだけかもしれないと気づけた時点で、たねは置けています。", action: "まずは歯医者の何が一番怖いのかを一つだけ書いてみましょう。", art: "seed" },
+      { name: "めばえ", title: "不安を言葉にするめばえが出た日", lead: "怖さを少し分解し、何が不安なのか見え始めています。分からない怖さが、少し扱える怖さに変わり始めています。", action: "痛み・音・匂い・過去の記憶・怒られる不安の中から、当てはまるものを一つ選んでみましょう。", art: "sprout" },
+      { name: "若葉", title: "行く前の準備の若葉が育った日", lead: "不安の正体や準備の方向が見えています。いきなり治療ではなく、相談や検診から始めてよい感覚が育っています。", action: "予約前に『怖いのでゆっくり説明してほしい』と伝える文章を一文だけ用意してみましょう。", art: "leaf" },
+      { name: "小さな木", title: "小さく通う準備の小さな木が育った日", lead: "怖さをゼロにしなくても、小さく行動するイメージができています。自分のペースで進める土台が整い始めています。", action: "今日は予約まで行かなくても、候補の歯医者を一つ見る、または診療時間を確認するだけで十分です。", art: "tree" },
+      { name: "花と実り", title: "怖いけど動ける状態が実り始めた日", lead: "不安を分解し、伝え方や準備、小さな行動までかなり整っています。怖さがあっても、現実的に一歩進める状態に近づいています。", action: "次の一歩を“相談だけ”“検診だけ”など軽い目的にして、無理のない形で予定に入れてみましょう。", art: "bloom" }
+    ],
+    typeTitle: "整えポイント",
+    types: {
+      breakdown: { title: "整えポイント：怖さの分解タイプ", text: "怖さが大きな塊になりやすいタイプです。痛み、音、匂い、過去の記憶などに分けるだけで対策しやすくなります。" },
+      understand: { title: "整えポイント：不安の構造理解タイプ", text: "分からないことが怖さを強めやすいタイプです。治療の流れや止め方を軽く知るだけでも、不安は扱いやすくなります。" },
+      average: { title: "整えポイント：現実サイズに戻すタイプ", text: "最悪の想像を基準にしやすいタイプです。実際は麻酔や説明、段階的な治療で調整できる場面も多いと捉え直しましょう。" },
+      words: { title: "整えポイント：不安の言語化タイプ", text: "なんとなく怖いままだと動きにくくなります。何が怖いのかを一つ言葉にすると、次の対策が見えます。" },
+      prep: { title: "整えポイント：行く前の準備タイプ", text: "いきなり治療を想像して重くなりやすいタイプです。まずは検診だけ、相談だけ、クリーニングだけでも十分です。" },
+      tell: { title: "整えポイント：怖いと伝えるタイプ", text: "我慢してしまいやすいタイプです。怖いことを事前に伝えると、説明や合図の相談がしやすくなります。" },
+      smallStep: { title: "整えポイント：小さく進めるタイプ", text: "全部やらなきゃと思いやすいタイプです。予約、問い合わせ、場所を見るだけでも0から1への大事な一歩です。" },
+      image: { title: "整えポイント：行動イメージタイプ", text: "次に何をすればいいか曖昧になりやすいタイプです。予約する、候補を探す、電話文を作るなど、行動を小さく具体化しましょう。" },
+      pace: { title: "整えポイント：自分のペースタイプ", text: "周りと比べて焦りやすいタイプです。怖さが残っていても、自分のペースで一つずつ進めば大丈夫です。" }
+    },
+    shareText: "歯医者の不安を整えるチェックをしました。",
+    resetText: "もう一度チェックする",
+    copyText: "結果をコピー",
+    copiedText: "コピーしました"
+  },
+  en: {
+    title: "Dentist Anxiety Prep Check | One Coin Books",
+    metaDescription: "A gentle checklist for people afraid of the dentist, helping break down anxiety, prepare, communicate fears, and take small steps.",
+    ogTitle: "Dentist Anxiety Prep Check | One Coin Books",
+    pageTitle: "Dentist Anxiety Prep Check",
+    pageLead: "This check helps make dental fear more manageable, not erase it completely.",
+    introTitle: "Check how manageable your dentist anxiety feels",
+    introText: "Select what applies to see your current anxiety-preparation stage, next adjustment point, and a small step toward going at your own pace.",
+    checkTitle: "Checklist",
+    checks: [
+      { text: "I broke down why the dentist feels scary", hint: "You separated pain, sound, smell, past memories, and other fears.", type: "breakdown" },
+      { text: "I understood what my anxiety is made of", hint: "You understand that uncertainty, unpredictability, and lack of control can increase fear.", type: "understand" },
+      { text: "I thought in averages, not worst cases", hint: "You considered realistic treatment flow instead of only the imagined maximum fear.", type: "average" },
+      { text: "I put my anxiety into words", hint: "You named what feels scary instead of leaving it vague.", type: "words" },
+      { text: "I know how to prepare before going", hint: "You know the first purpose can be light, such as consultation or checkup only.", type: "prep" },
+      { text: "I understand I can say I am scared", hint: "You know that sharing fear can make explanation and consideration easier.", type: "tell" },
+      { text: "I know I can move in small steps", hint: "You accept that booking, consultation, or checkup can be enough for a first step.", type: "smallStep" },
+      { text: "I can imagine one small action", hint: "You can picture booking, checking the location, or asking a question.", type: "image" },
+      { text: "I feel allowed to go at my own pace", hint: "Even with fear still present, you can accept moving at your own pace.", type: "pace" }
+    ],
+    resultTitle: "Result",
+    resultLead: "Here is how prepared your dentist anxiety feels right now.",
+    stages: [
+      { name: "Seed", title: "A day of planting the seed of separating fear", lead: "Even if the fear is still strong, noticing that it may be unclear anxiety, not laziness or weak will, is already a seed.", action: "Write down the one thing about the dentist that scares you most.", art: "seed" },
+      { name: "Sprout", title: "A day when anxiety became words", lead: "You are beginning to separate the fear and see what is inside it. Unknown fear is becoming more manageable.", action: "Choose one: pain, sound, smell, past memory, or fear of being judged.", art: "sprout" },
+      { name: "Young Leaves", title: "A day when preparation began to grow", lead: "You can see the shape of your anxiety and how to prepare. You do not have to start with full treatment.", action: "Prepare one sentence such as: 'I am nervous, so I would like slow explanations.'", art: "leaf" },
+      { name: "Small Tree", title: "A day when small dental steps began to grow", lead: "You can imagine small actions without needing fear to disappear. Your own pace is becoming a foundation.", action: "Today, simply look up one clinic or check its hours. That is enough.", art: "tree" },
+      { name: "Bloom and Fruit", title: "A day when scared-but-able began to bear fruit", lead: "You have broken down anxiety, prepared words, and imagined small action. You are close to taking a realistic next step even while still scared.", action: "Make the next step light, such as consultation only or checkup only, and place it gently into your schedule.", art: "bloom" }
+    ],
+    typeTitle: "Adjustment Point",
+    types: {
+      breakdown: { title: "Adjustment: Breaking down fear", text: "Fear may feel like one large block. Separating pain, sound, smell, and memories makes it easier to address." },
+      understand: { title: "Adjustment: Understanding anxiety", text: "Uncertainty may intensify fear. Knowing the flow and how to pause can make anxiety more manageable." },
+      average: { title: "Adjustment: Returning to realistic size", text: "You may base fear on worst-case imagination. Remember that explanation, anesthesia, and step-by-step treatment can often be discussed." },
+      words: { title: "Adjustment: Naming anxiety", text: "Vague fear is hard to act on. Name one specific fear to reveal the next support you need." },
+      prep: { title: "Adjustment: Before-visit preparation", text: "Imagining immediate treatment may feel heavy. Starting with consultation, checkup, or cleaning only is okay." },
+      tell: { title: "Adjustment: Saying you are scared", text: "You may tend to endure silently. Telling the clinic beforehand can make it easier to ask for explanations and signals." },
+      smallStep: { title: "Adjustment: Small steps", text: "You may feel you must do everything at once. Booking, asking, or just checking the location can be an important first step." },
+      image: { title: "Adjustment: Action image", text: "The next action may be vague. Make it concrete: book, search, check hours, or write a message." },
+      pace: { title: "Adjustment: Your own pace", text: "You may compare yourself to others and rush. Even with fear, one step at your own pace is enough." }
+    },
+    shareText: "I tried the Dentist Anxiety Prep Check.",
+    resetText: "Check again",
+    copyText: "Copy result",
+    copiedText: "Copied"
+  }
+};
+let currentLang = "ja";
+let checks = i18n[currentLang].checks;
+let stages = i18n[currentLang].stages;
+let types = i18n[currentLang].types;
+
+const checksNode = document.getElementById("checks");
+const jaButton = document.getElementById("jaButton");
+const enButton = document.getElementById("enButton");
+const eyebrow = document.getElementById("eyebrow");
+const pageTitle = document.getElementById("pageTitle");
+const pageLead = document.getElementById("pageLead");
+const checkHeading = document.getElementById("checkHeading");
+const checkLead = document.getElementById("checkLead");
+const resultHeading = document.getElementById("resultHeading");
+const nextHeading = document.getElementById("nextHeading");
+const quietText = document.getElementById("quietText");
+const stageName = document.getElementById("stageName");
+const stageTitle = document.getElementById("stageTitle");
+const stageLead = document.getElementById("stageLead");
+const meterBar = document.getElementById("meterBar");
+const statusArt = document.getElementById("statusArt");
+const heroArt = document.getElementById("heroArt");
+const typeTitle = document.getElementById("typeTitle");
+const typeText = document.getElementById("typeText");
+const nextAction = document.getElementById("nextAction");
+const resetButton = document.getElementById("resetButton");
+
+function art(kind) {
+  const seed = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="seed">
+      <rect x="34" y="136" width="132" height="22" rx="11" fill="#d9c2a4"/>
+      <ellipse cx="100" cy="128" rx="28" ry="20" fill="#9a6a45"/>
+      <path class="piece" d="M87 127c10-25 35-24 31 1-5 24-33 25-31-1z" fill="#c98b4c"/>
+      <path d="M94 120c8-6 16-5 20 2" fill="none" stroke="#fff1d6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  const sprout = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="sprout">
+      <rect x="34" y="148" width="132" height="20" rx="10" fill="#d9c2a4"/>
+      <path d="M100 148c1-29 1-44 0-62" fill="none" stroke="#4e8a65" stroke-width="8" stroke-linecap="round"/>
+      <path class="piece" d="M98 100c-30-22-50 5-29 20 15 11 28-4 29-20z" fill="#84b779"/>
+      <path class="piece piece-2" d="M103 90c28-25 51 2 28 18-16 12-28-1-28-18z" fill="#6fae72"/>
+      <ellipse cx="100" cy="147" rx="23" ry="13" fill="#9a6a45"/>
+    </svg>`;
+  const leaf = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="young leaves">
+      <rect x="34" y="152" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 152c1-43 2-73 1-103" fill="none" stroke="#4e8a65" stroke-width="9" stroke-linecap="round"/>
+      <path class="piece" d="M98 88c-35-24-62 5-37 25 19 15 35-3 37-25z" fill="#84b779"/>
+      <path class="piece piece-2" d="M104 75c36-28 66 2 39 24-21 17-38-1-39-24z" fill="#6fae72"/>
+      <path class="piece piece-3" d="M99 120c-30-18-52 8-29 22 17 10 29-5 29-22z" fill="#9ac984"/>
+    </svg>`;
+  const tree = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="small tree">
+      <rect x="34" y="160" width="132" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 160c4-40 4-72 2-105" fill="none" stroke="#8d6040" stroke-width="13" stroke-linecap="round"/>
+      <circle class="piece" cx="74" cy="78" r="31" fill="#84b779"/>
+      <circle class="piece piece-2" cx="124" cy="72" r="36" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="95" r="38" fill="#5f9f68"/>
+    </svg>`;
+  const bloom = `
+    <svg viewBox="0 0 200 200" role="img" aria-label="bloom and fruit">
+      <rect x="28" y="164" width="144" height="18" rx="9" fill="#d9c2a4"/>
+      <path d="M100 164c4-42 5-80 2-116" fill="none" stroke="#8d6040" stroke-width="14" stroke-linecap="round"/>
+      <circle class="piece" cx="70" cy="80" r="34" fill="#84b779"/>
+      <circle class="piece piece-2" cx="130" cy="78" r="39" fill="#6fae72"/>
+      <circle class="piece piece-3" cx="101" cy="99" r="42" fill="#5f9f68"/>
+      <g class="piece piece-2">
+        <circle cx="72" cy="68" r="8" fill="#f6d36f"/>
+        <circle cx="63" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="81" cy="68" r="8" fill="#f2a9b7"/>
+        <circle cx="72" cy="59" r="8" fill="#f7bdc8"/>
+        <circle cx="72" cy="77" r="8" fill="#f7bdc8"/>
+      </g>
+      <circle class="piece piece-3" cx="91" cy="96" r="9" fill="#e7b75f"/>
+      <circle class="piece piece-3" cx="124" cy="110" r="10" fill="#e88963"/>
+    </svg>`;
+  return { seed, sprout, leaf, tree, bloom }[kind] || seed;
+}
+
+function stageIndex(count) {
+  if (count <= 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  if (count <= 6) return 3;
+  return 4;
+}
+
+function bestType(selected) {
+  const totals = {};
+  selected.forEach(item => {
+    if (!item.type || !types[item.type]) return;
+    totals[item.type] = (totals[item.type] || 0) + 1;
+  });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return !best ? null : best[0];
+}
+
+function renderChecks() {
+  checksNode.innerHTML = checks.map((item, index) => `
+    <label class="check-card">
+      <input type="checkbox" value="${index}">
+      <span>
+        <strong>${item.text}</strong>
+        <span>${item.hint}</span>
+      </span>
+    </label>
+  `).join("");
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      input.closest(".check-card").classList.toggle("is-checked", input.checked);
+      updateResult();
+    });
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const data = i18n[currentLang];
+  checks = data.checks;
+  stages = data.stages;
+  types = data.types;
+  document.documentElement.lang = data.htmlLang;
+  document.title = data.title;
+  eyebrow.textContent = data.eyebrow;
+  pageTitle.textContent = data.pageTitle;
+  pageLead.textContent = data.pageLead;
+  checkHeading.textContent = data.checkHeading;
+  checkLead.textContent = data.checkLead;
+  resultHeading.textContent = data.resultHeading;
+  nextHeading.textContent = data.nextHeading;
+  quietText.textContent = data.quietText;
+  resetButton.textContent = data.reset;
+  jaButton.classList.toggle("is-active", currentLang === "ja");
+  enButton.classList.toggle("is-active", currentLang === "en");
+  renderChecks();
+  updateResult();
+}
+
+function updateResult() {
+  const selected = [...checksNode.querySelectorAll("input:checked")]
+    .map(input => checks[Number(input.value)]);
+  const stage = stages[stageIndex(selected.length)];
+  stageName.textContent = stage.name;
+  stageTitle.textContent = stage.title;
+  stageLead.textContent = stage.lead;
+  nextAction.textContent = stage.action;
+  statusArt.innerHTML = art(stage.art);
+  heroArt.innerHTML = art(stage.art);
+  meterBar.style.width = `${Math.round((selected.length / checks.length) * 100)}%`;
+
+  const typeKey = bestType(selected);
+  if (!typeKey) {
+    typeTitle.textContent = i18n[currentLang].defaultTypeTitle;
+    typeText.textContent = i18n[currentLang].defaultTypeText;
+    return;
+  }
+  typeTitle.textContent = types[typeKey].title;
+  typeText.textContent = types[typeKey].text;
+}
+
+resetButton.addEventListener("click", () => {
+  checksNode.querySelectorAll("input").forEach(input => {
+    input.checked = false;
+    input.closest(".check-card").classList.remove("is-checked");
+  });
+  updateResult();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+jaButton.addEventListener("click", () => applyLanguage("ja"));
+enButton.addEventListener("click", () => applyLanguage("en"));
+
+applyLanguage("ja");
+</script>
+</body>
+</html>
+
+
+
