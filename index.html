@@ -11,23 +11,23 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>暮らし診断ツール | 買い物・仕事・疲れ・習慣を整える無料診断集</title>
-  <meta name="description" content="暮らし診断、買い物診断、仕事の悩み診断、疲れや習慣の見直しに使える無料診断ツール集です。今の状態に合うnote記事の入口を探せます。">
+  <title>今の悩みに合う記事診断 | One Coin Books お悩み案内所</title>
+  <meta name="description" content="心、仕事、お金、暮らし、外見、発信、日本旅行の悩みから、今の自分に合うnote記事と無料診断ツールを探せるOne Coin Booksのお悩み案内所です。">
   <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/">
   <link rel="alternate" hreflang="ja" href="https://seigotanaka123-creator.github.io/life-check-tools/">
   <link rel="alternate" hreflang="en" href="https://seigotanaka123-creator.github.io/life-check-tools/en/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="暮らし診断ツール">
-  <meta property="og:title" content="暮らし診断ツール | 買い物・仕事・疲れ・習慣を整える無料診断集">
-  <meta property="og:description" content="暮らし診断、買い物診断、仕事の悩み診断、疲れや習慣の見直しに使える無料診断ツール集です。">
+  <meta property="og:site_name" content="One Coin Books お悩み案内所">
+  <meta property="og:title" content="今の悩みに合う記事診断 | One Coin Books お悩み案内所">
+  <meta property="og:description" content="悩みを選ぶ・検索する・おみくじを引く。今の状態に合うnote記事と無料ツールを見つけられます。">
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="暮らし診断ツール | 買い物・仕事・疲れ・習慣を整える無料診断集">
-  <meta name="twitter:description" content="無料診断から、今の状態に合うnote記事の入口を探せます。">
+  <meta name="twitter:title" content="今の悩みに合う記事診断 | One Coin Books お悩み案内所">
+  <meta name="twitter:description" content="今の悩みに合うnote記事と無料ツールを探せる入口ページです。">
   <meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
   <style>
     :root {
@@ -38,11 +38,14 @@
       --line: #e2ddd2;
       --accent: #2f6f64;
       --accent-2: #9a5b42;
+      --accent-3: #526d8d;
       --soft-green: #edf6f2;
       --soft-gold: #fff4dc;
+      --soft-blue: #eef4f8;
       --shadow: 0 18px 44px rgba(47, 44, 38, .08);
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     html, body { max-width: 100%; overflow-x: hidden; }
     body {
       margin: 0;
@@ -50,60 +53,88 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.8;
       background:
-        linear-gradient(180deg, #f0f7f3 0, var(--bg) 320px),
+        radial-gradient(circle at 84% 120px, rgba(154, 91, 66, .12), transparent 230px),
+        linear-gradient(180deg, #eef7f3 0, var(--bg) 360px),
         var(--bg);
     }
     a { color: inherit; }
-    header {
-      max-width: 1120px;
+    header, main {
+      width: min(1120px, calc(100% - 40px));
       margin: 0 auto;
-      padding: 44px 20px 18px;
     }
+    header { padding: 42px 0 22px; }
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-columns: minmax(0, 1fr) 320px;
       gap: 28px;
       align-items: end;
     }
-    .hero > * { min-width: 0; }
     .eyebrow {
       display: inline-flex;
       margin: 0 0 12px;
       padding: 4px 10px;
       border: 1px solid rgba(47, 111, 100, .18);
       border-radius: 999px;
-      background: rgba(255, 255, 255, .72);
+      background: rgba(255, 255, 255, .75);
       color: var(--accent);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
     h1 {
-      max-width: 780px;
+      max-width: 800px;
       margin: 0 0 12px;
-      font-size: clamp(28px, 4.4vw, 46px);
-      line-height: 1.25;
+      font-size: clamp(30px, 5vw, 50px);
+      line-height: 1.22;
       letter-spacing: 0;
       word-break: keep-all;
       overflow-wrap: anywhere;
     }
-    .no-break { white-space: nowrap; }
-    header p {
-      max-width: 760px;
+    .lead {
+      max-width: 780px;
       margin: 0;
       color: var(--muted);
       font-size: 16px;
-      overflow-wrap: anywhere;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border: 1px solid rgba(47, 111, 100, .34);
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button.secondary {
+      background: #fff;
+      color: var(--accent);
+    }
+    .button.gold {
+      border-color: rgba(154, 91, 66, .28);
+      background: #fff;
+      color: var(--accent-2);
     }
     .summary {
       display: grid;
-      gap: 10px;
-      padding: 16px;
+      gap: 12px;
+      padding: 18px;
       border: 1px solid rgba(47, 111, 100, .16);
       border-radius: 8px;
-      background: rgba(255, 255, 255, .78);
+      background: rgba(255, 255, 255, .82);
       box-shadow: var(--shadow);
     }
-    .summary, .card, .language-panel { min-width: 0; }
     .summary div {
       display: flex;
       justify-content: space-between;
@@ -112,22 +143,17 @@
       padding-bottom: 8px;
       color: var(--muted);
       font-size: 14px;
-      min-width: 0;
     }
     .summary div:last-child { border-bottom: 0; padding-bottom: 0; }
-    .summary strong { color: var(--text); font-size: 18px; }
-    main {
-      max-width: 1120px;
-      margin: 0 auto 58px;
-      padding: 0 20px;
-    }
-    .category-nav {
+    .summary strong { color: var(--text); font-size: 19px; }
+    main { padding-bottom: 64px; }
+    .nav {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 22px 0 18px;
+      margin: 18px 0;
     }
-    .category-nav a {
+    .nav a {
       min-height: 36px;
       padding: 5px 12px;
       border: 1px solid var(--line);
@@ -135,201 +161,192 @@
       background: var(--paper);
       color: var(--muted);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       text-decoration: none;
     }
-    .language-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      margin: 0 0 18px;
-      padding: 14px 16px;
-      border: 1px solid rgba(47, 111, 100, .18);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .76);
-      box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
-    }
-    .language-panel > * { min-width: 0; }
-    .language-panel p {
-      flex: 1 1 220px;
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .language-panel strong {
-      display: block;
-      color: var(--text);
-      font-size: 15px;
-    }
-    .language-link {
-      display: inline-flex;
-      min-height: 38px;
-      align-items: center;
-      padding: 6px 13px;
-      border: 1px solid rgba(47, 111, 100, .28);
-      border-radius: 999px;
-      background: var(--paper);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .travel-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      margin: 0 0 18px;
-      padding: 18px;
-      border: 1px solid rgba(154, 91, 66, .2);
-      border-radius: 8px;
-      background: linear-gradient(135deg, #fff8e8 0%, #ffffff 68%);
-      box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
-    }
-    .travel-panel > * { min-width: 0; }
-    .travel-panel .tag {
-      display: inline-flex;
-      width: fit-content;
-      margin-bottom: 8px;
-      padding: 2px 9px;
-      border-radius: 999px;
-      background: #fff4dc;
-      color: var(--accent-2);
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .travel-panel strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 19px;
-      line-height: 1.45;
-      word-break: keep-all;
-      overflow-wrap: anywhere;
-    }
-    .travel-panel p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-    }
-    .travel-link {
-      display: inline-flex;
-      min-height: 42px;
-      align-items: center;
-      justify-content: center;
-      padding: 7px 14px;
-      border: 1px solid rgba(154, 91, 66, .28);
-      border-radius: 999px;
-      background: #fff;
-      color: var(--accent-2);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .tools {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
-      gap: 14px;
-      margin: 18px 0 34px;
-    }
-    .card {
-      position: relative;
-      display: flex;
-      min-height: 184px;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 18px;
+    .panel {
+      margin: 18px 0;
+      padding: 22px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 32px);
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .panel p { margin: 0 0 12px; color: var(--muted); }
+    .diagnosis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .choice {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 11px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .choice:hover, .choice:has(input:checked) {
+      border-color: rgba(47, 111, 100, .55);
+      background: var(--soft-green);
+      transform: translateY(-1px);
+    }
+    .choice input {
+      width: 20px;
+      height: 20px;
+      margin-top: 4px;
+      accent-color: var(--accent);
+    }
+    .choice strong { display: block; line-height: 1.45; }
+    .choice span { display: block; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid rgba(47, 111, 100, .2);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f6fbf8, #ffffff 72%);
+    }
+    .result.is-visible { display: block; }
+    .result-title { margin: 0 0 6px; font-size: 22px; font-weight: 900; }
+    .recommendations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .rec-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .rec-card .tag {
+      display: inline-flex;
+      margin-bottom: 8px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--soft-gold);
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .rec-card strong { display: block; line-height: 1.45; }
+    .rec-card p { margin: 6px 0 12px; font-size: 13px; line-height: 1.65; }
+    .rec-links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mini-link {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      padding: 4px 10px;
+      border: 1px solid rgba(47, 111, 100, .24);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .search-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .search-box input {
+      min-height: 46px;
+      width: 100%;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+    .hint-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .hint-tags button {
+      min-height: 32px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .category-grid, .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .category-card, .tool-card {
+      display: flex;
+      min-height: 168px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
       color: var(--text);
       text-decoration: none;
       box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
       transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }
-    .card:hover {
+    .category-card:hover, .tool-card:hover {
       border-color: rgba(47, 111, 100, .55);
       box-shadow: var(--shadow);
       transform: translateY(-2px);
     }
-    .card .tag {
+    .category-card .tag, .tool-card .tag {
       display: inline-flex;
       width: fit-content;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       padding: 2px 9px;
       border-radius: 999px;
       background: var(--soft-green);
       color: var(--accent);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
     }
-    .card:nth-child(3n) .tag { background: var(--soft-gold); color: var(--accent-2); }
-    .card strong {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text);
-      font-size: 18px;
-      line-height: 1.45;
-      word-break: keep-all;
-      overflow-wrap: anywhere;
+    .category-card strong, .tool-card strong { display: block; margin-bottom: 7px; font-size: 17px; line-height: 1.45; }
+    .category-card span, .tool-card span { display: block; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .category-card em, .tool-card em { display: block; margin-top: 12px; color: var(--accent); font-style: normal; font-size: 13px; font-weight: 800; }
+    .fortune {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid rgba(154, 91, 66, .22);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff8e8, #ffffff 76%);
     }
-    .card span {
-      display: block;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-    }
-    .card em {
-      display: block;
-      margin-top: 16px;
-      color: var(--accent);
-      font-style: normal;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .section {
-      margin-top: 34px;
-      padding: 24px 0 0;
-      border-top: 1px solid var(--line);
-    }
-    .section h2 {
-      margin: 0 0 8px;
-      font-size: clamp(21px, 4vw, 30px);
-      line-height: 1.35;
-      letter-spacing: 0;
-    }
-    .section p {
-      max-width: 820px;
-      margin: 0;
-      color: var(--muted);
-      overflow-wrap: anywhere;
-    }
-    @media (max-width: 900px) {
-      header,
-      main {
-        width: 100%;
-        max-width: 390px;
-        margin-left: 0;
-        margin-right: 0;
-      }
-      header { padding-top: 32px; }
-      .hero { grid-template-columns: 1fr; gap: 18px; }
+    .small-note { margin-top: 12px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 820px) {
+      header, main { width: min(100% - 28px, 430px); }
+      header { padding-top: 30px; }
+      .hero { grid-template-columns: 1fr; }
       .summary { box-shadow: none; }
       .summary div { display: block; }
-      .summary strong { display: block; margin-top: 2px; }
-      .tools { grid-template-columns: 1fr; }
-      .card { min-height: 0; }
-      header p { font-size: 15px; }
-      .language-link { white-space: normal; text-align: center; }
-      .travel-panel { grid-template-columns: 1fr; }
-      .travel-link { width: 100%; white-space: normal; text-align: center; }
+      .summary strong { display: block; }
+      .search-box, .fortune { grid-template-columns: 1fr; }
+      .button { width: 100%; }
     }
   </style>
 </head>
@@ -337,55 +354,396 @@
 <header>
   <div class="hero">
     <div>
-      <p class="eyebrow">無料診断ツール集</p>
-      <h1>暮らし・仕事・買い物・見た目など<br>今の悩みに合う読みものを<br><span class="no-break">診断から探す。</span></h1>
-      <p>疲れ、習慣、見た目、子育て、発信まで。<br>今の状態に近い診断から、読みたいnote記事へ進めます。</p>
+      <p class="eyebrow">One Coin Books お悩み案内所</p>
+      <h1>今の悩みに合う<br>note記事と無料ツールを探す</h1>
+      <p class="lead">ここは読後ツール置き場ではなく、悩みから記事へ進むための入口です。心、仕事、お金、暮らし、外見、発信、日本旅行の不安まで、今の状態に合う読み物を診断・検索・おみくじで見つけられます。</p>
+      <div class="hero-actions">
+        <a class="button" href="#entry-diagnosis">まず診断する</a>
+        <a class="button secondary" href="#worry-search">悩みで検索する</a>
+        <a class="button gold" href="https://note.com/cheeky_guppy1145">noteを開く</a>
+      </div>
     </div>
     <aside class="summary" aria-label="サイト概要">
-      <div><span>診断数</span><strong>11</strong></div>
-      <div><span>対象テーマ</span><strong>暮らし全般</strong></div>
-      <div><span>料金</span><strong>無料</strong></div>
+      <div><span>主な入口</span><strong>診断・検索・おみくじ</strong></div>
+      <div><span>対象テーマ</span><strong>心 / 仕事 / お金 / 暮らし / 外見 / 発信 / 旅行</strong></div>
+      <div><span>目的</span><strong>note記事への案内</strong></div>
     </aside>
   </div>
 </header>
 <main>
-  <aside class="language-panel" aria-label="English version">
-    <p><strong>English version is available</strong> Lifestyle tools and Japan Travel Tips.</p>
-    <a class="language-link" href="en/">Open English version</a>
-  </aside>
-  <aside class="travel-panel" aria-label="Japan Travel guide">
-    <div>
-      <span class="tag">Japan Travel</span>
-      <strong>日本旅行向け英語ガイド</strong>
-      <p>食べもの、マナー、観光地、お土産、便利な日本語など、海外の読者向けの記事をまとめています。</p>
-    </div>
-    <a class="travel-link" href="en/japan-travel-tips.html">Japan Travel Guideを見る</a>
-  </aside>
-  <nav class="category-nav" aria-label="テーマ">
-    <a href="fatigue-reset-diagnosis.html">疲れ</a>
-    <a href="life-reset-diagnosis.html">暮らし</a>
-    <a href="appearance-style-diagnosis.html">見た目</a>
-    <a href="work-worry-diagnosis.html">仕事</a>
-    <a href="spending-type-diagnosis.html">買い物</a>
-    <a href="writing-habit-diagnosis.html">書く習慣</a>
+  <nav class="nav" aria-label="ページ内ナビ">
+    <a href="#entry-diagnosis">入口診断</a>
+    <a href="#worry-search">悩み検索</a>
+    <a href="#fortune">今日のおみくじ</a>
+    <a href="#categories">カテゴリ別</a>
+    <a href="#tools">無料ツール一覧</a>
+    <a href="en/">English</a>
   </nav>
-  <section class="tools" aria-label="無料診断ツール">
-    <a class="card" href="fatigue-reset-diagnosis.html"><div><span class="tag">疲れ</span><strong>疲れの整え方<span class="no-break">タイプ診断</span></strong><span>睡眠、週末、静かな習慣など、回復の入口を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="life-reset-diagnosis.html"><div><span class="tag">暮らし</span><strong>暮らしの整え方<span class="no-break">タイプ診断</span></strong><span>収納、掃除、断捨離など、暮らしを整える方向を見つけます。</span></div><em>診断する</em></a>
-    <a class="card" href="mood-fulfillment-diagnosis.html"><div><span class="tag">気持ち</span><strong>気持ちの満たし方<span class="no-break">タイプ診断</span></strong><span>寂しさ、ご褒美、小さな幸せとの付き合い方を整理できます。</span></div><em>診断する</em></a>
-    <a class="card" href="self-time-diagnosis.html"><div><span class="tag">自分時間</span><strong>自分時間の<span class="no-break">つくり方診断</span></strong><span>時間がない、続かない悩みに合わせて入口を探します。</span></div><em>診断する</em></a>
-    <a class="card" href="appearance-style-diagnosis.html"><div><span class="tag">見た目</span><strong>垢抜け・見た目の<span class="no-break">整え方診断</span></strong><span>服、髪、色、小物など、整える入口を探します。</span></div><em>診断する</em></a>
-    <a class="card" href="work-worry-diagnosis.html"><div><span class="tag">仕事</span><strong>仕事の悩み<span class="no-break">整理診断</span></strong><span>新生活、転職、面接など、仕事の悩みに合う記事を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="parenting-health-diagnosis.html"><div><span class="tag">子育て・健康</span><strong>子育てと健康の不安<span class="no-break">整理診断</span></strong><span>子育て、自分のケア、歯医者、視力など、今の不安に近い入口を選べます。</span></div><em>診断する</em></a>
-    <a class="card" href="writing-habit-diagnosis.html"><div><span class="tag">発信</span><strong>書く習慣・発信<span class="no-break">タイプ診断</span></strong><span>書く、続ける、発信する、運営改善するための次の一歩を探せます。</span></div><em>診断する</em></a>
-    <a class="card" href="spending-type-diagnosis.html"><div><span class="tag">買い物</span><strong>無駄な出費<span class="no-break">タイプ診断</span></strong><span>買い物で後悔しやすい判断のクセを確認できます。</span></div><em>診断する</em></a>
-    <a class="card" href="buy-before-checklist.html"><div><span class="tag">買う前</span><strong>買う前<span class="no-break">チェックリスト</span></strong><span>買う前に必要性、使う場面、代替案を整理できます。</span></div><em>チェックする</em></a>
-    <a class="card" href="replacement-checklist.html"><div><span class="tag">買い替え</span><strong>買い替え判断<span class="no-break">チェックリスト</span></strong><span>買い替えるか、待つか、使い方を見直すかを確認できます。</span></div><em>チェックする</em></a>
+
+  <section class="panel" id="entry-diagnosis">
+    <h2>今のあなたに合う記事診断</h2>
+    <p>近いものを選んでください。複数選んでも大丈夫です。いちばん多く選ばれた悩みの方向から、おすすめ記事と関連ツールを出します。</p>
+    <div class="diagnosis-grid" id="diagnosisChoices"></div>
+    <div class="hero-actions">
+      <button class="button" id="diagnoseButton" type="button">結果を見る</button>
+      <button class="button secondary" id="clearDiagnosisButton" type="button">選択をリセット</button>
+    </div>
+    <div class="result" id="diagnosisResult" aria-live="polite"></div>
   </section>
-  <section class="section" aria-labelledby="about-heading">
-    <h2 id="about-heading">このサイトの使い方</h2>
-    <p>暮らし診断、買い物診断、仕事の悩み診断、疲れの整え方診断などから、気になるテーマを選んでください。<br>近い答えを選ぶと、今の状態に合いそうなnote記事が表示されます。</p>
+
+  <section class="panel" id="worry-search">
+    <h2>悩み別おすすめ記事ナビ</h2>
+    <p>言葉を入力すると、近いテーマの記事・診断ツールを表示します。例：やる気が出ない、仕事がつらい、部屋が片付かない、垢ぬけたい、日本旅行。</p>
+    <div class="search-box">
+      <input id="worryInput" type="search" placeholder="悩みを入力してください">
+      <button class="button" id="searchButton" type="button">探す</button>
+    </div>
+    <div class="hint-tags" id="hintTags"></div>
+    <div class="recommendations" id="searchResults"></div>
+    <p class="small-note">※ 現在はテーマに近い記事タイトルとnote入口を表示します。個別note URLが分かる記事から順に直リンクへ差し替えできます。</p>
+  </section>
+
+  <section class="panel" id="fortune">
+    <h2>今日の整え方おみくじ</h2>
+    <p>軽く始めたい人向けの入口です。今読むとよさそうなテーマをひとつだけ出します。</p>
+    <div class="fortune">
+      <div>
+        <strong id="fortuneTitle">今日のテーマを引いてみましょう</strong>
+        <p id="fortuneText">迷ったら、おみくじから入るのもありです。結果からnote記事へ進めます。</p>
+      </div>
+      <button class="button gold" id="fortuneButton" type="button">おみくじを引く</button>
+    </div>
+    <div class="recommendations" id="fortuneResult"></div>
+  </section>
+
+  <section class="panel" id="categories">
+    <h2>カテゴリ別に探す</h2>
+    <p>悩みの方向が決まっている人は、ここから近い入口を選んでください。</p>
+    <div class="category-grid" id="categoryGrid"></div>
+  </section>
+
+  <section class="panel" id="tools">
+    <h2>無料診断・チェックツール一覧</h2>
+    <p>記事を読む前の入口として使いやすい主要ツールです。個別記事の読後チェックは、各note記事内から使う設計に移行しています。</p>
+    <div class="tool-grid" id="toolGrid"></div>
   </section>
 </main>
+<script>
+const noteHome = "https://note.com/cheeky_guppy1145";
+
+const categories = {
+  mind: {
+    label: "心を整えたい",
+    tag: "心・メンタル",
+    tool: "mood-fulfillment-diagnosis.html",
+    lead: "なんとなくしんどい、寂しい、考えすぎる、満たされない。そんな状態に近い記事を探します。",
+    keywords: ["しんどい", "寂しい", "不安", "疲れた", "考えすぎ", "満たされない", "モヤモヤ", "心", "メンタル", "朝", "夜", "幸せ", "ご褒美"],
+    articles: [
+      { title: "寂しい夜を乗り越える方法", url: "https://note.com/cheeky_guppy1145/n/n02da50e32408", keywords: ["寂しい", "夜", "一人", "孤独"] },
+      { title: "考えすぎてしまう原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n6e1a13aeed24", keywords: ["考えすぎ", "思考", "不安", "頭"] },
+      { title: "朝に気持ちをリセットする方法", url: "https://note.com/cheeky_guppy1145/n/n26ec627462c9", keywords: ["朝", "朝日", "リセット", "気持ち"] },
+      { title: "疲れた日に試してほしい習慣", url: "https://note.com/cheeky_guppy1145/n/nd7695d2618b1", keywords: ["疲れた", "静か", "休む", "整える"] },
+      { title: "小さな幸せに気づく人の習慣", url: "https://note.com/cheeky_guppy1145/n/n9a57178b0a59", keywords: ["小さな幸せ", "満たされない", "日常"] },
+      { title: "満たされない毎日を終わらせる考え方", url: "https://note.com/cheeky_guppy1145/n/n5867705128cc", keywords: ["満たされない", "日常", "心"] },
+      { title: "自分へのご褒美の使い方", url: "https://note.com/cheeky_guppy1145/n/n929b9d98a82f", keywords: ["ご褒美", "満たされない", "自分"] },
+      { title: "一人ご飯を楽しむ工夫", url: "https://note.com/cheeky_guppy1145/n/n69295f690877", keywords: ["一人ご飯", "食事", "ひとり"] },
+      { title: "推し活が人生を豊かにする理由", url: "https://note.com/cheeky_guppy1145/n/ne9fa01855473", keywords: ["推し活", "楽しみ", "豊か"] }
+    ]
+  },
+  work: {
+    label: "仕事・人間関係を整えたい",
+    tag: "仕事",
+    tool: "work-worry-diagnosis.html",
+    lead: "転職、面接、仕事の迷い、チーム運営、人間関係など、働き方の悩みに近い記事を探します。",
+    keywords: ["仕事", "転職", "面接", "職場", "人間関係", "リーダー", "チーム", "店", "集客", "募集", "参加者", "リピーター", "新社会人"],
+    articles: [
+      { title: "仕事でこのままでいいのかと思った時に読む話", url: "https://note.com/cheeky_guppy1145/n/n4ec2965b6775", keywords: ["仕事", "このままでいい", "働き方"] },
+      { title: "転職すべきか悩んだ時の判断基準", url: "https://note.com/cheeky_guppy1145/n/n1bf6b3bd683c", keywords: ["転職", "判断", "仕事"] },
+      { title: "初めての面接でも安心して話せる方法", url: "https://note.com/cheeky_guppy1145/n/n7b18897927f1", keywords: ["面接", "初めて", "緊張"] },
+      { title: "新しい環境に慣れるまでの過ごし方", url: "https://note.com/cheeky_guppy1145/n/n730d0509729f", keywords: ["新しい環境", "慣れる", "不安"] },
+      { title: "新社会人の仕事が怖い日を楽にする考え方", url: "https://note.com/cheeky_guppy1145/n/na5f519df0496", keywords: ["新社会人", "仕事が怖い", "不安"] },
+      { title: "結果を出すチームのリーダー思考法", url: "https://note.com/cheeky_guppy1145/n/n7bb5cea92465", keywords: ["チーム", "リーダー", "結果"] },
+      { title: "参加者が集まらない原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n9e8737bd35e1", keywords: ["参加者", "募集", "集まらない"] },
+      { title: "リピーターが増えるお店のつくり方", url: "https://note.com/cheeky_guppy1145/n/n6be7cffc6368", keywords: ["リピーター", "お店", "集客"] }
+    ]
+  },
+  money: {
+    label: "お金・買い物を整えたい",
+    tag: "お金",
+    tool: "spending-type-diagnosis.html",
+    lead: "買い替え、高額な買い物、無駄な出費、環境にやさしい選び方など、判断の迷いを整理します。",
+    keywords: ["お金", "買い物", "出費", "節約", "高額", "後悔", "買い替え", "無駄", "環境", "選び方", "引っ越し", "AI"],
+    articles: [
+      { title: "高額な買い物で後悔しない方法", url: "https://note.com/cheeky_guppy1145/n/nad22e0c6bea8", keywords: ["高額", "買い物", "後悔"] },
+      { title: "無駄な出費を減らす方法", url: "https://note.com/cheeky_guppy1145/n/n7e7c512545da", keywords: ["無駄", "出費", "買い替え"] },
+      { title: "知らないと損する環境問題の現実", url: "https://note.com/cheeky_guppy1145/n/nc034b4b8ea62", keywords: ["環境", "選択", "損"] },
+      { title: "引っ越しで後悔しないための見直し", url: "https://note.com/cheeky_guppy1145/n/n064e3d75dc7d", keywords: ["引っ越し", "後悔", "暮らし"] },
+      { title: "無印良品で選び方がうまい人に近づくコツ", url: "https://note.com/cheeky_guppy1145/n/n05e7ccfcc1aa", keywords: ["無印", "買い物", "選び方"] },
+      { title: "AIで生活コストを少し下げる方法", url: "https://note.com/cheeky_guppy1145/n/n0c236df08ab9", keywords: ["AI", "生活コスト", "節約"] },
+      { title: "AIで暮らしを少し楽にする使い方", url: "https://note.com/cheeky_guppy1145/n/na3b4f6f561fe", keywords: ["AI", "暮らし", "楽"] }
+    ]
+  },
+  life: {
+    label: "暮らしを整えたい",
+    tag: "暮らし",
+    tool: "life-reset-diagnosis.html",
+    lead: "部屋、週末、お風呂、散歩、余白、気温など、日常の流れを整える記事を探します。",
+    keywords: ["暮らし", "部屋", "片付け", "掃除", "収納", "週末", "金曜日", "お風呂", "温泉", "散歩", "余白", "気温", "疲れ", "実家", "パン", "自然栽培"],
+    articles: [
+      { title: "週末の質を上げる方法", url: "https://note.com/cheeky_guppy1145/n/n51dceefd84d8", keywords: ["週末", "金曜日", "休み"] },
+      { title: "無駄な疲れを減らす気温に合わせた暮らし方", url: "https://note.com/cheeky_guppy1145/n/n7494c17f0ac9", keywords: ["気温", "疲れ", "暮らし"] },
+      { title: "自宅を温泉のようにする方法", url: "https://note.com/cheeky_guppy1145/n/nfe4cf11f320d", keywords: ["お風呂", "温泉", "入浴"] },
+      { title: "散歩の時間が日常を整える理由", url: "https://note.com/cheeky_guppy1145/n/nfe8a308ecbe9", keywords: ["散歩", "余白", "日常"] },
+      { title: "なんとなく乱れている暮らしを整える方法", url: "https://note.com/cheeky_guppy1145/n/na3b455883712", keywords: ["暮らし", "乱れ", "整える"] },
+      { title: "収納場所で迷わなくなる設計", url: "https://note.com/cheeky_guppy1145/n/n41f9b3566c63", keywords: ["収納", "置き場所", "部屋"] },
+      { title: "掃除を楽にする部屋のつくり方", url: "https://note.com/cheeky_guppy1145/n/n6ca24b4f7970", keywords: ["掃除", "部屋", "楽"] },
+      { title: "捨てられない人のための断捨離", url: "https://note.com/cheeky_guppy1145/n/n111b4e0ee687", keywords: ["断捨離", "捨てられない", "片付け"] },
+      { title: "実家での時間を有効にする過ごし方", url: "https://note.com/cheeky_guppy1145/n/n3d849baf62e1", keywords: ["実家", "帰省", "時間"] },
+      { title: "パン作りを始める前に知っておきたいコツ", url: "https://note.com/cheeky_guppy1145/n/n0cfa82ac9160", keywords: ["パン", "パン作り", "余白"] },
+      { title: "自然栽培の始め方", url: "https://note.com/cheeky_guppy1145/n/nb8ae4dbe99e1", keywords: ["自然栽培", "土", "育てる"] }
+    ]
+  },
+  appearance: {
+    label: "外見・印象を整えたい",
+    tag: "外見",
+    tool: "appearance-style-diagnosis.html",
+    lead: "服、髪型、色、アクセサリー、骨格、日焼け対策など、見た目を整える記事を探します。",
+    keywords: ["外見", "垢ぬけ", "髪", "髪型", "服", "ワンピース", "色", "ネイル", "アクセサリー", "骨格", "日焼け", "下着", "プレゼント", "花見"],
+    articles: [
+      { title: "日焼け対策は日焼け止めだけでは不十分", url: "https://note.com/cheeky_guppy1145/n/na2249cee2f4e", keywords: ["日焼け", "紫外線", "外見"] },
+      { title: "色選びで印象が変わる", url: "https://note.com/cheeky_guppy1145/n/n38b1ad264707", keywords: ["色", "服", "髪", "ネイル", "印象"] },
+      { title: "朝の服選びで迷わないワンピース活用法", url: "https://note.com/cheeky_guppy1145/n/n6221254663a2", keywords: ["ワンピース", "服選び", "朝"] },
+      { title: "垢ぬける髪型の見つけ方", url: "https://note.com/cheeky_guppy1145/n/n519a4efe2fd4", keywords: ["髪型", "垢ぬけ", "顔型"] },
+      { title: "アクセサリーの使い方で印象が変わる", url: "https://note.com/cheeky_guppy1145/n/nf4766bc8e111", keywords: ["アクセサリー", "手元", "印象"] },
+      { title: "骨格診断の活用法", url: "https://note.com/cheeky_guppy1145/n/n827ff75def2a", keywords: ["骨格", "服", "垢ぬけ"] },
+      { title: "下着を見直すと快適さが変わる", url: "https://note.com/cheeky_guppy1145/n/n179e0709601d", keywords: ["下着", "快適", "インナー"] },
+      { title: "また会いたいにつながる習慣", url: "https://note.com/cheeky_guppy1145/n/n8f22b161656a", keywords: ["印象", "また会いたい", "人間関係"] },
+      { title: "プレゼント習慣でセンスを整える", url: "https://note.com/cheeky_guppy1145/n/n679c052825d2", keywords: ["プレゼント", "センス", "贈り物"] },
+      { title: "花見を忘れられない一日に近づける方法", url: "https://note.com/cheeky_guppy1145/n/n274d93bb997a", keywords: ["花見", "春", "思い出"] }
+    ]
+  },
+  output: {
+    label: "発信・運営を伸ばしたい",
+    tag: "発信",
+    tool: "writing-habit-diagnosis.html",
+    lead: "書く習慣、note発信、投稿運営、募集設計、活動休止など、発信の流れを整えます。",
+    keywords: ["発信", "note", "投稿", "運営", "書く", "文章", "募集", "参加者", "活動休止", "検索", "フォロワー", "モヤモヤ"],
+    articles: [
+      { title: "モヤモヤを解消する書く習慣", url: "https://note.com/cheeky_guppy1145/n/nf582302adb06", keywords: ["モヤモヤ", "書く", "ノート"] },
+      { title: "書く習慣が続かない人への対処法", url: "https://note.com/cheeky_guppy1145/n/n3f1208586639", keywords: ["書く習慣", "続かない", "継続"] },
+      { title: "書く習慣を発信につなげる方法", url: "https://note.com/cheeky_guppy1145/n/na5aa1dc8c299", keywords: ["発信", "書く", "note"] },
+      { title: "投稿しても結果が出ない人のための運営改善", url: "https://note.com/cheeky_guppy1145/n/n06bea5c1039a", keywords: ["投稿", "運営", "伸びない", "フォロワー"] },
+      { title: "活動休止を無駄にしない過ごし方", url: "https://note.com/cheeky_guppy1145/n/nea055cb05bc4", keywords: ["活動休止", "止まる", "再開"] },
+      { title: "本とnoteを組み合わせた習慣の整え方", url: "https://note.com/cheeky_guppy1145/n/nb191a93cf415", keywords: ["本", "note", "読書", "アウトプット"] }
+    ]
+  },
+  growth: {
+    label: "行動・人生の方向を整えたい",
+    tag: "思考と行動",
+    tool: "self-time-diagnosis.html",
+    lead: "やる気、目的、価値観、経験、頑張り方など、行動が止まる理由を整える記事を探します。",
+    keywords: ["やる気", "目的", "価値観", "経験", "頑張りすぎ", "限界", "自己実現", "やりたいこと", "時間", "大谷翔平", "朝ドラ"],
+    articles: [
+      { title: "やる目的が分からなくなった時に読む話", url: "https://note.com/cheeky_guppy1145/n/naeb505285203", keywords: ["目的", "モチベーション", "やる理由"] },
+      { title: "やりたいことが分からない時の対処法", url: "https://note.com/cheeky_guppy1145/n/n9a6de131a11e", keywords: ["やりたいこと", "自己実現", "迷い"] },
+      { title: "価値観をアップデートする方法", url: "https://note.com/cheeky_guppy1145/n/nf884a70901f5", keywords: ["価値観", "アップデート", "生き方"] },
+      { title: "頑張りすぎる人がうまくいかない理由", url: "https://note.com/cheeky_guppy1145/n/na8d29f256444", keywords: ["頑張りすぎ", "限界", "疲れ"] },
+      { title: "やる気に頼らない時間の使い方", url: "https://note.com/cheeky_guppy1145/n/n39b92a292f49", keywords: ["やる気", "時間", "仕組み"] },
+      { title: "経験の活かし方", url: "https://note.com/cheeky_guppy1145/n/n5b331224f034", keywords: ["経験", "使う", "人生"] },
+      { title: "結果を出し続ける人の思考法", url: "https://note.com/cheeky_guppy1145/n/ne0b5b657acb6", keywords: ["大谷翔平", "結果", "思考"] },
+      { title: "朝ドラから学ぶ人生がうまくいく人の共通点", url: "https://note.com/cheeky_guppy1145/n/n98e0f7700196", keywords: ["朝ドラ", "人生", "続ける"] },
+      { title: "時間がない人ほどやるべき自分時間のつくり方", url: "https://note.com/cheeky_guppy1145/n/n2619543a0afd", keywords: ["時間がない", "自分時間", "習慣"] }
+    ]
+  },
+  parenting: {
+    label: "子育て・健康を整えたい",
+    tag: "子育て・健康",
+    tool: "parenting-health-diagnosis.html",
+    lead: "子育ての不安、偏食、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探します。",
+    keywords: ["子育て", "母親", "お母さん", "偏食", "自信", "後回し", "歯医者", "視力", "健康", "目"],
+    articles: [
+      { title: "子供の偏食で悩む人への対処法", url: "https://note.com/cheeky_guppy1145/n/na446a2d94699", keywords: ["偏食", "子供", "食事"] },
+      { title: "子育てに自信が持てない時の思考の整え方", url: "https://note.com/cheeky_guppy1145/n/n2614af905b5b", keywords: ["子育て", "自信", "不安"] },
+      { title: "頑張りすぎているお母さんへ", url: "https://note.com/cheeky_guppy1145/n/n2b08455a9f95", keywords: ["母親", "お母さん", "頑張りすぎ"] },
+      { title: "自分を後回しにしてしまう原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n258bcc443ac8", keywords: ["後回し", "自分", "優先"] },
+      { title: "歯医者が怖い人のための治療ガイド", url: "https://note.com/cheeky_guppy1145/n/ne9ecf6f9a0b6", keywords: ["歯医者", "怖い", "治療"] },
+      { title: "視力が落ちる原因は目だけじゃない", url: "https://note.com/cheeky_guppy1145/n/n8e1a992f8131", keywords: ["視力", "目", "健康"] }
+    ]
+  },
+  travel: {
+    label: "日本旅行の不安を減らしたい",
+    tag: "Japan Travel",
+    tool: "en/japan-travel-tips.html",
+    lead: "日本語フレーズ、日常習慣、ルール・マナーなど、外国人旅行者向けの記事を探します。",
+    keywords: ["日本旅行", "旅行", "外国人", "日本語", "フレーズ", "マナー", "ルール", "電車", "ゴミ", "観光", "Japan", "travel"],
+    articles: [
+      { title: "日本旅行で気をつけること", url: "https://note.com/cheeky_guppy1145/n/nffd0836cbc05", keywords: ["日本旅行", "ルール", "マナー"] },
+      { title: "日常で役立つ知識", url: "https://note.com/cheeky_guppy1145/n/n435fc178ad69", keywords: ["日常", "知識", "役立つ"] }
+    ]
+  }
+};
+
+const diagnosisQuestions = [
+  { text: "なんとなくしんどい・気持ちが重い", hint: "心の疲れ、寂しさ、考えすぎを整えたい", type: "mind" },
+  { text: "仕事や人間関係で迷っている", hint: "転職、面接、働き方、チーム運営を整理したい", type: "work" },
+  { text: "お金や買い物で後悔したくない", hint: "高額な買い物、買い替え、無駄な出費を減らしたい", type: "money" },
+  { text: "暮らしや週末を整えたい", hint: "部屋、散歩、お風呂、金曜日、余白を見直したい", type: "life" },
+  { text: "見た目や印象を整えたい", hint: "服、髪、色、アクセサリー、骨格で迷っている", type: "appearance" },
+  { text: "発信・運営・募集を伸ばしたい", hint: "投稿、note、募集、活動休止、書く習慣を整えたい", type: "output" },
+  { text: "行動や人生の方向を整えたい", hint: "やる気、目的、価値観、経験、頑張り方を見直したい", type: "growth" },
+  { text: "子育て・健康の不安を減らしたい", hint: "偏食、母親の疲れ、歯医者、視力などを整えたい", type: "parenting" },
+  { text: "日本旅行の不安を減らしたい", hint: "日本語、マナー、日常習慣、旅行準備を知りたい", type: "travel" }
+];
+
+const articleData = Object.entries(categories).flatMap(([key, cat]) =>
+  cat.articles.map(article => ({
+    ...article,
+    category: key,
+    tag: cat.tag,
+    tool: cat.tool,
+    keywords: [...cat.keywords, ...(article.keywords || [])],
+    note: article.url
+  }))
+);
+
+const hints = ["やる気が出ない", "仕事がつらい", "高額な買い物", "部屋が片付かない", "垢ぬけたい", "投稿が伸びない", "日本旅行 マナー", "寂しい夜", "髪型", "参加者が集まらない", "子育て 自信", "歯医者 怖い"];
+
+const diagnosisChoices = document.getElementById("diagnosisChoices");
+const diagnosisResult = document.getElementById("diagnosisResult");
+const diagnoseButton = document.getElementById("diagnoseButton");
+const clearDiagnosisButton = document.getElementById("clearDiagnosisButton");
+const worryInput = document.getElementById("worryInput");
+const searchButton = document.getElementById("searchButton");
+const hintTags = document.getElementById("hintTags");
+const searchResults = document.getElementById("searchResults");
+const categoryGrid = document.getElementById("categoryGrid");
+const toolGrid = document.getElementById("toolGrid");
+const fortuneButton = document.getElementById("fortuneButton");
+const fortuneTitle = document.getElementById("fortuneTitle");
+const fortuneText = document.getElementById("fortuneText");
+const fortuneResult = document.getElementById("fortuneResult");
+
+function cardHtml(item) {
+  return `<article class="rec-card">
+    <span class="tag">${item.tag}</span>
+    <strong>${item.title}</strong>
+    <p>${categories[item.category]?.lead || "今の悩みに近いテーマです。"}</p>
+    <div class="rec-links">
+      <a class="mini-link" href="${item.note}">noteで読む</a>
+      <a class="mini-link" href="${categories[item.category].tool}">関連ツール</a>
+    </div>
+  </article>`;
+}
+
+function renderDiagnosisChoices() {
+  diagnosisChoices.innerHTML = diagnosisQuestions.map(q => `<label class="choice">
+    <input type="checkbox" value="${q.type}">
+    <span><strong>${q.text}</strong><span>${q.hint}</span></span>
+  </label>`).join("");
+}
+
+function showDiagnosis() {
+  const selected = [...diagnosisChoices.querySelectorAll("input:checked")].map(input => input.value);
+  const totals = {};
+  selected.forEach(type => { totals[type] = (totals[type] || 0) + 1; });
+  const best = Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] || "mind";
+  const cat = categories[best];
+  const picks = articleData.filter(item => item.category === best).slice(0, 4);
+  diagnosisResult.classList.add("is-visible");
+  diagnosisResult.innerHTML = `<div class="result-title">今は「${cat.label}」入口がおすすめです</div>
+    <p>${cat.lead}</p>
+    <div class="hero-actions">
+      <a class="button" href="${picks[0]?.note || noteHome}">最初の記事を読む</a>
+      <a class="button secondary" href="${cat.tool}">関連ツールを使う</a>
+    </div>
+    <div class="recommendations">${picks.map(cardHtml).join("")}</div>`;
+}
+
+function clearDiagnosis() {
+  diagnosisChoices.querySelectorAll("input").forEach(input => { input.checked = false; });
+  diagnosisResult.classList.remove("is-visible");
+  diagnosisResult.innerHTML = "";
+}
+
+function normalize(text) {
+  return text.toLowerCase().replace(/[“”"'.。、「」・｜\s]/g, "");
+}
+
+function scoreItem(item, query) {
+  const q = normalize(query);
+  if (!q) return 0;
+  let score = 0;
+  const title = normalize(item.title);
+  if (title.includes(q) || q.includes(title)) score += 8;
+  item.keywords.forEach(k => {
+    const key = normalize(k);
+    if (q.includes(key) || key.includes(q)) score += 4;
+  });
+  const cat = categories[item.category];
+  if (normalize(cat.label).includes(q)) score += 2;
+  return score;
+}
+
+function runSearch(query = worryInput.value) {
+  const q = query.trim();
+  worryInput.value = q;
+  const results = articleData
+    .map(item => ({ ...item, score: scoreItem(item, q) }))
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 9);
+  const fallback = articleData.filter(item => ["mind", "work", "money", "life", "appearance", "output"].includes(item.category)).slice(0, 9);
+  const list = results.length ? results : fallback;
+  searchResults.innerHTML = list.map(cardHtml).join("");
+}
+
+function renderHints() {
+  hintTags.innerHTML = hints.map(hint => `<button type="button" data-hint="${hint}">${hint}</button>`).join("");
+  hintTags.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => runSearch(button.dataset.hint));
+  });
+}
+
+function renderCategories() {
+  categoryGrid.innerHTML = Object.entries(categories).map(([key, cat]) => `<a class="category-card" href="${cat.tool}">
+    <div><span class="tag">${cat.tag}</span><strong>${cat.label}</strong><span>${cat.lead}</span></div><em>入口を見る</em>
+  </a>`).join("");
+}
+
+function renderTools() {
+  const tools = [
+    ["疲れを整える", "fatigue-reset-diagnosis.html", "睡眠、週末、気温、朝のリセットから回復の入口を探します。"],
+    ["暮らしを整える", "life-reset-diagnosis.html", "片付け、掃除、収納、余白の入口を探します。"],
+    ["仕事の悩みを整理する", "work-worry-diagnosis.html", "転職、面接、新生活、人間関係の入口を探します。"],
+    ["見た目を整える", "appearance-style-diagnosis.html", "服、髪、色、アクセサリーの入口を探します。"],
+    ["発信を整える", "writing-habit-diagnosis.html", "書く習慣、投稿、運営、募集の入口を探します。"],
+    ["お金の使い方を整える", "spending-type-diagnosis.html", "買い物、買い替え、高額購入の判断を整理します。"]
+  ];
+  toolGrid.innerHTML = tools.map(([title, href, text]) => `<a class="tool-card" href="${href}">
+    <div><span class="tag">無料診断</span><strong>${title}</strong><span>${text}</span></div><em>使ってみる</em>
+  </a>`).join("");
+}
+
+function drawFortune() {
+  const list = articleData;
+  const item = list[Math.floor(Math.random() * list.length)];
+  const cat = categories[item.category];
+  fortuneTitle.textContent = `今日のテーマ：${cat.label}`;
+  fortuneText.textContent = item.title;
+  fortuneResult.innerHTML = cardHtml(item);
+}
+
+renderDiagnosisChoices();
+renderHints();
+renderCategories();
+renderTools();
+runSearch("やる気が出ない");
+
+diagnoseButton.addEventListener("click", showDiagnosis);
+clearDiagnosisButton.addEventListener("click", clearDiagnosis);
+searchButton.addEventListener("click", () => runSearch());
+worryInput.addEventListener("keydown", event => { if (event.key === "Enter") runSearch(); });
+fortuneButton.addEventListener("click", drawFortune);
+</script>
 </body>
 </html>
