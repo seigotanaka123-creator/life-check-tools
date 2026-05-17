@@ -674,9 +674,10 @@
       border-radius: 18px;
       background: #fffdf8;
       color: var(--illust-main, #c96a4a);
-      font-size: 25px;
+      font-size: 20px;
       font-weight: 900;
       line-height: 1;
+      white-space: nowrap;
       transform: translateX(-50%) rotate(-4deg);
       box-shadow: 0 8px 16px rgba(80, 61, 38, .12);
       opacity: 1;
@@ -2162,8 +2163,9 @@ function articleVisual(item) {
     [/日本旅行|日本語|外国人|マナー|ルール/, ["旅", "日本旅行"]]
   ];
   const match = rules.find(([pattern]) => pattern.test(title));
-  const [icon, label] = match ? match[1] : ["整", categories[item.category]?.label || "整える"];
-  return { icon, label };
+  const [base, label] = match ? match[1] : ["整う", categories[item.category]?.label || "整える"];
+  const fortuneText = base === "AI" ? "AI吉" : `${base}吉`;
+  return { icon: fortuneText, label };
 }
 
 function renderDiagnosisChoices() {
