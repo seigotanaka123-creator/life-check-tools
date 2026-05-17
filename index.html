@@ -189,6 +189,37 @@
       border-radius: 8px;
       background: var(--paper);
       box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: var(--accent);
+    }
+    .panel.diagnosis-panel {
+      border-color: rgba(47, 111, 100, .22);
+      background: linear-gradient(135deg, #ffffff 0%, #f4fbf7 100%);
+    }
+    .panel.search-panel {
+      border-color: rgba(82, 109, 141, .24);
+      background: linear-gradient(135deg, #ffffff 0%, #f2f7fb 100%);
+    }
+    .panel.search-panel::before { background: var(--accent-3); }
+    .panel.fortune-panel {
+      border-color: rgba(154, 91, 66, .24);
+      background: linear-gradient(135deg, #ffffff 0%, #fff7e7 100%);
+    }
+    .panel.fortune-panel::before { background: var(--accent-2); }
+    .panel.category-panel {
+      border-color: rgba(47, 111, 100, .18);
+      background: linear-gradient(135deg, #ffffff 0%, #f8f6ef 100%);
+    }
+    .panel.tools-panel {
+      border-style: dashed;
+      background: #fff;
     }
     .panel h2 {
       margin: 0 0 8px;
@@ -196,7 +227,17 @@
       line-height: 1.35;
       letter-spacing: 0;
     }
-    .panel p { margin: 0 0 12px; color: var(--muted); }
+    .panel > p {
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(104, 100, 93, .14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .68);
+      color: #565149;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .panel p:not(.small-note) { color: #565149; }
     .diagnosis-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
@@ -400,7 +441,7 @@
     <a href="#tools">無料ツール一覧</a>
   </nav>
 
-  <section class="panel" id="entry-diagnosis">
+  <section class="panel diagnosis-panel" id="entry-diagnosis">
     <h2>今のあなたに合う記事診断</h2>
     <p>近いものを選んでください。複数選んでも大丈夫です。いちばん多く選ばれた悩みの方向から、おすすめ記事と関連ツールを出します。</p>
     <div class="diagnosis-grid" id="diagnosisChoices"></div>
@@ -411,7 +452,7 @@
     <div class="result" id="diagnosisResult" aria-live="polite"></div>
   </section>
 
-  <section class="panel" id="worry-search">
+  <section class="panel search-panel" id="worry-search">
     <h2>悩み別おすすめ記事ナビ</h2>
     <p>言葉を入力すると、近いテーマの記事・診断ツールを表示します。例：やる気が出ない、仕事がつらい、部屋が片付かない、垢ぬけたい、日本旅行。</p>
     <div class="search-box">
@@ -423,7 +464,7 @@
     <p class="small-note">※ 検索語は少しずつ追加しています。近い言葉で見つからない場合は、別の言い方でも試してみてください。</p>
   </section>
 
-  <section class="panel" id="fortune">
+  <section class="panel fortune-panel" id="fortune">
     <h2>今日の整え方おみくじ</h2>
     <p>軽く始めたい人向けの入口です。今読むとよさそうなテーマをひとつだけ出します。</p>
     <div class="fortune">
@@ -436,13 +477,13 @@
     <div class="recommendations" id="fortuneResult"></div>
   </section>
 
-  <section class="panel" id="categories">
+  <section class="panel category-panel" id="categories">
     <h2>カテゴリ別に探す</h2>
     <p>悩みの方向が決まっている人は、ここから近い入口を選んでください。</p>
     <div class="category-grid" id="categoryGrid"></div>
   </section>
 
-  <section class="panel" id="tools">
+  <section class="panel tools-panel" id="tools">
     <h2>無料診断・チェックツール一覧</h2>
     <p>記事を読む前の入口として使いやすい主要ツールです。悩みの方向がまだ曖昧なときに使ってください。</p>
     <div class="tool-grid" id="toolGrid"></div>
