@@ -12,14 +12,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>今の悩みに合う記事診断 | One Coin Books お悩み案内所</title>
-  <meta name="description" content="心、仕事、お金、暮らし、外見、発信、日本旅行の悩みから、今の自分に合うnote記事と無料診断ツールを探せるOne Coin Booksのお悩み案内所です。">
+  <meta name="description" content="心、仕事、お金、暮らし、外見、発信、日本旅行の悩みから、今の自分に合う記事と無料診断ツールを探せるOne Coin Booksのお悩み案内所です。">
   <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/">
   <link rel="alternate" hreflang="ja" href="https://seigotanaka123-creator.github.io/life-check-tools/">
   <link rel="alternate" hreflang="en" href="https://seigotanaka123-creator.github.io/life-check-tools/en/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="One Coin Books お悩み案内所">
   <meta property="og:title" content="今の悩みに合う記事診断 | One Coin Books お悩み案内所">
-  <meta property="og:description" content="悩みを選ぶ・検索する・おみくじを引く。今の状態に合うnote記事と無料ツールを見つけられます。">
+  <meta property="og:description" content="悩みを選ぶ・検索する・おみくじを引く。今の状態に合う記事と無料ツールを見つけられます。">
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
   <meta property="og:image:width" content="1200">
@@ -27,7 +27,7 @@
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="今の悩みに合う記事診断 | One Coin Books お悩み案内所">
-  <meta name="twitter:description" content="今の悩みに合うnote記事と無料ツールを探せる入口ページです。">
+  <meta name="twitter:description" content="今の悩みに合う記事と無料ツールを探せる入口ページです。">
   <meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png">
   <style>
     :root {
@@ -63,6 +63,24 @@
       margin: 0 auto;
     }
     header { padding: 42px 0 22px; }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+    }
+    .language-link {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      padding: 3px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .72);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+    }
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 320px;
@@ -352,21 +370,24 @@
 </head>
 <body>
 <header>
+  <div class="topbar">
+    <a class="language-link" href="en/">English</a>
+  </div>
   <div class="hero">
     <div>
       <p class="eyebrow">One Coin Books お悩み案内所</p>
-      <h1>今の悩みに合う<br>note記事と無料ツールを探す</h1>
-      <p class="lead">ここは読後ツール置き場ではなく、悩みから記事へ進むための入口です。心、仕事、お金、暮らし、外見、発信、日本旅行の不安まで、今の状態に合う読み物を診断・検索・おみくじで見つけられます。</p>
+      <h1>今の悩みに合う<br>記事と無料ツールを探す</h1>
+      <p class="lead">心、仕事、お金、暮らし、外見、発信、日本旅行の不安まで。今の状態に近い読み物や無料ツールを、診断・検索・おみくじから見つけられます。</p>
       <div class="hero-actions">
         <a class="button" href="#entry-diagnosis">まず診断する</a>
         <a class="button secondary" href="#worry-search">悩みで検索する</a>
-        <a class="button gold" href="https://note.com/cheeky_guppy1145">noteを開く</a>
+        <a class="button gold" href="https://note.com/cheeky_guppy1145">記事一覧を見る</a>
       </div>
     </div>
     <aside class="summary" aria-label="サイト概要">
       <div><span>主な入口</span><strong>診断・検索・おみくじ</strong></div>
       <div><span>対象テーマ</span><strong>心 / 仕事 / お金 / 暮らし / 外見 / 発信 / 旅行</strong></div>
-      <div><span>目的</span><strong>note記事への案内</strong></div>
+      <div><span>できること</span><strong>悩みの整理と次の一歩</strong></div>
     </aside>
   </div>
 </header>
@@ -377,7 +398,6 @@
     <a href="#fortune">今日のおみくじ</a>
     <a href="#categories">カテゴリ別</a>
     <a href="#tools">無料ツール一覧</a>
-    <a href="en/">English</a>
   </nav>
 
   <section class="panel" id="entry-diagnosis">
@@ -400,7 +420,7 @@
     </div>
     <div class="hint-tags" id="hintTags"></div>
     <div class="recommendations" id="searchResults"></div>
-    <p class="small-note">※ 現在はテーマに近い記事タイトルとnote入口を表示します。個別note URLが分かる記事から順に直リンクへ差し替えできます。</p>
+    <p class="small-note">※ 検索語は少しずつ追加しています。近い言葉で見つからない場合は、別の言い方でも試してみてください。</p>
   </section>
 
   <section class="panel" id="fortune">
@@ -409,7 +429,7 @@
     <div class="fortune">
       <div>
         <strong id="fortuneTitle">今日のテーマを引いてみましょう</strong>
-        <p id="fortuneText">迷ったら、おみくじから入るのもありです。結果からnote記事へ進めます。</p>
+        <p id="fortuneText">迷ったら、おみくじから入るのもありです。結果から記事へ進めます。</p>
       </div>
       <button class="button gold" id="fortuneButton" type="button">おみくじを引く</button>
     </div>
@@ -424,7 +444,7 @@
 
   <section class="panel" id="tools">
     <h2>無料診断・チェックツール一覧</h2>
-    <p>記事を読む前の入口として使いやすい主要ツールです。個別記事の読後チェックは、各note記事内から使う設計に移行しています。</p>
+    <p>記事を読む前の入口として使いやすい主要ツールです。悩みの方向がまだ曖昧なときに使ってください。</p>
     <div class="tool-grid" id="toolGrid"></div>
   </section>
 </main>
@@ -1716,7 +1736,7 @@ function cardHtml(item) {
     <strong>${item.title}</strong>
     <p>${categories[item.category]?.lead || "今の悩みに近いテーマです。"}</p>
     <div class="rec-links">
-      <a class="mini-link" href="${item.note}">noteで読む</a>
+      <a class="mini-link" href="${item.note}">記事を読む</a>
       <a class="mini-link" href="${categories[item.category].tool}">関連ツール</a>
     </div>
   </article>`;
