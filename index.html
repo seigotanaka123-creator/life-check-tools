@@ -432,153 +432,1240 @@
 const noteHome = "https://note.com/cheeky_guppy1145";
 
 const categories = {
-  mind: {
-    label: "心を整えたい",
-    tag: "心・メンタル",
-    tool: "mood-fulfillment-diagnosis.html",
-    lead: "なんとなくしんどい、寂しい、考えすぎる、満たされない。そんな状態に近い記事を探します。",
-    keywords: ["しんどい", "寂しい", "不安", "疲れた", "考えすぎ", "満たされない", "モヤモヤ", "心", "メンタル", "朝", "夜", "幸せ", "ご褒美"],
-    articles: [
-      { title: "寂しい夜を乗り越える方法", url: "https://note.com/cheeky_guppy1145/n/n02da50e32408", keywords: ["寂しい", "夜", "一人", "孤独"] },
-      { title: "考えすぎてしまう原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n6e1a13aeed24", keywords: ["考えすぎ", "思考", "不安", "頭"] },
-      { title: "朝に気持ちをリセットする方法", url: "https://note.com/cheeky_guppy1145/n/n26ec627462c9", keywords: ["朝", "朝日", "リセット", "気持ち"] },
-      { title: "疲れた日に試してほしい習慣", url: "https://note.com/cheeky_guppy1145/n/nd7695d2618b1", keywords: ["疲れた", "静か", "休む", "整える"] },
-      { title: "小さな幸せに気づく人の習慣", url: "https://note.com/cheeky_guppy1145/n/n9a57178b0a59", keywords: ["小さな幸せ", "満たされない", "日常"] },
-      { title: "満たされない毎日を終わらせる考え方", url: "https://note.com/cheeky_guppy1145/n/n5867705128cc", keywords: ["満たされない", "日常", "心"] },
-      { title: "自分へのご褒美の使い方", url: "https://note.com/cheeky_guppy1145/n/n929b9d98a82f", keywords: ["ご褒美", "満たされない", "自分"] },
-      { title: "一人ご飯を楽しむ工夫", url: "https://note.com/cheeky_guppy1145/n/n69295f690877", keywords: ["一人ご飯", "食事", "ひとり"] },
-      { title: "推し活が人生を豊かにする理由", url: "https://note.com/cheeky_guppy1145/n/ne9fa01855473", keywords: ["推し活", "楽しみ", "豊か"] }
+  "mind": {
+    "label": "心を整えたい",
+    "tag": "心・メンタル",
+    "tool": "mood-fulfillment-diagnosis.html",
+    "lead": "なんとなくしんどい、寂しい、考えすぎる、満たされない。そんな状態に近い記事を探します。",
+    "keywords": [
+      "しんどい",
+      "寂しい",
+      "不安",
+      "疲れた",
+      "考えすぎ",
+      "満たされない",
+      "モヤモヤ",
+      "心",
+      "メンタル",
+      "朝",
+      "夜",
+      "幸せ",
+      "ご褒美",
+      "気分が重い",
+      "落ち込む",
+      "孤独",
+      "心が疲れた",
+      "不安が消えない",
+      "心を軽くしたい",
+      "気持ちを整えたい",
+      "メンタルケア",
+      "自己肯定感",
+      "夜がつらい",
+      "満足できない",
+      "毎日つらい",
+      "幸せを感じたい",
+      "リラックス",
+      "気持ちの整理"
+    ],
+    "articles": [
+      {
+        "title": "寂しい夜を乗り越える方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n02da50e32408",
+        "keywords": [
+          "寂しい",
+          "夜",
+          "一人",
+          "孤独",
+          "眠れない夜",
+          "人恋しい",
+          "心細い",
+          "不安な夜"
+        ]
+      },
+      {
+        "title": "考えすぎてしまう原因と対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/n6e1a13aeed24",
+        "keywords": [
+          "考えすぎ",
+          "思考",
+          "不安",
+          "頭"
+        ]
+      },
+      {
+        "title": "朝に気持ちをリセットする方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n26ec627462c9",
+        "keywords": [
+          "朝",
+          "朝日",
+          "リセット",
+          "気持ち",
+          "朝がつらい",
+          "気持ちを切り替える",
+          "カーテン",
+          "朝の習慣",
+          "一日の始まり"
+        ]
+      },
+      {
+        "title": "疲れた日に試してほしい習慣",
+        "url": "https://note.com/cheeky_guppy1145/n/nd7695d2618b1",
+        "keywords": [
+          "疲れた",
+          "静か",
+          "休む",
+          "整える",
+          "なんとなく疲れた",
+          "休みたい",
+          "静かに過ごす",
+          "回復",
+          "何もしたくない",
+          "余裕がない"
+        ]
+      },
+      {
+        "title": "小さな幸せに気づく人の習慣",
+        "url": "https://note.com/cheeky_guppy1145/n/n9a57178b0a59",
+        "keywords": [
+          "小さな幸せ",
+          "満たされない",
+          "日常",
+          "幸せがない",
+          "日常の幸せ",
+          "感謝",
+          "気づき",
+          "満たされる",
+          "心の余白"
+        ]
+      },
+      {
+        "title": "満たされない毎日を終わらせる考え方",
+        "url": "https://note.com/cheeky_guppy1145/n/n5867705128cc",
+        "keywords": [
+          "満たされない",
+          "日常",
+          "心",
+          "虚しい",
+          "毎日がつまらない",
+          "何か足りない",
+          "充実感",
+          "心が空っぽ"
+        ]
+      },
+      {
+        "title": "自分へのご褒美の使い方",
+        "url": "https://note.com/cheeky_guppy1145/n/n929b9d98a82f",
+        "keywords": [
+          "ご褒美",
+          "満たされない",
+          "自分",
+          "自分へのご褒美",
+          "買い物",
+          "ストレス買い",
+          "自分を労る"
+        ]
+      },
+      {
+        "title": "一人ご飯を楽しむ工夫",
+        "url": "https://note.com/cheeky_guppy1145/n/n69295f690877",
+        "keywords": [
+          "一人ご飯",
+          "食事",
+          "ひとり",
+          "ひとりごはん",
+          "自炊",
+          "外食",
+          "孤独感",
+          "一人暮らし",
+          "食事を楽しむ"
+        ]
+      },
+      {
+        "title": "推し活が人生を豊かにする理由",
+        "url": "https://note.com/cheeky_guppy1145/n/ne9fa01855473",
+        "keywords": [
+          "推し活",
+          "楽しみ",
+          "豊か",
+          "推し",
+          "オタ活",
+          "好きな人",
+          "趣味",
+          "人生を豊かに"
+        ]
+      }
     ]
   },
-  work: {
-    label: "仕事・人間関係を整えたい",
-    tag: "仕事",
-    tool: "work-worry-diagnosis.html",
-    lead: "転職、面接、仕事の迷い、チーム運営、人間関係など、働き方の悩みに近い記事を探します。",
-    keywords: ["仕事", "転職", "面接", "職場", "人間関係", "リーダー", "チーム", "店", "集客", "募集", "参加者", "リピーター", "新社会人"],
-    articles: [
-      { title: "仕事でこのままでいいのかと思った時に読む話", url: "https://note.com/cheeky_guppy1145/n/n4ec2965b6775", keywords: ["仕事", "このままでいい", "働き方"] },
-      { title: "転職すべきか悩んだ時の判断基準", url: "https://note.com/cheeky_guppy1145/n/n1bf6b3bd683c", keywords: ["転職", "判断", "仕事"] },
-      { title: "初めての面接でも安心して話せる方法", url: "https://note.com/cheeky_guppy1145/n/n7b18897927f1", keywords: ["面接", "初めて", "緊張"] },
-      { title: "新しい環境に慣れるまでの過ごし方", url: "https://note.com/cheeky_guppy1145/n/n730d0509729f", keywords: ["新しい環境", "慣れる", "不安"] },
-      { title: "新社会人の仕事が怖い日を楽にする考え方", url: "https://note.com/cheeky_guppy1145/n/na5f519df0496", keywords: ["新社会人", "仕事が怖い", "不安"] },
-      { title: "結果を出すチームのリーダー思考法", url: "https://note.com/cheeky_guppy1145/n/n7bb5cea92465", keywords: ["チーム", "リーダー", "結果"] },
-      { title: "参加者が集まらない原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n9e8737bd35e1", keywords: ["参加者", "募集", "集まらない"] },
-      { title: "リピーターが増えるお店のつくり方", url: "https://note.com/cheeky_guppy1145/n/n6be7cffc6368", keywords: ["リピーター", "お店", "集客"] }
+  "work": {
+    "label": "仕事・人間関係を整えたい",
+    "tag": "仕事",
+    "tool": "work-worry-diagnosis.html",
+    "lead": "転職、面接、仕事の迷い、チーム運営、人間関係など、働き方の悩みに近い記事を探します。",
+    "keywords": [
+      "仕事",
+      "転職",
+      "面接",
+      "職場",
+      "人間関係",
+      "リーダー",
+      "チーム",
+      "店",
+      "集客",
+      "募集",
+      "参加者",
+      "リピーター",
+      "新社会人",
+      "仕事がつらい",
+      "働き方",
+      "キャリア",
+      "転職したい",
+      "仕事辞めたい",
+      "このままでいいのか",
+      "お店",
+      "仕事の悩み"
+    ],
+    "articles": [
+      {
+        "title": "仕事でこのままでいいのかと思った時に読む話",
+        "url": "https://note.com/cheeky_guppy1145/n/n4ec2965b6775",
+        "keywords": [
+          "仕事",
+          "このままでいい",
+          "働き方",
+          "このままでいいのか",
+          "キャリア",
+          "不安",
+          "納得感"
+        ]
+      },
+      {
+        "title": "転職すべきか悩んだ時の判断基準",
+        "url": "https://note.com/cheeky_guppy1145/n/n1bf6b3bd683c",
+        "keywords": [
+          "転職",
+          "判断",
+          "仕事",
+          "辞めたい",
+          "仕事を変える",
+          "判断基準",
+          "キャリア",
+          "退職",
+          "職場"
+        ]
+      },
+      {
+        "title": "初めての面接でも安心して話せる方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n7b18897927f1",
+        "keywords": [
+          "面接",
+          "初めて",
+          "緊張",
+          "就活",
+          "転職面接",
+          "話せない",
+          "志望動機",
+          "自己PR"
+        ]
+      },
+      {
+        "title": "新しい環境に慣れるまでの過ごし方",
+        "url": "https://note.com/cheeky_guppy1145/n/n730d0509729f",
+        "keywords": [
+          "新しい環境",
+          "慣れる",
+          "不安",
+          "慣れない",
+          "新生活",
+          "職場",
+          "学校"
+        ]
+      },
+      {
+        "title": "新社会人の仕事が怖い日を楽にする考え方",
+        "url": "https://note.com/cheeky_guppy1145/n/na5f519df0496",
+        "keywords": [
+          "新社会人",
+          "仕事が怖い",
+          "不安",
+          "入社",
+          "会社",
+          "新人"
+        ]
+      },
+      {
+        "title": "結果を出すチームのリーダー思考法",
+        "url": "https://note.com/cheeky_guppy1145/n/n7bb5cea92465",
+        "keywords": [
+          "チーム",
+          "リーダー",
+          "結果",
+          "マネジメント",
+          "部下",
+          "前提",
+          "ズレ"
+        ]
+      },
+      {
+        "title": "参加者が集まらない原因と対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/n9e8737bd35e1",
+        "keywords": [
+          "参加者",
+          "募集",
+          "集まらない",
+          "満席",
+          "講座",
+          "イベント",
+          "申し込み",
+          "集客"
+        ]
+      },
+      {
+        "title": "リピーターが増えるお店のつくり方",
+        "url": "https://note.com/cheeky_guppy1145/n/n6be7cffc6368",
+        "keywords": [
+          "リピーター",
+          "お店",
+          "集客",
+          "再来店",
+          "常連",
+          "店舗",
+          "飲食店",
+          "また来たい"
+        ]
+      }
     ]
   },
-  money: {
-    label: "お金・買い物を整えたい",
-    tag: "お金",
-    tool: "spending-type-diagnosis.html",
-    lead: "買い替え、高額な買い物、無駄な出費、環境にやさしい選び方など、判断の迷いを整理します。",
-    keywords: ["お金", "買い物", "出費", "節約", "高額", "後悔", "買い替え", "無駄", "環境", "選び方", "引っ越し", "AI"],
-    articles: [
-      { title: "高額な買い物で後悔しない方法", url: "https://note.com/cheeky_guppy1145/n/nad22e0c6bea8", keywords: ["高額", "買い物", "後悔"] },
-      { title: "無駄な出費を減らす方法", url: "https://note.com/cheeky_guppy1145/n/n7e7c512545da", keywords: ["無駄", "出費", "買い替え"] },
-      { title: "知らないと損する環境問題の現実", url: "https://note.com/cheeky_guppy1145/n/nc034b4b8ea62", keywords: ["環境", "選択", "損"] },
-      { title: "引っ越しで後悔しないための見直し", url: "https://note.com/cheeky_guppy1145/n/n064e3d75dc7d", keywords: ["引っ越し", "後悔", "暮らし"] },
-      { title: "無印良品で選び方がうまい人に近づくコツ", url: "https://note.com/cheeky_guppy1145/n/n05e7ccfcc1aa", keywords: ["無印", "買い物", "選び方"] },
-      { title: "AIで生活コストを少し下げる方法", url: "https://note.com/cheeky_guppy1145/n/n0c236df08ab9", keywords: ["AI", "生活コスト", "節約"] },
-      { title: "AIで暮らしを少し楽にする使い方", url: "https://note.com/cheeky_guppy1145/n/na3b4f6f561fe", keywords: ["AI", "暮らし", "楽"] }
+  "money": {
+    "label": "お金・買い物を整えたい",
+    "tag": "お金",
+    "tool": "spending-type-diagnosis.html",
+    "lead": "買い替え、高額な買い物、無駄な出費、環境にやさしい選び方など、判断の迷いを整理します。",
+    "keywords": [
+      "お金",
+      "買い物",
+      "出費",
+      "節約",
+      "高額",
+      "後悔",
+      "買い替え",
+      "無駄",
+      "環境",
+      "選び方",
+      "引っ越し",
+      "AI",
+      "無駄遣い",
+      "お金が減る",
+      "支出",
+      "生活費",
+      "高い買い物",
+      "買うか迷う",
+      "損したくない",
+      "サステナブル"
+    ],
+    "articles": [
+      {
+        "title": "高額な買い物で後悔しない方法",
+        "url": "https://note.com/cheeky_guppy1145/n/nad22e0c6bea8",
+        "keywords": [
+          "高額",
+          "買い物",
+          "後悔",
+          "高額購入",
+          "高い買い物",
+          "後悔したくない",
+          "買うか迷う",
+          "大きな買い物",
+          "判断基準"
+        ]
+      },
+      {
+        "title": "無駄な出費を減らす方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n7e7c512545da",
+        "keywords": [
+          "無駄",
+          "出費",
+          "買い替え",
+          "まだ使える",
+          "無駄な出費",
+          "家電",
+          "スマホ",
+          "買うタイミング",
+          "節約"
+        ]
+      },
+      {
+        "title": "知らないと損する環境問題の現実",
+        "url": "https://note.com/cheeky_guppy1145/n/nc034b4b8ea62",
+        "keywords": [
+          "環境",
+          "選択",
+          "損",
+          "環境問題",
+          "エコ",
+          "サステナブル",
+          "ゴミ",
+          "使い捨て",
+          "地球",
+          "無駄を減らす",
+          "知らないと損"
+        ]
+      },
+      {
+        "title": "引っ越しで後悔しないための見直し",
+        "url": "https://note.com/cheeky_guppy1145/n/n064e3d75dc7d",
+        "keywords": [
+          "引っ越し",
+          "後悔",
+          "暮らし",
+          "部屋選び",
+          "賃貸",
+          "物件",
+          "後悔しない",
+          "住まい"
+        ]
+      },
+      {
+        "title": "無印良品で選び方がうまい人に近づくコツ",
+        "url": "https://note.com/cheeky_guppy1145/n/n05e7ccfcc1aa",
+        "keywords": [
+          "無印",
+          "買い物",
+          "選び方",
+          "無印良品",
+          "失敗しない",
+          "日用品"
+        ]
+      },
+      {
+        "title": "AIで生活コストを少し下げる方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n0c236df08ab9",
+        "keywords": [
+          "AI",
+          "生活コスト",
+          "節約",
+          "生活費",
+          "コスト削減",
+          "ChatGPT",
+          "お金を減らす"
+        ]
+      },
+      {
+        "title": "AIで暮らしを少し楽にする使い方",
+        "url": "https://note.com/cheeky_guppy1145/n/na3b4f6f561fe",
+        "keywords": [
+          "AI",
+          "暮らし",
+          "楽",
+          "生活を楽に",
+          "ChatGPT",
+          "時短",
+          "家事",
+          "便利"
+        ]
+      }
     ]
   },
-  life: {
-    label: "暮らしを整えたい",
-    tag: "暮らし",
-    tool: "life-reset-diagnosis.html",
-    lead: "部屋、週末、お風呂、散歩、余白、気温など、日常の流れを整える記事を探します。",
-    keywords: ["暮らし", "部屋", "片付け", "掃除", "収納", "週末", "金曜日", "お風呂", "温泉", "散歩", "余白", "気温", "疲れ", "実家", "パン", "自然栽培"],
-    articles: [
-      { title: "週末の質を上げる方法", url: "https://note.com/cheeky_guppy1145/n/n51dceefd84d8", keywords: ["週末", "金曜日", "休み"] },
-      { title: "無駄な疲れを減らす気温に合わせた暮らし方", url: "https://note.com/cheeky_guppy1145/n/n7494c17f0ac9", keywords: ["気温", "疲れ", "暮らし"] },
-      { title: "自宅を温泉のようにする方法", url: "https://note.com/cheeky_guppy1145/n/nfe4cf11f320d", keywords: ["お風呂", "温泉", "入浴"] },
-      { title: "散歩の時間が日常を整える理由", url: "https://note.com/cheeky_guppy1145/n/nfe8a308ecbe9", keywords: ["散歩", "余白", "日常"] },
-      { title: "なんとなく乱れている暮らしを整える方法", url: "https://note.com/cheeky_guppy1145/n/na3b455883712", keywords: ["暮らし", "乱れ", "整える"] },
-      { title: "収納場所で迷わなくなる設計", url: "https://note.com/cheeky_guppy1145/n/n41f9b3566c63", keywords: ["収納", "置き場所", "部屋"] },
-      { title: "掃除を楽にする部屋のつくり方", url: "https://note.com/cheeky_guppy1145/n/n6ca24b4f7970", keywords: ["掃除", "部屋", "楽"] },
-      { title: "捨てられない人のための断捨離", url: "https://note.com/cheeky_guppy1145/n/n111b4e0ee687", keywords: ["断捨離", "捨てられない", "片付け"] },
-      { title: "実家での時間を有効にする過ごし方", url: "https://note.com/cheeky_guppy1145/n/n3d849baf62e1", keywords: ["実家", "帰省", "時間"] },
-      { title: "パン作りを始める前に知っておきたいコツ", url: "https://note.com/cheeky_guppy1145/n/n0cfa82ac9160", keywords: ["パン", "パン作り", "余白"] },
-      { title: "自然栽培の始め方", url: "https://note.com/cheeky_guppy1145/n/nb8ae4dbe99e1", keywords: ["自然栽培", "土", "育てる"] }
+  "life": {
+    "label": "暮らしを整えたい",
+    "tag": "暮らし",
+    "tool": "life-reset-diagnosis.html",
+    "lead": "部屋、週末、お風呂、散歩、余白、気温など、日常の流れを整える記事を探します。",
+    "keywords": [
+      "暮らし",
+      "部屋",
+      "片付け",
+      "掃除",
+      "収納",
+      "週末",
+      "金曜日",
+      "お風呂",
+      "温泉",
+      "散歩",
+      "余白",
+      "気温",
+      "疲れ",
+      "実家",
+      "パン",
+      "自然栽培",
+      "生活",
+      "睡眠",
+      "朝",
+      "疲労",
+      "一人暮らし"
+    ],
+    "articles": [
+      {
+        "title": "週末の質を上げる方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n51dceefd84d8",
+        "keywords": [
+          "週末",
+          "金曜日",
+          "休み",
+          "土日",
+          "休日",
+          "休み方",
+          "疲れを持ち越す",
+          "スマホ見すぎ",
+          "月曜日が嫌"
+        ]
+      },
+      {
+        "title": "無駄な疲れを減らす気温に合わせた暮らし方",
+        "url": "https://note.com/cheeky_guppy1145/n/n7494c17f0ac9",
+        "keywords": [
+          "気温",
+          "疲れ",
+          "暮らし",
+          "寒暖差",
+          "暑い",
+          "寒い",
+          "だるい",
+          "自律神経",
+          "気候",
+          "服装調整",
+          "疲れやすい"
+        ]
+      },
+      {
+        "title": "自宅を温泉のようにする方法",
+        "url": "https://note.com/cheeky_guppy1145/n/nfe4cf11f320d",
+        "keywords": [
+          "お風呂",
+          "温泉",
+          "入浴",
+          "入浴剤",
+          "自宅風呂",
+          "リラックス",
+          "バスタイム",
+          "整う",
+          "睡眠"
+        ]
+      },
+      {
+        "title": "散歩の時間が日常を整える理由",
+        "url": "https://note.com/cheeky_guppy1145/n/nfe8a308ecbe9",
+        "keywords": [
+          "散歩",
+          "余白",
+          "日常",
+          "何もない日",
+          "外に出る",
+          "気分転換",
+          "歩く"
+        ]
+      },
+      {
+        "title": "なんとなく乱れている暮らしを整える方法",
+        "url": "https://note.com/cheeky_guppy1145/n/na3b455883712",
+        "keywords": [
+          "暮らし",
+          "乱れ",
+          "整える",
+          "暮らしが乱れる",
+          "生活リズム",
+          "部屋が乱れる",
+          "整えたい",
+          "毎日が乱れる"
+        ]
+      },
+      {
+        "title": "収納場所で迷わなくなる設計",
+        "url": "https://note.com/cheeky_guppy1145/n/n41f9b3566c63",
+        "keywords": [
+          "収納",
+          "置き場所",
+          "部屋",
+          "片付け",
+          "物の住所",
+          "探し物",
+          "部屋が散らかる"
+        ]
+      },
+      {
+        "title": "掃除を楽にする部屋のつくり方",
+        "url": "https://note.com/cheeky_guppy1145/n/n6ca24b4f7970",
+        "keywords": [
+          "掃除",
+          "部屋",
+          "楽",
+          "部屋掃除",
+          "掃除が面倒",
+          "汚部屋",
+          "楽な部屋",
+          "片付けられない"
+        ]
+      },
+      {
+        "title": "捨てられない人のための断捨離",
+        "url": "https://note.com/cheeky_guppy1145/n/n111b4e0ee687",
+        "keywords": [
+          "断捨離",
+          "捨てられない",
+          "片付け",
+          "物を減らす",
+          "手放す",
+          "ミニマル"
+        ]
+      },
+      {
+        "title": "実家での時間を有効にする過ごし方",
+        "url": "https://note.com/cheeky_guppy1145/n/n3d849baf62e1",
+        "keywords": [
+          "実家",
+          "帰省",
+          "時間",
+          "親",
+          "実家暮らし",
+          "時間の使い方",
+          "帰省中",
+          "だらだら"
+        ]
+      },
+      {
+        "title": "パン作りを始める前に知っておきたいコツ",
+        "url": "https://note.com/cheeky_guppy1145/n/n0cfa82ac9160",
+        "keywords": [
+          "パン",
+          "パン作り",
+          "余白",
+          "発酵",
+          "こねる",
+          "手作りパン",
+          "初心者",
+          "失敗"
+        ]
+      },
+      {
+        "title": "自然栽培の始め方",
+        "url": "https://note.com/cheeky_guppy1145/n/nb8ae4dbe99e1",
+        "keywords": [
+          "自然栽培",
+          "土",
+          "育てる",
+          "家庭菜園",
+          "土づくり",
+          "野菜",
+          "無農薬",
+          "畑",
+          "初心者"
+        ]
+      }
     ]
   },
-  appearance: {
-    label: "外見・印象を整えたい",
-    tag: "外見",
-    tool: "appearance-style-diagnosis.html",
-    lead: "服、髪型、色、アクセサリー、骨格、日焼け対策など、見た目を整える記事を探します。",
-    keywords: ["外見", "垢ぬけ", "髪", "髪型", "服", "ワンピース", "色", "ネイル", "アクセサリー", "骨格", "日焼け", "下着", "プレゼント", "花見"],
-    articles: [
-      { title: "日焼け対策は日焼け止めだけでは不十分", url: "https://note.com/cheeky_guppy1145/n/na2249cee2f4e", keywords: ["日焼け", "紫外線", "外見"] },
-      { title: "色選びで印象が変わる", url: "https://note.com/cheeky_guppy1145/n/n38b1ad264707", keywords: ["色", "服", "髪", "ネイル", "印象"] },
-      { title: "朝の服選びで迷わないワンピース活用法", url: "https://note.com/cheeky_guppy1145/n/n6221254663a2", keywords: ["ワンピース", "服選び", "朝"] },
-      { title: "垢ぬける髪型の見つけ方", url: "https://note.com/cheeky_guppy1145/n/n519a4efe2fd4", keywords: ["髪型", "垢ぬけ", "顔型"] },
-      { title: "アクセサリーの使い方で印象が変わる", url: "https://note.com/cheeky_guppy1145/n/nf4766bc8e111", keywords: ["アクセサリー", "手元", "印象"] },
-      { title: "骨格診断の活用法", url: "https://note.com/cheeky_guppy1145/n/n827ff75def2a", keywords: ["骨格", "服", "垢ぬけ"] },
-      { title: "下着を見直すと快適さが変わる", url: "https://note.com/cheeky_guppy1145/n/n179e0709601d", keywords: ["下着", "快適", "インナー"] },
-      { title: "また会いたいにつながる習慣", url: "https://note.com/cheeky_guppy1145/n/n8f22b161656a", keywords: ["印象", "また会いたい", "人間関係"] },
-      { title: "プレゼント習慣でセンスを整える", url: "https://note.com/cheeky_guppy1145/n/n679c052825d2", keywords: ["プレゼント", "センス", "贈り物"] },
-      { title: "花見を忘れられない一日に近づける方法", url: "https://note.com/cheeky_guppy1145/n/n274d93bb997a", keywords: ["花見", "春", "思い出"] }
+  "appearance": {
+    "label": "外見・印象を整えたい",
+    "tag": "外見",
+    "tool": "appearance-style-diagnosis.html",
+    "lead": "服、髪型、色、アクセサリー、骨格、日焼け対策など、見た目を整える記事を探します。",
+    "keywords": [
+      "外見",
+      "垢ぬけ",
+      "髪",
+      "髪型",
+      "服",
+      "ワンピース",
+      "色",
+      "ネイル",
+      "アクセサリー",
+      "骨格",
+      "日焼け",
+      "下着",
+      "プレゼント",
+      "花見",
+      "垢抜け",
+      "見た目",
+      "コーデ",
+      "印象",
+      "おしゃれ",
+      "清潔感",
+      "紫外線"
+    ],
+    "articles": [
+      {
+        "title": "日焼け対策は日焼け止めだけでは不十分",
+        "url": "https://note.com/cheeky_guppy1145/n/na2249cee2f4e",
+        "keywords": [
+          "日焼け",
+          "紫外線",
+          "外見",
+          "焼けたくない",
+          "日焼け止め",
+          "日傘",
+          "帽子",
+          "肌を守る",
+          "夏",
+          "外出",
+          "日差し",
+          "UV",
+          "シミ",
+          "美容"
+        ]
+      },
+      {
+        "title": "色選びで印象が変わる",
+        "url": "https://note.com/cheeky_guppy1145/n/n38b1ad264707",
+        "keywords": [
+          "色",
+          "服",
+          "髪",
+          "ネイル",
+          "印象",
+          "配色",
+          "色選び",
+          "トーン",
+          "服の色",
+          "髪色",
+          "部屋の色",
+          "ネイルの色",
+          "統一感",
+          "センスない",
+          "印象を変えたい"
+        ]
+      },
+      {
+        "title": "朝の服選びで迷わないワンピース活用法",
+        "url": "https://note.com/cheeky_guppy1145/n/n6221254663a2",
+        "keywords": [
+          "ワンピース",
+          "服選び",
+          "朝",
+          "朝の支度",
+          "コーデが決まらない",
+          "着回し",
+          "時短",
+          "迷わない服",
+          "毎朝迷う",
+          "ワンピース活用"
+        ]
+      },
+      {
+        "title": "垢ぬける髪型の見つけ方",
+        "url": "https://note.com/cheeky_guppy1145/n/n519a4efe2fd4",
+        "keywords": [
+          "髪型",
+          "垢ぬけ",
+          "顔型",
+          "似合う髪型",
+          "美容院",
+          "前髪",
+          "丸顔",
+          "面長",
+          "髪型迷子",
+          "イメチェン",
+          "ヘアスタイル",
+          "髪型似合わない",
+          "髪型が似合わない",
+          "似合わない"
+        ]
+      },
+      {
+        "title": "アクセサリーの使い方で印象が変わる",
+        "url": "https://note.com/cheeky_guppy1145/n/nf4766bc8e111",
+        "keywords": [
+          "アクセサリー",
+          "手元",
+          "印象",
+          "指輪",
+          "リング",
+          "ネックレス",
+          "ピアス",
+          "小物",
+          "アクセが浮く",
+          "バランス",
+          "手元を整える"
+        ]
+      },
+      {
+        "title": "骨格診断の活用法",
+        "url": "https://note.com/cheeky_guppy1145/n/n827ff75def2a",
+        "keywords": [
+          "骨格",
+          "服",
+          "垢ぬけ",
+          "骨格診断",
+          "ストレート",
+          "ウェーブ",
+          "ナチュラル",
+          "似合う服",
+          "服が似合わない",
+          "体型",
+          "スタイルアップ",
+          "服似合わない",
+          "なんか似合わない"
+        ]
+      },
+      {
+        "title": "下着を見直すと快適さが変わる",
+        "url": "https://note.com/cheeky_guppy1145/n/n179e0709601d",
+        "keywords": [
+          "下着",
+          "快適",
+          "インナー",
+          "蒸れ",
+          "締め付け",
+          "肌着",
+          "疲れにくい",
+          "服の中",
+          "違和感"
+        ]
+      },
+      {
+        "title": "また会いたいにつながる習慣",
+        "url": "https://note.com/cheeky_guppy1145/n/n8f22b161656a",
+        "keywords": [
+          "印象",
+          "また会いたい",
+          "人間関係",
+          "好印象",
+          "感じがいい",
+          "会話",
+          "距離感",
+          "さりげない"
+        ]
+      },
+      {
+        "title": "プレゼント習慣でセンスを整える",
+        "url": "https://note.com/cheeky_guppy1145/n/n679c052825d2",
+        "keywords": [
+          "プレゼント",
+          "センス",
+          "贈り物",
+          "ギフト",
+          "センスがいい",
+          "誕生日",
+          "相手に喜ばれる",
+          "選び方"
+        ]
+      },
+      {
+        "title": "花見を忘れられない一日に近づける方法",
+        "url": "https://note.com/cheeky_guppy1145/n/n274d93bb997a",
+        "keywords": [
+          "花見",
+          "春",
+          "思い出",
+          "桜",
+          "デート",
+          "休日",
+          "季節",
+          "お出かけ"
+        ]
+      }
     ]
   },
-  output: {
-    label: "発信・運営を伸ばしたい",
-    tag: "発信",
-    tool: "writing-habit-diagnosis.html",
-    lead: "書く習慣、note発信、投稿運営、募集設計、活動休止など、発信の流れを整えます。",
-    keywords: ["発信", "note", "投稿", "運営", "書く", "文章", "募集", "参加者", "活動休止", "検索", "フォロワー", "モヤモヤ"],
-    articles: [
-      { title: "モヤモヤを解消する書く習慣", url: "https://note.com/cheeky_guppy1145/n/nf582302adb06", keywords: ["モヤモヤ", "書く", "ノート"] },
-      { title: "書く習慣が続かない人への対処法", url: "https://note.com/cheeky_guppy1145/n/n3f1208586639", keywords: ["書く習慣", "続かない", "継続"] },
-      { title: "書く習慣を発信につなげる方法", url: "https://note.com/cheeky_guppy1145/n/na5aa1dc8c299", keywords: ["発信", "書く", "note"] },
-      { title: "投稿しても結果が出ない人のための運営改善", url: "https://note.com/cheeky_guppy1145/n/n06bea5c1039a", keywords: ["投稿", "運営", "伸びない", "フォロワー"] },
-      { title: "活動休止を無駄にしない過ごし方", url: "https://note.com/cheeky_guppy1145/n/nea055cb05bc4", keywords: ["活動休止", "止まる", "再開"] },
-      { title: "本とnoteを組み合わせた習慣の整え方", url: "https://note.com/cheeky_guppy1145/n/nb191a93cf415", keywords: ["本", "note", "読書", "アウトプット"] }
+  "output": {
+    "label": "発信・運営を伸ばしたい",
+    "tag": "発信",
+    "tool": "writing-habit-diagnosis.html",
+    "lead": "書く習慣、note発信、投稿運営、募集設計、活動休止など、発信の流れを整えます。",
+    "keywords": [
+      "発信",
+      "note",
+      "投稿",
+      "運営",
+      "書く",
+      "文章",
+      "募集",
+      "参加者",
+      "活動休止",
+      "検索",
+      "フォロワー",
+      "モヤモヤ",
+      "アウトプット",
+      "書けない",
+      "続かない",
+      "SNS",
+      "読書"
+    ],
+    "articles": [
+      {
+        "title": "モヤモヤを解消する書く習慣",
+        "url": "https://note.com/cheeky_guppy1145/n/nf582302adb06",
+        "keywords": [
+          "モヤモヤ",
+          "書く",
+          "ノート",
+          "気持ち",
+          "本音",
+          "整理",
+          "ジャーナリング"
+        ]
+      },
+      {
+        "title": "書く習慣が続かない人への対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/n3f1208586639",
+        "keywords": [
+          "書く習慣",
+          "続かない",
+          "継続",
+          "日記",
+          "1行",
+          "書けない",
+          "習慣化"
+        ]
+      },
+      {
+        "title": "書く習慣を発信につなげる方法",
+        "url": "https://note.com/cheeky_guppy1145/n/na5aa1dc8c299",
+        "keywords": [
+          "発信",
+          "書く",
+          "note",
+          "投稿",
+          "書いたもの",
+          "外に出す",
+          "不安",
+          "SNS"
+        ]
+      },
+      {
+        "title": "投稿しても結果が出ない人のための運営改善",
+        "url": "https://note.com/cheeky_guppy1145/n/n06bea5c1039a",
+        "keywords": [
+          "投稿",
+          "運営",
+          "伸びない",
+          "フォロワー",
+          "SNS",
+          "導線",
+          "売上",
+          "発信改善"
+        ]
+      },
+      {
+        "title": "活動休止を無駄にしない過ごし方",
+        "url": "https://note.com/cheeky_guppy1145/n/nea055cb05bc4",
+        "keywords": [
+          "活動休止",
+          "止まる",
+          "再開",
+          "休む",
+          "戻れない",
+          "発信疲れ",
+          "休止"
+        ]
+      },
+      {
+        "title": "本とnoteを組み合わせた習慣の整え方",
+        "url": "https://note.com/cheeky_guppy1145/n/nb191a93cf415",
+        "keywords": [
+          "本",
+          "note",
+          "読書",
+          "アウトプット",
+          "読んでも変わらない",
+          "書く",
+          "習慣"
+        ]
+      }
     ]
   },
-  growth: {
-    label: "行動・人生の方向を整えたい",
-    tag: "思考と行動",
-    tool: "self-time-diagnosis.html",
-    lead: "やる気、目的、価値観、経験、頑張り方など、行動が止まる理由を整える記事を探します。",
-    keywords: ["やる気", "目的", "価値観", "経験", "頑張りすぎ", "限界", "自己実現", "やりたいこと", "時間", "大谷翔平", "朝ドラ"],
-    articles: [
-      { title: "やる目的が分からなくなった時に読む話", url: "https://note.com/cheeky_guppy1145/n/naeb505285203", keywords: ["目的", "モチベーション", "やる理由"] },
-      { title: "やりたいことが分からない時の対処法", url: "https://note.com/cheeky_guppy1145/n/n9a6de131a11e", keywords: ["やりたいこと", "自己実現", "迷い"] },
-      { title: "価値観をアップデートする方法", url: "https://note.com/cheeky_guppy1145/n/nf884a70901f5", keywords: ["価値観", "アップデート", "生き方"] },
-      { title: "頑張りすぎる人がうまくいかない理由", url: "https://note.com/cheeky_guppy1145/n/na8d29f256444", keywords: ["頑張りすぎ", "限界", "疲れ"] },
-      { title: "やる気に頼らない時間の使い方", url: "https://note.com/cheeky_guppy1145/n/n39b92a292f49", keywords: ["やる気", "時間", "仕組み"] },
-      { title: "経験の活かし方", url: "https://note.com/cheeky_guppy1145/n/n5b331224f034", keywords: ["経験", "使う", "人生"] },
-      { title: "結果を出し続ける人の思考法", url: "https://note.com/cheeky_guppy1145/n/ne0b5b657acb6", keywords: ["大谷翔平", "結果", "思考"] },
-      { title: "朝ドラから学ぶ人生がうまくいく人の共通点", url: "https://note.com/cheeky_guppy1145/n/n98e0f7700196", keywords: ["朝ドラ", "人生", "続ける"] },
-      { title: "時間がない人ほどやるべき自分時間のつくり方", url: "https://note.com/cheeky_guppy1145/n/n2619543a0afd", keywords: ["時間がない", "自分時間", "習慣"] }
+  "growth": {
+    "label": "行動・人生の方向を整えたい",
+    "tag": "思考と行動",
+    "tool": "self-time-diagnosis.html",
+    "lead": "やる気、目的、価値観、経験、頑張り方など、行動が止まる理由を整える記事を探します。",
+    "keywords": [
+      "やる気",
+      "目的",
+      "価値観",
+      "経験",
+      "頑張りすぎ",
+      "限界",
+      "自己実現",
+      "やりたいこと",
+      "時間",
+      "大谷翔平",
+      "朝ドラ",
+      "人生",
+      "継続",
+      "習慣",
+      "行動",
+      "目標",
+      "結果",
+      "思考法",
+      "変わりたい"
+    ],
+    "articles": [
+      {
+        "title": "やる目的が分からなくなった時に読む話",
+        "url": "https://note.com/cheeky_guppy1145/n/naeb505285203",
+        "keywords": [
+          "目的",
+          "モチベーション",
+          "やる理由",
+          "何のため",
+          "意味がない",
+          "動けない"
+        ]
+      },
+      {
+        "title": "やりたいことが分からない時の対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/n9a6de131a11e",
+        "keywords": [
+          "やりたいこと",
+          "自己実現",
+          "迷い",
+          "分からない",
+          "何がしたい",
+          "方向性"
+        ]
+      },
+      {
+        "title": "価値観をアップデートする方法",
+        "url": "https://note.com/cheeky_guppy1145/n/nf884a70901f5",
+        "keywords": [
+          "価値観",
+          "アップデート",
+          "生き方",
+          "違和感",
+          "考え方",
+          "判断基準"
+        ]
+      },
+      {
+        "title": "頑張りすぎる人がうまくいかない理由",
+        "url": "https://note.com/cheeky_guppy1145/n/na8d29f256444",
+        "keywords": [
+          "頑張りすぎ",
+          "限界",
+          "疲れ",
+          "燃え尽き",
+          "無理",
+          "続かない",
+          "力を抜く"
+        ]
+      },
+      {
+        "title": "やる気に頼らない時間の使い方",
+        "url": "https://note.com/cheeky_guppy1145/n/n39b92a292f49",
+        "keywords": [
+          "やる気",
+          "時間",
+          "仕組み",
+          "時間管理",
+          "最低限",
+          "動けない",
+          "時間の使い方"
+        ]
+      },
+      {
+        "title": "経験の活かし方",
+        "url": "https://note.com/cheeky_guppy1145/n/n5b331224f034",
+        "keywords": [
+          "経験",
+          "使う",
+          "人生",
+          "活かす",
+          "失敗",
+          "振り返り",
+          "成長"
+        ]
+      },
+      {
+        "title": "結果を出し続ける人の思考法",
+        "url": "https://note.com/cheeky_guppy1145/n/ne0b5b657acb6",
+        "keywords": [
+          "大谷翔平",
+          "結果",
+          "思考",
+          "結果を出す",
+          "思考法",
+          "継続",
+          "目標",
+          "行動"
+        ]
+      },
+      {
+        "title": "朝ドラから学ぶ人生がうまくいく人の共通点",
+        "url": "https://note.com/cheeky_guppy1145/n/n98e0f7700196",
+        "keywords": [
+          "朝ドラ",
+          "人生",
+          "続ける",
+          "続く人",
+          "人生がうまくいく",
+          "変わりたい",
+          "仕組み"
+        ]
+      },
+      {
+        "title": "時間がない人ほどやるべき自分時間のつくり方",
+        "url": "https://note.com/cheeky_guppy1145/n/n2619543a0afd",
+        "keywords": [
+          "時間がない",
+          "自分時間",
+          "習慣",
+          "忙しい",
+          "余裕がない",
+          "時間管理",
+          "一人時間"
+        ]
+      }
     ]
   },
-  parenting: {
-    label: "子育て・健康を整えたい",
-    tag: "子育て・健康",
-    tool: "parenting-health-diagnosis.html",
-    lead: "子育ての不安、偏食、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探します。",
-    keywords: ["子育て", "母親", "お母さん", "偏食", "自信", "後回し", "歯医者", "視力", "健康", "目"],
-    articles: [
-      { title: "子供の偏食で悩む人への対処法", url: "https://note.com/cheeky_guppy1145/n/na446a2d94699", keywords: ["偏食", "子供", "食事"] },
-      { title: "子育てに自信が持てない時の思考の整え方", url: "https://note.com/cheeky_guppy1145/n/n2614af905b5b", keywords: ["子育て", "自信", "不安"] },
-      { title: "頑張りすぎているお母さんへ", url: "https://note.com/cheeky_guppy1145/n/n2b08455a9f95", keywords: ["母親", "お母さん", "頑張りすぎ"] },
-      { title: "自分を後回しにしてしまう原因と対処法", url: "https://note.com/cheeky_guppy1145/n/n258bcc443ac8", keywords: ["後回し", "自分", "優先"] },
-      { title: "歯医者が怖い人のための治療ガイド", url: "https://note.com/cheeky_guppy1145/n/ne9ecf6f9a0b6", keywords: ["歯医者", "怖い", "治療"] },
-      { title: "視力が落ちる原因は目だけじゃない", url: "https://note.com/cheeky_guppy1145/n/n8e1a992f8131", keywords: ["視力", "目", "健康"] }
+  "parenting": {
+    "label": "子育て・健康を整えたい",
+    "tag": "子育て・健康",
+    "tool": "parenting-health-diagnosis.html",
+    "lead": "子育ての不安、偏食、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探します。",
+    "keywords": [
+      "子育て",
+      "母親",
+      "お母さん",
+      "偏食",
+      "自信",
+      "後回し",
+      "歯医者",
+      "視力",
+      "健康",
+      "目",
+      "育児",
+      "子ども",
+      "自信がない",
+      "体調",
+      "歯",
+      "子供"
+    ],
+    "articles": [
+      {
+        "title": "子供の偏食で悩む人への対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/na446a2d94699",
+        "keywords": [
+          "偏食",
+          "子供",
+          "食事",
+          "子どもが食べない",
+          "野菜嫌い",
+          "食育",
+          "好き嫌い",
+          "子供の食事"
+        ]
+      },
+      {
+        "title": "子育てに自信が持てない時の思考の整え方",
+        "url": "https://note.com/cheeky_guppy1145/n/n2614af905b5b",
+        "keywords": [
+          "子育て",
+          "自信",
+          "不安",
+          "育児不安",
+          "自信がない",
+          "母親",
+          "親",
+          "比較",
+          "ちゃんとできない"
+        ]
+      },
+      {
+        "title": "頑張りすぎているお母さんへ",
+        "url": "https://note.com/cheeky_guppy1145/n/n2b08455a9f95",
+        "keywords": [
+          "母親",
+          "お母さん",
+          "頑張りすぎ",
+          "育児疲れ",
+          "ちゃんとしなきゃ",
+          "家事育児"
+        ]
+      },
+      {
+        "title": "自分を後回しにしてしまう原因と対処法",
+        "url": "https://note.com/cheeky_guppy1145/n/n258bcc443ac8",
+        "keywords": [
+          "後回し",
+          "自分",
+          "優先",
+          "自分を後回し",
+          "断れない",
+          "自分優先",
+          "我慢",
+          "予定",
+          "頼まれごと"
+        ]
+      },
+      {
+        "title": "歯医者が怖い人のための治療ガイド",
+        "url": "https://note.com/cheeky_guppy1145/n/ne9ecf6f9a0b6",
+        "keywords": [
+          "歯医者",
+          "怖い",
+          "治療",
+          "歯科",
+          "虫歯",
+          "痛い",
+          "予約",
+          "麻酔"
+        ]
+      },
+      {
+        "title": "視力が落ちる原因は目だけじゃない",
+        "url": "https://note.com/cheeky_guppy1145/n/n8e1a992f8131",
+        "keywords": [
+          "視力",
+          "目",
+          "健康",
+          "目が悪い",
+          "スマホ",
+          "目の疲れ",
+          "遠くが見えない",
+          "眼精疲労",
+          "目を守る"
+        ]
+      }
     ]
   },
-  travel: {
-    label: "日本旅行の不安を減らしたい",
-    tag: "Japan Travel",
-    tool: "en/japan-travel-tips.html",
-    lead: "日本語フレーズ、日常習慣、ルール・マナーなど、外国人旅行者向けの記事を探します。",
-    keywords: ["日本旅行", "旅行", "外国人", "日本語", "フレーズ", "マナー", "ルール", "電車", "ゴミ", "観光", "Japan", "travel"],
-    articles: [
-      { title: "日本旅行で気をつけること", url: "https://note.com/cheeky_guppy1145/n/nffd0836cbc05", keywords: ["日本旅行", "ルール", "マナー"] },
-      { title: "日常で役立つ知識", url: "https://note.com/cheeky_guppy1145/n/n435fc178ad69", keywords: ["日常", "知識", "役立つ"] }
+  "travel": {
+    "label": "日本旅行の不安を減らしたい",
+    "tag": "Japan Travel",
+    "tool": "en/japan-travel-tips.html",
+    "lead": "日本語フレーズ、日常習慣、ルール・マナーなど、外国人旅行者向けの記事を探します。",
+    "keywords": [
+      "日本旅行",
+      "旅行",
+      "外国人",
+      "日本語",
+      "フレーズ",
+      "マナー",
+      "ルール",
+      "電車",
+      "ゴミ",
+      "観光",
+      "Japan",
+      "travel",
+      "訪日",
+      "tourist",
+      "etiquette"
+    ],
+    "articles": [
+      {
+        "title": "日本旅行で気をつけること",
+        "url": "https://note.com/cheeky_guppy1145/n/nffd0836cbc05",
+        "keywords": [
+          "日本旅行",
+          "ルール",
+          "マナー",
+          "初めての日本",
+          "観光",
+          "Japan travel",
+          "日本ガイド",
+          "訪日"
+        ]
+      },
+      {
+        "title": "日常で役立つ知識",
+        "url": "https://note.com/cheeky_guppy1145/n/n435fc178ad69",
+        "keywords": [
+          "日常",
+          "知識",
+          "役立つ",
+          "日常で役立つ",
+          "暮らしの知識",
+          "便利",
+          "生活",
+          "チェックリスト"
+        ]
+      }
     ]
   }
 };
