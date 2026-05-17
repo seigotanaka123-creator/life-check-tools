@@ -267,14 +267,19 @@
       margin-top: 4px;
       accent-color: var(--accent);
     }
-    .choice strong { display: block; line-height: 1.45; }
+    .choice strong {
+      display: block;
+      padding: 0;
+      background: transparent;
+      line-height: 1.45;
+    }
     .choice span {
       display: block;
       width: 100%;
       margin-top: 7px;
       padding: 8px 10px;
       border-radius: 8px;
-      background: var(--soft-green);
+      background: #f6f3ec;
       color: #514c45;
       font-size: 13px;
       line-height: 1.6;
@@ -423,7 +428,7 @@
     .category-card em, .tool-card em { display: block; margin-top: 12px; color: var(--accent); font-style: normal; font-size: 13px; font-weight: 800; }
     .fortune {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) 190px auto;
       gap: 14px;
       align-items: center;
       margin-top: 14px;
@@ -431,6 +436,47 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
+    }
+    .fortune-reel {
+      display: grid;
+      min-height: 86px;
+      place-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f6f3ec;
+    }
+    .fortune-mass {
+      display: grid;
+      width: 100%;
+      min-height: 64px;
+      place-items: center;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 1px rgba(36, 35, 33, .06);
+      transform: translateY(0);
+      transition: transform .08s ease, background .08s ease, color .08s ease;
+    }
+    .fortune-mass.is-rolling {
+      transform: translateY(-2px) scale(1.02);
+    }
+    .fortune-mass.type-plus { background: #eef8f3; color: #22665b; }
+    .fortune-mass.type-minus { background: #fff0eb; color: #934832; }
+    .fortune-mass.type-card { background: #eef4fb; color: #3f668f; }
+    .fortune-mass.type-rest { background: #fff7e0; color: #8a6234; }
+    .fortune-mass.type-goal { background: #f3eefb; color: #69538f; }
+    .fortune-button-area {
+      display: grid;
+      gap: 8px;
+    }
+    .sound-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
     }
     .small-note { margin-top: 12px; color: var(--muted); font-size: 13px; }
     @media (max-width: 820px) {
@@ -508,7 +554,13 @@
         <strong id="fortuneTitle">今日のテーマを引いてみましょう</strong>
         <p id="fortuneText">迷ったら、おみくじから入るのもありです。結果から記事へ進めます。</p>
       </div>
-      <button class="button gold" id="fortuneButton" type="button">おみくじを引く</button>
+      <div class="fortune-reel" aria-live="polite">
+        <div class="fortune-mass type-rest" id="fortuneMass">待機マス</div>
+      </div>
+      <div class="fortune-button-area">
+        <button class="button gold" id="fortuneButton" type="button">おみくじを引く</button>
+        <span class="sound-note">音が鳴ります</span>
+      </div>
     </div>
     <div class="recommendations" id="fortuneResult"></div>
   </section>
@@ -1806,6 +1858,7 @@ const fortuneButton = document.getElementById("fortuneButton");
 const fortuneTitle = document.getElementById("fortuneTitle");
 const fortuneText = document.getElementById("fortuneText");
 const fortuneResult = document.getElementById("fortuneResult");
+const fortuneMass = document.getElementById("fortuneMass");
 
 function cardHtml(item) {
   return `<article class="rec-card">
@@ -1908,13 +1961,74 @@ function renderTools() {
   </a>`).join("");
 }
 
-function drawFortune() {
+const fortuneMasses = [
+  { label: "プラスマス", type: "type-plus", tone: 740 },
+  { label: "マイナスマス", type: "type-minus", tone: 360 },
+  { label: "カードマス", type: "type-card", tone: 620 },
+  { label: "休憩マス", type: "type-rest", tone: 520 },
+  { label: "目的地マス", type: "type-goal", tone: 820 }
+];
+
+let fortuneAudioContext;
+
+function playTone(frequency, duration = 0.06, volume = 0.035) {
+  try {
+    fortuneAudioContext = fortuneAudioContext || new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = fortuneAudioContext.createOscillator();
+    const gain = fortuneAudioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+    gain.gain.value = volume;
+    oscillator.connect(gain);
+    gain.connect(fortuneAudioContext.destination);
+    oscillator.start();
+    oscillator.stop(fortuneAudioContext.currentTime + duration);
+  } catch (error) {
+    // 音が使えない環境では、演出だけ動かします。
+  }
+}
+
+function setFortuneMass(mass, rolling = true) {
+  fortuneMass.className = `fortune-mass ${mass.type}${rolling ? " is-rolling" : ""}`;
+  fortuneMass.textContent = mass.label;
+  if (rolling) {
+    window.setTimeout(() => fortuneMass.classList.remove("is-rolling"), 70);
+  }
+}
+
+function wait(ms) {
+  return new Promise(resolve => window.setTimeout(resolve, ms));
+}
+
+async function drawFortune() {
+  fortuneButton.disabled = true;
+  fortuneButton.textContent = "抽選中";
+  fortuneResult.innerHTML = "";
+  fortuneTitle.textContent = "今日のテーマを抽選中です";
+  fortuneText.textContent = "マスが止まるまで、少しだけ待ってください。";
+
+  const rounds = 16 + Math.floor(Math.random() * 6);
+  for (let index = 0; index < rounds; index += 1) {
+    const mass = fortuneMasses[Math.floor(Math.random() * fortuneMasses.length)];
+    setFortuneMass(mass, true);
+    playTone(mass.tone, 0.045, 0.028);
+    await wait(65 + index * 9);
+  }
+
   const list = articleData;
   const item = list[Math.floor(Math.random() * list.length)];
   const cat = categories[item.category];
+  const finalMass = fortuneMasses.find(mass => mass.type === "type-goal") || fortuneMasses[0];
+  setFortuneMass(finalMass, false);
+  playTone(880, 0.09, 0.04);
+  await wait(90);
+  playTone(1040, 0.12, 0.035);
+
   fortuneTitle.textContent = `今日のテーマ：${cat.label}`;
   fortuneText.textContent = item.title;
   fortuneResult.innerHTML = cardHtml(item);
+  fortuneButton.disabled = false;
+  fortuneButton.textContent = "もう一度引く";
 }
 
 renderDiagnosisChoices();
