@@ -555,7 +555,7 @@
         <p id="fortuneText">迷ったら、おみくじから入るのもありです。結果から記事へ進めます。</p>
       </div>
       <div class="fortune-reel" aria-live="polite">
-        <div class="fortune-mass type-rest" id="fortuneMass">待機マス</div>
+        <div class="fortune-mass type-rest" id="fortuneMass">今日のテーマ</div>
       </div>
       <div class="fortune-button-area">
         <button class="button gold" id="fortuneButton" type="button">おみくじを引く</button>
@@ -1961,36 +1961,52 @@ function renderTools() {
   </a>`).join("");
 }
 
-const fortuneMasses = [
-  { label: "プラスマス", type: "type-plus", tone: 740 },
-  { label: "マイナスマス", type: "type-minus", tone: 360 },
-  { label: "カードマス", type: "type-card", tone: 620 },
-  { label: "休憩マス", type: "type-rest", tone: 520 },
-  { label: "目的地マス", type: "type-goal", tone: 820 }
-];
-
 let fortuneAudioContext;
 
-function playTone(frequency, duration = 0.06, volume = 0.035) {
+function playTone(frequency, duration = 0.06, volume = 0.035, type = "sine", delay = 0) {
   try {
     fortuneAudioContext = fortuneAudioContext || new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = fortuneAudioContext.createOscillator();
     const gain = fortuneAudioContext.createGain();
-    oscillator.type = "sine";
+    const start = fortuneAudioContext.currentTime + delay;
+    oscillator.type = type;
     oscillator.frequency.value = frequency;
-    gain.gain.value = volume;
+    gain.gain.setValueAtTime(volume, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
     oscillator.connect(gain);
     gain.connect(fortuneAudioContext.destination);
-    oscillator.start();
-    oscillator.stop(fortuneAudioContext.currentTime + duration);
+    oscillator.start(start);
+    oscillator.stop(start + duration);
   } catch (error) {
     // 音が使えない環境では、演出だけ動かします。
   }
 }
 
-function setFortuneMass(mass, rolling = true) {
-  fortuneMass.className = `fortune-mass ${mass.type}${rolling ? " is-rolling" : ""}`;
-  fortuneMass.textContent = mass.label;
+function playRollSound(step) {
+  const base = 420 + (step % 5) * 55;
+  playTone(base, 0.035, 0.025, "square");
+}
+
+function playResultSound() {
+  playTone(660, 0.08, 0.045, "triangle", 0);
+  playTone(880, 0.1, 0.04, "triangle", 0.08);
+  playTone(1170, 0.14, 0.035, "sine", 0.18);
+}
+
+function setFortuneMass(label, categoryKey = "life", rolling = true) {
+  const typeMap = {
+    mind: "type-rest",
+    work: "type-card",
+    money: "type-minus",
+    life: "type-plus",
+    appearance: "type-goal",
+    output: "type-card",
+    growth: "type-goal",
+    parenting: "type-rest",
+    travel: "type-plus"
+  };
+  fortuneMass.className = `fortune-mass ${typeMap[categoryKey] || "type-rest"}${rolling ? " is-rolling" : ""}`;
+  fortuneMass.textContent = label;
   if (rolling) {
     window.setTimeout(() => fortuneMass.classList.remove("is-rolling"), 70);
   }
@@ -2009,20 +2025,19 @@ async function drawFortune() {
 
   const rounds = 16 + Math.floor(Math.random() * 6);
   for (let index = 0; index < rounds; index += 1) {
-    const mass = fortuneMasses[Math.floor(Math.random() * fortuneMasses.length)];
-    setFortuneMass(mass, true);
-    playTone(mass.tone, 0.045, 0.028);
+    const rollingItem = articleData[Math.floor(Math.random() * articleData.length)];
+    const rollingCat = categories[rollingItem.category];
+    setFortuneMass(rollingCat.label, rollingItem.category, true);
+    playRollSound(index);
     await wait(65 + index * 9);
   }
 
   const list = articleData;
   const item = list[Math.floor(Math.random() * list.length)];
   const cat = categories[item.category];
-  const finalMass = fortuneMasses.find(mass => mass.type === "type-goal") || fortuneMasses[0];
-  setFortuneMass(finalMass, false);
-  playTone(880, 0.09, 0.04);
+  setFortuneMass(cat.label, item.category, false);
+  playResultSound();
   await wait(90);
-  playTone(1040, 0.12, 0.035);
 
   fortuneTitle.textContent = `今日のテーマ：${cat.label}`;
   fortuneText.textContent = item.title;
