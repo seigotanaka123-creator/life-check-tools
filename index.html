@@ -254,10 +254,32 @@
       background: linear-gradient(135deg, #ffffff 0%, #f8f6ef 100%);
     }
     .panel.intro-panel {
+      margin: 10px 0 18px;
+      padding: 15px 18px;
       border-color: rgba(154, 91, 66, .18);
-      background: linear-gradient(135deg, #ffffff 0%, #fffaf6 100%);
+      border-style: dashed;
+      background: #fffdf9;
+      box-shadow: none;
     }
-    .panel.intro-panel::before { background: var(--accent-2); }
+    .panel.intro-panel::before { display: none; }
+    .panel.intro-panel h2 {
+      margin-bottom: 7px;
+      color: #8f4f39;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    .panel.intro-panel > p {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #4d4942;
+      font-size: 13.5px;
+      line-height: 1.85;
+    }
+    .panel.intro-panel > p + p {
+      margin-top: 5px;
+    }
     .panel.tools-panel {
       border-style: dashed;
       background: #fff;
