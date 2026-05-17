@@ -570,6 +570,49 @@
       display: grid;
       gap: 8px;
     }
+    .fortune-result-box {
+      margin-top: 14px;
+      padding: 14px;
+      border: 2px solid rgba(202, 140, 58, .42);
+      border-radius: 8px;
+      background: #fff9e8;
+      box-shadow: 0 12px 28px rgba(102, 72, 34, .12);
+      animation: resultPop .28s ease both;
+    }
+    .fortune-result-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #8a6234;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .fortune-result-label::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f7d46b;
+      box-shadow: 0 0 0 3px rgba(247, 212, 107, .28);
+    }
+    .fortune-result-box .recommendations {
+      margin-top: 0;
+    }
+    @keyframes resultPop {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
     .sound-note {
       color: var(--muted);
       font-size: 12px;
@@ -2151,7 +2194,10 @@ async function drawFortune() {
 
   fortuneTitle.textContent = `今日のテーマ：${cat.label}`;
   fortuneText.textContent = item.title;
-  fortuneResult.innerHTML = cardHtml(item);
+  fortuneResult.innerHTML = `<div class="fortune-result-box">
+    <div class="fortune-result-label">抽選結果：この記事がおすすめです</div>
+    <div class="recommendations">${cardHtml(item)}</div>
+  </div>`;
   fortuneButton.disabled = false;
   fortuneButton.textContent = "もう一度引く";
 }
