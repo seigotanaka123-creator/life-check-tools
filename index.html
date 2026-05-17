@@ -268,7 +268,18 @@
       accent-color: var(--accent);
     }
     .choice strong { display: block; line-height: 1.45; }
-    .choice span { display: block; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .choice span {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      margin-top: 7px;
+      padding: 5px 9px;
+      border-radius: 8px;
+      background: rgba(47, 111, 100, .08);
+      color: #565149;
+      font-size: 13px;
+      line-height: 1.6;
+    }
     .result {
       display: none;
       margin-top: 18px;
