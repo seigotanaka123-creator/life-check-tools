@@ -258,7 +258,7 @@
     }
     .choice:hover, .choice:has(input:checked) {
       border-color: rgba(47, 111, 100, .55);
-      background: var(--soft-green);
+      background: #fff;
       transform: translateY(-1px);
     }
     .choice input {
@@ -270,13 +270,12 @@
     .choice strong { display: block; line-height: 1.45; }
     .choice span {
       display: block;
-      width: fit-content;
-      max-width: 100%;
+      width: 100%;
       margin-top: 7px;
-      padding: 5px 9px;
+      padding: 8px 10px;
       border-radius: 8px;
-      background: rgba(47, 111, 100, .08);
-      color: #565149;
+      background: var(--soft-green);
+      color: #514c45;
       font-size: 13px;
       line-height: 1.6;
     }
@@ -313,7 +312,15 @@
       font-weight: 800;
     }
     .rec-card strong { display: block; line-height: 1.45; }
-    .rec-card p { margin: 6px 0 12px; font-size: 13px; line-height: 1.65; }
+    .rec-card p {
+      margin: 8px 0 12px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #f6f3ec;
+      color: #514c45;
+      font-size: 13px;
+      line-height: 1.65;
+    }
     .rec-links { display: flex; flex-wrap: wrap; gap: 8px; }
     .mini-link {
       display: inline-flex;
@@ -394,7 +401,16 @@
       font-weight: 800;
     }
     .category-card strong, .tool-card strong { display: block; margin-bottom: 7px; font-size: 17px; line-height: 1.45; }
-    .category-card span, .tool-card span { display: block; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .category-card span, .tool-card span {
+      display: block;
+      margin-top: 8px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #f6f3ec;
+      color: #514c45;
+      font-size: 13px;
+      line-height: 1.65;
+    }
     .category-card em, .tool-card em { display: block; margin-top: 12px; color: var(--accent); font-style: normal; font-size: 13px; font-weight: 800; }
     .fortune {
       display: grid;
