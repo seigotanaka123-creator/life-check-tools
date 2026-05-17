@@ -663,15 +663,39 @@
       background: var(--illust-sub, #f0c28d);
       opacity: .42;
     }
-    .fortune-illustration span {
-      left: 27px;
-      top: 25px;
-      width: 48px;
-      height: 48px;
-      border: 8px solid var(--illust-main, #c96a4a);
-      border-top-color: transparent;
-      transform: rotate(-22deg);
-      opacity: .86;
+    .fortune-illustration .illust-icon {
+      left: 50%;
+      top: 29px;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border: 4px solid var(--illust-main, #c96a4a);
+      border-radius: 18px;
+      background: #fffdf8;
+      color: var(--illust-main, #c96a4a);
+      font-size: 25px;
+      font-weight: 900;
+      line-height: 1;
+      transform: translateX(-50%) rotate(-4deg);
+      box-shadow: 0 8px 16px rgba(80, 61, 38, .12);
+      opacity: 1;
+      z-index: 2;
+    }
+    .fortune-illustration .illust-label {
+      left: 10px;
+      right: 10px;
+      bottom: 18px;
+      display: block;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: var(--illust-main, #c96a4a);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.35;
+      text-align: center;
+      z-index: 2;
     }
     .fortune-illustration.fortune-mind { --illust-main: #7c6f9e; --illust-sub: #d9d3ef; }
     .fortune-illustration.fortune-work { --illust-main: #4d7891; --illust-sub: #cfe3ed; }
@@ -2105,6 +2129,43 @@ function cardHtml(item) {
   </article>`;
 }
 
+function articleVisual(item) {
+  const title = item.title;
+  const rules = [
+    [/日焼け|紫外線/, ["日", "日焼け"]],
+    [/色|配色/, ["色", "色選び"]],
+    [/ワンピース|服選び|服/, ["服", "服選び"]],
+    [/髪型|髪/, ["髪", "髪型"]],
+    [/アクセサリー|手元/, ["飾", "アクセ"]],
+    [/骨格/, ["骨", "骨格"]],
+    [/会いたい|人間関係/, ["会", "関係"]],
+    [/花見|桜/, ["花", "花見"]],
+    [/プレゼント/, ["贈", "贈り物"]],
+    [/下着|インナー/, ["肌", "快適"]],
+    [/週末|金曜日/, ["金", "週末"]],
+    [/気温|暑い|寒い/, ["温", "気温"]],
+    [/疲れ|しんどい|休/, ["休", "休息"]],
+    [/睡眠|眠/, ["眠", "睡眠"]],
+    [/朝日|朝/, ["朝", "朝の整え"]],
+    [/幸せ|満たされる|寂しい|一人ご飯|推し活/, ["心", "気持ち"]],
+    [/お金|出費|買い替え|高額|買い物/, ["¥", "買い物"]],
+    [/環境問題|環境/, ["環", "環境"]],
+    [/温泉|お風呂|入浴/, ["湯", "お風呂"]],
+    [/実家|暮らし|部屋|収納|掃除|断捨離|無印|料理|引っ越し/, ["家", "暮らし"]],
+    [/AI|ＡＩ/, ["AI", "AI活用"]],
+    [/自分時間|散歩|パン|自然栽培|価値観|経験|目的|やりたいこと|朝ドラ|大谷|限界|やる気|継続|考えすぎ/, ["整", "整える"]],
+    [/子供|子育て|母親|お母さん|偏食/, ["親", "子育て"]],
+    [/歯医者|歯/, ["歯", "歯医者"]],
+    [/視力|目/, ["目", "視力"]],
+    [/本|note|書く|発信|投稿|運営|募集|活動休止/, ["書", "発信"]],
+    [/面接|転職|仕事|リーダー|チーム|リピーター|お店|参加者/, ["仕", "仕事"]],
+    [/日本旅行|日本語|外国人|マナー|ルール/, ["旅", "日本旅行"]]
+  ];
+  const match = rules.find(([pattern]) => pattern.test(title));
+  const [icon, label] = match ? match[1] : ["整", categories[item.category]?.label || "整える"];
+  return { icon, label };
+}
+
 function renderDiagnosisChoices() {
   diagnosisChoices.innerHTML = diagnosisQuestions.map(q => `<label class="choice">
     <input type="checkbox" value="${q.type}">
@@ -2276,13 +2337,17 @@ async function drawFortune() {
   playResultSound();
   await wait(90);
 
+  const visual = articleVisual(item);
   fortuneTitle.textContent = `今日のテーマ：${cat.label}`;
   fortuneText.textContent = item.title;
   fortuneResult.innerHTML = `<div class="fortune-result-box">
     <div class="fortune-result-label">抽選結果：この記事がおすすめです</div>
     <div class="fortune-pick">
       ${cardHtml(item)}
-      <div class="fortune-illustration fortune-${item.category}" aria-hidden="true"><span></span></div>
+      <div class="fortune-illustration fortune-${item.category}" aria-hidden="true">
+        <span class="illust-icon">${visual.icon}</span>
+        <span class="illust-label">${visual.label}</span>
+      </div>
     </div>
   </div>`;
   fortuneButton.disabled = false;
