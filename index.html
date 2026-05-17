@@ -283,12 +283,21 @@
       display: none;
       margin-top: 18px;
       padding: 18px;
-      border: 1px solid rgba(47, 111, 100, .2);
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: linear-gradient(135deg, #f6fbf8, #ffffff 72%);
+      background: #fff;
     }
     .result.is-visible { display: block; }
     .result-title { margin: 0 0 6px; font-size: 22px; font-weight: 900; }
+    .result > p, .fortune p {
+      margin: 8px 0 12px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #f6f3ec;
+      color: #514c45;
+      font-size: 13px;
+      line-height: 1.65;
+    }
     .recommendations {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -419,9 +428,9 @@
       align-items: center;
       margin-top: 14px;
       padding: 16px;
-      border: 1px solid rgba(154, 91, 66, .22);
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: linear-gradient(135deg, #fff8e8, #ffffff 76%);
+      background: #fff;
     }
     .small-note { margin-top: 12px; color: var(--muted); font-size: 13px; }
     @media (max-width: 820px) {
