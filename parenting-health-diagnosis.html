@@ -1,3 +1,418 @@
-<!DOCTYPE html><html lang="ja"><head><script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QKD3PTLJSQ');</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>子育てと健康の不安整理診断 | 偏食・自分のケアを考える無料ツール</title><meta name="description" content="子どもの偏食、子育ての不安、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探せる無料診断です。"><link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/parenting-health-diagnosis.html"><meta property="og:type" content="website"><meta property="og:site_name" content="暮らし診断ツール"><meta property="og:title" content="子育てと健康の不安整理診断 | 偏食・自分のケアを考える無料ツール"><meta property="og:description" content="子どもの偏食、子育ての不安、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探せる無料診断です。"><meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/parenting-health-diagnosis.html"><meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="子育てと健康の不安整理診断 | 偏食・自分のケアを考える無料ツール"><meta name="twitter:description" content="子どもの偏食、子育ての不安、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探せる無料診断です。"><meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-spending-type-diagnosis.png"><link rel="stylesheet" href="diagnosis-common.css"></head><body><header><a href="index.html">← 診断一覧へ戻る</a><h1 id="title"></h1><p id="lead" class="lead"></p></header><main><div class="progress"><span id="progressBar"></span></div><section id="quiz" class="question"><h2 id="questionText"></h2><div id="choices"></div><div class="actions"><button id="backButton" class="button secondary" type="button">戻る</button><button id="nextButton" class="button" type="button" disabled>次へ</button></div></section><section id="result" class="result"><h2 id="resultTitle"></h2><p id="resultLead"></p><div class="box"><strong>まず試したいこと</strong><div id="resultAction"></div></div><div class="box"><strong>おすすめ記事</strong><ul id="resultArticles" class="article-list"></ul></div><div class="actions"><a id="noteLink" class="button" href="https://note.com/cheeky_guppy1145">noteで記事を探す</a><button id="restartButton" class="button secondary" type="button">もう一度診断する</button></div></section></main><script>
-window.DIAGNOSIS_CONFIG={pageTitle:"子育てと健康の不安整理診断 | 偏食・自分のケアを考える無料ツール",description:"子どもの偏食、子育ての不安、自分を後回しにする悩み、歯医者や視力の不安に近い記事を探せる無料診断です。",title:"子育てと健康の不安整理診断",lead:"子育てや健康まわりの不安に近い答えを選ぶと、今読むとよさそうな記事に振り分けます。",results:{child:{title:"子どもの悩み整理タイプ",lead:"子どものことが気になって、考えすぎてしまいやすい状態かもしれません。",action:"正解を急がず、今困っている場面を1つに絞って整理しましょう。",articles:["子供の偏食が気になる人へ","子育てに自信が持てない人のため、思考の整え方。"]},mother:{title:"自分を後回しにしやすいタイプ",lead:"家族や周囲を優先しすぎて、自分のケアが後ろに回っていそうです。",action:"自分のための休みや食事を、予定として扱ってみましょう。",articles:["頑張りすぎている母親のための、やさしい考え方。","自分を後回しにしてしまう人へ"]},dental:{title:"治療不安をやさしく整えるタイプ",lead:"不安の正体を知ることで、少し安心しやすいタイプです。",action:"怖い理由を言葉にして、相談できることを1つ決めましょう。",articles:["歯医者が怖い人のための優しい歯の治療ガイド"]},eyes:{title:"体のサインを見直すタイプ",lead:"不調を一つの原因だけで見ず、生活全体から整えるとよさそうです。",action:"目、姿勢、睡眠、環境の中で変えられることを1つ選びましょう。",articles:["視力が落ちるのは「目のせい」だけじゃない。"]}},questions:[{text:"今一番近い不安は？",choices:[{label:"子どもの食事や子育て",scores:{child:4}},{label:"自分を後回しにしている",scores:{mother:4}},{label:"歯医者や治療が怖い",scores:{dental:4}},{label:"視力や体の変化が気になる",scores:{eyes:4}}]},{text:"ほしいものは？",choices:[{label:"考え方の整理",scores:{child:3}},{label:"自分へのやさしさ",scores:{mother:3}},{label:"不安を減らす情報",scores:{dental:3}},{label:"生活から見直す視点",scores:{eyes:3}}]},{text:"今できそうなのは？",choices:[{label:"困りごとを1つに絞る",scores:{child:3}},{label:"自分の時間を取る",scores:{mother:3}},{label:"怖い理由を書き出す",scores:{dental:3}},{label:"環境を1つ変える",scores:{eyes:3}}]}]};
-</script><script src="diagnosis-common.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QKD3PTLJSQ');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>子育て・健康の悩み記事診断 | 偏食・育児不安・歯医者・視力の記事を探す</title>
+  <meta name="description" content="子育てに自信がない、子どもの偏食で悩む、頑張りすぎる母親、自分を後回しにする、歯医者が怖い、視力が落ちる不安に合う記事を探せる無料診断です。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/parenting-health-diagnosis.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="One Coin Books お悩み案内所">
+  <meta property="og:title" content="子育て・健康の悩み記事診断">
+  <meta property="og:description" content="子育て、偏食、自分を後回し、歯医者、視力。今の不安に合う記事を探せる無料診断です。">
+  <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/parenting-health-diagnosis.html">
+  <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="子育て・健康の悩み記事診断">
+  <meta name="twitter:description" content="子育てや健康の不安に合う記事を探せる無料診断です。">
+  <meta name="twitter:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "子育て・健康の悩み記事診断",
+    "description": "子育てに自信がない、子どもの偏食で悩む、頑張りすぎる母親、自分を後回しにする、歯医者が怖い、視力が落ちる不安に合う記事を探せる無料診断です。",
+    "url": "https://seigotanaka123-creator.github.io/life-check-tools/parenting-health-diagnosis.html",
+    "inLanguage": "ja",
+    "about": [
+      { "@type": "Thing", "name": "子育ての不安" },
+      { "@type": "Thing", "name": "子どもの偏食" },
+      { "@type": "Thing", "name": "自分を後回し" },
+      { "@type": "Thing", "name": "歯医者が怖い" },
+      { "@type": "Thing", "name": "視力低下" }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --paper: #ffffff;
+      --ink: #26342f;
+      --muted: #647067;
+      --line: #e6ded3;
+      --blue: #526d8d;
+      --blue-soft: #f1f6fb;
+      --terracotta: #b45f45;
+      --terracotta-soft: #fff5ef;
+      --green: #2f6f64;
+      --green-soft: #eef7f2;
+      --shadow: 0 18px 48px rgba(69, 59, 45, .09);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top right, #f1f6fb 0, transparent 34%), var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic", "Yu Gothic UI", "Hiragino Sans", Meiryo, sans-serif;
+      line-height: 1.8;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    header, main, footer {
+      width: min(100% - 32px, 980px);
+      margin: 0 auto;
+    }
+    header { padding: 30px 0 14px; }
+    .back {
+      display: inline-flex;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f1f6fb 56%, #eef7f2 100%);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: clamp(24px, 5vw, 48px);
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 13px;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(28px, 6vw, 48px);
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 0;
+      color: #405048;
+      font-weight: 700;
+      font-size: clamp(16px, 2.8vw, 19px);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .button.secondary {
+      background: #fff;
+      color: var(--green);
+      border: 1px solid #bfd8ce;
+    }
+    section {
+      margin: 22px 0;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: clamp(18px, 4vw, 30px);
+      box-shadow: 0 10px 30px rgba(69, 59, 45, .06);
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(22px, 4vw, 30px);
+      line-height: 1.35;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .note {
+      margin: 10px 0 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f8f4ed;
+      color: #38463f;
+      font-weight: 700;
+    }
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .choice {
+      width: 100%;
+      border: 1px solid #d7c8b8;
+      border-radius: 14px;
+      background: #fffdf9;
+      color: var(--ink);
+      padding: 18px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      font: inherit;
+    }
+    .choice:hover, .choice:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--blue);
+      box-shadow: 0 12px 24px rgba(82, 109, 141, .14);
+      outline: none;
+    }
+    .choice strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .choice span {
+      display: inline-block;
+      max-width: max-content;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--green-soft);
+      color: #3c554e;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .result {
+      display: none;
+      margin-top: 18px;
+      border: 2px solid var(--terracotta);
+      border-radius: 16px;
+      background: var(--terracotta-soft);
+      padding: 20px;
+    }
+    .result.show { display: block; }
+    .result-label {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--terracotta);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .article-card {
+      display: block;
+      border: 1px solid #d4deeb;
+      border-radius: 14px;
+      background: #fff;
+      padding: 16px;
+      text-decoration: none;
+    }
+    .article-card strong {
+      display: block;
+      color: var(--blue);
+      line-height: 1.55;
+    }
+    .article-card span {
+      display: inline-block;
+      max-width: max-content;
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: #f8f4ed;
+      color: #48534d;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fffdf9;
+    }
+    .mini-card p {
+      display: inline-block;
+      max-width: max-content;
+      margin: 8px 0 0;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: var(--blue-soft);
+      color: #445266;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    footer {
+      padding: 28px 0 44px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 720px) {
+      .choices, .articles, .grid { grid-template-columns: 1fr; }
+      header, main, footer { width: min(100% - 22px, 980px); }
+      .hero, section { border-radius: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="index.html">← お悩み案内所に戻る</a>
+    <div class="hero">
+      <span class="eyebrow">無料診断</span>
+      <h1>子育て・健康の悩み記事診断</h1>
+      <p class="lead">子育てに自信がない、子どもの偏食で悩む、自分を後回しにしている、歯医者や視力が不安。今の悩みに近い入口から、読む記事を選べます。</p>
+      <div class="hero-actions">
+        <a class="button" href="#diagnosis">診断を始める</a>
+        <a class="button secondary" href="#articles">おすすめ記事を見る</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>このページでできること</h2>
+      <p class="note">子育てや健康の不安を、子ども・自分の余裕・日常のケア・治療への不安に分けて整理します。今の状態に近い記事へ進めます。</p>
+    </section>
+
+    <section id="diagnosis">
+      <h2>今の悩みはどれに近いですか？</h2>
+      <p class="note">一番近いものを1つ選んでください。すぐに今読むとよい記事が表示されます。</p>
+      <div class="choices">
+        <button class="choice" type="button" data-type="parenting">
+          <strong>子育てに自信がない</strong>
+          <span>ちゃんとできているか不安</span>
+        </button>
+        <button class="choice" type="button" data-type="food">
+          <strong>子どもの食事で悩んでいる</strong>
+          <span>偏食や食べないことが気になる</span>
+        </button>
+        <button class="choice" type="button" data-type="self">
+          <strong>自分を後回しにしている</strong>
+          <span>頑張りすぎて余裕がない</span>
+        </button>
+        <button class="choice" type="button" data-type="health">
+          <strong>健康や治療が不安</strong>
+          <span>歯医者・視力・体の不安がある</span>
+        </button>
+      </div>
+
+      <div class="result" id="result" aria-live="polite">
+        <span class="result-label">診断結果：この記事がおすすめです</span>
+        <h3 id="resultTitle"></h3>
+        <p id="resultText"></p>
+        <div class="articles" id="resultArticles"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>不安が強くなる時に起きやすいこと</h2>
+      <div class="grid">
+        <div class="mini-card">
+          <h3>正解を探しすぎる</h3>
+          <p>子育てや健康は正解が見えにくく、考えるほど不安が増えることがあります。</p>
+        </div>
+        <div class="mini-card">
+          <h3>自分を責める</h3>
+          <p>できていない部分ばかり見ると、すでにできていることが見えなくなります。</p>
+        </div>
+        <div class="mini-card">
+          <h3>怖さを放置する</h3>
+          <p>歯医者や体の不安は、分からないままにすると動きにくくなります。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="articles">
+      <h2>子育て・健康の不安に役立つ記事</h2>
+      <div class="articles">
+        <a class="article-card" href="https://note.com/cheeky_guppy1145/n/n2614af905b5b"><strong>子育てに自信が持てない人のため、思考の整え方。</strong><span>子育ての不安を整理したい時に。</span></a>
+        <a class="article-card" href="https://note.com/cheeky_guppy1145/n/na446a2d94699"><strong>子供の偏食が気になる人へ</strong><span>食事の悩みをやさしく整えたい時に。</span></a>
+        <a class="article-card" href="https://note.com/cheeky_guppy1145/n/n2b08455a9f95"><strong>頑張りすぎている母親のための、やさしい考え方。</strong><span>余裕がなくなっている時に。</span></a>
+        <a class="article-card" href="https://note.com/cheeky_guppy1145/n/ne9ecf6f9a0b6"><strong>歯医者が怖い人のための優しい歯の治療ガイド</strong><span>歯医者への不安を軽くしたい時に。</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>One Coin Books お悩み案内所</p>
+  </footer>
+
+  <script>
+    const data = {
+      parenting: {
+        title: "子育てに自信がない時は、正解探しよりもできていることを拾うのがおすすめです。",
+        text: "不安は向き合っている証拠でもあります。完璧ではなく、今できていることに目を向けると少し楽になります。",
+        articles: [
+          ["子育てに自信が持てない人のため、思考の整え方。", "https://note.com/cheeky_guppy1145/n/n2614af905b5b", "子育ての不安を整理したい時に。"],
+          ["頑張りすぎている母親のための、やさしい考え方。", "https://note.com/cheeky_guppy1145/n/n2b08455a9f95", "ちゃんとしなきゃが苦しい時に。"]
+        ]
+      },
+      food: {
+        title: "子どもの食事で悩む時は、食べさせるより安心して触れられる環境づくりが先です。",
+        text: "偏食はすぐ直すものではなく、少しずつ整えていくものです。食事の空気を軽くすることから始められます。",
+        articles: [
+          ["子供の偏食が気になる人へ", "https://note.com/cheeky_guppy1145/n/na446a2d94699", "偏食や食べない悩みを整えたい時に。"],
+          ["子育てに自信が持てない人のため、思考の整え方。", "https://note.com/cheeky_guppy1145/n/n2614af905b5b", "親側の不安も一緒に整理したい時に。"]
+        ]
+      },
+      self: {
+        title: "自分を後回しにしている時は、優しさではなく順番を整えるのがおすすめです。",
+        text: "自分を少し先に置くことは、わがままではありません。長く安定して過ごすための整え方です。",
+        articles: [
+          ["自分を後回しにしてしまう人へ", "https://note.com/cheeky_guppy1145/n/n258bcc443ac8", "自分の順番を整えたい時に。"],
+          ["頑張りすぎている母親のための、やさしい考え方。", "https://note.com/cheeky_guppy1145/n/n2b08455a9f95", "無理を減らしたい時に。"]
+        ]
+      },
+      health: {
+        title: "健康や治療が不安な時は、怖さをなくすより扱える大きさにするのが先です。",
+        text: "分からないことが多いほど不安は強くなります。少し知って、少し準備するだけでも動きやすくなります。",
+        articles: [
+          ["歯医者が怖い人のための優しい歯の治療ガイド", "https://note.com/cheeky_guppy1145/n/ne9ecf6f9a0b6", "歯医者への不安を軽くしたい時に。"],
+          ["視力が落ちるのは「目のせい」だけじゃない。", "https://note.com/cheeky_guppy1145/n/n8e1a992f8131", "目の使い方や生活習慣を見直したい時に。"]
+        ]
+      }
+    };
+
+    const result = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const resultArticles = document.getElementById("resultArticles");
+
+    document.querySelectorAll(".choice").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = data[button.dataset.type];
+        resultTitle.textContent = item.title;
+        resultText.textContent = item.text;
+        resultArticles.innerHTML = item.articles.map(([title, href, text]) => (
+          `<a class="article-card" href="${href}"><strong>${title}</strong><span>${text}</span></a>`
+        )).join("");
+        result.classList.add("show");
+        result.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  </script>
+</body>
+</html>
