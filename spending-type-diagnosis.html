@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -112,66 +112,65 @@
 
     .choices {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 12px;
+      margin-top: 16px;
+      counter-reset: choice;
     }
-
     .choice {
+      position: relative;
       width: 100%;
-      min-height: 84px;
-      padding: 14px 16px;
-      border: 1px solid var(--line);
+      min-height: 116px;
+      padding: 16px 16px 15px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-left: 5px solid rgba(47, 111, 100, .26);
       border-radius: 8px;
-      background: #fff;
-      color: var(--text);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 8px 18px rgba(69, 59, 45, .04);
+      color: var(--ink);
       text-align: left;
       font: inherit;
       cursor: pointer;
+      transition: border-color .18s ease, border-left-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+      counter-increment: choice;
     }
-
-    .choice:hover,
+    .choice::after {
+      content: counter(choice);
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: rgba(47, 111, 100, .16);
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .choice:hover, .choice:focus-visible {
+      border-color: rgba(47, 111, 100, .45);
+      border-left-color: rgba(47, 111, 100, .78);
+      box-shadow: 0 14px 30px rgba(69, 59, 45, .08);
+      transform: translateY(-2px);
+      outline: none;
+    }
+    .choice strong {
+      display: block;
+      margin-bottom: 7px;
+      padding-right: 28px;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    .choice span {
+      display: block;
+      color: #5b625d;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
     .choice.is-selected {
-      border-color: var(--accent);
-      background: #f6efe6;
+      border-color: rgba(47, 111, 100, .68);
+      border-left-color: var(--green, #2f6f64);
+      background: var(--green-soft, #eef7f2);
+      box-shadow: 0 14px 30px rgba(47, 111, 100, .12);
+      transform: translateY(-1px);
     }
-
-    .nav {
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 22px;
-    }
-
-    button.action,
-    a.action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 10px 18px;
-      border: 1px solid var(--accent);
-      border-radius: 8px;
-      background: var(--accent);
-      color: #fff;
-      font: inherit;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    button.secondary,
-    a.secondary {
-      background: #fff;
-      color: var(--accent-dark);
-      border-color: var(--line);
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
     .result {
       display: none;
       border-top: 1px solid var(--line);
@@ -606,6 +605,7 @@
 </script>
 </body>
 </html>
+
 
 
 
