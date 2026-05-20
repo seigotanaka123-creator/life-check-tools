@@ -507,30 +507,57 @@ a.article-card strong::after {
 }
 
 article.purpose-card {
+  min-height: 0;
   justify-content: flex-start;
-  background: #f7f5ef;
+  padding: 15px 16px 16px;
+  border-color: rgba(47, 111, 100, .16);
+  border-left: 4px solid rgba(47, 111, 100, .36);
+  background: rgba(255, 255, 255, .86);
   box-shadow: none;
   cursor: default;
 }
 
 article.purpose-card span {
+  margin-bottom: 10px;
   background: var(--soft);
   color: var(--accent);
 }
 
+article.purpose-card strong {
+  margin-bottom: 7px;
+  font-size: 16px;
+}
+
+article.purpose-card em {
+  color: #514e49;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
 article.purpose-card:hover {
-  border-color: var(--line);
+  border-color: rgba(47, 111, 100, .16);
+  border-left-color: rgba(47, 111, 100, .36);
   box-shadow: none;
 }
 
 article.article-card {
-  background: #f7f5ef;
+  background: rgba(255, 255, 255, .9);
   box-shadow: none;
   cursor: default;
 }
 
 article.article-card div {
-  border-left: 4px solid rgba(47, 111, 100, .28);
+  border-left: 4px solid rgba(47, 111, 100, .30);
+}
+
+article.article-card strong {
+  font-size: 16px;
+}
+
+article.article-card span {
+  color: #514e49;
+  font-size: 14px;
+  line-height: 1.75;
 }
 
 article.article-card:hover {
@@ -565,5 +592,6 @@ article.article-card:hover {
     margin-top: 2px;
   }
 }
+
 
 
