@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #fbfaf7;
   --paper: #ffffff;
   --text: #242321;
@@ -208,7 +208,7 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   text-decoration: none;
   box-shadow: 0 10px 24px rgba(47, 44, 38, .04);
 }
-.purpose-card:hover {
+a.purpose-card:hover {
   border-color: rgba(47, 111, 100, .55);
   box-shadow: var(--shadow);
 }
@@ -348,7 +348,7 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
 .article-card div {
   padding: 14px 16px 16px;
 }
-.article-card:hover {
+a.article-card:hover {
   border-color: rgba(47, 111, 100, .55);
   box-shadow: var(--shadow);
 }
@@ -493,6 +493,50 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
   text-decoration: none;
 }
 .small-note { color: var(--muted); font-size: 13px; }
+/* Clickable guide cards and read-only explanation cards must look different. */
+a.purpose-card,
+a.article-card {
+  cursor: pointer;
+}
+
+a.purpose-card strong::after,
+a.article-card strong::after {
+  content: " →";
+  color: var(--accent);
+  font-weight: 700;
+}
+
+article.purpose-card {
+  justify-content: flex-start;
+  background: #f7f5ef;
+  box-shadow: none;
+  cursor: default;
+}
+
+article.purpose-card span {
+  background: var(--soft);
+  color: var(--accent);
+}
+
+article.purpose-card:hover {
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+article.article-card {
+  background: #f7f5ef;
+  box-shadow: none;
+  cursor: default;
+}
+
+article.article-card div {
+  border-left: 4px solid rgba(47, 111, 100, .28);
+}
+
+article.article-card:hover {
+  border-color: var(--line);
+  box-shadow: none;
+}
 @media (max-width: 900px) {
   header,
   main {
@@ -521,3 +565,5 @@ h1, .lead, .card strong, .card span, .article-card strong, .article-card span {
     margin-top: 2px;
   }
 }
+
+
