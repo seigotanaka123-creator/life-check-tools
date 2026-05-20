@@ -386,37 +386,62 @@
     .panel p:not(.small-note) { color: #565149; }
     .diagnosis-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
-      gap: 10px;
-      margin-top: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+      counter-reset: diagnosis;
     }
     .choice {
+      position: relative;
       display: grid;
-      grid-template-columns: 24px minmax(0, 1fr);
-      gap: 11px;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 12px;
       align-items: start;
-      padding: 14px;
-      border: 1px solid var(--line);
+      min-height: 126px;
+      padding: 16px 16px 15px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-left: 5px solid rgba(47, 111, 100, .22);
       border-radius: 8px;
-      background: #fff;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 8px 18px rgba(47, 44, 38, .04);
       cursor: pointer;
-      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
+      counter-increment: diagnosis;
     }
-    .choice:hover, .choice:has(input:checked) {
-      border-color: rgba(47, 111, 100, .55);
-      background: #fff;
+    .choice::after {
+      content: counter(diagnosis);
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      color: rgba(47, 111, 100, .16);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .choice:hover {
+      border-color: rgba(47, 111, 100, .42);
+      border-left-color: rgba(47, 111, 100, .72);
+      box-shadow: 0 14px 30px rgba(47, 44, 38, .08);
+      transform: translateY(-2px);
+    }
+    .choice:has(input:checked) {
+      border-color: rgba(47, 111, 100, .58);
+      border-left-color: var(--accent);
+      background: #f3fbf7;
+      box-shadow: 0 14px 30px rgba(47, 111, 100, .12);
       transform: translateY(-1px);
     }
     .choice input {
-      width: 20px;
-      height: 20px;
-      margin-top: 4px;
+      width: 21px;
+      height: 21px;
+      margin-top: 3px;
       accent-color: var(--accent);
     }
     .choice strong {
       display: block;
-      padding: 0;
+      padding-right: 26px;
       background: transparent;
+      font-size: 16px;
       line-height: 1.45;
     }
     .choice-body {
@@ -429,13 +454,13 @@
     .choice-desc {
       display: block;
       width: 100%;
-      margin-top: 7px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #f6f3ec;
-      color: #514c45;
-      font-size: 13px;
-      line-height: 1.6;
+      margin-top: 9px;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #5b554d;
+      font-size: 13.5px;
+      line-height: 1.7;
     }
     .result {
       display: none;
@@ -538,28 +563,31 @@
       margin-top: 16px;
     }
     .category-card, .tool-card {
+      position: relative;
       display: flex;
-      min-height: 168px;
+      min-height: 176px;
       flex-direction: column;
       justify-content: space-between;
-      padding: 16px;
-      border: 1px solid var(--line);
+      padding: 17px 17px 16px;
+      border: 1px solid rgba(47, 111, 100, .16);
+      border-top: 4px solid rgba(47, 111, 100, .30);
       border-radius: 8px;
-      background: #fff;
+      background: rgba(255, 255, 255, .95);
       color: var(--text);
       text-decoration: none;
       box-shadow: 0 10px 24px rgba(47, 44, 38, .05);
       transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }
     .category-card:hover, .tool-card:hover {
-      border-color: rgba(47, 111, 100, .55);
+      border-color: rgba(47, 111, 100, .48);
+      border-top-color: var(--accent);
       box-shadow: var(--shadow);
       transform: translateY(-2px);
     }
     .category-card .tag, .tool-card .tag {
       display: inline-flex;
       width: fit-content;
-      margin-bottom: 10px;
+      margin-bottom: 11px;
       padding: 2px 9px;
       border-radius: 999px;
       background: var(--soft-green);
@@ -567,18 +595,42 @@
       font-size: 12px;
       font-weight: 800;
     }
-    .category-card strong, .tool-card strong { display: block; margin-bottom: 7px; font-size: 17px; line-height: 1.45; }
+    .category-card strong, .tool-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    .category-card strong::after, .tool-card strong::after {
+      content: " →";
+      color: var(--accent);
+      font-weight: 900;
+    }
     .category-card span, .tool-card span {
       display: block;
       margin-top: 8px;
-      padding: 9px 10px;
-      border-radius: 8px;
-      background: #f6f3ec;
-      color: #514c45;
-      font-size: 13px;
-      line-height: 1.65;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #575149;
+      font-size: 13.5px;
+      line-height: 1.7;
     }
-    .category-card em, .tool-card em { display: block; margin-top: 12px; color: var(--accent); font-style: normal; font-size: 13px; font-weight: 800; }
+    .category-card em, .tool-card em {
+      display: inline-flex;
+      width: fit-content;
+      min-height: 30px;
+      align-items: center;
+      margin-top: 14px;
+      padding: 3px 10px;
+      border: 1px solid rgba(47, 111, 100, .22);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--accent);
+      font-style: normal;
+      font-size: 13px;
+      font-weight: 800;
+    }
     .fortune {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 260px auto;
@@ -2547,5 +2599,6 @@ fortuneButton.addEventListener("click", drawFortune);
 </script>
 </body>
 </html>
+
 
 
