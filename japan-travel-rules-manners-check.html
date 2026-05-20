@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
@@ -10,9 +10,9 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
   <title>日本旅行ルール・マナー確認チェック | One Coin Books</title>
-  <meta name="description" content="「日本旅行で気をつけること」を読んだあとに使える、外国人旅行者向けのルール・マナー確認チェックです。">
+  <meta name="description" content="日本旅行前に、喫煙・電車・列・食事・撮影・ゴミ・周囲への配慮など、知っておきたいルールとマナーを確認するチェックツールです。">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="One Coin Books">
   <meta property="og:title" content="日本旅行ルール・マナー確認チェック | One Coin Books">
@@ -313,33 +313,109 @@
       .actions { flex-direction: column; }
       .button { width: 100%; }
     }
+  
+    /* Travel checklist pages: make each item feel selectable and action-oriented. */
+    .panel {
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: rgba(47, 111, 100, .72);
+    }
+    .checks {
+      gap: 12px;
+      counter-reset: travel-check;
+    }
+    .check-card {
+      position: relative;
+      grid-template-columns: 28px minmax(0, 1fr);
+      min-height: 112px;
+      padding: 16px 16px 15px;
+      border: 1px solid rgba(47, 111, 100, .18);
+      border-left: 5px solid rgba(47, 111, 100, .24);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 8px 18px rgba(47, 44, 38, .04);
+      transition: border-color .18s ease, border-left-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+      counter-increment: travel-check;
+    }
+    .check-card::after {
+      content: counter(travel-check);
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: rgba(47, 111, 100, .16);
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .check-card:hover {
+      border-color: rgba(47, 111, 100, .45);
+      border-left-color: rgba(47, 111, 100, .78);
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(47, 44, 38, .08);
+      transform: translateY(-2px);
+    }
+    .check-card.is-checked {
+      border-color: rgba(47, 111, 100, .64);
+      border-left-color: var(--accent);
+      background: #edf6f2;
+      box-shadow: 0 14px 30px rgba(47, 111, 100, .12);
+      transform: translateY(-1px);
+    }
+    .check-card input {
+      width: 21px;
+      height: 21px;
+      accent-color: var(--accent);
+    }
+    .check-card strong {
+      padding-right: 28px;
+      color: var(--text);
+      font-size: 15.5px;
+      line-height: 1.5;
+    }
+    .check-card span span {
+      margin-top: 4px;
+      color: #5d5851;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+    .status,
+    .box,
+    .quiet {
+      border-left: 4px solid rgba(47, 111, 100, .26);
+      background: rgba(255, 255, 255, .92);
+    }
   </style>
 </head>
 <body>
 <header>
   <div>
     <p class="eyebrow" id="eyebrow">記事専用チェックツール</p>
-    <h1 id="pageTitle">小さな幸せに気づく習慣チェック</h1>
-    <p class="lead" id="pageLead">「小さな幸せに気づく人の習慣」を読んだあとに、今日気づけたことを選んでみてください。今の感じる力の整い具合と、自分に合う小さな幸せの見つけ方タイプが分かります。</p>
+    <h1 id="pageTitle">日本旅行ルール・マナー確認チェック</h1>
+    <p class="lead" id="pageLead">日本旅行前に知っておきたいルールとマナーを、喫煙・交通・食事・撮影・ゴミ・周囲への配慮まで確認できます。</p>
     <div class="language-switch" aria-label="Language">
       <button class="is-active" id="jaButton" type="button">日本語</button>
       <button id="enButton" type="button">English</button>
     </div>
   </div>
-  <aside class="hero-art" aria-label="小さな幸せチェックのイラスト">
+  <aside class="hero-art" aria-label="日本旅行ルール・マナー確認チェックのイラスト">
     <div id="heroArt"></div>
   </aside>
 </header>
 <main>
   <section class="panel">
-    <h2 id="checkHeading">今日できたことを選んでください</h2>
-    <p id="checkLead">全部できなくて大丈夫です。ひとつでも選べたら、今日は少しだけ自分で流れを作れています。</p>
+    <h2 id="checkHeading">日本旅行前に確認できたことを選んでください</h2>
+    <p id="checkLead">全部できなくても大丈夫です。知っている項目を選ぶことで、今の準備度と、次に意識すると安心なポイントが見えてきます。</p>
     <div class="status" aria-live="polite">
       <div class="status-art" id="statusArt"></div>
       <div>
         <span class="badge" id="stageName">たね</span>
-        <strong id="stageTitle">まず気づけた日</strong>
-        <span id="stageLead">チェックを入れると、ここに今日の成長結果が表示されます。</span>
+        <strong id="stageTitle">日本旅行マナーの準備度が表示されます</strong>
+        <span id="stageLead">チェックを入れると、旅行前にどこまで確認できているかが分かります。</span>
         <div class="meter"><span id="meterBar"></span></div>
       </div>
     </div>
@@ -350,16 +426,16 @@
     <h2 id="resultHeading">今日の結果</h2>
     <div class="result-grid">
       <div class="box">
-        <strong id="typeTitle">今日の整え方タイプ：これからタイプ</strong>
-        <span id="typeText">気になった項目をひとつ選ぶと、今日の自分に合う整え方が見えてきます。</span>
+        <strong id="typeTitle">マナー準備タイプ：これから確認するタイプ</strong>
+        <span id="typeText">気になった項目をひとつ選ぶと、日本旅行で特に整えるとよいマナーが表示されます。</span>
       </div>
       <div class="box">
         <strong id="nextHeading">次の小さな一歩</strong>
-        <span id="nextAction">まずは今日のテーマをひとつだけ決めてみてください。</span>
+        <span id="nextAction">まずは、喫煙・ゴミ・撮影の3つだけ確認しておきましょう。</span>
       </div>
     </div>
     <div class="quiet" id="quietText">
-      このチェックは、今日を採点するためのものではありません。できたことを見える形にして、「今日はこれでOK」と区切るための小さな道具です。
+      このチェックは、旅行者を採点するものではありません。日本のルールやマナーを少し知って、トラブルや余計な不安を減らすための小さな確認ツールです。
     </div>
     <div class="actions">
       <button class="button secondary" id="resetButton" type="button">チェックをリセット</button>
@@ -636,6 +712,7 @@ applyLanguage("ja");
 </script>
 </body>
 </html>
+
 
 
 
