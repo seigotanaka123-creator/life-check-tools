@@ -1,9 +1,9 @@
 ﻿:root {
   --text: #242321;
   --muted: #68645d;
-  --line: #e2ddd2;
-  --soft: #f7f5ef;
-  --paper: #ffffff;
+  --line: #e7ddcf;
+  --soft: #fff3dd;
+  --paper: #fffdf8;
   --accent: #2f6f64;
   --accent-2: #9a5b42;
   --shadow: 0 16px 38px rgba(47, 44, 38, .08);
@@ -16,8 +16,9 @@ body {
   color: var(--text);
   line-height: 1.8;
   background:
-    linear-gradient(180deg, #f0f7f3 0, #fbfaf7 280px),
-    #fbfaf7;
+    linear-gradient(155deg, rgba(255, 238, 216, .70) 0, rgba(255, 249, 239, .32) 34%, transparent 60%),
+    linear-gradient(180deg, #eef8f1 0, #fff7ec 240px, #fcf8f0 580px),
+    #fcf8f0;
 }
 header, main {
   max-width: 920px;
@@ -56,7 +57,7 @@ main::before {
   padding: 4px 10px;
   border: 1px solid rgba(47, 111, 100, .18);
   border-radius: 999px;
-  background: rgba(255, 255, 255, .76);
+  background: rgba(255, 253, 248, .82);
   color: var(--accent);
   font-size: 13px;
   font-weight: 700;
@@ -218,4 +219,5 @@ main::before {
   .actions { flex-direction: column; }
   .button { width: 100%; }
 }
+
 
