@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -353,6 +353,81 @@
     .check:hover {
       transform: translateY(-1px);
     }
+  
+    /* Make checklist pages feel like selectable decision tools. */
+    .checks {
+      counter-reset: check-step;
+    }
+    .check {
+      position: relative;
+      border-left: 5px solid rgba(47, 111, 100, .24);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 8px 18px rgba(47, 44, 38, .04);
+      transition: border-color .18s ease, border-left-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+      counter-increment: check-step;
+      cursor: pointer;
+    }
+    .check::after {
+      content: counter(check-step);
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      color: rgba(47, 111, 100, .16);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .check:hover {
+      border-color: rgba(47, 111, 100, .45);
+      border-left-color: rgba(47, 111, 100, .78);
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(47, 44, 38, .08);
+      transform: translateY(-2px);
+    }
+    .check:has(input:checked) {
+      border-color: rgba(47, 111, 100, .64);
+      border-left-color: var(--accent, #2f6f64);
+      background: #edf6f2;
+      box-shadow: 0 14px 30px rgba(47, 111, 100, .12);
+    }
+    .check input {
+      width: 20px;
+      height: 20px;
+      margin-top: 4px;
+      accent-color: var(--accent, #2f6f64);
+    }
+    .check strong {
+      display: block;
+      padding-right: 28px;
+      color: var(--text, #242321);
+      line-height: 1.5;
+    }
+    .check span {
+      color: var(--muted, #68645d);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .related-card {
+      position: relative;
+      padding-right: 42px;
+      border-left: 4px solid rgba(47, 111, 100, .26);
+      box-shadow: 0 8px 18px rgba(47, 44, 38, .04);
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .related-card::after {
+      content: "→";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      color: var(--accent, #2f6f64);
+      font-size: 20px;
+      font-weight: 900;
+      transform: translateY(-50%);
+    }
+    .related-card:hover {
+      box-shadow: 0 14px 30px rgba(47, 44, 38, .08);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -535,4 +610,5 @@
 </script>
 </body>
 </html>
+
 
