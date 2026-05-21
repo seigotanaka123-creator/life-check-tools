@@ -659,3 +659,34 @@ article.article-card:hover {
   border-color: rgba(47, 111, 100, .28);
   background: #ffffff;
 }
+
+.en-home .article-grid .article-card {
+  border: 1px solid rgba(47, 111, 100, .38);
+  border-left: 5px solid rgba(47, 111, 100, .70);
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(47, 44, 38, .14);
+}
+
+.en-home .article-grid .article-card div {
+  padding: 15px 17px 17px;
+  border-left: 0;
+  background: #ffffff;
+}
+
+.en-home .article-grid .article-card strong {
+  color: #1f302b;
+}
+
+.en-home .article-grid .article-card span {
+  color: #514a42;
+}
+
+.en-home .article-grid .article-card img {
+  border-bottom: 1px solid rgba(47, 111, 100, .18);
+}
+
+.en-home .article-grid a.article-card:hover {
+  border-color: rgba(47, 111, 100, .58);
+  border-left-color: rgba(47, 111, 100, .82);
+  box-shadow: 0 22px 48px rgba(47, 44, 38, .17);
+}
