@@ -616,10 +616,46 @@ article.article-card:hover {
   }
 }
 
+/* Stronger contrast for the English top page only. */
+.en-home .travel-spotlight,
+.en-home .link-panel {
+  border-color: rgba(47, 111, 100, .34);
+  border-left-color: rgba(47, 111, 100, .72);
+  background: #ffffff;
+  box-shadow: 0 20px 46px rgba(47, 44, 38, .14);
+}
 
+.en-home .travel-spotlight {
+  border-color: rgba(154, 91, 66, .44);
+  border-left-color: rgba(154, 91, 66, .78);
+  background: #ffffff;
+}
 
+.en-home .purpose-card,
+.en-home .card,
+.en-home .article-card {
+  border-color: rgba(47, 111, 100, .30);
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(47, 44, 38, .10);
+}
 
+.en-home .purpose-card {
+  border-left-color: rgba(47, 111, 100, .66);
+}
 
+.en-home .card {
+  border-left: 4px solid rgba(47, 111, 100, .52);
+}
 
+.en-home .article-card div {
+  border-left-color: rgba(47, 111, 100, .50);
+}
 
+.en-home .section {
+  border-top-color: rgba(47, 111, 100, .18);
+}
 
+.en-home .link-list a {
+  border-color: rgba(47, 111, 100, .28);
+  background: #ffffff;
+}
