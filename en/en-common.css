@@ -690,3 +690,26 @@ article.article-card:hover {
   border-left-color: rgba(47, 111, 100, .82);
   box-shadow: 0 22px 48px rgba(47, 44, 38, .17);
 }
+
+.en-home .featured-guides {
+  margin: 24px 0 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(47, 111, 100, .24);
+  border-left: 5px solid rgba(47, 111, 100, .58);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(47, 44, 38, .08);
+}
+
+.en-home .featured-guides h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.en-home .featured-guides p {
+  margin: 0;
+  color: #575047;
+  font-size: 14px;
+  line-height: 1.65;
+}
