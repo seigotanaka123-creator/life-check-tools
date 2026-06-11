@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QKD3PTLJSQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life Quest | 毎日の生活を冒険に変えるゲーム</title>
+  <meta name="description" content="回復、修行、散歩、明日のクエストをゲームとして遊ぶ、毎日の生活冒険アプリです。">
+  <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/life-quest.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Life Check Tools">
+  <meta property="og:title" content="Life Quest | 毎日の生活を冒険に変えるゲーム">
+  <meta property="og:description" content="生活行動を回復、修行、探索、クエスト受注に変える無料Webゲームです。">
+  <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest.html">
+  <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root {
+      --bg: #111724;
+      --bg2: #1b2540;
+      --paper: #fff7e6;
+      --ink: #241f1a;
+      --muted: #746858;
+      --line: #d8c7aa;
+      --gold: #d8aa3d;
+      --green: #3b8a6b;
+      --blue: #536fbb;
+      --rose: #b85868;
+      --purple: #7b5bb8;
+      --shadow: 0 24px 58px rgba(0,0,0,.32);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      background:
+        radial-gradient(circle at top left, rgba(216,170,61,.24), transparent 34%),
+        radial-gradient(circle at top right, rgba(83,111,187,.25), transparent 34%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 18px; }
+    .top { padding: 14px 0 0; }
+    .back { color: #eadcc7; font-weight: 800; text-decoration: none; }
+    header { padding-bottom: 18px; }
+    .hero {
+      padding: 34px 0 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 22px;
+      align-items: end;
+    }
+    .eyebrow { margin: 0 0 8px; color: var(--gold); font-weight: 900; }
+    h1 { margin: 0; font-size: clamp(36px, 8vw, 72px); line-height: 1.02; letter-spacing: 0; }
+    .lead { margin: 18px 0 0; color: #e9d8bd; font-size: 18px; max-width: 720px; }
+    .hero-card, .panel {
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .hero-card {
+      background: rgba(255,247,230,.09);
+      border: 1px solid rgba(255,247,230,.22);
+      padding: 16px;
+    }
+    .avatar-stage {
+      height: 210px;
+      border-radius: 8px;
+      background: linear-gradient(#2a355c 0 58%, #6a5135 59%);
+      display: grid;
+      place-items: end center;
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar-stage::before {
+      content: "";
+      position: absolute;
+      inset: -60px 12% 28%;
+      background: radial-gradient(circle, rgba(255,255,210,.35), transparent 62%);
+    }
+    .avatar {
+      position: relative;
+      width: 122px;
+      height: 162px;
+      transform: translateY(4px);
+    }
+    .avatar.bounce { animation: bounce .52s ease; }
+    .head { position: absolute; top: 0; left: 40px; width: 42px; height: 42px; border-radius: 50%; background: #ecc095; }
+    .body { position: absolute; top: 48px; left: 34px; width: 54px; height: 70px; border-radius: 22px 22px 12px 12px; background: var(--green); transform: scaleX(var(--power-size, 1)); }
+    .arm { position: absolute; top: 58px; width: 24px; height: 74px; border-radius: 16px; background: #ecc095; transform-origin: top; }
+    .arm.left { left: 15px; transform: rotate(18deg) scaleX(var(--power-size, 1)); }
+    .arm.right { right: 15px; transform: rotate(-18deg) scaleX(var(--power-size, 1)); }
+    .leg { position: absolute; bottom: 0; width: 24px; height: 56px; border-radius: 14px; background: #25242d; }
+    .leg.left { left: 34px; }
+    .leg.right { right: 34px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat {
+      background: rgba(255,247,230,.1);
+      border: 1px solid rgba(255,247,230,.18);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat strong { display: block; color: var(--gold); font-size: 24px; line-height: 1.1; }
+    .stat span { color: #d7cab7; font-size: 12px; }
+    main { padding: 8px 0 64px; }
+    .panel {
+      background: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+    h2 { margin: 0 0 8px; font-size: 26px; line-height: 1.25; }
+    h3 { margin: 20px 0 8px; }
+    p { margin: 0; color: var(--muted); }
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .route {
+      min-height: 170px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      align-content: space-between;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .route:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(35,28,18,.14); }
+    .icon { display: block; font-size: 38px; color: var(--gold); font-weight: 900; line-height: 1; }
+    .route b { display: block; font-size: 19px; margin-top: 8px; }
+    .route span { color: var(--muted); font-size: 14px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .cards, .choices, .map-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .choice, .tarot, .practice, .quest-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 128px;
+      cursor: pointer;
+      text-align: left;
+      display: grid;
+      align-content: space-between;
+    }
+    .choice.selected, .practice.selected, .quest-card.selected {
+      background: #fff2cf;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(216,170,61,.24);
+    }
+    .tarot {
+      min-height: 260px;
+      border: 8px solid #ecd8ad;
+      background:
+        linear-gradient(#fffaf0, #f2dfbd);
+      text-align: center;
+      align-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .tarot.reversed { transform: rotate(180deg); }
+    .tarot::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 2px solid rgba(80,54,18,.24);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+    .tarot small { position: absolute; top: 14px; left: 16px; color: var(--rose); font-weight: 900; }
+    .tarot .mark { font-size: 58px; color: var(--gold); font-weight: 900; }
+    .tarot b { display: block; font-size: 22px; line-height: 1.25; margin-top: 10px; }
+    .result {
+      background: #fff;
+      border-left: 7px solid var(--gold);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .result strong { display: block; font-size: 24px; line-height: 1.25; margin-bottom: 6px; }
+    .article-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 900;
+      margin-top: 12px;
+    }
+    .map {
+      background: #e9f2e7;
+      border: 1px solid #bfd7bd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .map-line {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .tile {
+      min-height: 48px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #c7d7c3;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: var(--green);
+    }
+    .tile.now { background: var(--gold); color: #211809; transform: scale(1.05); }
+    .tile.done { background: #d7ead5; }
+    .log {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .log-item {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    button {
+      border: 0;
+      border-radius: 8px;
+      min-height: 48px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .primary { background: var(--gold); color: #23180a; }
+    .secondary { background: #fff; border: 1px solid var(--green); color: var(--green); }
+    .quiet { background: #eee1ce; color: var(--ink); }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff7e6;
+      color: var(--ink);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 5;
+      font-weight: 900;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @keyframes bounce { 50% { transform: translateY(-10px) scale(1.04); } }
+    @media (max-width: 880px) {
+      .hero, .route-grid, .cards, .choices, .map-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .map-line { grid-template-columns: repeat(5, minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+<header class="wrap">
+  <div class="top"><a class="back" href="index.html">Life Check Toolsへ戻る</a></div>
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Life Quest MVP</p>
+      <h1>今日の生活を<br>冒険に変える</h1>
+      <p class="lead">記録ではなく冒険。回復、修行、探索、明日のクエストを選んで、経験値・コイン・称号を集めます。</p>
+    </div>
+    <aside class="hero-card">
+      <div class="avatar-stage">
+        <div class="avatar" id="avatar">
+          <span class="head"></span><span class="body"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="lv">1</strong><span>Lv</span></div>
+        <div class="stat"><strong id="hp">10</strong><span>HP</span></div>
+        <div class="stat"><strong id="coin">0</strong><span>Coin</span></div>
+        <div class="stat"><strong id="streak">0</strong><span>連続日</span></div>
+      </div>
+    </aside>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="panel screen active" id="home">
+    <h2>今日の冒険</h2>
+    <p>行き先を選んでください。どれか一つだけでも、今日の冒険は進みます。</p>
+    <div class="route-grid">
+      <button class="route" data-open="temple"><span><span class="icon">T</span><b>回復の神殿</b></span><span>リフレッシュタロットを引く</span></button>
+      <button class="route" data-open="training"><span><span class="icon">P</span><b>修行場</b></span><span>練習で能力を伸ばす</span></button>
+      <button class="route" data-open="map"><span><span class="icon">M</span><b>散歩マップ</b></span><span>発見でマスを進む</span></button>
+      <button class="route" data-open="guild"><span><span class="icon">Q</span><b>冒険者ギルド</b></span><span>明日のクエストを受注</span></button>
+    </div>
+    <h3>受注中のクエスト</h3>
+    <div class="result" id="currentQuest"></div>
+    <h3>最近の冒険ログ</h3>
+    <div class="log" id="dailyLog"></div>
+  </section>
+
+  <section class="panel screen" id="temple">
+    <h2>回復の神殿</h2>
+    <p>今の状態を一つ選び、リフレッシュタロットを引きます。上向きと逆向きで意味が変わります。</p>
+    <div class="choices" id="moodChoices"></div>
+    <div class="cards" id="tarotArea"></div>
+    <div class="result" id="templeResult" hidden></div>
+    <div class="actions"><button class="secondary" data-open="home">ホームへ戻る</button></div>
+  </section>
+
+  <section class="panel screen" id="training">
+    <h2>修行場</h2>
+    <p>練習カードを一つ選びます。能力は伸びますが、疲労もたまります。休息も戦略です。</p>
+    <div class="choices" id="practiceChoices"></div>
+    <div class="result" id="trainingResult" hidden></div>
+    <div class="actions"><button class="secondary" data-open="home">ホームへ戻る</button></div>
+  </section>
+
+  <section class="panel screen" id="map">
+    <h2>散歩マップ</h2>
+    <p>散歩で見つけたものを選ぶと、その数だけマップを進みます。止まったマスでイベントが起きます。</p>
+    <div class="choices" id="discoveryChoices"></div>
+    <div class="map"><div class="map-line" id="mapLine"></div></div>
+    <div class="result" id="mapResult" hidden></div>
+    <div class="actions"><button class="secondary" data-open="home">ホームへ戻る</button></div>
+  </section>
+
+  <section class="panel screen" id="guild">
+    <h2>冒険者ギルド</h2>
+    <p>明日のクエストを一つ受注します。日記を書く代わりに、明日やる行動をゲーム内の依頼として決めます。</p>
+    <div class="choices" id="guildChoices"></div>
+    <div class="result" id="guildResult" hidden></div>
+    <div class="actions"><button class="secondary" data-open="home">ホームへ戻る</button></div>
+  </section>
+
+  <section class="panel">
+    <h2>開発用リセット</h2>
+    <p>試作確認用です。公開版では場所や見せ方を変えます。</p>
+    <div class="actions"><button class="quiet" id="resetGame">このゲームの保存データを削除</button></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const storageKey = "lifeQuestMvpState";
+const todayKey = () => new Date().toLocaleDateString("sv-SE");
+const defaultState = {
+  player: { xp: 0, hp: 10, maxHp: 10, energy: 5, coin: 0, power: 0, focus: 0, mind: 0, fatigue: 0 },
+  mapPosition: 0,
+  acceptedQuest: null,
+  logs: [],
+  lastVisit: ""
+};
+const moods = [
+  ["body", "体が重い", "HPを戻したい日"],
+  ["mind", "頭が散らかる", "考えを外へ出したい日"],
+  ["room", "部屋が気になる", "視界を整えたい日"],
+  ["work", "仕事を引きずる", "明日に渡したい日"],
+  ["money", "お金が気になる", "不安を見える化したい日"],
+  ["low", "低空飛行", "小さく気分を上げたい日"]
+];
+const tarotCards = [
+  { name: "太陽", mark: "SUN", upright: "外の光で回復する日", reversed: "明るくしようとしすぎて疲れている日", ritual: "窓を開けて、外の光を1分だけ見る", article: ["疲れた日に試してほしい習慣", "https://note.com/cheeky_guppy1145/n/nd7695d2618b1"] },
+  { name: "月", mark: "MOON", upright: "不安を言葉にする日", reversed: "考えすぎから離れる日", ritual: "気になることを3つだけメモして閉じる", article: ["考えすぎて疲れる時の整え方", "https://note.com/cheeky_guppy1145/n/n6e1a13aeed24"] },
+  { name: "王", mark: "KING", upright: "自分で一つ決める日", reversed: "抱え込みすぎを手放す日", ritual: "今日やらないことを一つ決める", article: ["仕事でこのままでいいのかと思った時に読む話", "https://note.com/cheeky_guppy1145/n/n4ec2965b6775"] },
+  { name: "塔", mark: "TOWER", upright: "乱れを一つ壊して整える日", reversed: "変えすぎず崩れた場所だけ直す日", ritual: "机か床から物を3つだけ移動する", article: ["収納の置き場所を整える考え方", "https://note.com/cheeky_guppy1145/n/n41f9b3566c63"] },
+  { name: "銀貨", mark: "COIN", upright: "不安を見える化する日", reversed: "買う理由を疑う日", ritual: "気になる出費を一つだけ書く", article: ["無駄な出費を減らす考え方", "https://note.com/cheeky_guppy1145/n/n7e7c512545da"] },
+  { name: "灯火", mark: "LAMP", upright: "小さな楽しみで戻る日", reversed: "刺激を減らして静かに戻る日", ritual: "好きな飲み物を用意して音楽を1曲だけ聴く", article: ["寂しい夜の過ごし方", "https://note.com/cheeky_guppy1145/n/n02da50e32408"] }
+];
+const practices = [
+  { id: "push", name: "腕立て修行", text: "Power +3 / Fatigue +2", power: 3, focus: 0, mind: 0, fatigue: 2, coin: 2 },
+  { id: "squat", name: "スクワット修行", text: "Power +2 / Focus +1 / Fatigue +2", power: 2, focus: 1, mind: 0, fatigue: 2, coin: 2 },
+  { id: "core", name: "体幹修行", text: "Focus +3 / Fatigue +1", power: 0, focus: 3, mind: 0, fatigue: 1, coin: 2 },
+  { id: "rest", name: "休息", text: "HP +3 / Fatigue -4", power: 0, focus: 0, mind: 2, fatigue: -4, coin: 1 }
+];
+const discoveries = [
+  ["flower", "花を見つけた"], ["sign", "看板を見つけた"], ["blue", "青いものを見つけた"],
+  ["wind", "風を感じた"], ["newroad", "初めての道を通った"], ["sky", "空を見上げた"]
+];
+const mapEvents = [
+  "草原で小さな宝箱を見つけた", "休憩所でHPが少し回復した", "古い石碑を見つけFocusが上がった",
+  "市場でCoinを拾った", "神社でMindが上がった", "分かれ道を越えて探索距離が伸びた",
+  "噴水広場で疲労が少し抜けた", "坂道を越えてPowerが上がった", "静かな通りで気分が戻った", "町の掲示板に新しい依頼が出た"
+];
+const guildQuests = [
+  { id: "walk10", name: "10分歩く", text: "明日、外を10分歩く", reward: "Coin +8 / Mind +1", coin: 8, focus: 0, mind: 1 },
+  { id: "desk5", name: "机を5分整える", text: "明日、机の上を5分だけ整える", reward: "Coin +6 / Focus +1", coin: 6, focus: 1, mind: 0 },
+  { id: "write100", name: "100文字だけ書く", text: "明日、100文字だけ書く", reward: "Coin +7 / Focus +2", coin: 7, focus: 2, mind: 0 },
+  { id: "holdbuy", name: "買い物を一晩保留", text: "明日、欲しいものを一晩だけ保留する", reward: "Coin +9 / Mind +1", coin: 9, focus: 0, mind: 1 },
+  { id: "first25", name: "最初の25分だけ進める", text: "明日、作業を25分だけ進める", reward: "Coin +10 / Focus +2", coin: 10, focus: 2, mind: 0 }
+];
+let state = loadState();
+let selectedMood = "body";
+let selectedDiscoveries = [];
+
+function loadState() {
+  try {
+    return { ...structuredClone(defaultState), ...(JSON.parse(localStorage.getItem(storageKey)) || {}) };
+  } catch {
+    return structuredClone(defaultState);
+  }
+}
+function saveState() {
+  localStorage.setItem(storageKey, JSON.stringify(state));
+}
+function visitToday() {
+  const today = todayKey();
+  if (state.lastVisit !== today) {
+    state.lastVisit = today;
+    state.player.energy = 5;
+    state.player.hp = Math.min(state.player.maxHp, state.player.hp + 2);
+    addLog("新しい一日が始まった。Energyが回復した。");
+    saveState();
+  }
+}
+function level() {
+  return Math.max(1, Math.floor(state.player.xp / 20) + 1);
+}
+function addReward({ xp = 5, hp = 0, coin = 0, power = 0, focus = 0, mind = 0, fatigue = 0 }, logText) {
+  state.player.xp += xp;
+  state.player.hp = Math.max(0, Math.min(state.player.maxHp, state.player.hp + hp));
+  state.player.coin += coin;
+  state.player.power += power;
+  state.player.focus += focus;
+  state.player.mind += mind;
+  state.player.fatigue = Math.max(0, state.player.fatigue + fatigue);
+  addLog(logText);
+  saveState();
+  renderAll();
+  bounce();
+  toast(`報酬獲得: XP +${xp} / Coin +${coin}`);
+}
+function addLog(text) {
+  state.logs.unshift({ date: todayKey(), text });
+  state.logs = state.logs.slice(0, 10);
+}
+function openScreen(id) {
+  document.querySelectorAll(".screen").forEach(screen => screen.classList.toggle("active", screen.id === id));
+  if (id === "temple") renderTemple();
+  if (id === "training") renderTraining();
+  if (id === "map") renderMap();
+  if (id === "guild") renderGuild();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function renderHeader() {
+  document.getElementById("lv").textContent = level();
+  document.getElementById("hp").textContent = state.player.hp;
+  document.getElementById("coin").textContent = state.player.coin;
+  document.getElementById("streak").textContent = streakDays();
+  document.getElementById("avatar").style.setProperty("--power-size", Math.min(1.6, 1 + state.player.power / 45));
+}
+function streakDays() {
+  const days = [...new Set(state.logs.map(log => log.date))].sort().reverse();
+  let streak = 0;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    if (days.includes(d.toLocaleDateString("sv-SE"))) streak += 1;
+    else break;
+  }
+  return streak;
+}
+function renderHome() {
+  const quest = state.acceptedQuest;
+  document.getElementById("currentQuest").innerHTML = quest
+    ? `<strong>${quest.name}</strong><p>${quest.text}</p><p>報酬: ${quest.reward}</p><div class="actions"><button class="primary" id="completeQuest">達成報告する</button></div>`
+    : `<strong>未受注</strong><p>冒険者ギルドで明日のクエストを受注できます。</p>`;
+  const complete = document.getElementById("completeQuest");
+  if (complete) complete.addEventListener("click", completeQuest);
+  document.getElementById("dailyLog").innerHTML = state.logs.length
+    ? state.logs.map(log => `<div class="log-item"><strong>${log.date}</strong><p>${log.text}</p></div>`).join("")
+    : `<p>まだ冒険ログがありません。</p>`;
+}
+function renderTemple() {
+  document.getElementById("moodChoices").innerHTML = moods.map(([id, name, text]) => `
+    <button class="choice ${selectedMood === id ? "selected" : ""}" data-mood="${id}" type="button"><b>${name}</b><span>${text}</span></button>
+  `).join("");
+  document.querySelectorAll("[data-mood]").forEach(btn => btn.addEventListener("click", () => {
+    selectedMood = btn.dataset.mood;
+    renderTemple();
+  }));
+  document.getElementById("tarotArea").innerHTML = [0,1,2].map(index => `<button class="tarot" data-card="${index}" type="button"><small>?</small><span class="mark">TAROT</span><b>カードを引く</b></button>`).join("");
+  document.querySelectorAll("[data-card]").forEach(btn => btn.addEventListener("click", drawTarot));
+}
+function drawTarot() {
+  const card = tarotCards[Math.floor(Math.random() * tarotCards.length)];
+  const reversed = Math.random() > .55;
+  const meaning = reversed ? card.reversed : card.upright;
+  document.querySelectorAll(".tarot").forEach(button => button.disabled = true);
+  this.classList.toggle("reversed", reversed);
+  this.innerHTML = `<small>${reversed ? "逆向き" : "上向き"}</small><span class="mark">${card.mark}</span><b>${card.name}</b>`;
+  const result = document.getElementById("templeResult");
+  result.hidden = false;
+  result.innerHTML = `<strong>${card.name} ${reversed ? "逆向き" : "上向き"}</strong><p>${meaning}</p><p>今日の回復儀式: ${card.ritual}</p><a class="article-link" href="${card.article[1]}">${card.article[0]}を読む</a>`;
+  addReward({ xp: 8, hp: 2, coin: 3, mind: 2, fatigue: -2 }, `回復の神殿で「${card.name}」を引いた。${card.ritual}`);
+}
+function renderTraining() {
+  document.getElementById("practiceChoices").innerHTML = practices.map(item => `
+    <button class="practice" data-practice="${item.id}" type="button"><b>${item.name}</b><span>${item.text}</span></button>
+  `).join("");
+  document.querySelectorAll("[data-practice]").forEach(btn => btn.addEventListener("click", () => {
+    const item = practices.find(p => p.id === btn.dataset.practice);
+    document.querySelectorAll(".practice").forEach(p => p.classList.remove("selected"));
+    btn.classList.add("selected");
+    document.getElementById("trainingResult").hidden = false;
+    document.getElementById("trainingResult").innerHTML = `<strong>${item.name}</strong><p>${item.text}</p><p>疲労がたまりすぎた日は、休息も強い選択です。</p>`;
+    addReward({ xp: 7, coin: item.coin, power: item.power, focus: item.focus, mind: item.mind, fatigue: item.fatigue, hp: item.id === "rest" ? 3 : -1 }, `修行場で「${item.name}」を行った。`);
+  }));
+}
+function renderMap() {
+  document.getElementById("discoveryChoices").innerHTML = discoveries.map(([id, name]) => `
+    <button class="choice ${selectedDiscoveries.includes(id) ? "selected" : ""}" data-discovery="${id}" type="button"><b>${name}</b><span>見つけたら選ぶ</span></button>
+  `).join("");
+  document.querySelectorAll("[data-discovery]").forEach(btn => btn.addEventListener("click", () => {
+    selectedDiscoveries = selectedDiscoveries.includes(btn.dataset.discovery)
+      ? selectedDiscoveries.filter(id => id !== btn.dataset.discovery)
+      : [...selectedDiscoveries, btn.dataset.discovery];
+    renderMap();
+  }));
+  document.getElementById("mapLine").innerHTML = Array.from({ length: 10 }, (_, i) => {
+    const done = i < state.mapPosition % 10;
+    const now = i === state.mapPosition % 10;
+    return `<div class="tile ${done ? "done" : ""} ${now ? "now" : ""}">${i + 1}</div>`;
+  }).join("");
+  if (!document.getElementById("walkBtn")) {
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.innerHTML = `<button class="primary" id="walkBtn" type="button">探索を進める</button>`;
+    document.getElementById("map").insertBefore(actions, document.getElementById("mapResult"));
+  }
+  document.getElementById("walkBtn").onclick = walkMap;
+}
+function walkMap() {
+  const steps = Math.max(1, selectedDiscoveries.length);
+  state.mapPosition += steps;
+  const event = mapEvents[state.mapPosition % mapEvents.length];
+  selectedDiscoveries = [];
+  document.getElementById("mapResult").hidden = false;
+  document.getElementById("mapResult").innerHTML = `<strong>${event}</strong><p>${steps}マス進みました。</p>`;
+  addReward({ xp: 6 + steps, coin: 3 + steps, mind: 1, fatigue: -1 }, `散歩マップを${steps}マス進んだ。${event}`);
+}
+function renderGuild() {
+  document.getElementById("guildChoices").innerHTML = guildQuests.map(item => `
+    <button class="quest-card" data-quest="${item.id}" type="button"><b>${item.name}</b><span>${item.text}</span><span>報酬: ${item.reward}</span></button>
+  `).join("");
+  document.querySelectorAll("[data-quest]").forEach(btn => btn.addEventListener("click", () => {
+    const item = guildQuests.find(q => q.id === btn.dataset.quest);
+    state.acceptedQuest = item;
+    addLog(`冒険者ギルドで「${item.name}」を受注した。`);
+    saveState();
+    renderAll();
+    document.getElementById("guildResult").hidden = false;
+    document.getElementById("guildResult").innerHTML = `<strong>${item.name}</strong><p>${item.text}</p><p>明日達成したら、ホーム画面で報告できます。</p>`;
+    toast("クエストを受注しました");
+  }));
+}
+function completeQuest() {
+  if (!state.acceptedQuest) return;
+  const quest = state.acceptedQuest;
+  state.acceptedQuest = null;
+  addReward({ xp: 10, coin: quest.coin, focus: quest.focus, mind: quest.mind }, `クエスト「${quest.name}」を達成した。`);
+}
+function renderAll() {
+  renderHeader();
+  renderHome();
+}
+function bounce() {
+  const avatar = document.getElementById("avatar");
+  avatar.classList.add("bounce");
+  setTimeout(() => avatar.classList.remove("bounce"), 560);
+}
+function toast(text) {
+  const box = document.getElementById("toast");
+  box.textContent = text;
+  box.classList.add("show");
+  setTimeout(() => box.classList.remove("show"), 1700);
+}
+document.querySelectorAll("[data-open]").forEach(btn => btn.addEventListener("click", () => openScreen(btn.dataset.open)));
+document.getElementById("resetGame").addEventListener("click", () => {
+  if (confirm("Life Questの保存データを削除しますか？")) {
+    localStorage.removeItem(storageKey);
+    state = loadState();
+    visitToday();
+    renderAll();
+    openScreen("home");
+  }
+});
+visitToday();
+renderAll();
+</script>
+</body>
+</html>
