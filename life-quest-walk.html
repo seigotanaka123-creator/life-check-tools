@@ -8130,7 +8130,7 @@ let pendingBattleAnimation = null;
 let battleAnimationTimer = null;
 let battleResultSfxTimer = null;
 let battleAdTimer = null;
-const capeFineAdjustStoreKey = "imasoraWalkCapeFineAdjustmentsV1";
+const capeFineAdjustStoreKey = "imasoraWalkCapeFineAdjustmentsV2";
 const capeFineReviewIndexStoreKey = "imasoraWalkCapeFineReviewIndexV1";
 const capeFineColorVariantSyncStoreKey = "imasoraWalkCapeFineColorVariantSyncV3";
 const capeFineReviewViews = [
@@ -8158,6 +8158,40 @@ let capeFineAdjustments = (() => {
     return {};
   }
 })();
+const starTurnaroundDefaultFineAdjustments = {
+  comet: {
+    "front-right": { wing: { x: -6, y: -7 }, wingLeft: { x: -5, y: -6 }, wingRight: { x: 4, y: -7 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "front-left": { wing: { x: -6, y: -7 }, wingLeft: { x: -5, y: -6 }, wingRight: { x: 4, y: -7 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "back-right": { wing: { x: -4, y: -6 }, wingLeft: { x: -4, y: -5 }, wingRight: { x: 4, y: -5 }, body: { x: -2, y: 0 } },
+    "back-left": { wing: { x: -4, y: -6 }, wingLeft: { x: -4, y: -5 }, wingRight: { x: 4, y: -5 }, body: { x: -2, y: 0 } }
+  },
+  crown: {
+    "front-right": { crown: { x: -1, y: -8 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "front-left": { crown: { x: -1, y: -8 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "back-right": { crown: { x: -1, y: -7 }, body: { x: -2, y: 0 } },
+    "back-left": { crown: { x: -1, y: -7 }, body: { x: -2, y: 0 } }
+  },
+  forest: {
+    "front-right": { both: { x: -1, y: 5 }, cape: { x: -6, y: 3 }, cord: { x: 1, y: 3, left: -5, right: -9 }, hand: { x: -1, y: -4 }, body: { x: -3, y: -1 } },
+    "front-left": { both: { x: -1, y: 5 }, cape: { x: -6, y: 3 }, cord: { x: 1, y: 3, left: -5, right: -9 }, hand: { x: -1, y: -4 }, body: { x: -3, y: -1 } },
+    "back-right": { both: { x: 0, y: 5 }, cape: { x: 0, y: 4 }, cord: { x: 0, y: 4, left: -5, right: -5 }, body: { x: -2, y: 0 } },
+    "back-left": { both: { x: 0, y: 5 }, cape: { x: 0, y: 4 }, cord: { x: 0, y: 4, left: -5, right: -5 }, body: { x: -2, y: 0 } }
+  }
+};
+function starTurnaroundBranchKey(item) {
+  const id = item?.id || "";
+  return id.endsWith("-comet") ? "comet" : id.endsWith("-crown") ? "crown" : id.endsWith("-forest") ? "forest" : "";
+}
+function starTurnaroundViewDefaults(item, viewKey) {
+  const branch = starTurnaroundBranchKey(item);
+  return starTurnaroundDefaultFineAdjustments[branch]?.[viewKey] || {};
+}
+function starTurnaroundPartAdjustment(item, viewKey, partKey) {
+  return {
+    ...(starTurnaroundViewDefaults(item, viewKey)[partKey] || {}),
+    ...(capeFineAdjustments[item.id]?.[viewKey]?.[partKey] || {})
+  };
+}
 let capeFineReviewItems = [];
 let capeFineReviewIndex = (() => {
   const saved = Number(localStorage.getItem(capeFineReviewIndexStoreKey) || 0);
@@ -33475,7 +33509,7 @@ function galleryTurnaroundArt(item) {
   const visualAdjustmentDx = (viewKey, dx) => viewKey.includes("left") ? -dx : dx;
   const fineAdjustmentForPart = (viewKey, partKey) => {
     if (!isStarTurnaround) return { x: 0, y: 0 };
-    const part = capeFineAdjustments[item.id]?.[viewKey]?.[partKey] || {};
+    const part = starTurnaroundPartAdjustment(item, viewKey, partKey);
     return { x: visualAdjustmentDx(viewKey, Number(part.x) || 0), y: Number(part.y) || 0 };
   };
   const applyFinePartAdjustment = (content, viewKey, partKey) => {
@@ -33486,7 +33520,7 @@ function galleryTurnaroundArt(item) {
   };
   const applyFineWholeAdjustment = (content, viewKey) => {
     if (!content || !isStarTurnaround) return content;
-    const part = capeFineAdjustments[item.id]?.[viewKey]?.all || {};
+    const part = starTurnaroundPartAdjustment(item, viewKey, "all");
     const x = Number(part.x) || 0;
     const y = Number(part.y) || 0;
     if (!x && !y) return content;
@@ -33527,8 +33561,10 @@ function galleryTurnaroundArt(item) {
   };
   const applyCapeFineAdjustment = (content, viewKey) => {
     if (!content || starBranch !== "forest") return content;
-    const itemAdjustments = capeFineAdjustments[item.id] || {};
-    const viewAdjustments = itemAdjustments[viewKey] || {};
+    const viewAdjustments = {
+      ...starTurnaroundViewDefaults(item, viewKey),
+      ...(capeFineAdjustments[item.id]?.[viewKey] || {})
+    };
     const cape = viewAdjustments.cape || {};
     const cord = viewAdjustments.cord || {};
     const both = viewAdjustments.both || {};
