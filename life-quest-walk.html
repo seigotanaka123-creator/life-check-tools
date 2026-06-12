@@ -8162,20 +8162,29 @@ const starTurnaroundDefaultFineAdjustments = {
   comet: {
     "front-right": { wing: { x: -6, y: -7 }, wingLeft: { x: -5, y: -6 }, wingRight: { x: 4, y: -7 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
     "front-left": { wing: { x: -6, y: -7 }, wingLeft: { x: -5, y: -6 }, wingRight: { x: 4, y: -7 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "side": { wing: { x: -4, y: -6 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: 0 } },
+    "side-left": { wing: { x: -4, y: -6 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: 0 } },
     "back-right": { wing: { x: -4, y: -6 }, wingLeft: { x: -4, y: -5 }, wingRight: { x: 4, y: -5 }, body: { x: -2, y: 0 } },
-    "back-left": { wing: { x: -4, y: -6 }, wingLeft: { x: -4, y: -5 }, wingRight: { x: 4, y: -5 }, body: { x: -2, y: 0 } }
+    "back-left": { wing: { x: -4, y: -6 }, wingLeft: { x: -4, y: -5 }, wingRight: { x: 4, y: -5 }, body: { x: -2, y: 0 } },
+    "back": { wing: { x: -2, y: -6 }, hand: { x: 0, y: -3 }, foot: { x: 0, y: 1 }, body: { x: -1, y: 0 } }
   },
   crown: {
     "front-right": { crown: { x: -1, y: -8 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
     "front-left": { crown: { x: -1, y: -8 }, hand: { x: -1, y: -4 }, body: { x: -3, y: 0 } },
+    "side": { crown: { x: -1, y: -7 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: 0 } },
+    "side-left": { crown: { x: -1, y: -7 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: 0 } },
     "back-right": { crown: { x: -1, y: -7 }, body: { x: -2, y: 0 } },
-    "back-left": { crown: { x: -1, y: -7 }, body: { x: -2, y: 0 } }
+    "back-left": { crown: { x: -1, y: -7 }, body: { x: -2, y: 0 } },
+    "back": { crown: { x: 0, y: -8 }, hand: { x: 0, y: -3 }, foot: { x: 0, y: 1 }, body: { x: -1, y: 0 } }
   },
   forest: {
     "front-right": { both: { x: -1, y: 5 }, cape: { x: -6, y: 3 }, cord: { x: 1, y: 3, left: -5, right: -9 }, hand: { x: -1, y: -4 }, body: { x: -3, y: -1 } },
     "front-left": { both: { x: -1, y: 5 }, cape: { x: -6, y: 3 }, cord: { x: 1, y: 3, left: -5, right: -9 }, hand: { x: -1, y: -4 }, body: { x: -3, y: -1 } },
+    "side": { both: { x: -1, y: 4 }, cape: { x: -4, y: 3 }, cord: { x: 1, y: 2, left: -3, right: -7 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: -1 } },
+    "side-left": { both: { x: -1, y: 4 }, cape: { x: -4, y: 3 }, cord: { x: 1, y: 2, left: -3, right: -7 }, hand: { x: -1, y: -3 }, foot: { x: -1, y: 1 }, body: { x: -2, y: -1 } },
     "back-right": { both: { x: 0, y: 5 }, cape: { x: 0, y: 4 }, cord: { x: 0, y: 4, left: -5, right: -5 }, body: { x: -2, y: 0 } },
-    "back-left": { both: { x: 0, y: 5 }, cape: { x: 0, y: 4 }, cord: { x: 0, y: 4, left: -5, right: -5 }, body: { x: -2, y: 0 } }
+    "back-left": { both: { x: 0, y: 5 }, cape: { x: 0, y: 4 }, cord: { x: 0, y: 4, left: -5, right: -5 }, body: { x: -2, y: 0 } },
+    "back": { both: { x: 0, y: 4 }, cape: { x: 0, y: 3 }, cord: { x: 0, y: 3, left: -4, right: -4 }, hand: { x: 0, y: -3 }, foot: { x: 0, y: 1 }, body: { x: -1, y: 0 } }
   }
 };
 function starTurnaroundBranchKey(item) {
@@ -33641,8 +33650,9 @@ function galleryTurnaroundArt(item) {
     : averageRightCrownBase;
   averageRightCrown = starBranch === "crown" ? alignRioCuteDiagonalDecorAngle(averageRightCrown, view) : averageRightCrown;
   const backBehindDecor = "";
-  const backFrontDecor = starBranch === "comet" ? flapBackWingPair(backWing) : starBranch === "forest" ? flutterCapeTips(backCape) : "";
-  const turnCrown = starBranch === "crown" ? shineCrown(sideView ? (crownSideMap[crownKind] || crownSideMap.normal) : (crownBackMap[crownKind] || crownBackMap.normal)) : "";
+  const backFrontDecor = starBranch === "comet" ? applyFinePartAdjustment(flapBackWingPair(backWing), "back", "wing") : starBranch === "forest" ? flutterCapeTips(applyCapeFineAdjustment(backCape, "back")) : "";
+  const turnCrownBase = starBranch === "crown" ? shineCrown(sideView ? (crownSideMap[crownKind] || crownSideMap.normal) : (crownBackMap[crownKind] || crownBackMap.normal)) : "";
+  const turnCrown = starBranch === "crown" ? applyFinePartAdjustment(turnCrownBase, view, "crown") : "";
   const backFeetAt = (angle = 0) => starBranch === "forest" && crownKind === "walkCute" ? `<g transform="translate(2 0)">${feetAt(angle)}</g>` : feetAt(angle);
   const backFeet = backFeetAt();
   const backDiagFeetAt = (angle = 135) => {
@@ -33660,8 +33670,16 @@ function galleryTurnaroundArt(item) {
   const backLeftDiagFeet = !isStarTurnaround && isWalkRoute && isCute
     ? (lowerHeroBackDiagFeet ? `<g transform="translate(0 2)">${backLeftWalkCuteSpreadFeetBase}</g>` : backLeftWalkCuteSpreadFeetBase)
     : backDiagFeet;
-  const rawSideLayers = hasSoraDama ? `${sideBehindDecor}${soraDama}${sideFarHand}${body}${sideFrontDecor}${backMark}${sideEye}${sideNearHand}${sideFeet}${turnCrown}` : `${sideBehindDecor}${body}${sideFrontDecor}${backMark}${hand}${sideEye}${sideFeet}${turnCrown}`;
-  const rawSideLayersWithoutSora = `${sideBehindDecor}${sideFarHand}${body}${sideFrontDecor}${backMark}${sideEye}${sideNearHand}${sideFeet}${turnCrown}`;
+  const sideBehindDecorForView = starBranch === "comet" ? applyFinePartAdjustment(sideBehindDecor, view, "wing") : sideBehindDecor;
+  const sideFrontDecorForView = starBranch === "forest" ? flutterCapeTips(applyCapeFineAdjustment(sideCape, view)) : starBranch === "comet" ? applyFinePartAdjustment(sideFrontDecor, view, "wing") : sideFrontDecor;
+  const bodyForView = view === "side" || view === "side-left" || view === "back" ? applyFinePartAdjustment(body, view, "body") : body;
+  const handForView = view === "side" || view === "side-left" || view === "back" ? applyFinePartAdjustment(hand, view, "hand") : hand;
+  const sideFarHandForView = view === "side" || view === "side-left" ? applyFinePartAdjustment(sideFarHand, view, "hand") : sideFarHand;
+  const sideNearHandForView = view === "side" || view === "side-left" ? applyFinePartAdjustment(sideNearHand, view, "hand") : sideNearHand;
+  const sideFeetForView = view === "side" || view === "side-left" ? applyFinePartAdjustment(sideFeet, view, "foot") : sideFeet;
+  const backFeetForView = view === "back" ? applyFinePartAdjustment(backFeet, view, "foot") : backFeet;
+  const rawSideLayers = hasSoraDama ? `${sideBehindDecorForView}${soraDama}${sideFarHandForView}${bodyForView}${sideFrontDecorForView}${backMark}${sideEye}${sideNearHandForView}${sideFeetForView}${turnCrown}` : `${sideBehindDecorForView}${bodyForView}${sideFrontDecorForView}${backMark}${handForView}${sideEye}${sideFeetForView}${turnCrown}`;
+  const rawSideLayersWithoutSora = `${sideBehindDecorForView}${sideFarHandForView}${bodyForView}${sideFrontDecorForView}${backMark}${sideEye}${sideNearHandForView}${sideFeetForView}${turnCrown}`;
   const leftSideLayers = hasSoraDama
     ? `<g transform="translate(116 0) scale(-1 1)">${rawSideLayersWithoutSora}</g>${leftSideSoraDama}`
     : `<g transform="translate(116 0) scale(-1 1)">${rawSideLayers}</g>`;
@@ -33669,15 +33687,15 @@ function galleryTurnaroundArt(item) {
   const walkBraveBackView = symmetricBackView;
   const sideBaseLayers = leftSideView ? leftSideLayers : rawSideLayers;
   const sideLayers = sideBaseLayers;
-  const normalBackLayers = `${backBehindDecor}${soraDama}${hand}${backFeet}${body}${backMark}${backFrontDecor}${turnCrown}`;
-  const mirroredBackBaseLayers = `${backBehindDecor}${hand}${backFeet}${body}${backMark}${backFrontDecor}${turnCrown}`;
+  const normalBackLayers = `${backBehindDecor}${soraDama}${handForView}${backFeetForView}${bodyForView}${backMark}${backFrontDecor}${turnCrown}`;
+  const mirroredBackBaseLayers = `${backBehindDecor}${handForView}${backFeetForView}${bodyForView}${backMark}${backFrontDecor}${turnCrown}`;
   const mirroredBackSoraDama = hasSoraDama ? `<circle cx="24" cy="58" r="10" fill="#7edcff" stroke="#1c6e9f" stroke-width="3"/><circle cx="21" cy="54" r="3" fill="rgba(255,255,255,.72)"/>` : "";
   const mirroredBackLayers = walkBraveBackView
     ? `${mirroredBackSoraDama}<g transform="translate(116 0) scale(-1 1)">${mirroredBackBaseLayers}</g>`
     : `<g transform="translate(116 0) scale(-1 1)">${mirroredBackBaseLayers}</g>${mirroredBackSoraDama}`;
   const backLayers = symmetricBackView ? mirroredBackLayers : normalBackLayers;
-  const normalBackDiagLayers = `${backBehindDecor}${soraDama}${hand}${backDiagFeet}${body}${backMark}${backFrontDecor}${turnCrown}`;
-  const mirroredBackDiagBaseLayers = `${backBehindDecor}${hand}${backDiagFeet}${body}${backMark}${backFrontDecor}${turnCrown}`;
+  const normalBackDiagLayers = `${backBehindDecor}${soraDama}${handForView}${backDiagFeet}${bodyForView}${backMark}${backFrontDecor}${turnCrown}`;
+  const mirroredBackDiagBaseLayers = `${backBehindDecor}${handForView}${backDiagFeet}${bodyForView}${backMark}${backFrontDecor}${turnCrown}`;
   const mirroredBackDiagLayers = walkBraveBackView
     ? `${mirroredBackSoraDama}<g transform="translate(116 0) scale(-1 1)">${mirroredBackDiagBaseLayers}</g>`
     : `<g transform="translate(116 0) scale(-1 1)">${mirroredBackDiagBaseLayers}</g>${mirroredBackSoraDama}`;
