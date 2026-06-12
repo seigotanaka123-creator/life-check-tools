@@ -1793,6 +1793,20 @@
       overflow: visible;
       background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.88), rgba(218,239,255,.62) 48%, rgba(244,232,189,.62));
     }
+    .gallery-monster-card .monster-art.star-gallery-art {
+      width: 112px;
+      height: 112px;
+      justify-self: center;
+      align-self: center;
+      place-items: center;
+    }
+    .gallery-monster-card .monster-art.star-gallery-art > .turnaround-monster {
+      width: 112px;
+      height: 112px;
+      justify-self: center;
+      align-self: center;
+      transform-origin: center center;
+    }
     .unique-monster {
       width: 104px;
       height: 104px;
@@ -32636,7 +32650,7 @@ function monsterInnerParts() {
 }
 function galleryMonsterArt(item) {
   if (item.id.startsWith("star-")) {
-    return `<div class="monster-art unique-art">${turnaroundMonsterSvg(item, "front-right")}</div>`;
+    return `<div class="monster-art unique-art star-gallery-art">${turnaroundMonsterSvg(item, "front-right")}</div>`;
   }
   if (item.id.startsWith("hero-")) {
     return `<div class="monster-art unique-art">${uniqueMonsterSvg(item)}</div>`;
