@@ -8155,7 +8155,7 @@ const recoveredStarTurnaroundFineAdjustments = {"star-hero-young-seed-walk-walk-
 let capeFineAdjustments = (() => {
   try {
     const saved = JSON.parse(localStorage.getItem(capeFineAdjustStoreKey) || "{}") || {};
-    return { ...recoveredStarTurnaroundFineAdjustments, ...saved };
+    return { ...saved, ...recoveredStarTurnaroundFineAdjustments };
   } catch {
     return { ...recoveredStarTurnaroundFineAdjustments };
   }
