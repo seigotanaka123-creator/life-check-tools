@@ -1807,6 +1807,13 @@
       align-self: center;
       transform-origin: center center;
     }
+    /* These star families have an off-center visual mass in front-right view; center the visible character, not only the SVG box. */
+    .gallery-monster-card[class*="-walk-cute-crown"] .monster-art.star-gallery-art > .turnaround-monster,
+    .gallery-monster-card[class*="-walk-cute-forest"] .monster-art.star-gallery-art > .turnaround-monster,
+    .gallery-monster-card[class*="-walk-cool-a-crown"] .monster-art.star-gallery-art > .turnaround-monster,
+    .gallery-monster-card[class*="-walk-cool-a-forest"] .monster-art.star-gallery-art > .turnaround-monster {
+      transform: translateX(-6px);
+    }
     .unique-monster {
       width: 104px;
       height: 104px;
