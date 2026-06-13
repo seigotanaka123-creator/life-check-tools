@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -33470,6 +33470,23 @@ function setRetirementRecovery(status, record) {
     status,
     record,
     retirementStorageAdViews: Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0))),
+    retirementGiftAdViews: Math.max(0, Math.min(retirementGiftAdRequiredViews, Number(retirementGiftAdViews || 0))),
+    selectedSeedId: state.retirementRecovery?.selectedSeedId || "",
+    selectedSeedGifted: Boolean(state.retirementRecovery?.selectedSeedGifted),
+    forceNoSeeds: Boolean(state.retirementRecovery?.forceNoSeeds),
+    sproutSeedId: state.retirementRecovery?.sproutSeedId || "",
+    sproutGifted: Boolean(state.retirementRecovery?.sproutGifted),
+    updatedAt: Date.now()
+  };
+}
+function updateRetirementRecovery(extra = {}) {
+  const recovery = activeRetirementRecovery();
+  if (!recovery) return;
+  state.retirementRecovery = {
+    ...recovery,
+    ...extra,
+    retirementStorageAdViews: Math.max(0, Math.min(2, Number(extra.retirementStorageAdViews ?? state.retirementStorageAdViews ?? recovery.retirementStorageAdViews ?? 0))),
+    retirementGiftAdViews: Math.max(0, Math.min(retirementGiftAdRequiredViews, Number(extra.retirementGiftAdViews ?? retirementGiftAdViews ?? recovery.retirementGiftAdViews ?? 0))),
     updatedAt: Date.now()
   };
 }
@@ -33486,10 +33503,16 @@ function renderRetirementRecovery() {
   if (!recovery) return false;
   state.pendingRetirementRecord = recovery.record;
   state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(recovery.retirementStorageAdViews || state.retirementStorageAdViews || 0)));
+  retirementGiftAdViews = Math.max(0, Math.min(retirementGiftAdRequiredViews, Number(recovery.retirementGiftAdViews || retirementGiftAdViews || 0)));
   if (recovery.status === "record-saved") {
     renderRetirementRecordSaved(recovery.record);
   } else if (recovery.status === "seed-choice") {
-    renderNextRetirementSeedChoice(recovery.record);
+    renderNextRetirementSeedChoice(recovery.record, { forceNoSeeds: Boolean(recovery.forceNoSeeds), preserveGiftAd: true });
+  } else if (recovery.status === "seed-confirm") {
+    renderRetirementSeedConfirm(recovery.selectedSeedId, Boolean(recovery.selectedSeedGifted));
+  } else if (recovery.status === "sprout-result") {
+    const seed = seedForms.find(item => item.id === recovery.sproutSeedId) || randomStarterSeed();
+    renderNewSeedSproutCeremony(seed, Boolean(recovery.sproutGifted), { fromRecovery: true });
   } else if (recovery.status === "ad-expand") {
     renderRetirementStorageAdExpand();
   } else {
@@ -33554,10 +33577,13 @@ function consumeSeedStock(seed) {
   if (count > 0) state.skyStock.seeds[seed.name] = count - 1;
 }
 function completeRetirementWithSeed(seed, gifted = false) {
+  const record = activeRetirementRecovery()?.record || state.pendingRetirementRecord || null;
   resetMonsterToSeed(seed);
   if (!gifted) consumeSeedStock(seed);
-  state.pendingRetirementRecord = null;
-  clearRetirementRecovery();
+  if (record) {
+    setRetirementRecovery("sprout-result", record);
+    updateRetirementRecovery({ sproutSeedId: seed.id, sproutGifted: Boolean(gifted) });
+  }
   addLog(`引退式の後、${seed.name}から新しい相棒がめばえ期へ進化。`);
   saveState();
   renderAll();
@@ -33611,11 +33637,15 @@ function startRetirementGiftAdView(index) {
   const adIndex = Number(index || 0);
   if (!adIndex || retirementGiftAdWatching || adIndex > retirementGiftAdViews + 1 || adIndex <= retirementGiftAdViews) return;
   retirementGiftAdWatching = adIndex;
+  updateRetirementRecovery({ status: "seed-choice", forceNoSeeds: true, retirementGiftAdViews });
+  saveState();
   updateRetirementGiftAdGate();
   retirementGiftAdTimer = setTimeout(() => {
     retirementGiftAdViews = Math.max(retirementGiftAdViews, adIndex);
     retirementGiftAdWatching = 0;
     retirementGiftAdTimer = null;
+    updateRetirementRecovery({ status: "seed-choice", forceNoSeeds: true, retirementGiftAdViews });
+    saveState();
     playSfx("reward");
     updateRetirementGiftAdGate();
   }, retirementGiftAdDurationMs);
@@ -33764,7 +33794,15 @@ function bindRetirementCeremonyActions(box) {
       }
       const seed = randomStarterSeed();
       resetRetirementGiftAdGate();
+      updateRetirementRecovery({ status: "seed-confirm", selectedSeedId: seed.id, selectedSeedGifted: true });
       selectNextRetirementSeed(seed.id, true);
+      return;
+    }
+    if (button.hasAttribute("data-retirement-sprout-home")) {
+      clearRetirementRecovery();
+      state.pendingRetirementRecord = null;
+      saveState();
+      switchScreen("walk");
       return;
     }
     if (button.hasAttribute("data-retirement-replay")) {
@@ -34110,10 +34148,18 @@ function retirementSeedChoiceArt(seed) {
 function renderNextRetirementSeedChoice(record, options = {}) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  if (record) setRetirementRecovery("seed-choice", record);
+  if (record) {
+    setRetirementRecovery("seed-choice", record);
+    updateRetirementRecovery({
+      forceNoSeeds: Boolean(options.forceNoSeeds),
+      selectedSeedId: "",
+      selectedSeedGifted: false,
+      retirementGiftAdViews: options.preserveGiftAd ? retirementGiftAdViews : 0
+    });
+  }
   const seeds = options.forceNoSeeds ? [] : availableRetirementSeeds();
   const hasSeeds = seeds.length > 0;
-  if (!hasSeeds) resetRetirementGiftAdGate();
+  if (!hasSeeds && !options.preserveGiftAd) resetRetirementGiftAdGate();
   box.innerHTML = `
     <div class="retirement-ceremony-hero retirement-seed-choice">
       <div class="retirement-ceremony-copy">
@@ -34147,8 +34193,10 @@ function renderRetirementSeedConfirm(seedId, gifted = false) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
   const seed = seedForms.find(item => item.id === seedId) || randomStarterSeed();
-  const record = state.pendingRetirementRecord || createRetirementRecord();
+  const record = state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord();
   state.pendingRetirementRecord = record;
+  setRetirementRecovery("seed-confirm", record);
+  updateRetirementRecovery({ selectedSeedId: seed.id, selectedSeedGifted: Boolean(gifted) });
   box.innerHTML = `
     <div class="retirement-ceremony-hero retirement-seed-choice">
       <div class="retirement-ceremony-copy">
@@ -34170,14 +34218,15 @@ function renderRetirementSeedConfirm(seedId, gifted = false) {
       </div>
     </div>
   `;
+  saveState();
   bindRetirementCeremonyActions(box);
 }
 function selectNextRetirementSeed(seedId, gifted = false) {
   const seed = seedForms.find(item => item.id === seedId) || randomStarterSeed();
   completeRetirementWithSeed(seed, gifted);
 }
-function renderNewSeedSproutCeremony(seed, gifted = false) {
-  switchScreen("retirement");
+function renderNewSeedSproutCeremony(seed, gifted = false, options = {}) {
+  if (!options.fromRecovery) switchScreen("retirement");
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
   const profile = monsterProfile();
@@ -34193,13 +34242,18 @@ function renderNewSeedSproutCeremony(seed, gifted = false) {
         <div class="retirement-ceremony-card"><b>${companionDisplayName(profile)}</b><p>${profile.text}</p></div>
       </div>
       <div class="retirement-ceremony-actions retirement-sprout-actions">
-        <button type="button" class="primary" data-retirement-home onclick="switchScreen('walk')">ホームへ戻る</button>
+        <button type="button" class="primary" data-retirement-sprout-home>ホームへ戻る</button>
       </div>
     </div>
   `;
   bindRetirementCeremonyActions(box);
 }
 function openRetirementCeremony() {
+  if (activeRetirementRecovery()) {
+    switchScreen("retirement");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
   if (!isRetirementReady()) {
     playSfx("error");
     toast("まだ引退準備の時間ではありません");
