@@ -369,6 +369,19 @@
       font-size: 12px;
       font-weight: 900;
     }
+    .map-time-note.closed {
+      display: block;
+      width: 100%;
+      margin: 12px 0 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #fffdf2;
+      border: 2px solid #e3bd58;
+      color: #5f4112;
+      font-size: 15px;
+      line-height: 1.55;
+      box-shadow: 0 8px 18px rgba(92, 63, 18, .12), inset 0 1px 0 rgba(255,255,255,.85);
+    }
     .tile {
       aspect-ratio: 1;
       border-radius: 18px;
@@ -2334,18 +2347,31 @@
       align-self: center;
       filter: drop-shadow(0 7px 5px rgba(23,32,44,.14));
     }
+    .monster-current-art .monster.sprout::before,
+    .monster-current-art .monster.trail::before,
+    .monster-current-art .monster.skykid::before,
+    .monster-current-art .monster.leaf::before,
+    .monster-current-art .monster.city::before,
+    .monster-current-art .monster.sky::before,
     .gallery-monster-card .monster.sprout::before,
     .gallery-monster-card .monster.trail::before,
     .gallery-monster-card .monster.skykid::before,
     .gallery-monster-card .monster.leaf::before,
     .gallery-monster-card .monster.city::before,
     .gallery-monster-card .monster.sky::before { background: var(--body, currentColor); }
+    .monster-current-art .monster.sprout::after,
+    .monster-current-art .monster.trail::after,
+    .monster-current-art .monster.skykid::after,
+    .monster-current-art .monster.leaf::after,
+    .monster-current-art .monster.sky::after,
     .gallery-monster-card .monster.sprout::after,
     .gallery-monster-card .monster.trail::after,
     .gallery-monster-card .monster.skykid::after,
     .gallery-monster-card .monster.leaf::after,
     .gallery-monster-card .monster.sky::after { background: var(--accent, currentColor); }
+    .monster-current-art .monster.city .monster-mark,
     .gallery-monster-card .monster.city .monster-mark { background: repeating-linear-gradient(90deg, var(--window, rgba(255,242,143,.9)) 0 5px, rgba(37,74,120,.12) 5px 10px); }
+    .monster-current-art .monster .monster-spark,
     .gallery-monster-card .monster .monster-spark { background: var(--spark, #ffffff); }
     .gallery-monster-card[class*="young-"] .monster-mark { display: block; }
     .gallery-monster-card.young-seed-walk-walk .monster.trail::before { border-radius: 48% 38% 38% 42%; clip-path: polygon(50% 0, 88% 26%, 78% 100%, 22% 100%, 12% 26%); }
@@ -32524,8 +32550,28 @@ function handleGuideAction(action) {
   document.getElementById("dailyProgress")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function renderMap() {
+  const map = document.getElementById("map");
+  const counter = document.getElementById("mapSkyCounter");
+  const timeNote = document.querySelector(".map-time-note");
+  const mapWrap = map?.closest(".map-wrap");
+  if (!map) return;
+  if (!isMapPlaytime()) {
+    map.innerHTML = "";
+    if (counter) counter.innerHTML = "";
+    if (mapWrap) mapWrap.hidden = true;
+    if (timeNote) {
+      timeNote.classList.add("closed");
+      timeNote.textContent = "マップ進行は06:00〜19:00のみです。時間外は25マスマップを表示しません。夜遅い時間に外へ出ず、次は朝6時から安全に進めましょう。";
+    }
+    return;
+  }
+  if (mapWrap) mapWrap.hidden = false;
+  if (timeNote) {
+    timeNote.classList.remove("closed");
+    timeNote.textContent = "マップ進行は06:00〜19:00のみ";
+  }
   const start = Math.floor(state.position / 25) * 25;
-  document.getElementById("map").innerHTML = Array.from({ length: 25 }, (_, index) => {
+  map.innerHTML = Array.from({ length: 25 }, (_, index) => {
     const n = start + index;
     const now = n === state.position;
     const done = n < state.position;
@@ -38567,6 +38613,7 @@ renderAll();
 resumePendingRetirementRecoveryOnLoad();
 updateHomeWindowClock();
 setInterval(updateHomeWindowClock, 60000);
+setInterval(renderMap, 60000);
 </script>
 </body>
 </html>
