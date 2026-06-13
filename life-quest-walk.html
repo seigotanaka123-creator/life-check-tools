@@ -6052,6 +6052,9 @@
         radial-gradient(circle at 78% 18%, rgba(255,255,255,.72) 0 16px, transparent 17px),
         linear-gradient(180deg, rgba(168,219,142,.62), rgba(91,171,118,.64));
     }
+    .retirement-storage-full::before {
+      background: linear-gradient(180deg, rgba(168,219,142,.62), rgba(91,171,118,.64));
+    }
     .retirement-ceremony-copy {
       position: relative;
       z-index: 1;
@@ -6112,6 +6115,38 @@
       flex: 0 0 auto;
       padding: 8px 14px;
       white-space: nowrap;
+      border: 2px solid rgba(164, 119, 34, .55);
+      box-shadow: 0 5px 12px rgba(92, 68, 18, .18), inset 0 1px 0 rgba(255,255,255,.72);
+    }
+    .retirement-storage-choice-actions button.primary,
+    .retirement-storage-choice-actions button[data-retirement-expand] {
+      border-color: rgba(171, 124, 26, .66);
+      background: linear-gradient(180deg, #ffe28a, #f6be4b);
+      color: #5f3d08;
+    }
+    .retirement-storage-ad-progress {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      width: min(100%, 420px);
+      margin: 16px auto 0;
+    }
+    .retirement-storage-ad-step {
+      border: 2px solid rgba(164, 119, 34, .36);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 253, 244, .96);
+      box-shadow: 0 6px 14px rgba(92, 68, 18, .12), inset 0 1px 0 #fff;
+      color: #5f3d08;
+      font-weight: 900;
+      text-align: center;
+    }
+    .retirement-storage-ad-step.done {
+      border-color: rgba(78, 144, 92, .48);
+      background: rgba(242, 255, 237, .96);
+      color: #2e6a35;
     }
     .retirement-ceremony-stage {
       position: relative;
@@ -29934,7 +29969,9 @@ function defaultState() {
     skyStock: { seeds: {}, materials: {}, townPieces: {} },
     retiredMonsters: [],
     retiredStorageLimit: 20,
+    retirementStorageAdViews: 0,
     pendingRetirementRecord: null,
+    retirementRecovery: null,
     pendingSky: null,
     mapAwaitingSky: null,
     comboDex: [],
@@ -30020,8 +30057,13 @@ function normalizeState() {
   state.skyStock.materials = state.skyStock.materials && typeof state.skyStock.materials === "object" ? state.skyStock.materials : {};
   state.skyStock.townPieces = state.skyStock.townPieces && typeof state.skyStock.townPieces === "object" ? state.skyStock.townPieces : {};
   state.retiredMonsters = Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [];
-  state.retiredStorageLimit = Math.max(1, Number(state.retiredStorageLimit || 20));
+  state.retiredStorageLimit = Math.max(1, Math.min(500, Number(state.retiredStorageLimit || 20)));
+  state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0)));
   state.pendingRetirementRecord = state.pendingRetirementRecord && typeof state.pendingRetirementRecord === "object" ? state.pendingRetirementRecord : null;
+  state.retirementRecovery = state.retirementRecovery && typeof state.retirementRecovery === "object" ? state.retirementRecovery : null;
+  if (state.retirementRecovery?.record && !state.pendingRetirementRecord) {
+    state.pendingRetirementRecord = state.retirementRecovery.record;
+  }
   state.pendingSky = state.pendingSky && typeof state.pendingSky === "object" ? state.pendingSky : null;
   state.mapAwaitingSky = state.mapAwaitingSky && typeof state.mapAwaitingSky === "object" ? state.mapAwaitingSky : null;
   if (state.mapStartPositionVersion !== 2) {
@@ -33416,7 +33458,44 @@ function retirementDateText() {
   return new Date().toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
 }
 function retirementStorageLimit() {
-  return Math.max(1, Number(state.retiredStorageLimit || 20));
+  return Math.max(1, Math.min(500, Number(state.retiredStorageLimit || 20)));
+}
+function resetRetirementStorageAdGate() {
+  state.retirementStorageAdViews = 0;
+}
+function setRetirementRecovery(status, record) {
+  if (!record) return;
+  state.pendingRetirementRecord = record;
+  state.retirementRecovery = {
+    status,
+    record,
+    retirementStorageAdViews: Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0))),
+    updatedAt: Date.now()
+  };
+}
+function clearRetirementRecovery() {
+  state.retirementRecovery = null;
+}
+function activeRetirementRecovery() {
+  const recovery = state.retirementRecovery;
+  if (!recovery || typeof recovery !== "object" || !recovery.record) return null;
+  return recovery;
+}
+function renderRetirementRecovery() {
+  const recovery = activeRetirementRecovery();
+  if (!recovery) return false;
+  state.pendingRetirementRecord = recovery.record;
+  state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(recovery.retirementStorageAdViews || state.retirementStorageAdViews || 0)));
+  if (recovery.status === "record-saved") {
+    renderRetirementRecordSaved(recovery.record);
+  } else if (recovery.status === "seed-choice") {
+    renderNextRetirementSeedChoice(recovery.record);
+  } else if (recovery.status === "ad-expand") {
+    renderRetirementStorageAdExpand();
+  } else {
+    renderRetirementStorageFull(recovery.record);
+  }
+  return true;
 }
 function availableRetirementSeeds() {
   const stock = state.skyStock?.seeds || {};
@@ -33458,6 +33537,8 @@ function storeRetirementRecord(record, replaceId = "") {
   } else {
     state.retiredMonsters.push(record);
   }
+  resetRetirementStorageAdGate();
+  clearRetirementRecovery();
   state.pendingRetirementRecord = null;
 }
 function resetMonsterToSeed(seed) {
@@ -33476,6 +33557,7 @@ function completeRetirementWithSeed(seed, gifted = false) {
   resetMonsterToSeed(seed);
   if (!gifted) consumeSeedStock(seed);
   state.pendingRetirementRecord = null;
+  clearRetirementRecovery();
   addLog(`引退式の後、${seed.name}から新しい相棒がめばえ期へ進化。`);
   saveState();
   renderAll();
@@ -33627,9 +33709,10 @@ function bindRetirementCeremonyActions(box) {
       return;
     }
     if (button.hasAttribute("data-retirement-storage-give-up")) {
-      state.pendingRetirementRecord = null;
+      setRetirementRecovery("storage-full", state.pendingRetirementRecord || createRetirementRecord());
       saveState();
       switchScreen("walk");
+      toast("保存待ちの引退記録を残しました");
       return;
     }
     if (button.hasAttribute("data-retirement-show-replace")) {
@@ -33645,7 +33728,15 @@ function bindRetirementCeremonyActions(box) {
       return;
     }
     if (button.hasAttribute("data-retirement-expand")) {
-      renderRetirementStorageExpandGuide();
+      renderRetirementStorageAdExpand();
+      return;
+    }
+    if (button.hasAttribute("data-retirement-storage-ad")) {
+      watchRetirementStorageAd();
+      return;
+    }
+    if (button.hasAttribute("data-retirement-storage-ad-complete")) {
+      completeRetirementStorageAdExpand();
       return;
     }
     if (button.hasAttribute("data-retirement-seed")) {
@@ -33685,6 +33776,7 @@ function renderRetirementCeremony() {
   clearRetirementSendoffTimers();
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
+  if (activeRetirementRecovery() && renderRetirementRecovery()) return;
   if (!isRetirementReady()) {
     box.innerHTML = `
       <div class="retirement-ceremony-hero">
@@ -33872,9 +33964,10 @@ function renderRetirementSendoff() {
 function finalizeRetirementAfterCeremony(replaceId = "") {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  const record = state.pendingRetirementRecord || createRetirementRecord();
+  const record = state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord();
   state.pendingRetirementRecord = record;
   if (!replaceId && state.retiredMonsters.length >= retirementStorageLimit()) {
+    setRetirementRecovery("storage-full", record);
     renderRetirementStorageFull(record);
     saveState();
     return;
@@ -33887,7 +33980,7 @@ function finalizeRetirementAfterCeremony(replaceId = "") {
 function renderRetirementRecordSaved(record) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  state.pendingRetirementRecord = record;
+  setRetirementRecovery("record-saved", record);
   box.innerHTML = `
     <div class="retirement-ceremony-hero retirement-record-saved">
       <div class="retirement-ceremony-copy">
@@ -33902,27 +33995,28 @@ function renderRetirementRecordSaved(record) {
       </div>
     </div>
   `;
+  saveState();
   bindRetirementCeremonyActions(box);
 }
 function renderRetirementStorageFull(record, options = {}) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  state.pendingRetirementRecord = record;
+  setRetirementRecovery("storage-full", record);
   const { showReplaceList = false } = options;
   box.innerHTML = `
     <div class="retirement-ceremony-hero retirement-storage-full">
       <div class="retirement-ceremony-copy">
         <h2>モンスター保存数の空きがありません</h2>
-        <p>${record.name}を街の記録へ残すには、保存済みの相棒と入れ替えるか、保存数を拡張します。</p>
+        <p>${record.name}を街の記録へ残すには、保存済みの相棒と入れ替えるか、広告を2つ見て保存枠を1つ拡張する必要があります。</p>
       </div>
       <div class="retirement-record-message warning">
         <b>保存できませんでした</b>
         <p>モンスター保存数の空きがありません。</p>
       </div>
       <div class="retirement-ceremony-actions retirement-storage-choice-actions">
-        <button type="button" data-retirement-storage-give-up>諦める</button>
+        <button type="button" data-retirement-storage-give-up>あとで決める</button>
         <button type="button" class="primary" data-retirement-show-replace>入れ替える</button>
-        <button type="button" data-retirement-expand>拡張する</button>
+        <button type="button" data-retirement-expand>広告で保存枠+1</button>
       </div>
     </div>
     ${showReplaceList ? `<div class="retirement-ceremony-steps retirement-replace-list">
@@ -33945,7 +34039,7 @@ function renderRetirementReplaceConfirm(replaceId) {
     <div class="retirement-ceremony-hero">
       <div class="retirement-ceremony-copy">
         <h2>入れ替え確認</h2>
-        <p>${target.name}とはこれでお別れになりますが、本当に${target.name}とお別れして大丈夫ですか？保存数追加も出来ますよ？</p>
+        <p>${target.name}とはこれでお別れになりますが、本当に${target.name}とお別れして大丈夫ですか？広告で保存枠を追加することも出来ますよ？</p>
       </div>
       <div class="retirement-ceremony-card">
         <div class="retirement-ceremony-name"><span>${target.name}</span><strong class="retirement-rank-badge">${target.rank}</strong><span>能力合計 ${target.abilityTotal}</span></div>
@@ -33953,27 +34047,61 @@ function renderRetirementReplaceConfirm(replaceId) {
     </div>
     <div class="retirement-ceremony-actions">
       <button type="button" data-retirement-replace-confirm="${target.id}">お別れする</button>
-      <button type="button" data-retirement-expand>保存数追加（有料）</button>
+      <button type="button" data-retirement-expand>広告で保存枠+1</button>
       <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord, { showReplaceList: true })">戻る</button>
     </div>
   `;
   bindRetirementCeremonyActions(box);
 }
-function renderRetirementStorageExpandGuide() {
+function renderRetirementStorageAdExpand() {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
+  const record = state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord();
+  setRetirementRecovery("ad-expand", record);
+  const views = Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0)));
+  const canComplete = views >= 2;
+  const isMax = retirementStorageLimit() >= 500;
   box.innerHTML = `
-    <div class="retirement-ceremony-hero">
+    <div class="retirement-ceremony-hero retirement-storage-full">
       <div class="retirement-ceremony-copy">
-        <h2>最大保存数追加（有料）</h2>
-        <p>正式版では、保存枠を追加購入して大切な相棒を残せるようにします。ローカル試作では購入処理はまだ行いません。</p>
+        <h2>広告で保存枠を1つ拡張</h2>
+        <p>${isMax ? "保存枠は現在の設計上の最大数です。" : "長めの広告を2つ見ると、保存枠を1つ拡張できます。拡張した枠は課金拡張を追加した場合でも無駄にならない加算方式です。"}</p>
+      </div>
+      <div class="retirement-storage-ad-progress">
+        <div class="retirement-storage-ad-step ${views >= 1 ? "done" : ""}">広告1 ${views >= 1 ? "視聴済み" : "未視聴"}</div>
+        <div class="retirement-storage-ad-step ${views >= 2 ? "done" : ""}">広告2 ${views >= 2 ? "視聴済み" : "未視聴"}</div>
       </div>
     </div>
     <div class="retirement-ceremony-actions">
+      ${!isMax && !canComplete ? `<button type="button" class="primary" data-retirement-storage-ad>広告を見る</button>` : ""}
+      ${!isMax && canComplete ? `<button type="button" class="primary" data-retirement-storage-ad-complete>保存枠を1つ増やして記録する</button>` : ""}
       <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord)">選択に戻る</button>
     </div>
   `;
+  saveState();
   bindRetirementCeremonyActions(box);
+}
+function watchRetirementStorageAd() {
+  state.retirementStorageAdViews = Math.min(2, Number(state.retirementStorageAdViews || 0) + 1);
+  setRetirementRecovery("ad-expand", state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord());
+  addLog(`保存枠拡張広告 ${state.retirementStorageAdViews}/2 を視聴済み。`);
+  saveState();
+  renderRetirementStorageAdExpand();
+  playSfx("reward");
+  toast(`広告視聴 ${state.retirementStorageAdViews}/2`);
+}
+function completeRetirementStorageAdExpand() {
+  if (Number(state.retirementStorageAdViews || 0) < 2) {
+    renderRetirementStorageAdExpand();
+    return;
+  }
+  state.retiredStorageLimit = Math.min(500, retirementStorageLimit() + 1);
+  resetRetirementStorageAdGate();
+  addLog(`広告2つ視聴で、モンスター保存枠を${retirementStorageLimit()}枠へ拡張。`);
+  saveState();
+  finalizeRetirementAfterCeremony();
+  playSfx("reward");
+  toast("保存枠を1つ拡張しました");
 }
 function retirementSeedChoiceArt(seed) {
   const item = dexCharacterItem({ id: seed.id, name: seed.name });
@@ -33982,6 +34110,7 @@ function retirementSeedChoiceArt(seed) {
 function renderNextRetirementSeedChoice(record, options = {}) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
+  if (record) setRetirementRecovery("seed-choice", record);
   const seeds = options.forceNoSeeds ? [] : availableRetirementSeeds();
   const hasSeeds = seeds.length > 0;
   if (!hasSeeds) resetRetirementGiftAdGate();
@@ -34011,6 +34140,7 @@ function renderNextRetirementSeedChoice(record, options = {}) {
     </div>
   `;
   bindRetirementCeremonyActions(box);
+  if (record) saveState();
   if (!hasSeeds) updateRetirementGiftAdGate();
 }
 function renderRetirementSeedConfirm(seedId, gifted = false) {
@@ -38286,6 +38416,11 @@ function switchScreen(screen) {
   if (screen === "walk" && leavingRetirementBgm) startBgm("normal");
   scheduleCaretCleanup();
 }
+function resumePendingRetirementRecoveryOnLoad() {
+  if (!activeRetirementRecovery()) return;
+  switchScreen("retirement");
+  toast("保存待ちの引退記録を再開しました");
+}
 document.querySelectorAll("[data-tab]").forEach(button => {
   button.addEventListener("click", () => {
     playSfx("select");
@@ -38375,6 +38510,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 });
 shuffleCards();
 renderAll();
+resumePendingRetirementRecoveryOnLoad();
 updateHomeWindowClock();
 setInterval(updateHomeWindowClock, 60000);
 </script>
