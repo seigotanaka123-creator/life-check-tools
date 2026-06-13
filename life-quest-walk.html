@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -1793,6 +1793,43 @@
       overflow: visible;
       background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.88), rgba(218,239,255,.62) 48%, rgba(244,232,189,.62));
     }
+    .character-gallery .gallery-monster-card,
+    .character-gallery .turnaround-card {
+      background:
+        radial-gradient(ellipse at 50% 72%, rgba(73,96,122,.18), rgba(73,96,122,0) 42%),
+        linear-gradient(145deg, rgba(255,255,255,.95), rgba(237,247,255,.82) 52%, rgba(255,246,216,.72));
+      box-shadow:
+        inset 0 -5px 0 rgba(44,69,95,.08),
+        0 9px 18px rgba(25,46,70,.12);
+    }
+    .character-gallery .monster-art,
+    .character-gallery .turnaround-view {
+      background:
+        radial-gradient(ellipse at 50% 78%, rgba(41,58,77,.2), rgba(41,58,77,0) 42%),
+        radial-gradient(circle at 34% 22%, rgba(255,255,255,.95), rgba(218,239,255,.42) 44%, rgba(240,226,181,.46));
+    }
+    .character-gallery .monster,
+    .character-gallery .unique-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.2))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(3px 4px 0 rgba(39,58,78,.12));
+    }
+    .character-gallery .turnaround-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.22))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(4px 5px 0 rgba(39,58,78,.13));
+    }
+    .character-gallery .monster::before,
+    .character-gallery .monster::after {
+      box-shadow:
+        inset -10px -12px 0 rgba(31,45,60,.14),
+        inset 7px 6px 0 rgba(255,255,255,.18);
+    }
+    .character-gallery .monster-eye {
+      box-shadow: inset -1px -1px 0 rgba(255,255,255,.35), 0 1px 0 rgba(23,32,44,.12);
+    }
     .gallery-monster-card .monster-art.star-gallery-art {
       width: 112px;
       height: 112px;
@@ -2742,7 +2779,7 @@
       border-radius: 999px;
       background: rgba(255,255,255,.9);
       color: #254a78;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 900;
       padding: 6px 10px;
       box-shadow: 0 4px 12px rgba(23,50,78,.12);
@@ -4320,6 +4357,28 @@
       margin: 0;
       transform-origin: center center;
     }
+    .dex-full-card .dex-character.gallery-monster-card[class*="star-"] {
+      display: grid;
+      place-items: center;
+    }
+    .dex-full-card .dex-character.gallery-monster-card[class*="star-"] .monster-art.star-gallery-art {
+      width: 88px;
+      height: 88px;
+      display: grid;
+      place-items: center;
+      justify-self: center;
+      align-self: center;
+      margin: 0 auto;
+      overflow: visible;
+    }
+    .dex-full-card .dex-character.gallery-monster-card[class*="star-"] .monster-art.star-gallery-art > .turnaround-monster {
+      width: 88px;
+      height: 88px;
+      justify-self: center;
+      align-self: center;
+      margin: 0 auto;
+      transform-origin: center center;
+    }
     .dex-character.locked {
       width: 58px;
       height: 58px;
@@ -5783,6 +5842,30 @@
       width: 88px;
       height: 88px;
     }
+    .home-seat .monster,
+    .home-seat .unique-monster,
+    .retirement-sendoff .retirement-ceremony-art .monster,
+    .retirement-sendoff .retirement-ceremony-art .unique-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.2))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(3px 4px 0 rgba(39,58,78,.12));
+    }
+    .home-seat .turnaround-monster,
+    .retirement-sendoff .retirement-ceremony-art .turnaround-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.22))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(4px 5px 0 rgba(39,58,78,.13));
+    }
+    .home-seat .monster::before,
+    .home-seat .monster::after,
+    .retirement-sendoff .retirement-ceremony-art .monster::before,
+    .retirement-sendoff .retirement-ceremony-art .monster::after {
+      box-shadow:
+        inset -10px -12px 0 rgba(31,45,60,.14),
+        inset 7px 6px 0 rgba(255,255,255,.18);
+    }
     .home-seat .monster:not(.unique-monster) {
       margin: auto;
       transform: translateY(6px) scale(.9, .82);
@@ -5935,29 +6018,11 @@
       box-shadow: none;
       text-shadow: none;
     }
-    .home-retirement-action {
-      position: absolute;
-      left: 14px;
-      bottom: 0;
-      z-index: 7;
-      width: calc((100% - 28px - 15px) / 4);
-    }
-    .home-retirement-action button {
-      width: 100%;
-      min-height: 38px;
-      border: 0;
-      border-radius: 7px;
-      background: linear-gradient(180deg, #fff08a, #dcb95a);
-      color: #4f3712;
-      padding: 7px 3px;
-      font-weight: 900;
-      font-size: 15px;
-      line-height: 1;
-      box-shadow: 0 3px 0 rgba(138, 106, 34, .22), inset 0 1px 0 rgba(255,255,255,.38);
-    }
     .home-actions.retirement-ready {
-      left: calc(14px + ((100% - 28px - 15px) / 4) + 5px);
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top-color: rgba(188, 139, 36, .34);
+      background: rgba(255, 248, 211, .97);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.66), 0 -2px 0 rgba(188,139,36,.12);
     }
     .retirement-ceremony {
       display: grid;
@@ -6003,6 +6068,51 @@
       line-height: 1.75;
       font-weight: 700;
     }
+    .retirement-record-message {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 6px;
+      width: min(100%, 430px);
+      margin: 18px auto 0;
+      padding: 13px 15px;
+      border: 2px solid rgba(185, 137, 36, .42);
+      border-radius: 10px;
+      background: rgba(255, 253, 244, .96);
+      box-shadow: 0 8px 18px rgba(92, 68, 18, .12), inset 0 1px 0 #fff;
+      text-align: center;
+    }
+    .retirement-record-message b {
+      color: #6c4b14;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .retirement-record-message p {
+      margin: 0;
+      color: #3f351d;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.65;
+    }
+    .retirement-record-message.warning {
+      border-color: rgba(198, 78, 52, .42);
+      background: rgba(255, 248, 241, .96);
+    }
+    .retirement-record-actions,
+    .retirement-storage-choice-actions {
+      position: relative;
+      z-index: 2;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .retirement-record-actions button,
+    .retirement-storage-choice-actions button {
+      width: auto;
+      min-width: 0;
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      white-space: nowrap;
+    }
     .retirement-ceremony-stage {
       position: relative;
       z-index: 1;
@@ -6018,10 +6128,61 @@
       place-items: center;
     }
     .retirement-ceremony-art .monster-current-art,
+    .retirement-ceremony-art .monster-art,
     .retirement-ceremony-art .unique-monster,
     .retirement-ceremony-art .monster {
       width: 138px;
       height: 138px;
+    }
+    .retirement-confirm .retirement-ceremony-art .monster-art {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .retirement-confirm .retirement-ceremony-art .monster,
+    .retirement-confirm .retirement-ceremony-art .unique-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.2))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(3px 4px 0 rgba(39,58,78,.12));
+    }
+    .retirement-confirm .retirement-ceremony-art .turnaround-monster {
+      filter:
+        drop-shadow(0 12px 8px rgba(23,32,44,.22))
+        drop-shadow(-3px -3px 0 rgba(255,255,255,.28))
+        drop-shadow(4px 5px 0 rgba(39,58,78,.13));
+    }
+    .retirement-confirm .retirement-ceremony-art .monster::before,
+    .retirement-confirm .retirement-ceremony-art .monster::after {
+      box-shadow:
+        inset -10px -12px 0 rgba(31,45,60,.14),
+        inset 7px 6px 0 rgba(255,255,255,.18);
+    }
+    .retirement-sprout-result .retirement-ceremony-art {
+      justify-items: center;
+      align-items: center;
+    }
+    .retirement-sprout-result .retirement-ceremony-art .monster-current-art {
+      display: grid;
+      place-items: center;
+      width: 138px;
+      height: 138px;
+      margin: 0 auto;
+    }
+    .retirement-sprout-result .retirement-ceremony-art .monster-art {
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+    }
+    .retirement-sprout-result .retirement-ceremony-art .monster:not(.unique-monster) {
+      width: 82px;
+      height: 82px;
+      left: auto;
+      top: auto;
+      margin: auto;
+      transform: none;
+      transform-origin: center center;
     }
     .retirement-ceremony-card {
       display: grid;
@@ -6090,6 +6251,180 @@
     .retirement-confirm .retirement-ceremony-hero {
       min-height: 260px;
     }
+    .retirement-confirm .retirement-ceremony-hero::before {
+      bottom: -22px;
+      background: linear-gradient(180deg, rgba(168,219,142,.62), rgba(91,171,118,.64));
+    }
+    .retirement-confirm .retirement-ceremony-stage {
+      grid-template-columns: minmax(130px, 180px) 1fr;
+    }
+    .retirement-ceremony-hero.retirement-seed-choice::before {
+      background: linear-gradient(180deg, rgba(168,219,142,.62), rgba(91,171,118,.64));
+    }
+    .retirement-ceremony-hero.retirement-seed-choice {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+    .retirement-ceremony-hero.retirement-seed-choice .seed-list {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 560px);
+      margin-top: 0;
+    }
+    .retirement-ceremony-hero.retirement-seed-choice .seed-pick {
+      min-height: 98px;
+      display: grid;
+      align-content: start;
+      justify-items: center;
+      gap: 4px;
+      padding: 9px 8px 10px;
+    }
+    .retirement-ceremony-hero.retirement-seed-choice .seed-pick strong {
+      margin-top: 2px;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .retirement-ceremony-hero.retirement-seed-choice .seed-pick small {
+      margin-top: 1px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .retirement-seed-art {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 48px;
+      pointer-events: none;
+    }
+    .retirement-seed-art.dex-character.gallery-monster-card .monster-art {
+      width: 48px;
+      height: 42px;
+      margin: 0 auto;
+    }
+    .retirement-seed-art.dex-character.gallery-monster-card .monster.seed {
+      transform: translate(-50%, -50%) scale(.82) rotate(-7deg);
+      transform-origin: center center;
+    }
+    .retirement-seed-confirm {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      width: min(100%, 360px);
+      margin: 0 auto;
+    }
+    .retirement-seed-confirm-pick {
+      width: min(100%, 260px);
+      min-height: 142px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 6px;
+      padding: 14px 12px;
+      border: 2px solid #b98924;
+      background: #fff7cf;
+      box-shadow: 0 8px 18px rgba(92, 68, 18, .18), inset 0 1px 0 #fff;
+      cursor: default;
+    }
+    .retirement-seed-confirm-pick .retirement-seed-art {
+      width: 78px;
+      height: 68px;
+    }
+    .retirement-seed-confirm-pick .retirement-seed-art.dex-character.gallery-monster-card .monster-art {
+      width: 66px;
+      height: 58px;
+    }
+    .retirement-seed-confirm-pick .retirement-seed-art.dex-character.gallery-monster-card .monster.seed {
+      transform: translate(-50%, -50%) scale(1.05) rotate(-7deg);
+    }
+    .retirement-seed-confirm-text {
+      display: grid;
+      gap: 2px;
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #d9b257;
+      border-radius: 8px;
+      background: #fffdf4;
+      box-shadow: inset 0 1px 0 #fff, 0 2px 0 rgba(122, 86, 18, .08);
+    }
+    .retirement-seed-confirm-text strong {
+      font-size: 16px;
+      width: 100%;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #2f2815;
+    }
+    .retirement-seed-confirm-text small {
+      font-size: 11.5px;
+      width: 100%;
+      margin-top: 0;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #5c4a20;
+    }
+    .retirement-seed-confirm-actions {
+      display: grid;
+      grid-template-columns: max-content max-content;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 2px;
+    }
+    .retirement-seed-confirm-actions button {
+      width: auto;
+      min-width: 0;
+      min-height: 40px;
+      padding: 8px 13px;
+      white-space: nowrap;
+    }
+    .retirement-sprout-actions {
+      justify-content: center;
+      width: 100%;
+      margin-top: 2px;
+    }
+    .retirement-sprout-actions button {
+      width: auto;
+      min-width: 0;
+      min-height: 40px;
+      padding: 8px 14px;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    @media (max-width: 430px) {
+      .retirement-seed-confirm-actions {
+        grid-template-columns: max-content;
+        max-width: 100%;
+        margin-inline: auto;
+      }
+      .retirement-seed-confirm-actions button {
+        white-space: normal;
+      }
+    }
+    .retirement-gift-ad-gate {
+      display: grid;
+      gap: 8px;
+    }
+    .retirement-gift-ad-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .retirement-gift-ad-status {
+      color: #7b6b4d;
+      font-size: 11px;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .retirement-gift-ad-actions {
+      justify-content: center;
+    }
+    .retirement-gift-ad-actions button:disabled {
+      opacity: .56;
+      cursor: not-allowed;
+    }
     .retirement-confirm-message {
       position: relative;
       z-index: 1;
@@ -6105,6 +6440,23 @@
     .retirement-confirm-message strong {
       color: #7a5210;
     }
+    .retirement-confirm .retirement-ceremony-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+    .retirement-confirm .retirement-ceremony-actions button {
+      width: 100%;
+      min-width: 0;
+      min-height: 36px;
+      padding: 7px 10px;
+      border: 1px solid rgba(157, 116, 24, .34);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fff28a, #eac84a);
+      color: #50370e;
+      font-size: 13px;
+      box-shadow: inset 0 -3px 0 rgba(89, 61, 14, .14);
+    }
     .retirement-sendoff {
       display: grid;
       gap: 12px;
@@ -6115,8 +6467,38 @@
       border-color: #111;
       isolation: isolate;
       background:
-        linear-gradient(180deg, #050505 0 44px, #f7d6c0 45px, #f7d6c0 100%);
+        linear-gradient(180deg, #050505 0 44px, #f6bd72 45px, #f6bd72 100%);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 12px 28px rgba(0,0,0,.22);
+    }
+    @property --retirement-sky-top {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #ffe78e;
+    }
+    @property --retirement-sky-mid {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #ffd37c;
+    }
+    @property --retirement-sky-haze {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #d5b18f;
+    }
+    @property --retirement-sky-low {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #f0a364;
+    }
+    @property --retirement-sky-edge {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: rgba(241, 142, 78, .38);
+    }
+    @property --retirement-sky-glow {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: rgba(255, 244, 157, .72);
     }
     .retirement-sendoff-sky-base {
       position: absolute;
@@ -6126,24 +6508,58 @@
       bottom: 44px;
       z-index: 3;
       pointer-events: none;
-      background: #f7d6c0;
+      --retirement-sky-top: #ffe78e;
+      --retirement-sky-mid: #ffd37c;
+      --retirement-sky-haze: #d5b18f;
+      --retirement-sky-low: #f0a364;
+      --retirement-sky-edge: rgba(241, 142, 78, .38);
+      --retirement-sky-glow: rgba(255, 244, 157, .72);
+      background:
+        radial-gradient(ellipse at 52% 0%, var(--retirement-sky-glow) 0 28%, transparent 58%),
+        linear-gradient(90deg, var(--retirement-sky-edge) 0%, transparent 28%, transparent 72%, var(--retirement-sky-edge) 100%),
+        linear-gradient(180deg, var(--retirement-sky-top) 0%, var(--retirement-sky-mid) 36%, var(--retirement-sky-haze) 58%, var(--retirement-sky-low) 100%);
       animation: retirementUnifiedSkyBackground 42s ease-in-out forwards;
     }
     @keyframes retirementUnifiedSkyBackground {
       0% {
-        background: #f7d6c0;
+        --retirement-sky-top: #ffe78e;
+        --retirement-sky-mid: #ffd37c;
+        --retirement-sky-haze: #d5b18f;
+        --retirement-sky-low: #f0a364;
+        --retirement-sky-edge: rgba(241, 142, 78, .38);
+        --retirement-sky-glow: rgba(255, 244, 157, .72);
       }
       54% {
-        background: #efc5ba;
+        --retirement-sky-top: #e7b784;
+        --retirement-sky-mid: #d79a78;
+        --retirement-sky-haze: #a99186;
+        --retirement-sky-low: #bc7c66;
+        --retirement-sky-edge: rgba(165, 92, 86, .36);
+        --retirement-sky-glow: rgba(229, 184, 128, .34);
       }
       78% {
-        background: #bfa3b3;
+        --retirement-sky-top: #77719e;
+        --retirement-sky-mid: #897296;
+        --retirement-sky-haze: #8c7480;
+        --retirement-sky-low: #6f5d78;
+        --retirement-sky-edge: rgba(75, 57, 88, .3);
+        --retirement-sky-glow: rgba(150, 117, 126, .16);
       }
       90% {
-        background: #55537f;
+        --retirement-sky-top: #2b356f;
+        --retirement-sky-mid: #374171;
+        --retirement-sky-haze: #3e3e66;
+        --retirement-sky-low: #282b57;
+        --retirement-sky-edge: rgba(22, 26, 58, .34);
+        --retirement-sky-glow: rgba(95, 94, 135, .08);
       }
       100% {
-        background: #070b2d;
+        --retirement-sky-top: #050824;
+        --retirement-sky-mid: #07113a;
+        --retirement-sky-haze: #0d1745;
+        --retirement-sky-low: #050824;
+        --retirement-sky-edge: rgba(3, 6, 25, .38);
+        --retirement-sky-glow: rgba(255, 255, 255, .03);
       }
     }
     .retirement-sendoff-sun {
@@ -6155,7 +6571,8 @@
       border-radius: 50%;
       z-index: 6;
       pointer-events: none;
-      background: radial-gradient(circle, rgba(255,239,178,.82) 0 35%, rgba(255,202,166,.34) 36% 72%, transparent 73%);
+      background: radial-gradient(circle, rgba(255,246,188,.96) 0 34%, rgba(255,213,132,.54) 35% 67%, rgba(255,167,92,.18) 68% 78%, transparent 79%);
+      filter: drop-shadow(0 0 12px rgba(255, 209, 111, .52));
       animation: retirementSunset 42s ease-in-out forwards;
     }
     @keyframes retirementSunset {
@@ -6163,13 +6580,17 @@
         opacity: .94;
         transform: translateY(0);
       }
-      68% {
-        opacity: .9;
-        transform: translateY(112px);
+      54% {
+        opacity: .86;
+        transform: translateY(122px);
+      }
+      78% {
+        opacity: .72;
+        transform: translateY(166px);
       }
       100% {
-        opacity: .78;
-        transform: translateY(156px);
+        opacity: .48;
+        transform: translateY(190px);
       }
     }
     .retirement-sendoff .retirement-ceremony-hero::before {
@@ -6246,6 +6667,47 @@
         filter: drop-shadow(0 0 7px rgba(255,255,236,.88));
       }
     }
+    .retirement-sendoff-loop-shooting-star {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 44px;
+      height: 148px;
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0;
+      overflow: hidden;
+    }
+    .retirement-sendoff-loop-shooting-star::before {
+      content: "";
+      position: absolute;
+      left: 78%;
+      top: 18px;
+      width: 72px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,248,190,.95) 42%, #fff);
+      box-shadow:
+        0 0 9px rgba(255, 246, 176, .92),
+        0 0 18px rgba(126, 207, 255, .46);
+      transform: rotate(-24deg) translateX(0);
+      transform-origin: right center;
+    }
+    .retirement-sendoff.loop-shooting-star .retirement-sendoff-loop-shooting-star {
+      animation: retirementLoopShootingStar 1.9s ease-out both;
+    }
+    .retirement-sendoff.loop-shooting-star .retirement-sendoff-loop-shooting-star::before {
+      animation: retirementLoopShootingStarTrail 1.9s ease-out both;
+    }
+    @keyframes retirementLoopShootingStar {
+      0%, 100% { opacity: 0; }
+      12% { opacity: 1; }
+      72% { opacity: .95; }
+    }
+    @keyframes retirementLoopShootingStarTrail {
+      0% { transform: rotate(-24deg) translateX(0); }
+      100% { transform: rotate(-24deg) translateX(-390px); }
+    }
     .retirement-sendoff-sky-night-fill {
       display: none;
     }
@@ -6287,6 +6749,107 @@
       white-space: nowrap;
       text-shadow: 0 1px 2px rgba(0,0,0,.68), 0 0 7px rgba(255, 168, 207, .2);
     }
+    .retirement-sendoff.farewell-hidden .retirement-sendoff-farewell {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .45s ease, visibility .45s ease;
+    }
+    .retirement-sendoff-top-actions {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      z-index: 18;
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      pointer-events: none;
+    }
+    .retirement-sendoff-top-actions button {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition: opacity .35s ease, visibility .35s ease, transform .35s ease;
+    }
+    .retirement-sendoff.shooting-star-ready .retirement-sendoff-top-actions [data-retirement-replay],
+    .retirement-sendoff.endroll-started .retirement-sendoff-top-actions [data-retirement-finalize] {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .retirement-sendoff-top-actions button {
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border-color: rgba(255,255,255,.48);
+      background: rgba(255,255,255,.94);
+      color: #1b2538;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.22);
+    }
+    .retirement-sendoff-wish {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 44px;
+      z-index: 16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 0;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0,0,0,.85), 0 0 10px rgba(255,255,255,.36);
+      transition: opacity .45s ease;
+    }
+    .retirement-sendoff.wish-started .retirement-sendoff-wish {
+      opacity: 1;
+    }
+    .retirement-sendoff.wish-hidden .retirement-sendoff-wish {
+      opacity: 0;
+    }
+    .retirement-sendoff-endroll {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 44px;
+      z-index: 14;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      color: #fffaf0;
+      font-size: 13.5px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+      text-shadow: 0 1px 2px rgba(0,0,0,.8), 0 0 8px rgba(255, 221, 142, .28);
+    }
+    .retirement-sendoff-endroll span {
+      display: inline-block;
+      min-width: max-content;
+      padding-left: 100%;
+      white-space: nowrap;
+    }
+    .retirement-sendoff.endroll-started .retirement-sendoff-endroll {
+      opacity: 1;
+    }
+    .retirement-sendoff.endroll-started .retirement-sendoff-endroll span {
+      animation: retirementEndrollSlide 90s linear forwards;
+    }
+    @keyframes retirementEndrollSlide {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(-100% - 100vw)); }
+    }
     .retirement-sendoff .retirement-ceremony-copy {
       position: absolute;
       left: 16px;
@@ -6317,7 +6880,7 @@
       height: 132px;
       z-index: 7;
       pointer-events: none;
-      background: #a8d58a;
+      background: #7fa86f;
       animation: retirementGroundNight 42s ease-in-out forwards;
     }
     .retirement-sendoff-road {
@@ -6325,9 +6888,9 @@
       left: -12%;
       right: -24%;
       bottom: 66px;
-      height: 112px;
+      height: 132px;
       border-radius: 30px 18px 18px 30px;
-      background: #a8d58a;
+      background: #7fa86f;
       clip-path: polygon(0 44%, 100% 18%, 100% 64%, 0 94%);
       box-shadow: none;
       transform: none;
@@ -6336,30 +6899,30 @@
     }
     @keyframes retirementGroundNight {
       0% {
-        background: #b8dc98;
+        background: #8cb77a;
       }
       52% {
-        background: #a9c98d;
+        background: #7fa86f;
       }
       78% {
-        background: #98b987;
+        background: #6f9667;
       }
       100% {
-        background: #8dab80;
+        background: #5f805e;
       }
     }
     @keyframes retirementRoadNight {
       0% {
-        background: #b8dc98;
+        background: #8cb77a;
       }
       52% {
-        background: #a9c98d;
+        background: #7fa86f;
       }
       78% {
-        background: #98b987;
+        background: #6f9667;
       }
       100% {
-        background: #8dab80;
+        background: #5f805e;
       }
     }
     .retirement-sendoff-guide {
@@ -6395,7 +6958,7 @@
       pointer-events: none;
     }
     .retirement-sendoff.guide-tear-started .retirement-guide-tear {
-      animation: retirementGuideTear 2.8s ease-in-out infinite;
+      animation: retirementGuideTear 2.6s ease-in-out infinite;
     }
     @keyframes retirementGuideTear {
       0%, 24% { opacity: 0; transform: translateY(0) scale(.68); }
@@ -6412,7 +6975,7 @@
     .retirement-sendoff-town {
       position: absolute;
       right: -16px;
-      bottom: 124px;
+      bottom: 138px;
       display: flex;
       align-items: end;
       gap: 6px;
@@ -6443,28 +7006,51 @@
       background: linear-gradient(180deg, #ffe17f, #83b9d2);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 3px 7px rgba(76, 83, 92, .22);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
       animation: retirementBuildingNight 42s ease-in-out forwards;
     }
     .retirement-sendoff-town span::before {
       content: "";
       position: absolute;
-      left: 6px;
-      top: 10px;
-      width: 4px;
-      height: 4px;
-      border-radius: 1px;
-      background: #fff4a0;
+      left: 5px;
+      top: 9px;
+      width: 5px;
+      height: 5px;
+      border-radius: 2px;
+      z-index: 1;
+      background: #fffbd1;
       box-shadow:
-        10px 0 #fff4a0,
-        0 10px #fff4a0,
-        10px 10px rgba(255, 244, 160, .98),
-        0 0 12px rgba(255, 234, 118, .95),
-        10px 0 12px rgba(255, 234, 118, .92),
-        0 10px 12px rgba(255, 234, 118, .9),
-        0 0 22px rgba(255, 218, 86, .58);
+        12px 0 #fffbd1,
+        0 12px #fffbd1,
+        12px 12px #fffbd1,
+        0 0 18px rgba(255, 244, 139, .98),
+        12px 0 18px rgba(255, 244, 139, .96),
+        0 12px 18px rgba(255, 244, 139, .94),
+        12px 12px 18px rgba(255, 244, 139, .92),
+        0 0 32px rgba(255, 226, 82, .78),
+        0 0 46px rgba(255, 198, 52, .42);
       opacity: 0;
-      animation: retirementTownLights 42s ease-in-out forwards, retirementTownLightsGlow 2.8s ease-in-out 22s infinite;
+      filter: brightness(1.18);
+      animation: retirementTownLights 42s ease-in-out forwards, retirementTownLightsGlow 2.8s ease-in-out 32.5s infinite;
+    }
+    .retirement-sendoff-town span::after {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 2px;
+      width: 32px;
+      height: 34px;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 8px 8px, rgba(255, 248, 178, .72) 0 5px, rgba(255, 224, 83, .38) 6px 14px, transparent 18px),
+        radial-gradient(circle at 20px 8px, rgba(255, 248, 178, .68) 0 5px, rgba(255, 224, 83, .34) 6px 14px, transparent 18px),
+        radial-gradient(circle at 8px 20px, rgba(255, 248, 178, .66) 0 5px, rgba(255, 224, 83, .32) 6px 14px, transparent 18px),
+        radial-gradient(circle at 20px 20px, rgba(255, 248, 178, .62) 0 5px, rgba(255, 224, 83, .3) 6px 14px, transparent 18px);
+      filter: blur(2.4px);
+      opacity: 0;
+      z-index: 0;
+      pointer-events: none;
+      animation: retirementTownLights 42s ease-in-out forwards, retirementTownWindowHalo 2.8s ease-in-out 32.5s infinite;
     }
     .retirement-sendoff-town span:nth-child(2) {
       width: 32px;
@@ -6501,22 +7087,40 @@
       }
     }
     @keyframes retirementTownLights {
-      0%, 48% {
+      0%, 77.8% {
         opacity: 0;
       }
-      70% {
-        opacity: .95;
+      89.8% {
+        opacity: .55;
       }
       100% {
-        opacity: 1;
+        opacity: .96;
       }
     }
     @keyframes retirementTownLightsGlow {
       0%, 100% {
-        filter: drop-shadow(0 0 8px rgba(255, 229, 135, .95));
+        filter:
+          brightness(1.22)
+          drop-shadow(0 0 10px rgba(255, 242, 145, .98))
+          drop-shadow(0 0 20px rgba(255, 218, 72, .72))
+          drop-shadow(0 0 34px rgba(255, 186, 42, .38));
       }
       50% {
-        filter: drop-shadow(0 0 14px rgba(255, 230, 138, 1));
+        filter:
+          brightness(1.34)
+          drop-shadow(0 0 14px rgba(255, 246, 158, 1))
+          drop-shadow(0 0 26px rgba(255, 220, 76, .82))
+          drop-shadow(0 0 42px rgba(255, 186, 42, .48));
+      }
+    }
+    @keyframes retirementTownWindowHalo {
+      0%, 100% {
+        opacity: .78;
+        filter: blur(2.4px);
+      }
+      50% {
+        opacity: .94;
+        filter: blur(3px);
       }
     }
     .retirement-sendoff .retirement-ceremony-art {
@@ -6589,28 +7193,6 @@
     .retirement-sendoff.step-4 .retirement-sendoff-message {
       display: none;
     }
-    .retirement-sendoff-progress {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-    .retirement-sendoff-progress span {
-      min-height: 54px;
-      border: 1px solid rgba(73, 108, 129, .16);
-      border-radius: 8px;
-      padding: 8px;
-      background: rgba(238, 243, 247, .85);
-      color: #64727b;
-      font-weight: 900;
-      text-align: center;
-      transition: transform .3s ease, background .3s ease, color .3s ease, box-shadow .3s ease;
-    }
-    .retirement-sendoff-progress span.active {
-      transform: translateY(-2px);
-      background: linear-gradient(180deg, #fff5a8, #f4d565);
-      color: #5b4213;
-      box-shadow: 0 4px 0 rgba(126, 91, 22, .16);
-    }
     .retirement-ceremony-actions {
       position: relative;
       z-index: 3;
@@ -6630,8 +7212,7 @@
         padding: 10px;
       }
       .retirement-ceremony-meta,
-      .retirement-ceremony-steps,
-      .retirement-sendoff-progress {
+      .retirement-ceremony-steps {
         grid-template-columns: 1fr;
       }
       .retirement-ceremony-actions {
@@ -8492,7 +9073,7 @@ const entrySfxFileKey = "entryCandidate2";
 const mapMoveSfxFileKey = "mapMove";
 const matchEndSfxFileKey = "matchEndCandidate1";
 const drumRollSfxFileKey = "drumRollCandidate1";
-const sound = { ctx: null, enabled: true, bgmTimer: null, step: 0, mode: "normal", audio: null, usingAudioFile: false };
+const sound = { ctx: null, enabled: true, bgmTimer: null, bgmLoopCueTimer: null, step: 0, mode: "normal", audio: null, usingAudioFile: false };
 const bgmModeNames = {
   normal: "通常時BGM",
   retirementCeremony: "引退式BGM",
@@ -8508,8 +9089,8 @@ const bgmModeNames = {
   major4Final: "水辺の四大杯 決勝BGM",
   grand: "グランドチャンピオン杯 通常戦BGM",
   grandFinal: "グランドチャンピオン杯 決勝BGM",
-  battleVictory: "勝利BGM",
-  battleDefeat: "敗北BGM"
+  battleVictory: "今日の空に勝った日",
+  battleDefeat: "負けても道は続く"
 };
 function bgmModeName(mode) {
   return bgmModeNames[mode] || bgmSong(mode).name;
@@ -30123,13 +30704,46 @@ function bgmSong(mode = "normal") {
 }
 function stopBgm() {
   if (sound.bgmTimer) clearTimeout(sound.bgmTimer);
+  if (sound.bgmLoopCueTimer) clearTimeout(sound.bgmLoopCueTimer);
   sound.bgmTimer = null;
+  sound.bgmLoopCueTimer = null;
   if (sound.audio) {
     sound.audio.pause();
     sound.audio.currentTime = 0;
     sound.audio = null;
   }
   sound.usingAudioFile = false;
+}
+function triggerRetirementLoopShootingStar() {
+  if (sound.mode !== "retirementCeremony") return;
+  const sendoff = document.getElementById("retirementSendoff");
+  if (!sendoff) return;
+  if (!sendoff.classList.contains("farewell-hidden")) return;
+  if (!sendoff.classList.contains("shooting-star-ready")) return;
+  playRetirementLoopShootingStar(sendoff);
+}
+function playRetirementLoopShootingStar(sendoff) {
+  if (!sendoff) return;
+  if (sendoff.classList.contains("loop-shooting-star-shown")) return;
+  sendoff.classList.add("loop-shooting-star-shown");
+  sendoff.classList.remove("loop-shooting-star");
+  void sendoff.offsetWidth;
+  sendoff.classList.add("loop-shooting-star");
+  scheduleRetirementSendoffStep(2000, () => sendoff.classList.remove("loop-shooting-star"));
+}
+function scheduleBgmLoopCue(mode, loopSeconds, currentSeconds = 0) {
+  if (sound.bgmLoopCueTimer) clearTimeout(sound.bgmLoopCueTimer);
+  sound.bgmLoopCueTimer = null;
+  const cueBeforeLoopSeconds = 5.8;
+  if (mode !== "retirementCeremony" || !Number.isFinite(loopSeconds) || loopSeconds <= cueBeforeLoopSeconds + .2) return;
+  const current = Math.max(0, Number(currentSeconds) || 0);
+  const untilLoop = loopSeconds - (current % loopSeconds);
+  const delaySeconds = untilLoop > cueBeforeLoopSeconds ? untilLoop - cueBeforeLoopSeconds : untilLoop + loopSeconds - cueBeforeLoopSeconds;
+  sound.bgmLoopCueTimer = setTimeout(() => {
+    if (!sound.enabled || sound.mode !== mode) return;
+    triggerRetirementLoopShootingStar();
+    scheduleBgmLoopCue(mode, loopSeconds, 0);
+  }, Math.max(0, delaySeconds * 1000));
 }
 function isBattleResultBgmMode() {
   return sound.mode === "battleVictory" || sound.mode === "battleDefeat";
@@ -30169,6 +30783,13 @@ function startBgm(mode = "normal") {
       audio.addEventListener("ended", () => {
         if (sound.audio === audio) sound.usingAudioFile = false;
       }, { once: true });
+    } else {
+      audio.addEventListener("loadedmetadata", () => {
+        if (sound.audio === audio) scheduleBgmLoopCue(mode, audio.duration, audio.currentTime);
+      }, { once: true });
+      audio.addEventListener("play", () => {
+        if (sound.audio === audio) scheduleBgmLoopCue(mode, audio.duration, audio.currentTime);
+      });
     }
     audio.addEventListener("error", () => {
       toast("MP3を読み込めません。assets/audio の配置を確認してください");
@@ -30185,6 +30806,8 @@ function startBgm(mode = "normal") {
   startSynthBgm(song, mode);
 }
 function startSynthBgm(song, mode) {
+  const loopSeconds = song.events.reduce((sum, event) => sum + event.dur * (60 / song.bpm), 0);
+  scheduleBgmLoopCue(mode, loopSeconds, 0);
   const schedule = () => {
     if (!sound.enabled || sound.mode !== mode) return;
     const event = song.events[sound.step % song.events.length];
@@ -31169,7 +31792,16 @@ function companionHomeArtMarkup(profile, growth) {
   return `<div class="monster-art"><div class="monster ${profile.form}${seedClass}${profile.white ? " white-body" : ""}">${monsterInnerParts()}</div></div>`;
 }
 function homeStillMonsterSvg(svg) {
-  return String(svg || "").replace(/<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1\.8;0 0;0 \.8;0 0" dur="\.54s" repeatCount="indefinite" additive="sum"\/>/, "<g>");
+  return String(svg || "").replace(/<animateTransform attributeName="transform" type="translate"[^>]*\/>/g, "");
+}
+function retirementStillMonsterSvg(svg) {
+  return String(svg || "")
+    .replace(/<animateTransform\b[^>]*\/>/g, "")
+    .replace(/<animate\b[^>]*\/>/g, "")
+    .replace(/<ellipse\b(?=[^>]*fill="#(?:8b5a34|6f4427)")[^>]*\/>/g, foot => {
+      const withoutRotation = foot.replace(/\s+transform="rotate\([^"]+\)"/g, "");
+      return withoutRotation.replace(/\scy="[^"]+"/, ' cy="91"');
+    });
 }
 function homeGuideArtMarkup() {
   const tokenName = "白ミチリオードセイバーシンラ";
@@ -31305,7 +31937,7 @@ function companionHomeConversation(profile, growth, lifeRemain) {
     ["町づくり素材は町で、育成アイテムは相棒に。役割を分けると分かりやすいね。", "家では相棒の様子とメニューを落ち着いて見られる場所にしよう。", "家の時間"]
   ];
   const index = Math.abs(new Date().getDate() + Math.round(Number(state.monster?.xp || 0)) + Math.round(Number(growth?.top?.value || 0))) % topics.length;
-  if (lifeRemain <= 0) return ["引退準備中は左の引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。", "引退準備"];
+  if (lifeRemain <= 0) return ["引退準備中は引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。", "引退準備"];
   if (state.mapAwaitingSky) return ["イマソラ認識待ちのマスで止まっているね。", "安全な場所で立ち止まってから、空だけを確認しよう。", "認識待ち"];
   if (canEnterTournament()) return ["大会に出られる状態だね。作戦を選んでから行こう。", "家で落ち着いて準備してから出るのがいいね。", "大会OK"];
   return topics[index];
@@ -31338,7 +31970,7 @@ function companionHomeDialoguePairs(profile, growth, lifeRemain) {
     return {
       topic: "引退準備",
       pairs: [
-        ["引退準備中は左の引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。"],
+        ["引退準備中は引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。"],
         ["散歩や大会や仕事は、今は進めないんだね。", "うん。キャラも引退ボタンから見る流れだよ。"],
         ["引退したらお別れなのかな。", "お別れじゃないよ。また街で会えるからね！"],
         ["名前も姿も残るなら安心だね。", "ゲームセンターでも一緒に遊べる予定だよ。"]
@@ -31497,6 +32129,12 @@ function renderCompanionHome() {
   const growth = growthForecast();
   const lifeRemain = retirementRemainingHours();
   const retirementReady = lifeRemain <= 0;
+  const homeActionItems = retirementReady
+    ? [
+        { id: "retirement", label: "引退する", target: "retirement" },
+        ...userMenuItems.filter(item => ["items", "town", "settings"].includes(item.id))
+      ]
+    : userMenuItems;
   const name = companionDisplayName(profile);
   const dialogue = companionHomeDialoguePairs(profile, growth, lifeRemain);
   const [companionLine, guideLine] = dialogue.pairs[0] || ["", ""];
@@ -31528,12 +32166,8 @@ function renderCompanionHome() {
         </div>
       </div>
       <div class="home-topic">話題: ${topic}</div>
-      ${retirementReady ? `
-      <div class="home-retirement-action">
-        <button type="button" data-home-action="retirement">引退する</button>
-      </div>` : ""}
       <div class="home-actions ${retirementReady ? "retirement-ready" : ""}">
-        ${(retirementReady ? userMenuItems.filter(item => ["items", "town", "settings"].includes(item.id)) : userMenuItems).map(item => `<button type="button" class="${item.id === "walk" ? "secondary" : ""}" data-home-action="${item.target}">${item.label}</button>`).join("")}
+        ${homeActionItems.map(item => `<button type="button" class="${item.id === "walk" ? "secondary" : ""}" data-home-action="${item.target}">${item.label}</button>`).join("")}
       </div>
     </div>
   `;
@@ -32164,11 +32798,21 @@ function monsterProfile() {
   const effectiveStageIndex = Math.min(4, Number(m.evolutionStage || 0) === 4 && !canEvolveToStar() ? 3 : Number(m.evolutionStage || 0));
   const stage = evolutionStageRules[effectiveStageIndex]?.stage || "タネ期";
   const seed = seedForms.find(item => item.id === m.seedId) || seedForms[0];
+  const sproutBaseNames = {
+    "seed-walk": "ミチメバ",
+    "seed-sky": "ソラメバ",
+    "seed-leaf": "ハニメバ",
+    "seed-city": "マチメバ",
+    "seed-river": "ミズメバ",
+    "seed-night": "アケメバ",
+    "seed-luck": "ユラメバ",
+    "seed-white": "メバノコ"
+  };
   const white = seed.id === "seed-white";
   const whiteName = name => white ? `白星${name}` : name;
   const whiteText = white ? "白星のタネから育つ特別版。体色だけが白く、目・手・足・ソラ玉・装飾は元の色を保つ。" : "";
   if (effectiveStageIndex === 0) return { id: seed.id, name: seed.name, text: `${stage}。${seed.text}。タネを使うとすぐめばえ期へ進みます。${whiteText}`, form: "seed", stage, power: Math.max(1, m.xp), white };
-  if (effectiveStageIndex === 1) return { id: "sprout", name: whiteName("メバノコ"), text: `${stage}。めばえ期になってから、進化マスでイマソラ認証すると若旅期へ進みます。${whiteText}`, form: "sprout", stage, power: m.xp + 2, white };
+  if (effectiveStageIndex === 1) return { id: `sprout-${seed.id}`, name: whiteName(sproutBaseNames[seed.id] || "ミチメバ"), text: `${stage}。めばえ期になってから、進化マスでイマソラ認証すると若旅期へ進みます。${whiteText}`, form: "sprout", stage, power: m.xp + 2, white };
   if (effectiveStageIndex === 2) {
     if (m.sky >= m.nature + m.city) return { id: "skykid", name: whiteName("ソラリオ"), text: `${stage}。空をよく見て育った、このアプリの看板候補。${whiteText}`, form: "skykid", stage, power: m.xp + m.sky, white };
     return { id: "trail", name: whiteName("ミチリオ"), text: `${stage}。散歩道の発見で育つ、このアプリのイメージキャラ候補。${whiteText}`, form: "trail", stage, power: m.xp + m.nature + m.city, white };
@@ -32732,6 +33376,14 @@ function companionArtHtml(profile, growth) {
   renderCurrentCompanionArt(art, profile, growth);
   return art.outerHTML;
 }
+function retirementStillCompanionArtHtml(profile, growth) {
+  const item = currentCompanionArtItem(profile, growth);
+  if (item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"))) {
+    const classes = `monster-current-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
+    return `<div class="${classes}">${retirementStillMonsterSvg(uniqueMonsterSvg(item, true))}</div>`;
+  }
+  return retirementStillMonsterSvg(companionArtHtml(profile, growth));
+}
 function companionRightFacingArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if (!item?.id) return companionArtHtml(profile, growth);
@@ -32739,7 +33391,7 @@ function companionRightFacingArtHtml(profile, growth) {
   return `<div class="${classes}">${turnaroundMonsterSvg(item, "side")}</div>`;
 }
 function retirementSendoffArtHtml(profile, growth) {
-  return `${companionRightFacingArtHtml(profile, growth)}<div class="retirement-front-art">${companionArtHtml(profile, growth)}</div>`;
+  return `${companionRightFacingArtHtml(profile, growth)}<div class="retirement-front-art">${retirementStillCompanionArtHtml(profile, growth)}</div>`;
 }
 function retirementGuideBackArtHtml() {
   const tokenName = "白ミチリオードセイバーシンラ";
@@ -32748,7 +33400,7 @@ function retirementGuideBackArtHtml() {
   const items = monsterDexGroups.flatMap(group => group.list || []);
   const item = items.find(entry => entry.id === tokenId) || items.find(entry => entry.name === tokenName);
   if (!item) return "";
-  return `<div class="retirement-guide-art" aria-label="${tokenName}の右後ろ向きの姿">${turnaroundMonsterSvg(item, "back-right")}<span class="retirement-guide-tear" aria-hidden="true"></span></div>`;
+  return `<div class="retirement-guide-art" aria-label="${tokenName}の右後ろ向きの姿">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "back-right"))}<span class="retirement-guide-tear" aria-hidden="true"></span></div>`;
 }
 function retirementAbilityTotal(stats = monsterStats()) {
   return Object.values(stats).reduce((sum, value) => sum + value, 0);
@@ -32812,6 +33464,8 @@ function resetMonsterToSeed(seed) {
   state.monster = { seedId: seed.id, nickname: "", xp: 0, nature: 0, city: 0, sky: 0, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now(), evolutionStage: 0, lifeExtensionUses: 0, grandQualified: false, skills: ["tap"] };
   forceEvolutionStage(1);
   if (!state.dex.includes(seed.id)) state.dex.push(seed.id);
+  const sproutId = `sprout-${seed.id}`;
+  if (!state.dex.includes(sproutId)) state.dex.push(sproutId);
 }
 function consumeSeedStock(seed) {
   if (seed.id === "seed-white") return;
@@ -32821,6 +33475,7 @@ function consumeSeedStock(seed) {
 function completeRetirementWithSeed(seed, gifted = false) {
   resetMonsterToSeed(seed);
   if (!gifted) consumeSeedStock(seed);
+  state.pendingRetirementRecord = null;
   addLog(`引退式の後、${seed.name}から新しい相棒がめばえ期へ進化。`);
   saveState();
   renderAll();
@@ -32833,9 +33488,55 @@ function retirementRecordArtHtml(record) {
 }
 let retirementSendoffTimers = [];
 let retirementFarewellTypeTimers = [];
+const retirementGiftAdRequiredViews = 2;
+const retirementGiftAdDurationMs = 30000;
+let retirementGiftAdViews = 0;
+let retirementGiftAdWatching = 0;
+let retirementGiftAdTimer = null;
 function clearRetirementFarewellTypeTimers() {
   retirementFarewellTypeTimers.forEach(timer => clearTimeout(timer));
   retirementFarewellTypeTimers = [];
+}
+function resetRetirementGiftAdGate() {
+  if (retirementGiftAdTimer) clearTimeout(retirementGiftAdTimer);
+  retirementGiftAdTimer = null;
+  retirementGiftAdViews = 0;
+  retirementGiftAdWatching = 0;
+}
+function updateRetirementGiftAdGate() {
+  const gate = document.querySelector("[data-retirement-gift-ad-gate]");
+  if (!gate) return;
+  const done = retirementGiftAdViews >= retirementGiftAdRequiredViews;
+  gate.querySelectorAll("[data-retirement-gift-ad]").forEach(button => {
+    const index = Number(button.dataset.retirementGiftAd || 0);
+    const watched = index <= retirementGiftAdViews;
+    const watching = index === retirementGiftAdWatching;
+    button.disabled = watched || watching || index > retirementGiftAdViews + 1;
+    button.textContent = watching ? `広告${index} 視聴中...` : watched ? `広告${index} 視聴済み` : `広告${index}を見る`;
+  });
+  const receive = gate.querySelector("[data-retirement-gift-seed]");
+  if (receive) receive.disabled = !done;
+  const status = gate.querySelector("[data-retirement-gift-ad-status]");
+  if (status) {
+    status.textContent = done
+      ? "広告を2つ見終わりました。タネを受け取れます。"
+      : retirementGiftAdWatching
+        ? `広告${retirementGiftAdWatching}を視聴中です。終わるまで待ってください。`
+        : `広告を${retirementGiftAdViews}/${retirementGiftAdRequiredViews}本見終わりました。`;
+  }
+}
+function startRetirementGiftAdView(index) {
+  const adIndex = Number(index || 0);
+  if (!adIndex || retirementGiftAdWatching || adIndex > retirementGiftAdViews + 1 || adIndex <= retirementGiftAdViews) return;
+  retirementGiftAdWatching = adIndex;
+  updateRetirementGiftAdGate();
+  retirementGiftAdTimer = setTimeout(() => {
+    retirementGiftAdViews = Math.max(retirementGiftAdViews, adIndex);
+    retirementGiftAdWatching = 0;
+    retirementGiftAdTimer = null;
+    playSfx("reward");
+    updateRetirementGiftAdGate();
+  }, retirementGiftAdDurationMs);
 }
 function stopNormalSoundForRetirementCeremony() {
   stopBgm();
@@ -32847,6 +33548,16 @@ function startRetirementCeremonySendoff() {
   stopNormalSoundForRetirementCeremony();
   startBgm("retirementCeremony");
   renderRetirementSendoff();
+}
+function replayRetirementSendoffFromStart() {
+  stopBgm();
+  startBgm("retirementCeremony");
+  renderRetirementSendoff();
+}
+function finalizeRetirementSendoffFromTopButton() {
+  stopBgm();
+  startBgm("normal");
+  finalizeRetirementAfterCeremony();
 }
 function clearRetirementSendoffTimers() {
   retirementSendoffTimers.forEach(timer => clearTimeout(timer));
@@ -32911,6 +33622,20 @@ function bindRetirementCeremonyActions(box) {
       finalizeRetirementAfterCeremony();
       return;
     }
+    if (button.hasAttribute("data-retirement-next-seed")) {
+      renderNextRetirementSeedChoice(state.pendingRetirementRecord || createRetirementRecord());
+      return;
+    }
+    if (button.hasAttribute("data-retirement-storage-give-up")) {
+      state.pendingRetirementRecord = null;
+      saveState();
+      switchScreen("walk");
+      return;
+    }
+    if (button.hasAttribute("data-retirement-show-replace")) {
+      renderRetirementStorageFull(state.pendingRetirementRecord || createRetirementRecord(), { showReplaceList: true });
+      return;
+    }
     if (button.hasAttribute("data-retirement-replace")) {
       renderRetirementReplaceConfirm(button.dataset.retirementReplace);
       return;
@@ -32924,11 +33649,30 @@ function bindRetirementCeremonyActions(box) {
       return;
     }
     if (button.hasAttribute("data-retirement-seed")) {
-      selectNextRetirementSeed(button.dataset.retirementSeed, false);
+      renderRetirementSeedConfirm(button.dataset.retirementSeed, false);
+      return;
+    }
+    if (button.hasAttribute("data-retirement-seed-final")) {
+      selectNextRetirementSeed(button.dataset.retirementSeedFinal, false);
+      return;
+    }
+    if (button.hasAttribute("data-retirement-seed-cancel")) {
+      renderNextRetirementSeedChoice(state.pendingRetirementRecord || createRetirementRecord());
+      return;
+    }
+    if (button.hasAttribute("data-retirement-gift-ad")) {
+      startRetirementGiftAdView(button.dataset.retirementGiftAd);
       return;
     }
     if (button.hasAttribute("data-retirement-gift-seed")) {
+      if (retirementGiftAdViews < retirementGiftAdRequiredViews) {
+        playSfx("error");
+        toast("広告を2つ見終わると受け取れます");
+        updateRetirementGiftAdGate();
+        return;
+      }
       const seed = randomStarterSeed();
+      resetRetirementGiftAdGate();
       selectNextRetirementSeed(seed.id, true);
       return;
     }
@@ -32973,10 +33717,10 @@ function renderRetirementFinalConfirm() {
       <div class="retirement-ceremony-hero">
         <div class="retirement-ceremony-copy">
           <h2>引退の確認</h2>
-          <p>ここから先は、${name}を街の記録へ残す引退式へ進みます。</p>
+          <p>ここから先は、引退の日へ進みます。</p>
         </div>
         <div class="retirement-ceremony-stage">
-          <div class="retirement-ceremony-art" aria-label="${name}の姿">${companionArtHtml(profile, growth)}</div>
+          <div class="retirement-ceremony-art" aria-label="${name}の姿">${retirementStillCompanionArtHtml(profile, growth)}</div>
           <div class="retirement-ceremony-card">
             <div class="retirement-ceremony-name">
               <span>${name}</span>
@@ -32989,13 +33733,13 @@ function renderRetirementFinalConfirm() {
             </div>
           </div>
         </div>
-      </div>
-      <div class="retirement-confirm-message">
-        本当に<strong>${name}</strong>を引退させていいですか？
-      </div>
-      <div class="retirement-ceremony-actions">
-        <button type="button" data-retirement-home onclick="switchScreen('walk')">まだ引退しない</button>
-        <button type="button" class="primary" data-retirement-confirm-yes>引退式へ進む</button>
+        <div class="retirement-confirm-message">
+          本当に<strong>${name}</strong>を引退させていいですか？
+        </div>
+        <div class="retirement-ceremony-actions">
+          <button type="button" data-retirement-home onclick="switchScreen('walk')">まだ引退しない</button>
+          <button type="button" class="primary" data-retirement-confirm-yes="">引退の日へ進む</button>
+        </div>
       </div>
     </div>
   `;
@@ -33008,7 +33752,7 @@ function renderRetirementSendoff() {
   const profile = monsterProfile();
   const growth = growthForecast();
   const name = companionDisplayName(profile);
-  const farewellText = `今までありがとう！${name}、また街で会おうね！`;
+  const farewellText = `今までありがとう！${name}、また街で逢おうね！`;
   const farewellReplyFirstText = "うん！";
   const farewellReplySecondText = "またね！";
   const farewellReplyText = `${farewellReplyFirstText}${farewellReplySecondText}`;
@@ -33016,12 +33760,17 @@ function renderRetirementSendoff() {
     <div class="retirement-sendoff step-enter" id="retirementSendoff">
       <div class="retirement-ceremony-hero">
         <div class="retirement-ceremony-copy">
-          <h2>引退式</h2>
+          <h2>引退の日</h2>
+        </div>
+        <div class="retirement-sendoff-top-actions">
+          <button type="button" data-retirement-replay onclick="replayRetirementSendoffFromStart()" disabled>もう一度見る</button>
+          <button type="button" data-retirement-finalize onclick="finalizeRetirementSendoffFromTopButton()" disabled>ホームへ戻る</button>
         </div>
         <div class="retirement-sendoff-sky-base" aria-hidden="true"></div>
         <div class="retirement-sendoff-sun" aria-hidden="true"></div>
         <div class="retirement-sendoff-sky-night-fill" aria-hidden="true"></div>
         <div class="retirement-sendoff-stars" aria-hidden="true"></div>
+        <div class="retirement-sendoff-loop-shooting-star" aria-hidden="true"></div>
         <div class="retirement-sendoff-ground" aria-hidden="true"></div>
         <div class="retirement-sendoff-town" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="retirement-sendoff-road" aria-hidden="true"></div>
@@ -33033,23 +33782,19 @@ function renderRetirementSendoff() {
           <span class="retirement-sendoff-farewell-main" id="retirementSendoffFarewellMain"></span>
           <span class="retirement-sendoff-farewell-reply" id="retirementSendoffFarewellReply"></span>
         </div>
-      </div>
-      <div class="retirement-sendoff-progress" id="retirementSendoffProgress">
-        <span>振り返る</span>
-        <span>記録する</span>
-        <span>街へ向かう</span>
-        <span>また会える</span>
-      </div>
-      <div class="retirement-ceremony-actions">
-        <button type="button" data-retirement-replay onclick="renderRetirementSendoff()" disabled>演出中</button>
-        <button type="button" data-retirement-finalize onclick="finalizeRetirementAfterCeremony()" disabled>ホームへ戻る</button>
+        <div class="retirement-sendoff-wish" aria-live="polite">
+          <span id="retirementSendoffWish"></span>
+        </div>
+        <div class="retirement-sendoff-endroll" aria-hidden="true">
+          <span>主演　${escapeAttr(name)}　　白ミチリオードセイバーシンラ　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーク制作委員会の提供でお送りしました。</span>
+        </div>
       </div>
     </div>
   `;
   const sendoff = document.getElementById("retirementSendoff");
   const farewell = document.getElementById("retirementSendoffFarewellMain");
   const farewellReply = document.getElementById("retirementSendoffFarewellReply");
-  const progress = Array.from(document.querySelectorAll("#retirementSendoffProgress span"));
+  const wish = document.getElementById("retirementSendoffWish");
   const replay = box.querySelector("[data-retirement-replay]");
   const finalize = box.querySelector("[data-retirement-finalize]");
   const applyStep = index => {
@@ -33058,7 +33803,6 @@ function renderRetirementSendoff() {
       sendoff.classList.remove(stepClass);
     });
     sendoff.classList.add(`step-${index}`);
-    progress.forEach((item, itemIndex) => item.classList.toggle("active", index > 0 && itemIndex <= index - 1));
     if (index === 1 && farewell) {
       const timer = setTimeout(() => typeRetirementFarewellLine(farewell, farewellText, {
         mode: "burst",
@@ -33074,8 +33818,38 @@ function renderRetirementSendoff() {
                   clearExisting: false,
                   mode: "single",
                   onComplete: () => {
-                    const tearTimer = setTimeout(() => sendoff?.classList.add("guide-tear-started"), 2000);
+                    const shootingStarTimer = setTimeout(() => {
+                      sendoff?.classList.add("shooting-star-ready");
+                      playRetirementLoopShootingStar(sendoff);
+                      if (replay) replay.disabled = false;
+                    }, 82900);
+                    const wishTimer = setTimeout(() => {
+                      if (!sendoff || !wish) return;
+                      sendoff.classList.add("wish-started");
+                      typeRetirementFarewellLine(wish, "また逢えますように", { clearExisting: false, mode: "burst" });
+                    }, 83000);
+                    const wishHideTimer = setTimeout(() => {
+                      sendoff?.classList.add("wish-hidden");
+                    }, 87000);
+                    const tearTimer = setTimeout(() => sendoff?.classList.add("guide-tear-started"), 2600);
+                    const farewellHideTimer = setTimeout(() => {
+                      sendoff?.classList.add("farewell-hidden");
+                      const clearReplyTimer = setTimeout(() => {
+                        if (farewellReply) farewellReply.textContent = "";
+                      }, 450);
+                      const endrollTimer = setTimeout(() => sendoff?.classList.add("endroll-started"), 1600);
+                      const finalizeTimer = setTimeout(() => {
+                        if (finalize) finalize.disabled = false;
+                      }, 1600);
+                      retirementFarewellTypeTimers.push(clearReplyTimer);
+                      retirementFarewellTypeTimers.push(endrollTimer);
+                      retirementFarewellTypeTimers.push(finalizeTimer);
+                    }, 4800);
+                    retirementFarewellTypeTimers.push(shootingStarTimer);
+                    retirementFarewellTypeTimers.push(wishTimer);
+                    retirementFarewellTypeTimers.push(wishHideTimer);
                     retirementFarewellTypeTimers.push(tearTimer);
+                    retirementFarewellTypeTimers.push(farewellHideTimer);
                   }
                 }), 500);
                 retirementFarewellTypeTimers.push(secondReplyTimer);
@@ -33087,11 +33861,6 @@ function renderRetirementSendoff() {
       }), 300);
       retirementFarewellTypeTimers.push(timer);
     }
-    if (index >= 4 && replay) {
-      replay.disabled = false;
-      replay.textContent = "もう一度見る";
-    }
-    if (index >= 4 && finalize) finalize.disabled = false;
   };
   bindRetirementCeremonyActions(box);
   scheduleRetirementSendoffStep(2000, () => applyStep(0));
@@ -33113,19 +33882,50 @@ function finalizeRetirementAfterCeremony(replaceId = "") {
   storeRetirementRecord(record, replaceId);
   addLog(`引退式: ${record.name}を街の記録へ保存。ランク${record.rank} / 能力合計${record.abilityTotal}`);
   saveState();
-  renderNextRetirementSeedChoice(record);
+  renderRetirementRecordSaved(record);
 }
-function renderRetirementStorageFull(record) {
+function renderRetirementRecordSaved(record) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
+  state.pendingRetirementRecord = record;
   box.innerHTML = `
-    <div class="retirement-ceremony-hero">
+    <div class="retirement-ceremony-hero retirement-record-saved">
       <div class="retirement-ceremony-copy">
-        <h2>保存枠がいっぱいです</h2>
-        <p>${record.name}を保存するには、保存済みの相棒と入れ替えるか、最大保存数追加（有料）を選びます。</p>
+        <h2>引退の日</h2>
+      </div>
+      <div class="retirement-record-message">
+        <b>街の記録</b>
+        <p>${record.name}は街の記録に残りました。</p>
+      </div>
+      <div class="retirement-ceremony-actions retirement-record-actions">
+        <button type="button" class="primary" data-retirement-next-seed>新しく育てるタネへ</button>
       </div>
     </div>
-    <div class="retirement-ceremony-steps">
+  `;
+  bindRetirementCeremonyActions(box);
+}
+function renderRetirementStorageFull(record, options = {}) {
+  const box = document.getElementById("retirementCeremony");
+  if (!box) return;
+  state.pendingRetirementRecord = record;
+  const { showReplaceList = false } = options;
+  box.innerHTML = `
+    <div class="retirement-ceremony-hero retirement-storage-full">
+      <div class="retirement-ceremony-copy">
+        <h2>モンスター保存数の空きがありません</h2>
+        <p>${record.name}を街の記録へ残すには、保存済みの相棒と入れ替えるか、保存数を拡張します。</p>
+      </div>
+      <div class="retirement-record-message warning">
+        <b>保存できませんでした</b>
+        <p>モンスター保存数の空きがありません。</p>
+      </div>
+      <div class="retirement-ceremony-actions retirement-storage-choice-actions">
+        <button type="button" data-retirement-storage-give-up>諦める</button>
+        <button type="button" class="primary" data-retirement-show-replace>入れ替える</button>
+        <button type="button" data-retirement-expand>拡張する</button>
+      </div>
+    </div>
+    ${showReplaceList ? `<div class="retirement-ceremony-steps retirement-replace-list">
       ${state.retiredMonsters.map(item => `
         <button type="button" class="retirement-ceremony-step" data-retirement-replace="${item.id}">
           <b>${item.name} / ${item.rank}</b>
@@ -33133,11 +33933,7 @@ function renderRetirementStorageFull(record) {
           <span>能力合計 ${item.abilityTotal} / 引退日 ${item.retiredAt} / 使用 ${item.usedCount || 0}回</span>
         </button>
       `).join("")}
-    </div>
-    <div class="retirement-ceremony-actions">
-      <button type="button" data-retirement-expand>最大保存数追加（有料）</button>
-      <button type="button" data-retirement-home onclick="switchScreen('walk')">保存をやめる</button>
-    </div>
+    </div>` : ""}
   `;
   bindRetirementCeremonyActions(box);
 }
@@ -33158,7 +33954,7 @@ function renderRetirementReplaceConfirm(replaceId) {
     <div class="retirement-ceremony-actions">
       <button type="button" data-retirement-replace-confirm="${target.id}">お別れする</button>
       <button type="button" data-retirement-expand>保存数追加（有料）</button>
-      <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord)">戻る</button>
+      <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord, { showReplaceList: true })">戻る</button>
     </div>
   `;
   bindRetirementCeremonyActions(box);
@@ -33174,34 +33970,75 @@ function renderRetirementStorageExpandGuide() {
       </div>
     </div>
     <div class="retirement-ceremony-actions">
-      <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord)">入れ替えに戻る</button>
+      <button type="button" onclick="renderRetirementStorageFull(state.pendingRetirementRecord)">選択に戻る</button>
     </div>
   `;
   bindRetirementCeremonyActions(box);
 }
-function renderNextRetirementSeedChoice(record) {
+function retirementSeedChoiceArt(seed) {
+  const item = dexCharacterItem({ id: seed.id, name: seed.name });
+  return `<span class="retirement-seed-art dex-character gallery-monster-card ${item.id}" aria-hidden="true">${galleryMonsterArt(item)}</span>`;
+}
+function renderNextRetirementSeedChoice(record, options = {}) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  const seeds = availableRetirementSeeds();
+  const seeds = options.forceNoSeeds ? [] : availableRetirementSeeds();
   const hasSeeds = seeds.length > 0;
+  if (!hasSeeds) resetRetirementGiftAdGate();
   box.innerHTML = `
-    <div class="retirement-ceremony-hero">
+    <div class="retirement-ceremony-hero retirement-seed-choice">
       <div class="retirement-ceremony-copy">
         <h2>新しく育てるタネ</h2>
-        <p>${record.name}は街の記録に残りました。次に育てるタネを選ぶと、そのタネがめばえ期へ進化します。</p>
+        <p>次に育てるタネを選ぶと、そのタネがめばえ期へ進化します。</p>
+      </div>
+      ${hasSeeds ? `
+        <div class="seed-list">
+          ${seeds.map(seed => `<button class="seed-pick" type="button" data-retirement-seed="${seed.id}">${retirementSeedChoiceArt(seed)}<strong>${seed.name}</strong><small>${seed.text}</small></button>`).join("")}
+        </div>
+      ` : `
+        <div class="retirement-ceremony-card">
+          <p>タネを持っていないみたいだから一つプレゼントするね！</p>
+          <div class="retirement-gift-ad-gate" data-retirement-gift-ad-gate>
+            <div class="retirement-gift-ad-list">
+              <button type="button" data-retirement-gift-ad="1">広告1を見る</button>
+              <button type="button" data-retirement-gift-ad="2" disabled>広告2を見る</button>
+            </div>
+            <div class="retirement-gift-ad-status" data-retirement-gift-ad-status>広告を0/2本見終わりました。</div>
+            <div class="retirement-ceremony-actions retirement-gift-ad-actions"><button type="button" class="primary" data-retirement-gift-seed disabled>タネを受け取る</button></div>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+  bindRetirementCeremonyActions(box);
+  if (!hasSeeds) updateRetirementGiftAdGate();
+}
+function renderRetirementSeedConfirm(seedId, gifted = false) {
+  const box = document.getElementById("retirementCeremony");
+  if (!box) return;
+  const seed = seedForms.find(item => item.id === seedId) || randomStarterSeed();
+  const record = state.pendingRetirementRecord || createRetirementRecord();
+  state.pendingRetirementRecord = record;
+  box.innerHTML = `
+    <div class="retirement-ceremony-hero retirement-seed-choice">
+      <div class="retirement-ceremony-copy">
+        <h2>新しく育てるタネ</h2>
+        <p>次に育てるタネを選ぶと、そのタネがめばえ期へ進化します。</p>
+      </div>
+      <div class="retirement-seed-confirm">
+        <div class="seed-pick selected retirement-seed-confirm-pick" aria-label="${seed.name}">
+          ${retirementSeedChoiceArt(seed)}
+          <div class="retirement-seed-confirm-text">
+            <strong>${seed.name}</strong>
+            <small>${seed.text}</small>
+          </div>
+        </div>
+      </div>
+      <div class="retirement-ceremony-actions retirement-seed-confirm-actions">
+        <button type="button" class="primary" data-retirement-seed-final="${seed.id}">本当にこのタネにしますか？</button>
+        <button type="button" class="primary" data-retirement-seed-cancel>やっぱりやめる</button>
       </div>
     </div>
-    ${hasSeeds ? `
-      <div class="seed-list">
-        ${seeds.map(seed => `<button class="seed-pick" type="button" data-retirement-seed="${seed.id}"><strong>${seed.name}</strong><small>${seed.text}</small></button>`).join("")}
-      </div>
-    ` : `
-      <div class="retirement-ceremony-card">
-        <b>タネを持っていません</b>
-        <p>可哀そうだから一つプレゼントするね！ランダムなタネを受け取って、すぐめばえ期へ進化します。</p>
-      </div>
-      <div class="retirement-ceremony-actions"><button type="button" class="primary" data-retirement-gift-seed>タネを受け取る</button></div>
-    `}
   `;
   bindRetirementCeremonyActions(box);
 }
@@ -33216,7 +34053,7 @@ function renderNewSeedSproutCeremony(seed, gifted = false) {
   const profile = monsterProfile();
   const growth = growthForecast();
   box.innerHTML = `
-    <div class="retirement-ceremony-hero">
+    <div class="retirement-ceremony-hero retirement-sprout-result">
       <div class="retirement-ceremony-copy">
         <h2>めばえ期へ進化</h2>
         <p>${gifted ? "プレゼントされた" : "選んだ"}${seed.name}が、進化工程どおりにめばえ期へ進みました。ここから新しい散歩が始まります。</p>
@@ -33225,9 +34062,9 @@ function renderNewSeedSproutCeremony(seed, gifted = false) {
         <div class="retirement-ceremony-art">${companionArtHtml(profile, growth)}</div>
         <div class="retirement-ceremony-card"><b>${companionDisplayName(profile)}</b><p>${profile.text}</p></div>
       </div>
-    </div>
-    <div class="retirement-ceremony-actions">
-      <button type="button" class="primary" data-retirement-home onclick="switchScreen('walk')">ホームへ戻る</button>
+      <div class="retirement-ceremony-actions retirement-sprout-actions">
+        <button type="button" class="primary" data-retirement-home onclick="switchScreen('walk')">ホームへ戻る</button>
+      </div>
     </div>
   `;
   bindRetirementCeremonyActions(box);
@@ -35840,6 +36677,9 @@ function handleStaticPlaytestAction(action) {
       <button class="secondary" id="playtestShopOpenBtn" type="button">小さな店を開ける</button>
       <button class="secondary" id="playtestTournamentBypassBtn" type="button">${tournamentBypass ? "大会確認モードをOFF" : "大会確認モードをON"}</button>
       <button class="secondary" id="playtestRetirementReadyBtn" type="button">引退式テスト状態へ戻す</button>
+      <button class="secondary" id="playtestRetirementStorageFullBtn" type="button">保存枠満タンの引退の日を開く</button>
+      <button class="secondary" id="playtestRetirementMultiSeedBtn" type="button">複数タネ選択画面を開く</button>
+      <button class="secondary" id="playtestRetirementNoSeedBtn" type="button">タネなし選択画面を開く</button>
       <button class="secondary" id="playtestEntryBtn" type="button">選択中の大会を確認準備</button>
     </div>
     <div class="playtest-flow" aria-label="試作確認の流れ">
@@ -35856,6 +36696,9 @@ function handleStaticPlaytestAction(action) {
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
   document.getElementById("playtestTournamentBypassBtn")?.addEventListener("click", toggleTournamentPlaytestBypass);
   document.getElementById("playtestRetirementReadyBtn")?.addEventListener("click", setRetirementCeremonyPlaytestReady);
+  document.getElementById("playtestRetirementStorageFullBtn")?.addEventListener("click", openRetirementStorageFullSendoffPlaytest);
+  document.getElementById("playtestRetirementMultiSeedBtn")?.addEventListener("click", openRetirementMultiSeedChoicePlaytest);
+  document.getElementById("playtestRetirementNoSeedBtn")?.addEventListener("click", openRetirementNoSeedChoicePlaytest);
   document.getElementById("playtestEntryBtn")?.addEventListener("click", () => preparePlaytestTournamentEntry(selectedCup));
   document.getElementById("playtestFlowItemsBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestFlowShopBtn")?.addEventListener("click", openPlaytestShop);
@@ -35907,6 +36750,84 @@ function setRetirementCeremonyPlaytestReady() {
   switchScreen("walk");
   playSfx("reward");
   toast("引退式テスト状態へ戻しました");
+}
+function openRetirementMultiSeedChoicePlaytest() {
+  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {}, townPieces: {} };
+  state.skyStock.seeds = {
+    ...(state.skyStock.seeds || {}),
+    "ミチタネ": Math.max(1, Number(state.skyStock.seeds?.["ミチタネ"] || 0)),
+    "ソラタネ": Math.max(1, Number(state.skyStock.seeds?.["ソラタネ"] || 0)),
+    "ハッパタネ": Math.max(1, Number(state.skyStock.seeds?.["ハッパタネ"] || 0)),
+    "マチタネ": Math.max(1, Number(state.skyStock.seeds?.["マチタネ"] || 0))
+  };
+  const record = state.pendingRetirementRecord || createRetirementRecord();
+  state.pendingRetirementRecord = record;
+  addLog("開発用テスト補助で、複数タネ所持の引退後タネ選択画面を開いた。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("retirement");
+  renderNextRetirementSeedChoice(record);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("reward");
+  toast("複数タネ選択画面を開きました");
+}
+function openRetirementNoSeedChoicePlaytest() {
+  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {}, townPieces: {} };
+  state.skyStock.seeds = {};
+  const record = state.pendingRetirementRecord || createRetirementRecord();
+  state.pendingRetirementRecord = record;
+  addLog("開発用テスト補助で、タネ未所持の引退後タネ選択画面を開いた。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("retirement");
+  renderNextRetirementSeedChoice(record, { forceNoSeeds: true });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("reward");
+  toast("タネなし選択画面を開きました");
+}
+function openRetirementStorageFullSendoffPlaytest() {
+  state.monster = {
+    seedId: "seed-walk",
+    nickname: "ミチリオードフワナ",
+    xp: 35,
+    nature: 4,
+    city: 3,
+    sky: 12,
+    wins: 0,
+    age: 0,
+    lifeBonus: 0,
+    bornAt: Date.now() - 73 * 60 * 60 * 1000,
+    evolutionStage: 3,
+    lifeExtensionUses: 0,
+    grandQualified: false,
+    skills: ["tap"]
+  };
+  const limit = retirementStorageLimit();
+  state.retiredMonsters = Array.from({ length: limit }, (_, index) => ({
+    id: `playtest-retired-full-${index + 1}`,
+    name: `記録テスト${index + 1}`,
+    profileId: "sky",
+    artId: "star-hero-young-seed-walk-sky-cute-comet",
+    seedId: "seed-walk",
+    rank: index % 3 === 0 ? "S" : index % 3 === 1 ? "A" : "B",
+    rankLabel: "保存枠確認用",
+    abilityTotal: 220 + index,
+    retiredAt: retirementDateText(),
+    usedCount: 0,
+    monster: { seedId: "seed-walk", evolutionStage: 4 },
+    savedAt: Date.now() - index * 1000
+  }));
+  state.pendingRetirementRecord = null;
+  addLog("開発用テスト補助で、保存枠満タンの引退の日を開いた。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("retirement");
+  renderRetirementSendoff();
+  const finalize = document.querySelector("[data-retirement-finalize]");
+  if (finalize) finalize.disabled = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("reward");
+  toast("保存枠満タンの引退の日を開きました");
 }
 function grantPlaytestItemSet() {
   const ids = ["walk-shoes", "map-snack", "growth-seed", "focus-ramune", "guard-tape", "wind-pin"];
@@ -37351,6 +38272,7 @@ function switchScreen(screen) {
   const leavingRetirementBgm = screen !== "retirement" && sound.mode === "retirementCeremony";
   if (screen !== "retirement") {
     clearRetirementSendoffTimers();
+    resetRetirementGiftAdGate();
     if (leavingRetirementBgm) stopBgm();
   }
   document.querySelectorAll("[data-screen]").forEach(section => {
