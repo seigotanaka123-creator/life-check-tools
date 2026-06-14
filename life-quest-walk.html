@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -324,24 +324,6 @@
       border: 1px solid rgba(77,145,180,.16);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
     }
-    .map.closed::after {
-      content: "×";
-      position: absolute;
-      inset: 0;
-      z-index: 12;
-      display: grid;
-      place-items: center;
-      color: rgba(188, 42, 42, .82);
-      font-size: clamp(220px, 48vw, 420px);
-      font-weight: 900;
-      line-height: 1;
-      text-shadow: 0 4px 0 rgba(255,255,255,.72), 0 14px 30px rgba(89,24,24,.22);
-      pointer-events: none;
-    }
-    .map.closed .tile {
-      filter: grayscale(1) saturate(.18) brightness(.86);
-      opacity: .58;
-    }
     .map-sky-counter {
       margin-top: 10px;
       padding: 10px 12px;
@@ -359,6 +341,23 @@
       color: #6b5a3b;
       font-size: 13px;
       font-weight: 800;
+    }
+    .map-sky-counter .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 9px;
+    }
+    .map-sky-counter .actions button {
+      min-width: 0;
+      min-height: 38px;
+      padding: 7px 5px;
+      font-size: 12px;
+      background: linear-gradient(180deg, #fff8d7, #f2df8b);
+      border: 1px solid rgba(128, 89, 21, .34);
+      color: #243f63;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 2px 5px rgba(44, 57, 74, .12);
+      white-space: nowrap;
     }
     .map-sky-counter.closed {
       display: grid;
@@ -1291,6 +1290,96 @@
       font-size: 20px;
       line-height: 1.25;
       margin-bottom: 4px;
+    }
+    .map-evolution-result {
+      display: grid;
+      gap: 12px;
+    }
+    .map-evolution-title {
+      color: #5f3d08;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+    .map-evolution-stage {
+      display: grid;
+      grid-template-columns: minmax(92px, 1fr) auto minmax(92px, 1fr);
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .map-evolution-card {
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      min-height: 156px;
+      padding: 10px 8px;
+      border: 1px solid rgba(125, 94, 35, .18);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,252,239,.98), rgba(255,247,222,.96));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 8px 16px rgba(87, 63, 24, .08);
+      text-align: center;
+    }
+    .map-evolution-card.after {
+      border-color: rgba(211, 160, 34, .36);
+      background: linear-gradient(180deg, #fff7d4, #fffdf2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 10px 20px rgba(162, 112, 18, .14);
+    }
+    .map-evolution-art {
+      display: grid;
+      place-items: center;
+      width: 116px;
+      height: 116px;
+      overflow: visible;
+    }
+    .map-evolution-art .monster-current-art,
+    .map-evolution-art .monster-art,
+    .map-evolution-art .unique-monster,
+    .map-evolution-art .turnaround-monster,
+    .map-evolution-art .monster {
+      width: 108px;
+      height: 108px;
+    }
+    .map-evolution-art .monster-art {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .map-evolution-art .monster:not(.unique-monster) {
+      left: auto;
+      top: auto;
+      margin: auto;
+      transform: none;
+      transform-origin: center center;
+    }
+    .map-evolution-card b {
+      color: #4f3820;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+    .map-evolution-arrow {
+      color: #b87912;
+      font-size: 28px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(255,255,255,.8);
+    }
+    .map-evolution-note {
+      padding: 9px 10px;
+      border-radius: 9px;
+      background: rgba(255, 248, 218, .9);
+      color: #68450f;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+    @media (max-width: 560px) {
+      .map-evolution-stage {
+        grid-template-columns: 1fr;
+      }
+      .map-evolution-arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+      }
     }
     .town {
       display: grid;
@@ -3069,7 +3158,7 @@
       animation: slash .38s ease .12s;
     }
     .battle-field.watching {
-      --battle-actor-y: 2px;
+      --battle-actor-y: 6px;
       --battle-stage-y: 48.5%;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       background:
@@ -3149,6 +3238,7 @@
       width: min(120px, 86%);
       background: rgba(255,255,255,.76);
       box-shadow: 0 1px 6px rgba(49,70,47,.18);
+      transform: translateY(4px);
     }
     .battle-field.watching .fighter.casting {
       filter: drop-shadow(0 0 10px rgba(255,214,109,.42));
@@ -5907,6 +5997,9 @@
       width: 88px;
       height: 88px;
     }
+    .home-seat.companion > .monster-current-art {
+      margin-top: 24px;
+    }
     .home-seat .monster,
     .home-seat .unique-monster,
     .retirement-sendoff .retirement-ceremony-art .monster,
@@ -5943,6 +6036,31 @@
       transform: translateY(12px) scale(.88);
       transform-origin: center bottom;
     }
+    .home-seat.companion .home-companion-art {
+      width: 94px;
+      height: 94px;
+      display: grid;
+      place-items: center;
+      transform: translateY(11px) scale(.96, .86);
+      transform-origin: center bottom;
+    }
+    .home-seat.companion .home-companion-flat[class*="sprout-"],
+    .home-seat.companion .home-companion-flat[class*="young-"] {
+      transform: translateY(15px) scale(.96, .86);
+    }
+    .home-seat.companion .home-companion-art,
+    .home-seat.companion .home-companion-art * {
+      animation: none !important;
+    }
+    .home-seat.companion .home-companion-turnaround .turnaround-monster,
+    .home-seat.companion .home-companion-turnaround .unique-monster {
+      width: 96px;
+      height: 96px;
+    }
+    .home-seat.companion .home-companion-flat .monster {
+      transform: translateY(7px) scale(.96, .86);
+      transform-origin: center bottom;
+    }
     .home-seat.guide .monster-art {
       transform: translateY(8px) scale(1.02, .9);
     }
@@ -5967,7 +6085,7 @@
     .home-talk {
       position: absolute;
       left: calc(50% + 34px);
-      top: 4px;
+      top: 9px;
       width: min(330px, calc(100% - 34px));
       transform: translateX(-50%);
       display: grid;
@@ -6108,6 +6226,12 @@
       text-shadow: 0 1px 0 rgba(218,255,249,.46);
     }
     .home-actions button.outside-locked {
+      background: linear-gradient(180deg, #dddddd, #aaaaaa);
+      color: #555;
+      box-shadow: 0 3px 0 rgba(90,90,90,.22), inset 0 1px 0 rgba(255,255,255,.42);
+      text-shadow: 0 1px 0 rgba(255,255,255,.36);
+    }
+    .home-actions button.guild-locked {
       background: linear-gradient(180deg, #dddddd, #aaaaaa);
       color: #555;
       box-shadow: 0 3px 0 rgba(90,90,90,.22), inset 0 1px 0 rgba(255,255,255,.42);
@@ -7369,7 +7493,7 @@
       .companion-home-state { display: inline-block; margin-top: 4px; }
       .home-window { left: 10px; width: 64px; }
       .home-door { right: 16px; }
-      .home-talk { left: calc(50% + 30px); top: 4px; }
+      .home-talk { left: calc(50% + 30px); top: 9px; }
       .home-talk-line { font-size: 12.5px; padding: 5px 9px; }
       .home-talk-line.speaker-guide { margin-left: 78px; }
       .home-seated-pair { width: calc(100% - 64px); gap: 2px; }
@@ -7896,6 +8020,65 @@
     .guild-chip strong, .friend-mode strong { display: block; color: #254a78; font-size: 13px; }
     .guild-chip small, .friend-mode small { display: block; margin-top: 3px; color: var(--muted); font-size: 10.5px; line-height: 1.35; }
     .guild-chip strong { color: #2f7b5e; }
+    .guild-panel {
+      border-color: rgba(80, 172, 190, .34);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,250,221,.96)),
+        linear-gradient(135deg, rgba(126,220,232,.28), rgba(255,214,116,.24));
+      box-shadow: 0 8px 0 rgba(66, 132, 142, .08), inset 0 1px 0 rgba(255,255,255,.72);
+    }
+    .guild-panel > b {
+      color: #226f7c;
+      font-size: 16px;
+    }
+    .guild-panel > span,
+    .guild-panel .mini-feature > span {
+      color: #4f5f67;
+    }
+    .guild-panel .guild-chip,
+    .guild-panel .mini-chip {
+      border-color: rgba(74, 170, 151, .24);
+      background: linear-gradient(180deg, #ffffff, #f1fff8);
+      box-shadow: 0 3px 0 rgba(74, 170, 151, .1), inset 0 1px 0 rgba(255,255,255,.78);
+    }
+    .guild-panel .guild-chip:nth-child(2n) {
+      border-color: rgba(243, 184, 77, .28);
+      background: linear-gradient(180deg, #ffffff, #fff8dc);
+    }
+    .guild-panel .guild-chip strong,
+    .guild-panel .mini-chip strong {
+      color: #25715e;
+    }
+    .guild-panel .mini-feature {
+      border-color: rgba(93, 185, 203, .26);
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(239,251,255,.9));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
+    }
+    .guild-panel .actions button.secondary,
+    .guild-panel .actions button.primary {
+      border: 0;
+      background: linear-gradient(180deg, #fff28a, #f2c94c);
+      color: #513611;
+      box-shadow: 0 3px 0 rgba(152, 107, 24, .24), inset 0 1px 0 rgba(255,255,255,.58);
+      text-shadow: 0 1px 0 rgba(255,250,218,.72);
+    }
+    .guild-panel .actions button.quiet {
+      border-color: rgba(50, 157, 175, .26);
+      background: linear-gradient(180deg, #e9fbff, #bceef5);
+      color: #245d67;
+      box-shadow: 0 3px 0 rgba(52, 126, 139, .16), inset 0 1px 0 rgba(255,255,255,.66);
+    }
+    .guild-panel button:disabled {
+      background: linear-gradient(180deg, #f1f1f1, #d8d8d8);
+      color: #777;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+      opacity: .86;
+    }
+    .guild-panel button.reward-locked {
+      background: linear-gradient(180deg, #eeeeee, #cfcfcf);
+      color: #666;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 2px 0 rgba(120,120,120,.18);
+    }
     .friend-mode { cursor: pointer; text-align: left; color: var(--ink); font: inherit; }
     .friend-mode:active { transform: scale(.98); }
     .battle-rounds { display: grid; gap: 6px; margin-top: 9px; }
@@ -8316,6 +8499,12 @@
       <div class="share-mission" id="shareMission"></div>
     </section>
 
+    <section class="panel screen" data-screen="guildSupportSearch">
+      <h2>協力支援を探す</h2>
+      <p>協力支援を依頼している相棒の一覧です。正式版では、依頼中の相棒をここから確認する想定です。</p>
+      <div class="guild-panel" id="guildRequestList"></div>
+    </section>
+
     <section class="panel screen retirement-ceremony-screen" data-screen="retirement">
       <div class="retirement-ceremony" id="retirementCeremony"></div>
     </section>
@@ -8371,7 +8560,7 @@
           <button class="primary" id="skySummonBtn" type="button">イマソラ認識で進行</button>
         </div>
         <div class="sky-result" id="skyResult">
-          <strong>召喚前</strong>
+          <strong>認識前の確認</strong>
           <p>歩行終了後、安全に立ち止まってから今の空を認識してください。危険な場所や、人の迷惑になる場所でのイマソラ認識は行わないでください。</p>
         </div>
       </div>
@@ -9279,7 +9468,7 @@ const mapTerrainRewards = {
   "風丘": { material: "土の素材", mark: "土", text: "土の素材 +1" },
   "森道": { material: "木の素材", mark: "木", text: "木の素材 +1" },
   "空見台": { material: "雲の素材", mark: "雲", text: "雲の素材 +1" },
-  "街道": { material: "鉄の素材", mark: "鉄", text: "鉄の素材 +1 / 相棒XP +1", xp: 1 }
+  "街道": { material: "鉄の素材", mark: "鉄", text: "鉄の素材 +1 / 相棒経験値 +1", xp: 1 }
 };
 const tournaments = [
   { id: "rookie", name: "はじまり杯", req: 3, enemy: "路地の挑戦者", medal: "R", reward: 18, cadence: "daily", bias: "総合", matchCount: 2, balance: "最初の腕試し。どの育ち方でも挑戦しやすい。" },
@@ -9323,10 +9512,10 @@ const moveBook = [
   { id: "sky", name: "星巡りミラージュ", tier: "strong", power: 1.85, acc: 76 }
 ];
 const supportItems = [
-  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとにXP +2", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび成長を少し増やす。", use: "dailyWalkXp" },
+  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとに相棒経験値 +2", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび成長を少し増やす。", use: "dailyWalkXp" },
   { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "今日一日のイマソラ認識ごとにCoin +5", text: "遠回りの楽しみを作る小さなおやつ。今日の散歩前に使うと、空を認識するたびコインが少し増える。", use: "dailyWalkCoin" },
-  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "XP +3", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
-  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "XP +1 / 引退まで +12時間", text: "ゆっくり休める毛布。お世話を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
+  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "相棒経験値 +3", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
+  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "相棒経験値 +1 / 引退まで +12時間", text: "ゆっくり休める毛布。お世話を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
   { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +4", text: "自然ルートへ少し寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
   { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +4", text: "空ルートへ少し寄せる。すばやさ特化だけが最強にならないよう控えめ。", use: "sky" },
   { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを少し整える。", use: "river" },
@@ -9372,15 +9561,13 @@ const userMenuItems = [
   { id: "settings", label: "設定", sub: "音量", target: "settings" }
 ];
 const homeTalkAgeOptions = [
-  { id: "auto", label: "おまかせ" },
   { id: "elementary", label: "小学生" },
   { id: "junior", label: "中学生" },
   { id: "high", label: "高校生" },
   { id: "adult", label: "大人" }
 ];
 const homeTalkThemeOptions = [
-  { id: "random", label: "おまかせ", ages: ["auto", "elementary", "junior", "high", "adult"] },
-  { id: "riddle", label: "なぞなぞ", ages: ["auto", "elementary", "junior", "high", "adult"], paused: true },
+  { id: "riddle", label: "なぞなぞ", ages: ["elementary", "junior"] },
   { id: "prefecture", label: "都道府県", ages: ["auto", "elementary", "junior", "high", "adult"] },
   { id: "kanji", label: "漢字", ages: ["auto", "elementary", "junior", "high", "adult"] },
   { id: "history", label: "歴史", ages: ["auto", "junior", "high", "adult"] },
@@ -30074,9 +30261,9 @@ const homeTalkTemplateSets = [
   }
 ];
 const dailySideQuestItems = [
-  { id: "map", mark: "道", title: "マップを見る", text: "今日の25マスマップを見ると報酬ゲット。次のイマソラ認識までの歩数も確認できます。", reward: "growth-seed", action: "map" },
-  { id: "companion", mark: "友", title: "相棒を見る", text: "相棒の状態を見ると報酬ゲット。育成傾向や引退までの残り時間を確認できます。", reward: "nap-blanket", action: "character" },
-  { id: "sky", mark: "空", title: "イマソラ認識", text: "安全に立ち止まって空を認識すると報酬ゲット。今日の空が相棒の成長につながります。", reward: "sky-feather", action: "sky", requiresSky: true }
+  { id: "item-use", mark: "道具", title: "アイテムを使用する", text: "その日に一度でもアイテムを使うと報酬ゲット。散歩前や大会前の準備が今日のお仕事になります。", reward: "random", action: "items", requiresAction: true },
+  { id: "guild-support", mark: "支援", title: "協力支援を引き受ける", text: "協力支援を引き受け、25マスマップ制覇またはスタンプラリー全制覇で報酬ゲット。", reward: "nap-blanket", action: "guildSupport", requiresAction: true },
+  { id: "sky", mark: "空", title: "イマソラ認識", text: "安全に立ち止まって空を認識すると報酬ゲット。今日の空が相棒の成長につながります。", reward: "nap-blanket", action: "sky", requiresSky: true }
 ];
 
 function defaultState() {
@@ -30107,6 +30294,7 @@ function defaultState() {
     grandUnlockBonusGiven: false,
     playtestTournamentBypass: false,
     playtestMapTimeMode: "",
+    playtestInsideHoursHomeMode: false,
     playtestOutsideHoursHomeMode: false,
     shopPurchases: [],
     pendingBattle: null,
@@ -30125,7 +30313,7 @@ function defaultState() {
     hpDrainSfxMode: "metalBuzz",
     hpDrainSfxVersion: 3,
     soundVolumes: { normalBgm: 5, retirementBgm: 5, battleBgm: 5, sfx: 5 },
-    homeTalk: { age: "adult", theme: "random", date: "", currentId: "", lastId: "", usedToday: [] },
+    homeTalk: { age: "adult", theme: "prefecture", date: "", currentId: "", lastId: "", usedToday: [] },
     dex: ["seed-walk"],
     lastPlay: "",
     days: [],
@@ -30229,6 +30417,7 @@ function normalizeState() {
   state.playtestTournamentBypass = Boolean(state.playtestTournamentBypass);
   const validMapTimeModes = ["", "open"];
   state.playtestMapTimeMode = validMapTimeModes.includes(state.playtestMapTimeMode) ? state.playtestMapTimeMode : "";
+  state.playtestInsideHoursHomeMode = Boolean(state.playtestInsideHoursHomeMode);
   state.playtestOutsideHoursHomeMode = Boolean(state.playtestOutsideHoursHomeMode);
   state.shopPurchases = Array.isArray(state.shopPurchases) ? state.shopPurchases : [];
   state.pendingBattle = state.pendingBattle && typeof state.pendingBattle === "object" ? state.pendingBattle : null;
@@ -30240,6 +30429,13 @@ function normalizeState() {
     state.guildSupport.supporter = state.guildSupport.supporter && typeof state.guildSupport.supporter === "object" ? state.guildSupport.supporter : { xp: Number(state.guildSupport.xp || 1), coin: Number(state.guildSupport.coin || 2) };
     state.guildSupport.receiverRewardClaimed = Boolean(state.guildSupport.receiverRewardClaimed || legacyImmediateGuildReward);
     state.guildSupport.thanked = Boolean(state.guildSupport.thanked || legacyImmediateGuildReward);
+    state.guildSupport.supporterMapResult = state.guildSupport.supporterMapResult && typeof state.guildSupport.supporterMapResult === "object" ? state.guildSupport.supporterMapResult : null;
+    if (!state.guildSupport.receiverRewardClaimed) {
+      state.guildSupport.supporter = { ...guildRewardAmount() };
+    }
+    if (!state.guildSupport.receiverRewardClaimed && !state.guildSupport.supporterMapResult) {
+      state.guildSupport.receiver = { xp: 0, coin: 0, pending: true };
+    }
   }
   state.guildMessages = Array.isArray(state.guildMessages) ? state.guildMessages : [];
   state.guildMessages = state.guildMessages.filter(item => item.id === "thanks-simple");
@@ -30266,7 +30462,7 @@ function normalizeState() {
   if (state.sideQuest.date !== todayKey()) {
     state.sideQuest = { date: todayKey(), done: [], claimed: [] };
   }
-  const validSideQuestIds = ["map", "companion", "sky"];
+  const validSideQuestIds = ["item-use", "guild-support", "sky"];
   state.sideQuest.done = Array.isArray(state.sideQuest.done) ? state.sideQuest.done.filter(id => validSideQuestIds.includes(id)) : [];
   state.sideQuest.claimed = Array.isArray(state.sideQuest.claimed) ? state.sideQuest.claimed.filter(id => validSideQuestIds.includes(id)) : [];
   if (state.hpDrainSfxVersion !== 3) {
@@ -30280,24 +30476,24 @@ function normalizeState() {
     state.soundVolumes[key] = Number.isFinite(value) ? Math.max(0, Math.min(5, Math.round(value))) : 5;
   });
   state.homeTalk = state.homeTalk && typeof state.homeTalk === "object" ? state.homeTalk : {};
-  const validHomeTalkAges = ["auto", "elementary", "junior", "high", "adult"];
-  const validHomeTalkThemes = ["random", "riddle", "prefecture", "kanji", "history", "english", "psychology", "lovePsychology", "money", "healthWalk"];
+  const validHomeTalkAges = ["elementary", "junior", "high", "adult"];
+  const validHomeTalkThemes = ["riddle", "prefecture", "kanji", "history", "english", "aiTech", "psychology", "lovePsychology", "money", "healthWalk"];
   state.homeTalk.age = validHomeTalkAges.includes(state.homeTalk.age) ? state.homeTalk.age : "adult";
-  state.homeTalk.theme = validHomeTalkThemes.includes(state.homeTalk.theme) ? state.homeTalk.theme : "random";
+  state.homeTalk.theme = validHomeTalkThemes.includes(state.homeTalk.theme) ? state.homeTalk.theme : "prefecture";
   const homeTalkThemeAgeMap = {
-    random: validHomeTalkAges,
-    riddle: validHomeTalkAges,
+    riddle: ["elementary", "junior"],
     prefecture: validHomeTalkAges,
     kanji: validHomeTalkAges,
-    history: ["auto", "junior", "high", "adult"],
-    english: ["auto", "junior", "high", "adult"],
-    psychology: ["auto", "high", "adult"],
+    history: ["junior", "high", "adult"],
+    english: ["junior", "high", "adult"],
+    aiTech: ["junior", "high", "adult"],
+    psychology: ["high", "adult"],
     lovePsychology: ["adult"],
-    money: ["auto", "high", "adult"],
+    money: ["high", "adult"],
     healthWalk: validHomeTalkAges
   };
-  const allowedThemeIds = validHomeTalkThemes.filter(id => (homeTalkThemeAgeMap[id] || validHomeTalkAges).includes(state.homeTalk.age) || state.homeTalk.age === "auto");
-  if (!allowedThemeIds.includes(state.homeTalk.theme)) state.homeTalk.theme = "random";
+  const allowedThemeIds = validHomeTalkThemes.filter(id => (homeTalkThemeAgeMap[id] || validHomeTalkAges).includes(state.homeTalk.age));
+  if (!allowedThemeIds.includes(state.homeTalk.theme)) state.homeTalk.theme = allowedThemeIds[0] || "prefecture";
   state.homeTalk.date = String(state.homeTalk.date || "");
   if (state.homeTalk.date !== todayKey()) {
     state.homeTalk.date = todayKey();
@@ -30322,7 +30518,7 @@ function renderTalkSettings() {
   const box = document.getElementById("talkSettings");
   if (!box) return;
   const age = state.homeTalk?.age || "adult";
-  const theme = state.homeTalk?.theme || "random";
+  const theme = state.homeTalk?.theme || "prefecture";
   const allowedThemes = homeTalkAllowedThemes(age);
   const currentSet = homeTalkTemplateSets.find(set => set.id === state.homeTalk?.currentId);
   box.innerHTML = `
@@ -30355,7 +30551,7 @@ function setHomeTalkAge(age) {
   if (!homeTalkAgeOptions.some(item => item.id === age)) return;
   state.homeTalk.age = age;
   const allowed = homeTalkAllowedThemes(age).map(item => item.id);
-  if (!allowed.includes(state.homeTalk.theme)) state.homeTalk.theme = "random";
+  if (!allowed.includes(state.homeTalk.theme)) state.homeTalk.theme = allowed[0] || "prefecture";
   state.homeTalk.currentId = "";
   state.homeTalk.usedToday = [];
   saveState();
@@ -31565,7 +31761,7 @@ function renderTodaySkyBonus() {
   box.hidden = false;
   const sky = skyTypes.find(item => item.name === latest.sky) || skyTypes[0];
   const bonus = skyBonusFor(sky);
-  box.innerHTML = `<b>今日の空ボーナス</b><span>${sky?.name || "今日の空"}: ${bonus.title}。${bonus.text}。報酬は小さく、固定の正解にならない範囲で反映します。</span><div class="mini-grid"><div class="mini-chip"><strong>XP +${bonus.xp}</strong><small>空認識時だけ</small></div><div class="mini-chip"><strong>Coin +${bonus.coin}</strong><small>おまけ報酬</small></div></div>`;
+  box.innerHTML = `<b>今日の空ボーナス</b><span>${sky?.name || "今日の空"}: ${bonus.title}。${bonus.text}。報酬は小さく、固定の正解にならない範囲で反映します。</span><div class="mini-grid"><div class="mini-chip"><strong>相棒経験値 +${bonus.xp}</strong><small>空認識時だけ</small></div><div class="mini-chip"><strong>Coin +${bonus.coin}</strong><small>おまけ報酬</small></div></div>`;
 }
 function renderBadWeatherPanel() {
   const box = document.getElementById("badWeatherPanel");
@@ -31709,7 +31905,32 @@ const guildMessageCategories = [
 const guildMessageBook = guildMessageCategories.flatMap(category => category.items);
 const guildMessageIds = new Set(guildMessageBook.map(item => item.id));
 function guildRewardAmount() {
-  return { xp: 1, coin: 2 };
+  return { xp: 3, coin: 3 };
+}
+function normalizeGuildReward(reward = {}) {
+  return {
+    xp: Math.max(0, Math.floor(Number(reward.xp || 0))),
+    coin: Math.max(0, Math.floor(Number(reward.coin || 0)))
+  };
+}
+function guildReceiverRewardFromSupporterMap(result = {}) {
+  return {
+    xp: Math.floor(Math.max(0, Number(result.xp || 0)) / 2),
+    coin: Math.floor(Math.max(0, Number(result.coin || 0)) / 2)
+  };
+}
+function guildReceiverRewardAmount() {
+  if (state.guildSupport?.supporterMapResult) return guildReceiverRewardFromSupporterMap(state.guildSupport.supporterMapResult);
+  if (state.guildSupport?.receiver && !state.guildSupport.receiver.pending) return normalizeGuildReward(state.guildSupport.receiver);
+  return { xp: 0, coin: 0, pending: true };
+}
+function guildReceiverRewardText(reward = guildReceiverRewardAmount()) {
+  if (reward.pending) return "支援者の25マップ総Coinと総相棒経験値の半分";
+  return `相棒経験値 +${reward.xp} / Coin +${reward.coin}`;
+}
+function currentSupporterMapResult() {
+  const result = state.todayResult && state.todayResult.date === todayKey() && state.todayResult.kind !== "guild" ? state.todayResult : null;
+  return normalizeGuildReward({ xp: result?.xp || 0, coin: result?.coin || 0 });
 }
 function hasGuildSupportToday() {
   return Boolean(state.guildSupport && state.guildSupport.date === todayKey());
@@ -31746,12 +31967,15 @@ function claimGuildSupporterReward() {
     toast("支援側報酬は未達成です");
     return;
   }
+  const supporterMapResult = currentSupporterMapResult();
+  const receiverReward = guildReceiverRewardFromSupporterMap(supporterMapResult);
   const reward = guildRewardAmount();
   state.monster.xp += reward.xp;
   state.coin += reward.coin;
-  state.guildSupporterRewards.unshift({ date: todayKey(), xp: reward.xp, coin: reward.coin, reason: status.reason, at: Date.now() });
+  state.guildSupporterRewards.unshift({ date: todayKey(), xp: reward.xp, coin: reward.coin, reason: status.reason, supporterMapResult, receiverReward, at: Date.now() });
   state.guildSupporterRewards = state.guildSupporterRewards.slice(0, 20);
-  addLog(`支援側報酬: ${status.reason}により XP +${reward.xp} / Coin +${reward.coin} を獲得。`);
+  markSideQuestDone("guild-support");
+  addLog(`支援側報酬: ${status.reason}により相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。`);
   saveState();
   renderAll();
   playSfx("reward");
@@ -31760,56 +31984,100 @@ function claimGuildSupporterReward() {
 function hasTodayResult() {
   return Boolean((state.todayResult && state.todayResult.date === todayKey()) || state.days.includes(todayKey()));
 }
+function guildRequestListItems() {
+  if (!hasGuildSupportToday()) return [];
+  const reward = state.guildSupport?.supporter || guildRewardAmount();
+  const profile = monsterProfile();
+  return [{
+    name: companionDisplayName(profile),
+    stage: profile.stage,
+    reward,
+    status: state.guildSupport?.receiverRewardClaimed ? "成立済み" : "依頼中"
+  }];
+}
+function renderGuildRequestList() {
+  const box = document.getElementById("guildRequestList");
+  if (!box) return;
+  const items = guildRequestListItems();
+  box.innerHTML = `
+    <b>協力支援の依頼一覧</b>
+    <span>依頼中の相棒がいる時だけ表示します。支援を引き受ける側は、25マスマップクリア、またはスタンプラリー全制覇で支援報酬を受け取れます。</span>
+    <div class="mini-grid">
+      ${items.length ? items.map(item => `
+        <div class="mini-chip">
+          <strong>${item.name}</strong>
+          <small>${item.stage} / ${item.status} / 支援する側報酬 相棒経験値 +${item.reward.xp} / Coin +${item.reward.coin}</small>
+        </div>
+      `).join("") : `<div class="mini-chip"><strong>今は協力支援の依頼はありません</strong><small>依頼が出ると、ここに相棒名と支援する側報酬が表示されます。</small></div>`}
+    </div>
+    <div class="actions"><button class="secondary" id="guildRequestListBackBtn" type="button">協力支援ページへ戻る</button></div>
+  `;
+  document.getElementById("guildRequestListBackBtn")?.addEventListener("click", () => {
+    switchScreen("walk");
+    document.getElementById("guildPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+function openGuildSupportSearch() {
+  renderGuildRequestList();
+  switchScreen("guildSupportSearch");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("select");
+}
 function renderGuildPanel() {
   const box = document.getElementById("guildPanel");
   if (!box) return;
   const used = hasGuildSupportToday();
   const alreadyWalked = hasTodayResult() && state.todayResult.kind !== "guild";
+  const rewardLocked = used || alreadyWalked;
   const messages = state.guildMessages.filter(item => guildMessageIds.has(item.id)).slice(0, 4);
   const supporterStatus = guildSupporterRewardStatus();
-  const receiverReward = used ? state.guildSupport?.receiver || guildRewardAmount() : guildRewardAmount();
+  const receiverReward = used ? guildReceiverRewardAmount() : { xp: 0, coin: 0, pending: true };
   const receiverThanked = Boolean(used && state.guildSupport?.receiverRewardClaimed);
   const supporterReward = guildRewardAmount();
+  const canCancelRequest = Boolean(used && !receiverThanked);
   const confirmHtml = guildSupportConfirmOpen && !used && !alreadyWalked ? `
     <div class="mini-feature">
-      <b>協力支援を受けますか？</b>
-      <span>協力支援を受けると、今日は自分のイマソラ認識と散歩報酬は受け取れません。受ける側の報酬は、支援後に「ありがとう」を送った時に確定します。</span>
+      <b>協力支援を依頼しますか？</b>
+      <span>協力支援を依頼すると当日分の協力支援のわずかな報酬が与えられる権利はもらえますが、代わりに今日の25マスマップが使用不可となります。それでも大丈夫ですか？</span>
       <div class="guild-grid">
-        <div class="guild-chip"><strong>受ける側</strong><small>ありがとう送信で XP +${receiverReward.xp} / Coin +${receiverReward.coin}</small></div>
-        <div class="guild-chip"><strong>支援側</strong><small>25マスクリア、またはスタンプ全制覇で XP +${supporterReward.xp} / Coin +${supporterReward.coin}</small></div>
+      <div class="guild-chip"><strong>受ける側</strong><small>ありがとう送信で、支援者の25マップ総Coinと総相棒経験値の半分</small></div>
+      <div class="guild-chip"><strong>支援側</strong><small>25マスクリア、またはスタンプ全制覇で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}</small></div>
         <div class="guild-chip"><strong>今日の扱い</strong><small>自分の散歩成果は終了</small></div>
       </div>
-      <div class="actions"><button class="primary" id="guildSupportConfirmBtn" type="button">確認して受ける</button><button class="quiet" id="guildSupportCancelBtn" type="button">キャンセル</button></div>
+      <div class="actions"><button class="primary" id="guildSupportConfirmBtn" type="button">はい</button><button class="quiet" id="guildSupportCancelBtn" type="button">やっぱりやめる</button></div>
     </div>
   ` : "";
   box.innerHTML = `
     <b>協力支援</b>
     <span>歩けない日や悪天候の日は、協力者から小さな助けを受けられる構想にします。受ける側は支援後のお礼で受ける側の報酬を受け取り、支援する側は歩いた成果で支援報酬を受け取ります。自分のマップ進行の主役は、あくまで自分の安全な散歩とイマソラ認識です。</span>
     <div class="guild-grid">
-      <div class="guild-chip"><strong>受ける側</strong><small>協力支援後、「ありがとう」を送った時に XP +${receiverReward.xp} / Coin +${receiverReward.coin}。</small></div>
-      <div class="guild-chip"><strong>支援側</strong><small>25マスマップクリア、またはスタンプラリー全制覇で XP +${supporterReward.xp} / Coin +${supporterReward.coin}。</small></div>
+        <div class="guild-chip"><strong>受ける側</strong><small>協力支援後、「ありがとう」を送った時に、支援者の25マップ総Coinと総相棒経験値の半分。</small></div>
+        <div class="guild-chip"><strong>支援側</strong><small>25マスマップクリア、またはスタンプラリー全制覇で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。</small></div>
       <div class="guild-chip"><strong>併用不可</strong><small>受けた日は自分のイマソラ認識と散歩ボーナスなし。</small></div>
     </div>
-    <div class="actions"><button class="secondary" id="guildSupportBtn" type="button" ${used || alreadyWalked ? "disabled" : ""}>協力支援を受ける</button></div>
-    <span>${used ? `今日の協力支援済み: ${receiverThanked ? `お礼送信済み。受ける側 XP +${receiverReward.xp} / Coin +${receiverReward.coin}を受け取りました。` : `まだ受ける側報酬は未確定です。「ありがとう」を送ると XP +${receiverReward.xp} / Coin +${receiverReward.coin}を受け取れます。`}今日は自分のイマソラ認識と散歩ボーナスは受け取れません。` : alreadyWalked ? "今日はすでに自分の散歩成果が確定しています。協力支援との併用はできません。" : "確認後に1日1回だけ受け取れます。歩いたことの代替として強すぎる報酬にはせず、マップは進めません。"}</span>
+    <div class="actions"><button class="secondary ${rewardLocked ? "reward-locked" : ""}" id="guildSupportBtn" type="button" data-reward-locked="${rewardLocked ? "true" : "false"}">協力支援を依頼する</button><button class="secondary" id="guildSupportSearchBtn" type="button">協力支援を探す</button></div>
+        <span>${used ? receiverThanked ? `今日の協力支援は成立済みです。お礼送信済み。受ける側 ${guildReceiverRewardText(receiverReward)}を受け取りました。今日は自分のイマソラ認識と散歩ボーナスは受け取れません。` : receiverReward.pending ? "協力支援を依頼中です。成立前ならキャンセルできます。支援者の25マップ成果が届いた後、「ありがとう」を送ると協力支援が成立し、支援者の25マップ総Coinと総相棒経験値の半分を受け取れます。" : `協力支援を依頼中です。成立前ならキャンセルできます。「ありがとう」を送ると協力支援が成立し、${guildReceiverRewardText(receiverReward)}を受け取れます。` : alreadyWalked ? "今日はすでに自分の散歩成果が確定しています。協力支援との併用はできません。" : "確認後に1日1回だけ受け取れます。歩いたことの代替として強すぎる報酬にはせず、マップは進めません。"}</span>
+    ${canCancelRequest ? `<div class="actions"><button class="quiet" id="guildSupportRequestCancelBtn" type="button">協力支援をキャンセル</button></div>` : ""}
     ${confirmHtml}
     <div class="mini-feature">
       <b>支援側報酬</b>
-      <span>${supporterStatus.claimed ? `今日は受取済みです。${state.guildSupporterRewards[0]?.reason || "条件達成"}で XP +${supporterReward.xp} / Coin +${supporterReward.coin}。` : supporterStatus.ready ? `${supporterStatus.reason}により、支援する側の報酬を受け取れます。` : supporterStatus.reason}</span>
+          <span>${supporterStatus.claimed ? `今日は受取済みです。${state.guildSupporterRewards[0]?.reason || "条件達成"}で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。` : supporterStatus.ready ? `${supporterStatus.reason}により、支援する側の報酬を受け取れます。` : supporterStatus.reason}</span>
       <div class="actions"><button class="secondary" id="guildSupporterRewardBtn" type="button" ${supporterStatus.ready && !supporterStatus.claimed ? "" : "disabled"}>支援報酬を受け取る</button></div>
     </div>
     <div class="mini-feature">
       <b>支援後のお礼メッセージ</b>
       <span>募集文ではなく、歩いて支援してくれた人へ送るねぎらいです。自由入力チャットは置かず、送れるのは安全な定型文だけです。</span>
-      <div class="guild-grid">${guildMessageBook.map(item => `<button class="guild-chip" type="button" data-guild-message="${item.id}" ${used && !receiverThanked ? "" : "disabled"}><strong>${item.text}</strong></button>`).join("")}</div>
-      <div class="mini-grid">${messages.length ? messages.map(item => `<div class="mini-chip"><strong>${item.text}</strong><small>${item.date}</small></div>`).join("") : `<div class="mini-chip"><strong>まだ送信なし</strong><small>${used ? receiverThanked ? "お礼は送信済みです。" : "ありがとうを送ると受ける側報酬が確定します。" : "協力支援を受けた後に送れます。"}</small></div>`}</div>
+      <div class="guild-grid">${guildMessageBook.map(item => `<button class="guild-chip" type="button" data-guild-message="${item.id}" ${used && !receiverThanked && !receiverReward.pending ? "" : "disabled"}><strong>${item.text}</strong></button>`).join("")}</div>
+      <div class="mini-grid">${messages.length ? messages.map(item => `<div class="mini-chip"><strong>${item.text}</strong><small>${item.date}</small></div>`).join("") : `<div class="mini-chip"><strong>まだ送信なし</strong><small>${used ? receiverThanked ? "お礼は送信済みです。" : receiverReward.pending ? "支援者の25マップ成果が届いた後に送れます。" : "ありがとうを送ると受ける側報酬が確定します。" : "協力支援を受けた後に送れます。"}</small></div>`}</div>
     </div>
   `;
   const button = document.getElementById("guildSupportBtn");
   if (button) button.addEventListener("click", openGuildSupportConfirm);
+  document.getElementById("guildSupportSearchBtn")?.addEventListener("click", openGuildSupportSearch);
   document.getElementById("guildSupporterRewardBtn")?.addEventListener("click", claimGuildSupporterReward);
   document.getElementById("guildSupportConfirmBtn")?.addEventListener("click", claimGuildSupport);
   document.getElementById("guildSupportCancelBtn")?.addEventListener("click", cancelGuildSupportConfirm);
+  document.getElementById("guildSupportRequestCancelBtn")?.addEventListener("click", cancelGuildSupportRequest);
   document.querySelectorAll("[data-guild-message]").forEach(button => button.addEventListener("click", () => sendGuildMessage(button.dataset.guildMessage)));
 }
 function sendGuildMessage(id) {
@@ -31825,15 +32093,34 @@ function sendGuildMessage(id) {
   }
   const item = guildMessageBook.find(message => message.id === id);
   if (!item) return;
-  const reward = state.guildSupport.receiver || guildRewardAmount();
+  const reward = guildReceiverRewardAmount();
+  if (reward.pending) {
+    playSfx("error");
+    toast("支援者の25マップ成果がまだ届いていません");
+    return;
+  }
   state.monster.xp += reward.xp;
   state.coin += reward.coin;
   state.guildSupport.thanked = true;
   state.guildSupport.thankedAt = Date.now();
   state.guildSupport.receiverRewardClaimed = true;
+  state.guildSupport.status = "confirmed";
+  setTodayResult({
+    kind: "guild",
+    title: "協力支援を受けて今日は休む",
+    map: 0,
+    coin: reward.coin,
+    xp: reward.xp,
+    notes: [
+      `協力を受ける側: お礼送信で相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
+      `支援者の25マップ成果の半分: 相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
+      "今日は自分のイマソラ認識と散歩ボーナスは受け取れません。",
+      "歩けない日、悪天候の日のための控えめな代替です。"
+    ]
+  });
   state.guildMessages.unshift({ id: item.id, text: item.text, date: new Date().toLocaleString("ja-JP") });
   state.guildMessages = state.guildMessages.slice(0, 12);
-  addLog(`支援後のお礼メッセージに「${item.text}」を送った。受ける側報酬として XP +${reward.xp} / Coin +${reward.coin} を獲得。自由入力チャットは使わない安全設計。`);
+  addLog(`支援後のお礼メッセージに「${item.text}」を送った。受ける側報酬として相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。自由入力チャットは使わない安全設計。`);
   saveState();
   renderAll();
   toast("お礼を送りました");
@@ -31841,12 +32128,12 @@ function sendGuildMessage(id) {
 function openGuildSupportConfirm() {
   if (hasGuildSupportToday()) {
     playSfx("error");
-    toast("今日は協力支援済み");
+    toast("今日の報酬は獲得済です");
     return;
   }
   if (hasTodayResult()) {
     playSfx("error");
-    toast("今日は散歩成果が確定済み");
+    toast("今日の報酬は獲得済です");
     return;
   }
   guildSupportConfirmOpen = true;
@@ -31857,6 +32144,29 @@ function cancelGuildSupportConfirm() {
   renderGuildPanel();
   playSfx("select");
   toast("協力支援をキャンセル");
+}
+function cancelGuildSupportRequest() {
+  if (!hasGuildSupportToday()) {
+    playSfx("error");
+    toast("協力支援依頼はありません");
+    return;
+  }
+  if (state.guildSupport.receiverRewardClaimed) {
+    playSfx("error");
+    toast("成立済みの協力支援はキャンセルできません");
+    return;
+  }
+  state.guildSupport = null;
+  guildSupportConfirmOpen = false;
+  if (state.todayResult && state.todayResult.date === todayKey() && state.todayResult.kind === "guild") {
+    state.todayResult = null;
+    state.days = state.days.filter(day => day !== todayKey());
+  }
+  addLog("協力支援依頼をキャンセル。今日の25マスマップを使用できる状態に戻した。");
+  saveState();
+  renderAll();
+  playSfx("select");
+  toast("協力支援依頼をキャンセルしました");
 }
 function claimGuildSupport() {
   if (hasGuildSupportToday()) {
@@ -31870,31 +32180,18 @@ function claimGuildSupport() {
     return;
   }
   const reward = guildRewardAmount();
-  state.guildSupport = { date: todayKey(), receiver: { ...reward }, supporter: { ...reward }, receiverRewardClaimed: false, thanked: false, supporterRewardClaimed: false };
-  setTodayResult({
-    kind: "guild",
-    title: "協力支援を受けて今日は休む",
-    map: 0,
-    coin: 0,
-    xp: 0,
-    notes: [
-      `協力を受ける側: お礼送信で XP +${reward.xp} / Coin +${reward.coin}`,
-      `支援する側: 25マスマップクリア、またはスタンプラリー全制覇で XP +${reward.xp} / Coin +${reward.coin}`,
-      "今日は自分のイマソラ認識と散歩ボーナスは受け取れません。",
-      "歩けない日、悪天候の日のための控えめな代替です。"
-    ]
-  });
+  state.guildSupport = { date: todayKey(), status: "pending", receiver: { xp: 0, coin: 0, pending: true }, supporter: { ...reward }, supporterMapResult: null, receiverRewardClaimed: false, thanked: false, supporterRewardClaimed: false };
   state.walkSession.active = false;
   state.walkSession.stepChecked = false;
   state.walkSession.stopped = false;
   state.walkSession.skyVerified = false;
   state.pendingSky = null;
   guildSupportConfirmOpen = false;
-  addLog(`協力支援を受けた。受ける側報酬は「ありがとう」送信時に XP +${reward.xp} / Coin +${reward.coin}。支援側報酬は25マスマップクリア、またはスタンプラリー全制覇で獲得。今日は自分のイマソラ認識と散歩ボーナスは受け取れない。`);
+  addLog("協力支援を依頼中。成立前ならキャンセル可能。成立後の受ける側報酬は、支援者の25マップ総Coinと総相棒経験値の半分。");
   saveState();
   renderAll();
   playSfx("reward");
-  toast("協力支援を受けました。お礼送信で報酬確定");
+  toast("協力支援を依頼しました");
 }
 function renderFriendBattlePanel(profile, lifeRemain) {
   const box = document.getElementById("friendBattlePanel");
@@ -31928,9 +32225,19 @@ function simulateFriendBattle(mode = "solo") {
   toast(`${labels.solo} 合言葉部屋プレビュー`);
 }
 function companionHomeArtMarkup(profile, growth) {
+  const stageKey = currentCompanionStageKey(profile);
+  const item = currentCompanionArtItem(profile, growth);
+  if ((stageKey === "hero" || stageKey === "star") && item?.id) {
+    const classes = `monster-current-art home-companion-art home-companion-turnaround ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
+    return `<div class="${classes}">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-right"))}</div>`;
+  }
+  if (item?.id) {
+    const whiteClass = item.whiteVariant ? " white-body" : "";
+    const classes = `monster-current-art home-companion-art home-companion-flat ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
+    return `<div class="${classes}"><div class="monster ${item.form}${whiteClass}" style="${item.style || ""}">${monsterInnerParts()}</div></div>`;
+  }
   const html = companionArtHtml(profile, growth);
-  if (profile.stage !== "めばえ期") return html;
-  return html.replace('class="', 'class="home-sprout-art ');
+  return html.replace('class="', 'class="home-companion-art home-companion-flat ');
 }
 function homeStillMonsterSvg(svg) {
   return String(svg || "").replace(/<animateTransform attributeName="transform" type="translate"[^>]*\/>/g, "");
@@ -32025,10 +32332,10 @@ function homeTalkThemeCount(themeId, age = state.homeTalk?.age || "adult") {
 }
 function homeTalkCandidateSets() {
   const age = state.homeTalk?.age || "adult";
-  const theme = state.homeTalk?.theme || "random";
+  const theme = state.homeTalk?.theme || "prefecture";
   const allowedThemes = homeTalkAllowedThemes(age).map(item => item.id);
-  const safeTheme = allowedThemes.includes(theme) ? theme : "random";
-  const themePool = safeTheme === "random" ? allowedThemes.filter(id => id !== "random") : [safeTheme];
+  const safeTheme = allowedThemes.includes(theme) ? theme : allowedThemes[0];
+  const themePool = safeTheme ? [safeTheme] : [];
   return homeTalkTemplateSets.filter(set =>
     themePool.includes(set.theme) &&
     homeTalkSetAllowsAge(set, age)
@@ -32208,6 +32515,11 @@ function companionHomeRetirementText(name, hours) {
 }
 function homeWindowClockDate() {
   const now = new Date();
+  if (state.playtestInsideHoursHomeMode) {
+    const insidePreview = new Date(now);
+    insidePreview.setHours(12, now.getMinutes(), 0, 0);
+    return insidePreview;
+  }
   if (!state.playtestOutsideHoursHomeMode) return now;
   const outsidePreview = new Date(now);
   outsidePreview.setHours(21, now.getMinutes(), 0, 0);
@@ -32278,6 +32590,7 @@ function renderCompanionHome() {
   const lifeRemain = retirementRemainingHours();
   const retirementReady = lifeRemain <= 0;
   const outsideHours = isHomeOutsideHours();
+  const guildSupportUsed = hasGuildSupportToday();
   const homeActionItems = retirementReady
     ? [
         { id: "retirement", label: "引退する", target: "retirement" },
@@ -32320,7 +32633,8 @@ function renderCompanionHome() {
         ${homeActionItems.map(item => {
           const classes = [
             item.id === "walk" ? "secondary" : "",
-            outsideHours && (item.id === "walk" || item.id === "sideQuest") ? "outside-locked" : ""
+            outsideHours && (item.id === "walk" || item.id === "sideQuest") ? "outside-locked" : "",
+            !outsideHours && guildSupportUsed && item.id === "walk" ? "guild-locked" : ""
           ].filter(Boolean).join(" ");
           return `<button type="button" class="${classes}" data-home-action="${item.target}">${item.label}</button>`;
         }).join("")}
@@ -32339,14 +32653,21 @@ function hasTodaySkyRecognition() {
   return state.skySummons.some(item => item.date === todayKey());
 }
 function isSideQuestDone(id) {
-  return state.sideQuest.done.includes(id) || (id === "sky" && hasTodaySkyRecognition());
+  return state.sideQuest.done.includes(id)
+    || (id === "sky" && hasTodaySkyRecognition())
+    || (id === "guild-support" && guildSupporterRewardStatus().ready);
 }
 function markSideQuestDone(id) {
   if (!dailySideQuestItems.some(item => item.id === id)) return;
   if (!state.sideQuest.done.includes(id)) state.sideQuest.done.push(id);
 }
 function sideQuestRewardItem(itemId) {
+  if (itemId === "random") return supportItems[Math.floor(Math.random() * supportItems.length)] || supportItems[0];
   return supportItems.find(item => item.id === itemId) || supportItems[0];
+}
+function sideQuestRewardLabel(itemId) {
+  if (itemId === "random") return "ランダム";
+  return sideQuestRewardItem(itemId).name;
 }
 function addSideQuestItem(itemId) {
   const reward = sideQuestRewardItem(itemId);
@@ -32377,12 +32698,12 @@ function renderDailySideQuest() {
       ${dailySideQuestItems.map(item => {
         const done = isSideQuestDone(item.id);
         const claimed = state.sideQuest.claimed.includes(item.id);
-        const buttonText = claimed ? "受け取り済み" : done ? "報酬を受け取る" : item.requiresSky ? "認識へ進む" : "確認する";
+        const buttonText = claimed ? "受け取り済み" : done ? "報酬を受け取る" : item.requiresSky ? "認識へ進む" : item.requiresAction ? "進む" : "確認する";
         return `
           <div class="side-quest-card ${done ? "done" : ""} ${claimed ? "claimed" : ""}">
             <small>${item.mark} / ${done ? "達成" : "未達成"}</small>
             <strong>${item.title}</strong>
-            <span>${item.text}<br><span class="side-quest-reward">報酬: ${sideQuestRewardItem(item.reward).name} x1 / 育成用アイテム</span></span>
+            <span>${item.text}<br><span class="side-quest-reward">報酬: ${sideQuestRewardLabel(item.reward)} x1 / 育成用アイテム</span></span>
             <button type="button" data-side-quest="${item.id}" ${claimed ? "disabled" : ""}>${buttonText}</button>
           </div>
         `;
@@ -32402,6 +32723,11 @@ function handleUserMenu(target) {
     playSfx("error");
     refreshPlaytimeSensitiveViews();
     showHomeCenterNotice("散歩とお仕事は06:00〜19:00以外では時間外となっています");
+    return;
+  }
+  if (hasGuildSupportToday() && (target === "walk" || target === "map" || target === "sky")) {
+    playSfx("error");
+    showHomeCenterNotice("協力支援を依頼したため今日は25マスマップは使用できません");
     return;
   }
   if (isRetirementReady() && (target === "walk" || target === "map" || target === "sky" || target === "battle" || target === "character" || target === "sideQuest")) {
@@ -32442,6 +32768,11 @@ function navigateUserTarget(target, markDone = false) {
     document.getElementById("itemBox")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
+  if (target === "guildSupport") {
+    switchScreen("walk");
+    document.getElementById("guildPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
   if (target === "town") {
     switchScreen("town");
     document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -32467,6 +32798,11 @@ function handleSideQuest(id) {
     if (item.requiresSky) {
       navigateUserTarget(item.action);
       toast("イマソラ認識後に達成します");
+      return;
+    }
+    if (item.requiresAction) {
+      navigateUserTarget(item.action);
+      toast(item.id === "item-use" ? "アイテム使用後に達成します" : "支援条件達成後に達成します");
       return;
     }
     markSideQuestDone(id);
@@ -32513,8 +32849,8 @@ function renderTodayResult() {
   if (!box) return;
   const result = state.todayResult && state.todayResult.date === todayKey() ? state.todayResult : null;
   const todayCards = result
-    ? [[`+${result.map}`, "Map"], [`+${result.coin}`, "Coin"], [`+${result.xp}`, "Monster XP"]]
-    : [["0", "Map"], ["0", "Coin"], ["0", "Monster XP"]];
+      ? [[`+${result.map}`, "Map"], [`+${result.coin}`, "Coin"], [`+${result.xp}`, "相棒経験値"]]
+      : [["0", "Map"], ["0", "Coin"], ["0", "相棒経験値"]];
   const totalCards = [[state.position, "Map"], [openedTownBuildings().length, "建物"], [streak(), "Days"]];
   const todayText = result ? result.title : "まだ今日の成果は確定していません。歩行後に安全停止し、イマソラ認識を確認すると、ここに進行内容がまとまります。";
   if (!result) {
@@ -32686,13 +33022,19 @@ function renderMap() {
   const mapWrap = map?.closest(".map-wrap");
   if (!map) return;
   if (mapWrap) mapWrap.hidden = false;
-  map.classList.toggle("closed", !isMapPlaytime());
+  const closed = !isMapPlaytime();
+  map.hidden = closed;
+  map.classList.remove("closed");
   if (timeNote) {
-    const closed = !isMapPlaytime();
     timeNote.classList.toggle("closed", closed);
     timeNote.textContent = closed
       ? "マップ進行は06:00〜19:00のみです。時間外は進行できません。夜遅い外出はしないようにしましょう。"
       : "マップ進行は06:00〜19:00のみ";
+  }
+  if (closed) {
+    map.innerHTML = "";
+    renderMapSkyCounter();
+    return;
   }
   const start = Math.floor(state.position / 25) * 25;
   map.innerHTML = Array.from({ length: 25 }, (_, index) => {
@@ -32733,7 +33075,7 @@ function renderMapSkyCounter() {
     return;
   }
   box.classList.remove("closed");
-  const actions = isMapPlaytime() ? `<div class="actions"><button class="secondary" type="button" onclick="openItemBoxFromMapCounter()">アイテム</button><button class="secondary" type="button" onclick="openStampRallyFromMapCounter()">スタンプラリー</button><button class="secondary" type="button" onclick="returnHomeFromMapClosedCounter()">ホームへ戻る</button></div>` : "";
+  const actions = isMapPlaytime() ? `<div class="actions"><button class="secondary" type="button" onclick="openItemBoxFromMapCounter()">アイテム</button><button class="secondary" type="button" onclick="openStampRallyFromMapCounter()">スタンプラリー</button><button class="secondary" type="button" onclick="openGuildSupportFromMapCounter()">協力支援</button><button class="secondary" type="button" onclick="returnHomeFromMapClosedCounter()">ホームへ戻る</button></div>` : "";
   const next = nextSkyRequiredMapDistance();
   if (!next) {
     box.innerHTML = `次のイマソラ認識まであと--歩<small>進化マスまたはタネ召喚を探索中</small>${actions}`;
@@ -32754,9 +33096,19 @@ function openStampRallyFromMapCounter() {
   switchScreen("walk");
   document.getElementById("stampView")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+function openGuildSupportFromMapCounter() {
+  switchScreen("walk");
+  document.getElementById("guildPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 function returnHomeFromMapClosedCounter() {
   switchScreen("walk");
   document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function scrollToWalkSkyRecognition() {
+  switchScreen("walk");
+  requestAnimationFrame(() => {
+    document.querySelector(".walk-sky")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 function mapCurrentHeroTokenArt() {
   const tokenName = "白ミチリオードセイバーシンラ";
@@ -33185,6 +33537,7 @@ function isMapPlaytime(now = new Date()) {
   return hour >= 6 && hour < 19;
 }
 function isHomeOutsideHours(now = new Date()) {
+  if (state.playtestInsideHoursHomeMode) return false;
   return Boolean(state.playtestOutsideHoursHomeMode) || !isMapPlaytime(now);
 }
 function mapClosedText() {
@@ -33208,14 +33561,27 @@ function mapStepsPerTile() {
 }
 function evolveOnMapTile(reason = "進化マス") {
   const current = Number(state.monster.evolutionStage || 0);
-  if (current >= 4) return { ok: false, text: "すでに星旅期です。" };
+  if (current >= 4) {
+    state.monster.xp += 2;
+    state.coin += 2;
+    addLog(`${reason}: 星旅期のためこれ以上の進化はなく、相棒経験値 +2 / Coin +2を獲得。`);
+    return { ok: true, text: "星旅期ボーナス 相棒経験値 +2 / Coin +2", stageName: "星旅期" };
+  }
   if (current === 3 && !canEvolveToStar()) {
     return { ok: false, text: "星旅期へ進むには、引退時期を延ばすアイテムを最低3回使う必要があります。" };
   }
+  const beforeGrowth = growthForecast();
+  const beforeProfile = monsterProfile();
+  const beforeName = companionSpeciesName(beforeProfile, beforeGrowth);
+  const beforeArt = companionArtHtml(beforeProfile, beforeGrowth);
   forceEvolutionStage(current + 1);
+  const afterGrowth = growthForecast();
+  const afterProfile = monsterProfile();
+  const afterName = companionSpeciesName(afterProfile, afterGrowth);
+  const afterArt = companionArtHtml(afterProfile, afterGrowth);
   const stageName = evolutionStageRules[state.monster.evolutionStage]?.stage || "成長";
-  addLog(`${reason}: イマソラ認証で${stageName}へ進化。`);
-  return { ok: true, text: `${stageName}へ進化`, stageName };
+  addLog(`${reason}: イマソラ認証で${beforeName}は${afterName}に進化。`);
+  return { ok: true, evolved: true, text: `${beforeName}は${afterName}に進化した`, stageName, beforeProfile, afterProfile, beforeName, afterName, beforeArt, afterArt };
 }
 function mapTileForPosition(position = state.position) {
   const n = Math.max(0, Number(position || 0));
@@ -33273,6 +33639,12 @@ function applyMapTileReward(position = state.position, source = "散歩") {
   }
   if (tile.type === "evolution") {
     addMapStamp("進", "進化マス");
+    if (Number(state.monster.evolutionStage || 0) >= 4) {
+      state.monster.xp += 2;
+      state.coin += 2;
+      addLog(`${source}: 星旅期で進化マスに到着。これ以上の進化はないため相棒経験値 +2 / Coin +2 を獲得。`);
+      return { title: "進化マス", text: "星旅期ボーナス 相棒経験値 +2 / Coin +2", mark: "進" };
+    }
     addLog(`${source}: 進化マスに到着。ここでイマソラ認証すると次の成長段階へ進化できる。`);
     return { title: "進化マス", text: "イマソラ認証で進化", mark: "進" };
   }
@@ -33288,6 +33660,7 @@ function applyMapTileReward(position = state.position, source = "散歩") {
   return null;
 }
 function isSkyRequiredMapTile(tile) {
+  if (tile?.type === "evolution" && Number(state.monster.evolutionStage || 0) >= 4) return false;
   return ["seedSummon", "evolution"].includes(tile?.type);
 }
 function markMapSkyGate(position, tile, source = "散歩") {
@@ -33556,6 +33929,37 @@ function companionArtHtml(profile, growth) {
   const art = document.createElement("div");
   renderCurrentCompanionArt(art, profile, growth);
   return art.outerHTML;
+}
+function companionSpeciesName(profile, growth) {
+  const item = currentCompanionArtItem(profile, growth);
+  return item?.name || profile.name;
+}
+function mapEvolutionResultHtml(result, current, xpGain, coinGain) {
+  const beforeName = escapeAttr(result.beforeName || result.beforeProfile?.name || "相棒");
+  const afterName = escapeAttr(result.afterName || result.afterProfile?.name || result.stageName || "相棒");
+  const beforeStage = escapeAttr(result.beforeProfile?.stage || "");
+  const afterStage = escapeAttr(result.afterProfile?.stage || result.stageName || "");
+  const skyName = escapeAttr(current?.name || "今の空");
+  return `
+    <div class="map-evolution-result">
+      <strong>進化</strong>
+      <div class="map-evolution-title">${beforeName}は${afterName}に進化した</div>
+      <div class="map-evolution-stage" aria-label="${beforeName}から${afterName}への進化">
+        <div class="map-evolution-card before">
+          <div class="map-evolution-art">${result.beforeArt || ""}</div>
+          <b>${beforeName}</b>
+          <small>${beforeStage}</small>
+        </div>
+        <div class="map-evolution-arrow" aria-hidden="true">→</div>
+        <div class="map-evolution-card after">
+          <div class="map-evolution-art">${result.afterArt || ""}</div>
+          <b>${afterName}</b>
+          <small>${afterStage}</small>
+        </div>
+      </div>
+      <div class="map-evolution-note">${skyName}のイマソラ認識で進化しました。相棒経験値 +${Number(xpGain || 0)} / Coin +${Number(coinGain || 0)}</div>
+    </div>
+  `;
 }
 function retirementStillCompanionArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
@@ -36542,9 +36946,9 @@ function pendingItemEffectText() {
   const daily = effects.daily || {};
   const battle = effects.battle || {};
   const notes = [];
-  if (daily.walkXp) notes.push(`今日のイマソラ認識ごとに XP +${daily.walkXp}`);
+  if (daily.walkXp) notes.push(`今日のイマソラ認識ごとに相棒経験値 +${daily.walkXp}`);
   if (daily.walkCoin) notes.push(`今日のイマソラ認識ごとに Coin +${daily.walkCoin}`);
-  if (effects.walkXp) notes.push(`次のイマソラ認識 XP +${effects.walkXp}`);
+  if (effects.walkXp) notes.push(`次のイマソラ認識 相棒経験値 +${effects.walkXp}`);
   if (effects.walkCoin) notes.push(`次のイマソラ認識 Coin +${effects.walkCoin}`);
   if (battle.acc) notes.push(`次の大会 命中 +${battle.acc}`);
   if (battle.def) notes.push(`次の大会 防御 +${battle.def}`);
@@ -36579,7 +36983,7 @@ function useSupportItem(itemId) {
   if (item.use === "xp") state.monster.xp += 3;
   if (item.use === "rest") {
     state.monster.xp += 1;
-    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。XP +1のみ反映";
+    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。相棒経験値 +1のみ反映";
   }
   if (item.use === "nature") state.monster.nature += 4;
   if (item.use === "city") state.monster.city += 2;
@@ -36593,6 +36997,7 @@ function useSupportItem(itemId) {
   }
   if (item.use === "life" && !extendRetirementByItem()) message = "延命アイテムは最大5回までです。";
   if (isDailyLimitedItem(item)) markDailyItemUsed(item.id);
+  markSideQuestDone("item-use");
   addLog(`アイテム使用: ${item.name}。${message}`);
   saveState();
   renderAll();
@@ -36733,7 +37138,7 @@ function renderSkyResult() {
   const latest = state.skySummons[0];
   setBoxes(latest
     ? `<strong>${latest.result}</strong><p>${latest.sky}を認識済みです。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。</p>`
-    : `<strong>召喚前</strong><p>歩行終了後、安全に立ち止まり、人・私物・建造物が入らない空だけを認識してください。危険な場所や、人の迷惑になる場所でのイマソラ認識は行わないでください。猛暑日や真夏日、体調が悪い日は散歩を控え、暑い日は熱中症対策を優先してください。</p>`);
+    : `<strong>認識前の確認</strong><p>歩行終了後、安全に立ち止まり、人・私物・建造物が入らない空だけを認識してください。危険な場所や、人の迷惑になる場所でのイマソラ認識は行わないでください。猛暑日や真夏日、体調が悪い日は散歩を控え、暑い日は熱中症対策を優先してください。</p>`);
 }
 function prototypeSkyRecognition() {
   const hour = new Date().getHours();
@@ -36850,21 +37255,25 @@ function confirmSkyRecognition() {
     notes: [
       `${current.name}: ${current.result}`,
       `空の気配: ${imasoraTraitNames(imasoraTraits)}`,
-      `今日の空ボーナス: ${skyBonus.title}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label} XP+${stepBonus.xp} Coin+${stepBonus.coin}` : ""}${itemWalkXp || itemWalkCoin ? ` / アイテム補助 XP+${itemWalkXp} Coin+${itemWalkCoin}` : ""}`,
+      `今日の空ボーナス: ${skyBonus.title}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label} 相棒経験値+${stepBonus.xp} Coin+${stepBonus.coin}` : ""}${itemWalkXp || itemWalkCoin ? ` / アイテム補助 相棒経験値+${itemWalkXp} Coin+${itemWalkCoin}` : ""}`,
       `${summonSeed ? `召喚タネ: ${summonSeed.name}` : evolutionResult ? `進化: ${evolutionResult.text}` : "直接付与なし"}`,
       "今日の空: 気配を記録",
       "投稿テンプレ補助は任意共有用として扱い、投稿による報酬は付与しません。"
     ]
   });
-  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}`);
+  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / 相棒経験値 +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}`);
   [document.getElementById("skyResult"), document.getElementById("walkSkyResult")].filter(Boolean).forEach(box => { box.innerHTML = `
     <strong>${current.result}</strong>
-    <p>${current.name}を認識しました。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化 ${evolutionResult.text}` : ""}</p>
+    <p>${current.name}を認識しました。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。空の気配: ${imasoraTraitNames(imasoraTraits)} / 相棒経験値 +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化 ${evolutionResult.text}` : ""}</p>
   `; });
   const rewardExtra = summonSeed ? ` / 召喚タネ ${summonSeed.name}` : evolutionResult ? ` / 進化 ${evolutionResult.text}` : mapReward ? ` / ${mapReward.title}: ${mapReward.text}` : "";
-  showReward("SKY", "イマソラ認識", `${current.result}${mapProgress.moved ? ` / マップ+${mapProgress.moved}` : ""}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${rewardExtra}`, "sky");
   saveState();
   renderAll();
+  if (evolutionResult?.evolved) {
+    const eventBox = document.getElementById("eventBox");
+    if (eventBox) eventBox.innerHTML = mapEvolutionResultHtml(evolutionResult, current, xpGain, coinGain);
+  }
+  showReward("SKY", "イマソラ認識", `${current.result}${mapProgress.moved ? ` / マップ+${mapProgress.moved}` : ""}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${rewardExtra}`, "sky");
 }
 function rejectSkyRecognition() {
   state.pendingSky = null;
@@ -36989,6 +37398,7 @@ function playtestMapTimeLabel() {
 }
 function setPlaytestMapTimeMode(mode = "") {
   state.playtestMapTimeMode = mode === "open" ? "open" : "";
+  state.playtestInsideHoursHomeMode = false;
   state.playtestOutsideHoursHomeMode = false;
   addLog(`開発用テスト補助で25マスマップ表示を${playtestMapTimeLabel()}に切り替え。正式版の通常進行では使わない補助です。`);
   saveState();
@@ -36998,7 +37408,19 @@ function setPlaytestMapTimeMode(mode = "") {
   playSfx("select");
   toast(state.playtestMapTimeMode === "open" ? "時間内25マップを表示します" : "25マップを実時間に戻しました");
 }
+function setPlaytestInsideHoursHome() {
+  state.playtestInsideHoursHomeMode = true;
+  state.playtestOutsideHoursHomeMode = false;
+  addLog("開発用テスト補助で時間内ホーム画面を表示。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("時間内ホーム画面を表示します");
+}
 function setPlaytestOutsideHoursHome() {
+  state.playtestInsideHoursHomeMode = false;
   state.playtestOutsideHoursHomeMode = true;
   addLog("開発用テスト補助で時間外ホーム画面を表示。正式版の通常進行では使わない補助です。");
   saveState();
@@ -37007,6 +37429,21 @@ function setPlaytestOutsideHoursHome() {
   document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
   toast("時間外ホーム画面を表示します");
+}
+function openPlaytestGuildSupportReady() {
+  const today = todayKey();
+  state.guildSupport = null;
+  guildSupportConfirmOpen = false;
+  if (state.todayResult?.date === today) state.todayResult = null;
+  state.days = state.days.filter(day => day !== today);
+  state.guildSupporterRewards = (state.guildSupporterRewards || []).filter(item => item.date !== today);
+  addLog("開発用テスト補助で、協力支援を依頼できる状態を開いた。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("walk");
+  document.getElementById("guildPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("協力支援を依頼できる状態にしました");
 }
 function renderPlaytestBoost() {
   const box = document.getElementById("playtestBoost");
@@ -37024,19 +37461,22 @@ function renderPlaytestBoost() {
     <span>ローカル試作でアイテム・店・大会をすぐ触るための補助です。正式版のゲーム進行では使いません。データは初期化せず、確認に足りない分だけ追加します。</span>
     <div class="playtest-boost-grid">
       <div class="playtest-boost-chip"><strong>${profile.stage}</strong><small>現在の段階</small></div>
-      <div class="playtest-boost-chip"><strong>${state.monster.xp}</strong><small>現在のXP</small></div>
+      <div class="playtest-boost-chip"><strong>${state.monster.xp}</strong><small>現在の相棒経験値</small></div>
       <div class="playtest-boost-chip"><strong>${canBattle ? "OK" : "準備前"}</strong><small>大会テスト</small></div>
       <div class="playtest-boost-chip"><strong>${itemTotal}</strong><small>所持アイテム</small></div>
       <div class="playtest-boost-chip"><strong>${shopOpen ? "開店" : "準備前"}</strong><small>小さな店</small></div>
       <div class="playtest-boost-chip"><strong>${pendingCup ? pendingCup.name : "なし"}</strong><small>参加</small></div>
       <div class="playtest-boost-chip"><strong>${tournamentBypass ? "ON" : "OFF"}</strong><small>大会確認モード</small></div>
       <div class="playtest-boost-chip"><strong>${mapTimeMode}</strong><small>25マップ表示</small></div>
+      <div class="playtest-boost-chip"><strong>${state.playtestInsideHoursHomeMode ? "時間内" : state.playtestOutsideHoursHomeMode ? "時間外" : "実時間"}</strong><small>ホーム表示</small></div>
     </div>
     <div class="actions">
       <button class="secondary" id="playtestGrowingMonsterBtn" type="button">通常育成中テスト状態にする</button>
+      <button class="secondary" id="playtestInsideHoursHomeBtn" type="button">時間内ホームを開く</button>
       <button class="secondary" id="playtestOutsideHoursHomeBtn" type="button">時間外ホームを開く</button>
       <button class="secondary" id="playtestMapOpenBtn" type="button">時間内25マップを開く</button>
       <button class="secondary" id="playtestMapRealTimeBtn" type="button">25マップを実時間に戻す</button>
+      <button class="secondary" id="playtestGuildSupportReadyBtn" type="button">協力支援依頼テストを開く</button>
       <button class="secondary" id="playtestBattleReadyBtn" type="button" ${canBattle ? "disabled" : ""}>大会テスト状態にする</button>
       <button class="secondary" id="playtestItemSetBtn" type="button">アイテム確認セットを入れる</button>
       <button class="secondary" id="playtestShopOpenBtn" type="button">小さな店を開ける</button>
@@ -37050,9 +37490,11 @@ function renderPlaytestBoost() {
     <div class="playtest-status">${tournamentBypass ? "大会確認モード中です。正式版条件は残したまま、ローカル試作では全大会の試合を確認できます。" : canBattle ? "勇旅期以降です。大会参加、アイテム使用、店の購入導線を確認できます。" : "大会確認は、確認モードをONにするか、勇旅期相当まで育てると触れます。アイテムと店は単独でも確認できます。"}</div>
   `;
   document.getElementById("playtestGrowingMonsterBtn")?.addEventListener("click", setPlaytestGrowingMonster);
+  document.getElementById("playtestInsideHoursHomeBtn")?.addEventListener("click", setPlaytestInsideHoursHome);
   document.getElementById("playtestOutsideHoursHomeBtn")?.addEventListener("click", setPlaytestOutsideHoursHome);
   document.getElementById("playtestMapOpenBtn")?.addEventListener("click", () => setPlaytestMapTimeMode("open"));
   document.getElementById("playtestMapRealTimeBtn")?.addEventListener("click", () => setPlaytestMapTimeMode(""));
+  document.getElementById("playtestGuildSupportReadyBtn")?.addEventListener("click", openPlaytestGuildSupportReady);
   document.getElementById("playtestBattleReadyBtn")?.addEventListener("click", setPlaytestBattleReady);
   document.getElementById("playtestItemSetBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
@@ -37349,6 +37791,7 @@ function startWalk() {
   if (state.mapAwaitingSky) {
     playSfx("error");
     toast(`${state.mapAwaitingSky.name}で空認識待ちです`);
+    scrollToWalkSkyRecognition();
     return;
   }
   playSfx("select");
@@ -37386,6 +37829,7 @@ function checkStepProof() {
     playSfx("error");
     toast(state.pendingSky ? "先に空認識を確定してください" : `${state.mapAwaitingSky.name}で空認識待ち`);
     renderProof();
+    scrollToWalkSkyRecognition();
     return;
   }
   playSfx("select");
@@ -37403,7 +37847,8 @@ function checkStepProof() {
   const mapProgress = advanceMap(gainedMap, "歩数計");
   const mapReward = mapProgress.latestReward;
   saveState();
-  renderProof();
+  renderAll();
+  if (mapProgress.stoppedForSky) scrollToWalkSkyRecognition();
   if (mapReward) showReward(mapReward.mark, mapReward.title, `${mapReward.text} / 歩数計でマップ+${mapProgress.moved}`, "walk");
   toast(`${state.walkSession.stepCount}歩確認。マップ+${mapProgress.moved}${mapProgress.stoppedForSky ? ` / ${mapProgress.stoppedForSky.name}で停止` : mapReward ? ` / ${mapReward.title}` : ""}`);
 }
@@ -37527,6 +37972,7 @@ function renderMonsterLibrary(forceGallery = false) {
 function renderAll() {
   renderHud();
   renderGuildPanel();
+  renderGuildRequestList();
   renderProof();
   renderSkySummon();
   renderCompanionHome();
