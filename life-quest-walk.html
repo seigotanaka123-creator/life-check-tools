@@ -43,10 +43,7 @@
     html, body { min-height: 100%; }
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 18% 6%, rgba(255,214,116,.42), transparent 24%),
-        radial-gradient(circle at 84% 13%, rgba(79,188,255,.46), transparent 26%),
-        linear-gradient(155deg, #f5fbff 0%, #dbefff 35%, #eaf7e9 68%, #1b3342 100%);
+      background: linear-gradient(155deg, #f5fbff 0%, #dbefff 35%, #eaf7e9 68%, #1b3342 100%);
       color: var(--ink);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.65;
@@ -68,9 +65,7 @@
       max-width: 520px;
       min-height: 100dvh;
       margin: 0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.7), rgba(240,247,255,.86) 42%, rgba(246,250,244,.96)),
-        radial-gradient(circle at top left, rgba(59,120,255,.12), transparent 36%);
+      background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(240,247,255,.86) 42%, rgba(246,250,244,.96));
       box-shadow: 0 0 0 1px rgba(255,255,255,.56), 0 28px 90px rgba(7,18,31,.26);
       position: relative;
       overflow: hidden;
@@ -92,9 +87,8 @@
       margin-bottom: 10px;
     }
     .hero {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.92), rgba(235,247,255,.82)),
-        radial-gradient(circle at 86% 8%, rgba(255,206,96,.55), transparent 28%);
+      position: relative;
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(235,247,255,.82));
       border: 1px solid rgba(55,116,170,.18);
       border-radius: 22px;
       padding: 16px;
@@ -166,16 +160,6 @@
       box-shadow: 0 12px 28px rgba(28,57,88,.12), inset 0 1px 0 rgba(255,255,255,.8);
       overflow: hidden;
     }
-    .loop-step::after {
-      content: "";
-      position: absolute;
-      inset: auto -10px -18px auto;
-      width: 78px;
-      height: 78px;
-      border-radius: 50%;
-      background: rgba(54,120,255,.08);
-      pointer-events: none;
-    }
     .loop-num {
       position: absolute;
       right: 9px;
@@ -192,7 +176,7 @@
       z-index: 2;
     }
     .loop-step b { display: block; margin-top: 8px; color: #17202c; font-size: 13px; line-height: 1.25; }
-    .loop-step span:not(.loop-num) { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .loop-step > span:not(.loop-num) { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.38; }
     .loop-icon {
       position: relative;
       display: grid;
@@ -329,6 +313,7 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 10px 22px rgba(44,92,121,.08);
     }
     .map {
+      position: relative;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
@@ -338,6 +323,24 @@
       background: rgba(255,255,255,.52);
       border: 1px solid rgba(77,145,180,.16);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
+    }
+    .map.closed::after {
+      content: "×";
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: grid;
+      place-items: center;
+      color: rgba(188, 42, 42, .82);
+      font-size: clamp(220px, 48vw, 420px);
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 4px 0 rgba(255,255,255,.72), 0 14px 30px rgba(89,24,24,.22);
+      pointer-events: none;
+    }
+    .map.closed .tile {
+      filter: grayscale(1) saturate(.18) brightness(.86);
+      opacity: .58;
     }
     .map-sky-counter {
       margin-top: 10px;
@@ -356,6 +359,20 @@
       color: #6b5a3b;
       font-size: 13px;
       font-weight: 800;
+    }
+    .map-sky-counter.closed {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      line-height: 1.55;
+    }
+    .map-sky-counter.closed span {
+      max-width: 34em;
+    }
+    .map-sky-counter.closed button {
+      width: fit-content;
+      min-width: 126px;
+      padding-inline: 16px;
     }
     .map-time-note {
       display: inline-flex;
@@ -935,15 +952,12 @@
       margin-top: 12px;
     }
     .sound-panel {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 12px;
-      padding: 10px;
-      border: 1px solid #d9c59e;
-      border-radius: 10px;
-      background: #fffdf4;
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      margin: 0;
+      padding: 0;
+      z-index: 3;
     }
     .sound-panel span {
       color: var(--muted);
@@ -956,8 +970,8 @@
       border-radius: 6px;
       background: #24382c;
       color: #fff8cf;
-      font: 900 11px/1.1 system-ui, sans-serif;
-      padding: 10px 12px;
+      font: 900 10px/1.1 system-ui, sans-serif;
+      padding: 7px 9px;
       box-shadow: inset 0 -3px rgba(0,0,0,.2);
     }
     .proof {
@@ -4627,6 +4641,36 @@
       font-size: 12px;
       line-height: 1.55;
     }
+    .item-guide-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .item-guide-tab {
+      border: 2px solid #c9b179;
+      border-radius: 8px;
+      background: #fff8dc;
+      color: #6b4f21;
+      padding: 9px 10px;
+      font-weight: 900;
+      box-shadow: inset 0 -3px 0 rgba(107,79,33,.12);
+    }
+    .item-guide-tab.active {
+      background: #2f6948;
+      border-color: #244f38;
+      color: #fff;
+      box-shadow: 0 3px 0 rgba(36,79,56,.2);
+    }
+    .item-empty {
+      border: 1px solid #d9c59e;
+      border-radius: 10px;
+      background: #fffdf4;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
     .item-category {
       border: 1px solid var(--line);
       border-radius: 12px;
@@ -4645,7 +4689,8 @@
     }
     .item-category-title span {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 12px;
+      line-height: 1.45;
       text-align: right;
     }
     .item-list {
@@ -4720,9 +4765,6 @@
     .item-art-leaf-compass i { inset: 5px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #fffdf0 0 34%, #e6f4cf 35% 46%, #fffdf0 47% 100%); border: 3px solid #3f8a55; box-shadow: inset -3px -4px 0 rgba(63,138,85,.16); }
     .item-art-leaf-compass em { left: 18px; top: 8px; width: 4px; height: 24px; background: linear-gradient(#cf4438 0 50%, #3f8a55 51% 100%); border-radius: 999px; transform: rotate(38deg); transform-origin: center; box-shadow: 0 0 0 1px rgba(74,61,34,.2); }
     .item-art-leaf-compass span { right: 7px; top: 11px; width: 14px; height: 10px; border-radius: 100% 0 100% 0; background: #78c56b; border: 1px solid #3f8a55; transform: rotate(-20deg); box-shadow: -10px 13px 0 -4px #3f8a55; }
-    .item-art-city-charm i { left: 11px; top: 8px; width: 17px; height: 23px; border-radius: 8px 8px 5px 5px; background: linear-gradient(#ffe68d, #f5b647); border: 2px solid #7b4e17; box-shadow: inset 0 -6px 0 rgba(139,78,12,.18), 0 2px 0 rgba(123,78,23,.2); }
-    .item-art-city-charm em { left: 16px; top: 4px; width: 7px; height: 8px; border-radius: 5px 5px 2px 2px; background: #7b4e17; box-shadow: 0 -3px 0 -1px #fff0a8; }
-    .item-art-city-charm span { left: 15px; top: 14px; width: 9px; height: 10px; border-radius: 3px 3px 1px 1px; background: #fff8bd; box-shadow: 0 0 0 1px #7b4e17, 0 0 9px rgba(255,228,119,.8), -8px 18px 0 -4px #7b4e17, 8px 18px 0 -4px #7b4e17; }
     .item-art-sky-feather i { left: 10px; top: 5px; width: 17px; height: 29px; border-radius: 100% 0 100% 0; background: linear-gradient(135deg, #f2fbff, #b5dcff 58%, #7db7ff); border: 2px solid #3e73ad; transform: rotate(27deg); box-shadow: inset -4px -5px 0 rgba(61,115,173,.14); }
     .item-art-sky-feather em { left: 18px; top: 7px; width: 2px; height: 26px; background: #3e73ad; transform: rotate(27deg); box-shadow: 0 0 0 1px rgba(255,255,255,.35); }
     .item-art-sky-feather span { left: 9px; top: 14px; width: 17px; height: 2px; background: #6daeea; transform: rotate(-21deg); box-shadow: 4px 5px 0 #6daeea, 7px 10px 0 #6daeea, -1px 15px 0 #9fd2ff; }
@@ -4738,18 +4780,12 @@
     .item-art-wind-pin i { left: 13px; top: 7px; width: 13px; height: 13px; border-radius: 50%; background: #baf5ff; border: 2px solid #2d8fa3; }
     .item-art-wind-pin em { left: 18px; top: 19px; width: 3px; height: 14px; background: #2d8fa3; border-radius: 999px; }
     .item-art-wind-pin span { left: 9px; top: 12px; width: 20px; height: 9px; border-top: 3px solid #2d8fa3; border-radius: 50%; transform: rotate(-18deg); }
-    .item-art-memory-ribbon i { left: 14px; top: 8px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle, #fff8fb 0 32%, #ffd7ea 33% 100%); border: 2px solid #a74775; box-shadow: 0 0 0 2px rgba(233,166,200,.28); }
-    .item-art-memory-ribbon em { left: 5px; top: 14px; width: 16px; height: 13px; background: linear-gradient(135deg, #f4bad7, #d973a8); border: 2px solid #a74775; clip-path: polygon(0 0,100% 35%,0 100%); }
-    .item-art-memory-ribbon span { right: 5px; top: 14px; width: 16px; height: 13px; background: linear-gradient(225deg, #f4bad7, #d973a8); border: 2px solid #a74775; clip-path: polygon(100% 0,0 35%,100% 100%); box-shadow: 0 13px 0 -5px #d973a8, -10px 13px 0 -5px #e9a6c8; }
-    .item-art-life-bell i { left: 9px; top: 9px; width: 21px; height: 21px; border-radius: 12px 12px 7px 7px; background: linear-gradient(#ffe49b, #d6a84e 72%, #b9832e); border: 2px solid #72511c; box-shadow: inset -4px -6px 0 rgba(114,81,28,.18), 0 2px 0 rgba(114,81,28,.2); }
-    .item-art-life-bell em { left: 15px; top: 4px; width: 9px; height: 8px; border-radius: 50% 50% 2px 2px; background: #72511c; box-shadow: 0 -3px 0 -1px #f6d681; }
-    .item-art-life-bell span { left: 16px; bottom: 6px; width: 7px; height: 7px; border-radius: 50%; background: #72511c; box-shadow: -8px -5px 0 -3px rgba(255,255,255,.45), 8px -5px 0 -3px rgba(255,255,255,.32); }
     .item-entry .item-info { min-width: 0; }
     .item-entry .item-effect {
       display: block;
       margin-top: 4px;
       color: #315b91;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 900;
       line-height: 1.35;
     }
@@ -4786,13 +4822,13 @@
     .item-entry b {
       display: block;
       color: var(--ink);
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.3;
     }
     .item-entry span {
       display: block;
       color: var(--muted);
-      font-size: 10px;
+      font-size: 11px;
       line-height: 1.45;
       margin-top: 4px;
     }
@@ -5864,6 +5900,9 @@
       display: grid;
       place-items: center;
     }
+    .home-seat .home-guide-art {
+      transform: translateY(12px);
+    }
     .home-seat .unique-monster {
       width: 88px;
       height: 88px;
@@ -5900,8 +5939,15 @@
     .home-seat.companion .monster-art {
       transform: translateY(9px) scale(1, .88);
     }
+    .home-seat.companion .home-sprout-art {
+      transform: translateY(12px) scale(.88);
+      transform-origin: center bottom;
+    }
     .home-seat.guide .monster-art {
       transform: translateY(8px) scale(1.02, .9);
+    }
+    .home-seat.guide .home-guide-art {
+      transform: translateY(12px) scale(1.02, .9);
     }
     .home-seat-name {
       position: absolute;
@@ -6002,6 +6048,31 @@
       font-size: 10px;
       font-weight: 900;
     }
+    .home-center-notice {
+      position: absolute;
+      z-index: 6;
+      left: 50%;
+      top: 50%;
+      width: min(88%, 430px);
+      transform: translate(-50%, -50%) scale(.98);
+      padding: 12px 14px;
+      border: 2px solid rgba(71, 71, 71, .42);
+      border-radius: 8px;
+      background: rgba(255, 252, 238, .96);
+      color: #4a3b25;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.55;
+      text-align: center;
+      box-shadow: 0 8px 0 rgba(70, 57, 35, .14);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .home-center-notice.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
     .home-actions {
       position: absolute;
       left: 0;
@@ -6035,6 +6106,12 @@
       color: #5a3b12;
       box-shadow: 0 3px 0 rgba(31,113,106,.22), inset 0 1px 0 rgba(255,255,255,.36);
       text-shadow: 0 1px 0 rgba(218,255,249,.46);
+    }
+    .home-actions button.outside-locked {
+      background: linear-gradient(180deg, #dddddd, #aaaaaa);
+      color: #555;
+      box-shadow: 0 3px 0 rgba(90,90,90,.22), inset 0 1px 0 rgba(255,255,255,.42);
+      text-shadow: 0 1px 0 rgba(255,255,255,.36);
     }
     .home-actions button:disabled {
       background: linear-gradient(180deg, #e3e3e3, #bfbfbf);
@@ -7481,12 +7558,30 @@
       overflow-x: auto;
       padding-bottom: 2px;
     }
+    .result-section-title {
+      display: block;
+      margin-top: 12px;
+      color: #6e4b0d;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+    .result-section-title:first-of-type {
+      margin-top: 10px;
+    }
     .result-card {
       min-height: 58px;
       border: 1px solid #d9c59e;
       border-radius: 8px;
       background: #fff;
       padding: 7px;
+    }
+    .result-grid.total-record {
+      grid-template-columns: repeat(3, minmax(74px, 1fr));
+    }
+    .result-grid.coin-balance {
+      grid-template-columns: minmax(120px, 1fr);
+      max-width: 180px;
     }
     .result-card strong {
       display: block;
@@ -7789,6 +7884,7 @@
       gap: 8px;
       margin-top: 10px;
     }
+    .friend-mode-grid { grid-template-columns: 1fr; }
     .guild-chip, .friend-mode {
       border: 1px solid rgba(40,73,107,.16);
       border-radius: 13px;
@@ -7944,6 +8040,18 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+    .toast.center-notice {
+      top: 50%;
+      bottom: auto;
+      width: min(86vw, 440px);
+      white-space: normal;
+      text-align: center;
+      line-height: 1.55;
+      transform: translateX(-50%) translateY(-46%);
+    }
+    .toast.center-notice.show {
+      transform: translateX(-50%) translateY(-50%);
+    }
     .reward-pop {
       position: fixed;
       z-index: 9;
@@ -8084,12 +8192,9 @@
 <body>
 <div class="app">
   <header>
-    <a class="back" href="index.html">Life Check Toolsへ戻る</a>
     <section class="hero">
       <p class="eyebrow">大人もハマる、今の空で進化する散歩ゲームアプリ</p>
       <h1>イマソラウォーク</h1>
-      <p class="lead">歩いて、立ち止まり、今の空を撮影・認識して町と相棒を育てます。進化マスやタネ召喚で、今日の空が相棒の成長につながります。</p>
-      <div class="theme-line">現実の散歩 × イマソラ認識 × 町づくり × 育成大会</div>
       <div class="core-loop" aria-label="イマソラウォークの基本の遊び方">
         <div class="loop-step walk">
           <span class="loop-num">1</span><div class="loop-icon walker-icon" aria-hidden="true"><span class="walker"><i class="walker-head"></i><i class="walker-body"></i><i class="walker-arm front"></i><i class="walker-arm back"></i><i class="walker-leg front"></i><i class="walker-leg back"></i></span></div>
@@ -8107,19 +8212,11 @@
           <span>今の空を確認し、マスの種類に応じて報酬・タネ召喚・進化・マップ進行が決まります。</span>
         </div>
       </div>
-      <div class="hud">
-        <div><strong id="steps">0</strong><span>Map</span></div>
-        <div><strong id="coin">0</strong><span>Coin</span></div>
-        <div><strong id="town">0</strong><span>Town</span></div>
-        <div><strong id="streak">0</strong><span>Days</span></div>
-      </div>
       <div class="sound-panel">
-        <span>ファミコン風の短いBGMと操作音。音はボタンを押した時だけ開始します。</span>
         <button class="sound-chip" id="soundBtn" type="button">BGM ON</button>
       </div>
       <div class="opening-actions">
         <button class="opening-start" id="openingStartBtn" type="button">はじめる</button>
-        <span>相棒の家から、今日の散歩と町づくりを始めます。</span>
       </div>
     </section>
   </header>
@@ -8133,7 +8230,6 @@
 
   <main>
     <section class="panel screen active" data-screen="walk">
-      <div class="daily-progress" id="dailyProgress"></div>
       <div class="companion-home" id="companionHome"></div>
       <div class="user-home-menu" id="userHomeMenu"></div>
       <div class="daily-side-quest" id="dailySideQuest"></div>
@@ -8226,27 +8322,23 @@
 
     <section class="panel screen" data-screen="town">
       <h2>町の発展</h2>
-      <p>探索で町が少しずつ育ちます。建物が増えると、散歩の成果が残っていきます。</p>
+      <p>散歩で素材を集め、町では自分で建物を作ります。集めた素材を使って、ひとつずつ形にしていきます。</p>
       <div class="town" id="townView"></div>
       <div class="town-workshop" id="townWorkshop"></div>
       <div class="town-shop" id="townShop">
         <b>小さな店</b>
-        <span>Town 3で開きます。散歩とイマソラ認識で町のかけらを使うと、育成アイテムを少し選んで買えるようになります。</span>
+        <span>小さな店を素材で建てると、育成アイテムを少し選んで買えるようになります。</span>
         <div class="shop-grid">
-          <div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>日替わりで3つの道具が並びます。</span><small>Town 3</small></div></div>
+          <div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>日替わりで3つの道具が並びます。</span><small>木の素材2 / 鉄の素材1 / 灯りの素材1</small></div></div>
         </div>
       </div>
-      <div class="town-board" id="townQuestBoard"></div>
-      <div class="town-memory" id="townMemory"></div>
-      <div class="mini-feature" id="townFootprints"></div>
       <div class="mini-feature" id="imasoraDex"></div>
       <div class="home-play-card">
         <b>自宅でできること</b>
         <span>自宅では報酬やマップ進行を確定しない設計にします。ただし、ゲーム自体は開けます。</span>
         <ul>
-          <li>町の確認、図鑑、スタンプ、育成アイテム、冒険ログを見る。</li>
+          <li>町の建物、図鑑、スタンプ、育成アイテム、冒険ログを見る。</li>
           <li>散歩モンスターの状態、大会参加、戦闘結果を確認する。</li>
-          <li>スポンサー掲示板やOne Coin Booksの読み物を、散歩後の休憩時間に読む。</li>
         </ul>
       </div>
     </section>
@@ -8263,8 +8355,8 @@
       <div class="sky-summon">
         <div class="sky-title">
           <div>
-            <b>Sky Seed / イマソラ召喚</b>
-            <span>歩行後、安全に立ち止まってから空を認識し、タネ・素材・アイテムを呼び出します。</span>
+            <b>イマソラ認識</b>
+            <span>歩行後、安全に立ち止まってから空を認識します。タネはタネ召喚マス、素材は25マスマップの通過報酬で獲得します。</span>
           </div>
           <div class="sky-orb" id="skyOrb"></div>
         </div>
@@ -8282,17 +8374,13 @@
           <strong>召喚前</strong>
           <p>歩行終了後、安全に立ち止まってから今の空を認識してください。危険な場所や、人の迷惑になる場所でのイマソラ認識は行わないでください。</p>
         </div>
-        <div class="sky-reward-panel">
-          <b>今日の空報酬</b>
-          <div id="skyRewardPanel"></div>
-        </div>
       </div>
       <div class="seed-choice" id="seedChoice"></div>
       <div class="monster-stage">
-        <div class="monster-art"><div class="monster seed seed-walk" id="monsterArt"></div></div>
+        <div class="monster-art"><div id="monsterArt"></div></div>
         <div class="monster-info">
-          <b id="monsterName">散歩のタネ</b>
-          <span id="monsterText">発見を集めると芽を出します。</span>
+          <b id="monsterName"></b>
+          <span id="monsterText"></span>
           <div class="monster-meter"><i id="monsterMeter" style="--w:0%"></i></div>
           <div class="growth-panel" id="growthPanel"></div>
         </div>
@@ -8302,7 +8390,7 @@
       <div class="retirement-panel" id="retirementPanel"></div>
       <div class="friend-battle-panel" id="friendBattlePanel"></div>
       <div class="battle-field resting" id="battleField">
-        <div class="fighter" id="myFighter">散歩のタネ</div>
+        <div class="fighter" id="myFighter"></div>
       </div>
       <div class="battle-log" id="battleLog">
         <strong>育成中</strong>
@@ -8352,9 +8440,9 @@
         <b>第1回プレイテスト準備</b>
         <span>完成度ではなく、方向性の確認をします。実際に触って、楽しいか、分かりやすいか、面倒ではないかを見ます。</span>
         <ul>
-          <li>歩くタブ: 今日の進行、成果ボード、マップ、投稿テンプレ補助の流れを見る。</li>
+          <li>歩くタブ: ホーム、成果ボード、マップ、投稿テンプレ補助の流れを見る。</li>
           <li>育成・大会タブ: イマソラ認識、タネ、相棒、お世話、大会、図鑑を見る。</li>
-          <li>町・記録タブ: 町づくり、町依頼、町の記念帳、スタンプを見る。</li>
+          <li>町・記録タブ: 町の建物、小さな店、素材ストック、スタンプを見る。</li>
           <li>規約・設定タブ: 安全ルール、利用規約、プライバシー、画面階層案を見る。</li>
           <li>最後に判断: 大人が毎日開きたくなるか、イマソラが主役に感じるか、削るべきものがあるかをメモする。</li>
         </ul>
@@ -8362,13 +8450,6 @@
       <div class="policy-card playtest-boost" id="playtestBoost">
         <b>開発用テスト補助</b>
         <span>ローカル試作でアイテム・店・大会をすぐ確認するための補助です。正式版のゲーム進行では使いません。</span>
-        <div class="playtest-flow" aria-label="試作確認の流れ">
-          <div class="playtest-flow-title"><b>試作確認の流れ</b><span>下の順番で、アイテム・店・大会結果まで確認します。</span></div>
-          <div class="playtest-flow-step"><strong>1</strong><span><b>アイテムを入れて使う</b><small>散歩用・大会用のアイテムを入れて、育成アイテム画面へ移動します。</small></span><button type="button" data-static-playtest="items" onclick="handleStaticPlaytestAction('items')">開く</button></div>
-          <div class="playtest-flow-step"><strong>2</strong><span><b>小さな店で買う</b><small>小さな店を確認できる状態にして、店まで移動します。</small></span><button type="button" data-static-playtest="shop" onclick="handleStaticPlaytestAction('shop')">開く</button></div>
-          <div class="playtest-flow-step"><strong>3</strong><span><b>森の四大杯に入る</b><small>参加確認を作り、大会画面へ移動します。</small></span><button type="button" data-static-playtest="entry" onclick="handleStaticPlaytestAction('entry')">準備</button></div>
-          <div class="playtest-flow-step"><strong>4</strong><span><b>大会戦を観戦する</b><small>大会戦を観戦するボタンの場所まで移動します。</small></span><button type="button" data-static-playtest="battle" onclick="handleStaticPlaytestAction('battle')">観戦へ</button></div>
-        </div>
       </div>
       <div class="policy-card playtest-memo" id="playtestMemo"></div>
       <div class="policy-card" id="talkSettings"></div>
@@ -8409,7 +8490,7 @@
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase3"><strong>購入候補3</strong><span>OtoLogic SNES-RPG03-6 Purchase。購入音の仮採用候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase4"><strong>購入候補4</strong><span>OtoLogic SNES-RPG03-7 Select。軽い購入候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase5"><strong>購入候補5</strong><span>OtoLogic SNES-RPG03-8 Select。軽い別候補。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="itemUse"><strong>アイテム使用音</strong><span>町のかけらやお世話などの使用音。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="itemUse"><strong>アイテム使用音</strong><span>素材やお世話などの使用音。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate1"><strong>使用候補1</strong><span>OtoLogic NES-Action01-08 Item。使用音の仮採用候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate2"><strong>使用候補2</strong><span>OtoLogic NES-Action01-09 Item。別の使用音候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate3"><strong>使用候補3</strong><span>OtoLogic NES-Action01-10 Item。短い使用音候補。</span></button>
@@ -8426,7 +8507,7 @@
             <button class="safety-chip" type="button" data-sfx-preview="skyScanCandidate7"><strong>認証候補7</strong><span>OtoLogic Cyber07-1。長めのサイバー候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="skyScanCandidate8"><strong>認証候補8</strong><span>OtoLogic Cyber07-2。長めの別候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="skyScanCandidate9"><strong>認証候補9</strong><span>OtoLogic Cyber07-3。長めの演出候補。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="summon"><strong>召喚・報酬音</strong><span>空報酬が確定する気持ちよい音。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="summon"><strong>認識・到着音</strong><span>イマソラ認識や到着マスの結果が確定する気持ちよい音。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="summonRewardCandidate1"><strong>報酬候補1</strong><span>OtoLogic NES-Action01-16 Score。召喚報酬音の仮採用候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="summonRewardCandidate2"><strong>報酬候補2</strong><span>OtoLogic NES-Action01-14 Enter。報酬確定の別候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="summonRewardCandidate3"><strong>報酬候補3</strong><span>OtoLogic NES-Action01-08 Item。短い報酬候補。</span></button>
@@ -8615,7 +8696,7 @@
           <li>1. 歩くタブで「歩行セッション開始」を押す。</li>
           <li>2. 「歩行終了・停止確認（試作）」を押し、安全停止後の状態にする。</li>
           <li>3. 育成・大会タブで空タイプを選び、「イマソラ認識で進行」を押す。</li>
-          <li>4. 「この空でOK」を押し、空報酬、到着マスの結果、成果ボードの変化を見る。</li>
+          <li>4. 「この空でOK」を押し、イマソラ認識、到着マスの結果、成果ボードの変化を見る。</li>
           <li>5. 歩くタブで投稿テンプレ補助を確認する。共有したい人が安全に投稿文を作るための補助で、報酬は付与しない。</li>
           <li>6. 町・記録タブ、育成・大会タブ、規約・設定タブを見て、つながり方に違和感がないか確認する。</li>
           <li>7. 規約・設定タブのプレイテスト記録欄に、手応えと気づいたことを保存する。</li>
@@ -8633,11 +8714,6 @@
           <div class="safety-chip"><strong>撮影マナー</strong><span>迷惑となる場所、危険な場所、撮影禁止の場所ではスマホ操作やイマソラ認識をしません。</span></div>
           <div class="safety-chip"><strong>暑さ対策</strong><span>猛暑日や真夏日は散歩を控えます。暑い日は水分・塩分補給、休憩、日陰、涼しい時間帯を優先します。</span></div>
         </div>
-      </div>
-      <div class="sponsor">
-        <b>スポンサー掲示板</b>
-        <span>大人の散歩後に読む小さな掲示板です。ゲームとは別枠の読み物案内として、冒険の邪魔をしない場所に置きます。</span>
-        <a href="https://note.com/cheeky_guppy1145/m/m991938a3278f">One Coin Booksを見る</a>
       </div>
       <div class="terms-box">
         <b>利用規約ドラフト</b>
@@ -8682,10 +8758,10 @@
         <b>正式アプリの画面階層案</b>
         <ul>
           <li>ホーム: 今日の歩数、25マスマップ、歩行セッション、停止確認、安全表示。</li>
-          <li>探索: イマソラ認識、空の気配、町依頼、マップイベント。</li>
-          <li>育成: 散歩モンスター、能力、技、イマソラ召喚。</li>
+          <li>探索: イマソラ認識、空の気配、マップイベント。</li>
+          <li>育成: 散歩モンスター、能力、技、イマソラ認識。</li>
           <li>大会: 参加、大会結果、メダル、グランドチャンピオン杯。</li>
-          <li>町: 建物、掲示板、スポンサー枠、記念、自宅でできる確認メニュー。</li>
+          <li>町: 建物、小さな店、素材ストック、自宅でできる確認メニュー。</li>
           <li>図鑑: モンスター図鑑、進化ツリー、スタンプ、アイテム。</li>
           <li>設定: 利用規約、プライバシーポリシー、安全ガイド、サウンド、データ削除、問い合わせ。</li>
         </ul>
@@ -8737,37 +8813,39 @@ const allDiscoveries = [
   ["light", "店の明かり", "店の明かりを見つけた"]
 ];
 const discoveryCombos = [
-  { id: "sky-wind", title: "空風コンボ", need: ["sky", "wind"], path: "空寄り", text: "空と風を同じ散歩で見つけた。空寄りに大きく成長。", coin: 8, town: 0, sky: 3, nature: 0, city: 0 },
-  { id: "green-road", title: "みどり道コンボ", need: ["flower", "park"], path: "自然寄り", text: "花と公園をつないで歩いた。自然寄りに成長。", coin: 6, town: 1, sky: 0, nature: 3, city: 0 },
-  { id: "city-lights", title: "街あかりコンボ", need: ["sign", "vending", "light"], path: "街寄り", text: "看板、自販機、店の明かりを見つけた。街寄りに成長。", coin: 10, town: 1, sky: 0, nature: 0, city: 3 },
-  { id: "trail-adventure", title: "冒険道コンボ", need: ["newroad", "slope"], path: "ミチリオ向き", text: "初めての道と坂道を越えた。ミチリオ向きに大きく育つ。", coin: 9, town: 0, sky: 1, nature: 1, city: 1 }
+  { id: "sky-wind", title: "空風コンボ", need: ["sky", "wind"], path: "空寄り", text: "空と風を同じ散歩で見つけた。空寄りに大きく成長。", coin: 8, sky: 3, nature: 0, city: 0 },
+  { id: "green-road", title: "みどり道コンボ", need: ["flower", "park"], path: "自然寄り", text: "花と公園をつないで歩いた。自然寄りに成長。", coin: 6, sky: 0, nature: 3, city: 0 },
+  { id: "city-lights", title: "街あかりコンボ", need: ["sign", "vending", "light"], path: "街寄り", text: "看板、自販機、店の明かりを見つけた。街寄りに成長。", coin: 10, sky: 0, nature: 0, city: 3 },
+  { id: "trail-adventure", title: "冒険道コンボ", need: ["newroad", "slope"], path: "ミチリオ向き", text: "初めての道と坂道を越えた。ミチリオ向きに大きく育つ。", coin: 9, sky: 1, nature: 1, city: 1 }
 ];
 const events = [
-  { type: "coin", title: "道ばたの小銭", text: "小さな光を見つけた。Coinを獲得。", coin: 8, town: 0 },
-  { type: "chest", title: "古い宝箱", text: "草むらの奥で宝箱を見つけた。町の素材を獲得。", coin: 12, town: 1 },
-  { type: "rest", title: "木陰の休憩所", text: "少し休んで、次の散歩に向けて気分が戻った。", coin: 5, town: 1 },
-  { type: "market", title: "旅の市場", text: "市場に人が集まり、町が少しにぎわった。", coin: 10, town: 2 },
-  { type: "shrine", title: "小さな神社", text: "静かな場所で、今日の散歩が記憶に残った。", coin: 7, town: 2 },
-  { type: "boss", title: "坂道の番人", text: "きつい道を越えた。大きな報酬を獲得。", coin: 18, town: 3 }
+  { type: "coin", title: "道ばたの小銭", text: "小さな光を見つけた。Coinを獲得。", coin: 8 },
+  { type: "chest", title: "古い宝箱", text: "草むらの奥で宝箱を見つけた。素材を獲得。", coin: 12 },
+  { type: "rest", title: "木陰の休憩所", text: "少し休んで、次の散歩に向けて気分が戻った。", coin: 5 },
+  { type: "market", title: "旅の市場", text: "市場のにぎわいを見つけた。建物づくりのヒントが増えた。", coin: 10 },
+  { type: "shrine", title: "小さな神社", text: "静かな場所で、今日の散歩が記憶に残った。", coin: 7 },
+  { type: "boss", title: "坂道の番人", text: "きつい道を越えた。大きな報酬を獲得。", coin: 18 }
 ];
 const buildings = [
-  ["bench", "B", "ベンチ", 1, "散歩後の休憩記録が残る"],
+  ["bench", "B", "ベンチ", 1, "休憩場所が増える"],
   ["shop", "S", "小さな店", 3, "育成アイテムの置き場が増える"],
-  ["fountain", "F", "噴水", 6, "水辺系の発見メモが開く"],
-  ["tower", "T", "見晴台", 10, "イマソラ記録が映える"],
+  ["fountain", "F", "噴水", 6, "町の景色が少しにぎやかになる"],
+  ["tower", "T", "見晴台", 10, "空を見上げる場所が増える"],
   ["garden", "G", "花壇", 15, "自然寄りの育成が楽しくなる"],
-  ["guild", "Q", "掲示板", 22, "町クエストとスポンサー枠が育つ"],
+  ["guild", "Q", "案内板", 22, "町の建物づくりを見渡しやすくなる"],
   ["station", "M", "駅前", 30, "遠回り散歩の立ち寄り先になる"],
-  ["castle", "C", "城門", 42, "大会記念が町の象徴になる"]
+  ["castle", "C", "城門", 42, "町の大きな目印になる"]
 ];
-const townQuestCatalog = [
-  { building: "bench", mark: "B", title: "休憩ベンチ便り", target: "イマソラ認識で風・自然・街の気配のどれかを確認", reward: "休憩記録 / Coin小", need: 1, picks: ["wind", "park", "sign"], required: 1, coin: 5, town: 0, bias: "nature" },
-  { building: "shop", mark: "S", title: "小さな店の仕入れ", target: "曇り空や夕方のイマソラから街の気配を確認", reward: "育成アイテム候補", need: 3, picks: ["sign", "light"], required: 1, coin: 8, town: 1, bias: "city" },
-  { building: "fountain", mark: "F", title: "噴水まわりの観察", target: "青空・風・自然の気配をイマソラで確認", reward: "水辺メモ", need: 6, picks: ["blue", "wind", "park"], required: 1, coin: 6, town: 1, bias: "nature" },
-  { building: "tower", mark: "T", title: "見晴台の空メモ", target: "イマソラ認識で空と風の気配を確認", reward: "空寄り育成", need: 10, picks: ["sky", "wind"], required: 1, coin: 10, town: 0, bias: "sky" },
-  { building: "garden", mark: "G", title: "花壇の手入れ", target: "夕焼けや曇り空から自然の気配を確認", reward: "自然寄り育成", need: 15, picks: ["flower", "park"], required: 1, coin: 8, town: 1, bias: "nature" },
-  { building: "guild", mark: "Q", title: "掲示板の散歩依頼", target: "今日のイマソラから道・空・朝の気配を確認", reward: "町クエスト拡張", need: 22, picks: ["newroad", "sky", "blue"], required: 1, coin: 12, town: 1, bias: "sky" }
-];
+const townBuildingCosts = {
+  bench: { "木の素材": 8, "草の素材": 6 },
+  shop: { "木の素材": 18, "鉄の素材": 10, "灯りの素材": 8 },
+  fountain: { "土の素材": 16, "雲の素材": 8 },
+  tower: { "鉄の素材": 18, "雲の素材": 14 },
+  garden: { "草の素材": 24, "土の素材": 16 },
+  guild: { "木の素材": 28, "灯りの素材": 18, "鉄の素材": 16 },
+  station: { "鉄の素材": 36, "木の素材": 24, "土の素材": 20 },
+  castle: { "鉄の素材": 60, "灯りの素材": 36, "雲の素材": 32 }
+};
 const stampCatalog = [
   ["家", "出発"], ["森", "森道"], ["道", "街道"], ["台", "空見台"],
   ["草", "草原"], ["灯", "灯り"], ["風", "風丘"], ["宝", "宝箱"],
@@ -8782,6 +8860,7 @@ let selectedSky = "blue";
 let selectedCup = "rookie";
 let pendingTournamentStrategyCupId = "";
 let selectedDexStage = "";
+let selectedItemGuideTab = "inventory";
 let guildSupportConfirmOpen = false;
 let monsterDexGroups = [];
 let characterGalleryRendered = false;
@@ -8833,6 +8912,7 @@ let capeFineReviewView = "front-right";
 let capeFineReviewPart = "both";
 const bgmAudioFiles = {
   normal: "assets/audio/imasora_labyrinth_normal_v01.mp3",
+  outsideHome: "assets/audio/imasora_labyrinth_night_street_v01.mp3",
   retirementCeremony: "assets/audio/imasora_retirement_ceremony_v01.mp3",
   rookieBattle: "assets/audio/imasora_corridor_rookie_battle_v01.mp3",
   rookieFinal: "assets/audio/imasora_adventure_charm_rookie_final_v01.mp3",
@@ -9137,6 +9217,7 @@ const drumRollSfxFileKey = "drumRollCandidate1";
 const sound = { ctx: null, enabled: true, bgmTimer: null, bgmLoopCueTimer: null, step: 0, mode: "normal", audio: null, usingAudioFile: false };
 const bgmModeNames = {
   normal: "通常時BGM",
+  outsideHome: "時間外ホームBGM",
   retirementCeremony: "引退式BGM",
   rookieBattle: "はじまり杯 通常戦BGM",
   rookieFinal: "はじまり杯 決勝BGM",
@@ -9156,6 +9237,17 @@ const bgmModeNames = {
 function bgmModeName(mode) {
   return bgmModeNames[mode] || bgmSong(mode).name;
 }
+function homeBgmMode() {
+  return isHomeOutsideHours() ? "outsideHome" : "normal";
+}
+function syncHomeBgmMode() {
+  if (!sound.enabled) return;
+  const walkScreen = document.querySelector('[data-screen="walk"]');
+  if (!walkScreen?.classList.contains("active")) return;
+  if (sound.mode === "retirementCeremony" || isBattleResultBgmMode()) return;
+  const mode = homeBgmMode();
+  if (sound.mode !== mode) startBgm(mode);
+}
 const seedForms = [
   { id: "seed-walk", name: "ミチタネ", bias: "trail", text: "歩くほど道タイプに寄るタネ" },
   { id: "seed-sky", name: "ソラタネ", bias: "sky", text: "空を読むほど空タイプに寄るタネ" },
@@ -9164,13 +9256,13 @@ const seedForms = [
   { id: "seed-river", name: "ミズタネ", bias: "river", text: "水辺の大会向きに育つタネ" },
   { id: "seed-night", name: "ヨルタネ", bias: "night", text: "朝空や夕焼けで伸びやすいタネ" },
   { id: "seed-luck", name: "ユラタネ", bias: "luck", text: "進化先がゆらぎやすいタネ" },
-  { id: "seed-white", name: "白星のタネ", bias: "champion", text: "グランドチャンピオン杯の優勝賞品。体色だけが白く育つ特別なタネ" }
+  { id: "seed-white", name: "白のタネ", bias: "champion", text: "グランドチャンピオン杯の優勝賞品。体色だけが白く育つ特別なタネ" }
 ];
 const skyTypes = [
-  { id: "blue", name: "青空", text: "光属性のタネとスピード素材が出やすい", orb: "", type: "sky", xp: 3, coin: 8, result: "青空のタネ", seed: "青空のタネ", material: "空風の素材", townPiece: "青い屋根のかけら" },
-  { id: "cloud", name: "曇り空", text: "防御型の素材と安定アイテムが出やすい", orb: "cloud", type: "city", xp: 2, coin: 10, result: "雲守りの甲羅", seed: "雲待ちのタネ", material: "雲守りの素材", townPiece: "雲見台のかけら" },
-  { id: "sunset", name: "夕焼け", text: "レア進化素材が出やすい", orb: "sunset", type: "nature", xp: 4, coin: 12, result: "夕焼けの進化石", seed: "夕焼けのタネ", material: "夕色の進化素材", townPiece: "夕灯りのかけら" },
-  { id: "morning", name: "朝空", text: "明るく判別しやすく、集中と一歩目の素材が出やすい", orb: "morning", type: "sky", xp: 4, coin: 9, result: "朝光のしずく", seed: "朝待ちのタネ", material: "朝光の素材", townPiece: "朝見台のかけら" }
+  { id: "blue", name: "青空", text: "光属性のタネとスピード素材が出やすい", orb: "", type: "sky", xp: 3, coin: 8, result: "青空のタネ", seed: "青空のタネ", material: "空風の素材" },
+  { id: "cloud", name: "曇り空", text: "防御型の素材と安定アイテムが出やすい", orb: "cloud", type: "city", xp: 2, coin: 10, result: "雲守りの甲羅", seed: "雲待ちのタネ", material: "雲守りの素材" },
+  { id: "sunset", name: "夕焼け", text: "レア進化素材が出やすい", orb: "sunset", type: "nature", xp: 4, coin: 12, result: "夕焼けの進化石", seed: "夕焼けのタネ", material: "夕色の進化素材" },
+  { id: "morning", name: "朝空", text: "明るく判別しやすく、集中と一歩目の素材が出やすい", orb: "morning", type: "sky", xp: 4, coin: 9, result: "朝光のしずく", seed: "朝待ちのタネ", material: "朝光の素材" }
 ];
 const terrains = [
   { cls: "forest", pic: "forest-pic", name: "森道" },
@@ -9181,6 +9273,14 @@ const terrains = [
   { cls: "townroad", pic: "light-pic", name: "灯り" },
   { cls: "skygate", pic: "wind-pic", name: "風丘" }
 ];
+const mapTerrainRewards = {
+  "草原": { material: "草の素材", mark: "草", text: "草の素材 +1" },
+  "灯り": { material: "灯りの素材", mark: "灯", text: "灯りの素材 +1" },
+  "風丘": { material: "土の素材", mark: "土", text: "土の素材 +1" },
+  "森道": { material: "木の素材", mark: "木", text: "木の素材 +1" },
+  "空見台": { material: "雲の素材", mark: "雲", text: "雲の素材 +1" },
+  "街道": { material: "鉄の素材", mark: "鉄", text: "鉄の素材 +1 / 相棒XP +1", xp: 1 }
+};
 const tournaments = [
   { id: "rookie", name: "はじまり杯", req: 3, enemy: "路地の挑戦者", medal: "R", reward: 18, cadence: "daily", bias: "総合", matchCount: 2, balance: "最初の腕試し。どの育ち方でも挑戦しやすい。" },
   { id: "green", name: "森の四大杯", req: 12, enemy: "森の王者", medal: "G", reward: 35, cadence: "weekly", bias: "自然", matchCount: 2, balance: "自然寄りが少し動きやすいが、命中や技選びでも勝ち筋がある。" },
@@ -9223,23 +9323,20 @@ const moveBook = [
   { id: "sky", name: "星巡りミラージュ", tier: "strong", power: 1.85, acc: 76 }
 ];
 const supportItems = [
-  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "次のイマソラ認識でXP +2", text: "歩き出したくなる軽い靴。散歩後の成長を少し増やす。", use: "nextWalkXp" },
-  { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "次のイマソラ認識でCoin +6 / Town +1", text: "遠回りの楽しみを作る小さなおやつ。報酬は控えめ。", use: "nextWalkReward" },
-  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "XP +2", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
+  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとにXP +2", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび成長を少し増やす。", use: "dailyWalkXp" },
+  { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "今日一日のイマソラ認識ごとにCoin +5", text: "遠回りの楽しみを作る小さなおやつ。今日の散歩前に使うと、空を認識するたびコインが少し増える。", use: "dailyWalkCoin" },
+  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "XP +3", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
   { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "XP +1 / 引退まで +12時間", text: "ゆっくり休める毛布。お世話を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
-  { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +2", text: "自然ルートへ少し寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
-  { id: "city-charm", name: "街灯チャーム", type: "進化", mark: "灯", color: "#f2b449", sub: "街 +2", text: "街ルートへ少し寄せる。攻撃だけが正解にならない範囲の補助。", use: "city" },
-  { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +2", text: "空ルートへ少し寄せる。すばやさ特化だけが最強にならないよう控えめ。", use: "sky" },
-  { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +1 / 空 +1", text: "水辺系の安定感を育てる小貝。偏りすぎを少し整える。", use: "river" },
-  { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +2", text: "試合前に気持ちを整えるラムネ。1試合だけの小さな補助。", use: "battleAcc" },
-  { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +2", text: "装備を少し整えるテープ。勝敗を決めきらない大会準備。", use: "battleDef" },
-  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +2", text: "胸につける小さなピン。先手の可能性を少しだけ上げる。", use: "battleSpd" },
-  { id: "memory-ribbon", name: "思い出リボン", type: "引退", mark: "記", color: "#e9a6c8", sub: "Town +1 / 引退まで +12時間", text: "相棒との記録を町に残しやすくする。強さより思い出の道具。延命アイテムは最大5回まで。", use: "memory" },
-  { id: "life-bell", name: "町しるしの鈴", type: "引退", mark: "鈴", color: "#c9a76a", sub: "引退まで +12時間", text: "町に響く小さな鈴。別れではなく、町に残る準備を少しゆっくりにする。延命アイテムは最大5回まで。", use: "life" }
+  { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +4", text: "自然ルートへ少し寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
+  { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +4", text: "空ルートへ少し寄せる。すばやさ特化だけが最強にならないよう控えめ。", use: "sky" },
+  { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを少し整える。", use: "river" },
+  { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +10", text: "試合前に気持ちを整えるラムネ。散歩で集めた準備が試合にしっかり効く大会用。", use: "battleAcc" },
+  { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +10", text: "装備を整えるテープ。散歩で集めた準備が受けるダメージを抑える大会用。", use: "battleDef" },
+  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。散歩で集めた準備が先手の流れを作る大会用。", use: "battleSpd" }
 ];const careActions = [
   { id: "water", name: "葉に水をあげる", text: "自然寄りに少し育つ", bias: "nature" },
   { id: "sky", name: "空を見せる", text: "空寄りに少し育つ", bias: "sky" },
-  { id: "town", name: "町の話をする", text: "街寄りに少し育つ", bias: "city" }
+  { id: "road", name: "道の話をする", text: "道寄りの気分で少し落ち着く", bias: "trail" }
 ];
 const evolutionPlan = [
   { stage: "タネ期", count: 7, branch: "7つのタネから始まる", tone: "小さく不思議。どれを育てるか選ぶ入口。" },
@@ -9250,18 +9347,18 @@ const evolutionPlan = [
 ];
 const evolutionRoutes = [
   { key: "sky", label: "空ルート", next: "ソラリオ / アオリオ系", picks: "青空、朝空、空風の気配", text: "イマソラ認識で伸びる。すばやさ寄りだが、回避だけが正解にはならない。" },
-  { key: "nature", label: "自然ルート", next: "ハノリオ / ホシハノン系", picks: "夕焼け、雲、風、自然の気配", text: "イマソラ結果や町の花壇依頼で伸びる。安定感が出るが、万能にはしない。" },
-  { key: "city", label: "街ルート", next: "マチリオ / ホシマチル系", picks: "曇り空、夕方、街の気配", text: "イマソラ結果と町依頼で伸びる。攻めやすいが、防御や命中の工夫も必要。" },
+  { key: "nature", label: "自然ルート", next: "ハノリオ / ホシハノン系", picks: "夕焼け、雲、風、自然の気配", text: "イマソラ結果で伸びる。安定感が出るが、万能にはしない。" },
+  { key: "city", label: "街ルート", next: "マチリオ / ホシマチル系", picks: "曇り空、夕方、街の気配", text: "イマソラ結果で伸びる。攻めやすいが、防御や命中の工夫も必要。" },
   { key: "trail", label: "道ルート", next: "ミチリオ向き", picks: "歩行セッション、道の気配", text: "歩いた事実とイマソラ確認で伸びる。散歩そのものが相棒の個性になる。" }
 ];
 const playtestSteps = [
   { id: "refresh", title: "画面更新", text: "Ctrl + Rで最新表示にしてから始める" },
   { id: "walk", title: "歩くタブを1周", text: "歩行セッション、停止確認、マップ、投稿テンプレ補助を見る" },
-  { id: "sky", title: "イマソラ確認", text: "空タイプ選択、イマソラ認識、この空でOK、空報酬を見る" },
+  { id: "sky", title: "イマソラ確認", text: "空タイプ選択、イマソラ認識、この空でOK、到着マスの結果を見る" },
   { id: "result", title: "成果確認", text: "今日の成果ボードと冒険ログに結果が残るか見る" },
   { id: "boost", title: "大会テスト状態", text: "規約・設定で大会テスト状態にして、勇旅期以降の戦闘確認へ進む" },
   { id: "battle", title: "大会と能力値", text: "育成・大会で大会、10回模擬戦、能力値の意味、MPの手応えを見る" },
-  { id: "town", title: "町・記録確認", text: "町づくり、町依頼、町の記念帳、スタンプを見る" },
+  { id: "town", title: "町・記録確認", text: "町の建物、小さな店、素材ストック、スタンプを見る" },
   { id: "safety", title: "安全設計確認", text: "歩行中操作なし、停止後認識、自宅確認中心の見え方を見る" },
   { id: "memo", title: "メモ保存", text: "手応えと気づいたことをプレイテスト記録欄に保存する" }
 ];
@@ -9269,8 +9366,8 @@ const userMenuItems = [
   { id: "walk", label: "散歩", sub: "歩く", target: "walk" },
   { id: "character", label: "キャラ", sub: "相棒", target: "character" },
   { id: "battle", label: "大会", sub: "試合", target: "battle" },
-  { id: "items", label: "道具", sub: "アイテム", target: "items" },
-  { id: "town", label: "町", sub: "記録", target: "town" },
+  { id: "items", label: "アイテム", sub: "持ち物", target: "items" },
+  { id: "town", label: "街", sub: "記録", target: "town" },
   { id: "sideQuest", label: "仕事", sub: "今日", target: "sideQuest" },
   { id: "settings", label: "設定", sub: "音量", target: "settings" }
 ];
@@ -17822,7 +17919,7 @@ const homeTalkTemplateSets = [
     "lines": [
       [
         "star は星だね。",
-        "白星の星にも使える言葉だよ。"
+        "白の星にも使える言葉だよ。"
       ],
       [
         "starry は星空？",
@@ -29979,20 +30076,18 @@ const homeTalkTemplateSets = [
 const dailySideQuestItems = [
   { id: "map", mark: "道", title: "マップを見る", text: "今日の25マスマップを見ると報酬ゲット。次のイマソラ認識までの歩数も確認できます。", reward: "growth-seed", action: "map" },
   { id: "companion", mark: "友", title: "相棒を見る", text: "相棒の状態を見ると報酬ゲット。育成傾向や引退までの残り時間を確認できます。", reward: "nap-blanket", action: "character" },
-  { id: "town", mark: "町", title: "街をのぞく", text: "街をのぞくと報酬ゲット。町の記録、小さな店、協力支援の状態を確認できます。", reward: "map-snack", action: "town" },
-  { id: "sky", mark: "空", title: "イマソラ認識", text: "安全に立ち止まって空を認識すると報酬ゲット。今日の空が相棒と町づくりに残ります。", reward: "sky-feather", action: "sky", requiresSky: true }
+  { id: "sky", mark: "空", title: "イマソラ認識", text: "安全に立ち止まって空を認識すると報酬ゲット。今日の空が相棒の成長につながります。", reward: "sky-feather", action: "sky", requiresSky: true }
 ];
 
 function defaultState() {
   return {
     position: 0,
     coin: 0,
-    town: 0,
-    stamps: [],
     monster: { seedId: "seed-walk", nickname: "ミチリオードフワナ", xp: 35, nature: 4, city: 3, sky: 12, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now() - 73 * 60 * 60 * 1000, evolutionStage: 3, lifeExtensionUses: 0, grandQualified: false, skills: ["tap"] },
     walkSession: { active: false, startedAt: 0, stepChecked: false, stopped: false, skyVerified: false, stepCount: 0, blocked: false },
     skySummons: [],
-    skyStock: { seeds: {}, materials: {}, townPieces: {} },
+    skyStock: { seeds: {}, materials: {} },
+    townBuildings: [],
     retiredMonsters: [],
     retiredStorageLimit: 20,
     retirementStorageAdViews: 0,
@@ -30004,12 +30099,15 @@ function defaultState() {
     careLog: [],
     cups: [],
     inventory: [],
-    itemEffects: { walkXp: 0, walkCoin: 0, walkTown: 0, battle: {} },
+    itemEffects: { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} },
+    dailyItemUses: { date: "", used: [] },
     tournamentEntries: [],
     mapTickets: { major4: 0 },
     grandEntryUsed: false,
     grandUnlockBonusGiven: false,
     playtestTournamentBypass: false,
+    playtestMapTimeMode: "",
+    playtestOutsideHoursHomeMode: false,
     shopPurchases: [],
     pendingBattle: null,
     todayResult: null,
@@ -30065,6 +30163,7 @@ function normalizeState() {
     state.monster.evolutionStage = state.monster.xp < 6 ? 0 : state.monster.xp < 16 ? 1 : state.monster.xp < 35 ? 2 : state.monster.xp < 65 ? 3 : 4;
   }
   state.monster.evolutionStage = Math.max(0, Math.min(4, Number(state.monster.evolutionStage || 0)));
+  if (state.monster.evolutionStage <= 2 && state.monster.nickname === "ミチリオードフワナ") state.monster.nickname = "";
   state.monster.lifeExtensionUses = Math.max(0, Math.min(5, Number(state.monster.lifeExtensionUses || 0)));
   state.monster.grandQualified = Boolean(state.monster.grandQualified);
   state.monster.skills = Array.isArray(state.monster.skills) && state.monster.skills.length ? state.monster.skills : ["tap"];
@@ -30078,10 +30177,16 @@ function normalizeState() {
   state.walkSession.stepCount = Number(state.walkSession.stepCount || 0);
   state.walkSession.blocked = Boolean(state.walkSession.blocked);
   state.skySummons = Array.isArray(state.skySummons) ? state.skySummons : [];
-  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {}, townPieces: {} };
+  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {} };
   state.skyStock.seeds = state.skyStock.seeds && typeof state.skyStock.seeds === "object" ? state.skyStock.seeds : {};
   state.skyStock.materials = state.skyStock.materials && typeof state.skyStock.materials === "object" ? state.skyStock.materials : {};
-  state.skyStock.townPieces = state.skyStock.townPieces && typeof state.skyStock.townPieces === "object" ? state.skyStock.townPieces : {};
+  if (state.skyStock.townPieces && typeof state.skyStock.townPieces === "object") {
+    Object.entries(state.skyStock.townPieces).forEach(([name, count]) => {
+      state.skyStock.materials[name] = Number(state.skyStock.materials[name] || 0) + Number(count || 0);
+    });
+    delete state.skyStock.townPieces;
+  }
+  state.townBuildings = Array.isArray(state.townBuildings) ? state.townBuildings.filter(id => buildings.some(([buildingId]) => buildingId === id)) : [];
   state.retiredMonsters = Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [];
   state.retiredStorageLimit = Math.max(1, Math.min(500, Number(state.retiredStorageLimit || 20)));
   state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0)));
@@ -30101,18 +30206,30 @@ function normalizeState() {
   state.careLog = Array.isArray(state.careLog) ? state.careLog : [];
   state.cups = Array.isArray(state.cups) ? state.cups : [];
   state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
-  state.itemEffects = state.itemEffects && typeof state.itemEffects === "object" ? state.itemEffects : { walkXp: 0, walkCoin: 0, walkTown: 0, battle: {} };
+  if ("town" in state) delete state.town;
+  state.itemEffects = state.itemEffects && typeof state.itemEffects === "object" ? state.itemEffects : { walkXp: 0, walkCoin: 0, battle: {} };
   state.itemEffects.walkXp = Math.max(0, Number(state.itemEffects.walkXp || 0));
   state.itemEffects.walkCoin = Math.max(0, Number(state.itemEffects.walkCoin || 0));
-  state.itemEffects.walkTown = Math.max(0, Number(state.itemEffects.walkTown || 0));
+  if ("walkMaterial" in state.itemEffects) delete state.itemEffects.walkMaterial;
+  if ("walkTown" in state.itemEffects) delete state.itemEffects.walkTown;
+  state.itemEffects.daily = state.itemEffects.daily && typeof state.itemEffects.daily === "object" ? state.itemEffects.daily : { date: "", walkXp: 0, walkCoin: 0 };
+  if (state.itemEffects.daily.date !== todayKey()) state.itemEffects.daily = { date: todayKey(), walkXp: 0, walkCoin: 0 };
+  state.itemEffects.daily.walkXp = Math.max(0, Number(state.itemEffects.daily.walkXp || 0));
+  state.itemEffects.daily.walkCoin = Math.max(0, Number(state.itemEffects.daily.walkCoin || 0));
   state.itemEffects.battle = state.itemEffects.battle && typeof state.itemEffects.battle === "object" ? state.itemEffects.battle : {};
   ["acc", "def", "spd"].forEach(key => { state.itemEffects.battle[key] = Math.max(0, Number(state.itemEffects.battle[key] || 0)); });
+  state.dailyItemUses = state.dailyItemUses && typeof state.dailyItemUses === "object" ? state.dailyItemUses : { date: "", used: [] };
+  if (state.dailyItemUses.date !== todayKey()) state.dailyItemUses = { date: todayKey(), used: [] };
+  state.dailyItemUses.used = Array.isArray(state.dailyItemUses.used) ? [...new Set(state.dailyItemUses.used)] : [];
   state.tournamentEntries = Array.isArray(state.tournamentEntries) ? state.tournamentEntries : [];
   state.mapTickets = state.mapTickets && typeof state.mapTickets === "object" ? state.mapTickets : { major4: 0 };
   state.mapTickets.major4 = Math.max(0, Number(state.mapTickets.major4 || 0));
   state.grandEntryUsed = Boolean(state.grandEntryUsed || state.cups.includes("grand"));
   state.grandUnlockBonusGiven = Boolean(state.grandUnlockBonusGiven);
   state.playtestTournamentBypass = Boolean(state.playtestTournamentBypass);
+  const validMapTimeModes = ["", "open"];
+  state.playtestMapTimeMode = validMapTimeModes.includes(state.playtestMapTimeMode) ? state.playtestMapTimeMode : "";
+  state.playtestOutsideHoursHomeMode = Boolean(state.playtestOutsideHoursHomeMode);
   state.shopPurchases = Array.isArray(state.shopPurchases) ? state.shopPurchases : [];
   state.pendingBattle = state.pendingBattle && typeof state.pendingBattle === "object" ? state.pendingBattle : null;
   state.todayResult = state.todayResult && typeof state.todayResult === "object" ? state.todayResult : null;
@@ -30134,7 +30251,7 @@ function normalizeState() {
   state.imasoraDiary.note = String(state.imasoraDiary.note || "").slice(0, 180);
   state.imasoraDiary.updatedAt = String(state.imasoraDiary.updatedAt || "").slice(0, 24);
   state.skyDex = Array.isArray(state.skyDex) ? state.skyDex : [];
-  state.townFootprints = Array.isArray(state.townFootprints) ? state.townFootprints : [];
+  if (Object.prototype.hasOwnProperty.call(state, "town" + "Footprints")) delete state["town" + "Footprints"];
   const validStrategies = ["balanced", "rush", "guard", "focus"];
   state.battleStrategy = validStrategies.includes(state.battleStrategy) ? state.battleStrategy : "balanced";
   state.playtestMemo = state.playtestMemo && typeof state.playtestMemo === "object" ? state.playtestMemo : { mood: "未確認", note: "", updatedAt: "" };
@@ -30149,7 +30266,7 @@ function normalizeState() {
   if (state.sideQuest.date !== todayKey()) {
     state.sideQuest = { date: todayKey(), done: [], claimed: [] };
   }
-  const validSideQuestIds = ["map", "companion", "town", "sky"];
+  const validSideQuestIds = ["map", "companion", "sky"];
   state.sideQuest.done = Array.isArray(state.sideQuest.done) ? state.sideQuest.done.filter(id => validSideQuestIds.includes(id)) : [];
   state.sideQuest.claimed = Array.isArray(state.sideQuest.claimed) ? state.sideQuest.claimed.filter(id => validSideQuestIds.includes(id)) : [];
   if (state.hpDrainSfxVersion !== 3) {
@@ -30257,13 +30374,13 @@ function setHomeTalkTheme(theme) {
   toast(`テーマ: ${homeTalkThemeLabel(theme)}`);
 }
 function bgmVolumeKey(mode = "normal") {
-  if (mode === "normal") return "normalBgm";
+  if (mode === "normal" || mode === "outsideHome") return "normalBgm";
   if (mode === "retirementCeremony") return "retirementBgm";
   return "battleBgm";
 }
 function bgmVolumeScale(mode = "normal") {
   const scale = volumeScale(bgmVolumeKey(mode));
-  return mode === "normal" ? scale * .9 : scale;
+  return mode === "normal" || mode === "outsideHome" ? scale * .9 : scale;
 }
 function renderSoundSettings() {
   const box = document.getElementById("soundSettings");
@@ -30903,7 +31020,7 @@ function toggleSound() {
     sound.enabled = true;
     document.getElementById("soundBtn").textContent = "BGM ON";
     playSfx("reward");
-    startBgm("normal");
+    syncHomeBgmMode();
     toast("BGM ON");
     return;
   }
@@ -31407,7 +31524,7 @@ function imasoraTraitIds(sky) {
 function imasoraTraitNames(ids) {
   return ids.map(discoveryName).join("、");
 }const skyBonusBook = {
-  blue: { title: "青空ボーナス", text: "すばやさと空素材が少し伸びやすい日", xp: 1, coin: 1, bias: "sky" },
+  blue: { title: "青空ボーナス", text: "すばやさが少し伸びやすい日", xp: 1, coin: 1, bias: "sky" },
   cloud: { title: "曇り空ボーナス", text: "安定素材と防御寄りの育成が少し伸びやすい日", xp: 1, coin: 2, bias: "nature" },
   sunset: { title: "夕焼けボーナス", text: "レア素材と進化の予感が少し出やすい日", xp: 2, coin: 1, bias: "nature" },
   morning: { title: "朝空ボーナス", text: "一歩目の集中と空寄りの育成が少し伸びやすい日", xp: 1, coin: 2, bias: "sky" }
@@ -31427,7 +31544,7 @@ function monsterPersonality() {
   if (m.sky >= m.nature + 3 && m.sky >= m.city + 3) return { name: "空読み", text: "空の流れに敏感。すばやさや技の流れに少し個性が出ます。", effect: "MPとすばやさの見え方に少し反映" };
   if (m.nature >= m.city + 3 && m.nature >= m.sky + 3) return { name: "おだやか", text: "無理をせず粘る相棒。防御とHPの印象が少し強くなります。", effect: "耐える試合が似合う" };
   if (m.city >= m.nature + 3 && m.city >= m.sky + 3) return { name: "勝負好き", text: "街の刺激で前向きに攻める相棒。攻撃と命中の印象が少し強くなります。", effect: "攻めの作戦が似合う" };
-  if (latest.includes("夕焼け")) return { name: "ロマン派", text: "夕焼けの記憶が好き。見た目や記念ログで個性を出しやすい性格です。", effect: "記念向き" };
+  if (latest.includes("夕焼け")) return { name: "ロマン派", text: "夕焼けの記憶が好き。見た目や図鑑ログで個性を出しやすい性格です。", effect: "図鑑ログ向き" };
   return { name: "好奇心", text: "まだ決まった正解を持たない相棒。散歩と空で少しずつ個性が育ちます。", effect: "固定の正解なし" };
 }
 function recordImasoraDex(current, reward, bonus) {
@@ -31435,12 +31552,6 @@ function recordImasoraDex(current, reward, bonus) {
   const entry = { date: todayKey(), sky: current.name, result: current.result, bonus: bonus.title, note, at: Date.now() };
   state.skyDex.unshift(entry);
   state.skyDex = state.skyDex.filter((item, index, list) => list.findIndex(other => other.date === item.date && other.sky === item.sky && other.note === item.note) === index).slice(0, 20);
-}
-function recordTownFootprint(current) {
-  const profile = monsterProfile();
-  const entry = { date: todayKey(), name: profile.name, sky: current.name, text: `${profile.name}が${current.name}の日に町を歩いた足跡`, at: Date.now() };
-  state.townFootprints.unshift(entry);
-  state.townFootprints = state.townFootprints.slice(0, 12);
 }
 function renderTodaySkyBonus() {
   const box = document.getElementById("todaySkyBonus");
@@ -31459,7 +31570,7 @@ function renderTodaySkyBonus() {
 function renderBadWeatherPanel() {
   const box = document.getElementById("badWeatherPanel");
   if (!box) return;
-  box.innerHTML = `<b>悪天候の日の遊び</b><span>雨や強風などで無理に歩かない日でも、町、図鑑、相棒の性格、フレンド対戦準備、協力支援を確認できます。報酬やマップ進行の主役は、安全な散歩とイマソラ認識のままです。</span><div class="mini-grid"><div class="mini-chip"><strong>町を見る</strong><small>足跡や記念を確認</small></div><div class="mini-chip"><strong>支援する</strong><small>相互報酬は小さめ</small></div></div>`;
+  box.innerHTML = `<b>悪天候の日の遊び</b><span>雨や強風などで無理に歩かない日でも、町、図鑑、相棒の性格、フレンド対戦準備、協力支援を確認できます。報酬やマップ進行の主役は、安全な散歩とイマソラ認識のままです。</span><div class="mini-grid"><div class="mini-chip"><strong>町を見る</strong><small>建物と素材を確認</small></div><div class="mini-chip"><strong>支援する</strong><small>相互報酬は小さめ</small></div></div>`;
 }
 function renderImasoraDiary() {
   const box = document.getElementById("imasoraDiary");
@@ -31480,12 +31591,6 @@ function renderImasoraDex() {
   if (!box) return;
   const list = state.skyDex.slice(0, 6);
   box.innerHTML = `<b>イマソラ図鑑</b><span>認識した空とひとことを、リアルタイム投稿ではなく後から振り返る図鑑として残します。投稿テンプレ補助とも相性がよく、安全性を高めます。</span><div class="mini-grid">${list.length ? list.map(item => `<div class="sky-dex-card"><strong>${item.sky}</strong><small>${item.result} / ${item.bonus}${item.note ? `<br>「${escapeAttr(item.note)}」` : ""}</small></div>`).join("") : `<div class="sky-dex-card"><strong>未登録</strong><small>イマソラ認識後に追加されます。</small></div>`}</div>`;
-}
-function renderTownFootprints() {
-  const box = document.getElementById("townFootprints");
-  if (!box) return;
-  const list = state.townFootprints.slice(0, 4);
-  box.innerHTML = `<b>町に残る相棒の足跡</b><span>強さの上乗せではなく、歩いた記念が町に残る仕組みです。</span><div class="mini-grid">${list.length ? list.map(item => `<div class="footprint-card"><strong>${item.name}</strong><small>${item.sky} / ${item.date}<br>${item.text}</small></div>`).join("") : `<div class="footprint-card"><strong>準備中</strong><small>イマソラ認識をすると足跡が残ります。</small></div>`}</div>`;
 }
 function renderPersonalityPanel() {
   const box = document.getElementById("personalityPanel");
@@ -31534,7 +31639,7 @@ function shareDraftUrl(target = "x") {
   const text = encodeURIComponent(shareDraftText());
   const urls = {
     x: `https://x.com/intent/tweet?text=${text}`,
-    threads: `https://www.threads.net/intent/post?text=${text}`,
+    threads: `https://www.threads.com/intent/post?text=${text}`,
     instagram: "https://www.instagram.com/"
   };
   return urls[target] || urls.x;
@@ -31584,7 +31689,7 @@ function renderAirTraits() {
   box.hidden = false;
   const sky = skyTypes.find(item => item.name === latest.sky) || skyTypes[0];
   const traits = Array.isArray(latest?.traits) && latest.traits.length ? latest.traits : imasoraTraitIds(sky);
-  const lead = `${latest.sky}から ${imasoraTraitNames(traits)} を確認。育成傾向・町依頼・今日の記録に少し反映します。`;
+  const lead = `${latest.sky}から ${imasoraTraitNames(traits)} を確認。育成傾向・今日の記録に少し反映します。`;
   box.innerHTML = `
     <b>今日の空の気配</b>
     <span>${lead}</span>
@@ -31772,7 +31877,6 @@ function claimGuildSupport() {
     map: 0,
     coin: 0,
     xp: 0,
-    town: 0,
     notes: [
       `協力を受ける側: お礼送信で XP +${reward.xp} / Coin +${reward.coin}`,
       `支援する側: 25マスマップクリア、またはスタンプラリー全制覇で XP +${reward.xp} / Coin +${reward.coin}`,
@@ -31795,69 +31899,38 @@ function claimGuildSupport() {
 function renderFriendBattlePanel(profile, lifeRemain) {
   const box = document.getElementById("friendBattlePanel");
   if (!box) return;
-  const ready = lifeRemain <= 0;
   const recent = state.friendBattles[0];
   box.innerHTML = `
     <b>引退相棒フレンド対戦</b>
-    <span>${ready ? "引退準備に入った相棒は町に残り、友人との合言葉バトル部屋で記念対戦に参加できる構想です。" : "正式版では、育て終えた相棒を記念登録し、フレンド同士が合言葉で戦闘部屋に入り、1対1、3対3、5対5の記念対戦をできるようにします。今は設計プレビューです。"}</span>
+    <span>引退して街の記録に残った相棒と、友人との合言葉バトル部屋で1対1の記念試合ができる構想です。</span>
     <div class="friend-mode-grid">
-      ${[["solo", "1対1", "合言葉で入る短い記念試合"], ["team3", "3対3", "フレンド同士の小隊戦"], ["team5", "5対5", "5体で遊ぶ記念団体戦"]].map(([mode, title, text]) => `
-        <button class="friend-mode" type="button" data-friend-mode="${mode}">
-          <strong>${title}</strong><small>${text}</small>
-        </button>
-      `).join("")}
+      <button class="friend-mode" type="button" data-friend-mode="solo">
+        <strong>1対1</strong><small>記録に残った相棒と合言葉で入る短い記念試合</small>
+      </button>
     </div>
-    <span>${recent ? `直近: ${recent.label} / ${recent.result} / 判定 ${recent.score}` : "対戦は合言葉の戦闘部屋で行うフレンド記念戦です。団体イベントではなく、思い出・称号・見た目解放を中心にします。"}</span>
+    <span>${recent ? `直近: ${recent.label} / ${recent.result} / 判定 ${recent.score}` : "対戦は引退済み相棒との1対1フレンド記念戦です。思い出・称号・見た目解放を中心にします。"}</span>
   `;
   document.querySelectorAll("[data-friend-mode]").forEach(button => {
     button.addEventListener("click", () => simulateFriendBattle(button.dataset.friendMode));
   });
 }
-function simulateFriendBattle(mode) {
-  const labels = { solo: "1対1", team3: "3対3", team5: "5対5" };
+function simulateFriendBattle(mode = "solo") {
+  const labels = { solo: "1対1" };
   const stats = monsterStats();
-  const teamSize = mode === "team5" ? 5 : mode === "team3" ? 3 : 1;
-  const score = Math.round((stats.hp + stats.atk + stats.def + stats.spd + stats.acc + stats.eva) / 12) + teamSize;
+  const score = Math.round((stats.hp + stats.atk + stats.def + stats.spd + stats.acc + stats.eva) / 12) + 1;
   const result = score % 3 === 0 ? "接戦勝利" : score % 3 === 1 ? "判定勝ち" : "惜敗";
-  state.friendBattles.unshift({ mode, label: labels[mode] || "1対1", result, score, at: Date.now() });
+  state.friendBattles.unshift({ mode: "solo", label: labels.solo, result, score, at: Date.now() });
   state.friendBattles = state.friendBattles.slice(0, 10);
-  addLog(`合言葉バトル部屋プレビュー: ${labels[mode]} ${result}。フレンド同士の記念対戦構想を確認。`);
+  addLog(`合言葉バトル部屋プレビュー: ${labels.solo} ${result}。引退済み相棒とのフレンド記念戦構想を確認。`);
   saveState();
   renderFriendBattlePanel(monsterProfile(), retirementRemainingHours());
   playSfx("battle");
-  toast(`${labels[mode]} 合言葉部屋プレビュー`);
-}
-function renderDailyProgress() {
-  const session = state.walkSession;
-  const steps = [
-    ["1", "歩く", "歩行中は画面操作しない", Boolean(session.active || session.startedAt)],
-    ["2", "止まる", "安全な場所で停止確認", Boolean(session.stepChecked && session.stopped && !session.blocked)],
-    ["3", "空確認", "イマソラ認識で報酬確定", Boolean(session.skyVerified)],
-    ["4", "成果確認", "空報酬と投稿導線を確認", state.days.includes(todayKey())]
-  ];
-  const firstOpen = steps.findIndex(([, , , done]) => !done);
-  const nowIndex = firstOpen === -1 ? steps.length - 1 : firstOpen;
-  document.getElementById("dailyProgress").innerHTML = `
-    <b>今日の進行</b>
-    <span>イマソラウォークは、歩く → 止まる → 空確認 → 記録完了の順番で進みます。歩行中はゲーム進行も画面操作も前提にしません。</span>
-    <div class="daily-steps">
-      ${steps.map(([mark, title, text, done], index) => `
-        <div class="daily-step ${done ? "done" : ""} ${index === nowIndex ? "now" : ""}">
-          <strong>${done ? "OK" : mark}</strong>
-          <small>${title}<br>${text}</small>
-        </div>
-      `).join("")}
-    </div>
-  `;
+  toast(`${labels.solo} 合言葉部屋プレビュー`);
 }
 function companionHomeArtMarkup(profile, growth) {
-  const item = currentCompanionArtItem(profile, growth);
-  if (item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"))) {
-    return `<div class="monster-art unique-art">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-right"))}</div>`;
-  }
-  if (item?.id) return galleryMonsterArt(item);
-  const seedClass = profile.form === "seed" ? ` ${profile.id || state.monster.seedId || "seed-walk"}` : "";
-  return `<div class="monster-art"><div class="monster ${profile.form}${seedClass}${profile.white ? " white-body" : ""}">${monsterInnerParts()}</div></div>`;
+  const html = companionArtHtml(profile, growth);
+  if (profile.stage !== "めばえ期") return html;
+  return html.replace('class="', 'class="home-sprout-art ');
 }
 function homeStillMonsterSvg(svg) {
   return String(svg || "").replace(/<animateTransform attributeName="transform" type="translate"[^>]*\/>/g, "");
@@ -31878,7 +31951,7 @@ function homeGuideArtMarkup() {
   const items = monsterDexGroups.flatMap(group => group.list || []);
   const item = items.find(entry => entry.id === tokenId) || items.find(entry => entry.name === tokenName);
   if (!item) return `<div class="monster-art"><div class="monster sprout white-body">${monsterInnerParts()}</div></div>`;
-  return `<div class="monster-art unique-art">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-left"))}</div>`;
+  return `<div class="monster-art unique-art home-guide-art">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-left"))}</div>`;
 }
 function companionHomeMood(profile, growth, lifeRemain) {
   if (lifeRemain <= 0) return "町に残る準備中";
@@ -32133,6 +32206,13 @@ function companionHomeRetirementText(name, hours) {
   if (hours <= 0) return `${displayName}は引退準備中`;
   return `${displayName}の引退までのこり ${Math.ceil(Number(hours) || 0)}時間`;
 }
+function homeWindowClockDate() {
+  const now = new Date();
+  if (!state.playtestOutsideHoursHomeMode) return now;
+  const outsidePreview = new Date(now);
+  outsidePreview.setHours(21, now.getMinutes(), 0, 0);
+  return outsidePreview;
+}
 function homeWindowTimeView(date = new Date()) {
   const hour = date.getHours();
   const minute = date.getMinutes();
@@ -32185,7 +32265,7 @@ function homeWindowTimeView(date = new Date()) {
 function updateHomeWindowClock() {
   const win = document.querySelector(".home-window");
   if (!win) return;
-  const view = homeWindowTimeView();
+  const view = homeWindowTimeView(homeWindowClockDate());
   win.classList.remove("time-day", "time-morning", "time-evening", "time-moon");
   win.classList.add(view.className);
   win.setAttribute("style", view.style);
@@ -32197,6 +32277,7 @@ function renderCompanionHome() {
   const growth = growthForecast();
   const lifeRemain = retirementRemainingHours();
   const retirementReady = lifeRemain <= 0;
+  const outsideHours = isHomeOutsideHours();
   const homeActionItems = retirementReady
     ? [
         { id: "retirement", label: "引退する", target: "retirement" },
@@ -32207,7 +32288,7 @@ function renderCompanionHome() {
   const dialogue = companionHomeDialoguePairs(profile, growth, lifeRemain);
   const [companionLine, guideLine] = dialogue.pairs[0] || ["", ""];
   const topic = dialogue.topic;
-  const windowView = homeWindowTimeView();
+  const windowView = homeWindowTimeView(homeWindowClockDate());
   box.innerHTML = `
     <div class="companion-home-head">
       <div>
@@ -32234,8 +32315,15 @@ function renderCompanionHome() {
         </div>
       </div>
       <div class="home-topic">話題: ${topic}</div>
-      <div class="home-actions ${retirementReady ? "retirement-ready" : ""}">
-        ${homeActionItems.map(item => `<button type="button" class="${item.id === "walk" ? "secondary" : ""}" data-home-action="${item.target}">${item.label}</button>`).join("")}
+      <div class="home-center-notice" data-home-center-notice></div>
+      <div class="home-actions ${retirementReady ? "retirement-ready" : outsideHours ? "outside-hours" : ""}">
+        ${homeActionItems.map(item => {
+          const classes = [
+            item.id === "walk" ? "secondary" : "",
+            outsideHours && (item.id === "walk" || item.id === "sideQuest") ? "outside-locked" : ""
+          ].filter(Boolean).join(" ");
+          return `<button type="button" class="${classes}" data-home-action="${item.target}">${item.label}</button>`;
+        }).join("")}
       </div>
     </div>
   `;
@@ -32274,6 +32362,13 @@ function renderUserMenu() {
 function renderDailySideQuest() {
   const box = document.getElementById("dailySideQuest");
   if (!box) return;
+  if (!isMapPlaytime()) {
+    box.innerHTML = `
+      <b>今日のお仕事</b>
+      <span>マップ進行は06:00〜19:00のみです。時間外はお仕事を進められません。夜遅い外出はしないようにしましょう。</span>
+    `;
+    return;
+  }
   const finished = dailySideQuestItems.filter(item => isSideQuestDone(item.id)).length;
   box.innerHTML = `
     <b>今日のお仕事</b>
@@ -32303,6 +32398,12 @@ function handleUserMenu(target) {
     openRetirementCeremony();
     return;
   }
+  if (isHomeOutsideHours() && (target === "walk" || target === "map" || target === "sky" || target === "sideQuest")) {
+    playSfx("error");
+    refreshPlaytimeSensitiveViews();
+    showHomeCenterNotice("散歩とお仕事は06:00〜19:00以外では時間外となっています");
+    return;
+  }
   if (isRetirementReady() && (target === "walk" || target === "map" || target === "sky" || target === "battle" || target === "character" || target === "sideQuest")) {
     playSfx("error");
     toast(target === "battle" ? "引退準備中は大会に出場できません" : target === "character" ? "引退準備中は引退ボタンから進んでください" : target === "sideQuest" ? "引退準備中は仕事を受けられません" : "引退準備中は散歩できません");
@@ -32321,8 +32422,8 @@ function navigateUserTarget(target, markDone = false) {
   if (markDone && target === "town") markSideQuestDone("town");
   if (target === "walk" || target === "map" || target === "sky") {
     switchScreen("walk");
-    const id = target === "sky" ? "startWalkBtn" : target === "map" ? "map" : "dailyProgress";
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: target === "map" ? "center" : "start" });
+    const id = target === "sky" ? "startWalkBtn" : "map";
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: id === "map" ? "center" : "start" });
     return;
   }
   if (target === "character") {
@@ -32332,7 +32433,7 @@ function navigateUserTarget(target, markDone = false) {
   }
   if (target === "battle") {
     switchScreen("monster");
-    document.getElementById("entryStatus")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("tournamentBoard")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
   if (target === "items") {
@@ -32355,6 +32456,12 @@ function handleSideQuest(id) {
   const item = dailySideQuestItems.find(entry => entry.id === id);
   if (!item) return;
   playSfx("select");
+  if (!isMapPlaytime()) {
+    playSfx("error");
+    toast("時間外はお仕事を進められません");
+    renderDailySideQuest();
+    return;
+  }
   const done = isSideQuestDone(id);
   if (!done) {
     if (item.requiresSky) {
@@ -32380,8 +32487,15 @@ function handleSideQuest(id) {
 function startOpeningGame() {
   if (!playAudioSfx("itemGetCandidate3", 0, .95)) playSfx("itemGet");
   switchScreen("walk");
-  startBgm("normal");
+  syncHomeBgmMode();
   document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function refreshPlaytimeSensitiveViews() {
+  renderProof();
+  renderCompanionHome();
+  renderDailySideQuest();
+  renderMap();
+  syncHomeBgmMode();
 }
 function setTodayResult(result) {
   state.todayResult = {
@@ -32391,7 +32505,6 @@ function setTodayResult(result) {
     map: Number(result.map || 0),
     coin: Number(result.coin || 0),
     xp: Number(result.xp || 0),
-    town: Number(result.town || 0),
     notes: Array.isArray(result.notes) ? result.notes.slice(0, 4) : []
   };
 }
@@ -32399,27 +32512,44 @@ function renderTodayResult() {
   const box = document.getElementById("todayResult");
   if (!box) return;
   const result = state.todayResult && state.todayResult.date === todayKey() ? state.todayResult : null;
+  const todayCards = result
+    ? [[`+${result.map}`, "Map"], [`+${result.coin}`, "Coin"], [`+${result.xp}`, "Monster XP"]]
+    : [["0", "Map"], ["0", "Coin"], ["0", "Monster XP"]];
+  const totalCards = [[state.position, "Map"], [openedTownBuildings().length, "建物"], [streak(), "Days"]];
+  const todayText = result ? result.title : "まだ今日の成果は確定していません。歩行後に安全停止し、イマソラ認識を確認すると、ここに進行内容がまとまります。";
   if (!result) {
     box.innerHTML = `
       <b>今日の成果ボード</b>
-      <span>まだ今日の成果は確定していません。歩行後に安全停止し、イマソラ認識を確認すると、ここに進行内容がまとまります。</span>
+      <span>${todayText}</span>
+      <strong class="result-section-title">今日の成果</strong>
       <div class="result-grid">
-        ${[["0", "Map"], ["0", "Coin"], ["0", "Monster XP"], ["0", "Town"]].map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+        ${todayCards.map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+      </div>
+      <strong class="result-section-title">総合記録</strong>
+      <div class="result-grid total-record">
+        ${totalCards.map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+      </div>
+      <strong class="result-section-title">所持コイン</strong>
+      <div class="result-grid coin-balance">
+        <div class="result-card"><strong>${state.coin}</strong><small>Coin</small></div>
       </div>
     `;
     return;
   }
-  const cards = [
-    [`+${result.map}`, "Map"],
-    [`+${result.coin}`, "Coin"],
-    [`+${result.xp}`, "Monster XP"],
-    [`+${result.town}`, "Town"]
-  ];
   box.innerHTML = `
     <b>今日の成果ボード</b>
-    <span>${result.title}</span>
+    <span>${todayText}</span>
+    <strong class="result-section-title">今日の成果</strong>
     <div class="result-grid">
-      ${cards.map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+      ${todayCards.map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+    </div>
+    <strong class="result-section-title">総合記録</strong>
+    <div class="result-grid total-record">
+      ${totalCards.map(([value, label]) => `<div class="result-card"><strong>${value}</strong><small>${label}</small></div>`).join("")}
+    </div>
+    <strong class="result-section-title">所持コイン</strong>
+    <div class="result-grid coin-balance">
+      <div class="result-card"><strong>${state.coin}</strong><small>Coin</small></div>
     </div>
     <div class="result-note">
       ${result.notes.length ? result.notes.map(note => `<span>${note}</span>`).join("") : `<span>今日の散歩成果が記録されました。</span>`}
@@ -32437,16 +32567,16 @@ function todayGuideActions() {
   }
   if (preview === "shop") {
     return [
-      { mark: "店", title: "小さな店を見る", text: "Town 3以降に日替わり3品、1日2個まで買える想定です。", action: "town", button: "店を見る" },
+      { mark: "店", title: "小さな店を見る", text: "小さな店を素材で建てると、日替わり3品を買える想定です。", action: "town", button: "店を見る" },
       { mark: "道具", title: "買った道具を使う", text: "買い物後は育成アイテム画面で使い道を確認します。", action: "items", button: "アイテムを見る" },
       { mark: "散歩", title: "次の散歩につなげる", text: "買い物だけで終わらず、散歩したくなる導線にします。", action: "walk", button: "散歩へ戻る" }
     ];
   }
   if (preview === "battlePending") {
     return [
-      { mark: "大会", title: "大会戦を観戦する", text: "参加準備中の大会戦を観戦する想定です。戦闘画面に入ってから即結果も選べます。", action: "monster", button: "大会を見る" },
+      { mark: "大会", title: "大会画面を見る", text: "参加準備中の大会画面を確認する想定です。戦闘画面に入ってから即結果も選べます。", action: "monster", button: "大会を見る" },
       { mark: "道具", title: "大会補助を確認", text: "大会用アイテムがある時は、次の1試合だけ小さく補助します。", action: "items", button: "アイテムを見る" },
-      { mark: "町", title: "大会記念を見る", text: "勝っても負けても、町や記録へつながる導線を確認します。", action: "town", button: "町を見る" }
+      { mark: "町", title: "町と図鑑を見る", text: "勝っても負けても、町の建物や図鑑へつながる導線を確認します。", action: "town", button: "町を見る" }
     ];
   }
   if (preview === "battleReady") {
@@ -32462,13 +32592,13 @@ function todayGuideActions() {
   const selectedCupEntry = tournaments.find(item => item.id === selectedCup) || tournaments[0];
   const itemTotal = state.inventory.length;
   const pendingNotes = pendingItemEffectText();
-  const shopOpen = state.town >= 3;
+  const shopOpen = isTownBuildingBuilt("shop");
   const shopBuysLeft = Math.max(0, 2 - todayShopPurchases().length);
   const shopStock = shopOpen ? dailyShopItems() : [];
   const minShopCost = shopStock.length ? Math.min(...shopStock.map(itemCost)) : 0;
   if (state.pendingBattle) {
     const cup = tournaments.find(item => item.id === state.pendingBattle.cupId) || selectedCupEntry;
-    actions.push({ mark: "大会", title: "大会戦を観戦する", text: `${cup.name}に参加準備中。試合を観戦してから結果確認できます。`, action: "monster", button: "大会を見る" });
+    actions.push({ mark: "大会", title: "大会画面を見る", text: `${cup.name}に参加準備中。試合画面から結果確認できます。`, action: "monster", button: "大会を見る" });
   }
   if (itemTotal > 0 && !pendingNotes.length) {
     actions.push({ mark: "道具", title: "アイテムを選ぶ", text: `持ち物が${itemTotal}個あります。散歩前や大会前に小さく準備できます。`, action: "items", button: "アイテムを見る" });
@@ -32547,7 +32677,7 @@ function handleGuideAction(action) {
     return;
   }
   switchScreen("walk");
-  document.getElementById("dailyProgress")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function renderMap() {
   const map = document.getElementById("map");
@@ -32555,20 +32685,14 @@ function renderMap() {
   const timeNote = document.querySelector(".map-time-note");
   const mapWrap = map?.closest(".map-wrap");
   if (!map) return;
-  if (!isMapPlaytime()) {
-    map.innerHTML = "";
-    if (counter) counter.innerHTML = "";
-    if (mapWrap) mapWrap.hidden = true;
-    if (timeNote) {
-      timeNote.classList.add("closed");
-      timeNote.textContent = "マップ進行は06:00〜19:00のみです。時間外は25マスマップを表示しません。夜遅い時間に外へ出ず、次は朝6時から安全に進めましょう。";
-    }
-    return;
-  }
   if (mapWrap) mapWrap.hidden = false;
+  map.classList.toggle("closed", !isMapPlaytime());
   if (timeNote) {
-    timeNote.classList.remove("closed");
-    timeNote.textContent = "マップ進行は06:00〜19:00のみ";
+    const closed = !isMapPlaytime();
+    timeNote.classList.toggle("closed", closed);
+    timeNote.textContent = closed
+      ? "マップ進行は06:00〜19:00のみです。時間外は進行できません。夜遅い外出はしないようにしましょう。"
+      : "マップ進行は06:00〜19:00のみ";
   }
   const start = Math.floor(state.position / 25) * 25;
   map.innerHTML = Array.from({ length: 25 }, (_, index) => {
@@ -32603,16 +32727,36 @@ function nextSkyRequiredMapDistance() {
 function renderMapSkyCounter() {
   const box = document.getElementById("mapSkyCounter");
   if (!box) return;
+  if (!isMapPlaytime()) {
+    box.classList.add("closed");
+    box.innerHTML = `<span>マップ進行は06:00〜19:00のみです。時間外は進行できません。夜遅い外出はしないようにしましょう。</span><button class="secondary" type="button" onclick="returnHomeFromMapClosedCounter()">ホームへ戻る</button>`;
+    return;
+  }
+  box.classList.remove("closed");
+  const actions = isMapPlaytime() ? `<div class="actions"><button class="secondary" type="button" onclick="openItemBoxFromMapCounter()">アイテム</button><button class="secondary" type="button" onclick="openStampRallyFromMapCounter()">スタンプラリー</button><button class="secondary" type="button" onclick="returnHomeFromMapClosedCounter()">ホームへ戻る</button></div>` : "";
   const next = nextSkyRequiredMapDistance();
   if (!next) {
-    box.innerHTML = `次のイマソラ認識まであと--歩<small>進化マスまたはタネ召喚を探索中</small>`;
+    box.innerHTML = `次のイマソラ認識まであと--歩<small>進化マスまたはタネ召喚を探索中</small>${actions}`;
     return;
   }
   if (next.waiting) {
-    box.innerHTML = `${next.tile.name}でイマソラ認識待ち<small>安全な場所で空を確認すると先へ進めます</small>`;
+    box.innerHTML = `${next.tile.name}でイマソラ認識待ち<small>安全な場所で空を確認すると先へ進めます</small>${actions}`;
     return;
   }
-  box.innerHTML = `次のイマソラ認識まであと${next.steps}歩<small>${next.tile.name}まであと${next.tiles}マス</small>`;
+  box.innerHTML = `次のイマソラ認識まであと${next.steps}歩<small>${next.tile.name}まであと${next.tiles}マス</small>${actions}`;
+}
+function openItemBoxFromMapCounter() {
+  switchScreen("monster");
+  openMonsterSubpage(null, "itemBoxPage");
+  document.getElementById("itemBox")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function openStampRallyFromMapCounter() {
+  switchScreen("walk");
+  document.getElementById("stampView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function returnHomeFromMapClosedCounter() {
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function mapCurrentHeroTokenArt() {
   const tokenName = "白ミチリオードセイバーシンラ";
@@ -32631,49 +32775,57 @@ function mapCurrentHeroTokenArt() {
   return `<span class="hero-token" aria-label="現在地: ${tokenName}"><span class="map-hero-art">${art}</span><i></i></span>`;
 }
 function renderTown() {
-  document.getElementById("townView").innerHTML = buildings.map(([id, mark, name, need, effect]) => `
-    <div class="building ${state.town >= need ? "open" : ""}" title="${effect}">
+  document.getElementById("townView").innerHTML = buildings.map(([id, mark, name, need, effect]) => {
+    const built = isTownBuildingBuilt(id);
+    return `
+    <div class="building ${built ? "open" : ""}" title="${effect}">
       <span>${name}</span>
-      <small>${state.town >= need ? effect : `Town ${need}`}</small>
+      <small>${built ? effect : townBuildingCostText(id)}</small>
     </div>
-  `).join("");
+  `;
+  }).join("");
   renderTownWorkshop();
   renderTownShop();
-  renderTownQuestBoard();
-  renderTownMemory();
 }
-function totalTownPieces() {
-  return Object.values(state.skyStock.townPieces || {}).reduce((sum, count) => sum + Number(count || 0), 0);
+function townMaterialCount(name) {
+  return Number(state.skyStock.materials?.[name] || 0);
+}
+function townBuildingCostEntries(id) {
+  return Object.entries(townBuildingCosts[id] || {});
+}
+function townBuildingCostText(id) {
+  const entries = townBuildingCostEntries(id);
+  return entries.length ? entries.map(([name, count]) => `${name}${count}`).join(" / ") : "素材なし";
+}
+function canBuildTownBuilding(id) {
+  return townBuildingCostEntries(id).every(([name, count]) => townMaterialCount(name) >= Number(count || 0));
+}
+function isTownBuildingBuilt(id) {
+  return state.townBuildings.includes(id);
 }
 function nextTownBuilding() {
-  return buildings.find(([, , , need]) => state.town < need) || buildings[buildings.length - 1];
+  return buildings.find(([id]) => !isTownBuildingBuilt(id)) || null;
 }
 function openedTownBuildings() {
-  return buildings.filter(([, , , need]) => state.town >= need);
-}
-function availableTownQuests() {
-  return townQuestCatalog.filter(quest => state.town >= quest.need);
-}
-function nextTownQuest() {
-  const quests = availableTownQuests();
-  if (!quests.length) return null;
-  return quests[state.position % quests.length];
-}
-function completedTownQuest() {
-  const quest = nextTownQuest();
-  if (!quest) return null;
-  const hits = quest.picks.filter(id => selected.includes(id));
-  if (hits.length < quest.required) return null;
-  return { ...quest, hits };
+  return buildings.filter(([id]) => isTownBuildingBuilt(id));
 }
 function itemCost(item) {
+  if (item?.id === "map-snack") return 5;
+  if (["leaf-compass", "sky-feather", "river-shell"].includes(item?.id)) return 10;
   const base = { "散歩": 12, "育成": 14, "進化": 18, "大会": 16, "引退": 22 };
   return base[item.type] || 15;
 }
+function shopDayIndex() {
+  const [year, month, day] = todayKey().split("-").map(Number);
+  return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+}
 function dailyShopItems() {
-  const seed = todayKey().split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) + state.town;
-  const pool = supportItems.filter(item => item.id !== "life-bell" || state.town >= 6);
-  return [0, 1, 2].map(index => pool[(seed + index * 5) % pool.length]);
+  const day = shopDayIndex();
+  const fixed = supportItems.find(item => item.id === "nap-blanket");
+  const walkItem = supportItems.find(item => item.id === (day % 2 === 0 ? "walk-shoes" : "map-snack"));
+  const evolutionIds = ["leaf-compass", "sky-feather", "river-shell"];
+  const evolutionItem = supportItems.find(item => item.id === evolutionIds[day % evolutionIds.length]);
+  return [fixed, walkItem, evolutionItem].filter(Boolean);
 }
 function todayShopPurchases() {
   return state.shopPurchases.filter(item => item.date === todayKey());
@@ -32681,31 +32833,31 @@ function todayShopPurchases() {
 function renderTownShop() {
   const box = document.getElementById("townShop");
   if (!box) return;
-  const shopOpen = state.town >= 3;
+  const shopOpen = isTownBuildingBuilt("shop");
   const purchases = todayShopPurchases();
-  const buyLimit = 2;
+  const buyLimit = 3;
   if (!shopOpen) {
-    box.innerHTML = `<b>小さな店</b><span>Town 3で開きます。散歩とイマソラ認識で町のかけらを使うと、育成アイテムを少し選んで買えるようになります。</span><div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>小さな店が開くと、日替わりで3つの道具が並びます。</span><small>Town 3</small></div></div></div>`;
+    box.innerHTML = `<b>小さな店</b><span>小さな店を素材で建てると開きます。必要素材: ${townBuildingCostText("shop")}</span><div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>小さな店が開くと、日替わりで3つの道具が並びます。</span><small>${townBuildingCostText("shop")}</small></div></div></div>`;
     return;
   }
   const stock = dailyShopItems();
   box.innerHTML = `
     <b>小さな店</b>
-    <span>毎日3つだけ並ぶ道具屋です。買えるのは1日${buyLimit}個まで。Coinの使い道を作りつつ、買い物だけで強くなりすぎないようにします。</span>
+    <span>毎日3つだけ並ぶ道具屋です。ひだまり毛布は毎日、散歩アイテムは日替わり、進化アイテムは3日ごとの順番で並びます。買えるのは、それぞれ1日${buyLimit}個までです。</span>
     <div class="shop-grid">
       ${stock.map(item => {
         const cost = itemCost(item);
-        const bought = purchases.some(entry => entry.id === item.id);
-        const soldOut = bought || purchases.length >= buyLimit;
+        const boughtCount = purchases.filter(entry => entry.id === item.id).length;
+        const soldOut = boughtCount >= buyLimit;
         const canBuy = state.coin >= cost && !soldOut;
         return `<div class="shop-card ${soldOut ? "locked" : ""}" style="--item-color:${item.color}">
           ${itemArt(item)}
           <div>
             <strong>${item.name}</strong>
             <span>${item.text}</span>
-            <small>${item.sub} / ${cost} Coin</small>
+            <small>${item.sub} / ${cost} Coin / 本日 ${boughtCount}/${buyLimit}</small>
           </div>
-          <button type="button" data-shop-buy="${item.id}" ${canBuy ? "" : "disabled"}>${bought ? "購入済み" : purchases.length >= buyLimit ? "本日終了" : state.coin < cost ? "Coin不足" : "買う"}</button>
+          <button type="button" data-shop-buy="${item.id}" ${canBuy ? "" : "disabled"}>${soldOut ? "売り切れ" : state.coin < cost ? "Coin不足" : "買う"}</button>
         </div>`;
       }).join("")}
     </div>`;
@@ -32716,9 +32868,10 @@ function buyShopItem(itemId) {
   if (!item) return;
   const purchases = todayShopPurchases();
   const cost = itemCost(item);
-  if (purchases.length >= 2 || purchases.some(entry => entry.id === item.id)) {
+  const boughtCount = purchases.filter(entry => entry.id === item.id).length;
+  if (boughtCount >= 3) {
     playSfx("error");
-    toast("今日はここまで");
+    toast(`${item.name}は売り切れです`);
     return;
   }
   if (state.coin < cost) {
@@ -32737,141 +32890,76 @@ function buyShopItem(itemId) {
   if (!playAudioSfx(shopPurchaseSfxFileKey, 0, .95)) playSfx("itemGet");
   toast(`${item.name}を購入`);
 }
-function renderTownQuestBoard() {
-  const available = availableTownQuests();
-  const nextLocked = townQuestCatalog.find(quest => state.town < quest.need);
-  const items = available.length ? available.slice(-4).reverse() : [];
-  document.getElementById("townQuestBoard").innerHTML = `
-    <b>町クエスト掲示板</b>
-    <span>開いた建物から、次の散歩で狙う空の気配が届きます。自宅では確認だけ、達成記録は散歩後のイマソラ認識で行います。</span>
-    <div class="town-quest-list">
-      ${items.length ? items.map(quest => `
-        <div class="town-quest-card">
-          <strong>${quest.mark} ${quest.title}</strong>
-          <span>${quest.target}</span>
-          <small>${quest.reward}</small>
-        </div>
-      `).join("") : `
-        <div class="town-quest-card locked">
-          <strong>町からの依頼待ち</strong>
-          <span>Town 1でベンチが開くと、散歩後の小さな依頼が届きます。</span>
-          <small>町のかけらを使う</small>
-        </div>
-      `}
-      ${nextLocked ? `
-        <div class="town-quest-card locked">
-          <strong>${nextLocked.mark} 次の依頼枠</strong>
-          <span>${nextLocked.title} / Town ${nextLocked.need}で開放</span>
-          <small>${nextLocked.reward}</small>
-        </div>
-      ` : ""}
-    </div>
-  `;
-}
-function renderTownMemory() {
-  const opened = openedTownBuildings();
-  const latest = opened[opened.length - 1];
-  const next = buildings.find(([, , , need]) => state.town < need);
-  const museumOpen = state.town >= 42;
-  const whiteOpen = isWhiteSeedUnlocked();
-  const visible = [
-    ...opened.slice(-4).reverse(),
-    ...(next ? [next] : [])
-  ];
-  const uniqueVisible = visible.filter((item, index, list) => list.findIndex(other => other[0] === item[0]) === index);
-  document.getElementById("townMemory").innerHTML = `
-    <b>町の記念帳</b>
-    <span>散歩とイマソラ認識で育った町の記録です。強さの上乗せではなく、建物、称号、思い出として残します。通常タネはタネ召喚で獲得します。</span>
-      <div class="memory-summary">
-        <div><strong>開いた建物</strong><small>${opened.length}/${buildings.length}</small></div>
-        <div><strong>町の最新記念</strong><small>${latest ? latest[2] : "準備中"}</small></div>
-        <div><strong>相棒の記念</strong><small>${whiteOpen ? "白星記念碑" : museumOpen ? "記念館OK" : "Town 42"}</small></div>
-      </div>
-    <div class="memory-grid">
-      ${uniqueVisible.length ? uniqueVisible.map(([id, mark, name, need, effect]) => {
-        const open = state.town >= need;
-        const current = latest && latest[0] === id;
-        return `
-          <div class="memory-card ${open ? "" : "locked"} ${current ? "current" : ""}">
-            <strong>${mark} ${name}</strong>
-            <span>${open ? effect : `Town ${need}で町の記念に追加`}</span>
-            <small>${open ? current ? "最新の記念" : "記念済み" : "これから"}</small>
-          </div>
-        `;
-      }).join("") : `
-        <div class="memory-card locked">
-          <strong>B ベンチ</strong>
-          <span>町のかけらを使うと、最初の散歩記念が町に残ります。</span>
-          <small>Town 1</small>
-        </div>
-      `}
-      <div class="memory-card ${museumOpen ? "current" : "locked"}">
-        <strong>Z 相棒の思い出棚</strong>
-        <span>${museumOpen ? "引退準備を迎えた相棒の称号、見た目、思い出を前向きな記念として飾れます。" : "記念館が開くと、育てた相棒との思い出を町に飾る構想です。"}</span>
-        <small>${museumOpen ? "準備OK" : "記念館で開放"}</small>
-      </div>
-      <div class="memory-card ${whiteOpen ? "current" : "locked"}">
-        <strong>☆ 白星記念碑</strong>
-        <span>${whiteOpen ? "グランドチャンピオン杯を制した相棒と、白星のタネが町の特別な記念として残ります。" : "グランドチャンピオン杯を制すると、白星のタネと一緒に町へ特別な記念碑が建ちます。"}</span>
-        <small>${whiteOpen ? "白星記念" : "GC杯優勝で開放"}</small>
-      </div>
-    </div>
-  `;
+function openTownShopFromItems() {
+  switchScreen("town");
+  renderTown();
+  document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("小さな店へ移動しました");
 }
 function renderTownWorkshop() {
-  const total = totalTownPieces();
-  const next = nextTownBuilding();
-  const nextNeed = next ? next[3] : state.town;
-  const remain = Math.max(0, nextNeed - state.town);
-  const progress = nextNeed ? Math.min(100, Math.round((state.town / nextNeed) * 100)) : 100;
   const opened = openedTownBuildings();
   const latest = opened[opened.length - 1];
+  const unbuilt = buildings.filter(([id]) => !isTownBuildingBuilt(id));
   document.getElementById("townWorkshop").innerHTML = `
     <b>町づくり工房</b>
-    <span>イマソラ認識で集めた町のかけらを使って、町の発展を少し進めます。自宅でも確認できます。</span>
-    <div class="workshop-meter"><i style="--w:${progress}%"></i></div>
+    <span>散歩で集めた素材を使って、建物を一つずつ直接作ります。素材がそろっても自動では建たず、建設するボタンを押して形にします。</span>
     <div class="workshop-status">
-      <div><strong>町のかけら</strong><small>${total}個</small></div>
-      <div><strong>Town</strong><small>${state.town}</small></div>
-      <div><strong>次の建物</strong><small>${next ? `${next[2]} あと${remain}` : "完成"}</small></div>
+      <div><strong>建築済み</strong><small>${opened.length}/${buildings.length}</small></div>
+      <div><strong>草</strong><small>${townMaterialCount("草の素材")}</small></div>
+      <div><strong>木</strong><small>${townMaterialCount("木の素材")}</small></div>
+      <div><strong>鉄</strong><small>${townMaterialCount("鉄の素材")}</small></div>
     </div>
     <div class="workshop-effects">
       <div class="workshop-effect"><strong>最近開いた建物</strong><span>${latest ? `${latest[2]}: ${latest[4]}` : "まだ建物はありません"}</span></div>
-      <div class="workshop-effect"><strong>次に開く効果</strong><span>${next ? `${next[2]}: ${next[4]}` : "町の主要施設は完成。次は記念や見た目の強化候補です。"}</span></div>
+      <div class="workshop-effect"><strong>素材ストック</strong><span>草${townMaterialCount("草の素材")} / 木${townMaterialCount("木の素材")} / 灯り${townMaterialCount("灯りの素材")} / 土${townMaterialCount("土の素材")} / 雲${townMaterialCount("雲の素材")} / 鉄${townMaterialCount("鉄の素材")}</span></div>
     </div>
-    <div class="actions">
-      <button class="secondary" id="buildTownBtn" type="button">町のかけらを使う</button>
+    <div class="town-quest-list">
+      ${unbuilt.length ? unbuilt.map(([id, mark, name, need, effect]) => {
+        const canBuild = canBuildTownBuilding(id);
+        return `<div class="town-quest-card ${canBuild ? "" : "locked"}">
+          <strong>${mark} ${name}</strong>
+          <span>${effect}</span>
+          <small>${townBuildingCostText(id)}</small>
+          <button type="button" data-town-build="${id}" ${canBuild ? "" : "disabled"}>${canBuild ? "建設する" : "素材不足"}</button>
+        </div>`;
+      }).join("") : `
+        <div class="town-quest-card">
+          <strong>町づくり完了</strong>
+          <span>現在用意されている建物はすべて建築済みです。</span>
+          <small>追加建物は今後の拡張候補</small>
+        </div>
+      `}
     </div>
   `;
-  document.getElementById("buildTownBtn").addEventListener("click", buildTownWithPiece);
+  document.querySelectorAll("[data-town-build]").forEach(button => button.addEventListener("click", () => buildTownBuilding(button.dataset.townBuild)));
 }
-function spendOneTownPiece() {
-  const entries = Object.entries(state.skyStock.townPieces || {}).filter(([, count]) => Number(count || 0) > 0);
-  if (!entries.length) return "";
-  const [name] = entries[0];
-  state.skyStock.townPieces[name] -= 1;
-  if (state.skyStock.townPieces[name] <= 0) delete state.skyStock.townPieces[name];
-  return name;
+function spendTownBuildingMaterials(id) {
+  if (!canBuildTownBuilding(id)) return false;
+  townBuildingCostEntries(id).forEach(([name, count]) => {
+    state.skyStock.materials[name] = Math.max(0, townMaterialCount(name) - Number(count || 0));
+    if (state.skyStock.materials[name] <= 0) delete state.skyStock.materials[name];
+  });
+  return true;
 }
-function buildTownWithPiece() {
-  const used = spendOneTownPiece();
-  if (!used) {
+function buildTownBuilding(id) {
+  const building = buildings.find(([buildingId]) => buildingId === id);
+  if (!building || isTownBuildingBuilt(id)) return;
+  if (!spendTownBuildingMaterials(id)) {
     playSfx("error");
-    toast("町のかけらが必要");
+    toast("素材が足りません");
     return;
   }
   playSfx("itemUse");
-  const beforeOpened = openedTownBuildings().length;
-  state.town += 1;
-  const afterOpened = openedTownBuildings();
-  const opened = afterOpened.length > beforeOpened ? afterOpened[afterOpened.length - 1] : null;
-  addLog(`町づくり工房: ${used}を使って町が少し発展した。Town +1${opened ? ` / ${opened[2]}が開放` : ""}`);
+  state.townBuildings.push(id);
+  const [, mark, name, , effect] = building;
+  addLog(`町づくり工房: 素材を使って${name}を建てた。${effect}`);
   saveState();
   renderHud();
   renderTown();
   renderSkySummon();
-  if (opened) showReward(opened[1], "建物開放", `${opened[2]}: ${opened[4]}`);
-  toast(opened ? `${opened[2]} 開放` : "町が発展");
+  showReward(mark, "建物完成", `${name}: ${effect}`);
+  toast(`${name} 完成`);
 }
 function renderStamps() {
   document.getElementById("stampView").innerHTML = stampCatalog.map(([mark, name]) => `
@@ -32897,8 +32985,8 @@ function monsterProfile() {
     "seed-white": "メバノコ"
   };
   const white = seed.id === "seed-white";
-  const whiteName = name => white ? `白星${name}` : name;
-  const whiteText = white ? "白星のタネから育つ特別版。体色だけが白く、目・手・足・ソラ玉・装飾は元の色を保つ。" : "";
+  const whiteName = name => white ? `白${name}` : name;
+  const whiteText = white ? "白のタネから育つ特別版。体色だけが白く、目・手・足・ソラ玉・装飾は元の色を保つ。" : "";
   if (effectiveStageIndex === 0) return { id: seed.id, name: seed.name, text: `${stage}。${seed.text}。タネを使うとすぐめばえ期へ進みます。${whiteText}`, form: "seed", stage, power: Math.max(1, m.xp), white };
   if (effectiveStageIndex === 1) return { id: `sprout-${seed.id}`, name: whiteName(sproutBaseNames[seed.id] || "ミチメバ"), text: `${stage}。めばえ期になってから、進化マスでイマソラ認証すると若旅期へ進みます。${whiteText}`, form: "sprout", stage, power: m.xp + 2, white };
   if (effectiveStageIndex === 2) {
@@ -33064,7 +33152,7 @@ function isRetirementReady() {
   return retirementRemainingHours() <= 0;
 }
 function isRetirementExtensionItem(item) {
-  return item && ["rest", "memory", "life"].includes(item.use);
+  return item && item.use === "rest";
 }
 function retirementTimeText(hours = retirementRemainingHours()) {
   if (hours <= 0) return "引退準備中";
@@ -33092,8 +33180,12 @@ function mapActiveDayKey(now = new Date()) {
   return mapActiveDayDate(now).toLocaleDateString("sv-SE");
 }
 function isMapPlaytime(now = new Date()) {
+  if (state.playtestMapTimeMode === "open") return true;
   const hour = now.getHours();
   return hour >= 6 && hour < 19;
+}
+function isHomeOutsideHours(now = new Date()) {
+  return Boolean(state.playtestOutsideHoursHomeMode) || !isMapPlaytime(now);
 }
 function mapClosedText() {
   return "19時を過ぎたため、今日のマップ進行は締切です。次は朝6時に出発マスから始まります。";
@@ -33137,8 +33229,7 @@ function mapTileForPosition(position = state.position) {
   return { ...terrain, type: "walk" };
 }
 function giveMapTreasureItem() {
-  const ids = ["growth-seed", "nap-blanket", "leaf-compass", "city-charm", "sky-feather", "river-shell", "focus-ramune"];
-  const pool = supportItems.filter(item => ids.includes(item.id));
+  const pool = supportItems;
   const item = pool[Math.floor(Math.random() * pool.length)] || supportItems[0];
   state.inventory.unshift({ id: item.id, at: Date.now(), reason: "宝箱マス" });
   state.inventory = state.inventory.slice(0, 40);
@@ -33184,6 +33275,15 @@ function applyMapTileReward(position = state.position, source = "散歩") {
     addMapStamp("進", "進化マス");
     addLog(`${source}: 進化マスに到着。ここでイマソラ認証すると次の成長段階へ進化できる。`);
     return { title: "進化マス", text: "イマソラ認証で進化", mark: "進" };
+  }
+  if (tile.type === "walk") {
+    const reward = mapTerrainRewards[tile.name];
+    if (!reward) return null;
+    state.skyStock.materials[reward.material] = Number(state.skyStock.materials[reward.material] || 0) + 1;
+    if (reward.xp) state.monster.xp += reward.xp;
+    addMapStamp(reward.mark, tile.name);
+    addLog(`${source}: ${tile.name}を通過。${reward.text}を獲得。`);
+    return { title: tile.name, text: reward.text, mark: reward.mark };
   }
   return null;
 }
@@ -33232,17 +33332,15 @@ function advanceMap(count = 1, source = "散歩") {
   return { latestReward, moved, stoppedForSky };
 }
 function supportItemPool(reason = "", bias = "") {
-  const allowed = supportItems.filter(item => item.id !== "life-bell" || state.town >= 6);
+  const allowed = supportItems;
   const typeWeights = {
-    "イマソラ召喚": { "散歩": 4, "育成": 3, "進化": 2, "大会": 1, "引退": 1 },
-    "散歩発見": { "散歩": 4, "育成": 2, "進化": 2, "大会": 1, "引退": 1 },
-    "町依頼": { "散歩": 2, "育成": 3, "進化": 2, "大会": 2, "引退": 1 }
+    "散歩発見": { "散歩": 4, "育成": 2, "進化": 2, "大会": 1, "引退": 1 }
   };
   const weights = typeWeights[reason] || { "散歩": 2, "育成": 2, "進化": 2, "大会": 2, "引退": 1 };
   const biasIds = {
-    sky: ["sky-charm", "wind-pin", "walk-shoes"],
+    sky: ["sky-feather", "wind-pin", "walk-shoes"],
     nature: ["leaf-compass", "river-shell", "growth-seed"],
-    city: ["city-charm", "guard-tape", "map-snack"]
+    city: ["guard-tape", "map-snack"]
   };
   return allowed.flatMap(item => {
     let weight = weights[item.type] || 1;
@@ -33257,12 +33355,7 @@ function giveSupportItem(reason = "", bias = "") {
   state.inventory = state.inventory.slice(0, 40);
   return item;
 }
-function maybeGiveTownQuestItem(quest) {
-  if (!quest) return null;
-  const shouldGive = quest.building === "shop" || quest.building === "guild" || selected.length >= 4;
-  if (!shouldGive) return null;
-  return giveSupportItem("町依頼", quest.bias);
-}function autoEnterGrandChampion() {
+function autoEnterGrandChampion() {
   if (hasGrandQualification()) state.monster.grandQualified = true;
 }
 function monsterStats() {
@@ -33493,8 +33586,11 @@ function retirementGuideBackArtHtml() {
 function retirementAbilityTotal(stats = monsterStats()) {
   return Object.values(stats).reduce((sum, value) => sum + value, 0);
 }
-function retirementRankInfo(total) {
-  if (total >= 260) return { rank: "S", label: "街の主役級", detail: "ゲームセンターでしっかり有利になる見込みです。" };
+function hasGrandChampionVictory() {
+  return Boolean(state.cups?.includes("grand") || state.whiteSeedUnlocked);
+}
+function retirementRankInfo(total, grandChampionWon = hasGrandChampionVictory()) {
+  if (total >= 260 && grandChampionWon) return { rank: "S", label: "街の主役級", detail: "グランドチャンピオン杯を制した最高記録です。" };
   if (total >= 220) return { rank: "A", label: "頼れる相棒", detail: "高い力を残して街へ向かえる見込みです。" };
   if (total >= 180) return { rank: "B", label: "育った証あり", detail: "歩いて育てた実感が残る見込みです。" };
   if (total >= 140) return { rank: "C", label: "思い出の相棒", detail: "街でまた遊べる力を残せる見込みです。" };
@@ -33581,7 +33677,8 @@ function createRetirementRecord() {
   const growth = growthForecast();
   const stats = monsterStats();
   const total = retirementAbilityTotal(stats);
-  const rank = retirementRankInfo(total);
+  const grandChampionWon = hasGrandChampionVictory();
+  const rank = retirementRankInfo(total, grandChampionWon);
   const item = currentCompanionArtItem(profile, growth);
   return {
     id: `retired-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -33592,6 +33689,7 @@ function createRetirementRecord() {
     rank: rank.rank,
     rankLabel: rank.label,
     abilityTotal: total,
+    grandChampionWon,
     retiredAt: retirementDateText(),
     usedCount: 0,
     monster: JSON.parse(JSON.stringify(state.monster)),
@@ -33714,7 +33812,7 @@ function replayRetirementSendoffFromStart() {
 }
 function finalizeRetirementSendoffFromTopButton() {
   stopBgm();
-  startBgm("normal");
+  syncHomeBgmMode();
   finalizeRetirementAfterCeremony();
 }
 function clearRetirementSendoffTimers() {
@@ -33886,7 +33984,7 @@ function renderRetirementFinalConfirm() {
   const growth = growthForecast();
   const stats = monsterStats();
   const total = retirementAbilityTotal(stats);
-  const rank = retirementRankInfo(total);
+  const rank = retirementRankInfo(total, hasGrandChampionVictory());
   const name = companionDisplayName(profile);
   box.innerHTML = `
     <div class="retirement-confirm">
@@ -35496,8 +35594,8 @@ function renderCharacterGallery() {
   const whiteVariantCard = item => ({
     ...item,
     id: item.id.startsWith("hero-") ? item.id.replace(/^hero-/, "hero-white-") : item.id.startsWith("star-") ? item.id.replace(/^star-/, "star-white-") : `white-${item.id}`,
-    name: `白星${item.name}`,
-    note: `グランドチャンピオン杯の優勝賞品「白星のタネ」から育つ特別版。体色だけが白く、体以外の色は元デザインを保つ。`,
+    name: `白${item.name}`,
+    note: `グランドチャンピオン杯の優勝賞品「白のタネ」から育つ特別版。体色だけが白く、体以外の色は元デザインを保つ。`,
     style: whiteBodyStyle(item),
     whiteVariant: true
   });
@@ -35508,15 +35606,15 @@ function renderCharacterGallery() {
   const whiteStarLine = starCards.filter(item => item.id.includes("hero-young-seed-walk-"));
   const whiteStarTurnaroundItems = whiteStarLine.map(whiteVariantCard);
   const whiteGroups = [
-    { stage: "白星タネ期", count: whiteSeedLine.length, list: whiteSeedLine.map(whiteVariantCard) },
-    { stage: "白星めばえ期", count: whiteSproutLine.length, list: whiteSproutLine.map(whiteVariantCard) },
-    { stage: "白星若旅期", count: whiteYoungLine.length, list: whiteYoungLine.map(whiteVariantCard) },
-    { stage: "白星勇旅期", count: whiteHeroLine.length, list: whiteHeroLine.map(whiteVariantCard) },
-    { stage: "白星星旅期", count: whiteStarLine.length, list: whiteStarTurnaroundItems }
+    { stage: "白タネ期", count: whiteSeedLine.length, list: whiteSeedLine.map(whiteVariantCard) },
+    { stage: "白めばえ期", count: whiteSproutLine.length, list: whiteSproutLine.map(whiteVariantCard) },
+    { stage: "白若旅期", count: whiteYoungLine.length, list: whiteYoungLine.map(whiteVariantCard) },
+    { stage: "白勇旅期", count: whiteHeroLine.length, list: whiteHeroLine.map(whiteVariantCard) },
+    { stage: "白の星旅期", count: whiteStarLine.length, list: whiteStarTurnaroundItems }
   ];
   monsterDexGroups = [
     ...groups.map(group => ({ ...group, label: group.stage, dexStage: group.stage })),
-    { stage: "白星", label: "白星", dexStage: "白星", count: whiteGroups.reduce((sum, group) => sum + group.count, 0), list: whiteGroups.flatMap(group => group.list.map(item => ({ ...item, note: `${group.stage} / ${item.note}` }))) }
+    { stage: "白", label: "白", dexStage: "白", count: whiteGroups.reduce((sum, group) => sum + group.count, 0), list: whiteGroups.flatMap(group => group.list.map(item => ({ ...item, note: `${group.stage} / ${item.note}` }))) }
   ];
   const turnaroundCardHtml = item => `<div class="turnaround-card ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}"><strong>${item.name}</strong>${galleryTurnaroundArt(item)}<small>${item.note}</small></div>`;
   const turnaroundItems = heroCards.slice(0, 6);
@@ -35527,7 +35625,7 @@ function renderCharacterGallery() {
   const starTurnaroundHtml = lazyTurnaroundSection("star", "360度確認ラフ 星旅期126種", "星旅期の正面デザインを基準に、8方向の身体・王冠・羽・マントを確認する欄です。開くと描画します。");
   syncStarColorVariantFineAdjustments([...starCards, ...whiteStarTurnaroundItems]);
   if (!box) return;
-  const whiteStarTurnaroundHtml = `<section class="gallery-stage turnaround-stage"><b>360度確認ラフ 白星星旅期18種</b><span>ミチ系で確定した8方向調整を、体色だけ白い白星版にも反映した確認欄です。</span><div data-turnaround-group="star"><div class="turnaround-grid">${whiteStarTurnaroundItems.map(turnaroundCardHtml).join("")}</div></div></section>`;
+  const whiteStarTurnaroundHtml = `<section class="gallery-stage turnaround-stage"><b>360度確認ラフ 白の星旅期18種</b><span>ミチ系で確定した8方向調整を、体色だけ白い白版にも反映した確認欄です。</span><div data-turnaround-group="star"><div class="turnaround-grid">${whiteStarTurnaroundItems.map(turnaroundCardHtml).join("")}</div></div></section>`;
   capeFineReviewItems = starCards;
   capeFineReviewIndex = Math.max(0, Math.min(capeFineReviewIndex, Math.max(0, capeFineReviewItems.length - 1)));
   const capeFineReviewHtml = `<section class="gallery-stage turnaround-stage"><b>星旅期 パーツ微調整確認</b><span>1体ずつ、斜め4方向の手・王冠・羽・マント・紐をマウスだけで微調整します。</span><div id="capeFineReviewPanel"></div></section>`;
@@ -35535,7 +35633,7 @@ function renderCharacterGallery() {
   const lazyGalleryGroups = Object.fromEntries(groups.map((group, index) => [`group-${index}`, group.list]));
   lazyGalleryGroups.white = whiteGroups.flatMap(group => group.list.map(item => ({ ...item, note: `${group.stage} / ${item.note}` })));
   const lazyGallerySection = (key, title, description) => `<section class="gallery-stage"><details data-gallery-group="${key}"><summary><b>${title}</b><span>${description}</span></summary><div class="gallery-grid" data-gallery-target="${key}"></div></details></section>`;
-  const whiteGalleryHtml = lazyGallerySection("white", "グランドチャンピオン杯賞品 白星のタネ系統", "既存キャラの体色だけを白くした特別版です。開くと表示します。");
+  const whiteGalleryHtml = lazyGallerySection("white", "グランドチャンピオン杯賞品 白のタネ系統", "既存キャラの体色だけを白くした特別版です。開くと表示します。");
   const stageGalleryHtml = groups.map((group, index) => lazyGallerySection(`group-${index}`, `${group.stage} ${group.count}種`, "開くと表示します。")).join("");
   box.innerHTML = `
     <div class="gallery-note">確認用ギャラリーです。正式リリース用ではなく、制作者本人が全進化分岐の方向性を確認するための仮デザイン一覧です。重い一覧は見出しを開いた時に表示します。</div>
@@ -35643,12 +35741,12 @@ function renderSeedChoice(profile) {
   const locked = profile.stage !== "タネ期";
   box.innerHTML = `
     <b>はじまりのタネ</b>
-    <span>${locked ? "成長後は相棒の記録として表示します。通常タネはタネ召喚、白星のタネはGC杯優勝で開放します。" : "使うタネを選びます。選ぶとすぐめばえ期へ進化します。"}</span>
+    <span>${locked ? "成長後は相棒の記録として表示します。通常タネはタネ召喚、白のタネはGC杯優勝で開放します。" : "使うタネを選びます。選ぶとすぐめばえ期へ進化します。"}</span>
     <div class="seed-list">
       ${seedForms.map(seed => {
         const whiteLocked = seed.id === "seed-white" && !isWhiteSeedUnlocked();
         return `<button class="seed-pick ${state.monster.seedId === seed.id ? "selected" : ""}" type="button" data-seed-pick="${seed.id}" ${(locked || whiteLocked) ? "disabled" : ""}>
-          <strong>${whiteLocked ? "白星のタネ" : seed.name}</strong>
+          <strong>${whiteLocked ? "白のタネ" : seed.name}</strong>
           <small>${whiteLocked ? "グランドチャンピオン杯を制覇すると開放されます。" : seed.text}</small>
         </button>`;
       }).join("")}
@@ -35745,12 +35843,12 @@ function renderRetirementPanel(profile, lifeRemain) {
   box.innerHTML = `
     <b>${ready ? "引退準備中" : "引退準備メモ"}</b>
     <p>${ready
-      ? `${profile.name}は町に残る準備をしています。ここは終わりではなく、町の記念・図鑑の思い出へつながる前向きな節目です。`
-      : `${profile.name}がいつか町に残る時のために、強さの大幅上乗せではなく、思い出や見た目、称号を少しずつ残していきます。${retirementTimeText(lifeRemain)}。`}</p>
+      ? `${profile.name}は街でまた会える相棒として、引退の日へ進む準備をしています。ここは終わりではなく、図鑑や見た目として残る前向きな節目です。`
+      : `${profile.name}がいつか街で暮らす時のために、強さの大幅上乗せではなく、見た目や称号を少しずつ残していきます。${retirementTimeText(lifeRemain)}。`}</p>
     <div class="retirement-grid">
       <div class="retirement-step">
-        <em>町の記念</em>
-        <span>育てた道のりを町の景色や小さな記念物として残します。</span>
+        <em>街で遊ぶ</em>
+        <span>引退後も街で会える相棒として残します。</span>
       </div>
       <div class="retirement-step">
         <em>図鑑の思い出</em>
@@ -35768,7 +35866,7 @@ function renderBattleStage(profile, lifeRemain = 1) {
   field.classList.remove("attack", "lose");
   if (lifeRemain <= 0) {
     field.className = "battle-field resting";
-    field.innerHTML = `<div class="fighter" id="myFighter">${pixelFighter(profile.name, profile.form)}<span class="rest-note">町の記念を準備中。大会より、思い出の入口を整えます。</span></div>`;
+    field.innerHTML = `<div class="fighter" id="myFighter">${pixelFighter(profile.name, profile.form)}<span class="rest-note">引退の日へ進む準備中。大会より、街でまた会う入口を整えます。</span></div>`;
     log.innerHTML = retirementMessage(profile);
     return;
   }
@@ -35799,9 +35897,9 @@ function renderBattleStage(profile, lifeRemain = 1) {
 }
 function retirementMessage(profile) {
   return `<strong>引退準備</strong>
-    <p>${profile.name}は町に残って幸せに暮らしながら、町の記念として残る準備に入りました。</p>
+    <p>${profile.name}は街でまた会える相棒として、引退の日へ進む準備に入りました。</p>
     <div class="retirement-card">
-      <b>町の記念: ${profile.name}の散歩碑</b>
+      <b>${profile.name}とまた街で遊べます</b>
       <span>強さの大幅上乗せではなく、図鑑・称号・見た目・思い出として残る前向きな節目です。通常タネは引退ではなく、25マスマップのタネ召喚で獲得します。</span>
     </div>`;
 }
@@ -36033,7 +36131,7 @@ function renderMedalShelf() {
       }).join("")}
     </div>
     <div class="medal-route">獲得 ${openCount}/${tournaments.length}。四大大会参加券 ${fourMajorTicketCount()}枚。${route}</div>
-    <div class="medal-route">${isWhiteSeedUnlocked() ? "白星のタネ開放済み。体色だけが白い特別版を次のタネ候補にできます。" : "グランドチャンピオン杯を制覇すると、白星のタネが賞品として開放されます。"}</div>`;
+    <div class="medal-route">${isWhiteSeedUnlocked() ? "白のタネ開放済み。体色だけが白い特別版を次のタネ候補にできます。" : "グランドチャンピオン杯を制覇すると、白のタネが賞品として開放されます。"}</div>`;
 }
 function entryPeriod(cup) {
   if (cup.cadence === "daily") return todayKey();
@@ -36322,8 +36420,8 @@ function directionFrameArt(item, direction) {
   const routeMap = renderEvolutionRouteMap();
   const whiteDex = `
     <div class="dex-next white-star-dex">
-      <b>白星図鑑枠</b><br>
-      グランドチャンピオン杯の優勝賞品として、白星のタネ系統を記録できます。体色だけが白い特別版として、白星タネ期1種、白星めばえ期1種、白星若旅期2種、白星勇旅期6種、白星星旅期18種を別枠にまとめています。
+      <b>白図鑑枠</b><br>
+      グランドチャンピオン杯の優勝賞品として、白のタネ系統を記録できます。体色だけが白い特別版として、白タネ期1種、白めばえ期1種、白若旅期2種、白勇旅期6種、白の星旅期18種を別枠にまとめています。
     </div>
   `;
   const directionPlan = renderDirectionPlanPanel();
@@ -36418,13 +36516,36 @@ function removeInventoryItem(itemId) {
   state.inventory.splice(index, 1);
   return true;
 }
+const dailyLimitedItemIds = ["walk-shoes", "map-snack", "growth-seed", "leaf-compass", "sky-feather", "river-shell", "focus-ramune"];
+function ensureDailyItemState() {
+  state.dailyItemUses = state.dailyItemUses && typeof state.dailyItemUses === "object" ? state.dailyItemUses : { date: "", used: [] };
+  if (state.dailyItemUses.date !== todayKey()) state.dailyItemUses = { date: todayKey(), used: [] };
+  state.dailyItemUses.used = Array.isArray(state.dailyItemUses.used) ? state.dailyItemUses.used : [];
+  state.itemEffects = state.itemEffects || { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} };
+  state.itemEffects.daily = state.itemEffects.daily && typeof state.itemEffects.daily === "object" ? state.itemEffects.daily : { date: "", walkXp: 0, walkCoin: 0 };
+  if (state.itemEffects.daily.date !== todayKey()) state.itemEffects.daily = { date: todayKey(), walkXp: 0, walkCoin: 0 };
+  return state.dailyItemUses;
+}
+function isDailyLimitedItem(item) {
+  return Boolean(item && dailyLimitedItemIds.includes(item.id));
+}
+function hasUsedDailyItemToday(itemId) {
+  return ensureDailyItemState().used.includes(itemId);
+}
+function markDailyItemUsed(itemId) {
+  const daily = ensureDailyItemState();
+  if (!daily.used.includes(itemId)) daily.used.push(itemId);
+}
 function pendingItemEffectText() {
+  ensureDailyItemState();
   const effects = state.itemEffects || {};
+  const daily = effects.daily || {};
   const battle = effects.battle || {};
   const notes = [];
+  if (daily.walkXp) notes.push(`今日のイマソラ認識ごとに XP +${daily.walkXp}`);
+  if (daily.walkCoin) notes.push(`今日のイマソラ認識ごとに Coin +${daily.walkCoin}`);
   if (effects.walkXp) notes.push(`次のイマソラ認識 XP +${effects.walkXp}`);
   if (effects.walkCoin) notes.push(`次のイマソラ認識 Coin +${effects.walkCoin}`);
-  if (effects.walkTown) notes.push(`次のイマソラ認識 Town +${effects.walkTown}`);
   if (battle.acc) notes.push(`次の大会 命中 +${battle.acc}`);
   if (battle.def) notes.push(`次の大会 防御 +${battle.def}`);
   if (battle.spd) notes.push(`次の大会 すばやさ +${battle.spd}`);
@@ -36437,33 +36558,41 @@ function useSupportItem(itemId) {
     toast("引退準備中は延命アイテムだけ使えます");
     return;
   }
+  if (isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id)) {
+    playSfx("error");
+    toast(`${item.name}は今日は使用済みです`);
+    return;
+  }
   if (!item || !removeInventoryItem(itemId)) {
     playSfx("error");
     toast("アイテムがありません");
     return;
   }
-  state.itemEffects = state.itemEffects || { walkXp: 0, walkCoin: 0, walkTown: 0, battle: {} };
+  state.itemEffects = state.itemEffects || { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} };
+  ensureDailyItemState();
   state.itemEffects.battle = state.itemEffects.battle || {};
   let message = item.sub;
+  if (item.use === "dailyWalkXp") state.itemEffects.daily.walkXp += 2;
+  if (item.use === "dailyWalkCoin") state.itemEffects.daily.walkCoin += 5;
   if (item.use === "nextWalkXp") state.itemEffects.walkXp += 2;
-  if (item.use === "nextWalkReward") { state.itemEffects.walkCoin += 6; state.itemEffects.walkTown += 1; }
-  if (item.use === "xp") state.monster.xp += 2;
+  if (item.use === "nextWalkReward") state.itemEffects.walkCoin += 6;
+  if (item.use === "xp") state.monster.xp += 3;
   if (item.use === "rest") {
     state.monster.xp += 1;
     if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。XP +1のみ反映";
   }
-  if (item.use === "nature") state.monster.nature += 2;
+  if (item.use === "nature") state.monster.nature += 4;
   if (item.use === "city") state.monster.city += 2;
-  if (item.use === "sky") state.monster.sky += 2;
-  if (item.use === "river") { state.monster.nature += 1; state.monster.sky += 1; }
-  if (item.use === "battleAcc") state.itemEffects.battle.acc = (state.itemEffects.battle.acc || 0) + 2;
-  if (item.use === "battleDef") state.itemEffects.battle.def = (state.itemEffects.battle.def || 0) + 2;
-  if (item.use === "battleSpd") state.itemEffects.battle.spd = (state.itemEffects.battle.spd || 0) + 2;
+  if (item.use === "sky") state.monster.sky += 4;
+  if (item.use === "river") { state.monster.nature += 2; state.monster.sky += 2; }
+  if (item.use === "battleAcc") state.itemEffects.battle.acc = (state.itemEffects.battle.acc || 0) + 10;
+  if (item.use === "battleDef") state.itemEffects.battle.def = (state.itemEffects.battle.def || 0) + 10;
+  if (item.use === "battleSpd") state.itemEffects.battle.spd = (state.itemEffects.battle.spd || 0) + 10;
   if (item.use === "memory") {
-    state.town += 1;
-    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。Town +1のみ反映";
+    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。";
   }
   if (item.use === "life" && !extendRetirementByItem()) message = "延命アイテムは最大5回までです。";
+  if (isDailyLimitedItem(item)) markDailyItemUsed(item.id);
   addLog(`アイテム使用: ${item.name}。${message}`);
   saveState();
   renderAll();
@@ -36480,45 +36609,69 @@ function renderItemGuide() {
     "育成": "日々の成長を少し支える。お世話を増やしすぎず、1日1回の軽さを守ります。",
     "進化": "成長傾向を少し寄せる。固定の正解にならないよう、強制分岐にはしません。",
     "大会": "試合前の小さな準備。次の大会1回だけで消えるので、必須アイテムにはしません。",
-    "引退": "町の記念や思い出を整える。能力値の大幅上乗せには使いません。"
+    "引退": "引退までの時間を少し整える。能力値の大幅上乗せには使いません。"
   };
   const categories = ["散歩", "育成", "進化", "大会", "引退"];
   const totalOwned = state.inventory.length;
   const pendingNotes = pendingItemEffectText();
+  const tab = selectedItemGuideTab === "dex" ? "dex" : "inventory";
+  const itemEntryHtml = (item, mode) => {
+    const count = counts[item.id] || 0;
+    const owned = count > 0;
+    const color = owned ? item.color : "#d8d1c4";
+    const blockedByRetirement = retirementReady && !isRetirementExtensionItem(item);
+    const usedToday = isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id);
+    const canUse = mode === "inventory" && owned && !blockedByRetirement && !usedToday;
+    const status = blockedByRetirement && owned ? "引退準備中は使用×" : usedToday && owned ? `今日は使用済み / x${count}` : owned ? `x${count}` : "未所持";
+    return `<div class="item-entry ${canUse ? "" : "locked"}" style="--item-color:${color}">
+      ${itemArt(item, true)}
+      <div class="item-info">
+        <b>${item.name}</b>
+        <span>${item.text}</span>
+        <em class="item-effect">${item.sub}</em>
+        <small>${status}</small>
+      </div>
+      ${mode === "inventory" ? `<button class="item-use-btn" type="button" data-item-use="${item.id}" ${canUse ? "" : "disabled"}>${blockedByRetirement && owned ? "×" : usedToday && owned ? "済" : "使う"}</button>` : `<button class="item-use-btn" type="button" disabled>${owned ? "所持中" : "未所持"}</button>`}
+    </div>`;
+  };
+  const categoryHtml = categories.map(type => {
+    const categoryItems = supportItems.filter(item => item.type === type);
+    const visibleItems = tab === "inventory" ? categoryItems.filter(item => counts[item.id]) : categoryItems;
+    if (tab === "inventory" && !visibleItems.length) return "";
+    const ownedKinds = categoryItems.filter(item => counts[item.id]).length;
+    return `<div class="item-category">
+      <div class="item-category-title">
+        <b>${type}アイテム</b>
+        <span>${categoryCopy[type]} / 入手 ${ownedKinds}/${categoryItems.length}</span>
+      </div>
+      <div class="item-list">
+        ${visibleItems.map(item => itemEntryHtml(item, tab)).join("")}
+      </div>
+    </div>`;
+  }).filter(Boolean).join("");
   box.className = "item-guide";
   box.innerHTML = `
     <div class="item-guide-head">
-      試作確認のため、未所持アイテムも名前・見た目・効果を表示します。使えるのは所持中のものだけです。持ち物 ${totalOwned}個。
+      ${tab === "inventory" ? `もちものには、今持っている道具だけを表示します。持ち物 ${totalOwned}個。` : `道具図鑑では、未所持を含めて道具の種類と効果を確認できます。使う操作はもちものから行います。`}
+    </div>
+    <div class="item-guide-tabs">
+      <button class="item-guide-tab ${tab === "inventory" ? "active" : ""}" type="button" data-item-tab="inventory">もちもの</button>
+      <button class="item-guide-tab ${tab === "dex" ? "active" : ""}" type="button" data-item-tab="dex">道具図鑑</button>
+    </div>
+    <div class="actions">
+      <button class="secondary" type="button" id="openTownShopFromItemsBtn">小さな店へ行く</button>
     </div>
     <div class="item-effect-panel">${pendingNotes.length ? `予約中: ${pendingNotes.join(" / ")}` : "予約中の効果はありません。アイテム効果は小さく、固定の正解にならない範囲で反映します。"}</div>
-    ${categories.map(type => {
-      const items = supportItems.filter(item => item.type === type);
-      const ownedKinds = items.filter(item => counts[item.id]).length;
-      return `<div class="item-category">
-        <div class="item-category-title">
-          <b>${type}アイテム</b>
-          <span>${categoryCopy[type]} / 入手 ${ownedKinds}/${items.length}</span>
-        </div>
-        <div class="item-list">
-          ${items.map(item => {
-            const count = counts[item.id] || 0;
-            const color = count ? item.color : "#d8d1c4";
-            const blockedByRetirement = retirementReady && !isRetirementExtensionItem(item);
-            return `<div class="item-entry ${count && !blockedByRetirement ? "" : "locked"}" style="--item-color:${color}">
-              ${itemArt(item, true)}
-              <div class="item-info">
-                <b>${item.name}</b>
-                <span>${item.text}</span>
-                <em class="item-effect">${item.sub}</em>
-                <small>${blockedByRetirement ? "引退準備中は使用×" : count ? `x${count}` : "未所持"}</small>
-              </div>
-              <button class="item-use-btn" type="button" data-item-use="${item.id}" ${count && !blockedByRetirement ? "" : "disabled"}>${blockedByRetirement ? "×" : "使う"}</button>
-            </div>`;
-          }).join("")}
-        </div>
-      </div>`;
-    }).join("")}
+    ${categoryHtml || `<div class="item-empty">持っている道具はまだありません。散歩やイマソラ認識、町の店などで道具を入手すると、ここに表示されます。</div>`}
   `;
+  document.getElementById("openTownShopFromItemsBtn")?.addEventListener("click", openTownShopFromItems);
+  document.querySelectorAll("[data-item-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedItemGuideTab = button.dataset.itemTab === "dex" ? "dex" : "inventory";
+      renderItemGuide();
+      playSfx("select");
+    });
+  });
   document.querySelectorAll("[data-item-use]").forEach(button => {
     button.addEventListener("click", () => useSupportItem(button.dataset.itemUse));
   });
@@ -36533,16 +36686,16 @@ function renderSkySummon() {
   });
   renderSkyDetector(current);
   renderSkyResult();
-  renderSkyRewardPanel();
 }
 function renderSkyDetector(current = skyTypes.find(item => item.id === selectedSky) || skyTypes[0]) {
   const chip = document.getElementById("skyDetectorChip");
   const panel = document.getElementById("skyDetectorStatus");
   const session = state.walkSession;
+  const playtime = isMapPlaytime();
   const stopped = session.active && session.stepChecked && session.stopped && !session.blocked;
   const verified = stopped && session.skyVerified;
   const pending = stopped && state.pendingSky;
-  const chipText = verified ? "SKY OK" : pending ? "CHECK" : stopped ? "STOP OK" : session.active ? "WALK" : "READY";
+  const chipText = !playtime ? "CLOSE" : verified ? "SKY OK" : pending ? "CHECK" : stopped ? "STOP OK" : session.active ? "WALK" : "READY";
   const detectorHtml = [
     ["歩行", session.active ? `${session.stepCount || 0}歩 試作` : "未開始"],
     ["停止", stopped ? "安全停止OK" : "停止後に認識"],
@@ -36551,6 +36704,9 @@ function renderSkyDetector(current = skyTypes.find(item => item.id === selectedS
   [[chip, panel], [document.getElementById("walkSkyDetectorChip"), document.getElementById("walkSkyDetectorStatus")]].forEach(([targetChip, targetPanel]) => {
     if (targetChip) targetChip.textContent = chipText;
     if (targetPanel) targetPanel.innerHTML = detectorHtml;
+  });
+  [document.getElementById("skySummonBtn"), document.getElementById("walkSkySummonBtn")].forEach(button => {
+    if (button) button.disabled = !playtime;
   });
 }
 function renderSkyResult() {
@@ -36576,56 +36732,8 @@ function renderSkyResult() {
   }
   const latest = state.skySummons[0];
   setBoxes(latest
-    ? `<strong>${latest.result}</strong><p>${latest.sky}を認識済みです。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。タネ・素材・町のかけらが記録されています。</p>`
+    ? `<strong>${latest.result}</strong><p>${latest.sky}を認識済みです。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。</p>`
     : `<strong>召喚前</strong><p>歩行終了後、安全に立ち止まり、人・私物・建造物が入らない空だけを認識してください。危険な場所や、人の迷惑になる場所でのイマソラ認識は行わないでください。猛暑日や真夏日、体調が悪い日は散歩を控え、暑い日は熱中症対策を優先してください。</p>`);
-}
-function renderSkyRewardPanel() {
-  const latest = state.skySummons[0];
-  const panel = document.getElementById("skyRewardPanel");
-  if (!latest) {
-    panel.innerHTML = `<p class="sky-reward-empty">まだ空報酬はありません。停止後のイマソラ認識で、タネ・素材・町のかけらが記録されます。</p>${skyStockHtml()}`;
-    return;
-  }
-  const rewards = [
-    ["タネ", latest.seed || latest.result || "空のタネ", "新しい相棒や進化候補の入口"],
-    ["素材", latest.material || "空素材", "技や進化傾向に使う育成素材"],
-    ["町のかけら", latest.townPiece || "町のかけら", "町の建物や記念に使う素材"]
-  ];
-  panel.innerHTML = `
-    <div class="sky-reward-grid">
-      ${rewards.map(([type, name, text]) => `<div class="sky-reward-item"><strong>${type}: ${name}</strong><span>${text}</span></div>`).join("")}
-    </div>
-    ${skyStockHtml()}
-  `;
-}
-function stockEntries(group) {
-  return Object.entries(group || {})
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-}
-function skyStockHtml() {
-  const seeds = stockEntries(state.skyStock.seeds);
-  const materials = stockEntries(state.skyStock.materials);
-  const townPieces = stockEntries(state.skyStock.townPieces);
-  const groups = [
-    ["タネ", seeds],
-    ["素材", materials],
-    ["町", townPieces]
-  ];
-  return `<div class="sky-stock">
-    <div class="sky-stock-title"><span>空素材ストック</span><span>${state.skySummons.length}回</span></div>
-    <div class="sky-stock-grid">
-      ${groups.map(([label, entries]) => {
-        const text = entries.length ? entries.map(([name, count]) => `${name} x${count}`).join(" / ") : "未入手";
-        return `<div class="sky-stock-chip"><strong>${label}</strong><span>${text}</span></div>`;
-      }).join("")}
-    </div>
-  </div>`;
-}
-function addSkyStock(current) {
-  state.skyStock.seeds[current.seed] = (state.skyStock.seeds[current.seed] || 0) + 1;
-  state.skyStock.materials[current.material] = (state.skyStock.materials[current.material] || 0) + 1;
-  state.skyStock.townPieces[current.townPiece] = (state.skyStock.townPieces[current.townPiece] || 0) + 1;
 }
 function prototypeSkyRecognition() {
   const hour = new Date().getHours();
@@ -36690,16 +36798,17 @@ function confirmSkyRecognition() {
   selected = imasoraTraits;
   const sessionBonus = Number(state.pendingSky.sessionBonus || 0);
   const stepBonus = walkStepBonus(state.walkSession.stepCount);
-  const itemWalkXp = Number(state.itemEffects.walkXp || 0);
-  const itemWalkCoin = Number(state.itemEffects.walkCoin || 0);
-  const itemWalkTown = Number(state.itemEffects.walkTown || 0);
+  ensureDailyItemState();
+  const dailyItemWalkXp = Number(state.itemEffects.daily?.walkXp || 0);
+  const dailyItemWalkCoin = Number(state.itemEffects.daily?.walkCoin || 0);
+  const itemWalkXp = Number(state.itemEffects.walkXp || 0) + dailyItemWalkXp;
+  const itemWalkCoin = Number(state.itemEffects.walkCoin || 0) + dailyItemWalkCoin;
   state.walkSession.skyVerified = true;
+  if ("walkMaterial" in state.itemEffects) delete state.itemEffects.walkMaterial;
   state.monster.xp += current.xp + sessionBonus + skyBonus.xp + stepBonus.xp + itemWalkXp;
   state.coin += current.coin + skyBonus.coin + stepBonus.coin + itemWalkCoin;
-  state.town += itemWalkTown;
   state.itemEffects.walkXp = 0;
   state.itemEffects.walkCoin = 0;
-  state.itemEffects.walkTown = 0;
   if (current.type === "nature") state.monster.nature += 2;
   if (current.type === "city") state.monster.city += 2;
   if (current.type === "sky") state.monster.sky += 2;
@@ -36709,24 +36818,17 @@ function confirmSkyRecognition() {
   if (current.type === "nature") learnSkill("flower");
   if (current.type === "city") learnSkill("sign");
   if (current.type === "sky") learnSkill("sky");
-  const item = giveSupportItem("イマソラ召喚");
-  addSkyStock(current);
   const currentMapTile = mapTileForPosition(state.position);
   const summonSeed = currentMapTile.type === "seedSummon" ? grantSummonSeedReward("タネ召喚", { current, imasoraTraits, skyBonus }) : null;
   const evolutionResult = currentMapTile.type === "evolution" ? evolveOnMapTile("進化マス") : null;
   const skyGateCleared = Boolean(state.mapAwaitingSky && Number(state.mapAwaitingSky.position) === Number(state.position));
   if (skyGateCleared) state.mapAwaitingSky = null;
-  const townQuest = applyTownQuest();
   const xpGain = current.xp + sessionBonus + skyBonus.xp + stepBonus.xp + itemWalkXp;
   const coinGain = current.coin + skyBonus.coin + stepBonus.coin + itemWalkCoin;
   const reward = {
     date: todayKey(),
     sky: current.name,
     result: current.result,
-    seed: current.seed,
-    material: current.material,
-    townPiece: current.townPiece,
-    item: item.name,
     traits: imasoraTraits,
     bonus: skyBonus.title,
     note: state.imasoraDiary?.note || ""
@@ -36734,7 +36836,6 @@ function confirmSkyRecognition() {
   state.skySummons.unshift(reward);
   state.skySummons = state.skySummons.slice(0, 20);
   recordImasoraDex(current, reward, skyBonus);
-  recordTownFootprint(current);
   if (!state.days.includes(todayKey())) state.days.push(todayKey());
   state.pendingSky = null;
   const mapProgress = skyGateCleared ? { latestReward: null, moved: 0, stoppedForSky: null } : advanceMap(1, "イマソラ認識");
@@ -36742,28 +36843,26 @@ function confirmSkyRecognition() {
   const mapMoveText = mapProgress.moved ? ` / Map +${mapProgress.moved}` : "";
   setTodayResult({
     kind: "sky",
-    title: "イマソラ認識で空報酬を確定",
+    title: "イマソラ認識を確定",
     map: mapProgress.moved,
     coin: coinGain,
     xp: xpGain,
-    town: itemWalkTown,
     notes: [
       `${current.name}: ${current.result}`,
       `空の気配: ${imasoraTraitNames(imasoraTraits)}`,
-      `${current.seed} / ${current.material} / ${current.townPiece}`,
-      `今日の空ボーナス: ${skyBonus.title}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label} XP+${stepBonus.xp} Coin+${stepBonus.coin}` : ""}${itemWalkXp || itemWalkCoin || itemWalkTown ? ` / アイテム補助 XP+${itemWalkXp} Coin+${itemWalkCoin} Town+${itemWalkTown}` : ""}`,
-      `入手アイテム: ${item.name}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}`,
-      townQuest ? `町依頼達成: ${townQuest.title}` : "町依頼: 今日の空の気配を記録",
+      `今日の空ボーナス: ${skyBonus.title}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label} XP+${stepBonus.xp} Coin+${stepBonus.coin}` : ""}${itemWalkXp || itemWalkCoin ? ` / アイテム補助 XP+${itemWalkXp} Coin+${itemWalkCoin}` : ""}`,
+      `${summonSeed ? `召喚タネ: ${summonSeed.name}` : evolutionResult ? `進化: ${evolutionResult.text}` : "直接付与なし"}`,
+      "今日の空: 気配を記録",
       "投稿テンプレ補助は任意共有用として扱い、投稿による報酬は付与しません。"
     ]
   });
-  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${itemWalkTown ? ` / Town +${itemWalkTown}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}${townQuest ? ` / 町依頼: ${townQuest.title}` : ""}`);
+  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}`);
   [document.getElementById("skyResult"), document.getElementById("walkSkyResult")].filter(Boolean).forEach(box => { box.innerHTML = `
     <strong>${current.result}</strong>
-    <p>${current.name}を認識しました。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${itemWalkTown ? ` / Town +${itemWalkTown}` : ""} / ${current.seed} / ${current.material} / ${current.townPiece} / Item ${item.name}${summonSeed ? ` / 召喚タネ ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化 ${evolutionResult.text}` : ""}${townQuest ? ` / 町依頼達成: ${townQuest.title}` : ""}</p>
+    <p>${current.name}を認識しました。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。空の気配: ${imasoraTraitNames(imasoraTraits)} / Monster XP +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化 ${evolutionResult.text}` : ""}</p>
   `; });
   const rewardExtra = summonSeed ? ` / 召喚タネ ${summonSeed.name}` : evolutionResult ? ` / 進化 ${evolutionResult.text}` : mapReward ? ` / ${mapReward.title}: ${mapReward.text}` : "";
-  showReward("SKY", "空から報酬", `${current.result} / タネ・素材・町のかけら${mapProgress.moved ? ` / マップ+${mapProgress.moved}` : ""}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${itemWalkTown ? " / Town+1" : ""}${rewardExtra}`, "sky");
+  showReward("SKY", "イマソラ認識", `${current.result}${mapProgress.moved ? ` / マップ+${mapProgress.moved}` : ""}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${rewardExtra}`, "sky");
   saveState();
   renderAll();
 }
@@ -36776,10 +36875,14 @@ function rejectSkyRecognition() {
   toast("もう一度イマソラ認識してください");
 }
 function renderHud() {
-  document.getElementById("steps").textContent = state.position;
-  document.getElementById("coin").textContent = state.coin;
-  document.getElementById("town").textContent = state.town;
-  document.getElementById("streak").textContent = streak();
+  const stepsEl = document.getElementById("steps");
+  const coinEl = document.getElementById("coin");
+  const townEl = document.getElementById("town");
+  const streakEl = document.getElementById("streak");
+  if (stepsEl) stepsEl.textContent = state.position;
+  if (coinEl) coinEl.textContent = state.coin;
+  if (townEl) townEl.textContent = openedTownBuildings().length;
+  if (streakEl) streakEl.textContent = streak();
 }
 function renderLog() {
   document.getElementById("log").innerHTML = state.logs.length
@@ -36879,16 +36982,43 @@ function handleStaticPlaytestAction(action) {
     document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "center" });
     toast("確認場所へ移動しました");
   }
-}function renderPlaytestBoost() {
+}
+function playtestMapTimeLabel() {
+  if (state.playtestMapTimeMode === "open") return "時間内";
+  return "実時間";
+}
+function setPlaytestMapTimeMode(mode = "") {
+  state.playtestMapTimeMode = mode === "open" ? "open" : "";
+  state.playtestOutsideHoursHomeMode = false;
+  addLog(`開発用テスト補助で25マスマップ表示を${playtestMapTimeLabel()}に切り替え。正式版の通常進行では使わない補助です。`);
+  saveState();
+  renderAll();
+  switchScreen("walk");
+  document.getElementById("map")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  playSfx("select");
+  toast(state.playtestMapTimeMode === "open" ? "時間内25マップを表示します" : "25マップを実時間に戻しました");
+}
+function setPlaytestOutsideHoursHome() {
+  state.playtestOutsideHoursHomeMode = true;
+  addLog("開発用テスト補助で時間外ホーム画面を表示。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("時間外ホーム画面を表示します");
+}
+function renderPlaytestBoost() {
   const box = document.getElementById("playtestBoost");
   if (!box) return;
   const profile = monsterProfile();
   const canBattle = canEnterTournament();
-  const shopOpen = state.town >= 3;
+  const shopOpen = isTownBuildingBuilt("shop");
   const itemTotal = state.inventory.length;
   const pendingCup = state.pendingBattle ? tournaments.find(item => item.id === state.pendingBattle.cupId) : null;
   const tournamentBypass = isTournamentPlaytestBypass();
   const selectedTestCup = tournaments.find(item => item.id === selectedCup) || tournaments[0];
+  const mapTimeMode = playtestMapTimeLabel();
   box.innerHTML = `
     <b>開発用テスト補助</b>
     <span>ローカル試作でアイテム・店・大会をすぐ触るための補助です。正式版のゲーム進行では使いません。データは初期化せず、確認に足りない分だけ追加します。</span>
@@ -36900,8 +37030,13 @@ function handleStaticPlaytestAction(action) {
       <div class="playtest-boost-chip"><strong>${shopOpen ? "開店" : "準備前"}</strong><small>小さな店</small></div>
       <div class="playtest-boost-chip"><strong>${pendingCup ? pendingCup.name : "なし"}</strong><small>参加</small></div>
       <div class="playtest-boost-chip"><strong>${tournamentBypass ? "ON" : "OFF"}</strong><small>大会確認モード</small></div>
+      <div class="playtest-boost-chip"><strong>${mapTimeMode}</strong><small>25マップ表示</small></div>
     </div>
     <div class="actions">
+      <button class="secondary" id="playtestGrowingMonsterBtn" type="button">通常育成中テスト状態にする</button>
+      <button class="secondary" id="playtestOutsideHoursHomeBtn" type="button">時間外ホームを開く</button>
+      <button class="secondary" id="playtestMapOpenBtn" type="button">時間内25マップを開く</button>
+      <button class="secondary" id="playtestMapRealTimeBtn" type="button">25マップを実時間に戻す</button>
       <button class="secondary" id="playtestBattleReadyBtn" type="button" ${canBattle ? "disabled" : ""}>大会テスト状態にする</button>
       <button class="secondary" id="playtestItemSetBtn" type="button">アイテム確認セットを入れる</button>
       <button class="secondary" id="playtestShopOpenBtn" type="button">小さな店を開ける</button>
@@ -36912,15 +37047,12 @@ function handleStaticPlaytestAction(action) {
       <button class="secondary" id="playtestRetirementNoSeedBtn" type="button">タネなし選択画面を開く</button>
       <button class="secondary" id="playtestEntryBtn" type="button">選択中の大会を確認準備</button>
     </div>
-    <div class="playtest-flow" aria-label="試作確認の流れ">
-            <div class="playtest-flow-title"><b>試作確認の流れ</b><span>下の順番で、アイテム・店・大会結果まで確認します。</span></div>
-<div class="playtest-flow-step"><strong>1</strong><span><b>アイテムを入れて使う</b><small>散歩用・大会用のアイテムが、強すぎず分かりやすいか確認します。</small></span><button type="button" id="playtestFlowItemsBtn" onclick="handleStaticPlaytestAction('items')">開く</button></div>
-      <div class="playtest-flow-step"><strong>2</strong><span><b>小さな店で買う</b><small>日替わり3品、1日2個までの制限が自然に見えるか確認します。</small></span><button type="button" id="playtestFlowShopBtn" onclick="handleStaticPlaytestAction('shop')">開く</button></div>
-      <div class="playtest-flow-step"><strong>3</strong><span><b>${selectedTestCup.name}に入る</b><small>参加確認を作り、大会戦を観戦する準備をします。</small></span><button type="button" id="playtestFlowEntryBtn" onclick="handleStaticPlaytestAction('entry')">準備</button></div>
-      <div class="playtest-flow-step"><strong>4</strong><span><b>大会戦を観戦する</b><small>1試合ごとの長い操作ではなく、戦闘画面から結果確認まで短く進めるか見ます。</small></span><button type="button" id="playtestFlowBattleBtn" onclick="handleStaticPlaytestAction('battle')">観戦へ</button></div>
-    </div>
     <div class="playtest-status">${tournamentBypass ? "大会確認モード中です。正式版条件は残したまま、ローカル試作では全大会の試合を確認できます。" : canBattle ? "勇旅期以降です。大会参加、アイテム使用、店の購入導線を確認できます。" : "大会確認は、確認モードをONにするか、勇旅期相当まで育てると触れます。アイテムと店は単独でも確認できます。"}</div>
   `;
+  document.getElementById("playtestGrowingMonsterBtn")?.addEventListener("click", setPlaytestGrowingMonster);
+  document.getElementById("playtestOutsideHoursHomeBtn")?.addEventListener("click", setPlaytestOutsideHoursHome);
+  document.getElementById("playtestMapOpenBtn")?.addEventListener("click", () => setPlaytestMapTimeMode("open"));
+  document.getElementById("playtestMapRealTimeBtn")?.addEventListener("click", () => setPlaytestMapTimeMode(""));
   document.getElementById("playtestBattleReadyBtn")?.addEventListener("click", setPlaytestBattleReady);
   document.getElementById("playtestItemSetBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
@@ -36930,10 +37062,6 @@ function handleStaticPlaytestAction(action) {
   document.getElementById("playtestRetirementMultiSeedBtn")?.addEventListener("click", openRetirementMultiSeedChoicePlaytest);
   document.getElementById("playtestRetirementNoSeedBtn")?.addEventListener("click", openRetirementNoSeedChoicePlaytest);
   document.getElementById("playtestEntryBtn")?.addEventListener("click", () => preparePlaytestTournamentEntry(selectedCup));
-  document.getElementById("playtestFlowItemsBtn")?.addEventListener("click", grantPlaytestItemSet);
-  document.getElementById("playtestFlowShopBtn")?.addEventListener("click", openPlaytestShop);
-  document.getElementById("playtestFlowEntryBtn")?.addEventListener("click", () => preparePlaytestTournamentEntry(selectedCup));
-  document.getElementById("playtestFlowBattleBtn")?.addEventListener("click", openPlaytestBattleResult);
 }
 function setPlaytestBattleReady() {
   state.monster.xp = Math.max(state.monster.xp, 35);
@@ -36951,6 +37079,38 @@ function setPlaytestBattleReady() {
   window.scrollTo({ top: 0, behavior: "smooth" });
   playSfx("reward");
   toast("大会テスト状態にしました。育成と大会で確認できます");
+}
+function setPlaytestGrowingMonster() {
+  state.monster = {
+    seedId: "seed-walk",
+    nickname: "",
+    xp: 6,
+    nature: 1,
+    city: 1,
+    sky: 1,
+    wins: 0,
+    age: 0,
+    lifeBonus: 0,
+    bornAt: Date.now() - 24 * 60 * 60 * 1000,
+    evolutionStage: 1,
+    lifeExtensionUses: 0,
+    grandQualified: false,
+    skills: ["tap"]
+  };
+  state.pendingRetirementRecord = null;
+  state.retirementRecovery = null;
+  state.pendingBattle = null;
+  state.walkSession = { active: false, startedAt: 0, stepChecked: false, stopped: false, skyVerified: false, stepCount: 0, blocked: false };
+  if (!state.dex.includes("seed-walk")) state.dex.push("seed-walk");
+  if (!state.dex.includes("sprout-seed-walk")) state.dex.push("sprout-seed-walk");
+  selectedDexStage = "";
+  addLog("開発用テスト補助で、引退準備中ではない通常育成中の相棒状態へ調整。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("monster");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("reward");
+  toast("通常育成中テスト状態にしました");
 }
 function setRetirementCeremonyPlaytestReady() {
   state.monster = {
@@ -36982,7 +37142,7 @@ function setRetirementCeremonyPlaytestReady() {
   toast("引退式テスト状態へ戻しました");
 }
 function openRetirementMultiSeedChoicePlaytest() {
-  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {}, townPieces: {} };
+  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {} };
   state.skyStock.seeds = {
     ...(state.skyStock.seeds || {}),
     "ミチタネ": Math.max(1, Number(state.skyStock.seeds?.["ミチタネ"] || 0)),
@@ -37002,7 +37162,7 @@ function openRetirementMultiSeedChoicePlaytest() {
   toast("複数タネ選択画面を開きました");
 }
 function openRetirementNoSeedChoicePlaytest() {
-  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {}, townPieces: {} };
+  state.skyStock = state.skyStock && typeof state.skyStock === "object" ? state.skyStock : { seeds: {}, materials: {} };
   state.skyStock.seeds = {};
   const record = state.pendingRetirementRecord || createRetirementRecord();
   state.pendingRetirementRecord = record;
@@ -37060,7 +37220,7 @@ function openRetirementStorageFullSendoffPlaytest() {
   toast("保存枠満タンの引退の日を開きました");
 }
 function grantPlaytestItemSet() {
-  const ids = ["walk-shoes", "map-snack", "growth-seed", "focus-ramune", "guard-tape", "wind-pin"];
+  const ids = supportItems.map(item => item.id);
   const added = ids
     .map(id => supportItems.find(item => item.id === id))
     .filter(Boolean)
@@ -37076,9 +37236,9 @@ function grantPlaytestItemSet() {
   toast("アイテム確認セットを入れました");
 }
 function openPlaytestShop() {
-  state.town = Math.max(state.town, 3);
+  if (!state.townBuildings.includes("shop")) state.townBuildings.push("shop");
   state.coin = Math.max(state.coin, 60);
-  addLog("開発用テスト補助で小さな店を確認できる状態に調整。");
+  addLog("開発用テスト補助で小さな店を建築済み状態に調整。");
   saveState();
   renderAll();
   switchScreen("town");
@@ -37115,7 +37275,7 @@ function openPlaytestBattleResult() {
   switchScreen("monster");
   document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
   playSfx("select");
-  toast("大会戦を観戦するボタンへ移動しました");
+  toast("大会画面へ移動しました");
 }
 function startPlaytestTournamentBattle(cupId = selectedCup) {
   const cup = tournaments.find(item => item.id === cupId) || tournaments[0];
@@ -37162,10 +37322,10 @@ function renderProof() {
         : "歩行中はゲーム進行しません。安全に立ち止まり、イマソラ認識を行うと進行できます。"
       : "歩行セッションを開始してください。歩数計カウント中はゲーム進行しません。";
   if (startButton) {
-    startButton.disabled = retirementReady;
-    startButton.textContent = retirementReady ? "散歩×" : "歩く";
+    startButton.disabled = retirementReady || !playtime;
+    startButton.textContent = retirementReady ? "散歩×" : !playtime ? "時間外" : "歩く";
   }
-  if (stepButton) stepButton.disabled = retirementReady;
+  if (stepButton) stepButton.disabled = retirementReady || !playtime;
   renderSkyDetector();
 }
 function startWalk() {
@@ -37275,20 +37435,18 @@ function explore() {
   const before = {
     position: state.position,
     coin: state.coin,
-    town: state.town,
+    buildings: openedTownBuildings().length,
     xp: state.monster.xp
   };
   const event = getEvent();
   const bonus = selected.length >= 4 ? 5 : 0;
   state.coin += event.coin + bonus;
-  state.town += event.town;
   growMonster();
   const combo = applyDiscoveryCombo();
-  const townQuest = applyTownQuest();
   if (!state.days.includes(todayKey())) state.days.push(todayKey());
   const foundNames = todayCards.filter(([id]) => selected.includes(id)).map(([, name]) => name);
   const foundText = foundNames.length ? foundNames.join("、") : "小さな発見";
-  const text = `イマソラ認識後の発見記録: ${foundText}。${event.title}: ${event.text}${combo ? ` / ${combo.title}: ${combo.text}` : ""}${townQuest ? ` / ${townQuest.title}: ${townQuest.reward}` : ""}`;
+  const text = `イマソラ認識後の発見記録: ${foundText}。${event.title}: ${event.text}${combo ? ` / ${combo.title}: ${combo.text}` : ""}`;
   addLog(text);
   setTodayResult({
     kind: "discovery",
@@ -37296,15 +37454,14 @@ function explore() {
     map: state.position - before.position,
     coin: state.coin - before.coin,
     xp: state.monster.xp - before.xp,
-    town: state.town - before.town,
     notes: [
       `発見: ${foundText}`,
-      `${townQuest ? `町依頼達成: ${townQuest.title}` : combo ? `空の気配: ${combo.title}` : `イベント: ${event.title}`}`,
+      `${combo ? `空の気配: ${combo.title}` : `イベント: ${event.title}`}`,
       combo ? `育成傾向: ${combo.path}` : "育成傾向: イマソラで出た空の気配に応じて少し変化",
       "歩行中ではなく、安全停止後の記録として保存しました。"
     ]
   });
-  document.getElementById("eventBox").innerHTML = `<strong>${townQuest ? "町依頼達成" : combo ? combo.title : event.title}</strong><p>${townQuest ? `${townQuest.title}: ${townQuest.target}` : combo ? combo.text : event.text}</p><p>空の気配を保存 / マップ進行はイマソラ認識分のみ / Coin +${event.coin + bonus + (combo ? combo.coin : 0) + (townQuest ? townQuest.coin : 0)} / Town +${event.town + (combo ? combo.town : 0) + (townQuest ? townQuest.town : 0)}</p>`;
+  document.getElementById("eventBox").innerHTML = `<strong>${combo ? combo.title : event.title}</strong><p>${combo ? combo.text : event.text}</p><p>空の気配を保存 / マップ進行はイマソラ認識分のみ / Coin +${event.coin + bonus + (combo ? combo.coin : 0)}</p>`;
   state.walkSession.active = false;
   state.walkSession.skyVerified = false;
   state.walkSession.stopped = false;
@@ -37331,7 +37488,7 @@ function growMonster() {
       ["city", state.monster.city]
     ].sort((a, b) => a[1] - b[1])[0][0];
     state.monster[lowest] += 1;
-    addLog("白星のタネの特性で、一番低い育成傾向が少し伸びた。");
+    addLog("白のタネの特性で、一番低い育成傾向が少し伸びた。");
   }
   if (selected.length >= 4) {
     const item = giveSupportItem("散歩発見");
@@ -37346,25 +37503,11 @@ function applyDiscoveryCombo() {
   if (!combo) return null;
   if (!state.comboDex.includes(combo.id)) state.comboDex.push(combo.id);
   state.coin += combo.coin;
-  state.town += combo.town;
   state.monster.sky += combo.sky;
   state.monster.nature += combo.nature;
   state.monster.city += combo.city;
   addLog(`${combo.title}: ${combo.text} Coin +${combo.coin}`);
   return combo;
-}
-function applyTownQuest() {
-  const quest = completedTownQuest();
-  if (!quest) return null;
-  state.coin += quest.coin;
-  state.town += quest.town;
-  if (quest.bias === "sky") state.monster.sky += 1;
-  if (quest.bias === "nature") state.monster.nature += 1;
-  if (quest.bias === "city") state.monster.city += 1;
-  const item = maybeGiveTownQuestItem(quest);
-  addLog(`町依頼達成「${quest.title}」: ${quest.reward} / Coin +${quest.coin}${quest.town ? ` / Town +${quest.town}` : ""}${item ? ` / Item ${item.name}` : ""}`);
-  showReward(quest.mark, "町依頼達成", `${quest.title}: ${quest.reward}${item ? ` / ${item.name}` : ""}`);
-  return quest;
 }
 function getEvent() {
   if (state.position > 0 && state.position % 10 === 0) return events.find(item => item.type === "boss");
@@ -37386,7 +37529,6 @@ function renderAll() {
   renderGuildPanel();
   renderProof();
   renderSkySummon();
-  renderDailyProgress();
   renderCompanionHome();
   renderUserMenu();
   renderDailySideQuest();
@@ -37398,7 +37540,6 @@ function renderAll() {
   renderImasoraDiary();
   renderMap();
   renderTown();
-  renderTownFootprints();
   renderImasoraDex();
   renderStamps();
   renderMonster();
@@ -38430,7 +38571,6 @@ function battle() {
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
     state.monster.wins += 1;
     state.coin += cup.reward;
-    state.town += 1;
     if (!state.cups.includes(cup.id)) state.cups.push(cup.id);
     const openedWhiteSeed = cup.id === "grand" ? unlockWhiteSeedReward() : false;
     if (fourMajorCupIds().includes(cup.id) && hasGrandQualification() && !state.grandUnlockBonusGiven) {
@@ -38439,11 +38579,11 @@ function battle() {
       addLog("四大杯4つ全てを制覇。グランドチャンピオン杯の出場資格を獲得。");
     }
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦を勝ち抜き。${allMatches.length}試合 / 最終${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote} / Coin +${cup.reward}`);
-    if (openedWhiteSeed) pendingBattleLogMessages.push("グランドチャンピオン杯優勝賞品として、白星のタネを授与された。");
-    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。参加人数不足やシードなしで、公式大会を安定して運営できます。${openedWhiteSeed ? "白星のタネが賞品として授与されました。" : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
+    if (openedWhiteSeed) pendingBattleLogMessages.push("グランドチャンピオン杯優勝賞品として、白のタネを授与された。");
+    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。参加人数不足やシードなしで、公式大会を安定して運営できます。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
     pendingBattleReward = {
       mark: openedWhiteSeed ? "白" : cup.medal,
-      title: openedWhiteSeed ? "白星のタネ獲得" : `${cup.name}メダル獲得`,
+      title: openedWhiteSeed ? "白のタネ獲得" : `${cup.name}メダル獲得`,
       text: openedWhiteSeed ? "体色だけが白く育つ特別なタネが開放されました。" : `${cup.name}を制覇しました。`,
       cupId: cup.id,
       cupName: cup.name,
@@ -38493,8 +38633,25 @@ function showReward(mark, title, text, kind = "") {
 function toast(text) {
   const box = document.getElementById("toast");
   box.textContent = text;
+  box.classList.remove("center-notice");
   box.classList.add("show");
   setTimeout(() => box.classList.remove("show"), 1300);
+}
+function centerNotice(text) {
+  const box = document.getElementById("toast");
+  box.textContent = text;
+  box.classList.add("center-notice", "show");
+  setTimeout(() => box.classList.remove("show", "center-notice"), 1800);
+}
+function showHomeCenterNotice(text) {
+  const box = document.querySelector("[data-home-center-notice]");
+  if (!box) {
+    centerNotice(text);
+    return;
+  }
+  box.textContent = text;
+  box.classList.add("show");
+  setTimeout(() => box.classList.remove("show"), 2200);
 }
 function switchScreen(screen) {
   blurActiveTextInput();
@@ -38513,7 +38670,7 @@ function switchScreen(screen) {
   });
   if (screen === "town") renderTown();
   if (screen === "retirement") renderRetirementCeremony();
-  if (screen === "walk" && leavingRetirementBgm) startBgm("normal");
+  if (screen === "walk") syncHomeBgmMode();
   scheduleCaretCleanup();
 }
 function resumePendingRetirementRecoveryOnLoad() {
@@ -38613,7 +38770,7 @@ renderAll();
 resumePendingRetirementRecoveryOnLoad();
 updateHomeWindowClock();
 setInterval(updateHomeWindowClock, 60000);
-setInterval(renderMap, 60000);
+setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
