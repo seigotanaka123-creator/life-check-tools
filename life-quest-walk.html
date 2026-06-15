@@ -8382,17 +8382,17 @@
         <div class="loop-step walk">
           <span class="loop-num">1</span><div class="loop-icon walker-icon" aria-hidden="true"><span class="walker"><i class="walker-head"></i><i class="walker-body"></i><i class="walker-arm front"></i><i class="walker-arm back"></i><i class="walker-leg front"></i><i class="walker-leg back"></i></span></div>
           <b>歩く</b>
-          <span>散歩中は操作しない。歩数計は徒歩セッション確認と、無理のない歩数ボーナスに使います。</span>
+          <span>散歩中は操作しない。歩数計は徒歩セッション確認と、散歩での報酬獲得に使います。</span>
         </div>
         <div class="loop-step stop">
           <span class="loop-num">2</span><div class="loop-icon" aria-hidden="true"><i></i></div>
           <b>立ち止まる</b>
-          <span>安全な場所で止まり、人や建物が入らない空を確認します。</span>
+          <span>安全な場所で止まり、人や建物が入らない空を確認しましょう。</span>
         </div>
         <div class="loop-step sky">
           <span class="loop-num">3</span><div class="loop-icon" aria-hidden="true"></div>
           <b>イマソラ認識</b>
-          <span>今の空を確認し、マスの種類に応じて報酬・タネ召喚・進化・マップ進行が決まります。</span>
+          <span>今の空を認識させて、マスの種類に応じ報酬やタネの獲得、進化が決まります。</span>
         </div>
       </div>
       <div class="sound-panel">
@@ -8591,7 +8591,6 @@
         <span>正式大会は、はじまり杯、森の四大杯、街の四大杯、空の四大杯、水辺の四大杯、グランドチャンピオン杯すべてをNPC代表との大会戦にします。大会は最大2試合の短い勝ち抜きにして、参加人数不足、シード、あぶれ、待ち時間をなくします。試合は観戦を基本にし、1試合ごとの演出を白熱させます。戦闘画面の端にある「すぐに結果を見る」からすぐ結果確認もできます。ユーザー同士の対戦は、大会とは分けて合言葉の対戦室だけで行います。</span>
       </div>
       <div class="medal-shelf" id="medalShelf"></div>
-      <div class="mini-feature" id="strategyPanel"></div>
       <div class="entry-status" id="entryStatus">
         <b>大会を選択</b>
         <p>大会を選ぶと、参加確認へ進めます。</p>
@@ -9051,6 +9050,7 @@ let pendingTournamentStrategyCupId = "";
 let selectedDexStage = "";
 let selectedItemGuideTab = "inventory";
 let guildSupportConfirmOpen = false;
+let guildRequestAcceptConfirmId = "";
 let monsterDexGroups = [];
 let characterGalleryRendered = false;
 let pendingBattleResultHtml = "";
@@ -30429,6 +30429,8 @@ function normalizeState() {
     state.guildSupport.supporter = state.guildSupport.supporter && typeof state.guildSupport.supporter === "object" ? state.guildSupport.supporter : { xp: Number(state.guildSupport.xp || 1), coin: Number(state.guildSupport.coin || 2) };
     state.guildSupport.receiverRewardClaimed = Boolean(state.guildSupport.receiverRewardClaimed || legacyImmediateGuildReward);
     state.guildSupport.thanked = Boolean(state.guildSupport.thanked || legacyImmediateGuildReward);
+    state.guildSupport.accepted = Boolean(state.guildSupport.accepted);
+    state.guildSupport.acceptedAt = Number(state.guildSupport.acceptedAt || 0);
     state.guildSupport.supporterMapResult = state.guildSupport.supporterMapResult && typeof state.guildSupport.supporterMapResult === "object" ? state.guildSupport.supporterMapResult : null;
     if (!state.guildSupport.receiverRewardClaimed) {
       state.guildSupport.supporter = { ...guildRewardAmount() };
@@ -30448,7 +30450,7 @@ function normalizeState() {
   state.imasoraDiary.updatedAt = String(state.imasoraDiary.updatedAt || "").slice(0, 24);
   state.skyDex = Array.isArray(state.skyDex) ? state.skyDex : [];
   if (Object.prototype.hasOwnProperty.call(state, "town" + "Footprints")) delete state["town" + "Footprints"];
-  const validStrategies = ["balanced", "rush", "guard", "focus"];
+  const validStrategies = ["balanced", "rush", "guard", "focus", "reserve", "read"];
   state.battleStrategy = validStrategies.includes(state.battleStrategy) ? state.battleStrategy : "balanced";
   state.playtestMemo = state.playtestMemo && typeof state.playtestMemo === "object" ? state.playtestMemo : { mood: "未確認", note: "", updatedAt: "" };
   state.playtestMemo.mood = String(state.playtestMemo.mood || "未確認").slice(0, 20);
@@ -31729,7 +31731,9 @@ const strategyBook = [
   { id: "balanced", name: "バランス", text: "大きく偏らず、判定まで安定しやすい作戦。", note: "固定の正解にしない基準作戦" },
   { id: "rush", name: "速攻", text: "序盤の中技率を少しだけ上げる。外れると伸びにくい。", note: "短期戦向き" },
   { id: "guard", name: "堅守", text: "受けるダメージを少し抑え、判定で粘りやすい。", note: "長めの試合向き" },
-  { id: "focus", name: "集中", text: "命中とMPの流れを少し整える。強すぎない補助。", note: "中技・強技の安定感" }
+  { id: "focus", name: "集中", text: "命中とMPの流れを少し整える。強すぎない補助。", note: "中技・強技の安定感" },
+  { id: "reserve", name: "温存", text: "予選は少し控えめに入り、決勝でMPと攻めを少し残す。", note: "大会通しての後半寄り" },
+  { id: "read", name: "先読み", text: "命中と回避を少し安定させる。大技より事故りにくさ重視。", note: "相手の動きを読む" }
 ];
 function skyBonusFor(sky) {
   return skyBonusBook[sky?.id] || skyBonusBook.blue;
@@ -31959,12 +31963,12 @@ function claimGuildSupporterReward() {
   const status = guildSupporterRewardStatus();
   if (status.claimed) {
     playSfx("error");
-    toast("今日は支援側報酬を受取済み");
+    toast("今日は引き受け側報酬を受取済み");
     return;
   }
   if (!status.ready) {
     playSfx("error");
-    toast("支援側報酬は未達成です");
+    toast("引き受け側報酬は未達成です");
     return;
   }
   const supporterMapResult = currentSupporterMapResult();
@@ -31975,11 +31979,11 @@ function claimGuildSupporterReward() {
   state.guildSupporterRewards.unshift({ date: todayKey(), xp: reward.xp, coin: reward.coin, reason: status.reason, supporterMapResult, receiverReward, at: Date.now() });
   state.guildSupporterRewards = state.guildSupporterRewards.slice(0, 20);
   markSideQuestDone("guild-support");
-  addLog(`支援側報酬: ${status.reason}により相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。`);
+  addLog(`引き受け側報酬: ${status.reason}により相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。`);
   saveState();
   renderAll();
   playSfx("reward");
-  toast("支援側報酬を受け取りました");
+  toast("引き受け側報酬を受け取りました");
 }
 function hasTodayResult() {
   return Boolean((state.todayResult && state.todayResult.date === todayKey()) || state.days.includes(todayKey()));
@@ -31989,10 +31993,12 @@ function guildRequestListItems() {
   const reward = state.guildSupport?.supporter || guildRewardAmount();
   const profile = monsterProfile();
   return [{
+    id: "today-guild-request",
     name: companionDisplayName(profile),
     stage: profile.stage,
     reward,
-    status: state.guildSupport?.receiverRewardClaimed ? "成立済み" : "依頼中"
+    status: state.guildSupport?.receiverRewardClaimed ? "報酬確定済み" : state.guildSupport?.accepted ? "引き受け成立" : "依頼中",
+    accepted: Boolean(state.guildSupport?.accepted)
   }];
 }
 function renderGuildRequestList() {
@@ -32001,14 +32007,24 @@ function renderGuildRequestList() {
   const items = guildRequestListItems();
   box.innerHTML = `
     <b>協力支援の依頼一覧</b>
-    <span>依頼中の相棒がいる時だけ表示します。支援を引き受ける側は、25マスマップクリア、またはスタンプラリー全制覇で支援報酬を受け取れます。</span>
+    <span>依頼中の相棒がいる時だけ表示します。引き受け側は、25マスマップクリア、またはスタンプラリー全制覇で報酬を受け取れます。</span>
     <div class="mini-grid">
       ${items.length ? items.map(item => `
         <div class="mini-chip">
           <strong>${item.name}</strong>
-          <small>${item.stage} / ${item.status} / 支援する側報酬 相棒経験値 +${item.reward.xp} / Coin +${item.reward.coin}</small>
+          <small>${item.stage} / ${item.status} / 引き受け側報酬 相棒経験値 +${item.reward.xp} / Coin +${item.reward.coin}</small>
+          ${item.accepted ? `<span>この依頼は引き受け成立済みです。報酬はまだ獲得していません。</span>` : `<button class="secondary" type="button" data-guild-accept="${item.id}">引き受ける</button>`}
+          ${guildRequestAcceptConfirmId === item.id ? `
+            <div class="mini-feature">
+              <b>この依頼を引き受けますか？</b>
+              <div class="actions">
+                <button class="primary" type="button" data-guild-accept-confirm="${item.id}">はい</button>
+                <button class="quiet" type="button" data-guild-accept-cancel="">いいえ</button>
+              </div>
+            </div>
+          ` : ""}
         </div>
-      `).join("") : `<div class="mini-chip"><strong>今は協力支援の依頼はありません</strong><small>依頼が出ると、ここに相棒名と支援する側報酬が表示されます。</small></div>`}
+      `).join("") : `<div class="mini-chip"><strong>今は協力支援の依頼はありません</strong><small>依頼が出ると、ここに相棒名と引き受け側報酬が表示されます。</small></div>`}
     </div>
     <div class="actions"><button class="secondary" id="guildRequestListBackBtn" type="button">協力支援ページへ戻る</button></div>
   `;
@@ -32016,6 +32032,37 @@ function renderGuildRequestList() {
     switchScreen("walk");
     document.getElementById("guildPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  document.querySelectorAll("[data-guild-accept]").forEach(button => button.addEventListener("click", () => openGuildRequestAcceptConfirm(button.dataset.guildAccept)));
+  document.querySelectorAll("[data-guild-accept-confirm]").forEach(button => button.addEventListener("click", () => acceptGuildRequest(button.dataset.guildAcceptConfirm)));
+  document.querySelectorAll("[data-guild-accept-cancel]").forEach(button => button.addEventListener("click", cancelGuildRequestAcceptConfirm));
+}
+function openGuildRequestAcceptConfirm(requestId) {
+  guildRequestAcceptConfirmId = requestId;
+  renderGuildRequestList();
+  playSfx("select");
+}
+function cancelGuildRequestAcceptConfirm() {
+  guildRequestAcceptConfirmId = "";
+  renderGuildRequestList();
+  playSfx("select");
+}
+function acceptGuildRequest(requestId) {
+  const item = guildRequestListItems().find(entry => entry.id === requestId);
+  if (!item || !state.guildSupport) {
+    playSfx("error");
+    toast("依頼がありません");
+    return;
+  }
+  state.guildSupport.accepted = true;
+  state.guildSupport.acceptedAt = Date.now();
+  state.guildSupport.status = "accepted";
+  guildRequestAcceptConfirmId = "";
+  addLog(`${item.name}の協力支援を引き受けました。報酬獲得はまだ行いません。`);
+  saveState();
+  renderGuildRequestList();
+  renderGuildPanel();
+  playSfx("reward");
+  toast("協力支援成立");
 }
 function openGuildSupportSearch() {
   renderGuildRequestList();
@@ -32040,8 +32087,8 @@ function renderGuildPanel() {
       <b>協力支援を依頼しますか？</b>
       <span>協力支援を依頼すると当日分の協力支援のわずかな報酬が与えられる権利はもらえますが、代わりに今日の25マスマップが使用不可となります。それでも大丈夫ですか？</span>
       <div class="guild-grid">
-      <div class="guild-chip"><strong>受ける側</strong><small>ありがとう送信で、支援者の25マップ総Coinと総相棒経験値の半分</small></div>
-      <div class="guild-chip"><strong>支援側</strong><small>25マスクリア、またはスタンプ全制覇で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}</small></div>
+      <div class="guild-chip"><strong>依頼側</strong><small>ありがとう送信で、引き受けた人の25マップ総Coinと総相棒経験値の半分</small></div>
+      <div class="guild-chip"><strong>引き受け側</strong><small>25マスクリア、またはスタンプ全制覇で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}</small></div>
         <div class="guild-chip"><strong>今日の扱い</strong><small>自分の散歩成果は終了</small></div>
       </div>
       <div class="actions"><button class="primary" id="guildSupportConfirmBtn" type="button">はい</button><button class="quiet" id="guildSupportCancelBtn" type="button">やっぱりやめる</button></div>
@@ -32049,26 +32096,26 @@ function renderGuildPanel() {
   ` : "";
   box.innerHTML = `
     <b>協力支援</b>
-    <span>歩けない日や悪天候の日は、協力者から小さな助けを受けられる構想にします。受ける側は支援後のお礼で受ける側の報酬を受け取り、支援する側は歩いた成果で支援報酬を受け取ります。自分のマップ進行の主役は、あくまで自分の安全な散歩とイマソラ認識です。</span>
+    <span>歩けない日や悪天候の日は、ほかの人に協力支援を依頼できます。依頼した人は、お礼を送ると引き受けた人の歩行成果の一部を受け取れます。引き受けた人は、自分の25マスマップやスタンプラリーを進めることで報酬を受け取れます。</span>
     <div class="guild-grid">
-        <div class="guild-chip"><strong>受ける側</strong><small>協力支援後、「ありがとう」を送った時に、支援者の25マップ総Coinと総相棒経験値の半分。</small></div>
-        <div class="guild-chip"><strong>支援側</strong><small>25マスマップクリア、またはスタンプラリー全制覇で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。</small></div>
-      <div class="guild-chip"><strong>併用不可</strong><small>受けた日は自分のイマソラ認識と散歩ボーナスなし。</small></div>
+        <div class="guild-chip"><strong>依頼側</strong><small>協力支援後、「ありがとう」を送った時に、引き受けた人の25マップ総Coinと総相棒経験値の半分。</small></div>
+        <div class="guild-chip"><strong>引き受け側</strong><small>25マスマップクリア、またはスタンプラリー全制覇で25マスマップの報酬とは別に相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。</small></div>
+      <div class="guild-chip"><strong>併用不可</strong><small>協力支援を依頼した日は自分の25マスマップの報酬獲得は不可となります。</small></div>
     </div>
     <div class="actions"><button class="secondary ${rewardLocked ? "reward-locked" : ""}" id="guildSupportBtn" type="button" data-reward-locked="${rewardLocked ? "true" : "false"}">協力支援を依頼する</button><button class="secondary" id="guildSupportSearchBtn" type="button">協力支援を探す</button></div>
-        <span>${used ? receiverThanked ? `今日の協力支援は成立済みです。お礼送信済み。受ける側 ${guildReceiverRewardText(receiverReward)}を受け取りました。今日は自分のイマソラ認識と散歩ボーナスは受け取れません。` : receiverReward.pending ? "協力支援を依頼中です。成立前ならキャンセルできます。支援者の25マップ成果が届いた後、「ありがとう」を送ると協力支援が成立し、支援者の25マップ総Coinと総相棒経験値の半分を受け取れます。" : `協力支援を依頼中です。成立前ならキャンセルできます。「ありがとう」を送ると協力支援が成立し、${guildReceiverRewardText(receiverReward)}を受け取れます。` : alreadyWalked ? "今日はすでに自分の散歩成果が確定しています。協力支援との併用はできません。" : "確認後に1日1回だけ受け取れます。歩いたことの代替として強すぎる報酬にはせず、マップは進めません。"}</span>
+        <span>${used ? receiverThanked ? `今日の協力支援は成立済みです。お礼送信済み。依頼側 ${guildReceiverRewardText(receiverReward)}を受け取りました。今日は自分のイマソラ認識と散歩ボーナスは受け取れません。` : receiverReward.pending ? "協力支援を依頼中です。成立前ならキャンセルできます。引き受けた人の25マップ成果が届いた後、「ありがとう」を送ると協力支援が成立し、引き受けた人の25マップ総Coinと総相棒経験値の半分を受け取れます。" : `協力支援を依頼中です。成立前ならキャンセルできます。「ありがとう」を送ると協力支援が成立し、${guildReceiverRewardText(receiverReward)}を受け取れます。` : alreadyWalked ? "今日はすでに自分の散歩成果が確定しています。協力支援との併用はできません。" : "確認後に1日1回だけ受け取れます。歩いたことの代替として強すぎる報酬にはせず、マップは進めません。"}</span>
     ${canCancelRequest ? `<div class="actions"><button class="quiet" id="guildSupportRequestCancelBtn" type="button">協力支援をキャンセル</button></div>` : ""}
     ${confirmHtml}
     <div class="mini-feature">
-      <b>支援側報酬</b>
-          <span>${supporterStatus.claimed ? `今日は受取済みです。${state.guildSupporterRewards[0]?.reason || "条件達成"}で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。` : supporterStatus.ready ? `${supporterStatus.reason}により、支援する側の報酬を受け取れます。` : supporterStatus.reason}</span>
+      <b>引き受け側報酬</b>
+          <span>${supporterStatus.claimed ? `今日は受取済みです。${state.guildSupporterRewards[0]?.reason || "条件達成"}で相棒経験値 +${supporterReward.xp} / Coin +${supporterReward.coin}。` : supporterStatus.ready ? `${supporterStatus.reason}により、引き受け側の報酬を受け取れます。` : supporterStatus.reason}</span>
       <div class="actions"><button class="secondary" id="guildSupporterRewardBtn" type="button" ${supporterStatus.ready && !supporterStatus.claimed ? "" : "disabled"}>支援報酬を受け取る</button></div>
     </div>
     <div class="mini-feature">
       <b>支援後のお礼メッセージ</b>
       <span>募集文ではなく、歩いて支援してくれた人へ送るねぎらいです。自由入力チャットは置かず、送れるのは安全な定型文だけです。</span>
       <div class="guild-grid">${guildMessageBook.map(item => `<button class="guild-chip" type="button" data-guild-message="${item.id}" ${used && !receiverThanked && !receiverReward.pending ? "" : "disabled"}><strong>${item.text}</strong></button>`).join("")}</div>
-      <div class="mini-grid">${messages.length ? messages.map(item => `<div class="mini-chip"><strong>${item.text}</strong><small>${item.date}</small></div>`).join("") : `<div class="mini-chip"><strong>まだ送信なし</strong><small>${used ? receiverThanked ? "お礼は送信済みです。" : receiverReward.pending ? "支援者の25マップ成果が届いた後に送れます。" : "ありがとうを送ると受ける側報酬が確定します。" : "協力支援を受けた後に送れます。"}</small></div>`}</div>
+      <div class="mini-grid">${messages.length ? messages.map(item => `<div class="mini-chip"><strong>${item.text}</strong><small>${item.date}</small></div>`).join("") : `<div class="mini-chip"><strong>まだ送信なし</strong><small>${used ? receiverThanked ? "お礼は送信済みです。" : receiverReward.pending ? "引き受けた人の25マップ成果が届いた後に送れます。" : "ありがとうを送ると依頼側報酬が確定します。" : "協力支援を受けた後に送れます。"}</small></div>`}</div>
     </div>
   `;
   const button = document.getElementById("guildSupportBtn");
@@ -32112,15 +32159,15 @@ function sendGuildMessage(id) {
     coin: reward.coin,
     xp: reward.xp,
     notes: [
-      `協力を受ける側: お礼送信で相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
-      `支援者の25マップ成果の半分: 相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
+      `依頼側: お礼送信で相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
+      `引き受けた人の25マップ成果の半分: 相棒経験値 +${reward.xp} / Coin +${reward.coin}`,
       "今日は自分のイマソラ認識と散歩ボーナスは受け取れません。",
       "歩けない日、悪天候の日のための控えめな代替です。"
     ]
   });
   state.guildMessages.unshift({ id: item.id, text: item.text, date: new Date().toLocaleString("ja-JP") });
   state.guildMessages = state.guildMessages.slice(0, 12);
-  addLog(`支援後のお礼メッセージに「${item.text}」を送った。受ける側報酬として相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。自由入力チャットは使わない安全設計。`);
+  addLog(`支援後のお礼メッセージに「${item.text}」を送った。依頼側報酬として相棒経験値 +${reward.xp} / Coin +${reward.coin} を獲得。自由入力チャットは使わない安全設計。`);
   saveState();
   renderAll();
   toast("お礼を送りました");
@@ -32180,14 +32227,14 @@ function claimGuildSupport() {
     return;
   }
   const reward = guildRewardAmount();
-  state.guildSupport = { date: todayKey(), status: "pending", receiver: { xp: 0, coin: 0, pending: true }, supporter: { ...reward }, supporterMapResult: null, receiverRewardClaimed: false, thanked: false, supporterRewardClaimed: false };
+  state.guildSupport = { date: todayKey(), status: "pending", receiver: { xp: 0, coin: 0, pending: true }, supporter: { ...reward }, supporterMapResult: null, receiverRewardClaimed: false, thanked: false, supporterRewardClaimed: false, accepted: false, acceptedAt: 0 };
   state.walkSession.active = false;
   state.walkSession.stepChecked = false;
   state.walkSession.stopped = false;
   state.walkSession.skyVerified = false;
   state.pendingSky = null;
   guildSupportConfirmOpen = false;
-  addLog("協力支援を依頼中。成立前ならキャンセル可能。成立後の受ける側報酬は、支援者の25マップ総Coinと総相棒経験値の半分。");
+  addLog("協力支援を依頼中。成立前ならキャンセル可能。成立後の依頼側報酬は、引き受けた人の25マップ総Coinと総相棒経験値の半分。");
   saveState();
   renderAll();
   playSfx("reward");
@@ -32387,7 +32434,7 @@ function companionHomeConversation(profile, growth, lifeRemain) {
   const index = Math.abs(new Date().getDate() + Math.round(Number(state.monster?.xp || 0)) + Math.round(Number(growth?.top?.value || 0))) % topics.length;
   if (lifeRemain <= 0) return ["引退準備中は引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。", "引退準備"];
   if (state.mapAwaitingSky) return ["イマソラ認識待ちのマスで止まっているね。", "安全な場所で立ち止まってから、空だけを確認しよう。", "認識待ち"];
-  if (canEnterTournament()) return ["大会に出られる状態だね。作戦を選んでから行こう。", "家で落ち着いて準備してから出るのがいいね。", "大会OK"];
+  if (canEnterTournament()) return ["大会に出られる状態だね。大会を選んでから作戦を決めよう。", "家で落ち着いて準備してから出るのがいいね。", "大会OK"];
   return topics[index];
 }
 let companionHomeTalkTimer = null;
@@ -32440,7 +32487,7 @@ function companionHomeDialoguePairs(profile, growth, lifeRemain) {
     return {
       topic: "大会OK",
       pairs: [
-        ["大会に出られる状態だね。作戦を選んでから行こう。", "家で落ち着いて準備してから出るのがいいね。"],
+        ["大会に出られる状態だね。大会を選んでから作戦を決めよう。", "家で落ち着いて準備してから出るのがいいね。"],
         ["そうだね、おちつかないとね。", "アイテムも確認してから大会へ行こう。"],
         ["今日は勝ち筋を考えてから出発しよう。", "うん。無理せず、でも堂々と行こう。"]
       ]
@@ -38835,7 +38882,7 @@ function renderTournamentStrategyDecision(cup) {
   if (!box) return;
   const selectedStrategy = state.battleStrategy || "balanced";
   box.innerHTML = `
-    <b>${cup.name} 大会前の作戦</b>
+    <b>${cup.name} 大会通しての作戦選択</b>
     <p>作戦を選んでから「作戦決定」を押すと、大会オープニングへ進みます。</p>
     <div class="mini-grid">
       ${strategyBook.map(s => `<button class="strategy-card ${selectedStrategy === s.id ? "selected" : ""}" type="button" data-entry-strategy="${s.id}" data-cup="${cup.id}"><strong>${s.name}</strong><small>${s.text}</small></button>`).join("")}
@@ -38964,6 +39011,7 @@ function battle() {
     if (strategy === "rush") battleStats.spd += 2;
     if (strategy === "guard") { battleStats.def += 2; battleStats.hp += 2; }
     if (strategy === "focus") { battleStats.acc += 2; battleStats.mp += 2; }
+    if (strategy === "read") { battleStats.acc += 1; battleStats.eva += 2; }
     const battleItemEffects = { ...(state.itemEffects.battle || {}) };
     battleStats.acc += Number(battleItemEffects.acc || 0);
     battleStats.def += Number(battleItemEffects.def || 0);
@@ -38975,10 +39023,19 @@ function battle() {
   }
   const total = tournamentMatchCount(cup);
   const currentMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), total - 1));
+  const isFinalMatch = currentMatchIndex >= total - 1;
+  const activeBattleStats = { ...battleStats };
+  if (strategy === "reserve") {
+    if (isFinalMatch) {
+      activeBattleStats.atk += 1;
+      activeBattleStats.mp += 3;
+    } else {
+      activeBattleStats.mp = Math.max(0, activeBattleStats.mp - 1);
+    }
+  }
   const playerDisplayName = tournamentPlayerDisplayName(profile);
   const opponent = tournamentOpponentForMatch(cup, currentMatchIndex, total, playerDisplayName);
-  const match = applyTournamentOpponentToMatch(simulateTournamentMatch(battleStats, cup, currentMatchIndex, total, opponent), opponent);
-  const isFinalMatch = currentMatchIndex >= total - 1;
+  const match = applyTournamentOpponentToMatch(simulateTournamentMatch(activeBattleStats, cup, currentMatchIndex, total, opponent), opponent);
   const matchLabel = isFinalMatch ? "決勝" : "予選";
   const watchLabel = `${matchLabel}試合を観戦する`;
   const result = { ...match, win: match.win };
@@ -39003,7 +39060,7 @@ function battle() {
   `;
   void field.offsetWidth;
   field.classList.add("attack");
-  pendingBattleAnimation = { cup, profile, playerStats: battleStats, matchLabel, watchLabel, bgmMode: tournamentBgmMode(cup, currentMatchIndex, total), queue: buildBattleAnimationQueue([match], cup, profile, battleStats) };
+  pendingBattleAnimation = { cup, profile, playerStats: activeBattleStats, matchLabel, watchLabel, bgmMode: tournamentBgmMode(cup, currentMatchIndex, total), queue: buildBattleAnimationQueue([match], cup, profile, activeBattleStats) };
   const roundsHtml = tournamentMatchesHtml([match], cup);
   document.getElementById("battleLog").innerHTML = `<strong>${cup.name} ${matchLabel}観戦中</strong><p>${enemyName}との${matchLabel}試合です。BGMと効果音を楽しみながら観戦できます。すぐ確認したい場合は、戦闘画面右上の「すぐに結果を見る」を押してください。</p>`;
   if (result.win && !isFinalMatch) {
