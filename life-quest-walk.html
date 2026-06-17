@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -106,7 +106,7 @@
       background: #fffdf4;
       color: #6b4f21;
       font-weight: 900;
-      font-size: 12.5px;
+      font-size: 12px;
     }
     .opening-actions {
       display: flex;
@@ -303,6 +303,16 @@
       font-size: 18px;
     }
     p { margin: 0; color: var(--muted); }
+    .map-safety-note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 2px solid #315b91;
+      border-radius: 8px;
+      background: #f4f9ff;
+      color: #163f73;
+      font-weight: 800;
+      line-height: 1.55;
+    }
     .map-wrap {
       background: linear-gradient(180deg, #eefaff, #fff7e8);
       border: 1px solid #b7dff0;
@@ -352,7 +362,7 @@
       min-width: 0;
       min-height: 38px;
       padding: 7px 5px;
-      font-size: 12px;
+      font-size: 12.5px;
       background: linear-gradient(180deg, #fff8d7, #f2df8b);
       border: 1px solid rgba(128, 89, 21, .34);
       color: #243f63;
@@ -1291,6 +1301,9 @@
       margin-top: 12px;
       min-height: 92px;
     }
+    .event:empty {
+      display: none;
+    }
     .event strong {
       display: block;
       font-size: 20px;
@@ -1475,71 +1488,6 @@
       color: var(--ink);
       font: inherit;
       font-size: 13px;
-    }
-    .care-panel {
-      margin-top: 12px;
-      padding: 12px;
-      border: 1px solid #d9c59e;
-      border-left: 6px solid var(--gold);
-      border-radius: 12px;
-      background: #fff8dc;
-      box-shadow: inset 0 -4px 0 rgba(216,166,58,.09);
-    }
-    .care-panel b {
-      display: block;
-      color: #71511b;
-      font-size: 15px;
-      line-height: 1.25;
-    }
-    .care-panel > span {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-    .care-actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .care-action {
-      min-height: 82px;
-      border: 1px solid #e1cfaa;
-      border-radius: 8px;
-      background: #fffdf4;
-      padding: 8px 6px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: inset 0 -3px 0 rgba(216,166,58,.08);
-    }
-    .care-action:disabled {
-      opacity: .62;
-      cursor: not-allowed;
-    }
-    .care-action strong {
-      display: block;
-      color: #263d2d;
-      font-size: 12px;
-      line-height: 1.2;
-    }
-    .care-action small {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.35;
-    }
-    .care-status {
-      margin-top: 9px;
-      border: 1px dashed #d9a21e;
-      border-radius: 8px;
-      background: #fff;
-      padding: 8px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.45;
     }
     .monster-art {
       aspect-ratio: 1;
@@ -1824,6 +1772,29 @@
     .monster.trail .monster-spark { background: #b6f0a0; }
     .monster.skykid .monster-mark, .monster.sky .monster-mark { left: 19px; top: 55px; width: 46px; height: 8px; background: rgba(255,255,255,.82); box-shadow: 12px -15px 0 -2px rgba(255,255,255,.72); }
     .monster.skykid .monster-spark, .monster.sky .monster-spark { background: #ffffff; filter: drop-shadow(0 0 8px rgba(102,181,255,.8)); }
+    .monster.sprout,
+    .monster.trail,
+    .monster.skykid {
+      animation: youngMonsterWalkBounce .54s ease-in-out infinite;
+    }
+    .monster.sprout .monster-foot,
+    .monster.trail .monster-foot,
+    .monster.skykid .monster-foot {
+      animation: youngMonsterFootStep 1.08s ease-in-out infinite;
+    }
+    .monster.sprout .monster-foot.right,
+    .monster.trail .monster-foot.right,
+    .monster.skykid .monster-foot.right {
+      animation-delay: -.54s;
+    }
+    @keyframes youngMonsterWalkBounce {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -1.8px; }
+    }
+    @keyframes youngMonsterFootStep {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 2.6px; }
+    }
     .monster.leaf .monster-mark { left: 39px; top: 25px; width: 4px; height: 36px; border-radius: 999px; background: rgba(38,93,50,.42); transform: rotate(8deg); box-shadow: -8px 14px 0 -2px rgba(255,255,255,.28), 8px 20px 0 -2px rgba(255,255,255,.22); }
     .monster.leaf .monster-spark { background: #d9ff8f; }
     .monster.city .monster-eye { top: 43px; }
@@ -2826,18 +2797,12 @@
       font-size: 11px;
       line-height: 1.35;
     }
-    .monster-meter {
-      height: 10px;
-      border-radius: 999px;
-      background: #eadfc9;
-      overflow: hidden;
+    .monster-xp-text {
       margin-top: 8px;
-    }
-    .monster-meter i {
-      display: block;
-      height: 100%;
-      width: var(--w);
-      background: linear-gradient(90deg, var(--green), var(--gold));
+      color: #315b91;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.3;
     }
     .battle-log {
       background: #fff;
@@ -2881,41 +2846,53 @@
     }
     .battle-field.tournament-opening .opening-fighter {
       display: grid;
-      grid-template-columns: minmax(74px, 1fr) max-content;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+      align-items: stretch;
       justify-items: center;
-      gap: 5px;
-      padding: 7px 5px;
+      gap: 7px 6px;
+      padding: 8px 6px;
       overflow: visible;
     }
     .battle-field.tournament-opening .opening-fighter.enemy {
-      grid-template-columns: max-content minmax(74px, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
-    .battle-field.tournament-opening .opening-fighter .pixel-fighter {
-      min-width: 0;
-      gap: 3px;
+    .opening-monster-name {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 28px;
+      display: grid;
+      place-items: center;
+      padding: 2px 4px;
+      color: #254a78;
+      font-size: 12.5px;
+      font-weight: 1000;
+      line-height: 1.16;
+      text-align: center;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
     }
-    .battle-field.tournament-opening .opening-fighter .hp-strip {
+    .battle-field.tournament-opening .opening-fighter .hp-strip,
+    .battle-field.tournament-opening .opening-fighter .hp-pack {
       display: none;
+    }
+    .opening-monster-art {
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      align-self: center;
+    }
+    .battle-field.tournament-opening .opening-fighter.player .opening-monster-art,
+    .battle-field.tournament-opening .opening-fighter.player .opening-stat-card {
+      transform: translateX(-6px);
+    }
+    .battle-field.tournament-opening .opening-fighter.enemy .opening-stat-card {
+      transform: translateX(4px);
     }
     .battle-field.tournament-opening .opening-fighter .battle-turnaround-art,
     .battle-field.tournament-opening .opening-fighter .battle-unique-art {
-      grid-row: 2;
-    }
-    .battle-field.tournament-opening .opening-fighter .pixel-fighter > span:last-child {
-      display: block;
-      width: 100%;
-      max-width: 132px;
-      grid-row: 1;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      line-height: 1.16;
-      text-align: center;
-      font-size: 11px;
-      letter-spacing: 0;
-    }
-    .battle-field.tournament-opening .opening-fighter.enemy .pixel-fighter > span:last-child {
-      max-width: 128px;
+      margin: 0;
     }
     .battle-field.tournament-opening .battle-turnaround-art,
     .battle-field.tournament-opening .battle-unique-art {
@@ -2937,7 +2914,7 @@
       border-radius: 10px;
       background: rgba(255,255,255,.9);
       color: #4f3715;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 900;
       line-height: 1.18;
       box-shadow: 0 3px 0 rgba(90,60,30,.08);
@@ -2959,6 +2936,9 @@
       gap: 7px;
       min-width: 0;
     }
+    .battle-field.tournament-opening .versus-chip {
+      font-size: 12px;
+    }
     .opening-affinity-card {
       position: relative;
       z-index: 2;
@@ -2969,7 +2949,7 @@
       border-radius: 12px;
       background: rgba(255,250,225,.94);
       color: #5d3718;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 1000;
       line-height: 1.22;
       text-align: center;
@@ -2981,13 +2961,13 @@
       display: block;
       margin-bottom: 2px;
       color: #8d6531;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 1000;
     }
     .opening-affinity-card b {
       display: block;
       color: #254a78;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 1000;
     }
     .battle-field.resting {
@@ -3031,6 +3011,15 @@
       display: grid;
       gap: 6px;
       justify-items: stretch;
+    }
+    .battle-field.tournament-opening .battle-action-stack {
+      justify-self: center;
+      justify-items: center;
+    }
+    .battle-field.tournament-opening .battle-watch-btn,
+    .battle-field.tournament-opening .battle-skip-btn {
+      width: max-content;
+      padding-inline: 12px;
     }
     .battle-watch-btn,
     .battle-skip-btn {
@@ -3234,7 +3223,7 @@
     }
     .hp-number {
       color: #4f3715;
-      font: 1000 10.5px/1 system-ui, sans-serif;
+      font: 1000 12px/1 system-ui, sans-serif;
       padding: 1px 5px;
       border: 1px solid rgba(82,69,48,.18);
       border-radius: 999px;
@@ -3463,7 +3452,7 @@
       position: absolute;
       inset: 0 10px 8px;
       pointer-events: none;
-      z-index: 4;
+      z-index: auto;
       overflow: visible;
     }
     .battle-field.watching .battle-effect-layer {
@@ -3471,6 +3460,7 @@
     }
     .battle-cue {
       position: absolute;
+      z-index: 9;
       left: 0;
       right: 0;
       bottom: -4px;
@@ -3494,6 +3484,16 @@
     .battle-cue b,
     .battle-cue span { display: block; }
     .battle-cue span { color: #ffe08a; }
+    .battle-cue .battle-cue-move-lines {
+      animation: battleCueMoveLinesOut .16s ease forwards;
+      animation-delay: var(--result-cue-delay, 0s);
+    }
+    .battle-cue .battle-cue-result-lines {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 5px;
+    }
     .battle-cue .move-strength-cue,
     .battle-cue .move-name-cue {
       display: inline-block;
@@ -3519,6 +3519,9 @@
     }
     @keyframes cueTypeIn {
       to { clip-path: inset(0 0 0 0); }
+    }
+    @keyframes battleCueMoveLinesOut {
+      to { opacity: 0; visibility: hidden; }
     }
     .magic-world {
       position: absolute;
@@ -3558,13 +3561,13 @@
     .magic-sigil.medium { --sigil-size: 148px; }
     .magic-sigil.strong { --sigil-size: 178px; border-width: 4px; }
     .magic-sigil.caster-sigil {
-      top: calc(var(--battle-stage-y) + 2%);
+      top: calc(var(--battle-stage-y) + 4%);
       width: calc(var(--sigil-size, 124px) * .92);
       height: calc(var(--sigil-size, 124px) * .24);
       margin-top: calc(var(--sigil-size, 124px) * -.1);
       transform: none;
       transform-origin: 50% 50%;
-      z-index: 5;
+      z-index: 0;
       background:
         radial-gradient(ellipse at 50% 50%, transparent 0 36%, rgba(255,255,255,.7) 37% 39%, transparent 40% 100%),
         radial-gradient(ellipse at 50% 50%, transparent 0 57%, var(--magic, #8ee7ff) 58% 61%, transparent 62% 100%),
@@ -4156,6 +4159,7 @@
       box-shadow: inset 0 -4px 0 rgba(0,0,0,.04);
     }
     .cup-card {
+      position: relative;
       display: grid;
       align-content: center;
       justify-items: center;
@@ -4176,6 +4180,7 @@
     }
     .cup-card b, .dex-card b { display: block; font-size: 14px; line-height: 1.25; }
     .cup-card span, .dex-card span { display: block; color: var(--muted); font-size: 11px; }
+    .cup-card > span { font-size: 11.5px; }
     .cup-balance {
       display: inline-flex;
       margin-top: 6px;
@@ -4205,6 +4210,9 @@
       border-radius: 12px;
       background: #f7fbff;
       box-shadow: inset 0 -4px 0 rgba(79,120,185,.08);
+    }
+    .balance-room:empty {
+      display: none;
     }
     .balance-room b {
       display: block;
@@ -4795,70 +4803,6 @@
       font-size: 12px;
       margin-top: 4px;
     }
-    .retirement-panel {
-      margin: 12px 0;
-      padding: 12px;
-      border: 2px solid #dcb95a;
-      border-radius: 12px;
-      background:
-        linear-gradient(135deg, rgba(255, 248, 218, .96), rgba(234, 246, 255, .94)),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, .28) 0 2px, transparent 2px 4px);
-      box-shadow: 0 8px 0 rgba(138, 106, 34, .12);
-    }
-    .retirement-panel.ready {
-      border-color: #8cc96f;
-      background:
-        linear-gradient(135deg, rgba(241, 255, 226, .96), rgba(255, 248, 218, .96)),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, .24) 0 2px, transparent 2px 4px);
-    }
-    .retirement-panel b {
-      display: block;
-      color: #6e5a18;
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-    .retirement-panel p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.55;
-    }
-    .retirement-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
-      margin-top: 10px;
-    }
-    .retirement-step {
-      min-height: 70px;
-      padding: 8px;
-      border-radius: 9px;
-      border: 1px solid rgba(138, 106, 34, .22);
-      background: rgba(255, 255, 255, .72);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-    }
-    .retirement-step em {
-      font-style: normal;
-      font-weight: 900;
-      font-size: 11px;
-      color: var(--ink);
-    }
-    .retirement-step span {
-      font-size: 10px;
-      line-height: 1.4;
-      color: var(--muted);
-    }
-    @media (max-width: 430px) {
-      .retirement-grid {
-        grid-template-columns: 1fr;
-      }
-      .retirement-step {
-        min-height: auto;
-      }
-    }
     .evolution-plan {
       margin-top: 12px;
       display: grid;
@@ -5177,9 +5121,17 @@
       box-shadow: inset 0 -2px 0 rgba(0,0,0,.12), 0 2px 0 rgba(93,64,15,.16), 0 0 0 1px rgba(0,0,0,.05);
     }
     .cup-title {
-      display: inline-flex;
+      display: grid;
+      justify-items: center;
       align-items: center;
-      gap: 6px;
+      gap: 3px;
+      width: 100%;
+      text-align: center;
+    }
+    .cup-title .cup-name {
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.25;
     }
     .medal-shelf {
       margin-top: 12px;
@@ -5191,13 +5143,13 @@
     .medal-shelf > b {
       display: block;
       color: #6b4f21;
-      font-size: 14px;
+      font-size: 14.5px;
     }
     .medal-shelf > span {
       display: block;
       margin-top: 4px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 11.5px;
       line-height: 1.55;
     }
     .medal-grid {
@@ -5400,8 +5352,8 @@
       position: absolute;
       left: 50%;
       top: 47px;
-      width: 38px;
-      height: 46px;
+      width: 35px;
+      height: 43px;
       transform: translateX(-50%);
       opacity: 0;
       pointer-events: none;
@@ -5414,16 +5366,24 @@
       padding-bottom: 10px;
     }
     .award-stage.medal-awarding .award-medal {
-      animation: awardMedalDrop 1.35s ease .28s both;
+      animation:
+        awardMedalDrop 1.35s ease .28s both,
+        awardMedalRestBob .82s ease-in-out 1.63s infinite;
       z-index: 10;
     }
     .award-stage.medal-awarding .award-medal::before,
     .award-stage.medal-awarding .award-medal::after {
-      animation: awardMedalBob .54s ease-in-out 1.63s infinite;
+      animation: none;
     }
     .award-stage.medal-awarding .award-winner {
-      animation: awardNeckZoom 1.35s ease both;
+      animation:
+        awardNeckZoom 1.35s ease both,
+        awardWinnerRestBob .82s ease-in-out 1.63s infinite;
       z-index: 6;
+    }
+    .award-stage.medal-awarding .award-winner .turnaround-monster,
+    .award-stage.medal-awarding .award-winner .monster {
+      animation: none;
     }
     .award-stage.medal-awarding .podium,
     .award-stage.medal-awarding .award-caption {
@@ -5449,8 +5409,8 @@
       position: absolute;
       top: 0;
       left: 50%;
-      width: 24px;
-      height: 23px;
+      width: 22px;
+      height: 21px;
       transform: translateX(-50%);
       clip-path: polygon(8% 0, 42% 0, 50% 46%, 58% 0, 92% 0, 72% 76%, 50% 100%, 28% 76%);
       background: linear-gradient(180deg, #ffeaa5, #b77918);
@@ -5460,8 +5420,8 @@
       position: absolute;
       left: 50%;
       bottom: 0;
-      width: 29px;
-      height: 29px;
+      width: 27px;
+      height: 27px;
       transform: translateX(-50%);
       display: grid;
       place-items: center;
@@ -5494,10 +5454,13 @@
       64% { opacity: 1; transform: translateX(-50%) translateY(58px) scale(.86); }
       100% { opacity: 1; transform: translateX(-50%) translateY(54px) scale(.72); }
     }
-    @keyframes awardMedalBob {
-      0%, 46%, 100% { transform: translateX(-50%) translateY(0); }
-      23% { transform: translateX(-50%) translateY(-1.8px); }
-      70% { transform: translateX(-50%) translateY(.8px); }
+    @keyframes awardMedalRestBob {
+      0%, 100% { transform: translateX(-50%) translateY(54px) scale(.72); }
+      50% { transform: translateX(-50%) translateY(51px) scale(.72); }
+    }
+    @keyframes awardWinnerRestBob {
+      0%, 100% { transform: translateX(-50%) translateY(4px) scale(2.2); }
+      50% { transform: translateX(-50%) translateY(1px) scale(2.2); }
     }
     @keyframes awardNeckZoom {
       0% { transform: translateX(-50%) translateY(0) scale(1); }
@@ -6100,7 +6063,7 @@
     }
     .home-window {
       position: absolute;
-      left: 16px;
+      left: 13px;
       top: 24px;
       width: 76px;
       height: 60px;
@@ -6169,7 +6132,7 @@
       position: absolute;
       bottom: 18px;
       width: 30px;
-      height: 52px;
+      height: 45px;
       border: 4px solid #4f6f62;
       background: #88aa98;
       box-shadow: inset 0 -9px 0 rgba(47,72,62,.14);
@@ -6277,6 +6240,12 @@
     .home-seat.companion .home-companion-art,
     .home-seat.companion .home-companion-art * {
       animation: none !important;
+      translate: 0 0 !important;
+    }
+    .home-seat .monster,
+    .home-seat .monster * {
+      animation: none !important;
+      translate: 0 0 !important;
     }
     .home-seat.companion .home-companion-turnaround .turnaround-monster,
     .home-seat.companion .home-companion-turnaround .unique-monster {
@@ -6310,7 +6279,7 @@
     }
     .home-talk {
       position: absolute;
-      left: calc(50% + 34px);
+      left: calc(50% + 31px);
       top: 9px;
       width: min(330px, calc(100% - 34px));
       transform: translateX(-50%);
@@ -6323,7 +6292,8 @@
       box-sizing: border-box;
       width: max-content;
       min-width: 4.5em;
-      max-width: 86%;
+      max-width: none;
+      white-space: nowrap;
       border: 2px solid rgba(93,66,24,.16);
       border-radius: 14px;
       background: rgba(255,255,255,.94);
@@ -6351,16 +6321,18 @@
     .home-talk-line.guide,
     .home-talk-line.speaker-guide {
       justify-self: start;
-      margin-left: 36px;
+      margin-left: 24px;
       border-color: rgba(93,66,24,.16);
       background: rgba(255,255,255,.94);
     }
     .home-talk-line.speaker-guide::after {
+      left: calc(10px + 8em);
       border-top-color: rgba(255,255,255,.94);
       transform: translateX(-50%) skewX(48deg);
     }
     .home-talk-line.speaker-companion {
       justify-self: start;
+      margin-left: -4px;
       border-color: rgba(224,130,128,.22);
       background: rgba(255,240,236,.98);
       box-shadow: 0 3px 0 rgba(76,46,38,.16), 0 0 0 1px rgba(76,46,38,.07);
@@ -6651,6 +6623,9 @@
       justify-items: center;
       align-items: center;
     }
+    .retirement-ceremony-hero.retirement-sprout-result::before {
+      display: none;
+    }
     .retirement-sprout-result .retirement-ceremony-art .monster-current-art {
       display: grid;
       place-items: center;
@@ -6671,6 +6646,11 @@
       margin: auto;
       transform: none;
       transform-origin: center center;
+    }
+    .retirement-still-art .monster,
+    .retirement-still-art .monster * {
+      animation: none !important;
+      translate: 0 0 !important;
     }
     .retirement-ceremony-card {
       display: grid;
@@ -7717,11 +7697,11 @@
     @media (max-width: 620px) {
       .companion-home-head { display: block; }
       .companion-home-state { display: inline-block; margin-top: 4px; }
-      .home-window { left: 10px; width: 64px; }
+      .home-window { left: 7px; width: 64px; }
       .home-door { right: 16px; }
-      .home-talk { left: calc(50% + 30px); top: 9px; }
+      .home-talk { left: calc(50% + 27px); top: 9px; }
       .home-talk-line { font-size: 12.5px; padding: 5px 9px; }
-      .home-talk-line.speaker-guide { margin-left: 24px; }
+      .home-talk-line.speaker-guide { margin-left: 20px; }
       .home-seated-pair { width: calc(100% - 64px); gap: 2px; }
       .home-seat .monster-art { width: 78px; height: 78px; }
       .home-seat .unique-monster { width: 82px; height: 82px; }
@@ -7812,11 +7792,12 @@
     .user-home-menu { display: none; }
     .side-quest-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
       margin-top: 10px;
     }
     .side-quest-card {
+      min-width: 0;
       min-height: 128px;
       display: grid;
       grid-template-rows: auto auto 1fr auto;
@@ -8578,7 +8559,7 @@
       margin-bottom: 8px;
     }
     .reward-pop.medal-reward .reward-card b {
-      font-size: 35px;
+      font-size: 32px;
       margin-bottom: 10px;
     }
     .reward-card strong {
@@ -8652,7 +8633,7 @@
       <div class="today-result" id="todayResult"></div>
       <div class="mini-feature" id="todaySkyBonus"></div>
       <h2>今日の探索マップ</h2>
-      <p>安全に歩き、歩数で25マスマップを進めます。進化マスやタネ召喚では、安全に立ち止まってからイマソラ認識を行いましょう。</p>
+      <p class="map-safety-note">安全に歩き、歩数で25マスマップを進めます。進化マスやタネ召喚では、安全に立ち止まってからイマソラ認識を行いましょう。</p>
       <div class="air-traits" id="airTraits"></div>
       <div class="map-wrap">
         <div class="map" id="map"></div>
@@ -8661,13 +8642,10 @@
       </div>
       <div class="map-stamp-rally">
         <h3>マップスタンプラリー</h3>
-        <p>25マスマップで到着した場所が記録されます。通常マスはまとめて通過してもスタンプになり、宝箱・挑戦券・進化・タネ召喚は到着した時に開きます。</p>
+        <p>スタンプは、25マスマップで通ったマスや到着したマスの種類ごとに記録されます。通常マスは通過した分もスタンプになり、宝箱・挑戦券・進化マス・タネ召喚はそのマスに止まった時にスタンプがつきます。</p>
         <div class="collection" id="stampView"></div>
       </div>
-      <div class="event" id="eventBox">
-        <strong>探索前</strong>
-        <p>歩行終了後に、同じ画面でイマソラ認識まで進めます。重要マスでは、自己申告ではなくイマソラ確認で進化やタネ召喚を確定します。</p>
-      </div>
+      <div class="event" id="eventBox"></div>
     </section>
 
     <section class="panel screen active" data-screen="walk">
@@ -8792,13 +8770,11 @@
         <div class="monster-info">
           <b id="monsterName"></b>
           <span id="monsterText"></span>
-          <div class="monster-meter"><i id="monsterMeter" style="--w:0%"></i></div>
+          <div class="monster-xp-text" id="monsterXpText"></div>
           <div class="growth-panel" id="growthPanel"></div>
         </div>
       </div>
       <div class="stat-guide" id="statGuide"></div>
-      <div class="care-panel" id="carePanel"></div>
-      <div class="retirement-panel" id="retirementPanel"></div>
       <div class="friend-battle-panel" id="friendBattlePanel"></div>
       <div class="battle-field resting" id="battleField">
         <div class="fighter" id="myFighter"></div>
@@ -8851,7 +8827,7 @@
         <span>完成度ではなく、方向性の確認をします。実際に触って、楽しいか、分かりやすいか、面倒ではないかを見ます。</span>
         <ul>
           <li>歩くタブ: ホーム、成果ボード、マップ、投稿テンプレ補助の流れを見る。</li>
-          <li>育成・大会タブ: イマソラ認識、タネ、相棒、お世話、大会、図鑑を見る。</li>
+          <li>育成・大会タブ: イマソラ認識、タネ、相棒、大会、図鑑を見る。</li>
           <li>町・記録タブ: 町の建物、小さな店、素材ストック、スタンプを見る。</li>
           <li>規約・設定タブ: 安全ルール、利用規約、プライバシー、画面階層案を見る。</li>
           <li>最後に判断: 大人が毎日開きたくなるか、イマソラが主役に感じるか、削るべきものがあるかをメモする。</li>
@@ -8899,7 +8875,7 @@
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase3"><strong>購入候補3</strong><span>OtoLogic SNES-RPG03-6 Purchase。購入音の仮採用候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase4"><strong>購入候補4</strong><span>OtoLogic SNES-RPG03-7 Select。軽い購入候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="shopPurchase5"><strong>購入候補5</strong><span>OtoLogic SNES-RPG03-8 Select。軽い別候補。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="itemUse"><strong>アイテム使用音</strong><span>素材やお世話などの使用音。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="itemUse"><strong>アイテム使用音</strong><span>素材やアイテムなどの使用音。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate1"><strong>使用候補1</strong><span>OtoLogic NES-Action01-08 Item。使用音の仮採用候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate2"><strong>使用候補2</strong><span>OtoLogic NES-Action01-09 Item。別の使用音候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="itemUseCandidate3"><strong>使用候補3</strong><span>OtoLogic NES-Action01-10 Item。短い使用音候補。</span></button>
@@ -9327,6 +9303,8 @@ const bgmAudioFiles = {
   retirementCeremony: "assets/audio/imasora_retirement_ceremony_v01.mp3",
   rookieBattle: "assets/audio/imasora_corridor_rookie_battle_v01.mp3",
   rookieFinal: "assets/audio/imasora_adventure_charm_rookie_final_v01.mp3",
+  rookieAward: "assets/audio/imasora_award_rookie_ceremony_v01.mp3",
+  majorAward: "assets/audio/imasora_award_four_major_ceremony_v01.mp3",
   major1: "assets/audio/imasora_password_major_battle_v01.mp3",
   major1Final: "assets/audio/imasora_hero_major_final_v01.mp3",
   major2: "assets/audio/imasora_dream_circuit_major2_battle_v01.mp3",
@@ -9632,6 +9610,8 @@ const bgmModeNames = {
   retirementCeremony: "引退式BGM",
   rookieBattle: "はじまり杯 通常戦BGM",
   rookieFinal: "はじまり杯 決勝BGM",
+  rookieAward: "はじまり杯 表彰式BGM",
+  majorAward: "四大杯 表彰式BGM",
   major1: "森の四大杯 通常戦BGM",
   major1Final: "森の四大杯 決勝BGM",
   major2: "街の四大杯 通常戦BGM",
@@ -9737,17 +9717,13 @@ const supportItems = [
   { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとに相棒経験値 +2", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび成長を少し増やす。", use: "dailyWalkXp" },
   { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "今日一日のイマソラ認識ごとにCoin +5", text: "遠回りの楽しみを作る小さなおやつ。今日の散歩前に使うと、空を認識するたびコインが少し増える。", use: "dailyWalkCoin" },
   { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "相棒経験値 +3", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
-  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "相棒経験値 +1 / 引退まで +12時間", text: "ゆっくり休める毛布。お世話を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
+  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "相棒経験値 +1 / 引退まで +12時間", text: "ゆっくり休める毛布。手間を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
   { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +4", text: "自然ルートへ少し寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
   { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +4", text: "空ルートへ少し寄せる。すばやさ特化だけが最強にならないよう控えめ。", use: "sky" },
   { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを少し整える。", use: "river" },
   { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +10", text: "試合前に気持ちを整えるラムネ。散歩で集めた準備が試合にしっかり効く大会用。", use: "battleAcc" },
   { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +10", text: "装備を整えるテープ。散歩で集めた準備が受けるダメージを抑える大会用。", use: "battleDef" },
   { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。散歩で集めた準備が先手の流れを作る大会用。", use: "battleSpd" }
-];const careActions = [
-  { id: "water", name: "葉に水をあげる", text: "自然寄りに少し育つ", bias: "nature" },
-  { id: "sky", name: "空を見せる", text: "空寄りに少し育つ", bias: "sky" },
-  { id: "road", name: "道の話をする", text: "道寄りの気分で少し落ち着く", bias: "trail" }
 ];
 const evolutionPlan = [
   { stage: "タネ期", count: 7, branch: "7つのタネから始まる", tone: "小さく不思議。どれを育てるか選ぶ入口。" },
@@ -31010,7 +30986,6 @@ function defaultState() {
     pendingSky: null,
     mapAwaitingSky: null,
     comboDex: [],
-    careLog: [],
     cups: [],
     inventory: [],
     itemEffects: { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} },
@@ -31119,7 +31094,6 @@ function normalizeState() {
   }
   resetDailyMapProgressIfNeeded();
   state.comboDex = Array.isArray(state.comboDex) ? state.comboDex : [];
-  state.careLog = Array.isArray(state.careLog) ? state.careLog : [];
   state.cups = Array.isArray(state.cups) ? state.cups : [];
   state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
   if ("town" in state) delete state.town;
@@ -31894,8 +31868,11 @@ function scheduleBgmLoopCue(mode, loopSeconds, currentSeconds = 0) {
 function isBattleResultBgmMode() {
   return sound.mode === "battleVictory" || sound.mode === "battleDefeat";
 }
+function isTournamentAwardBgmMode() {
+  return sound.mode === "rookieAward" || sound.mode === "majorAward" || sound.mode === "grandAward";
+}
 function stopBattleResultBgm() {
-  if (isBattleResultBgmMode()) stopBgm();
+  if (isBattleResultBgmMode() || isTournamentAwardBgmMode()) stopBgm();
 }
 function playBgmEvent(song, event) {
   const beat = 60 / song.bpm;
@@ -32613,8 +32590,6 @@ function renderShareMission() {
   const ready = Boolean(latest && latest.date === todayKey());
   box.innerHTML = `
     <b>イマソラ投稿テンプレ補助</b>
-    <span>投稿は義務ではなく、共有したい人のための任意の補助として扱います。報酬は付与しません。今いる場所が分かるものが映った投稿は禁止し、リアルタイムの居場所が分かる内容は入れない方針です。</span>
-    <div class="share-tags"><i>#イマソラウォーク#イマソラ</i><i>大人もハマる、今の空で進化する散歩ゲームアプリ</i></div>
     <textarea class="share-draft" id="shareMissionText" readonly>${escapeAttr(shareDraftText())}</textarea>
     <p>${ready ? "今日のイマソラ認識とひとことから、任意で使える投稿文を作れます。" : "まず歩いて立ち止まり、イマソラ認識を確定すると投稿文の内容が今日の空に変わります。"}</p>
     <div class="actions share-buttons">
@@ -34210,7 +34185,7 @@ function monsterProfile() {
   const whiteName = name => white ? `白${name}` : name;
   const whiteText = white ? "白のタネから育つ特別版。体色だけが白く、目・手・足・ソラ玉・装飾は元の色を保つ。" : "";
   if (effectiveStageIndex === 0) return { id: seed.id, name: seed.name, text: `${stage}。${seed.text}。タネを使うとすぐ新芽期へ進みます。${whiteText}`, form: "seed", stage, power: Math.max(1, m.xp), white };
-  if (effectiveStageIndex === 1) return { id: `sprout-${seed.id}`, name: whiteName(sproutBaseNames[seed.id] || "ミチメバ"), text: `${stage}。新芽期になってから、進化マスでイマソラ認証すると青葉期へ進みます。${whiteText}`, form: "sprout", stage, power: m.xp + 2, white };
+  if (effectiveStageIndex === 1) return { id: `sprout-${seed.id}`, name: whiteName(sproutBaseNames[seed.id] || "ミチメバ"), text: `${stage}。進化マスでイマソラ認証をすると青葉期へと進化します。${whiteText}`, form: "sprout", stage, power: m.xp + 2, white };
   if (effectiveStageIndex === 2) {
     if (m.sky >= m.nature + m.city) return { id: "skykid", name: whiteName("ソラリオ"), text: `${stage}。空をよく見て育った、このアプリの看板候補。${whiteText}`, form: "skykid", stage, power: m.xp + m.sky, white };
     return { id: "trail", name: whiteName("ミチリオ"), text: `${stage}。散歩道の発見で育つ、このアプリのイメージキャラ候補。${whiteText}`, form: "trail", stage, power: m.xp + m.nature + m.city, white };
@@ -34249,6 +34224,21 @@ function toggleTournamentPlaytestBypass() {
 }
 function fourMajorCupIds() {
   return ["green", "city", "sky", "river"];
+}
+function tournamentAwardBgmMode(cup) {
+  if (!cup) return "";
+  if (cup.id === "rookie") return "rookieAward";
+  if (cup.id === "grand") return "grandAward";
+  if (fourMajorCupIds().includes(cup.id)) return "majorAward";
+  return "";
+}
+function startTournamentAwardBgm(cup) {
+  const awardBgmMode = tournamentAwardBgmMode(cup);
+  if (battleResultSfxTimer) clearTimeout(battleResultSfxTimer);
+  battleResultSfxTimer = null;
+  stopBgm();
+  sound.mode = "";
+  if (awardBgmMode && bgmAudioFiles[awardBgmMode]) startBgm(awardBgmMode);
 }
 function clearedFourMajorId() {
   return fourMajorCupIds().find(id => state.cups.includes(id)) || "";
@@ -34838,10 +34828,10 @@ function mapEvolutionResultHtml(result, current, xpGain, coinGain) {
 function retirementStillCompanionArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if (item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"))) {
-    const classes = `monster-current-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
+    const classes = `monster-current-art retirement-still-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
     return `<div class="${classes}">${retirementStillMonsterSvg(uniqueMonsterSvg(item, true))}</div>`;
   }
-  return retirementStillMonsterSvg(companionArtHtml(profile, growth));
+  return retirementStillMonsterSvg(companionArtHtml(profile, growth).replace('class="', 'class="retirement-still-art '));
 }
 function companionRightFacingArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
@@ -35657,7 +35647,7 @@ function renderNewSeedSproutCeremony(seed, gifted = false, options = {}) {
     <div class="retirement-ceremony-hero retirement-sprout-result">
       <div class="retirement-ceremony-copy">
         <h2>新芽期へ進化</h2>
-        <p>${gifted ? "プレゼントされた" : "選んだ"}${seed.name}が、進化工程どおりに新芽期へ進みました。ここから新しい散歩が始まります。</p>
+        <p>${gifted ? "プレゼントされた" : "選んだ"}${seed.name}が、進化工程どおりに新芽期へ進化しました。ここから新しい散歩が始まります。</p>
       </div>
       <div class="retirement-ceremony-stage">
         <div class="retirement-ceremony-art">${companionArtHtml(profile, growth)}</div>
@@ -36960,14 +36950,13 @@ function renderMonster() {
   const growth = growthForecast();
   const displayName = companionDisplayName(profile);
   renderSeedChoice(profile);
-  renderCarePanel(profile);
-  renderRetirementPanel(profile, lifeRemain);
   renderFriendBattlePanel(profile, lifeRemain);
   renderStatGuide(stats);
   const art = document.getElementById("monsterArt");
   renderCurrentCompanionArt(art, profile, growth);
   document.getElementById("monsterName").textContent = displayName;
   document.getElementById("monsterText").textContent = companionSummaryText(profile, growth, lifeText, stats, skillNames);
+  document.getElementById("monsterXpText").textContent = `相棒経験値 ${state.monster.xp}`;
   document.getElementById("growthPanel").innerHTML = `
     ${growth.scores.map(item => {
       const max = Math.max(1, ...growth.scores.map(score => score.value));
@@ -36975,9 +36964,7 @@ function renderMonster() {
       const color = item.key === "sky" ? "#63a6ff" : item.key === "nature" ? "#7fb069" : "#d9a21e";
       return `<div class="growth-row"><span>${item.label}</span><div class="growth-bar"><i style="--w:${width}%;--c:${color}"></i></div><span>${item.value}</span></div>`;
     }).join("")}
-    <div class="growth-forecast">育成傾向: 現在は${growth.top.label}寄りです。${growth.top.hint}。</div>
   `;
-  document.getElementById("monsterMeter").style.setProperty("--w", `${Math.min(100, state.monster.xp * 8)}%`);
   if (!state.dex.includes(profile.id)) state.dex.push(profile.id);
   renderBattleStage(profile, lifeRemain);
 }
@@ -36985,19 +36972,18 @@ function renderStatGuide(stats) {
   const box = document.getElementById("statGuide");
   if (!box) return;
   const items = [
-    ["HP", stats.hp, "体力。長い試合で粘り、判定でも残りHP比率に効きます。"],
-    ["MP", stats.mp, "技の流れを引き出す力。高いほど中技・強技が少し出やすく、反撃気配や最終ターンでも少し光ります。", "mp"],
-    ["すばやさ", stats.spd, "先手を取りやすくなります。先に動くほど、短い試合で流れを作りやすいです。"],
-    ["攻撃力", stats.atk, "与えるダメージの中心。強技だけに頼らず、弱技・中技の底上げにも効きます。"],
-    ["防御力", stats.def, "受けるダメージを抑えます。強技を受けた後の反撃気配まで耐える力です。"],
-    ["命中", stats.acc, "攻撃を当てる安定感。中技・強技を引いても、当たらなければ流れは変わります。"],
-    ["回避", stats.eva, "相手の攻撃を外させる力。ただし回避だけが絶対の正解にならないよう控えめに扱います。"]
+    ["HP", "体力です。0になると戦えなくなります。"],
+    ["MP", "技を使う力です。技の出やすさや技の流れに関わります。", "mp"],
+    ["すばやさ", "行動の早さです。高いほど先に動きやすくなります。"],
+    ["攻撃力", "相手に与えるダメージの強さです。"],
+    ["防御力", "相手から受けるダメージを減らす力です。"],
+    ["命中", "攻撃を相手に当てる力です。"],
+    ["回避", "相手の攻撃を避ける力です。"]
   ];
   box.innerHTML = `
     <b>能力値の意味</b>
-    <span>どれか一つを極めれば勝てる設計ではなく、散歩・空・育成の積み重ねで相棒の戦い方が少しずつ変わります。</span>
     <div class="stat-guide-grid">
-      ${items.map(([name, value, text, cls]) => `<div class="stat-guide-card ${cls || ""}"><strong>${name}<i>${value}</i></strong><p>${text}</p></div>`).join("")}
+      ${items.map(([name, text, cls]) => `<div class="stat-guide-card ${cls || ""}"><strong>${name}</strong><p>${text}</p></div>`).join("")}
     </div>
   `;
 }
@@ -37070,74 +37056,6 @@ function saveNickname() {
   playSfx("select");
   toast(name ? "名前を保存" : "名前を空にしました");
 }
-function renderCarePanel(profile) {
-  const box = document.getElementById("carePanel");
-  if (!box) return;
-  const today = todayKey();
-  const done = state.careLog.find(item => item.date === today);
-  const earlyStage = !canEnterTournament();
-  box.innerHTML = `
-    <b>今日のお世話</b>
-    <span>${earlyStage ? "タネ期・新芽期・青葉期は戦闘しません。お世話は1日1回だけ、相棒に少し触れるための小さな選択です。" : "開花期以降も記録として残します。お世話は義務ではなく、散歩前後の短い触れ合いです。"}</span>
-    <div class="care-actions">
-      ${careActions.map(action => `
-        <button class="care-action" type="button" data-care="${action.id}" ${done ? "disabled" : ""}>
-          <strong>${action.name}</strong>
-          <small>${action.text}</small>
-        </button>
-      `).join("")}
-    </div>
-    <div class="care-status">${done ? `今日は「${done.name}」をしました。次はまた明日、好きな時で大丈夫です。` : "好きな時に1日1回だけで大丈夫です。時間ごとの管理はありません。"}</div>
-  `;
-  document.querySelectorAll("[data-care]").forEach(button => {
-    button.addEventListener("click", () => careMonster(button.dataset.care));
-  });
-}
-function careMonster(actionId) {
-  const today = todayKey();
-  if (state.careLog.some(item => item.date === today)) {
-    playSfx("error");
-    toast("今日はお世話済み");
-    return;
-  }
-  const action = careActions.find(item => item.id === actionId) || careActions[0];
-  state.monster.xp += 1;
-  if (action.bias === "nature") state.monster.nature += 1;
-  if (action.bias === "sky") state.monster.sky += 1;
-  if (action.bias === "city") state.monster.city += 1;
-  state.careLog.unshift({ date: today, id: action.id, name: action.name });
-  state.careLog = state.careLog.slice(0, 14);
-  addLog(`今日のお世話: ${action.name}。小さく育った。`);
-  saveState();
-  renderAll();
-  playSfx("reward");
-  toast("お世話完了");
-}
-function renderRetirementPanel(profile, lifeRemain) {
-  const box = document.getElementById("retirementPanel");
-  if (!box) return;
-  const ready = lifeRemain <= 0;
-  box.className = `retirement-panel${ready ? " ready" : ""}`;
-  box.innerHTML = `
-    <b>${ready ? "引退準備中" : "引退準備メモ"}</b>
-    <p>${ready
-      ? `${profile.name}は街でまた会える相棒として、引退の日へ進む準備をしています。ここは終わりではなく、図鑑や見た目として残る前向きな節目です。`
-      : `${profile.name}がいつか街で暮らす時のために、強さの大幅上乗せではなく、見た目や称号を少しずつ残していきます。${retirementTimeText(lifeRemain)}。`}</p>
-    <div class="retirement-grid">
-      <div class="retirement-step">
-        <em>街で遊ぶ</em>
-        <span>引退後も街で会える相棒として残します。</span>
-      </div>
-      <div class="retirement-step">
-        <em>図鑑の思い出</em>
-        <span>勝敗だけでなく、歩いた空や空の気配も記録します。</span>
-      </div>
-      <div class="retirement-step">
-        <em>タネ召喚/進化</em>
-        <span>通常タネはタネ召喚、進化は進化マスのイマソラ認証で進みます。</span>
-      </div>
-    </div>`;
-}
 function renderBattleStage(profile, lifeRemain = 1) {
   const field = document.getElementById("battleField");
   const log = document.getElementById("battleLog");
@@ -37163,21 +37081,24 @@ function renderBattleStage(profile, lifeRemain = 1) {
   field.className = "battle-field tournament-opening";
   const readyCup = tournaments.find(item => item.id === state.pendingBattle.cupId) || tournaments[0];
   const readyPlayerName = tournamentPlayerDisplayName(profile);
-  const readyOpponent = readyCup ? tournamentOpponentForMatch(readyCup, 0, tournamentMatchCount(readyCup), readyPlayerName) : null;
+  const readyTotal = readyCup ? tournamentMatchCount(readyCup) : 2;
+  const readyMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), readyTotal - 1));
+  const readyMatchLabel = readyMatchIndex >= readyTotal - 1 ? "決勝" : "予選";
+  const readyOpponent = readyCup ? tournamentOpponentForMatch(readyCup, readyMatchIndex, readyTotal, readyPlayerName) : null;
   const readyEnemyName = readyOpponent?.name || (readyCup ? tournamentEnemyMonsterName(readyCup, readyPlayerName) : "大会相手");
   const readyPlayerStats = state.pendingBattle.battleStats || monsterStats();
-  const readyEnemyStats = readyCup ? enemyStatsForTournamentMatch(readyCup, 0) : null;
+  const readyEnemyStats = readyCup ? enemyStatsForTournamentMatch(readyCup, readyMatchIndex) : null;
   const readyAffinityStats = tournamentOpeningPlayerAffinityStats(readyPlayerStats, profile);
   field.innerHTML = `
     <div class="battle-hud">
       <div class="battle-action-stack">
-        <button class="battle-watch-btn" type="button" onclick="startTournamentBattleFromReady(false)">予選試合を観戦する</button>
+        <button class="battle-watch-btn" type="button" onclick="startTournamentBattleFromReady(false)">${readyMatchLabel}試合を観戦する</button>
         <button class="battle-skip-btn" type="button" onclick="startTournamentBattleFromReady(true)">すぐに結果を見る</button>
       </div>
     </div>
-    <div class="fighter opening-fighter player" id="myFighter">${tournamentPlayerFighter(profile)}${tournamentOpeningStatsHtml(readyPlayerStats)}</div>
+    <div class="fighter opening-fighter player" id="myFighter">${tournamentPlayerOpeningFighterHtml(profile, readyPlayerStats)}</div>
     <div class="opening-match-center"><div class="versus-chip">VS</div>${tournamentOpeningAffinityHtml(readyAffinityStats, readyOpponent)}</div>
-    <div class="fighter opening-fighter enemy" id="enemyFighter">${readyCup ? `${tournamentOpeningStatsHtml(readyEnemyStats)}${tournamentEnemyFighter(readyCup, readyOpponent || readyEnemyName)}` : readyEnemyName}</div>
+    <div class="fighter opening-fighter enemy" id="enemyFighter">${readyCup ? tournamentEnemyOpeningFighterHtml(readyCup, readyOpponent || readyEnemyName, readyEnemyStats) : readyEnemyName}</div>
     <div class="battle-flash"></div>
   `;
 }
@@ -37292,6 +37213,14 @@ function tournamentPlayerFighter(profile, hpPercent = 100, view = "front", hpAft
     ${art}
     <span>${fighterName}</span>
   </div>`;
+}
+function tournamentPlayerOpeningFighterHtml(profile, stats) {
+  ensureMonsterDexGroups();
+  const item = directionDesignItem(profile, false);
+  const fighterName = item.name || profile.name;
+  const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
+  const art = battleDirectionArtFromItem(item, "front", profile.form, whiteClass);
+  return `<div class="opening-monster-name">${fighterName}</div><div class="opening-monster-art">${art}</div>${tournamentOpeningStatsHtml(stats)}`;
 }
 function tournamentPlayerAwardArt(profile) {
   ensureMonsterDexGroups();
@@ -37410,6 +37339,13 @@ function tournamentEnemyFighter(cup, opponentOrName, hpPercent = 100, view = "fr
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
   return completedFighterFromItem(opponent.name, opponent.item || tournamentNpcItem(cup), hpPercent, view, hpAfterPercent, advantageState, true, hpValue, hpAfterValue);
 }
+function tournamentEnemyOpeningFighterHtml(cup, opponentOrName, stats) {
+  const opponent = normalizeTournamentOpponent(opponentOrName, cup);
+  const item = opponent.item || tournamentNpcItem(cup);
+  const whiteClass = item?.whiteVariant ? " white-body" : "";
+  const art = item ? battleDirectionArtFromItem(item, "front", "leaf", whiteClass) : "";
+  return `<div class="opening-monster-name">${opponent.name}</div>${tournamentOpeningStatsHtml(stats)}<div class="opening-monster-art">${art}</div>`;
+}
 function tournamentEnemyAwardArt(cup, opponentOrName, view = "front") {
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
   const item = opponent.item || tournamentNpcItem(cup);
@@ -37437,7 +37373,7 @@ function renderTournament() {
     ].filter(Boolean).join(" / ");
     return `
       <button class="cup-card ${selectedCup === cup.id ? "selected" : ""} ${locked ? "locked" : ""} ${entered ? "entered" : ""}" type="button" data-cup="${cup.id}" ${retirementReady ? "disabled" : ""}>
-        <b class="cup-title">${cup.name}<span class="cup-medal medal-${cup.id}" aria-label="${cup.name}のメダル"></span></b>
+        <b class="cup-title"><span class="cup-medal medal-${cup.id}" aria-label="${cup.name}のメダル"></span><span class="cup-name">${cup.name}</span></b>
         <span>${cupDetails}</span>
       </button>
     `;
@@ -37505,24 +37441,15 @@ function renderEntryStatus() {
         : majorLocked
           ? "四大杯は四大大会参加券が必要です。25マスマップの挑戦券で複数枚入手できます。"
         : "";
-  const playtestNote = playtestBypass ? `<div class="balance-note">開発確認モード中です。出場条件、参加券消費、グランドチャンピオン杯の1回制限を一時的に無視して試合を確認できます。</div>` : "";
-  const playtestQuickAction = `<div class="balance-note">ローカル試作用です。正式な出場条件は残したまま、選択中の大会をすぐ確認できます。</div>
-    <div class="actions">
-      <button class="secondary" type="button" data-cup="${selected.id}" onclick="preparePlaytestTournamentEntry(this.dataset.cup)">開発確認: この大会を準備</button>
-      <button class="primary" type="button" data-cup="${selected.id}" onclick="startPlaytestTournamentBattle(this.dataset.cup)">開発確認: この大会を観戦</button>
-    </div>`;
   document.getElementById("entryStatus").innerHTML = `
     <b>${selected.name}に参加しますか？</b>
     <p>${unavailableText || `最大${selected.matchCount || 2}試合の大会です。参加確認後、大会前の作戦を決めてからオープニングへ進みます。`}</p>
-    <div class="balance-note">${selected.balance}</div>
-    ${playtestNote}
     <div class="actions tournament-confirm-actions">
       <button class="primary" id="confirmTournamentBtn" type="button" data-cup="${selected.id}" onclick="confirmTournamentParticipation(this.dataset.cup)" ${retirementReady ? "disabled" : ""}>${retirementReady ? "大会×" : "はい"}</button>
       <button class="quiet" id="cancelTournamentBtn" type="button" onclick="cancelTournamentParticipation()">いいえ</button>
-    </div>
-    ${playtestQuickAction}
-    <div class="balance-note" id="entryResponse" aria-live="polite"></div>`;
-  renderBalanceRoom(selected);
+    </div>`;
+  const balanceRoom = document.getElementById("balanceRoom");
+  if (balanceRoom) balanceRoom.innerHTML = "";
 }
 function balanceWeightRow(label, weights, note) {
   const total = Math.max(1, weights.weak + weights.medium + weights.strong);
@@ -37688,7 +37615,7 @@ function directionDesignItem(profile, useProfileName = true) {
 }
 function directionFrameArt(item, direction) {
   const art = direction.art || direction.id || "front";
-  if (["side", "side-left", "back", "front-right", "front-left", "back-right", "back-left"].includes(art)) {
+  if (["front", "side", "side-left", "back", "front-right", "front-left", "back-right", "back-left"].includes(art)) {
     return `<div class="direction-turnaround-art">${turnaroundMonsterSvg(item, art)}</div>`;
   }
   if (item.id.startsWith("hero-") || item.id.startsWith("star-")) {
@@ -37952,7 +37879,7 @@ function renderItemGuide() {
   const retirementReady = isRetirementReady();
   const categoryCopy = {
     "散歩": "歩く理由を増やす。操作中に使うものではなく、次のイマソラ認識時に小さく効きます。",
-    "育成": "日々の成長を少し支える。お世話を増やしすぎず、1日1回の軽さを守ります。",
+    "育成": "日々の成長を少し支える。手間を増やしすぎず、使いやすい軽さを守ります。",
     "進化": "成長傾向を少し寄せる。固定の正解にならないよう、強制分岐にはしません。",
     "大会": "試合前の小さな準備。次の大会1回だけで消えるので、必須アイテムにはしません。",
     "引退": "引退までの時間を少し整える。能力値の大幅上乗せには使いません。"
@@ -39800,18 +39727,26 @@ function playBattleAnimationStep(index) {
     ? `${battleCueLine("b", scene.text, 0)}${battleCueLine("span", `${pendingBattleAnimation?.matchLabel || "試合"}、開始。`, 1.1)}`
     : `${battleTurnCueLine(scene.name, turnNameColor, 0)}${battleCueLine("span", `${scene.name}は${tierLabel[scene.tier] || "技"}`, attackLeadDelay, "move-strength-cue")}${battleCueLine("span", `「${scene.moveName}」を放った！`, attackReleaseDelay, "move-name-cue")}${magicCaptionLines}`;
   const targetAfterPercent = scene.target === "me" ? myFinalPercent : enemyFinalPercent;
+  const isSurrenderResult = scene.type !== "match" && scene.hit && targetAfterPercent <= 0;
   const resultText = scene.hit
-    ? targetAfterPercent <= 0 ? `${scene.targetName}は『降参した』。` : `${scene.targetName}は『攻撃に耐えた』。`
+    ? isSurrenderResult ? `${scene.targetName}は降参した。` : `${scene.targetName}は攻撃に耐えた。`
     : `${scene.targetName}は攻撃を回避した。`;
-  const resultLine = scene.type === "match" ? "" : battleCueLine("span", resultText, resultCueDelay, "result-cue");
+  const surrenderVictoryText = isSurrenderResult ? `${cup.name}、${pendingBattleAnimation?.matchLabel || "試合"}は${scene.name}の勝利！` : "";
+  const surrenderVictoryDelay = surrenderVictoryText ? resultCueDelay + cueTypeDurationFor(resultText) + .32 : resultCueDelay;
+  if (surrenderVictoryText) cueSoundDelays.push(surrenderVictoryDelay);
+  const resultLine = scene.type === "match"
+    ? ""
+    : `${battleCueLine("span", resultText, resultCueDelay, "result-cue")}${surrenderVictoryText ? battleCueLine("span", surrenderVictoryText, surrenderVictoryDelay, "result-cue victory-cue") : ""}`;
+  const decisionRevealDelay = surrenderVictoryText ? surrenderVictoryDelay + cueTypeDurationFor(surrenderVictoryText) + .6 : finalDecisionDelay;
+  const battleCueHtml = scene.type === "match"
+    ? moveLine
+    : `<div class="battle-cue-move-lines" style="--result-cue-delay:${Math.max(0, resultCueDelay - .04).toFixed(2)}s">${moveLine}</div><div class="battle-cue-result-lines">${resultLine}</div>`;
   const decisionPrimaryAction = finalOutcomeSide === "me" && pendingBattleAnimation?.matchLabel === "予選"
-    ? { label: "決勝試合を観戦する", action: "proceedToFinalFromDecision()" }
+    ? { label: "決勝へと進む", action: "proceedToFinalFromDecision()" }
     : finalOutcomeSide === "me" && pendingBattleAnimation?.matchLabel === "決勝"
       ? { label: "表彰式", action: "showTournamentAwardCeremony()" }
       : { label: pendingBattleAnimation?.watchLabel || "試合を観戦する", action: "startBattleAnimation()" };
-  const activeActionButtons = finalOutcomeSide
-    ? ""
-    : `<button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>`;
+  const activeActionButtons = `<button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>`;
   field.innerHTML = `
     <div class="battle-hud">
       <span class="battle-title">${cup.name} / ${pendingBattleAnimation?.matchLabel || "試合"}</span>
@@ -39823,7 +39758,7 @@ function playBattleAnimationStep(index) {
     <div class="fighter ${scene.actor === "enemy" ? "casting" : scene.target === "enemy" ? `struck${hitTierClass}` : ""}" id="enemyFighter">${tournamentEnemyFighter(cup, enemyOpponent || enemyName, enemyPercent, "side-left", enemyAfterPercent, fighterStateFor("enemy"), enemyHpBeforeValue, enemyHpAfterValue)}</div>
     <div class="battle-effect-layer ${actorClass}">
       ${magicSceneVisualFor(scene)}
-      <div class="battle-cue">${moveLine}${resultLine}</div>
+      <div class="battle-cue">${battleCueHtml}</div>
       ${isJudgedFinalDecision ? `<div class="battle-decision-cue" id="battleJudgementCue">判定</div>` : ""}
       ${scene.type === "match" ? "" : `${visualType === "route" ? `<i class="magic-orb ${orbClass} ${scene.tier}" style="--magic:${magicColorFor(scene.tier, scene.actor)}"></i>` : ""}`}
     </div>
@@ -39873,7 +39808,7 @@ function playBattleAnimationStep(index) {
       if (actions) {
         actions.innerHTML = `<button class="battle-watch-btn" type="button" onclick="${decisionPrimaryAction.action}">${decisionPrimaryAction.label}</button>`;
       }
-    }, Math.round(finalDecisionDelay * 1000));
+    }, Math.round(decisionRevealDelay * 1000));
   }
   if (finalOutcomeSide && !pendingBattleAnimation.resultSfxPlayed) {
     if (battleResultSfxTimer) clearTimeout(battleResultSfxTimer);
@@ -39894,7 +39829,10 @@ function playBattleAnimationStep(index) {
   if (log) {
     log.innerHTML = battleAnimationProgressLogHtml(pendingBattleAnimation, index);
   }
-  const actionSceneDuration = Math.round((isJudgedFinalDecision ? finalDecisionDelay + 1.45 : resultCueDelay + 3) * 1000);
+  const resultSceneHoldSeconds = surrenderVictoryText
+    ? surrenderVictoryDelay + cueTypeDurationFor(surrenderVictoryText) + 2.4
+    : resultCueDelay + 3;
+  const actionSceneDuration = Math.round((isJudgedFinalDecision ? finalDecisionDelay + 1.45 : resultSceneHoldSeconds) * 1000);
   battleAnimationTimer = setTimeout(() => playBattleAnimationStep(index + 1), scene.type === "match" ? 2200 : actionSceneDuration);
 }
 function revealBattleResult() {
@@ -39931,6 +39869,7 @@ function showTournamentAwardCeremony() {
     return;
   }
   const cup = tournaments.find(item => item.id === pendingBattleReward.cupId) || tournaments[0];
+  startTournamentAwardBgm(cup);
   const profile = monsterProfile();
   const field = document.getElementById("battleField");
   if (!field) return;
@@ -40131,7 +40070,13 @@ function advanceTournamentMatch(skipResult = false) {
     toast("進行中の大会がありません");
     return;
   }
-  startPreparedTournamentBattle(skipResult);
+  pendingBattleAnimation = null;
+  pendingBattleResultHtml = "";
+  pendingBattleResultSfx = "";
+  clearBattleAnimationTimer();
+  clearBattleAdTimer();
+  renderBattleStage(monsterProfile());
+  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 function cancelTournamentParticipation() {
   pendingTournamentStrategyCupId = "";
@@ -40260,7 +40205,7 @@ function battle() {
     state.pendingBattle.completedMatches = [...(state.pendingBattle.completedMatches || []), match];
     state.pendingBattle.currentMatch = currentMatchIndex + 1;
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が${matchLabel}を突破。${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote}`);
-    pendingBattleResultHtml = `<strong>${cup.name} ${matchLabel}勝利 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${enemyName}を破り、決勝へ進みました。決勝も観戦するか、すぐに結果を見るかを選べます。</p>${roundsHtml}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="advanceTournamentMatch(false)">決勝試合を観戦する</button><button class="battle-skip-btn" type="button" onclick="advanceTournamentMatch(true)">すぐに結果を見る</button></div>`;
+    pendingBattleResultHtml = `<strong>${cup.name} ${matchLabel}勝利 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${enemyName}を破り、決勝へ進みました。次に決勝相手との対戦票を確認します。</p>${roundsHtml}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="advanceTournamentMatch()">決勝へと進む</button></div>`;
   } else if (result.win) {
     pendingBattleResultSfx = "victory";
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
@@ -40456,7 +40401,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     localStorage.removeItem(storeKey);
     Object.assign(state, defaultState());
     normalizeState();
-    document.getElementById("eventBox").innerHTML = `<strong>探索前</strong><p>歩行終了後に、同じ画面でイマソラ認識まで進めます。重要マスでは、自己申告ではなくイマソラ確認で進化やタネ召喚を確定します。</p>`;
+    document.getElementById("eventBox").innerHTML = "";
     shuffleCards();
     renderAll();
   }
