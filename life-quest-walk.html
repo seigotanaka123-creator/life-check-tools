@@ -863,6 +863,24 @@
     .mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
     .mini-chip, .strategy-card, .sky-dex-card, .footprint-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 9px; text-align: left; }
     .mini-chip strong, .strategy-card strong, .sky-dex-card strong, .footprint-card strong { display: block; font-size: 13px; color: var(--ink); }
+    .color-option-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    .color-swatch-btn { display: grid; justify-items: center; gap: 4px; min-height: 54px; padding: 7px 4px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); font-size: 11px; font-weight: 800; }
+    .color-swatch-btn.selected { border-color: #4f78b9; background: #edf6ff; box-shadow: 0 0 0 3px rgba(79,120,185,.16); }
+    .color-dot { width: 20px; height: 20px; border-radius: 999px; background: var(--swatch); border: 2px solid rgba(36,50,70,.22); box-shadow: inset -3px -3px 0 rgba(0,0,0,.12), inset 2px 2px 0 rgba(255,255,255,.55); }
+    .companion-color-preview {
+      display: grid;
+      place-items: center;
+      min-height: 128px;
+      margin-top: 10px;
+      border: 1px solid rgba(79,120,185,.2);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #f8fcff, #eef7ff);
+      overflow: hidden;
+    }
+    .companion-color-preview .monster-current-art {
+      transform: scale(1.25);
+      transform-origin: center;
+    }
     .strategy-card { cursor: pointer; min-height: 72px; }
     .strategy-card.selected { border-color: #4f78b9; background: #edf6ff; box-shadow: 0 0 0 3px rgba(79,120,185,.16); }
     .diary-row textarea { width: 100%; min-height: 68px; resize: vertical; margin-top: 8px; }
@@ -1730,6 +1748,11 @@
       transform: rotate(-10deg);
     }
     .monster .monster-foot.right { left: 44px; transform: rotate(10deg); }
+    .monster-current-art .monster .monster-foot,
+    .monster.companion-color-target .monster-foot,
+    .battle-monster-art .monster.companion-color-target .monster-foot {
+      background: var(--companion-foot, #8b5a34);
+    }
     .monster .monster-mark {
       left: 32px;
       top: 54px;
@@ -4180,6 +4203,7 @@
     }
     .cup-card b, .dex-card b { display: block; font-size: 14px; line-height: 1.25; }
     .cup-card span, .dex-card span { display: block; color: var(--muted); font-size: 11px; }
+    .dex-card span { font-size: 11.8px; line-height: 1.38; }
     .cup-card > span { font-size: 11.5px; }
     .cup-balance {
       display: inline-flex;
@@ -5352,8 +5376,8 @@
       position: absolute;
       left: 50%;
       top: 47px;
-      width: 35px;
-      height: 43px;
+      width: 33px;
+      height: 41px;
       transform: translateX(-50%);
       opacity: 0;
       pointer-events: none;
@@ -5366,9 +5390,7 @@
       padding-bottom: 10px;
     }
     .award-stage.medal-awarding .award-medal {
-      animation:
-        awardMedalDrop 1.35s ease .28s both,
-        awardMedalRestBob .82s ease-in-out 1.63s infinite;
+      animation: awardMedalDrop 1.35s ease .28s both;
       z-index: 10;
     }
     .award-stage.medal-awarding .award-medal::before,
@@ -5409,8 +5431,8 @@
       position: absolute;
       top: 0;
       left: 50%;
-      width: 22px;
-      height: 21px;
+      width: 21px;
+      height: 20px;
       transform: translateX(-50%);
       clip-path: polygon(8% 0, 42% 0, 50% 46%, 58% 0, 92% 0, 72% 76%, 50% 100%, 28% 76%);
       background: linear-gradient(180deg, #ffeaa5, #b77918);
@@ -5420,8 +5442,8 @@
       position: absolute;
       left: 50%;
       bottom: 0;
-      width: 27px;
-      height: 27px;
+      width: 25px;
+      height: 25px;
       transform: translateX(-50%);
       display: grid;
       place-items: center;
@@ -5429,7 +5451,7 @@
       border: 2px solid rgba(255,255,255,.78);
       background: radial-gradient(circle at 32% 25%, #fff 0 8%, transparent 9%), linear-gradient(180deg, #ffe978, #d49a24);
       color: #6b4f21;
-      font: 900 11px/1 system-ui, sans-serif;
+      font: 900 10px/1 system-ui, sans-serif;
       box-shadow: inset 0 -4px 0 rgba(0,0,0,.12), 0 4px 0 rgba(93,64,15,.16), 0 0 18px rgba(255,231,120,.72);
     }
     .award-caption {
@@ -5453,10 +5475,6 @@
       0% { opacity: 0; transform: translateX(-50%) translateY(-36px) scale(.72); }
       64% { opacity: 1; transform: translateX(-50%) translateY(58px) scale(.86); }
       100% { opacity: 1; transform: translateX(-50%) translateY(54px) scale(.72); }
-    }
-    @keyframes awardMedalRestBob {
-      0%, 100% { transform: translateX(-50%) translateY(54px) scale(.72); }
-      50% { transform: translateX(-50%) translateY(51px) scale(.72); }
     }
     @keyframes awardWinnerRestBob {
       0%, 100% { transform: translateX(-50%) translateY(4px) scale(2.2); }
@@ -8820,6 +8838,7 @@
       <p>イマソラウォークは現実の散歩とつながるため、安全ルールをゲーム進行より上位に置きます。</p>
       <div class="settings-panel-stack" id="homeSettingsPanel">
         <div class="policy-card" id="talkSettings"></div>
+        <div class="policy-card" id="companionColorSettings"></div>
         <div class="policy-card" id="soundSettings"></div>
       </div>
       <div class="policy-card">
@@ -9305,6 +9324,7 @@ const bgmAudioFiles = {
   rookieFinal: "assets/audio/imasora_adventure_charm_rookie_final_v01.mp3",
   rookieAward: "assets/audio/imasora_award_rookie_ceremony_v01.mp3",
   majorAward: "assets/audio/imasora_award_four_major_ceremony_v01.mp3",
+  grandAward: "assets/audio/imasora_grand_award_fanfare_v01.mp3",
   major1: "assets/audio/imasora_password_major_battle_v01.mp3",
   major1Final: "assets/audio/imasora_hero_major_final_v01.mp3",
   major2: "assets/audio/imasora_dream_circuit_major2_battle_v01.mp3",
@@ -9612,6 +9632,7 @@ const bgmModeNames = {
   rookieFinal: "はじまり杯 決勝BGM",
   rookieAward: "はじまり杯 表彰式BGM",
   majorAward: "四大杯 表彰式BGM",
+  grandAward: "グランドチャンピオン杯 表彰式BGM",
   major1: "森の四大杯 通常戦BGM",
   major1Final: "森の四大杯 決勝BGM",
   major2: "街の四大杯 通常戦BGM",
@@ -10279,6 +10300,78 @@ const homeTalkTemplateSets = [
       [
         "ソラタマも、見た目だけじゃなく作戦に関係するんだね。",
         "有利なら1.08倍、不利なら0.92倍。大きすぎないけど、大会前に見たい特性だよ。"
+      ]
+    ]
+  },
+  {
+    "id": "tournament-022",
+    "theme": "tournament",
+    "ages": [
+      "elementary",
+      "junior",
+      "high",
+      "adult"
+    ],
+    "lines": [
+      [
+        "大会は、何ターンで判定になるの？",
+        "はじまり杯は5ターン、四大杯は6ターン、グランドチャンピオン杯は8ターンまで戦うよ。"
+      ],
+      [
+        "その前にどちらかのHPがなくなったら？",
+        "その時は判定を待たずに、その場で勝敗が決まるよ。"
+      ],
+      [
+        "最後まで決着しない時だけ判定なんだね。",
+        "うん。最大ターンまで粘った時に、残りHPの割合で見るよ。"
+      ]
+    ]
+  },
+  {
+    "id": "tournament-023",
+    "theme": "tournament",
+    "ages": [
+      "elementary",
+      "junior",
+      "high",
+      "adult"
+    ],
+    "lines": [
+      [
+        "試合中にファンファーレが鳴ったら、何の合図？",
+        "最大ターンまで終わって、判定に入る合図だよ。"
+      ],
+      [
+        "ファンファーレが鳴ったら、もう攻撃は続かないんだね。",
+        "うん。そこで試合終了。あとは判定で勝敗を見る流れだよ。"
+      ],
+      [
+        "音で終わりが分かるのは見やすいね。",
+        "判定の合図として覚えておくと、観戦しやすくなるよ。"
+      ]
+    ]
+  },
+  {
+    "id": "tournament-024",
+    "theme": "tournament",
+    "ages": [
+      "elementary",
+      "junior",
+      "high",
+      "adult"
+    ],
+    "lines": [
+      [
+        "判定では、どこを見るの？",
+        "残っているHPの割合を見るよ。最大HPから見て、どれだけ残せたかだね。"
+      ],
+      [
+        "HPの数字そのものより、割合なんだ。",
+        "うん。体力の多い相棒だけが有利になりすぎないようにしているよ。"
+      ],
+      [
+        "だから守って残す戦い方もあるんだね。",
+        "攻め切れない時は、耐えて判定に持ち込むのも作戦になるよ。"
       ]
     ]
   },
@@ -31016,6 +31109,7 @@ function defaultState() {
     hpDrainSfxMode: "metalBuzz",
     hpDrainSfxVersion: 3,
     soundVolumes: { normalBgm: 5, retirementBgm: 5, battleBgm: 5, sfx: 5 },
+    companionColors: { hand: "standard", foot: "standard" },
     homeTalk: { age: "adult", theme: "prefecture", date: "", currentId: "", lastId: "", usedToday: [] },
     dex: ["seed-walk"],
     lastPlay: "",
@@ -31182,6 +31276,9 @@ function normalizeState() {
     const value = Number(state.soundVolumes[key]);
     state.soundVolumes[key] = Number.isFinite(value) ? Math.max(0, Math.min(5, Math.round(value))) : 5;
   });
+  state.companionColors = state.companionColors && typeof state.companionColors === "object" ? state.companionColors : {};
+  if (!["standard", "leaf", "sky", "light", "flower"].includes(state.companionColors.hand)) state.companionColors.hand = "standard";
+  if (!["standard", "soil", "stone", "navy", "moss"].includes(state.companionColors.foot)) state.companionColors.foot = "standard";
   state.homeTalk = state.homeTalk && typeof state.homeTalk === "object" ? state.homeTalk : {};
   const validHomeTalkAges = ["elementary", "junior", "high", "adult"];
   const validHomeTalkThemes = ["riddle", "prefecture", "kanji", "history", "english", "aiTech", "psychology", "lovePsychology", "money", "healthWalk", "tournament"];
@@ -31221,6 +31318,95 @@ function volumeLevel(key) {
 }
 function volumeScale(key) {
   return volumeLevel(key) / 5;
+}
+const companionHandColorOptions = [
+  { id: "standard", label: "標準", color: "#58bf72", shadow: "#4fa966" },
+  { id: "leaf", label: "若葉", color: "#6fcf7f", shadow: "#4fa966" },
+  { id: "sky", label: "空色", color: "#6eb6ff", shadow: "#4d8fd4" },
+  { id: "light", label: "光", color: "#f0d37a", shadow: "#c59b42" },
+  { id: "flower", label: "花", color: "#e68a9b", shadow: "#be6678" }
+];
+const companionFootColorOptions = [
+  { id: "standard", label: "標準", color: "#8b5a34", shadow: "#6f4427" },
+  { id: "soil", label: "土", color: "#7a5131", shadow: "#5d3b25" },
+  { id: "stone", label: "石", color: "#71808e", shadow: "#536170" },
+  { id: "navy", label: "紺", color: "#405a84", shadow: "#2d4164" },
+  { id: "moss", label: "苔", color: "#5f7a43", shadow: "#465c33" }
+];
+function companionColorOption(kind, id) {
+  const list = kind === "foot" ? companionFootColorOptions : companionHandColorOptions;
+  return list.find(item => item.id === id) || list[0];
+}
+function companionColorSettings() {
+  const hand = companionColorOption("hand", state.companionColors?.hand);
+  const foot = companionColorOption("foot", state.companionColors?.foot);
+  return {
+    hand,
+    foot,
+    handColor: hand.color,
+    handFarColor: hand.shadow,
+    footColor: foot.color,
+    footFarColor: foot.shadow
+  };
+}
+function companionColorInlineStyle(settings = companionColorSettings()) {
+  return `--companion-hand:${settings.handColor};--companion-hand-far:${settings.handFarColor};--companion-foot:${settings.footColor};--companion-foot-far:${settings.footFarColor};`;
+}
+function companionColorStyleAttr(settings = companionColorSettings()) {
+  return ` style="${companionColorInlineStyle(settings)}"`;
+}
+function applyCompanionSvgColors(svg, settings = companionColorSettings()) {
+  return String(svg || "")
+    .replace(/#58bf72/g, settings.handColor)
+    .replace(/#4fa966/g, settings.handFarColor)
+    .replace(/#8b5a34/g, settings.footColor)
+    .replace(/#6f4427/g, settings.footFarColor);
+}
+function renderCompanionColorSettings() {
+  const box = document.getElementById("companionColorSettings");
+  if (!box) return;
+  const hand = state.companionColors?.hand || "standard";
+  const foot = state.companionColors?.foot || "standard";
+  const profile = monsterProfile();
+  const growth = growthForecast();
+  const previewName = companionSpeciesName(profile, growth);
+  const previewArt = companionArtHtml(profile, growth);
+  const swatches = (kind, options, current) => options.map(item => `
+    <button class="color-swatch-btn ${current === item.id ? "selected" : ""}" type="button" data-companion-color-kind="${kind}" data-companion-color-id="${item.id}">
+      <span class="color-dot" style="--swatch:${item.color}"></span>
+      <span>${item.label}</span>
+    </button>
+  `).join("");
+  box.innerHTML = `
+    <b>相棒の手足カラー</b>
+    <span>今の相棒だけの見た目です。</span>
+    <div class="mini-feature">
+      <b>${previewName}</b>
+      <div class="companion-color-preview">${previewArt}</div>
+    </div>
+    <div class="mini-feature">
+      <b>手の色</b>
+      <div class="color-option-grid">${swatches("hand", companionHandColorOptions, hand)}</div>
+    </div>
+    <div class="mini-feature">
+      <b>足の色</b>
+      <div class="color-option-grid">${swatches("foot", companionFootColorOptions, foot)}</div>
+    </div>
+  `;
+  box.querySelectorAll("[data-companion-color-kind]").forEach(button => {
+    button.addEventListener("click", () => setCompanionColor(button.dataset.companionColorKind, button.dataset.companionColorId));
+  });
+}
+function setCompanionColor(kind, id) {
+  if (!["hand", "foot"].includes(kind)) return;
+  const option = companionColorOption(kind, id);
+  state.companionColors = state.companionColors && typeof state.companionColors === "object" ? state.companionColors : {};
+  state.companionColors[kind] = option.id;
+  saveState();
+  renderCompanionColorSettings();
+  renderCompanionHome();
+  renderMonster();
+  toast(`相棒の${kind === "hand" ? "手" : "足"}の色: ${option.label}`);
 }
 function renderTalkSettings() {
   const box = document.getElementById("talkSettings");
@@ -33133,12 +33319,12 @@ function companionHomeArtMarkup(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if ((stageKey === "hero" || stageKey === "star") && item?.id) {
     const classes = `monster-current-art home-companion-art home-companion-turnaround ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
-    return `<div class="${classes}">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-right"))}</div>`;
+    return `<div class="${classes}"${companionColorStyleAttr()}>${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-right", companionColorSettings()))}</div>`;
   }
   if (item?.id) {
     const whiteClass = item.whiteVariant ? " white-body" : "";
     const classes = `monster-current-art home-companion-art home-companion-flat ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
-    return `<div class="${classes}"><div class="monster ${item.form}${whiteClass}" style="${item.style || ""}">${monsterInnerParts()}</div></div>`;
+    return `<div class="${classes}"${companionColorStyleAttr()}><div class="monster ${item.form}${whiteClass} companion-color-target" style="${item.style || ""}${companionColorInlineStyle()}">${monsterInnerParts()}</div></div>`;
   }
   const html = companionArtHtml(profile, growth);
   return html.replace('class="', 'class="home-companion-art home-companion-flat ');
@@ -34777,16 +34963,19 @@ function renderCurrentCompanionArt(art, profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if (item?.id) {
     art.className = `monster-current-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
+    art.setAttribute("style", companionColorInlineStyle());
     if (item.id.startsWith("hero-") || item.id.startsWith("star-")) {
-      art.innerHTML = uniqueMonsterSvg(item, true);
+      art.innerHTML = uniqueMonsterSvg(item, true, companionColorSettings());
     } else {
       const whiteClass = item.whiteVariant ? " white-body" : "";
-      art.innerHTML = `<div class="monster ${item.form}${whiteClass}" style="${item.style}">${monsterInnerParts()}</div>`;
+      art.innerHTML = `<div class="monster ${item.form}${whiteClass} companion-color-target" style="${item.style}${companionColorInlineStyle()}">${monsterInnerParts()}</div>`;
     }
     return;
   }
   const seedClass = profile.form === "seed" ? ` ${profile.id || state.monster.seedId || "seed-walk"}` : "";
   art.className = `monster ${profile.form}${seedClass}${profile.white ? " white-body" : ""}`;
+  art.setAttribute("style", companionColorInlineStyle());
+  art.classList.add("companion-color-target");
   art.innerHTML = monsterInnerParts();
 }
 function companionArtHtml(profile, growth) {
@@ -34829,7 +35018,7 @@ function retirementStillCompanionArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if (item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"))) {
     const classes = `monster-current-art retirement-still-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
-    return `<div class="${classes}">${retirementStillMonsterSvg(uniqueMonsterSvg(item, true))}</div>`;
+    return `<div class="${classes}"${companionColorStyleAttr()}>${retirementStillMonsterSvg(uniqueMonsterSvg(item, true, companionColorSettings()))}</div>`;
   }
   return retirementStillMonsterSvg(companionArtHtml(profile, growth).replace('class="', 'class="retirement-still-art '));
 }
@@ -34837,7 +35026,7 @@ function companionRightFacingArtHtml(profile, growth) {
   const item = currentCompanionArtItem(profile, growth);
   if (!item?.id) return companionArtHtml(profile, growth);
   const classes = `monster-current-art retirement-side-art ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}`.trim();
-  return `<div class="${classes}">${turnaroundMonsterSvg(item, "side")}</div>`;
+  return `<div class="${classes}"${companionColorStyleAttr()}>${turnaroundMonsterSvg(item, "side", companionColorSettings())}</div>`;
 }
 function retirementSendoffArtHtml(profile, growth) {
   return `${companionRightFacingArtHtml(profile, growth)}<div class="retirement-front-art">${retirementStillCompanionArtHtml(profile, growth)}</div>`;
@@ -35687,7 +35876,7 @@ function galleryTurnaroundArt(item) {
     { key: "front-left diag-front mirror", label: "左前", svg: turnaroundMonsterSvg(item, "front-left") }
   ];
   return `<div class="turnaround-views eight-direction-views">${views.map(view => `<div class="turnaround-view ${view.key}">${view.svg}<b>${view.label}</b></div>`).join("")}</div>`;
-}function turnaroundMonsterSvg(item, view) {
+}function turnaroundMonsterSvg(item, view, colorSettings = null) {
   const frontDiagView = view === "front-right" || view === "front-left";
   const backDiagView = view === "back-right" || view === "back-left";
   const sideView = view === "side" || view === "side-left" || frontDiagView;
@@ -36341,9 +36530,9 @@ function galleryTurnaroundArt(item) {
   };
   const handMotionMode = view === "front-right" || view === "front-left" ? "horizontalSame" : view === "side" || view === "side-left" ? "horizontal" : "vertical";
   const walkMotion = content => `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.8;0 0;0 .8;0 0" dur=".54s" repeatCount="indefinite" additive="sum"/>${animateHandMotion(animateFootSteps(content), handMotionMode)}</g>`;
-  return `<svg class="unique-monster turnaround-monster" viewBox="0 0 116 116" aria-hidden="true">${walkMotion(finalDisplayedLayers)}</svg>`;
+  return `<svg class="unique-monster turnaround-monster" viewBox="0 0 116 116" aria-hidden="true">${colorSettings ? applyCompanionSvgColors(walkMotion(finalDisplayedLayers), colorSettings) : walkMotion(finalDisplayedLayers)}</svg>`;
 }
-function uniqueMonsterSvg(item, centeredTurnaround = false) {
+function uniqueMonsterSvg(item, centeredTurnaround = false, colorSettings = null) {
   const isStar = item.id.startsWith("star-");
   const baseId = item.sourceId || item.id.replace(/^star-hero-/, "").replace(/-(comet|crown|forest)$/, "");
   const archetypes = ["dragon", "turtle", "bird", "golem", "whale", "moth", "fox", "runner", "ray", "deer", "tower", "shell", "blade", "sprite"];
@@ -36472,7 +36661,8 @@ function uniqueMonsterSvg(item, centeredTurnaround = false) {
     });
   };
   const walkMotion = content => `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.8;0 0;0 .8;0 0" dur=".54s" repeatCount="indefinite" additive="sum"/>${animateHandMotion(animateFootSteps(content))}</g>`;
-  return `<svg class="unique-monster ${isStar ? "unique-star" : "unique-hero"}${turnClass}" viewBox="0 0 116 116" aria-hidden="true" style="transform:${turnTransform}">${walkMotion(`${comet}${cape}${wing}${body}${crown}`)}</svg>`;
+  const motionBody = walkMotion(`${comet}${cape}${wing}${body}${crown}`);
+  return `<svg class="unique-monster ${isStar ? "unique-star" : "unique-hero"}${turnClass}" viewBox="0 0 116 116" aria-hidden="true" style="transform:${turnTransform}">${colorSettings ? applyCompanionSvgColors(motionBody, colorSettings) : motionBody}</svg>`;
 }
 function extractCssColor(style, key) {
   const matches = [...String(style || "").matchAll(new RegExp(`${key}:([^;]+);`, "g"))];
@@ -37125,15 +37315,17 @@ function ensureMonsterDexGroups() {
   renderCharacterGallery();
   characterGalleryRendered = true;
 }
-function battleDirectionArtFromItem(item, view, fallbackForm, whiteClass = "") {
+function battleDirectionArtFromItem(item, view, fallbackForm, whiteClass = "", colorSettings = null) {
   const isUnique = item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"));
   if (isUnique && view !== "front") {
-    return `<span class="battle-unique-art battle-turnaround-art">${turnaroundMonsterSvg(item, view)}</span>`;
+    return `<span class="battle-unique-art battle-turnaround-art">${turnaroundMonsterSvg(item, view, colorSettings)}</span>`;
   }
   if (isUnique) {
-    return `<span class="battle-unique-art battle-turnaround-art">${uniqueMonsterSvg(item, true)}</span>`;
+    return `<span class="battle-unique-art battle-turnaround-art">${uniqueMonsterSvg(item, true, colorSettings)}</span>`;
   }
-  return `<span class="battle-monster-art"><span class="monster ${item?.form || fallbackForm}${whiteClass}" style="${item?.style || ""}">${monsterInnerParts()}</span></span>`;
+  const companionClass = colorSettings ? " companion-color-target" : "";
+  const companionStyle = colorSettings ? companionColorInlineStyle(colorSettings) : "";
+  return `<span class="battle-monster-art"><span class="monster ${item?.form || fallbackForm}${whiteClass}${companionClass}" style="${item?.style || ""}${companionStyle}">${monsterInnerParts()}</span></span>`;
 }
 function hpDrainMarkup(hpPercent = 100, hpAfterPercent = null, reverse = false, hpValue = null, hpAfterValue = null) {
   const hp = Math.max(0, Math.min(100, hpPercent));
@@ -37207,7 +37399,7 @@ function tournamentPlayerFighter(profile, hpPercent = 100, view = "front", hpAft
   const item = directionDesignItem(profile, false);
   const fighterName = item.name || profile.name;
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
-  const art = battleDirectionArtFromItem(item, view, profile.form, whiteClass);
+  const art = battleDirectionArtFromItem(item, view, profile.form, whiteClass, companionColorSettings());
   return `<div class="pixel-fighter${advantageClassName(advantageState)}">
     ${hpDrainMarkup(hpPercent, hpAfterPercent, false, hpValue, hpAfterValue)}
     ${art}
@@ -37219,14 +37411,14 @@ function tournamentPlayerOpeningFighterHtml(profile, stats) {
   const item = directionDesignItem(profile, false);
   const fighterName = item.name || profile.name;
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
-  const art = battleDirectionArtFromItem(item, "front", profile.form, whiteClass);
+  const art = battleDirectionArtFromItem(item, "front", profile.form, whiteClass, companionColorSettings());
   return `<div class="opening-monster-name">${fighterName}</div><div class="opening-monster-art">${art}</div>${tournamentOpeningStatsHtml(stats)}`;
 }
 function tournamentPlayerAwardArt(profile) {
   ensureMonsterDexGroups();
   const item = directionDesignItem(profile, false);
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
-  return `<div class="award-monster-figure">${battleDirectionArtFromItem(item, "front", profile.form, whiteClass)}</div>`;
+  return `<div class="award-monster-figure">${battleDirectionArtFromItem(item, "front", profile.form, whiteClass, companionColorSettings())}</div>`;
 }
 function completedFighterFromItem(name, item, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", reverseHp = false, hpValue = null, hpAfterValue = null) {
   if (!item) return pixelFighter(name, reverseHp ? "enemy" : "", hpPercent);
@@ -37934,7 +38126,7 @@ function renderItemGuide() {
     <div class="actions">
       <button class="secondary" type="button" id="openTownShopFromItemsBtn">小さな店へ行く</button>
     </div>
-    <div class="item-effect-panel">${pendingNotes.length ? `予約中: ${pendingNotes.join(" / ")}` : "予約中の効果はありません。アイテム効果は小さく、固定の正解にならない範囲で反映します。"}</div>
+    ${pendingNotes.length ? `<div class="item-effect-panel">予約中: ${pendingNotes.join(" / ")}</div>` : ""}
     ${categoryHtml || `<div class="item-empty">持っている道具はまだありません。散歩やイマソラ認識、町の店などで道具を入手すると、ここに表示されます。</div>`}
   `;
   document.getElementById("openTownShopFromItemsBtn")?.addEventListener("click", openTownShopFromItems);
@@ -38921,6 +39113,7 @@ function renderAll() {
   renderPlaytestMemo();
   renderTalkSettings();
   renderTournamentTalkPreview();
+  renderCompanionColorSettings();
   renderSoundSettings();
   renderPlaytestRunner();
   renderPlaytestBoost();
@@ -39899,16 +40092,15 @@ function showTournamentAwardCeremony() {
       </div>
     </div>
     <div class="award-stage" id="awardStage">
-      <div class="award-medal" data-mark="${pendingBattleReward.mark}"></div>
       <div class="award-contestant second-place">${tournamentEnemyAwardArt(cup, finalEnemy, "front-right")}</div>
-      <div class="award-winner">${tournamentPlayerAwardArt(profile)}</div>
+      <div class="award-winner">${tournamentPlayerAwardArt(profile)}<div class="award-medal" data-mark="${pendingBattleReward.mark}"></div></div>
       <div class="award-contestant third-place">${tournamentEnemyAwardArt(cup, preliminaryEnemy, "front-left")}</div>
       <div class="podium"><span class="second">2</span><span class="first">1</span><span class="third">3</span></div>
       <div class="award-caption">${cup.name} 優勝表彰</div>
     </div>
   `;
   const log = document.getElementById("battleLog");
-  if (log) log.innerHTML = `<strong>${cup.name} 表彰式</strong><p>1位に相棒、2位に決勝で破った相手、3位に予選で破った相手が並びます。「メダルを受け取る」を押すとメダル装着演出を見られます。</p>`;
+  if (log) log.innerHTML = "";
   playSfx("summon");
 }
 function playTournamentMedalCeremony() {
