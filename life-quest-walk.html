@@ -3334,14 +3334,31 @@
         linear-gradient(180deg, transparent 0 40%, rgba(220,190,124,.98) 41% 70%, transparent 71%),
         linear-gradient(180deg, #bfe9ff 0 34%, #86bf63 35% 100%);
     }
-    .battle-field.arena-city,
-    .battle-field.arena-sky,
-    .battle-field.arena-river,
     .battle-field.arena-green {
       background:
-        radial-gradient(circle at 78% 18%, rgba(255,214,104,.74), transparent 18%),
-        linear-gradient(180deg, transparent 0 40%, rgba(211,142,91,.98) 41% 70%, transparent 71%),
-        linear-gradient(180deg, #ffb36e 0 28%, #f07c63 45%, #8ab86b 46% 100%);
+        radial-gradient(circle at 16% 18%, rgba(255,246,168,.7), transparent 13%),
+        linear-gradient(180deg, transparent 0 40%, rgba(105,138,72,.96) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #d9f7ca 0 30%, #86c779 43%, #4f8c55 44% 100%);
+    }
+    .battle-field.arena-city {
+      background:
+        radial-gradient(circle at 78% 18%, rgba(255,222,118,.78), transparent 16%),
+        linear-gradient(180deg, transparent 0 40%, rgba(198,127,83,.98) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #f8b47a 0 28%, #ef7a62 45%, #9d6954 46% 100%);
+    }
+    .battle-field.arena-sky {
+      background:
+        radial-gradient(ellipse at 18% 42%, rgba(255,255,255,.92) 0 12%, transparent 13%),
+        radial-gradient(ellipse at 82% 39%, rgba(255,255,255,.88) 0 14%, transparent 15%),
+        radial-gradient(ellipse at 48% 34%, rgba(255,255,255,.74) 0 18%, transparent 19%),
+        linear-gradient(180deg, transparent 0 40%, rgba(255,255,255,.96) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #dff8ff 0 30%, #a7ddff 45%, #ffffff 46% 100%);
+    }
+    .battle-field.arena-river {
+      background:
+        radial-gradient(circle at 78% 17%, rgba(255,255,214,.72), transparent 14%),
+        linear-gradient(180deg, transparent 0 40%, rgba(91,166,181,.94) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #b9ecff 0 32%, #66c6d8 45%, #4b9eb8 46% 100%);
     }
     .battle-field.arena-grand {
       background:
@@ -3388,6 +3405,18 @@
     .battle-field.watching .pixel-fighter > span:last-child {
       display: inline-block;
       transform: translateY(-4px);
+    }
+    .battle-field.watching.arena-green .pixel-fighter > span:last-child {
+      color: #fff;
+      font-family: inherit;
+      font-weight: 900;
+      text-shadow:
+        -1px -1px 0 #23512f,
+        1px -1px 0 #23512f,
+        -1px 1px 0 #23512f,
+        1px 1px 0 #23512f,
+        0 3px 0 rgba(24,58,32,.26),
+        0 0 8px rgba(255,255,235,.82);
     }
     .battle-field.watching .battle-turnaround-art {
       width: 112px;
@@ -3964,6 +3993,484 @@
     }
     .magic-orb.medium { width: 42px; height: 42px; margin-top: -21px; }
     .magic-orb.strong { width: 52px; height: 52px; margin-top: -26px; filter: saturate(1.2); }
+    .magic-orb.route-lamp {
+      width: 28px;
+      height: 28px;
+      background: radial-gradient(circle at 34% 34%, #fff, #fff5a8 34%, var(--magic, #9ff0c0) 64%, transparent 72%);
+      box-shadow: 0 0 12px #fff5a8, 0 0 24px var(--magic, #9ff0c0);
+    }
+    .magic-orb.route-aircurrent {
+      width: 48px;
+      height: 32px;
+      border-radius: 58% 42% 56% 44%;
+      background: radial-gradient(ellipse at 35% 40%, #fff, var(--magic, #8ee7ff) 42%, rgba(255,255,255,.18) 70%, transparent 76%);
+      filter: drop-shadow(0 0 14px var(--magic, #8ee7ff));
+    }
+    .magic-orb.route-ripple {
+      width: 46px;
+      height: 46px;
+      background: radial-gradient(circle, #fff 0 14%, transparent 15% 22%, var(--magic, #8ee7ff) 23% 48%, transparent 56%);
+      box-shadow: 0 0 0 7px rgba(255,255,255,.24), 0 0 22px var(--magic, #8ee7ff);
+    }
+    .magic-orb.route-forest {
+      width: 44px;
+      height: 38px;
+      border-radius: 64% 36% 58% 42%;
+      background: radial-gradient(circle at 35% 35%, #fff, #caff9e 30%, var(--magic, #9ff0c0) 58%, transparent 70%);
+      transform-origin: 50% 80%;
+    }
+    .magic-orb.route-light {
+      width: 40px;
+      height: 40px;
+      background: conic-gradient(from 20deg, #fff, var(--magic, #8ee7ff), #fff, transparent, var(--magic, #8ee7ff), #fff);
+      box-shadow: 0 0 20px #fff, 0 0 36px var(--magic, #8ee7ff);
+    }
+    .magic-world.route-lamp,
+    .magic-world.route-light {
+      height: 46px;
+      top: calc(var(--battle-stage-y) - 12%);
+      background:
+        radial-gradient(circle at 15% 52%, #fff7ae 0 4px, transparent 6px),
+        radial-gradient(circle at 38% 44%, var(--magic, #9ff0c0) 0 3px, transparent 5px),
+        radial-gradient(circle at 62% 56%, #fff 0 2px, transparent 4px),
+        radial-gradient(circle at 84% 48%, #fff7ae 0 4px, transparent 6px);
+    }
+    .magic-world.route-aircurrent {
+      top: calc(var(--battle-stage-y) - 20%);
+      height: 92px;
+      background:
+        linear-gradient(100deg, transparent, rgba(255,255,255,.68), var(--magic, #8ee7ff), transparent),
+        radial-gradient(circle at 22% 28%, #fff 0 2px, transparent 4px),
+        radial-gradient(circle at 68% 68%, var(--magic, #8ee7ff) 0 4px, transparent 6px);
+      clip-path: polygon(0 52%, 20% 32%, 46% 52%, 72% 28%, 100% 50%, 72% 72%, 46% 54%, 20% 74%);
+    }
+    .magic-world.route-ripple {
+      top: calc(var(--battle-stage-y) - 9%);
+      background:
+        repeating-radial-gradient(ellipse at 50% 52%, transparent 0 12px, rgba(255,255,255,.62) 13px 15px, var(--magic, #8ee7ff) 16px 18px, transparent 19px 26px);
+    }
+    .magic-world.route-forest {
+      top: calc(var(--battle-stage-y) - 15%);
+      background:
+        radial-gradient(ellipse at 18% 58%, #b9ff93 0 5px, transparent 7px),
+        radial-gradient(ellipse at 40% 38%, var(--magic, #9ff0c0) 0 4px, transparent 6px),
+        radial-gradient(ellipse at 66% 55%, #eaffc8 0 5px, transparent 7px),
+        radial-gradient(ellipse at 86% 42%, var(--magic, #9ff0c0) 0 4px, transparent 6px);
+      clip-path: polygon(0 58%, 16% 40%, 30% 60%, 44% 36%, 58% 62%, 74% 38%, 100% 56%, 100% 100%, 0 100%);
+    }
+    .magic-trail.route-aircurrent {
+      height: 18px;
+      top: calc(var(--battle-stage-y) - 13%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.82), var(--magic, #8ee7ff), transparent);
+    }
+    .magic-trail.route-ripple {
+      height: 24px;
+      top: calc(var(--battle-stage-y) - 2%);
+      background: repeating-linear-gradient(90deg, transparent 0 12px, rgba(255,255,255,.88) 13px 15px, var(--magic, #8ee7ff) 16px 20px, transparent 21px 32px);
+    }
+    .magic-trail.route-forest {
+      height: 16px;
+      background: linear-gradient(90deg, transparent, #caff9e, var(--magic, #9ff0c0), #fff, transparent);
+    }
+    .magic-slash-field.slash-signpost .magic-slash-blade {
+      height: 12px;
+      box-shadow: 0 0 10px #fff, 0 0 18px var(--magic, #8ee7ff);
+    }
+    .magic-slash-field.slash-neon .magic-slash-blade {
+      height: 16px;
+      background: linear-gradient(90deg, transparent, #fff, #ff7df1, var(--magic, #c9a6ff), transparent);
+      filter: drop-shadow(0 0 12px #ff7df1);
+    }
+    .magic-slash-field.slash-sunrise .magic-slash-blade {
+      height: 20px;
+      background: linear-gradient(90deg, transparent, #fff5a8, #ff9b6b, var(--magic, #ffd66d), transparent);
+      transform: rotate(-4deg);
+    }
+    .magic-slash-field.slash-magic .magic-slash-blade {
+      height: 14px;
+      background: linear-gradient(90deg, transparent, #fff, var(--magic, #8ee7ff), #fff, transparent);
+      clip-path: polygon(0 50%, 18% 20%, 80% 20%, 100% 50%, 80% 80%, 18% 80%);
+    }
+    .magic-slash-field.cross-slash-mirage .magic-slash-blade {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), #d8b8ff, var(--magic, #c9a6ff), transparent);
+      filter: drop-shadow(0 0 14px #d8b8ff);
+    }
+    .magic-starfall-field.starfall-skyflare::before {
+      top: calc(var(--battle-stage-y) - 42%);
+      height: 176px;
+      background:
+        radial-gradient(circle at 12% 8%, #fff 0 4px, #bff2ff 5px 10px, transparent 11px),
+        radial-gradient(circle at 35% 18%, var(--magic, #ffd66d) 0 5px, transparent 8px),
+        radial-gradient(circle at 58% 4%, #fff 0 3px, #bff2ff 4px 9px, transparent 10px),
+        radial-gradient(circle at 84% 20%, var(--magic, #ffd66d) 0 6px, transparent 9px);
+    }
+    .magic-starfall-field.starfall-leaflumi::before {
+      background:
+        radial-gradient(ellipse at 16% 18%, #eaffc8 0 6px, transparent 8px),
+        radial-gradient(ellipse at 40% 8%, var(--magic, #9ff0c0) 0 5px, transparent 7px),
+        radial-gradient(ellipse at 62% 24%, #fff 0 4px, transparent 6px),
+        radial-gradient(ellipse at 86% 10%, #caff9e 0 6px, transparent 8px);
+      clip-path: polygon(50% 0, 63% 26%, 92% 18%, 72% 48%, 94% 76%, 60% 68%, 50% 100%, 40% 68%, 6% 76%, 28% 48%, 8% 18%, 37% 26%);
+    }
+    .magic-starfall-field.starfall-lightflare::after {
+      width: 146px;
+      height: 146px;
+      filter: drop-shadow(0 0 22px #fff) drop-shadow(0 0 14px var(--magic, #8ee7ff));
+    }
+    .magic-wind-field.wind-cloud .magic-wind-ring {
+      width: 154px;
+      height: 86px;
+      border-style: dotted;
+    }
+    .magic-wind-field.wind-wobble .magic-wind-ring {
+      width: 198px;
+      height: 96px;
+      border-left-color: rgba(255,255,255,.8);
+      transform-origin: 44% 55%;
+    }
+    .magic-wind-field.wind-leaf .magic-wind-ring {
+      width: 168px;
+      height: 126px;
+      border-radius: 70% 30% 70% 30%;
+      border-right-color: #b8ff7a;
+    }
+    .magic-water-field.water-drop .magic-water-wave {
+      left: 32%;
+      right: 32%;
+      height: 72px;
+      clip-path: ellipse(42% 48% at 50% 54%);
+    }
+    .magic-flash-field.flash-roadstar .magic-flash-burst,
+    .magic-flash-field.flash-mirage .magic-flash-burst,
+    .magic-flash-field.flash-dawn .magic-flash-burst,
+    .magic-flash-field.flash-phantom .magic-flash-burst {
+      border-radius: 50%;
+    }
+    .magic-flash-field.flash-roadstar .magic-flash-burst {
+      clip-path: polygon(50% 0, 58% 38%, 100% 50%, 58% 62%, 50% 100%, 42% 62%, 0 50%, 42% 38%);
+    }
+    .magic-flash-field.flash-mirage .magic-flash-burst {
+      filter: blur(.4px) drop-shadow(0 0 20px #bdf7ff);
+      opacity: 0;
+    }
+    .magic-flash-field.flash-dawn .magic-flash-burst {
+      background:
+        linear-gradient(0deg, transparent 0 43%, #fff5a8 44% 48%, #ff9b6b 49% 54%, transparent 55% 100%),
+        radial-gradient(circle, #fff 0 9%, #ffd66d 10% 22%, transparent 23%);
+    }
+    .magic-flash-field.flash-phantom .magic-flash-ring {
+      border-style: dashed;
+      transform: skewX(-10deg);
+    }
+    .magic-city-field.city-spark-grain .magic-city-signal {
+      left: 34%;
+      right: 34%;
+      height: 84px;
+      background:
+        radial-gradient(circle at 20% 40%, #fff 0 3px, transparent 5px),
+        radial-gradient(circle at 52% 24%, var(--magic, #c9a6ff) 0 5px, transparent 7px),
+        radial-gradient(circle at 76% 58%, #fff 0 3px, transparent 5px);
+    }
+    .magic-thunder-field.thunder-citystar .magic-thunder-bolt {
+      clip-path: polygon(50% 0, 75% 0, 62% 35%, 92% 35%, 58% 70%, 74% 70%, 35% 100%, 48% 58%, 20% 58%);
+    }
+    .magic-thunder-field.thunder-akeflare .magic-thunder-bolt {
+      background: linear-gradient(180deg, #fff, #ffd66d 35%, #ff9b6b 68%, #fff);
+      filter: drop-shadow(0 0 18px #ff9b6b);
+    }
+    .magic-custom-field {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .magic-custom-field::before,
+    .magic-custom-field::after,
+    .magic-custom-core,
+    .magic-custom-mark,
+    .magic-custom-extra {
+      content: "";
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .magic-custom-field.target-enemy .magic-custom-core,
+    .magic-custom-field.target-enemy .magic-custom-mark,
+    .magic-custom-field.target-enemy .magic-custom-extra { right: 12%; }
+    .magic-custom-field.target-me .magic-custom-core,
+    .magic-custom-field.target-me .magic-custom-mark,
+    .magic-custom-field.target-me .magic-custom-extra { left: 12%; }
+    .walk-lamp-step::before {
+      left: 22%;
+      right: 22%;
+      top: calc(var(--battle-stage-y) + 2%);
+      height: 26px;
+      background:
+        radial-gradient(circle at 8% 50%, #fff4a8 0 5px, transparent 6px),
+        radial-gradient(circle at 28% 50%, #fff4a8 0 5px, transparent 6px),
+        radial-gradient(circle at 48% 50%, #fff4a8 0 5px, transparent 6px),
+        radial-gradient(circle at 68% 50%, #fff4a8 0 5px, transparent 6px),
+        radial-gradient(circle at 88% 50%, #fff4a8 0 5px, transparent 6px);
+      filter: drop-shadow(0 0 8px #fff4a8);
+      animation: customFadeRun 2.05s steps(5, end) calc(var(--magic-start-delay, 0s) + .9s) both;
+    }
+    .walk-lamp-step .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 8%);
+      width: 54px;
+      height: 54px;
+      border-radius: 14px 14px 50% 50%;
+      background: linear-gradient(#fff9b9, #ffd86d);
+      box-shadow: 0 0 18px #fff4a8;
+      animation: customPop 1s ease calc(var(--magic-start-delay, 0s) + 2.35s) both;
+    }
+    .walk-signpost-beam::before {
+      top: calc(var(--battle-stage-y) - 15%);
+      left: 22%;
+      width: 56%;
+      height: 68px;
+      background:
+        linear-gradient(90deg, transparent 0 8%, #fff 9% 11%, transparent 12% 34%, var(--magic) 35% 39%, transparent 40% 100%),
+        linear-gradient(100deg, transparent 20%, rgba(255,255,255,.9), var(--magic), transparent 80%);
+      clip-path: polygon(0 56%, 16% 36%, 100% 45%, 100% 57%, 16% 68%);
+      animation: customSweepRight 2.2s ease calc(var(--magic-start-delay, 0s) + 1s) both;
+    }
+    .walk-signpost-beam .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 20%);
+      width: 78px;
+      height: 78px;
+      clip-path: polygon(15% 20%, 68% 20%, 88% 50%, 68% 80%, 15% 80%, 36% 50%);
+      background: linear-gradient(135deg, #fff, var(--magic));
+      filter: drop-shadow(0 0 14px var(--magic));
+      animation: customPop 1.1s ease calc(var(--magic-start-delay, 0s) + 2.45s) both;
+    }
+    .walk-roadstar-comet::before {
+      left: 18%;
+      right: 18%;
+      top: calc(var(--battle-stage-y) - 28%);
+      height: 140px;
+      border-bottom: 8px solid var(--magic);
+      border-radius: 0 0 70% 70%;
+      filter: drop-shadow(0 0 14px var(--magic));
+      animation: customArcIn 2.45s ease calc(var(--magic-start-delay, 0s) + .85s) both;
+    }
+    .walk-roadstar-comet .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 22%);
+      width: 132px;
+      height: 132px;
+      clip-path: polygon(50% 0, 60% 34%, 96% 34%, 66% 54%, 78% 94%, 50% 68%, 22% 94%, 34% 54%, 4% 34%, 40% 34%);
+      background: radial-gradient(circle, #fff 0 18%, var(--magic) 19% 45%, transparent 46%);
+      animation: customPop 1.25s ease calc(var(--magic-start-delay, 0s) + 2.65s) both;
+    }
+    .sky-cloud-puff .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 16%);
+      width: 118px;
+      height: 74px;
+      border-radius: 50px;
+      background:
+        radial-gradient(circle at 26% 58%, #fff 0 24%, transparent 25%),
+        radial-gradient(circle at 48% 34%, #fff 0 30%, transparent 31%),
+        radial-gradient(circle at 72% 58%, #fff 0 23%, transparent 24%),
+        linear-gradient(#e8fbff, #bfeaff);
+      filter: drop-shadow(0 0 14px #dff8ff);
+      animation: customCloudPuff 1.45s ease calc(var(--magic-start-delay, 0s) + 1.65s) both;
+    }
+    .sky-jetstream-rune::before {
+      left: 18%;
+      right: 18%;
+      top: calc(var(--battle-stage-y) - 24%);
+      height: 120px;
+      background: repeating-linear-gradient(115deg, transparent 0 18px, rgba(255,255,255,.8) 19px 22px, var(--magic) 23px 26px, transparent 27px 42px);
+      clip-path: polygon(0 54%, 22% 28%, 48% 56%, 72% 26%, 100% 50%, 72% 78%, 48% 58%, 22% 82%);
+      animation: customSweepRight 2.1s ease calc(var(--magic-start-delay, 0s) + 1s) both;
+    }
+    .sky-jetstream-rune .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 24%);
+      width: 116px;
+      height: 116px;
+      border: 5px double var(--magic);
+      border-radius: 50%;
+      box-shadow: inset 0 0 18px rgba(255,255,255,.72), 0 0 18px var(--magic);
+      animation: customSpinPop 1.45s ease calc(var(--magic-start-delay, 0s) + 2.2s) both;
+    }
+    .sky-sunburst-column .magic-custom-core,
+    .city-tower-laser .magic-custom-core,
+    .ake-solar-crown .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 42%);
+      width: 122px;
+      height: 250px;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), var(--magic), transparent);
+      clip-path: polygon(45% 0, 55% 0, 88% 100%, 12% 100%);
+      filter: drop-shadow(0 0 22px var(--magic));
+      animation: customColumnDrop 1.7s ease calc(var(--magic-start-delay, 0s) + 1.6s) both;
+    }
+    .city-lamppost-pop::before {
+      top: calc(var(--battle-stage-y) - 16%);
+      width: 24px;
+      height: 118px;
+      background: linear-gradient(#27384a 0 70%, transparent 71%), radial-gradient(circle at 50% 16%, #fff 0 12px, #ffd86d 13px 24px, transparent 25px);
+      animation: customPop .9s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
+    }
+    .city-lamppost-pop.target-enemy::before { right: 18%; }
+    .city-lamppost-pop.target-me::before { left: 18%; }
+    .city-lamppost-pop .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 11%);
+      width: 86px;
+      height: 86px;
+      background: repeating-conic-gradient(from 0deg, #fff 0deg 8deg, var(--magic) 9deg 18deg, transparent 19deg 34deg);
+      animation: customPop 1s ease calc(var(--magic-start-delay, 0s) + 2.2s) both;
+    }
+    .city-rune-grid::before {
+      left: 22%;
+      right: 22%;
+      top: calc(var(--battle-stage-y) - 3%);
+      height: 98px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 24px, var(--magic) 25px 28px, transparent 29px 52px),
+        repeating-linear-gradient(0deg, transparent 0 18px, rgba(255,255,255,.75) 19px 21px, transparent 22px 42px);
+      transform: perspective(180px) rotateX(58deg);
+      animation: customGridFlicker 2.1s ease calc(var(--magic-start-delay, 0s) + 1.05s) both;
+    }
+    .river-drop-arc::before {
+      left: 22%;
+      right: 22%;
+      top: calc(var(--battle-stage-y) - 30%);
+      height: 154px;
+      border-top: 8px dotted var(--magic);
+      border-radius: 50%;
+      animation: customArcIn 1.75s ease calc(var(--magic-start-delay, 0s) + 1.05s) both;
+    }
+    .river-drop-arc .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 17%);
+      width: 72px;
+      height: 92px;
+      border-radius: 52% 48% 58% 42%;
+      background: radial-gradient(circle at 35% 25%, #fff, var(--magic) 42%, #4cb8ff);
+      clip-path: ellipse(42% 50% at 50% 50%);
+      animation: customSplash 1.1s ease calc(var(--magic-start-delay, 0s) + 2.18s) both;
+    }
+    .river-ripple-gate .magic-custom-core,
+    .white-magic-gate .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 24%);
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 7px double var(--magic);
+      box-shadow: inset 0 0 20px rgba(255,255,255,.65), 0 0 20px var(--magic);
+      animation: customGateOpen 1.8s ease calc(var(--magic-start-delay, 0s) + 1.4s) both;
+    }
+    .river-mirage-tide::before {
+      left: 16%;
+      right: 16%;
+      top: calc(var(--battle-stage-y) - 8%);
+      height: 120px;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,.85) 0 6px, var(--magic) 7px 14px, transparent 15px 28px);
+      clip-path: polygon(0 70%, 10% 42%, 22% 70%, 34% 38%, 48% 70%, 62% 40%, 78% 70%, 90% 42%, 100% 70%, 100% 100%, 0 100%);
+      animation: customTidePush 2.2s ease calc(var(--magic-start-delay, 0s) + 1.1s) both;
+    }
+    .ake-ember-rise::before {
+      left: 20%;
+      right: 20%;
+      top: calc(var(--battle-stage-y) - 22%);
+      height: 118px;
+      background:
+        radial-gradient(circle at 18% 82%, #ff9b6b 0 5px, transparent 7px),
+        radial-gradient(circle at 38% 64%, #fff5a8 0 4px, transparent 6px),
+        radial-gradient(circle at 60% 44%, #ff9b6b 0 5px, transparent 7px),
+        radial-gradient(circle at 82% 28%, #fff5a8 0 4px, transparent 6px);
+      animation: customEmbers 2s ease calc(var(--magic-start-delay, 0s) + 1s) both;
+    }
+    .ake-sunrise-fan .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 24%);
+      width: 170px;
+      height: 110px;
+      background: conic-gradient(from 210deg at 50% 100%, transparent 0 18deg, #fff5a8 19deg 31deg, transparent 32deg 48deg, #ff9b6b 49deg 62deg, transparent 63deg 84deg, #fff5a8 85deg 98deg, transparent 99deg 150deg);
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+      animation: customFanOpen 1.5s ease calc(var(--magic-start-delay, 0s) + 1.65s) both;
+    }
+    .yura-wobble-orbit .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 18%);
+      width: 132px;
+      height: 132px;
+      border-radius: 42% 58% 45% 55%;
+      border: 6px dashed var(--magic);
+      filter: drop-shadow(0 0 14px var(--magic));
+      animation: customWobble 1.65s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
+    }
+    .yura-phantom-lanterns::before {
+      left: 18%;
+      right: 18%;
+      top: calc(var(--battle-stage-y) - 30%);
+      height: 150px;
+      background:
+        radial-gradient(ellipse at 20% 55%, rgba(255,255,255,.92) 0 10px, var(--magic) 11px 21px, transparent 22px),
+        radial-gradient(ellipse at 43% 26%, rgba(255,255,255,.72) 0 8px, var(--magic) 9px 18px, transparent 19px),
+        radial-gradient(ellipse at 68% 64%, rgba(255,255,255,.9) 0 10px, var(--magic) 11px 21px, transparent 22px),
+        radial-gradient(ellipse at 86% 34%, rgba(255,255,255,.65) 0 7px, var(--magic) 8px 16px, transparent 17px);
+      animation: customLanterns 2.2s ease calc(var(--magic-start-delay, 0s) + 1s) both;
+    }
+    .yura-mirror-maze::before {
+      left: 20%;
+      right: 20%;
+      top: calc(var(--battle-stage-y) - 28%);
+      height: 160px;
+      background:
+        linear-gradient(110deg, transparent 0 12%, rgba(255,255,255,.8) 13% 18%, var(--magic) 19% 22%, transparent 23% 36%, rgba(255,255,255,.65) 37% 43%, transparent 44% 58%, var(--magic) 59% 63%, rgba(255,255,255,.8) 64% 68%, transparent 69% 100%);
+      filter: drop-shadow(0 0 16px var(--magic));
+      animation: customMirror 2.05s ease calc(var(--magic-start-delay, 0s) + 1.15s) both;
+    }
+    .leaf-sprout-pop .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 9%);
+      width: 92px;
+      height: 92px;
+      background:
+        radial-gradient(ellipse at 38% 62%, #b8ff7a 0 20%, transparent 21%),
+        radial-gradient(ellipse at 62% 42%, #eaffc8 0 24%, transparent 25%),
+        linear-gradient(90deg, transparent 47%, #6dbb45 48% 52%, transparent 53%);
+      animation: customSprout 1.2s ease calc(var(--magic-start-delay, 0s) + 1.85s) both;
+    }
+    .leaf-forest-crest .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 22%);
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      background: repeating-conic-gradient(from 18deg, #eaffc8 0deg 12deg, var(--magic) 13deg 25deg, transparent 26deg 42deg);
+      clip-path: polygon(50% 0, 62% 28%, 92% 18%, 72% 50%, 92% 82%, 62% 72%, 50% 100%, 38% 72%, 8% 82%, 28% 50%, 8% 18%, 38% 28%);
+      animation: customSpinPop 1.55s ease calc(var(--magic-start-delay, 0s) + 1.55s) both;
+    }
+    .leaf-vine-bloom::before {
+      left: 18%;
+      right: 18%;
+      top: calc(var(--battle-stage-y) - 8%);
+      height: 90px;
+      background: linear-gradient(100deg, transparent, #b8ff7a, var(--magic), transparent);
+      clip-path: polygon(0 64%, 16% 42%, 30% 66%, 46% 38%, 62% 66%, 78% 42%, 100% 64%, 100% 84%, 0 84%);
+      animation: customVineGrow 1.75s ease calc(var(--magic-start-delay, 0s) + 1.15s) both;
+    }
+    .leaf-vine-bloom .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 24%);
+      width: 132px;
+      height: 132px;
+      background: radial-gradient(circle, #fff 0 12%, #eaffc8 13% 24%, var(--magic) 25% 44%, transparent 45%);
+      clip-path: polygon(50% 0, 62% 36%, 100% 50%, 62% 64%, 50% 100%, 38% 64%, 0 50%, 38% 36%);
+      animation: customBloom 1.28s ease calc(var(--magic-start-delay, 0s) + 2.35s) both;
+    }
+    .white-prism-dot .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 15%);
+      width: 92px;
+      height: 92px;
+      background: conic-gradient(#fff, #dff8ff, #fff4a8, #fff, #c9a6ff, #fff);
+      clip-path: polygon(50% 0, 95% 28%, 78% 88%, 22% 88%, 5% 28%);
+      animation: customSweepRight 1.55s ease calc(var(--magic-start-delay, 0s) + 1.65s) both;
+    }
+    .white-star-crest .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 26%);
+      width: 164px;
+      height: 164px;
+      background: radial-gradient(circle, #fff 0 12%, #dff8ff 13% 28%, transparent 29%), repeating-conic-gradient(#fff 0deg 10deg, transparent 11deg 24deg);
+      clip-path: polygon(50% 0, 60% 34%, 96% 34%, 66% 54%, 78% 94%, 50% 68%, 22% 94%, 34% 54%, 4% 34%, 40% 34%);
+      animation: customSpinPop 1.5s ease calc(var(--magic-start-delay, 0s) + 1.9s) both;
+    }
     .battle-ad-panel {
       position: absolute;
       left: 50%;
@@ -4111,6 +4618,105 @@
       0% { opacity: 0; transform: scale(.34) rotate(-18deg); }
       20%, 50% { opacity: 1; transform: scale(1.08) rotate(10deg); }
       100% { opacity: 0; transform: scale(1.34) rotate(28deg); }
+    }
+    @keyframes customFadeRun {
+      0% { opacity: 0; transform: translateX(-14px) scale(.9); }
+      20%, 76% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(14px) scale(1.08); }
+    }
+    @keyframes customPop {
+      0% { opacity: 0; transform: scale(.35) rotate(-8deg); }
+      20%, 62% { opacity: 1; transform: scale(1.08) rotate(4deg); }
+      100% { opacity: 0; transform: scale(1.32) rotate(12deg); }
+    }
+    @keyframes customSweepRight {
+      0% { opacity: 0; transform: translateX(-44px) scale(.85); }
+      22%, 70% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(38px) scale(1.12); }
+    }
+    @keyframes customArcIn {
+      0% { opacity: 0; transform: translateY(24px) scale(.84) rotate(-8deg); }
+      24%, 72% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-8px) scale(1.12) rotate(8deg); }
+    }
+    @keyframes customCloudPuff {
+      0% { opacity: 0; transform: scale(.42) translateY(18px); filter: blur(0); }
+      26%, 58% { opacity: 1; transform: scale(1.04) translateY(0); }
+      100% { opacity: 0; transform: scale(1.42) translateY(-8px); filter: blur(2px); }
+    }
+    @keyframes customSpinPop {
+      0% { opacity: 0; transform: scale(.42) rotate(-70deg); }
+      24%, 66% { opacity: 1; transform: scale(1.06) rotate(18deg); }
+      100% { opacity: 0; transform: scale(1.28) rotate(92deg); }
+    }
+    @keyframes customColumnDrop {
+      0% { opacity: 0; transform: translateY(-60px) scaleY(.55); }
+      18%, 64% { opacity: 1; transform: translateY(0) scaleY(1); }
+      100% { opacity: 0; transform: translateY(24px) scaleY(1.12); }
+    }
+    @keyframes customGridFlicker {
+      0% { opacity: 0; transform: perspective(180px) rotateX(58deg) translateY(22px); }
+      22%, 38%, 58%, 76% { opacity: 1; }
+      30%, 48%, 68% { opacity: .48; }
+      100% { opacity: 0; transform: perspective(180px) rotateX(58deg) translateY(-8px); }
+    }
+    @keyframes customSplash {
+      0% { opacity: 0; transform: translateY(-18px) scale(.52); }
+      18%, 54% { opacity: 1; transform: translateY(0) scale(1.04); }
+      100% { opacity: 0; transform: translateY(18px) scale(1.28); }
+    }
+    @keyframes customGateOpen {
+      0% { opacity: 0; transform: scale(.22) rotate(-28deg); }
+      24%, 68% { opacity: 1; transform: scale(1.04) rotate(10deg); }
+      100% { opacity: 0; transform: scale(1.28) rotate(34deg); }
+    }
+    @keyframes customTidePush {
+      0% { opacity: 0; transform: translateX(-32px) skewX(-8deg); }
+      24%, 72% { opacity: .95; }
+      100% { opacity: 0; transform: translateX(36px) skewX(8deg); }
+    }
+    @keyframes customEmbers {
+      0% { opacity: 0; transform: translateY(28px) scale(.86); }
+      24%, 78% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-30px) scale(1.12); }
+    }
+    @keyframes customFanOpen {
+      0% { opacity: 0; transform: scaleX(.18) scaleY(.72); transform-origin: 50% 100%; }
+      24%, 68% { opacity: 1; transform: scaleX(1) scaleY(1); transform-origin: 50% 100%; }
+      100% { opacity: 0; transform: scaleX(1.22) scaleY(1.08); transform-origin: 50% 100%; }
+    }
+    @keyframes customWobble {
+      0% { opacity: 0; transform: translate(-12px, 0) scale(.72) rotate(-18deg); }
+      24% { opacity: 1; transform: translate(10px, -4px) scale(1.02) rotate(16deg); }
+      48% { opacity: 1; transform: translate(-8px, 5px) scale(.96) rotate(-12deg); }
+      72% { opacity: 1; transform: translate(7px, -2px) scale(1.08) rotate(18deg); }
+      100% { opacity: 0; transform: translate(0, 0) scale(1.24) rotate(40deg); }
+    }
+    @keyframes customLanterns {
+      0% { opacity: 0; transform: translateY(18px); }
+      20%, 36%, 54%, 76% { opacity: 1; }
+      28%, 46%, 64% { opacity: .5; }
+      100% { opacity: 0; transform: translateY(-16px); }
+    }
+    @keyframes customMirror {
+      0% { opacity: 0; transform: perspective(180px) rotateY(-35deg) scale(.8); }
+      24%, 68% { opacity: 1; transform: perspective(180px) rotateY(12deg) scale(1); }
+      100% { opacity: 0; transform: perspective(180px) rotateY(42deg) scale(1.08); }
+    }
+    @keyframes customSprout {
+      0% { opacity: 0; transform: translateY(24px) scale(.38); }
+      26%, 62% { opacity: 1; transform: translateY(0) scale(1.08); }
+      100% { opacity: 0; transform: translateY(-10px) scale(1.22); }
+    }
+    @keyframes customVineGrow {
+      0% { opacity: 0; clip-path: polygon(0 64%, 0 42%, 0 66%, 0 38%, 0 66%, 0 42%, 0 64%, 0 84%, 0 84%); }
+      28%, 74% { opacity: 1; }
+      100% { opacity: 0; clip-path: polygon(0 64%, 16% 42%, 30% 66%, 46% 38%, 62% 66%, 78% 42%, 100% 64%, 100% 84%, 0 84%); }
+    }
+    @keyframes customBloom {
+      0% { opacity: 0; transform: scale(.32) rotate(-20deg); }
+      22%, 64% { opacity: 1; transform: scale(1.06) rotate(8deg); }
+      100% { opacity: 0; transform: scale(1.3) rotate(32deg); }
     }
     @keyframes magicCasterStep {
       0%, 100% { transform: translateY(0) scale(1); filter: none; }
@@ -5107,12 +5713,12 @@
       height: 28px;
       flex: 0 0 auto;
     }
-    .cup-medal.medal-rookie { --medal-main: #ff9b2f; --medal-deep: #7a3c00; --medal-pale: #fff0d8; }
-    .cup-medal.medal-green { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
-    .cup-medal.medal-city { --medal-main: #9a72ff; --medal-deep: #3f2788; --medal-pale: #efe9ff; }
-    .cup-medal.medal-sky { --medal-main: #65d7ff; --medal-deep: #11617a; --medal-pale: #e5f8ff; }
-    .cup-medal.medal-river { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
-    .cup-medal.medal-grand { --medal-main: #ffffff; --medal-deep: #58606c; --medal-pale: #f9fbff; }
+    .cup-medal.medal-rookie, .award-medal.medal-rookie { --medal-main: #ff9b2f; --medal-deep: #7a3c00; --medal-pale: #fff0d8; }
+    .cup-medal.medal-green, .award-medal.medal-green { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
+    .cup-medal.medal-city, .award-medal.medal-city { --medal-main: #9a72ff; --medal-deep: #3f2788; --medal-pale: #efe9ff; }
+    .cup-medal.medal-sky, .award-medal.medal-sky { --medal-main: #65d7ff; --medal-deep: #11617a; --medal-pale: #e5f8ff; }
+    .cup-medal.medal-river, .award-medal.medal-river { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
+    .cup-medal.medal-grand, .award-medal.medal-grand { --medal-main: #ffffff; --medal-deep: #58606c; --medal-pale: #f9fbff; }
     .cup-medal::before {
       content: "";
       position: absolute;
@@ -5373,15 +5979,18 @@
       z-index: 8;
     }
     .award-medal {
+      --medal-main: #eadfc9;
+      --medal-deep: #6f6046;
+      --medal-pale: #fffaf0;
       position: absolute;
       left: 50%;
-      top: 47px;
+      top: 48px;
       width: 33px;
       height: 41px;
       transform: translateX(-50%);
       opacity: 0;
       pointer-events: none;
-      z-index: 4;
+      z-index: 10;
     }
     .award-stage.medal-awarding {
       width: min(96%, 560px);
@@ -5390,22 +5999,39 @@
       padding-bottom: 10px;
     }
     .award-stage.medal-awarding .award-medal {
-      animation: awardMedalDrop 1.35s ease .28s both;
+      left: 50%;
+      top: 48px;
+      animation: awardMedalNeckZoom 1.35s ease both;
       z-index: 10;
+    }
+    .award-stage.medal-awarding .award-medal.body-synced {
+      animation: awardMedalUniqueBodyMotion .54s ease-in-out -1.35s infinite;
+    }
+    .award-stage.medal-awarding.award-young-body .award-medal.body-synced {
+      animation-name: awardMedalYoungBodyMotion;
     }
     .award-stage.medal-awarding .award-medal::before,
     .award-stage.medal-awarding .award-medal::after {
       animation: none;
     }
     .award-stage.medal-awarding .award-winner {
-      animation:
-        awardNeckZoom 1.35s ease both,
-        awardWinnerRestBob .82s ease-in-out 1.63s infinite;
+      animation: awardNeckZoom 1.35s ease both;
       z-index: 6;
     }
-    .award-stage.medal-awarding .award-winner .turnaround-monster,
-    .award-stage.medal-awarding .award-winner .monster {
-      animation: none;
+    .award-stage.medal-awarding .award-winner .monster.sprout,
+    .award-stage.medal-awarding .award-winner .monster.trail,
+    .award-stage.medal-awarding .award-winner .monster.skykid {
+      animation: youngMonsterWalkBounce .54s ease-in-out infinite;
+    }
+    .award-stage.medal-awarding .award-winner .monster.sprout .monster-foot,
+    .award-stage.medal-awarding .award-winner .monster.trail .monster-foot,
+    .award-stage.medal-awarding .award-winner .monster.skykid .monster-foot {
+      animation: youngMonsterFootStep 1.08s ease-in-out infinite;
+    }
+    .award-stage.medal-awarding .award-winner .monster.sprout .monster-foot.right,
+    .award-stage.medal-awarding .award-winner .monster.trail .monster-foot.right,
+    .award-stage.medal-awarding .award-winner .monster.skykid .monster-foot.right {
+      animation-delay: -.54s;
     }
     .award-stage.medal-awarding .podium,
     .award-stage.medal-awarding .award-caption {
@@ -5435,7 +6061,9 @@
       height: 20px;
       transform: translateX(-50%);
       clip-path: polygon(8% 0, 42% 0, 50% 46%, 58% 0, 92% 0, 72% 76%, 50% 100%, 28% 76%);
-      background: linear-gradient(180deg, #ffeaa5, #b77918);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.65) 0 7%, transparent 7% 50%, rgba(0,0,0,.1) 50% 57%, transparent 57%),
+        linear-gradient(180deg, color-mix(in srgb, var(--medal-main) 55%, #fff 45%), color-mix(in srgb, var(--medal-deep) 62%, var(--medal-main) 38%));
     }
     .award-medal::after {
       content: attr(data-mark);
@@ -5449,10 +6077,13 @@
       place-items: center;
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,.78);
-      background: radial-gradient(circle at 32% 25%, #fff 0 8%, transparent 9%), linear-gradient(180deg, #ffe978, #d49a24);
-      color: #6b4f21;
+      background:
+        radial-gradient(circle at 32% 25%, #fff 0 8%, transparent 9%),
+        radial-gradient(circle at center, transparent 0 44%, rgba(255,255,255,.58) 45% 47%, transparent 48%),
+        radial-gradient(circle at center, var(--medal-main) 0 58%, color-mix(in srgb, var(--medal-main) 62%, var(--medal-deep) 38%) 59% 100%);
+      color: var(--medal-deep);
       font: 900 10px/1 system-ui, sans-serif;
-      box-shadow: inset 0 -4px 0 rgba(0,0,0,.12), 0 4px 0 rgba(93,64,15,.16), 0 0 18px rgba(255,231,120,.72);
+      box-shadow: inset 0 -4px 0 rgba(0,0,0,.12), 0 4px 0 rgba(93,64,15,.16), 0 0 18px color-mix(in srgb, var(--medal-main) 48%, transparent);
     }
     .award-caption {
       position: relative;
@@ -5463,6 +6094,10 @@
       font-weight: 900;
       text-shadow: 0 2px 0 rgba(0,0,0,.22);
     }
+    .battle-field.award-ceremony.arena-sky .award-caption {
+      color: #000;
+      text-shadow: 0 1px 0 rgba(255,255,255,.75);
+    }
     @keyframes awardStepUp {
       0% { opacity: 0; transform: translateX(-50%) translateY(34px) scale(.92); }
       100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
@@ -5471,10 +6106,19 @@
       0% { opacity: 0; transform: translateX(-50%) translateY(24px) scale(.72); }
       100% { opacity: 1; }
     }
-    @keyframes awardMedalDrop {
+    @keyframes awardMedalNeckZoom {
       0% { opacity: 0; transform: translateX(-50%) translateY(-36px) scale(.72); }
-      64% { opacity: 1; transform: translateX(-50%) translateY(58px) scale(.86); }
-      100% { opacity: 1; transform: translateX(-50%) translateY(54px) scale(.72); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(60px) scale(.72); }
+    }
+    @keyframes awardMedalUniqueBodyMotion {
+      0%, 100% { opacity: 1; transform: translateX(-50%) translateY(60px) scale(.72); }
+      25% { opacity: 1; transform: translateX(-50%) translateY(57px) scale(.72); }
+      50% { opacity: 1; transform: translateX(-50%) translateY(60px) scale(.72); }
+      75% { opacity: 1; transform: translateX(-50%) translateY(61.3px) scale(.72); }
+    }
+    @keyframes awardMedalYoungBodyMotion {
+      0%, 100% { opacity: 1; transform: translateX(-50%) translateY(60px) scale(.72); }
+      50% { opacity: 1; transform: translateX(-50%) translateY(56px) scale(.72); }
     }
     @keyframes awardWinnerRestBob {
       0%, 100% { transform: translateX(-50%) translateY(4px) scale(2.2); }
@@ -8354,10 +8998,10 @@
     }
     .pixel-fighter.advantage-late::after {
       opacity: 0;
-      animation: advantageLate .12s step-end 5.05s forwards;
+      animation: advantageLate .12s step-end var(--advantage-change-delay, 5.05s) forwards;
     }
     .pixel-fighter.advantage-exit::after {
-      animation: advantageExit .12s step-end 5.05s forwards;
+      animation: advantageExit .12s step-end var(--advantage-change-delay, 5.05s) forwards;
     }
     .battle-field.final-decision .pixel-fighter.advantage::after,
     .battle-field.final-decision .pixel-fighter.advantage-late::after {
@@ -9274,6 +9918,7 @@ let pendingBattleReward = null;
 let pendingBattleResultSfx = "";
 let pendingBattleLogMessages = [];
 let pendingBattleAnimation = null;
+let pendingBattleResultHomeAction = false;
 let battleAnimationTimer = null;
 let battleResultSfxTimer = null;
 let battleHpCountTimers = [];
@@ -9533,7 +10178,22 @@ const sfxAudioFiles = {
   messageSnesRpg01_07: "assets/audio/otologic_snes_rpg01_07_message_candidate.mp3",
   messageSnesRpg01_08: "assets/audio/otologic_snes_rpg01_08_message_candidate.mp3",
   messageSnesRpg01_09: "assets/audio/otologic_snes_rpg01_09_message_candidate.mp3",
-  moveReleaseAssortedSe07_01: "assets/audio/otologic_assorted_se07_01_move_release.mp3"
+  moveReleaseAssortedSe07_01: "assets/audio/otologic_assorted_se07_01_move_release.mp3",
+  customLampFlashShort: "assets/audio/otologic_battle_custom_lamp_flash_short.mp3",
+  customLampFlashLong: "assets/audio/otologic_battle_custom_lamp_flash_long.mp3",
+  customLaserShort: "assets/audio/otologic_battle_custom_laser_short.mp3",
+  customLaserMid: "assets/audio/otologic_battle_custom_laser_mid.mp3",
+  customBeamLong: "assets/audio/otologic_battle_custom_beam_long.mp3",
+  customAirSwishShort: "assets/audio/otologic_battle_custom_air_swish_short.mp3",
+  customWindPressure: "assets/audio/otologic_battle_custom_wind_pressure.mp3",
+  customEmberShort: "assets/audio/otologic_battle_custom_ember_short.mp3",
+  customSolarSpotlight: "assets/audio/otologic_battle_custom_solar_spotlight.mp3",
+  customYuraShort: "assets/audio/otologic_battle_custom_yura_short.mp3",
+  customMirrorLong: "assets/audio/otologic_battle_custom_mirror_long.mp3",
+  customSproutWhistle: "assets/audio/otologic_battle_custom_sprout_whistle.mp3",
+  customBloomPhrase: "assets/audio/otologic_battle_custom_bloom_phrase.mp3",
+  customPrismShort: "assets/audio/otologic_battle_custom_prism_short.mp3",
+  customMagicGate: "assets/audio/otologic_battle_custom_magic_gate.mp3"
 };
 const battleHitSfxFileKey = "damageCandidate1";
 const battleHitSfxFileKeys = {
@@ -9588,9 +10248,9 @@ const battleHitSfxFileKeys = {
     strong: ["electricCandidate9", "thunderCandidate1", "thunderCandidate2"]
   },
   route: {
-    weak: ["damageCandidate1"],
-    medium: ["damageCandidate1", "damageSnesShooter1"],
-    strong: ["impactCandidate6", "explosionCandidate1", "impactCandidate7"]
+    weak: ["damageSnesShooter1"],
+    medium: ["damageSnesShooter1", "impactCandidate6"],
+    strong: ["damageSnesShooter1", "explosionCandidate1", "impactCandidate7"]
   },
   explosion: {
     weak: ["explosionCandidate1"],
@@ -9601,6 +10261,126 @@ const battleHitSfxFileKeys = {
     weak: ["impactCandidate6"],
     medium: ["impactCandidate6", "impactCandidate1"],
     strong: ["impactCandidate6", "impactCandidate1", "impactCandidate7"]
+  },
+  "walk-lamp-step": {
+    weak: ["customLampFlashShort"],
+    medium: ["customLampFlashShort", "customLampFlashLong"],
+    strong: ["customLampFlashShort", "customLampFlashLong", "impactCandidate6"]
+  },
+  "walk-signpost-beam": {
+    weak: ["customLaserShort"],
+    medium: ["customLaserShort", "customLaserMid"],
+    strong: ["customLaserShort", "customLaserMid", "customBeamLong"]
+  },
+  "walk-roadstar-comet": {
+    weak: ["customLaserMid"],
+    medium: ["customLaserMid", "customBeamLong"],
+    strong: ["customLaserMid", "customBeamLong", "impactCandidate7"]
+  },
+  "sky-cloud-puff": {
+    weak: ["customAirSwishShort"],
+    medium: ["customAirSwishShort", "customWindPressure"],
+    strong: ["customAirSwishShort", "customWindPressure", "impactCandidate6"]
+  },
+  "sky-jetstream-rune": {
+    weak: ["customAirSwishShort"],
+    medium: ["customAirSwishShort", "customWindPressure"],
+    strong: ["customAirSwishShort", "customWindPressure", "impactCandidate1"]
+  },
+  "sky-sunburst-column": {
+    weak: ["customSolarSpotlight"],
+    medium: ["customSolarSpotlight", "customPrismShort"],
+    strong: ["customSolarSpotlight", "customPrismShort", "impactCandidate5"]
+  },
+  "city-lamppost-pop": {
+    weak: ["customLampFlashShort"],
+    medium: ["customLampFlashShort", "electricCandidate12"],
+    strong: ["customLampFlashShort", "electricCandidate12", "customLampFlashLong"]
+  },
+  "city-rune-grid": {
+    weak: ["customMagicGate"],
+    medium: ["customMagicGate", "customLaserShort"],
+    strong: ["customMagicGate", "customLaserShort", "electricCandidate11"]
+  },
+  "city-tower-laser": {
+    weak: ["customLaserShort"],
+    medium: ["customLaserShort", "customLaserMid"],
+    strong: ["customLaserShort", "customLaserMid", "customBeamLong"]
+  },
+  "river-drop-arc": {
+    weak: ["waterDrop6"],
+    medium: ["waterDrop6", "waterDrop5"],
+    strong: ["waterDrop6", "waterDrop5", "impactCandidate6"]
+  },
+  "river-ripple-gate": {
+    weak: ["waterDrop5"],
+    medium: ["waterDrop5", "customMagicGate"],
+    strong: ["waterDrop5", "customMagicGate", "impactCandidate6"]
+  },
+  "river-mirage-tide": {
+    weak: ["waterDrop5"],
+    medium: ["waterDrop5", "customMirrorLong"],
+    strong: ["waterDrop5", "customMirrorLong", "impactCandidate5"]
+  },
+  "ake-ember-rise": {
+    weak: ["customEmberShort"],
+    medium: ["customEmberShort", "customLampFlashShort"],
+    strong: ["customEmberShort", "customLampFlashShort", "impactCandidate6"]
+  },
+  "ake-sunrise-fan": {
+    weak: ["customEmberShort"],
+    medium: ["customEmberShort", "customSolarSpotlight"],
+    strong: ["customEmberShort", "customSolarSpotlight", "impactCandidate1"]
+  },
+  "ake-solar-crown": {
+    weak: ["customSolarSpotlight"],
+    medium: ["customSolarSpotlight", "customLampFlashLong"],
+    strong: ["customSolarSpotlight", "customLampFlashLong", "impactCandidate5"]
+  },
+  "yura-wobble-orbit": {
+    weak: ["customYuraShort"],
+    medium: ["customYuraShort", "fantasize8_2"],
+    strong: ["customYuraShort", "fantasize8_2", "impactCandidate6"]
+  },
+  "yura-phantom-lanterns": {
+    weak: ["customYuraShort"],
+    medium: ["customYuraShort", "customMirrorLong"],
+    strong: ["customYuraShort", "customMirrorLong", "fantasize4_2"]
+  },
+  "yura-mirror-maze": {
+    weak: ["customMirrorLong"],
+    medium: ["customMirrorLong", "customMagicGate"],
+    strong: ["customMirrorLong", "customMagicGate", "impactCandidate9"]
+  },
+  "leaf-sprout-pop": {
+    weak: ["customSproutWhistle"],
+    medium: ["customSproutWhistle", "animeMotion2"],
+    strong: ["customSproutWhistle", "animeMotion2", "impactCandidate6"]
+  },
+  "leaf-forest-crest": {
+    weak: ["customSproutWhistle"],
+    medium: ["customSproutWhistle", "customBloomPhrase"],
+    strong: ["customSproutWhistle", "customBloomPhrase", "impactCandidate1"]
+  },
+  "leaf-vine-bloom": {
+    weak: ["customSproutWhistle"],
+    medium: ["customSproutWhistle", "customBloomPhrase"],
+    strong: ["customSproutWhistle", "customBloomPhrase", "impactCandidate5"]
+  },
+  "white-prism-dot": {
+    weak: ["customPrismShort"],
+    medium: ["customPrismShort", "starSparkle1"],
+    strong: ["customPrismShort", "starSparkle1", "impactCandidate6"]
+  },
+  "white-magic-gate": {
+    weak: ["customPrismShort"],
+    medium: ["customPrismShort", "customMagicGate"],
+    strong: ["customPrismShort", "customMagicGate", "impactCandidate1"]
+  },
+  "white-star-crest": {
+    weak: ["customPrismShort"],
+    medium: ["customPrismShort", "customMagicGate"],
+    strong: ["customPrismShort", "customMagicGate", "customSolarSpotlight"]
   }
 };
 const starfallSfxFileKeys = { sparkle: "starSparkle1", flash: "starFlash1" };
@@ -9611,7 +10391,7 @@ const routeMagicSfxFileKey = "magicSparkle13_6";
 const chargeSfxFileKey = "chargeCandidate1";
 const battleAvoidSfxFileKey = "avoidCandidate1";
 const battleMessageSfxFileKey = "messageNesRpg01_10";
-const moveReleaseSfxFileKey = "moveReleaseAssortedSe07_01";
+const moveReleaseSfxFileKey = "skyConfirmCandidate3";
 const buttonSfxFileKey = "buttonSelect1";
 const itemGetSfxFileKey = "itemGetCandidate1";
 const itemUseSfxFileKey = "itemUseCandidate1";
@@ -37134,7 +37914,8 @@ function renderCharacterGallery() {
 function renderMonster() {
   const profile = monsterProfile();
   const stats = monsterStats();
-  const skillNames = state.monster.skills.map(id => moveBook.find(move => move.id === id)?.name).filter(Boolean).join(" / ");
+  const skillBook = battleMoveBookForActor(state.monster);
+  const skillNames = [skillBook.weak, skillBook.medium, skillBook.strong].filter(Boolean).join(" / ");
   const lifeRemain = retirementRemainingHours();
   const lifeText = `${retirementTimeText(lifeRemain)} / 延命 ${state.monster.lifeExtensionUses || 0}/5回 / 満開期条件 ${canEvolveToStar() ? "OK" : "延命3回以上"}`;
   const growth = growthForecast();
@@ -37268,8 +38049,8 @@ function renderBattleStage(profile, lifeRemain = 1) {
     log.innerHTML = `<strong>大会待ち</strong><p>大会は、参加確認と作戦選択のあとに始まります。</p>`;
     return;
   }
-  field.className = "battle-field tournament-opening";
   const readyCup = tournaments.find(item => item.id === state.pendingBattle.cupId) || tournaments[0];
+  field.className = `battle-field tournament-opening ${arenaClassFor(readyCup)}`;
   const readyPlayerName = tournamentPlayerDisplayName(profile);
   const readyTotal = readyCup ? tournamentMatchCount(readyCup) : 2;
   const readyMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), readyTotal - 1));
@@ -38624,6 +39405,7 @@ function setPlaytestBattleReady() {
   pendingBattleResultHtml = "";
   pendingBattleReward = null;
   pendingBattleResultSfx = "";
+  pendingBattleResultHomeAction = false;
   pendingBattleLogMessages = [];
   clearBattleAnimationTimer();
   clearBattleAdTimer();
@@ -39481,17 +40263,55 @@ function tournamentMatchesHtml(matches, cup = null) {
     ${match.judged ? `<div class="battle-judge">最大ターンで決着がつかなかったため、残りHP比率で判定しました。</div>` : ""}
   `).join("");
 }
-function enemyMagicMoveName(cup, tier) {
-  const book = {
-    rookie: { weak: "路地灯の粒", medium: "看板ルーン", strong: "路地星フレア" },
-    green: { weak: "若葉の灯", medium: "森風の紋", strong: "深緑ルミナ" },
-    city: { weak: "街灯の粒", medium: "時計塔ルーン", strong: "シティスター" },
-    sky: { weak: "そよ雲", medium: "気流の紋", strong: "蒼天フレア" },
-    river: { weak: "しずく弾", medium: "波紋ライト", strong: "アクアミラージュ" },
-    grand: { weak: "白いきらめき", medium: "王者の星印", strong: "グランドルミナ" },
-    default: { weak: "光の粒", medium: "魔法の紋", strong: "星光フレア" }
-  };
-  return (book[cup?.id] || book.default)[tier] || book.default.weak;
+const battleMoveBooksBySeed = {
+  "seed-walk": { weak: "こみちの灯", medium: "風標のきらめき", strong: "路地星フレア", style: "route", styles: { weak: "walk-lamp-step", medium: "walk-signpost-beam", strong: "walk-roadstar-comet" } },
+  "seed-sky": { weak: "そよ雲", medium: "気流の紋", strong: "ソラノフレア", style: "starfall", styles: { weak: "sky-cloud-puff", medium: "sky-jetstream-rune", strong: "sky-sunburst-column" } },
+  "seed-city": { weak: "街灯の粒", medium: "街灯ルーン", strong: "シティスター", style: "city-spark", styles: { weak: "city-lamppost-pop", medium: "city-rune-grid", strong: "city-tower-laser" } },
+  "seed-river": { weak: "しずく弾", medium: "波紋ライト", strong: "アクアミラージュ", style: "water", styles: { weak: "river-drop-arc", medium: "river-ripple-gate", strong: "river-mirage-tide" } },
+  "seed-night": { weak: "朝焼けの粒", medium: "暁のルーン", strong: "アケノフレア", style: "flash", styles: { weak: "ake-ember-rise", medium: "ake-sunrise-fan", strong: "ake-solar-crown" } },
+  "seed-luck": { weak: "ゆらぎの粒", medium: "幻灯ルーン", strong: "ユラノミラージュ", style: "wind", styles: { weak: "yura-wobble-orbit", medium: "yura-phantom-lanterns", strong: "yura-mirror-maze" } },
+  "seed-leaf": { weak: "若葉の灯", medium: "森風の紋", strong: "深緑ルミナ", style: "wind", styles: { weak: "leaf-sprout-pop", medium: "leaf-forest-crest", strong: "leaf-vine-bloom" } },
+  default: { weak: "光の粒", medium: "魔法の紋", strong: "星光フレア", style: "route", styles: { weak: "white-prism-dot", medium: "white-magic-gate", strong: "white-star-crest" } }
+};
+const customMagicSceneTypes = new Set(Object.values(battleMoveBooksBySeed).flatMap(book => Object.values(book.styles || {})));
+function battleSeedIdFromActor(actor) {
+  if (!actor) return "";
+  const seedId = actor.seedId || battleAffinitySeedFromOpponent(actor);
+  if (seedId && battleMoveBooksBySeed[seedId]) return seedId;
+  const text = `${actor.id || ""} ${actor.baseName || ""} ${actor.name || ""}`;
+  if (text.includes("白")) return "";
+  if (text.includes("ミチ")) return "seed-walk";
+  if (text.includes("ソラ")) return "seed-sky";
+  if (text.includes("マチ")) return "seed-city";
+  if (text.includes("ミズ")) return "seed-river";
+  if (text.includes("アケ")) return "seed-night";
+  if (text.includes("ユラ")) return "seed-luck";
+  if (text.includes("ハニ")) return "seed-leaf";
+  return "";
+}
+function battleMoveBookForActor(actor) {
+  return battleMoveBooksBySeed[battleSeedIdFromActor(actor)] || battleMoveBooksBySeed.default;
+}
+function battleMagicMoveName(actor, tier, fallback = "") {
+  const book = battleMoveBookForActor(actor);
+  return book[tier] || fallback || battleMoveBooksBySeed.default.weak;
+}
+function battleMagicStyleForActor(actor, tier = "weak") {
+  const book = battleMoveBookForActor(actor);
+  return book.styles?.[tier] || book.style || "route";
+}
+function magicBaseSceneType(sceneType = "route") {
+  if (customMagicSceneTypes.has(sceneType)) return "custom";
+  if (sceneType === "cross-slash" || sceneType.startsWith("cross-slash-")) return "cross-slash";
+  if (sceneType === "city-spark" || sceneType.startsWith("city-spark-")) return "city-spark";
+  if (sceneType.startsWith("route-")) return "route";
+  if (sceneType.startsWith("slash-")) return "slash";
+  if (sceneType.startsWith("starfall-")) return "starfall";
+  if (sceneType.startsWith("wind-")) return "wind";
+  if (sceneType.startsWith("water-")) return "water";
+  if (sceneType.startsWith("flash-")) return "flash";
+  if (sceneType.startsWith("thunder-")) return "thunder";
+  return sceneType;
 }
 function magicColorFor(tier, actor) {
   if (tier === "strong") return actor === "me" ? "#ffd66d" : "#ff8f9b";
@@ -39499,7 +40319,10 @@ function magicColorFor(tier, actor) {
   return actor === "me" ? "#9ff0c0" : "#ffc6de";
 }
 function magicSceneClassFor(tier) {
-  if (tier && typeof tier === "object") return `${magicSceneClassFor(tier.tier)} magic-style-${magicSceneTypeFor(tier)}`;
+  if (tier && typeof tier === "object") {
+    const sceneType = magicSceneTypeFor(tier);
+    return `${magicSceneClassFor(tier.tier)} magic-style-${magicBaseSceneType(sceneType)} magic-variant-${sceneType}`;
+  }
   if (tier === "strong") return "magic-scene-strong";
   if (tier === "medium") return "magic-scene-medium";
   if (tier === "weak") return "magic-scene-weak";
@@ -39512,6 +40335,10 @@ function arenaClassFor(cup) {
 function magicSceneTypeFor(scene) {
   if (!scene || scene.type === "match") return "route";
   const seed = magicNameHash(`${scene.moveName}-${scene.name}-${scene.enemyName || ""}`);
+  if (scene.magicStyle) {
+    if (scene.magicStyle === "route" && scene.tier === "strong" && seed % 2 === 0) return "cross-slash";
+    return scene.magicStyle;
+  }
   const cupId = scene.cupId || scene.cup?.id || "";
   if (cupId === "sky") return scene.tier === "weak" && seed % 3 ? "route" : "starfall";
   if (cupId === "river") return scene.tier === "weak" && seed % 2 ? "route" : "water";
@@ -39528,14 +40355,44 @@ function magicSceneTextFor(sceneOrTier) {
   const scene = sceneOrTier && typeof sceneOrTier === "object" ? sceneOrTier : null;
   const tier = scene ? scene.tier : sceneOrTier;
   const sceneType = scene ? magicSceneTypeFor(scene) : "route";
-  if (sceneType === "cross-slash") return "二本の光刃が交差し、相手側で鋭い閃光が弾ける。";
-  if (sceneType === "slash") return "光の刃が戦場を切り抜け、相手側で閃光が走る。";
-  if (sceneType === "starfall") return "空から星の光が降り、相手側で大きな星が弾ける。";
-  if (sceneType === "wind") return "風の輪が渦を巻き、相手を包み込むように走る。";
-  if (sceneType === "water") return "水の波が戦場を走り、相手側でしぶきが跳ねる。";
-  if (sceneType === "city-spark") return "街灯の光柱が立ち上がり、相手側でネオンの火花が弾ける。";
-  if (sceneType === "flash") return "まばゆい光が一瞬集まり、相手側で大きく弾ける。";
-  if (sceneType === "thunder") return "空からまっすぐ雷が落ち、相手側で電気の火花が散る。";
+  const baseType = magicBaseSceneType(sceneType);
+  if (baseType === "custom") {
+    const customText = {
+      "walk-lamp-step": "足元に小さな道灯りが並び、相手のそばで順番に灯る。",
+      "walk-signpost-beam": "道しるべの標識が立ち、細い光の線で相手を指し示す。",
+      "walk-roadstar-comet": "道の星が弧を描いて走り、相手側で大きく跳ねる。",
+      "sky-cloud-puff": "小さな雲がふくらみ、相手の近くではじける。",
+      "sky-jetstream-rune": "気流の紋が空中に開き、流れる風で相手を押す。",
+      "sky-sunburst-column": "空から太い光柱が差し、相手側を明るく照らす。",
+      "city-lamppost-pop": "街灯がぱっと点き、足元から小さな火花が跳ねる。",
+      "city-rune-grid": "街の路面に光る格子が走り、相手の足元で点滅する。",
+      "city-tower-laser": "街の塔のような光が立ち、上から鋭い光線が降りる。",
+      "river-drop-arc": "しずくが弧を描いて飛び、相手の前で跳ねる。",
+      "river-ripple-gate": "水面の門のような波紋が開き、相手を包む。",
+      "river-mirage-tide": "揺れる水の幻が押し寄せ、相手側を大きくゆがめる。",
+      "ake-ember-rise": "朝焼け色の火の粉がふわりと上がり、相手側へ流れる。",
+      "ake-sunrise-fan": "日の出の扇のような光が広がり、相手を照らす。",
+      "ake-solar-crown": "太陽の冠のような光が現れ、相手側で強く輝く。",
+      "yura-wobble-orbit": "ゆらぐ輪が不規則に揺れながら相手へ近づく。",
+      "yura-phantom-lanterns": "幻の灯りがいくつも浮かび、相手の周りでまたたく。",
+      "yura-mirror-maze": "鏡の迷路のような光面が並び、相手側で反射する。",
+      "leaf-sprout-pop": "若葉がぱっと芽吹き、相手の足元で小さく弾む。",
+      "leaf-forest-crest": "森の紋章が地面に広がり、葉の光が相手へ届く。",
+      "leaf-vine-bloom": "光るツタが伸び、大きな花のように相手側で開く。",
+      "white-prism-dot": "白いプリズムの点がすっと走り、相手側で光を分ける。",
+      "white-magic-gate": "白い魔法門が開き、相手の前へ光を送り込む。",
+      "white-star-crest": "白い星紋が大きく浮かび、相手側でまぶしく広がる。"
+    };
+    return customText[sceneType] || "専用の技演出が相手側で発動する。";
+  }
+  if (baseType === "cross-slash") return "二本の光刃が交差し、相手側で鋭い閃光が弾ける。";
+  if (baseType === "slash") return "光の刃が戦場を切り抜け、相手側で閃光が走る。";
+  if (baseType === "starfall") return "空から星の光が降り、相手側で大きな星が弾ける。";
+  if (baseType === "wind") return "風の輪が渦を巻き、相手を包み込むように走る。";
+  if (baseType === "water") return "水の波が戦場を走り、相手側でしぶきが跳ねる。";
+  if (baseType === "city-spark") return "街灯の光柱が立ち上がり、相手側でネオンの火花が弾ける。";
+  if (baseType === "flash") return "まばゆい光が一瞬集まり、相手側で大きく弾ける。";
+  if (baseType === "thunder") return "空からまっすぐ雷が落ち、相手側で電気の火花が散る。";
   if (tier === "strong") return "足元の魔法陣で力をため、大きな光の道を相手へ放つ。";
   if (tier === "medium") return "足元の魔法陣が回り、ためた粒子が攻撃ルートを描く。";
   return "足元の魔法陣が灯り、ためた光の粒がまっすぐ走る。";
@@ -39550,7 +40407,7 @@ function magicSigilStyleFor(scene) {
   return `--sigil-rot:${rot}deg;--sigil-size:${124 + sizeBoost + (seed % 12)}px;--magic:${magicColorFor(scene.tier, scene.actor)}`;
 }
 function magicNeedsCasterFootSigil(scene) {
-  return magicSceneTypeFor(scene) === "route" || magicSceneTextFor(scene).includes("足元の魔法陣");
+  return magicBaseSceneType(magicSceneTypeFor(scene)) === "route" || magicSceneTextFor(scene).includes("足元の魔法陣");
 }
 function magicSceneVisualFor(scene) {
   if (!scene || scene.type === "match") return "";
@@ -39558,33 +40415,37 @@ function magicSceneVisualFor(scene) {
   const sideClass = scene.actor === "me" ? "from-me" : "from-enemy";
   const targetClass = scene.target === "me" ? "target-me" : "target-enemy";
   const sceneType = magicSceneTypeFor(scene);
+  const baseType = magicBaseSceneType(sceneType);
+  if (baseType === "custom") {
+    return `<div class="magic-custom-field ${sideClass} ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-custom-core"></i><i class="magic-custom-mark"></i><i class="magic-custom-extra"></i></div>`;
+  }
   const casterFootSigil = magicNeedsCasterFootSigil(scene)
     ? `<i class="magic-sigil caster-sigil ${sideClass} ${scene.tier}" style="${magicSigilStyleFor(scene)}"></i>`
     : "";
-  if (sceneType === "slash" || sceneType === "cross-slash") {
-    const secondSlash = sceneType === "cross-slash" ? `<i class="magic-slash-blade second"></i>` : "";
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-slash-field ${sideClass} ${scene.tier}" style="--magic:${color}"><i class="magic-slash-blade"></i>${secondSlash}<i class="magic-slash-impact ${targetClass}"></i></div>`;
+  if (baseType === "slash" || baseType === "cross-slash") {
+    const secondSlash = baseType === "cross-slash" ? `<i class="magic-slash-blade second"></i>` : "";
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-slash-field ${sideClass} ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-slash-blade"></i>${secondSlash}<i class="magic-slash-impact ${targetClass}"></i></div>`;
   }
-  if (sceneType === "starfall") {
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-starfall-field ${targetClass} ${scene.tier}" style="--magic:${color}"></div>`;
+  if (baseType === "starfall") {
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-starfall-field ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"></div>`;
   }
-  if (sceneType === "wind") {
+  if (baseType === "wind") {
     const secondRing = scene.tier === "strong" ? `<i class="magic-wind-ring second"></i>` : "";
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-wind-field ${sideClass} ${targetClass} ${scene.tier}" style="--magic:${color}"><i class="magic-wind-ring"></i>${secondRing}</div>`;
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-wind-field ${sideClass} ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-wind-ring"></i>${secondRing}</div>`;
   }
-  if (sceneType === "water") {
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-water-field ${targetClass} ${scene.tier}" style="--magic:${color}"><i class="magic-water-wave"></i><i class="magic-water-splash"></i></div>`;
+  if (baseType === "water") {
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-water-field ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-water-wave"></i><i class="magic-water-splash"></i></div>`;
   }
-  if (sceneType === "city-spark") {
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-city-field ${targetClass} ${scene.tier}" style="--magic:${color}"><i class="magic-city-signal"></i><i class="magic-city-spark"></i></div>`;
+  if (baseType === "city-spark") {
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-city-field ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-city-signal"></i><i class="magic-city-spark"></i></div>`;
   }
-  if (sceneType === "flash") {
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-flash-field ${targetClass} ${scene.tier}" style="--magic:${color}"><i class="magic-flash-ring"></i><i class="magic-flash-burst"></i></div>`;
+  if (baseType === "flash") {
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-flash-field ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-flash-ring"></i><i class="magic-flash-burst"></i></div>`;
   }
-  if (sceneType === "thunder") {
-    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-thunder-field ${targetClass} ${scene.tier}" style="--magic:${color}"><i class="magic-thunder-bolt"></i><i class="magic-thunder-spark"></i></div>`;
+  if (baseType === "thunder") {
+    return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div>${casterFootSigil}<div class="magic-thunder-field ${targetClass} ${scene.tier} ${sceneType}" style="--magic:${color}"><i class="magic-thunder-bolt"></i><i class="magic-thunder-spark"></i></div>`;
   }
-  return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div><div class="magic-world ${scene.tier}" style="--magic:${color}"></div>${casterFootSigil}<i class="magic-trail ${sideClass} ${scene.tier}" style="--magic:${color}"></i>`;
+  return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div><div class="magic-world ${scene.tier} ${sceneType}" style="--magic:${color}"></div>${casterFootSigil}<i class="magic-trail ${sideClass} ${scene.tier} ${sceneType}" style="--magic:${color}"></i>`;
 }
 function battleCueLine(tag, text, delay = 0, extraClass = "", durationScale = 1) {
   const content = escapeAttr(text);
@@ -39626,6 +40487,11 @@ function battleTurnNameColorForScene(scene, profile, cup, enemyOpponent) {
 }
 function buildBattleAnimationQueue(matches, cup, profile, playerStats) {
   const playerName = tournamentPlayerDisplayName(profile);
+  const playerActor = {
+    seedId: playerStats?.seedId || state.monster?.seedId || "",
+    name: playerName,
+    baseName: playerName
+  };
   const queue = [];
   matches.forEach(match => {
     const matchQueueStart = queue.length;
@@ -39663,7 +40529,8 @@ function buildBattleAnimationQueue(matches, cup, profile, playerStats) {
             name: playerName,
             targetName: enemyName,
             tier: round.move.tier,
-            moveName: round.move.name,
+            moveName: battleMagicMoveName(playerActor, round.move.tier, round.move.name),
+            magicStyle: battleMagicStyleForActor(playerActor, round.move.tier),
             hit: round.myHit,
             damage,
             turnLabel: `T${actionTurn}`,
@@ -39697,7 +40564,8 @@ function buildBattleAnimationQueue(matches, cup, profile, playerStats) {
             name: enemyName,
             targetName: playerName,
             tier: round.enemyTier,
-            moveName: enemyMagicMoveName(cup, round.enemyTier),
+            moveName: battleMagicMoveName(enemyOpponent, round.enemyTier),
+            magicStyle: battleMagicStyleForActor(enemyOpponent, round.enemyTier),
             hit: round.enemyHit,
             damage,
             turnLabel: `T${actionTurn}`,
@@ -39896,10 +40764,30 @@ function playBattleAnimationStep(index) {
   const targetClass = scene.target === "me" ? "target-me" : "target-enemy";
   const orbClass = scene.actor === "me" ? "from-me" : "from-enemy";
   const visualType = scene.type === "match" ? "route" : magicSceneTypeFor(scene);
+  const visualBaseType = magicBaseSceneType(visualType);
   const hitTierClass = scene.hit && (scene.tier === "medium" || scene.tier === "strong") ? ` ${scene.tier}` : "";
-  const hpDrainVisualDelay = magicStartDelay + (visualType === "route" ? 5.95 : 3.15);
+  const hpDrainVisualDelay = magicStartDelay + (visualBaseType === "route" ? 5.95 : 3.15);
   const hpDrainVisualDuration = 1.95;
-  const resultCueDelay = scene.type === "match" ? 0 : scene.hit ? hpDrainVisualDelay + hpDrainVisualDuration : magicStartDelay + (visualType === "route" ? 6.05 : 4.7);
+  const advantageChangeDelay = (() => {
+    if (scene.type === "match" || !scene.hit || beforeAdvantageSide === afterAdvantageSide) return 5.05;
+    const targetSide = scene.target;
+    const targetStart = targetSide === "me" ? myPercent : enemyPercent;
+    const targetEnd = targetSide === "me" ? myFinalPercent : enemyFinalPercent;
+    const otherSide = targetSide === "me" ? "enemy" : "me";
+    const otherPercent = otherSide === "me" ? myPercent : enemyPercent;
+    const drainRange = targetStart - targetEnd;
+    if (drainRange <= 0) return hpDrainVisualDelay + hpDrainVisualDuration;
+    let threshold = otherPercent;
+    if (afterAdvantageSide === otherSide) {
+      threshold = otherPercent - 1;
+    } else if (beforeAdvantageSide === targetSide && afterAdvantageSide !== targetSide) {
+      threshold = otherPercent + 1;
+    }
+    const progress = Math.max(0, Math.min(1, (targetStart - threshold) / drainRange));
+    return hpDrainVisualDelay + (hpDrainVisualDuration * progress);
+  })();
+  field.style.setProperty("--advantage-change-delay", `${advantageChangeDelay.toFixed(2)}s`);
+  const resultCueDelay = scene.type === "match" ? 0 : scene.hit ? hpDrainVisualDelay + hpDrainVisualDuration : magicStartDelay + (visualBaseType === "route" ? 6.05 : 4.7);
   const judgementCueDelay = resultCueDelay + 1.05;
   const drumRollDelay = judgementCueDelay + .72;
   const finalDecisionDelay = isJudgedFinalDecision ? drumRollDelay + 2.55 : resultCueDelay + .4;
@@ -39938,7 +40826,7 @@ function playBattleAnimationStep(index) {
     ? { label: "決勝へと進む", action: "proceedToFinalFromDecision()" }
     : finalOutcomeSide === "me" && pendingBattleAnimation?.matchLabel === "決勝"
       ? { label: "表彰式", action: "showTournamentAwardCeremony()" }
-      : { label: pendingBattleAnimation?.watchLabel || "試合を観戦する", action: "startBattleAnimation()" };
+      : { label: "ホームへ戻る", action: "returnHomeFromTournamentDefeatDecision()" };
   const activeActionButtons = `<button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>`;
   field.innerHTML = `
     <div class="battle-hud">
@@ -39953,7 +40841,7 @@ function playBattleAnimationStep(index) {
       ${magicSceneVisualFor(scene)}
       <div class="battle-cue">${battleCueHtml}</div>
       ${isJudgedFinalDecision ? `<div class="battle-decision-cue" id="battleJudgementCue">判定</div>` : ""}
-      ${scene.type === "match" ? "" : `${visualType === "route" ? `<i class="magic-orb ${orbClass} ${scene.tier}" style="--magic:${magicColorFor(scene.tier, scene.actor)}"></i>` : ""}`}
+      ${scene.type === "match" ? "" : `${visualBaseType === "route" ? `<i class="magic-orb ${orbClass} ${scene.tier} ${visualType}" style="--magic:${magicColorFor(scene.tier, scene.actor)}"></i>` : ""}`}
     </div>
   `;
   playBattleMessageSfx(cueSoundDelays);
@@ -39963,9 +40851,10 @@ function playBattleAnimationStep(index) {
   if (scene.type !== "match" && scene.hit) {
     const drainBefore = scene.target === "me" ? myPercent : enemyPercent;
     const drainAfter = scene.target === "me" ? myFinalPercent : enemyFinalPercent;
-    const hitSfxDelay = magicStartDelay + (visualType === "route" ? 4.8 : 2.62);
-    const hpDrainDelay = magicStartDelay + (visualType === "route" ? 6.03 : 3.35);
-    playBattleHitSfx(scene.tier, hitSfxDelay, visualType, magicStartDelay);
+    const hitSfxDelay = magicStartDelay + (visualBaseType === "route" ? 4.8 : 2.62);
+    const hpDrainDelay = magicStartDelay + (visualBaseType === "route" ? 6.03 : 3.35);
+    const hitSfxType = visualBaseType === "custom" ? visualType : visualBaseType;
+    playBattleHitSfx(scene.tier, hitSfxDelay, hitSfxType, magicStartDelay);
     playHpDrainSfx(drainBefore, drainAfter, hpDrainDelay);
     if (scene.target === "me") {
       scheduleHpNumberCountdown("#myFighter .hp-number", myHpBeforeValue, myHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
@@ -39973,7 +40862,7 @@ function playBattleAnimationStep(index) {
       scheduleHpNumberCountdown("#enemyFighter .hp-number", enemyHpBeforeValue, enemyHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
     }
   } else if (scene.type !== "match" && !scene.hit) {
-    const avoidSfxDelay = magicStartDelay + (visualType === "route" ? 4.8 : 2.62);
+    const avoidSfxDelay = magicStartDelay + (visualBaseType === "route" ? 4.8 : 2.62);
     playBattleAvoidSfx(avoidSfxDelay);
   }
   if (finalOutcomeSide) {
@@ -40037,17 +40926,39 @@ function revealBattleResult() {
   if (!isBattleResultBgmMode()) stopBgm();
   const log = document.getElementById("battleLog");
   if (log) log.innerHTML = pendingBattleResultHtml;
+  if (pendingBattleResultHomeAction) {
+    const actions = document.querySelector("#battleField .battle-hud .battle-action-stack");
+    if (actions) {
+      actions.innerHTML = `<button class="battle-watch-btn" type="button" onclick="returnHomeFromTournamentDefeatDecision()">ホームへ戻る</button>`;
+    }
+  }
   pendingBattleResultHtml = "";
   if (pendingBattleResultSfx) playSfx(pendingBattleResultSfx);
   else playSfx("select");
   pendingBattleResultSfx = "";
   pendingBattleLogMessages.forEach(message => addLog(message));
   pendingBattleLogMessages = [];
+  pendingBattleResultHomeAction = false;
   renderLog();
   if (pendingBattleReward && !pendingBattleReward.defer) {
     showReward(pendingBattleReward.mark, pendingBattleReward.title, pendingBattleReward.text, pendingBattleReward.kind || "");
     pendingBattleReward = null;
   }
+}
+function returnHomeFromTournamentDefeatDecision() {
+  blurActiveTextInput();
+  clearBattleAnimationTimer();
+  clearBattleAdTimer();
+  pendingBattleAnimation = null;
+  pendingBattleResultHtml = "";
+  pendingBattleResultSfx = "";
+  pendingBattleLogMessages.forEach(message => addLog(message));
+  pendingBattleLogMessages = [];
+  saveState();
+  renderLog();
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
 }
 function proceedToFinalFromDecision() {
   revealBattleResult();
@@ -40093,7 +41004,8 @@ function showTournamentAwardCeremony() {
     </div>
     <div class="award-stage" id="awardStage">
       <div class="award-contestant second-place">${tournamentEnemyAwardArt(cup, finalEnemy, "front-right")}</div>
-      <div class="award-winner">${tournamentPlayerAwardArt(profile)}<div class="award-medal" data-mark="${pendingBattleReward.mark}"></div></div>
+      <div class="award-winner">${tournamentPlayerAwardArt(profile)}</div>
+      <div class="award-medal medal-${cup.id}" data-mark="${pendingBattleReward.mark}"></div>
       <div class="award-contestant third-place">${tournamentEnemyAwardArt(cup, preliminaryEnemy, "front-left")}</div>
       <div class="podium"><span class="second">2</span><span class="first">1</span><span class="third">3</span></div>
       <div class="award-caption">${cup.name} 優勝表彰</div>
@@ -40116,7 +41028,19 @@ function playTournamentMedalCeremony() {
     button.disabled = true;
     button.hidden = true;
   }
-  if (stage) stage.classList.add("medal-awarding");
+  if (stage) {
+    const winner = stage.querySelector(".award-winner");
+    const medal = stage.querySelector(".award-medal");
+    if (winner) {
+      winner.innerHTML = winner.innerHTML;
+    }
+    stage.classList.toggle("award-young-body", !stage.querySelector(".award-winner .unique-monster"));
+    stage.classList.add("medal-awarding");
+    if (medal) {
+      medal.classList.remove("body-synced");
+      setTimeout(() => medal.classList.add("body-synced"), 1350);
+    }
+  }
   playSfx("summon");
   setTimeout(() => {
     if (!pendingBattleReward) return;
@@ -40288,7 +41212,8 @@ function startPreparedTournamentBattle(skipResult = false) {
   if (skipResult) {
     const field = document.getElementById("battleField");
     if (field) {
-      field.className = "battle-field tournament-opening";
+      const cup = tournaments.find(item => item.id === state.pendingBattle?.cupId) || tournaments[0];
+      field.className = `battle-field tournament-opening ${arenaClassFor(cup)}`;
       field.innerHTML = `<div class="battle-flash"></div>`;
     }
     requestBattleResultWithAd();
@@ -40310,6 +41235,7 @@ function battle() {
   pendingBattleResultHtml = "";
   pendingBattleReward = null;
   pendingBattleResultSfx = "";
+  pendingBattleResultHomeAction = false;
   pendingBattleLogMessages = [];
   pendingBattleAnimation = null;
   clearBattleAnimationTimer();
@@ -40425,6 +41351,7 @@ function battle() {
     if (state.pendingBattle && state.pendingBattle.cupId === cup.id) state.pendingBattle = null;
   } else {
     pendingBattleResultSfx = "defeat";
+    pendingBattleResultHomeAction = true;
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦で敗退。第${currentMatchIndex + 1}試合 / ${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦`);
     pendingBattleResultHtml = `<strong>${cup.name} 敗退 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は第${currentMatchIndex + 1}試合で敗退しました。公式大会は参加人数不足やシードなしでいつでも挑戦できます。</p>${tournamentMatchesHtml(allMatches, cup)}`;
