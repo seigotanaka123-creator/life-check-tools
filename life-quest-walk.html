@@ -3369,6 +3369,41 @@
         linear-gradient(180deg, transparent 0 40%, rgba(72,77,118,.98) 41% 70%, transparent 71%),
         linear-gradient(180deg, #162447 0 34%, #24315d 45%, #415d58 46% 100%);
     }
+    .battle-field.tournament-opening.arena-green {
+      background:
+        radial-gradient(circle at 16% 18%, rgba(255,246,168,.7), transparent 13%),
+        linear-gradient(180deg, transparent 0 40%, rgba(105,138,72,.96) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #d9f7ca 0 30%, #86c779 43%, #4f8c55 44% 100%);
+    }
+    .battle-field.tournament-opening.arena-city {
+      background:
+        radial-gradient(circle at 78% 18%, rgba(255,222,118,.78), transparent 16%),
+        linear-gradient(180deg, transparent 0 40%, rgba(198,127,83,.98) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #f8b47a 0 28%, #ef7a62 45%, #9d6954 46% 100%);
+    }
+    .battle-field.tournament-opening.arena-sky {
+      background:
+        radial-gradient(ellipse at 18% 42%, rgba(255,255,255,.92) 0 12%, transparent 13%),
+        radial-gradient(ellipse at 82% 39%, rgba(255,255,255,.88) 0 14%, transparent 15%),
+        radial-gradient(ellipse at 48% 34%, rgba(255,255,255,.74) 0 18%, transparent 19%),
+        linear-gradient(180deg, transparent 0 40%, rgba(255,255,255,.96) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #dff8ff 0 30%, #a7ddff 45%, #ffffff 46% 100%);
+    }
+    .battle-field.tournament-opening.arena-river {
+      background:
+        radial-gradient(circle at 78% 17%, rgba(255,255,214,.72), transparent 14%),
+        linear-gradient(180deg, transparent 0 40%, rgba(91,166,181,.94) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #b9ecff 0 32%, #66c6d8 45%, #4b9eb8 46% 100%);
+    }
+    .battle-field.tournament-opening.arena-grand {
+      background:
+        radial-gradient(circle at 22% 16%, rgba(255,255,224,.88), transparent 8%),
+        radial-gradient(circle at 70% 12%, rgba(255,255,255,.75), transparent 2%),
+        radial-gradient(circle at 82% 25%, rgba(255,255,255,.62), transparent 1.8%),
+        radial-gradient(circle at 45% 22%, rgba(255,255,255,.58), transparent 1.6%),
+        linear-gradient(180deg, transparent 0 40%, rgba(72,77,118,.98) 41% 70%, transparent 71%),
+        linear-gradient(180deg, #162447 0 34%, #24315d 45%, #415d58 46% 100%);
+    }
     .battle-field.watching::before {
       display: none;
     }
@@ -3406,7 +3441,9 @@
       display: inline-block;
       transform: translateY(-4px);
     }
-    .battle-field.watching.arena-green .pixel-fighter > span:last-child {
+    .battle-field.watching.arena-green .pixel-fighter > span:last-child,
+    .battle-field.watching.arena-river .pixel-fighter > span:last-child,
+    .battle-field.watching.arena-grand .pixel-fighter > span:last-child {
       color: #fff;
       font-family: inherit;
       font-weight: 900;
@@ -3685,7 +3722,8 @@
       background:
         linear-gradient(90deg, transparent 0 5%, rgba(255,255,255,.96) 10% 34%, var(--magic, #8ee7ff) 35% 68%, rgba(255,255,255,.92) 69% 88%, transparent 89% 100%);
       box-shadow: 0 0 14px var(--magic, #8ee7ff), 0 0 26px rgba(255,255,255,.6);
-      clip-path: polygon(0 50%, 10% 16%, 82% 8%, 100% 50%, 82% 92%, 10% 84%);
+      border-radius: 999px;
+      clip-path: none;
     }
     .magic-slash-blade::after {
       content: "";
@@ -3819,7 +3857,8 @@
       background:
         linear-gradient(100deg, transparent, rgba(255,255,255,.82), var(--magic, #9ff0c0), transparent),
         linear-gradient(80deg, transparent 10%, rgba(255,255,255,.7) 38%, transparent 62%);
-      clip-path: polygon(0 45%, 18% 20%, 44% 48%, 68% 22%, 100% 50%, 68% 78%, 42% 52%, 18% 80%);
+      border-radius: 999px;
+      clip-path: none;
       animation: windGustSweep 1.6s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
     }
     .magic-wind-field.from-enemy::after {
@@ -4042,7 +4081,8 @@
         linear-gradient(100deg, transparent, rgba(255,255,255,.68), var(--magic, #8ee7ff), transparent),
         radial-gradient(circle at 22% 28%, #fff 0 2px, transparent 4px),
         radial-gradient(circle at 68% 68%, var(--magic, #8ee7ff) 0 4px, transparent 6px);
-      clip-path: polygon(0 52%, 20% 32%, 46% 52%, 72% 28%, 100% 50%, 72% 72%, 46% 54%, 20% 74%);
+      border-radius: 999px;
+      clip-path: none;
     }
     .magic-world.route-ripple {
       top: calc(var(--battle-stage-y) - 9%);
@@ -4089,7 +4129,8 @@
     .magic-slash-field.slash-magic .magic-slash-blade {
       height: 14px;
       background: linear-gradient(90deg, transparent, #fff, var(--magic, #8ee7ff), #fff, transparent);
-      clip-path: polygon(0 50%, 18% 20%, 80% 20%, 100% 50%, 80% 80%, 18% 80%);
+      border-radius: 999px;
+      clip-path: none;
     }
     .magic-slash-field.cross-slash-mirage .magic-slash-blade {
       background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), #d8b8ff, var(--magic, #c9a6ff), transparent);
@@ -4201,6 +4242,19 @@
     .magic-custom-field.target-me .magic-custom-core,
     .magic-custom-field.target-me .magic-custom-mark,
     .magic-custom-field.target-me .magic-custom-extra { left: 12%; }
+    .magic-custom-field.from-enemy.walk-signpost-beam::before,
+    .magic-custom-field.from-enemy.sky-jetstream-rune::before,
+    .magic-custom-field.from-enemy.river-mirage-tide::before,
+    .magic-custom-field.from-enemy.leaf-vine-bloom::before,
+    .magic-custom-field.from-enemy .magic-custom-core,
+    .magic-custom-field.from-enemy .magic-custom-mark,
+    .magic-custom-field.from-enemy .magic-custom-extra {
+      --custom-attack-flip: -1;
+      --custom-sweep-start: 44px;
+      --custom-sweep-end: -38px;
+      --custom-tide-start: 32px;
+      --custom-tide-end: -36px;
+    }
     .walk-lamp-step::before {
       left: 22%;
       right: 22%;
@@ -4224,6 +4278,12 @@
       box-shadow: 0 0 18px #fff4a8;
       animation: customPop 1s ease calc(var(--magic-start-delay, 0s) + 2.35s) both;
     }
+    .magic-custom-field.target-enemy.walk-lamp-step .magic-custom-core {
+      right: 20%;
+    }
+    .magic-custom-field.target-me.walk-lamp-step .magic-custom-core {
+      left: 20%;
+    }
     .walk-signpost-beam::before {
       top: calc(var(--battle-stage-y) - 15%);
       left: 22%;
@@ -4232,7 +4292,8 @@
       background:
         linear-gradient(90deg, transparent 0 8%, #fff 9% 11%, transparent 12% 34%, var(--magic) 35% 39%, transparent 40% 100%),
         linear-gradient(100deg, transparent 20%, rgba(255,255,255,.9), var(--magic), transparent 80%);
-      clip-path: polygon(0 56%, 16% 36%, 100% 45%, 100% 57%, 16% 68%);
+      border-radius: 999px;
+      clip-path: none;
       animation: customSweepRight 2.2s ease calc(var(--magic-start-delay, 0s) + 1s) both;
     }
     .walk-signpost-beam .magic-custom-core {
@@ -4256,10 +4317,13 @@
     }
     .walk-roadstar-comet .magic-custom-core {
       top: calc(var(--battle-stage-y) - 22%);
-      width: 132px;
-      height: 132px;
+      width: 142px;
+      height: 142px;
       clip-path: polygon(50% 0, 60% 34%, 96% 34%, 66% 54%, 78% 94%, 50% 68%, 22% 94%, 34% 54%, 4% 34%, 40% 34%);
-      background: radial-gradient(circle, #fff 0 18%, var(--magic) 19% 45%, transparent 46%);
+      background:
+        radial-gradient(circle at 50% 50%, #fff 0 14%, #fff4a8 15% 26%, transparent 27%),
+        conic-gradient(from 18deg, transparent 0 10deg, #fff 11deg 18deg, var(--magic) 19deg 32deg, transparent 33deg 58deg);
+      filter: drop-shadow(0 0 18px #fff4a8) drop-shadow(0 0 10px var(--magic));
       animation: customPop 1.25s ease calc(var(--magic-start-delay, 0s) + 2.65s) both;
     }
     .sky-cloud-puff .magic-custom-core {
@@ -4281,7 +4345,8 @@
       top: calc(var(--battle-stage-y) - 24%);
       height: 120px;
       background: repeating-linear-gradient(115deg, transparent 0 18px, rgba(255,255,255,.8) 19px 22px, var(--magic) 23px 26px, transparent 27px 42px);
-      clip-path: polygon(0 54%, 22% 28%, 48% 56%, 72% 26%, 100% 50%, 72% 78%, 48% 58%, 22% 82%);
+      border-radius: 999px;
+      clip-path: none;
       animation: customSweepRight 2.1s ease calc(var(--magic-start-delay, 0s) + 1s) both;
     }
     .sky-jetstream-rune .magic-custom-core {
@@ -4308,7 +4373,7 @@
       top: calc(var(--battle-stage-y) - 16%);
       width: 24px;
       height: 118px;
-      background: linear-gradient(#27384a 0 70%, transparent 71%), radial-gradient(circle at 50% 16%, #fff 0 12px, #ffd86d 13px 24px, transparent 25px);
+      background: linear-gradient(#b8a9ff 0 70%, transparent 71%), radial-gradient(circle at 50% 16%, #fff 0 12px, #ffe9a8 13px 24px, transparent 25px);
       animation: customPop .9s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
     }
     .city-lamppost-pop.target-enemy::before { right: 18%; }
@@ -4349,6 +4414,12 @@
       clip-path: ellipse(42% 50% at 50% 50%);
       animation: customSplash 1.1s ease calc(var(--magic-start-delay, 0s) + 2.18s) both;
     }
+    .magic-custom-field.target-enemy.river-drop-arc .magic-custom-core {
+      right: 16%;
+    }
+    .magic-custom-field.target-me.river-drop-arc .magic-custom-core {
+      left: 16%;
+    }
     .river-ripple-gate .magic-custom-core,
     .white-magic-gate .magic-custom-core {
       top: calc(var(--battle-stage-y) - 24%);
@@ -4362,7 +4433,7 @@
     .river-mirage-tide::before {
       left: 16%;
       right: 16%;
-      top: calc(var(--battle-stage-y) - 8%);
+      top: calc(var(--battle-stage-y) - 13%);
       height: 120px;
       background: repeating-linear-gradient(0deg, rgba(255,255,255,.85) 0 6px, var(--magic) 7px 14px, transparent 15px 28px);
       clip-path: polygon(0 70%, 10% 42%, 22% 70%, 34% 38%, 48% 70%, 62% 40%, 78% 70%, 90% 42%, 100% 70%, 100% 100%, 0 100%);
@@ -4470,6 +4541,167 @@
       background: radial-gradient(circle, #fff 0 12%, #dff8ff 13% 28%, transparent 29%), repeating-conic-gradient(#fff 0deg 10deg, transparent 11deg 24deg);
       clip-path: polygon(50% 0, 60% 34%, 96% 34%, 66% 54%, 78% 94%, 50% 68%, 22% 94%, 34% 54%, 4% 34%, 40% 34%);
       animation: customSpinPop 1.5s ease calc(var(--magic-start-delay, 0s) + 1.9s) both;
+    }
+    .walk-lamp-step .magic-custom-mark {
+      top: calc(var(--battle-stage-y) + 4%);
+      width: 132px;
+      height: 24px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 12% 50%, #fff 0 3px, #fff4a8 4px 7px, transparent 8px),
+        radial-gradient(circle at 34% 50%, #fff 0 3px, var(--magic) 4px 7px, transparent 8px),
+        radial-gradient(circle at 58% 50%, #fff 0 3px, #fff4a8 4px 7px, transparent 8px),
+        radial-gradient(circle at 82% 50%, #fff 0 3px, var(--magic) 4px 7px, transparent 8px),
+        linear-gradient(90deg, transparent 0 6%, rgba(255,255,255,.72) 7% 46%, rgba(255,244,168,.62) 47% 78%, transparent 79%);
+      filter: drop-shadow(0 0 10px #fff4a8) drop-shadow(0 0 6px var(--magic));
+      animation: customFadeRun 1.8s steps(4, end) calc(var(--magic-start-delay, 0s) + .82s) both;
+    }
+    .walk-signpost-beam .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 4%);
+      width: 112px;
+      height: 34px;
+      border-radius: 999px;
+      clip-path: none;
+      background: linear-gradient(90deg, #fff6b8, var(--magic));
+      filter: drop-shadow(0 0 12px var(--magic));
+      animation: customSweepRight 1.35s ease calc(var(--magic-start-delay, 0s) + 1.8s) both;
+    }
+    .walk-roadstar-comet .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 4%);
+      width: 176px;
+      height: 58px;
+      background:
+        radial-gradient(circle at 78% 50%, #fff 0 8px, #fff4a8 9px 16px, transparent 17px),
+        linear-gradient(90deg, transparent 0 6%, rgba(255,255,255,.82) 7% 18%, var(--magic) 19% 56%, rgba(255,244,168,.68) 57% 78%, transparent 79% 100%),
+        repeating-linear-gradient(90deg, transparent 0 20px, rgba(255,255,255,.64) 21px 24px, transparent 25px 38px);
+      border-radius: 999px;
+      clip-path: none;
+      filter: drop-shadow(0 0 14px #fff4a8) drop-shadow(0 0 8px var(--magic));
+      animation: customSweepRight 1.75s ease calc(var(--magic-start-delay, 0s) + 1.1s) both;
+    }
+    .sky-cloud-puff .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 4%);
+      width: 164px;
+      height: 28px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,.9) 0 22px, transparent 23px 38px);
+      filter: blur(.2px) drop-shadow(0 0 8px #dff8ff);
+      animation: customCloudPuff 1.65s ease calc(var(--magic-start-delay, 0s) + 1.15s) both;
+    }
+    .sky-jetstream-rune::before {
+      height: 84px;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,.88), transparent),
+        repeating-linear-gradient(0deg, transparent 0 12px, rgba(129,214,255,.75) 13px 16px, transparent 17px 28px);
+      border-radius: 999px;
+      clip-path: none;
+    }
+    .sky-jetstream-rune .magic-custom-core {
+      width: 138px;
+      height: 68px;
+      border: 0;
+      border-radius: 999px;
+      background:
+        radial-gradient(ellipse at 15% 50%, rgba(255,255,255,.95) 0 14%, transparent 15%),
+        linear-gradient(90deg, transparent 0 8%, #fff 9% 16%, var(--magic) 17% 72%, transparent 73%);
+      box-shadow: none;
+      border-radius: 999px;
+      clip-path: none;
+      animation: customSweepRight 1.5s ease calc(var(--magic-start-delay, 0s) + 2.05s) both;
+    }
+    .sky-sunburst-column .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 30%);
+      width: 156px;
+      height: 156px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, #fff 0 18%, #fff4a8 19% 36%, var(--magic) 37% 50%, transparent 51%),
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,.95) 0deg 7deg, transparent 8deg 18deg);
+      clip-path: none;
+      animation: customSpinPop 1.35s ease calc(var(--magic-start-delay, 0s) + 1.75s) both;
+    }
+    .city-tower-laser .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 22%);
+      width: 88px;
+      height: 168px;
+      background:
+        repeating-linear-gradient(0deg, #c7dcff 0 12px, #fff2a8 13px 17px, #d8c9ff 18px 26px),
+        linear-gradient(#d9ecff, #cbbcff);
+      clip-path: polygon(22% 100%, 22% 18%, 38% 18%, 38% 0, 62% 0, 62% 18%, 78% 18%, 78% 100%);
+      filter: drop-shadow(0 0 14px #ffe27a);
+      animation: customPop 1.05s ease calc(var(--magic-start-delay, 0s) + 1.35s) both;
+    }
+    .city-tower-laser .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 25%);
+      width: 190px;
+      height: 34px;
+      background: linear-gradient(90deg, transparent, #fff, var(--magic), transparent);
+      border-radius: 999px;
+      clip-path: none;
+      animation: customSweepRight 1.2s ease calc(var(--magic-start-delay, 0s) + 2s) both;
+    }
+    .river-ripple-gate .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 4%);
+      width: 178px;
+      height: 76px;
+      border: 6px solid rgba(255,255,255,.82);
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 50% 50%, transparent 0 28%, rgba(255,255,255,.7) 29% 32%, transparent 33% 54%, var(--magic) 55% 58%, transparent 59%);
+      box-shadow: 0 0 18px var(--magic);
+      animation: customGateOpen 1.35s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
+    }
+    .white-magic-gate .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 28%);
+      width: 150px;
+      height: 150px;
+      border: 0;
+      border-radius: 0;
+      background:
+        linear-gradient(45deg, transparent 0 38%, rgba(255,255,255,.9) 39% 43%, transparent 44% 100%),
+        linear-gradient(-45deg, transparent 0 38%, #dff8ff 39% 43%, transparent 44% 100%),
+        conic-gradient(#fff, #dff8ff, #fff4a8, #c9a6ff, #fff);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      box-shadow: 0 0 20px rgba(255,255,255,.9);
+      animation: customSpinPop 1.55s ease calc(var(--magic-start-delay, 0s) + 1.5s) both;
+    }
+    .ake-solar-crown .magic-custom-core {
+      top: calc(var(--battle-stage-y) - 30%);
+      width: 174px;
+      height: 118px;
+      background:
+        radial-gradient(circle at 50% 72%, #fff 0 12%, #fff5a8 13% 28%, var(--magic) 29% 46%, transparent 47%),
+        linear-gradient(180deg, transparent 0 44%, #ff9b6b 45% 100%);
+      clip-path: polygon(6% 100%, 14% 30%, 30% 76%, 50% 0, 70% 76%, 86% 30%, 94% 100%);
+      filter: drop-shadow(0 0 20px #ffb066);
+      animation: customFanOpen 1.35s ease calc(var(--magic-start-delay, 0s) + 1.7s) both;
+    }
+    .yura-wobble-orbit .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 20%);
+      width: 178px;
+      height: 78px;
+      border: 5px dotted rgba(255,255,255,.82);
+      border-radius: 50%;
+      transform: rotate(-18deg);
+      animation: customWobble 1.9s ease calc(var(--magic-start-delay, 0s) + 1.2s) both;
+    }
+    .leaf-forest-crest .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 16%);
+      width: 174px;
+      height: 88px;
+      background:
+        radial-gradient(ellipse at 20% 50%, #eaffc8 0 16%, transparent 17%),
+        radial-gradient(ellipse at 50% 35%, var(--magic) 0 18%, transparent 19%),
+        radial-gradient(ellipse at 80% 50%, #b8ff7a 0 16%, transparent 17%);
+      animation: customBloom 1.45s ease calc(var(--magic-start-delay, 0s) + 1.55s) both;
+    }
+    .white-prism-dot .magic-custom-mark {
+      top: calc(var(--battle-stage-y) - 23%);
+      width: 160px;
+      height: 30px;
+      background: linear-gradient(90deg, transparent, #ff9cff, #fff, #9cf7ff, transparent);
+      clip-path: polygon(0 50%, 30% 10%, 70% 90%, 100% 50%, 70% 10%, 30% 90%);
+      animation: customSweepRight 1.4s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
     }
     .battle-ad-panel {
       position: absolute;
@@ -4630,9 +4862,9 @@
       100% { opacity: 0; transform: scale(1.32) rotate(12deg); }
     }
     @keyframes customSweepRight {
-      0% { opacity: 0; transform: translateX(-44px) scale(.85); }
+      0% { opacity: 0; transform: translateX(var(--custom-sweep-start, -44px)) scaleX(var(--custom-attack-flip, 1)) scale(.85); }
       22%, 70% { opacity: 1; }
-      100% { opacity: 0; transform: translateX(38px) scale(1.12); }
+      100% { opacity: 0; transform: translateX(var(--custom-sweep-end, 38px)) scaleX(var(--custom-attack-flip, 1)) scale(1.12); }
     }
     @keyframes customArcIn {
       0% { opacity: 0; transform: translateY(24px) scale(.84) rotate(-8deg); }
@@ -4671,9 +4903,9 @@
       100% { opacity: 0; transform: scale(1.28) rotate(34deg); }
     }
     @keyframes customTidePush {
-      0% { opacity: 0; transform: translateX(-32px) skewX(-8deg); }
+      0% { opacity: 0; transform: translateX(var(--custom-tide-start, -32px)) scaleX(var(--custom-attack-flip, 1)) skewX(-8deg); }
       24%, 72% { opacity: .95; }
-      100% { opacity: 0; transform: translateX(36px) skewX(8deg); }
+      100% { opacity: 0; transform: translateX(var(--custom-tide-end, 36px)) scaleX(var(--custom-attack-flip, 1)) skewX(8deg); }
     }
     @keyframes customEmbers {
       0% { opacity: 0; transform: translateY(28px) scale(.86); }
@@ -4709,9 +4941,9 @@
       100% { opacity: 0; transform: translateY(-10px) scale(1.22); }
     }
     @keyframes customVineGrow {
-      0% { opacity: 0; clip-path: polygon(0 64%, 0 42%, 0 66%, 0 38%, 0 66%, 0 42%, 0 64%, 0 84%, 0 84%); }
-      28%, 74% { opacity: 1; }
-      100% { opacity: 0; clip-path: polygon(0 64%, 16% 42%, 30% 66%, 46% 38%, 62% 66%, 78% 42%, 100% 64%, 100% 84%, 0 84%); }
+      0% { opacity: 0; transform: scaleX(var(--custom-attack-flip, 1)); clip-path: polygon(0 64%, 0 42%, 0 66%, 0 38%, 0 66%, 0 42%, 0 64%, 0 84%, 0 84%); }
+      28%, 74% { opacity: 1; transform: scaleX(var(--custom-attack-flip, 1)); }
+      100% { opacity: 0; transform: scaleX(var(--custom-attack-flip, 1)); clip-path: polygon(0 64%, 16% 42%, 30% 66%, 46% 38%, 62% 66%, 78% 42%, 100% 64%, 100% 84%, 0 84%); }
     }
     @keyframes customBloom {
       0% { opacity: 0; transform: scale(.32) rotate(-20deg); }
@@ -9035,7 +9267,7 @@
     .pixel-fighter.result-lose::before {
       position: absolute;
       left: 8px;
-      top: 24px;
+      top: 34px;
       padding: 3px 8px;
       border-radius: 999px;
       color: #fff;
@@ -10193,7 +10425,8 @@ const sfxAudioFiles = {
   customSproutWhistle: "assets/audio/otologic_battle_custom_sprout_whistle.mp3",
   customBloomPhrase: "assets/audio/otologic_battle_custom_bloom_phrase.mp3",
   customPrismShort: "assets/audio/otologic_battle_custom_prism_short.mp3",
-  customMagicGate: "assets/audio/otologic_battle_custom_magic_gate.mp3"
+  customMagicGate: "assets/audio/otologic_battle_custom_magic_gate.mp3",
+  customCloudPopper: "assets/audio/otologic_party_popper03_1_cloud_puff.mp3"
 };
 const battleHitSfxFileKey = "damageCandidate1";
 const battleHitSfxFileKeys = {
@@ -10264,78 +10497,78 @@ const battleHitSfxFileKeys = {
   },
   "walk-lamp-step": {
     weak: ["customLampFlashShort"],
-    medium: ["customLampFlashShort", "customLampFlashLong"],
-    strong: ["customLampFlashShort", "customLampFlashLong", "impactCandidate6"]
+    medium: ["customLampFlashShort", "magicSparkle13_6"],
+    strong: ["customLampFlashShort", "customLampFlashLong", "magicSparkle01_1"]
   },
   "walk-signpost-beam": {
     weak: ["customLaserShort"],
-    medium: ["customLaserShort", "customLaserMid"],
+    medium: ["customLaserShort", "chargeCandidate4"],
     strong: ["customLaserShort", "customLaserMid", "customBeamLong"]
   },
   "walk-roadstar-comet": {
-    weak: ["customLaserMid"],
-    medium: ["customLaserMid", "customBeamLong"],
-    strong: ["customLaserMid", "customBeamLong", "impactCandidate7"]
+    weak: ["starSparkle1"],
+    medium: ["starSparkle1", "customLaserMid"],
+    strong: ["starSparkle1", "customBeamLong", "impactCandidate7"]
   },
   "sky-cloud-puff": {
-    weak: ["customAirSwishShort"],
-    medium: ["customAirSwishShort", "customWindPressure"],
-    strong: ["customAirSwishShort", "customWindPressure", "impactCandidate6"]
+    weak: ["customCloudPopper"],
+    medium: ["customAirSwishShort", "animeMotion4"],
+    strong: ["customAirSwishShort", "customWindPressure", "animeMotion5"]
   },
   "sky-jetstream-rune": {
-    weak: ["customAirSwishShort"],
-    medium: ["customAirSwishShort", "customWindPressure"],
-    strong: ["customAirSwishShort", "customWindPressure", "impactCandidate1"]
+    weak: ["windCandidate4"],
+    medium: ["windCandidate4", "customAirSwishShort"],
+    strong: ["windCandidate4", "customWindPressure", "impactCandidate1"]
   },
   "sky-sunburst-column": {
     weak: ["customSolarSpotlight"],
-    medium: ["customSolarSpotlight", "customPrismShort"],
-    strong: ["customSolarSpotlight", "customPrismShort", "impactCandidate5"]
+    medium: ["customSolarSpotlight", "starFlash1"],
+    strong: ["customSolarSpotlight", "starFlash3", "impactCandidate5"]
   },
   "city-lamppost-pop": {
     weak: ["customLampFlashShort"],
-    medium: ["customLampFlashShort", "electricCandidate12"],
-    strong: ["customLampFlashShort", "electricCandidate12", "customLampFlashLong"]
+    medium: ["customLampFlashShort", "cityCrackle4"],
+    strong: ["customLampFlashShort", "cityCrackle3", "electricCandidate12"]
   },
   "city-rune-grid": {
     weak: ["customMagicGate"],
-    medium: ["customMagicGate", "customLaserShort"],
-    strong: ["customMagicGate", "customLaserShort", "electricCandidate11"]
+    medium: ["customMagicGate", "electricCandidate13"],
+    strong: ["customMagicGate", "electricCandidate13", "electricCandidate11"]
   },
   "city-tower-laser": {
     weak: ["customLaserShort"],
-    medium: ["customLaserShort", "customLaserMid"],
-    strong: ["customLaserShort", "customLaserMid", "customBeamLong"]
+    medium: ["customLaserShort", "electricCandidate15"],
+    strong: ["customLaserShort", "customBeamLong", "electricCandidate10"]
   },
   "river-drop-arc": {
     weak: ["waterDrop6"],
-    medium: ["waterDrop6", "waterDrop5"],
-    strong: ["waterDrop6", "waterDrop5", "impactCandidate6"]
+    medium: ["waterDrop6", "waterDrop2"],
+    strong: ["waterDrop6", "waterDrop2", "impactCandidate6"]
   },
   "river-ripple-gate": {
     weak: ["waterDrop5"],
-    medium: ["waterDrop5", "customMagicGate"],
-    strong: ["waterDrop5", "customMagicGate", "impactCandidate6"]
+    medium: ["waterDrop5", "waterDrop3"],
+    strong: ["waterDrop5", "waterDrop3", "customMagicGate"]
   },
   "river-mirage-tide": {
-    weak: ["waterDrop5"],
-    medium: ["waterDrop5", "customMirrorLong"],
-    strong: ["waterDrop5", "customMirrorLong", "impactCandidate5"]
+    weak: ["customMirrorLong"],
+    medium: ["customMirrorLong", "waterDrop4"],
+    strong: ["customMirrorLong", "waterDrop4", "impactCandidate5"]
   },
   "ake-ember-rise": {
     weak: ["customEmberShort"],
-    medium: ["customEmberShort", "customLampFlashShort"],
-    strong: ["customEmberShort", "customLampFlashShort", "impactCandidate6"]
+    medium: ["customEmberShort", "flashCandidate2"],
+    strong: ["customEmberShort", "flashCandidate2", "explosionCandidate1"]
   },
   "ake-sunrise-fan": {
     weak: ["customEmberShort"],
     medium: ["customEmberShort", "customSolarSpotlight"],
-    strong: ["customEmberShort", "customSolarSpotlight", "impactCandidate1"]
+    strong: ["customEmberShort", "customSolarSpotlight", "flashCandidate4"]
   },
   "ake-solar-crown": {
     weak: ["customSolarSpotlight"],
-    medium: ["customSolarSpotlight", "customLampFlashLong"],
-    strong: ["customSolarSpotlight", "customLampFlashLong", "impactCandidate5"]
+    medium: ["customSolarSpotlight", "flashCandidate6"],
+    strong: ["customSolarSpotlight", "flashCandidate6", "explosionCandidate3"]
   },
   "yura-wobble-orbit": {
     weak: ["customYuraShort"],
@@ -10355,32 +10588,32 @@ const battleHitSfxFileKeys = {
   "leaf-sprout-pop": {
     weak: ["customSproutWhistle"],
     medium: ["customSproutWhistle", "animeMotion2"],
-    strong: ["customSproutWhistle", "animeMotion2", "impactCandidate6"]
+    strong: ["customSproutWhistle", "animeMotion2", "magicSparkle13_1"]
   },
   "leaf-forest-crest": {
-    weak: ["customSproutWhistle"],
-    medium: ["customSproutWhistle", "customBloomPhrase"],
-    strong: ["customSproutWhistle", "customBloomPhrase", "impactCandidate1"]
+    weak: ["magicSparkle13_5"],
+    medium: ["magicSparkle13_5", "customBloomPhrase"],
+    strong: ["magicSparkle13_5", "customBloomPhrase", "impactCandidate1"]
   },
   "leaf-vine-bloom": {
-    weak: ["customSproutWhistle"],
-    medium: ["customSproutWhistle", "customBloomPhrase"],
-    strong: ["customSproutWhistle", "customBloomPhrase", "impactCandidate5"]
+    weak: ["customBloomPhrase"],
+    medium: ["customBloomPhrase", "streamer5"],
+    strong: ["customBloomPhrase", "streamer6", "impactCandidate5"]
   },
   "white-prism-dot": {
     weak: ["customPrismShort"],
-    medium: ["customPrismShort", "starSparkle1"],
-    strong: ["customPrismShort", "starSparkle1", "impactCandidate6"]
+    medium: ["customPrismShort", "magicSparkle01_2"],
+    strong: ["customPrismShort", "magicSparkle01_2", "starFlash2"]
   },
   "white-magic-gate": {
-    weak: ["customPrismShort"],
-    medium: ["customPrismShort", "customMagicGate"],
-    strong: ["customPrismShort", "customMagicGate", "impactCandidate1"]
+    weak: ["customMagicGate"],
+    medium: ["customMagicGate", "fantasize4_3"],
+    strong: ["customMagicGate", "fantasize4_3", "impactCandidate1"]
   },
   "white-star-crest": {
-    weak: ["customPrismShort"],
-    medium: ["customPrismShort", "customMagicGate"],
-    strong: ["customPrismShort", "customMagicGate", "customSolarSpotlight"]
+    weak: ["starSparkle2"],
+    medium: ["starSparkle2", "customPrismShort"],
+    strong: ["starSparkle2", "customPrismShort", "customSolarSpotlight"]
   }
 };
 const starfallSfxFileKeys = { sparkle: "starSparkle1", flash: "starFlash1" };
@@ -40276,9 +40509,7 @@ const battleMoveBooksBySeed = {
 const customMagicSceneTypes = new Set(Object.values(battleMoveBooksBySeed).flatMap(book => Object.values(book.styles || {})));
 function battleSeedIdFromActor(actor) {
   if (!actor) return "";
-  const seedId = actor.seedId || battleAffinitySeedFromOpponent(actor);
-  if (seedId && battleMoveBooksBySeed[seedId]) return seedId;
-  const text = `${actor.id || ""} ${actor.baseName || ""} ${actor.name || ""}`;
+  const text = `${actor.id || ""} ${actor.baseName || ""} ${actor.name || ""} ${actor.nickname || ""}`;
   if (text.includes("白")) return "";
   if (text.includes("ミチ")) return "seed-walk";
   if (text.includes("ソラ")) return "seed-sky";
@@ -40287,6 +40518,8 @@ function battleSeedIdFromActor(actor) {
   if (text.includes("アケ")) return "seed-night";
   if (text.includes("ユラ")) return "seed-luck";
   if (text.includes("ハニ")) return "seed-leaf";
+  const seedId = actor.seedId || battleAffinitySeedFromOpponent(actor);
+  if (seedId && battleMoveBooksBySeed[seedId]) return seedId;
   return "";
 }
 function battleMoveBookForActor(actor) {
@@ -41299,7 +41532,7 @@ function battle() {
   const field = document.getElementById("battleField");
   playSfx("battle");
   field.classList.remove("attack", "lose");
-  field.className = `battle-field ${arenaClassFor(cup)}`;
+  field.className = `battle-field tournament-opening ${arenaClassFor(cup)}`;
   field.innerHTML = `
     <div class="battle-hud">
       <span class="battle-title">${cup.name} / ${matchLabel} / ${strategyName(strategy)}作戦${battleItemNote ? " / アイテム準備" : ""}</span>
