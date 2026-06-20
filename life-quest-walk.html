@@ -458,36 +458,18 @@
     .tile.seed-summon {
       background: linear-gradient(180deg, #fff9e8, #ffe1bd 56%, #facda9);
       color: #6f3518;
-      outline: 2.5px solid rgba(68, 198, 255, .92);
-      outline-offset: .5px;
+      outline: 3px solid rgba(68, 198, 255, .92);
+      outline-offset: -2px;
     }
     .tile.evolution {
       background: linear-gradient(180deg, #fdfaff, #f0e8ff 54%, #d9e6ff);
       color: #33406f;
-      outline: 2.5px solid rgba(68, 198, 255, .92);
-      outline-offset: .5px;
+      outline: 3px solid rgba(68, 198, 255, .92);
+      outline-offset: -2px;
     }
     .tile.seed-summon::after,
     .tile.evolution::after {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border-radius: 17px;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .tile.seed-summon::after {
-      background:
-        radial-gradient(circle at 50% 38%, rgba(255,244,196,.9) 0 11%, transparent 12%),
-        radial-gradient(circle at 26% 70%, rgba(255,255,255,.48) 0 5%, transparent 6%),
-        radial-gradient(circle at 72% 22%, rgba(255,204,96,.62) 0 5%, transparent 6%);
-      animation: treasureAuraPulse 1.4s ease-in-out infinite;
-    }
-    .tile.evolution::after {
-      background:
-        radial-gradient(circle at 50% 58%, rgba(255,255,255,.58) 0 12%, rgba(156,198,255,.22) 13% 40%, transparent 41%),
-        conic-gradient(from 0deg, transparent 0 17%, rgba(255,255,255,.42) 18% 20%, transparent 21% 42%, rgba(255,242,148,.36) 43% 45%, transparent 46% 100%);
-      animation: crownSparkle 1.2s ease-in-out infinite;
+      display: none;
     }
     .tile.treasure::after {
       content: "";
@@ -634,38 +616,35 @@
       display: none;
     }
     .tile-icon.seed-pic {
-      background: rgba(255,255,255,.86);
-      border-color: rgba(255,255,255,.94);
-      box-shadow: inset 0 0 0 1px rgba(255,190,95,.22), 0 4px 10px rgba(122,67,24,.12);
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
     }
     .tile-icon.seed-pic::before {
-      width: 20px;
-      height: 25px;
-      left: 14px;
-      top: 17px;
+      width: 22px;
+      height: 28px;
+      left: 13px;
+      top: 15px;
       border-radius: 60% 40% 58% 42% / 46% 52% 48% 56%;
       background:
-        radial-gradient(circle at 38% 28%, rgba(255,255,255,.82) 0 9%, transparent 10%),
-        linear-gradient(100deg, transparent 0 48%, rgba(70,42,23,.16) 49% 52%, transparent 53% 100%),
+        linear-gradient(100deg, transparent 0 49%, rgba(70,42,23,.16) 50% 53%, transparent 54% 100%),
         linear-gradient(145deg, #ffd5a8 0%, #ffb978 55%, #f08f64 100%);
       border: 2px solid #d98255;
-      box-shadow:
-        inset -5px -6px 0 rgba(128,64,28,.14),
-        0 0 12px rgba(255,185,82,.72);
+      box-shadow: inset -3px -4px 0 rgba(0,0,0,.12), 0 3px 5px rgba(66,45,26,.16);
       transform: rotate(-7deg);
     }
     .tile-icon.seed-pic::after {
-      width: 11px;
-      height: 10px;
-      left: 19px;
-      top: 11px;
+      width: 12px;
+      height: 11px;
+      left: 18px;
+      top: 8px;
       background:
         linear-gradient(135deg, #92d878, #45a356);
       border: 1px solid #2d6539;
       border-radius: 80% 0 80% 0;
       box-shadow: inset -2px -2px 0 rgba(0,0,0,.1);
       transform: rotate(28deg);
-      filter: drop-shadow(0 2px 0 rgba(45,101,57,.16));
+      filter: none;
     }
     .tile-icon.evo-pic {
       background: rgba(255,255,255,.72);
@@ -676,7 +655,7 @@
       height: 46px;
       left: 1px;
       top: 1px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ccircle cx='48' cy='53' r='33' fill='%23e8f2ff' stroke='%235f82d9' stroke-width='5'/%3E%3Cpath d='M48 13l24 27H59v36H37V40H24Z' fill='%23fff28c' stroke='%234b61c8' stroke-width='6' stroke-linejoin='round'/%3E%3Cpath d='M48 24l10 12h-6v28h-8V36h-6Z' fill='%238bd6ff' opacity='.9'/%3E%3Cpath d='M22 21l4 9 9 4-9 4-4 9-4-9-9-4 9-4ZM76 16l3 7 7 3-7 3-3 7-3-7-7-3 7-3ZM75 63l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z' fill='%23ffffff' stroke='%23f3c94e' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ccircle cx='48' cy='53' r='33' fill='%23e8f2ff' stroke='%235f82d9' stroke-width='5'/%3E%3Cpath d='M48 13l24 27H59v36H37V40H24Z' fill='%23fff28c' stroke='%234b61c8' stroke-width='6' stroke-linejoin='round'/%3E%3Cpath d='M48 24l10 12h-6v28h-8V36h-6Z' fill='%238bd6ff' opacity='.9'/%3E%3C/svg%3E") center / contain no-repeat;
       filter: drop-shadow(0 0 8px rgba(121,169,255,.42));
       border: 0;
       box-shadow: none;
@@ -1419,10 +1398,134 @@
       }
     }
     .town {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      position: relative;
+      min-height: 520px;
       margin-top: 12px;
+      padding: 14px;
+      border: 1px solid rgba(55, 77, 60, .22);
+      border-radius: 12px;
+      overflow: hidden;
+      perspective: 760px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.14) 1px, transparent 1px),
+        radial-gradient(circle at 18% 74%, #79b86b 0 10%, transparent 11%),
+        radial-gradient(circle at 78% 24%, #7bb7c9 0 8%, transparent 9%),
+        linear-gradient(135deg, #7ea56c 0%, #91bd79 34%, #b7c69a 35%, #9db57c 100%);
+      background-size: 34px 34px, 34px 34px, auto, auto, auto;
+      box-shadow:
+        inset 0 0 0 8px rgba(255,255,255,.2),
+        inset 0 -12px 0 rgba(42, 72, 49, .12),
+        0 7px 0 rgba(60, 85, 52, .16),
+        0 18px 24px rgba(44, 57, 39, .18);
+      transform-style: preserve-3d;
+    }
+    .town::before {
+      content: "";
+      position: absolute;
+      left: -6%;
+      top: 46%;
+      width: 112%;
+      height: 86px;
+      border-radius: 0;
+      background:
+        linear-gradient(90deg, transparent 0 7%, rgba(255,255,255,.62) 8% 10%, transparent 11% 45%, rgba(255,255,255,.62) 46% 48%, transparent 49% 100%),
+        linear-gradient(180deg, #5d6261 0 16%, #454b4b 17% 82%, #333a3a 83% 100%);
+      transform: rotate(-8deg);
+      box-shadow:
+        0 -8px 0 #d8d2c2,
+        0 8px 0 #d8d2c2,
+        0 15px 0 rgba(40, 50, 45, .18);
+      opacity: .96;
+    }
+    .town::after {
+      content: "";
+      position: absolute;
+      left: 43%;
+      top: -8%;
+      width: 82px;
+      height: 116%;
+      border-radius: 0;
+      background:
+        linear-gradient(180deg, transparent 0 7%, rgba(255,255,255,.6) 8% 10%, transparent 11% 47%, rgba(255,255,255,.6) 48% 50%, transparent 51% 100%),
+        linear-gradient(90deg, #555b5b 0 15%, #3e4545 16% 84%, #2f3636 85% 100%);
+      transform: rotate(7deg);
+      box-shadow:
+        -8px 0 0 #d8d2c2,
+        8px 0 0 #d8d2c2,
+        16px 0 0 rgba(40, 50, 45, .16);
+      opacity: .94;
+    }
+    .town-page-fold,
+    .town-paper-hill,
+    .town-paper-river,
+    .town-paper-sign {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .town-page-fold {
+      right: 4%;
+      bottom: 8%;
+      width: 128px;
+      height: 82px;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, transparent 0 19%, rgba(255,255,255,.78) 20% 22%, transparent 23% 39%, rgba(255,255,255,.78) 40% 42%, transparent 43% 59%, rgba(255,255,255,.78) 60% 62%, transparent 63% 100%),
+        linear-gradient(180deg, #777d80, #565f62);
+      border: 4px solid #cfd3ce;
+      box-shadow: 0 8px 0 rgba(42, 55, 50, .16);
+      transform: rotate(-5deg);
+    }
+    .town-paper-hill {
+      left: 4%;
+      bottom: 8%;
+      width: 27%;
+      height: 86px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 22% 60%, #4e8b43 0 10px, transparent 11px),
+        radial-gradient(circle at 46% 36%, #5ea055 0 9px, transparent 10px),
+        radial-gradient(circle at 72% 62%, #437d3d 0 11px, transparent 12px),
+        linear-gradient(180deg, #94c982, #6fac61);
+      border: 4px solid #d7d2bf;
+      box-shadow: inset 0 8px 0 rgba(255,255,255,.16), 0 8px 0 rgba(42, 72, 49, .14);
+    }
+    .town-paper-river {
+      right: -4%;
+      top: 28%;
+      width: 32%;
+      height: 58px;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.38) 0 14%, transparent 15% 35%, rgba(255,255,255,.34) 36% 48%, transparent 49% 100%),
+        linear-gradient(90deg, #74cbe3, #268aaa 48%, #95dff0);
+      transform: rotate(-17deg);
+      box-shadow: 0 6px 0 #d4d0bf, inset 0 8px 0 rgba(255,255,255,.28);
+    }
+    .town-paper-sign {
+      left: 7%;
+      top: 8%;
+      width: 96px;
+      height: 66px;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, transparent 0 12%, rgba(255,255,255,.42) 13% 15%, transparent 16% 100%),
+        linear-gradient(180deg, #9aa0a0, #727b7d);
+      border: 4px solid #d7d2bf;
+      box-shadow: 0 7px 0 rgba(42, 55, 50, .16);
+      transform: rotate(-7deg);
+    }
+    .town-paper-sign::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 26px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.68);
+      box-shadow: 0 15px 0 rgba(255,255,255,.5);
     }
     .monster-stage {
       display: grid;
@@ -1752,6 +1855,12 @@
     .monster.companion-color-target .monster-foot,
     .battle-monster-art .monster.companion-color-target .monster-foot {
       background: var(--companion-foot, #8b5a34);
+    }
+    .monster.companion-color-target.sprout .monster-spark,
+    .monster.companion-color-target.trail .monster-spark,
+    .monster.companion-color-target.skykid .monster-spark {
+      background: var(--companion-hand, #fff0a8);
+      filter: drop-shadow(0 0 7px var(--companion-hand-far, rgba(255,215,92,.72)));
     }
     .monster .monster-mark {
       left: 32px;
@@ -3246,7 +3355,7 @@
     }
     .hp-number {
       color: #4f3715;
-      font: 1000 12px/1 system-ui, sans-serif;
+      font: 1000 14px/1 system-ui, sans-serif;
       padding: 1px 5px;
       border: 1px solid rgba(82,69,48,.18);
       border-radius: 999px;
@@ -3259,9 +3368,24 @@
     .battle-field.watching.magic-style-route .hp-strip i.hp-drain {
       animation-delay: calc(var(--magic-start-delay, 0s) + 5.95s);
     }
+    .battle-field.battle-screen-shake {
+      animation: battleScreenShake .46s linear both;
+      transform-origin: center center;
+      will-change: transform;
+    }
     @keyframes hpDrain {
       from { width: var(--hp, 100%); }
       to { width: var(--hp-after, var(--hp, 100%)); }
+    }
+    @keyframes battleScreenShake {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      12% { transform: translate3d(-5px, 3px, 0); }
+      24% { transform: translate3d(6px, -3px, 0); }
+      36% { transform: translate3d(-7px, -2px, 0); }
+      48% { transform: translate3d(7px, 3px, 0); }
+      60% { transform: translate3d(-5px, 2px, 0); }
+      72% { transform: translate3d(4px, -2px, 0); }
+      84% { transform: translate3d(-2px, 1px, 0); }
     }
     .battle-lines {
       display: grid;
@@ -3810,7 +3934,7 @@
     .magic-starfall-field::after {
       content: "";
       position: absolute;
-      top: calc(var(--battle-stage-y) - 18%);
+      top: calc(var(--battle-stage-y) - 23%);
       width: 124px;
       height: 124px;
       opacity: 0;
@@ -4330,33 +4454,39 @@
       top: calc(var(--battle-stage-y) - 16%);
       width: 118px;
       height: 74px;
+      z-index: 2;
       border-radius: 50px;
       background:
-        radial-gradient(circle at 26% 58%, #fff 0 24%, transparent 25%),
-        radial-gradient(circle at 48% 34%, #fff 0 30%, transparent 31%),
-        radial-gradient(circle at 72% 58%, #fff 0 23%, transparent 24%),
-        linear-gradient(#e8fbff, #bfeaff);
-      filter: drop-shadow(0 0 14px #dff8ff);
+        radial-gradient(circle at 24% 58%, #fff 0 26%, transparent 27%),
+        radial-gradient(circle at 48% 34%, #fff 0 32%, transparent 33%),
+        radial-gradient(circle at 73% 58%, #fff 0 25%, transparent 26%),
+        radial-gradient(ellipse at 50% 68%, #fff 0 45%, transparent 46%);
+      filter: drop-shadow(0 0 18px #ffffff) drop-shadow(0 0 16px var(--magic));
       animation: customCloudPuff 1.45s ease calc(var(--magic-start-delay, 0s) + 1.65s) both;
     }
     .sky-jetstream-rune::before {
       left: 18%;
       right: 18%;
       top: calc(var(--battle-stage-y) - 24%);
-      height: 120px;
-      background: repeating-linear-gradient(115deg, transparent 0 18px, rgba(255,255,255,.8) 19px 22px, var(--magic) 23px 26px, transparent 27px 42px);
+      height: 96px;
+      background:
+        linear-gradient(112deg, transparent 0 8%, rgba(255,255,255,.82) 9% 11%, transparent 12% 25%, rgba(142,231,255,.72) 26% 28%, transparent 29% 46%, rgba(255,255,255,.7) 47% 49%, transparent 50% 100%);
       border-radius: 999px;
       clip-path: none;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,.85)) drop-shadow(0 0 12px var(--magic));
       animation: customSweepRight 2.1s ease calc(var(--magic-start-delay, 0s) + 1s) both;
     }
     .sky-jetstream-rune .magic-custom-core {
       top: calc(var(--battle-stage-y) - 24%);
-      width: 116px;
-      height: 116px;
-      border: 5px double var(--magic);
+      width: 112px;
+      height: 112px;
+      border: 5px double rgba(255,255,255,.92);
       border-radius: 50%;
-      box-shadow: inset 0 0 18px rgba(255,255,255,.72), 0 0 18px var(--magic);
-      animation: customSpinPop 1.45s ease calc(var(--magic-start-delay, 0s) + 2.2s) both;
+      background:
+        radial-gradient(circle at 50% 50%, transparent 0 36%, rgba(255,255,255,.62) 37% 39%, transparent 40%),
+        conic-gradient(from 18deg, transparent 0 18deg, rgba(255,255,255,.92) 19deg 25deg, transparent 26deg 58deg, var(--magic) 59deg 65deg, transparent 66deg 104deg, rgba(255,255,255,.82) 105deg 111deg, transparent 112deg 360deg);
+      box-shadow: inset 0 0 14px rgba(255,255,255,.45), 0 0 18px var(--magic);
+      animation: customSpinPop 1.35s ease calc(var(--magic-start-delay, 0s) + 2.05s) both;
     }
     .sky-sunburst-column .magic-custom-core,
     .city-tower-laser .magic-custom-core,
@@ -4373,18 +4503,22 @@
       top: calc(var(--battle-stage-y) - 16%);
       width: 24px;
       height: 118px;
-      background: linear-gradient(#b8a9ff 0 70%, transparent 71%), radial-gradient(circle at 50% 16%, #fff 0 12px, #ffe9a8 13px 24px, transparent 25px);
+      background:
+        linear-gradient(180deg, #fff4b8 0 18%, #c9bbff 19% 70%, transparent 71%),
+        radial-gradient(circle at 50% 16%, #fff 0 12px, #fff2b6 13px 21px, #ffd86d 22px 26px, transparent 27px);
       animation: customPop .9s ease calc(var(--magic-start-delay, 0s) + 1.45s) both;
     }
-    .city-lamppost-pop.target-enemy::before { right: 18%; }
-    .city-lamppost-pop.target-me::before { left: 18%; }
+    .city-lamppost-pop.target-enemy::before { right: 20%; }
+    .city-lamppost-pop.target-me::before { left: 20%; }
     .city-lamppost-pop .magic-custom-core {
       top: calc(var(--battle-stage-y) - 11%);
       width: 86px;
       height: 86px;
-      background: repeating-conic-gradient(from 0deg, #fff 0deg 8deg, var(--magic) 9deg 18deg, transparent 19deg 34deg);
+      background: repeating-conic-gradient(from 0deg, #fff 0deg 7deg, #fff4b8 8deg 14deg, var(--magic) 15deg 22deg, transparent 23deg 34deg);
       animation: customPop 1s ease calc(var(--magic-start-delay, 0s) + 2.2s) both;
     }
+    .magic-custom-field.target-enemy.city-lamppost-pop .magic-custom-core { right: 14%; }
+    .magic-custom-field.target-me.city-lamppost-pop .magic-custom-core { left: 14%; }
     .city-rune-grid::before {
       left: 22%;
       right: 22%;
@@ -4415,10 +4549,10 @@
       animation: customSplash 1.1s ease calc(var(--magic-start-delay, 0s) + 2.18s) both;
     }
     .magic-custom-field.target-enemy.river-drop-arc .magic-custom-core {
-      right: 16%;
+      right: 20%;
     }
     .magic-custom-field.target-me.river-drop-arc .magic-custom-core {
-      left: 16%;
+      left: 20%;
     }
     .river-ripple-gate .magic-custom-core,
     .white-magic-gate .magic-custom-core {
@@ -4433,7 +4567,7 @@
     .river-mirage-tide::before {
       left: 16%;
       right: 16%;
-      top: calc(var(--battle-stage-y) - 13%);
+      top: calc(var(--battle-stage-y) - 18%);
       height: 120px;
       background: repeating-linear-gradient(0deg, rgba(255,255,255,.85) 0 6px, var(--magic) 7px 14px, transparent 15px 28px);
       clip-path: polygon(0 70%, 10% 42%, 22% 70%, 34% 38%, 48% 70%, 62% 40%, 78% 70%, 90% 42%, 100% 70%, 100% 100%, 0 100%);
@@ -4479,6 +4613,14 @@
         radial-gradient(ellipse at 68% 64%, rgba(255,255,255,.9) 0 10px, var(--magic) 11px 21px, transparent 22px),
         radial-gradient(ellipse at 86% 34%, rgba(255,255,255,.65) 0 7px, var(--magic) 8px 16px, transparent 17px);
       animation: customLanterns 2.2s ease calc(var(--magic-start-delay, 0s) + 1s) both;
+    }
+    .magic-custom-field.target-enemy.yura-phantom-lanterns::before {
+      left: 26%;
+      right: 10%;
+    }
+    .magic-custom-field.target-me.yura-phantom-lanterns::before {
+      left: 10%;
+      right: 26%;
     }
     .yura-mirror-maze::before {
       left: 20%;
@@ -4534,6 +4676,16 @@
       clip-path: polygon(50% 0, 95% 28%, 78% 88%, 22% 88%, 5% 28%);
       animation: customSweepRight 1.55s ease calc(var(--magic-start-delay, 0s) + 1.65s) both;
     }
+    .magic-custom-field.target-enemy.white-prism-dot .magic-custom-core,
+    .magic-custom-field.target-enemy.white-prism-dot .magic-custom-mark,
+    .magic-custom-field.target-enemy.white-prism-dot .magic-custom-extra {
+      right: 24%;
+    }
+    .magic-custom-field.target-me.white-prism-dot .magic-custom-core,
+    .magic-custom-field.target-me.white-prism-dot .magic-custom-mark,
+    .magic-custom-field.target-me.white-prism-dot .magic-custom-extra {
+      left: 24%;
+    }
     .white-star-crest .magic-custom-core {
       top: calc(var(--battle-stage-y) - 26%);
       width: 164px;
@@ -4580,34 +4732,7 @@
       animation: customSweepRight 1.75s ease calc(var(--magic-start-delay, 0s) + 1.1s) both;
     }
     .sky-cloud-puff .magic-custom-mark {
-      top: calc(var(--battle-stage-y) - 4%);
-      width: 164px;
-      height: 28px;
-      border-radius: 999px;
-      background: repeating-linear-gradient(90deg, rgba(255,255,255,.9) 0 22px, transparent 23px 38px);
-      filter: blur(.2px) drop-shadow(0 0 8px #dff8ff);
-      animation: customCloudPuff 1.65s ease calc(var(--magic-start-delay, 0s) + 1.15s) both;
-    }
-    .sky-jetstream-rune::before {
-      height: 84px;
-      background:
-        linear-gradient(90deg, transparent, rgba(255,255,255,.88), transparent),
-        repeating-linear-gradient(0deg, transparent 0 12px, rgba(129,214,255,.75) 13px 16px, transparent 17px 28px);
-      border-radius: 999px;
-      clip-path: none;
-    }
-    .sky-jetstream-rune .magic-custom-core {
-      width: 138px;
-      height: 68px;
-      border: 0;
-      border-radius: 999px;
-      background:
-        radial-gradient(ellipse at 15% 50%, rgba(255,255,255,.95) 0 14%, transparent 15%),
-        linear-gradient(90deg, transparent 0 8%, #fff 9% 16%, var(--magic) 17% 72%, transparent 73%);
-      box-shadow: none;
-      border-radius: 999px;
-      clip-path: none;
-      animation: customSweepRight 1.5s ease calc(var(--magic-start-delay, 0s) + 2.05s) both;
+      display: none;
     }
     .sky-sunburst-column .magic-custom-core {
       top: calc(var(--battle-stage-y) - 30%);
@@ -4631,8 +4756,14 @@
       filter: drop-shadow(0 0 14px #ffe27a);
       animation: customPop 1.05s ease calc(var(--magic-start-delay, 0s) + 1.35s) both;
     }
+    .city-tower-laser.from-me .magic-custom-core {
+      right: 24%;
+    }
+    .city-tower-laser.from-enemy .magic-custom-core {
+      left: 24%;
+    }
     .city-tower-laser .magic-custom-mark {
-      top: calc(var(--battle-stage-y) - 25%);
+      top: calc(var(--battle-stage-y) - 20%);
       width: 190px;
       height: 34px;
       background: linear-gradient(90deg, transparent, #fff, var(--magic), transparent);
@@ -4675,6 +4806,16 @@
       clip-path: polygon(6% 100%, 14% 30%, 30% 76%, 50% 0, 70% 76%, 86% 30%, 94% 100%);
       filter: drop-shadow(0 0 20px #ffb066);
       animation: customFanOpen 1.35s ease calc(var(--magic-start-delay, 0s) + 1.7s) both;
+    }
+    .magic-custom-field.target-enemy.ake-solar-crown .magic-custom-core,
+    .magic-custom-field.target-enemy.ake-solar-crown .magic-custom-mark,
+    .magic-custom-field.target-enemy.ake-solar-crown .magic-custom-extra {
+      right: 9%;
+    }
+    .magic-custom-field.target-me.ake-solar-crown .magic-custom-core,
+    .magic-custom-field.target-me.ake-solar-crown .magic-custom-mark,
+    .magic-custom-field.target-me.ake-solar-crown .magic-custom-extra {
+      left: 9%;
     }
     .yura-wobble-orbit .magic-custom-mark {
       top: calc(var(--battle-stage-y) - 20%);
@@ -5728,25 +5869,28 @@
       margin-bottom: 8px;
     }
     .item-category-title b {
-      font-size: 14px;
+      font-size: 15px;
     }
     .item-category-title span {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 12.5px;
       line-height: 1.45;
       text-align: right;
     }
     .item-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
+      justify-items: start;
       gap: 8px;
     }
     .item-entry {
       position: relative;
       display: grid;
-      grid-template-columns: 42px minmax(0, 1fr) auto;
+      grid-template-columns: 42px max-content;
       gap: 8px;
       align-items: start;
+      width: fit-content;
+      max-width: 100%;
     }
     .item-art {
       width: 38px;
@@ -5828,35 +5972,85 @@
       display: block;
       margin-top: 4px;
       color: #315b91;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 900;
       line-height: 1.35;
     }
-    .item-use-btn {
-      align-self: end;
-      min-width: 48px;
-      min-height: 28px;
-      border-radius: 999px;
-      border: 1px solid #d9c59e;
-      background: #fff8dc;
+    .item-entry-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .item-count-label {
       color: #6b4f21;
-      font: 900 11px/1 system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .item-use-btn {
+      margin-left: auto;
+      flex: 0 0 auto;
+      min-width: 54px;
+      min-height: 32px;
+      border-radius: 999px;
+      border: 1px solid #f3c766;
+      background: linear-gradient(180deg, #fff9b8, #ffd86f);
+      color: #5b3b12;
+      font: 900 13px/1 system-ui, sans-serif;
       cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.76), 0 2px 0 rgba(181,122,28,.18);
     }
     .item-use-btn:disabled { opacity: .45; cursor: default; }
     .item-effect-panel {
-      padding: 9px;
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      margin-top: 2px;
+      padding: 10px 12px;
       border-radius: 10px;
-      background: #f7fbff;
-      border: 1px solid rgba(49,91,145,.18);
-      color: #315b91;
-      font-size: 11px;
+      background: linear-gradient(180deg, #fff6c7, #ffe08a);
+      border: 2px solid #f0a629;
+      color: #6b3f09;
+      font-size: 12.5px;
       line-height: 1.45;
-      font-weight: 800;
+      font-weight: 900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.76), 0 3px 0 rgba(167,98,16,.14);
+    }
+    .item-effect-panel small {
+      display: block;
+      margin-top: 4px;
+      color: #7a4c14;
+      font-size: 11.5px;
+      line-height: 1.45;
+      font-weight: 900;
+    }
+    .item-immediate-panel {
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      margin-top: 2px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #e8fff4, #bdf2d7);
+      border: 2px solid #43b97a;
+      color: #175339;
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 3px 0 rgba(33,128,78,.14);
+    }
+    #openTownShopFromItemsBtn {
+      border: 1px solid #59b7d8;
+      background: linear-gradient(180deg, #dffaff, #8edff0);
+      color: #17445b;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 3px 0 rgba(37,112,139,.18);
     }
     .item-entry {
-      min-height: 78px;
-      padding: 9px;
+      min-height: 0;
+      padding: 10px;
       border-radius: 10px;
       border: 1px solid rgba(75, 53, 28, .13);
       background: rgba(255, 255, 255, .86);
@@ -5865,27 +6059,29 @@
     .item-entry b {
       display: block;
       color: var(--ink);
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.3;
     }
     .item-entry span {
       display: block;
       color: var(--muted);
-      font-size: 11px;
-      line-height: 1.45;
+      font-size: 12.5px;
+      line-height: 1.5;
       margin-top: 4px;
+      white-space: nowrap;
+      max-width: 26em;
     }
     .item-entry small {
       display: inline-grid;
       place-items: center;
-      min-width: 28px;
-      min-height: 20px;
-      margin-top: 7px;
+      min-width: 34px;
+      min-height: 22px;
+      padding: 0 8px;
       border-radius: 999px;
       background: #edf6e9;
       color: var(--green);
       font-weight: 900;
-      font-size: 10px;
+      font-size: 13px;
     }
     .item-entry.locked {
       opacity: .88;
@@ -5894,6 +6090,13 @@
     @media (max-width: 430px) {
       .item-list {
         grid-template-columns: 1fr;
+      }
+      .item-entry {
+        grid-template-columns: 42px minmax(0, 1fr);
+        width: 100%;
+      }
+      .item-entry span {
+        white-space: normal;
       }
     }
     .evo-stage-card {
@@ -5946,10 +6149,10 @@
       flex: 0 0 auto;
     }
     .cup-medal.medal-rookie, .award-medal.medal-rookie { --medal-main: #ff9b2f; --medal-deep: #7a3c00; --medal-pale: #fff0d8; }
-    .cup-medal.medal-green, .award-medal.medal-green { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
+    .cup-medal.medal-green, .award-medal.medal-green { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
     .cup-medal.medal-city, .award-medal.medal-city { --medal-main: #9a72ff; --medal-deep: #3f2788; --medal-pale: #efe9ff; }
     .cup-medal.medal-sky, .award-medal.medal-sky { --medal-main: #65d7ff; --medal-deep: #11617a; --medal-pale: #e5f8ff; }
-    .cup-medal.medal-river, .award-medal.medal-river { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
+    .cup-medal.medal-river, .award-medal.medal-river { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
     .cup-medal.medal-grand, .award-medal.medal-grand { --medal-main: #ffffff; --medal-deep: #58606c; --medal-pale: #f9fbff; }
     .cup-medal::before {
       content: "";
@@ -6037,10 +6240,10 @@
       box-shadow: inset 0 -4px 0 rgba(0,0,0,.04);
     }
     .medal-slot.medal-rookie { --medal-main: #ff9b2f; --medal-deep: #7a3c00; --medal-pale: #fff0d8; }
-    .medal-slot.medal-green { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
+    .medal-slot.medal-green { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
     .medal-slot.medal-city { --medal-main: #9a72ff; --medal-deep: #3f2788; --medal-pale: #efe9ff; }
     .medal-slot.medal-sky { --medal-main: #65d7ff; --medal-deep: #11617a; --medal-pale: #e5f8ff; }
-    .medal-slot.medal-river { --medal-main: #a8e85b; --medal-deep: #3f6b0e; --medal-pale: #effbdc; }
+    .medal-slot.medal-river { --medal-main: #ff8fc7; --medal-deep: #7a1d4c; --medal-pale: #ffeaf5; }
     .medal-slot.medal-grand { --medal-main: #ffffff; --medal-deep: #58606c; --medal-pale: #f9fbff; }
     .medal-slot.open {
       border-color: color-mix(in srgb, var(--medal-main) 72%, var(--medal-deep) 28%);
@@ -6094,6 +6297,130 @@
       display: block;
       font-size: 9px;
       line-height: 1.25;
+    }
+    .home-medal-shelf {
+      --shelf-width: 124px;
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      width: var(--shelf-width);
+      height: 64px;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 3px 5px;
+      padding: 8px 8px 9px;
+      border: 3px solid rgba(115, 82, 42, .42);
+      border-radius: 9px;
+      background:
+        linear-gradient(180deg, rgba(255,250,224,.88), rgba(238,204,142,.88)),
+        linear-gradient(90deg, transparent 0 31%, rgba(115,82,42,.18) 32% 34%, transparent 35% 65%, rgba(115,82,42,.18) 66% 68%, transparent 69%);
+      box-shadow: inset 0 -8px 0 rgba(132, 92, 45, .16), 0 4px 0 rgba(70, 48, 27, .14);
+      pointer-events: none;
+    }
+    .home-medal-shelf::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      top: 50%;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(112, 78, 37, .26);
+      box-shadow: 0 22px 0 rgba(112, 78, 37, .22);
+      z-index: 1;
+    }
+    .home-medal-shelf.complete {
+      background:
+        radial-gradient(ellipse at 50% 36%, rgba(255, 245, 173, .54) 0 30%, transparent 62%),
+        linear-gradient(180deg, rgba(255,250,224,.92), rgba(238,204,142,.9)),
+        linear-gradient(90deg, transparent 0 31%, rgba(115,82,42,.18) 32% 34%, transparent 35% 65%, rgba(115,82,42,.18) 66% 68%, transparent 69%);
+      box-shadow:
+        inset 0 -8px 0 rgba(132, 92, 45, .16),
+        0 4px 0 rgba(70, 48, 27, .14),
+        0 0 16px rgba(255, 226, 126, .82),
+        0 0 34px rgba(255, 238, 158, .62),
+        0 0 44px rgba(160, 220, 255, .38);
+    }
+    .home-medal-shelf.complete::after {
+      content: "";
+      position: absolute;
+      inset: -18px -16px -14px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,248,184,.3), rgba(255,220,116,.12)),
+        radial-gradient(ellipse at 50% 48%, rgba(255,236,143,.68), transparent 70%);
+      animation: homeMedalShelfGlow 2.4s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .home-medal-place {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      z-index: 2;
+    }
+    .home-medal-empty {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .home-medal-place .cup-medal {
+      width: 20px;
+      height: 24px;
+      transform: translateY(1px) scale(.82);
+      transform-origin: center center;
+      filter: drop-shadow(0 1px 0 rgba(67,46,25,.2));
+    }
+    .companion-room.medal-complete {
+      background:
+        linear-gradient(115deg, rgba(255,246,175,.26) 0 18%, transparent 42%),
+        linear-gradient(250deg, rgba(184,226,255,.18) 0 16%, transparent 44%),
+        linear-gradient(90deg, rgba(255,255,255,.38) 0 1px, transparent 1px 100%) 0 0 / 34px 34px,
+        linear-gradient(180deg, #eefaff 0 58%, #fae7c6 58% 100%);
+      box-shadow:
+        inset 0 0 34px rgba(255,238,165,.32),
+        inset 0 0 58px rgba(180,222,255,.18);
+    }
+    .companion-room.medal-complete::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255,248,188,.13), transparent 45%),
+        radial-gradient(circle at 28% 26%, rgba(255,246,170,.78) 0 2px, transparent 3px),
+        radial-gradient(circle at 74% 18%, rgba(255,255,255,.88) 0 2px, transparent 3px),
+        radial-gradient(circle at 84% 38%, rgba(185,232,255,.82) 0 2px, transparent 3px),
+        radial-gradient(circle at 45% 17%, rgba(255,234,151,.72) 0 1.5px, transparent 2.5px);
+      animation: homeCelebrationTwinkle 2.8s ease-in-out infinite;
+    }
+    .companion-room.medal-complete .home-window.time-moon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        radial-gradient(circle at 84% 13%, rgba(255,247,174,.95) 0 1.8px, transparent 2.6px);
+      animation: homeWindowStarTwinkle 2.2s ease-in-out infinite;
+    }
+    @keyframes homeMedalShelfGlow {
+      0%, 100% { opacity: .58; transform: scale(.98); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    @keyframes homeCelebrationTwinkle {
+      0%, 100% { opacity: .48; filter: saturate(1); }
+      50% { opacity: .86; filter: saturate(1.18); }
+    }
+    @keyframes homeWindowStarTwinkle {
+      0%, 100% { opacity: .54; }
+      50% { opacity: .96; }
     }
     .medal-route {
       margin-top: 8px;
@@ -6448,39 +6775,1070 @@
       font-weight: 800;
     }
     .building {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 9px 6px;
+      appearance: none;
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: var(--w, 68px);
+      height: var(--h, 76px);
+      cursor: pointer;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,0) 36%),
+        linear-gradient(180deg, #fffef7, #f2dfad);
+      border: 1px solid rgba(116, 83, 39, .2);
+      border-radius: 8px 8px 12px 12px;
+      padding: 16px 5px 6px;
       text-align: center;
-      min-height: 74px;
+      min-height: 0;
       filter: grayscale(1);
       opacity: .55;
+      transform: translate(-50%, -50%) rotate(var(--r, 0deg)) rotateX(8deg);
+      transform-origin: 50% 100%;
+      z-index: var(--z, 3);
+      box-shadow:
+        inset 0 -7px 0 rgba(122, 91, 36, .09),
+        0 8px 0 rgba(96, 74, 42, .12),
+        0 18px 18px rgba(56, 45, 28, .14);
+      transition: transform .16s ease, opacity .16s ease, filter .16s ease;
+    }
+    .building::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: -12px;
+      height: 24px;
+      border-radius: 9px 9px 5px 5px;
+      background: linear-gradient(135deg, #f4b56d, #ffd68f);
+      border: 1px solid rgba(116, 83, 39, .18);
+      transform: skewX(-10deg);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.34);
+    }
+    .building::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -10px;
+      width: 82%;
+      height: 13px;
+      border-radius: 50%;
+      background: rgba(83, 71, 45, .18);
+      transform: translateX(-50%);
+      z-index: -1;
     }
     .building.open {
       filter: none;
       opacity: 1;
-      background: #fff8da;
+      background: linear-gradient(180deg, #fffef2, #ffe8a8);
       border-color: #dcb95a;
+    }
+    .building.open:hover {
+      transform: translate(-50%, -54%) rotate(var(--r, 0deg)) rotateX(6deg);
+    }
+    .building.special {
+      --w: 80px;
+      --h: 86px;
+      background: linear-gradient(180deg, #f9fcff, #dcecff);
+      border-color: rgba(49,91,145,.2);
+    }
+    .building.special::before {
+      background: linear-gradient(135deg, #c7dcff, #f8fbff);
+    }
+    .building.open.special {
+      background: linear-gradient(180deg, #fffdf7, #edf6ff);
+      border-color: #8eb6d9;
+    }
+    .building.selected {
+      outline: 3px solid rgba(79,120,185,.22);
+      border-color: #4f78b9;
+      transform: translate(-50%, -57%) rotate(var(--r, 0deg)) rotateX(4deg);
     }
     .building b {
       display: block;
+      position: relative;
+      z-index: 1;
+      width: 26px;
+      height: 22px;
+      margin: 0 auto;
+      border-radius: 7px;
+      background: rgba(255,255,255,.7);
       color: var(--gold);
-      font-size: 22px;
+      font-size: 15px;
       line-height: 1.1;
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 -2px 0 rgba(122,91,36,.08);
     }
     .building span {
       display: block;
-      color: var(--muted);
+      position: relative;
+      z-index: 1;
+      margin-top: 4px;
+      color: #263d2d;
       font-size: 11px;
       font-weight: 800;
+      line-height: 1.2;
     }
     .building small {
       display: block;
-      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+      margin-top: 3px;
       color: #7b6b4d;
-      font-size: 10px;
+      font-size: 9px;
       line-height: 1.25;
+    }
+    .building:not(.open)::before {
+      background: linear-gradient(135deg, #d7c7a5, #efe3ca);
+    }
+    .building:not(.open) {
+      background:
+        repeating-linear-gradient(-12deg, rgba(143, 122, 86, .08) 0 7px, transparent 8px 16px),
+        linear-gradient(180deg, #fff9e7, #dfcfaa);
+      border-style: dashed;
+    }
+    .building:not(.open)::after {
+      background: rgba(83, 71, 45, .12);
+    }
+    .building:not(.open) b {
+      background: #fff8dc;
+      color: #8a7352;
+    }
+    .building.special:not(.open) {
+      background:
+        repeating-linear-gradient(-12deg, rgba(79,120,185,.08) 0 7px, transparent 8px 16px),
+        linear-gradient(180deg, #fbfdff, #dce8f5);
+    }
+    .building.open {
+      --wall: #ffe8a8;
+      --wall-deep: #e9bd68;
+      --roof: #f4b56d;
+      --roof-deep: #c77a30;
+      --trim: #ffffff;
+      background:
+        linear-gradient(90deg, transparent 0 18%, rgba(255,255,255,.5) 19% 25%, transparent 26% 100%),
+        linear-gradient(180deg, var(--wall) 0 78%, var(--wall-deep) 79% 100%);
+    }
+    .building.open::before {
+      background: linear-gradient(135deg, var(--roof), var(--roof-deep));
+    }
+    .building.open b {
+      color: #3f2f1d;
+      background:
+        linear-gradient(90deg, transparent 0 45%, rgba(255,255,255,.75) 46% 54%, transparent 55% 100%),
+        linear-gradient(180deg, var(--trim), rgba(255,255,255,.76));
+      border: 1px solid rgba(75, 56, 36, .16);
+    }
+    .building-bench.open { --wall:#d9c090; --wall-deep:#9f7340; --roof:#b6844f; --roof-deep:#795331; }
+    .building-garden.open { --wall:#dff6c9; --wall-deep:#8fc477; --roof:#ffcfda; --roof-deep:#dc7896; }
+    .building-streetlight.open { --wall:#fff4b8; --wall-deep:#d5b45d; --roof:#c9bbff; --roof-deep:#7568b7; }
+    .building-fountain.open { --wall:#dff9ff; --wall-deep:#77c5d7; --roof:#b7ecff; --roof-deep:#4da8bf; }
+    .building-tower.open { --wall:#e9f3ff; --wall-deep:#9fbde4; --roof:#b9d4ff; --roof-deep:#638ac6; }
+    .building-bridge.open { --wall:#e6c18f; --wall-deep:#9c6b3c; --roof:#c99356; --roof-deep:#7b4e2a; }
+    .building-warehouse.open { --wall:#ead7b5; --wall-deep:#b08b5a; --roof:#a77b45; --roof-deep:#6f4c2c; }
+    .building-plaza.open { --wall:#fff0c6; --wall-deep:#dfb86a; --roof:#f3d27c; --roof-deep:#c79430; }
+    .building-clock.open { --wall:#f7f1dc; --wall-deep:#bfae82; --roof:#83b7d9; --roof-deep:#3e7897; }
+    .building-shop.open { --wall:#ffe3b8; --wall-deep:#d69352; --roof:#ff9f8c; --roof-deep:#bd5a48; }
+    .building-guild.open { --wall:#e5f4d4; --wall-deep:#9ab979; --roof:#d9b56f; --roof-deep:#9a6b28; }
+    .building-station.open { --wall:#e8e2d8; --wall-deep:#aba098; --roof:#8fa8c6; --roof-deep:#596f8a; }
+    .building-castle.open { --wall:#e9eef8; --wall-deep:#a7b2c8; --roof:#c7d3ea; --roof-deep:#7687a7; }
+    .building-medalHall.open { --wall:#fff0bc; --wall-deep:#d6a94d; --roof:#f2c94c; --roof-deep:#aa7a17; }
+    .building-dojo.open { --wall:#f2dfc7; --wall-deep:#b88662; --roof:#d66b55; --roof-deep:#8d3e32; }
+    .building-soundShop.open { --wall:#e8f2ff; --wall-deep:#9bb9dc; --roof:#b9a7ff; --roof-deep:#6e5abc; }
+    .building-bookstore.open { --wall:#f5dfbf; --wall-deep:#b98452; --roof:#87b777; --roof-deep:#4d7f43; }
+    .building-retirePark.open { --wall:#e9f8d9; --wall-deep:#97c47f; --roof:#d7ecb2; --roof-deep:#779e4e; }
+    .building-arcade.open { --wall:#e7edff; --wall-deep:#8ca4da; --roof:#ffb3d1; --roof-deep:#c45f91; }
+    .building-bench.open::before {
+      top: 16px;
+      height: 10px;
+      border-radius: 999px;
+      transform: none;
+    }
+    .building-bench.open b {
+      width: 42px;
+      height: 10px;
+      margin-top: 8px;
+      border-radius: 999px;
+      box-shadow: 0 12px 0 rgba(255,255,255,.64), inset 0 -2px 0 rgba(122,91,36,.12);
+      font-size: 0;
+    }
+    .building-fountain.open {
+      border-radius: 999px 999px 14px 14px;
+    }
+    .building-fountain.open b,
+    .building-plaza.open b {
+      border-radius: 999px;
+    }
+    .building-clock.open::before,
+    .building-tower.open::before,
+    .building-castle.open::before {
+      top: -18px;
+      height: 30px;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      border-radius: 5px;
+      transform: none;
+    }
+    .building-clock.open b {
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .building-special.open,
+    .building.open.special {
+      box-shadow:
+        inset 0 -8px 0 rgba(49,91,145,.08),
+        0 9px 0 rgba(73, 101, 130, .13),
+        0 18px 20px rgba(56, 45, 28, .14);
+    }
+    .building:not(.open) {
+      height: 62px;
+      padding-top: 22px;
+      background:
+        linear-gradient(90deg, transparent 0 34%, rgba(136,104,62,.22) 35% 40%, transparent 41% 100%),
+        linear-gradient(180deg, #f4e4c7 0 34%, #cdb98c 35% 100%);
+      border: 1px dashed rgba(111,86,48,.32);
+      border-radius: 14px 14px 10px 10px;
+      box-shadow:
+        inset 0 5px 0 rgba(255,255,255,.34),
+        0 7px 0 rgba(96,74,42,.1),
+        0 12px 14px rgba(56,45,28,.1);
+    }
+    .building:not(.open)::before {
+      left: 50%;
+      right: auto;
+      top: -17px;
+      width: 34px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #fff4c8, #d7b775);
+      transform: translateX(-50%) rotate(-4deg);
+      box-shadow: 0 8px 0 -4px #8f653a;
+    }
+    .building:not(.open) b {
+      width: 20px;
+      height: 16px;
+      margin-top: 0;
+      font-size: 11px;
+      background: rgba(255,255,255,.52);
+    }
+    .building:not(.open) span {
+      font-size: 10px;
+    }
+    .building:not(.open) small {
+      color: #6f5b3a;
+    }
+    .building {
+      width: var(--w, 82px);
+      height: var(--h, 82px);
+      padding: 0;
+      border-radius: 6px;
+      background: transparent;
+      border: 0;
+      overflow: visible;
+      filter: none;
+      opacity: .82;
+      transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+      box-shadow: none;
+    }
+    .building::before {
+      left: 8%;
+      right: 8%;
+      top: 16%;
+      height: 54%;
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, transparent 0 16%, rgba(255,255,255,.48) 17% 27%, transparent 28% 49%, rgba(255,255,255,.48) 50% 60%, transparent 61% 100%),
+        linear-gradient(180deg, var(--roof, #b86d3d), var(--roof-deep, #744225));
+      border: 1px solid rgba(32, 38, 38, .24);
+      transform: skewY(-8deg);
+      box-shadow:
+        inset 0 5px 0 rgba(255,255,255,.18),
+        0 5px 0 rgba(31, 38, 38, .16);
+    }
+    .building::after {
+      left: 13%;
+      bottom: 9%;
+      width: 72%;
+      height: 28%;
+      border-radius: 3px;
+      background:
+        linear-gradient(90deg, transparent 0 12%, rgba(255,255,255,.45) 13% 20%, transparent 21% 78%, rgba(255,255,255,.45) 79% 86%, transparent 87% 100%),
+        linear-gradient(180deg, var(--wall, #e9d8b5), var(--wall-deep, #b7935f));
+      border: 1px solid rgba(32, 38, 38, .18);
+      transform: skewY(-8deg);
+      box-shadow:
+        inset 0 -5px 0 rgba(0,0,0,.08),
+        0 10px 12px rgba(24, 32, 30, .22);
+      z-index: 0;
+    }
+    .building.open {
+      opacity: 1;
+      background: transparent;
+      border: 0;
+    }
+    .building.open:hover,
+    .building.selected {
+      transform: translate(-50%, -54%) rotate(var(--r, 0deg));
+    }
+    .building.selected {
+      outline: 3px solid rgba(255,255,255,.55);
+      border-radius: 10px;
+    }
+    .building b {
+      position: absolute;
+      left: 50%;
+      top: 41%;
+      z-index: 2;
+      width: 16px;
+      height: 18px;
+      margin: 0;
+      border-radius: 2px 2px 0 0;
+      transform: translateX(-50%) skewY(-8deg);
+      background: #51453a;
+      color: transparent;
+      font-size: 0;
+      border: 1px solid rgba(20,20,20,.18);
+      box-shadow:
+        -18px -2px 0 -5px rgba(255,255,255,.68),
+        18px -2px 0 -5px rgba(255,255,255,.68);
+    }
+    .building span {
+      position: absolute;
+      left: 50%;
+      bottom: -17px;
+      z-index: 3;
+      min-width: 64px;
+      max-width: 96px;
+      margin: 0;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(32,38,38,.12);
+      color: #263d2d;
+      font-size: 10px;
+      line-height: 1.2;
+      transform: translateX(-50%);
+      box-shadow: 0 3px 0 rgba(24,32,30,.08);
+    }
+    .building small {
+      display: none;
+    }
+    .building.special {
+      --w: 90px;
+      --h: 90px;
+    }
+    .building-bench.open::before,
+    .building-bench.open::after {
+      top: 44%;
+      height: 12px;
+      border-radius: 999px;
+      transform: skewY(-8deg);
+      background: linear-gradient(180deg, #9f7340, #6d4b2e);
+    }
+    .building-bench.open::after {
+      top: 60%;
+      left: 22%;
+      width: 56%;
+      height: 10px;
+    }
+    .building-fountain.open::before {
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 50%, #e8fdff 0 18%, #77c5d7 19% 42%, #386d78 43% 47%, transparent 48%),
+        linear-gradient(180deg, #dff9ff, #77c5d7);
+    }
+    .building-fountain.open::after {
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,.9), rgba(97,190,212,.65) 46%, rgba(64,118,132,.2) 47%);
+    }
+    .building-clock.open::before,
+    .building-tower.open::before,
+    .building-castle.open::before {
+      top: 4%;
+      height: 70%;
+      clip-path: polygon(50% 0, 92% 30%, 82% 100%, 18% 100%, 8% 30%);
+    }
+    .building-clock.open b {
+      width: 22px;
+      height: 22px;
+      top: 34%;
+      border-radius: 999px;
+      background: radial-gradient(circle, #fff 0 52%, #3e7897 53% 58%, transparent 59%);
+    }
+    .building:not(.open) {
+      height: var(--h, 70px);
+      opacity: .88;
+      background: transparent;
+      border: 0;
+    }
+    .building:not(.open)::before {
+      left: 12%;
+      right: 12%;
+      top: 42%;
+      width: auto;
+      height: 34%;
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, rgba(120,95,58,.16) 0 14%, transparent 15% 32%, rgba(120,95,58,.16) 33% 47%, transparent 48% 67%, rgba(120,95,58,.16) 68% 82%, transparent 83% 100%),
+        linear-gradient(180deg, #c7b18a, #8d7451);
+      border: 1px solid rgba(83,64,41,.32);
+      transform: skewY(-8deg);
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.18), 0 8px 0 rgba(57,44,30,.14);
+    }
+    .building:not(.open)::after {
+      left: 50%;
+      top: 19%;
+      width: 38px;
+      height: 28px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #fff2c9, #cda96d);
+      border: 1px solid rgba(83,64,41,.28);
+      transform: translateX(-50%) rotate(-4deg);
+      box-shadow: 0 12px 0 -6px #6f573a;
+    }
+    .building:not(.open) b {
+      display: none;
+    }
+    .building:not(.open) span {
+      background: rgba(255,248,220,.9);
+      color: #5c4a31;
+    }
+    .building:not(.open) {
+      width: var(--w, 74px);
+      height: var(--h, 76px);
+      opacity: .96;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .building:not(.open)::before {
+      left: 50%;
+      top: 42%;
+      width: 9px;
+      height: 34px;
+      border-radius: 0 0 3px 3px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.2), transparent 42%),
+        linear-gradient(180deg, #8f623c, #5f3f29);
+      border: 1px solid rgba(74,48,29,.34);
+      transform: translateX(-50%) rotate(var(--r, 0deg));
+      box-shadow:
+        -18px 4px 0 -1px #6f4b30,
+        -18px 4px 0 0 rgba(74,48,29,.34),
+        0 9px 10px rgba(34,28,20,.2);
+      z-index: 0;
+    }
+    .building:not(.open)::after {
+      left: 50%;
+      top: 17%;
+      width: 66px;
+      height: 40px;
+      border-radius: 5px;
+      background:
+        linear-gradient(90deg, transparent 0 30%, rgba(92,58,32,.18) 31% 33%, transparent 34% 65%, rgba(92,58,32,.18) 66% 68%, transparent 69%),
+        linear-gradient(180deg, rgba(255,255,255,.22), transparent 28%),
+        linear-gradient(180deg, #d2a36d 0 48%, #bb8753 49% 100%);
+      border: 2px solid rgba(83,53,31,.5);
+      transform: translateX(-50%) rotate(-3deg);
+      box-shadow:
+        inset 0 -4px 0 rgba(92,58,32,.18),
+        0 6px 0 rgba(67,43,28,.16),
+        0 10px 12px rgba(34,28,20,.16);
+      z-index: 1;
+    }
+    .building:not(.open) .town-building-art {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .building:not(.open) .art-roof,
+    .building:not(.open) .art-body,
+    .building:not(.open) .art-window,
+    .building:not(.open) .art-door {
+      display: none;
+    }
+    .building:not(.open) .art-sign {
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      width: 22px;
+      height: 18px;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      transform: translateX(-50%) rotate(-3deg);
+      background: rgba(255,244,210,.64);
+      color: #5b3d25;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: inset 0 -2px 0 rgba(92,58,32,.12);
+    }
+    .building:not(.open) span {
+      top: 44%;
+      bottom: auto;
+      min-width: 58px;
+      max-width: 66px;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: rgba(255,248,224,.76);
+      border-color: rgba(83,53,31,.18);
+      color: #4f3824;
+      font-size: 9px;
+      line-height: 1.15;
+      transform: translateX(-50%) rotate(-3deg);
+      box-shadow: none;
+    }
+    .building.open::before,
+    .building.open::after {
+      display: none;
+    }
+    .building.open .town-building-art {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .building.open .art-roof,
+    .building.open .art-body,
+    .building.open .art-window,
+    .building.open .art-door,
+    .building.open .art-sign {
+      position: absolute;
+      display: block;
+      box-sizing: border-box;
+    }
+    .building.open .art-roof {
+      left: 12%;
+      top: 14%;
+      width: 76%;
+      height: 24%;
+      border-radius: 4px 4px 2px 2px;
+      background: linear-gradient(180deg, var(--roof, #b86d3d), var(--roof-deep, #744225));
+      border: 1px solid rgba(33, 36, 31, .24);
+      transform: skewY(-7deg);
+      box-shadow: inset 0 4px 0 rgba(255,255,255,.18), 0 4px 0 rgba(33,36,31,.14);
+    }
+    .building.open .art-body {
+      left: 18%;
+      top: 36%;
+      width: 64%;
+      height: 36%;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--wall, #e9d8b5), var(--wall-deep, #b7935f));
+      border: 1px solid rgba(33, 36, 31, .2);
+      transform: skewY(-7deg);
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.08), 0 9px 12px rgba(24,32,30,.22);
+    }
+    .building.open .art-window {
+      top: 45%;
+      width: 12px;
+      height: 11px;
+      border-radius: 2px;
+      background: rgba(255,255,255,.68);
+      border: 1px solid rgba(33,36,31,.12);
+      transform: skewY(-7deg);
+      z-index: 3;
+    }
+    .building.open .art-window.w1 { left: 27%; }
+    .building.open .art-window.w2 { right: 27%; }
+    .building.open .art-door {
+      left: 50%;
+      top: 51%;
+      width: 14px;
+      height: 20px;
+      border-radius: 2px 2px 0 0;
+      background: #51453a;
+      border: 1px solid rgba(20,20,20,.18);
+      transform: translateX(-50%) skewY(-7deg);
+      z-index: 3;
+    }
+    .building.open .art-sign {
+      left: 50%;
+      top: 30%;
+      width: 22px;
+      height: 18px;
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      transform: translateX(-50%) skewY(-7deg);
+      background: rgba(255,255,255,.66);
+      color: #3f2f1d;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      z-index: 4;
+    }
+    .building-bench.open .art-roof {
+      display: none;
+    }
+    .building-bench.open .art-body {
+      left: 14%;
+      top: 48%;
+      width: 72%;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #b48252, #6d4b2e);
+      box-shadow: 0 13px 0 #7b5535, -22px 11px 0 -6px #5f412a, 22px 11px 0 -6px #5f412a;
+      transform: rotate(-3deg);
+    }
+    .building-bench.open .art-window,
+    .building-bench.open .art-door,
+    .building-bench.open .art-sign {
+      display: none;
+    }
+    .building-garden.open .art-roof {
+      left: 17%;
+      top: 39%;
+      width: 66%;
+      height: 30px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 24% 46%, #ff9db6 0 12%, transparent 13%),
+        radial-gradient(circle at 48% 35%, #fff09a 0 11%, transparent 12%),
+        radial-gradient(circle at 70% 54%, #9edc86 0 13%, transparent 14%),
+        linear-gradient(180deg, #b5de86, #6a9b4f);
+      transform: rotate(4deg);
+    }
+    .building-garden.open .art-body {
+      left: 20%;
+      top: 60%;
+      width: 60%;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #d5b07b, #8d6845);
+      transform: rotate(4deg);
+    }
+    .building-garden.open .art-window,
+    .building-garden.open .art-door,
+    .building-garden.open .art-sign {
+      display: none;
+    }
+    .building-streetlight.open .art-roof {
+      left: 47%;
+      top: 18%;
+      width: 8px;
+      height: 48px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #84779f, #4e466a);
+      transform: rotate(-3deg);
+    }
+    .building-streetlight.open .art-body {
+      left: 37%;
+      top: 18%;
+      width: 31px;
+      height: 20px;
+      border-radius: 999px 999px 6px 6px;
+      background: radial-gradient(circle at 50% 60%, #fffbd0 0 38%, #e8cf77 39% 60%, #7a6d9d 61%);
+      transform: rotate(-3deg);
+      box-shadow: 0 0 12px rgba(255,239,150,.62);
+    }
+    .building-streetlight.open .art-window,
+    .building-streetlight.open .art-door,
+    .building-streetlight.open .art-sign {
+      display: none;
+    }
+    .building-fountain.open .art-roof {
+      left: 20%;
+      top: 31%;
+      width: 60%;
+      height: 44px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 45%, #ecffff 0 18%, #8bd9e8 19% 42%, #4aa1b8 43% 48%, transparent 49%),
+        linear-gradient(180deg, #aeeeff, #5db1ca);
+      transform: rotate(2deg);
+    }
+    .building-fountain.open .art-body {
+      left: 25%;
+      top: 62%;
+      width: 50%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #e8fdff, #77c5d7);
+      transform: rotate(2deg);
+    }
+    .building-fountain.open .art-window,
+    .building-fountain.open .art-door,
+    .building-fountain.open .art-sign {
+      display: none;
+    }
+    .building-tower.open .art-roof {
+      left: 33%;
+      top: 6%;
+      width: 34%;
+      height: 24%;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      border-radius: 3px;
+      transform: none;
+    }
+    .building-tower.open .art-body {
+      left: 36%;
+      top: 27%;
+      width: 28%;
+      height: 49%;
+      border-radius: 3px;
+      transform: none;
+    }
+    .building-tower.open .art-window.w1 {
+      left: 43%;
+      top: 38%;
+    }
+    .building-tower.open .art-window.w2 {
+      left: 43%;
+      top: 56%;
+      right: auto;
+    }
+    .building-tower.open .art-door,
+    .building-tower.open .art-sign {
+      display: none;
+    }
+    .building-bridge.open .art-roof {
+      left: 11%;
+      top: 45%;
+      width: 78%;
+      height: 14px;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #c99356, #7b4e2a);
+      transform: rotate(7deg);
+    }
+    .building-bridge.open .art-body {
+      left: 15%;
+      top: 53%;
+      width: 70%;
+      height: 20px;
+      border-radius: 0 0 999px 999px;
+      background:
+        radial-gradient(ellipse at 50% 100%, transparent 0 36%, #9c6b3c 37% 100%);
+      transform: rotate(7deg);
+    }
+    .building-bridge.open .art-window,
+    .building-bridge.open .art-door,
+    .building-bridge.open .art-sign {
+      display: none;
+    }
+    .building-warehouse.open .art-roof {
+      left: 8%;
+      top: 24%;
+      width: 84%;
+      height: 25%;
+      border-radius: 2px;
+      transform: skewY(-4deg);
+    }
+    .building-warehouse.open .art-body {
+      left: 12%;
+      top: 45%;
+      width: 76%;
+      height: 32%;
+      border-radius: 2px;
+      background:
+        repeating-linear-gradient(90deg, rgba(80,54,33,.18) 0 3px, transparent 4px 10px),
+        linear-gradient(180deg, var(--wall), var(--wall-deep));
+      transform: skewY(-4deg);
+    }
+    .building-warehouse.open .art-door {
+      width: 24px;
+      height: 24px;
+      top: 53%;
+    }
+    .building-warehouse.open .art-sign {
+      display: none;
+    }
+    .building-plaza.open .art-roof {
+      left: 17%;
+      top: 38%;
+      width: 66%;
+      height: 36px;
+      border-radius: 10px;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.38) 25%, transparent 26% 74%, rgba(255,255,255,.38) 75%),
+        linear-gradient(180deg, #f3d27c, #c79430);
+      transform: rotate(1deg);
+    }
+    .building-plaza.open .art-body,
+    .building-plaza.open .art-window,
+    .building-plaza.open .art-door,
+    .building-plaza.open .art-sign {
+      display: none;
+    }
+    .building-clock.open .art-roof {
+      left: 35%;
+      top: 5%;
+      width: 30%;
+      height: 18%;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      transform: none;
+    }
+    .building-clock.open .art-body {
+      left: 37%;
+      top: 23%;
+      width: 26%;
+      height: 55%;
+      transform: none;
+    }
+    .building-clock.open .art-sign {
+      left: 50%;
+      top: 35%;
+      width: 23px;
+      height: 23px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #fff 0 52%, #3e7897 53% 60%, transparent 61%);
+      color: transparent;
+      transform: translateX(-50%);
+    }
+    .building-clock.open .art-door,
+    .building-clock.open .art-window {
+      display: none;
+    }
+    .building-shop.open .art-roof {
+      left: 9%;
+      top: 26%;
+      width: 82%;
+      height: 20%;
+      border-radius: 4px 4px 10px 10px;
+      background:
+        repeating-linear-gradient(90deg, #ff9f8c 0 8px, #fff6e3 9px 16px);
+      transform: skewY(-6deg);
+    }
+    .building-shop.open .art-body {
+      left: 16%;
+      top: 43%;
+      width: 68%;
+      height: 34%;
+    }
+    .building-shop.open .art-window.w1 { left: 25%; width: 18px; height: 16px; }
+    .building-shop.open .art-window.w2 { right: 25%; width: 18px; height: 16px; }
+    .building-guild.open .art-roof {
+      clip-path: polygon(50% 0, 100% 38%, 92% 100%, 8% 100%, 0 38%);
+      height: 34%;
+    }
+    .building-guild.open .art-sign {
+      background: #d9b56f;
+    }
+    .building-station.open .art-roof {
+      left: 6%;
+      top: 29%;
+      width: 88%;
+      height: 18%;
+      border-radius: 4px;
+      transform: skewY(-3deg);
+    }
+    .building-station.open .art-body {
+      left: 8%;
+      top: 46%;
+      width: 84%;
+      height: 28%;
+      border-radius: 3px;
+      transform: skewY(-3deg);
+    }
+    .building-station.open .art-window.w1 { left: 20%; width: 16px; }
+    .building-station.open .art-window.w2 { right: 20%; width: 16px; }
+    .building-station.open .art-door { width: 24px; }
+    .building-castle.open .art-roof {
+      left: 12%;
+      top: 8%;
+      width: 76%;
+      height: 18%;
+      background:
+        linear-gradient(90deg, var(--roof) 0 17%, transparent 18% 28%, var(--roof) 29% 45%, transparent 46% 56%, var(--roof) 57% 73%, transparent 74% 84%, var(--roof) 85%);
+      transform: none;
+    }
+    .building-castle.open .art-body {
+      left: 16%;
+      top: 27%;
+      width: 68%;
+      height: 50%;
+      border-radius: 3px 3px 8px 8px;
+      transform: none;
+    }
+    .building-castle.open .art-body::before {
+      content: "";
+      position: absolute;
+      left: -10px;
+      bottom: 0;
+      width: 18px;
+      height: 58px;
+      background: linear-gradient(180deg, var(--wall), var(--wall-deep));
+      border: 1px solid rgba(33,36,31,.18);
+      border-radius: 4px 4px 8px 8px;
+      box-shadow: 58px 0 0 -1px var(--wall-deep);
+    }
+    .building-castle.open .art-sign {
+      display: none;
+    }
+    .building-medalHall.open .art-roof {
+      left: 14%;
+      top: 16%;
+      width: 72%;
+      height: 22%;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      transform: none;
+    }
+    .building-medalHall.open .art-body {
+      left: 18%;
+      top: 38%;
+      width: 64%;
+      height: 36%;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.55) 0 12%, transparent 13% 26%, rgba(255,255,255,.55) 27% 39%, transparent 40% 59%, rgba(255,255,255,.55) 60% 72%, transparent 73% 86%, rgba(255,255,255,.55) 87%),
+        linear-gradient(180deg, var(--wall), var(--wall-deep));
+    }
+    .building-medalHall.open .art-sign {
+      border-radius: 999px;
+      background: radial-gradient(circle, #fff8ce 0 38%, #d6a94d 39% 70%, transparent 71%);
+      color: transparent;
+    }
+    .building-dojo.open .art-roof {
+      left: 8%;
+      top: 20%;
+      width: 84%;
+      height: 20%;
+      border-radius: 999px 999px 5px 5px;
+      transform: skewY(-4deg);
+    }
+    .building-dojo.open .art-body {
+      left: 17%;
+      top: 41%;
+      width: 66%;
+      height: 34%;
+      transform: skewY(-4deg);
+    }
+    .building-dojo.open .art-door {
+      width: 26px;
+      background: #6b342d;
+    }
+    .building-soundShop.open .art-roof {
+      left: 14%;
+      top: 16%;
+      width: 72%;
+      height: 28%;
+      border-radius: 8px 8px 3px 3px;
+      background:
+        radial-gradient(circle at 22% 42%, #fff 0 9%, transparent 10%),
+        radial-gradient(circle at 74% 42%, #fff 0 9%, transparent 10%),
+        linear-gradient(180deg, var(--roof), var(--roof-deep));
+    }
+    .building-soundShop.open .art-sign {
+      background: #262049;
+      color: #dfe7ff;
+    }
+    .building-bookstore.open .art-body {
+      background:
+        repeating-linear-gradient(90deg, #7f5d39 0 7px, #e8d4a9 8px 10px, #5c7b52 11px 17px),
+        linear-gradient(180deg, var(--wall), var(--wall-deep));
+    }
+    .building-bookstore.open .art-sign {
+      background: #fff1c7;
+    }
+    .building-retirePark.open .art-roof {
+      left: 30%;
+      top: 16%;
+      width: 42%;
+      height: 38px;
+      border-radius: 52% 48% 44% 56%;
+      background:
+        radial-gradient(circle at 35% 35%, #f5ffd9 0 11%, transparent 12%),
+        linear-gradient(180deg, #8dc36b, #4f8545);
+      transform: rotate(-4deg);
+    }
+    .building-retirePark.open .art-body {
+      left: 47%;
+      top: 51%;
+      width: 9px;
+      height: 26px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #96663e, #5f3f29);
+      transform: rotate(-4deg);
+    }
+    .building-retirePark.open .art-window,
+    .building-retirePark.open .art-door,
+    .building-retirePark.open .art-sign {
+      display: none;
+    }
+    .building-arcade.open .art-roof {
+      left: 10%;
+      top: 17%;
+      width: 80%;
+      height: 24%;
+      border-radius: 5px;
+      background:
+        linear-gradient(90deg, #ffdf74 0 25%, #ff9bd2 26% 50%, #8ac7ff 51% 75%, #d7b4ff 76%),
+        linear-gradient(180deg, var(--roof), var(--roof-deep));
+      transform: skewY(-4deg);
+    }
+    .building-arcade.open .art-body {
+      left: 15%;
+      top: 40%;
+      width: 70%;
+      height: 38%;
+      background:
+        radial-gradient(circle at 25% 44%, #fff 0 7%, transparent 8%),
+        radial-gradient(circle at 70% 44%, #fff 0 7%, transparent 8%),
+        linear-gradient(180deg, var(--wall), var(--wall-deep));
+      transform: skewY(-4deg);
+    }
+    .building-arcade.open .art-sign {
+      background: #3c315f;
+      color: #fff3a6;
+    }
+    .town-detail {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid rgba(49,91,145,.18);
+      border-left: 6px solid #4f78b9;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f7fbff, #fffdf4);
+      box-shadow: inset 0 -4px 0 rgba(49,91,145,.06);
+    }
+    .town-detail b {
+      display: block;
+      color: #254a78;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .town-detail span,
+    .town-detail small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .town-detail small {
+      color: #31513d;
+      font-weight: 900;
+    }
+    .town-detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .town-detail-actions button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #d9c59e;
+      background: #fff8dc;
+      color: #6b4f21;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .town-detail-actions button.primary {
+      border-color: #4f78b9;
+      background: #eaf5ff;
+      color: #254a78;
+    }
+    .town-detail-actions button:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+    @media (max-width: 560px) {
+      .town { min-height: 500px; }
+      .building { --w: 60px; --h: 72px; }
+      .building.special { --w: 70px; --h: 82px; }
+      .building span { font-size: 10px; }
+      .building small { font-size: 8px; }
     }
     .town-workshop {
       margin-top: 12px;
@@ -6974,12 +8332,26 @@
       box-shadow: inset 0 -10px 0 rgba(255,255,255,.22), 0 3px 0 rgba(80,90,100,.12);
     }
     .home-window::after {
-      display: none;
+      content: "";
+      position: absolute;
+      inset: 0;
+      display: block;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) 48px 36px / 22px 5px no-repeat,
+        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) 50px 41px / 17px 14px no-repeat,
+        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) 63px 32px / 4px 8px no-repeat;
+      opacity: .72;
+      pointer-events: none;
     }
     .home-window.time-moon::after {
-      width: 12px;
-      height: 12px;
-      box-shadow: var(--home-window-orb-shadow, 0 0 10px rgba(255,248,216,.8));
+      background:
+        radial-gradient(circle at 55px 48px, rgba(255,244,174,.94) 0 1.7px, transparent 2.5px),
+        radial-gradient(circle at 62px 48px, rgba(255,235,137,.9) 0 1.5px, transparent 2.3px),
+        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) 48px 36px / 22px 5px no-repeat,
+        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) 50px 41px / 17px 14px no-repeat,
+        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) 63px 32px / 4px 8px no-repeat;
+      opacity: .9;
     }
     .home-door {
       position: absolute;
@@ -7129,7 +8501,7 @@
     }
     .home-seat.companion .home-companion-flat[class*="sprout-"],
     .home-seat.companion .home-companion-flat[class*="young-"] {
-      transform: translateY(15px) scale(.96, .86);
+      transform: translateY(3px) scale(.96, .86);
     }
     .home-seat.companion .home-companion-art,
     .home-seat.companion .home-companion-art * {
@@ -7159,7 +8531,7 @@
     .home-seat-name {
       position: absolute;
       left: 50%;
-      bottom: -18px;
+      bottom: -21px;
       transform: translateX(-50%);
       border-radius: 999px;
       background: rgba(255,255,255,.9);
@@ -8592,6 +9964,9 @@
       .companion-home-head { display: block; }
       .companion-home-state { display: inline-block; margin-top: 4px; }
       .home-window { left: 7px; width: 64px; }
+      .home-medal-shelf { right: 7px; top: 8px; width: 106px; height: 58px; padding: 7px 7px 8px; gap: 2px 4px; }
+      .home-medal-place .cup-medal { transform: translateY(1px) scale(.74); }
+      .home-medal-empty { width: 15px; height: 15px; }
       .home-door { right: 16px; }
       .home-talk { left: calc(50% + 27px); top: 9px; }
       .home-talk-line { font-size: 12.5px; padding: 5px 9px; }
@@ -9607,10 +10982,11 @@
       <h2>町の発展</h2>
       <p>散歩で素材を集め、町では自分で建物を作ります。集めた素材を使って、ひとつずつ形にしていきます。</p>
       <div class="town" id="townView"></div>
+      <div class="town-detail" id="townBuildingDetail"></div>
       <div class="town-workshop" id="townWorkshop"></div>
       <div class="town-shop" id="townShop">
-        <b>小さな店</b>
-        <span>小さな店を素材で建てると、育成アイテムを少し選んで買えるようになります。</span>
+        <b>アイテムショップ</b>
+        <span>アイテムショップを素材で建てると、育成アイテムを少し選んで買えるようになります。</span>
         <div class="shop-grid">
           <div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>日替わりで3つの道具が並びます。</span><small>木の素材2 / 鉄の素材1 / 灯りの素材1</small></div></div>
         </div>
@@ -9723,7 +11099,7 @@
         <ul>
           <li>歩くタブ: ホーム、成果ボード、マップ、投稿テンプレ補助の流れを見る。</li>
           <li>育成・大会タブ: イマソラ認識、タネ、相棒、大会、図鑑を見る。</li>
-          <li>町・記録タブ: 町の建物、小さな店、素材ストック、スタンプを見る。</li>
+          <li>町・記録タブ: 町の建物、アイテムショップ、素材ストック、スタンプを見る。</li>
           <li>規約・設定タブ: 安全ルール、利用規約、プライバシー、画面階層案を見る。</li>
           <li>最後に判断: 大人が毎日開きたくなるか、イマソラが主役に感じるか、削るべきものがあるかをメモする。</li>
         </ul>
@@ -10041,7 +11417,7 @@
           <li>探索: イマソラ認識、空の気配、マップイベント。</li>
           <li>育成: 散歩モンスター、能力、技、イマソラ認識。</li>
           <li>大会: 参加、大会結果、メダル、グランドチャンピオン杯。</li>
-          <li>町: 建物、小さな店、素材ストック、自宅でできる確認メニュー。</li>
+          <li>町: 建物、アイテムショップ、素材ストック、自宅でできる確認メニュー。</li>
           <li>図鑑: モンスター図鑑、進化ツリー、スタンプ、アイテム。</li>
           <li>設定: 利用規約、プライバシーポリシー、安全ガイド、サウンド、データ削除、問い合わせ。</li>
         </ul>
@@ -10107,24 +11483,46 @@ const events = [
   { type: "boss", title: "坂道の番人", text: "きつい道を越えた。大きな報酬を獲得。", coin: 18 }
 ];
 const buildings = [
-  ["bench", "B", "ベンチ", 1, "休憩場所が増える"],
-  ["shop", "S", "小さな店", 3, "育成アイテムの置き場が増える"],
-  ["fountain", "F", "噴水", 6, "町の景色が少しにぎやかになる"],
-  ["tower", "T", "見晴台", 10, "空を見上げる場所が増える"],
-  ["garden", "G", "花壇", 15, "自然寄りの育成が楽しくなる"],
-  ["guild", "Q", "案内板", 22, "町の建物づくりを見渡しやすくなる"],
-  ["station", "M", "駅前", 30, "遠回り散歩の立ち寄り先になる"],
-  ["castle", "C", "城門", 42, "町の大きな目印になる"]
+  ["bench", "休", "ベンチ", 1, "休憩場所が増える", "normal", "街の入口に置く小さな休憩場所。"],
+  ["garden", "花", "花壇", 2, "街にやわらかい彩りが増える", "normal", "散歩で集めた草の素材を活かす花壇。"],
+  ["streetlight", "灯", "街灯通り", 3, "夜の街が少し明るくなる", "normal", "灯りの素材で道沿いを照らす場所。"],
+  ["fountain", "水", "噴水", 4, "町の景色がにぎやかになる", "normal", "土と雲の素材で作る小さな噴水。"],
+  ["tower", "空", "空見の丘", 5, "空を見上げる場所が増える", "normal", "空見台で集めた雲の素材を活かす丘。"],
+  ["bridge", "橋", "小さな橋", 6, "街の地図に道のつながりが増える", "normal", "木と鉄で作る小さな橋。"],
+  ["warehouse", "倉", "素材倉庫", 7, "素材を見渡しやすくなる", "normal", "街づくり素材を確認しやすくする倉庫。"],
+  ["plaza", "広", "小さな広場", 8, "建物の中心になる場所ができる", "normal", "相棒と街の空気を感じる広場。"],
+  ["clock", "時", "時計台", 9, "街の目印が増える", "normal", "鉄と灯りの素材で作る目印。"],
+  ["shop", "店", "アイテムショップ", 10, "育成アイテムの置き場が増える", "normal", "日替わりの道具を買える店。"],
+  ["guild", "案", "案内板", 11, "町の建物づくりを見渡しやすくなる", "normal", "建設できる場所を整理する案内板。"],
+  ["station", "駅", "駅前", 12, "遠回り散歩の立ち寄り先になる", "normal", "街の奥へ向かう気分を作る駅前。"],
+  ["castle", "門", "城門", 13, "街の大きな目印になる", "normal", "街の奥に立つ大きな目印。"],
+  ["medalHall", "賞", "メダル記念館", 20, "大会メダルを振り返る特別施設", "special", "大会メダル、優勝記録、表彰式の思い出をまとめる候補。"],
+  ["dojo", "技", "技の道場", 21, "技演出を確認する特別施設", "special", "系統別の弱技・中技・強技を確認する候補。"],
+  ["soundShop", "音", "音源ショップ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
+  ["bookstore", "本", "本屋", 23, "世界観やヒントを読む特別施設", "special", "おしゃべり、攻略ヒント、世界観メモを置く候補。"],
+  ["retirePark", "縁", "引退相棒の広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
+  ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"]
 ];
 const townBuildingCosts = {
   bench: { "木の素材": 8, "草の素材": 6 },
-  shop: { "木の素材": 18, "鉄の素材": 10, "灯りの素材": 8 },
+  garden: { "草の素材": 14, "土の素材": 8 },
+  streetlight: { "灯りの素材": 12, "鉄の素材": 8 },
   fountain: { "土の素材": 16, "雲の素材": 8 },
-  tower: { "鉄の素材": 18, "雲の素材": 14 },
-  garden: { "草の素材": 24, "土の素材": 16 },
+  tower: { "雲の素材": 18, "木の素材": 10 },
+  bridge: { "木の素材": 18, "鉄の素材": 12 },
+  warehouse: { "木の素材": 22, "土の素材": 14, "鉄の素材": 8 },
+  plaza: { "草の素材": 22, "土の素材": 20, "灯りの素材": 8 },
+  clock: { "鉄の素材": 24, "灯りの素材": 18 },
+  shop: { "木の素材": 18, "鉄の素材": 10, "灯りの素材": 8 },
   guild: { "木の素材": 28, "灯りの素材": 18, "鉄の素材": 16 },
   station: { "鉄の素材": 36, "木の素材": 24, "土の素材": 20 },
-  castle: { "鉄の素材": 60, "灯りの素材": 36, "雲の素材": 32 }
+  castle: { "鉄の素材": 42, "灯りの素材": 26, "雲の素材": 18 },
+  medalHall: { "鉄の素材": 44, "灯りの素材": 34, "木の素材": 24 },
+  dojo: { "鉄の素材": 40, "土の素材": 32, "灯りの素材": 24 },
+  soundShop: { "灯りの素材": 46, "鉄の素材": 32, "雲の素材": 24 },
+  bookstore: { "木の素材": 44, "草の素材": 30, "灯りの素材": 20 },
+  retirePark: { "草の素材": 48, "木の素材": 38, "雲の素材": 32 },
+  arcade: { "鉄の素材": 58, "灯りの素材": 46, "雲の素材": 32 }
 };
 const stampCatalog = [
   ["家", "出発"], ["森", "森道"], ["道", "街道"], ["台", "空見台"],
@@ -10141,6 +11539,7 @@ let selectedCup = "rookie";
 let pendingTournamentStrategyCupId = "";
 let selectedDexStage = "";
 let selectedItemGuideTab = "inventory";
+let selectedTownBuildingId = "";
 let guildSupportConfirmOpen = false;
 let guildRequestAcceptConfirmId = "";
 let monsterDexGroups = [];
@@ -10571,13 +11970,13 @@ const battleHitSfxFileKeys = {
     strong: ["customSolarSpotlight", "flashCandidate6", "explosionCandidate3"]
   },
   "yura-wobble-orbit": {
-    weak: ["customYuraShort"],
+    weak: ["fantasize8_1"],
     medium: ["customYuraShort", "fantasize8_2"],
     strong: ["customYuraShort", "fantasize8_2", "impactCandidate6"]
   },
   "yura-phantom-lanterns": {
     weak: ["customYuraShort"],
-    medium: ["customYuraShort", "customMirrorLong"],
+    medium: ["customMirrorLong", "impactCandidate9"],
     strong: ["customYuraShort", "customMirrorLong", "fantasize4_2"]
   },
   "yura-mirror-maze": {
@@ -10592,7 +11991,7 @@ const battleHitSfxFileKeys = {
   },
   "leaf-forest-crest": {
     weak: ["magicSparkle13_5"],
-    medium: ["magicSparkle13_5", "customBloomPhrase"],
+    medium: ["magicSparkle13_5", "customSproutWhistle"],
     strong: ["magicSparkle13_5", "customBloomPhrase", "impactCandidate1"]
   },
   "leaf-vine-bloom": {
@@ -10748,16 +12147,16 @@ const moveBook = [
   { id: "sky", name: "星巡りミラージュ", tier: "strong", power: 1.85, acc: 76 }
 ];
 const supportItems = [
-  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとに相棒経験値 +2", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび成長を少し増やす。", use: "dailyWalkXp" },
-  { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "今日一日のイマソラ認識ごとにCoin +5", text: "遠回りの楽しみを作る小さなおやつ。今日の散歩前に使うと、空を認識するたびコインが少し増える。", use: "dailyWalkCoin" },
-  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "相棒経験値 +3", text: "相棒が少し育つタネ。能力を一気に伸ばさない安全な育成用。", use: "xp" },
-  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "相棒経験値 +1 / 引退まで +12時間", text: "ゆっくり休める毛布。手間を増やさず、気持ちよく次へ向かう。延命アイテムは最大5回まで。", use: "rest" },
-  { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +4", text: "自然ルートへ少し寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
-  { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +4", text: "空ルートへ少し寄せる。すばやさ特化だけが最強にならないよう控えめ。", use: "sky" },
-  { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを少し整える。", use: "river" },
-  { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +10", text: "試合前に気持ちを整えるラムネ。散歩で集めた準備が試合にしっかり効く大会用。", use: "battleAcc" },
-  { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +10", text: "装備を整えるテープ。散歩で集めた準備が受けるダメージを抑える大会用。", use: "battleDef" },
-  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。散歩で集めた準備が先手の流れを作る大会用。", use: "battleSpd" }
+  { id: "walk-shoes", name: "軽足シューズ", type: "散歩", mark: "足", color: "#66c7a3", sub: "今日一日のイマソラ認識ごとに相棒経験値 +3", text: "歩き出したくなる軽い靴。今日の散歩前に使うと、空を認識するたび相棒経験値が+3増える。", use: "dailyWalkXp" },
+  { id: "map-snack", name: "よりみちビスケット", type: "散歩", mark: "道", color: "#d9a21e", sub: "今日一日のイマソラ認識ごとにCoin +5", text: "遠回りの楽しみを作る小さなおやつ。今日の散歩前に使うと、空を認識するたびコインが増える。", use: "dailyWalkCoin" },
+  { id: "growth-seed", name: "成長のタネ", type: "育成", mark: "芽", color: "#7fb069", sub: "相棒経験値 +2", text: "相棒が育つタネ。使うと相棒経験値が+2増える。", use: "xp" },
+  { id: "nap-blanket", name: "ひだまり毛布", type: "育成", mark: "休", color: "#f0b887", sub: "相棒経験値 +1 / 引退まで +12時間", text: "ゆっくり休める毛布。引退延期アイテムであるひだまりの毛布の使用は、モンスターごとに最大5回まで。", use: "rest" },
+  { id: "leaf-compass", name: "緑のコンパス", type: "進化", mark: "葉", color: "#6fbf7b", sub: "自然 +4", text: "自然ルートへ寄せる。固定分岐ではなく、成長傾向の微調整。", use: "nature" },
+  { id: "sky-feather", name: "空羽のしるし", type: "進化", mark: "羽", color: "#7db7ff", sub: "空 +4", text: "空ルートへ寄せる。成長傾向の微調整。", use: "sky" },
+  { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを整える。", use: "river" },
+  { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +10", text: "試合前に気持ちを整えるラムネ。試合にしっかり効く大会用。", use: "battleAcc" },
+  { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +10", text: "装備を整えるテープ。受けるダメージを抑える大会用。", use: "battleDef" },
+  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。先手の流れを作る大会用。", use: "battleSpd" }
 ];
 const evolutionPlan = [
   { stage: "タネ期", count: 7, branch: "7つのタネから始まる", tone: "小さく不思議。どれを育てるか選ぶ入口。" },
@@ -10779,7 +12178,7 @@ const playtestSteps = [
   { id: "result", title: "成果確認", text: "今日の成果ボードと冒険ログに結果が残るか見る" },
   { id: "boost", title: "大会テスト状態", text: "規約・設定で大会テスト状態にして、開花期以降の戦闘確認へ進む" },
   { id: "battle", title: "大会と能力値", text: "育成・大会で大会、10回模擬戦、能力値の意味、MPの手応えを見る" },
-  { id: "town", title: "町・記録確認", text: "町の建物、小さな店、素材ストック、スタンプを見る" },
+  { id: "town", title: "町・記録確認", text: "町の建物、アイテムショップ、素材ストック、スタンプを見る" },
   { id: "safety", title: "安全設計確認", text: "歩行中操作なし、停止後認識、自宅確認中心の見え方を見る" },
   { id: "memo", title: "メモ保存", text: "手応えと気づいたことをプレイテスト記録欄に保存する" }
 ];
@@ -10995,7 +12394,7 @@ const homeTalkTemplateSets = [
         "メバンフワナ、メバンブレイブ、メバンセイバーの順に見るよ。"
       ],
       [
-        "その次はリオードフワナ、リオードブレイブ、リオードセイバーだね。",
+        "その次はロードフワナ、ロードブレイブ、ロードセイバーだね。",
         "最後はまたメバンフワナへ戻る輪っか構成で相性があるよ。"
       ],
       [
@@ -32079,7 +33478,7 @@ function defaultState() {
   return {
     position: 0,
     coin: 0,
-    monster: { seedId: "seed-walk", nickname: "ミチリオードフワナ", xp: 35, nature: 4, city: 3, sky: 12, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now() - 73 * 60 * 60 * 1000, evolutionStage: 3, lifeExtensionUses: 0, grandQualified: false, skills: ["tap"] },
+    monster: { seedId: "seed-walk", nickname: "ミチロードフワナ", xp: 35, nature: 4, city: 3, sky: 12, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now() - 73 * 60 * 60 * 1000, evolutionStage: 3, lifeExtensionUses: 0, grandQualified: false, medals: [], skills: ["tap"] },
     walkSession: { active: false, startedAt: 0, stepChecked: false, stopped: false, skyVerified: false, stepCount: 0, blocked: false },
     skySummons: [],
     skyStock: { seeds: {}, materials: {} },
@@ -32143,7 +33542,23 @@ function saveState() {
 function escapeAttr(value) {
   return String(value).replace(/[&"<']/g, char => ({ "&": "&amp;", "\"": "&quot;", "<": "&lt;", "'": "&#39;" }[char]));
 }
+function normalizeOfficialMonsterNames(value, seen = new WeakSet()) {
+  const oldNamePart = "リオ" + "ード";
+  const newNamePart = "ロード";
+  if (!value || typeof value !== "object") return value;
+  if (seen.has(value)) return value;
+  seen.add(value);
+  Object.keys(value).forEach(key => {
+    if (typeof value[key] === "string") {
+      value[key] = value[key].replaceAll(oldNamePart, newNamePart);
+    } else if (value[key] && typeof value[key] === "object") {
+      normalizeOfficialMonsterNames(value[key], seen);
+    }
+  });
+  return value;
+}
 function normalizeState() {
+  normalizeOfficialMonsterNames(state);
   state.stamps = Array.isArray(state.stamps) ? state.stamps : [];
   state.monster = state.monster && typeof state.monster === "object" ? state.monster : { xp: 0, nature: 0, city: 0, sky: 0, wins: 0, skills: ["tap"] };
   const validSeedIds = ["seed-walk", "seed-sky", "seed-leaf", "seed-city", "seed-river", "seed-night", "seed-luck", "seed-white"];
@@ -32161,9 +33576,13 @@ function normalizeState() {
     state.monster.evolutionStage = state.monster.xp < 6 ? 0 : state.monster.xp < 16 ? 1 : state.monster.xp < 35 ? 2 : state.monster.xp < 65 ? 3 : 4;
   }
   state.monster.evolutionStage = Math.max(0, Math.min(4, Number(state.monster.evolutionStage || 0)));
-  if (state.monster.evolutionStage <= 2 && state.monster.nickname === "ミチリオードフワナ") state.monster.nickname = "";
+  if (state.monster.evolutionStage <= 2 && state.monster.nickname === "ミチロードフワナ") state.monster.nickname = "";
   state.monster.lifeExtensionUses = Math.max(0, Math.min(5, Number(state.monster.lifeExtensionUses || 0)));
   state.monster.grandQualified = Boolean(state.monster.grandQualified);
+  const validCupIds = ["rookie", "green", "city", "sky", "river", "grand"];
+  state.monster.medals = Array.isArray(state.monster.medals)
+    ? [...new Set(state.monster.medals)].filter(id => validCupIds.includes(id))
+    : [...new Set(Array.isArray(state.cups) ? state.cups : [])].filter(id => validCupIds.includes(id));
   state.monster.skills = Array.isArray(state.monster.skills) && state.monster.skills.length ? state.monster.skills : ["tap"];
   state.monster.skills = [...new Set(state.monster.skills)].slice(-3);
   state.walkSession = state.walkSession && typeof state.walkSession === "object" ? state.walkSession : { active: false, startedAt: 0, stepChecked: false, stepCount: 0, blocked: false };
@@ -32215,6 +33634,8 @@ function normalizeState() {
   state.itemEffects.daily.walkCoin = Math.max(0, Number(state.itemEffects.daily.walkCoin || 0));
   state.itemEffects.battle = state.itemEffects.battle && typeof state.itemEffects.battle === "object" ? state.itemEffects.battle : {};
   ["acc", "def", "spd"].forEach(key => { state.itemEffects.battle[key] = Math.max(0, Number(state.itemEffects.battle[key] || 0)); });
+  state.lastImmediateItemResult = state.lastImmediateItemResult && typeof state.lastImmediateItemResult === "object" ? state.lastImmediateItemResult : null;
+  if (state.lastImmediateItemResult && state.lastImmediateItemResult.date !== todayKey()) state.lastImmediateItemResult = null;
   state.dailyItemUses = state.dailyItemUses && typeof state.dailyItemUses === "object" ? state.dailyItemUses : { date: "", used: [] };
   if (state.dailyItemUses.date !== todayKey()) state.dailyItemUses = { date: todayKey(), used: [] };
   state.dailyItemUses.used = Array.isArray(state.dailyItemUses.used) ? [...new Set(state.dailyItemUses.used)] : [];
@@ -32398,7 +33819,7 @@ function renderCompanionColorSettings() {
       <div class="companion-color-preview">${previewArt}</div>
     </div>
     <div class="mini-feature">
-      <b>手の色</b>
+      <b>手の色(新芽期と青葉期はツヤの色)</b>
       <div class="color-option-grid">${swatches("hand", companionHandColorOptions, hand)}</div>
     </div>
     <div class="mini-feature">
@@ -32798,7 +34219,7 @@ function playCitySparkSfx(tier = "weak", startDelay = 0) {
   if (!initSound() || !sound.enabled) return;
   const count = tier === "strong" ? 3 : tier === "medium" ? 2 : 1;
   for (let index = 0; index < count; index += 1) {
-    playAudioSfx(citySparkSfxFileKey, startDelay + 1.72 + index * .34, tier === "weak" ? .78 : .94);
+    playAudioSfx(citySparkSfxFileKey, startDelay + 1.52 + index * .34, tier === "weak" ? .78 : .94);
   }
 }
 function playRouteMagicSfx(tier = "weak", startDelay = 0) {
@@ -34355,7 +35776,7 @@ function retirementStillMonsterSvg(svg) {
     });
 }
 function homeGuideArtMarkup() {
-  const tokenName = "白ミチリオードセイバーレン";
+  const tokenName = "白ミチロードセイバーレン";
   const tokenId = "star-white-hero-young-seed-walk-sky-cool-b-forest";
   ensureMonsterDexGroups();
   const items = monsterDexGroups.flatMap(group => group.list || []);
@@ -34488,7 +35909,7 @@ function companionHomeConversation(profile, growth, lifeRemain) {
     ["町づくり素材は町で、育成アイテムは相棒に。役割を分けると分かりやすいね。", "家では相棒の様子とメニューを落ち着いて見られる場所にしよう。", "家の時間"]
   ];
   const index = Math.abs(new Date().getDate() + Math.round(Number(state.monster?.xp || 0)) + Math.round(Number(growth?.top?.value || 0))) % topics.length;
-  if (lifeRemain <= 0) return ["引退準備中は引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。", "引退準備"];
+  if (lifeRemain <= 0) return ["引退準備中は引退するボタンから進めるよ。", "引退延期アイテムを使うなら道具から選べるね。", "引退準備"];
   if (state.mapAwaitingSky) return ["イマソラ認識待ちのマスで止まっているね。", "安全な場所で立ち止まってから、空だけを確認しよう。", "認識待ち"];
   if (canEnterTournament()) return ["大会に出られる状態だね。大会を選んでから作戦を決めよう。", "家で落ち着いて準備してから出るのがいいね。", "大会OK"];
   return topics[index];
@@ -34521,7 +35942,7 @@ function companionHomeDialoguePairs(profile, growth, lifeRemain) {
     return {
       topic: "引退準備",
       pairs: [
-        ["引退準備中は引退するボタンから進めるよ。", "延命アイテムを使うなら道具から選べるね。"],
+        ["引退準備中は引退するボタンから進めるよ。", "引退延期アイテムを使うなら道具から選べるね。"],
         ["散歩や大会や仕事は、今は進めないんだね。", "うん。キャラも引退ボタンから見る流れだよ。"],
         ["引退したらお別れなのかな。", "お別れじゃないよ。また街で会えるからね！"],
         ["名前も姿も残るなら安心だね。", "ゲームセンターでも一緒に遊べる予定だよ。"]
@@ -34742,6 +36163,31 @@ function updateHomeWindowClock() {
   win.classList.add(view.className);
   win.setAttribute("style", view.style);
 }
+function companionMedalCupList() {
+  const order = ["rookie", "green", "city", "sky", "river", "grand"];
+  return order.map(id => tournaments.find(cup => cup.id === id)).filter(Boolean);
+}
+function companionMedalIds() {
+  const validCupIds = companionMedalCupList().map(cup => cup.id);
+  return [...new Set(Array.isArray(state.monster?.medals) ? state.monster.medals : [])].filter(id => validCupIds.includes(id));
+}
+function hasCurrentCompanionWonCup(cupId) {
+  return companionMedalIds().includes(cupId);
+}
+function hasCompleteCompanionMedalShelf() {
+  const medals = companionMedalIds();
+  return companionMedalCupList().every(cup => medals.includes(cup.id));
+}
+function homeMedalShelfHtml() {
+  const medals = companionMedalIds();
+  const completeClass = hasCompleteCompanionMedalShelf() ? " complete" : "";
+  const slots = companionMedalCupList().map(cup => {
+    const hasMedal = medals.includes(cup.id);
+    const label = `${cup.name}${hasMedal ? "獲得済み" : "未獲得"}`;
+    return `<span class="home-medal-place" aria-label="${escapeAttr(label)}">${hasMedal ? `<span class="cup-medal medal-${cup.id}" aria-hidden="true"></span>` : `<span class="home-medal-empty" aria-hidden="true"></span>`}</span>`;
+  }).join("");
+  return `<div class="home-medal-shelf${completeClass}" aria-label="今の相棒の大会メダル棚">${slots}</div>`;
+}
 function renderCompanionHome() {
   const box = document.getElementById("companionHome");
   if (!box) return;
@@ -34763,6 +36209,7 @@ function renderCompanionHome() {
   const topic = dialogue.topic;
   const windowView = homeWindowTimeView(homeWindowClockDate());
   const guildNoticeButtons = homeGuildNoticeButtons();
+  const medalShelfComplete = hasCompleteCompanionMedalShelf();
   box.innerHTML = `
     <div class="companion-home-head">
       <div>
@@ -34770,9 +36217,10 @@ function renderCompanionHome() {
       </div>
       <div class="companion-home-state">${escapeAttr(companionHomeRetirementText(name, lifeRemain))}</div>
     </div>
-    <div class="companion-room" aria-label="${name}と白ミチリオードセイバーレンの家">
+    <div class="companion-room${medalShelfComplete ? " medal-complete" : ""}" aria-label="${name}と白ミチロードセイバーレンの家">
       <div class="home-window ${windowView.className}" style="${windowView.style}" aria-hidden="true"></div>
       <div class="home-door" aria-hidden="true"></div>
+      ${homeMedalShelfHtml()}
       <div class="home-talk" aria-label="家での会話">
         <div class="home-talk-line is-waiting" data-home-talk="companion"></div>
         <div class="home-talk-line speaker-companion" data-home-talk="guide">${companionLine}</div>
@@ -34785,7 +36233,7 @@ function renderCompanionHome() {
         </div>
         <div class="home-seat guide">
           ${homeGuideArtMarkup()}
-          <span class="home-seat-name">白ミチリオードセイバーレン</span>
+          <span class="home-seat-name">白ミチロードセイバーレン</span>
         </div>
       </div>
       <div class="home-topic">話題: ${topic}</div>
@@ -35155,7 +36603,7 @@ function scrollToWalkSkyRecognition() {
   });
 }
 function mapCurrentHeroTokenArt() {
-  const tokenName = "白ミチリオードセイバーレン";
+  const tokenName = "白ミチロードセイバーレン";
   const tokenId = "star-white-hero-young-seed-walk-sky-cool-b-forest";
   if (!monsterDexGroups.length) {
     try {
@@ -35171,17 +36619,68 @@ function mapCurrentHeroTokenArt() {
   return `<span class="hero-token" aria-label="現在地: ${tokenName}"><span class="map-hero-art">${art}</span><i></i></span>`;
 }
 function renderTown() {
-  document.getElementById("townView").innerHTML = buildings.map(([id, mark, name, need, effect]) => {
+  if (!selectedTownBuildingId || !buildings.some(([id]) => id === selectedTownBuildingId)) {
+    const firstUnbuilt = buildings.find(([id]) => !isTownBuildingBuilt(id));
+    selectedTownBuildingId = (firstUnbuilt || buildings[0] || [])[0] || "";
+  }
+  const townDecor = `<i class="town-page-fold"></i><i class="town-paper-hill"></i><i class="town-paper-river"></i><i class="town-paper-sign"></i>`;
+  document.getElementById("townView").innerHTML = townDecor + buildings.map(([id, mark, name, need, effect, kind]) => {
     const built = isTownBuildingBuilt(id);
+    const selectedClass = id === selectedTownBuildingId ? " selected" : "";
+    const specialClass = kind === "special" ? " special" : "";
+    const pos = townBuildingMapPosition(id);
+    const style = `--x:${pos.x}%;--y:${pos.y}%;--r:${pos.r}deg;--z:${pos.z};${pos.w ? `--w:${pos.w}px;` : ""}${pos.h ? `--h:${pos.h}px;` : ""}`;
     return `
-    <div class="building ${built ? "open" : ""}" title="${effect}">
+    <button class="building building-${id} ${built ? "open" : "planned"}${specialClass}${selectedClass}" type="button" data-town-select="${id}" title="${effect}" style="${style}">
+      <i class="town-building-art" aria-hidden="true">
+        <i class="art-roof"></i>
+        <i class="art-body">
+          <i class="art-window w1"></i>
+          <i class="art-window w2"></i>
+          <i class="art-door"></i>
+        </i>
+        <i class="art-sign">${mark}</i>
+      </i>
       <span>${name}</span>
-      <small>${built ? effect : townBuildingCostText(id)}</small>
-    </div>
+      <small>${built ? "建設済み" : kind === "special" ? "特別施設" : "未建設"}</small>
+    </button>
   `;
   }).join("");
+  document.querySelectorAll("[data-town-select]").forEach(button => button.addEventListener("click", () => {
+    selectedTownBuildingId = button.dataset.townSelect;
+    renderTown();
+    playSfx("select");
+  }));
+  renderTownBuildingDetail();
   renderTownWorkshop();
   renderTownShop();
+}
+function townBuildingMapPosition(id) {
+  const map = {
+    bench: { x: 15, y: 69, r: -6, z: 8 },
+    garden: { x: 20, y: 39, r: 4, z: 5 },
+    streetlight: { x: 32, y: 61, r: -3, z: 9 },
+    fountain: { x: 43, y: 36, r: 5, z: 6 },
+    tower: { x: 59, y: 20, r: -4, z: 4 },
+    bridge: { x: 55, y: 67, r: 7, z: 10 },
+    warehouse: { x: 72, y: 54, r: -5, z: 8 },
+    plaza: { x: 48, y: 52, r: 1, z: 7 },
+    clock: { x: 82, y: 30, r: 4, z: 5 },
+    shop: { x: 24, y: 78, r: 3, z: 11 },
+    guild: { x: 37, y: 22, r: -7, z: 4 },
+    station: { x: 82, y: 76, r: -2, z: 11 },
+    castle: { x: 89, y: 48, r: 5, z: 8 },
+    medalHall: { x: 15, y: 18, r: -3, z: 5, w: 82, h: 88 },
+    dojo: { x: 67, y: 17, r: 4, z: 5, w: 82, h: 88 },
+    soundShop: { x: 12, y: 48, r: 5, z: 7, w: 82, h: 88 },
+    bookstore: { x: 73, y: 83, r: -5, z: 12, w: 82, h: 88 },
+    retirePark: { x: 38, y: 84, r: -4, z: 12, w: 86, h: 88 },
+    arcade: { x: 88, y: 16, r: -4, z: 5, w: 82, h: 88 }
+  };
+  return map[id] || { x: 50, y: 50, r: 0, z: 5 };
+}
+function townBuildingById(id) {
+  return buildings.find(([buildingId]) => buildingId === id) || null;
 }
 function townMaterialCount(name) {
   return Number(state.skyStock.materials?.[name] || 0);
@@ -35192,6 +36691,10 @@ function townBuildingCostEntries(id) {
 function townBuildingCostText(id) {
   const entries = townBuildingCostEntries(id);
   return entries.length ? entries.map(([name, count]) => `${name}${count}`).join(" / ") : "素材なし";
+}
+function townBuildingCostProgressText(id) {
+  const entries = townBuildingCostEntries(id);
+  return entries.length ? entries.map(([name, count]) => `${name}${townMaterialCount(name)}/${count}`).join(" / ") : "素材なし";
 }
 function canBuildTownBuilding(id) {
   return townBuildingCostEntries(id).every(([name, count]) => townMaterialCount(name) >= Number(count || 0));
@@ -35204,6 +36707,49 @@ function nextTownBuilding() {
 }
 function openedTownBuildings() {
   return buildings.filter(([id]) => isTownBuildingBuilt(id));
+}
+function renderTownBuildingDetail() {
+  const box = document.getElementById("townBuildingDetail");
+  if (!box) return;
+  const building = townBuildingById(selectedTownBuildingId) || buildings[0];
+  if (!building) {
+    box.innerHTML = `<b>建物</b><span>建物候補はまだありません。</span>`;
+    return;
+  }
+  const [id, mark, name, need, effect, kind, description] = building;
+  const built = isTownBuildingBuilt(id);
+  const canBuild = canBuildTownBuilding(id);
+  const kindText = kind === "special" ? "特別施設" : "通常建物";
+  const action = built
+    ? `<button class="primary" type="button" data-town-enter="${id}">中を見る</button>`
+    : `<button class="primary" type="button" data-town-build="${id}" ${canBuild ? "" : "disabled"}>${canBuild ? "建設する" : "素材不足"}</button>`;
+  box.innerHTML = `
+    <b>${mark} ${name}</b>
+    <span>${kindText}。${description || effect}</span>
+    <small>${built ? `建設済み: ${effect}` : `必要素材: ${townBuildingCostText(id)}`}</small>
+    <small>${built ? "この建物は街に配置されています。" : `所持素材: ${townBuildingCostProgressText(id)}`}</small>
+    <div class="town-detail-actions">
+      ${action}
+    </div>
+  `;
+  box.querySelector("[data-town-build]")?.addEventListener("click", event => buildTownBuilding(event.currentTarget.dataset.townBuild));
+  box.querySelector("[data-town-enter]")?.addEventListener("click", event => enterTownBuilding(event.currentTarget.dataset.townEnter));
+}
+function enterTownBuilding(id) {
+  const building = townBuildingById(id);
+  if (!building || !isTownBuildingBuilt(id)) {
+    playSfx("error");
+    toast("まだ建設されていません");
+    return;
+  }
+  if (id === "shop") {
+    document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+    toast("アイテムショップへ移動しました");
+    return;
+  }
+  playSfx("select");
+  toast(`${building[2]}は試作準備中です`);
 }
 function itemCost(item) {
   if (item?.id === "map-snack") return 5;
@@ -35233,12 +36779,12 @@ function renderTownShop() {
   const purchases = todayShopPurchases();
   const buyLimit = 3;
   if (!shopOpen) {
-    box.innerHTML = `<b>小さな店</b><span>小さな店を素材で建てると開きます。必要素材: ${townBuildingCostText("shop")}</span><div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>小さな店が開くと、日替わりで3つの道具が並びます。</span><small>${townBuildingCostText("shop")}</small></div></div></div>`;
+    box.innerHTML = `<b>アイテムショップ</b><span>アイテムショップを素材で建てると開きます。必要素材: ${townBuildingCostText("shop")}</span><div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>アイテムショップが開くと、日替わりで3つの道具が並びます。</span><small>${townBuildingCostText("shop")}</small></div></div></div>`;
     return;
   }
   const stock = dailyShopItems();
   box.innerHTML = `
-    <b>小さな店</b>
+    <b>アイテムショップ</b>
     <span>毎日3つだけ並ぶ道具屋です。ひだまり毛布は毎日、散歩アイテムは日替わり、進化アイテムは3日ごとの順番で並びます。買えるのは、それぞれ1日${buyLimit}個までです。</span>
     <div class="shop-grid">
       ${stock.map(item => {
@@ -35276,11 +36822,11 @@ function buyShopItem(itemId) {
     return;
   }
   state.coin -= cost;
-  state.inventory.unshift({ id: item.id, at: Date.now(), reason: "小さな店" });
+  state.inventory.unshift({ id: item.id, at: Date.now(), reason: "アイテムショップ" });
   state.inventory = state.inventory.slice(0, 40);
   state.shopPurchases.unshift({ date: todayKey(), id: item.id, cost });
   state.shopPurchases = state.shopPurchases.slice(0, 20);
-  addLog(`小さな店: ${item.name}を${cost} Coinで購入。`);
+  addLog(`アイテムショップ: ${item.name}を${cost} Coinで購入。`);
   saveState();
   renderAll();
   if (!playAudioSfx(shopPurchaseSfxFileKey, 0, .95)) playSfx("itemGet");
@@ -35291,7 +36837,7 @@ function openTownShopFromItems() {
   renderTown();
   document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
-  toast("小さな店へ移動しました");
+  toast("アイテムショップへ移動しました");
 }
 function renderTownWorkshop() {
   const opened = openedTownBuildings();
@@ -35328,7 +36874,7 @@ function renderTownWorkshop() {
       `}
     </div>
   `;
-  document.querySelectorAll("[data-town-build]").forEach(button => button.addEventListener("click", () => buildTownBuilding(button.dataset.townBuild)));
+  document.querySelectorAll("#townWorkshop [data-town-build]").forEach(button => button.addEventListener("click", () => buildTownBuilding(button.dataset.townBuild)));
 }
 function spendTownBuildingMaterials(id) {
   if (!canBuildTownBuilding(id)) return false;
@@ -35401,7 +36947,6 @@ function monsterProfile() {
 }
 function canEnterTournament() {
   if (isRetirementReady()) return false;
-  if (canBypassTournamentEntry()) return true;
   const stage = monsterProfile().stage;
   return ["開花期", "満開期"].includes(stage);
 }
@@ -35944,11 +37489,14 @@ function currentCompanionArtItem(profile, growth) {
   const allItems = monsterDexGroups.flatMap(group => group.list || []);
   const byId = id => allItems.find(item => item.id === id);
   const seedId = state.monster.seedId || "seed-walk";
-  const seedKey = seedId.replace(/^seed-/, "");
+  const artSeedId = seedId === "seed-white" ? "seed-walk" : seedId;
   const branchKey = currentCompanionBranchKey(growth);
   const stageKey = currentCompanionStageKey(profile);
   const withWhite = id => {
     if (!profile.white || !id) return id;
+    if (id.startsWith("seed-")) return "white-seed-walk";
+    if (id.startsWith("sprout-")) return `white-${id}`;
+    if (id.startsWith("young-")) return `white-${id}`;
     if (id.startsWith("hero-")) return id.replace(/^hero-/, "hero-white-");
     if (id.startsWith("star-")) return id.replace(/^star-/, "star-white-");
     return id;
@@ -35957,15 +37505,15 @@ function currentCompanionArtItem(profile, growth) {
   if (stageKey === "seed") {
     candidates.push(seedId, profile.id);
   } else if (stageKey === "sprout") {
-    candidates.push(`sprout-${seedId}`, profile.id);
+    candidates.push(`sprout-${artSeedId}`, profile.id);
   } else if (stageKey === "young") {
-    candidates.push(`young-${seedId}-${branchKey}`, `young-${seedId}-walk`, profile.id);
+    candidates.push(`young-${artSeedId}-${branchKey}`, `young-${artSeedId}-walk`, profile.id);
   } else if (stageKey === "hero") {
-    ["cute", "cool-a", "cool-b"].forEach(styleKey => candidates.push(`hero-young-${seedId}-${branchKey}-${styleKey}`));
+    ["cute", "cool-a", "cool-b"].forEach(styleKey => candidates.push(`hero-young-${artSeedId}-${branchKey}-${styleKey}`));
     candidates.push(profile.id);
   } else if (stageKey === "star") {
     ["comet", "crown", "forest"].forEach(starKey => {
-      ["cute", "cool-a", "cool-b"].forEach(styleKey => candidates.push(`star-hero-young-${seedId}-${branchKey}-${styleKey}-${starKey}`));
+      ["cute", "cool-a", "cool-b"].forEach(styleKey => candidates.push(`star-hero-young-${artSeedId}-${branchKey}-${styleKey}-${starKey}`));
     });
     candidates.push(profile.id);
   }
@@ -36045,7 +37593,7 @@ function retirementSendoffArtHtml(profile, growth) {
   return `${companionRightFacingArtHtml(profile, growth)}<div class="retirement-front-art">${retirementStillCompanionArtHtml(profile, growth)}</div>`;
 }
 function retirementGuideBackArtHtml() {
-  const tokenName = "白ミチリオードセイバーレン";
+  const tokenName = "白ミチロードセイバーレン";
   const tokenId = "star-white-hero-young-seed-walk-sky-cool-b-forest";
   ensureMonsterDexGroups();
   const items = monsterDexGroups.flatMap(group => group.list || []);
@@ -36138,6 +37686,10 @@ function availableRetirementSeeds() {
   const white = isWhiteSeedUnlocked() ? seedForms.filter(seed => seed.id === "seed-white") : [];
   return [...new Map([...stocked, ...white].map(seed => [seed.id, seed])).values()];
 }
+function retirementSeedById(seedId, gifted = false) {
+  const candidates = gifted ? standardSeedForms() : availableRetirementSeeds();
+  return candidates.find(seed => seed.id === seedId) || null;
+}
 function randomStarterSeed() {
   const seeds = standardSeedForms();
   return seeds[Math.floor(Math.random() * seeds.length)] || seedForms[0];
@@ -36179,7 +37731,7 @@ function storeRetirementRecord(record, replaceId = "") {
   state.pendingRetirementRecord = null;
 }
 function resetMonsterToSeed(seed) {
-  state.monster = { seedId: seed.id, nickname: "", xp: 0, nature: 0, city: 0, sky: 0, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now(), evolutionStage: 0, lifeExtensionUses: 0, grandQualified: false, skills: ["tap"] };
+  state.monster = { seedId: seed.id, nickname: "", xp: 0, nature: 0, city: 0, sky: 0, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now(), evolutionStage: 0, lifeExtensionUses: 0, grandQualified: false, medals: [], skills: ["tap"] };
   forceEvolutionStage(1);
   if (!state.dex.includes(seed.id)) state.dex.push(seed.id);
   const sproutId = `sprout-${seed.id}`;
@@ -36530,7 +38082,7 @@ function renderRetirementSendoff() {
           <span id="retirementSendoffWish"></span>
         </div>
         <div class="retirement-sendoff-endroll" aria-hidden="true">
-          <span>主演　${escapeAttr(name)}　　白ミチリオードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーク制作委員会の提供でお送りしました。</span>
+          <span>主演　${escapeAttr(name)}　　白ミチロードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーク制作委員会の提供でお送りしました。</span>
         </div>
       </div>
     </div>
@@ -36806,7 +38358,13 @@ function renderNextRetirementSeedChoice(record, options = {}) {
 function renderRetirementSeedConfirm(seedId, gifted = false) {
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
-  const seed = seedForms.find(item => item.id === seedId) || randomStarterSeed();
+  const seed = retirementSeedById(seedId, gifted);
+  if (!seed) {
+    playSfx("error");
+    toast("選べないタネです");
+    renderNextRetirementSeedChoice(state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord());
+    return;
+  }
   const record = state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord();
   state.pendingRetirementRecord = record;
   setRetirementRecovery("seed-confirm", record);
@@ -36836,20 +38394,27 @@ function renderRetirementSeedConfirm(seedId, gifted = false) {
   bindRetirementCeremonyActions(box);
 }
 function selectNextRetirementSeed(seedId, gifted = false) {
-  const seed = seedForms.find(item => item.id === seedId) || randomStarterSeed();
+  const seed = retirementSeedById(seedId, gifted);
+  if (!seed) {
+    playSfx("error");
+    toast("選べないタネです");
+    renderNextRetirementSeedChoice(state.pendingRetirementRecord || activeRetirementRecovery()?.record || createRetirementRecord());
+    return;
+  }
   completeRetirementWithSeed(seed, gifted);
 }
 function renderNewSeedSproutCeremony(seed, gifted = false, options = {}) {
   if (!options.fromRecovery) switchScreen("retirement");
   const box = document.getElementById("retirementCeremony");
   if (!box) return;
+  const actualSeed = seedForms.find(item => item.id === state.monster.seedId) || seed;
   const profile = monsterProfile();
   const growth = growthForecast();
   box.innerHTML = `
     <div class="retirement-ceremony-hero retirement-sprout-result">
       <div class="retirement-ceremony-copy">
         <h2>新芽期へ進化</h2>
-        <p>${gifted ? "プレゼントされた" : "選んだ"}${seed.name}が、進化工程どおりに新芽期へ進化しました。ここから新しい散歩が始まります。</p>
+        <p>${gifted ? "プレゼントされた" : "選んだ"}${actualSeed.name}が、進化工程どおりに新芽期へ進化しました。ここから新しい散歩が始まります。</p>
       </div>
       <div class="retirement-ceremony-stage">
         <div class="retirement-ceremony-art">${companionArtHtml(profile, growth)}</div>
@@ -37546,7 +39111,7 @@ function galleryTurnaroundArt(item) {
   return `<svg class="unique-monster turnaround-monster" viewBox="0 0 116 116" aria-hidden="true">${colorSettings ? applyCompanionSvgColors(walkMotion(finalDisplayedLayers), colorSettings) : walkMotion(finalDisplayedLayers)}</svg>`;
 }
 function uniqueMonsterSvg(item, centeredTurnaround = false, colorSettings = null) {
-  const isStar = item.id.startsWith("star-");
+  const isStar = item.id.startsWith("star-") || item.id.startsWith("star-white-");
   const baseId = item.sourceId || item.id.replace(/^star-hero-/, "").replace(/-(comet|crown|forest)$/, "");
   const archetypes = ["dragon", "turtle", "bird", "golem", "whale", "moth", "fox", "runner", "ray", "deer", "tower", "shell", "blade", "sprite"];
   const order = ["seed-walk-walk", "seed-walk-sky", "seed-sky-walk", "seed-sky-sky", "seed-leaf-walk", "seed-leaf-sky", "seed-city-walk", "seed-city-sky", "seed-river-walk", "seed-river-sky", "seed-night-walk", "seed-night-sky", "seed-luck-walk", "seed-luck-sky"];
@@ -37891,7 +39456,7 @@ function renderCharacterGallery() {
   ];
   const youngBranches = [
     { key: "walk", label: "歩き好き", form: "trail", tail: "メバン", tone: "可愛い。散歩の入口に立つ" },
-    { key: "sky", label: "空好き", form: "skykid", tail: "リオード", tone: "可愛い。空を見る楽しさを持つ" }
+    { key: "sky", label: "空好き", form: "skykid", tail: "ロード", tone: "可愛い。空を見る楽しさを持つ" }
   ];
   const heroBranches = [
     { key: "cute", label: "可愛い進化", tail: "フワナ", tone: "青葉期の可愛さを残して育った開花" },
@@ -38150,7 +39715,7 @@ function renderMonster() {
   const skillBook = battleMoveBookForActor(state.monster);
   const skillNames = [skillBook.weak, skillBook.medium, skillBook.strong].filter(Boolean).join(" / ");
   const lifeRemain = retirementRemainingHours();
-  const lifeText = `${retirementTimeText(lifeRemain)} / 延命 ${state.monster.lifeExtensionUses || 0}/5回 / 満開期条件 ${canEvolveToStar() ? "OK" : "延命3回以上"}`;
+  const lifeText = `${retirementTimeText(lifeRemain)} / 引退延期 ${state.monster.lifeExtensionUses || 0}/5回 / 満開期条件 ${canEvolveToStar() ? "OK" : "引退延期3回以上"}`;
   const growth = growthForecast();
   const displayName = companionDisplayName(profile);
   renderSeedChoice(profile);
@@ -38330,7 +39895,7 @@ function ensureMonsterDexGroups() {
   characterGalleryRendered = true;
 }
 function battleDirectionArtFromItem(item, view, fallbackForm, whiteClass = "", colorSettings = null) {
-  const isUnique = item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-"));
+  const isUnique = item?.id && (item.id.startsWith("hero-") || item.id.startsWith("star-") || item.id.startsWith("hero-white-") || item.id.startsWith("star-white-"));
   if (isUnique && view !== "front") {
     return `<span class="battle-unique-art battle-turnaround-art">${turnaroundMonsterSvg(item, view, colorSettings)}</span>`;
   }
@@ -38565,12 +40130,13 @@ function renderTournament() {
   const retirementReady = isRetirementReady();
   document.getElementById("tournamentBoard").innerHTML = tournaments.map(cup => {
     const isMajor = fourMajorCupIds().includes(cup.id);
+    const companionWon = hasCurrentCompanionWonCup(cup.id);
     const majorLocked = !playtestBypass && isMajor && majorTickets <= 0;
     const grandLocked = !playtestBypass && cup.id === "grand" && (!clearedFour || state.grandEntryUsed);
-    const locked = retirementReady || majorLocked || grandLocked;
+    const locked = retirementReady || companionWon || majorLocked || grandLocked;
     const clear = state.cups.includes(cup.id);
     const entered = state.pendingBattle && state.pendingBattle.cupId === cup.id;
-    const accessText = retirementReady ? "引退準備中は出場不可" : playtestBypass ? "" : cup.id === "rookie" ? "自由参加" : isMajor ? `四大大会参加券 ${majorTickets}枚` : state.grandEntryUsed ? "出場済み" : `四大杯 ${clearedFourMajorCount()}/4制覇`;
+    const accessText = retirementReady ? "引退準備中は出場不可" : companionWon ? "今の相棒は優勝済み" : playtestBypass ? "" : cup.id === "rookie" ? "自由参加" : isMajor ? `四大大会参加券 ${majorTickets}枚` : state.grandEntryUsed ? "出場済み" : `四大杯 ${clearedFourMajorCount()}/4制覇`;
     const cupDetails = [
       accessText,
       `最大${cup.matchCount || 2}試合`,
@@ -38636,9 +40202,12 @@ function renderEntryStatus() {
   const retirementReady = isRetirementReady();
   const majorLocked = !playtestBypass && isMajor && fourMajorTicketCount() <= 0;
   const grandUsed = !playtestBypass && selected.id === "grand" && state.grandEntryUsed;
+  const companionWon = hasCurrentCompanionWonCup(selected.id);
   const unavailableText = retirementReady
     ? "引退準備中は、はじまり杯を含む全ての大会に出場できません。町へ残る準備を優先します。"
-    : !canEnterTournament()
+    : companionWon
+      ? "今の相棒はこの大会で優勝済みです。同じ相棒では同じ大会にもう一度出場できません。引退後、次の相棒ではまた出場できます。"
+  : !canEnterTournament()
     ? "タネ期・新芽期・青葉期は大会に参加できません。開花期から大会へ進めます。"
     : !playtestBypass && selected.id === "grand" && !clearedFour
       ? "グランドチャンピオン杯は四大杯4つ全てを制覇すると、1回限り出場できます。"
@@ -38750,7 +40319,7 @@ function enterTournament() {
     toast("引退準備中は大会に出場できません");
     return;
   }
-  if (!playtestBypass && !canEnterTournament()) {
+  if (!canEnterTournament()) {
     playSfx("error");
     toast("タネ期・新芽期・青葉期は戦闘なし");
     return;
@@ -38806,8 +40375,13 @@ function directionDesignItem(profile, useProfileName = true) {
   const mapped = map[profile.id];
   const displayId = id => {
     if (!profile.white || !id) return id;
-    if (id.startsWith("hero-")) return id.replace(/^hero-/, "hero-white-");
-    if (id.startsWith("star-")) return id.replace(/^star-/, "star-white-");
+    const branch = profile.id === "sky" || profile.id === "starsky" || id.includes("-sky-") ? "sky" : "walk";
+    const style = id.includes("-cool-a") ? "cool-a" : id.includes("-cool-b") ? "cool-b" : "cute";
+    if (id.startsWith("hero-")) return `hero-white-young-seed-walk-${branch}-${style}`;
+    if (id.startsWith("star-")) {
+      const starKey = id.endsWith("-crown") ? "crown" : id.endsWith("-forest") ? "forest" : "comet";
+      return `star-white-hero-young-seed-walk-${branch}-${style}-${starKey}`;
+    }
     return id;
   };
   const directId = displayId(profile.id);
@@ -39033,7 +40607,7 @@ function useSupportItem(itemId) {
   const item = supportItems.find(entry => entry.id === itemId);
   if (isRetirementReady() && !isRetirementExtensionItem(item)) {
     playSfx("error");
-    toast("引退準備中は延命アイテムだけ使えます");
+    toast("引退準備中は引退延期アイテムだけ使えます");
     return;
   }
   if (isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id)) {
@@ -39050,26 +40624,61 @@ function useSupportItem(itemId) {
   ensureDailyItemState();
   state.itemEffects.battle = state.itemEffects.battle || {};
   let message = item.sub;
-  if (item.use === "dailyWalkXp") state.itemEffects.daily.walkXp += 2;
+  let immediateResult = "";
+  if (item.use === "dailyWalkXp") state.itemEffects.daily.walkXp += 3;
   if (item.use === "dailyWalkCoin") state.itemEffects.daily.walkCoin += 5;
   if (item.use === "nextWalkXp") state.itemEffects.walkXp += 2;
   if (item.use === "nextWalkReward") state.itemEffects.walkCoin += 6;
-  if (item.use === "xp") state.monster.xp += 3;
+  if (item.use === "xp") {
+    state.monster.xp += 2;
+    immediateResult = `${item.name}: 相棒経験値 +2`;
+  }
   if (item.use === "rest") {
     state.monster.xp += 1;
-    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。相棒経験値 +1のみ反映";
+    if (extendRetirementByItem()) {
+      immediateResult = `${item.name}: 相棒経験値 +1 / 引退まで +12時間`;
+    } else {
+      message = "引退延期アイテムは最大5回までです。相棒経験値 +1のみ反映";
+      immediateResult = `${item.name}: 相棒経験値 +1`;
+    }
   }
-  if (item.use === "nature") state.monster.nature += 4;
-  if (item.use === "city") state.monster.city += 2;
-  if (item.use === "sky") state.monster.sky += 4;
-  if (item.use === "river") { state.monster.nature += 2; state.monster.sky += 2; }
+  if (item.use === "nature") {
+    state.monster.nature += 4;
+    immediateResult = `${item.name}: 自然 +4`;
+  }
+  if (item.use === "city") {
+    state.monster.city += 2;
+    immediateResult = `${item.name}: 街 +2`;
+  }
+  if (item.use === "sky") {
+    state.monster.sky += 4;
+    immediateResult = `${item.name}: 空 +4`;
+  }
+  if (item.use === "river") {
+    state.monster.nature += 2;
+    state.monster.sky += 2;
+    immediateResult = `${item.name}: 自然 +2 / 空 +2`;
+  }
   if (item.use === "battleAcc") state.itemEffects.battle.acc = (state.itemEffects.battle.acc || 0) + 10;
   if (item.use === "battleDef") state.itemEffects.battle.def = (state.itemEffects.battle.def || 0) + 10;
   if (item.use === "battleSpd") state.itemEffects.battle.spd = (state.itemEffects.battle.spd || 0) + 10;
   if (item.use === "memory") {
-    if (!extendRetirementByItem()) message = "延命アイテムは最大5回までです。";
+    if (extendRetirementByItem()) {
+      immediateResult = `${item.name}: 引退まで +12時間`;
+    } else {
+      message = "引退延期アイテムは最大5回までです。";
+    }
   }
-  if (item.use === "life" && !extendRetirementByItem()) message = "延命アイテムは最大5回までです。";
+  if (item.use === "life") {
+    if (extendRetirementByItem()) {
+      immediateResult = `${item.name}: 引退まで +12時間`;
+    } else {
+      message = "引退延期アイテムは最大5回までです。";
+    }
+  }
+  if (immediateResult) {
+    state.lastImmediateItemResult = { date: todayKey(), text: immediateResult, at: Date.now() };
+  }
   if (isDailyLimitedItem(item)) markDailyItemUsed(item.id);
   markSideQuestDone("item-use");
   addLog(`アイテム使用: ${item.name}。${message}`);
@@ -39093,7 +40702,24 @@ function renderItemGuide() {
   const categories = ["散歩", "育成", "進化", "大会", "引退"];
   const totalOwned = state.inventory.length;
   const pendingNotes = pendingItemEffectText();
+  const immediateResultText = state.lastImmediateItemResult?.date === todayKey() ? String(state.lastImmediateItemResult.text || "") : "";
   const tab = selectedItemGuideTab === "dex" ? "dex" : "inventory";
+  const itemDescriptionHtml = text => {
+    const chars = Array.from(String(text || ""));
+    const lines = [];
+    let line = "";
+    chars.forEach(char => {
+      line += char;
+      if (char === "。" || char === "、" || Array.from(line).length >= 26) {
+        lines.push(escapeAttr(line));
+        line = "";
+      }
+    });
+    if (line) {
+      lines.push(escapeAttr(line));
+    }
+    return lines.join("<br>");
+  };
   const itemEntryHtml = (item, mode) => {
     const count = counts[item.id] || 0;
     const owned = count > 0;
@@ -39102,15 +40728,21 @@ function renderItemGuide() {
     const usedToday = isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id);
     const canUse = mode === "inventory" && owned && !blockedByRetirement && !usedToday;
     const status = blockedByRetirement && owned ? "引退準備中は使用×" : usedToday && owned ? `今日は使用済み / x${count}` : owned ? `x${count}` : "未所持";
+    const itemText = item.id === "nap-blanket"
+      ? `ゆっくり休める毛布。引退延期アイテムであるひだまりの毛布の使用は、モンスターごとに最大5回まで(${state.monster.lifeExtensionUses || 0}/5)。`
+      : item.text;
     return `<div class="item-entry ${canUse ? "" : "locked"}" style="--item-color:${color}">
       ${itemArt(item, true)}
       <div class="item-info">
         <b>${item.name}</b>
-        <span>${item.text}</span>
+        <span>${itemDescriptionHtml(itemText)}</span>
         <em class="item-effect">${item.sub}</em>
-        <small>${status}</small>
+        <div class="item-entry-actions">
+          <i class="item-count-label">所持数</i>
+          <small>${status}</small>
+          ${mode === "inventory" ? `<button class="item-use-btn" type="button" data-item-use="${item.id}" ${canUse ? "" : "disabled"}>${blockedByRetirement && owned ? "×" : usedToday && owned ? "済" : "使う"}</button>` : `<button class="item-use-btn" type="button" disabled>${owned ? "所持中" : "未所持"}</button>`}
+        </div>
       </div>
-      ${mode === "inventory" ? `<button class="item-use-btn" type="button" data-item-use="${item.id}" ${canUse ? "" : "disabled"}>${blockedByRetirement && owned ? "×" : usedToday && owned ? "済" : "使う"}</button>` : `<button class="item-use-btn" type="button" disabled>${owned ? "所持中" : "未所持"}</button>`}
     </div>`;
   };
   const categoryHtml = categories.map(type => {
@@ -39121,7 +40753,7 @@ function renderItemGuide() {
     return `<div class="item-category">
       <div class="item-category-title">
         <b>${type}アイテム</b>
-        <span>${categoryCopy[type]} / 入手 ${ownedKinds}/${categoryItems.length}</span>
+        ${tab === "inventory" ? "" : `<span>${categoryCopy[type]} / 入手 ${ownedKinds}/${categoryItems.length}</span>`}
       </div>
       <div class="item-list">
         ${visibleItems.map(item => itemEntryHtml(item, tab)).join("")}
@@ -39138,9 +40770,10 @@ function renderItemGuide() {
       <button class="item-guide-tab ${tab === "dex" ? "active" : ""}" type="button" data-item-tab="dex">道具図鑑</button>
     </div>
     <div class="actions">
-      <button class="secondary" type="button" id="openTownShopFromItemsBtn">小さな店へ行く</button>
+      <button class="secondary" type="button" id="openTownShopFromItemsBtn">アイテムショップへ行く</button>
     </div>
-    ${pendingNotes.length ? `<div class="item-effect-panel">予約中: ${pendingNotes.join(" / ")}</div>` : ""}
+    ${pendingNotes.length ? `<div class="item-effect-panel">アイテム効果予約中: ${pendingNotes.join(" / ")}<small>即時反映アイテムはここには表示されません。</small></div>` : ""}
+    ${immediateResultText ? `<div class="item-immediate-panel">直前の即時反映: ${escapeAttr(immediateResultText)}</div>` : ""}
     ${categoryHtml || `<div class="item-empty">持っている道具はまだありません。散歩やイマソラ認識、町の店などで道具を入手すると、ここに表示されます。</div>`}
   `;
   document.getElementById("openTownShopFromItemsBtn")?.addEventListener("click", openTownShopFromItems);
@@ -39501,6 +41134,16 @@ function setPlaytestOutsideHoursHome() {
   playSfx("select");
   toast("時間外ホーム画面を表示します");
 }
+function setPlaytestCompleteMedalShelfHome() {
+  state.monster.medals = ["rookie", "green", "city", "sky", "river", "grand"];
+  addLog("開発用テスト補助で、今の相棒の大会メダル棚を6つ揃った状態にした。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("reward");
+  toast("メダル6つのホーム演出を表示します");
+}
 function openPlaytestGuildSupportReady() {
   const today = todayKey();
   state.guildSupport = null;
@@ -39563,6 +41206,7 @@ function renderPlaytestBoost() {
   const profile = monsterProfile();
   const canBattle = canEnterTournament();
   const shopOpen = isTownBuildingBuilt("shop");
+  const builtTownCount = openedTownBuildings().length;
   const itemTotal = state.inventory.length;
   const pendingCup = state.pendingBattle ? tournaments.find(item => item.id === state.pendingBattle.cupId) : null;
   const tournamentBypass = isTournamentPlaytestBypass();
@@ -39576,7 +41220,8 @@ function renderPlaytestBoost() {
       <div class="playtest-boost-chip"><strong>${state.monster.xp}</strong><small>現在の相棒経験値</small></div>
       <div class="playtest-boost-chip"><strong>${canBattle ? "OK" : "準備前"}</strong><small>大会テスト</small></div>
       <div class="playtest-boost-chip"><strong>${itemTotal}</strong><small>所持アイテム</small></div>
-      <div class="playtest-boost-chip"><strong>${shopOpen ? "開店" : "準備前"}</strong><small>小さな店</small></div>
+      <div class="playtest-boost-chip"><strong>${shopOpen ? "開店" : "準備前"}</strong><small>アイテムショップ</small></div>
+      <div class="playtest-boost-chip"><strong>${builtTownCount}/${buildings.length}</strong><small>街の建物</small></div>
       <div class="playtest-boost-chip"><strong>${pendingCup ? pendingCup.name : "なし"}</strong><small>参加</small></div>
       <div class="playtest-boost-chip"><strong>${tournamentBypass ? "ON" : "OFF"}</strong><small>大会確認モード</small></div>
       <div class="playtest-boost-chip"><strong>${mapTimeMode}</strong><small>25マップ表示</small></div>
@@ -39586,13 +41231,16 @@ function renderPlaytestBoost() {
       <button class="secondary" id="playtestGrowingMonsterBtn" type="button">通常育成中テスト状態にする</button>
       <button class="secondary" id="playtestInsideHoursHomeBtn" type="button">時間内ホームを開く</button>
       <button class="secondary" id="playtestOutsideHoursHomeBtn" type="button">時間外ホームを開く</button>
+      <button class="secondary" id="playtestCompleteMedalShelfHomeBtn" type="button">メダル6つホームを開く</button>
       <button class="secondary" id="playtestMapOpenBtn" type="button">時間内25マップを開く</button>
       <button class="secondary" id="playtestMapRealTimeBtn" type="button">25マップを実時間に戻す</button>
       <button class="secondary" id="playtestGuildSupportReadyBtn" type="button">協力支援依頼テストを開く</button>
       <button class="secondary" id="playtestGuildSupportRewardFlowBtn" type="button">協力支援報酬テストを開く</button>
       <button class="secondary" id="playtestBattleReadyBtn" type="button">大会テスト状態にする</button>
+      <button class="secondary" id="playtestWhiteBattleReadyBtn" type="button">白モンスター大会確認を開く</button>
       <button class="secondary" id="playtestItemSetBtn" type="button">アイテム確認セットを入れる</button>
-      <button class="secondary" id="playtestShopOpenBtn" type="button">小さな店を開ける</button>
+      <button class="secondary" id="playtestShopOpenBtn" type="button">アイテムショップを開ける</button>
+      <button class="secondary" id="playtestAllTownBuildingsBtn" type="button">全建造物の街を開く</button>
       <button class="secondary" id="playtestTournamentBypassBtn" type="button">${tournamentBypass ? "大会確認モードをOFF" : "大会確認モードをON"}</button>
       <button class="secondary" id="playtestRetirementReadyBtn" type="button">引退式テスト状態へ戻す</button>
       <button class="secondary" id="playtestRetirementStorageFullBtn" type="button">保存枠満タンの引退の日を開く</button>
@@ -39606,13 +41254,16 @@ function renderPlaytestBoost() {
   document.getElementById("playtestGrowingMonsterBtn")?.addEventListener("click", setPlaytestGrowingMonster);
   document.getElementById("playtestInsideHoursHomeBtn")?.addEventListener("click", setPlaytestInsideHoursHome);
   document.getElementById("playtestOutsideHoursHomeBtn")?.addEventListener("click", setPlaytestOutsideHoursHome);
+  document.getElementById("playtestCompleteMedalShelfHomeBtn")?.addEventListener("click", setPlaytestCompleteMedalShelfHome);
   document.getElementById("playtestMapOpenBtn")?.addEventListener("click", () => setPlaytestMapTimeMode("open"));
   document.getElementById("playtestMapRealTimeBtn")?.addEventListener("click", () => setPlaytestMapTimeMode(""));
   document.getElementById("playtestGuildSupportReadyBtn")?.addEventListener("click", openPlaytestGuildSupportReady);
   document.getElementById("playtestGuildSupportRewardFlowBtn")?.addEventListener("click", openPlaytestGuildSupportRewardFlow);
   document.getElementById("playtestBattleReadyBtn")?.addEventListener("click", setPlaytestBattleReady);
+  document.getElementById("playtestWhiteBattleReadyBtn")?.addEventListener("click", setPlaytestWhiteBattleReady);
   document.getElementById("playtestItemSetBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
+  document.getElementById("playtestAllTownBuildingsBtn")?.addEventListener("click", openPlaytestAllTownBuildings);
   document.getElementById("playtestTournamentBypassBtn")?.addEventListener("click", toggleTournamentPlaytestBypass);
   document.getElementById("playtestRetirementReadyBtn")?.addEventListener("click", setRetirementCeremonyPlaytestReady);
   document.getElementById("playtestRetirementStorageFullBtn")?.addEventListener("click", openRetirementStorageFullSendoffPlaytest);
@@ -39653,6 +41304,50 @@ function setPlaytestBattleReady() {
   playSfx("reward");
   toast("大会テスト状態にしました。大会選択へ移動します");
 }
+function setPlaytestWhiteBattleReady() {
+  state.monster = {
+    seedId: "seed-white",
+    nickname: "",
+    xp: 35,
+    nature: 4,
+    city: 3,
+    sky: 12,
+    wins: 0,
+    age: 0,
+    lifeBonus: 0,
+    bornAt: Date.now() - 36 * 60 * 60 * 1000,
+    evolutionStage: 3,
+    lifeExtensionUses: 0,
+    grandQualified: false,
+    medals: [],
+    skills: ["tap", "step", "gust"]
+  };
+  state.whiteSeedUnlocked = true;
+  state.playtestTournamentBypass = true;
+  state.pendingRetirementRecord = null;
+  state.retirementRecovery = null;
+  state.pendingBattle = null;
+  pendingBattleAnimation = null;
+  pendingBattleResultHtml = "";
+  pendingBattleReward = null;
+  pendingBattleResultSfx = "";
+  pendingBattleResultHomeAction = false;
+  pendingBattleLogMessages = [];
+  clearBattleAnimationTimer();
+  clearBattleAdTimer();
+  stopBattleResultBgm();
+  ["seed-white", "white-seed-walk", "white-sprout-seed-walk", "white-young-seed-walk-sky", "hero-white-young-seed-walk-sky-cute"].forEach(id => {
+    if (!state.dex.includes(id)) state.dex.push(id);
+  });
+  selectedCup = selectedCup || "rookie";
+  addLog("開発用テスト補助で、白モンスターの大会確認用状態へ調整。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("monster");
+  document.getElementById("tournamentBoard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("reward");
+  toast("白モンスターの大会確認状態にしました");
+}
 function setPlaytestGrowingMonster() {
   state.monster = {
     seedId: "seed-walk",
@@ -39668,6 +41363,7 @@ function setPlaytestGrowingMonster() {
     evolutionStage: 1,
     lifeExtensionUses: 0,
     grandQualified: false,
+    medals: [],
     skills: ["tap"]
   };
   state.pendingRetirementRecord = null;
@@ -39688,7 +41384,7 @@ function setPlaytestGrowingMonster() {
 function setRetirementCeremonyPlaytestReady() {
   state.monster = {
     seedId: "seed-walk",
-    nickname: "ミチリオードフワナ",
+    nickname: "ミチロードフワナ",
     xp: 35,
     nature: 4,
     city: 3,
@@ -39700,6 +41396,7 @@ function setRetirementCeremonyPlaytestReady() {
     evolutionStage: 3,
     lifeExtensionUses: 0,
     grandQualified: false,
+    medals: [],
     skills: ["tap"]
   };
   state.pendingRetirementRecord = null;
@@ -39707,7 +41404,7 @@ function setRetirementCeremonyPlaytestReady() {
   if (!state.dex.includes("seed-walk")) state.dex.push("seed-walk");
   if (!state.dex.includes("sky")) state.dex.push("sky");
   selectedDexStage = "満開期";
-  addLog("開発用テスト補助で、ミチリオードフワナを引退式確認状態へ戻した。正式版の引退後進行では使わない補助です。");
+  addLog("開発用テスト補助で、ミチロードフワナを引退式確認状態へ戻した。正式版の引退後進行では使わない補助です。");
   saveState();
   renderAll();
   switchScreen("walk");
@@ -39751,7 +41448,7 @@ function openRetirementNoSeedChoicePlaytest() {
 function openRetirementStorageFullSendoffPlaytest() {
   state.monster = {
     seedId: "seed-walk",
-    nickname: "ミチリオードフワナ",
+    nickname: "ミチロードフワナ",
     xp: 35,
     nature: 4,
     city: 3,
@@ -39763,6 +41460,7 @@ function openRetirementStorageFullSendoffPlaytest() {
     evolutionStage: 3,
     lifeExtensionUses: 0,
     grandQualified: false,
+    medals: [],
     skills: ["tap"]
   };
   const limit = retirementStorageLimit();
@@ -39811,15 +41509,36 @@ function grantPlaytestItemSet() {
 function openPlaytestShop() {
   if (!state.townBuildings.includes("shop")) state.townBuildings.push("shop");
   state.coin = Math.max(state.coin, 60);
-  addLog("開発用テスト補助で小さな店を建築済み状態に調整。");
+  addLog("開発用テスト補助でアイテムショップを建築済み状態に調整。");
   saveState();
   renderAll();
   switchScreen("town");
   document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("reward");
-  toast("小さな店を確認できる状態にしました");
+  toast("アイテムショップを確認できる状態にしました");
+}
+function openPlaytestAllTownBuildings() {
+  state.townBuildings = buildings.map(([id]) => id);
+  selectedTownBuildingId = "shop";
+  addLog("開発用テスト補助で、街の全建造物を建設済み状態に調整。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("town");
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("reward");
+  toast("全建造物の街を確認できます");
 }
 function preparePlaytestTournamentEntry(cupId = selectedCup) {
+  if (!canEnterTournament()) {
+    playSfx("error");
+    toast("開花期から大会確認できます");
+    addLog("開発用テスト補助: タネ期・新芽期・青葉期のため大会確認を止めました。");
+    saveState();
+    renderAll();
+    switchScreen("monster");
+    document.getElementById("entryStatus")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
   if (!isTournamentPlaytestBypass()) setPlaytestBattleReady();
   const cup = tournaments.find(item => item.id === cupId) || tournaments.find(item => item.id === "green") || tournaments[1] || tournaments[0];
   selectedCup = cup.id;
@@ -40215,17 +41934,17 @@ const battleLineageAffinityLabels = {
   mebanFuwana: "メバンフワナ系",
   mebanBrave: "メバンブレイブ系",
   mebanSaber: "メバンセイバー系",
-  rioFuwana: "リオードフワナ系",
-  rioBrave: "リオードブレイブ系",
-  rioSaber: "リオードセイバー系"
+  rioFuwana: "ロードフワナ系",
+  rioBrave: "ロードブレイブ系",
+  rioSaber: "ロードセイバー系"
 };
 const battleLineageAffinityWords = {
   mebanFuwana: "メバンフワナ",
   mebanBrave: "メバンブレイブ",
   mebanSaber: "メバンセイバー",
-  rioFuwana: "リオードフワナ",
-  rioBrave: "リオードブレイブ",
-  rioSaber: "リオードセイバー"
+  rioFuwana: "ロードフワナ",
+  rioBrave: "ロードブレイブ",
+  rioSaber: "ロードセイバー"
 };
 const battleLineageAffinityWins = {
   mebanFuwana: "mebanBrave",
@@ -40936,6 +42655,20 @@ function scheduleHpNumberCountdown(selector, fromValue, toValue, delaySeconds, d
   }, Math.max(0, Math.round(delaySeconds * 1000)));
   battleHpCountTimers.push({ type: "timeout", id: timeoutId });
 }
+function scheduleBattleScreenShake(delaySeconds = 0) {
+  const timeoutId = setTimeout(() => {
+    const field = document.getElementById("battleField");
+    if (!field) return;
+    field.classList.remove("battle-screen-shake");
+    void field.offsetWidth;
+    field.classList.add("battle-screen-shake");
+    const clearId = setTimeout(() => {
+      document.getElementById("battleField")?.classList.remove("battle-screen-shake");
+    }, 520);
+    battleHpCountTimers.push({ type: "timeout", id: clearId });
+  }, Math.max(0, Math.round(delaySeconds * 1000)));
+  battleHpCountTimers.push({ type: "timeout", id: timeoutId });
+}
 function playBattleAnimationStep(index) {
   if (!pendingBattleAnimation) return;
   clearBattleHpCountTimers();
@@ -41088,6 +42821,7 @@ function playBattleAnimationStep(index) {
     const hpDrainDelay = magicStartDelay + (visualBaseType === "route" ? 6.03 : 3.35);
     const hitSfxType = visualBaseType === "custom" ? visualType : visualBaseType;
     playBattleHitSfx(scene.tier, hitSfxDelay, hitSfxType, magicStartDelay);
+    if (scene.tier === "strong") scheduleBattleScreenShake(hitSfxDelay);
     playHpDrainSfx(drainBefore, drainAfter, hpDrainDelay);
     if (scene.target === "me") {
       scheduleHpNumberCountdown("#myFighter .hp-number", myHpBeforeValue, myHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
@@ -41307,13 +43041,19 @@ function showTournamentParticipationPrompt(cupId = selectedCup) {
 function tournamentEntryBlockMessage(cup, playtestBypass = isTournamentPlaytestBypass()) {
   const clearedFour = hasGrandQualification();
   const isMajor = fourMajorCupIds().includes(cup.id);
+  if (hasCurrentCompanionWonCup(cup.id)) {
+    return {
+      message: "今の相棒はこの大会で優勝済みです。同じ相棒では同じ大会にもう一度出場できません。引退後、次の相棒ではまた出場できます。",
+      toast: "この相棒は優勝済みです"
+    };
+  }
   if (isRetirementReady()) {
     return {
       message: "引退準備中は、はじまり杯を含む全ての大会に出場できません。町へ残る準備を優先します。",
       toast: "引退準備中は大会に出場できません"
     };
   }
-  if (!playtestBypass && !canEnterTournament()) {
+  if (!canEnterTournament()) {
     return {
       message: "タネ期・新芽期・青葉期は大会に参加できません。開花期または満開期になると大会へ進めます。",
       toast: "まだ大会に参加できません"
@@ -41481,7 +43221,7 @@ function battle() {
     toast("引退準備中は大会に出場できません");
     return;
   }
-  if (!playtestBypass && !canEnterTournament()) {
+  if (!canEnterTournament()) {
     playSfx("error");
     toast("タネ期・新芽期・青葉期は戦闘なし");
     return;
@@ -41489,6 +43229,11 @@ function battle() {
   if (!playtestBypass && cup.id === "grand" && !clearedFour) {
     playSfx("error");
     toast("四大杯4つ制覇で解放");
+    return;
+  }
+  if (!playtestBypass && hasCurrentCompanionWonCup(cup.id)) {
+    playSfx("error");
+    toast("この相棒は優勝済みです");
     return;
   }
   const strategy = state.pendingBattle.strategy || state.battleStrategy || "balanced";
@@ -41563,6 +43308,8 @@ function battle() {
     state.monster.wins += 1;
     state.coin += cup.reward;
     if (!state.cups.includes(cup.id)) state.cups.push(cup.id);
+    state.monster.medals = Array.isArray(state.monster.medals) ? state.monster.medals : [];
+    if (!state.monster.medals.includes(cup.id)) state.monster.medals.push(cup.id);
     const openedWhiteSeed = cup.id === "grand" ? unlockWhiteSeedReward() : false;
     if (fourMajorCupIds().includes(cup.id) && hasGrandQualification() && !state.grandUnlockBonusGiven) {
       state.monster.grandQualified = true;
@@ -41767,6 +43514,7 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
+
 
 
 
