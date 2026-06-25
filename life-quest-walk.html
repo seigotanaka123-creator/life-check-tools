@@ -1399,29 +1399,34 @@
     }
     .town {
       position: relative;
-      min-height: 520px;
+      min-height: 0;
+      aspect-ratio: 3 / 2;
       margin-top: 12px;
-      padding: 14px;
+      padding: 0;
       border: 1px solid rgba(55, 77, 60, .22);
       border-radius: 12px;
       overflow: hidden;
       perspective: 760px;
       background:
-        linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(255,255,255,.14) 1px, transparent 1px),
-        radial-gradient(circle at 18% 74%, #79b86b 0 10%, transparent 11%),
-        radial-gradient(circle at 78% 24%, #7bb7c9 0 8%, transparent 9%),
-        linear-gradient(135deg, #7ea56c 0%, #91bd79 34%, #b7c69a 35%, #9db57c 100%);
-      background-size: 34px 34px, 34px 34px, auto, auto, auto;
+        url("assets/town-layered-prebuild-v1.png") center / cover no-repeat,
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.62) 0 8%, transparent 9%),
+        linear-gradient(135deg, #cde9ff 0 18%, transparent 19%),
+        linear-gradient(45deg, #9bd777 0 22%, #78c96b 23% 48%, #b4df80 49% 68%, #82c96f 69% 100%);
       box-shadow:
-        inset 0 0 0 8px rgba(255,255,255,.2),
-        inset 0 -12px 0 rgba(42, 72, 49, .12),
+        inset 0 0 0 1px rgba(255,255,255,.22),
         0 7px 0 rgba(60, 85, 52, .16),
         0 18px 24px rgba(44, 57, 39, .18);
       transform-style: preserve-3d;
     }
+    .town.town-developed {
+      background-image:
+        url("assets/town-layered-prebuild-v1.png"),
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.62) 0 8%, transparent 9%),
+        linear-gradient(135deg, #cde9ff 0 18%, transparent 19%),
+        linear-gradient(45deg, #9bd777 0 22%, #78c96b 23% 48%, #b4df80 49% 68%, #82c96f 69% 100%);
+    }
     .town::before {
-      content: "";
+      content: none;
       position: absolute;
       left: -6%;
       top: 46%;
@@ -1439,7 +1444,7 @@
       opacity: .96;
     }
     .town::after {
-      content: "";
+      content: none;
       position: absolute;
       left: 43%;
       top: -8%;
@@ -1455,6 +1460,72 @@
         8px 0 0 #d8d2c2,
         16px 0 0 rgba(40, 50, 45, .16);
       opacity: .94;
+    }
+    .town::before,
+    .town::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      left: 0;
+      top: 0;
+      width: auto;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      pointer-events: none;
+      transform: none;
+      clip-path: none;
+    }
+    .town::before {
+      z-index: 18;
+      background: var(--town-scene-tint, transparent);
+      box-shadow: var(--town-scene-shadow, none);
+      opacity: var(--town-scene-tint-opacity, 1);
+      mix-blend-mode: multiply;
+    }
+    .town::after {
+      z-index: 19;
+      background:
+        radial-gradient(circle at 30% 22%, rgba(255, 228, 138, .9) 0 1.2%, rgba(255, 196, 86, .36) 1.3% 3.4%, transparent 3.6%),
+        radial-gradient(circle at 51% 32%, rgba(255, 221, 132, .92) 0 1.4%, rgba(255, 178, 82, .34) 1.5% 4.4%, transparent 4.6%),
+        radial-gradient(circle at 73% 36%, rgba(255, 231, 152, .88) 0 1.2%, rgba(255, 187, 76, .32) 1.3% 3.8%, transparent 4%),
+        radial-gradient(circle at 39% 47%, rgba(145, 220, 255, .72) 0 1%, rgba(92, 178, 255, .22) 1.2% 3.8%, transparent 4%),
+        radial-gradient(circle at 61% 50%, rgba(255, 224, 138, .92) 0 1%, rgba(255, 186, 80, .34) 1.2% 3.8%, transparent 4%),
+        radial-gradient(circle at 83% 63%, rgba(255, 227, 142, .86) 0 1%, rgba(255, 186, 80, .28) 1.2% 3.8%, transparent 4%),
+        radial-gradient(circle at 26% 70%, rgba(255, 222, 138, .82) 0 1%, rgba(255, 186, 80, .24) 1.2% 3.6%, transparent 3.8%);
+      opacity: var(--town-scene-light-opacity, 0);
+      mix-blend-mode: screen;
+      filter: blur(.2px);
+    }
+    .town-scene-morning {
+      --town-scene-tint:
+        linear-gradient(135deg, rgba(255, 225, 164, .34), transparent 44%),
+        linear-gradient(180deg, rgba(255, 249, 226, .18), rgba(255, 255, 255, 0) 62%);
+      --town-scene-shadow: inset 0 0 34px rgba(255, 244, 205, .16);
+      --town-scene-light-opacity: .08;
+    }
+    .town-scene-day {
+      --town-scene-tint:
+        linear-gradient(180deg, rgba(255, 255, 255, .08), transparent 52%);
+      --town-scene-shadow: inset 0 0 26px rgba(255, 255, 255, .08);
+      --town-scene-light-opacity: 0;
+    }
+    .town-scene-evening {
+      --town-scene-tint:
+        linear-gradient(135deg, rgba(255, 170, 92, .3), transparent 46%),
+        linear-gradient(180deg, rgba(106, 71, 126, .12), rgba(37, 45, 78, .18));
+      --town-scene-shadow: inset 0 0 42px rgba(109, 56, 80, .2);
+      --town-scene-light-opacity: 0;
+    }
+    .town-scene-night {
+      --town-scene-tint:
+        linear-gradient(180deg, rgba(14, 25, 64, .44), rgba(10, 19, 48, .54)),
+        radial-gradient(circle at 82% 12%, rgba(111, 145, 255, .18), transparent 28%);
+      --town-scene-shadow: inset 0 0 50px rgba(5, 12, 32, .5);
+      --town-scene-light-opacity: 0;
+    }
+    .town-scene-night::before {
+      z-index: 11;
     }
     .town-page-fold,
     .town-paper-hill,
@@ -6936,7 +7007,6 @@
     .building-tower.open { --wall:#e9f3ff; --wall-deep:#9fbde4; --roof:#b9d4ff; --roof-deep:#638ac6; }
     .building-bridge.open { --wall:#e6c18f; --wall-deep:#9c6b3c; --roof:#c99356; --roof-deep:#7b4e2a; }
     .building-warehouse.open { --wall:#ead7b5; --wall-deep:#b08b5a; --roof:#a77b45; --roof-deep:#6f4c2c; }
-    .building-plaza.open { --wall:#fff0c6; --wall-deep:#dfb86a; --roof:#f3d27c; --roof-deep:#c79430; }
     .building-clock.open { --wall:#f7f1dc; --wall-deep:#bfae82; --roof:#83b7d9; --roof-deep:#3e7897; }
     .building-shop.open { --wall:#ffe3b8; --wall-deep:#d69352; --roof:#ff9f8c; --roof-deep:#bd5a48; }
     .building-guild.open { --wall:#e5f4d4; --wall-deep:#9ab979; --roof:#d9b56f; --roof-deep:#9a6b28; }
@@ -6965,8 +7035,7 @@
     .building-fountain.open {
       border-radius: 999px 999px 14px 14px;
     }
-    .building-fountain.open b,
-    .building-plaza.open b {
+    .building-fountain.open b {
       border-radius: 999px;
     }
     .building-clock.open::before,
@@ -7544,23 +7613,6 @@
     .building-warehouse.open .art-sign {
       display: none;
     }
-    .building-plaza.open .art-roof {
-      left: 17%;
-      top: 38%;
-      width: 66%;
-      height: 36px;
-      border-radius: 10px;
-      background:
-        linear-gradient(45deg, rgba(255,255,255,.38) 25%, transparent 26% 74%, rgba(255,255,255,.38) 75%),
-        linear-gradient(180deg, #f3d27c, #c79430);
-      transform: rotate(1deg);
-    }
-    .building-plaza.open .art-body,
-    .building-plaza.open .art-window,
-    .building-plaza.open .art-door,
-    .building-plaza.open .art-sign {
-      display: none;
-    }
     .building-clock.open .art-roof {
       left: 35%;
       top: 5%;
@@ -7781,6 +7833,664 @@
       background: #3c315f;
       color: #fff3a6;
     }
+    .town .town-page-fold,
+    .town .town-paper-hill,
+    .town .town-paper-river,
+    .town .town-paper-sign {
+      display: none;
+    }
+    .town-map-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .town-map-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .town-map-svg text {
+      font-family: inherit;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .town-base-layer { z-index: 1; }
+    .town-vacant-layer {
+      z-index: 7;
+      pointer-events: auto;
+    }
+    .town-building-layer { z-index: 12; }
+    .town-road {
+      position: absolute;
+      left: var(--road-x);
+      top: var(--road-y);
+      width: var(--road-w);
+      height: var(--road-h);
+      border: solid rgba(247, 245, 223, .86);
+      border-width: 2px 0;
+      background:
+        linear-gradient(90deg, transparent 0 9%, rgba(255,255,255,.58) 10% 12%, transparent 13% 45%, rgba(255,255,255,.58) 46% 48%, transparent 49%),
+        linear-gradient(180deg, #899082, #687267);
+      box-shadow: 0 6px 0 rgba(43, 65, 47, .16);
+      transform: translate(-50%, -50%) rotate(var(--road-r));
+      transform-origin: center;
+    }
+    .town-river {
+      position: absolute;
+      left: 51%;
+      top: 67%;
+      width: 96%;
+      height: 16%;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 24% 45%, rgba(255,255,255,.55) 0 2px, transparent 3px),
+        radial-gradient(circle at 58% 55%, rgba(255,255,255,.45) 0 2px, transparent 3px),
+        linear-gradient(90deg, #4b9fc4, #6fc8d9 48%, #438fb8);
+      clip-path: polygon(0 45%, 18% 21%, 36% 39%, 55% 20%, 73% 44%, 100% 22%, 100% 72%, 73% 92%, 56% 70%, 36% 90%, 17% 70%, 0 92%);
+      opacity: .72;
+      transform: translate(-50%, -50%) rotate(-18deg);
+    }
+    .town-rail {
+      position: absolute;
+      left: 24%;
+      top: 28%;
+      width: 46%;
+      height: 5.2%;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 5%, rgba(72, 61, 57, .92) 5% 7%, transparent 7% 12%),
+        linear-gradient(180deg, transparent 0 32%, #5b574f 33% 43%, transparent 44% 57%, #5b574f 58% 68%, transparent 69%);
+      transform: translate(-50%, -50%) rotate(-26deg);
+      filter: drop-shadow(0 4px 0 rgba(47, 57, 45, .16));
+    }
+    .town-workshop-building {
+      position: absolute;
+      left: 69%;
+      top: 55%;
+      width: 15%;
+      height: 20%;
+      z-index: 9;
+      filter: drop-shadow(0 9px 0 rgba(33, 45, 38, .2));
+    }
+    .town-workshop-building::before {
+      content: "";
+      position: absolute;
+      left: 8%;
+      top: 32%;
+      width: 76%;
+      height: 52%;
+      background:
+        linear-gradient(90deg, transparent 0 18%, rgba(83, 99, 72, .8) 19% 28%, transparent 29% 48%, rgba(83, 99, 72, .8) 49% 58%, transparent 59%),
+        linear-gradient(180deg, #f0d59f, #be8c52);
+      transform: skewY(-24deg);
+      border: 2px solid rgba(84, 79, 56, .45);
+    }
+    .town-workshop-building::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 12%;
+      width: 92%;
+      height: 38%;
+      background: linear-gradient(180deg, #6fa7b5, #3f6f7c);
+      clip-path: polygon(18% 0, 78% 0, 100% 64%, 35% 100%, 0 60%);
+      border-radius: 4px;
+    }
+    .town-vacant-site,
+    .town-iso-building {
+      position: absolute;
+      left: var(--slot-x);
+      top: var(--slot-y);
+      width: var(--slot-w);
+      height: var(--slot-h);
+      transform: translate(-50%, -82%);
+      transform-origin: 50% 82%;
+      z-index: var(--slot-z);
+    }
+    .town-vacant-site {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      appearance: none;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .town-vacant-site::before {
+      content: "";
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 0;
+      height: 42%;
+      background:
+        radial-gradient(circle at 38% 28%, rgba(255, 246, 205, .38), transparent 34%),
+        linear-gradient(135deg, #dec284, #b9905a);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      box-shadow: inset 0 0 0 2px rgba(94, 73, 50, .24), 0 6px 0 rgba(50, 68, 45, .16);
+    }
+    .town-vacant-site::after {
+      content: "";
+      position: absolute;
+      left: 43%;
+      bottom: 28%;
+      width: 14%;
+      height: 22%;
+      border-radius: 3px 3px 1px 1px;
+      background: linear-gradient(180deg, #fff7ce, #dcae55);
+      box-shadow: 0 3px 0 rgba(77, 61, 40, .18);
+    }
+    .town-vacant-background .town-vacant-site {
+      pointer-events: none;
+      opacity: 0;
+      filter: saturate(.8);
+    }
+    .town-vacant-background .town-vacant-site::before,
+    .town-vacant-background .town-vacant-site::after {
+      content: none;
+    }
+    .town-vacant-layered .town-vacant-site::before {
+      outline: 2px solid rgba(255, 245, 178, .78);
+      outline-offset: 2px;
+      background:
+        radial-gradient(circle at 38% 28%, rgba(255, 249, 210, .42), transparent 34%),
+        linear-gradient(135deg, rgba(255, 233, 164, .92), rgba(203, 163, 83, .9));
+    }
+    .town-vacant-layered .town-vacant-site:hover::before,
+    .town-vacant-layered .town-vacant-site:focus-visible::before {
+      filter: brightness(1.08);
+      box-shadow: inset 0 0 0 2px rgba(37, 74, 120, .38), 0 7px 0 rgba(50, 68, 45, .18);
+    }
+    .town-iso-building {
+      pointer-events: none;
+      filter: drop-shadow(0 9px 0 rgba(33, 45, 38, .22));
+    }
+    .town-iso-building.has-sprite {
+      filter: drop-shadow(0 10px 5px rgba(25, 35, 29, .2));
+    }
+    .town-iso-building .facility-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .town-iso-building .base {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 0;
+      height: 30%;
+      background: linear-gradient(135deg, #d9dfc8, #aab597);
+      clip-path: polygon(50% 0, 100% 48%, 50% 100%, 0 48%);
+    }
+    .town-iso-building .body {
+      position: absolute;
+      left: 23%;
+      top: 30%;
+      width: 48%;
+      height: 44%;
+      background: linear-gradient(180deg, var(--wall, #f1d8a0), var(--wall-dark, #b88954));
+      transform: skewY(-18deg);
+      border: 2px solid rgba(72, 61, 53, .32);
+    }
+    .town-iso-building .roof {
+      position: absolute;
+      left: 16%;
+      top: 16%;
+      width: 62%;
+      height: 28%;
+      background: linear-gradient(180deg, var(--roof, #d65f55), var(--roof-dark, #913d3a));
+      clip-path: polygon(18% 0, 78% 0, 100% 60%, 36% 100%, 0 58%);
+    }
+    .town-iso-building .accent {
+      position: absolute;
+      background: var(--accent, #fff1a8);
+    }
+    .town-iso-building .sign {
+      position: absolute;
+      left: 34%;
+      top: 44%;
+      min-width: 28%;
+      padding: 2px 3px;
+      border-radius: 3px;
+      background: var(--sign-bg, #fff7cf);
+      color: var(--sign-color, #6a3b27);
+      font-size: 9px;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      transform: rotate(-7deg);
+    }
+    .town-iso-building .window {
+      position: absolute;
+      width: 10%;
+      height: 12%;
+      border-radius: 2px;
+      background: #fff7c7;
+      box-shadow: 18px 8px 0 #fff7c7, 0 22px 0 #fff7c7;
+    }
+    .town-iso-building.fountain .bowl {
+      position: absolute;
+      left: 24%;
+      top: 38%;
+      width: 52%;
+      height: 32%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 28%, #e8feff 0 12%, transparent 13%),
+        radial-gradient(ellipse at 50% 58%, #8fd4df 0 42%, #478ca4 43% 60%, transparent 61%);
+    }
+    .town-iso-building.bridge .deck {
+      position: absolute;
+      left: 8%;
+      top: 38%;
+      width: 84%;
+      height: 24%;
+      border-radius: 999px 999px 4px 4px;
+      background: repeating-linear-gradient(90deg, #b77d45 0 8px, #e0a86b 8px 14px);
+      transform: rotate(-8deg);
+      box-shadow: 0 12px 0 rgba(104, 74, 47, .32);
+    }
+    .town-iso-building.clock .tower {
+      position: absolute;
+      left: 37%;
+      top: 8%;
+      width: 28%;
+      height: 70%;
+      background: linear-gradient(180deg, #f4d88f, #b78443);
+      border: 2px solid rgba(76, 58, 41, .35);
+    }
+    .town-iso-building.clock .tower::before {
+      content: "";
+      position: absolute;
+      left: 18%;
+      top: 10%;
+      width: 64%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff8c8 0 34%, #5d4631 35% 42%, #fff8c8 43%);
+    }
+    .town-iso-building.station .rail-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8%;
+      height: 18%;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 8%, #6c4e44 8% 10%, transparent 10% 16%),
+        linear-gradient(180deg, transparent 0 35%, #4f5151 36% 48%, transparent 49% 60%, #4f5151 61% 72%, transparent 73%);
+      transform: rotate(-5deg);
+    }
+    .town-iso-building.station .train {
+      position: absolute;
+      left: 8%;
+      bottom: 21%;
+      width: 50%;
+      height: 22%;
+      border-radius: 16px 8px 8px 16px;
+      background: linear-gradient(180deg, #ffe9a6 0 38%, #4fa6b4 39% 68%, #325c75 69%);
+      transform: rotate(-5deg);
+    }
+    .town-iso-building.station .platform {
+      position: absolute;
+      left: 46%;
+      bottom: 27%;
+      width: 44%;
+      height: 14%;
+      background: #cfc6a5;
+      transform: rotate(-5deg) skewX(-18deg);
+    }
+    .town-iso-building.station .body {
+      left: 53%;
+      top: 30%;
+      width: 30%;
+      height: 34%;
+    }
+    .town-iso-building.station .roof {
+      left: 49%;
+      top: 18%;
+      width: 38%;
+    }
+    .town-iso-building.castle .gate {
+      position: absolute;
+      left: 20%;
+      top: 28%;
+      width: 60%;
+      height: 48%;
+      background: linear-gradient(180deg, #d4d4c6, #8d8f86);
+      clip-path: polygon(0 18%, 18% 18%, 18% 0, 36% 0, 36% 18%, 64% 18%, 64% 0, 82% 0, 82% 18%, 100% 18%, 100% 100%, 0 100%);
+      border: 2px solid rgba(58, 60, 53, .36);
+    }
+    .town-iso-building.castle .gate::after {
+      content: "";
+      position: absolute;
+      left: 39%;
+      bottom: 0;
+      width: 22%;
+      height: 46%;
+      border-radius: 12px 12px 0 0;
+      background: #5b4d45;
+    }
+    .town-iso-building.guild .board {
+      position: absolute;
+      left: 24%;
+      top: 26%;
+      width: 52%;
+      height: 42%;
+      border: 4px solid #8d5c35;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #fff2bd, #d7ad64);
+      transform: rotate(-7deg);
+    }
+    .town-iso-building.retirePark .plaza {
+      position: absolute;
+      left: 18%;
+      top: 26%;
+      width: 64%;
+      height: 50%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 44%, #fff7ce 0 8%, transparent 9%),
+        conic-gradient(from 45deg, #e8d7a4, #b6d68d, #e8d7a4, #9cc77e, #e8d7a4);
+      transform: rotate(-12deg);
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.44);
+    }
+    .town-iso-building.statue1 .monument,
+    .town-iso-building.statue2 .monument {
+      position: absolute;
+      left: 34%;
+      top: 20%;
+      width: 32%;
+      height: 52%;
+      background: linear-gradient(180deg, #d2a267, #7f704f);
+      clip-path: polygon(50% 0, 72% 18%, 66% 48%, 86% 72%, 64% 100%, 34% 100%, 14% 72%, 34% 48%, 28% 18%);
+    }
+    .town-iso-building.statue2 .monument {
+      background: linear-gradient(180deg, #c7d5d8, #71858a);
+    }
+    .town-built-piece {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      background: none;
+      clip-path: var(--piece-clip, inset(var(--piece-top) calc(100% - var(--piece-right)) calc(100% - var(--piece-bottom)) var(--piece-left)));
+    }
+    .town-built-asset {
+      position: absolute;
+      left: var(--piece-left);
+      top: var(--piece-top);
+      width: calc(var(--piece-right) - var(--piece-left));
+      height: calc(var(--piece-bottom) - var(--piece-top));
+      z-index: 10;
+      pointer-events: none;
+      object-fit: contain;
+    }
+    .town-layer-sprite {
+      position: absolute;
+      left: var(--sprite-x);
+      top: var(--sprite-y);
+      width: var(--sprite-w);
+      height: var(--sprite-h);
+      z-index: var(--sprite-z);
+      pointer-events: none;
+      object-fit: contain;
+      transform: rotate(var(--sprite-r, 0deg));
+      transform-origin: center center;
+      filter: drop-shadow(0 8px 5px rgba(20, 30, 24, .2));
+    }
+    .town-layer-sprite-bridgeLanding {
+      filter: none;
+    }
+    .town-scene-evening .town-layer-sprite {
+      filter: drop-shadow(0 9px 6px rgba(36, 27, 38, .28)) brightness(1.05) saturate(1.08);
+    }
+    .town-scene-evening .town-layer-sprite-bridgeLanding {
+      filter: brightness(1.03) saturate(1.04);
+    }
+    .town-scene-night .town-layer-sprite {
+      filter:
+        drop-shadow(0 0 6px rgba(255, 236, 168, .58))
+        drop-shadow(0 0 14px rgba(255, 196, 94, .34))
+        drop-shadow(0 10px 7px rgba(5, 10, 24, .34))
+        brightness(1.16)
+        saturate(1.18);
+    }
+    .town-scene-night .town-layer-sprite-bridgeLanding {
+      filter:
+        drop-shadow(0 0 5px rgba(255, 236, 168, .46))
+        drop-shadow(0 0 12px rgba(255, 196, 94, .28))
+        brightness(1.12)
+        saturate(1.14);
+    }
+    .town-night-light-object {
+      display: none;
+      position: absolute;
+      left: var(--light-x);
+      top: var(--light-y);
+      width: var(--light-w);
+      height: var(--light-h);
+      z-index: var(--light-z);
+      pointer-events: none;
+      transform: translate(-50%, -50%) rotate(var(--light-r, 0deg));
+      transform-origin: center center;
+      mix-blend-mode: screen;
+      isolation: isolate;
+    }
+    .town-scene-night .town-night-light-object {
+      display: block;
+    }
+    .town-night-light-orb {
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0 10%, rgba(255, 250, 210, .98) 11% 24%, rgba(255, 232, 133, .7) 25% 45%, rgba(255, 191, 73, .28) 46% 68%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(255, 248, 216, .46) 0 72%, transparent 74%);
+      box-shadow:
+        0 0 8px rgba(255,255,255,.88),
+        0 0 18px rgba(255, 245, 190, .78),
+        0 0 34px rgba(255, 210, 108, .52),
+        0 0 58px rgba(255, 175, 70, .25);
+      filter: saturate(1.2) brightness(1.18);
+      opacity: 1;
+    }
+    .town-night-light-window {
+      border: 1px solid rgba(255, 246, 190, .9);
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, transparent 46%, rgba(255,255,238,.78) 47% 53%, transparent 54%),
+        linear-gradient(180deg, transparent 46%, rgba(255,255,238,.72) 47% 53%, transparent 54%),
+        radial-gradient(ellipse at 50% 52%, rgba(255,255,232,1) 0 28%, rgba(255, 238, 142, .88) 29% 56%, rgba(255, 196, 91, .48) 57% 82%, transparent 84%);
+      box-shadow:
+        0 0 7px rgba(255,255,236,.9),
+        0 0 16px rgba(255, 230, 137, .72),
+        0 0 30px rgba(255, 184, 82, .42),
+        inset 0 0 8px rgba(255,255,238,.78);
+      filter: saturate(1.15) brightness(1.12);
+      opacity: 1;
+    }
+    .town-decoration-piece {
+      position: absolute;
+      left: var(--decor-x);
+      top: var(--decor-y);
+      width: var(--decor-w);
+      transform: translate(-50%, -50%) rotate(var(--decor-r, 0deg));
+      z-index: 11;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 5px rgba(25, 35, 29, .2));
+    }
+    .town-facility-name {
+      position: absolute;
+      left: var(--label-x);
+      top: var(--label-y);
+      transform: translate(-50%, 0);
+      max-width: 130px;
+      padding: 3px 7px;
+      border: 1px solid rgba(37, 74, 120, .28);
+      border-radius: 999px;
+      background: rgba(255, 253, 244, .92);
+      color: #254a78;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.15;
+      text-align: center;
+      text-shadow: 0 1px 0 rgba(255,255,255,.7);
+      box-shadow: 0 3px 0 rgba(24, 32, 30, .12), 0 8px 16px rgba(24, 32, 30, .14);
+      pointer-events: none;
+      z-index: 26;
+      white-space: normal;
+    }
+    .town-facility-name.nowrap {
+      max-width: none;
+      white-space: nowrap;
+    }
+    .town-facility-name:not(.town-facility-button) {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+    .town-facility-button {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .town-facility-button:hover,
+    .town-facility-button:focus-visible {
+      border-color: rgba(37, 74, 120, .52);
+      background: rgba(255, 253, 244, .98);
+      outline: none;
+    }
+    .town-workshop-hotspot {
+      position: absolute;
+      left: 61%;
+      top: 41%;
+      width: 18%;
+      height: 24%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      appearance: none;
+      cursor: pointer;
+      z-index: 19;
+    }
+    .town-facility-toggle {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 27;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid rgba(37, 74, 120, .28);
+      border-radius: 999px;
+      background: rgba(255, 253, 244, .94);
+      color: #254a78;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 5px 0 rgba(24, 32, 30, .14), 0 12px 18px rgba(24, 32, 30, .12);
+    }
+    .town-facility-toggle:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 rgba(24, 32, 30, .14), 0 8px 12px rgba(24, 32, 30, .1);
+    }
+    .town-dev-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .town-dev-menu button {
+      min-height: 36px;
+      padding: 8px 10px;
+      border: 1px solid rgba(49,91,145,.24);
+      border-radius: 8px;
+      background: #f7fbff;
+      color: #254a78;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .town-dev-menu button.built {
+      background: #fffdf4;
+      border-color: rgba(197, 145, 46, .36);
+      color: #735221;
+    }
+    .town-dev-card {
+      padding: 8px;
+      border: 1px solid rgba(49,91,145,.16);
+      border-radius: 10px;
+      background: rgba(255,255,255,.74);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .town-dev-card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #254a78;
+    }
+    .town-dev-offset {
+      color: #7a6a3d;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .town-dev-nudge {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .town-dev-menu .town-dev-nudge button {
+      min-height: 30px;
+      padding: 5px 6px;
+      font-size: 13px;
+      line-height: 1;
+    }
+    .town-dev-menu .town-dev-reset {
+      background: #fff8f6;
+      border-color: rgba(177, 78, 64, .24);
+      color: #8b3f32;
+    }
+    .town-dev-rotate {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .town-dev-size {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .town-dev-scene-card {
+      grid-column: 1 / -1;
+    }
+    .town-dev-light-card {
+      grid-column: 1 / -1;
+    }
+    .town-dev-scene-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .town-dev-light-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .town-dev-menu button.town-dev-scene-active {
+      background: #fff8dc;
+      border-color: rgba(197, 145, 46, .46);
+      color: #735221;
+    }
+    @media (max-width: 560px) {
+      .town-dev-scene-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
     .town-detail {
       margin-top: 12px;
       padding: 12px;
@@ -7834,9 +8544,9 @@
       cursor: default;
     }
     @media (max-width: 560px) {
-      .town { min-height: 500px; }
-      .building { --w: 60px; --h: 72px; }
-      .building.special { --w: 70px; --h: 82px; }
+      .town { min-height: 0; }
+      .building { --w: 9%; --h: 9%; }
+      .building.special { --w: 10%; --h: 10%; }
       .building span { font-size: 10px; }
       .building small { font-size: 8px; }
     }
@@ -10890,7 +11600,7 @@
   <nav class="app-nav" aria-label="イマソラウォーク menu">
     <button class="nav-tab active" type="button" data-tab="walk">歩く</button>
     <button class="nav-tab" type="button" data-tab="monster">育成・大会</button>
-    <button class="nav-tab" type="button" data-tab="town">町・記録</button>
+    <button class="nav-tab" type="button" data-tab="town">街・記録</button>
     <button class="nav-tab" type="button" data-tab="rules">規約・設定</button>
   </nav>
 
@@ -10979,9 +11689,10 @@
     </section>
 
     <section class="panel screen" data-screen="town">
-      <h2>町の発展</h2>
+      <h2>街の発展</h2>
       <p>散歩で素材を集め、町では自分で建物を作ります。集めた素材を使って、ひとつずつ形にしていきます。</p>
       <div class="town" id="townView"></div>
+      <div class="town-dev-menu" id="townDevMenu"></div>
       <div class="town-detail" id="townBuildingDetail"></div>
       <div class="town-workshop" id="townWorkshop"></div>
       <div class="town-shop" id="townShop">
@@ -11483,46 +12194,170 @@ const events = [
   { type: "boss", title: "坂道の番人", text: "きつい道を越えた。大きな報酬を獲得。", coin: 18 }
 ];
 const buildings = [
-  ["bench", "休", "ベンチ", 1, "休憩場所が増える", "normal", "街の入口に置く小さな休憩場所。"],
-  ["garden", "花", "花壇", 2, "街にやわらかい彩りが増える", "normal", "散歩で集めた草の素材を活かす花壇。"],
-  ["streetlight", "灯", "街灯通り", 3, "夜の街が少し明るくなる", "normal", "灯りの素材で道沿いを照らす場所。"],
+  ["bench", "座", "ベンチ", 2, "町に休憩場所が増える", "normal", "木の素材で作る小さな休憩場所。"],
+  ["garden", "花", "花壇", 3, "町の景色に花が増える", "normal", "草と土の素材で作る花の区画。"],
+  ["streetlight", "灯", "街灯", 4, "町の夜道に灯りが増える", "normal", "鉄と灯りの素材で作る街の明かり。"],
   ["fountain", "水", "噴水", 4, "町の景色がにぎやかになる", "normal", "土と雲の素材で作る小さな噴水。"],
-  ["tower", "空", "空見の丘", 5, "空を見上げる場所が増える", "normal", "空見台で集めた雲の素材を活かす丘。"],
-  ["bridge", "橋", "小さな橋", 6, "街の地図に道のつながりが増える", "normal", "木と鉄で作る小さな橋。"],
-  ["warehouse", "倉", "素材倉庫", 7, "素材を見渡しやすくなる", "normal", "街づくり素材を確認しやすくする倉庫。"],
-  ["plaza", "広", "小さな広場", 8, "建物の中心になる場所ができる", "normal", "相棒と街の空気を感じる広場。"],
+  ["bridge", "橋", "橋", 6, "街の地図に道のつながりが増える", "normal", "木と鉄で作る橋。"],
+  ["warehouse", "倉", "街づくり工房", 7, "素材を見渡しやすくなる", "normal", "街づくり素材を確認しやすくする倉庫。"],
   ["clock", "時", "時計台", 9, "街の目印が増える", "normal", "鉄と灯りの素材で作る目印。"],
   ["shop", "店", "アイテムショップ", 10, "育成アイテムの置き場が増える", "normal", "日替わりの道具を買える店。"],
   ["guild", "案", "案内板", 11, "町の建物づくりを見渡しやすくなる", "normal", "建設できる場所を整理する案内板。"],
-  ["station", "駅", "駅前", 12, "遠回り散歩の立ち寄り先になる", "normal", "街の奥へ向かう気分を作る駅前。"],
+  ["station", "駅", "駅前", 12, "遠回り散歩の立ち寄り先になる", "normal", "駅前にある小さな駅。"],
   ["castle", "門", "城門", 13, "街の大きな目印になる", "normal", "街の奥に立つ大きな目印。"],
-  ["medalHall", "賞", "メダル記念館", 20, "大会メダルを振り返る特別施設", "special", "大会メダル、優勝記録、表彰式の思い出をまとめる候補。"],
+  ["medalHall", "勲", "メダル記念館", 20, "大会メダルを飾る特別施設", "special", "大会で集めたメダルを並べる候補。"],
   ["dojo", "技", "技の道場", 21, "技演出を確認する特別施設", "special", "系統別の弱技・中技・強技を確認する候補。"],
   ["soundShop", "音", "音源ショップ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
   ["bookstore", "本", "本屋", 23, "世界観やヒントを読む特別施設", "special", "おしゃべり、攻略ヒント、世界観メモを置く候補。"],
-  ["retirePark", "縁", "引退相棒の広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
-  ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"]
+  ["retirePark", "縁", "広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
+  ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"],
+  ["statue1", "像", "銅像1", 26, "街の記念物になる特別施設", "special", "左側に建てる記念の銅像。"],
+  ["statue2", "像", "銅像2", 27, "街の記念物になる特別施設", "special", "右側に建てる記念の銅像。"]
 ];
+const townBuildableBuildingIds = ["fountain", "bridge", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
+const townBuildableBuildings = buildings.filter(([id]) => townBuildableBuildingIds.includes(id));
+const townFacilityNames = [
+  { id: "station", name: "駅", x: 25, y: 18 },
+  { id: "medalHall", name: "相棒記念館", x: 61, y: 20 },
+  { id: "soundShop", name: "音源ショップ", x: 76, y: 33 },
+  { id: "bookstore", name: "本屋", x: 32, y: 39 },
+  { id: "shop", name: "アイテムショップ", x: 55, y: 42 },
+  { id: "arcade", name: "ゲームセンター", x: 79, y: 48, cls: "nowrap" },
+  { id: "fountain", name: "噴水", x: 46, y: 54 },
+  { id: "statue1", name: "銅像1", x: 22, y: 55 },
+  { id: "retirePark", name: "広場", x: 34, y: 70 },
+  { id: "guild", name: "案内板", x: 59, y: 70 },
+  { id: "statue2", name: "銅像2", x: 57, y: 75 },
+  { id: "bridge", name: "橋", x: 88, y: 72 },
+  { id: "castle", name: "城門", x: 22, y: 84 },
+  { id: "clock", name: "時計台", x: 43, y: 85 },
+  { id: "warehouse", name: "街づくり工房", x: 85, y: 21, cls: "nowrap" }
+];
+const townMapSlots = {
+  station: { x: 27, y: 28, w: 30, h: 25, z: 4, theme: "station" },
+  medalHall: { x: 61, y: 27, w: 16, h: 18, z: 5, theme: "medalHall" },
+  warehouse: { x: 61, y: 27, w: 16, h: 18, z: 5, theme: "warehouse" },
+  soundShop: { x: 76, y: 43, w: 14, h: 19, z: 8, theme: "soundShop" },
+  bookstore: { x: 32, y: 47, w: 15, h: 18, z: 7, theme: "bookstore" },
+  shop: { x: 55, y: 50, w: 14, h: 20, z: 9, theme: "shop" },
+  arcade: { x: 79, y: 52, w: 15, h: 19, z: 10, theme: "arcade" },
+  fountain: { x: 46, y: 57, w: 16, h: 16, z: 12, theme: "fountain" },
+  statue1: { x: 22, y: 55, w: 15, h: 13, z: 11, theme: "statue1" },
+  retirePark: { x: 34, y: 75, w: 18, h: 18, z: 14, theme: "retirePark" },
+  guild: { x: 58, y: 73, w: 12, h: 19, z: 15, theme: "guild" },
+  statue2: { x: 57, y: 76, w: 13, h: 13, z: 16, theme: "statue2" },
+  bridge: { x: 87, y: 78, w: 16, h: 19, z: 17, theme: "bridge" },
+  castle: { x: 22, y: 83, w: 17, h: 19, z: 18, theme: "castle" },
+  clock: { x: 43, y: 85, w: 12, h: 19, z: 19, theme: "clock" }
+};
+const townFacilitySpriteReadyIds = ["warehouse", "fountain", "bridge", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
+let townFacilityNamesVisible = true;
+const townVacantMode = "background";
+const townSceneOptions = [
+  { id: "auto", label: "自動", text: "現在時刻" },
+  { id: "morning", label: "朝", text: "06:00〜" },
+  { id: "day", label: "昼", text: "09:00〜" },
+  { id: "evening", label: "夕方", text: "16:00〜" },
+  { id: "night", label: "夜", text: "19:00〜" }
+];
+let townScenePreviewMode = "auto";
+const townNightLightObjects = [
+  { id: "orb1", kind: "orb", name: "丸型発光体1", x: 88.65, y: 48.3, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb2", kind: "orb", name: "丸型発光体2", x: 91.75, y: 75.7, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb3", kind: "orb", name: "丸型発光体3", x: 75.65, y: 21.75, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb4", kind: "orb", name: "丸型発光体4", x: 72.85, y: 25.5, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb5", kind: "orb", name: "丸型発光体5", x: 65.5, y: 12.1, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb6", kind: "orb", name: "丸型発光体6", x: 54.3, y: 12.35, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb7", kind: "orb", name: "丸型発光体7", x: 45.95, y: 3.85, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb8", kind: "orb", name: "丸型発光体8", x: 20.8, y: 7.2, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb9", kind: "orb", name: "丸型発光体9", x: 14.55, y: 42.7, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb10", kind: "orb", name: "丸型発光体10", x: 26.75, y: 42.75, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb11", kind: "orb", name: "丸型発光体11", x: 48.65, y: 82.7, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb12", kind: "orb", name: "丸型発光体12", x: 48.3, y: 70.55, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb13", kind: "orb", name: "丸型発光体13", x: 52.55, y: 33.65, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb14", kind: "orb", name: "丸型発光体14", x: 65.55, y: 34.55, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb15", kind: "orb", name: "丸型発光体15", x: 45.65, y: 67.65, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb16", kind: "orb", name: "丸型発光体16", x: 36.25, y: 67.85, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb17", kind: "orb", name: "丸型発光体17", x: 33.5, y: 70.5, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb18", kind: "orb", name: "丸型発光体18", x: 27.6, y: 53.15, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb19", kind: "orb", name: "丸型発光体19", x: 36.4, y: 53.95, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb20", kind: "orb", name: "丸型発光体20", x: 43.35, y: 50.45, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb21", kind: "orb", name: "丸型発光体21", x: 49.05, y: 50.1, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb22", kind: "orb", name: "丸型発光体22", x: 37.9, y: 42.15, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb23", kind: "orb", name: "丸型発光体23", x: 54.4, y: 42.3, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb24", kind: "orb", name: "丸型発光体24", x: 40.8, y: 38.95, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb25", kind: "orb", name: "丸型発光体25", x: 51.7, y: 39.45, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb26", kind: "orb", name: "丸型発光体26", x: 61.9, y: 45.2, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb27", kind: "orb", name: "丸型発光体27", x: 28.35, y: 31.7, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb28", kind: "orb", name: "丸型発光体28", x: 39.6, y: 32.85, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb29", kind: "orb", name: "丸型発光体29", x: 7.8, y: 45.85, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb30", kind: "orb", name: "丸型発光体30", x: 6.8, y: 36.6, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb31", kind: "orb", name: "丸型発光体31", x: 14.9, y: 28.45, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb32", kind: "orb", name: "丸型発光体32", x: 40.85, y: 23.45, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb33", kind: "orb", name: "丸型発光体33", x: 54.2, y: 24.05, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb34", kind: "orb", name: "丸型発光体34", x: 86.1, y: 39.05, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "orb35", kind: "orb", name: "丸型発光体35", x: 69.7, y: 37.95, w: 1.96, h: 1.96, z: 23, r: 0 },
+  { id: "window1", kind: "window", name: "窓型発光体1", x: 27.15, y: 15.45, w: 1.1, h: 0.8, z: 24, r: 90 },
+  { id: "window2", kind: "window", name: "窓型発光体2", x: 27.95, y: 14.75, w: 1.1, h: 0.8, z: 24, r: 92 },
+  { id: "window3", kind: "window", name: "窓型発光体3", x: 26.2, y: 16.15, w: 1.1, h: 0.8, z: 24, r: 98 },
+  { id: "window4", kind: "window", name: "窓型発光体4", x: 25.15, y: 16.8, w: 1.1, h: 0.8, z: 24, r: 101 },
+  { id: "window5", kind: "window", name: "窓型発光体5", x: 22.35, y: 18.85, w: 1.1, h: 0.8, z: 24, r: 104 },
+  { id: "window6", kind: "window", name: "窓型発光体6", x: 21.3, y: 19.45, w: 1.1, h: 0.8, z: 24, r: 106 },
+  { id: "window7", kind: "window", name: "窓型発光体7", x: 20.2, y: 20.25, w: 1.1, h: 0.8, z: 24, r: 102 },
+  { id: "window8", kind: "window", name: "窓型発光体8", x: 19.2, y: 21.1, w: 1.1, h: 0.8, z: 24, r: 100 },
+  { id: "window9", kind: "window", name: "窓型発光体9", x: 16.15, y: 22.9, w: 1.1, h: 0.8, z: 24, r: 98 },
+  { id: "window10", kind: "window", name: "窓型発光体10", x: 31.7, y: 18.7, w: 1.1, h: 0.8, z: 24, r: 95 },
+  { id: "window11", kind: "window", name: "窓型発光体11", x: 30.75, y: 18.15, w: 1.1, h: 0.8, z: 24, r: 90 },
+  { id: "window12", kind: "window", name: "窓型発光体12", x: 36.7, y: 18.35, w: 2.86, h: 2.08, z: 24, r: 89 },
+  { id: "window13", kind: "window", name: "窓型発光体13", x: 37.7, y: 17.9, w: 2.86, h: 2.08, z: 24, r: 92 },
+  { id: "window14", kind: "window", name: "窓型発光体14", x: 46.4, y: 22, w: 1.54, h: 1.12, z: 24, r: 88 },
+  { id: "window15", kind: "window", name: "窓型発光体15", x: 45.25, y: 21.55, w: 1.54, h: 1.12, z: 24, r: 91 },
+  { id: "window16", kind: "window", name: "窓型発光体16", x: 44.15, y: 21.05, w: 1.54, h: 1.12, z: 24, r: 93 },
+  { id: "window17", kind: "window", name: "窓型発光体17", x: 47.95, y: 22.25, w: 1.54, h: 1.12, z: 24, r: 89 },
+  { id: "window18", kind: "window", name: "窓型発光体18", x: 49, y: 21.7, w: 1.54, h: 1.12, z: 24, r: 88 },
+  { id: "window19", kind: "window", name: "窓型発光体19", x: 50.05, y: 21.1, w: 1.54, h: 1.12, z: 24, r: 84 },
+  { id: "window20", kind: "window", name: "窓型発光体20", x: 80.65, y: 42.1, w: 1.98, h: 1.44, z: 24, r: 91 },
+  { id: "window21", kind: "window", name: "窓型発光体21", x: 81.8, y: 41, w: 1.98, h: 1.44, z: 24, r: 88 },
+  { id: "window22", kind: "window", name: "窓型発光体22", x: 83.15, y: 39.85, w: 1.98, h: 1.44, z: 24, r: 85 },
+  { id: "window23", kind: "window", name: "窓型発光体23", x: 31.3, y: 52.7, w: 1.54, h: 1.12, z: 24, r: 94 },
+  { id: "window24", kind: "window", name: "窓型発光体24", x: 73.6, y: 43.5, w: 1.98, h: 1.44, z: 24, r: 87 },
+  { id: "window25", kind: "window", name: "窓型発光体25", x: 74.6, y: 44.1, w: 1.98, h: 1.44, z: 24, r: 89 },
+  { id: "window26", kind: "window", name: "窓型発光体26", x: 31.15, y: 54.85, w: 1.43, h: 1.04, z: 24, r: 89 },
+  { id: "window27", kind: "window", name: "窓型発光体27", x: 31.1, y: 57.15, w: 1.98, h: 1.44, z: 24, r: 88 },
+  { id: "window28", kind: "window", name: "窓型発光体28", x: 44.7, y: 26.5, w: 1.54, h: 1.12, z: 24, r: 90 },
+  { id: "window29", kind: "window", name: "窓型発光体29", x: 45.7, y: 27.3, w: 1.54, h: 1.12, z: 24, r: 87 },
+  { id: "window30", kind: "window", name: "窓型発光体30", x: 49.6, y: 27.7, w: 1.54, h: 1.12, z: 24, r: 89 },
+  { id: "window31", kind: "window", name: "窓型発光体31", x: 50.35, y: 27.1, w: 1.54, h: 1.12, z: 24, r: 84 },
+  { id: "window32", kind: "window", name: "窓型発光体32", x: 31.4, y: 34.7, w: 1.54, h: 1.12, z: 24, r: 85 },
+  { id: "window33", kind: "window", name: "窓型発光体33", x: 32.05, y: 34.95, w: 1.54, h: 1.12, z: 24, r: 88 },
+  { id: "window34", kind: "window", name: "窓型発光体34", x: 58.25, y: 66.7, w: 1.98, h: 1.44, z: 24, r: 88 },
+  { id: "window35", kind: "window", name: "窓型発光体35", x: 58.55, y: 66.6, w: 1.98, h: 1.44, z: 24, r: 90 },
+  { id: "window36", kind: "window", name: "窓型発光体36", x: 50.8, y: 66.5, w: 1.1, h: 0.8, z: 24, r: 94 },
+  { id: "window37", kind: "window", name: "窓型発光体37", x: 51.1, y: 66.7, w: 1.1, h: 0.8, z: 24, r: 95 },
+  { id: "window38", kind: "window", name: "窓型発光体38", x: 50.35, y: 66.15, w: 1.1, h: 0.8, z: 24, r: 93 },
+  { id: "window39", kind: "window", name: "窓型発光体39", x: 51.7, y: 67, w: 1.1, h: 0.8, z: 24, r: 90 },
+  { id: "window40", kind: "window", name: "窓型発光体40", x: 9.7, y: 27.55, w: 1.54, h: 1.12, z: 24, r: 208 }
+];
+const townNightLightStorageKey = "imasoraWalkTownNightLightOffsetsV2";
+const townNightLightNudgeStep = 0.35;
+const townNightLightScaleStep = 0.08;
+const townNightLightRotateStep = 2;
+let townNightLightOffsets = loadTownNightLightOffsets();
 const townBuildingCosts = {
-  bench: { "木の素材": 8, "草の素材": 6 },
-  garden: { "草の素材": 14, "土の素材": 8 },
-  streetlight: { "灯りの素材": 12, "鉄の素材": 8 },
   fountain: { "土の素材": 16, "雲の素材": 8 },
-  tower: { "雲の素材": 18, "木の素材": 10 },
   bridge: { "木の素材": 18, "鉄の素材": 12 },
-  warehouse: { "木の素材": 22, "土の素材": 14, "鉄の素材": 8 },
-  plaza: { "草の素材": 22, "土の素材": 20, "灯りの素材": 8 },
   clock: { "鉄の素材": 24, "灯りの素材": 18 },
   shop: { "木の素材": 18, "鉄の素材": 10, "灯りの素材": 8 },
   guild: { "木の素材": 28, "灯りの素材": 18, "鉄の素材": 16 },
   station: { "鉄の素材": 36, "木の素材": 24, "土の素材": 20 },
   castle: { "鉄の素材": 42, "灯りの素材": 26, "雲の素材": 18 },
   medalHall: { "鉄の素材": 44, "灯りの素材": 34, "木の素材": 24 },
-  dojo: { "鉄の素材": 40, "土の素材": 32, "灯りの素材": 24 },
   soundShop: { "灯りの素材": 46, "鉄の素材": 32, "雲の素材": 24 },
   bookstore: { "木の素材": 44, "草の素材": 30, "灯りの素材": 20 },
   retirePark: { "草の素材": 48, "木の素材": 38, "雲の素材": 32 },
-  arcade: { "鉄の素材": 58, "灯りの素材": 46, "雲の素材": 32 }
+  arcade: { "鉄の素材": 58, "灯りの素材": 46, "雲の素材": 32 },
+  statue1: { "鉄の素材": 34, "土の素材": 24, "灯りの素材": 16 },
+  statue2: { "鉄の素材": 34, "土の素材": 24, "灯りの素材": 16 }
 };
 const stampCatalog = [
   ["家", "出発"], ["森", "森道"], ["道", "街道"], ["台", "空見台"],
@@ -33482,7 +34317,7 @@ function defaultState() {
     walkSession: { active: false, startedAt: 0, stepChecked: false, stopped: false, skyVerified: false, stepCount: 0, blocked: false },
     skySummons: [],
     skyStock: { seeds: {}, materials: {} },
-    townBuildings: [],
+    townBuildings: ["warehouse"],
     retiredMonsters: [],
     retiredStorageLimit: 20,
     retirementStorageAdViews: 0,
@@ -33604,6 +34439,7 @@ function normalizeState() {
     delete state.skyStock.townPieces;
   }
   state.townBuildings = Array.isArray(state.townBuildings) ? state.townBuildings.filter(id => buildings.some(([buildingId]) => buildingId === id)) : [];
+  if (!state.townBuildings.includes("warehouse")) state.townBuildings.push("warehouse");
   state.retiredMonsters = Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [];
   state.retiredStorageLimit = Math.max(1, Math.min(500, Number(state.retiredStorageLimit || 20)));
   state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0)));
@@ -36618,69 +37454,462 @@ function mapCurrentHeroTokenArt() {
   const art = item ? turnaroundMonsterSvg(item, "front-right") : `<span class="map-token-fallback"></span>`;
   return `<span class="hero-token" aria-label="現在地: ${tokenName}"><span class="map-hero-art">${art}</span><i></i></span>`;
 }
-function renderTown() {
-  if (!selectedTownBuildingId || !buildings.some(([id]) => id === selectedTownBuildingId)) {
-    const firstUnbuilt = buildings.find(([id]) => !isTownBuildingBuilt(id));
-    selectedTownBuildingId = (firstUnbuilt || buildings[0] || [])[0] || "";
+function townSlotStyle(slot) {
+  return `--slot-x:${slot.x}%;--slot-y:${slot.y}%;--slot-w:${slot.w}%;--slot-h:${slot.h}%;--slot-z:${slot.z};`;
+}
+function townBaseLayerMarkup() {
+  return `<div class="town-map-layer town-base-layer"></div>`;
+}
+function townSceneForDate(now = new Date()) {
+  const hour = now.getHours();
+  if (hour >= 19 || hour < 6) return "night";
+  if (hour >= 16) return "evening";
+  if (hour >= 9) return "day";
+  return "morning";
+}
+function currentTownScene() {
+  return townScenePreviewMode === "auto" ? townSceneForDate() : townScenePreviewMode;
+}
+function townSceneLabel(id) {
+  return townSceneOptions.find(item => item.id === id)?.label || id;
+}
+function applyTownScene(townView) {
+  const scene = currentTownScene();
+  townView.classList.remove("town-scene-morning", "town-scene-day", "town-scene-evening", "town-scene-night");
+  townView.classList.add(`town-scene-${scene}`);
+  townView.dataset.townScene = scene;
+}
+function loadTownNightLightOffsets() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(townNightLightStorageKey) || "{}");
+    if (!parsed || typeof parsed !== "object") return {};
+    const validIds = new Set(townNightLightObjects.map(item => item.id));
+    return Object.fromEntries(Object.entries(parsed).filter(([id, offset]) => (
+      validIds.has(id)
+      && offset
+      && Number.isFinite(Number(offset.x))
+      && Number.isFinite(Number(offset.y))
+    )).map(([id, offset]) => [id, {
+      x: Number(offset.x),
+      y: Number(offset.y),
+      r: Number.isFinite(Number(offset.r)) ? Number(offset.r) : 0,
+      s: Number.isFinite(Number(offset.s)) ? Math.max(0.1, Math.min(4, Number(offset.s))) : 1
+    }]));
+  } catch (error) {
+    return {};
   }
-  const townDecor = `<i class="town-page-fold"></i><i class="town-paper-hill"></i><i class="town-paper-river"></i><i class="town-paper-sign"></i>`;
-  document.getElementById("townView").innerHTML = townDecor + buildings.map(([id, mark, name, need, effect, kind]) => {
+}
+function saveTownNightLightOffsets() {
+  localStorage.setItem(townNightLightStorageKey, JSON.stringify(townNightLightOffsets));
+}
+function townNightLightOffset(id) {
+  return townNightLightOffsets[id] || { x: 0, y: 0, r: 0, s: 1 };
+}
+function townNightLightStyle(item) {
+  const offset = townNightLightOffset(item.id);
+  const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
+  return `--light-x:${(item.x + offset.x).toFixed(2)}%;--light-y:${(item.y + offset.y).toFixed(2)}%;--light-w:${(item.w * scale).toFixed(2)}%;--light-h:${(item.h * scale).toFixed(2)}%;--light-z:${item.z};--light-r:${((item.r || 0) + (offset.r || 0)).toFixed(1)}deg;`;
+}
+function townNightLightMarkup() {
+  return townNightLightObjects.map(item => `<span class="town-night-light-object town-night-light-${item.kind}" aria-label="${escapeAttr(item.name)}" style="${townNightLightStyle(item)}"></span>`).join("");
+}
+function townVacantSiteMarkup(id, mode) {
+  const slot = townMapSlots[id];
+  if (!slot) return "";
+  const attrs = mode === "layer"
+    ? `type="button" data-town-facility="${id}" aria-label="${townFacilityDisplayName(id)}を選ぶ"`
+    : `type="button" tabindex="-1" aria-hidden="true"`;
+  return `<button class="town-vacant-site" ${attrs} style="${townSlotStyle(slot)}"></button>`;
+}
+const townLayeredSpriteAssets = {
+  station: { file: "town-layered-station-v2.png", x: 25.9, y: 4, w: 18.5, h: 22, z: 5, r: 0 },
+  train: { file: "town-layered-train-v2.png", x: -3.6, y: 10.8, w: 44.95, h: 19.57, z: 6, r: 0 },
+  warehouse: { file: "town-layered-workshop-v1.png", x: 78.61, y: 18.94, w: 15.95, h: 18.16, z: 5, r: 0 },
+  medalHall: { file: "town-layered-medal-hall-v3.png", x: 41.35, y: 50.15, w: 29.4, h: 24.43, z: 22, r: 0 },
+  bookstore: { file: "town-layered-bookstore-v1.png", x: 26.24, y: 24.05, w: 14.65, h: 18.07, z: 7, r: 4 },
+  soundShop: { file: "town-layered-sound-shop-v1.png", x: 50.03, y: 22.53, w: 17.9, h: 24.29, z: 8, r: 2 },
+  shop: { file: "town-layered-shop-v1.png", x: 40.1, y: 10.19, w: 15.72, h: 23.14, z: 9, r: 0 },
+  arcade: { file: "town-layered-arcade-v1.png", x: 68.19, y: 27.95, w: 20.21, h: 25.7, z: 10, r: 2 },
+  statue1: { file: "town-layered-statue1-v1.png", x: 12.5, y: 39.33, w: 16.47, h: 13.97, z: 11, r: 0 },
+  fountain: { file: "town-layered-fountain-v1.png", x: 36.66, y: 35.77, w: 18.76, h: 19.22, z: 12, r: 0 },
+  retirePark: { file: "town-layered-retire-park-v1.png", x: 30.44, y: 62.03, w: 20.05, h: 19.77, z: 14, r: 0 },
+  guild: { file: "town-layered-guide-board-v1.png", x: 59.06, y: 37.4, w: 12.89, h: 20.63, z: 15, r: 4 },
+  statue2: { file: "town-layered-statue2-v1.png", x: 52.23, y: 7.26, w: 15.62, h: 15.59, z: 16, r: 0 },
+  bridgeLanding: { file: "town-layered-bridge-landing-v1.png", x: 77.5, y: 78.8, w: 18, h: 11.25, z: 16.5, r: 0 },
+  bridge: { file: "town-layered-bridge-v2.png", x: 63.9, y: 71.35, w: 30.45, h: 26.82, z: 17, r: -360 },
+  castle: { file: "town-layered-castle-gate-v1.png", x: 12.95, y: 59.34, w: 16.6, h: 18.65, z: 18, r: 8 },
+  clock: { file: "town-layered-clock-v1.png", x: 25.96, y: 41.34, w: 13.48, h: 21.45, z: 19, r: 4 }
+};
+const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2";
+const townLayeredSpriteNudgeStep = 0.35;
+const townLayeredSpriteRotateStep = 2;
+const townLayeredSpriteScaleStep = 0.05;
+let townLayeredSpriteOffsets = loadTownLayeredSpriteOffsets();
+function loadTownLayeredSpriteOffsets() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(townLayeredSpriteOffsetStorageKey) || "{}");
+    if (!parsed || typeof parsed !== "object") return {};
+    if (parsed.medalHall && !parsed.warehouse) parsed.warehouse = parsed.medalHall;
+    return Object.fromEntries(Object.entries(parsed).filter(([id, offset]) => (
+      townLayeredSpriteAssets[id]
+      && offset
+      && Number.isFinite(Number(offset.x))
+      && Number.isFinite(Number(offset.y))
+    )).map(([id, offset]) => [id, {
+      x: Number(offset.x),
+      y: Number(offset.y),
+      r: Number.isFinite(Number(offset.r)) ? Number(offset.r) : 0,
+      s: Number.isFinite(Number(offset.s)) ? Math.max(0.1, Math.min(3, Number(offset.s))) : 1
+    }]));
+  } catch (error) {
+    return {};
+  }
+}
+function saveTownLayeredSpriteOffsets() {
+  localStorage.setItem(townLayeredSpriteOffsetStorageKey, JSON.stringify(townLayeredSpriteOffsets));
+}
+function townLayeredSpriteOffset(id) {
+  return townLayeredSpriteOffsets[id] || { x: 0, y: 0, r: 0, s: 1 };
+}
+function townLayeredSpriteStyle(id, sprite) {
+  const offset = townLayeredSpriteOffset(id);
+  const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
+  const rotation = (Number.isFinite(Number(sprite.r)) ? Number(sprite.r) : 0) + offset.r;
+  return `--sprite-x:${(sprite.x + offset.x).toFixed(2)}%;--sprite-y:${(sprite.y + offset.y).toFixed(2)}%;--sprite-w:${(sprite.w * scale).toFixed(2)}%;--sprite-h:${(sprite.h * scale).toFixed(2)}%;--sprite-z:${sprite.z};--sprite-r:${rotation.toFixed(1)}deg;`;
+}
+function townLayeredSpriteBounds(id) {
+  const sprite = townLayeredSpriteAssets[id];
+  if (!sprite) return null;
+  const offset = townLayeredSpriteOffset(id);
+  const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
+  return {
+    x: sprite.x + offset.x,
+    y: sprite.y + offset.y,
+    w: sprite.w * scale,
+    h: sprite.h * scale
+  };
+}
+function townFacilityLabelStyle(id, fallbackX, fallbackY) {
+  const labelSpriteId = id === "station" ? "station" : id;
+  const bounds = townLayeredSpriteBounds(labelSpriteId);
+  const labelOffset = id === "bridge" ? { x: -9, y: -9 } : id === "castle" ? { x: 1.5, y: -1.5 } : { x: 0, y: 0 };
+  if (!bounds) return `--label-x:${Math.max(3, Math.min(97, fallbackX + labelOffset.x))}%;--label-y:${Math.max(5, fallbackY - 4 + labelOffset.y)}%;`;
+  const labelX = Math.max(3, Math.min(97, bounds.x + bounds.w / 2 + labelOffset.x));
+  const labelY = Math.max(5, Math.min(94, bounds.y + bounds.h - 3 + labelOffset.y));
+  return `--label-x:${labelX.toFixed(2)}%;--label-y:${labelY.toFixed(2)}%;`;
+}
+function townBuildingSprite(id) {
+  const sprite = townLayeredSpriteAssets[id];
+  if (!sprite) return "";
+  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${townLayeredSpriteStyle(id, sprite)}">`;
+}
+function townLayeredBuildingSprites(id) {
+  if (id === "station") return townBuildingSprite("station") + townBuildingSprite("train");
+  if (id === "bridge") return townBuildingSprite("bridgeLanding") + townBuildingSprite("bridge");
+  return townBuildingSprite(id);
+}
+function renderTown() {
+  if (!selectedTownBuildingId || (selectedTownBuildingId !== "warehouse" && !townBuildableBuildingIds.includes(selectedTownBuildingId))) {
+    const firstUnbuilt = townBuildableBuildings.find(([id]) => !isTownBuildingBuilt(id));
+    selectedTownBuildingId = (firstUnbuilt || townBuildableBuildings[0] || [])[0] || "";
+  }
+  const townView = document.getElementById("townView");
+  const fullyBuilt = townBuildableBuildings.every(([id]) => isTownBuildingBuilt(id));
+  townView.classList.toggle("town-developed", fullyBuilt);
+  townView.classList.toggle("town-vacant-background", townVacantMode === "background");
+  townView.classList.remove("town-vacant-layered");
+  applyTownScene(townView);
+  const vacantLayer = "";
+  const buildingLayer = townBuildingSprite("warehouse") + townBuildableBuildings.map(([id]) => isTownBuildingBuilt(id) && townFacilitySpriteReadyIds.includes(id) ? townLayeredBuildingSprites(id) : "").join("");
+  const labels = townFacilityNames.map(({ id, name, x, y, cls }) => {
     const built = isTownBuildingBuilt(id);
-    const selectedClass = id === selectedTownBuildingId ? " selected" : "";
-    const specialClass = kind === "special" ? " special" : "";
-    const pos = townBuildingMapPosition(id);
-    const style = `--x:${pos.x}%;--y:${pos.y}%;--r:${pos.r}deg;--z:${pos.z};${pos.w ? `--w:${pos.w}px;` : ""}${pos.h ? `--h:${pos.h}px;` : ""}`;
-    return `
-    <button class="building building-${id} ${built ? "open" : "planned"}${specialClass}${selectedClass}" type="button" data-town-select="${id}" title="${effect}" style="${style}">
-      <i class="town-building-art" aria-hidden="true">
-        <i class="art-roof"></i>
-        <i class="art-body">
-          <i class="art-window w1"></i>
-          <i class="art-window w2"></i>
-          <i class="art-door"></i>
-        </i>
-        <i class="art-sign">${mark}</i>
-      </i>
-      <span>${name}</span>
-      <small>${built ? "建設済み" : kind === "special" ? "特別施設" : "未建設"}</small>
-    </button>
-  `;
+    if (id !== "warehouse" && !townMapSlots[id]) return "";
+    const className = `town-facility-name ${cls || ""}${built ? "" : " town-facility-button"}`;
+    const style = townFacilityLabelStyle(id, x, y);
+    return built && townFacilityNamesVisible
+      ? `<span class="${className}" style="${style}">${name}</span>`
+      : built
+      ? ""
+      : `<button class="${className}" type="button" data-town-facility="${id}" style="${style}">${name}</button>`;
   }).join("");
-  document.querySelectorAll("[data-town-select]").forEach(button => button.addEventListener("click", () => {
-    selectedTownBuildingId = button.dataset.townSelect;
-    renderTown();
-    playSfx("select");
-  }));
+  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-workshop-hotspot" type="button" data-town-workshop></button><button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
+  document.getElementById("townFacilityToggle")?.addEventListener("click", toggleTownFacilityNames);
+  document.querySelector("[data-town-workshop]")?.addEventListener("click", openTownWorkshopFromMap);
+  document.querySelectorAll("[data-town-facility]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townFacility)));
+  renderTownDevMenu();
   renderTownBuildingDetail();
   renderTownWorkshop();
   renderTownShop();
 }
+function renderTownDevMenu() {
+  const box = document.getElementById("townDevMenu");
+  if (!box) return;
+  const nudgeButtons = [
+    ["↖", -1, -1], ["↑", 0, -1], ["↗", 1, -1],
+    ["←", -1, 0], ["戻", 0, 0], ["→", 1, 0],
+    ["↙", -1, 1], ["↓", 0, 1], ["↘", 1, 1]
+  ];
+  const townDevAdjustableIds = ["warehouse", ...townBuildableBuildings.map(([id]) => id).flatMap(id => id === "station" ? ["station", "train"] : id === "bridge" ? ["bridgeLanding", "bridge"] : [id]).filter(id => townLayeredSpriteAssets[id])];
+  const sceneControls = `<div class="town-dev-card town-dev-scene-card">
+    <div class="town-dev-card-title"><span>街マップ時間帯</span><span class="town-dev-offset">表示: ${townSceneLabel(currentTownScene())}</span></div>
+    <div class="town-dev-scene-buttons">
+      ${townSceneOptions.map(item => `<button class="${townScenePreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-scene-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
+    </div>
+  </div>`;
+  const lightControls = `<div class="town-dev-card town-dev-light-card">
+    <div class="town-dev-card-title"><span>夜背景 発光体</span><span class="town-dev-offset">丸型 / 窓型</span></div>
+    <div class="town-dev-light-grid">
+      ${townNightLightObjects.filter(item => !["orb1", "orb2", "orb3", "orb4", "orb5", "orb6", "orb7", "orb8", "orb9", "orb10", "orb11", "orb12", "orb13", "orb14", "orb15", "orb16", "orb17", "orb18", "orb19", "orb20", "orb21", "orb22", "orb23", "orb24", "orb25", "orb26", "orb27", "orb28", "orb29", "orb30", "orb31", "orb32", "orb33", "orb34", "orb35", "window1", "window2", "window3", "window4", "window5", "window6", "window7", "window8", "window9", "window10", "window11", "window12", "window13", "window14", "window15", "window16", "window17", "window18", "window19", "window20", "window21", "window22", "window23", "window24", "window25", "window26", "window27", "window28", "window29", "window30", "window31", "window32", "window33", "window34", "window35", "window36", "window37", "window38", "window39", "window40"].includes(item.id)).map(item => {
+        const offset = townNightLightOffset(item.id);
+        const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
+        return `<div class="town-dev-card">
+          <div class="town-dev-card-title"><span>${item.name}</span><span class="town-dev-offset">x ${offset.x.toFixed(2)} / y ${offset.y.toFixed(2)} / r ${offset.r.toFixed(1)}° / ${Math.round(scale * 100)}%</span></div>
+          <div class="town-dev-nudge">
+            ${nudgeButtons.map(([label, dx, dy]) => dx === 0 && dy === 0
+              ? `<button class="town-dev-reset" type="button" data-town-light-reset="${item.id}">${label}</button>`
+              : `<button type="button" data-town-light-nudge="${item.id}" data-town-light-dx="${dx}" data-town-light-dy="${dy}">${label}</button>`
+            ).join("")}
+          </div>
+          <div class="town-dev-rotate">
+            <button type="button" data-town-light-rotate="${item.id}" data-town-light-dr="-1">左回転</button>
+            <button type="button" data-town-light-rotate="${item.id}" data-town-light-dr="1">右回転</button>
+          </div>
+          <div class="town-dev-size">
+            <button type="button" data-town-light-scale="${item.id}" data-town-light-ds="-1">小さく</button>
+            <button type="button" data-town-light-scale="${item.id}" data-town-light-ds="1">大きく</button>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+  box.innerHTML = sceneControls + lightControls + townDevAdjustableIds.map((id) => {
+    const built = id === "train" ? isTownBuildingBuilt("station") : id === "bridgeLanding" ? isTownBuildingBuilt("bridge") : isTownBuildingBuilt(id);
+    const displayName = id === "train" ? "列車" : id === "bridgeLanding" ? "橋の足場" : townFacilityDisplayName(id);
+    const offset = townLayeredSpriteOffset(id);
+    const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
+    const buildToggle = id === "warehouse"
+      ? `<button class="built" type="button" disabled>常設</button>`
+      : id === "train"
+      ? `<button class="${built ? "built" : ""}" type="button" disabled>駅と連動</button>`
+      : id === "bridgeLanding"
+      ? `<button class="${built ? "built" : ""}" type="button" disabled>橋と連動</button>`
+      : `<button class="${built ? "built" : ""}" type="button" data-town-dev-toggle="${id}">${built ? "建造前にする" : "建造後にする"}</button>`;
+    const controls = townLayeredSpriteAssets[id]
+      ? `<div class="town-dev-card-title"><span>${displayName}</span><span class="town-dev-offset">x ${offset.x.toFixed(2)} / y ${offset.y.toFixed(2)} / r ${offset.r.toFixed(1)}° / ${Math.round(scale * 100)}%</span></div>
+        ${buildToggle}
+        <div class="town-dev-nudge">
+          ${nudgeButtons.map(([label, dx, dy]) => dx === 0 && dy === 0
+            ? `<button class="town-dev-reset" type="button" data-town-layer-reset="${id}">${label}</button>`
+            : `<button type="button" data-town-layer-nudge="${id}" data-town-layer-dx="${dx}" data-town-layer-dy="${dy}">${label}</button>`
+          ).join("")}
+        </div>
+        <div class="town-dev-rotate">
+          <button type="button" data-town-layer-rotate="${id}" data-town-layer-dr="-1">左回転</button>
+          <button type="button" data-town-layer-rotate="${id}" data-town-layer-dr="1">右回転</button>
+        </div>
+        <div class="town-dev-size">
+          <button type="button" data-town-layer-scale="${id}" data-town-layer-ds="-1">小さく</button>
+          <button type="button" data-town-layer-scale="${id}" data-town-layer-ds="1">大きく</button>
+        </div>`
+      : id === "warehouse"
+      ? `<button class="built" type="button" disabled>${displayName}: 常設</button>`
+      : id === "train"
+      ? `<button class="${built ? "built" : ""}" type="button" disabled>${displayName}: 駅と連動</button>`
+      : `<button class="${built ? "built" : ""}" type="button" data-town-dev-toggle="${id}">${displayName}: ${built ? "建造前にする" : "建造後にする"}</button>`;
+    return `<div class="town-dev-card">${controls}</div>`;
+  }).join("");
+  box.querySelectorAll("[data-town-scene-preview]").forEach(button => {
+    button.addEventListener("click", () => setTownScenePreview(button.dataset.townScenePreview));
+  });
+  box.querySelectorAll("[data-town-light-nudge]").forEach(button => {
+    button.addEventListener("click", () => nudgeTownNightLight(
+      button.dataset.townLightNudge,
+      Number(button.dataset.townLightDx),
+      Number(button.dataset.townLightDy)
+    ));
+  });
+  box.querySelectorAll("[data-town-light-reset]").forEach(button => {
+    button.addEventListener("click", () => resetTownNightLight(button.dataset.townLightReset));
+  });
+  box.querySelectorAll("[data-town-light-rotate]").forEach(button => {
+    button.addEventListener("click", () => rotateTownNightLight(
+      button.dataset.townLightRotate,
+      Number(button.dataset.townLightDr)
+    ));
+  });
+  box.querySelectorAll("[data-town-light-scale]").forEach(button => {
+    button.addEventListener("click", () => scaleTownNightLight(
+      button.dataset.townLightScale,
+      Number(button.dataset.townLightDs)
+    ));
+  });
+  box.querySelectorAll("[data-town-dev-toggle]").forEach(button => {
+    button.addEventListener("click", () => toggleTownDevBuilding(button.dataset.townDevToggle));
+  });
+  box.querySelectorAll("[data-town-layer-nudge]").forEach(button => {
+    button.addEventListener("click", () => nudgeTownLayeredSprite(
+      button.dataset.townLayerNudge,
+      Number(button.dataset.townLayerDx),
+      Number(button.dataset.townLayerDy)
+    ));
+  });
+  box.querySelectorAll("[data-town-layer-reset]").forEach(button => {
+    button.addEventListener("click", () => resetTownLayeredSpriteOffset(button.dataset.townLayerReset));
+  });
+  box.querySelectorAll("[data-town-layer-rotate]").forEach(button => {
+    button.addEventListener("click", () => rotateTownLayeredSprite(
+      button.dataset.townLayerRotate,
+      Number(button.dataset.townLayerDr)
+    ));
+  });
+  box.querySelectorAll("[data-town-layer-scale]").forEach(button => {
+    button.addEventListener("click", () => scaleTownLayeredSprite(
+      button.dataset.townLayerScale,
+      Number(button.dataset.townLayerDs)
+    ));
+  });
+}
+function setTownScenePreview(id) {
+  if (!townSceneOptions.some(item => item.id === id)) return;
+  townScenePreviewMode = id;
+  renderTown();
+  playSfx("select");
+}
+function nudgeTownNightLight(id, dx, dy) {
+  if (!townNightLightObjects.some(item => item.id === id)) return;
+  const offset = townNightLightOffset(id);
+  townNightLightOffsets[id] = {
+    x: Number((offset.x + dx * townNightLightNudgeStep).toFixed(2)),
+    y: Number((offset.y + dy * townNightLightNudgeStep).toFixed(2)),
+    r: Number(offset.r || 0),
+    s: Number(offset.s || 1)
+  };
+  saveTownNightLightOffsets();
+  renderTown();
+}
+function rotateTownNightLight(id, direction) {
+  if (!townNightLightObjects.some(item => item.id === id)) return;
+  const offset = townNightLightOffset(id);
+  townNightLightOffsets[id] = {
+    x: Number(offset.x || 0),
+    y: Number(offset.y || 0),
+    r: Number((offset.r + direction * townNightLightRotateStep).toFixed(1)),
+    s: Number(offset.s || 1)
+  };
+  saveTownNightLightOffsets();
+  renderTown();
+}
+function scaleTownNightLight(id, direction) {
+  if (!townNightLightObjects.some(item => item.id === id)) return;
+  const offset = townNightLightOffset(id);
+  townNightLightOffsets[id] = {
+    x: Number(offset.x || 0),
+    y: Number(offset.y || 0),
+    r: Number(offset.r || 0),
+    s: Number(Math.max(0.1, Math.min(4, Number(offset.s || 1) + direction * townNightLightScaleStep)).toFixed(2))
+  };
+  saveTownNightLightOffsets();
+  renderTown();
+}
+function resetTownNightLight(id) {
+  if (!townNightLightObjects.some(item => item.id === id)) return;
+  delete townNightLightOffsets[id];
+  saveTownNightLightOffsets();
+  renderTown();
+}
+function nudgeTownLayeredSprite(id, dx, dy) {
+  if (!townLayeredSpriteAssets[id]) return;
+  const offset = townLayeredSpriteOffset(id);
+  townLayeredSpriteOffsets[id] = {
+    x: Number((offset.x + dx * townLayeredSpriteNudgeStep).toFixed(2)),
+    y: Number((offset.y + dy * townLayeredSpriteNudgeStep).toFixed(2)),
+    r: Number(offset.r || 0),
+    s: Number(offset.s || 1)
+  };
+  saveTownLayeredSpriteOffsets();
+  renderTown();
+}
+function rotateTownLayeredSprite(id, direction) {
+  if (!townLayeredSpriteAssets[id]) return;
+  const offset = townLayeredSpriteOffset(id);
+  townLayeredSpriteOffsets[id] = {
+    x: Number(offset.x || 0),
+    y: Number(offset.y || 0),
+    r: Number((offset.r + direction * townLayeredSpriteRotateStep).toFixed(1)),
+    s: Number(offset.s || 1)
+  };
+  saveTownLayeredSpriteOffsets();
+  renderTown();
+}
+function scaleTownLayeredSprite(id, direction) {
+  if (!townLayeredSpriteAssets[id]) return;
+  const offset = townLayeredSpriteOffset(id);
+  townLayeredSpriteOffsets[id] = {
+    x: Number(offset.x || 0),
+    y: Number(offset.y || 0),
+    r: Number(offset.r || 0),
+    s: Number(Math.max(0.1, Math.min(3, (Number(offset.s || 1) + direction * townLayeredSpriteScaleStep))).toFixed(2))
+  };
+  saveTownLayeredSpriteOffsets();
+  renderTown();
+}
+function resetTownLayeredSpriteOffset(id) {
+  if (!townLayeredSpriteAssets[id]) return;
+  delete townLayeredSpriteOffsets[id];
+  saveTownLayeredSpriteOffsets();
+  renderTown();
+}
+function toggleTownDevBuilding(id) {
+  if (!townBuildableBuildingIds.includes(id) || !townBuildingById(id)) return;
+  if (isTownBuildingBuilt(id)) {
+    state.townBuildings = state.townBuildings.filter(buildingId => buildingId !== id);
+  } else {
+    state.townBuildings.push(id);
+  }
+  selectedTownBuildingId = id;
+  saveState();
+  renderTown();
+  playSfx("select");
+}
+function selectTownFacility(id) {
+  if (id !== "warehouse" && !townBuildableBuildingIds.includes(id)) return;
+  selectedTownBuildingId = id;
+  renderTown();
+  playSfx("select");
+}
+function openTownWorkshopFromMap() {
+  document.getElementById("townWorkshop")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
+function toggleTownFacilityNames() {
+  townFacilityNamesVisible = !townFacilityNamesVisible;
+  renderTown();
+}
 function townBuildingMapPosition(id) {
   const map = {
-    bench: { x: 15, y: 69, r: -6, z: 8 },
-    garden: { x: 20, y: 39, r: 4, z: 5 },
-    streetlight: { x: 32, y: 61, r: -3, z: 9 },
-    fountain: { x: 43, y: 36, r: 5, z: 6 },
-    tower: { x: 59, y: 20, r: -4, z: 4 },
-    bridge: { x: 55, y: 67, r: 7, z: 10 },
-    warehouse: { x: 72, y: 54, r: -5, z: 8 },
-    plaza: { x: 48, y: 52, r: 1, z: 7 },
-    clock: { x: 82, y: 30, r: 4, z: 5 },
-    shop: { x: 24, y: 78, r: 3, z: 11 },
-    guild: { x: 37, y: 22, r: -7, z: 4 },
-    station: { x: 82, y: 76, r: -2, z: 11 },
-    castle: { x: 89, y: 48, r: 5, z: 8 },
-    medalHall: { x: 15, y: 18, r: -3, z: 5, w: 82, h: 88 },
-    dojo: { x: 67, y: 17, r: 4, z: 5, w: 82, h: 88 },
-    soundShop: { x: 12, y: 48, r: 5, z: 7, w: 82, h: 88 },
-    bookstore: { x: 73, y: 83, r: -5, z: 12, w: 82, h: 88 },
-    retirePark: { x: 38, y: 84, r: -4, z: 12, w: 86, h: 88 },
-    arcade: { x: 88, y: 16, r: -4, z: 5, w: 82, h: 88 }
+    fountain: { x: 56, y: 55, r: 0, z: 10 },
+    bridge: { x: 75, y: 78, r: -8, z: 14 },
+    warehouse: { x: 69, y: 55, r: -5, z: 9 },
+    clock: { x: 28, y: 51, r: 0, z: 8 },
+    shop: { x: 39, y: 31, r: 0, z: 5 },
+    guild: { x: 44, y: 52, r: -7, z: 9 },
+    station: { x: 23, y: 32, r: -4, z: 4 },
+    castle: { x: 28, y: 91, r: 0, z: 15 },
+    medalHall: { x: 55, y: 91, r: -3, z: 16 },
+    soundShop: { x: 73, y: 35, r: 0, z: 7 },
+    bookstore: { x: 57, y: 32, r: 0, z: 6 },
+    retirePark: { x: 39, y: 73, r: -8, z: 12 },
+    arcade: { x: 84, y: 50, r: 0, z: 9 },
+    statue1: { x: 18, y: 65, r: 0, z: 11 },
+    statue2: { x: 63, y: 73, r: 0, z: 13 }
   };
   return map[id] || { x: 50, y: 50, r: 0, z: 5 };
 }
 function townBuildingById(id) {
   return buildings.find(([buildingId]) => buildingId === id) || null;
+}
+function townFacilityDisplayName(id) {
+  return townFacilityNames.find(item => item.id === id)?.name || townBuildingById(id)?.[2] || id;
 }
 function townMaterialCount(name) {
   return Number(state.skyStock.materials?.[name] || 0);
@@ -36703,10 +37932,10 @@ function isTownBuildingBuilt(id) {
   return state.townBuildings.includes(id);
 }
 function nextTownBuilding() {
-  return buildings.find(([id]) => !isTownBuildingBuilt(id)) || null;
+  return townBuildableBuildings.find(([id]) => !isTownBuildingBuilt(id)) || null;
 }
 function openedTownBuildings() {
-  return buildings.filter(([id]) => isTownBuildingBuilt(id));
+  return townBuildableBuildings.filter(([id]) => isTownBuildingBuilt(id));
 }
 function renderTownBuildingDetail() {
   const box = document.getElementById("townBuildingDetail");
@@ -36717,14 +37946,15 @@ function renderTownBuildingDetail() {
     return;
   }
   const [id, mark, name, need, effect, kind, description] = building;
+  const displayName = townFacilityDisplayName(id);
   const built = isTownBuildingBuilt(id);
   const canBuild = canBuildTownBuilding(id);
   const kindText = kind === "special" ? "特別施設" : "通常建物";
   const action = built
     ? `<button class="primary" type="button" data-town-enter="${id}">中を見る</button>`
-    : `<button class="primary" type="button" data-town-build="${id}" ${canBuild ? "" : "disabled"}>${canBuild ? "建設する" : "素材不足"}</button>`;
+    : `<button class="primary" type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "所持不足"}</button>`;
   box.innerHTML = `
-    <b>${mark} ${name}</b>
+    <b>${mark} ${displayName}</b>
     <span>${kindText}。${description || effect}</span>
     <small>${built ? `建設済み: ${effect}` : `必要素材: ${townBuildingCostText(id)}`}</small>
     <small>${built ? "この建物は街に配置されています。" : `所持素材: ${townBuildingCostProgressText(id)}`}</small>
@@ -36842,12 +38072,12 @@ function openTownShopFromItems() {
 function renderTownWorkshop() {
   const opened = openedTownBuildings();
   const latest = opened[opened.length - 1];
-  const unbuilt = buildings.filter(([id]) => !isTownBuildingBuilt(id));
+  const unbuilt = townBuildableBuildings.filter(([id]) => !isTownBuildingBuilt(id));
   document.getElementById("townWorkshop").innerHTML = `
-    <b>町づくり工房</b>
+    <b>街づくり工房</b>
     <span>散歩で集めた素材を使って、建物を一つずつ直接作ります。素材がそろっても自動では建たず、建設するボタンを押して形にします。</span>
     <div class="workshop-status">
-      <div><strong>建築済み</strong><small>${opened.length}/${buildings.length}</small></div>
+      <div><strong>建築済み</strong><small>${opened.length}/${townBuildableBuildings.length}</small></div>
       <div><strong>草</strong><small>${townMaterialCount("草の素材")}</small></div>
       <div><strong>木</strong><small>${townMaterialCount("木の素材")}</small></div>
       <div><strong>鉄</strong><small>${townMaterialCount("鉄の素材")}</small></div>
@@ -36859,11 +38089,12 @@ function renderTownWorkshop() {
     <div class="town-quest-list">
       ${unbuilt.length ? unbuilt.map(([id, mark, name, need, effect]) => {
         const canBuild = canBuildTownBuilding(id);
+        const displayName = townFacilityDisplayName(id);
         return `<div class="town-quest-card ${canBuild ? "" : "locked"}">
-          <strong>${mark} ${name}</strong>
+          <strong>${mark} ${displayName}</strong>
           <span>${effect}</span>
           <small>${townBuildingCostText(id)}</small>
-          <button type="button" data-town-build="${id}" ${canBuild ? "" : "disabled"}>${canBuild ? "建設する" : "素材不足"}</button>
+          <button type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "所持不足"}</button>
         </div>`;
       }).join("") : `
         <div class="town-quest-card">
@@ -36895,7 +38126,7 @@ function buildTownBuilding(id) {
   playSfx("itemUse");
   state.townBuildings.push(id);
   const [, mark, name, , effect] = building;
-  addLog(`町づくり工房: 素材を使って${name}を建てた。${effect}`);
+  addLog(`街づくり工房: 素材を使って${name}を建てた。${effect}`);
   saveState();
   renderHud();
   renderTown();
@@ -41221,7 +42452,7 @@ function renderPlaytestBoost() {
       <div class="playtest-boost-chip"><strong>${canBattle ? "OK" : "準備前"}</strong><small>大会テスト</small></div>
       <div class="playtest-boost-chip"><strong>${itemTotal}</strong><small>所持アイテム</small></div>
       <div class="playtest-boost-chip"><strong>${shopOpen ? "開店" : "準備前"}</strong><small>アイテムショップ</small></div>
-      <div class="playtest-boost-chip"><strong>${builtTownCount}/${buildings.length}</strong><small>街の建物</small></div>
+      <div class="playtest-boost-chip"><strong>${builtTownCount}/${townBuildableBuildings.length}</strong><small>街の建物</small></div>
       <div class="playtest-boost-chip"><strong>${pendingCup ? pendingCup.name : "なし"}</strong><small>参加</small></div>
       <div class="playtest-boost-chip"><strong>${tournamentBypass ? "ON" : "OFF"}</strong><small>大会確認モード</small></div>
       <div class="playtest-boost-chip"><strong>${mapTimeMode}</strong><small>25マップ表示</small></div>
@@ -41241,6 +42472,7 @@ function renderPlaytestBoost() {
       <button class="secondary" id="playtestItemSetBtn" type="button">アイテム確認セットを入れる</button>
       <button class="secondary" id="playtestShopOpenBtn" type="button">アイテムショップを開ける</button>
       <button class="secondary" id="playtestAllTownBuildingsBtn" type="button">全建造物の街を開く</button>
+      ${townBuildableBuildings.map(([id]) => `<button class="secondary" type="button" data-playtest-town-building="${id}">${townFacilityDisplayName(id)}だけ確認</button>`).join("")}
       <button class="secondary" id="playtestTournamentBypassBtn" type="button">${tournamentBypass ? "大会確認モードをOFF" : "大会確認モードをON"}</button>
       <button class="secondary" id="playtestRetirementReadyBtn" type="button">引退式テスト状態へ戻す</button>
       <button class="secondary" id="playtestRetirementStorageFullBtn" type="button">保存枠満タンの引退の日を開く</button>
@@ -41264,6 +42496,9 @@ function renderPlaytestBoost() {
   document.getElementById("playtestItemSetBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
   document.getElementById("playtestAllTownBuildingsBtn")?.addEventListener("click", openPlaytestAllTownBuildings);
+  document.querySelectorAll("[data-playtest-town-building]").forEach(button => {
+    button.addEventListener("click", () => openPlaytestSingleTownBuilding(button.dataset.playtestTownBuilding));
+  });
   document.getElementById("playtestTournamentBypassBtn")?.addEventListener("click", toggleTournamentPlaytestBypass);
   document.getElementById("playtestRetirementReadyBtn")?.addEventListener("click", setRetirementCeremonyPlaytestReady);
   document.getElementById("playtestRetirementStorageFullBtn")?.addEventListener("click", openRetirementStorageFullSendoffPlaytest);
@@ -41518,7 +42753,7 @@ function openPlaytestShop() {
   toast("アイテムショップを確認できる状態にしました");
 }
 function openPlaytestAllTownBuildings() {
-  state.townBuildings = buildings.map(([id]) => id);
+  state.townBuildings = ["warehouse", ...townBuildableBuildings.map(([id]) => id)];
   selectedTownBuildingId = "shop";
   addLog("開発用テスト補助で、街の全建造物を建設済み状態に調整。正式版の通常進行では使わない補助です。");
   saveState();
@@ -41527,6 +42762,20 @@ function openPlaytestAllTownBuildings() {
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("reward");
   toast("全建造物の街を確認できます");
+}
+function openPlaytestSingleTownBuilding(id) {
+  const building = townBuildingById(id);
+  if (!building || id === "warehouse") return;
+  state.townBuildings = ["warehouse", id];
+  selectedTownBuildingId = id;
+  const displayName = townFacilityDisplayName(id);
+  addLog(`開発用テスト補助で、${displayName}だけを建設済み状態に調整。正式版の通常進行では使わない補助です。`);
+  saveState();
+  renderAll();
+  switchScreen("town");
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("reward");
+  toast(`${displayName}だけ確認できます`);
 }
 function preparePlaytestTournamentEntry(cupId = selectedCup) {
   if (!canEnterTournament()) {
@@ -43514,6 +44763,7 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
+
 
 
 
