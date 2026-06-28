@@ -298,6 +298,27 @@
       font-size: 22px;
       line-height: 1.25;
     }
+    .town-screen-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 6px;
+    }
+    .town-screen-heading h2 {
+      margin: 0;
+    }
+    .town-screen-heading button {
+      min-height: 30px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #d9c59e;
+      background: #fff8dc;
+      color: #6b4f21;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
     h3 {
       margin: 16px 0 8px;
       font-size: 18px;
@@ -1499,22 +1520,24 @@
     }
     .town-scene-morning {
       --town-scene-tint:
-        linear-gradient(135deg, rgba(255, 225, 164, .34), transparent 44%),
-        linear-gradient(180deg, rgba(255, 249, 226, .18), rgba(255, 255, 255, 0) 62%);
-      --town-scene-shadow: inset 0 0 34px rgba(255, 244, 205, .16);
-      --town-scene-light-opacity: .08;
+        linear-gradient(180deg, rgba(176, 225, 255, .22), rgba(255, 255, 255, .16) 48%, transparent 72%),
+        radial-gradient(circle at 74% 14%, rgba(255, 255, 255, .3), transparent 28%);
+      --town-scene-shadow: inset 0 0 22px rgba(221, 248, 255, .16);
+      --town-scene-light-opacity: .02;
     }
     .town-scene-day {
       --town-scene-tint:
-        linear-gradient(180deg, rgba(255, 255, 255, .08), transparent 52%);
-      --town-scene-shadow: inset 0 0 26px rgba(255, 255, 255, .08);
+        linear-gradient(180deg, rgba(255, 239, 158, .24), rgba(255, 255, 230, .16) 48%, transparent 72%),
+        radial-gradient(circle at 74% 14%, rgba(255, 244, 176, .36), transparent 28%);
+      --town-scene-shadow: inset 0 0 22px rgba(255, 236, 160, .18);
       --town-scene-light-opacity: 0;
     }
     .town-scene-evening {
       --town-scene-tint:
-        linear-gradient(135deg, rgba(255, 170, 92, .3), transparent 46%),
-        linear-gradient(180deg, rgba(106, 71, 126, .12), rgba(37, 45, 78, .18));
-      --town-scene-shadow: inset 0 0 42px rgba(109, 56, 80, .2);
+        radial-gradient(circle at 18% 8%, rgba(255, 221, 118, .42), transparent 26%),
+        linear-gradient(135deg, rgba(255, 132, 63, .46), rgba(255, 181, 92, .18) 43%, transparent 62%),
+        linear-gradient(180deg, rgba(255, 126, 86, .18), rgba(126, 62, 117, .24) 62%, rgba(45, 45, 86, .18));
+      --town-scene-shadow: inset 0 0 46px rgba(134, 55, 77, .28);
       --town-scene-light-opacity: 0;
     }
     .town-scene-night {
@@ -8239,14 +8262,33 @@
       transform-origin: center center;
       filter: drop-shadow(0 8px 5px rgba(20, 30, 24, .2));
     }
+    .town-layer-click-target {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      pointer-events: auto;
+      cursor: pointer;
+    }
     .town-layer-sprite-bridgeLanding {
       filter: none;
     }
+    .town-scene-morning .town-layer-sprite {
+      filter: drop-shadow(0 8px 5px rgba(20, 38, 50, .16)) brightness(1.11) saturate(1.07) hue-rotate(3deg);
+    }
+    .town-scene-morning .town-layer-sprite-bridgeLanding {
+      filter: brightness(1.07) saturate(1.04) hue-rotate(3deg);
+    }
+    .town-scene-day .town-layer-sprite {
+      filter: drop-shadow(0 8px 5px rgba(50, 42, 20, .16)) sepia(.08) brightness(1.12) saturate(1.1) hue-rotate(-4deg);
+    }
+    .town-scene-day .town-layer-sprite-bridgeLanding {
+      filter: sepia(.06) brightness(1.08) saturate(1.06) hue-rotate(-3deg);
+    }
     .town-scene-evening .town-layer-sprite {
-      filter: drop-shadow(0 9px 6px rgba(36, 27, 38, .28)) brightness(1.05) saturate(1.08);
+      filter: drop-shadow(0 9px 6px rgba(54, 28, 36, .3)) sepia(.12) brightness(1.08) saturate(1.22) hue-rotate(-7deg);
     }
     .town-scene-evening .town-layer-sprite-bridgeLanding {
-      filter: brightness(1.03) saturate(1.04);
+      filter: sepia(.1) brightness(1.06) saturate(1.16) hue-rotate(-6deg);
     }
     .town-scene-night .town-layer-sprite {
       filter:
@@ -8664,6 +8706,118 @@
     .shop-card small { display:block; margin-top:4px; color:#315b91; font-weight:900; font-size:10px; line-height:1.35; }
     .shop-card button { grid-column: 1 / -1; min-height: 30px; border-radius: 999px; border: 1px solid #d9c59e; background: #fff8dc; color: #6b4f21; font-weight: 900; cursor: pointer; }
     .shop-card button:disabled { opacity: .5; cursor: default; }
+    #townPractice .town-practice-card {
+      grid-template-columns: 1fr;
+    }
+    #townPractice .town-practice-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    #townPractice .town-practice-heading button {
+      min-height: 26px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid #d9c59e;
+      background: #fff8dc;
+      color: #6b4f21;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    #townPractice .town-practice-card strong {
+      display: block;
+      white-space: nowrap;
+    }
+    #townPractice .shop-card button {
+      justify-self: start;
+      min-height: 22px;
+      padding: 4px 10px;
+      font-size: 11px;
+      line-height: 1.1;
+    }
+    #townKaraoke .karaoke-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    #townKaraoke .karaoke-heading button,
+    #townKaraoke .karaoke-controls button {
+      min-height: 26px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid #d9c59e;
+      background: #fff8dc;
+      color: #6b4f21;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    #townKaraoke .karaoke-room {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    #townKaraoke .karaoke-singers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+    #townKaraoke .karaoke-singer {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid #ead8ac;
+      border-radius: 8px;
+      background: #fffaf0;
+    }
+    #townKaraoke .karaoke-singer strong {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #townKaraoke .karaoke-song-section {
+      display: grid;
+      gap: 8px;
+    }
+    #townKaraoke .karaoke-song-section h4 {
+      margin: 0;
+      color: #6f5428;
+      font-size: .95rem;
+    }
+    #townKaraoke .karaoke-song-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+    #townKaraoke .karaoke-song-grid button {
+      min-height: 44px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d9c59e;
+      background: #fff8dc;
+      color: #5f4822;
+      text-align: left;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    #townKaraoke .karaoke-song-grid button.selected {
+      border-color: #8c6ee6;
+      background: #eee9ff;
+      color: #3b2d76;
+    }
+    #townKaraoke .karaoke-lyrics {
+      min-height: 120px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e1cfaa;
+      background: #fffdf6;
+      color: #574427;
+      line-height: 1.8;
+      white-space: pre-line;
+    }
     @media (max-width: 430px) { .shop-grid { grid-template-columns: 1fr; } }
     .town-board {
       margin-top: 12px;
@@ -11689,7 +11843,7 @@
     </section>
 
     <section class="panel screen" data-screen="town">
-      <h2>街の発展</h2>
+      <div class="town-screen-heading"><h2>街の発展</h2><button type="button" onclick="returnHomeFromTownScreen()">ホームに戻る</button></div>
       <p>散歩で素材を集め、町では自分で建物を作ります。集めた素材を使って、ひとつずつ形にしていきます。</p>
       <div class="town" id="townView"></div>
       <div class="town-dev-menu" id="townDevMenu"></div>
@@ -11702,15 +11856,9 @@
           <div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>日替わりで3つの道具が並びます。</span><small>木の素材2 / 鉄の素材1 / 灯りの素材1</small></div></div>
         </div>
       </div>
+      <div class="town-shop" id="townKaraoke" hidden></div>
+      <div class="town-shop" id="townPractice" hidden></div>
       <div class="mini-feature" id="imasoraDex"></div>
-      <div class="home-play-card">
-        <b>自宅でできること</b>
-        <span>自宅では報酬やマップ進行を確定しない設計にします。ただし、ゲーム自体は開けます。</span>
-        <ul>
-          <li>町の建物、図鑑、スタンプ、育成アイテム、冒険ログを見る。</li>
-          <li>散歩モンスターの状態、大会参加、戦闘結果を確認する。</li>
-        </ul>
-      </div>
     </section>
 
     <section class="panel screen" data-screen="monster">
@@ -12207,7 +12355,7 @@ const buildings = [
   ["castle", "門", "城門", 13, "街の大きな目印になる", "normal", "街の奥に立つ大きな目印。"],
   ["medalHall", "勲", "メダル記念館", 20, "大会メダルを飾る特別施設", "special", "大会で集めたメダルを並べる候補。"],
   ["dojo", "技", "技の道場", 21, "技演出を確認する特別施設", "special", "系統別の弱技・中技・強技を確認する候補。"],
-  ["soundShop", "音", "音源ショップ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
+  ["soundShop", "音", "音楽プラザ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
   ["bookstore", "本", "本屋", 23, "世界観やヒントを読む特別施設", "special", "おしゃべり、攻略ヒント、世界観メモを置く候補。"],
   ["retirePark", "縁", "広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
   ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"],
@@ -12219,7 +12367,7 @@ const townBuildableBuildings = buildings.filter(([id]) => townBuildableBuildingI
 const townFacilityNames = [
   { id: "station", name: "駅", x: 25, y: 18 },
   { id: "medalHall", name: "相棒記念館", x: 61, y: 20 },
-  { id: "soundShop", name: "音源ショップ", x: 76, y: 33 },
+  { id: "soundShop", name: "音楽プラザ", x: 76, y: 33 },
   { id: "bookstore", name: "本屋", x: 32, y: 39 },
   { id: "shop", name: "アイテムショップ", x: 55, y: 42 },
   { id: "arcade", name: "ゲームセンター", x: 79, y: 48, cls: "nowrap" },
@@ -12375,6 +12523,9 @@ let pendingTournamentStrategyCupId = "";
 let selectedDexStage = "";
 let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
+let pendingRetireParkPracticeRecordId = "";
+let musicPlazaKaraokeOpen = false;
+let selectedKaraokeBgmMode = "normal";
 let guildSupportConfirmOpen = false;
 let guildRequestAcceptConfirmId = "";
 let monsterDexGroups = [];
@@ -12384,6 +12535,7 @@ let pendingBattleReward = null;
 let pendingBattleResultSfx = "";
 let pendingBattleLogMessages = [];
 let pendingBattleAnimation = null;
+let pendingRetireParkPracticeBattle = null;
 let pendingBattleResultHomeAction = false;
 let battleAnimationTimer = null;
 let battleResultSfxTimer = null;
@@ -12446,6 +12598,10 @@ const bgmAudioFiles = {
   major4Final: "assets/audio/climax_major4_final_v01.mp3",
   grand: "assets/audio/maou_grand_battle_v01.mp3",
   grandFinal: "assets/audio/imasora_loop_grand_final_v01.mp3",
+  retireParkPracticeMorningDay: "assets/audio/plaza_sparring_retirepark_morning_day_v01.mp3",
+  retireParkPracticeEvening: "assets/audio/sunset_sparring_retirepark_evening_v01.mp3",
+  retireParkPracticeNight: "assets/audio/night_plaza_sparring_retirepark_night_v01.mp3",
+  nightPlaza: "assets/audio/night_plaza_karaoke_v01.mp3",
   battleVictory: "assets/audio/imasora_victory_result_v01.mp3",
   battleDefeat: "assets/audio/imasora_defeat_result_v01.mp3"
 };
@@ -12890,6 +13046,11 @@ const bgmModeNames = {
   major4Final: "水辺の四大杯 決勝BGM",
   grand: "グランドチャンピオン杯 通常戦BGM",
   grandFinal: "グランドチャンピオン杯 決勝BGM",
+  retireParkPracticeMorningDay: "広場 練習試合 朝昼BGM",
+  retireParkPracticeEvening: "広場 練習試合 夕方BGM",
+  retireParkPracticeNight: "広場 練習試合 夜BGM",
+  nightPlaza: "夜の広場で",
+  retireParkPractice: "広場 練習試合BGM",
   battleVictory: "今日の空に勝った日",
   battleDefeat: "負けても道は続く"
 };
@@ -37432,6 +37593,11 @@ function returnHomeFromMapClosedCounter() {
   switchScreen("walk");
   document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+function returnHomeFromTownScreen() {
+  switchScreen("walk");
+  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
 function scrollToWalkSkyRecognition() {
   switchScreen("walk");
   requestAnimationFrame(() => {
@@ -37601,7 +37767,12 @@ function townFacilityLabelStyle(id, fallbackX, fallbackY) {
 function townBuildingSprite(id) {
   const sprite = townLayeredSpriteAssets[id];
   if (!sprite) return "";
-  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${townLayeredSpriteStyle(id, sprite)}">`;
+  const style = townLayeredSpriteStyle(id, sprite);
+  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", retirePark: "広場" };
+  const enterButton = enterLabels[id]
+    ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-enter="${id}" aria-label="${enterLabels[id]}" style="${style}"></button>`
+    : "";
+  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}">${enterButton}`;
 }
 function townLayeredBuildingSprites(id) {
   if (id === "station") return townBuildingSprite("station") + townBuildingSprite("train");
@@ -37632,18 +37803,23 @@ function renderTown() {
       ? ""
       : `<button class="${className}" type="button" data-town-facility="${id}" style="${style}">${name}</button>`;
   }).join("");
-  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-workshop-hotspot" type="button" data-town-workshop></button><button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
+  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
   document.getElementById("townFacilityToggle")?.addEventListener("click", toggleTownFacilityNames);
-  document.querySelector("[data-town-workshop]")?.addEventListener("click", openTownWorkshopFromMap);
   document.querySelectorAll("[data-town-facility]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townFacility)));
+  document.querySelectorAll("[data-town-layer-enter]").forEach(button => button.addEventListener("click", () => enterTownBuilding(button.dataset.townLayerEnter)));
   renderTownDevMenu();
   renderTownBuildingDetail();
   renderTownWorkshop();
   renderTownShop();
+  renderTownKaraoke();
+  renderTownPractice();
 }
 function renderTownDevMenu() {
   const box = document.getElementById("townDevMenu");
   if (!box) return;
+  box.innerHTML = "";
+  box.hidden = true;
+  return;
   const nudgeButtons = [
     ["↖", -1, -1], ["↑", 0, -1], ["↗", 1, -1],
     ["←", -1, 0], ["戻", 0, 0], ["→", 1, 0],
@@ -37972,10 +38148,24 @@ function enterTownBuilding(id) {
     toast("まだ建設されていません");
     return;
   }
+  if (id === "warehouse") {
+    openTownWorkshopFromMap();
+    return;
+  }
   if (id === "shop") {
     document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
     playSfx("select");
     toast("アイテムショップへ移動しました");
+    return;
+  }
+  if (id === "soundShop") {
+    openMusicPlazaKaraokeFromTown();
+    return;
+  }
+  if (id === "retirePark") {
+    document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+    toast("広場へ移動しました");
     return;
   }
   playSfx("select");
@@ -38035,6 +38225,347 @@ function renderTownShop() {
     </div>`;
   document.querySelectorAll("[data-shop-buy]").forEach(button => button.addEventListener("click", () => buyShopItem(button.dataset.shopBuy)));
 }
+const karaokeSongModes = [
+  "normal", "outsideHome", "retirementCeremony",
+  "rookieBattle", "rookieFinal", "rookieAward",
+  "major1", "major1Final", "major2", "major2Final", "major3", "major3Final", "major4", "major4Final",
+  "majorAward", "grand", "grandFinal", "grandAward",
+  "nightPlaza",
+  "retireParkPracticeMorningDay", "retireParkPracticeEvening", "retireParkPracticeNight",
+  "battleVictory", "battleDefeat"
+];
+const karaokeVocalSongModes = ["outsideHome", "nightPlaza"];
+function karaokeAvailableSongModes() {
+  return karaokeSongModes.filter(mode => bgmAudioFiles[mode]);
+}
+function karaokeAvailableVocalSongModes() {
+  return karaokeVocalSongModes.filter(mode => bgmAudioFiles[mode]);
+}
+function karaokeAvailableSoundSongModes() {
+  return karaokeAvailableSongModes().filter(mode => !karaokeVocalSongModes.includes(mode));
+}
+function karaokeSongDisplayName(mode) {
+  const names = {
+    outsideHome: "イマソララビリンス ナイトバージョン",
+    nightPlaza: "夜の広場で"
+  };
+  return names[mode] || bgmModeName(mode);
+}
+function karaokeSongButtons(modes) {
+  return modes.map(mode => `<button class="${mode === selectedKaraokeBgmMode ? "selected" : ""}" type="button" data-karaoke-song="${mode}">${escapeAttr(karaokeSongDisplayName(mode))}</button>`).join("");
+}
+function karaokeParticipants() {
+  const profile = monsterProfile();
+  const current = { name: companionDisplayName(profile), role: "育成中の相棒" };
+  const retired = [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+    .slice(0, 3)
+    .map(record => ({ name: record.name || "引退相棒", role: "引退した相棒" }));
+  return [current, ...retired].slice(0, 4);
+}
+function karaokeLyricsText(mode) {
+  return `♪ ${karaokeSongDisplayName(mode)}
+
+歌詞はまだ登録されていません。
+歌詞を追加すると、このカラオケボックスで表示できます。`;
+}
+function renderTownKaraoke() {
+  const box = document.getElementById("townKaraoke");
+  if (!box) return;
+  if (!isTownBuildingBuilt("soundShop") || !musicPlazaKaraokeOpen) {
+    box.innerHTML = "";
+    box.hidden = true;
+    return;
+  }
+  const karaokeModes = karaokeAvailableVocalSongModes();
+  const soundModes = karaokeAvailableSoundSongModes();
+  const songModes = [...karaokeModes, ...soundModes];
+  if (!songModes.includes(selectedKaraokeBgmMode)) selectedKaraokeBgmMode = songModes[0] || "normal";
+  const participants = karaokeParticipants();
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="karaoke-heading"><b>カラオケボックス</b><button type="button" data-karaoke-return-town>町に戻る</button></div>
+    <span>育成中の相棒と、引退した相棒最大3匹まで一緒に、イマソラウォークの曲を歌詞表示ありで試聴できます。</span>
+    <div class="karaoke-room">
+      <div class="karaoke-singers">
+        ${participants.map(item => `<div class="karaoke-singer"><strong>${escapeAttr(item.name)}</strong><small>${escapeAttr(item.role)}</small></div>`).join("")}
+      </div>
+      <div class="karaoke-song-section">
+        <h4>カラオケ試聴</h4>
+        <div class="karaoke-song-grid">
+          ${karaokeSongButtons(karaokeModes)}
+        </div>
+      </div>
+      <div class="karaoke-song-section">
+        <h4>サウンド試聴</h4>
+        <div class="karaoke-song-grid">
+          ${karaokeSongButtons(soundModes)}
+        </div>
+      </div>
+      <div class="karaoke-controls">
+        <button type="button" data-karaoke-play>この曲を試聴する</button>
+        <button type="button" data-karaoke-stop>停止</button>
+      </div>
+      <div class="karaoke-lyrics">${escapeAttr(karaokeLyricsText(selectedKaraokeBgmMode))}</div>
+    </div>
+  `;
+  box.querySelector("[data-karaoke-return-town]")?.addEventListener("click", returnToTownMapFromKaraoke);
+  box.querySelectorAll("[data-karaoke-song]").forEach(button => {
+    button.addEventListener("click", () => selectKaraokeSong(button.dataset.karaokeSong));
+  });
+  box.querySelector("[data-karaoke-play]")?.addEventListener("click", playSelectedKaraokeSong);
+  box.querySelector("[data-karaoke-stop]")?.addEventListener("click", stopKaraokeSong);
+}
+function openMusicPlazaKaraokeFromTown() {
+  if (!isTownBuildingBuilt("soundShop")) {
+    playSfx("error");
+    toast("音楽プラザはまだ建設されていません");
+    return;
+  }
+  musicPlazaKaraokeOpen = true;
+  renderTownKaraoke();
+  document.getElementById("townKaraoke")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("カラオケボックスへ移動しました");
+}
+function returnToTownMapFromKaraoke() {
+  musicPlazaKaraokeOpen = false;
+  stopBgm();
+  renderTownKaraoke();
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
+function selectKaraokeSong(mode) {
+  if (!karaokeAvailableSongModes().includes(mode)) return;
+  selectedKaraokeBgmMode = mode;
+  renderTownKaraoke();
+  playSfx("select");
+}
+function playSelectedKaraokeSong() {
+  previewBgm(selectedKaraokeBgmMode);
+}
+function stopKaraokeSong() {
+  stopBgm();
+  playSfx("select");
+  toast("試聴を停止しました");
+}
+function retiredPracticeStats(record) {
+  const saved = record?.stats;
+  const keys = ["hp", "mp", "spd", "atk", "def", "acc", "eva"];
+  if (saved && keys.every(key => Number.isFinite(Number(saved[key])))) {
+    return Object.fromEntries(keys.map(key => [key, Number(saved[key])]));
+  }
+  return baseMonsterStats(record?.monster || {});
+}
+function retireParkPracticeBattleStats(strategy = state.battleStrategy || "balanced") {
+  const stats = { ...monsterStats(), seedId: state.monster?.seedId || "" };
+  if (strategy === "rush") stats.spd += 2;
+  if (strategy === "guard") { stats.def += 2; stats.hp += 2; }
+  if (strategy === "focus") { stats.acc += 2; stats.mp += 2; }
+  if (strategy === "reserve") stats.mp += 3;
+  if (strategy === "read") { stats.acc += 1; stats.eva += 2; }
+  return stats;
+}
+function retireParkPracticeArenaCup() {
+  const scene = currentTownScene();
+  const arenaId = scene === "night" ? "grand" : scene === "evening" ? "city" : "rookie";
+  return { id: arenaId, name: "広場の練習試合", req: 0, matchCount: 1, reward: 0 };
+}
+function retireParkPracticeBgmMode() {
+  const scene = currentTownScene();
+  if (scene === "night") return "retireParkPracticeNight";
+  if (scene === "evening") return "retireParkPracticeEvening";
+  return scene === "morning" || scene === "day" ? "retireParkPracticeMorningDay" : "retireParkPractice";
+}
+function retireParkPracticeOpponent(record) {
+  ensureMonsterDexGroups();
+  const items = monsterDexGroups.flatMap(group => group.list || []);
+  const item = items.find(entry => entry.id === record?.artId)
+    || items.find(entry => entry.id === record?.profileId)
+    || items.find(entry => entry.id === record?.seedId)
+    || null;
+  return {
+    id: record?.id || "",
+    name: record?.name || "引退相棒",
+    baseName: record?.name || "引退相棒",
+    seedId: record?.seedId || record?.monster?.seedId || "",
+    stage: "満開期",
+    item
+  };
+}
+function retireParkPracticeStrategyMenu(record) {
+  const selectedStrategy = state.battleStrategy || "balanced";
+  return `
+    <div class="mini-feature">
+      <div class="mini-grid">
+        ${strategyBook.map(s => `<button class="strategy-card ${selectedStrategy === s.id ? "selected" : ""}" type="button" data-town-practice-strategy="${s.id}"><strong>${s.name}</strong><small>${s.text}</small></button>`).join("")}
+      </div>
+      <div class="balance-note">選択中: ${strategyName(selectedStrategy)}作戦</div>
+      <div class="actions">
+        <button class="primary" type="button" data-town-practice-decide="${record.id}">作戦決定</button>
+        <button class="quiet" type="button" data-town-practice-back>戻る</button>
+      </div>
+    </div>
+  `;
+}
+function renderTownPractice(resultHtml = "") {
+  const box = document.getElementById("townPractice");
+  if (!box) return;
+  if (!isTownBuildingBuilt("retirePark")) {
+    box.innerHTML = "";
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  const records = [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0));
+  const pendingRecord = pendingRetireParkPracticeRecordId
+    ? records.find(item => item.id === pendingRetireParkPracticeRecordId)
+    : null;
+  const listHtml = records.length
+    ? `<div class="shop-grid">${records.map(record => {
+        const stats = retiredPracticeStats(record);
+        const total = retirementAbilityTotal(stats);
+        return `<div class="shop-card town-practice-card">
+          <div class="item-art item-art-locked"><i></i><em></em><span></span></div>
+          <div><strong>${record.name || "引退相棒"}</strong><small>HP${stats.hp} MP${stats.mp}<br>攻撃${stats.atk} 防御${stats.def}<br>速度${stats.spd} 命中${stats.acc}<br>回避${stats.eva}</small></div>
+          <button type="button" data-town-practice-record="${record.id}">練習試合をする</button>
+        </div>`;
+      }).join("")}</div>`
+    : `<div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>記録待ち</strong><span>引退して記録した相棒がいると、ここで練習試合ができます。</span><small>報酬なし / 消耗なし</small></div></div></div>`;
+  box.innerHTML = `
+    <div class="town-practice-heading"><b>広場</b><button type="button" data-town-practice-return-town>町に戻る</button></div>
+    <span>今の相棒と、過去の相棒が練習試合をできます。勝敗は記録だけで、報酬や消耗はありません。</span>
+    ${listHtml}
+    ${pendingRecord ? retireParkPracticeStrategyMenu(pendingRecord) : ""}
+    ${resultHtml}
+  `;
+  box.querySelector("[data-town-practice-return-town]")?.addEventListener("click", returnToTownMapFromRetireParkPractice);
+  box.querySelectorAll("[data-town-practice-record]").forEach(button => {
+    button.addEventListener("click", () => showRetireParkPracticeStrategy(button.dataset.townPracticeRecord));
+  });
+  box.querySelectorAll("[data-town-practice-strategy]").forEach(button => {
+    button.addEventListener("click", () => selectRetireParkPracticeStrategy(button.dataset.townPracticeStrategy));
+  });
+  box.querySelector("[data-town-practice-decide]")?.addEventListener("click", (event) => {
+    startRetireParkPracticeBattle(event.currentTarget.dataset.townPracticeDecide);
+  });
+  box.querySelector("[data-town-practice-back]")?.addEventListener("click", cancelRetireParkPracticeStrategy);
+}
+function showRetireParkPracticeStrategy(recordId) {
+  if (!isTownBuildingBuilt("retirePark")) {
+    playSfx("error");
+    toast("広場はまだ建設されていません");
+    return;
+  }
+  const record = (Array.isArray(state.retiredMonsters) ? state.retiredMonsters : []).find(item => item.id === recordId);
+  if (!record) {
+    playSfx("error");
+    toast("練習相手が見つかりません");
+    return;
+  }
+  pendingRetireParkPracticeRecordId = recordId;
+  renderTownPractice();
+  document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("作戦を選んでください");
+}
+function selectRetireParkPracticeStrategy(id) {
+  if (!setBattleStrategy(id)) return;
+  renderStrategyPanel();
+  renderTownPractice();
+  playSfx("select");
+  toast(`${strategyName(id)}作戦を選択`);
+}
+function cancelRetireParkPracticeStrategy() {
+  pendingRetireParkPracticeRecordId = "";
+  renderTownPractice();
+  playSfx("select");
+  toast("練習試合に戻りました");
+}
+function returnToTownMapFromRetireParkPractice() {
+  pendingRetireParkPracticeRecordId = "";
+  renderTownPractice();
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
+function startRetireParkPracticeBattle(recordId) {
+  if (!isTownBuildingBuilt("retirePark")) {
+    playSfx("error");
+    toast("広場はまだ建設されていません");
+    return;
+  }
+  const record = (Array.isArray(state.retiredMonsters) ? state.retiredMonsters : []).find(item => item.id === recordId);
+  if (!record) {
+    playSfx("error");
+    toast("練習相手が見つかりません");
+    return;
+  }
+  const profile = monsterProfile();
+  const playerName = companionDisplayName(profile);
+  const strategy = state.battleStrategy || "balanced";
+  const playerStats = { ...retireParkPracticeBattleStats(strategy), affinityName: playerName, affinityStage: profile.stage || "" };
+  const enemyStats = retiredPracticeStats(record);
+  const opponent = retireParkPracticeOpponent(record);
+  const cup = retireParkPracticeArenaCup();
+  const result = simulateTournamentRounds(playerStats, enemyStats, cup, opponent);
+  const match = { index: 0, enemy: opponent.name, enemyId: opponent.id, enemyBaseName: opponent.baseName, enemyStage: opponent.stage, enemyStats, ...result };
+  pendingRetireParkPracticeRecordId = "";
+  pendingRetireParkPracticeBattle = { cup, profile, playerStats, enemyStats, opponent, match, strategy };
+  const resultHtml = `
+    <div class="battle-judge"><strong>${playerName} vs ${opponent.name}</strong></div>
+    ${tournamentMatchesHtml([match], cup)}
+  `;
+  pendingBattleResultHtml = `<strong>${cup.name} ${match.win ? "勝利" : "敗北"} / ${battleDecisionLabel(match)}</strong><p>${playerName}は${opponent.name}と練習試合をしました。勝敗は記録だけで、報酬や消耗はありません。</p>${resultHtml}`;
+  pendingBattleResultSfx = "victory";
+  pendingBattleResultHomeAction = false;
+  pendingBattleLogMessages = [`広場: ${playerName}が${opponent.name}と${strategyName(strategy)}作戦で練習試合。${match.win ? "勝利" : "敗北"} / ${battleDecisionLabel(match)}`];
+  renderRetireParkPracticeBattleReady();
+}
+function renderRetireParkPracticeBattleReady() {
+  if (!pendingRetireParkPracticeBattle) return;
+  const { cup, profile, playerStats, enemyStats, opponent, match, strategy } = pendingRetireParkPracticeBattle;
+  const field = document.getElementById("battleField");
+  const log = document.getElementById("battleLog");
+  if (!field || !log) return;
+  const affinityStats = tournamentOpeningPlayerAffinityStats(playerStats, profile);
+  field.classList.remove("attack", "lose");
+  field.className = `battle-field tournament-opening ${arenaClassFor(cup)}`;
+  field.innerHTML = `
+    <div class="battle-hud">
+      <span class="battle-title">${cup.name} / ${strategyName(strategy)}作戦</span>
+      <div class="battle-action-stack">
+        <button class="battle-watch-btn" type="button" onclick="startRetireParkPracticeBattleFromReady(false)">練習試合を観戦する</button>
+        <button class="battle-skip-btn" type="button" onclick="startRetireParkPracticeBattleFromReady(true)">すぐに結果を見る</button>
+      </div>
+    </div>
+    <div class="fighter opening-fighter player" id="myFighter">${tournamentPlayerOpeningFighterHtml(profile, playerStats)}</div>
+    <div class="opening-match-center"><div class="versus-chip">VS</div>${tournamentOpeningAffinityHtml(affinityStats, opponent)}</div>
+    <div class="fighter opening-fighter enemy" id="enemyFighter">${tournamentEnemyOpeningFighterHtml(cup, opponent, enemyStats)}</div>
+    <div class="battle-flash"></div>
+  `;
+  pendingBattleAnimation = { cup, profile, playerStats, matchLabel: "練習試合", watchLabel: "練習試合を観戦する", bgmMode: retireParkPracticeBgmMode(), queue: buildBattleAnimationQueue([match], cup, profile, playerStats) };
+  log.innerHTML = `<strong>${cup.name} 観戦前</strong><p>${opponent.name}との練習試合です。BGMと効果音を楽しみながら観戦できます。すぐ確認したい場合は、戦闘画面右上の「すぐに結果を見る」を押してください。</p>`;
+  saveState();
+  renderHud();
+  renderTown();
+  renderTournament();
+  switchScreen("monster");
+  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  playSfx("battle");
+}
+function startRetireParkPracticeBattleFromReady(skipResult = false) {
+  if (!pendingRetireParkPracticeBattle) {
+    playSfx("error");
+    toast("練習試合が見つかりません");
+    return;
+  }
+  if (skipResult) {
+    requestBattleResultWithAd();
+    return;
+  }
+  startBattleAnimation();
+}
 function buyShopItem(itemId) {
   const item = dailyShopItems().find(entry => entry.id === itemId);
   if (!item) return;
@@ -38075,7 +38606,7 @@ function renderTownWorkshop() {
   const unbuilt = townBuildableBuildings.filter(([id]) => !isTownBuildingBuilt(id));
   document.getElementById("townWorkshop").innerHTML = `
     <b>街づくり工房</b>
-    <span>散歩で集めた素材を使って、建物を一つずつ直接作ります。素材がそろっても自動では建たず、建設するボタンを押して形にします。</span>
+    <span>散歩で集めた素材を、街の建物に変えられる場所です。建てたいものを選んで、あなたのタイミングで街を少しずつ育てていきましょう。</span>
     <div class="workshop-status">
       <div><strong>建築済み</strong><small>${opened.length}/${townBuildableBuildings.length}</small></div>
       <div><strong>草</strong><small>${townMaterialCount("草の素材")}</small></div>
@@ -38329,9 +38860,30 @@ const evolutionStageRules = [
 function retirementBaseHours() {
   return 72;
 }
+function townBuildingMonsterBonuses() {
+  const bonuses = { hp: 0, mp: 0, spd: 0, atk: 0, def: 0, acc: 0, eva: 0, retirementHours: 0 };
+  const statBonuses = {
+    castle: { hp: 5 },
+    retirePark: { mp: 5 },
+    bridge: { spd: 3 },
+    clock: { atk: 3 },
+    fountain: { def: 3 },
+    guild: { acc: 3 },
+    station: { eva: 3 }
+  };
+  Object.entries(statBonuses).forEach(([id, values]) => {
+    if (!isTownBuildingBuilt(id)) return;
+    Object.entries(values).forEach(([key, value]) => {
+      bonuses[key] += value;
+    });
+  });
+  if (isTownBuildingBuilt("statue1")) bonuses.retirementHours += 12;
+  if (isTownBuildingBuilt("statue2")) bonuses.retirementHours += 12;
+  return bonuses;
+}
 function retirementRemainingHours() {
   const bornAt = Number(state.monster.bornAt || Date.now());
-  const extensionHours = Math.min(5, Number(state.monster.lifeExtensionUses || 0)) * 12;
+  const extensionHours = Math.min(5, Number(state.monster.lifeExtensionUses || 0)) * 12 + townBuildingMonsterBonuses().retirementHours;
   const endAt = bornAt + (retirementBaseHours() + extensionHours) * 60 * 60 * 1000;
   return Math.max(0, Math.ceil((endAt - Date.now()) / (60 * 60 * 1000)));
 }
@@ -38570,17 +39122,29 @@ function giveSupportItem(reason = "", bias = "") {
 function autoEnterGrandChampion() {
   if (hasGrandQualification()) state.monster.grandQualified = true;
 }
-function monsterStats() {
-  const m = state.monster;
+function baseMonsterStats(m = state.monster) {
   const whiteBonus = m.seedId === "seed-white" ? 1 : 0;
   return {
-    hp: 24 + Math.floor(m.xp * 1.5) + m.nature + whiteBonus,
-    mp: 10 + Math.floor(m.xp * .8) + m.sky * 2 + whiteBonus,
-    spd: 8 + Math.floor(m.xp * .45) + m.sky + whiteBonus,
-    atk: 9 + Math.floor(m.xp * .62) + m.city,
-    def: 7 + Math.floor(m.xp * .5) + m.nature,
-    acc: 78 + Math.min(14, Math.floor(m.xp / 8) + m.city),
-    eva: 6 + Math.min(18, Math.floor(m.xp / 7) + m.sky)
+    hp: 24 + Math.floor(Number(m.xp || 0) * 1.5) + Number(m.nature || 0) + whiteBonus,
+    mp: 10 + Math.floor(Number(m.xp || 0) * .8) + Number(m.sky || 0) * 2 + whiteBonus,
+    spd: 8 + Math.floor(Number(m.xp || 0) * .45) + Number(m.sky || 0) + whiteBonus,
+    atk: 9 + Math.floor(Number(m.xp || 0) * .62) + Number(m.city || 0),
+    def: 7 + Math.floor(Number(m.xp || 0) * .5) + Number(m.nature || 0),
+    acc: 78 + Math.min(14, Math.floor(Number(m.xp || 0) / 8) + Number(m.city || 0)),
+    eva: 6 + Math.min(18, Math.floor(Number(m.xp || 0) / 7) + Number(m.sky || 0))
+  };
+}
+function monsterStats() {
+  const stats = baseMonsterStats(state.monster);
+  const townBonus = townBuildingMonsterBonuses();
+  return {
+    hp: stats.hp + townBonus.hp,
+    mp: stats.mp + townBonus.mp,
+    spd: stats.spd + townBonus.spd,
+    atk: stats.atk + townBonus.atk,
+    def: stats.def + townBonus.def,
+    acc: stats.acc + townBonus.acc,
+    eva: stats.eva + townBonus.eva
   };
 }
 function growthForecast() {
@@ -38942,6 +39506,7 @@ function createRetirementRecord() {
     rank: rank.rank,
     rankLabel: rank.label,
     abilityTotal: total,
+    stats,
     grandChampionWon,
     retiredAt: retirementDateText(),
     usedCount: 0,
@@ -42472,6 +43037,7 @@ function renderPlaytestBoost() {
       <button class="secondary" id="playtestItemSetBtn" type="button">アイテム確認セットを入れる</button>
       <button class="secondary" id="playtestShopOpenBtn" type="button">アイテムショップを開ける</button>
       <button class="secondary" id="playtestAllTownBuildingsBtn" type="button">全建造物の街を開く</button>
+      <button class="secondary" id="playtestRetireParkRecordsBtn" type="button">広場の記録4件を用意</button>
       ${townBuildableBuildings.map(([id]) => `<button class="secondary" type="button" data-playtest-town-building="${id}">${townFacilityDisplayName(id)}だけ確認</button>`).join("")}
       <button class="secondary" id="playtestTournamentBypassBtn" type="button">${tournamentBypass ? "大会確認モードをOFF" : "大会確認モードをON"}</button>
       <button class="secondary" id="playtestRetirementReadyBtn" type="button">引退式テスト状態へ戻す</button>
@@ -42496,6 +43062,7 @@ function renderPlaytestBoost() {
   document.getElementById("playtestItemSetBtn")?.addEventListener("click", grantPlaytestItemSet);
   document.getElementById("playtestShopOpenBtn")?.addEventListener("click", openPlaytestShop);
   document.getElementById("playtestAllTownBuildingsBtn")?.addEventListener("click", openPlaytestAllTownBuildings);
+  document.getElementById("playtestRetireParkRecordsBtn")?.addEventListener("click", openPlaytestRetireParkRecords);
   document.querySelectorAll("[data-playtest-town-building]").forEach(button => {
     button.addEventListener("click", () => openPlaytestSingleTownBuilding(button.dataset.playtestTownBuilding));
   });
@@ -42762,6 +43329,62 @@ function openPlaytestAllTownBuildings() {
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("reward");
   toast("全建造物の街を確認できます");
+}
+function openPlaytestRetireParkRecords() {
+  if (!state.townBuildings.includes("retirePark")) {
+    state.townBuildings.push("retirePark");
+  }
+  const samples = [
+    { id: "playtest-retirepark-1", name: "ミチロードフワナ", seedId: "seed-walk", rank: "A", stats: { hp: 84, mp: 42, spd: 32, atk: 38, def: 31, acc: 90, eva: 22 } },
+    { id: "playtest-retirepark-2", name: "ソラミルフワナ", seedId: "seed-sky", rank: "B", stats: { hp: 76, mp: 51, spd: 39, atk: 31, def: 27, acc: 87, eva: 29 } },
+    { id: "playtest-retirepark-3", name: "マチアカリフワナ", seedId: "seed-city", rank: "A", stats: { hp: 88, mp: 44, spd: 30, atk: 42, def: 34, acc: 93, eva: 20 } },
+    { id: "playtest-retirepark-4", name: "ハニモリフワナ", seedId: "seed-leaf", rank: "C", stats: { hp: 72, mp: 39, spd: 28, atk: 30, def: 36, acc: 84, eva: 18 } }
+  ].map((item, index) => ({
+    id: item.id,
+    name: item.name,
+    profileId: item.seedId,
+    artId: item.seedId,
+    seedId: item.seedId,
+    rank: item.rank,
+    rankLabel: "広場確認用",
+    abilityTotal: retirementAbilityTotal(item.stats),
+    grandChampionWon: false,
+    retiredAt: retirementDateText(),
+    usedCount: 0,
+    stats: item.stats,
+    monster: {
+      seedId: item.seedId,
+      nickname: item.name,
+      xp: 45 + index * 8,
+      nature: 6 + index,
+      city: 5 + index,
+      sky: 7 + index,
+      wins: index,
+      age: 0,
+      lifeBonus: 0,
+      bornAt: Date.now() - 80 * 60 * 60 * 1000,
+      evolutionStage: 4,
+      lifeExtensionUses: 0,
+      grandQualified: false,
+      medals: [],
+      skills: ["tap"]
+    },
+    savedAt: Date.now() - index * 1000
+  }));
+  state.retiredMonsters = [
+    ...samples,
+    ...(Array.isArray(state.retiredMonsters)
+      ? state.retiredMonsters.filter((item) => !String(item.id || "").startsWith("playtest-retirepark-"))
+      : [])
+  ];
+  selectedTownBuildingId = "retirePark";
+  addLog("開発用テスト補助で、広場の練習試合確認用に引退記録4件を用意。正式版の通常進行では使わない補助です。");
+  saveState();
+  renderAll();
+  switchScreen("town");
+  document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("reward");
+  toast("広場の記録4件を用意しました");
 }
 function openPlaytestSingleTownBuilding(id) {
   const building = townBuildingById(id);
@@ -43105,13 +43728,13 @@ function renderAll() {
 function enemyStatsForCup(cup) {
   const enemyPower = cup.req + Math.floor(state.position / 8);
   return {
-    hp: 24 + enemyPower * 2,
-    atk: 8 + enemyPower,
-    def: 6 + Math.floor(enemyPower * .7),
-    mp: 10 + Math.floor(enemyPower * .85),
-    spd: 7 + Math.floor(enemyPower * .55),
-    acc: 75 + Math.min(15, Math.floor(enemyPower / 3)),
-    eva: 6 + Math.min(16, Math.floor(enemyPower / 4))
+    hp: 24 + enemyPower * 2 + 5,
+    atk: 8 + enemyPower + 3,
+    def: 6 + Math.floor(enemyPower * .7) + 3,
+    mp: 10 + Math.floor(enemyPower * .85) + 5,
+    spd: 7 + Math.floor(enemyPower * .55) + 3,
+    acc: 75 + Math.min(15, Math.floor(enemyPower / 3)) + 3,
+    eva: 6 + Math.min(16, Math.floor(enemyPower / 4)) + 3
   };
 }
 function tournamentMatchCount(cup) {
@@ -44112,13 +44735,9 @@ function playBattleAnimationStep(index) {
     if (battleResultSfxTimer) clearTimeout(battleResultSfxTimer);
     battleResultSfxTimer = setTimeout(() => {
       battleResultSfxTimer = null;
-      if (finalOutcomeSide === "me") {
-        stopBgm();
-        startBgm("battleVictory");
-      } else {
-        stopBgm();
-        startBgm("battleDefeat");
-      }
+      const resultBgmMode = pendingBattleAnimation?.matchLabel === "練習試合" ? "battleVictory" : finalOutcomeSide === "me" ? "battleVictory" : "battleDefeat";
+      stopBgm();
+      startBgm(resultBgmMode);
       pendingBattleResultSfx = "";
       if (pendingBattleAnimation) pendingBattleAnimation.resultSfxPlayed = true;
     }, Math.round(finalDecisionDelay * 1000));
@@ -44139,10 +44758,16 @@ function revealBattleResult() {
   clearBattleAdTimer();
   pendingBattleAnimation = null;
   if (!pendingBattleResultHtml) return;
+  const isRetireParkPracticeResult = !!pendingRetireParkPracticeBattle;
   if (!isBattleResultBgmMode()) stopBgm();
   const log = document.getElementById("battleLog");
   if (log) log.innerHTML = pendingBattleResultHtml;
-  if (pendingBattleResultHomeAction) {
+  if (isRetireParkPracticeResult) {
+    const actions = document.querySelector("#battleField .battle-hud .battle-action-stack");
+    if (actions) {
+      actions.innerHTML = `<button class="battle-watch-btn" type="button" onclick="returnToRetireParkPracticeFromBattleResult()">広場に戻る</button>`;
+    }
+  } else if (pendingBattleResultHomeAction) {
     const actions = document.querySelector("#battleField .battle-hud .battle-action-stack");
     if (actions) {
       actions.innerHTML = `<button class="battle-watch-btn" type="button" onclick="returnHomeFromTournamentDefeatDecision()">ホームへ戻る</button>`;
@@ -44154,12 +44779,31 @@ function revealBattleResult() {
   pendingBattleResultSfx = "";
   pendingBattleLogMessages.forEach(message => addLog(message));
   pendingBattleLogMessages = [];
+  pendingRetireParkPracticeBattle = null;
   pendingBattleResultHomeAction = false;
   renderLog();
   if (pendingBattleReward && !pendingBattleReward.defer) {
     showReward(pendingBattleReward.mark, pendingBattleReward.title, pendingBattleReward.text, pendingBattleReward.kind || "");
     pendingBattleReward = null;
   }
+}
+function returnToRetireParkPracticeFromBattleResult() {
+  blurActiveTextInput();
+  clearBattleAnimationTimer();
+  clearBattleAdTimer();
+  pendingBattleAnimation = null;
+  pendingBattleResultHtml = "";
+  pendingBattleResultSfx = "";
+  pendingBattleLogMessages = [];
+  pendingRetireParkPracticeBattle = null;
+  pendingBattleResultHomeAction = false;
+  selectedTownBuildingId = "retirePark";
+  saveState();
+  renderAll();
+  switchScreen("town");
+  document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("広場に戻りました");
 }
 function returnHomeFromTournamentDefeatDecision() {
   blurActiveTextInput();
