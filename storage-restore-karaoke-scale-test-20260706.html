@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Karaoke scale test restore</title>
+<script>
+(function () {
+  var seatAdjust = {
+    retiredLeft: { x: -16, y: 40, scale: 1.12 },
+    current: { x: 0, y: 52, scale: 1.38 },
+    guide: { x: 0, y: 40, scale: 1.05 },
+    retiredRight: { x: 12, y: 40, scale: 1.10 }
+  };
+  var nameAdjust = {
+    retiredLeft: { x: -30, y: 52 },
+    current: { x: -8, y: 52 },
+    guide: { x: 8, y: 52 },
+    retiredRight: { x: 26, y: 52 }
+  };
+  localStorage.setItem("imasoraKaraokeSeatAdjustV1", JSON.stringify(seatAdjust));
+  localStorage.setItem("imasoraKaraokeNameAdjustV1", JSON.stringify(nameAdjust));
+  localStorage.setItem("imasoraKaraokeScaleTestVersion", "20260706-0001");
+  location.replace("life-quest-walk.html?restored=20260706-karaoke-scale-test-0001");
+})();
+</script>
