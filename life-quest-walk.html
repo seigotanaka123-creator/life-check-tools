@@ -38402,17 +38402,6 @@ const townLayeredSpriteAssets = {
   clock: { file: "town-layered-clock-v1.png", x: 25.96, y: 41.34, w: 13.48, h: 21.45, z: 19, r: 4 }
 };
 const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2";
-const townLayeredSpriteBaselineStoreKey = "imasoraTownLayeredSpriteBaselineV20260705";
-function ensureTownLayeredSpriteBaseline() {
-  try {
-    if (localStorage.getItem(townLayeredSpriteBaselineStoreKey) === "1") return;
-    localStorage.removeItem(townLayeredSpriteOffsetStorageKey);
-    localStorage.setItem(townLayeredSpriteBaselineStoreKey, "1");
-  } catch (error) {
-    // If localStorage is unavailable, the built-in sprite positions are used.
-  }
-}
-ensureTownLayeredSpriteBaseline();
 const townLayeredSpriteNudgeStep = 0.35;
 const townLayeredSpriteRotateStep = 2;
 const townLayeredSpriteScaleStep = 0.05;
