@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -295,7 +295,7 @@
     }
     h2 {
       margin: 0 0 6px;
-      font-size: 22px;
+      font-size: 23px;
       line-height: 1.25;
     }
     .town-screen-heading {
@@ -8528,6 +8528,56 @@
       border-color: rgba(197, 145, 46, .46);
       color: #735221;
     }
+    .karaoke-dev-adjust-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .karaoke-dev-adjust-row {
+      display: grid;
+      gap: 5px;
+      padding: 7px;
+      border: 1px solid rgba(49,91,145,.16);
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+    }
+    .karaoke-dev-adjust-row b {
+      color: #254a78;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+    .karaoke-dev-adjust-values {
+      color: #6d7a87;
+      font: 800 11px/1.2 var(--mono);
+    }
+    .karaoke-dev-adjust-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .town-dev-menu .karaoke-dev-adjust-buttons button,
+    #townKaraoke .karaoke-dev-adjust-buttons button {
+      min-height: 28px;
+      padding: 4px 5px;
+      font-size: 11px;
+      line-height: 1;
+    }
+    #townKaraoke .karaoke-dev-inline {
+      margin-top: 10px;
+      padding: 9px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 8px;
+      background: rgba(255,255,255,.86);
+    }
+    #townKaraoke .karaoke-dev-inline-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #254a78;
+      font-size: 12px;
+      font-weight: 900;
+    }
     @media (max-width: 560px) {
       .town-dev-scene-buttons {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -8755,6 +8805,13 @@
       font-weight: 900;
       cursor: pointer;
     }
+    #townKaraoke .karaoke-time {
+      min-width: 86px;
+      color: #6b4f21;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
     #townKaraoke .karaoke-room {
       display: grid;
       gap: 12px;
@@ -8817,6 +8874,540 @@
       color: #574427;
       line-height: 1.8;
       white-space: pre-line;
+    }
+    #townKaraoke .karaoke-stage-scene {
+      position: relative;
+      min-height: 260px;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 2px solid #49335d;
+      border-radius: 12px;
+      background-image: var(--karaoke-room-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 12px 28px rgba(44, 31, 70, .18);
+    }
+    #townKaraoke .karaoke-stage-scene::before,
+    #townKaraoke .karaoke-stage-scene::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 15%;
+      background: #050505;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    #townKaraoke .karaoke-stage-scene::before {
+      top: 0;
+      transform: translateY(-100%);
+    }
+    #townKaraoke .karaoke-stage-scene::after {
+      bottom: 0;
+      transform: translateY(100%);
+    }
+    #townKaraoke .karaoke-stage-scene.cinemascope-active::before,
+    #townKaraoke .karaoke-stage-scene.cinemascope-active::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #townKaraoke .karaoke-cinemascope-lyric {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 15%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity .45s ease, transform .45s ease;
+      pointer-events: none;
+      z-index: 31;
+      contain: layout paint;
+    }
+    #townKaraoke .karaoke-stage-scene.cinemascope-active .karaoke-cinemascope-lyric {
+      opacity: 1;
+      transform: translateY(-4px);
+    }
+    #townKaraoke .karaoke-cinemascope-line {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      color: #fff;
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: 0 2px 4px rgba(0,0,0,.78);
+      contain: layout paint;
+    }
+    #townKaraoke .karaoke-cinemascope-base {
+      color: #fff;
+      font-size: inherit;
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+      letter-spacing: inherit;
+    }
+    #townKaraoke .karaoke-cinemascope-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      clip-path: inset(0 calc(100% - var(--karaoke-lyric-progress, 0%)) 0 0);
+      color: #ffb36b;
+      font-size: inherit;
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+      letter-spacing: inherit;
+      white-space: nowrap;
+      text-shadow: 0 0 6px rgba(255,179,107,.82), 0 2px 4px rgba(0,0,0,.78);
+      contain: paint;
+      transform: translateZ(0);
+      will-change: clip-path;
+    }
+    #townKaraoke .karaoke-cinemascope-gap {
+      display: inline-block;
+      width: .38em;
+    }
+    #townKaraoke .karaoke-cinemascope-gap.big {
+      width: .76em;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-scene-morning-day {
+      --karaoke-room-image: url("assets/karaoke-room-morning-day-v01.png");
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-scene-evening {
+      --karaoke-room-image: url("assets/karaoke-room-evening-v01.png");
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-scene-night {
+      --karaoke-room-image: url("assets/karaoke-room-night-v01.png");
+    }
+    #townKaraoke .karaoke-stage-scene {
+      --karaoke-light-beat-pulse: 0;
+    }
+    #townKaraoke .karaoke-room-light-wash {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: normal;
+      --karaoke-light-recolor-opacity: 0;
+      --karaoke-light-recolor-brightness: 1;
+      --karaoke-light-room-a: .12;
+      --karaoke-light-room-side-a: .08;
+      --karaoke-light-room-right-a: .12;
+      --karaoke-light-room-center-a: .12;
+      --karaoke-light-main-a: .20;
+      --karaoke-light-edge-a: .07;
+      --karaoke-light-beam-a: .22;
+      --karaoke-light-glow-opacity: .45;
+      --karaoke-light-room-halo-a: .24;
+      --karaoke-light-room-top-a: .20;
+      --karaoke-light-room-floor-a: .16;
+      --karaoke-light-room-deep-rgb: 8, 28, 118;
+      --karaoke-light-room-mid-rgb: 18, 58, 176;
+      --karaoke-light-room-center-rgb: 18, 62, 190;
+      --karaoke-light-room-right-rgb: 8, 28, 114;
+      --karaoke-light-room-top-rgb: 7, 20, 82;
+      --karaoke-light-room-floor-rgb: 5, 12, 56;
+      --karaoke-light-edge-rgb: 12, 36, 136;
+      --karaoke-light-beam-rgb: 34, 88, 226;
+      --karaoke-light-core-rgb: 84, 152, 255;
+      --karaoke-light-soft-rgb: 94, 164, 255;
+      --karaoke-light-bright-rgb: 120, 184, 255;
+      --karaoke-light-recolor-filter: hue-rotate(188deg) saturate(1.9);
+      background:
+        linear-gradient(103deg, transparent 0 9%, rgba(var(--karaoke-light-room-deep-rgb), calc(var(--karaoke-light-room-side-a) + var(--karaoke-light-beat-pulse) * .20)) 23%, rgba(var(--karaoke-light-room-mid-rgb), calc(var(--karaoke-light-room-a) + var(--karaoke-light-beat-pulse) * .36)) 43%, rgba(var(--karaoke-light-room-deep-rgb), calc(var(--karaoke-light-room-side-a) + var(--karaoke-light-beat-pulse) * .18)) 67%, transparent 86% 100%),
+        linear-gradient(77deg, transparent 0 14%, rgba(var(--karaoke-light-room-deep-rgb), calc(var(--karaoke-light-room-side-a) + var(--karaoke-light-beat-pulse) * .18)) 33%, rgba(var(--karaoke-light-room-mid-rgb), calc(var(--karaoke-light-room-a) + var(--karaoke-light-beat-pulse) * .36)) 57%, rgba(var(--karaoke-light-room-deep-rgb), calc(var(--karaoke-light-room-side-a) + var(--karaoke-light-beat-pulse) * .20)) 77%, transparent 91% 100%),
+        linear-gradient(96deg, transparent 0 28%, rgba(var(--karaoke-light-room-center-rgb), calc(var(--karaoke-light-room-center-a) + var(--karaoke-light-beat-pulse) * .30)) 43%, rgba(var(--karaoke-light-room-center-rgb), calc(var(--karaoke-light-room-center-a) + var(--karaoke-light-beat-pulse) * .30)) 57%, transparent 72% 100%),
+        linear-gradient(90deg, transparent 0 50%, rgba(var(--karaoke-light-room-right-rgb), calc(var(--karaoke-light-room-right-a) + var(--karaoke-light-beat-pulse) * .30)) 100%),
+        linear-gradient(180deg, rgba(var(--karaoke-light-room-top-rgb), calc(var(--karaoke-light-room-top-a) + var(--karaoke-light-beat-pulse) * .34)), rgba(var(--karaoke-light-room-mid-rgb), calc(.06 + var(--karaoke-light-beat-pulse) * .24)) 44%, rgba(var(--karaoke-light-room-floor-rgb), calc(var(--karaoke-light-room-floor-a) + var(--karaoke-light-beat-pulse) * .30)) 100%);
+      transition: opacity .36s ease, filter .36s ease;
+      filter: none;
+    }
+    #townKaraoke .karaoke-room-light-wash::before,
+    #townKaraoke .karaoke-room-light-wash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    #townKaraoke .karaoke-room-light-wash::before {
+      background-image: var(--karaoke-room-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: var(--karaoke-light-recolor-filter) brightness(calc(var(--karaoke-light-recolor-brightness) + var(--karaoke-light-beat-pulse) * .28)) contrast(1.05);
+      opacity: calc(var(--karaoke-light-recolor-opacity) + var(--karaoke-light-beat-pulse) * .16);
+      mix-blend-mode: normal;
+      -webkit-mask-image: linear-gradient(180deg, #000 0 100%);
+      mask-image: linear-gradient(180deg, #000 0 100%);
+      clip-path: polygon(29% 0%, 71% 0%, 100% 100%, 0% 100%);
+    }
+    #townKaraoke .karaoke-room-light-wash::after {
+      background:
+        linear-gradient(103deg, transparent 0 17%, rgba(var(--karaoke-light-edge-rgb), calc(var(--karaoke-light-edge-a) * 1.05 + var(--karaoke-light-beat-pulse) * .24)) 25%, rgba(var(--karaoke-light-beam-rgb), calc(var(--karaoke-light-beam-a) * 1.35 + var(--karaoke-light-beat-pulse) * .50)) 34%, rgba(var(--karaoke-light-core-rgb), calc(.22 + var(--karaoke-light-beat-pulse) * .44)) 42%, rgba(var(--karaoke-light-beam-rgb), calc(var(--karaoke-light-beam-a) * 1.18 + var(--karaoke-light-beat-pulse) * .42)) 50%, rgba(var(--karaoke-light-edge-rgb), calc(var(--karaoke-light-edge-a) * .92 + var(--karaoke-light-beat-pulse) * .20)) 61%, transparent 72% 100%),
+        linear-gradient(77deg, transparent 0 28%, rgba(var(--karaoke-light-edge-rgb), calc(var(--karaoke-light-edge-a) * .92 + var(--karaoke-light-beat-pulse) * .20)) 39%, rgba(var(--karaoke-light-beam-rgb), calc(var(--karaoke-light-beam-a) * 1.18 + var(--karaoke-light-beat-pulse) * .42)) 50%, rgba(var(--karaoke-light-core-rgb), calc(.22 + var(--karaoke-light-beat-pulse) * .44)) 58%, rgba(var(--karaoke-light-beam-rgb), calc(var(--karaoke-light-beam-a) * 1.35 + var(--karaoke-light-beat-pulse) * .50)) 66%, rgba(var(--karaoke-light-edge-rgb), calc(var(--karaoke-light-edge-a) * 1.05 + var(--karaoke-light-beat-pulse) * .24)) 75%, transparent 83% 100%),
+        linear-gradient(103deg, transparent 0 35%, rgba(var(--karaoke-light-soft-rgb), calc(.16 + var(--karaoke-light-beat-pulse) * .42)) 41%, rgba(var(--karaoke-light-bright-rgb), calc(.20 + var(--karaoke-light-beat-pulse) * .50)) 45%, rgba(var(--karaoke-light-soft-rgb), calc(.16 + var(--karaoke-light-beat-pulse) * .42)) 49%, transparent 55% 100%),
+        linear-gradient(77deg, transparent 0 45%, rgba(var(--karaoke-light-soft-rgb), calc(.16 + var(--karaoke-light-beat-pulse) * .42)) 51%, rgba(var(--karaoke-light-bright-rgb), calc(.20 + var(--karaoke-light-beat-pulse) * .50)) 55%, rgba(var(--karaoke-light-soft-rgb), calc(.16 + var(--karaoke-light-beat-pulse) * .42)) 59%, transparent 65% 100%),
+        linear-gradient(180deg, rgba(var(--karaoke-light-room-center-rgb), calc(var(--karaoke-light-room-top-a) * .18 + var(--karaoke-light-beat-pulse) * .12)) 0%, rgba(var(--karaoke-light-beam-rgb), calc(.12 + var(--karaoke-light-beat-pulse) * .22)) 62%, rgba(var(--karaoke-light-room-mid-rgb), calc(var(--karaoke-light-room-floor-a) * .28 + var(--karaoke-light-beat-pulse) * .22)) 100%);
+      mix-blend-mode: screen;
+      opacity: calc(var(--karaoke-light-glow-opacity) + var(--karaoke-light-beat-pulse) * .86);
+      transform-origin: 50% 0%;
+      clip-path: polygon(31% 4%, 69% 4%, 100% 100%, 0% 100%);
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-off .karaoke-room-light-wash {
+      opacity: 0;
+      --karaoke-light-recolor-opacity: 0;
+      --karaoke-light-glow-opacity: 0;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-quiet .karaoke-room-light-wash {
+      opacity: 1;
+      --karaoke-light-recolor-opacity: .92;
+      --karaoke-light-recolor-brightness: .92;
+      --karaoke-light-recolor-filter: hue-rotate(188deg) saturate(1.82);
+      --karaoke-light-room-a: .44;
+      --karaoke-light-room-side-a: .31;
+      --karaoke-light-room-right-a: .56;
+      --karaoke-light-room-center-a: .42;
+      --karaoke-light-main-a: .08;
+      --karaoke-light-edge-a: .04;
+      --karaoke-light-beam-a: .075;
+      --karaoke-light-glow-opacity: .22;
+      --karaoke-light-room-halo-a: .68;
+      --karaoke-light-room-top-a: .56;
+      --karaoke-light-room-floor-a: .48;
+      --karaoke-light-room-deep-rgb: 5, 16, 74;
+      --karaoke-light-room-mid-rgb: 13, 38, 128;
+      --karaoke-light-room-center-rgb: 18, 48, 158;
+      --karaoke-light-room-right-rgb: 6, 18, 82;
+      --karaoke-light-room-top-rgb: 4, 12, 58;
+      --karaoke-light-room-floor-rgb: 3, 8, 42;
+      --karaoke-light-edge-rgb: 8, 28, 126;
+      --karaoke-light-beam-rgb: 24, 74, 205;
+      --karaoke-light-core-rgb: 78, 132, 255;
+      --karaoke-light-soft-rgb: 70, 120, 224;
+      --karaoke-light-bright-rgb: 110, 166, 255;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-lift .karaoke-room-light-wash {
+      opacity: 1;
+      --karaoke-light-recolor-opacity: .98;
+      --karaoke-light-recolor-brightness: .86;
+      --karaoke-light-recolor-filter: hue-rotate(190deg) saturate(1.55);
+      --karaoke-light-room-a: .52;
+      --karaoke-light-room-side-a: .38;
+      --karaoke-light-room-right-a: .66;
+      --karaoke-light-room-center-a: .50;
+      --karaoke-light-main-a: .12;
+      --karaoke-light-edge-a: .055;
+      --karaoke-light-beam-a: .115;
+      --karaoke-light-glow-opacity: .34;
+      --karaoke-light-room-halo-a: .80;
+      --karaoke-light-room-top-a: .66;
+      --karaoke-light-room-floor-a: .58;
+      --karaoke-light-room-deep-rgb: 2, 8, 40;
+      --karaoke-light-room-mid-rgb: 6, 20, 72;
+      --karaoke-light-room-center-rgb: 10, 30, 96;
+      --karaoke-light-room-right-rgb: 3, 10, 46;
+      --karaoke-light-room-top-rgb: 2, 6, 30;
+      --karaoke-light-room-floor-rgb: 1, 4, 22;
+      --karaoke-light-edge-rgb: 5, 18, 82;
+      --karaoke-light-beam-rgb: 14, 48, 146;
+      --karaoke-light-core-rgb: 54, 104, 224;
+      --karaoke-light-soft-rgb: 40, 84, 180;
+      --karaoke-light-bright-rgb: 86, 140, 238;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-bridge .karaoke-room-light-wash {
+      opacity: 1;
+      --karaoke-light-recolor-opacity: .96;
+      --karaoke-light-recolor-brightness: .82;
+      --karaoke-light-recolor-filter: hue-rotate(315deg) saturate(1.35);
+      --karaoke-light-room-a: .50;
+      --karaoke-light-room-side-a: .36;
+      --karaoke-light-room-right-a: .64;
+      --karaoke-light-room-center-a: .48;
+      --karaoke-light-main-a: .12;
+      --karaoke-light-edge-a: .055;
+      --karaoke-light-beam-a: .12;
+      --karaoke-light-glow-opacity: .34;
+      --karaoke-light-room-halo-a: .78;
+      --karaoke-light-room-top-a: .64;
+      --karaoke-light-room-floor-a: .56;
+      --karaoke-light-room-deep-rgb: 58, 6, 18;
+      --karaoke-light-room-mid-rgb: 104, 14, 32;
+      --karaoke-light-room-center-rgb: 126, 20, 42;
+      --karaoke-light-room-right-rgb: 56, 8, 24;
+      --karaoke-light-room-top-rgb: 44, 5, 18;
+      --karaoke-light-room-floor-rgb: 38, 4, 14;
+      --karaoke-light-edge-rgb: 86, 12, 30;
+      --karaoke-light-beam-rgb: 166, 28, 50;
+      --karaoke-light-core-rgb: 218, 70, 88;
+      --karaoke-light-soft-rgb: 174, 42, 60;
+      --karaoke-light-bright-rgb: 232, 104, 118;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-chorus .karaoke-room-light-wash {
+      opacity: 1;
+      --karaoke-light-recolor-opacity: 1;
+      --karaoke-light-recolor-brightness: 1;
+      --karaoke-light-recolor-filter: hue-rotate(188deg) saturate(2.05);
+      --karaoke-light-room-a: .64;
+      --karaoke-light-room-side-a: .48;
+      --karaoke-light-room-right-a: .82;
+      --karaoke-light-room-center-a: .62;
+      --karaoke-light-main-a: .20;
+      --karaoke-light-edge-a: .08;
+      --karaoke-light-beam-a: .19;
+      --karaoke-light-glow-opacity: .52;
+      --karaoke-light-room-halo-a: .96;
+      --karaoke-light-room-top-a: .80;
+      --karaoke-light-room-floor-a: .72;
+      --karaoke-light-room-deep-rgb: 8, 28, 118;
+      --karaoke-light-room-mid-rgb: 18, 58, 176;
+      --karaoke-light-room-center-rgb: 20, 70, 208;
+      --karaoke-light-room-right-rgb: 8, 28, 114;
+      --karaoke-light-room-top-rgb: 7, 20, 82;
+      --karaoke-light-room-floor-rgb: 5, 12, 56;
+      --karaoke-light-edge-rgb: 12, 36, 136;
+      --karaoke-light-beam-rgb: 34, 88, 226;
+      --karaoke-light-core-rgb: 84, 152, 255;
+      --karaoke-light-soft-rgb: 94, 164, 255;
+      --karaoke-light-bright-rgb: 120, 184, 255;
+    }
+    #townKaraoke .karaoke-stage-scene.karaoke-light-finale .karaoke-room-light-wash {
+      opacity: 1;
+      --karaoke-light-recolor-opacity: 1;
+      --karaoke-light-recolor-brightness: 1.03;
+      --karaoke-light-recolor-filter: hue-rotate(188deg) saturate(2.15);
+      --karaoke-light-room-a: .70;
+      --karaoke-light-room-side-a: .54;
+      --karaoke-light-room-right-a: .90;
+      --karaoke-light-room-center-a: .68;
+      --karaoke-light-main-a: .23;
+      --karaoke-light-edge-a: .09;
+      --karaoke-light-beam-a: .22;
+      --karaoke-light-glow-opacity: .58;
+      --karaoke-light-room-halo-a: 1;
+      --karaoke-light-room-top-a: .88;
+      --karaoke-light-room-floor-a: .78;
+      --karaoke-light-room-deep-rgb: 10, 36, 138;
+      --karaoke-light-room-mid-rgb: 26, 80, 210;
+      --karaoke-light-room-center-rgb: 36, 100, 238;
+      --karaoke-light-room-right-rgb: 10, 34, 130;
+      --karaoke-light-room-top-rgb: 8, 26, 104;
+      --karaoke-light-room-floor-rgb: 6, 18, 78;
+      --karaoke-light-edge-rgb: 18, 54, 170;
+      --karaoke-light-beam-rgb: 48, 112, 246;
+      --karaoke-light-core-rgb: 112, 182, 255;
+      --karaoke-light-soft-rgb: 110, 184, 255;
+      --karaoke-light-bright-rgb: 158, 214, 255;
+    }
+    #townKaraoke .karaoke-stage-monitor {
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      width: min(68%, 430px);
+      min-height: 58px;
+      transform: translateX(-50%);
+      display: grid;
+      place-items: center;
+      padding: 10px 16px;
+      border: 3px solid #1d1730;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #3b2c74, #17142c);
+      color: #f9f2ff;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 0 18px rgba(156, 119, 255, .5), inset 0 0 16px rgba(132, 211, 255, .24);
+      z-index: 2;
+    }
+    #townKaraoke .karaoke-stage-neon {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 92px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff7bd3, #7ce8ff, #ffe46b, #ff7bd3);
+      opacity: .78;
+      box-shadow: 0 0 16px rgba(124, 232, 255, .64);
+    }
+    #townKaraoke .karaoke-stage-sofa {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      bottom: 45px;
+      height: 118px;
+      border-radius: 30px 30px 18px 18px;
+      background: linear-gradient(180deg, #8f3c7b, #5c285f 58%, #341d3d);
+      box-shadow: inset 0 12px 0 rgba(255,255,255,.12), 0 18px 0 #221422, 0 24px 24px rgba(0,0,0,.28);
+      z-index: 1;
+    }
+    #townKaraoke .karaoke-stage-table {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      width: 168px;
+      height: 38px;
+      transform: translateX(-50%);
+      border-radius: 50% 50% 18px 18px;
+      background: linear-gradient(180deg, #f3c26b, #8c532f);
+      box-shadow: 0 8px 0 #533018;
+      z-index: 4;
+    }
+    #townKaraoke .karaoke-stage-table::before,
+    #townKaraoke .karaoke-stage-table::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      width: 26px;
+      height: 18px;
+      border-radius: 6px;
+      background: #fff4c7;
+      box-shadow: inset 0 -5px 0 #e8774f;
+    }
+    #townKaraoke .karaoke-stage-table::before { left: 34px; }
+    #townKaraoke .karaoke-stage-table::after { right: 34px; background: #ffd45a; box-shadow: inset 0 -5px 0 #d48625; }
+    #townKaraoke .karaoke-stage-mic {
+      position: absolute;
+      width: 54px;
+      height: 8px;
+      border-radius: 999px;
+      background: #d7e7ff;
+      box-shadow: -9px 0 0 #3c365a, 0 2px 0 rgba(0,0,0,.24);
+      z-index: 5;
+    }
+    #townKaraoke .karaoke-stage-mic.one { left: 16%; bottom: 38px; transform: rotate(-18deg); }
+    #townKaraoke .karaoke-stage-mic.two { right: 16%; bottom: 38px; transform: rotate(18deg) scaleX(-1); }
+    #townKaraoke .karaoke-seat-row {
+      position: absolute;
+      left: 16%;
+      right: 16%;
+      bottom: 22%;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(58px, 1fr));
+      align-items: end;
+      gap: 10px;
+      z-index: 3;
+    }
+    #townKaraoke .karaoke-seat {
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+      min-width: 0;
+    }
+    #townKaraoke .karaoke-seat-art {
+      width: clamp(58px, 8vw, 86px);
+      height: clamp(58px, 8vw, 86px);
+      max-width: 100%;
+      display: grid;
+      place-items: center;
+      overflow: visible;
+      transform: translate(var(--karaoke-seat-x, 0px), var(--karaoke-seat-y, 0px)) scale(var(--karaoke-seat-scale, 1));
+      transform-origin: center bottom;
+    }
+    #townKaraoke .karaoke-seat-art > *,
+    #townKaraoke .karaoke-seat-art .monster-current-art,
+    #townKaraoke .karaoke-seat-art .monster-art,
+    #townKaraoke .karaoke-seat-art .dex-character,
+    #townKaraoke .karaoke-seat-art .gallery-monster-card,
+    #townKaraoke .karaoke-seat-art .unique-art {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      overflow: visible;
+    }
+    #townKaraoke .karaoke-seat-art .gallery-monster-card .monster-art {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    #townKaraoke .karaoke-seat-art .monster-current-art .monster,
+    #townKaraoke .karaoke-seat-art .monster-art .monster,
+    #townKaraoke .karaoke-seat-art .gallery-monster-card .monster {
+      transform-origin: center bottom;
+    }
+    #townKaraoke .karaoke-seat-art .monster,
+    #townKaraoke .karaoke-seat-art .monster *,
+    #townKaraoke .karaoke-seat-art .turnaround-monster,
+    #townKaraoke .karaoke-seat-art .turnaround-monster *,
+    #townKaraoke .karaoke-seat-art .unique-monster,
+    #townKaraoke .karaoke-seat-art .unique-monster *,
+    #townKaraoke .karaoke-seat-art svg,
+    #townKaraoke .karaoke-seat-art svg * {
+      animation: none !important;
+      animation-delay: 0s !important;
+    }
+    #townKaraoke .karaoke-seat-art .monster .monster-spark {
+      animation: karaokeHandOnlyMotion 1.08s ease-in-out infinite !important;
+      transform-origin: center;
+    }
+    @keyframes karaokeHandOnlyMotion {
+      0%, 100% { translate: 0 0; }
+      25% { translate: 0 -2.2px; }
+      50% { translate: 0 0; }
+      75% { translate: 0 1.5px; }
+    }
+    #townKaraoke .karaoke-seat-art .monster-current-art > .monster {
+      transform: scale(.72);
+    }
+    #townKaraoke .karaoke-seat-art .gallery-monster-card .monster {
+      transform: scale(.82);
+    }
+    #townKaraoke .karaoke-seat-art .gallery-monster-card[class*="young-"] .monster {
+      transform: scale(.82);
+    }
+    #townKaraoke .karaoke-seat-art .gallery-monster-card .monster.seed {
+      transform: scale(.82) rotate(-7deg);
+    }
+    #townKaraoke .karaoke-seat-art .turnaround-monster,
+    #townKaraoke .karaoke-seat-art .unique-monster {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #townKaraoke .karaoke-seat-name {
+      display: inline-block;
+      width: max-content;
+      max-width: calc(12em + 12px);
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255, 248, 220, .92);
+      color: #3a2441;
+      font-size: 10.8px;
+      font-weight: 900;
+      line-height: 1.2;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: nowrap;
+      transform: translate(var(--karaoke-name-x, 0px), var(--karaoke-name-y, 0px));
+    }
+    #townKaraoke .karaoke-seat.empty .karaoke-seat-placeholder {
+      width: 54px;
+      height: 46px;
+      border-radius: 18px 18px 8px 8px;
+      background: rgba(255,255,255,.13);
+      border: 1px dashed rgba(255,255,255,.34);
     }
     @media (max-width: 430px) { .shop-grid { grid-template-columns: 1fr; } }
     .town-board {
@@ -9574,7 +10165,7 @@
       text-shadow: none;
     }
     .home-actions.retirement-ready {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       border-top-color: rgba(188, 139, 36, .34);
       background: rgba(255, 248, 211, .97);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.66), 0 -2px 0 rgba(188,139,36,.12);
@@ -10838,8 +11429,8 @@
       .home-seated-pair { width: calc(100% - 64px); gap: 2px; }
       .home-seat .monster-art { width: 78px; height: 78px; }
       .home-seat .unique-monster { width: 82px; height: 82px; }
-      .home-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .home-actions button { font-size: 16px; padding: 7px 2px; }
+      .home-actions { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+      .home-actions button { font-size: 13px; padding: 7px 1px; }
     }
     .today-guide {
       margin-top: 12px;
@@ -12512,6 +13103,7 @@ const stampCatalog = [
   ["草", "草原"], ["灯", "灯り"], ["風", "風丘"], ["宝", "宝箱"],
   ["券", "挑戦券"], ["進", "進化マス"], ["種", "タネ召喚"]
 ];
+const monsterNicknameMaxLength = 12;
 const state = loadState();
 normalizeState();
 saveState();
@@ -12526,6 +13118,34 @@ let selectedTownBuildingId = "";
 let pendingRetireParkPracticeRecordId = "";
 let musicPlazaKaraokeOpen = false;
 let selectedKaraokeBgmMode = "normal";
+let karaokePerformanceMode = "";
+let karaokePerformanceTimer = null;
+let karaokeCinemascopeTimer = null;
+let karaokeLyricFrame = null;
+let karaokeTransportFrame = null;
+const karaokeDisplayLineCache = Object.create(null);
+const karaokeDisplayLineLookupCache = Object.create(null);
+let karaokePreviewRequestId = 0;
+let karaokeSeekDebugTimer = null;
+let karaokeSeekDebugEntries = [];
+let karaokeSyncClock = null;
+let karaokeSeekPendingTarget = null;
+let karaokeSeekPendingAudio = null;
+let karaokeSeekPendingTimer = null;
+let karaokeSeekRequestId = 0;
+let karaokeSeekPendingRequestId = 0;
+let karaokeSeekApplyTimer = null;
+let karaokeSeekResumeAfterSettle = false;
+let karaokeSeekLockedClock = false;
+let karaokeCinemascopeLyricEl = null;
+let karaokeStageSceneEl = null;
+let karaokeTransportTimeEl = null;
+let karaokeCinemascopeVisibleState = null;
+let karaokeCinemascopeProgressText = "";
+let karaokeLastRealtimeRenderAt = 0;
+let karaokeLastTransportLabelAt = 0;
+let karaokeLastTransportText = "";
+const karaokeAudioBlobUrls = Object.create(null);
 let guildSupportConfirmOpen = false;
 let guildRequestAcceptConfirmId = "";
 let monsterDexGroups = [];
@@ -13051,8 +13671,8 @@ const bgmModeNames = {
   retireParkPracticeNight: "広場 練習試合 夜BGM",
   nightPlaza: "夜の広場で",
   retireParkPractice: "広場 練習試合BGM",
-  battleVictory: "今日の空に勝った日",
-  battleDefeat: "負けても道は続く"
+  battleVictory: "戦闘勝利音",
+  battleDefeat: "戦闘敗北音"
 };
 function bgmModeName(mode) {
   return bgmModeNames[mode] || bgmSong(mode).name;
@@ -34559,7 +35179,7 @@ function normalizeState() {
   state.monster = state.monster && typeof state.monster === "object" ? state.monster : { xp: 0, nature: 0, city: 0, sky: 0, wins: 0, skills: ["tap"] };
   const validSeedIds = ["seed-walk", "seed-sky", "seed-leaf", "seed-city", "seed-river", "seed-night", "seed-luck", "seed-white"];
   state.monster.seedId = validSeedIds.includes(state.monster.seedId) ? state.monster.seedId : "seed-walk";
-  state.monster.nickname = String(state.monster.nickname || "").slice(0, 12);
+  state.monster.nickname = String(state.monster.nickname || "").slice(0, monsterNicknameMaxLength);
   state.monster.xp = Number(state.monster.xp || 0);
   state.monster.nature = Number(state.monster.nature || 0);
   state.monster.city = Number(state.monster.city || 0);
@@ -34768,9 +35388,9 @@ function companionColorOption(kind, id) {
   const list = kind === "foot" ? companionFootColorOptions : companionHandColorOptions;
   return list.find(item => item.id === id) || list[0];
 }
-function companionColorSettings() {
-  const hand = companionColorOption("hand", state.companionColors?.hand);
-  const foot = companionColorOption("foot", state.companionColors?.foot);
+function companionColorSettingsFromIds(colors = {}) {
+  const hand = companionColorOption("hand", colors?.hand);
+  const foot = companionColorOption("foot", colors?.foot);
   return {
     hand,
     foot,
@@ -34779,6 +35399,9 @@ function companionColorSettings() {
     footColor: foot.color,
     footFarColor: foot.shadow
   };
+}
+function companionColorSettings() {
+  return companionColorSettingsFromIds(state.companionColors);
 }
 function companionColorInlineStyle(settings = companionColorSettings()) {
   return `--companion-hand:${settings.handColor};--companion-hand-far:${settings.handFarColor};--companion-foot:${settings.footColor};--companion-foot-far:${settings.footFarColor};`;
@@ -35440,6 +36063,7 @@ function bgmSong(mode = "normal") {
   return songs[mode] || songs.normal;
 }
 function stopBgm() {
+  karaokePreviewRequestId += 1;
   if (sound.bgmTimer) clearTimeout(sound.bgmTimer);
   if (sound.bgmLoopCueTimer) clearTimeout(sound.bgmLoopCueTimer);
   sound.bgmTimer = null;
@@ -35589,6 +36213,66 @@ function previewBgm(mode) {
   document.getElementById("soundBtn").textContent = "BGM ON";
   startBgm(mode);
   toast(`${bgmModeName(mode)}を再生`);
+}
+async function karaokeAudioSourceForMode(mode) {
+  const source = bgmAudioFiles[mode];
+  if (!source) return "";
+  if (karaokeAudioBlobUrls[source]) return karaokeAudioBlobUrls[source];
+  try {
+    const response = await fetch(source, { cache: "force-cache" });
+    if (!response.ok) throw new Error("audio fetch failed");
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    karaokeAudioBlobUrls[source] = objectUrl;
+    return objectUrl;
+  } catch (error) {
+    return source;
+  }
+}
+async function previewKaraokeSongOnce(mode) {
+  if (!initSound()) return;
+  if (!bgmAudioFiles[mode]) {
+    toast(`${karaokeSongDisplayName(mode)}のMP3が設定されていません`);
+    return;
+  }
+  sound.enabled = true;
+  document.getElementById("soundBtn").textContent = "BGM ON";
+  stopBgm();
+  const requestId = ++karaokePreviewRequestId;
+  sound.mode = mode;
+  sound.step = 0;
+  const audioSource = await karaokeAudioSourceForMode(mode);
+  if (requestId !== karaokePreviewRequestId || !audioSource) return;
+  const audio = new Audio(audioSource);
+  audio.loop = false;
+  audio.preload = "auto";
+  audio.volume = 0.42 * bgmVolumeScale(mode);
+  sound.audio = audio;
+  resetKaraokeSyncClock(audio);
+  bindKaraokeSyncClock(audio);
+  sound.usingAudioFile = true;
+  const isKaraokePerformancePreview = musicPlazaKaraokeOpen && karaokePerformanceMode === mode && karaokeAvailableVocalSongModes().includes(mode);
+  audio.addEventListener("ended", () => {
+    if (sound.audio === audio) sound.usingAudioFile = false;
+    if (isKaraokePerformancePreview) clearKaraokeCinemascope();
+  }, { once: true });
+  audio.addEventListener("error", () => {
+    if (isKaraokePerformancePreview) clearKaraokeCinemascope();
+    toast("MP3を読み込めません。assets/audio の配置を確認してください");
+  }, { once: true });
+  audio.play().then(() => {
+    if (requestId !== karaokePreviewRequestId || sound.audio !== audio) return;
+    if (isKaraokePerformancePreview) {
+      scheduleKaraokeCinemascope(mode, audio);
+      startKaraokeTransportDisplay();
+    }
+    toast(`${karaokeSongDisplayName(mode)}を試聴中`);
+  }).catch(() => {
+    if (requestId !== karaokePreviewRequestId || sound.audio !== audio) return;
+    if (isKaraokePerformancePreview) clearKaraokeCinemascope();
+    stopBgm();
+    toast("MP3再生に失敗しました。BGMは鳴らしません");
+  });
 }
 function startBattleBgm(mode) {
   if (!initSound()) return;
@@ -36913,11 +37597,20 @@ function companionHomeConversation(profile, growth, lifeRemain) {
 }
 let companionHomeTalkTimer = null;
 let companionHomeTypeTimers = [];
+function isCompanionHomeScreenActive() {
+  return document.querySelector('[data-screen="walk"]')?.classList.contains("active");
+}
 function clearCompanionHomeTypeTimers() {
   companionHomeTypeTimers.forEach(timer => clearTimeout(timer));
   companionHomeTypeTimers = [];
 }
+function stopCompanionHomeDialogue() {
+  if (companionHomeTalkTimer) clearInterval(companionHomeTalkTimer);
+  companionHomeTalkTimer = null;
+  clearCompanionHomeTypeTimers();
+}
 function playHomeDialogueTypeSfxTick() {
+  if (!isCompanionHomeScreenActive()) return;
   if (!initSound() || !sound.enabled) return;
   playAudioSfx(battleMessageSfxFileKey, 0, .38);
 }
@@ -36928,6 +37621,7 @@ function typeHomeDialogueLine(el, text) {
   el.textContent = "";
   chars.forEach((char, index) => {
     const timer = setTimeout(() => {
+      if (!el.isConnected || !isCompanionHomeScreenActive()) return;
       el.textContent += char;
       if (index % 7 === 0) playHomeDialogueTypeSfxTick();
     }, stepMs * index);
@@ -36982,8 +37676,7 @@ function companionHomeDialoguePairs(profile, growth, lifeRemain) {
   };
 }
 function startCompanionHomeDialogue(pairs) {
-  if (companionHomeTalkTimer) clearInterval(companionHomeTalkTimer);
-  clearCompanionHomeTypeTimers();
+  stopCompanionHomeDialogue();
   const topLine = document.querySelector('[data-home-talk="companion"]');
   const bottomLine = document.querySelector('[data-home-talk="guide"]');
   if (!topLine || !bottomLine || !pairs?.length) return;
@@ -37015,6 +37708,7 @@ function startCompanionHomeDialogue(pairs) {
         saveState();
       }
       if (companionHomeTalkTimer) clearInterval(companionHomeTalkTimer);
+      companionHomeTalkTimer = null;
       renderTalkSettings();
       renderCompanionHome();
       return;
@@ -37817,8 +38511,14 @@ function renderTown() {
 function renderTownDevMenu() {
   const box = document.getElementById("townDevMenu");
   if (!box) return;
-  box.innerHTML = "";
-  box.hidden = true;
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="town-dev-card town-dev-scene-card">
+      <div class="town-dev-card-title"><span>カラオケ配置確認</span><span class="town-dev-offset">4席</span></div>
+      <button type="button" data-karaoke-dev-sofa-preview>ソファに座らせる</button>
+    </div>
+  `;
+  box.querySelector("[data-karaoke-dev-sofa-preview]")?.addEventListener("click", openKaraokeSofaDevPreview);
   return;
   const nudgeButtons = [
     ["↖", -1, -1], ["↑", 0, -1], ["↗", 1, -1],
@@ -38246,7 +38946,7 @@ function karaokeAvailableSoundSongModes() {
 }
 function karaokeSongDisplayName(mode) {
   const names = {
-    outsideHome: "イマソララビリンス ナイトバージョン",
+    outsideHome: "イマソララビリンス - Night Street Version",
     nightPlaza: "夜の広場で"
   };
   return names[mode] || bgmModeName(mode);
@@ -38254,24 +38954,1062 @@ function karaokeSongDisplayName(mode) {
 function karaokeSongButtons(modes) {
   return modes.map(mode => `<button class="${mode === selectedKaraokeBgmMode ? "selected" : ""}" type="button" data-karaoke-song="${mode}">${escapeAttr(karaokeSongDisplayName(mode))}</button>`).join("");
 }
+function karaokeRetiredRecords() {
+  return [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
+    .slice(0, 2);
+}
+function karaokeGuideItem() {
+  const tokenName = "白ミチロードセイバーレン";
+  const tokenId = "star-white-hero-young-seed-walk-sky-cool-b-forest";
+  ensureMonsterDexGroups();
+  const items = monsterDexGroups.flatMap(group => group.list || []);
+  return items.find(entry => entry.id === tokenId) || items.find(entry => entry.name === tokenName) || null;
+}
+function karaokeStillArtHtml(html) {
+  return String(html || "").replace(/<animate(?:Transform)?\b(?![^>]*data-karaoke-hand-motion="1")[^>]*\/>/g, "");
+}
+const karaokeSeatAdjustStoreKey = "imasoraKaraokeSeatAdjustV1";
+const karaokeSeatAdjustDefaults = {
+  retiredLeft: { x: 0, y: 0, scale: 1 },
+  current: { x: 0, y: 8, scale: .54 },
+  guide: { x: 0, y: 0, scale: 1 },
+  retiredRight: { x: 0, y: 0, scale: 1 }
+};
+const karaokeNameAdjustStoreKey = "imasoraKaraokeNameAdjustV1";
+const karaokeNameAdjustDefaults = {
+  retiredLeft: { x: 0, y: 0 },
+  current: { x: 0, y: 0 },
+  guide: { x: 0, y: 0 },
+  retiredRight: { x: 0, y: 0 }
+};
+const karaokeSeatAdjustLabels = {
+  retiredLeft: "左端の引退相棒",
+  current: "育成中",
+  guide: "白ミチロードセイバーレン",
+  retiredRight: "右端の引退相棒"
+};
+let karaokeSeatAdjustCache = null;
+let karaokeNameAdjustCache = null;
+function karaokeSeatAdjustments() {
+  if (karaokeSeatAdjustCache) return karaokeSeatAdjustCache;
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem(karaokeSeatAdjustStoreKey) || "{}") || {};
+  } catch (error) {
+    saved = {};
+  }
+  karaokeSeatAdjustCache = Object.fromEntries(Object.entries(karaokeSeatAdjustDefaults).map(([slot, defaults]) => {
+    const raw = saved[slot] || {};
+    return [slot, {
+      x: Number.isFinite(Number(raw.x)) ? Number(raw.x) : defaults.x,
+      y: Number.isFinite(Number(raw.y)) ? Number(raw.y) : defaults.y,
+      scale: Number.isFinite(Number(raw.scale)) ? Number(raw.scale) : defaults.scale
+    }];
+  }));
+  return karaokeSeatAdjustCache;
+}
+function karaokeNameAdjustments() {
+  if (karaokeNameAdjustCache) return karaokeNameAdjustCache;
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem(karaokeNameAdjustStoreKey) || "{}") || {};
+  } catch (error) {
+    saved = {};
+  }
+  karaokeNameAdjustCache = Object.fromEntries(Object.entries(karaokeNameAdjustDefaults).map(([slot, defaults]) => {
+    const raw = saved[slot] || {};
+    return [slot, {
+      x: Number.isFinite(Number(raw.x)) ? Number(raw.x) : defaults.x,
+      y: Number.isFinite(Number(raw.y)) ? Number(raw.y) : defaults.y
+    }];
+  }));
+  return karaokeNameAdjustCache;
+}
+function saveKaraokeSeatAdjustments() {
+  localStorage.setItem(karaokeSeatAdjustStoreKey, JSON.stringify(karaokeSeatAdjustments()));
+}
+function saveKaraokeNameAdjustments() {
+  localStorage.setItem(karaokeNameAdjustStoreKey, JSON.stringify(karaokeNameAdjustments()));
+}
+function karaokeSeatStyle(slot) {
+  const adjust = karaokeSeatAdjustments()[slot] || { x: 0, y: 0, scale: 1 };
+  const guideSeatOffsetX = slot === "guide" ? -4 : 0;
+  return `--karaoke-seat-x:${adjust.x + guideSeatOffsetX}px;--karaoke-seat-y:${adjust.y}px;--karaoke-seat-scale:${adjust.scale};`;
+}
+function karaokeNameStyle(slot) {
+  const adjust = karaokeNameAdjustments()[slot] || { x: 0, y: 0 };
+  const guideNameOffsetX = slot === "guide" ? -8 : 0;
+  return `--karaoke-name-x:${adjust.x + guideNameOffsetX}px;--karaoke-name-y:${adjust.y}px;`;
+}
+function refreshKaraokeSeatDevAndPreview() {
+  renderTownDevMenu();
+  if (karaokePerformanceMode) renderTownKaraoke();
+}
+function karaokeDexArtMarkup(item, view = "", colorSettings = null) {
+  if (!item?.id) return "";
+  const canUseTurnaround = item.id.startsWith("star-") || item.id.startsWith("hero-");
+  const art = view === "front" && canUseTurnaround
+    ? `<div class="monster-art unique-art star-gallery-art">${uniqueMonsterSvg(item, true, colorSettings)}</div>`
+    : view && canUseTurnaround
+      ? `<div class="monster-art unique-art star-gallery-art">${turnaroundMonsterSvg(item, view, colorSettings)}</div>`
+      : galleryMonsterArt(item, colorSettings);
+  return `<div class="karaoke-dex-character gallery-monster-card ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}">${karaokeStillArtHtml(art)}</div>`;
+}
+function karaokeCurrentArtMarkup(profile, growth, view = "") {
+  const item = currentCompanionArtItem(profile, growth);
+  return karaokeDexArtMarkup(item, view, companionColorSettings());
+}
+function karaokeGuideArtMarkup(view = "") {
+  return karaokeDexArtMarkup(karaokeGuideItem(), view);
+}
+function retiredCompanionColorSettings(record) {
+  const colors = record?.companionColors || record?.monster?.companionColors || null;
+  return colors ? companionColorSettingsFromIds(colors) : null;
+}
+function karaokeRetiredArtMarkup(record, view = "") {
+  ensureMonsterDexGroups();
+  const items = monsterDexGroups.flatMap(group => group.list || []);
+  const item = items.find(entry => entry.id === record?.artId);
+  if (!item) return `<span class="retired-record-mark">${escapeAttr(record?.rank || "?")}</span>`;
+  return karaokeDexArtMarkup(item, view, retiredCompanionColorSettings(record));
+}
 function karaokeParticipants() {
   const profile = monsterProfile();
-  const current = { name: companionDisplayName(profile), role: "育成中の相棒" };
-  const retired = [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
-    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0))
-    .slice(0, 3)
-    .map(record => ({ name: record.name || "引退相棒", role: "引退した相棒" }));
-  return [current, ...retired].slice(0, 4);
+  const growth = growthForecast();
+  const current = { name: companionDisplayName(profile), role: "育成中の相棒", art: karaokeCurrentArtMarkup(profile, growth) };
+  const guide = { name: "白ミチロードセイバーレン", role: "カラオケ案内役", art: karaokeGuideArtMarkup() };
+  const retired = karaokeRetiredRecords().map(record => ({
+    name: record.name || "引退相棒",
+    role: "引退した相棒",
+    art: karaokeRetiredArtMarkup(record)
+  }));
+  return [current, guide, ...retired].slice(0, 4);
+}
+const karaokeTimedLyrics = {
+  outsideHome: [
+    { start: 10.7, end: 12.6, text: "夜の窓に" },
+    { start: 12.7, end: 14.9, text: "月が浮かんで" },
+    { start: 15.0, end: 18.5, text: "街の灯りが 小さくまたたく" },
+    { start: 21.1, end: 22.0, text: "今日はもう" },
+    { start: 22.1, end: 24.8, text: "歩かなくていい" },
+    { start: 25.3, end: 28.6, text: "明日の空が きっと待ってる" },
+    { start: 31.0, end: 32.8, text: "六時から十九時までの" },
+    { start: 32.9, end: 35.2, text: "きみと歩いた 小さな冒険" },
+    { start: 35.3, end: 38.1, text: "足あとみたいに コインが光って" },
+    { start: 38.2, end: 40.5, text: "道の向こうで 風が笑った" },
+    { start: 40.8, end: 42.7, text: "でも今は 夜の時間" },
+    { start: 42.8, end: 45.4, text: "外へ行かずに 家でひとやすみ" },
+    { start: 45.5, end: 47.8, text: "ソファの上で 相棒たちが" },
+    { start: 47.9, end: 50.4, text: "今日の話を そっと並べる" },
+    { start: 50.6, end: 54.7, text: "あの空は どこへ続くの" },
+    { start: 55.9, end: 60.0, text: "あの道は また呼んでるの" },
+    { start: 60.3, end: 62.8, text: "急がなくていいよ" },
+    { start: 62.8, end: 63.6, text: "夜は" },
+    { start: 64.2, end: 65.5, text: "夜の" },
+    { start: 65.7, end: 68.4, text: "クエストだから" },
+    { start: 71.0, end: 72.8, text: "イマソララビリンス" },
+    { start: 72.9, end: 74.8, text: "眠る街の中で" },
+    { start: 75.1, end: 78.6, text: "きみの今日が 星になってゆく" },
+    { start: 80.9, end: 82.9, text: "イマソララビリンス" },
+    { start: 83.0, end: 84.9, text: "窓の月を見上げ" },
+    { start: 85.0, end: 86.5, text: "また朝が来たら" },
+    { start: 86.6, end: 88.9, text: "歩き出そう" },
+    { start: 89.9, end: 91.3, text: "迷ってもいい" },
+    { start: 92.4, end: 93.8, text: "止まってもいい" },
+    { start: 95.0, end: 98.6, text: "明日の空で また会えるから" },
+    { start: 100.3, end: 102.9, text: "散歩ボタンは 灰色のまま" },
+    { start: 103.0, end: 105.4, text: "仕事の扉も 今はおやすみ" },
+    { start: 105.5, end: 107.8, text: "だけど相棒は そばにいるから" },
+    { start: 107.9, end: 110.3, text: "夜のホームも さみしくはない" },
+    { start: 110.4, end: 112.9, text: "窓の外では 時計みたいに" },
+    { start: 113.0, end: 115.3, text: "月がゆっくり 位置を変えてく" },
+    { start: 115.4, end: 118.0, text: "街の灯りが まばたきするたび" },
+    { start: 118.1, end: 120.5, text: "今日の疲れが ほどけていく" },
+    { start: 120.8, end: 124.9, text: "進めない時間にも" },
+    { start: 125.7, end: 128.2, text: "育っていくものがある" },
+    { start: 128.3, end: 130.6, text: "焦らなくていいよ" },
+    { start: 130.9, end: 135.8, text: "夜は夜の セーブポイント" },
+    { start: 135.9, end: 138.0, text: "イマソララビリンス" },
+    { start: 138.1, end: 139.9, text: "眠る街の中で" },
+    { start: 140.1, end: 143.7, text: "きみの今日が 星になってゆく" },
+    { start: 146.0, end: 147.9, text: "イマソララビリンス" },
+    { start: 148.0, end: 150.0, text: "窓の月を見上げ" },
+    { start: 150.3, end: 151.8, text: "また朝が来たら" },
+    { start: 152.0, end: 154.0, text: "歩き出そう" },
+    { start: 155.0, end: 156.5, text: "休んでもいい" },
+    { start: 157.7, end: 159.1, text: "笑ってもいい" },
+    { start: 160.0, end: 163.8, text: "明日の道は 消えないから" },
+    { start: 165.1, end: 167.3, text: "午前六時の光が" },
+    { start: 167.5, end: 169.8, text: "カーテンをそっと揺らしたら" },
+    { start: 169.9, end: 172.5, text: "また小さな地図が開く" },
+    { start: 172.8, end: 174.9, text: "二十五マスの物語" },
+    { start: 175.0, end: 176.9, text: "草の素材 木の素材" },
+    { start: 177.0, end: 179.9, text: "灯り 土 雲 鉄のきらめき" },
+    { start: 180.0, end: 182.7, text: "きみが選んだ一歩ずつが" },
+    { start: 182.8, end: 185.2, text: "街の未来を作っていく" },
+    { start: 186.1, end: 188.1, text: "今はまだ 夜の中" },
+    { start: 188.2, end: 190.2, text: "だけど夢は 歩いてる" },
+    { start: 190.9, end: 192.9, text: "ピコピコ鳴る胸の奥" },
+    { start: 193.1, end: 194.9, text: "明日のリズムを" },
+    { start: 195.0, end: 197.1, text: "探してる" },
+    { start: 198.8, end: 200.7, text: "イマソララビリンス" },
+    { start: 200.8, end: 202.7, text: "眠る街の中で" },
+    { start: 202.8, end: 206.6, text: "きみの今日が 星になってゆく" },
+    { start: 208.9, end: 210.8, text: "イマソララビリンス" },
+    { start: 210.9, end: 212.8, text: "窓の月を見上げ" },
+    { start: 213.1, end: 214.6, text: "また朝が来たら" },
+    { start: 214.8, end: 217.0, text: "歩き出そう" },
+    { start: 217.8, end: 219.3, text: "イマソララビリンス" },
+    { start: 219.4, end: 221.5, text: "相棒と並んで" },
+    { start: 221.6, end: 223.1, text: "夜のホームで" },
+    { start: 223.3, end: 226.7, text: "約束しよう" },
+    { start: 228.0, end: 229.3, text: "迷ってもいい" },
+    { start: 230.7, end: 231.9, text: "止まってもいい" },
+    { start: 233.2, end: 236.5, text: "明日の空で また会えるから" },
+    { start: 236.6, end: 238.6, text: "おやすみ 今日の空" },
+    { start: 239.2, end: 241.0, text: "おやすみ 今日の道" },
+    { start: 241.9, end: 243.1, text: "朝になったら" },
+    { start: 243.5, end: 246.9, text: "また一緒に 歩こう" }
+  ],
+  nightPlaza: [
+    { start: 11.7, end: 13, text: "夜の広" },
+    { start: 13, end: 13.9, text: "場に", sameLine: true },
+    { start: 13.9, end: 14.9, text: "灯りが", sameLine: true },
+    { start: 14.9, end: 16.2, text: "ともる", sameLine: true },
+    { start: 18.1, end: 18.8, text: "きみの" },
+    { start: 18.8, end: 19.6, text: "影が", sameLine: true },
+    { start: 19.9, end: 20.5, text: "とな", sameLine: true },
+    { start: 20.5, end: 21.1, text: "りで", sameLine: true },
+    { start: 21.1, end: 21.7, text: "～揺れ", sameLine: true },
+    { start: 21.7, end: 22.4, text: "る", sameLine: true },
+    { start: 24.3, end: 25.2, text: "勝ちた" },
+    { start: 25.2, end: 25.6, text: "い", sameLine: true },
+    { start: 25.6, end: 26.3, text: "～気持", sameLine: true },
+    { start: 26.3, end: 27, text: "ち", sameLine: true },
+    { start: 27.1, end: 28.5, text: "隠さな" },
+    { start: 28.5, end: 29.1, text: "くて", sameLine: true },
+    { start: 29.2, end: 29.9, text: "いい", sameLine: true },
+    { start: 30, end: 31.2, text: "笑い" },
+    { start: 31.2, end: 32, text: "ながら", sameLine: true },
+    { start: 32, end: 33.4, text: "構", sameLine: true },
+    { start: 33.4, end: 34.9, text: "えよう", sameLine: true },
+    { start: 36.6, end: 37.6, text: "昨日の" },
+    { start: 37.6, end: 39.1, text: "ぼくらを", sameLine: true },
+    { start: 39.1, end: 40.5, text: "越えてい", sameLine: true },
+    { start: 40.5, end: 41.4, text: "く", sameLine: true },
+    { start: 41.4, end: 42.2, text: "ため", sameLine: true },
+    { start: 42.8, end: 45.2, text: "小さな一歩を" },
+    { start: 45.2, end: 46.1, text: "重ね", sameLine: true },
+    { start: 46.1, end: 47, text: "て", sameLine: true },
+    { start: 47, end: 48.6, text: "きた", sameLine: true },
+    { start: 48.8, end: 49.9, text: "負けた" },
+    { start: 49.9, end: 50.6, text: "涙", sameLine: true },
+    { start: 50.6, end: 51.9, text: "も", sameLine: true },
+    { start: 52, end: 52.9, text: "胸", sameLine: true },
+    { start: 52.9, end: 53.2, text: "の", sameLine: true },
+    { start: 53.2, end: 53.8, text: "奥", sameLine: true },
+    { start: 53.8, end: 54.9, text: "で", sameLine: true },
+    { start: 55, end: 55.6, text: "今日" },
+    { start: 55.6, end: 57.5, text: "の力に", sameLine: true },
+    { start: 57.5, end: 58.5, text: "変わって", sameLine: true },
+    { start: 58.5, end: 59.6, text: "る", sameLine: true },
+    { start: 61, end: 61.8, text: "空を" },
+    { start: 61.8, end: 62.1, text: "～見", sameLine: true },
+    { start: 62.1, end: 62.9, text: "上", sameLine: true },
+    { start: 62.9, end: 63.2, text: "げたら", sameLine: true },
+    { start: 63.3, end: 64.6, text: "星が" },
+    { start: 64.6, end: 66.1, text: "～合図をくれ", sameLine: true },
+    { start: 66.1, end: 66.9, text: "る", sameLine: true },
+    { start: 67.4, end: 68.1, text: "まだ" },
+    { start: 68.1, end: 69.5, text: "～終わらない", sameLine: true },
+    { start: 69.5, end: 71, text: "ここか" },
+    { start: 71, end: 72.7, text: "ら", sameLine: true },
+    { start: 73, end: 73.6, text: "始", sameLine: true },
+    { start: 73.6, end: 73.8, text: "ま", sameLine: true },
+    { start: 73.8, end: 77.4, text: "る", sameLine: true },
+    { start: 79.2, end: 80.6, text: "イマソラ" },
+    { start: 81, end: 82.3, text: "走れ", sameLine: true },
+    { start: 82.6, end: 83, text: "夜", sameLine: true },
+    { start: 83, end: 83.8, text: "を", sameLine: true },
+    { start: 83.8, end: 85.3, text: "こえて", sameLine: true },
+    { start: 85.4, end: 86.1, text: "きみ" },
+    { start: 86.1, end: 87.4, text: "となら", sameLine: true },
+    { start: 87.6, end: 88.6, text: "強く", sameLine: true },
+    { start: 88.6, end: 89, text: "な", sameLine: true },
+    { start: 89, end: 89.2, text: "れ", sameLine: true },
+    { start: 89.2, end: 90.8, text: "る", sameLine: true },
+    { start: 91.7, end: 93.6, text: "ぶつかるた" },
+    { start: 93.6, end: 95, text: "び", sameLine: true },
+    { start: 95.1, end: 96.3, text: "光", sameLine: true },
+    { start: 96.3, end: 96.9, text: "にな", sameLine: true },
+    { start: 96.9, end: 97.7, text: "る", sameLine: true },
+    { start: 97.8, end: 99.3, text: "この広" },
+    { start: 99.3, end: 100.3, text: "場で", sameLine: true },
+    { start: 100.3, end: 100.7, text: "夢", sameLine: true },
+    { start: 100.7, end: 101.3, text: "を", sameLine: true },
+    { start: 101.3, end: 101.7, text: "鳴らそ", sameLine: true },
+    { start: 101.7, end: 103.4, text: "う", sameLine: true },
+    { start: 103.5, end: 105.4, text: "イマソラ" },
+    { start: 105.6, end: 107, text: "響け", sameLine: true },
+    { start: 107.1, end: 109.4, text: "胸の奥", sameLine: true },
+    { start: 109.4, end: 109.9, text: "へ", sameLine: true },
+    { start: 110, end: 111, text: "勝ち負" },
+    { start: 111, end: 111.9, text: "けより", sameLine: true },
+    { start: 112.1, end: 113.5, text: "大事", sameLine: true },
+    { start: 113.5, end: 113.9, text: "なも", sameLine: true },
+    { start: 113.9, end: 115.8, text: "の", sameLine: true },
+    { start: 116.3, end: 117.7, text: "何度だっ" },
+    { start: 117.7, end: 119, text: "て", sameLine: true },
+    { start: 119.1, end: 120.3, text: "立ち上", sameLine: true },
+    { start: 120.3, end: 122.1, text: "がれる", sameLine: true },
+    { start: 122.2, end: 124.7, text: "相棒となら" },
+    { start: 124.7, end: 125.6, text: "前", sameLine: true },
+    { start: 125.6, end: 126.5, text: "へ行け", sameLine: true },
+    { start: 126.5, end: 127.1, text: "る", sameLine: true },
+    { start: 132, end: 134.3, text: "静かな風が" },
+    { start: 134.4, end: 134.7, text: "街", sameLine: true },
+    { start: 134.7, end: 137.8, text: "を包んで", sameLine: true },
+    { start: 138.2, end: 140.5, text: "遠くの窓が" },
+    { start: 140.6, end: 141.7, text: "やさし", sameLine: true },
+    { start: 141.7, end: 144, text: "く光る", sameLine: true },
+    { start: 144.2, end: 145.4, text: "本気" },
+    { start: 145.4, end: 146.4, text: "で向か", sameLine: true },
+    { start: 146.4, end: 147.2, text: "う", sameLine: true },
+    { start: 147.3, end: 148, text: "きみの", sameLine: true },
+    { start: 148, end: 149.4, text: "まなざ", sameLine: true },
+    { start: 149.4, end: 150, text: "し", sameLine: true },
+    { start: 150.1, end: 151.2, text: "だから" },
+    { start: 151.2, end: 151.6, text: "ぼ", sameLine: true },
+    { start: 151.6, end: 151.9, text: "く", sameLine: true },
+    { start: 151.9, end: 152.4, text: "も", sameLine: true },
+    { start: 152.6, end: 152.9, text: "逃", sameLine: true },
+    { start: 152.9, end: 153.4, text: "げ", sameLine: true },
+    { start: 153.4, end: 153.9, text: "ない", sameLine: true },
+    { start: 153.9, end: 154.9, text: "～よ", sameLine: true },
+    { start: 156.3, end: 157.4, text: "小さな" },
+    { start: 157.3, end: 158.4, text: "勇", sameLine: true },
+    { start: 158.3, end: 158.5, text: "気が", sameLine: true },
+    { start: 158.6, end: 160.2, text: "夜空に" },
+    { start: 160.2, end: 160.4, text: "線", sameLine: true },
+    { start: 160.4, end: 160.8, text: "を", sameLine: true },
+    { start: 160.8, end: 161.3, text: "描", sameLine: true },
+    { start: 161.3, end: 162.2, text: "く", sameLine: true },
+    { start: 162.3, end: 163.6, text: "まだ" },
+    { start: 163.6, end: 163.9, text: "～届", sameLine: true },
+    { start: 163.9, end: 164.5, text: "く", sameLine: true },
+    { start: 164.5, end: 164.8, text: "から", sameLine: true },
+    { start: 164.9, end: 166.1, text: "もう一" },
+    { start: 166.2, end: 168.4, text: "度", sameLine: true },
+    { start: 168.6, end: 169.1, text: "い", sameLine: true },
+    { start: 169.1, end: 169.6, text: "こ", sameLine: true },
+    { start: 169.6, end: 170.8, text: "う", sameLine: true },
+    { start: 170.9, end: 173.1, text: "イマソラ" },
+    { start: 173.3, end: 174.7, text: "走れ", sameLine: true },
+    { start: 174.8, end: 175.3, text: "夜", sameLine: true },
+    { start: 175.3, end: 176.4, text: "を", sameLine: true },
+    { start: 176.4, end: 177.2, text: "こえ", sameLine: true },
+    { start: 177.2, end: 177.5, text: "て", sameLine: true },
+    { start: 177.6, end: 178.9, text: "きみと" },
+    { start: 178.9, end: 179.6, text: "なら", sameLine: true },
+    { start: 179.7, end: 181, text: "強く", sameLine: true },
+    { start: 181, end: 181.5, text: "なれ", sameLine: true },
+    { start: 181.5, end: 183.1, text: "る", sameLine: true },
+    { start: 184.1, end: 186.4, text: "ぶつかるた" },
+    { start: 186.4, end: 187.4, text: "び", sameLine: true },
+    { start: 187.5, end: 188.7, text: "光", sameLine: true },
+    { start: 188.7, end: 189.2, text: "にな", sameLine: true },
+    { start: 189.2, end: 190.2, text: "る", sameLine: true },
+    { start: 190.3, end: 191.9, text: "この広" },
+    { start: 191.9, end: 192.6, text: "場で", sameLine: true },
+    { start: 192.6, end: 193.2, text: "夢", sameLine: true },
+    { start: 193.2, end: 193.5, text: "を", sameLine: true },
+    { start: 193.5, end: 193.8, text: "鳴ら", sameLine: true },
+    { start: 193.8, end: 195.4, text: "そう", sameLine: true },
+    { start: 195.5, end: 197.8, text: "イマソラ" },
+    { start: 197.9, end: 199.4, text: "響け", sameLine: true },
+    { start: 199.6, end: 201.9, text: "胸の奥へ", sameLine: true },
+    { start: 202, end: 203.4, text: "勝ち負" },
+    { start: 203.4, end: 203.9, text: "けよ", sameLine: true },
+    { start: 203.9, end: 204.4, text: "り", sameLine: true },
+    { start: 204.5, end: 205.3, text: "大", sameLine: true },
+    { start: 205.3, end: 205.7, text: "事な", sameLine: true },
+    { start: 205.7, end: 206, text: "も", sameLine: true },
+    { start: 206, end: 207.9, text: "の", sameLine: true },
+    { start: 208, end: 209.7, text: "何度だっ" },
+    { start: 209.7, end: 211.3, text: "て", sameLine: true },
+    { start: 211.3, end: 212.6, text: "立ち上", sameLine: true },
+    { start: 212.6, end: 214.3, text: "がれる", sameLine: true },
+    { start: 214.4, end: 217.1, text: "相棒となら" },
+    { start: 217.1, end: 217.9, text: "前", sameLine: true },
+    { start: 217.9, end: 218.5, text: "へ行け", sameLine: true },
+    { start: 218.5, end: 219.6, text: "る", sameLine: true },
+    { start: 221.7, end: 223.8, text: "もしも明日" },
+    { start: 223.8, end: 224.2, text: "が", sameLine: true },
+    { start: 224.4, end: 225.6, text: "遠く見", sameLine: true },
+    { start: 225.6, end: 225.7, text: "え", sameLine: true },
+    { start: 225.7, end: 226.3, text: "て", sameLine: true },
+    { start: 226.2, end: 227.1, text: "も", sameLine: true },
+    { start: 227.4, end: 227.9, text: "今日" },
+    { start: 227.9, end: 228.6, text: "の", sameLine: true },
+    { start: 228.6, end: 230.1, text: "一戦は", sameLine: true },
+    { start: 230.1, end: 231, text: "消え", sameLine: true },
+    { start: 231, end: 231.3, text: "な", sameLine: true },
+    { start: 231.4, end: 232.7, text: "い", sameLine: true },
+    { start: 233.3, end: 234.6, text: "名前" },
+    { start: 234.6, end: 234.8, text: "を", sameLine: true },
+    { start: 234.8, end: 235, text: "呼", sameLine: true },
+    { start: 235, end: 236.4, text: "べば", sameLine: true },
+    { start: 236.5, end: 237.8, text: "力が", sameLine: true },
+    { start: 237.8, end: 238.3, text: "戻", sameLine: true },
+    { start: 238.3, end: 239.4, text: "る", sameLine: true },
+    { start: 239.8, end: 240.8, text: "夜の広" },
+    { start: 240.8, end: 241, text: "場", sameLine: true },
+    { start: 241, end: 241.7, text: "で", sameLine: true },
+    { start: 241.7, end: 242.2, text: "ま", sameLine: true },
+    { start: 242.2, end: 242.5, text: "た", sameLine: true },
+    { start: 242.5, end: 242.7, text: "会", sameLine: true },
+    { start: 242.7, end: 243.5, text: "お", sameLine: true },
+    { start: 243.5, end: 246, text: "う", sameLine: true },
+    { start: 248.5, end: 250, text: "イマソラ" },
+    { start: 250.2, end: 251.7, text: "走れ", sameLine: true },
+    { start: 251.8, end: 252.4, text: "夜", sameLine: true },
+    { start: 252.4, end: 253.4, text: "を", sameLine: true },
+    { start: 253.4, end: 254.4, text: "こえて", sameLine: true },
+    { start: 254.5, end: 255.5, text: "きみ" },
+    { start: 255.5, end: 256.6, text: "となら", sameLine: true },
+    { start: 256.7, end: 257.9, text: "強く", sameLine: true },
+    { start: 257.9, end: 258.5, text: "なれ", sameLine: true },
+    { start: 258.5, end: 259.8, text: "る", sameLine: true },
+    { start: 261, end: 262, text: "悔" },
+    { start: 262, end: 263.3, text: "しささ", sameLine: true },
+    { start: 263.3, end: 264.2, text: "え", sameLine: true },
+    { start: 264.3, end: 265.4, text: "光", sameLine: true },
+    { start: 265.4, end: 266.2, text: "にな", sameLine: true },
+    { start: 266.2, end: 267, text: "る", sameLine: true },
+    { start: 267.1, end: 269.1, text: "この広場" },
+    { start: 269.1, end: 269.5, text: "で", sameLine: true },
+    { start: 269.5, end: 270.1, text: "夢", sameLine: true },
+    { start: 270.1, end: 270.5, text: "を鳴ら", sameLine: true },
+    { start: 270.5, end: 272.4, text: "そう", sameLine: true },
+    { start: 272.5, end: 274.8, text: "イマソラ" },
+    { start: 275, end: 276.2, text: "響け", sameLine: true },
+    { start: 276.3, end: 277, text: "未", sameLine: true },
+    { start: 277, end: 278.2, text: "来", sameLine: true },
+    { start: 278.2, end: 278.6, text: "ま", sameLine: true },
+    { start: 278.7, end: 278.7, text: "で", sameLine: true },
+    { start: 278.8, end: 281.2, text: "育てた日々が" },
+    { start: 281.3, end: 282.6, text: "背中", sameLine: true },
+    { start: 282.6, end: 282.8, text: "を", sameLine: true },
+    { start: 282.8, end: 283.1, text: "押", sameLine: true },
+    { start: 283.1, end: 285.2, text: "す", sameLine: true },
+    { start: 285.5, end: 286.6, text: "何度だっ" },
+    { start: 286.6, end: 288.2, text: "て", sameLine: true },
+    { start: 288.3, end: 291.4, text: "強くなれる", sameLine: true },
+    { start: 291.5, end: 293.1, text: "相棒と" },
+    { start: 293.1, end: 294, text: "なら", sameLine: true },
+    { start: 294, end: 294.4, text: "前", sameLine: true },
+    { start: 294.4, end: 295.1, text: "へ", sameLine: true },
+    { start: 295.1, end: 295.4, text: "行け", sameLine: true },
+    { start: 295.4, end: 296.6, text: "る", sameLine: true },
+    { start: 298.3, end: 300.3, text: "夜の広場に" },
+    { start: 300.3, end: 300.8, text: "灯り", sameLine: true },
+    { start: 300.8, end: 301.5, text: "が", sameLine: true },
+    { start: 301.5, end: 301.9, text: "とも", sameLine: true },
+    { start: 301.9, end: 302.9, text: "る", sameLine: true },
+    { start: 304.4, end: 305.9, text: "次の勝" },
+    { start: 305.9, end: 306.5, text: "負へ", sameLine: true },
+    { start: 306.6, end: 306.9, text: "歩", sameLine: true },
+    { start: 306.9, end: 307.7, text: "き", sameLine: true },
+    { start: 307.7, end: 308.1, text: "出そ", sameLine: true },
+    { start: 308.1, end: 309.7, text: "う", sameLine: true },
+  ],
+
+};
+const karaokeLyricDisplayLeadSeconds = .1;
+const karaokeLyricHoldAfterSeconds = .35;
+function karaokeDisplayLinesFor(mode) {
+  if (karaokeDisplayLineCache[mode]) return karaokeDisplayLineCache[mode];
+  const timedLines = karaokeTimedLyrics[mode] || [];
+  const groups = timedLines.reduce((groups, line) => {
+    if (line.sameLine && groups.length) {
+      const group = groups[groups.length - 1];
+      group.end = line.end;
+      group.text += line.text;
+      group.parts.push(line);
+      return groups;
+    }
+    groups.push({ start: line.start, end: line.end, text: line.text, parts: [line] });
+    return groups;
+  }, []);
+  groups.forEach(group => {
+    group.karaokeCharacterCounts = karaokeLyricProgressWeightsForParts(group.parts);
+    group.karaokeTotalCharacters = group.karaokeCharacterCounts.reduce((total, count) => total + count, 0) || 1;
+  });
+  karaokeDisplayLineCache[mode] = groups;
+  return karaokeDisplayLineCache[mode];
 }
 function karaokeLyricsText(mode) {
+  const timedLines = karaokeTimedLyrics[mode] || null;
+  if (timedLines) {
+    return `♪ ${karaokeSongDisplayName(mode)}\n\n${karaokeDisplayLinesFor(mode).map(line => karaokeLyricVisibleText(line.text)).join("\n")}`;
+  }
   return `♪ ${karaokeSongDisplayName(mode)}
 
 歌詞はまだ登録されていません。
 歌詞を追加すると、このカラオケボックスで表示できます。`;
 }
+function clearKaraokePerformanceTimer() {
+  if (karaokePerformanceTimer) clearTimeout(karaokePerformanceTimer);
+  karaokePerformanceTimer = null;
+}
+function formatKaraokeTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00.0";
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds - minutes * 60;
+  return `${minutes}:${rest.toFixed(1).padStart(4, "0")}`;
+}
+function karaokeActiveAudio() {
+  if (!musicPlazaKaraokeOpen || !karaokePerformanceMode) return null;
+  if (!sound.audio || sound.mode !== karaokePerformanceMode) return null;
+  return sound.audio;
+}
+function updateKaraokeTransportDisplay() {
+  const label = karaokeTransportTimeBox();
+  const audio = karaokeActiveAudio();
+  const current = audio && Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+  if (label) {
+    const duration = audio && Number.isFinite(audio.duration) ? audio.duration : 0;
+    const nextText = `${formatKaraokeTime(current)} / ${formatKaraokeTime(duration)}`;
+    if (karaokeLastTransportText !== nextText) {
+      karaokeLastTransportText = nextText;
+      label.textContent = nextText;
+    }
+  }
+  if (audio) updateKaraokeRealtimeSync(audio, current);
+  if (!label || !audio || audio.ended || !musicPlazaKaraokeOpen || !karaokePerformanceMode) {
+    karaokeTransportFrame = null;
+    return;
+  }
+  karaokeTransportFrame = requestAnimationFrame(updateKaraokeTransportDisplay);
+}
+function startKaraokeTransportDisplay() {
+  if (karaokeTransportFrame) cancelAnimationFrame(karaokeTransportFrame);
+  updateKaraokeTransportDisplay();
+}
+function stopKaraokeTransportDisplay() {
+  if (karaokeTransportFrame) cancelAnimationFrame(karaokeTransportFrame);
+  karaokeTransportFrame = null;
+  karaokeSeekLockedClock = false;
+  clearKaraokeSeekPending();
+  const label = karaokeTransportTimeBox();
+  karaokeLastTransportText = "0:00.0 / 0:00.0";
+  if (label) label.textContent = karaokeLastTransportText;
+  karaokeTransportTimeEl = null;
+  karaokeSeekDebugEntries = [];
+  if (karaokeSeekDebugTimer) {
+    clearTimeout(karaokeSeekDebugTimer);
+    karaokeSeekDebugTimer = null;
+  }
+}
+function showKaraokeSeekDebug(targetTime, audio, phase = "seek") {
+  return;
+}
+function clearKaraokeSeekPending(audio = null) {
+  if (karaokeSeekPendingTimer) clearTimeout(karaokeSeekPendingTimer);
+  if (karaokeSeekApplyTimer) clearTimeout(karaokeSeekApplyTimer);
+  karaokeSeekPendingTimer = null;
+  karaokeSeekApplyTimer = null;
+  karaokeSeekPendingTarget = null;
+  karaokeSeekPendingAudio = null;
+  karaokeSeekPendingRequestId = 0;
+  karaokeSeekResumeAfterSettle = false;
+  karaokeSeekLockedClock = false;
+}
+function karaokePendingSeekTime(audio) {
+  return null;
+}
+function resetKaraokeSyncClock(audio = karaokeActiveAudio(), time = null, running = null) {
+  if (!audio) {
+    karaokeSyncClock = null;
+    return 0;
+  }
+  const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+  const fallback = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+  return Math.max(0, Math.min(duration, Number.isFinite(time) ? time : fallback));
+}
+function karaokeSyncedAudioTime(audio = karaokeActiveAudio()) {
+  if (!audio) return 0;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+  const actual = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+  return Math.max(0, Math.min(duration, actual));
+}
+function bindKaraokeSyncClock(audio) {
+  return;
+}
+function refreshKaraokePreviewSync(audio = karaokeActiveAudio(), time = null) {
+  const mode = karaokePerformanceMode;
+  if (!audio || !mode || sound.audio !== audio) return;
+  const syncTime = Number.isFinite(time) ? time : karaokeSyncedAudioTime(audio);
+  syncKaraokeCinemascopeToAudio(mode, audio, syncTime);
+  startKaraokeTransportDisplay();
+}
+function seekKaraokePreview(deltaSeconds) {
+  const audio = karaokeActiveAudio();
+  if (!audio) {
+    toast("再生開始後に使えます");
+    return;
+  }
+  clearKaraokePerformanceTimer();
+  const current = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : Math.max(current + Math.abs(deltaSeconds), current);
+  const nextTime = Math.round(Math.max(0, Math.min(duration, current + deltaSeconds)) * 1000) / 1000;
+  seekKaraokeAudioTo(audio, nextTime);
+}
+function toggleKaraokePreviewPause(button) {
+  const audio = karaokeActiveAudio();
+  if (!audio) {
+    toast("再生開始後に使えます");
+    return;
+  }
+  clearKaraokePerformanceTimer();
+  if (audio.paused) {
+    audio.play().then(() => {
+      if (button) button.textContent = "一旦ストップ";
+      refreshKaraokePreviewSync(audio);
+      toast("試聴を再開しました");
+    }).catch(() => {
+      toast("再開に失敗しました");
+    });
+    return;
+  }
+  audio.pause();
+  if (button) button.textContent = "再開";
+  updateKaraokeTransportDisplay();
+  toast("試聴を一時停止しました");
+}
+function applyKaraokeAudioSeek(audio, seekTo) {
+  try {
+    audio.currentTime = seekTo;
+  } catch (error) {
+    audio.currentTime = seekTo;
+  }
+}
+function seekKaraokeAudioTo(audio, targetTime) {
+  const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+  const seekTo = Math.round(Math.max(0, Math.min(duration, Number(targetTime) || 0)) * 1000) / 1000;
+  const wasPaused = audio.paused;
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascopeTimer();
+  clearKaraokeSeekPending(audio);
+  if (!wasPaused) audio.pause();
+  const syncAfterSeek = () => {
+    if (sound.audio !== audio) return;
+    refreshKaraokePreviewSync(audio);
+    requestAnimationFrame(() => refreshKaraokePreviewSync(audio));
+  };
+  audio.addEventListener("seeked", syncAfterSeek, { once: true });
+  applyKaraokeAudioSeek(audio, seekTo);
+  refreshKaraokePreviewSync(audio, seekTo);
+  updateKaraokeTransportDisplay();
+  if (!wasPaused) audio.play().catch(() => {});
+  requestAnimationFrame(syncAfterSeek);
+  setTimeout(syncAfterSeek, 80);
+}
+function karaokeTimedLyricFor(mode, currentTime) {
+  const windows = karaokeDisplayLineLookupCache[mode] || (karaokeDisplayLineLookupCache[mode] = karaokeDisplayLinesFor(mode).map(group => ({
+    line: group,
+    start: Math.max(0, group.start - karaokeLyricDisplayLeadSeconds),
+    end: group.end + karaokeLyricHoldAfterSeconds
+  })));
+  let low = 0;
+  let high = windows.length - 1;
+  let index = -1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (windows[mid].start <= currentTime) {
+      index = mid;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  let match = null;
+  for (let i = index; i >= 0; i--) {
+    const window = windows[i];
+    if (window.end < currentTime) break;
+    if (currentTime >= window.start && currentTime <= window.end) match = window.line;
+  }
+  return match;
+}
+function karaokeLyricVisibleText(text) {
+  return String(text || "").replace(/[|~～]+/g, "");
+}
+function karaokeLyricDisplayHtml(text) {
+  return String(text || "").replace(/[~～]+/g, "").split(/(\|+)/g).map(token => {
+    if (!token) return "";
+    if (/^\|+$/.test(token)) {
+      const bigGaps = Math.floor(token.length / 2);
+      const smallGap = token.length % 2;
+      return `${'<span class="karaoke-cinemascope-gap big" aria-hidden="true"></span>'.repeat(bigGaps)}${smallGap ? '<span class="karaoke-cinemascope-gap" aria-hidden="true"></span>' : ''}`;
+    }
+    return escapeAttr(token);
+  }).join("");
+}
+const karaokeAutoGapPhraseStops = new Set([
+  "夜の広場に", "灯りがともる", "きみの影が", "となりで揺れる",
+  "勝ちたい気持ち", "隠さなくていい", "笑いながら", "構えよう",
+  "昨日のぼくらを", "越えていくため", "小さな一歩を", "重ねてきた",
+  "負けた涙も", "胸の奥で", "今日の力に", "変わってる",
+  "空を", "見上げたら", "星が", "合図をくれる", "まだ", "終わらない", "ここから", "始まる",
+  "イマソラ", "走れ", "夜をこえて", "きみとなら", "強くなれる",
+  "ぶつかるたび", "光になる", "この広場で", "夢を鳴らそう",
+  "響け", "胸の奥へ", "勝ち負けより", "大事なもの", "何度だって", "立ち上がれる",
+  "相棒となら", "前へ行ける", "静かな風が", "街を包んで", "遠くの窓が", "やさしく光る",
+  "本気で向かう", "きみのまなざし", "だからぼくも", "逃げないよ",
+  "小さな勇気が", "夜空に", "線を描く", "届くから", "もう一度", "いこう",
+  "もしも明日が", "遠く見えても", "今日の一戦は", "消えない",
+  "名前を呼べば", "力が戻る", "夜の広場で", "また会おう",
+  "悔しささえ", "未来まで", "育てた日々が", "背中を押す", "次の勝負へ", "歩き出そう"
+]);
+function karaokeAutoGapAfterPart(part, nextPart, segmentText) {
+  if (!part || !nextPart) return false;
+  if (/^[~～]/.test(String(nextPart.text || "")) || /[~～]$/.test(String(part.text || ""))) return false;
+  const text = karaokeLyricVisibleText(part.text);
+  const nextText = karaokeLyricVisibleText(nextPart.text);
+  const phraseText = karaokeLyricVisibleText(segmentText);
+  if (!text || !nextText) return false;
+  if (String(part.text || "").endsWith("|") || String(nextPart.text || "").startsWith("|")) return false;
+  if (karaokeAutoGapPhraseStops.has(phraseText)) return true;
+  const timeGap = Math.max(0, (nextPart.start || 0) - (part.end || 0));
+  const phraseLength = Array.from(phraseText).length;
+  const nextIsTinyContinuation = /^(の|を|に|へ|で|が|も|と|て|く|り|る|う|び|し|な|れ|なら)$/.test(nextText);
+  if (timeGap >= .18 && phraseLength >= 3 && !nextIsTinyContinuation) return true;
+  if (phraseLength < 4 || nextIsTinyContinuation) return false;
+  if (/(に|が|を|で|へ|も|なら|より|から|まで)$/.test(phraseText)) return true;
+  if (/(ながら|たい|ない|なる|れる|とう|よう|もの|ため)$/.test(phraseText)) return true;
+  return false;
+}
+function karaokeLyricPartProgressWeight(part) {
+  return Math.max(1, Array.from(karaokeLyricVisibleText(part?.text)).length);
+}
+function karaokeLyricProgressWeightsForParts(parts) {
+  const list = Array.isArray(parts) ? parts : [];
+  const weights = list.map(part => karaokeLyricPartProgressWeight(part));
+  return weights.length ? weights : [1];
+}
+function karaokeLyricDisplayHtmlForParts(parts) {
+  if (!Array.isArray(parts) || parts.length <= 1) return karaokeLyricDisplayHtml(parts?.[0]?.text || "");
+  let html = "";
+  let segmentText = "";
+  parts.forEach((part, index) => {
+    html += karaokeLyricDisplayHtml(part.text);
+    segmentText += karaokeLyricVisibleText(part.text);
+    const nextPart = parts[index + 1];
+    if (karaokeAutoGapAfterPart(part, nextPart, segmentText)) {
+      html += '<span class="karaoke-cinemascope-gap big" aria-hidden="true"></span>';
+      segmentText = "";
+    }
+  });
+  return html;
+}
+function karaokeLyricProgressFor(line, currentTime) {
+  const parts = line?.parts || [line];
+  const counts = Array.isArray(line?.karaokeCharacterCounts) ? line.karaokeCharacterCounts : karaokeLyricProgressWeightsForParts(parts);
+  const totalCharacters = line?.karaokeTotalCharacters || counts.reduce((total, count) => total + count, 0) || 1;
+  let completedCharacters = 0;
+  for (let index = 0; index < parts.length; index++) {
+    const part = parts[index];
+    const partCharacters = counts[index] || 1;
+    if (currentTime < part.start) {
+      return (completedCharacters / totalCharacters) * 100;
+    }
+    if (currentTime <= part.end) {
+      const partDuration = Math.max(.1, part.end - part.start);
+      const partProgress = Math.max(0, Math.min(1, (currentTime - part.start) / partDuration));
+      return ((completedCharacters + (partCharacters * partProgress)) / totalCharacters) * 100;
+    }
+    completedCharacters += partCharacters;
+  }
+  return 100;
+}
+function karaokeCinemascopeLyricBox() {
+  if (!karaokeCinemascopeLyricEl || !karaokeCinemascopeLyricEl.isConnected) {
+    karaokeCinemascopeLyricEl = document.querySelector("#townKaraoke .karaoke-cinemascope-lyric");
+  }
+  return karaokeCinemascopeLyricEl;
+}
+function karaokeStageSceneBox() {
+  if (!karaokeStageSceneEl || !karaokeStageSceneEl.isConnected) {
+    karaokeStageSceneEl = document.querySelector("#townKaraoke .karaoke-stage-scene");
+  }
+  return karaokeStageSceneEl;
+}
+function karaokeLightPhaseFor(currentTime) {
+  if (!Number.isFinite(currentTime) || currentTime < 8) return "off";
+  if (currentTime >= 248) return "finale";
+  if (currentTime >= 220 && currentTime < 248) return "bridge";
+  if (
+    (currentTime >= 79 && currentTime < 128) ||
+    (currentTime >= 171 && currentTime < 220)
+  ) {
+    return "chorus";
+  }
+  if (
+    (currentTime >= 61 && currentTime < 79) ||
+    (currentTime >= 143 && currentTime < 171)
+  ) {
+    return "lift";
+  }
+  return "quiet";
+}
+const karaokeBassLightSync = {
+  audio: null,
+  source: null,
+  analyser: null,
+  bins: null,
+  level: 0,
+  baseline: 0,
+  pulse: 0,
+  releaseStartedAt: 0,
+  lastHitAt: 0
+};
+function ensureKaraokeBassLightAnalyser(audio) {
+  if (!audio || !sound.ctx) return false;
+  if (karaokeBassLightSync.audio === audio && karaokeBassLightSync.analyser) return true;
+  karaokeBassLightSync.audio = audio;
+  karaokeBassLightSync.source = null;
+  karaokeBassLightSync.analyser = null;
+  karaokeBassLightSync.bins = null;
+  karaokeBassLightSync.level = 0;
+  karaokeBassLightSync.baseline = 0;
+  karaokeBassLightSync.pulse = 0;
+  karaokeBassLightSync.releaseStartedAt = 0;
+  karaokeBassLightSync.lastHitAt = 0;
+  try {
+    const source = sound.ctx.createMediaElementSource(audio);
+    const analyser = sound.ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = .18;
+    source.connect(analyser);
+    analyser.connect(sound.ctx.destination);
+    karaokeBassLightSync.source = source;
+    karaokeBassLightSync.analyser = analyser;
+    karaokeBassLightSync.bins = new Uint8Array(analyser.frequencyBinCount);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+function karaokeLightBassPulseFor(audio, phase) {
+  if (!audio || phase === "off" || audio.paused || audio.currentTime < 8) return 0;
+  if (!ensureKaraokeBassLightAnalyser(audio)) return Math.max(0, karaokeBassLightSync.pulse * .82);
+  const analyser = karaokeBassLightSync.analyser;
+  const bins = karaokeBassLightSync.bins;
+  analyser.getByteFrequencyData(bins);
+  const nyquist = sound.ctx.sampleRate / 2;
+  const hzPerBin = nyquist / bins.length;
+  const averageBand = (fromHz, toHz) => {
+    const from = Math.max(1, Math.floor(fromHz / hzPerBin));
+    const to = Math.min(bins.length - 1, Math.ceil(toHz / hzPerBin));
+    let total = 0;
+    let count = 0;
+    for (let i = from; i <= to; i += 1) {
+      total += bins[i];
+      count += 1;
+    }
+    return (total / Math.max(1, count)) / 255;
+  };
+  const bassCore = averageBand(42, 118);
+  const bassHarmonic = averageBand(118, 180);
+  const lowMud = averageBand(180, 320);
+  const vocalBody = averageBand(320, 900);
+  const bassLevel = bassCore * .86 + bassHarmonic * .14;
+  const nonBassLevel = lowMud * .58 + vocalBody * .42;
+  const bassDominance = bassLevel / Math.max(.025, nonBassLevel);
+  const previous = karaokeBassLightSync.level;
+  karaokeBassLightSync.level = karaokeBassLightSync.level * .28 + bassLevel * .72;
+  if (!karaokeBassLightSync.baseline) karaokeBassLightSync.baseline = karaokeBassLightSync.level;
+  karaokeBassLightSync.baseline = karaokeBassLightSync.baseline * .994 + karaokeBassLightSync.level * .006;
+  const onset = karaokeBassLightSync.level - previous;
+  const overBaseline = karaokeBassLightSync.level - karaokeBassLightSync.baseline;
+  const now = performance.now();
+  const isBassHit = bassDominance > 1.18 && bassCore > .075 && onset > .004 && overBaseline > .006;
+  if (isBassHit && now - karaokeBassLightSync.lastHitAt > 120) {
+    const hitStrength = Math.min(.82, .16 + (onset * 25) + (overBaseline * 7) + ((bassDominance - 1.18) * .18));
+    karaokeBassLightSync.pulse = Math.max(karaokeBassLightSync.pulse, hitStrength);
+    karaokeBassLightSync.lastHitAt = now;
+    karaokeBassLightSync.releaseStartedAt = now + 260;
+  }
+  const bassOnlySustain = bassDominance > 1.08 ? Math.max(0, Math.min(.34, overBaseline * 3.2)) : 0;
+  const releaseDecay = now < karaokeBassLightSync.releaseStartedAt ? .995 : .972;
+  karaokeBassLightSync.pulse = Math.max(karaokeBassLightSync.pulse * releaseDecay, bassOnlySustain);
+  const phaseBoost = phase === "chorus" || phase === "finale" ? 1 : phase === "lift" || phase === "bridge" ? .9 : .72;
+  return Math.max(0, Math.min(1, karaokeBassLightSync.pulse * phaseBoost));
+}
+function setKaraokeRoomLightPhase(currentTime) {
+  const scene = karaokeStageSceneBox();
+  if (!scene) return;
+  const phase = karaokeLightPhaseFor(currentTime);
+  const beatPulse = karaokeLightBassPulseFor(karaokeActiveAudio(), phase);
+  scene.style.setProperty("--karaoke-light-beat-pulse", beatPulse.toFixed(3));
+  if (scene.dataset.lightPhase === phase) return;
+  scene.dataset.lightPhase = phase;
+  scene.classList.toggle("karaoke-light-off", phase === "off");
+  scene.classList.toggle("karaoke-light-quiet", phase === "quiet");
+  scene.classList.toggle("karaoke-light-lift", phase === "lift");
+  scene.classList.toggle("karaoke-light-bridge", phase === "bridge");
+  scene.classList.toggle("karaoke-light-chorus", phase === "chorus");
+  scene.classList.toggle("karaoke-light-finale", phase === "finale");
+}
+function karaokeTransportTimeBox() {
+  if (!karaokeTransportTimeEl || !karaokeTransportTimeEl.isConnected) {
+    karaokeTransportTimeEl = document.querySelector("#townKaraoke [data-karaoke-time]");
+  }
+  return karaokeTransportTimeEl;
+}
+function renderKaraokeCinemascopeLyric(line, progress) {
+  const box = karaokeCinemascopeLyricBox();
+  if (!box) return;
+  if (!line) {
+    if (box.dataset.text === "" && karaokeCinemascopeProgressText === "0%") return;
+    box.dataset.text = "";
+    karaokeCinemascopeProgressText = "0%";
+    box.innerHTML = "";
+    box.style.setProperty("--karaoke-lyric-progress", "0%");
+    return;
+  }
+  const text = line.text;
+  const progressText = `${Math.max(0, Math.min(100, progress)).toFixed(4)}%`;
+  if (karaokeCinemascopeProgressText !== progressText) {
+    karaokeCinemascopeProgressText = progressText;
+    box.style.setProperty("--karaoke-lyric-progress", progressText);
+  }
+  if (box.dataset.text === text) return;
+  box.dataset.text = text;
+  const displayText = karaokeLyricDisplayHtmlForParts(line.parts || [line]);
+  box.innerHTML = `<span class="karaoke-cinemascope-line"><span class="karaoke-cinemascope-base">${displayText}</span><span class="karaoke-cinemascope-fill" aria-hidden="true">${displayText}</span></span>`;
+}
+function renderKaraokeLyricSyncAt(mode, audio, currentTime) {
+  if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode || sound.audio !== audio) return;
+  const line = karaokeTimedLyricFor(mode, currentTime);
+  const progress = line ? karaokeLyricProgressFor(line, currentTime) : 0;
+  renderKaraokeCinemascopeLyric(line, progress);
+}
+function renderKaraokeRealtimeAt(mode, audio, currentTime) {
+  if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode || sound.audio !== audio) return;
+  setKaraokeRoomLightPhase(currentTime);
+  if (!karaokeTimedLyrics[mode] || currentTime < 8) {
+    setKaraokeCinemascopeVisible(false);
+    renderKaraokeCinemascopeLyric(null, 0);
+    return;
+  }
+  setKaraokeCinemascopeVisible(true);
+  renderKaraokeLyricSyncAt(mode, audio, currentTime);
+}
+function updateKaraokeRealtimeSync(audio = karaokeActiveAudio(), currentTime = null) {
+  const mode = karaokePerformanceMode;
+  if (!mode || !audio || sound.audio !== audio) return;
+  const current = Number.isFinite(currentTime) ? currentTime : karaokeSyncedAudioTime(audio);
+  renderKaraokeRealtimeAt(mode, audio, current);
+}
+function updateKaraokeLyricSync(mode, audio) {
+  if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode || sound.audio !== audio) return;
+  renderKaraokeLyricSyncAt(mode, audio, karaokeSyncedAudioTime(audio));
+}
+function refreshKaraokeLyricSyncNow(mode, audio, currentTime) {
+  if (karaokeLyricFrame) cancelAnimationFrame(karaokeLyricFrame);
+  karaokeLyricFrame = null;
+  renderKaraokeRealtimeAt(mode, audio, currentTime);
+}
+function startKaraokeLyricSync(mode, audio) {
+  stopKaraokeLyricSync();
+  if (!karaokeTimedLyrics[mode]) return;
+  updateKaraokeLyricSync(mode, audio);
+}
+function stopKaraokeLyricSync() {
+  if (karaokeLyricFrame) cancelAnimationFrame(karaokeLyricFrame);
+  karaokeLyricFrame = null;
+  renderKaraokeCinemascopeLyric(null, 0);
+}
+function clearKaraokeCinemascopeTimer() {
+  if (karaokeCinemascopeTimer) clearTimeout(karaokeCinemascopeTimer);
+  karaokeCinemascopeTimer = null;
+}
+function setKaraokeCinemascopeVisible(visible) {
+  const nextVisible = !!visible;
+  if (karaokeCinemascopeVisibleState === nextVisible) return;
+  karaokeCinemascopeVisibleState = nextVisible;
+  karaokeStageSceneBox()?.classList.toggle("cinemascope-active", nextVisible);
+}
+function clearKaraokeCinemascope() {
+  clearKaraokeCinemascopeTimer();
+  stopKaraokeLyricSync();
+  karaokeCinemascopeVisibleState = null;
+  setKaraokeCinemascopeVisible(false);
+}
+function syncKaraokeCinemascopeToAudio(mode, audio, currentOverride = null) {
+  clearKaraokeCinemascopeTimer();
+  if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode || sound.audio !== audio) return;
+  const current = Number.isFinite(currentOverride) ? currentOverride : karaokeSyncedAudioTime(audio);
+  renderKaraokeRealtimeAt(mode, audio, current);
+}
+function scheduleKaraokeCinemascope(mode, audio) {
+  clearKaraokeCinemascope();
+  syncKaraokeCinemascopeToAudio(mode, audio);
+}
+function karaokeSeatHtml(item, emptyLabel = "空き席") {
+  if (!item) {
+    return `<div class="karaoke-seat empty"><span class="karaoke-seat-placeholder" aria-hidden="true"></span><span class="karaoke-seat-name">${escapeAttr(emptyLabel)}</span></div>`;
+  }
+  const slotClass = item.slot ? ` ${item.slot}` : "";
+  const styleRules = [];
+  if (item.adjustSlot) styleRules.push(karaokeSeatStyle(item.adjustSlot));
+  if (item.gridColumn) styleRules.push(`grid-column:${item.gridColumn};`);
+  const style = styleRules.length ? ` style="${styleRules.join("")}"` : "";
+  const nameStyle = item.adjustSlot ? ` style="${karaokeNameStyle(item.adjustSlot)}"` : "";
+  return `<div class="karaoke-seat${slotClass}"${style}><span class="karaoke-seat-art">${item.art}</span><span class="karaoke-seat-name"${nameStyle}>${escapeAttr(item.name)}</span></div>`;
+}
+function karaokeRoomSceneClass() {
+  const scene = currentTownScene();
+  if (scene === "evening") return "karaoke-scene-evening";
+  if (scene === "night") return "karaoke-scene-night";
+  return "karaoke-scene-morning-day";
+}
+function karaokePerformanceSceneHtml(mode) {
+  const profile = monsterProfile();
+  const growth = growthForecast();
+  const current = { name: companionDisplayName(profile), slot: "current", adjustSlot: "current", gridColumn: 2, art: karaokeCurrentArtMarkup(profile, growth, "front") };
+  const guide = { name: "白ミチロードセイバーレン", slot: "guide", adjustSlot: "guide", gridColumn: 3, art: karaokeGuideArtMarkup("front") };
+  const retired = karaokeRetiredRecords().map((record, index) => ({
+    name: record.name || "引退相棒",
+    slot: index === 0 ? "retired-right" : "retired-left",
+    adjustSlot: index === 0 ? "retiredRight" : "retiredLeft",
+    gridColumn: index === 0 ? 4 : 1,
+    art: karaokeRetiredArtMarkup(record, index === 0 ? "front-left" : "front-right")
+  }));
+  const seats = [retired[1], current, guide, retired[0]].filter(Boolean);
+  return `
+    <div class="karaoke-stage-scene ${karaokeRoomSceneClass()}" aria-label="カラオケボックスで${escapeAttr(karaokeSongDisplayName(mode))}を試聴中">
+      <div class="karaoke-room-light-wash" aria-hidden="true"></div>
+      <div class="karaoke-cinemascope-lyric" aria-live="polite"></div>
+      <div class="karaoke-seat-row">
+        ${seats.map(seat => karaokeSeatHtml(seat)).join("")}
+      </div>
+    </div>
+  `;
+}
 function renderTownKaraoke() {
   const box = document.getElementById("townKaraoke");
   if (!box) return;
+  karaokeCinemascopeLyricEl = null;
+  karaokeStageSceneEl = null;
+  karaokeTransportTimeEl = null;
+  karaokeCinemascopeVisibleState = null;
+  karaokeCinemascopeProgressText = "";
+  karaokeLastRealtimeRenderAt = 0;
+  karaokeLastTransportLabelAt = 0;
+  karaokeLastTransportText = "";
   if (!isTownBuildingBuilt("soundShop") || !musicPlazaKaraokeOpen) {
     box.innerHTML = "";
     box.hidden = true;
@@ -38281,11 +40019,47 @@ function renderTownKaraoke() {
   const soundModes = karaokeAvailableSoundSongModes();
   const songModes = [...karaokeModes, ...soundModes];
   if (!songModes.includes(selectedKaraokeBgmMode)) selectedKaraokeBgmMode = songModes[0] || "normal";
+  if (karaokePerformanceMode && !karaokeModes.includes(karaokePerformanceMode)) karaokePerformanceMode = "";
   const participants = karaokeParticipants();
   box.hidden = false;
+  if (karaokePerformanceMode) {
+    box.innerHTML = `
+      <div class="karaoke-heading"><b>カラオケボックス</b><button type="button" data-karaoke-return-town>町に戻る</button></div>
+      <span>カラオケ試聴は、専用のカラオケボックス画面に切り替わってから1秒後に再生されます。</span>
+      <div class="karaoke-room">
+        ${karaokePerformanceSceneHtml(karaokePerformanceMode)}
+        <div class="karaoke-controls">
+          <button type="button" data-karaoke-back-songs>曲を選び直す</button>
+          <button type="button" data-karaoke-seek="-5">-5秒</button>
+          <button type="button" data-karaoke-pause>一旦ストップ</button>
+          <span class="karaoke-time" data-karaoke-time>0:00.0 / 0:00.0</span>
+          <button type="button" data-karaoke-seek="5">+5秒</button>
+          <button type="button" data-karaoke-stop>停止</button>
+        </div>
+        <div class="karaoke-lyrics">${escapeAttr(karaokeLyricsText(karaokePerformanceMode))}</div>
+      </div>
+    `;
+    box.querySelector("[data-karaoke-return-town]")?.addEventListener("click", returnToTownMapFromKaraoke);
+    box.querySelector("[data-karaoke-back-songs]")?.addEventListener("click", returnToKaraokeSongList);
+    box.querySelectorAll("[data-karaoke-seek]").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        seekKaraokePreview(Number(button.dataset.karaokeSeek) || 0);
+      });
+    });
+    box.querySelector("[data-karaoke-pause]")?.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleKaraokePreviewPause(event.currentTarget);
+    });
+    box.querySelector("[data-karaoke-stop]")?.addEventListener("click", stopKaraokeSong);
+    updateKaraokeTransportDisplay();
+      return;
+  }
   box.innerHTML = `
     <div class="karaoke-heading"><b>カラオケボックス</b><button type="button" data-karaoke-return-town>町に戻る</button></div>
-    <span>育成中の相棒と、引退した相棒最大3匹まで一緒に、イマソラウォークの曲を歌詞表示ありで試聴できます。</span>
+    <span>育成中の相棒、白ミチロードセイバーレン、引退した相棒最大2匹まで一緒に、イマソラウォークの曲を歌詞表示ありで試聴できます。</span>
     <div class="karaoke-room">
       <div class="karaoke-singers">
         ${participants.map(item => `<div class="karaoke-singer"><strong>${escapeAttr(item.name)}</strong><small>${escapeAttr(item.role)}</small></div>`).join("")}
@@ -38303,7 +40077,6 @@ function renderTownKaraoke() {
         </div>
       </div>
       <div class="karaoke-controls">
-        <button type="button" data-karaoke-play>この曲を試聴する</button>
         <button type="button" data-karaoke-stop>停止</button>
       </div>
       <div class="karaoke-lyrics">${escapeAttr(karaokeLyricsText(selectedKaraokeBgmMode))}</div>
@@ -38313,7 +40086,6 @@ function renderTownKaraoke() {
   box.querySelectorAll("[data-karaoke-song]").forEach(button => {
     button.addEventListener("click", () => selectKaraokeSong(button.dataset.karaokeSong));
   });
-  box.querySelector("[data-karaoke-play]")?.addEventListener("click", playSelectedKaraokeSong);
   box.querySelector("[data-karaoke-stop]")?.addEventListener("click", stopKaraokeSong);
 }
 function openMusicPlazaKaraokeFromTown() {
@@ -38329,22 +40101,76 @@ function openMusicPlazaKaraokeFromTown() {
   toast("カラオケボックスへ移動しました");
 }
 function returnToTownMapFromKaraoke() {
+  stopKaraokeTransportDisplay();
   musicPlazaKaraokeOpen = false;
+  karaokePerformanceMode = "";
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
   stopBgm();
   renderTownKaraoke();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
 }
-function selectKaraokeSong(mode) {
-  if (!karaokeAvailableSongModes().includes(mode)) return;
-  selectedKaraokeBgmMode = mode;
+function returnToKaraokeSongList() {
+  stopKaraokeTransportDisplay();
+  karaokePerformanceMode = "";
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
+  stopBgm();
   renderTownKaraoke();
   playSfx("select");
 }
-function playSelectedKaraokeSong() {
-  previewBgm(selectedKaraokeBgmMode);
+function openKaraokeSofaDevPreview() {
+  if (!isTownBuildingBuilt("soundShop")) {
+    playSfx("error");
+    toast("音楽プラザはまだ建設されていません");
+    return;
+  }
+  musicPlazaKaraokeOpen = true;
+  selectedKaraokeBgmMode = karaokeAvailableVocalSongModes()[0] || "nightPlaza";
+  karaokePerformanceMode = selectedKaraokeBgmMode;
+  stopKaraokeTransportDisplay();
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
+  stopBgm();
+  renderTownKaraoke();
+  document.getElementById("townKaraoke")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+  toast("カラオケ配置を表示しました");
+}
+function startKaraokePerformance(mode) {
+  selectedKaraokeBgmMode = mode;
+  karaokePerformanceMode = mode;
+  karaokeSeekLockedClock = false;
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
+  stopBgm();
+  renderTownKaraoke();
+  playSfx("select");
+  karaokePerformanceTimer = setTimeout(() => {
+    karaokePerformanceTimer = null;
+    if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode) return;
+    previewKaraokeSongOnce(mode);
+  }, 1000);
+}
+function selectKaraokeSong(mode) {
+  if (!karaokeAvailableSongModes().includes(mode)) return;
+  selectedKaraokeBgmMode = mode;
+  if (karaokeAvailableVocalSongModes().includes(mode)) {
+    startKaraokePerformance(mode);
+    return;
+  }
+  karaokePerformanceMode = "";
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
+  renderTownKaraoke();
+  playSfx("select");
+  previewKaraokeSongOnce(mode);
 }
 function stopKaraokeSong() {
+  stopKaraokeTransportDisplay();
+  clearKaraokePerformanceTimer();
+  clearKaraokeCinemascope();
   stopBgm();
   playSfx("select");
   toast("試聴を停止しました");
@@ -38390,7 +40216,8 @@ function retireParkPracticeOpponent(record) {
     baseName: record?.name || "引退相棒",
     seedId: record?.seedId || record?.monster?.seedId || "",
     stage: "満開期",
-    item
+    item,
+    colorSettings: retiredCompanionColorSettings(record)
   };
 }
 function retireParkPracticeStrategyMenu(record) {
@@ -38509,7 +40336,7 @@ function startRetireParkPracticeBattle(recordId) {
   const opponent = retireParkPracticeOpponent(record);
   const cup = retireParkPracticeArenaCup();
   const result = simulateTournamentRounds(playerStats, enemyStats, cup, opponent);
-  const match = { index: 0, enemy: opponent.name, enemyId: opponent.id, enemyBaseName: opponent.baseName, enemyStage: opponent.stage, enemyStats, ...result };
+  const match = { index: 0, enemy: opponent.name, enemyId: opponent.id, enemyBaseName: opponent.baseName, enemyStage: opponent.stage, enemyOpponent: opponent, enemyStats, ...result };
   pendingRetireParkPracticeRecordId = "";
   pendingRetireParkPracticeBattle = { cup, profile, playerStats, enemyStats, opponent, match, strategy };
   const resultHtml = `
@@ -39256,15 +41083,17 @@ function chooseMove(minRank = 0, turn = 1, maxTurns = 3, counter = false, mp = m
 function monsterInnerParts() {
   return `<span class="monster-eye left"></span><span class="monster-eye right"></span><span class="monster-mark"></span><span class="monster-foot left"></span><span class="monster-foot right"></span><span class="monster-spark"></span>`;
 }
-function galleryMonsterArt(item) {
+function galleryMonsterArt(item, colorSettings = null) {
   if (item.id.startsWith("star-")) {
-    return `<div class="monster-art unique-art star-gallery-art">${turnaroundMonsterSvg(item, "front-right")}</div>`;
+    return `<div class="monster-art unique-art star-gallery-art">${turnaroundMonsterSvg(item, "front-right", colorSettings)}</div>`;
   }
   if (item.id.startsWith("hero-")) {
-    return `<div class="monster-art unique-art">${uniqueMonsterSvg(item)}</div>`;
+    return `<div class="monster-art unique-art">${uniqueMonsterSvg(item, false, colorSettings)}</div>`;
   }
   const whiteClass = item.whiteVariant ? " white-body" : "";
-  return `<div class="monster-art"><div class="monster ${item.form}${whiteClass}" style="${item.style}">${monsterInnerParts()}</div></div>`;
+  const companionClass = colorSettings ? " companion-color-target" : "";
+  const companionStyle = colorSettings ? companionColorInlineStyle(colorSettings) : "";
+  return `<div class="monster-art"><div class="monster ${item.form}${whiteClass}${companionClass}" style="${item.style || ""}${companionStyle}">${monsterInnerParts()}</div></div>`;
 }
 function currentCompanionBranchKey(growth) {
   const key = growth?.top?.key || "";
@@ -39503,6 +41332,10 @@ function createRetirementRecord() {
     profileId: profile.id,
     artId: item?.id || profile.id,
     seedId: state.monster.seedId,
+    companionColors: {
+      hand: state.companionColors?.hand || "standard",
+      foot: state.companionColors?.foot || "standard"
+    },
     rank: rank.rank,
     rankLabel: rank.label,
     abilityTotal: total,
@@ -39614,9 +41447,7 @@ function startRetirementGiftAdView(index) {
 }
 function stopNormalSoundForRetirementCeremony() {
   stopBgm();
-  if (companionHomeTalkTimer) clearInterval(companionHomeTalkTimer);
-  companionHomeTalkTimer = null;
-  clearCompanionHomeTypeTimers();
+  stopCompanionHomeDialogue();
 }
 function startRetirementCeremonySendoff() {
   stopNormalSoundForRetirementCeremony();
@@ -40892,14 +42723,14 @@ function galleryTurnaroundArt(item) {
     const withHands = content.replace(/(<circle\b(?=[^>]*fill="#(?:58bf72|4fa966)")[^>]*\/>)/g, hand => {
       const side = handIndex++ % 2 ? "right" : "left";
       const values = valuesForSide(side);
-      return `<g><animateTransform attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${hand}</g>`;
+      return `<g><animateTransform data-karaoke-hand-motion="1" attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${hand}</g>`;
     });
     const invertSoraDamaMotion = view === "back" || view === "back-left";
     return withHands.replace(/(<circle\b[^>]*cx="([0-9.]+)"[^>]*cy="[0-9.]+"[^>]*r="[0-9.]+"[^>]*fill="#7edcff"[^>]*\/>)(<circle\b[^>]*fill="rgba\(255,255,255,.72\)"[^>]*\/>)/g, (match, orb, cx, highlight) => {
       const rawSide = Number(cx) >= 58 ? "right" : "left";
       const side = invertSoraDamaMotion ? (rawSide === "right" ? "left" : "right") : rawSide;
       const values = valuesForSide(side);
-      return `<g><animateTransform attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${orb}${highlight}</g>`;
+      return `<g><animateTransform data-karaoke-hand-motion="1" attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${orb}${highlight}</g>`;
     });
   };
   const handMotionMode = view === "front-right" || view === "front-left" ? "horizontalSame" : view === "side" || view === "side-left" ? "horizontal" : "vertical";
@@ -41026,12 +42857,12 @@ function uniqueMonsterSvg(item, centeredTurnaround = false, colorSettings = null
     const withHands = content.replace(/(<circle\b(?=[^>]*fill="#(?:58bf72|4fa966)")[^>]*\/>)/g, hand => {
       const side = handIndex++ % 2 ? "right" : "left";
       const values = valuesForSide(side);
-      return `<g><animateTransform attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${hand}</g>`;
+      return `<g><animateTransform data-karaoke-hand-motion="1" attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${hand}</g>`;
     });
     return withHands.replace(/(<circle\b[^>]*cx="([0-9.]+)"[^>]*cy="[0-9.]+"[^>]*r="[0-9.]+"[^>]*fill="#7edcff"[^>]*\/>)(<circle\b[^>]*fill="rgba\(255,255,255,.72\)"[^>]*\/>)/g, (match, orb, cx, highlight) => {
       const side = Number(cx) >= 58 ? "right" : "left";
       const values = valuesForSide(side);
-      return `<g><animateTransform attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${orb}${highlight}</g>`;
+      return `<g><animateTransform data-karaoke-hand-motion="1" attributeName="transform" type="translate" values="${values}" dur="1.08s" repeatCount="indefinite" additive="sum"/>${orb}${highlight}</g>`;
     });
   };
   const walkMotion = content => `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.8;0 0;0 .8;0 0" dur=".54s" repeatCount="indefinite" additive="sum"/>${animateHandMotion(animateFootSteps(content))}</g>`;
@@ -41581,7 +43412,7 @@ function renderSeedChoice(profile) {
       }).join("")}
     </div>
     <div class="name-row">
-      <input id="nicknameInput" type="text" maxlength="12" value="${escapeAttr(state.monster.nickname)}" placeholder="相棒の呼び名">
+      <input id="nicknameInput" type="text" maxlength="${monsterNicknameMaxLength}" value="${escapeAttr(state.monster.nickname)}" placeholder="相棒の呼び名">
       <button class="secondary" id="nicknameBtn" type="button">名前を保存</button>
     </div>
   `;
@@ -41614,7 +43445,7 @@ function chooseSeed(seedId) {
 }
 function saveNickname() {
   const input = document.getElementById("nicknameInput");
-  const name = String(input?.value || "").trim().slice(0, 12);
+  const name = String(input?.value || "").trim().slice(0, monsterNicknameMaxLength);
   state.monster.nickname = name;
   saveState();
   renderMonster();
@@ -41795,10 +43626,10 @@ function tournamentPlayerAwardArt(profile) {
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
   return `<div class="award-monster-figure">${battleDirectionArtFromItem(item, "front", profile.form, whiteClass, companionColorSettings())}</div>`;
 }
-function completedFighterFromItem(name, item, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", reverseHp = false, hpValue = null, hpAfterValue = null) {
+function completedFighterFromItem(name, item, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", reverseHp = false, hpValue = null, hpAfterValue = null, colorSettings = null) {
   if (!item) return pixelFighter(name, reverseHp ? "enemy" : "", hpPercent);
   const whiteClass = item.whiteVariant ? " white-body" : "";
-  const art = battleDirectionArtFromItem(item, view, "leaf", whiteClass);
+  const art = battleDirectionArtFromItem(item, view, "leaf", whiteClass, colorSettings);
   return `<div class="pixel-fighter${advantageClassName(advantageState)}">
     ${hpDrainMarkup(hpPercent, hpAfterPercent, reverseHp, hpValue, hpAfterValue)}
     ${art}
@@ -41888,7 +43719,7 @@ function tournamentOpponentForMatch(cup, index = 0, total = tournamentMatchCount
 function normalizeTournamentOpponent(opponentOrName, cup) {
   if (opponentOrName && typeof opponentOrName === "object") {
     const item = opponentOrName.id ? tournamentOpponentItemById(opponentOrName.id) : null;
-    return { name: opponentOrName.name || item?.name || cup?.enemy || "大会相手", item };
+    return { name: opponentOrName.name || item?.name || cup?.enemy || "大会相手", item: opponentOrName.item || item, colorSettings: opponentOrName.colorSettings || null };
   }
   const name = opponentOrName || cup?.enemy || "大会相手";
   const allItems = monsterDexGroups.flatMap(group => group.list || []);
@@ -41904,13 +43735,13 @@ function applyTournamentOpponentToMatch(match, opponent) {
 }
 function tournamentEnemyFighter(cup, opponentOrName, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", hpValue = null, hpAfterValue = null) {
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
-  return completedFighterFromItem(opponent.name, opponent.item || tournamentNpcItem(cup), hpPercent, view, hpAfterPercent, advantageState, true, hpValue, hpAfterValue);
+  return completedFighterFromItem(opponent.name, opponent.item || tournamentNpcItem(cup), hpPercent, view, hpAfterPercent, advantageState, true, hpValue, hpAfterValue, opponent.colorSettings);
 }
 function tournamentEnemyOpeningFighterHtml(cup, opponentOrName, stats) {
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
   const item = opponent.item || tournamentNpcItem(cup);
   const whiteClass = item?.whiteVariant ? " white-body" : "";
-  const art = item ? battleDirectionArtFromItem(item, "front", "leaf", whiteClass) : "";
+  const art = item ? battleDirectionArtFromItem(item, "front", "leaf", whiteClass, opponent.colorSettings) : "";
   return `<div class="opening-monster-name">${opponent.name}</div>${tournamentOpeningStatsHtml(stats)}<div class="opening-monster-art">${art}</div>`;
 }
 function tournamentEnemyAwardArt(cup, opponentOrName, view = "front") {
@@ -42189,18 +44020,19 @@ function directionDesignItem(profile, useProfileName = true) {
     || dexCharacterItem({ id: profile.id });
   return { ...found, name: useProfileName ? profile.name : found.name, whiteVariant: profile.white };
 }
-function directionFrameArt(item, direction) {
+function directionFrameArt(item, direction, colorSettings = null) {
   const art = direction.art || direction.id || "front";
   if (["front", "side", "side-left", "back", "front-right", "front-left", "back-right", "back-left"].includes(art)) {
-    return `<div class="direction-turnaround-art">${turnaroundMonsterSvg(item, art)}</div>`;
+    return `<div class="direction-turnaround-art">${turnaroundMonsterSvg(item, art, colorSettings)}</div>`;
   }
   if (item.id.startsWith("hero-") || item.id.startsWith("star-")) {
-    return `<div class="direction-turnaround-art">${uniqueMonsterSvg(item, true)}</div>`;
+    return `<div class="direction-turnaround-art">${uniqueMonsterSvg(item, true, colorSettings)}</div>`;
   }
-  return galleryMonsterArt(item);
+  return galleryMonsterArt(item, colorSettings);
 }function renderDirectionPlanPanel() {
   const profile = monsterProfile();
   const item = directionDesignItem(profile);
+  const colorSettings = companionColorSettings();
   const directions = [
     { id: "back-left", label: "左後ろ", cls: "diagonal back" },
     { id: "back", label: "後ろ", cls: "diagonal back right", art: "back" },
@@ -42223,7 +44055,7 @@ function directionFrameArt(item, direction) {
     <span>正式版の街歩きでは、完全3Dではなく2D 8方向スプライトを基本にします。今の試作では、向き・影・弾み・奥行きの見え方だけを確認します。</span>
     <div class="direction-stage">
       <div class="direction-compass">
-        ${directions.map(direction => `<div class="direction-frame ${direction.cls}" data-direction="${direction.id}">${directionFrameArt(item, direction)}<strong>${direction.label}</strong></div>`).join("")}
+        ${directions.map(direction => `<div class="direction-frame ${direction.cls}" data-direction="${direction.id}">${directionFrameArt(item, direction, colorSettings)}<strong>${direction.label}</strong></div>`).join("")}
       </div>
       <div class="direction-spec-grid">
         ${specs.map(([title, text]) => `<div class="direction-spec"><strong>${title}</strong><small>${text}</small></div>`).join("")}
@@ -42256,10 +44088,11 @@ function directionFrameArt(item, direction) {
   const tabs = `<div class="dex-stage-tabs" role="tablist" aria-label="モンスター図鑑の期切り替え">
     ${baseGroups.map(group => `<button class="dex-stage-tab ${group.stage === selectedGroup.stage ? "active" : ""}" type="button" data-dex-stage="${group.stage}" aria-pressed="${group.stage === selectedGroup.stage}">${group.label || group.stage}<small>${group.count}種</small></button>`).join("")}
   </div>`;
+  const currentArtItem = currentCompanionArtItem(profile, growthForecast());
   const cards = selectedGroup.list.map(item => {
-    const current = item.id === profile.id || item.name.includes(profile.name);
+    const current = item.id === profile.id || item.id === currentArtItem?.id || item.name.includes(profile.name);
     return `<div class="dex-node dex-full-card ${current ? "current" : ""}">
-      <div class="dex-character gallery-monster-card ${item.id}" aria-label="${item.name}">${galleryMonsterArt(item)}</div>
+      <div class="dex-character gallery-monster-card ${item.id}" aria-label="${item.name}">${galleryMonsterArt(item, current ? companionColorSettings() : null)}</div>
       <b>${item.name}</b>
       <small>${item.note || "進化分岐の試作登録"}</small>
     </div>`;
@@ -44319,7 +46152,7 @@ function buildBattleAnimationQueue(matches, cup, profile, playerStats) {
   const queue = [];
   matches.forEach(match => {
     const matchQueueStart = queue.length;
-    const enemyOpponent = {
+    const enemyOpponent = match.enemyOpponent || {
       id: match.enemyId || "",
       name: match.enemy && !match.enemy.includes("代表") ? match.enemy : tournamentEnemyMonsterName(cup, playerName),
       baseName: match.enemyBaseName || match.enemy || "",
@@ -45288,6 +47121,7 @@ function showHomeCenterNotice(text) {
 }
 function switchScreen(screen) {
   blurActiveTextInput();
+  if (screen !== "walk") stopCompanionHomeDialogue();
   if (screen !== "monster") stopBattleResultBgm();
   const leavingRetirementBgm = screen !== "retirement" && sound.mode === "retirementCeremony";
   if (screen !== "retirement") {
@@ -45407,6 +47241,66 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
