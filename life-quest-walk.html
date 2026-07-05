@@ -9769,6 +9769,7 @@
       border-top: 3px solid rgba(139, 91, 35, .3);
     }
     .home-window {
+      --home-window-view-shift: -6px;
       position: absolute;
       left: 13px;
       top: 24px;
@@ -9781,8 +9782,8 @@
       background:
         linear-gradient(90deg, transparent 45%, rgba(143,180,207,.8) 45% 55%, transparent 55%),
         linear-gradient(180deg, transparent 45%, rgba(143,180,207,.8) 45% 55%, transparent 55%),
-        radial-gradient(circle at calc(var(--home-window-orb-x, 59px) + 5.5px) calc(var(--home-window-orb-y, 7px) + 5.5px), var(--home-window-orb-color, rgba(255,255,255,.85)) 0 5.5px, transparent 6px),
-        radial-gradient(circle at calc(var(--home-window-orb-x, 59px) + 5.5px) calc(var(--home-window-orb-y, 7px) + 5.5px), rgba(255,248,216,.38) 0 14px, transparent 15px),
+        radial-gradient(circle at calc(var(--home-window-orb-x, 59px) + 5.5px + var(--home-window-view-shift)) calc(var(--home-window-orb-y, 7px) + 5.5px), var(--home-window-orb-color, rgba(255,255,255,.85)) 0 5.5px, transparent 6px),
+        radial-gradient(circle at calc(var(--home-window-orb-x, 59px) + 5.5px + var(--home-window-view-shift)) calc(var(--home-window-orb-y, 7px) + 5.5px), rgba(255,248,216,.38) 0 14px, transparent 15px),
         linear-gradient(180deg, var(--home-window-sky-top, #9bd7ff), var(--home-window-sky-bottom, #fff5bf));
       box-shadow: inset 0 -10px 0 rgba(255,255,255,.22), 0 3px 0 rgba(80,90,100,.12);
     }
@@ -9793,19 +9794,19 @@
       display: block;
       z-index: 1;
       background:
-        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) 48px 36px / 22px 5px no-repeat,
-        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) 50px 41px / 17px 14px no-repeat,
-        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) 63px 32px / 4px 8px no-repeat;
+        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) calc(48px + var(--home-window-view-shift)) 36px / 22px 5px no-repeat,
+        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) calc(50px + var(--home-window-view-shift)) 41px / 17px 14px no-repeat,
+        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) calc(63px + var(--home-window-view-shift)) 32px / 4px 8px no-repeat;
       opacity: .72;
       pointer-events: none;
     }
     .home-window.time-moon::after {
       background:
-        radial-gradient(circle at 55px 48px, rgba(255,244,174,.94) 0 1.7px, transparent 2.5px),
-        radial-gradient(circle at 62px 48px, rgba(255,235,137,.9) 0 1.5px, transparent 2.3px),
-        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) 48px 36px / 22px 5px no-repeat,
-        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) 50px 41px / 17px 14px no-repeat,
-        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) 63px 32px / 4px 8px no-repeat;
+        radial-gradient(circle at calc(55px + var(--home-window-view-shift)) 48px, rgba(255,244,174,.94) 0 1.7px, transparent 2.5px),
+        radial-gradient(circle at calc(62px + var(--home-window-view-shift)) 48px, rgba(255,235,137,.9) 0 1.5px, transparent 2.3px),
+        linear-gradient(180deg, rgba(129,160,190,.82), rgba(129,160,190,.82)) calc(48px + var(--home-window-view-shift)) 36px / 22px 5px no-repeat,
+        linear-gradient(180deg, rgba(184,207,224,.76), rgba(126,164,192,.76)) calc(50px + var(--home-window-view-shift)) 41px / 17px 14px no-repeat,
+        linear-gradient(180deg, rgba(111,146,174,.72), rgba(111,146,174,.72)) calc(63px + var(--home-window-view-shift)) 32px / 4px 8px no-repeat;
       opacity: .9;
     }
     .home-door {
