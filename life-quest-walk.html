@@ -13120,6 +13120,7 @@ let pendingRetireParkPracticeRecordId = "";
 let musicPlazaKaraokeOpen = false;
 let selectedKaraokeBgmMode = "normal";
 let karaokePerformanceMode = "";
+let karaokeSofaDevPreviewActive = false;
 let karaokePerformanceTimer = null;
 let karaokeCinemascopeTimer = null;
 let karaokeLyricFrame = null;
@@ -38517,9 +38518,11 @@ function renderTownDevMenu() {
     <div class="town-dev-card town-dev-scene-card">
       <div class="town-dev-card-title"><span>カラオケ配置確認</span><span class="town-dev-offset">4席</span></div>
       <button type="button" data-karaoke-dev-sofa-preview>ソファに座らせる</button>
+      ${karaokeSeatDevAdjustListHtml("配置調整")}
     </div>
   `;
   box.querySelector("[data-karaoke-dev-sofa-preview]")?.addEventListener("click", openKaraokeSofaDevPreview);
+  bindKaraokeSeatDevAdjustControls(box);
   return;
   const nudgeButtons = [
     ["↖", -1, -1], ["↑", 0, -1], ["↗", 1, -1],
@@ -39046,6 +39049,47 @@ function karaokeNameStyle(slot) {
 function refreshKaraokeSeatDevAndPreview() {
   renderTownDevMenu();
   if (karaokePerformanceMode) renderTownKaraoke();
+}
+function karaokeSeatDevAdjustListHtml(title = "カラオケ配置 微調整") {
+  const adjustments = karaokeSeatAdjustments();
+  const slotOrder = ["retiredLeft", "current", "guide", "retiredRight"];
+  const buttons = [
+    ["左", "x", -1], ["右", "x", 1],
+    ["上", "y", -1], ["下", "y", 1],
+    ["小", "scale", -.01], ["大", "scale", .01]
+  ];
+  return `<div class="karaoke-dev-inline">
+    <div class="town-dev-card-title"><span>${escapeAttr(title)}</span><span class="town-dev-offset">本体のみ / 1px・1%</span></div>
+    <div class="karaoke-dev-adjust-list">
+      ${slotOrder.map(slot => {
+        const value = adjustments[slot] || { x: 0, y: 0, scale: 1 };
+        return `<div class="karaoke-dev-adjust-row">
+          <b>${escapeAttr(karaokeSeatAdjustLabels[slot] || slot)}</b>
+          <span class="karaoke-dev-adjust-values">x ${value.x.toFixed(0)} / y ${value.y.toFixed(0)} / ${Math.round(value.scale * 100)}%</span>
+          <div class="karaoke-dev-adjust-buttons">
+            ${buttons.map(([label, prop, delta]) => `<button type="button" data-karaoke-seat-adjust="${slot}" data-karaoke-seat-prop="${prop}" data-karaoke-seat-delta="${delta}">${label}</button>`).join("")}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+}
+function bindKaraokeSeatDevAdjustControls(root) {
+  root?.querySelectorAll("[data-karaoke-seat-adjust]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      const slot = button.dataset.karaokeSeatAdjust;
+      const prop = button.dataset.karaokeSeatProp;
+      const delta = Number(button.dataset.karaokeSeatDelta);
+      const adjustments = karaokeSeatAdjustments();
+      const value = adjustments[slot];
+      if (!value || !Number.isFinite(delta)) return;
+      if (prop === "scale") value.scale = Math.max(.2, Math.min(2, Math.round((value.scale + delta) * 100) / 100));
+      if (prop === "x" || prop === "y") value[prop] = Math.round((value[prop] + delta) * 100) / 100;
+      saveKaraokeSeatAdjustments();
+      refreshKaraokeSeatDevAndPreview();
+    });
+  });
 }
 function karaokeDexArtMarkup(item, view = "", colorSettings = null) {
   if (!item?.id) return "";
@@ -40029,6 +40073,7 @@ function renderTownKaraoke() {
       <span>カラオケ試聴は、専用のカラオケボックス画面に切り替わってから1秒後に再生されます。</span>
       <div class="karaoke-room">
         ${karaokePerformanceSceneHtml(karaokePerformanceMode)}
+        ${karaokeSofaDevPreviewActive ? karaokeSeatDevAdjustListHtml("表示を見ながら本体調整") : ""}
         <div class="karaoke-controls">
           <button type="button" data-karaoke-back-songs>曲を選び直す</button>
           <button type="button" data-karaoke-seek="-5">-5秒</button>
@@ -40055,6 +40100,7 @@ function renderTownKaraoke() {
       toggleKaraokePreviewPause(event.currentTarget);
     });
     box.querySelector("[data-karaoke-stop]")?.addEventListener("click", stopKaraokeSong);
+    bindKaraokeSeatDevAdjustControls(box);
     updateKaraokeTransportDisplay();
       return;
   }
@@ -40095,6 +40141,7 @@ function openMusicPlazaKaraokeFromTown() {
     toast("音楽プラザはまだ建設されていません");
     return;
   }
+  karaokeSofaDevPreviewActive = false;
   musicPlazaKaraokeOpen = true;
   renderTownKaraoke();
   document.getElementById("townKaraoke")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -40105,6 +40152,7 @@ function returnToTownMapFromKaraoke() {
   stopKaraokeTransportDisplay();
   musicPlazaKaraokeOpen = false;
   karaokePerformanceMode = "";
+  karaokeSofaDevPreviewActive = false;
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
   stopBgm();
@@ -40115,6 +40163,7 @@ function returnToTownMapFromKaraoke() {
 function returnToKaraokeSongList() {
   stopKaraokeTransportDisplay();
   karaokePerformanceMode = "";
+  karaokeSofaDevPreviewActive = false;
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
   stopBgm();
@@ -40130,6 +40179,7 @@ function openKaraokeSofaDevPreview() {
   musicPlazaKaraokeOpen = true;
   selectedKaraokeBgmMode = karaokeAvailableVocalSongModes()[0] || "nightPlaza";
   karaokePerformanceMode = selectedKaraokeBgmMode;
+  karaokeSofaDevPreviewActive = true;
   stopKaraokeTransportDisplay();
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
@@ -40142,6 +40192,7 @@ function openKaraokeSofaDevPreview() {
 function startKaraokePerformance(mode) {
   selectedKaraokeBgmMode = mode;
   karaokePerformanceMode = mode;
+  karaokeSofaDevPreviewActive = false;
   karaokeSeekLockedClock = false;
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
@@ -40162,6 +40213,7 @@ function selectKaraokeSong(mode) {
     return;
   }
   karaokePerformanceMode = "";
+  karaokeSofaDevPreviewActive = false;
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
   renderTownKaraoke();

@@ -1,0 +1,6 @@
+﻿{
+    "imasoraKaraokeSeatAdjustV1":  "{\"retiredLeft\":{\"x\":-16,\"y\":40,\"scale\":1.12},\"current\":{\"x\":0,\"y\":52,\"scale\":1.38},\"guide\":{\"x\":0,\"y\":40,\"scale\":1.05},\"retiredRight\":{\"x\":12,\"y\":40,\"scale\":1.10}}",
+    "imasoraKaraokeNameAdjustV1":  "{\"retiredLeft\":{\"x\":-30,\"y\":52},\"current\":{\"x\":-8,\"y\":52},\"guide\":{\"x\":8,\"y\":52},\"retiredRight\":{\"x\":26,\"y\":52}}",
+    "imasoraKaraokeScaleAcceptedVersion":  "20260706-0042-manual-ok",
+    "imasoraKaraokeManualAcceptedVersion":  "20260706-0042-manual-ok"
+}
