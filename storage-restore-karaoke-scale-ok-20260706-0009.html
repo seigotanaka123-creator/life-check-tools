@@ -1,0 +1,13 @@
+﻿<!doctype html>
+<meta charset="utf-8">
+<title>Restore karaoke scale OK 20260706-0009</title>
+<h1>カラオケサイズ復元 20260706-0009</h1>
+<p>このページは、確認済みのカラオケモンスターサイズを保存してから life-quest-walk.html に移動します。</p>
+<script id="storage-payload" type="application/json">{"imasoraKaraokeSeatAdjustV1":"{\"retiredLeft\":{\"x\":-16,\"y\":40,\"scale\":1.12},\"current\":{\"x\":0,\"y\":52,\"scale\":1.38},\"guide\":{\"x\":0,\"y\":40,\"scale\":1.05},\"retiredRight\":{\"x\":12,\"y\":40,\"scale\":1.10}}","imasoraKaraokeScaleAcceptedVersion":"20260706-0009"}</script>
+<script>
+(function(){
+  var payload = JSON.parse(document.getElementById('storage-payload').textContent);
+  Object.keys(payload).forEach(function(key){ localStorage.setItem(key, payload[key]); });
+  location.replace('life-quest-walk.html?restored=20260706-0009-karaoke-scale-ok');
+})();
+</script>
