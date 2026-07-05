@@ -13079,22 +13079,9 @@ const townNightLightObjects = [
   { id: "window40", kind: "window", name: "窓型発光体40", x: 9.7, y: 27.55, w: 1.54, h: 1.12, z: 24, r: 208 }
 ];
 const townNightLightStorageKey = "imasoraWalkTownNightLightOffsetsV2";
-const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2";
 const townNightLightNudgeStep = 0.35;
 const townNightLightScaleStep = 0.08;
 const townNightLightRotateStep = 2;
-const townVisualBaselineStoreKey = "imasoraTownVisualBaselineV20260705";
-function ensureTownVisualBaseline() {
-  try {
-    if (localStorage.getItem(townVisualBaselineStoreKey) === "1") return;
-    localStorage.removeItem(townNightLightStorageKey);
-    localStorage.removeItem(townLayeredSpriteOffsetStorageKey);
-    localStorage.setItem(townVisualBaselineStoreKey, "1");
-  } catch (error) {
-    // If localStorage is unavailable, the built-in visual defaults are used.
-  }
-}
-ensureTownVisualBaseline();
 let townNightLightOffsets = loadTownNightLightOffsets();
 const townBuildingCosts = {
   fountain: { "土の素材": 16, "雲の素材": 8 },
@@ -38414,6 +38401,18 @@ const townLayeredSpriteAssets = {
   castle: { file: "town-layered-castle-gate-v1.png", x: 12.95, y: 59.34, w: 16.6, h: 18.65, z: 18, r: 8 },
   clock: { file: "town-layered-clock-v1.png", x: 25.96, y: 41.34, w: 13.48, h: 21.45, z: 19, r: 4 }
 };
+const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2";
+const townLayeredSpriteBaselineStoreKey = "imasoraTownLayeredSpriteBaselineV20260705";
+function ensureTownLayeredSpriteBaseline() {
+  try {
+    if (localStorage.getItem(townLayeredSpriteBaselineStoreKey) === "1") return;
+    localStorage.removeItem(townLayeredSpriteOffsetStorageKey);
+    localStorage.setItem(townLayeredSpriteBaselineStoreKey, "1");
+  } catch (error) {
+    // If localStorage is unavailable, the built-in sprite positions are used.
+  }
+}
+ensureTownLayeredSpriteBaseline();
 const townLayeredSpriteNudgeStep = 0.35;
 const townLayeredSpriteRotateStep = 2;
 const townLayeredSpriteScaleStep = 0.05;
@@ -38984,19 +38983,18 @@ function karaokeStillArtHtml(html) {
 }
 const karaokeSeatAdjustStoreKey = "imasoraKaraokeSeatAdjustV1";
 const karaokeSeatAdjustDefaults = {
-  retiredLeft: { x: -16, y: 40, scale: 1.24 },
-  current: { x: 0, y: 52, scale: 1.6 },
-  guide: { x: 0, y: 40, scale: 1.15 },
-  retiredRight: { x: 12, y: 40, scale: 1.21 }
+  retiredLeft: { x: 0, y: 0, scale: 1 },
+  current: { x: 0, y: 8, scale: .54 },
+  guide: { x: 0, y: 0, scale: 1 },
+  retiredRight: { x: 0, y: 0, scale: 1 }
 };
 const karaokeNameAdjustStoreKey = "imasoraKaraokeNameAdjustV1";
 const karaokeNameAdjustDefaults = {
-  retiredLeft: { x: -30, y: 52 },
-  current: { x: -8, y: 52 },
-  guide: { x: 8, y: 52 },
-  retiredRight: { x: 26, y: 52 }
+  retiredLeft: { x: 0, y: 0 },
+  current: { x: 0, y: 0 },
+  guide: { x: 0, y: 0 },
+  retiredRight: { x: 0, y: 0 }
 };
-const karaokeVisualBaselineStoreKey = "imasoraKaraokeVisualBaselineV20260705";
 const karaokeSeatAdjustLabels = {
   retiredLeft: "左端の引退相棒",
   current: "育成中",
@@ -39005,18 +39003,7 @@ const karaokeSeatAdjustLabels = {
 };
 let karaokeSeatAdjustCache = null;
 let karaokeNameAdjustCache = null;
-function ensureKaraokeVisualBaseline() {
-  try {
-    if (localStorage.getItem(karaokeVisualBaselineStoreKey) === "1") return;
-    localStorage.setItem(karaokeSeatAdjustStoreKey, JSON.stringify(karaokeSeatAdjustDefaults));
-    localStorage.setItem(karaokeNameAdjustStoreKey, JSON.stringify(karaokeNameAdjustDefaults));
-    localStorage.setItem(karaokeVisualBaselineStoreKey, "1");
-  } catch (error) {
-    // LocalStorage may be unavailable in private or restricted contexts; defaults still apply.
-  }
-}
 function karaokeSeatAdjustments() {
-  ensureKaraokeVisualBaseline();
   if (karaokeSeatAdjustCache) return karaokeSeatAdjustCache;
   let saved = {};
   try {
@@ -39035,7 +39022,6 @@ function karaokeSeatAdjustments() {
   return karaokeSeatAdjustCache;
 }
 function karaokeNameAdjustments() {
-  ensureKaraokeVisualBaseline();
   if (karaokeNameAdjustCache) return karaokeNameAdjustCache;
   let saved = {};
   try {
