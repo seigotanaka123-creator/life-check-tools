@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>イマソラウォーク 完璧状態の保存データ復元</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    line-height: 1.7;
+    margin: 32px;
+    color: #102033;
+    background: #f6fbff;
+  }
+  button {
+    font: inherit;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #2563eb;
+    cursor: pointer;
+  }
+  pre {
+    white-space: pre-wrap;
+    padding: 16px;
+    border-radius: 8px;
+    background: #fff;
+  }
+</style>
+<h1>イマソラウォーク 完璧状態の保存データ復元</h1>
+<p>ローカルで「完璧」と確認した保存状態を、このページを開いているURLの保存領域へ復元します。</p>
+<button id="restoreButton" type="button">保存状態を復元する</button>
+<pre id="status">待機中</pre>
+<script>
+const statusEl = document.getElementById("status");
+const restoreButton = document.getElementById("restoreButton");
+const dataUrl = "LOCAL_STORAGE_perfect-state-20260705-1222.json";
+
+restoreButton.addEventListener("click", async () => {
+  try {
+    restoreButton.disabled = true;
+    statusEl.textContent = "復元データを読み込み中...";
+    const response = await fetch(dataUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`復元データを読めませんでした: ${response.status}`);
+    const payload = await response.json();
+    const restored = [];
+    for (const [key, value] of Object.entries(payload)) {
+      if (typeof value === "string") {
+        localStorage.setItem(key, value);
+        restored.push(`${key}: ${value.length}文字`);
+      } else if (value === null) {
+        localStorage.removeItem(key);
+        restored.push(`${key}: 空として復元`);
+      }
+    }
+    statusEl.textContent = `復元しました。\n${restored.join("\n")}\n\nこのあと life-quest-walk.html をCtrl+F5で開き直してください。`;
+  } catch (error) {
+    restoreButton.disabled = false;
+    statusEl.textContent = `復元に失敗しました。\n${error && error.message ? error.message : error}`;
+  }
+});
+</script>
