@@ -1,0 +1,189 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Karaoke public visual diagnose 20260706-0946</title>
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #101827;
+    color: #f8fafc;
+  }
+  header {
+    padding: 14px 18px;
+    background: #182238;
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+  p {
+    margin: 4px 0;
+    color: #cbd5e1;
+    font-size: 14px;
+  }
+  .wrap {
+    display: grid;
+    grid-template-columns: minmax(360px, 52vw) 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  iframe {
+    width: 100%;
+    height: 680px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 8px;
+    background: white;
+  }
+  pre {
+    min-height: 640px;
+    max-height: 680px;
+    overflow: auto;
+    margin: 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: #020617;
+    color: #dbeafe;
+    border: 1px solid rgba(255, 255, 255, .18);
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+  button {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: #60a5fa;
+    color: #0f172a;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+<header>
+  <h1>カラオケ公開表示 診断</h1>
+  <p>このページは同じ公開ドメイン上で保存値を入れ、アプリを開き、カラオケ画面のモンスター実寸を測ります。</p>
+  <p>結果欄をそのままCodexへ貼ってください。</p>
+  <button id="copyButton" type="button">結果をコピー</button>
+</header>
+<div class="wrap">
+  <iframe id="appFrame" src="about:blank"></iframe>
+  <pre id="result">準備中...</pre>
+</div>
+<script>
+(function () {
+  var expectedSeat = {
+    retiredLeft: { x: -16, y: 40, scale: 1.12 },
+    current: { x: 0, y: 52, scale: 1.38 },
+    guide: { x: 0, y: 40, scale: 1.05 },
+    retiredRight: { x: 12, y: 40, scale: 1.10 }
+  };
+  var expectedName = {
+    retiredLeft: { x: -30, y: 52 },
+    current: { x: -8, y: 52 },
+    guide: { x: 8, y: 52 },
+    retiredRight: { x: 26, y: 52 }
+  };
+  localStorage.setItem("imasoraKaraokeSeatAdjustV1", JSON.stringify(expectedSeat));
+  localStorage.setItem("imasoraKaraokeNameAdjustV1", JSON.stringify(expectedName));
+  localStorage.setItem("imasoraKaraokeScaleTestVersion", "20260706-0001");
+
+  var result = document.getElementById("result");
+  var frame = document.getElementById("appFrame");
+  var appUrl = "life-quest-walk.html?diag=karaoke-public-visual-20260706-0946-" + Date.now();
+
+  function sleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+  function write(data) {
+    result.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+  }
+  function clickByText(doc, text) {
+    var buttons = Array.from(doc.querySelectorAll("button"));
+    var button = buttons.find(function (el) { return (el.textContent || "").trim() === text; });
+    if (!button) throw new Error("button not found: " + text);
+    button.click();
+  }
+  function clickByLabel(doc, label) {
+    var button = doc.querySelector('button[aria-label="' + label + '"]');
+    if (!button) throw new Error("aria button not found: " + label);
+    button.click();
+  }
+  function rectInfo(el) {
+    if (!el) return null;
+    var r = el.getBoundingClientRect();
+    var cs = getComputedStyle(el);
+    return {
+      x: Number(r.x.toFixed(3)),
+      y: Number(r.y.toFixed(3)),
+      w: Number(r.width.toFixed(3)),
+      h: Number(r.height.toFixed(3)),
+      width: cs.width,
+      height: cs.height,
+      transform: cs.transform,
+      className: String(el.className || "")
+    };
+  }
+  async function run() {
+    write("アプリを読み込み中...");
+    frame.src = appUrl;
+    await new Promise(function (resolve) { frame.onload = resolve; });
+    var win = frame.contentWindow;
+    var doc = win.document;
+    await sleep(700);
+    clickByText(doc, "街");
+    await sleep(600);
+    clickByLabel(doc, "音楽プラザ");
+    await sleep(600);
+    clickByText(doc, "夜の広場で");
+    await sleep(900);
+    doc = frame.contentWindow.document;
+
+    var seats = Array.from(doc.querySelectorAll("#townKaraoke .karaoke-seat")).map(function (seat, index) {
+      var art = seat.querySelector(".karaoke-seat-art");
+      var card = seat.querySelector(".gallery-monster-card, .monster-current-art, .monster-art, .unique-art");
+      var monster = seat.querySelector(".monster, .turnaround-monster, .unique-monster, svg");
+      var name = seat.querySelector(".karaoke-seat-name");
+      return {
+        index: index,
+        label: name ? name.textContent.trim() : "",
+        art: rectInfo(art),
+        card: rectInfo(card),
+        monster: rectInfo(monster),
+        name: rectInfo(name)
+      };
+    });
+    var data = {
+      diagnosis: "karaoke-public-visual-20260706-0946",
+      pageUrl: location.href,
+      appFrameUrl: frame.contentWindow.location.href,
+      devicePixelRatio: window.devicePixelRatio,
+      outerWidth: window.outerWidth,
+      innerWidth: window.innerWidth,
+      frameInnerWidth: frame.contentWindow.innerWidth,
+      frameInnerHeight: frame.contentWindow.innerHeight,
+      storedSeat: localStorage.getItem("imasoraKaraokeSeatAdjustV1"),
+      storedName: localStorage.getItem("imasoraKaraokeNameAdjustV1"),
+      expectedBase: {
+        karaokeSeatArtCssWidth: "58px at current viewport",
+        currentArtRenderedWidth: 80.04,
+        guideMonsterRenderedWidth: 63.945
+      },
+      seats: seats
+    };
+    write(data);
+  }
+  document.getElementById("copyButton").addEventListener("click", function () {
+    navigator.clipboard.writeText(result.textContent || "");
+  });
+  run().catch(function (error) {
+    write({
+      diagnosis: "karaoke-public-visual-20260706-0946",
+      error: error && error.message ? error.message : String(error),
+      pageUrl: location.href,
+      devicePixelRatio: window.devicePixelRatio,
+      innerWidth: window.innerWidth
+    });
+  });
+})();
+</script>
