@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -21,6 +21,13 @@
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
+  <link rel="preload" as="image" href="assets/town-layered-bridge-v2.png">
+  <link rel="preload" as="image" href="assets/karaoke-room-night-v01.png" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/karaoke-room-evening-v01.png">
+  <link rel="preload" as="image" href="assets/karaoke-room-morning-day-v01.png">
   <style>
     :root {
       --bg: #07121f;
@@ -9307,8 +9314,8 @@
       min-width: 0;
     }
     #townKaraoke .karaoke-seat-art {
-      width: 58px;
-      height: 58px;
+      width: 64px;
+      height: 64px;
       max-width: 100%;
       display: grid;
       place-items: center;
@@ -38402,6 +38409,63 @@ const townLayeredSpriteAssets = {
   castle: { file: "town-layered-castle-gate-v1.png", x: 12.95, y: 59.34, w: 16.6, h: 18.65, z: 18, r: 8 },
   clock: { file: "town-layered-clock-v1.png", x: 25.96, y: 41.34, w: 13.48, h: 21.45, z: 19, r: 4 }
 };
+const townVisualPreloadCache = new Map();
+let townVisualRenderedOnce = false;
+function preloadTownVisualImage(src) {
+  if (!src || townVisualPreloadCache.has(src)) return townVisualPreloadCache.get(src);
+  const img = new Image();
+  img.decoding = "async";
+  img.loading = "eager";
+  img.src = src;
+  const ready = img.decode ? img.decode().catch(() => {}) : new Promise(resolve => {
+    img.onload = resolve;
+    img.onerror = resolve;
+  });
+  townVisualPreloadCache.set(src, ready);
+  return ready;
+}
+function preloadTownVisualAssets() {
+  const files = new Set([
+    "town-layered-prebuild-v1.png",
+    ...Object.values(townLayeredSpriteAssets).map(sprite => sprite.file)
+  ]);
+  files.forEach(file => preloadTownVisualImage(`assets/${file}`));
+}
+const karaokeRoomVisualFiles = [
+  "karaoke-room-morning-day-v01.png",
+  "karaoke-room-evening-v01.png",
+  "karaoke-room-night-v01.png"
+];
+function preloadKaraokeVisualAssets() {
+  karaokeRoomVisualFiles.forEach(file => preloadTownVisualImage(`assets/${file}`));
+}
+function warmKaraokeTextCaches() {
+  karaokeAvailableSongModes().forEach(mode => karaokeLyricsText(mode));
+}
+function mountFastOpenImageWarmup() {
+  if (document.getElementById("fastOpenImageWarmup")) return;
+  const files = new Set([
+    "town-layered-prebuild-v1.png",
+    "town-layered-station-v2.png",
+    "town-layered-medal-hall-v3.png",
+    "town-layered-bridge-v2.png",
+    ...Object.values(townLayeredSpriteAssets).map(sprite => sprite.file),
+    ...karaokeRoomVisualFiles
+  ]);
+  const holder = document.createElement("div");
+  holder.id = "fastOpenImageWarmup";
+  holder.setAttribute("aria-hidden", "true");
+  holder.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;";
+  files.forEach(file => {
+    const img = document.createElement("img");
+    img.alt = "";
+    img.decoding = "async";
+    img.loading = "eager";
+    img.src = `assets/${file}`;
+    holder.appendChild(img);
+  });
+  document.body.appendChild(holder);
+}
 const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2";
 const townLayeredSpriteNudgeStep = 0.35;
 const townLayeredSpriteRotateStep = 2;
@@ -38509,6 +38573,7 @@ function renderTown() {
   renderTownShop();
   renderTownKaraoke();
   renderTownPractice();
+  townVisualRenderedOnce = true;
 }
 function renderTownDevMenu() {
   const box = document.getElementById("townDevMenu");
@@ -39039,7 +39104,8 @@ function saveKaraokeNameAdjustments() {
 function karaokeSeatStyle(slot) {
   const adjust = karaokeSeatAdjustments()[slot] || { x: 0, y: 0, scale: 1 };
   const guideSeatOffsetX = slot === "guide" ? -4 : 0;
-  return `--karaoke-seat-x:${adjust.x + guideSeatOffsetX}px;--karaoke-seat-y:${adjust.y}px;--karaoke-seat-scale:${adjust.scale};`;
+  const edgeSeatOffsetY = slot === "retiredLeft" || slot === "retiredRight" ? 2 : 0;
+  return `--karaoke-seat-x:${adjust.x + guideSeatOffsetX}px;--karaoke-seat-y:${adjust.y + edgeSeatOffsetY}px;--karaoke-seat-scale:${adjust.scale};`;
 }
 function karaokeNameStyle(slot) {
   const adjust = karaokeNameAdjustments()[slot] || { x: 0, y: 0 };
@@ -40142,6 +40208,7 @@ function openMusicPlazaKaraokeFromTown() {
     return;
   }
   karaokeSofaDevPreviewActive = false;
+  preloadKaraokeVisualAssets();
   musicPlazaKaraokeOpen = true;
   renderTownKaraoke();
   document.getElementById("townKaraoke")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -40176,6 +40243,7 @@ function openKaraokeSofaDevPreview() {
     toast("音楽プラザはまだ建設されていません");
     return;
   }
+  preloadKaraokeVisualAssets();
   musicPlazaKaraokeOpen = true;
   selectedKaraokeBgmMode = karaokeAvailableVocalSongModes()[0] || "nightPlaza";
   karaokePerformanceMode = selectedKaraokeBgmMode;
@@ -47188,7 +47256,12 @@ function switchScreen(screen) {
   document.querySelectorAll("[data-tab]").forEach(button => {
     button.classList.toggle("active", button.dataset.tab === screen);
   });
-  if (screen === "town") renderTown();
+  if (screen === "town") {
+    preloadTownVisualAssets();
+    preloadKaraokeVisualAssets();
+    warmKaraokeTextCaches();
+    if (!townVisualRenderedOnce) renderTown();
+  }
   if (screen === "retirement") renderRetirementCeremony();
   if (screen === "walk") syncHomeBgmMode();
   scheduleCaretCleanup();
@@ -47286,7 +47359,11 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   }
 });
 shuffleCards();
+preloadTownVisualAssets();
+preloadKaraokeVisualAssets();
+warmKaraokeTextCaches();
 renderAll();
+mountFastOpenImageWarmup();
 resumePendingRetirementRecoveryOnLoad();
 updateHomeWindowClock();
 setInterval(updateHomeWindowClock, 60000);
@@ -47294,6 +47371,9 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
+
+
+
 
 
 
