@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -8276,25 +8276,37 @@
       pointer-events: auto;
       cursor: pointer;
     }
-    .town-layer-sprite-bridgeLanding {
+    .town-layer-sprite-bridgeLanding,
+    .town-layer-sprite-bridgeLanding2,
+    .town-layer-sprite-bridge2Landing,
+    .town-layer-sprite-bridge2Landing2 {
       filter: none;
     }
     .town-scene-morning .town-layer-sprite {
       filter: drop-shadow(0 8px 5px rgba(20, 38, 50, .16)) brightness(1.11) saturate(1.07) hue-rotate(3deg);
     }
-    .town-scene-morning .town-layer-sprite-bridgeLanding {
+    .town-scene-morning .town-layer-sprite-bridgeLanding,
+    .town-scene-morning .town-layer-sprite-bridgeLanding2,
+    .town-scene-morning .town-layer-sprite-bridge2Landing,
+    .town-scene-morning .town-layer-sprite-bridge2Landing2 {
       filter: brightness(1.07) saturate(1.04) hue-rotate(3deg);
     }
     .town-scene-day .town-layer-sprite {
       filter: drop-shadow(0 8px 5px rgba(50, 42, 20, .16)) sepia(.08) brightness(1.12) saturate(1.1) hue-rotate(-4deg);
     }
-    .town-scene-day .town-layer-sprite-bridgeLanding {
+    .town-scene-day .town-layer-sprite-bridgeLanding,
+    .town-scene-day .town-layer-sprite-bridgeLanding2,
+    .town-scene-day .town-layer-sprite-bridge2Landing,
+    .town-scene-day .town-layer-sprite-bridge2Landing2 {
       filter: sepia(.06) brightness(1.08) saturate(1.06) hue-rotate(-3deg);
     }
     .town-scene-evening .town-layer-sprite {
       filter: drop-shadow(0 9px 6px rgba(54, 28, 36, .3)) sepia(.12) brightness(1.08) saturate(1.22) hue-rotate(-7deg);
     }
-    .town-scene-evening .town-layer-sprite-bridgeLanding {
+    .town-scene-evening .town-layer-sprite-bridgeLanding,
+    .town-scene-evening .town-layer-sprite-bridgeLanding2,
+    .town-scene-evening .town-layer-sprite-bridge2Landing,
+    .town-scene-evening .town-layer-sprite-bridge2Landing2 {
       filter: sepia(.1) brightness(1.06) saturate(1.16) hue-rotate(-6deg);
     }
     .town-scene-night .town-layer-sprite {
@@ -8305,7 +8317,10 @@
         brightness(1.16)
         saturate(1.18);
     }
-    .town-scene-night .town-layer-sprite-bridgeLanding {
+    .town-scene-night .town-layer-sprite-bridgeLanding,
+    .town-scene-night .town-layer-sprite-bridgeLanding2,
+    .town-scene-night .town-layer-sprite-bridge2Landing,
+    .town-scene-night .town-layer-sprite-bridge2Landing2 {
       filter:
         drop-shadow(0 0 5px rgba(255, 236, 168, .46))
         drop-shadow(0 0 12px rgba(255, 196, 94, .28))
@@ -9218,6 +9233,81 @@
       --karaoke-light-core-rgb: 112, 182, 255;
       --karaoke-light-soft-rgb: 110, 184, 255;
       --karaoke-light-bright-rgb: 158, 214, 255;
+    }
+    #townKaraoke .karaoke-stage-scene[data-light-song-mode="outsideHome"].karaoke-light-quiet .karaoke-room-light-wash {
+      --karaoke-light-recolor-brightness: 1.02;
+      --karaoke-light-recolor-filter: hue-rotate(302deg) saturate(1.34);
+      --karaoke-light-room-deep-rgb: 232, 108, 164;
+      --karaoke-light-room-mid-rgb: 255, 144, 194;
+      --karaoke-light-room-center-rgb: 255, 176, 216;
+      --karaoke-light-room-right-rgb: 238, 112, 174;
+      --karaoke-light-room-top-rgb: 255, 154, 204;
+      --karaoke-light-room-floor-rgb: 208, 82, 142;
+      --karaoke-light-edge-rgb: 246, 124, 184;
+      --karaoke-light-beam-rgb: 255, 164, 210;
+      --karaoke-light-core-rgb: 255, 210, 236;
+      --karaoke-light-soft-rgb: 255, 188, 224;
+      --karaoke-light-bright-rgb: 255, 232, 246;
+    }
+    #townKaraoke .karaoke-stage-scene[data-light-song-mode="outsideHome"].karaoke-light-lift .karaoke-room-light-wash {
+      --karaoke-light-recolor-brightness: 1.05;
+      --karaoke-light-recolor-filter: hue-rotate(306deg) saturate(1.52);
+      --karaoke-light-room-deep-rgb: 216, 84, 144;
+      --karaoke-light-room-mid-rgb: 248, 116, 178;
+      --karaoke-light-room-center-rgb: 255, 150, 202;
+      --karaoke-light-room-right-rgb: 224, 86, 154;
+      --karaoke-light-room-top-rgb: 246, 126, 184;
+      --karaoke-light-room-floor-rgb: 190, 62, 126;
+      --karaoke-light-edge-rgb: 236, 96, 164;
+      --karaoke-light-beam-rgb: 255, 138, 200;
+      --karaoke-light-core-rgb: 255, 190, 228;
+      --karaoke-light-soft-rgb: 255, 168, 216;
+      --karaoke-light-bright-rgb: 255, 222, 242;
+    }
+    #townKaraoke .karaoke-stage-scene[data-light-song-mode="outsideHome"].karaoke-light-bridge .karaoke-room-light-wash {
+      --karaoke-light-recolor-brightness: 1.04;
+      --karaoke-light-recolor-filter: hue-rotate(82deg) saturate(1.42);
+      --karaoke-light-room-deep-rgb: 92, 164, 86;
+      --karaoke-light-room-mid-rgb: 134, 212, 108;
+      --karaoke-light-room-center-rgb: 176, 236, 138;
+      --karaoke-light-room-right-rgb: 82, 150, 78;
+      --karaoke-light-room-top-rgb: 128, 202, 116;
+      --karaoke-light-room-floor-rgb: 62, 120, 62;
+      --karaoke-light-edge-rgb: 116, 200, 94;
+      --karaoke-light-beam-rgb: 168, 236, 120;
+      --karaoke-light-core-rgb: 214, 255, 174;
+      --karaoke-light-soft-rgb: 192, 246, 150;
+      --karaoke-light-bright-rgb: 232, 255, 206;
+    }
+    #townKaraoke .karaoke-stage-scene[data-light-song-mode="outsideHome"].karaoke-light-chorus .karaoke-room-light-wash {
+      --karaoke-light-recolor-brightness: 1.02;
+      --karaoke-light-recolor-filter: hue-rotate(16deg) saturate(1.42);
+      --karaoke-light-room-deep-rgb: 255, 145, 86;
+      --karaoke-light-room-mid-rgb: 255, 181, 112;
+      --karaoke-light-room-center-rgb: 255, 205, 142;
+      --karaoke-light-room-right-rgb: 250, 132, 82;
+      --karaoke-light-room-top-rgb: 255, 167, 112;
+      --karaoke-light-room-floor-rgb: 238, 118, 76;
+      --karaoke-light-edge-rgb: 255, 150, 86;
+      --karaoke-light-beam-rgb: 255, 194, 124;
+      --karaoke-light-core-rgb: 255, 228, 176;
+      --karaoke-light-soft-rgb: 255, 214, 162;
+      --karaoke-light-bright-rgb: 255, 240, 204;
+    }
+    #townKaraoke .karaoke-stage-scene[data-light-song-mode="outsideHome"].karaoke-light-finale .karaoke-room-light-wash {
+      --karaoke-light-recolor-brightness: 1.03;
+      --karaoke-light-recolor-filter: hue-rotate(34deg) saturate(1.35);
+      --karaoke-light-room-deep-rgb: 214, 168, 62;
+      --karaoke-light-room-mid-rgb: 246, 214, 94;
+      --karaoke-light-room-center-rgb: 255, 236, 132;
+      --karaoke-light-room-right-rgb: 224, 178, 66;
+      --karaoke-light-room-top-rgb: 250, 222, 116;
+      --karaoke-light-room-floor-rgb: 196, 140, 50;
+      --karaoke-light-edge-rgb: 235, 194, 74;
+      --karaoke-light-beam-rgb: 255, 230, 112;
+      --karaoke-light-core-rgb: 255, 246, 178;
+      --karaoke-light-soft-rgb: 255, 236, 150;
+      --karaoke-light-bright-rgb: 255, 252, 218;
     }
     #townKaraoke .karaoke-stage-monitor {
       position: absolute;
@@ -12945,7 +13035,8 @@ const buildings = [
   ["garden", "花", "花壇", 3, "町の景色に花が増える", "normal", "草と土の素材で作る花の区画。"],
   ["streetlight", "灯", "街灯", 4, "町の夜道に灯りが増える", "normal", "鉄と灯りの素材で作る街の明かり。"],
   ["fountain", "水", "噴水", 4, "町の景色がにぎやかになる", "normal", "土と雲の素材で作る小さな噴水。"],
-  ["bridge", "橋", "橋", 6, "街の地図に道のつながりが増える", "normal", "木と鉄で作る橋。"],
+  ["bridge", "橋", "橋1", 6, "街の地図に道のつながりが増える", "normal", "木と鉄で作る橋。"],
+  ["bridge2", "橋", "橋2", 8, "右奥側にも道のつながりが増える", "normal", "木と鉄で作るもう一つの橋。"],
   ["warehouse", "倉", "街づくり工房", 7, "素材を見渡しやすくなる", "normal", "街づくり素材を確認しやすくする倉庫。"],
   ["clock", "時", "時計台", 9, "街の目印が増える", "normal", "鉄と灯りの素材で作る目印。"],
   ["shop", "店", "アイテムショップ", 10, "育成アイテムの置き場が増える", "normal", "日替わりの道具を買える店。"],
@@ -12961,7 +13052,7 @@ const buildings = [
   ["statue1", "像", "銅像1", 26, "街の記念物になる特別施設", "special", "左側に建てる記念の銅像。"],
   ["statue2", "像", "銅像2", 27, "街の記念物になる特別施設", "special", "右側に建てる記念の銅像。"]
 ];
-const townBuildableBuildingIds = ["fountain", "bridge", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
+const townBuildableBuildingIds = ["fountain", "bridge", "bridge2", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
 const townBuildableBuildings = buildings.filter(([id]) => townBuildableBuildingIds.includes(id));
 const townFacilityNames = [
   { id: "station", name: "駅", x: 25, y: 18 },
@@ -12975,7 +13066,8 @@ const townFacilityNames = [
   { id: "retirePark", name: "広場", x: 34, y: 70 },
   { id: "guild", name: "案内板", x: 59, y: 70 },
   { id: "statue2", name: "銅像2", x: 57, y: 75 },
-  { id: "bridge", name: "橋", x: 88, y: 72 },
+  { id: "bridge", name: "橋1", x: 88, y: 72 },
+  { id: "bridge2", name: "橋2", x: 92, y: 61 },
   { id: "castle", name: "城門", x: 22, y: 84 },
   { id: "clock", name: "時計台", x: 43, y: 85 },
   { id: "warehouse", name: "街づくり工房", x: 85, y: 21, cls: "nowrap" }
@@ -12994,10 +13086,11 @@ const townMapSlots = {
   guild: { x: 58, y: 73, w: 12, h: 19, z: 15, theme: "guild" },
   statue2: { x: 57, y: 76, w: 13, h: 13, z: 16, theme: "statue2" },
   bridge: { x: 87, y: 78, w: 16, h: 19, z: 17, theme: "bridge" },
+  bridge2: { x: 91, y: 62, w: 16, h: 19, z: 13, theme: "bridge" },
   castle: { x: 22, y: 83, w: 17, h: 19, z: 18, theme: "castle" },
   clock: { x: 43, y: 85, w: 12, h: 19, z: 19, theme: "clock" }
 };
-const townFacilitySpriteReadyIds = ["warehouse", "fountain", "bridge", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
+const townFacilitySpriteReadyIds = ["warehouse", "fountain", "bridge", "bridge2", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
 let townFacilityNamesVisible = true;
 const townVacantMode = "background";
 const townSceneOptions = [
@@ -13093,6 +13186,7 @@ let townNightLightOffsets = loadTownNightLightOffsets();
 const townBuildingCosts = {
   fountain: { "土の素材": 16, "雲の素材": 8 },
   bridge: { "木の素材": 18, "鉄の素材": 12 },
+  bridge2: { "木の素材": 18, "鉄の素材": 12 },
   clock: { "鉄の素材": 24, "灯りの素材": 18 },
   shop: { "木の素材": 18, "鉄の素材": 10, "灯りの素材": 8 },
   guild: { "木の素材": 28, "灯りの素材": 18, "鉄の素材": 16 },
@@ -13134,6 +13228,7 @@ let karaokeLyricFrame = null;
 let karaokeTransportFrame = null;
 const karaokeDisplayLineCache = Object.create(null);
 const karaokeDisplayLineLookupCache = Object.create(null);
+const karaokeTimedLyricLastMatch = { mode: "", window: null, time: -1 };
 let karaokePreviewRequestId = 0;
 let karaokeSeekDebugTimer = null;
 let karaokeSeekDebugEntries = [];
@@ -38405,7 +38500,11 @@ const townLayeredSpriteAssets = {
   guild: { file: "town-layered-guide-board-v1.png", x: 59.06, y: 37.4, w: 12.89, h: 20.63, z: 15, r: 4 },
   statue2: { file: "town-layered-statue2-v1.png", x: 52.23, y: 7.26, w: 15.62, h: 15.59, z: 16, r: 0 },
   bridgeLanding: { file: "town-layered-bridge-landing-v1.png", x: 77.5, y: 78.8, w: 18, h: 11.25, z: 16.5, r: 0 },
+  bridgeLanding2: { file: "town-layered-bridge-landing-v1.png", x: 80.4, y: 79.2, w: 18, h: 11.25, z: 16.6, r: 0 },
+  bridge2Landing: { file: "town-layered-bridge-landing-v1.png", x: 80.8, y: 59.1, w: 15.3, h: 9.56, z: 12.5, r: 0 },
+  bridge2Landing2: { file: "town-layered-bridge-landing-v1.png", x: 83.3, y: 59.6, w: 15.3, h: 9.56, z: 12.6, r: 0 },
   bridge: { file: "town-layered-bridge-v2.png", x: 63.9, y: 71.35, w: 30.45, h: 26.82, z: 17, r: -360 },
+  bridge2: { file: "town-layered-bridge-v2.png", x: 70.9, y: 53.4, w: 25.88, h: 22.8, z: 13, r: -360 },
   castle: { file: "town-layered-castle-gate-v1.png", x: 12.95, y: 59.34, w: 16.6, h: 18.65, z: 18, r: 8 },
   clock: { file: "town-layered-clock-v1.png", x: 25.96, y: 41.34, w: 13.48, h: 21.45, z: 19, r: 4 }
 };
@@ -38470,6 +38569,13 @@ const townLayeredSpriteOffsetStorageKey = "imasoraWalkTownLayeredSpriteOffsetsV2
 const townLayeredSpriteNudgeStep = 0.35;
 const townLayeredSpriteRotateStep = 2;
 const townLayeredSpriteScaleStep = 0.05;
+const townLayeredSpriteDefaultOffsets = {
+  bridgeLanding: { x: -16.1, y: -6.65, r: 4, s: 1.1 },
+  bridgeLanding2: { x: -5.95, y: 8.4, r: 8, s: 1.8 },
+  bridge2Landing: { x: 0, y: 0, r: 0, s: 1 },
+  bridge2Landing2: { x: 6.65, y: 14.35, r: 6, s: 1.95 },
+  bridge2: { x: 10.5, y: 3.5, r: 2, s: 1.1 }
+};
 let townLayeredSpriteOffsets = loadTownLayeredSpriteOffsets();
 function loadTownLayeredSpriteOffsets() {
   try {
@@ -38495,7 +38601,33 @@ function saveTownLayeredSpriteOffsets() {
   localStorage.setItem(townLayeredSpriteOffsetStorageKey, JSON.stringify(townLayeredSpriteOffsets));
 }
 function townLayeredSpriteOffset(id) {
-  return townLayeredSpriteOffsets[id] || { x: 0, y: 0, r: 0, s: 1 };
+  return townLayeredSpriteOffsets[id] || townLayeredSpriteDefaultOffsets[id] || { x: 0, y: 0, r: 0, s: 1 };
+}
+const townFacilityLabelOffsetStorageKey = "imasoraWalkTownFacilityLabelOffsetsV1";
+const townFacilityLabelNudgeStep = 0.35;
+let townFacilityLabelOffsets = loadTownFacilityLabelOffsets();
+function loadTownFacilityLabelOffsets() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(townFacilityLabelOffsetStorageKey) || "{}");
+    if (!parsed || typeof parsed !== "object") return {};
+    return Object.fromEntries(Object.entries(parsed).filter(([id, offset]) => (
+      id === "bridge2"
+      && offset
+      && Number.isFinite(Number(offset.x))
+      && Number.isFinite(Number(offset.y))
+    )).map(([id, offset]) => [id, {
+      x: Number(offset.x),
+      y: Number(offset.y)
+    }]));
+  } catch (error) {
+    return {};
+  }
+}
+function saveTownFacilityLabelOffsets() {
+  localStorage.setItem(townFacilityLabelOffsetStorageKey, JSON.stringify(townFacilityLabelOffsets));
+}
+function townFacilityLabelOffset(id) {
+  return townFacilityLabelOffsets[id] || { x: 0, y: 0 };
 }
 function townLayeredSpriteStyle(id, sprite) {
   const offset = townLayeredSpriteOffset(id);
@@ -38518,7 +38650,10 @@ function townLayeredSpriteBounds(id) {
 function townFacilityLabelStyle(id, fallbackX, fallbackY) {
   const labelSpriteId = id === "station" ? "station" : id;
   const bounds = townLayeredSpriteBounds(labelSpriteId);
-  const labelOffset = id === "bridge" ? { x: -9, y: -9 } : id === "castle" ? { x: 1.5, y: -1.5 } : { x: 0, y: 0 };
+  const labelOffset = id === "bridge" || id === "bridge2" ? { x: -9, y: -9 } : id === "castle" ? { x: 1.5, y: -1.5 } : { x: 0, y: 0 };
+  const customLabelOffset = townFacilityLabelOffset(id);
+  labelOffset.x += customLabelOffset.x;
+  labelOffset.y += customLabelOffset.y;
   if (!bounds) return `--label-x:${Math.max(3, Math.min(97, fallbackX + labelOffset.x))}%;--label-y:${Math.max(5, fallbackY - 4 + labelOffset.y)}%;`;
   const labelX = Math.max(3, Math.min(97, bounds.x + bounds.w / 2 + labelOffset.x));
   const labelY = Math.max(5, Math.min(94, bounds.y + bounds.h - 3 + labelOffset.y));
@@ -38536,8 +38671,13 @@ function townBuildingSprite(id) {
 }
 function townLayeredBuildingSprites(id) {
   if (id === "station") return townBuildingSprite("station") + townBuildingSprite("train");
-  if (id === "bridge") return townBuildingSprite("bridgeLanding") + townBuildingSprite("bridge");
+  if (id === "bridge") return townBuildingSprite("bridgeLanding") + townBuildingSprite("bridgeLanding2") + townBuildingSprite("bridge");
+  if (id === "bridge2") return townBuildingSprite("bridge2Landing") + townBuildingSprite("bridge2Landing2") + townBuildingSprite("bridge2");
   return townBuildingSprite(id);
+}
+function shouldShowTownLayeredBuilding(id) {
+  if (id === "bridge2") return isTownBuildingBuilt("bridge2") || isTownBuildingBuilt("bridge");
+  return isTownBuildingBuilt(id);
 }
 function renderTown() {
   if (!selectedTownBuildingId || (selectedTownBuildingId !== "warehouse" && !townBuildableBuildingIds.includes(selectedTownBuildingId))) {
@@ -38551,9 +38691,9 @@ function renderTown() {
   townView.classList.remove("town-vacant-layered");
   applyTownScene(townView);
   const vacantLayer = "";
-  const buildingLayer = townBuildingSprite("warehouse") + townBuildableBuildings.map(([id]) => isTownBuildingBuilt(id) && townFacilitySpriteReadyIds.includes(id) ? townLayeredBuildingSprites(id) : "").join("");
+  const buildingLayer = townBuildingSprite("warehouse") + townBuildableBuildings.map(([id]) => shouldShowTownLayeredBuilding(id) && townFacilitySpriteReadyIds.includes(id) ? townLayeredBuildingSprites(id) : "").join("");
   const labels = townFacilityNames.map(({ id, name, x, y, cls }) => {
-    const built = isTownBuildingBuilt(id);
+    const built = id === "bridge2" ? shouldShowTownLayeredBuilding("bridge2") : isTownBuildingBuilt(id);
     if (id !== "warehouse" && !townMapSlots[id]) return "";
     const className = `town-facility-name ${cls || ""}${built ? "" : " town-facility-button"}`;
     const style = townFacilityLabelStyle(id, x, y);
@@ -38575,144 +38715,59 @@ function renderTown() {
   renderTownPractice();
   townVisualRenderedOnce = true;
 }
-function renderTownDevMenu() {
-  const box = document.getElementById("townDevMenu");
-  if (!box) return;
-  box.hidden = false;
-  box.innerHTML = `
-    <div class="town-dev-card town-dev-scene-card">
-      <div class="town-dev-card-title"><span>カラオケ配置確認</span><span class="town-dev-offset">4席</span></div>
-      <button type="button" data-karaoke-dev-sofa-preview>ソファに座らせる</button>
-      ${karaokeSeatDevAdjustListHtml("配置調整")}
-    </div>
-  `;
-  box.querySelector("[data-karaoke-dev-sofa-preview]")?.addEventListener("click", openKaraokeSofaDevPreview);
-  bindKaraokeSeatDevAdjustControls(box);
-  return;
-  const nudgeButtons = [
-    ["↖", -1, -1], ["↑", 0, -1], ["↗", 1, -1],
-    ["←", -1, 0], ["戻", 0, 0], ["→", 1, 0],
-    ["↙", -1, 1], ["↓", 0, 1], ["↘", 1, 1]
-  ];
-  const townDevAdjustableIds = ["warehouse", ...townBuildableBuildings.map(([id]) => id).flatMap(id => id === "station" ? ["station", "train"] : id === "bridge" ? ["bridgeLanding", "bridge"] : [id]).filter(id => townLayeredSpriteAssets[id])];
-  const sceneControls = `<div class="town-dev-card town-dev-scene-card">
-    <div class="town-dev-card-title"><span>街マップ時間帯</span><span class="town-dev-offset">表示: ${townSceneLabel(currentTownScene())}</span></div>
-    <div class="town-dev-scene-buttons">
-      ${townSceneOptions.map(item => `<button class="${townScenePreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-scene-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
-    </div>
-  </div>`;
-  const lightControls = `<div class="town-dev-card town-dev-light-card">
-    <div class="town-dev-card-title"><span>夜背景 発光体</span><span class="town-dev-offset">丸型 / 窓型</span></div>
-    <div class="town-dev-light-grid">
-      ${townNightLightObjects.filter(item => !["orb1", "orb2", "orb3", "orb4", "orb5", "orb6", "orb7", "orb8", "orb9", "orb10", "orb11", "orb12", "orb13", "orb14", "orb15", "orb16", "orb17", "orb18", "orb19", "orb20", "orb21", "orb22", "orb23", "orb24", "orb25", "orb26", "orb27", "orb28", "orb29", "orb30", "orb31", "orb32", "orb33", "orb34", "orb35", "window1", "window2", "window3", "window4", "window5", "window6", "window7", "window8", "window9", "window10", "window11", "window12", "window13", "window14", "window15", "window16", "window17", "window18", "window19", "window20", "window21", "window22", "window23", "window24", "window25", "window26", "window27", "window28", "window29", "window30", "window31", "window32", "window33", "window34", "window35", "window36", "window37", "window38", "window39", "window40"].includes(item.id)).map(item => {
-        const offset = townNightLightOffset(item.id);
-        const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
-        return `<div class="town-dev-card">
-          <div class="town-dev-card-title"><span>${item.name}</span><span class="town-dev-offset">x ${offset.x.toFixed(2)} / y ${offset.y.toFixed(2)} / r ${offset.r.toFixed(1)}° / ${Math.round(scale * 100)}%</span></div>
-          <div class="town-dev-nudge">
-            ${nudgeButtons.map(([label, dx, dy]) => dx === 0 && dy === 0
-              ? `<button class="town-dev-reset" type="button" data-town-light-reset="${item.id}">${label}</button>`
-              : `<button type="button" data-town-light-nudge="${item.id}" data-town-light-dx="${dx}" data-town-light-dy="${dy}">${label}</button>`
-            ).join("")}
-          </div>
-          <div class="town-dev-rotate">
-            <button type="button" data-town-light-rotate="${item.id}" data-town-light-dr="-1">左回転</button>
-            <button type="button" data-town-light-rotate="${item.id}" data-town-light-dr="1">右回転</button>
-          </div>
-          <div class="town-dev-size">
-            <button type="button" data-town-light-scale="${item.id}" data-town-light-ds="-1">小さく</button>
-            <button type="button" data-town-light-scale="${item.id}" data-town-light-ds="1">大きく</button>
-          </div>
-        </div>`;
-      }).join("")}
-    </div>
-  </div>`;
-  box.innerHTML = sceneControls + lightControls + townDevAdjustableIds.map((id) => {
-    const built = id === "train" ? isTownBuildingBuilt("station") : id === "bridgeLanding" ? isTownBuildingBuilt("bridge") : isTownBuildingBuilt(id);
-    const displayName = id === "train" ? "列車" : id === "bridgeLanding" ? "橋の足場" : townFacilityDisplayName(id);
-    const offset = townLayeredSpriteOffset(id);
-    const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
-    const buildToggle = id === "warehouse"
-      ? `<button class="built" type="button" disabled>常設</button>`
-      : id === "train"
-      ? `<button class="${built ? "built" : ""}" type="button" disabled>駅と連動</button>`
-      : id === "bridgeLanding"
-      ? `<button class="${built ? "built" : ""}" type="button" disabled>橋と連動</button>`
-      : `<button class="${built ? "built" : ""}" type="button" data-town-dev-toggle="${id}">${built ? "建造前にする" : "建造後にする"}</button>`;
-    const controls = townLayeredSpriteAssets[id]
-      ? `<div class="town-dev-card-title"><span>${displayName}</span><span class="town-dev-offset">x ${offset.x.toFixed(2)} / y ${offset.y.toFixed(2)} / r ${offset.r.toFixed(1)}° / ${Math.round(scale * 100)}%</span></div>
-        ${buildToggle}
-        <div class="town-dev-nudge">
-          ${nudgeButtons.map(([label, dx, dy]) => dx === 0 && dy === 0
-            ? `<button class="town-dev-reset" type="button" data-town-layer-reset="${id}">${label}</button>`
-            : `<button type="button" data-town-layer-nudge="${id}" data-town-layer-dx="${dx}" data-town-layer-dy="${dy}">${label}</button>`
-          ).join("")}
-        </div>
-        <div class="town-dev-rotate">
-          <button type="button" data-town-layer-rotate="${id}" data-town-layer-dr="-1">左回転</button>
-          <button type="button" data-town-layer-rotate="${id}" data-town-layer-dr="1">右回転</button>
-        </div>
-        <div class="town-dev-size">
-          <button type="button" data-town-layer-scale="${id}" data-town-layer-ds="-1">小さく</button>
-          <button type="button" data-town-layer-scale="${id}" data-town-layer-ds="1">大きく</button>
-        </div>`
-      : id === "warehouse"
-      ? `<button class="built" type="button" disabled>${displayName}: 常設</button>`
-      : id === "train"
-      ? `<button class="${built ? "built" : ""}" type="button" disabled>${displayName}: 駅と連動</button>`
-      : `<button class="${built ? "built" : ""}" type="button" data-town-dev-toggle="${id}">${displayName}: ${built ? "建造前にする" : "建造後にする"}</button>`;
-    return `<div class="town-dev-card">${controls}</div>`;
-  }).join("");
-  box.querySelectorAll("[data-town-scene-preview]").forEach(button => {
-    button.addEventListener("click", () => setTownScenePreview(button.dataset.townScenePreview));
-  });
-  box.querySelectorAll("[data-town-light-nudge]").forEach(button => {
-    button.addEventListener("click", () => nudgeTownNightLight(
-      button.dataset.townLightNudge,
-      Number(button.dataset.townLightDx),
-      Number(button.dataset.townLightDy)
-    ));
-  });
-  box.querySelectorAll("[data-town-light-reset]").forEach(button => {
-    button.addEventListener("click", () => resetTownNightLight(button.dataset.townLightReset));
-  });
-  box.querySelectorAll("[data-town-light-rotate]").forEach(button => {
-    button.addEventListener("click", () => rotateTownNightLight(
-      button.dataset.townLightRotate,
-      Number(button.dataset.townLightDr)
-    ));
-  });
-  box.querySelectorAll("[data-town-light-scale]").forEach(button => {
-    button.addEventListener("click", () => scaleTownNightLight(
-      button.dataset.townLightScale,
-      Number(button.dataset.townLightDs)
-    ));
-  });
-  box.querySelectorAll("[data-town-dev-toggle]").forEach(button => {
-    button.addEventListener("click", () => toggleTownDevBuilding(button.dataset.townDevToggle));
-  });
-  box.querySelectorAll("[data-town-layer-nudge]").forEach(button => {
+function townBridge2DevCardHtml() {
+  return "";
+}
+function bindTownLayeredSpriteDevControls(container) {
+  if (!container) return;
+  container.querySelectorAll("[data-town-layer-nudge]").forEach(button => {
     button.addEventListener("click", () => nudgeTownLayeredSprite(
       button.dataset.townLayerNudge,
       Number(button.dataset.townLayerDx),
       Number(button.dataset.townLayerDy)
     ));
   });
-  box.querySelectorAll("[data-town-layer-reset]").forEach(button => {
+  container.querySelectorAll("[data-town-layer-reset]").forEach(button => {
     button.addEventListener("click", () => resetTownLayeredSpriteOffset(button.dataset.townLayerReset));
   });
-  box.querySelectorAll("[data-town-layer-rotate]").forEach(button => {
+  container.querySelectorAll("[data-town-label-nudge]").forEach(button => {
+    button.addEventListener("click", () => nudgeTownFacilityLabel(
+      button.dataset.townLabelNudge,
+      Number(button.dataset.townLabelDx),
+      Number(button.dataset.townLabelDy)
+    ));
+  });
+  container.querySelectorAll("[data-town-label-reset]").forEach(button => {
+    button.addEventListener("click", () => resetTownFacilityLabelOffset(button.dataset.townLabelReset));
+  });
+  container.querySelectorAll("[data-town-layer-rotate]").forEach(button => {
     button.addEventListener("click", () => rotateTownLayeredSprite(
       button.dataset.townLayerRotate,
       Number(button.dataset.townLayerDr)
     ));
   });
-  box.querySelectorAll("[data-town-layer-scale]").forEach(button => {
+  container.querySelectorAll("[data-town-layer-scale]").forEach(button => {
     button.addEventListener("click", () => scaleTownLayeredSprite(
       button.dataset.townLayerScale,
       Number(button.dataset.townLayerDs)
     ));
   });
+}
+function renderTownDevMenu() {
+  const box = document.getElementById("townDevMenu");
+  if (!box) return;
+  box.hidden = false;
+  const sceneControls = `<div class="town-dev-card town-dev-scene-card">
+    <div class="town-dev-card-title"><span>街マップ時間帯</span><span class="town-dev-offset">表示: ${townSceneLabel(currentTownScene())}</span></div>
+    <div class="town-dev-scene-buttons">
+      ${townSceneOptions.map(item => `<button class="${townScenePreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-scene-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
+    </div>
+  </div>`;
+  box.innerHTML = sceneControls + townBridge2DevCardHtml();
+  box.querySelectorAll("[data-town-scene-preview]").forEach(button => {
+    button.addEventListener("click", () => setTownScenePreview(button.dataset.townScenePreview));
+  });
+  bindTownLayeredSpriteDevControls(box);
 }
 function setTownScenePreview(id) {
   if (!townSceneOptions.some(item => item.id === id)) return;
@@ -38802,6 +38857,22 @@ function resetTownLayeredSpriteOffset(id) {
   if (!townLayeredSpriteAssets[id]) return;
   delete townLayeredSpriteOffsets[id];
   saveTownLayeredSpriteOffsets();
+  renderTown();
+}
+function nudgeTownFacilityLabel(id, dx, dy) {
+  if (id !== "bridge2") return;
+  const offset = townFacilityLabelOffset(id);
+  townFacilityLabelOffsets[id] = {
+    x: Number((offset.x + dx * townFacilityLabelNudgeStep).toFixed(2)),
+    y: Number((offset.y + dy * townFacilityLabelNudgeStep).toFixed(2))
+  };
+  saveTownFacilityLabelOffsets();
+  renderTown();
+}
+function resetTownFacilityLabelOffset(id) {
+  if (id !== "bridge2") return;
+  delete townFacilityLabelOffsets[id];
+  saveTownFacilityLabelOffsets();
   renderTown();
 }
 function toggleTownDevBuilding(id) {
@@ -39199,89 +39270,205 @@ function karaokeParticipants() {
 }
 const karaokeTimedLyrics = {
   outsideHome: [
-    { start: 10.7, end: 12.6, text: "夜の窓に" },
-    { start: 12.7, end: 14.9, text: "月が浮かんで" },
-    { start: 15.0, end: 18.5, text: "街の灯りが 小さくまたたく" },
-    { start: 21.1, end: 22.0, text: "今日はもう" },
-    { start: 22.1, end: 24.8, text: "歩かなくていい" },
-    { start: 25.3, end: 28.6, text: "明日の空が きっと待ってる" },
-    { start: 31.0, end: 32.8, text: "六時から十九時までの" },
-    { start: 32.9, end: 35.2, text: "きみと歩いた 小さな冒険" },
-    { start: 35.3, end: 38.1, text: "足あとみたいに コインが光って" },
-    { start: 38.2, end: 40.5, text: "道の向こうで 風が笑った" },
-    { start: 40.8, end: 42.7, text: "でも今は 夜の時間" },
-    { start: 42.8, end: 45.4, text: "外へ行かずに 家でひとやすみ" },
-    { start: 45.5, end: 47.8, text: "ソファの上で 相棒たちが" },
-    { start: 47.9, end: 50.4, text: "今日の話を そっと並べる" },
-    { start: 50.6, end: 54.7, text: "あの空は どこへ続くの" },
-    { start: 55.9, end: 60.0, text: "あの道は また呼んでるの" },
-    { start: 60.3, end: 62.8, text: "急がなくていいよ" },
-    { start: 62.8, end: 63.6, text: "夜は" },
-    { start: 64.2, end: 65.5, text: "夜の" },
-    { start: 65.7, end: 68.4, text: "クエストだから" },
-    { start: 71.0, end: 72.8, text: "イマソララビリンス" },
-    { start: 72.9, end: 74.8, text: "眠る街の中で" },
-    { start: 75.1, end: 78.6, text: "きみの今日が 星になってゆく" },
-    { start: 80.9, end: 82.9, text: "イマソララビリンス" },
-    { start: 83.0, end: 84.9, text: "窓の月を見上げ" },
-    { start: 85.0, end: 86.5, text: "また朝が来たら" },
-    { start: 86.6, end: 88.9, text: "歩き出そう" },
-    { start: 89.9, end: 91.3, text: "迷ってもいい" },
+    { start: 10.7, end: 11.8, text: "夜" },
+    { start: 11.8, end: 12, text: "の", sameLine: true },
+    { start: 12, end: 12.4, text: "窓", sameLine: true },
+    { start: 12.4, end: 12.5, text: "に", sameLine: true },
+    { start: 12.6, end: 13.4, text: "月" },
+    { start: 13.4, end: 14, text: "が", sameLine: true },
+    { start: 14, end: 14.8, text: "浮かんで", sameLine: true },
+    { start: 14.9, end: 15.8, text: "街の" },
+    { start: 15.8, end: 17.4, text: "灯りが 小さ", sameLine: true },
+    { start: 17.4, end: 17.9, text: "く", sameLine: true },
+    { start: 17.9, end: 18.5, text: "またたく", sameLine: true },
+    { start: 20.9, end: 21.5, text: "今日" },
+    { start: 21.6, end: 21.85, text: "はもう", sameLine: true },
+    { start: 21.9, end: 22.7, text: "歩" },
+    { start: 22.7, end: 24.8, text: "かなくていい", sameLine: true },
+    { start: 25.2, end: 25.9, text: "明日の" },
+    { start: 25.9, end: 28.5, text: "空が きっと待ってる", sameLine: true },
+    { start: 31, end: 32.3, text: "六時から十九時ま" },
+    { start: 32.3, end: 32.6, text: "での", sameLine: true },
+    { start: 32.7, end: 34.8, text: "きみと歩いた 小さな" },
+    { start: 34.8, end: 35.1, text: "冒険", sameLine: true },
+    { start: 35.2, end: 35.9, text: "足" },
+    { start: 35.9, end: 38, text: "あとみたいに コインが光って", sameLine: true },
+    { start: 38.1, end: 40.4, text: "道の向こうで 風が笑った" },
+    { start: 40.5, end: 41.1, text: "でも" },
+    { start: 41.1, end: 42.4, text: "今は 夜の時間", sameLine: true },
+    { start: 42.5, end: 44.6, text: "外へ行かずに 家でひと" },
+    { start: 44.6, end: 45.2, text: "やすみ", sameLine: true },
+    { start: 45.3, end: 45.7, text: "ソ" },
+    { start: 45.7, end: 46, text: "ファ", sameLine: true },
+    { start: 46, end: 47.6, text: "の上で 相棒たちが", sameLine: true },
+    { start: 47.7, end: 49.6, text: "今日の話を そっと" },
+    { start: 49.6, end: 50.4, text: "並べる", sameLine: true },
+    { start: 50.8, end: 51.9, text: "あの空" },
+    { start: 51.9, end: 54.6, text: "は どこへ続くの", sameLine: true },
+    { start: 55.7, end: 59.8, text: "あの道は また呼んでるの" },
+    { start: 60, end: 60.8, text: "急" },
+    { start: 60.8, end: 61.3, text: "が", sameLine: true },
+    { start: 61.3, end: 62.3, text: "なくてい", sameLine: true },
+    { start: 62.3, end: 62.6, text: "いよ", sameLine: true },
+    { start: 62.7, end: 63.5, text: "夜は" },
+    { start: 64, end: 64.1, text: "夜", sameLine: true },
+    { start: 64.1, end: 65.3, text: "の", sameLine: true },
+    { start: 65.5, end: 68.4, text: "クエストだから", sameLine: true },
+    { start: 70.9, end: 71.4, text: "イ" },
+    { start: 71.4, end: 71.9, text: "マソラ", sameLine: true },
+    { start: 71.9, end: 72.5, text: "ラ", sameLine: true },
+    { start: 72.5, end: 72.8, text: "ビリンス", sameLine: true },
+    { start: 72.8, end: 73.6, text: "眠" },
+    { start: 73.6, end: 74.8, text: "る街の中で", sameLine: true },
+    { start: 75, end: 76.6, text: "きみの今日" },
+    { start: 76.6, end: 77, text: "が", sameLine: true },
+    { start: 77, end: 78.5, text: "星になってゆく", sameLine: true },
+    { start: 80.8, end: 81.3, text: "イ" },
+    { start: 81.3, end: 81.8, text: "マソラ", sameLine: true },
+    { start: 81.8, end: 82.4, text: "ラ", sameLine: true },
+    { start: 82.4, end: 82.7, text: "ビリンス", sameLine: true },
+    { start: 82.8, end: 83.6, text: "窓" },
+    { start: 83.6, end: 84.6, text: "の月を見上げ", sameLine: true },
+    { start: 84.7, end: 85.9, text: "また朝" },
+    { start: 85.9, end: 86.5, text: "が来たら", sameLine: true },
+    { start: 86.6, end: 87.3, text: "歩" },
+    { start: 87.3, end: 87.8, text: "き", sameLine: true },
+    { start: 87.8, end: 89, text: "出そう", sameLine: true },
+    { start: 89.9, end: 91.2, text: "迷ってもいい" },
     { start: 92.4, end: 93.8, text: "止まってもいい" },
-    { start: 95.0, end: 98.6, text: "明日の空で また会えるから" },
-    { start: 100.3, end: 102.9, text: "散歩ボタンは 灰色のまま" },
-    { start: 103.0, end: 105.4, text: "仕事の扉も 今はおやすみ" },
-    { start: 105.5, end: 107.8, text: "だけど相棒は そばにいるから" },
-    { start: 107.9, end: 110.3, text: "夜のホームも さみしくはない" },
-    { start: 110.4, end: 112.9, text: "窓の外では 時計みたいに" },
-    { start: 113.0, end: 115.3, text: "月がゆっくり 位置を変えてく" },
-    { start: 115.4, end: 118.0, text: "街の灯りが まばたきするたび" },
-    { start: 118.1, end: 120.5, text: "今日の疲れが ほどけていく" },
-    { start: 120.8, end: 124.9, text: "進めない時間にも" },
-    { start: 125.7, end: 128.2, text: "育っていくものがある" },
-    { start: 128.3, end: 130.6, text: "焦らなくていいよ" },
-    { start: 130.9, end: 135.8, text: "夜は夜の セーブポイント" },
-    { start: 135.9, end: 138.0, text: "イマソララビリンス" },
-    { start: 138.1, end: 139.9, text: "眠る街の中で" },
-    { start: 140.1, end: 143.7, text: "きみの今日が 星になってゆく" },
-    { start: 146.0, end: 147.9, text: "イマソララビリンス" },
-    { start: 148.0, end: 150.0, text: "窓の月を見上げ" },
-    { start: 150.3, end: 151.8, text: "また朝が来たら" },
-    { start: 152.0, end: 154.0, text: "歩き出そう" },
-    { start: 155.0, end: 156.5, text: "休んでもいい" },
-    { start: 157.7, end: 159.1, text: "笑ってもいい" },
-    { start: 160.0, end: 163.8, text: "明日の道は 消えないから" },
-    { start: 165.1, end: 167.3, text: "午前六時の光が" },
-    { start: 167.5, end: 169.8, text: "カーテンをそっと揺らしたら" },
-    { start: 169.9, end: 172.5, text: "また小さな地図が開く" },
-    { start: 172.8, end: 174.9, text: "二十五マスの物語" },
-    { start: 175.0, end: 176.9, text: "草の素材 木の素材" },
-    { start: 177.0, end: 179.9, text: "灯り 土 雲 鉄のきらめき" },
-    { start: 180.0, end: 182.7, text: "きみが選んだ一歩ずつが" },
-    { start: 182.8, end: 185.2, text: "街の未来を作っていく" },
-    { start: 186.1, end: 188.1, text: "今はまだ 夜の中" },
-    { start: 188.2, end: 190.2, text: "だけど夢は 歩いてる" },
-    { start: 190.9, end: 192.9, text: "ピコピコ鳴る胸の奥" },
-    { start: 193.1, end: 194.9, text: "明日のリズムを" },
-    { start: 195.0, end: 197.1, text: "探してる" },
-    { start: 198.8, end: 200.7, text: "イマソララビリンス" },
-    { start: 200.8, end: 202.7, text: "眠る街の中で" },
-    { start: 202.8, end: 206.6, text: "きみの今日が 星になってゆく" },
-    { start: 208.9, end: 210.8, text: "イマソララビリンス" },
-    { start: 210.9, end: 212.8, text: "窓の月を見上げ" },
-    { start: 213.1, end: 214.6, text: "また朝が来たら" },
-    { start: 214.8, end: 217.0, text: "歩き出そう" },
-    { start: 217.8, end: 219.3, text: "イマソララビリンス" },
-    { start: 219.4, end: 221.5, text: "相棒と並んで" },
-    { start: 221.6, end: 223.1, text: "夜のホームで" },
-    { start: 223.3, end: 226.7, text: "約束しよう" },
-    { start: 228.0, end: 229.3, text: "迷ってもいい" },
-    { start: 230.7, end: 231.9, text: "止まってもいい" },
-    { start: 233.2, end: 236.5, text: "明日の空で また会えるから" },
+    { start: 95, end: 95.5, text: "明日の" },
+    { start: 95.5, end: 96.5, text: "空", sameLine: true },
+    { start: 96.5, end: 98.6, text: "で また会えるから", sameLine: true },
+    { start: 100.5, end: 102.2, text: "散歩ボタンは 灰色の" },
+    { start: 102.2, end: 102.5, text: "まま", sameLine: true },
+    { start: 102.6, end: 103.4, text: "仕事" },
+    { start: 103.4, end: 104.1, text: "の扉", sameLine: true },
+    { start: 104.1, end: 105.2, text: "も 今はおやすみ", sameLine: true },
+    { start: 105.3, end: 106.3, text: "だけど相" },
+    { start: 106.3, end: 106.5, text: "棒", sameLine: true },
+    { start: 106.5, end: 107.6, text: "は そばにいるから", sameLine: true },
+    { start: 107.7, end: 109.6, text: "夜のホームも さみしく" },
+    { start: 109.6, end: 109.9, text: "は", sameLine: true },
+    { start: 109.9, end: 110.2, text: "ない", sameLine: true },
+    { start: 110.3, end: 112.3, text: "窓の外では 時計みた" },
+    { start: 112.3, end: 112.7, text: "いに", sameLine: true },
+    { start: 112.8, end: 115, text: "月がゆっくり 位置を変え" },
+    { start: 115, end: 115.2, text: "てく", sameLine: true },
+    { start: 115.3, end: 115.9, text: "街" },
+    { start: 115.9, end: 116.4, text: "の", sameLine: true },
+    { start: 116.4, end: 117.8, text: "灯りが まばたきするたび", sameLine: true },
+    { start: 117.8, end: 120.5, text: "今日の疲れが ほどけていく" },
+    { start: 120.8, end: 121.6, text: "進" },
+    { start: 121.6, end: 122.2, text: "め", sameLine: true },
+    { start: 122.2, end: 122.8, text: "ない", sameLine: true },
+    { start: 122.8, end: 124.9, text: "時間にも", sameLine: true },
+    { start: 125.6, end: 126.8, text: "育ってい" },
+    { start: 126.8, end: 127.4, text: "くもの", sameLine: true },
+    { start: 127.4, end: 128, text: "がある", sameLine: true },
+    { start: 128.1, end: 128.8, text: "焦" },
+    { start: 128.8, end: 129.6, text: "らなくて", sameLine: true },
+    { start: 129.6, end: 130.5, text: "いいよ", sameLine: true },
+    { start: 130.6, end: 131.8, text: "夜は" },
+    { start: 131.9, end: 132.5, text: "夜の", sameLine: true },
+    { start: 132.7, end: 133.7, text: "セー", sameLine: true },
+    { start: 133.7, end: 134.6, text: "ブ", sameLine: true },
+    { start: 134.7, end: 135.4, text: "ポイ", sameLine: true },
+    { start: 135.4, end: 135.6, text: "ント", sameLine: true },
+    { start: 135.8, end: 136.3, text: "イ" },
+    { start: 136.3, end: 136.8, text: "マソラ", sameLine: true },
+    { start: 136.8, end: 137.4, text: "ラ", sameLine: true },
+    { start: 137.4, end: 137.7, text: "ビリンス", sameLine: true },
+    { start: 137.7, end: 138.5, text: "眠" },
+    { start: 138.5, end: 139.8, text: "る街の中で", sameLine: true },
+        { start: 140, end: 141.6, text: "きみの今日" },
+        { start: 141.6, end: 141.6, text: "が", sameLine: true },
+        { start: 141.6, end: 142.3, text: "星", sameLine: true },
+    { start: 142.5, end: 143.6, text: "になってゆく", sameLine: true },
+    { start: 145.9, end: 146.4, text: "イ" },
+    { start: 146.4, end: 146.9, text: "マソラ", sameLine: true },
+    { start: 146.9, end: 147.5, text: "ラ", sameLine: true },
+    { start: 147.5, end: 147.8, text: "ビリンス", sameLine: true },
+    { start: 147.9, end: 148.8, text: "窓" },
+    { start: 148.8, end: 149.8, text: "の月を見上げ", sameLine: true },
+    { start: 150, end: 151, text: "また朝" },
+    { start: 151, end: 151.6, text: "が来たら", sameLine: true },
+    { start: 151.6, end: 152.6, text: "歩" },
+    { start: 152.6, end: 154, text: "き出そう", sameLine: true },
+    { start: 155, end: 156.2, text: "休んでもいい" },
+    { start: 157.6, end: 158.9, text: "笑ってもいい" },
+    { start: 160.1, end: 160.6, text: "明日" },
+    { start: 160.6, end: 162.6, text: "の道は 消え", sameLine: true },
+    { start: 162.6, end: 163.8, text: "ないから", sameLine: true },
+    { start: 165, end: 166.4, text: "午前六時の" },
+    { start: 166.4, end: 167.2, text: "光", sameLine: true },
+    { start: 167.2, end: 167.2, text: "が", sameLine: true },
+    { start: 167.3, end: 169.5, text: "カーテンをそっと揺らし" },
+    { start: 169.5, end: 169.8, text: "たら", sameLine: true },
+    { start: 169.9, end: 172.3, text: "また小さな地図が開く" },
+    { start: 172.4, end: 174.4, text: "二十五マスの物" },
+    { start: 174.4, end: 174.7, text: "語", sameLine: true },
+    { start: 174.9, end: 176.7, text: "草の素材　木の素材" },
+    { start: 176.8, end: 178.5, text: "灯り　土　雲　鉄のき" },
+    { start: 178.5, end: 179, text: "ら", sameLine: true },
+    { start: 179, end: 179.7, text: "めき", sameLine: true },
+    { start: 179.8, end: 182, text: "きみが選んだ一歩" },
+    { start: 182, end: 182.2, text: "ず", sameLine: true },
+    { start: 182.2, end: 182.4, text: "つが", sameLine: true },
+    { start: 182.5, end: 183.4, text: "街の" },
+    { start: 183.4, end: 185, text: "未来を作っていく", sameLine: true },
+    { start: 186.2, end: 187.6, text: "今はまだ 夜" },
+    { start: 187.6, end: 187.7, text: "の", sameLine: true },
+    { start: 187.7, end: 187.9, text: "中", sameLine: true },
+    { start: 188, end: 190.2, text: "だけど夢は 歩いてる" },
+    { start: 190.8, end: 192.5, text: "ピコピコ鳴る胸" },
+    { start: 192.5, end: 192.7, text: "の奥", sameLine: true },
+    { start: 192.8, end: 194.3, text: "明日のリズ" },
+    { start: 194.3, end: 194.5, text: "ムを", sameLine: true },
+    { start: 194.6, end: 195.6, text: "探し" },
+    { start: 195.6, end: 196, text: "て", sameLine: true },
+    { start: 196, end: 197.4, text: "る", sameLine: true },
+    { start: 198.7, end: 199.2, text: "イ" },
+    { start: 199.2, end: 199.7, text: "マソラ", sameLine: true },
+    { start: 199.7, end: 200.3, text: "ラ", sameLine: true },
+    { start: 200.3, end: 200.6, text: "ビリンス", sameLine: true },
+    { start: 200.6, end: 201.6, text: "眠" },
+    { start: 201.6, end: 202.7, text: "る街の中で", sameLine: true },
+    { start: 202.8, end: 203.6, text: "きみ" },
+    { start: 203.6, end: 204.2, text: "の今日", sameLine: true },
+    { start: 204.2, end: 205, text: "が", sameLine: true },
+    { start: 205, end: 206.4, text: "星になってゆく", sameLine: true },
+    { start: 208.8, end: 209.3, text: "イ" },
+    { start: 209.3, end: 209.8, text: "マソラ", sameLine: true },
+    { start: 209.8, end: 210.4, text: "ラ", sameLine: true },
+    { start: 210.4, end: 210.7, text: "ビリンス", sameLine: true },
+    { start: 210.7, end: 211.6, text: "窓" },
+    { start: 211.6, end: 212.7, text: "の月を見上げ", sameLine: true },
+    { start: 212.8, end: 214, text: "また朝" },
+    { start: 214, end: 214.5, text: "が来たら", sameLine: true },
+    { start: 214.6, end: 215.5, text: "歩" },
+    { start: 215.5, end: 217.1, text: "き出そう", sameLine: true },
+    { start: 217.8, end: 218.5, text: "イマ" },
+    { start: 218.5, end: 218.8, text: "ソ", sameLine: true },
+    { start: 218.8, end: 219.3, text: "ララビリンス", sameLine: true },
+    { start: 219.4, end: 220.3, text: "相" },
+    { start: 220.3, end: 221.3, text: "棒と並んで", sameLine: true },
+    { start: 221.4, end: 222.9, text: "夜のホームで" },
+    { start: 223.4, end: 224.2, text: "約" },
+    { start: 224.2, end: 225.8, text: "束", sameLine: true },
+    { start: 225.8, end: 226.7, text: "しよう", sameLine: true },
+    { start: 228.1, end: 229.3, text: "迷ってもいい" },
+    { start: 230.5, end: 231.9, text: "止まってもいい" },
+    { start: 233.1, end: 233.8, text: "明日の" },
+    { start: 233.8, end: 235.4, text: "空で また", sameLine: true },
+    { start: 235.4, end: 235.7, text: "会", sameLine: true },
+    { start: 235.7, end: 236.1, text: "え", sameLine: true },
+    { start: 236.1, end: 236.5, text: "るから", sameLine: true },
     { start: 236.6, end: 238.6, text: "おやすみ 今日の空" },
-    { start: 239.2, end: 241.0, text: "おやすみ 今日の道" },
-    { start: 241.9, end: 243.1, text: "朝になったら" },
-    { start: 243.5, end: 246.9, text: "また一緒に 歩こう" }
+    { start: 239.2, end: 241, text: "おやすみ 今日の道" },
+    { start: 241.8, end: 243.1, text: "朝になったら" },
+    { start: 243.5, end: 244.6, text: "また一" },
+    { start: 244.6, end: 245.1, text: "緒", sameLine: true },
+    { start: 245.1, end: 246.9, text: "に 歩こう", sameLine: true },
   ],
   nightPlaza: [
     { start: 11.7, end: 13, text: "夜の広" },
@@ -39312,7 +39499,7 @@ const karaokeTimedLyrics = {
     { start: 41.4, end: 42.2, text: "ため", sameLine: true },
     { start: 42.8, end: 45.2, text: "小さな一歩を" },
     { start: 45.2, end: 46.1, text: "重ね", sameLine: true },
-    { start: 46.1, end: 47, text: "て", sameLine: true },
+    { start: 46.1, sameLine: true, end: 47, text: "て", sameLine: true },
     { start: 47, end: 48.6, text: "きた", sameLine: true },
     { start: 48.8, end: 49.9, text: "負けた" },
     { start: 49.9, end: 50.6, text: "涙", sameLine: true },
@@ -39338,7 +39525,7 @@ const karaokeTimedLyrics = {
     { start: 71, end: 72.7, text: "ら", sameLine: true },
     { start: 73, end: 73.6, text: "始", sameLine: true },
     { start: 73.6, end: 73.8, text: "ま", sameLine: true },
-    { start: 73.8, end: 77.4, text: "る", sameLine: true },
+    { start: 73.8, sameLine: true, end: 77.4, text: "る", sameLine: true },
     { start: 79.2, end: 80.6, text: "イマソラ" },
     { start: 81, end: 82.3, text: "走れ", sameLine: true },
     { start: 82.6, end: 83, text: "夜", sameLine: true },
@@ -39374,7 +39561,7 @@ const karaokeTimedLyrics = {
     { start: 117.7, end: 119, text: "て", sameLine: true },
     { start: 119.1, end: 120.3, text: "立ち上", sameLine: true },
     { start: 120.3, end: 122.1, text: "がれる", sameLine: true },
-    { start: 122.2, end: 124.7, text: "相棒となら" },
+    { start: 122.2, sameLine: true, end: 124.7, text: "相棒となら" },
     { start: 124.7, end: 125.6, text: "前", sameLine: true },
     { start: 125.6, end: 126.5, text: "へ行け", sameLine: true },
     { start: 126.5, end: 127.1, text: "る", sameLine: true },
@@ -39383,7 +39570,7 @@ const karaokeTimedLyrics = {
     { start: 134.7, end: 137.8, text: "を包んで", sameLine: true },
     { start: 138.2, end: 140.5, text: "遠くの窓が" },
     { start: 140.6, end: 141.7, text: "やさし", sameLine: true },
-    { start: 141.7, end: 144, text: "く光る", sameLine: true },
+    { start: 141.7, sameLine: true, end: 144, text: "く光る", sameLine: true },
     { start: 144.2, end: 145.4, text: "本気" },
     { start: 145.4, end: 146.4, text: "で向か", sameLine: true },
     { start: 146.4, end: 147.2, text: "う", sameLine: true },
@@ -39556,6 +39743,10 @@ function karaokeDisplayLinesFor(mode) {
   groups.forEach(group => {
     group.karaokeCharacterCounts = karaokeLyricProgressWeightsForParts(group.parts);
     group.karaokeTotalCharacters = group.karaokeCharacterCounts.reduce((total, count) => total + count, 0) || 1;
+    group.karaokeCharacterStarts = group.karaokeCharacterCounts.reduce((starts, count) => {
+      starts.push((starts[starts.length - 1] || 0) + count);
+      return starts;
+    }, [0]);
   });
   karaokeDisplayLineCache[mode] = groups;
   return karaokeDisplayLineCache[mode];
@@ -39733,6 +39924,11 @@ function karaokeTimedLyricFor(mode, currentTime) {
     start: Math.max(0, group.start - karaokeLyricDisplayLeadSeconds),
     end: group.end + karaokeLyricHoldAfterSeconds
   })));
+  const cachedWindow = karaokeTimedLyricLastMatch.mode === mode ? karaokeTimedLyricLastMatch.window : null;
+  if (cachedWindow && currentTime >= karaokeTimedLyricLastMatch.time && currentTime >= cachedWindow.start && currentTime <= cachedWindow.end) {
+    karaokeTimedLyricLastMatch.time = currentTime;
+    return cachedWindow.line;
+  }
   let low = 0;
   let high = windows.length - 1;
   let index = -1;
@@ -39751,6 +39947,9 @@ function karaokeTimedLyricFor(mode, currentTime) {
     if (window.end < currentTime) break;
     if (currentTime >= window.start && currentTime <= window.end) match = window.line;
   }
+  karaokeTimedLyricLastMatch.mode = mode || "";
+  karaokeTimedLyricLastMatch.window = match ? windows.find(window => window.line === match) : null;
+  karaokeTimedLyricLastMatch.time = currentTime;
   return match;
 }
 function karaokeLyricVisibleText(text) {
@@ -39824,12 +40023,63 @@ function karaokeLyricDisplayHtmlForParts(parts) {
   });
   return html;
 }
-function karaokeLyricProgressFor(line, currentTime) {
+function karaokeLyricProgressFor(line, currentTime, mode = "") {
   const parts = line?.parts || [line];
   const counts = Array.isArray(line?.karaokeCharacterCounts) ? line.karaokeCharacterCounts : karaokeLyricProgressWeightsForParts(parts);
   const totalCharacters = line?.karaokeTotalCharacters || counts.reduce((total, count) => total + count, 0) || 1;
+  const starts = Array.isArray(line?.karaokeCharacterStarts) ? line.karaokeCharacterStarts : null;
   let completedCharacters = 0;
-  for (let index = 0; index < parts.length; index++) {
+  let index = Number.isInteger(line?.karaokeProgressPartIndex) ? line.karaokeProgressPartIndex : 0;
+  if (mode === "outsideHome" && parts.length) {
+    if (currentTime <= parts[0].start) {
+      line.karaokeProgressPartIndex = 0;
+      return 0;
+    }
+    const lastIndex = parts.length - 1;
+    if (currentTime >= parts[lastIndex].end) {
+      line.karaokeProgressPartIndex = lastIndex;
+      return 100;
+    }
+    const part = parts[index];
+    const nextPart = parts[index + 1];
+    const cacheStillUseful = part && index >= 0 && index < parts.length && currentTime >= part.start && (currentTime <= part.end || (nextPart && currentTime < nextPart.start));
+    if (!cacheStillUseful) {
+      let low = 0;
+      let high = parts.length - 1;
+      index = 0;
+      while (low <= high) {
+        const mid = (low + high) >> 1;
+        if (parts[mid].start <= currentTime) {
+          index = mid;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+      line.karaokeProgressPartIndex = index;
+    }
+  } else if (index < 0 || index >= parts.length || currentTime < parts[index].start || currentTime > parts[index].end) {
+    let low = 0;
+    let high = parts.length - 1;
+    index = -1;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (currentTime < parts[mid].start) {
+        high = mid - 1;
+      } else if (currentTime > parts[mid].end) {
+        low = mid + 1;
+      } else {
+        index = mid;
+        break;
+      }
+    }
+    if (index < 0) {
+      index = Math.max(0, Math.min(parts.length - 1, low));
+    }
+    line.karaokeProgressPartIndex = index;
+  }
+  completedCharacters = starts ? (starts[index] || 0) : counts.slice(0, index).reduce((total, count) => total + count, 0);
+  for (; index < parts.length; index++) {
     const part = parts[index];
     const partCharacters = counts[index] || 1;
     if (currentTime < part.start) {
@@ -39856,8 +40106,21 @@ function karaokeStageSceneBox() {
   }
   return karaokeStageSceneEl;
 }
-function karaokeLightPhaseFor(currentTime) {
+function karaokeLightPhaseFor(currentTime, mode = karaokePerformanceMode) {
   if (!Number.isFinite(currentTime) || currentTime < 8) return "off";
+  if (mode === "outsideHome") {
+    if (currentTime >= 236.8 && currentTime < 263.7) return "lift";
+    if (currentTime >= 198.7 && currentTime < 236.8) return "finale";
+    if (currentTime >= 186.4 && currentTime < 198.7) return "bridge";
+    if (currentTime >= 165.1 && currentTime < 186.4) return "lift";
+    if (currentTime >= 136.1 && currentTime < 165.1) return "chorus";
+    if (currentTime >= 120.9 && currentTime < 136.1) return "bridge";
+    if (currentTime >= 100.4 && currentTime < 120.9) return "lift";
+    if (currentTime >= 70.9 && currentTime < 100.4) return "chorus";
+    if (currentTime >= 51 && currentTime < 70.9) return "bridge";
+    if (currentTime >= 31 && currentTime < 51) return "lift";
+    return "quiet";
+  }
   if (currentTime >= 248) return "finale";
   if (currentTime >= 220 && currentTime < 248) return "bridge";
   if (
@@ -39912,9 +40175,13 @@ function ensureKaraokeBassLightAnalyser(audio) {
     return false;
   }
 }
-function karaokeLightBassPulseFor(audio, phase) {
+function karaokeLightBassPulseFor(audio, phase, mode = karaokePerformanceMode) {
   if (!audio || phase === "off" || audio.paused || audio.currentTime < 8) return 0;
   if (!ensureKaraokeBassLightAnalyser(audio)) return Math.max(0, karaokeBassLightSync.pulse * .82);
+  const isOutsideHome = mode === "outsideHome";
+  const hitIntervalMs = isOutsideHome ? 95 : 120;
+  const releaseHoldMs = isOutsideHome ? 190 : 260;
+  const releaseAfterDecay = isOutsideHome ? .965 : .972;
   const analyser = karaokeBassLightSync.analyser;
   const bins = karaokeBassLightSync.bins;
   analyser.getByteFrequencyData(bins);
@@ -39946,14 +40213,14 @@ function karaokeLightBassPulseFor(audio, phase) {
   const overBaseline = karaokeBassLightSync.level - karaokeBassLightSync.baseline;
   const now = performance.now();
   const isBassHit = bassDominance > 1.18 && bassCore > .075 && onset > .004 && overBaseline > .006;
-  if (isBassHit && now - karaokeBassLightSync.lastHitAt > 120) {
+  if (isBassHit && now - karaokeBassLightSync.lastHitAt > hitIntervalMs) {
     const hitStrength = Math.min(.82, .16 + (onset * 25) + (overBaseline * 7) + ((bassDominance - 1.18) * .18));
     karaokeBassLightSync.pulse = Math.max(karaokeBassLightSync.pulse, hitStrength);
     karaokeBassLightSync.lastHitAt = now;
-    karaokeBassLightSync.releaseStartedAt = now + 260;
+    karaokeBassLightSync.releaseStartedAt = now + releaseHoldMs;
   }
   const bassOnlySustain = bassDominance > 1.08 ? Math.max(0, Math.min(.34, overBaseline * 3.2)) : 0;
-  const releaseDecay = now < karaokeBassLightSync.releaseStartedAt ? .995 : .972;
+  const releaseDecay = now < karaokeBassLightSync.releaseStartedAt ? .995 : releaseAfterDecay;
   karaokeBassLightSync.pulse = Math.max(karaokeBassLightSync.pulse * releaseDecay, bassOnlySustain);
   const phaseBoost = phase === "chorus" || phase === "finale" ? 1 : phase === "lift" || phase === "bridge" ? .9 : .72;
   return Math.max(0, Math.min(1, karaokeBassLightSync.pulse * phaseBoost));
@@ -39961,8 +40228,9 @@ function karaokeLightBassPulseFor(audio, phase) {
 function setKaraokeRoomLightPhase(currentTime) {
   const scene = karaokeStageSceneBox();
   if (!scene) return;
-  const phase = karaokeLightPhaseFor(currentTime);
-  const beatPulse = karaokeLightBassPulseFor(karaokeActiveAudio(), phase);
+  const phase = karaokeLightPhaseFor(currentTime, karaokePerformanceMode);
+  const beatPulse = karaokeLightBassPulseFor(karaokeActiveAudio(), phase, karaokePerformanceMode);
+  scene.dataset.lightSongMode = karaokePerformanceMode || "";
   scene.style.setProperty("--karaoke-light-beat-pulse", beatPulse.toFixed(3));
   if (scene.dataset.lightPhase === phase) return;
   scene.dataset.lightPhase = phase;
@@ -40004,7 +40272,7 @@ function renderKaraokeCinemascopeLyric(line, progress) {
 function renderKaraokeLyricSyncAt(mode, audio, currentTime) {
   if (!musicPlazaKaraokeOpen || karaokePerformanceMode !== mode || sound.audio !== audio) return;
   const line = karaokeTimedLyricFor(mode, currentTime);
-  const progress = line ? karaokeLyricProgressFor(line, currentTime) : 0;
+  const progress = line ? karaokeLyricProgressFor(line, currentTime, mode) : 0;
   renderKaraokeCinemascopeLyric(line, progress);
 }
 function renderKaraokeRealtimeAt(mode, audio, currentTime) {
@@ -40139,7 +40407,6 @@ function renderTownKaraoke() {
       <span>カラオケ試聴は、専用のカラオケボックス画面に切り替わってから1秒後に再生されます。</span>
       <div class="karaoke-room">
         ${karaokePerformanceSceneHtml(karaokePerformanceMode)}
-        ${karaokeSofaDevPreviewActive ? karaokeSeatDevAdjustListHtml("表示を見ながら本体調整") : ""}
         <div class="karaoke-controls">
           <button type="button" data-karaoke-back-songs>曲を選び直す</button>
           <button type="button" data-karaoke-seek="-5">-5秒</button>
@@ -47371,6 +47638,29 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
