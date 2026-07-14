@@ -24,6 +24,10 @@
   <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
+  <link rel="preload" as="image" href="assets/imasora-wallpaper-workshop-night-v1.png">
+  <link rel="preload" as="image" href="assets/imasora-wallpaper-workshop-dawn-v1.png">
+  <link rel="preload" as="image" href="assets/imasora-wallpaper-workshop-home-v1.png">
+  <link rel="preload" as="image" href="assets/imasora-wallpaper-workshop-karaoke-v1.png">
   <link rel="preload" as="image" href="assets/town-layered-bridge-v2.png">
   <link rel="preload" as="image" href="assets/karaoke-room-night-v01.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/karaoke-room-evening-v01.png">
@@ -6478,6 +6482,569 @@
       transform-origin: center center;
       filter: drop-shadow(0 1px 0 rgba(67,46,25,.2));
     }
+    #townMemorialDex .town-memorial-medals {
+      display: grid;
+      grid-template-columns: repeat(3, 14px);
+      grid-auto-rows: 16px;
+      align-items: center;
+      justify-content: start;
+      gap: 2px 3px;
+      width: 48px;
+      min-height: 16px;
+      margin-top: 2px;
+      color: inherit;
+      font-size: 10px;
+      line-height: 1;
+    }
+    #townMemorialDex .town-memorial-medals .cup-medal {
+      display: inline-grid;
+      width: 14px;
+      height: 16px;
+      margin-top: 0;
+      transform: scale(.72);
+      transform-origin: center center;
+      filter: drop-shadow(0 1px 0 rgba(67,46,25,.18));
+    }
+    #townMemorialDex .shop-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #townMemorialDex .town-memorial-card {
+      position: relative;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      min-height: 240px;
+      padding: 10px 9px 12px;
+      border: 1px solid #b8ad98;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.08) 36%, rgba(80,73,63,.08)),
+        linear-gradient(135deg, #ede5d4, #d2c5ad 48%, #bdb19b);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.64),
+        inset 0 -7px 0 rgba(81,72,59,.12),
+        0 3px 0 rgba(91,78,60,.18);
+      overflow: hidden;
+    }
+    #townMemorialDex .town-memorial-card::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(83,70,52,.24);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+    #townMemorialDex .town-memorial-card::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(79,67,50,.18);
+      pointer-events: none;
+    }
+    #townMemorialDex .town-memorial-art {
+      display: grid;
+      place-items: center;
+      min-height: 74px;
+      margin: 2px 12px 0;
+      padding: 5px;
+      border-radius: 6px;
+      background: rgba(255,251,237,.36);
+      box-shadow: inset 0 0 0 1px rgba(99,82,59,.14);
+      overflow: hidden;
+    }
+    #townMemorialDex .town-memorial-art .karaoke-dex-character,
+    #townMemorialDex .town-memorial-art .gallery-monster-card {
+      width: 86px;
+      min-height: 74px;
+      padding: 0;
+      margin: 0 auto;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      display: grid;
+      place-items: center;
+      justify-self: center;
+      align-self: center;
+      text-align: center;
+      transform: scale(.78) translateX(-11px);
+      transform-origin: center center;
+    }
+    #townMemorialDex .town-memorial-art .monster-art.star-gallery-art,
+    #townMemorialDex .town-memorial-art .monster-art {
+      justify-self: center;
+      align-self: center;
+      margin: 0 auto;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    #townMemorialDex .town-memorial-art .unique-monster,
+    #townMemorialDex .town-memorial-art .turnaround-monster,
+    #townMemorialDex .town-memorial-art .monster {
+      justify-self: center;
+      align-self: center;
+    }
+    #townMemorialDex .town-memorial-inscription {
+      display: grid;
+      gap: 4px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    #townMemorialDex .town-memorial-name {
+      display: block;
+      color: #4c3d27;
+      font-size: 12.4px;
+      font-weight: 900;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #townMemorialDex .town-memorial-stats {
+      display: block;
+      justify-self: center;
+      margin-top: 0;
+      color: #332719;
+      font-size: 11.3px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: left;
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
+    }
+    #townMemorialDex .town-memorial-skills {
+      display: block;
+      justify-self: center;
+      color: #3b2b19;
+      font-size: 10.6px;
+      font-weight: 800;
+      line-height: 1.32;
+      text-align: left;
+      text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    }
+    #townMemorialDex .town-memorial-rank {
+      justify-self: center;
+      min-width: 52px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(108,84,44,.34);
+      background: linear-gradient(180deg, #fff4bd, #d8a947);
+      color: #5c4215;
+      font-size: 10.6px;
+      font-weight: 900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    #townMemorialDex .town-memorial-medal-row {
+      justify-self: center;
+      padding-top: 2px;
+    }
+    #townMemorialDex .town-memorial-anniversary-button {
+      position: relative;
+      z-index: 1;
+      justify-self: center;
+      min-height: 34px;
+      margin-top: 3px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      font-size: .78rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .memorial-wallpaper-workshop {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 2px solid rgba(95, 77, 54, .35);
+    }
+    .memorial-wallpaper-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    .memorial-wallpaper-heading b {
+      color: #443521;
+      font-size: 1.08rem;
+    }
+    .memorial-wallpaper-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      gap: 12px;
+      align-items: start;
+      margin-top: 12px;
+    }
+    .memorial-wallpaper-layout > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .memorial-wallpaper-preview-wrap {
+      display: flex;
+      justify-content: center;
+      min-width: 0;
+    }
+    .memorial-wallpaper-preview {
+      position: relative;
+      width: min(100%, 340px);
+      aspect-ratio: 9 / 16;
+      overflow: hidden;
+      border: 3px solid #453725;
+      border-radius: 6px;
+      background: #071632;
+      box-shadow: 0 8px 20px rgba(31, 23, 16, .24);
+    }
+    .memorial-wallpaper-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .memorial-wallpaper-character {
+      position: absolute;
+      left: var(--wallpaper-x);
+      top: var(--wallpaper-y);
+      width: 112px;
+      height: 112px;
+      transform: translate(-50%, -50%) scale(var(--wallpaper-scale));
+      transform-origin: center;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      filter: drop-shadow(0 5px 4px rgba(7, 12, 30, .5));
+    }
+    .memorial-wallpaper-character .karaoke-dex-character,
+    .memorial-wallpaper-character .gallery-monster-card {
+      width: 112px;
+      height: 112px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      display: grid;
+      place-items: center;
+    }
+    .memorial-wallpaper-character,
+    .memorial-wallpaper-character .karaoke-dex-character,
+    .memorial-wallpaper-character .gallery-monster-card,
+    .memorial-wallpaper-character .monster-art,
+    .memorial-wallpaper-character .unique-art,
+    .memorial-wallpaper-character .star-gallery-art {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .memorial-wallpaper-character .monster-art {
+      margin: 0 !important;
+      overflow: visible;
+    }
+    .memorial-wallpaper-medals {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .memorial-wallpaper-medals .cup-medal {
+      position: absolute;
+      left: var(--medal-x);
+      top: var(--medal-y);
+      transform: translate(-50%, -50%) scale(.58);
+      transform-origin: center;
+      margin: 0;
+      filter: drop-shadow(0 0 4px var(--medal-main));
+    }
+    .memorial-wallpaper-medals .cup-medal:nth-child(1) { --medal-x: 24%; --medal-y: 91.4%; }
+    .memorial-wallpaper-medals .cup-medal:nth-child(2) { --medal-x: 35.8%; --medal-y: 92.2%; }
+    .memorial-wallpaper-medals .cup-medal:nth-child(3) { --medal-x: 48%; --medal-y: 92.8%; }
+    .memorial-wallpaper-medals .cup-medal:nth-child(4) { --medal-x: 60%; --medal-y: 92.8%; }
+    .memorial-wallpaper-medals .cup-medal:nth-child(5) { --medal-x: 71.2%; --medal-y: 92.2%; }
+    .memorial-wallpaper-medals .cup-medal:nth-child(6) { --medal-x: 82%; --medal-y: 91.4%; }
+    .memorial-wallpaper-stamps {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .memorial-wallpaper-stamp {
+      position: absolute;
+      left: var(--stamp-x);
+      top: var(--stamp-y);
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      transform: translate(-50%, -50%) rotate(var(--stamp-rotation)) scale(var(--stamp-scale));
+      transform-origin: center;
+      color: var(--stamp-color);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      pointer-events: auto;
+    }
+    .memorial-wallpaper-stamp:active { cursor: grabbing; }
+    .memorial-wallpaper-stamp > span {
+      display: block;
+      font-family: "Segoe UI Symbol", "Yu Gothic", sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--stamp-color);
+      -webkit-text-fill-color: var(--stamp-color);
+      -webkit-text-stroke: 1.5px rgba(255,255,255,.96);
+      paint-order: stroke fill;
+      text-shadow: 0 2px 2px rgba(20,22,35,.42), 0 0 5px rgba(255,255,255,.72);
+    }
+    .memorial-wallpaper-stamp.selected::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border: 1px dashed rgba(255,255,255,.95);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(54,50,43,.55);
+      pointer-events: none;
+    }
+    .memorial-wallpaper-stamp-palette {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .memorial-wallpaper-stamp-choice {
+      min-width: 0;
+      height: 44px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--choice-color);
+      font-family: "Segoe UI Symbol", "Yu Gothic", sans-serif;
+      font-size: 25px;
+      font-weight: 900;
+      line-height: 1;
+      -webkit-text-stroke: 1px rgba(255,255,255,.92);
+      paint-order: stroke fill;
+      text-shadow: 0 1px 2px rgba(25,28,38,.28);
+    }
+    .memorial-wallpaper-stamp-choice.selected {
+      border-color: #4f3f2c;
+      background: #fff3c9;
+      box-shadow: inset 0 0 0 2px rgba(207,154,42,.35);
+    }
+    .memorial-wallpaper-stamp-colors {
+      display: grid;
+      grid-template-columns: repeat(5, 32px);
+      gap: 7px;
+      align-items: center;
+    }
+    .memorial-wallpaper-stamp-color {
+      width: 32px;
+      height: 32px;
+      min-width: 0;
+      padding: 0;
+      border: 2px solid rgba(61,51,40,.32);
+      border-radius: 50%;
+      background: var(--swatch-color);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.72);
+    }
+    .memorial-wallpaper-stamp-color.default-color {
+      background: conic-gradient(#ffd33d, #ff74ad, #c58aff, #64dcff, #67d59a, #ffd33d);
+    }
+    .memorial-wallpaper-stamp-color.selected {
+      border-color: #3d3022;
+      outline: 3px solid rgba(224,172,48,.42);
+      outline-offset: 1px;
+    }
+    .memorial-wallpaper-stamp-tools {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .memorial-wallpaper-stamp-tools button {
+      min-width: 0;
+      height: 38px;
+      padding: 0;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .memorial-wallpaper-controls {
+      min-width: 0;
+      display: grid;
+      gap: 11px;
+    }
+    .memorial-wallpaper-control {
+      display: grid;
+      min-width: 0;
+      max-width: 100%;
+      gap: 7px;
+      padding: 11px;
+      border: 1px solid rgba(91, 68, 37, .28);
+      border-radius: 6px;
+      background: rgba(255, 252, 242, .9);
+    }
+    .memorial-wallpaper-control label,
+    .memorial-wallpaper-control b {
+      color: #3c2e20;
+      font-size: .92rem;
+    }
+    .memorial-wallpaper-control select {
+      width: 100%;
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid #9a815d;
+      border-radius: 5px;
+      background: #fff;
+      color: #2f281f;
+      font: inherit;
+    }
+    .memorial-wallpaper-targets,
+    .memorial-wallpaper-size,
+    .memorial-wallpaper-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 7px;
+    }
+    .memorial-wallpaper-exit-confirm {
+      display: grid;
+      gap: 9px;
+      padding: 11px;
+      border: 1px solid rgba(124, 76, 45, .34);
+      border-radius: 6px;
+      background: #fff7e8;
+      color: #4b3324;
+      font-size: .84rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+    .memorial-wallpaper-exit-confirm[hidden] {
+      display: none;
+    }
+    .memorial-wallpaper-exit-confirm-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 7px;
+    }
+    .memorial-wallpaper-download-page-actions button {
+      grid-column: 1 / -1;
+    }
+    .memorial-wallpaper-download-result {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(91,68,37,.28);
+      display: grid;
+      grid-template-columns: minmax(110px, 160px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+    .memorial-wallpaper-download-result[hidden] { display: none; }
+    .memorial-wallpaper-download-preview {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      border: 2px solid #574632;
+      border-radius: 5px;
+      background: #071632;
+      box-shadow: 0 6px 14px rgba(31,23,16,.18);
+    }
+    .memorial-wallpaper-download-info {
+      min-width: 0;
+      display: grid;
+      gap: 9px;
+    }
+    .memorial-wallpaper-download-info b {
+      color: #3c2e20;
+      font-size: 1rem;
+    }
+    .memorial-wallpaper-download-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+    }
+    .memorial-wallpaper-download-actions a,
+    .memorial-wallpaper-download-actions button {
+      min-width: 0;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 9px;
+      border: 1px solid #8d7657;
+      border-radius: 6px;
+      background: #fffdf7;
+      color: #3a3024;
+      font: 800 .82rem/1.25 system-ui, sans-serif;
+      text-align: center;
+      text-decoration: none;
+    }
+    .memorial-wallpaper-download-actions .primary-download {
+      border-color: #315b43;
+      background: #3f7656;
+      color: #fff;
+    }
+    .memorial-wallpaper-targets button.selected {
+      color: #fff;
+      border-color: #5c4931;
+      background: #6e5739;
+    }
+    .memorial-wallpaper-nudge {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 38px);
+      gap: 5px;
+      justify-content: center;
+    }
+    .memorial-wallpaper-nudge button,
+    .memorial-wallpaper-size button {
+      min-width: 0;
+      padding: 0;
+    }
+    .memorial-wallpaper-reset {
+      font-size: .72rem;
+    }
+    .memorial-wallpaper-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .memorial-wallpaper-check input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+    .memorial-wallpaper-empty {
+      margin-top: 11px;
+      padding: 15px;
+      border: 1px dashed #9b835f;
+      border-radius: 6px;
+      background: rgba(255, 252, 242, .82);
+      color: #4e402f;
+    }
+    @media (max-width: 720px) {
+      .memorial-wallpaper-layout {
+        grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+        gap: 8px;
+      }
+      .memorial-wallpaper-preview {
+        width: 100%;
+      }
+      .memorial-wallpaper-download-result {
+        grid-template-columns: 104px minmax(0, 1fr);
+      }
+      .memorial-wallpaper-download-actions {
+        grid-template-columns: 1fr;
+      }
+    }
     .companion-room.medal-complete {
       background:
         linear-gradient(115deg, rgba(255,246,175,.26) 0 18%, transparent 42%),
@@ -8276,6 +8843,9 @@
       pointer-events: auto;
       cursor: pointer;
     }
+    .town-layer-click-target-guild {
+      z-index: 28;
+    }
     .town-layer-sprite-bridgeLanding,
     .town-layer-sprite-bridgeLanding2,
     .town-layer-sprite-bridge2Landing,
@@ -8780,6 +9350,95 @@
     .shop-card button:disabled { opacity: .5; cursor: default; }
     #townPractice .town-practice-card {
       grid-template-columns: 1fr;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #8f6235;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.14), rgba(255,255,255,0) 18%, rgba(88,52,23,.12) 52%, rgba(255,255,255,.08)),
+        repeating-linear-gradient(0deg, #c78b4e 0 12px, #b9793e 12px 24px);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,239,190,.38),
+        inset 0 -8px 0 rgba(91,52,24,.18),
+        0 5px 0 rgba(92,61,34,.2);
+      color: #432a16;
+    }
+    #townPractice .town-practice-card::before,
+    #townPractice .town-practice-card::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffe7a3, #9b632d 68%);
+      box-shadow: 0 1px 0 rgba(54,32,16,.28);
+    }
+    #townPractice .town-practice-card::before {
+      left: 9px;
+    }
+    #townPractice .town-practice-card::after {
+      right: 9px;
+    }
+    #townPractice .town-practice-card .item-art {
+      justify-self: center;
+      margin-top: 4px;
+      background: #fff8dc;
+      border-color: rgba(113,70,33,.3);
+      box-shadow: none;
+    }
+    #townPractice .town-practice-card .town-practice-art {
+      display: grid;
+      place-items: center;
+      width: 96px;
+      min-height: 74px;
+      padding: 4px;
+      overflow: hidden;
+    }
+    #townPractice .town-practice-card .town-practice-art::before,
+    #townPractice .town-practice-card .town-practice-art::after {
+      display: none;
+    }
+    #townPractice .town-practice-art .karaoke-dex-character,
+    #townPractice .town-practice-art .gallery-monster-card {
+      width: 86px;
+      min-height: 74px;
+      padding: 0;
+      margin: 0 auto;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      display: grid;
+      place-items: center;
+      transform: scale(.76) translate(-10px, -4px);
+      transform-origin: center center;
+    }
+    #townPractice .town-practice-art .monster-art.star-gallery-art,
+    #townPractice .town-practice-art .monster-art {
+      justify-self: center;
+      align-self: center;
+      margin: 0 auto;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    #townPractice .town-practice-card > div:not(.item-art) {
+      position: relative;
+      z-index: 1;
+      box-sizing: border-box;
+      width: calc(100% + 10px);
+      margin-left: -5px;
+      margin-right: -5px;
+      padding: 6px 5px;
+      border: 1px solid rgba(113,70,33,.24);
+      border-radius: 8px;
+      background: rgba(255,248,220,.82);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        0 2px 0 rgba(92,54,24,.12);
+    }
+    #townPractice .town-practice-card small {
+      color: #38200f;
+      font-size: 10.6px;
     }
     #townPractice .town-practice-heading {
       display: flex;
@@ -8800,6 +9459,9 @@
     }
     #townPractice .town-practice-card strong {
       display: block;
+      color: #2f1a0b;
+      font-size: 12.4px;
+      line-height: 1.2;
       white-space: nowrap;
     }
     #townPractice .shop-card button {
@@ -12547,6 +13209,7 @@
       </div>
       <div class="town-shop" id="townKaraoke" hidden></div>
       <div class="town-shop" id="townPractice" hidden></div>
+      <div class="town-shop" id="townMemorialDex" hidden></div>
       <div class="mini-feature" id="imasoraDex"></div>
     </section>
 
@@ -13043,7 +13706,7 @@ const buildings = [
   ["guild", "案", "案内板", 11, "町の建物づくりを見渡しやすくなる", "normal", "建設できる場所を整理する案内板。"],
   ["station", "駅", "駅前", 12, "遠回り散歩の立ち寄り先になる", "normal", "駅前にある小さな駅。"],
   ["castle", "門", "城門", 13, "街の大きな目印になる", "normal", "街の奥に立つ大きな目印。"],
-  ["medalHall", "勲", "メダル記念館", 20, "大会メダルを飾る特別施設", "special", "大会で集めたメダルを並べる候補。"],
+  ["medalHall", "記", "相棒記念館", 20, "記録したモンスターの記録碑を見られる", "special", "引退時に記録したモンスター名、姿、能力値、ランク、獲得メダルを残す施設。"],
   ["dojo", "技", "技の道場", 21, "技演出を確認する特別施設", "special", "系統別の弱技・中技・強技を確認する候補。"],
   ["soundShop", "音", "音楽プラザ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
   ["bookstore", "本", "本屋", 23, "世界観やヒントを読む特別施設", "special", "おしゃべり、攻略ヒント、世界観メモを置く候補。"],
@@ -13218,6 +13881,57 @@ let selectedDexStage = "";
 let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
 let pendingRetireParkPracticeRecordId = "";
+const memorialWallpaperChoices = [
+  { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォークの街" },
+  { id: "wallpaper2", name: "壁紙2", src: "assets/imasora-wallpaper-workshop-dawn-v1.png", alt: "朝焼けのイマソラウォークの街" },
+  { id: "wallpaper3", name: "壁紙3", src: "assets/imasora-wallpaper-workshop-home-v1.png", alt: "イマソラウォークの相棒の部屋" },
+  { id: "wallpaper4", name: "壁紙4", src: "assets/imasora-wallpaper-workshop-karaoke-v1.png", alt: "イマソラウォークのカラオケラウンジ" }
+];
+let memorialWallpaperSelectedBackgroundId = "wallpaper2";
+let memorialWallpaperSelectedRecordId = "memorial-wallpaper-test-4";
+let memorialWallpaperView = "records";
+const memorialWallpaperPositions = {
+  record: { x: 41, y: 81, scale: .55 },
+  guide: { x: 67, y: 81, scale: .55 }
+};
+const memorialWallpaperPreviewScaleRatio = .73;
+const memorialWallpaperStampTypes = [
+  { id: "star", name: "星", glyph: "★", color: "#ffd33d" },
+  { id: "sparkle", name: "キラキラ", glyph: "✦", color: "#79e9ff" },
+  { id: "heart", name: "ハート", glyph: "♥", color: "#ff74ad" },
+  { id: "flower", name: "花", glyph: "✿", color: "#ff9875" },
+  { id: "note", name: "音符", glyph: "♪", color: "#c58aff" },
+  { id: "moon", name: "月", glyph: "☾", color: "#fff08a" },
+  { id: "cloud", name: "雲", glyph: "☁", color: "#d9f4ff" },
+  { id: "crown", name: "王冠", glyph: "♛", color: "#ffc94f" },
+  { id: "ribbon", name: "リボン", glyph: "∞", color: "#ff8fc7" },
+  { id: "sun", name: "太陽", glyph: "☀", color: "#ffb84f" },
+  { id: "jewel", name: "宝石", glyph: "◆", color: "#7dd7ff" },
+  { id: "music", name: "連続音符", glyph: "♫", color: "#89f0c4" }
+];
+const memorialWallpaperStampColors = [
+  { name: "元の色", value: "" },
+  { name: "黄色", value: "#ffd33d" },
+  { name: "赤", value: "#ff706d" },
+  { name: "ピンク", value: "#ff74ad" },
+  { name: "紫", value: "#c58aff" },
+  { name: "青", value: "#6f91ff" },
+  { name: "水色", value: "#64dcff" },
+  { name: "緑", value: "#67d59a" },
+  { name: "白", value: "#ffffff" },
+  { name: "黒", value: "#4f5360" }
+];
+let memorialWallpaperStamps = [];
+let memorialWallpaperSelectedStampTypeId = "";
+let memorialWallpaperSelectedStampColor = "";
+let memorialWallpaperActiveStampId = "";
+let memorialWallpaperStampHistory = [];
+let memorialWallpaperStampSequence = 0;
+let memorialWallpaperStampDrag = null;
+let memorialWallpaperStampSuppressClick = false;
+let memorialWallpaperDownloadUrl = "";
+let memorialWallpaperDownloadBlob = null;
+let memorialWallpaperDownloadName = "";
 let musicPlazaKaraokeOpen = false;
 let selectedKaraokeBgmMode = "normal";
 let karaokePerformanceMode = "";
@@ -13892,7 +14606,7 @@ const evolutionRoutes = [
   { key: "trail", label: "道ルート", next: "ミチリオ向き", picks: "歩行セッション、道の気配", text: "歩いた事実とイマソラ確認で伸びる。散歩そのものが相棒の個性になる。" }
 ];
 const playtestSteps = [
-  { id: "refresh", title: "画面更新", text: "Ctrl + Rで最新表示にしてから始める" },
+  { id: "refresh", title: "画面更新", text: "画面を再読み込みして最新表示にしてから始める" },
   { id: "walk", title: "歩くタブを1周", text: "歩行セッション、停止確認、マップ、投稿テンプレ補助を見る" },
   { id: "sky", title: "イマソラ確認", text: "空タイプ選択、イマソラ認識、この空でOK、到着マスの結果を見る" },
   { id: "result", title: "成果確認", text: "今日の成果ボードと冒険ログに結果が残るか見る" },
@@ -38663,11 +39377,14 @@ function townBuildingSprite(id) {
   const sprite = townLayeredSpriteAssets[id];
   if (!sprite) return "";
   const style = townLayeredSpriteStyle(id, sprite);
-  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", retirePark: "広場" };
+  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", retirePark: "広場", medalHall: "相棒記念館" };
   const enterButton = enterLabels[id]
     ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-enter="${id}" aria-label="${enterLabels[id]}" style="${style}"></button>`
     : "";
-  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}">${enterButton}`;
+  const selectButton = enterLabels[id]
+    ? ""
+    : `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-select="${id}" aria-label="${townFacilityDisplayName(id)}を選ぶ" style="${style}"></button>`;
+  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}">${enterButton}${selectButton}`;
 }
 function townLayeredBuildingSprites(id) {
   if (id === "station") return townBuildingSprite("station") + townBuildingSprite("train");
@@ -38707,12 +39424,14 @@ function renderTown() {
   document.getElementById("townFacilityToggle")?.addEventListener("click", toggleTownFacilityNames);
   document.querySelectorAll("[data-town-facility]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townFacility)));
   document.querySelectorAll("[data-town-layer-enter]").forEach(button => button.addEventListener("click", () => enterTownBuilding(button.dataset.townLayerEnter)));
+  document.querySelectorAll("[data-town-layer-select]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townLayerSelect)));
   renderTownDevMenu();
   renderTownBuildingDetail();
   renderTownWorkshop();
   renderTownShop();
   renderTownKaraoke();
   renderTownPractice();
+  renderTownMemorialDex();
   townVisualRenderedOnce = true;
 }
 function townBridge2DevCardHtml() {
@@ -39006,6 +39725,13 @@ function enterTownBuilding(id) {
     document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
     playSfx("select");
     toast("広場へ移動しました");
+    return;
+  }
+  if (id === "medalHall") {
+    renderTownMemorialDex();
+    document.getElementById("townMemorialDex")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+    toast("相棒記念館へ移動しました");
     return;
   }
   playSfx("select");
@@ -40563,6 +41289,841 @@ function stopKaraokeSong() {
   playSfx("select");
   toast("試聴を停止しました");
 }
+function retirementRecordMedalIds(record) {
+  const ids = Array.isArray(record?.monster?.medals)
+    ? record.monster.medals
+    : Array.isArray(record?.medals)
+      ? record.medals
+      : [];
+  return [...new Set(ids)].filter(id => tournaments.some(cup => cup.id === id));
+}
+function memorialTestMedalIds(record) {
+  const testMedals = [
+    ["rookie", "green", "city"],
+    ["rookie", "green", "city", "sky", "river"],
+    ["rookie", "green", "city", "sky", "river", "grand"]
+  ];
+  const match = String(record?.id || record?.name || "").match(/(?:playtest-retired-full-|記録テスト)([123])$/);
+  return match ? testMedals[Number(match[1]) - 1] || [] : [];
+}
+function townMemorialDisplayMedalIds(record) {
+  const medals = retirementRecordMedalIds(record);
+  return medals.length ? medals : memorialTestMedalIds(record);
+}
+function townMemorialDisplayName(record) {
+  if (String(record?.id || record?.name || "").match(/(?:playtest-retired-full-|記録テスト)1$/)) {
+    return "白ミチロードセイバーレン";
+  }
+  return record?.name || "記録モンスター";
+}
+function townMemorialSkillNamesHtml(record) {
+  const actor = record?.monster || record || {};
+  const book = battleMoveBookForActor({ ...actor, seedId: actor.seedId || record?.seedId || record?.monster?.seedId || "" });
+  return `<span class="town-memorial-skills">弱技　${escapeAttr(book.weak || "光の粒")}<br>中技　${escapeAttr(book.medium || "魔法の紋")}<br>強技　${escapeAttr(book.strong || "星光フレア")}</span>`;
+}
+function townMemorialRecordArt(record) {
+  return `<div class="town-memorial-art">${karaokeRetiredArtMarkup(record, "front")}</div>`;
+}
+function townMemorialMedalsHtml(record) {
+  const medals = townMemorialDisplayMedalIds(record);
+  if (!medals.length) return "";
+  return `<span class="town-memorial-medals" aria-label="獲得メダル">${medals.map(id => {
+    const cup = tournaments.find(item => item.id === id);
+    return `<span class="cup-medal medal-${id}" aria-label="${escapeAttr(cup?.name || id)}のメダル"></span>`;
+  }).join("")}</span>`;
+}
+function memorialWallpaperRecordKey(record, index = 0) {
+  return String(record?.id || `${Number(record?.savedAt || 0)}-${index}`);
+}
+function memorialWallpaperTestRecord4() {
+  return {
+    id: "memorial-wallpaper-test-4",
+    name: "記録テスト4",
+    artId: "star-hero-young-seed-city-sky-cool-a-crown",
+    rank: "A",
+    stats: { hp: 178, mp: 132, atk: 166, def: 144, spd: 152, acc: 139, eva: 147 },
+    monster: { medals: [] }
+  };
+}
+function memorialWallpaperSelectableRecords(records) {
+  const list = Array.isArray(records) ? [...records] : [];
+  if (!list.some(record => memorialWallpaperRecordKey(record) === "memorial-wallpaper-test-4")) {
+    list.push(memorialWallpaperTestRecord4());
+  }
+  return list;
+}
+function selectedMemorialWallpaperBackground() {
+  return memorialWallpaperChoices.find(item => item.id === memorialWallpaperSelectedBackgroundId)
+    || memorialWallpaperChoices[0];
+}
+function selectedMemorialWallpaperRecord(records) {
+  if (!records.length) return null;
+  let index = records.findIndex((record, recordIndex) => memorialWallpaperRecordKey(record, recordIndex) === memorialWallpaperSelectedRecordId);
+  if (index < 0) index = 0;
+  memorialWallpaperSelectedRecordId = memorialWallpaperRecordKey(records[index], index);
+  return records[index];
+}
+function memorialWallpaperCharacterStyle(target) {
+  const position = memorialWallpaperPositions[target] || memorialWallpaperPositions.record;
+  const previewScale = Number((position.scale * memorialWallpaperPreviewScaleRatio).toFixed(3));
+  return `--wallpaper-x:${position.x}%;--wallpaper-y:${position.y}%;--wallpaper-scale:${previewScale};`;
+}
+function memorialWallpaperStampType(typeId) {
+  return memorialWallpaperStampTypes.find(item => item.id === typeId) || null;
+}
+function memorialWallpaperStampPositionAllowed(x, y, scale = 1) {
+  const margin = 2.4 + Math.max(.65, Number(scale) || 1) * 2.2;
+  const protectedAreas = [
+    { left: 30, right: 52, top: 73, bottom: 88 },
+    { left: 56, right: 79, top: 73, bottom: 88 },
+    { left: 17, right: 89, top: 88.5, bottom: 96 }
+  ];
+  return !protectedAreas.some(area => x >= area.left - margin && x <= area.right + margin && y >= area.top - margin && y <= area.bottom + margin);
+}
+function memorialWallpaperRememberStampState() {
+  memorialWallpaperStampHistory.push(JSON.stringify(memorialWallpaperStamps));
+  if (memorialWallpaperStampHistory.length > 30) memorialWallpaperStampHistory.shift();
+}
+function memorialWallpaperStampsMarkup(exportMode = false) {
+  const rootClass = exportMode ? "memorial-wallpaper-export-stamps" : "memorial-wallpaper-stamps";
+  return `<div class="${rootClass}" ${exportMode ? "" : "id=\"memorialWallpaperStampLayer\""}>${memorialWallpaperStamps.map(stamp => {
+    const type = memorialWallpaperStampType(stamp.typeId);
+    if (!type) return "";
+    const color = stamp.color || type.color;
+    const selectedClass = !exportMode && stamp.id === memorialWallpaperActiveStampId ? " selected" : "";
+    const dataAttr = exportMode ? "" : ` data-wallpaper-stamp-id="${escapeAttr(stamp.id)}"`;
+    return `<span class="${exportMode ? "memorial-wallpaper-export-stamp" : "memorial-wallpaper-stamp"}${selectedClass}"${dataAttr} aria-label="${escapeAttr(type.name)}" style="--stamp-x:${stamp.x}%;--stamp-y:${stamp.y}%;--stamp-scale:${stamp.scale};--stamp-rotation:${stamp.rotation}deg;--stamp-color:${escapeAttr(color)}"><span style="color:${escapeAttr(color)};-webkit-text-fill-color:${escapeAttr(color)}">${escapeAttr(type.glyph)}&#xfe0e;</span></span>`;
+  }).join("")}</div>`;
+}
+function memorialWallpaperStampPaletteHtml() {
+  return memorialWallpaperStampTypes.map(type => `<button class="memorial-wallpaper-stamp-choice${type.id === memorialWallpaperSelectedStampTypeId ? " selected" : ""}" type="button" data-wallpaper-stamp-type="${escapeAttr(type.id)}" title="${escapeAttr(type.name)}" aria-label="${escapeAttr(type.name)}" style="--choice-color:${escapeAttr(type.color)}">${escapeAttr(type.glyph)}</button>`).join("");
+}
+function memorialWallpaperStampColorsHtml() {
+  return memorialWallpaperStampColors.map((color, index) => `<button class="memorial-wallpaper-stamp-color${index === 0 ? " default-color" : ""}${color.value === memorialWallpaperSelectedStampColor ? " selected" : ""}" type="button" data-wallpaper-stamp-color="${escapeAttr(color.value)}" title="${escapeAttr(color.name)}" aria-label="${escapeAttr(color.name)}" style="--swatch-color:${escapeAttr(color.value || "#ffffff")}"></button>`).join("");
+}
+function memorialWallpaperActiveStamp() {
+  return memorialWallpaperStamps.find(stamp => stamp.id === memorialWallpaperActiveStampId) || null;
+}
+function renderMemorialWallpaperStampEditor() {
+  const layer = document.getElementById("memorialWallpaperStampLayer");
+  if (layer) layer.innerHTML = memorialWallpaperStampsMarkup(false).replace(/^<div[^>]*>|<\/div>$/g, "");
+  document.querySelectorAll("[data-wallpaper-stamp-type]").forEach(button => {
+    button.classList.toggle("selected", button.dataset.wallpaperStampType === memorialWallpaperSelectedStampTypeId);
+  });
+  document.querySelectorAll("[data-wallpaper-stamp-color]").forEach(button => {
+    button.classList.toggle("selected", button.dataset.wallpaperStampColor === memorialWallpaperSelectedStampColor);
+  });
+  const hasActive = Boolean(memorialWallpaperActiveStamp());
+  document.querySelectorAll("[data-wallpaper-stamp-edit]").forEach(button => { button.disabled = !hasActive; });
+  document.querySelector("[data-wallpaper-stamp-undo]")?.toggleAttribute("disabled", !memorialWallpaperStampHistory.length);
+  document.querySelector("[data-wallpaper-stamp-clear]")?.toggleAttribute("disabled", !memorialWallpaperStamps.length);
+}
+function addMemorialWallpaperStamp(x, y) {
+  const type = memorialWallpaperStampType(memorialWallpaperSelectedStampTypeId);
+  if (!type) return;
+  if (memorialWallpaperStamps.length >= 30) {
+    playSfx("error");
+    toast("スタンプは30個まで置けます");
+    return;
+  }
+  const scale = 1;
+  if (!memorialWallpaperStampPositionAllowed(x, y, scale)) {
+    playSfx("error");
+    toast("モンスターとメダルの上には置けません");
+    return;
+  }
+  clearMemorialWallpaperDownloadResult();
+  memorialWallpaperRememberStampState();
+  const stamp = { id: `wallpaper-stamp-${++memorialWallpaperStampSequence}`, typeId: type.id, color: memorialWallpaperSelectedStampColor, x, y, scale, rotation: 0 };
+  memorialWallpaperStamps.push(stamp);
+  memorialWallpaperActiveStampId = stamp.id;
+  renderMemorialWallpaperStampEditor();
+  playSfx("select");
+}
+function editMemorialWallpaperStamp(action) {
+  const stamp = memorialWallpaperActiveStamp();
+  if (!stamp) return;
+  clearMemorialWallpaperDownloadResult();
+  memorialWallpaperRememberStampState();
+  if (action === "smaller") stamp.scale = Math.max(.65, Math.round((stamp.scale - .15) * 100) / 100);
+  if (action === "larger") stamp.scale = Math.min(1.8, Math.round((stamp.scale + .15) * 100) / 100);
+  if (action === "rotate-left") stamp.rotation -= 15;
+  if (action === "rotate-right") stamp.rotation += 15;
+  if (action === "delete") {
+    memorialWallpaperStamps = memorialWallpaperStamps.filter(item => item.id !== stamp.id);
+    memorialWallpaperActiveStampId = "";
+  }
+  if (action !== "delete" && !memorialWallpaperStampPositionAllowed(stamp.x, stamp.y, stamp.scale)) {
+    memorialWallpaperStamps = JSON.parse(memorialWallpaperStampHistory.pop() || "[]");
+  }
+  renderMemorialWallpaperStampEditor();
+  playSfx("select");
+}
+function memorialWallpaperMedalsMarkup(record, exportMode = false) {
+  const acquiredMedals = townMemorialDisplayMedalIds(record);
+  const completeMedalOrder = ["rookie", "green", "city", "sky", "river", "grand"];
+  if (!completeMedalOrder.every(id => acquiredMedals.includes(id))) return "";
+  const medals = completeMedalOrder;
+  const className = exportMode ? "memorial-wallpaper-export-medals" : "memorial-wallpaper-medals";
+  return `<div class="${className}" aria-label="獲得メダル">${medals.map(id => `<span class="cup-medal medal-${id}" aria-hidden="true"></span>`).join("")}</div>`;
+}
+function memorialWallpaperWorkshopHtml(records) {
+  records = memorialWallpaperSelectableRecords(records);
+  const record = selectedMemorialWallpaperRecord(records);
+  if (!record) {
+    return `<div class="memorial-wallpaper-workshop">
+      <div class="memorial-wallpaper-heading"><b>イマソラ壁紙工房</b></div>
+      <span>記録した相棒と獲得メダルを組み合わせて、あなただけのスマホ壁紙を作ろう。</span>
+      <div class="memorial-wallpaper-empty"><b>記録された相棒がいません</b><br>相棒を引退時に記録すると、ここで壁紙に登場させられます。</div>
+    </div>`;
+  }
+  const options = records.map((item, index) => {
+    const key = memorialWallpaperRecordKey(item, index);
+    return `<option value="${escapeAttr(key)}" ${key === memorialWallpaperSelectedRecordId ? "selected" : ""}>${escapeAttr(townMemorialDisplayName(item))}</option>`;
+  }).join("");
+  const background = selectedMemorialWallpaperBackground();
+  const backgroundOptions = memorialWallpaperChoices.map(item => `<option value="${escapeAttr(item.id)}" ${item.id === background.id ? "selected" : ""}>${escapeAttr(item.name)}</option>`).join("");
+  return `<div class="memorial-wallpaper-workshop">
+    <div class="memorial-wallpaper-heading"><b>イマソラ壁紙工房</b></div>
+    <span>記録した相棒と獲得メダルを組み合わせて、あなただけのスマホ壁紙を作ろう。</span>
+    <div class="memorial-wallpaper-layout">
+      <div class="memorial-wallpaper-preview-wrap">
+        <div class="memorial-wallpaper-preview" id="memorialWallpaperPreview">
+          <img class="memorial-wallpaper-background" src="${escapeAttr(background.src)}" alt="${escapeAttr(background.alt)}">
+          <div class="memorial-wallpaper-character" style="${memorialWallpaperCharacterStyle("record")}">${karaokeRetiredArtMarkup(record, "front")}</div>
+          <div class="memorial-wallpaper-character" style="${memorialWallpaperCharacterStyle("guide")}">${karaokeGuideArtMarkup("front")}</div>
+          ${memorialWallpaperMedalsMarkup(record)}
+          ${memorialWallpaperStampsMarkup()}
+        </div>
+      </div>
+      <div class="memorial-wallpaper-controls">
+        <div class="memorial-wallpaper-control">
+          <label for="memorialWallpaperBackgroundSelect">壁紙</label>
+          <select id="memorialWallpaperBackgroundSelect">${backgroundOptions}</select>
+        </div>
+        <div class="memorial-wallpaper-control">
+          <label for="memorialWallpaperRecordSelect">壁紙に登場する記録相棒</label>
+          <select id="memorialWallpaperRecordSelect">${options}</select>
+        </div>
+        <div class="memorial-wallpaper-control">
+          <b>スタンプ</b>
+          <div class="memorial-wallpaper-stamp-palette">${memorialWallpaperStampPaletteHtml()}</div>
+          <div class="memorial-wallpaper-stamp-colors" aria-label="スタンプの色">${memorialWallpaperStampColorsHtml()}</div>
+          <div class="memorial-wallpaper-stamp-tools">
+            <button type="button" data-wallpaper-stamp-edit="smaller" title="小さく" aria-label="小さく">−</button>
+            <button type="button" data-wallpaper-stamp-edit="larger" title="大きく" aria-label="大きく">＋</button>
+            <button type="button" data-wallpaper-stamp-edit="rotate-left" title="左回転" aria-label="左回転">↶</button>
+            <button type="button" data-wallpaper-stamp-edit="rotate-right" title="右回転" aria-label="右回転">↷</button>
+            <button type="button" data-wallpaper-stamp-edit="delete" title="選択中を削除" aria-label="選択中を削除">×</button>
+            <button type="button" data-wallpaper-stamp-undo title="元に戻す" aria-label="元に戻す">↩</button>
+          </div>
+          <button type="button" data-wallpaper-stamp-clear>全スタンプを消す</button>
+        </div>
+        <div class="memorial-wallpaper-actions">
+          <button class="primary" id="memorialWallpaperCreateButton" type="button">壁紙を作成</button>
+          <button type="button" data-memorial-wallpaper-return-town>街に戻る</button>
+        </div>
+        <div class="memorial-wallpaper-exit-confirm" data-memorial-wallpaper-exit-confirm hidden>
+          <span>作成中の壁紙は破棄されますが、街に戻りますか？</span>
+          <div class="memorial-wallpaper-exit-confirm-actions">
+            <button class="primary" type="button" data-memorial-wallpaper-exit-answer="yes">はい</button>
+            <button type="button" data-memorial-wallpaper-exit-answer="no">いいえ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="memorial-wallpaper-download-result" id="memorialWallpaperDownloadResult" hidden></div>
+  </div>`;
+}
+function memorialWallpaperDownloadPageHtml() {
+  return `<div class="memorial-wallpaper-workshop memorial-wallpaper-download-page">
+    <div class="memorial-wallpaper-heading"><b>完成した壁紙</b></div>
+    <span>完成画像を確認し、「画像を保存」を押してスマホ壁紙を保存してください。</span>
+    <div class="memorial-wallpaper-download-result" id="memorialWallpaperDownloadResult" hidden></div>
+    <div class="memorial-wallpaper-actions memorial-wallpaper-download-page-actions">
+      <button type="button" data-memorial-wallpaper-download-back>壁紙工房に戻る</button>
+    </div>
+  </div>`;
+}
+function renderTownMemorialDex() {
+  const box = document.getElementById("townMemorialDex");
+  if (!box) return;
+  if (!isTownBuildingBuilt("medalHall")) {
+    box.innerHTML = "";
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  const records = [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0));
+  if (memorialWallpaperView === "download") {
+    box.innerHTML = memorialWallpaperDownloadPageHtml();
+    bindMemorialWallpaperDownloadPage(box);
+    return;
+  }
+  if (memorialWallpaperView === "workshop") {
+    box.innerHTML = memorialWallpaperWorkshopHtml(records);
+    bindMemorialWallpaperWorkshop(box);
+    return;
+  }
+  const listHtml = records.length
+    ? `<div class="shop-grid">${records.map((record, recordIndex) => {
+        const stats = retiredPracticeStats(record);
+        const recordKey = memorialWallpaperRecordKey(record, recordIndex);
+        return `<div class="shop-card town-memorial-card">
+          ${townMemorialRecordArt(record)}
+          <div class="town-memorial-inscription">
+            <strong class="town-memorial-name">${escapeAttr(townMemorialDisplayName(record))}</strong>
+            <span class="town-memorial-stats">HP${stats.hp} MP${stats.mp}<br>攻撃${stats.atk} 防御${stats.def}<br>速度${stats.spd} 命中${stats.acc}<br>回避${stats.eva}</span>
+            ${townMemorialSkillNamesHtml(record)}
+            <small class="town-memorial-rank">RANK ${escapeAttr(record.rank || "?")}</small>
+            <span class="town-memorial-medal-row">${townMemorialMedalsHtml(record)}</span>
+            <button class="town-memorial-anniversary-button" type="button" data-town-memorial-anniversary="${escapeAttr(recordKey)}">壁紙工房に移動</button>
+          </div>
+        </div>`;
+      }).join("")}</div>`
+    : `<div class="shop-grid"><div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>記録待ち</strong><span>引退して記録したモンスターがいると、ここにモンスター記録碑として表示されます。</span><small>モンスター名 / 画像 / 能力値 / 引退時ランク / 獲得メダル</small></div></div></div>`;
+  box.innerHTML = `
+    <div class="town-practice-heading"><b>相棒記念館のモンスター記録碑</b><button type="button" data-town-memorial-return-town>町に戻る</button></div>
+    <span>記録したモンスターの記録碑です。引退時の姿、能力値、ランク、獲得メダルを確認できます。</span>
+    ${listHtml}
+  `;
+  box.querySelector("[data-town-memorial-return-town]")?.addEventListener("click", returnToTownMapFromMemorialDex);
+  box.querySelectorAll("[data-town-memorial-anniversary]").forEach(button => button.addEventListener("click", () => {
+    memorialWallpaperSelectedRecordId = button.dataset.townMemorialAnniversary || "";
+    memorialWallpaperView = "workshop";
+    renderTownMemorialDex();
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+  }));
+}
+function returnToTownMapFromMemorialDex() {
+  memorialWallpaperView = "records";
+  renderTownMemorialDex();
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
+function bindMemorialWallpaperDownloadPage(box) {
+  box.querySelector("[data-memorial-wallpaper-download-back]")?.addEventListener("click", () => {
+    memorialWallpaperView = "workshop";
+    renderTownMemorialDex();
+    document.getElementById("townMemorialDex")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+  });
+}
+function discardMemorialWallpaperDraft() {
+  clearMemorialWallpaperDownloadResult();
+  memorialWallpaperSelectedBackgroundId = "wallpaper2";
+  memorialWallpaperStamps = [];
+  memorialWallpaperSelectedStampTypeId = "";
+  memorialWallpaperSelectedStampColor = "";
+  memorialWallpaperActiveStampId = "";
+  memorialWallpaperStampHistory = [];
+  memorialWallpaperStampSequence = 0;
+  memorialWallpaperStampDrag = null;
+  memorialWallpaperStampSuppressClick = false;
+}
+function bindMemorialWallpaperWorkshop(box) {
+  box.querySelector("#memorialWallpaperBackgroundSelect")?.addEventListener("change", event => {
+    clearMemorialWallpaperDownloadResult();
+    memorialWallpaperSelectedBackgroundId = event.currentTarget.value;
+    renderTownMemorialDex();
+    playSfx("select");
+  });
+  box.querySelector("#memorialWallpaperRecordSelect")?.addEventListener("change", event => {
+    clearMemorialWallpaperDownloadResult();
+    memorialWallpaperSelectedRecordId = event.currentTarget.value;
+    renderTownMemorialDex();
+    playSfx("select");
+  });
+  box.querySelectorAll("[data-wallpaper-stamp-type]").forEach(button => button.addEventListener("click", () => {
+    memorialWallpaperSelectedStampTypeId = button.dataset.wallpaperStampType || "";
+    memorialWallpaperActiveStampId = "";
+    renderMemorialWallpaperStampEditor();
+    playSfx("select");
+  }));
+  box.querySelectorAll("[data-wallpaper-stamp-color]").forEach(button => button.addEventListener("click", () => {
+    const color = button.dataset.wallpaperStampColor || "";
+    const stamp = memorialWallpaperActiveStamp();
+    if (stamp && (stamp.color || "") !== color) {
+      clearMemorialWallpaperDownloadResult();
+      memorialWallpaperRememberStampState();
+      stamp.color = color;
+    }
+    memorialWallpaperSelectedStampColor = color;
+    renderMemorialWallpaperStampEditor();
+    playSfx("select");
+  }));
+  box.querySelectorAll("[data-wallpaper-stamp-edit]").forEach(button => button.addEventListener("click", () => editMemorialWallpaperStamp(button.dataset.wallpaperStampEdit)));
+  box.querySelector("[data-wallpaper-stamp-undo]")?.addEventListener("click", () => {
+    if (!memorialWallpaperStampHistory.length) return;
+    clearMemorialWallpaperDownloadResult();
+    memorialWallpaperStamps = JSON.parse(memorialWallpaperStampHistory.pop() || "[]");
+    memorialWallpaperActiveStampId = "";
+    renderMemorialWallpaperStampEditor();
+    playSfx("select");
+  });
+  box.querySelector("[data-wallpaper-stamp-clear]")?.addEventListener("click", () => {
+    if (!memorialWallpaperStamps.length) return;
+    clearMemorialWallpaperDownloadResult();
+    memorialWallpaperRememberStampState();
+    memorialWallpaperStamps = [];
+    memorialWallpaperActiveStampId = "";
+    renderMemorialWallpaperStampEditor();
+    playSfx("select");
+  });
+  const preview = box.querySelector("#memorialWallpaperPreview");
+  const stampLayer = box.querySelector("#memorialWallpaperStampLayer");
+  stampLayer?.addEventListener("click", event => event.stopPropagation());
+  stampLayer?.addEventListener("pointerdown", event => {
+    const target = event.target.closest("[data-wallpaper-stamp-id]");
+    if (!target || !preview) return;
+    const stamp = memorialWallpaperStamps.find(item => item.id === target.dataset.wallpaperStampId);
+    if (!stamp) return;
+    event.preventDefault();
+    event.stopPropagation();
+    memorialWallpaperActiveStampId = stamp.id;
+    memorialWallpaperSelectedStampColor = stamp.color || "";
+    memorialWallpaperRememberStampState();
+    memorialWallpaperStampSuppressClick = true;
+    const rect = preview.getBoundingClientRect();
+    const pointerX = ((event.clientX - rect.left) / rect.width) * 100;
+    const pointerY = ((event.clientY - rect.top) / rect.height) * 100;
+    memorialWallpaperStampDrag = { id: stamp.id, pointerId: event.pointerId, offsetX: pointerX - stamp.x, offsetY: pointerY - stamp.y };
+    preview.setPointerCapture?.(event.pointerId);
+    renderMemorialWallpaperStampEditor();
+  });
+  preview?.addEventListener("pointermove", event => {
+    if (!memorialWallpaperStampDrag || memorialWallpaperStampDrag.pointerId !== event.pointerId) return;
+    const stamp = memorialWallpaperStamps.find(item => item.id === memorialWallpaperStampDrag.id);
+    if (!stamp) return;
+    const rect = preview.getBoundingClientRect();
+    const x = Math.max(4, Math.min(96, ((event.clientX - rect.left) / rect.width) * 100 - memorialWallpaperStampDrag.offsetX));
+    const y = Math.max(4, Math.min(96, ((event.clientY - rect.top) / rect.height) * 100 - memorialWallpaperStampDrag.offsetY));
+    if (!memorialWallpaperStampPositionAllowed(x, y, stamp.scale)) return;
+    clearMemorialWallpaperDownloadResult();
+    stamp.x = Math.round(x * 10) / 10;
+    stamp.y = Math.round(y * 10) / 10;
+    renderMemorialWallpaperStampEditor();
+  });
+  const finishStampDrag = event => {
+    if (!memorialWallpaperStampDrag || memorialWallpaperStampDrag.pointerId !== event.pointerId) return;
+    memorialWallpaperStampDrag = null;
+    preview?.releasePointerCapture?.(event.pointerId);
+    setTimeout(() => { memorialWallpaperStampSuppressClick = false; }, 0);
+  };
+  preview?.addEventListener("pointerup", finishStampDrag);
+  preview?.addEventListener("pointercancel", finishStampDrag);
+  preview?.addEventListener("click", event => {
+    if (memorialWallpaperStampSuppressClick) return;
+    if (!memorialWallpaperSelectedStampTypeId || event.target.closest("[data-wallpaper-stamp-id]")) return;
+    const rect = preview.getBoundingClientRect();
+    addMemorialWallpaperStamp(
+      Math.round(((event.clientX - rect.left) / rect.width) * 1000) / 10,
+      Math.round(((event.clientY - rect.top) / rect.height) * 1000) / 10
+    );
+  });
+  renderMemorialWallpaperStampEditor();
+  box.querySelector("#memorialWallpaperCreateButton")?.addEventListener("click", createMemorialWallpaperPng);
+  const exitConfirm = box.querySelector("[data-memorial-wallpaper-exit-confirm]");
+  box.querySelector("[data-memorial-wallpaper-return-town]")?.addEventListener("click", () => {
+    if (exitConfirm) exitConfirm.hidden = false;
+    playSfx("select");
+  });
+  box.querySelectorAll("[data-memorial-wallpaper-exit-answer]").forEach(button => button.addEventListener("click", () => {
+    if (button.dataset.memorialWallpaperExitAnswer === "yes") {
+      discardMemorialWallpaperDraft();
+      returnToTownMapFromMemorialDex();
+      return;
+    }
+    if (exitConfirm) exitConfirm.hidden = true;
+    playSfx("select");
+  }));
+}
+function loadMemorialWallpaperImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+function memorialWallpaperPreviewExportMetrics() {
+  const preview = document.getElementById("memorialWallpaperPreview");
+  if (!preview || !preview.clientWidth || !preview.clientHeight) return null;
+  const previewRect = preview.getBoundingClientRect();
+  const contentLeft = previewRect.left + preview.clientLeft;
+  const contentTop = previewRect.top + preview.clientTop;
+  const elementMetric = (element, visualSelector = "") => {
+    const visual = visualSelector ? element?.querySelector(visualSelector) || element : element;
+    if (!visual) return null;
+    const rect = visual.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    return {
+      x: (rect.left + rect.width / 2 - contentLeft) / preview.clientWidth,
+      y: (rect.top + rect.height / 2 - contentTop) / preview.clientHeight,
+      width: rect.width / preview.clientWidth,
+      height: rect.height / preview.clientHeight
+    };
+  };
+  const characters = [...preview.querySelectorAll(".memorial-wallpaper-character")];
+  const stampGlyph = preview.querySelector(".memorial-wallpaper-stamp > span");
+  const stampStyle = stampGlyph ? getComputedStyle(stampGlyph) : null;
+  const stampFontSize = stampStyle ? parseFloat(stampStyle.fontSize) : 0;
+  const stampStrokeWidth = stampStyle
+    ? parseFloat(stampStyle.getPropertyValue("-webkit-text-stroke-width") || stampStyle.webkitTextStrokeWidth || "0")
+    : 0;
+  return {
+    record: elementMetric(characters[0], "svg"),
+    guide: elementMetric(characters[1], "svg"),
+    medals: [...preview.querySelectorAll(".memorial-wallpaper-medals .cup-medal")].map(medal => elementMetric(medal)),
+    stampFontRatio: Number.isFinite(stampFontSize) ? stampFontSize / preview.clientWidth : 0,
+    stampStrokeRatio: Number.isFinite(stampStrokeWidth) ? stampStrokeWidth / preview.clientWidth : 0,
+    previewWidth: preview.clientWidth,
+    previewHeight: preview.clientHeight
+  };
+}
+async function memorialWallpaperCharacterImage(markup) {
+  const template = document.createElement("template");
+  template.innerHTML = markup;
+  const sourceSvg = template.content.querySelector("svg");
+  if (!sourceSvg) return null;
+  const svg = sourceSvg.cloneNode(true);
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  if (!svg.getAttribute("viewBox")) svg.setAttribute("viewBox", "0 0 116 116");
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
+  const serialized = new XMLSerializer().serializeToString(svg);
+  const url = URL.createObjectURL(new Blob([serialized], { type: "image/svg+xml;charset=utf-8" }));
+  try {
+    return await loadMemorialWallpaperImage(url);
+  } catch (error) {
+    console.warn("wallpaper-character-image-unavailable", error);
+    return null;
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+}
+function drawMemorialWallpaperCharacterFallback(context, record, target, width, height, exportMetric = null) {
+  const position = memorialWallpaperPositions[target] || memorialWallpaperPositions.record;
+  const x = exportMetric ? width * exportMetric.x : width * position.x / 100;
+  const y = exportMetric ? height * exportMetric.y : height * position.y / 100;
+  const radius = exportMetric ? width * exportMetric.width / 2 : width * .07;
+  context.save();
+  context.translate(x, y);
+  context.fillStyle = "rgba(255,255,255,.92)";
+  context.strokeStyle = "rgba(30,42,76,.88)";
+  context.lineWidth = Math.max(4, width * .005);
+  context.beginPath();
+  context.arc(0, 0, radius, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.fillStyle = "#24304f";
+  context.font = `900 ${Math.round(radius * .72)}px "Yu Gothic", sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(target === "guide" ? "白" : String(record?.rank || "相"), 0, 2);
+  context.restore();
+}
+async function drawMemorialWallpaperCharacter(context, markup, record, target, width, height, exportMetric = null) {
+  const position = memorialWallpaperPositions[target] || memorialWallpaperPositions.record;
+  const image = await memorialWallpaperCharacterImage(markup);
+  if (!image) {
+    drawMemorialWallpaperCharacterFallback(context, record, target, width, height, exportMetric);
+    return;
+  }
+  const drawWidth = exportMetric ? width * exportMetric.width : width * (336 / 1080) * position.scale;
+  const drawHeight = exportMetric ? height * exportMetric.height : drawWidth;
+  const x = exportMetric ? width * exportMetric.x : width * position.x / 100;
+  const y = exportMetric ? height * exportMetric.y : height * position.y / 100;
+  context.save();
+  context.shadowColor = "rgba(7,12,30,.5)";
+  context.shadowBlur = width * (12 / 1080);
+  context.shadowOffsetY = width * (8 / 1080);
+  context.drawImage(image, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
+  context.restore();
+}
+function memorialWallpaperCompleteMedalIds(record) {
+  const acquired = townMemorialDisplayMedalIds(record);
+  const order = ["rookie", "green", "city", "sky", "river", "grand"];
+  return order.every(id => acquired.includes(id)) ? order : [];
+}
+function drawMemorialWallpaperMedal(context, id, x, y, width, height, exportMetric = null) {
+  const colors = {
+    rookie: ["#ff9b2f", "#7a3c00", "#fff0d8"],
+    green: ["#a8e85b", "#3f6b0e", "#effbdc"],
+    city: ["#9a72ff", "#3f2788", "#efe9ff"],
+    sky: ["#65d7ff", "#11617a", "#e5f8ff"],
+    river: ["#ff8fc7", "#7a1d4c", "#ffeaf5"],
+    grand: ["#ffffff", "#58606c", "#f9fbff"]
+  };
+  const [main, deep] = colors[id] || ["#eadfc9", "#6f6046", "#fffaf0"];
+  const mixColor = (first, second, firstWeight) => {
+    const parse = color => [1, 3, 5].map(index => parseInt(color.slice(index, index + 2), 16));
+    const a = parse(first);
+    const b = parse(second);
+    const mixed = a.map((value, index) => Math.round(value * firstWeight + b[index] * (1 - firstWeight)));
+    return `#${mixed.map(value => value.toString(16).padStart(2, "0")).join("")}`;
+  };
+  const previewScale = width / 340;
+  const fixedWidth = 24 * .58 * previewScale;
+  const fixedHeight = 28 * .58 * previewScale;
+  const measuredWidth = exportMetric ? width * exportMetric.width : fixedWidth;
+  const measuredHeight = exportMetric ? height * exportMetric.height : fixedHeight;
+  const targetWidth = (fixedWidth + measuredWidth) / 2;
+  const targetHeight = (fixedHeight + measuredHeight) / 2;
+  context.save();
+  context.translate(x - targetWidth / 2, y - targetHeight / 2);
+  context.scale(targetWidth / 24, targetHeight / 28);
+  context.shadowColor = main;
+  context.shadowBlur = 4 * targetWidth / 24;
+  const medalPath = () => {
+    context.beginPath();
+    context.moveTo(4, 0);
+    context.lineTo(20, 0);
+    context.lineTo(17.6, 17);
+    context.lineTo(12, 13.26);
+    context.lineTo(6.4, 17);
+    context.closePath();
+  };
+  const strap = context.createLinearGradient(0, 0, 0, 17);
+  strap.addColorStop(0, mixColor(main, "#ffffff", .55));
+  strap.addColorStop(1, mixColor(deep, main, .62));
+  context.fillStyle = strap;
+  medalPath();
+  context.fill();
+  context.save();
+  medalPath();
+  context.clip();
+  const strapSheen = context.createLinearGradient(4, 0, 20, 0);
+  strapSheen.addColorStop(0, "rgba(255,255,255,.65)");
+  strapSheen.addColorStop(.07, "rgba(255,255,255,.65)");
+  strapSheen.addColorStop(.071, "rgba(255,255,255,0)");
+  strapSheen.addColorStop(.5, "rgba(255,255,255,0)");
+  strapSheen.addColorStop(.501, "rgba(0,0,0,.1)");
+  strapSheen.addColorStop(.57, "rgba(0,0,0,.1)");
+  strapSheen.addColorStop(.571, "rgba(255,255,255,0)");
+  context.fillStyle = strapSheen;
+  context.fillRect(4, 0, 16, 17);
+  context.restore();
+  const disc = context.createRadialGradient(12, 17, 0, 12, 17, 10.5);
+  disc.addColorStop(0, main);
+  disc.addColorStop(.58, main);
+  disc.addColorStop(.59, mixColor(main, deep, .62));
+  disc.addColorStop(1, mixColor(main, deep, .62));
+  context.fillStyle = disc;
+  context.strokeStyle = mixColor(main, "#ffffff", .64);
+  context.lineWidth = 1;
+  context.beginPath();
+  context.arc(12, 17, 10.5, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.shadowColor = "transparent";
+  context.strokeStyle = "rgba(255,255,255,.58)";
+  context.lineWidth = .6;
+  context.beginPath();
+  context.arc(12, 17, 4.8, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = "#ffffff";
+  context.beginPath();
+  context.arc(8.25, 11.05, 1, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+function drawMemorialWallpaperMedals(context, record, width, height, exportMetrics = []) {
+  const ids = memorialWallpaperCompleteMedalIds(record);
+  if (!ids.length) return;
+  const positions = [[24, 91.4], [35.8, 92.2], [48, 92.8], [60, 92.8], [71.2, 92.2], [82, 91.4]];
+  ids.forEach((id, index) => {
+    const [x, y] = positions[index];
+    const exportMetric = exportMetrics[index] || null;
+    drawMemorialWallpaperMedal(
+      context,
+      id,
+      exportMetric ? width * exportMetric.x : width * x / 100,
+      exportMetric ? height * exportMetric.y : height * y / 100,
+      width,
+      height,
+      exportMetric
+    );
+  });
+}
+function drawMemorialWallpaperStamps(context, width, height, exportMetrics = null) {
+  const unit = width / 1080;
+  const previewScale = exportMetrics?.previewWidth ? width / exportMetrics.previewWidth : 102 * unit / 32;
+  const fontSize = exportMetrics?.stampFontRatio ? width * exportMetrics.stampFontRatio : 102 * unit;
+  const strokeWidth = exportMetrics?.stampStrokeRatio ? width * exportMetrics.stampStrokeRatio : 10 * unit;
+  memorialWallpaperStamps.forEach(stamp => {
+    const type = memorialWallpaperStampType(stamp.typeId);
+    if (!type) return;
+    const scale = Math.max(.65, Number(stamp.scale) || 1);
+    context.save();
+    context.translate(width * Number(stamp.x) / 100, height * Number(stamp.y) / 100);
+    context.rotate((Number(stamp.rotation) || 0) * Math.PI / 180);
+    context.scale(scale, scale);
+    context.font = `900 ${fontSize}px "Segoe UI Symbol", "Yu Gothic", sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineJoin = "round";
+    context.shadowColor = "rgba(255,255,255,.72)";
+    context.shadowBlur = 5 * previewScale;
+    context.strokeStyle = "rgba(255,255,255,.96)";
+    context.lineWidth = strokeWidth;
+    context.strokeText(type.glyph, 0, 0);
+    context.shadowColor = "rgba(20,22,35,.42)";
+    context.shadowBlur = 2 * previewScale;
+    context.shadowOffsetY = 2 * previewScale;
+    context.fillStyle = stamp.color || type.color;
+    context.fillText(type.glyph, 0, 0);
+    context.restore();
+  });
+}
+function drawMemorialWallpaperCover(context, image, width, height) {
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = (image.naturalWidth - sourceWidth) / 2;
+  const sourceY = (image.naturalHeight - sourceHeight) / 2;
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+}
+function clearMemorialWallpaperDownloadResult() {
+  if (memorialWallpaperDownloadUrl) URL.revokeObjectURL(memorialWallpaperDownloadUrl);
+  memorialWallpaperDownloadUrl = "";
+  memorialWallpaperDownloadBlob = null;
+  memorialWallpaperDownloadName = "";
+  const result = document.getElementById("memorialWallpaperDownloadResult");
+  if (result) {
+    result.hidden = true;
+    result.innerHTML = "";
+  }
+}
+function memorialWallpaperDownloadFileName(backgroundId) {
+  const now = new Date();
+  const pad = value => String(value).padStart(2, "0");
+  const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const wallpaperNumber = String(backgroundId || "").replace(/\D/g, "") || "custom";
+  return `imasora-wallpaper-${wallpaperNumber}-${stamp}.png`;
+}
+async function saveMemorialWallpaperImage(button, blob, url, fileName) {
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = "保存画面を開いています...";
+  try {
+    const file = new File([blob], fileName, { type: "image/png" });
+    const shareData = { title: "イマソラウォーク壁紙", files: [file] };
+    const canShareFile = Boolean(navigator.share)
+      && (typeof navigator.canShare !== "function" || navigator.canShare(shareData));
+    if (canShareFile) {
+      await navigator.share(shareData);
+      playSfx("reward");
+      toast("スマホの保存・共有画面を開きました");
+      return;
+    }
+    const opened = window.open(url, "_blank", "noopener");
+    if (opened) {
+      toast("画像を長押ししてスマホに保存してください");
+    } else {
+      toast("下の完成画像を長押ししてスマホに保存してください");
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      toast("画像の保存をキャンセルしました");
+    } else {
+      console.warn("wallpaper-mobile-share-unavailable", error);
+      const opened = window.open(url, "_blank", "noopener");
+      toast(opened
+        ? "画像を長押ししてスマホに保存してください"
+        : "下の完成画像を長押ししてスマホに保存してください");
+    }
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+function showMemorialWallpaperDownloadResult(blob, url, fileName) {
+  clearMemorialWallpaperDownloadResult();
+  memorialWallpaperDownloadBlob = blob;
+  memorialWallpaperDownloadUrl = url;
+  memorialWallpaperDownloadName = fileName;
+  memorialWallpaperView = "download";
+  renderTownMemorialDex();
+  const result = document.getElementById("memorialWallpaperDownloadResult");
+  if (!result) return null;
+  result.hidden = false;
+  result.innerHTML = `
+    <img class="memorial-wallpaper-download-preview" src="${escapeAttr(url)}" alt="完成したスマホ壁紙">
+    <div class="memorial-wallpaper-download-info">
+      <b>完成した壁紙</b>
+      <div class="memorial-wallpaper-download-actions">
+        <button class="primary-download" type="button" id="memorialWallpaperDownloadLink">画像を保存</button>
+        <a href="${escapeAttr(url)}" target="_blank" rel="noopener">画像を開く</a>
+      </div>
+    </div>`;
+  const saveButton = result.querySelector("#memorialWallpaperDownloadLink");
+  saveButton?.addEventListener("click", () => saveMemorialWallpaperImage(saveButton, blob, url, fileName));
+  result.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+  return result.querySelector("#memorialWallpaperDownloadLink");
+}
+async function createMemorialWallpaperPng() {
+  const records = memorialWallpaperSelectableRecords([...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0)));
+  const record = selectedMemorialWallpaperRecord(records);
+  const backgroundChoice = selectedMemorialWallpaperBackground();
+  const button = document.getElementById("memorialWallpaperCreateButton");
+  if (!record || !button) return;
+  const exportMetrics = memorialWallpaperPreviewExportMetrics();
+  button.disabled = true;
+  button.textContent = "作成中...";
+  let createStage = "準備";
+  try {
+    const width = 1080;
+    const height = 1920;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("canvas-context-unavailable");
+    createStage = "背景画像";
+    const background = await loadMemorialWallpaperImage(backgroundChoice.src);
+    drawMemorialWallpaperCover(context, background, width, height);
+    createStage = "モンスター描画";
+    await drawMemorialWallpaperCharacter(context, karaokeRetiredArtMarkup(record, "front"), record, "record", width, height, exportMetrics?.record);
+    await drawMemorialWallpaperCharacter(context, karaokeGuideArtMarkup("front"), record, "guide", width, height, exportMetrics?.guide);
+    createStage = "メダルとスタンプ描画";
+    drawMemorialWallpaperMedals(context, record, width, height, exportMetrics?.medals);
+    drawMemorialWallpaperStamps(context, width, height, exportMetrics);
+    createStage = "PNG変換";
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("png-create-failed");
+    createStage = "保存準備";
+    const url = URL.createObjectURL(blob);
+    const fileName = memorialWallpaperDownloadFileName(backgroundChoice.id);
+    try {
+      const downloadLink = showMemorialWallpaperDownloadResult(blob, url, fileName);
+      if (!downloadLink) throw new Error("download-page-unavailable");
+    } catch (savePanelError) {
+      console.warn("wallpaper-download-panel-unavailable", savePanelError);
+      memorialWallpaperDownloadBlob = blob;
+      memorialWallpaperDownloadUrl = url;
+      memorialWallpaperDownloadName = fileName;
+      const fallbackLink = document.createElement("a");
+      fallbackLink.href = url;
+      fallbackLink.download = fileName;
+      document.body.appendChild(fallbackLink);
+      fallbackLink.click();
+      fallbackLink.remove();
+    }
+    playSfx("reward");
+    toast("壁紙を作成しました。完成画面から画像を保存できます");
+  } catch (error) {
+    console.error("wallpaper-create-failed", { stage: createStage, error });
+    playSfx("error");
+    toast("壁紙を作成できませんでした。もう一度お試しください");
+  } finally {
+    button.disabled = false;
+    button.textContent = "壁紙を作成";
+  }
+}
 function retiredPracticeStats(record) {
   const saved = record?.stats;
   const keys = ["hp", "mp", "spd", "atk", "def", "acc", "eva"];
@@ -40570,6 +42131,12 @@ function retiredPracticeStats(record) {
     return Object.fromEntries(keys.map(key => [key, Number(saved[key])]));
   }
   return baseMonsterStats(record?.monster || {});
+}
+function townPracticeDisplayName(record) {
+  if (String(record?.id || record?.name || "").match(/(?:playtest-retired-full-|記録テスト)1$/)) {
+    return "白ミチロードセイバーレン";
+  }
+  return record?.name || "引退相棒";
 }
 function retireParkPracticeBattleStats(strategy = state.battleStrategy || "balanced") {
   const stats = { ...monsterStats(), seedId: state.monster?.seedId || "" };
@@ -40642,8 +42209,8 @@ function renderTownPractice(resultHtml = "") {
         const stats = retiredPracticeStats(record);
         const total = retirementAbilityTotal(stats);
         return `<div class="shop-card town-practice-card">
-          <div class="item-art item-art-locked"><i></i><em></em><span></span></div>
-          <div><strong>${record.name || "引退相棒"}</strong><small>HP${stats.hp} MP${stats.mp}<br>攻撃${stats.atk} 防御${stats.def}<br>速度${stats.spd} 命中${stats.acc}<br>回避${stats.eva}</small></div>
+          <div class="item-art town-practice-art">${karaokeRetiredArtMarkup(record, "front")}</div>
+          <div><strong>${escapeAttr(townPracticeDisplayName(record))}</strong><small>HP${stats.hp} MP${stats.mp}<br>攻撃${stats.atk} 防御${stats.def}<br>速度${stats.spd} 命中${stats.acc}<br>回避${stats.eva}</small></div>
           <button type="button" data-town-practice-record="${record.id}">練習試合をする</button>
         </div>`;
       }).join("")}</div>`
@@ -41080,7 +42647,8 @@ function townBuildingMonsterBonuses() {
   const statBonuses = {
     castle: { hp: 5 },
     retirePark: { mp: 5 },
-    bridge: { spd: 3 },
+    bridge: { spd: 2 },
+    bridge2: { spd: 2 },
     clock: { atk: 3 },
     fountain: { def: 3 },
     guild: { acc: 3 },
@@ -43679,7 +45247,7 @@ function renderCharacterGallery() {
   const whiteStarTurnaroundHtml = `<section class="gallery-stage turnaround-stage"><b>360度確認ラフ 白の満開期18種</b><span>ミチ系で確定した8方向調整を、体色だけ白い白版にも反映した確認欄です。</span><div data-turnaround-group="star"><div class="turnaround-grid">${whiteStarTurnaroundItems.map(turnaroundCardHtml).join("")}</div></div></section>`;
   capeFineReviewItems = starCards;
   capeFineReviewIndex = Math.max(0, Math.min(capeFineReviewIndex, Math.max(0, capeFineReviewItems.length - 1)));
-  const capeFineReviewHtml = `<section class="gallery-stage turnaround-stage"><b>満開期 パーツ微調整確認</b><span>1体ずつ、斜め4方向の手・王冠・羽・マント・紐をマウスだけで微調整します。</span><div id="capeFineReviewPanel"></div></section>`;
+  const capeFineReviewHtml = `<section class="gallery-stage turnaround-stage"><b>満開期 パーツ微調整確認</b><span>1体ずつ、斜め4方向の手・王冠・羽・マント・紐を画面の調整ボタンで微調整します。</span><div id="capeFineReviewPanel"></div></section>`;
   const galleryCardHtml = item => `<div class="gallery-monster-card ${item.id} ${item.sourceId || ""} ${item.branchKey || ""}">${galleryMonsterArt(item)}<strong>${item.name}</strong><small>${item.note}</small></div>`;
   const lazyGalleryGroups = Object.fromEntries(groups.map((group, index) => [`group-${index}`, group.list]));
   lazyGalleryGroups.white = whiteGroups.flatMap(group => group.list.map(item => ({ ...item, note: `${group.stage} / ${item.note}` })));
@@ -45487,9 +47055,14 @@ function openRetirementStorageFullSendoffPlaytest() {
     skills: ["tap"]
   };
   const limit = retirementStorageLimit();
+  const testMedals = [
+    ["rookie", "green", "city"],
+    ["rookie", "green", "city", "sky", "river"],
+    ["rookie", "green", "city", "sky", "river", "grand"]
+  ];
   state.retiredMonsters = Array.from({ length: limit }, (_, index) => ({
     id: `playtest-retired-full-${index + 1}`,
-    name: `記録テスト${index + 1}`,
+    name: index === 0 ? "白ミチロードセイバーレン" : `記録テスト${index + 1}`,
     profileId: "sky",
     artId: "star-hero-young-seed-walk-sky-cute-comet",
     seedId: "seed-walk",
@@ -45498,7 +47071,7 @@ function openRetirementStorageFullSendoffPlaytest() {
     abilityTotal: 220 + index,
     retiredAt: retirementDateText(),
     usedCount: 0,
-    monster: { seedId: "seed-walk", evolutionStage: 4 },
+    monster: { seedId: "seed-walk", evolutionStage: 4, medals: testMedals[index] || [] },
     savedAt: Date.now() - index * 1000
   }));
   state.pendingRetirementRecord = null;
