@@ -45489,7 +45489,7 @@ function battleDirectionArtFromItem(item, view, fallbackForm, whiteClass = "", c
   const companionStyle = colorSettings ? companionColorInlineStyle(colorSettings) : "";
   return `<span class="battle-monster-art"><span class="monster ${item?.form || fallbackForm}${whiteClass}${companionClass}" style="${item?.style || ""}${companionStyle}">${monsterInnerParts()}</span></span>`;
 }
-function hpDrainMarkup(hpPercent = 100, hpAfterPercent = null, reverse = false, hpValue = null, hpAfterValue = null) {
+function hpDrainMarkup(hpPercent = 100, hpAfterPercent = null, reverse = false, hpValue = null, hpAfterValue = null, hpMaxValue = null) {
   const hp = Math.max(0, Math.min(100, hpPercent));
   const hpAfter = hpAfterPercent === null ? null : Math.max(0, Math.min(100, hpAfterPercent));
   const drainClass = hpAfter !== null && hpAfter !== hp ? " class=\"hp-drain\"" : "";
@@ -45498,7 +45498,8 @@ function hpDrainMarkup(hpPercent = 100, hpAfterPercent = null, reverse = false, 
   if (!Number.isFinite(Number(hpValue))) return strip;
   const value = Math.max(0, Math.round(Number(hpValue)));
   const afterValue = Number.isFinite(Number(hpAfterValue)) ? Math.max(0, Math.round(Number(hpAfterValue))) : value;
-  return `<span class="hp-pack${reverse ? " hp-reverse" : ""}"><span class="hp-number" data-hp-from="${value}" data-hp-to="${afterValue}">${value}</span>${strip}</span>`;
+  const maxValue = Number.isFinite(Number(hpMaxValue)) ? Math.max(1, Math.round(Number(hpMaxValue))) : Math.max(1, value, afterValue);
+  return `<span class="hp-pack${reverse ? " hp-reverse" : ""}"><span class="hp-number"><span class="hp-current" data-hp-from="${value}" data-hp-to="${afterValue}">${value}</span>/${maxValue}</span>${strip}</span>`;
 }
 function advantageClassName(advantageState = "") {
   if (advantageState === true) return " advantage";
@@ -45556,14 +45557,14 @@ function tournamentOpeningAffinityHtml(playerStats = {}, opponent = null) {
   const label = isPlayerAdvantage ? "こちら有利" : "こちら不利";
   return `<div class="opening-affinity-card"><small>総合相性</small><b>${label} ${result.player.toFixed(2)}倍</b></div>`;
 }
-function tournamentPlayerFighter(profile, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", hpValue = null, hpAfterValue = null) {
+function tournamentPlayerFighter(profile, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", hpValue = null, hpAfterValue = null, hpMaxValue = null) {
   ensureMonsterDexGroups();
   const item = directionDesignItem(profile, false);
   const fighterName = item.name || profile.name;
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
   const art = battleDirectionArtFromItem(item, view, profile.form, whiteClass, companionColorSettings());
   return `<div class="pixel-fighter${advantageClassName(advantageState)}">
-    ${hpDrainMarkup(hpPercent, hpAfterPercent, false, hpValue, hpAfterValue)}
+    ${hpDrainMarkup(hpPercent, hpAfterPercent, false, hpValue, hpAfterValue, hpMaxValue)}
     ${art}
     <span>${fighterName}</span>
   </div>`;
@@ -45582,12 +45583,12 @@ function tournamentPlayerAwardArt(profile) {
   const whiteClass = item.whiteVariant || profile.white ? " white-body" : "";
   return `<div class="award-monster-figure">${battleDirectionArtFromItem(item, "front", profile.form, whiteClass, companionColorSettings())}</div>`;
 }
-function completedFighterFromItem(name, item, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", reverseHp = false, hpValue = null, hpAfterValue = null, colorSettings = null) {
+function completedFighterFromItem(name, item, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", reverseHp = false, hpValue = null, hpAfterValue = null, colorSettings = null, hpMaxValue = null) {
   if (!item) return pixelFighter(name, reverseHp ? "enemy" : "", hpPercent);
   const whiteClass = item.whiteVariant ? " white-body" : "";
   const art = battleDirectionArtFromItem(item, view, "leaf", whiteClass, colorSettings);
   return `<div class="pixel-fighter${advantageClassName(advantageState)}">
-    ${hpDrainMarkup(hpPercent, hpAfterPercent, reverseHp, hpValue, hpAfterValue)}
+    ${hpDrainMarkup(hpPercent, hpAfterPercent, reverseHp, hpValue, hpAfterValue, hpMaxValue)}
     ${art}
     <span>${name}</span>
   </div>`;
@@ -45689,9 +45690,9 @@ function applyTournamentOpponentToMatch(match, opponent) {
   match.enemyStage = opponent.stage || "";
   return match;
 }
-function tournamentEnemyFighter(cup, opponentOrName, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", hpValue = null, hpAfterValue = null) {
+function tournamentEnemyFighter(cup, opponentOrName, hpPercent = 100, view = "front", hpAfterPercent = null, advantageState = "", hpValue = null, hpAfterValue = null, hpMaxValue = null) {
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
-  return completedFighterFromItem(opponent.name, opponent.item || tournamentNpcItem(cup), hpPercent, view, hpAfterPercent, advantageState, true, hpValue, hpAfterValue, opponent.colorSettings);
+  return completedFighterFromItem(opponent.name, opponent.item || tournamentNpcItem(cup), hpPercent, view, hpAfterPercent, advantageState, true, hpValue, hpAfterValue, opponent.colorSettings, hpMaxValue);
 }
 function tournamentEnemyOpeningFighterHtml(cup, opponentOrName, stats) {
   const opponent = normalizeTournamentOpponent(opponentOrName, cup);
@@ -48467,8 +48468,8 @@ function playBattleAnimationStep(index) {
         ${activeActionButtons}
       </div>
     </div>
-    <div class="fighter ${scene.actor === "me" ? "casting" : scene.target === "me" ? `struck${hitTierClass}` : ""}" id="myFighter">${tournamentPlayerFighter(profile, myPercent, "side", myAfterPercent, fighterStateFor("me"), myHpBeforeValue, myHpAfterValue)}</div>
-    <div class="fighter ${scene.actor === "enemy" ? "casting" : scene.target === "enemy" ? `struck${hitTierClass}` : ""}" id="enemyFighter">${tournamentEnemyFighter(cup, enemyOpponent || enemyName, enemyPercent, "side-left", enemyAfterPercent, fighterStateFor("enemy"), enemyHpBeforeValue, enemyHpAfterValue)}</div>
+    <div class="fighter ${scene.actor === "me" ? "casting" : scene.target === "me" ? `struck${hitTierClass}` : ""}" id="myFighter">${tournamentPlayerFighter(profile, myPercent, "side", myAfterPercent, fighterStateFor("me"), myHpBeforeValue, myHpAfterValue, myMaxHp)}</div>
+    <div class="fighter ${scene.actor === "enemy" ? "casting" : scene.target === "enemy" ? `struck${hitTierClass}` : ""}" id="enemyFighter">${tournamentEnemyFighter(cup, enemyOpponent || enemyName, enemyPercent, "side-left", enemyAfterPercent, fighterStateFor("enemy"), enemyHpBeforeValue, enemyHpAfterValue, enemyMaxHp)}</div>
     <div class="battle-effect-layer ${actorClass}">
       ${magicSceneVisualFor(scene)}
       <div class="battle-cue">${battleCueHtml}</div>
@@ -48490,9 +48491,9 @@ function playBattleAnimationStep(index) {
     if (scene.tier === "strong") scheduleBattleScreenShake(hitSfxDelay);
     playHpDrainSfx(drainBefore, drainAfter, hpDrainDelay);
     if (scene.target === "me") {
-      scheduleHpNumberCountdown("#myFighter .hp-number", myHpBeforeValue, myHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
+      scheduleHpNumberCountdown("#myFighter .hp-current", myHpBeforeValue, myHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
     } else {
-      scheduleHpNumberCountdown("#enemyFighter .hp-number", enemyHpBeforeValue, enemyHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
+      scheduleHpNumberCountdown("#enemyFighter .hp-current", enemyHpBeforeValue, enemyHpAfterValue, hpDrainVisualDelay, hpDrainVisualDuration);
     }
   } else if (scene.type !== "match" && !scene.hit) {
     const avoidSfxDelay = magicStartDelay + (visualBaseType === "route" ? 4.8 : 2.62);
@@ -48973,9 +48974,9 @@ function battle() {
         <button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>
       </div>
     </div>
-    <div class="fighter" id="myFighter">${tournamentPlayerFighter(profile, 100, "front", null, "", activeBattleStats.hp)}</div>
+    <div class="fighter" id="myFighter">${tournamentPlayerFighter(profile, 100, "front", null, "", activeBattleStats.hp, null, activeBattleStats.hp)}</div>
     <div class="versus-chip">VS</div>
-    <div class="fighter" id="enemyFighter">${tournamentEnemyFighter(cup, enemy, 100, "front", null, "", match.enemyMaxHp || match.enemyStats?.hp)}</div>
+    <div class="fighter" id="enemyFighter">${tournamentEnemyFighter(cup, enemy, 100, "front", null, "", match.enemyMaxHp || match.enemyStats?.hp, null, match.enemyMaxHp || match.enemyStats?.hp)}</div>
     <div class="battle-flash"></div>
   `;
   void field.offsetWidth;
