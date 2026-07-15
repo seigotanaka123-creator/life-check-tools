@@ -32,6 +32,7 @@
   <link rel="preload" as="image" href="assets/karaoke-room-night-v01.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/karaoke-room-evening-v01.png">
   <link rel="preload" as="image" href="assets/karaoke-room-morning-day-v01.png">
+  <link rel="preload" as="image" href="assets/imasora-new-opening-v1.png">
   <style>
     :root {
       --bg: #07121f;
@@ -155,11 +156,235 @@
         font-size: 18px;
       }
     }
+    body.loading-screen-active,
+    body.new-opening-active {
+      overflow: hidden;
+    }
+    body.loading-screen-active .app {
+      height: 100dvh;
+      overflow: hidden;
+    }
+    body.loading-screen-active .app > :not(header):not(.new-opening-screen) {
+      visibility: hidden;
+    }
+    .new-opening-screen {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: min(100%, 520px);
+      height: 100dvh;
+      transform: translateX(-50%);
+      z-index: 1000;
+      overflow: hidden;
+      background: #bfe2f6;
+      opacity: 1;
+      transition: opacity .28s ease;
+      isolation: isolate;
+    }
+    .new-opening-screen[hidden] {
+      display: none;
+    }
+    .new-opening-screen.is-leaving {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .new-opening-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: -1;
+    }
+    .new-opening-title {
+      position: absolute;
+      top: max(70px, calc(env(safe-area-inset-top) + 60px));
+      left: 16px;
+      right: 16px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #ff8abe;
+      font-family: "HGP創英角ﾎﾟｯﾌﾟ体", "HG創英角ﾎﾟｯﾌﾟ体", "HG丸ｺﾞｼｯｸM-PRO", "UD Digi Kyokasho NK-B", "Meiryo", sans-serif;
+      font-size: 82px;
+      font-weight: 900;
+      line-height: .94;
+      letter-spacing: 0;
+      text-align: center;
+      filter:
+        drop-shadow(0 4px 0 #7c6ca7)
+        drop-shadow(0 8px 0 rgba(255, 208, 154, .9))
+        drop-shadow(0 12px 14px rgba(38, 69, 90, .3));
+    }
+    .new-opening-title-part {
+      position: relative;
+      z-index: 0;
+      display: inline-block;
+      white-space: nowrap;
+      -webkit-text-stroke: 2.5px #315a7b;
+      paint-order: stroke fill;
+      isolation: isolate;
+    }
+    .new-opening-title-part::before {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 7px #9284c0;
+      paint-order: stroke fill;
+      pointer-events: none;
+    }
+    .new-opening-title-part.imasora {
+      color: #ff8abe;
+      transform: translateX(-22px) rotate(-2deg);
+    }
+    .new-opening-title-part.walk {
+      margin-top: -2px;
+      color: #72edbd;
+      transform: translateX(26px) rotate(2deg);
+    }
+    .new-opening-logo-char {
+      display: inline-block;
+      -webkit-text-fill-color: currentColor;
+      -webkit-text-stroke: 2px #666b9e;
+      paint-order: stroke fill;
+      text-shadow: 0 -2px 0 rgba(255, 255, 255, .4);
+    }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(1) { color: #ff86ba; transform: translateY(2px) rotate(-3deg); }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(2) { color: #f47cdf; transform: translateY(-2px) rotate(2deg); }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(3) { color: #db82f6; transform: translateY(1px) rotate(-1deg); }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(4) { color: #b58cf8; transform: translateY(-1px) rotate(3deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(1) { color: #8ff8dc; transform: translateY(-1px) rotate(-2deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(2) { color: #76efca; transform: translateY(2px) rotate(2deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(3) { color: #61e5b1; transform: translateY(-2px) rotate(-1deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(4) { color: #4dd49a; transform: translateY(1px) rotate(3deg); }
+    .new-opening-stage {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      padding: 0 18px;
+    }
+    .new-opening-guide {
+      position: relative;
+      width: 152px;
+      height: 152px;
+      display: grid;
+      place-items: center;
+    }
+    .new-opening-guide::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      width: 126px;
+      height: 27px;
+      border-radius: 50%;
+      background: rgba(70, 56, 47, .3);
+      filter: blur(5px);
+      transform: translateX(-60%) skewX(-24deg) rotate(-4deg);
+      transform-origin: right center;
+      z-index: 0;
+    }
+    .new-opening-guide .monster-art {
+      position: relative;
+      z-index: 1;
+      width: 152px !important;
+      height: 152px !important;
+      min-height: 0 !important;
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+      transform: none !important;
+    }
+    .new-opening-guide .unique-monster,
+    .new-opening-guide .turnaround-monster {
+      width: 152px !important;
+      height: 152px !important;
+      display: block;
+      overflow: visible;
+      filter:
+        drop-shadow(-5px 8px 4px rgba(54, 47, 43, .3))
+        drop-shadow(0 2px 1px rgba(255, 255, 255, .3));
+    }
+    .new-opening-start {
+      width: 210px;
+      min-height: 54px;
+      border: 2px solid rgba(255, 255, 255, .94);
+      border-radius: 8px;
+      background: #225d78;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: 0;
+      box-shadow: 0 5px 0 #17445b, 0 9px 22px rgba(24, 57, 76, .3);
+      cursor: pointer;
+    }
+    .new-opening-start:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #17445b, 0 5px 14px rgba(24, 57, 76, .25);
+    }
+    @media (max-width: 380px) {
+      .new-opening-title {
+        font-size: 70px;
+      }
+      .new-opening-title-part.imasora {
+        transform: translateX(-14px) rotate(-2deg);
+      }
+      .new-opening-title-part.walk {
+        transform: translateX(18px) rotate(2deg);
+      }
+    }
+    @media (max-height: 720px) {
+      .new-opening-title {
+        top: max(56px, calc(env(safe-area-inset-top) + 46px));
+        font-size: 74px;
+      }
+      .new-opening-stage {
+        bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
+      }
+      .new-opening-guide,
+      .new-opening-guide .monster-art,
+      .new-opening-guide .unique-monster,
+      .new-opening-guide .turnaround-monster {
+        width: 128px !important;
+        height: 128px !important;
+      }
+      .new-opening-start {
+        min-height: 50px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .new-opening-screen {
+        transition: none;
+      }
+    }
     .core-loop {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
       gap: 10px;
       margin-top: 12px;
+    }
+    .loading-status {
+      margin: 13px 0 0;
+      color: #31485d;
+      font: 900 14px/1.2 system-ui, sans-serif;
+      text-align: center;
+      letter-spacing: 0;
     }
     .loop-step {
       position: relative;
@@ -175,19 +400,59 @@
       position: absolute;
       right: 9px;
       top: 8px;
-      width: 24px;
-      height: 24px;
+      width: 27px;
+      height: 27px;
       display: grid;
       place-items: center;
       border-radius: 999px;
       background: #17202c;
       color: #fff;
-      font: 900 11px/1.1 system-ui, sans-serif;
+      font: 900 13px/1.1 system-ui, sans-serif;
       box-shadow: 0 8px 16px rgba(23,32,44,.18);
       z-index: 2;
     }
-    .loop-step b { display: block; margin-top: 8px; color: #17202c; font-size: 13px; line-height: 1.25; }
-    .loop-step > span:not(.loop-num) { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.38; }
+    .loop-step b { display: block; margin-top: 8px; color: #101a28; font-size: 15px; line-height: 1.3; }
+    .loop-step > span:not(.loop-num) { display: block; margin-top: 4px; color: #344255; font-size: 14px; line-height: 1.45; }
+    body.loading-screen-active {
+      background: linear-gradient(155deg, #8fddff 0%, #dff8ff 34%, #fff2ae 68%, #ffc5df 100%);
+    }
+    body.loading-screen-active .app {
+      background: linear-gradient(180deg, #b9edff 0%, #f2fcff 34%, #fff7ca 68%, #ffd9e8 100%);
+    }
+    body.loading-screen-active .hero {
+      background: linear-gradient(145deg, rgba(255,255,255,.98) 0%, rgba(255,249,211,.97) 48%, rgba(255,227,241,.96) 100%);
+      border: 2px solid rgba(255, 104, 166, .38);
+      box-shadow: 0 16px 34px rgba(70, 151, 194, .22), 0 6px 0 rgba(255, 255, 255, .68);
+    }
+    body.loading-screen-active .eyebrow {
+      color: #167d79;
+    }
+    body.loading-screen-active .hero > h1 {
+      color: #e94c95;
+      text-shadow: 0 2px 0 #fff, 2px 4px 0 #6bd6bf;
+    }
+    body.loading-screen-active .loop-step {
+      box-shadow: 0 10px 20px rgba(52, 88, 122, .13), inset 0 2px 0 rgba(255,255,255,.9);
+    }
+    body.loading-screen-active .loop-step.walk {
+      background: linear-gradient(145deg, #fff 0%, #dcfff0 100%);
+      border-color: rgba(43, 185, 128, .38);
+    }
+    body.loading-screen-active .loop-step.stop {
+      background: linear-gradient(145deg, #fff 0%, #fff1ad 100%);
+      border-color: rgba(237, 165, 42, .42);
+    }
+    body.loading-screen-active .loop-step.sky {
+      background: linear-gradient(145deg, #fff 0%, #dceeff 100%);
+      border-color: rgba(87, 142, 236, .4);
+    }
+    body.loading-screen-active .loop-step.walk .loop-num { background: #24aa75; }
+    body.loading-screen-active .loop-step.stop .loop-num { background: #e79b24; }
+    body.loading-screen-active .loop-step.sky .loop-num { background: #637fe5; }
+    body.loading-screen-active .loading-status {
+      color: #8c3f9e;
+      text-shadow: 0 1px 0 #fff;
+    }
     .loop-icon {
       position: relative;
       display: grid;
@@ -6843,14 +7108,18 @@
     }
     .memorial-wallpaper-stamp-colors {
       display: grid;
-      grid-template-columns: repeat(5, 32px);
+      grid-template-columns: repeat(6, 32px);
       gap: 7px;
       align-items: center;
     }
     .memorial-wallpaper-stamp-color {
       width: 32px;
       height: 32px;
-      min-width: 0;
+      min-width: 32px;
+      min-height: 32px;
+      max-width: 32px;
+      max-height: 32px;
+      aspect-ratio: 1 / 1;
       padding: 0;
       border: 2px solid rgba(61,51,40,.32);
       border-radius: 50%;
@@ -7029,6 +7298,108 @@
       border-radius: 6px;
       background: rgba(255, 252, 242, .82);
       color: #4e402f;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-heading {
+      position: relative;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-heading::after {
+      content: "✦";
+      position: absolute;
+      right: 24px;
+      top: -5px;
+      color: #f2b82f;
+      font-size: 1.2rem;
+      text-shadow: 12px 9px 0 #64d9ca, -12px 8px 0 #ff7fba;
+      pointer-events: none;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-heading b {
+      color: #f04f97;
+      font-size: 1.18rem;
+      font-family: "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+      font-weight: 900;
+      text-shadow: none;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) > span {
+      color: #403c69;
+      font-weight: 800;
+      text-shadow: none;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-preview {
+      border-color: #ff72b2;
+      box-shadow: 0 0 0 3px #fff, 0 0 0 6px #69d9ca, 0 9px 22px rgba(63,64,112,.25);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control {
+      border-color: rgba(94,136,198,.34);
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(228,246,255,.96));
+      box-shadow: inset 0 2px 0 #fff, 0 5px 12px rgba(73,101,145,.12);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control:nth-child(2) {
+      border-color: rgba(55,170,132,.36);
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(228,255,241,.96));
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control:nth-child(3) {
+      border-color: rgba(239,88,156,.36);
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(255,231,245,.96) 58%, rgba(255,248,205,.96));
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control label,
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control b {
+      color: #3e4771;
+      font-weight: 1000;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-control select {
+      border-color: #78bddd;
+      background: #fff;
+      color: #343759;
+      box-shadow: inset 0 -2px 0 rgba(92,189,214,.12);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-stamp-choice {
+      border: 1px solid rgba(106,151,192,.25);
+      background: linear-gradient(180deg, #fff, #eefaff);
+      box-shadow: inset 0 2px 0 #fff, 0 3px 7px rgba(60,93,134,.12);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-stamp-choice.selected {
+      border-color: #f05098;
+      background: linear-gradient(180deg, #fff9c5, #ffe2f0);
+      box-shadow: inset 0 0 0 2px rgba(255,90,163,.3), 0 0 0 2px rgba(103,216,199,.34);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-stamp-color.selected {
+      border-color: #f04f97;
+      outline-color: rgba(100,216,201,.68);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-stamp-tools button {
+      border: 1px solid #83cfe1;
+      background: linear-gradient(180deg, #fff, #dcf9ff);
+      color: #36527a;
+      box-shadow: inset 0 2px 0 #fff, 0 3px 0 rgba(63,153,178,.18);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) button[data-wallpaper-stamp-clear] {
+      border: 1px solid #ed9abd;
+      background: linear-gradient(180deg, #fff, #ffe5f1);
+      color: #a73869;
+      box-shadow: inset 0 2px 0 #fff, 0 3px 0 rgba(206,81,137,.15);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-actions button {
+      border: 1px solid #7fc8d8;
+      background: linear-gradient(180deg, #fff, #dff8ff);
+      color: #34506d;
+      box-shadow: inset 0 2px 0 #fff, 0 4px 0 rgba(63,143,164,.18);
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) #memorialWallpaperCreateButton {
+      border-color: #df4c8c;
+      background: linear-gradient(180deg, #ff91c5, #f24f96);
+      color: #fff;
+      text-shadow: 0 1px 0 rgba(116,32,72,.42);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.55), 0 4px 0 #bd3974;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-exit-confirm {
+      border-color: #ef9cbd;
+      background: linear-gradient(145deg, #fff, #fff0f7);
+      color: #65364e;
+    }
+    .memorial-wallpaper-workshop:not(.memorial-wallpaper-download-page) .memorial-wallpaper-empty {
+      border-color: #e481ad;
+      background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(232,252,255,.92));
+      color: #4b4269;
     }
     @media (max-width: 720px) {
       .memorial-wallpaper-layout {
@@ -10898,6 +11269,10 @@
   text-shadow: 0 1px 0 rgba(255,248,210,.52);
   white-space: nowrap;
 }
+    .home-actions button[data-home-action="retirement"] {
+      padding-inline: 1px;
+      font-size: 15px;
+    }
     .home-actions button.secondary {
       background: linear-gradient(180deg, #7ce3d8, #49c6ba);
       color: #5a3b12;
@@ -12191,6 +12566,7 @@
       .home-seat .unique-monster { width: 82px; height: 82px; }
       .home-actions { grid-template-columns: repeat(7, minmax(0, 1fr)); }
       .home-actions button { font-size: 13px; padding: 7px 1px; }
+      .home-actions button[data-home-action="retirement"] { font-size: 13px; }
     }
     .today-guide {
       margin-top: 12px;
@@ -13070,8 +13446,16 @@
     }
   </style>
 </head>
-<body>
+<body class="loading-screen-active">
 <div class="app">
+  <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラウォークのオープニング画面" hidden>
+    <img class="new-opening-background" src="assets/imasora-new-opening-v1.png" alt="">
+    <h1 class="new-opening-title" aria-label="イマソラウォーク"><span class="new-opening-title-part imasora" data-text="イマソラ" aria-hidden="true"><span class="new-opening-logo-char">イ</span><span class="new-opening-logo-char">マ</span><span class="new-opening-logo-char">ソ</span><span class="new-opening-logo-char">ラ</span></span><span class="new-opening-title-part walk" data-text="ウォーク" aria-hidden="true"><span class="new-opening-logo-char">ウ</span><span class="new-opening-logo-char">ォ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ク</span></span></h1>
+    <div class="new-opening-stage">
+      <div class="new-opening-guide" id="newOpeningGuide" role="img" aria-label="白ミチロードセイバーレン"></div>
+      <button class="new-opening-start" id="newOpeningStartBtn" type="button">はじめる</button>
+    </div>
+  </section>
   <header>
     <section class="hero">
       <p class="eyebrow">大人もハマる、今の空で進化する散歩ゲームアプリ</p>
@@ -13080,7 +13464,7 @@
         <div class="loop-step walk">
           <span class="loop-num">1</span><div class="loop-icon walker-icon" aria-hidden="true"><span class="walker"><i class="walker-head"></i><i class="walker-body"></i><i class="walker-arm front"></i><i class="walker-arm back"></i><i class="walker-leg front"></i><i class="walker-leg back"></i></span></div>
           <b>歩く</b>
-          <span>散歩中は操作しない。歩数計は徒歩セッション確認と、散歩での報酬獲得に使います。</span>
+          <span>散歩中は操作しないようにしましょう。歩数計のみで徒歩セッションを確認し、報酬が獲得できます。</span>
         </div>
         <div class="loop-step stop">
           <span class="loop-num">2</span><div class="loop-icon" aria-hidden="true"><i></i></div>
@@ -13093,12 +13477,7 @@
           <span>今の空を認識させて、マスの種類に応じ報酬やタネの獲得、進化が決まります。</span>
         </div>
       </div>
-      <div class="sound-panel">
-        <button class="sound-chip" id="soundBtn" type="button">BGM ON</button>
-      </div>
-      <div class="opening-actions">
-        <button class="opening-start" id="openingStartBtn" type="button">はじめる</button>
-      </div>
+      <p class="loading-status" role="status">ロード中....</p>
     </section>
   </header>
 
@@ -13918,6 +14297,8 @@ const memorialWallpaperStampColors = [
   { name: "青", value: "#6f91ff" },
   { name: "水色", value: "#64dcff" },
   { name: "緑", value: "#67d59a" },
+  { name: "黄緑", value: "#a8df5a" },
+  { name: "ベージュ", value: "#d8bd91" },
   { name: "白", value: "#ffffff" },
   { name: "黒", value: "#4f5360" }
 ];
@@ -37010,11 +37391,15 @@ function tournamentBgmMode(cup, matchIndex = 0, total = cup ? tournamentMatchCou
   };
   return modeMap[cup?.id] || (isFinal ? "rookieFinal" : "rookieBattle");
 }
+function setSoundButtonLabel(label) {
+  const button = document.getElementById("soundBtn");
+  if (button) button.textContent = label;
+}
 function toggleSound() {
   if (!sound.enabled) {
     if (!initSound()) return;
     sound.enabled = true;
-    document.getElementById("soundBtn").textContent = "BGM ON";
+    setSoundButtonLabel("BGM ON");
     playSfx("reward");
     syncHomeBgmMode();
     toast("BGM ON");
@@ -37022,13 +37407,13 @@ function toggleSound() {
   }
   stopBgm();
   sound.enabled = false;
-  document.getElementById("soundBtn").textContent = "BGM OFF";
+  setSoundButtonLabel("BGM OFF");
   toast("BGM OFF");
 }
 function previewBgm(mode) {
   if (!initSound()) return;
   sound.enabled = true;
-  document.getElementById("soundBtn").textContent = "BGM ON";
+  setSoundButtonLabel("BGM ON");
   startBgm(mode);
   toast(`${bgmModeName(mode)}を再生`);
 }
@@ -37054,7 +37439,7 @@ async function previewKaraokeSongOnce(mode) {
     return;
   }
   sound.enabled = true;
-  document.getElementById("soundBtn").textContent = "BGM ON";
+  setSoundButtonLabel("BGM ON");
   stopBgm();
   const requestId = ++karaokePreviewRequestId;
   sound.mode = mode;
@@ -37095,13 +37480,13 @@ async function previewKaraokeSongOnce(mode) {
 function startBattleBgm(mode) {
   if (!initSound()) return;
   sound.enabled = true;
-  document.getElementById("soundBtn").textContent = "BGM ON";
+  setSoundButtonLabel("BGM ON");
   startBgm(mode);
 }
 function previewSfx(kind) {
   if (!initSound()) return;
   sound.enabled = true;
-  document.getElementById("soundBtn").textContent = "BGM ON";
+  setSoundButtonLabel("BGM ON");
   if (kind.startsWith("hpDrain:")) {
     state.hpDrainSfxMode = kind.split(":")[1] || "retroBuzz";
     state.hpDrainSfxVersion = 3;
@@ -37511,7 +37896,7 @@ function previewSfx(kind) {
 }function stopBgmPreview() {
   stopBgm();
   sound.enabled = false;
-  document.getElementById("soundBtn").textContent = "BGM OFF";
+  setSoundButtonLabel("BGM OFF");
   toast("BGM停止");
 }
 function shuffleCards() {
@@ -38274,14 +38659,15 @@ function retirementStillMonsterSvg(svg) {
       return withoutRotation.replace(/\scy="[^"]+"/, ' cy="91"');
     });
 }
-function homeGuideArtMarkup() {
+function homeGuideArtMarkup(view = "front-left") {
   const tokenName = "白ミチロードセイバーレン";
   const tokenId = "star-white-hero-young-seed-walk-sky-cool-b-forest";
   ensureMonsterDexGroups();
   const items = monsterDexGroups.flatMap(group => group.list || []);
   const item = items.find(entry => entry.id === tokenId) || items.find(entry => entry.name === tokenName);
   if (!item) return `<div class="monster-art"><div class="monster sprout white-body">${monsterInnerParts()}</div></div>`;
-  return `<div class="monster-art unique-art home-guide-art">${homeStillMonsterSvg(turnaroundMonsterSvg(item, "front-left"))}</div>`;
+  const art = view === "front" ? uniqueMonsterSvg(item, true) : turnaroundMonsterSvg(item, view);
+  return `<div class="monster-art unique-art home-guide-art">${homeStillMonsterSvg(art)}</div>`;
 }
 function companionHomeMood(profile, growth, lifeRemain) {
   if (lifeRemain <= 0) return "町に残る準備中";
@@ -38946,11 +39332,36 @@ function handleSideQuest(id) {
 function startOpeningGame() {
   if (!initSound()) return;
   sound.enabled = true;
-  document.getElementById("soundBtn").textContent = "BGM ON";
+  setSoundButtonLabel("BGM ON");
   if (!playAudioSfx("itemGetCandidate3", 0, .95)) playSfx("itemGet");
   switchScreen("walk");
   syncHomeBgmMode();
   document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function renderNewOpeningScreen() {
+  const guide = document.getElementById("newOpeningGuide");
+  if (!guide || guide.childElementCount) return;
+  guide.innerHTML = homeGuideArtMarkup("front");
+}
+function scheduleNewOpeningScreenReveal() {
+  const opening = document.getElementById("newOpeningScreen");
+  if (!opening) return;
+  const revealDelay = Math.max(0, 2900 - performance.now());
+  window.setTimeout(() => {
+    document.body.classList.remove("loading-screen-active");
+    document.body.classList.add("new-opening-active");
+    opening.hidden = false;
+  }, revealDelay);
+}
+function startNewOpeningGame() {
+  startOpeningGame();
+  const opening = document.getElementById("newOpeningScreen");
+  document.body.classList.remove("new-opening-active");
+  if (!opening) return;
+  opening.classList.add("is-leaving");
+  window.setTimeout(() => {
+    opening.hidden = true;
+  }, 280);
 }
 function refreshPlaytimeSensitiveViews() {
   renderProof();
@@ -41473,7 +41884,7 @@ function memorialWallpaperWorkshopHtml(records) {
   if (!record) {
     return `<div class="memorial-wallpaper-workshop">
       <div class="memorial-wallpaper-heading"><b>イマソラ壁紙工房</b></div>
-      <span>記録した相棒と獲得メダルを組み合わせて、あなただけのスマホ壁紙を作ろう。</span>
+      <span>記録した相棒とスタンプを組み合わせて、あなただけのスマホ壁紙を作ろう！</span>
       <div class="memorial-wallpaper-empty"><b>記録された相棒がいません</b><br>相棒を引退時に記録すると、ここで壁紙に登場させられます。</div>
     </div>`;
   }
@@ -41485,7 +41896,7 @@ function memorialWallpaperWorkshopHtml(records) {
   const backgroundOptions = memorialWallpaperChoices.map(item => `<option value="${escapeAttr(item.id)}" ${item.id === background.id ? "selected" : ""}>${escapeAttr(item.name)}</option>`).join("");
   return `<div class="memorial-wallpaper-workshop">
     <div class="memorial-wallpaper-heading"><b>イマソラ壁紙工房</b></div>
-    <span>記録した相棒と獲得メダルを組み合わせて、あなただけのスマホ壁紙を作ろう。</span>
+    <span>記録した相棒とスタンプを組み合わせて、あなただけのスマホ壁紙を作ろう！</span>
     <div class="memorial-wallpaper-layout">
       <div class="memorial-wallpaper-preview-wrap">
         <div class="memorial-wallpaper-preview" id="memorialWallpaperPreview">
@@ -42185,10 +42596,28 @@ function retireParkPracticeStrategyMenu(record) {
       <div class="balance-note">選択中: ${strategyName(selectedStrategy)}作戦</div>
       <div class="actions">
         <button class="primary" type="button" data-town-practice-decide="${record.id}">作戦決定</button>
-        <button class="quiet" type="button" data-town-practice-back>戻る</button>
+        <button class="quiet" type="button" data-town-practice-back>広場に戻る</button>
       </div>
     </div>
   `;
+}
+function renderRetireParkPracticeStrategyDecision(record) {
+  const box = document.getElementById("entryStatus");
+  if (!box || !record) return;
+  box.innerHTML = `
+    <b>${escapeAttr(townPracticeDisplayName(record))}との練習試合 作戦選択</b>
+    <p>作戦を選んでから「作戦決定」を押すと、練習試合のオープニングへ進みます。</p>
+    ${retireParkPracticeStrategyMenu(record)}
+  `;
+  box.querySelectorAll("[data-town-practice-strategy]").forEach(button => {
+    button.addEventListener("click", () => selectRetireParkPracticeStrategy(button.dataset.townPracticeStrategy));
+  });
+  box.querySelector("[data-town-practice-decide]")?.addEventListener("click", event => {
+    startRetireParkPracticeBattle(event.currentTarget.dataset.townPracticeDecide);
+  });
+  box.querySelector("[data-town-practice-back]")?.addEventListener("click", cancelRetireParkPracticeStrategy);
+  switchScreen("monster");
+  document.getElementById("entryStatus")?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 function renderTownPractice(resultHtml = "") {
   const box = document.getElementById("townPractice");
@@ -42201,9 +42630,6 @@ function renderTownPractice(resultHtml = "") {
   box.hidden = false;
   const records = [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
     .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0));
-  const pendingRecord = pendingRetireParkPracticeRecordId
-    ? records.find(item => item.id === pendingRetireParkPracticeRecordId)
-    : null;
   const listHtml = records.length
     ? `<div class="shop-grid">${records.map(record => {
         const stats = retiredPracticeStats(record);
@@ -42219,20 +42645,12 @@ function renderTownPractice(resultHtml = "") {
     <div class="town-practice-heading"><b>広場</b><button type="button" data-town-practice-return-town>町に戻る</button></div>
     <span>今の相棒と、過去の相棒が練習試合をできます。勝敗は記録だけで、報酬や消耗はありません。</span>
     ${listHtml}
-    ${pendingRecord ? retireParkPracticeStrategyMenu(pendingRecord) : ""}
     ${resultHtml}
   `;
   box.querySelector("[data-town-practice-return-town]")?.addEventListener("click", returnToTownMapFromRetireParkPractice);
   box.querySelectorAll("[data-town-practice-record]").forEach(button => {
     button.addEventListener("click", () => showRetireParkPracticeStrategy(button.dataset.townPracticeRecord));
   });
-  box.querySelectorAll("[data-town-practice-strategy]").forEach(button => {
-    button.addEventListener("click", () => selectRetireParkPracticeStrategy(button.dataset.townPracticeStrategy));
-  });
-  box.querySelector("[data-town-practice-decide]")?.addEventListener("click", (event) => {
-    startRetireParkPracticeBattle(event.currentTarget.dataset.townPracticeDecide);
-  });
-  box.querySelector("[data-town-practice-back]")?.addEventListener("click", cancelRetireParkPracticeStrategy);
 }
 function showRetireParkPracticeStrategy(recordId) {
   if (!isTownBuildingBuilt("retirePark")) {
@@ -42247,23 +42665,32 @@ function showRetireParkPracticeStrategy(recordId) {
     return;
   }
   pendingRetireParkPracticeRecordId = recordId;
-  renderTownPractice();
-  document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  renderRetireParkPracticeStrategyDecision(record);
   playSfx("select");
   toast("作戦を選んでください");
 }
 function selectRetireParkPracticeStrategy(id) {
   if (!setBattleStrategy(id)) return;
+  const record = (Array.isArray(state.retiredMonsters) ? state.retiredMonsters : []).find(item => item.id === pendingRetireParkPracticeRecordId);
+  if (!record) {
+    playSfx("error");
+    toast("練習相手が見つかりません");
+    return;
+  }
   renderStrategyPanel();
-  renderTownPractice();
+  renderRetireParkPracticeStrategyDecision(record);
   playSfx("select");
   toast(`${strategyName(id)}作戦を選択`);
 }
 function cancelRetireParkPracticeStrategy() {
   pendingRetireParkPracticeRecordId = "";
+  selectedTownBuildingId = "retirePark";
+  renderTournament();
   renderTownPractice();
+  switchScreen("town");
+  document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
-  toast("練習試合に戻りました");
+  toast("広場に戻りました");
 }
 function returnToTownMapFromRetireParkPractice() {
   pendingRetireParkPracticeRecordId = "";
@@ -49176,8 +49603,7 @@ document.addEventListener("click", event => {
   event.preventDefault();
   handleStaticPlaytestAction(button.dataset.staticPlaytest);
 });
-document.getElementById("soundBtn").addEventListener("click", toggleSound);
-document.getElementById("openingStartBtn").addEventListener("click", startOpeningGame);
+document.getElementById("newOpeningStartBtn").addEventListener("click", startNewOpeningGame);
 document.querySelectorAll("[data-bgm-preview]").forEach(button => {
   button.addEventListener("click", () => previewBgm(button.dataset.bgmPreview));
 });
@@ -49204,6 +49630,12 @@ preloadTownVisualAssets();
 preloadKaraokeVisualAssets();
 warmKaraokeTextCaches();
 renderAll();
+renderNewOpeningScreen();
+if (document.readyState === "complete") {
+  scheduleNewOpeningScreenReveal();
+} else {
+  window.addEventListener("load", scheduleNewOpeningScreenReveal, { once: true });
+}
 mountFastOpenImageWarmup();
 resumePendingRetirementRecoveryOnLoad();
 updateHomeWindowClock();
