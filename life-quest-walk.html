@@ -2449,6 +2449,10 @@
     .gallery-monster-card.star-white-hero-young-seed-walk-walk-cool-a-comet .monster-art.star-gallery-art > .turnaround-monster {
       transform: translateX(-4px);
     }
+    #monsterDex .gallery-monster-card[class*="-walk-cool-a-comet"] .monster-art.star-gallery-art > .turnaround-monster,
+    #townBookstore .gallery-monster-card[class*="-walk-cool-a-comet"] .monster-art.star-gallery-art > .turnaround-monster {
+      transform: translateX(-4px);
+    }
     .unique-monster {
       width: 104px;
       height: 104px;
@@ -6835,7 +6839,7 @@
       justify-self: center;
       align-self: center;
       text-align: center;
-      transform: scale(.78) translateX(-11px);
+      transform: scale(.78) translateX(-13px);
       transform-origin: center center;
     }
     #townMemorialDex .town-memorial-art .monster-art.star-gallery-art,
@@ -9719,6 +9723,250 @@
     .shop-card small { display:block; margin-top:4px; color:#315b91; font-weight:900; font-size:10px; line-height:1.35; }
     .shop-card button { grid-column: 1 / -1; min-height: 30px; border-radius: 999px; border: 1px solid #d9c59e; background: #fff8dc; color: #6b4f21; font-weight: 900; cursor: pointer; }
     .shop-card button:disabled { opacity: .5; cursor: default; }
+    #townBookstore.town-bookstore {
+      border: 1px solid #a87b4d;
+      border-left: 6px solid #744827;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(97,55,29,.08) 1px, transparent 1px) 0 0 / 22px 100%,
+        linear-gradient(180deg, #f7ecd3, #ead1a7);
+      box-shadow: inset 0 0 0 3px rgba(255,250,225,.44), 0 3px 0 rgba(91,54,29,.14);
+      overflow: hidden;
+    }
+    #townBookstore .town-bookstore-heading,
+    #townBookstore .town-bookstore-volume-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    #townBookstore .town-bookstore-heading b,
+    #townBookstore .town-bookstore-volume-title strong {
+      color: #4c2d18;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+    #townBookstore .town-bookstore-intro {
+      color: #5e4938;
+      font-weight: 700;
+    }
+    #townBookstore .town-bookstore-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+    #townBookstore .town-bookstore-heading button,
+    #townBookstore .town-bookstore-actions button {
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid #9a7046;
+      border-radius: 6px;
+      background: #fff4cf;
+      color: #5a371d;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 -3px 0 rgba(91,54,29,.08);
+    }
+    #townBookstore .town-bookstore-room {
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+      padding: 12px 10px 15px;
+      border: 3px solid #5f371f;
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.06), transparent 16%, rgba(0,0,0,.08) 50%, transparent 84%),
+        #7c4a2a;
+      box-shadow: inset 0 0 0 2px #b77a46, inset 0 0 18px rgba(45,23,11,.45);
+    }
+    #townBookstore .town-bookstore-shelf-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      justify-items: center;
+      gap: 10px;
+      min-height: 126px;
+      padding: 8px 8px 17px;
+      border: 1px solid #3d2114;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #422719, #684029 72%, #3d2315);
+      box-shadow: inset 0 7px 12px rgba(18,9,4,.42);
+    }
+    #townBookstore .town-bookstore-shelf-row::after {
+      content: "";
+      position: absolute;
+      left: -4px;
+      right: -4px;
+      bottom: 4px;
+      height: 11px;
+      border: 1px solid #3c2113;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #b87842, #744122 70%, #4e2b19);
+      box-shadow: 0 3px 0 rgba(38,20,11,.48), inset 0 1px 0 rgba(255,218,157,.28);
+      pointer-events: none;
+    }
+    #townBookstore .town-bookstore-book {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 82px);
+      height: 108px;
+      min-width: 0;
+      padding: 12px 7px 9px 14px;
+      border: 2px solid var(--book-dark);
+      border-radius: 3px 7px 5px 3px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.18), transparent 9%, rgba(0,0,0,.13) 11%, transparent 18%),
+        linear-gradient(135deg, var(--book-light), var(--book) 55%, var(--book-dark));
+      color: #3e2818;
+      cursor: pointer;
+      box-shadow: inset 4px 0 0 rgba(255,255,255,.16), inset -3px -3px 0 rgba(0,0,0,.08), 0 4px 0 rgba(24,12,6,.34);
+    }
+    #townBookstore .town-bookstore-book::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-left: 1px solid rgba(255,255,255,.25);
+      border-right: 1px solid rgba(58,27,15,.26);
+    }
+    #townBookstore .town-bookstore-book::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 7px;
+      top: 7px;
+      bottom: 7px;
+      border: 1px solid rgba(255,226,158,.58);
+      border-radius: 2px 5px 3px 2px;
+      pointer-events: none;
+    }
+    #townBookstore .town-bookstore-book-label {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      align-content: center;
+      min-height: 59px;
+      margin: 0;
+      padding: 7px 3px;
+      border: 2px solid transparent;
+      border-radius: 7px;
+      background:
+        linear-gradient(180deg, #ffffff, #effff8) padding-box,
+        linear-gradient(120deg, #9f6400 0%, #ffd85e 22%, #fff3ad 42%, #d99c12 62%, #fff6c9 82%, #b97900 100%) border-box;
+      color: #c72c74;
+      font-family: "HGP創英角ﾎﾟｯﾌﾟ体", "HG創英角ﾎﾟｯﾌﾟ体", "HG丸ｺﾞｼｯｸM-PRO", "UD Digi Kyokasho NK-B", "Meiryo", sans-serif;
+      letter-spacing: 0;
+      line-height: 1.1;
+      box-shadow: 0 0 0 1px #fff4ad, 0 0 7px rgba(255,207,56,.62), 0 3px 0 rgba(140,91,0,.28);
+    }
+    #townBookstore .town-bookstore-book-label::before,
+    #townBookstore .town-bookstore-book-label::after {
+      position: absolute;
+      z-index: 2;
+      color: #fff7ba;
+      font-size: 8px;
+      line-height: 1;
+      text-shadow: 0 0 3px #e5a800, 0 0 6px #fff2a0;
+      pointer-events: none;
+    }
+    #townBookstore .town-bookstore-book-label::before {
+      content: "✦";
+      left: 3px;
+      top: 2px;
+    }
+    #townBookstore .town-bookstore-book-label::after {
+      content: "✧";
+      right: 3px;
+      bottom: 2px;
+    }
+    #townBookstore .town-bookstore-book-label strong {
+      display: block;
+      font-size: 15px;
+      font-family: "Yu Gothic UI", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-weight: 600;
+      text-shadow: none;
+    }
+    #townBookstore .town-bookstore-book-label small {
+      display: block;
+      margin-top: 4px;
+      color: #6548bd;
+      font-size: 14px;
+      font-family: "Yu Gothic UI", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-weight: 600;
+      text-shadow: none;
+    }
+    #townBookstore .book-tone-1 { --book:#f472a2; --book-light:#ffacd0; --book-dark:#a73363; }
+    #townBookstore .book-tone-2 { --book:#f4a94f; --book-light:#ffd47f; --book-dark:#a76417; }
+    #townBookstore .book-tone-3 { --book:#55c98a; --book-light:#8eeab3; --book-dark:#247447; }
+    #townBookstore .book-tone-4 { --book:#55aaf0; --book-light:#92d0ff; --book-dark:#256aa7; }
+    #townBookstore .book-tone-5 { --book:#9b78e8; --book-light:#c5aaff; --book-dark:#5b3aa2; }
+    #townBookstore .book-tone-6 { --book:#d8d7d1; --book-light:#f7f6f1; --book-dark:#8b8b86; }
+    #townBookstore .town-bookstore-volume {
+      margin-top: 12px;
+      padding: 12px 10px 15px;
+      border: 2px solid #8e633a;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #fffaf0, #fff3d2);
+      box-shadow: inset 0 0 16px rgba(91,54,29,.12), 0 3px 0 rgba(91,54,29,.16);
+    }
+    #townBookstore .town-bookstore-volume-title {
+      min-width: 0;
+    }
+    #townBookstore .town-bookstore-volume-title small {
+      display: block;
+      margin-bottom: 2px;
+      color: #87613d;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    #townBookstore .town-bookstore-volume-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    #townBookstore .town-bookstore-entry.dex-node {
+      border-color: #d1b77d;
+      border-radius: 6px;
+      background: rgba(255,253,238,.92);
+      box-shadow: inset 0 -4px 0 rgba(102,70,34,.06);
+    }
+    #townBookstore .town-bookstore-entry.dex-node.current {
+      border-color: #c7962e;
+      background: #fff4bf;
+      box-shadow: 0 0 0 2px rgba(199,150,46,.16), inset 0 -4px 0 rgba(102,70,34,.06);
+    }
+    #townBookstore .town-bookstore-entry b {
+      color: #49311d;
+      width: calc(100% + 8px);
+      margin-left: -4px;
+      margin-right: -4px;
+      font-size: 11.5px;
+      line-height: 1.2;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    #townBookstore .town-bookstore-entry small {
+      color: #4f3826;
+      font-size: 10.8px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    @media (min-width: 760px) {
+      #townBookstore .town-bookstore-volume-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 370px) {
+      #townBookstore .town-bookstore-heading,
+      #townBookstore .town-bookstore-volume-heading { align-items: flex-start; }
+      #townBookstore .town-bookstore-book { height: 102px; padding-left: 13px; }
+      #townBookstore .town-bookstore-actions { flex-direction: column; }
+    }
     #townPractice .town-practice-card {
       grid-template-columns: 1fr;
       position: relative;
@@ -9841,6 +10089,38 @@
       padding: 4px 10px;
       font-size: 11px;
       line-height: 1.1;
+    }
+    #monsterDex .dex-full-card.dex-node {
+      --gold-metallic-frame-fill: linear-gradient(180deg, #ffffff, #ffffff);
+    }
+    #monsterDex .dex-full-card.dex-node.current {
+      --gold-metallic-frame-fill: linear-gradient(180deg, #fffaf0, #fff4c8);
+    }
+    #townBookstore .town-bookstore-entry .dex-character.gallery-monster-card .monster-art {
+      --gold-metallic-frame-fill: radial-gradient(circle at 50% 38%, rgba(255,255,255,.95), rgba(225,241,255,.7) 48%, rgba(246,236,195,.72));
+    }
+    #townBookstore .town-bookstore-entry .dex-character.gallery-monster-card .monster-art.unique-art {
+      --gold-metallic-frame-fill: radial-gradient(circle at 50% 38%, rgba(255,255,255,.9), rgba(218,239,255,.62) 48%, rgba(244,232,189,.62));
+    }
+    #townPractice .town-practice-card .town-practice-art {
+      --gold-metallic-frame-fill: linear-gradient(180deg, #fffdf3, #fff8dc);
+    }
+    #townMemorialDex .town-memorial-art {
+      --gold-metallic-frame-fill: linear-gradient(180deg, rgba(255,251,237,.52), rgba(255,247,221,.34));
+    }
+    #townMemorialDex .town-memorial-rank {
+      --gold-metallic-frame-fill: linear-gradient(180deg, #fff4bd, #d8a947);
+    }
+    #monsterDex .dex-full-card.dex-node,
+    #townBookstore .town-bookstore-entry .dex-character.gallery-monster-card .monster-art,
+    #townPractice .town-practice-card .town-practice-art,
+    #townMemorialDex .town-memorial-art,
+    #townMemorialDex .town-memorial-rank {
+      border: 2px solid transparent;
+      background:
+        var(--gold-metallic-frame-fill) padding-box,
+        linear-gradient(120deg, #9f6400 0%, #ffd85e 22%, #fff3ad 42%, #d99c12 62%, #fff6c9 82%, #b97900 100%) border-box;
+      box-shadow: 0 0 0 1px #fff4ad, 0 0 7px rgba(255,207,56,.62), 0 3px 0 rgba(140,91,0,.28);
     }
     #townKaraoke .karaoke-heading {
       display: flex;
@@ -13586,6 +13866,7 @@
           <div class="shop-card locked"><div class="item-art item-art-locked"><i></i><em></em><span></span></div><div><strong>開店準備中</strong><span>日替わりで3つの道具が並びます。</span><small>木の素材2 / 鉄の素材1 / 灯りの素材1</small></div></div>
         </div>
       </div>
+      <div class="town-shop town-bookstore" id="townBookstore" hidden></div>
       <div class="town-shop" id="townKaraoke" hidden></div>
       <div class="town-shop" id="townPractice" hidden></div>
       <div class="town-shop" id="townMemorialDex" hidden></div>
@@ -14088,7 +14369,7 @@ const buildings = [
   ["medalHall", "記", "相棒記念館", 20, "記録したモンスターの記録碑を見られる", "special", "引退時に記録したモンスター名、姿、能力値、ランク、獲得メダルを残す施設。"],
   ["dojo", "技", "技の道場", 21, "技演出を確認する特別施設", "special", "系統別の弱技・中技・強技を確認する候補。"],
   ["soundShop", "音", "音楽プラザ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
-  ["bookstore", "本", "本屋", 23, "世界観やヒントを読む特別施設", "special", "おしゃべり、攻略ヒント、世界観メモを置く候補。"],
+  ["bookstore", "本", "本屋", 23, "モンスター図鑑を本で閲覧できる", "special", "タネ期から白まで、進化段階ごとのモンスター図鑑を本で読める施設。"],
   ["retirePark", "縁", "広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
   ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"],
   ["statue1", "像", "銅像1", 26, "街の記念物になる特別施設", "special", "左側に建てる記念の銅像。"],
@@ -14257,6 +14538,7 @@ let selectedSky = "blue";
 let selectedCup = "rookie";
 let pendingTournamentStrategyCupId = "";
 let selectedDexStage = "";
+let selectedBookstoreDexStage = "";
 let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
 let pendingRetireParkPracticeRecordId = "";
@@ -39788,7 +40070,7 @@ function townBuildingSprite(id) {
   const sprite = townLayeredSpriteAssets[id];
   if (!sprite) return "";
   const style = townLayeredSpriteStyle(id, sprite);
-  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", retirePark: "広場", medalHall: "相棒記念館" };
+  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", bookstore: "本屋", retirePark: "広場", medalHall: "相棒記念館" };
   const enterButton = enterLabels[id]
     ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-enter="${id}" aria-label="${enterLabels[id]}" style="${style}"></button>`
     : "";
@@ -39840,6 +40122,7 @@ function renderTown() {
   renderTownBuildingDetail();
   renderTownWorkshop();
   renderTownShop();
+  renderTownBookstore();
   renderTownKaraoke();
   renderTownPractice();
   renderTownMemorialDex();
@@ -40132,6 +40415,14 @@ function enterTownBuilding(id) {
     openMusicPlazaKaraokeFromTown();
     return;
   }
+  if (id === "bookstore") {
+    selectedBookstoreDexStage = "";
+    renderTownBookstore();
+    document.getElementById("townBookstore")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+    toast("本屋へ移動しました");
+    return;
+  }
   if (id === "retirePark") {
     document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
     playSfx("select");
@@ -40201,6 +40492,86 @@ function renderTownShop() {
       }).join("")}
     </div>`;
   document.querySelectorAll("[data-shop-buy]").forEach(button => button.addEventListener("click", () => buyShopItem(button.dataset.shopBuy)));
+}
+function townBookstoreBookMarkup(group, index) {
+  return `<button class="town-bookstore-book book-tone-${index + 1}" type="button" data-bookstore-stage="${escapeAttr(group.stage)}" aria-label="${escapeAttr(group.label || group.stage)} ${group.count}種を開く">
+    <span class="town-bookstore-book-label"><strong>${escapeAttr(group.label || group.stage)}</strong><small>${group.count}種</small></span>
+  </button>`;
+}
+function townBookstoreShelfHtml(groups) {
+  const books = groups.map(townBookstoreBookMarkup);
+  return `<div class="town-bookstore-room" aria-label="モンスター図鑑の書棚">
+    <div class="town-bookstore-shelf-row">${books.slice(0, 3).join("")}</div>
+    <div class="town-bookstore-shelf-row">${books.slice(3, 6).join("")}</div>
+  </div>`;
+}
+function townBookstoreEntryMarkup(item, current) {
+  return `<div class="dex-node dex-full-card town-bookstore-entry ${current ? "current" : ""}">
+    <div class="dex-character gallery-monster-card ${item.id}" aria-label="${escapeAttr(item.name)}">${galleryMonsterArt(item, current ? companionColorSettings() : null)}</div>
+    <b>${escapeAttr(item.name)}</b>
+    <small>${escapeAttr(item.note || "進化分岐の試作登録")}</small>
+  </div>`;
+}
+function renderTownBookstore() {
+  const box = document.getElementById("townBookstore");
+  if (!box) return;
+  if (!isTownBuildingBuilt("bookstore")) {
+    selectedBookstoreDexStage = "";
+    box.innerHTML = "";
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  ensureMonsterDexGroups();
+  const groups = monsterDexGroups;
+  if (!groups.length) {
+    box.innerHTML = `<div class="town-bookstore-heading"><b>本屋のモンスター図鑑</b><button type="button" data-bookstore-return-town>街に戻る</button></div><span class="town-bookstore-intro">図鑑の準備中です。</span>`;
+  } else {
+    const selectedGroup = groups.find(group => group.stage === selectedBookstoreDexStage);
+    if (!selectedGroup) {
+      selectedBookstoreDexStage = "";
+      box.innerHTML = `
+        <div class="town-bookstore-heading"><b>本屋のモンスター図鑑</b><button type="button" data-bookstore-return-town>街に戻る</button></div>
+        <span class="town-bookstore-intro">図鑑で進化段階ごとにモンスターを確認できます。</span>
+        ${townBookstoreShelfHtml(groups)}
+      `;
+    } else {
+      const profile = monsterProfile();
+      const currentArtItem = currentCompanionArtItem(profile, growthForecast());
+      const entries = selectedGroup.list.map(item => {
+        const current = item.id === profile.id || item.id === currentArtItem?.id || item.name.includes(profile.name);
+        return townBookstoreEntryMarkup(item, current);
+      }).join("");
+      box.innerHTML = `
+        <div class="town-bookstore-volume-heading">
+          <div class="town-bookstore-volume-title"><small>本屋のモンスター図鑑</small><strong>${escapeAttr(selectedGroup.label || selectedGroup.stage)} ${selectedGroup.count}種</strong></div>
+          <div class="town-bookstore-actions"><button type="button" data-bookstore-return-shelf>書棚に戻る</button><button type="button" data-bookstore-return-town>街に戻る</button></div>
+        </div>
+        <section class="town-bookstore-volume" aria-label="${escapeAttr(selectedGroup.label || selectedGroup.stage)}のモンスター図鑑">
+          <div class="town-bookstore-volume-grid">${entries}</div>
+        </section>
+      `;
+    }
+  }
+  box.querySelectorAll("[data-bookstore-stage]").forEach(button => button.addEventListener("click", () => {
+    selectedBookstoreDexStage = button.dataset.bookstoreStage || "";
+    renderTownBookstore();
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+  }));
+  box.querySelector("[data-bookstore-return-shelf]")?.addEventListener("click", () => {
+    selectedBookstoreDexStage = "";
+    renderTownBookstore();
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    playSfx("select");
+  });
+  box.querySelector("[data-bookstore-return-town]")?.addEventListener("click", returnToTownMapFromBookstore);
+}
+function returnToTownMapFromBookstore() {
+  selectedBookstoreDexStage = "";
+  renderTownBookstore();
+  document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
 }
 const karaokeSongModes = [
   "normal", "outsideHome", "retirementCeremony",
