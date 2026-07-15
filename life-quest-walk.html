@@ -9399,6 +9399,28 @@
       transform: translateY(2px);
       box-shadow: 0 3px 0 rgba(24, 32, 30, .14), 0 8px 12px rgba(24, 32, 30, .1);
     }
+    .town-home-button {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      z-index: 28;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid rgba(37, 74, 120, .28);
+      border-radius: 999px;
+      background: rgba(255, 253, 244, .96);
+      color: #254a78;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.1;
+      cursor: pointer;
+      box-shadow: 0 5px 0 rgba(24, 32, 30, .14), 0 12px 18px rgba(24, 32, 30, .12);
+      touch-action: manipulation;
+    }
+    .town-home-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 rgba(24, 32, 30, .14), 0 8px 12px rgba(24, 32, 30, .1);
+    }
     .town-dev-menu {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -13724,6 +13746,501 @@
       78% { opacity: 1; }
       100% { transform: translateY(78vh) scale(1) rotate(calc(var(--rot) + 32deg)); opacity: 0; }
     }
+
+    /* Battle technique depth pass: visual-only; move data and timing stay unchanged. */
+    .battle-field.watching:not(.magic-scene-ready) {
+      perspective: 760px;
+      perspective-origin: 50% 43%;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .battle-effect-layer {
+      --technique-atmosphere-opacity: .52;
+      --technique-atmosphere-entry-opacity: .37;
+      --technique-atmosphere-duration: 4.45s;
+      --technique-impact-delay: calc(var(--magic-start-delay, 0s) + 2.34s);
+      --technique-impact-opacity: .78;
+      --technique-impact-tail-opacity: .61;
+      --technique-impact-start: .28;
+      --technique-impact-peak: 1;
+      --technique-impact-end: 1.48;
+      isolation: isolate;
+    }
+    .battle-field.watching.magic-scene-medium .battle-effect-layer {
+      --technique-atmosphere-opacity: .64;
+      --technique-atmosphere-entry-opacity: .46;
+      --technique-atmosphere-duration: 4.7s;
+      --technique-impact-opacity: .9;
+      --technique-impact-tail-opacity: .7;
+      --technique-impact-start: .32;
+      --technique-impact-peak: 1.08;
+      --technique-impact-end: 1.62;
+    }
+    .battle-field.watching.magic-scene-strong .battle-effect-layer {
+      --technique-atmosphere-opacity: .76;
+      --technique-atmosphere-entry-opacity: .55;
+      --technique-atmosphere-duration: 5s;
+      --technique-impact-opacity: 1;
+      --technique-impact-tail-opacity: .78;
+      --technique-impact-start: .36;
+      --technique-impact-peak: 1.2;
+      --technique-impact-end: 1.82;
+    }
+    .battle-field.watching.magic-style-route .battle-effect-layer {
+      --technique-atmosphere-duration: 6.45s;
+      --technique-impact-delay: calc(var(--magic-start-delay, 0s) + 4.54s);
+    }
+    .battle-field.watching .battle-effect-layer.my-cast {
+      --technique-caster-x: 24%;
+      --technique-target-x: 76%;
+      --technique-impact-left: 55%;
+      --technique-drift: -8px;
+      --technique-drift-end: 8px;
+    }
+    .battle-field.watching .battle-effect-layer.enemy-cast {
+      --technique-caster-x: 76%;
+      --technique-target-x: 24%;
+      --technique-impact-left: 3%;
+      --technique-drift: 8px;
+      --technique-drift-end: -8px;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .battle-effect-layer::before,
+    .battle-field.watching.technique-hit .battle-effect-layer::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .battle-effect-layer::before {
+      inset: 46px 0 90px;
+      z-index: 0;
+      opacity: 0;
+      background:
+        radial-gradient(ellipse 35% 54% at var(--technique-caster-x, 24%) 58%, color-mix(in srgb, var(--technique-color, #8ee7ff) 34%, transparent) 0%, color-mix(in srgb, var(--technique-color, #8ee7ff) 14%, transparent) 43%, transparent 74%),
+        radial-gradient(ellipse 25% 42% at var(--technique-target-x, 76%) 57%, color-mix(in srgb, #ffffff 26%, transparent) 0%, color-mix(in srgb, var(--technique-color, #8ee7ff) 20%, transparent) 30%, transparent 72%),
+        linear-gradient(102deg, transparent 23%, color-mix(in srgb, var(--technique-color, #8ee7ff) 11%, transparent) 46%, color-mix(in srgb, #ffffff 9%, transparent) 53%, transparent 76%),
+        radial-gradient(ellipse 72% 68% at 50% 53%, transparent 46%, rgba(4,8,20,.2) 100%);
+      filter: saturate(1.12) contrast(1.03);
+      transform-origin: center;
+      will-change: opacity, transform;
+      animation: battleTechniqueAtmosphere var(--technique-atmosphere-duration) cubic-bezier(.2,.72,.2,1) calc(var(--magic-start-delay, 0s) + .08s) both;
+    }
+    .battle-field.watching.technique-hit .battle-effect-layer::after {
+      left: var(--technique-impact-left, 55%);
+      top: calc(var(--battle-stage-y) - 2%);
+      width: 42%;
+      height: 76px;
+      z-index: 1;
+      opacity: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at center, rgba(255,255,255,.94) 0 2%, color-mix(in srgb, var(--technique-color, #8ee7ff) 90%, #ffffff) 3% 7%, transparent 8% 24%, color-mix(in srgb, var(--technique-color, #8ee7ff) 66%, transparent) 25% 29%, transparent 30% 47%, color-mix(in srgb, #ffffff 26%, transparent) 48% 50%, transparent 51%),
+        radial-gradient(ellipse at center, color-mix(in srgb, var(--technique-color, #8ee7ff) 32%, transparent), transparent 64%);
+      filter: drop-shadow(0 0 7px #ffffff) drop-shadow(0 0 14px var(--technique-color, #8ee7ff));
+      transform-origin: center;
+      will-change: opacity, transform;
+      animation: battleTechniqueImpactPlane 1.14s cubic-bezier(.12,.72,.2,1) var(--technique-impact-delay) both;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .fighter.casting {
+      filter:
+        drop-shadow(0 8px 7px rgba(3,8,20,.3))
+        drop-shadow(0 0 11px color-mix(in srgb, var(--technique-color, #8ee7ff) 66%, transparent))
+        brightness(1.04)
+        saturate(1.06);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .fighter.struck {
+      filter:
+        drop-shadow(0 9px 8px rgba(3,8,20,.36))
+        drop-shadow(0 0 13px color-mix(in srgb, var(--technique-color, #8ee7ff) 72%, transparent))
+        brightness(1.06)
+        saturate(1.08);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil:not(.caster-sigil) {
+      border-color: color-mix(in srgb, var(--magic, #8ee7ff) 78%, #ffffff);
+      background:
+        conic-gradient(from var(--sigil-rot, 0deg), transparent 0 8%, rgba(255,255,255,.92) 9% 11%, transparent 12% 26%, color-mix(in srgb, var(--magic, #8ee7ff) 74%, #ffffff) 27% 29%, transparent 30% 47%, rgba(255,255,255,.62) 48% 50%, transparent 51% 100%),
+        repeating-radial-gradient(ellipse at center, transparent 0 12%, color-mix(in srgb, var(--magic, #8ee7ff) 38%, transparent) 13% 14%, transparent 15% 24%),
+        radial-gradient(ellipse at 43% 38%, rgba(255,255,255,.34), transparent 50%);
+      box-shadow:
+        0 0 4px rgba(255,255,255,.9),
+        0 0 17px var(--magic, #8ee7ff),
+        0 10px 18px rgba(3,8,20,.3),
+        inset 0 0 12px rgba(255,255,255,.42);
+      filter: saturate(1.16) contrast(1.07);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil.caster-sigil {
+      border-color: color-mix(in srgb, var(--magic, #8ee7ff) 82%, #ffffff);
+      box-shadow:
+        0 0 5px rgba(255,255,255,.78),
+        0 0 20px var(--magic, #8ee7ff),
+        0 11px 17px rgba(3,8,20,.3),
+        inset 0 0 18px rgba(255,255,255,.58);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil::before,
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil::before {
+      inset: 9%;
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: inset 0 0 8px var(--magic, #8ee7ff);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-sigil::after {
+      inset: -7%;
+      border: 1px solid color-mix(in srgb, var(--magic, #8ee7ff) 54%, transparent);
+      box-shadow: 0 0 7px color-mix(in srgb, var(--magic, #8ee7ff) 58%, transparent);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-slash-blade::before {
+      content: "";
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      top: 2px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.98), transparent);
+      box-shadow: 0 2px 5px rgba(255,255,255,.72);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-wind-ring::before {
+      content: "";
+      position: absolute;
+      inset: 8px 13px;
+      border: 1px solid color-mix(in srgb, var(--magic, #9ff0c0) 58%, #ffffff);
+      border-left-color: transparent;
+      border-radius: inherit;
+      box-shadow: inset 0 0 9px color-mix(in srgb, var(--magic, #9ff0c0) 44%, transparent);
+      transform: rotate(19deg);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-water-wave::after {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 28%;
+      height: 16%;
+      border-radius: 50%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.92), color-mix(in srgb, var(--magic, #8ee7ff) 52%, #ffffff), transparent);
+      filter: blur(.5px);
+      opacity: .82;
+      transform: skewX(-10deg);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-thunder-bolt::after,
+    .battle-field.watching:not(.magic-scene-ready) .magic-custom-core::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-thunder-bolt::after {
+      inset: 0 34%;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.12));
+      filter: blur(.6px);
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-custom-core::after {
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at 29% 23%, rgba(255,255,255,.92) 0 3%, rgba(255,255,255,.28) 4% 13%, transparent 36%);
+      mix-blend-mode: screen;
+      opacity: .78;
+    }
+    @keyframes battleTechniqueAtmosphere {
+      0% { opacity: 0; transform: translateX(var(--technique-drift, -8px)) scale(.97); }
+      18% { opacity: var(--technique-atmosphere-entry-opacity); }
+      43%, 68% { opacity: var(--technique-atmosphere-opacity); }
+      100% { opacity: 0; transform: translateX(var(--technique-drift-end, 8px)) scale(1.035); }
+    }
+    @keyframes battleTechniqueImpactPlane {
+      0% { opacity: 0; transform: perspective(260px) rotateX(66deg) scale(var(--technique-impact-start)); }
+      16% { opacity: var(--technique-impact-opacity); }
+      38% { opacity: var(--technique-impact-tail-opacity); transform: perspective(260px) rotateX(66deg) scale(var(--technique-impact-peak)); }
+      100% { opacity: 0; transform: perspective(260px) rotateX(66deg) scale(var(--technique-impact-end)); }
+    }
+    /* Foreground Canvas VFX stays above monsters and below battle text. */
+    .battle-field.watching:not(.magic-scene-ready) .battle-effect-layer {
+      z-index: 6;
+    }
+    .battle-modern-vfx {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 46px;
+      bottom: 90px;
+      z-index: 8;
+      display: block;
+      width: 100%;
+      height: calc(100% - 136px);
+      pointer-events: none;
+      opacity: 1;
+      mix-blend-mode: normal;
+      filter: saturate(1.2) contrast(1.08);
+      image-rendering: auto;
+    }
+    .battle-legacy-vfx {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      opacity: 1;
+      filter: saturate(1.24) contrast(1.09) brightness(1.035);
+      mix-blend-mode: normal;
+      isolation: isolate;
+      transform-style: preserve-3d;
+    }
+    .battle-legacy-vfx .magic-custom-field,
+    .battle-legacy-vfx .magic-slash-field,
+    .battle-legacy-vfx .magic-starfall-field,
+    .battle-legacy-vfx .magic-wind-field,
+    .battle-legacy-vfx .magic-water-field,
+    .battle-legacy-vfx .magic-city-field,
+    .battle-legacy-vfx .magic-flash-field,
+    .battle-legacy-vfx .magic-thunder-field {
+      perspective: 620px;
+      perspective-origin: 50% 45%;
+      transform-style: preserve-3d;
+    }
+    .battle-legacy-vfx .magic-custom-field::before,
+    .battle-legacy-vfx .magic-custom-field::after,
+    .battle-legacy-vfx .magic-custom-mark,
+    .battle-legacy-vfx .magic-custom-extra,
+    .battle-legacy-vfx .magic-starfall-field::before,
+    .battle-legacy-vfx .magic-starfall-field::after,
+    .battle-legacy-vfx .magic-wind-field::after,
+    .battle-legacy-vfx .magic-water-wave,
+    .battle-legacy-vfx .magic-water-splash,
+    .battle-legacy-vfx .magic-city-signal,
+    .battle-legacy-vfx .magic-city-spark,
+    .battle-legacy-vfx .magic-flash-burst,
+    .battle-legacy-vfx .magic-flash-ring,
+    .battle-legacy-vfx .magic-thunder-bolt,
+    .battle-legacy-vfx .magic-thunder-spark,
+    .battle-legacy-vfx .magic-slash-impact {
+      background-blend-mode: screen, soft-light, normal;
+      backface-visibility: hidden;
+      filter:
+        saturate(1.28)
+        contrast(1.12)
+        brightness(1.04)
+        drop-shadow(0 3px 2px rgba(2,6,18,.5))
+        drop-shadow(0 0 4px rgba(255,255,255,.72))
+        drop-shadow(0 0 15px var(--magic, #8ee7ff));
+    }
+    .battle-legacy-vfx .magic-custom-core {
+      isolation: isolate;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      background-blend-mode: screen, soft-light, normal;
+      box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.94),
+        inset 0 -7px 12px color-mix(in srgb, var(--magic, #8ee7ff) 42%, rgba(2,7,20,.82)),
+        0 4px 3px rgba(2,6,18,.52),
+        0 0 5px rgba(255,255,255,.78),
+        0 0 19px var(--magic, #8ee7ff),
+        0 0 34px color-mix(in srgb, var(--magic, #8ee7ff) 62%, transparent);
+      filter: saturate(1.24) contrast(1.1) brightness(1.04) drop-shadow(0 5px 3px rgba(2,6,18,.42));
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-custom-core::before {
+      content: "";
+      position: absolute;
+      inset: -7%;
+      z-index: -1;
+      border-radius: inherit;
+      clip-path: inherit;
+      background: inherit;
+      opacity: .44;
+      filter: blur(7px) saturate(1.3);
+      transform: translateY(5px) scale(.98);
+      pointer-events: none;
+      animation: battleShapeAura 1.45s ease-in-out infinite;
+    }
+    .battle-field.watching:not(.magic-scene-ready) .magic-custom-core::after {
+      inset: 1px;
+      z-index: 1;
+      border-radius: inherit;
+      clip-path: inherit;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.94) 0 5%, rgba(255,255,255,.32) 12%, transparent 29% 60%, rgba(2,8,24,.34) 84%, rgba(2,6,18,.58) 100%),
+        radial-gradient(circle at 30% 24%, rgba(255,255,255,.98) 0 3%, rgba(255,255,255,.34) 4% 12%, transparent 32%);
+      box-shadow:
+        inset 2px 2px 5px rgba(255,255,255,.72),
+        inset -4px -6px 9px rgba(2,7,20,.38);
+      mix-blend-mode: screen;
+      opacity: .82;
+      transform-origin: center;
+      animation: battleShapeSpecular 1.7s ease-in-out infinite;
+    }
+    .battle-legacy-vfx .magic-orb {
+      box-shadow:
+        inset 3px 3px 5px rgba(255,255,255,.94),
+        inset -5px -6px 9px rgba(4,10,30,.38),
+        0 4px 3px rgba(2,6,18,.48),
+        0 0 7px rgba(255,255,255,.9),
+        0 0 22px var(--magic, #8ee7ff),
+        0 0 42px color-mix(in srgb, var(--magic, #8ee7ff) 62%, transparent);
+      filter: saturate(1.25) contrast(1.08) drop-shadow(0 0 7px var(--magic, #8ee7ff));
+    }
+    .battle-legacy-vfx .magic-slash-blade {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96) 0 9%, rgba(255,255,255,.25) 10% 28%, rgba(2,8,24,.36) 63% 100%),
+        linear-gradient(90deg, transparent 0 4%, rgba(255,255,255,.98) 10% 32%, var(--magic, #8ee7ff) 40% 72%, rgba(255,255,255,.94) 80% 90%, transparent 96% 100%);
+      background-blend-mode: screen, normal;
+      box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.96),
+        inset 0 -5px 7px rgba(2,8,24,.44),
+        0 4px 3px rgba(2,6,18,.5),
+        0 0 9px rgba(255,255,255,.92),
+        0 0 25px var(--magic, #8ee7ff);
+      filter: saturate(1.22) contrast(1.12) drop-shadow(0 0 12px var(--magic, #8ee7ff));
+    }
+    .battle-legacy-vfx .magic-wind-ring,
+    .battle-legacy-vfx .magic-flash-ring {
+      box-shadow:
+        0 4px 3px rgba(2,6,18,.46),
+        0 0 7px rgba(255,255,255,.86),
+        0 0 22px var(--magic, #8ee7ff),
+        inset 0 0 5px rgba(255,255,255,.84),
+        inset 0 0 18px var(--magic, #8ee7ff);
+      filter: saturate(1.3) contrast(1.12) drop-shadow(0 0 11px var(--magic, #8ee7ff));
+    }
+    .battle-legacy-vfx .magic-sigil {
+      filter:
+        saturate(1.2)
+        contrast(1.09)
+        drop-shadow(0 5px 3px rgba(2,6,18,.46))
+        drop-shadow(0 0 8px rgba(255,255,255,.72))
+        drop-shadow(0 0 15px var(--magic, #8ee7ff));
+    }
+    @keyframes battleShapeAura {
+      0%, 100% { opacity: .3; transform: translateY(5px) scale(.96); }
+      50% { opacity: .58; transform: translateY(3px) scale(1.04); }
+    }
+    @keyframes battleShapeSpecular {
+      0%, 100% { opacity: .62; transform: translate(-2%, 2%) scale(.98); }
+      48% { opacity: .94; transform: translate(2%, -2%) scale(1.015); }
+    }
+    @keyframes customPop {
+      0% {
+        opacity: 0;
+        transform: perspective(520px) translateY(13px) rotateX(24deg) scale(.62);
+        filter: blur(4px) saturate(.9) drop-shadow(0 0 4px var(--magic, #8ee7ff));
+      }
+      24% {
+        opacity: .94;
+        transform: perspective(520px) translateY(1px) rotateX(5deg) scale(.97);
+        filter: blur(.4px) saturate(1.2) contrast(1.08) drop-shadow(0 3px 2px rgba(2,6,18,.46)) drop-shadow(0 0 13px var(--magic, #8ee7ff));
+      }
+      48%, 68% {
+        opacity: 1;
+        transform: perspective(520px) translateY(-2px) rotateX(0deg) scale(1.035);
+        filter: blur(0) saturate(1.28) contrast(1.12) drop-shadow(0 4px 3px rgba(2,6,18,.52)) drop-shadow(0 0 19px var(--magic, #8ee7ff));
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(520px) translateY(-10px) rotateX(-9deg) scale(1.16);
+        filter: blur(1.8px) saturate(1.18) drop-shadow(0 0 22px var(--magic, #8ee7ff));
+      }
+    }
+    @keyframes customSpinPop {
+      0% {
+        opacity: 0;
+        transform: perspective(560px) rotateY(-28deg) rotateZ(-52deg) scale(.58);
+        filter: blur(4px) saturate(.9) drop-shadow(0 0 5px var(--magic, #8ee7ff));
+      }
+      28%, 64% {
+        opacity: 1;
+        transform: perspective(560px) rotateY(8deg) rotateZ(14deg) scale(1.02);
+        filter: blur(0) saturate(1.3) contrast(1.12) drop-shadow(0 4px 3px rgba(2,6,18,.5)) drop-shadow(0 0 19px var(--magic, #8ee7ff));
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(560px) rotateY(24deg) rotateZ(66deg) scale(1.14);
+        filter: blur(1.6px) saturate(1.18) drop-shadow(0 0 24px var(--magic, #8ee7ff));
+      }
+    }
+    @keyframes customGateOpen {
+      0% {
+        opacity: 0;
+        transform: perspective(620px) rotateY(-38deg) scale(.34);
+        filter: blur(4px) drop-shadow(0 0 5px var(--magic, #8ee7ff));
+      }
+      28%, 67% {
+        opacity: 1;
+        transform: perspective(620px) rotateY(5deg) scale(1.025);
+        filter: blur(0) saturate(1.3) contrast(1.12) drop-shadow(0 5px 3px rgba(2,6,18,.5)) drop-shadow(0 0 21px var(--magic, #8ee7ff));
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(620px) rotateY(20deg) scale(1.17);
+        filter: blur(1.5px) drop-shadow(0 0 25px var(--magic, #8ee7ff));
+      }
+    }
+    @keyframes customBloom {
+      0% {
+        opacity: 0;
+        transform: perspective(520px) rotateX(28deg) scale(.52);
+        filter: blur(3px) saturate(.92) drop-shadow(0 0 5px var(--magic, #8ee7ff));
+      }
+      25%, 66% {
+        opacity: 1;
+        transform: perspective(520px) rotateX(3deg) scale(1.025);
+        filter: blur(0) saturate(1.3) contrast(1.1) drop-shadow(0 4px 3px rgba(2,6,18,.46)) drop-shadow(0 0 18px var(--magic, #8ee7ff));
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(520px) rotateX(-11deg) translateY(-7px) scale(1.15);
+        filter: blur(1.7px) saturate(1.16) drop-shadow(0 0 22px var(--magic, #8ee7ff));
+      }
+    }
+    @keyframes slashImpactFlash {
+      0% { opacity: 0; transform: perspective(480px) rotateY(-24deg) scale(.55); filter: blur(3px) saturate(.95); }
+      19% { opacity: 1; transform: perspective(480px) rotateY(7deg) scale(.98); filter: blur(0) saturate(1.28) drop-shadow(0 0 15px var(--magic, #8ee7ff)); }
+      46% { opacity: .96; transform: perspective(480px) rotateY(1deg) scale(1.06); filter: blur(0) saturate(1.34) contrast(1.12) drop-shadow(0 4px 3px rgba(2,6,18,.5)) drop-shadow(0 0 21px var(--magic, #8ee7ff)); }
+      100% { opacity: 0; transform: perspective(480px) rotateY(18deg) scale(1.28); filter: blur(2px) saturate(1.16) drop-shadow(0 0 25px var(--magic, #8ee7ff)); }
+    }
+    @keyframes starfallBurst {
+      0% { opacity: 0; transform: perspective(520px) rotateY(-26deg) rotateZ(-13deg) scale(.5); filter: blur(3px); }
+      22%, 57% { opacity: 1; transform: perspective(520px) rotateY(4deg) rotateZ(5deg) scale(1.03); filter: blur(0) saturate(1.3) contrast(1.1) drop-shadow(0 4px 3px rgba(2,6,18,.48)) drop-shadow(0 0 20px var(--magic, #ffd66d)); }
+      100% { opacity: 0; transform: perspective(520px) rotateY(17deg) rotateZ(17deg) scale(1.22); filter: blur(1.7px) drop-shadow(0 0 25px var(--magic, #ffd66d)); }
+    }
+    @keyframes citySparkPop {
+      0% { opacity: 0; transform: perspective(500px) rotateY(-30deg) scale(.52); filter: blur(3px); }
+      20%, 50% { opacity: 1; transform: perspective(500px) rotateY(6deg) scale(1.035); filter: blur(0) saturate(1.32) contrast(1.13) drop-shadow(0 4px 3px rgba(2,6,18,.5)) drop-shadow(0 0 19px var(--magic, #c9a6ff)); }
+      100% { opacity: 0; transform: perspective(500px) rotateY(19deg) scale(1.24); filter: blur(1.8px) drop-shadow(0 0 24px var(--magic, #c9a6ff)); }
+    }
+    @keyframes flashBurstPop {
+      0% { opacity: 0; transform: perspective(500px) rotateX(24deg) scale(.48); filter: blur(4px) saturate(.9); }
+      18%, 46% { opacity: 1; transform: perspective(500px) rotateX(2deg) scale(1.035); filter: blur(0) saturate(1.34) contrast(1.14) drop-shadow(0 4px 3px rgba(2,6,18,.48)) drop-shadow(0 0 22px var(--magic, #fff19a)); }
+      100% { opacity: 0; transform: perspective(500px) rotateX(-12deg) scale(1.3); filter: blur(2px) saturate(1.16) drop-shadow(0 0 28px var(--magic, #fff19a)); }
+    }
+    @keyframes thunderSparkPop {
+      0% { opacity: 0; transform: perspective(520px) rotateY(-28deg) scale(.48); filter: blur(3px) brightness(1.15); }
+      20%, 52% { opacity: 1; transform: perspective(520px) rotateY(5deg) scale(1.04); filter: blur(0) brightness(1.14) saturate(1.34) contrast(1.14) drop-shadow(0 4px 3px rgba(2,6,18,.5)) drop-shadow(0 0 21px var(--magic, #fff19a)); }
+      100% { opacity: 0; transform: perspective(520px) rotateY(20deg) scale(1.27); filter: blur(1.8px) brightness(1.08) drop-shadow(0 0 27px var(--magic, #fff19a)); }
+    }
+    @keyframes windRingSpin {
+      0% { opacity: 0; transform: perspective(560px) rotateX(24deg) rotateZ(-72deg) scale(.58); filter: blur(3px); }
+      24%, 69% { opacity: .98; transform: perspective(560px) rotateX(8deg) rotateZ(176deg) scale(1.03); filter: blur(0) saturate(1.3) contrast(1.1) drop-shadow(0 4px 3px rgba(2,6,18,.44)) drop-shadow(0 0 18px var(--magic, #9ff0c0)); }
+      100% { opacity: 0; transform: perspective(560px) rotateX(-5deg) rotateZ(292deg) scale(1.16); filter: blur(1.5px) drop-shadow(0 0 23px var(--magic, #9ff0c0)); }
+    }
+    @keyframes waterWaveRush {
+      0% { opacity: 0; transform: perspective(580px) rotateX(24deg) translateY(22px) scaleX(.76); filter: blur(2.5px); }
+      23%, 72% { opacity: .98; transform: perspective(580px) rotateX(8deg) translateY(-2px) scaleX(1.03); filter: blur(0) saturate(1.3) contrast(1.1) drop-shadow(0 5px 3px rgba(2,6,18,.44)) drop-shadow(0 0 18px var(--magic, #8ee7ff)); }
+      100% { opacity: 0; transform: perspective(580px) rotateX(3deg) translateY(-20px) scaleX(1.13); filter: blur(1.7px) drop-shadow(0 0 22px var(--magic, #8ee7ff)); }
+    }
+    @keyframes waterSplashPop {
+      0% { opacity: 0; transform: perspective(520px) rotateX(25deg) translateY(20px) scale(.5); filter: blur(3px); }
+      20%, 54% { opacity: 1; transform: perspective(520px) rotateX(4deg) translateY(-4px) scale(1.025); filter: blur(0) saturate(1.32) contrast(1.1) drop-shadow(0 4px 3px rgba(2,6,18,.45)) drop-shadow(0 0 19px var(--magic, #8ee7ff)); }
+      100% { opacity: 0; transform: perspective(520px) rotateX(-9deg) translateY(-35px) scale(1.19); filter: blur(1.6px) drop-shadow(0 0 24px var(--magic, #8ee7ff)); }
+    }
+    @keyframes flashRingOpen {
+      0% { opacity: 0; transform: perspective(560px) rotateX(28deg) scale(.38); filter: blur(2.7px); }
+      24%, 58% { opacity: .94; transform: perspective(560px) rotateX(9deg) scale(1.01); filter: blur(0) saturate(1.3) contrast(1.1) drop-shadow(0 5px 3px rgba(2,6,18,.42)) drop-shadow(0 0 19px var(--magic, #fff19a)); }
+      100% { opacity: 0; transform: perspective(560px) rotateX(2deg) scale(1.27); filter: blur(1.5px) drop-shadow(0 0 24px var(--magic, #fff19a)); }
+    }
+    .battle-field.watching .battle-effect-layer .battle-cue {
+      z-index: 12;
+    }
+    .battle-field.watching .battle-effect-layer .battle-decision-cue {
+      z-index: 13;
+    }
   </style>
 </head>
 <body class="loading-screen-active">
@@ -13853,7 +14370,7 @@
     </section>
 
     <section class="panel screen" data-screen="town">
-      <div class="town-screen-heading"><h2>街の発展</h2><button type="button" onclick="returnHomeFromTownScreen()">ホームに戻る</button></div>
+      <div class="town-screen-heading"><h2>街の発展</h2></div>
       <p>散歩で素材を集め、町では自分で建物を作ります。集めた素材を使って、ひとつずつ形にしていきます。</p>
       <div class="town" id="townView"></div>
       <div class="town-dev-menu" id="townDevMenu"></div>
@@ -14204,9 +14721,9 @@
             <button class="safety-chip" type="button" data-sfx-preview="messageSnesRpg01_07"><strong>解説音候補4</strong><span>OtoLogic SNES-RPG01-07 Message。短い解説候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="messageSnesRpg01_08"><strong>解説音候補5</strong><span>OtoLogic SNES-RPG01-08 Message。中くらいの解説候補。</span></button>
             <button class="safety-chip" type="button" data-sfx-preview="messageSnesRpg01_09"><strong>解説音候補6</strong><span>OtoLogic SNES-RPG01-09 Message。長めの解説候補。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:retroBuzz"><strong>HP減少音 A</strong><span>低めのファミコン風電子ブザー。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:metalBuzz"><strong>HP減少音 B</strong><span>硬めで緊迫感のある電子音。</span></button>
-            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:warningBuzz"><strong>HP減少音 C</strong><span>警告感のある太めの減少音。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:retroBuzz"><strong>HP減少音 A（試聴候補）</strong><span>低めのファミコン風電子ブザー。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:metalBuzz"><strong>HP減少音 B（正式）</strong><span>硬めで緊迫感のある電子音。</span></button>
+            <button class="safety-chip" type="button" data-sfx-preview="hpDrain:warningBuzz"><strong>HP減少音 C（試聴候補）</strong><span>警告感のある太めの減少音。</span></button>
           </div>
         </div><div class="actions">
           <button class="quiet" id="stopBgmPreviewBtn" type="button">BGMを止める</button>
@@ -14919,6 +15436,7 @@ const sfxAudioFiles = {
   customMagicGate: "assets/audio/otologic_battle_custom_magic_gate.mp3",
   customCloudPopper: "assets/audio/otologic_party_popper03_1_cloud_puff.mp3"
 };
+const officialBattleHpDrainSfxMode = "metalBuzz"; // Preview candidates must not change battle playback.
 const battleHitSfxFileKey = "damageCandidate1";
 const battleHitSfxFileKeys = {
   slash: {
@@ -37416,7 +37934,7 @@ function playBattleHitSfx(tier = "weak", delay = 2.62, sceneType = "slash", star
   }
   playTypedHitSfx(tier, delay, sceneType);
 }
-function playHpDrainSfx(beforePercent = 100, afterPercent = 100, delay = 3.35, duration = 2.18) {
+function playHpDrainSfx(beforePercent = 100, afterPercent = 100, delay = 3.35, duration = 2.18, previewMode = "") {
   initSound();
   if (!sound.enabled || !sound.ctx) return;
   const sfxScale = volumeScale("sfx");
@@ -37430,7 +37948,8 @@ function playHpDrainSfx(beforePercent = 100, afterPercent = 100, delay = 3.35, d
     metalBuzz: { type: "sawtooth", layerType: "square", base: 740, end: 740, layer: 1480, layerEnd: 1480, filter: "lowpass", filterFreq: 2200, q: 1.2, vibrato: 0, detune: 0, layerGain: .28, volume: .095 },
     warningBuzz: { type: "square", layerType: "sawtooth", base: 294, end: 247, layer: 587, layerEnd: 494, filter: "lowpass", filterFreq: 980, q: 2.1, vibrato: 8.4, detune: 13, layerGain: .28, volume: .07 }
   };
-  const preset = presets[state.hpDrainSfxMode] || presets.retroBuzz;
+  const mode = previewMode || officialBattleHpDrainSfxMode;
+  const preset = presets[mode] || presets[officialBattleHpDrainSfxMode];
   const start = sound.ctx.currentTime + delay;
   const end = start + duration;
   const carrier = sound.ctx.createOscillator();
@@ -37770,12 +38289,10 @@ function previewSfx(kind) {
   sound.enabled = true;
   setSoundButtonLabel("BGM ON");
   if (kind.startsWith("hpDrain:")) {
-    state.hpDrainSfxMode = kind.split(":")[1] || "retroBuzz";
-    state.hpDrainSfxVersion = 3;
-    saveState();
-    playHpDrainSfx(100, 35, 0, 2.45);
+    const previewMode = kind.split(":")[1] || officialBattleHpDrainSfxMode;
+    playHpDrainSfx(100, 35, 0, 2.45, previewMode);
     const hpNames = { retroBuzz: "HP減少音 A", metalBuzz: "HP減少音 B", warningBuzz: "HP減少音 C" };
-    toast(`${hpNames[state.hpDrainSfxMode] || "HP減少音"}を戦闘用に設定`);
+    toast(`${hpNames[previewMode] || "HP減少音"}を試聴（戦闘用はHP減少音 Bで固定）`);
     return;
   }
   if (sfxAudioFiles[kind]) {
@@ -40113,7 +40630,8 @@ function renderTown() {
       ? ""
       : `<button class="${className}" type="button" data-town-facility="${id}" style="${style}">${name}</button>`;
   }).join("");
-  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
+  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-home-button" type="button" id="townHomeButton">ホームに戻る</button><button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
+  document.getElementById("townHomeButton")?.addEventListener("click", returnHomeFromTownScreen);
   document.getElementById("townFacilityToggle")?.addEventListener("click", toggleTownFacilityNames);
   document.querySelectorAll("[data-town-facility]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townFacility)));
   document.querySelectorAll("[data-town-layer-enter]").forEach(button => button.addEventListener("click", () => enterTownBuilding(button.dataset.townLayerEnter)));
@@ -48864,6 +49382,1699 @@ function magicSceneVisualFor(scene) {
   }
   return `<div class="magic-air ${sideClass}" style="--magic:${color}"></div><div class="magic-world ${scene.tier} ${sceneType}" style="--magic:${color}"></div>${casterFootSigil}<i class="magic-trail ${sideClass} ${scene.tier} ${sceneType}" style="--magic:${color}"></i>`;
 }
+let battleModernVfxFrame = 0;
+let battleModernVfxToken = 0;
+function stopBattleModernVfx() {
+  battleModernVfxToken += 1;
+  if (battleModernVfxFrame && typeof cancelAnimationFrame === "function") cancelAnimationFrame(battleModernVfxFrame);
+  battleModernVfxFrame = 0;
+}
+function battleModernVfxClamp(value, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, Number(value) || 0));
+}
+function battleModernVfxEase(value) {
+  const progress = battleModernVfxClamp(value);
+  return 1 - Math.pow(1 - progress, 3);
+}
+function battleModernVfxHash(value) {
+  let hash = 2166136261;
+  for (const char of String(value || "")) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+function battleModernVfxRandom(seed) {
+  let value = seed >>> 0 || 1;
+  return () => {
+    value += 0x6d2b79f5;
+    let result = value;
+    result = Math.imul(result ^ (result >>> 15), result | 1);
+    result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+    return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function battleModernVfxRgb(color) {
+  let hex = String(color || "").trim().replace("#", "");
+  if (hex.length === 3) hex = hex.split("").map(char => char + char).join("");
+  if (!/^[0-9a-f]{6}$/i.test(hex)) hex = "8ee7ff";
+  return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
+}
+function battleModernVfxRgba(rgb, alpha) {
+  return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${battleModernVfxClamp(alpha)})`;
+}
+function battleModernVfxFamily(baseType, sceneType) {
+  if (baseType !== "custom") return baseType;
+  if (sceneType.startsWith("walk-")) return "route";
+  if (sceneType.startsWith("sky-")) return sceneType.includes("sunburst") ? "starfall" : "wind";
+  if (sceneType.startsWith("city-")) return "city-spark";
+  if (sceneType.startsWith("river-")) return "water";
+  if (sceneType.startsWith("ake-")) return "flash";
+  if (sceneType.startsWith("yura-")) return "wind";
+  if (sceneType.startsWith("leaf-")) return "wind";
+  if (sceneType.startsWith("white-")) return sceneType.includes("gate") ? "route" : "flash";
+  return "route";
+}
+/* Each authored move keeps a distinct foreground silhouette instead of sharing one generic projectile. */
+const battleModernVfxProfiles = Object.freeze({
+  "walk-lamp-step": { motif: "steps", accent: "#ffe47a", travel: "none", impact: "ground" },
+  "walk-signpost-beam": { motif: "chevron", accent: "#9ff2cb", travel: "none", impact: "burst" },
+  "walk-roadstar-comet": { motif: "comet", accent: "#ffd35c", travel: "arc", impact: "star" },
+  "sky-cloud-puff": { motif: "cloud", accent: "#e6fbff", travel: "none", impact: "cloud" },
+  "sky-jetstream-rune": { motif: "rune", accent: "#82e8ff", travel: "arc", impact: "ring" },
+  "sky-sunburst-column": { motif: "sunColumn", accent: "#fff09a", travel: "none", impact: "column" },
+  "city-lamppost-pop": { motif: "lamps", accent: "#ffd58a", travel: "none", impact: "ground" },
+  "city-rune-grid": { motif: "grid", accent: "#d9a7ff", travel: "none", impact: "grid" },
+  "city-tower-laser": { motif: "tower", accent: "#9cecff", travel: "none", impact: "column" },
+  "river-drop-arc": { motif: "drop", accent: "#78e4ff", travel: "arc", impact: "wave" },
+  "river-ripple-gate": { motif: "waterGate", accent: "#79cfff", travel: "none", impact: "gate" },
+  "river-mirage-tide": { motif: "tide", accent: "#91efff", travel: "none", impact: "wave" },
+  "ake-ember-rise": { motif: "embers", accent: "#ff9f68", travel: "none", impact: "burst" },
+  "ake-sunrise-fan": { motif: "sunFan", accent: "#ffc25f", travel: "none", impact: "fan" },
+  "ake-solar-crown": { motif: "solarCrown", accent: "#ffe36e", travel: "none", impact: "crown" },
+  "yura-wobble-orbit": { motif: "orbit", accent: "#d8b1ff", travel: "none", impact: "orbit" },
+  "yura-phantom-lanterns": { motif: "phantomLanternArray", accent: "#f2c1ff", travel: "none", impact: "grid" },
+  "yura-mirror-maze": { motif: "mirrors", accent: "#b8edff", travel: "none", impact: "shards" },
+  "leaf-sprout-pop": { motif: "sprout", accent: "#aaef7f", travel: "none", impact: "ground" },
+  "leaf-forest-crest": { motif: "forestCrest", accent: "#74dc96", travel: "none", impact: "crest" },
+  "leaf-vine-bloom": { motif: "vineBloom", accent: "#ffb7dd", travel: "none", impact: "petals" },
+  "white-prism-dot": { motif: "prism", accent: "#ffffff", travel: "none", impact: "prism" },
+  "white-magic-gate": { motif: "magicGate", accent: "#d8f7ff", travel: "none", impact: "gate" },
+  "white-star-crest": { motif: "starCrest", accent: "#fff0a5", travel: "none", impact: "star" }
+});
+function battleModernVfxProfile(sceneType) {
+  return battleModernVfxProfiles[String(sceneType || "")] || null;
+}
+function battleModernVfxPoint(start, target, progress, curveHeight) {
+  const p = battleModernVfxClamp(progress);
+  const inverse = 1 - p;
+  const middleX = (start.x + target.x) / 2;
+  const middleY = Math.min(start.y, target.y) + curveHeight;
+  return {
+    x: (inverse * inverse * start.x) + (2 * inverse * p * middleX) + (p * p * target.x),
+    y: (inverse * inverse * start.y) + (2 * inverse * p * middleY) + (p * p * target.y)
+  };
+}
+function battleModernVfxBloom(ctx, x, y, radius, rgb, alpha) {
+  if (alpha <= 0 || radius <= 0) return;
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  gradient.addColorStop(0, `rgba(255,255,255,${battleModernVfxClamp(alpha * .96)})`);
+  gradient.addColorStop(.1, battleModernVfxRgba(rgb, alpha * .86));
+  gradient.addColorStop(.42, battleModernVfxRgba(rgb, alpha * .28));
+  gradient.addColorStop(1, battleModernVfxRgba(rgb, 0));
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+function battleModernVfxStrokeLayers(ctx, trace, rgb, accentRgb, alpha, width) {
+  if (alpha <= 0 || width <= 0) return;
+  const canvasWidth = ctx.canvas?.clientWidth || 420;
+  const canvasHeight = ctx.canvas?.clientHeight || 360;
+  const deepRgb = rgb.map(channel => Math.max(2, Math.round(channel * .16)));
+  const bodyGradient = ctx.createLinearGradient(0, canvasHeight * .12, canvasWidth, canvasHeight * .88);
+  bodyGradient.addColorStop(0, battleModernVfxRgba(accentRgb, alpha * .94));
+  bodyGradient.addColorStop(.38, `rgba(255,255,255,${battleModernVfxClamp(alpha * .98)})`);
+  bodyGradient.addColorStop(.57, battleModernVfxRgba(rgb, alpha * .96));
+  bodyGradient.addColorStop(1, battleModernVfxRgba(deepRgb, alpha * .84));
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.translate(0, Math.max(1, width * .72));
+  trace();
+  ctx.strokeStyle = battleModernVfxRgba(deepRgb, alpha * .68);
+  ctx.lineWidth = width * 2.35;
+  ctx.shadowColor = "rgba(1,4,14,.72)";
+  ctx.shadowBlur = width * 2.1;
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  trace();
+  ctx.strokeStyle = battleModernVfxRgba(accentRgb, alpha * .18);
+  ctx.lineWidth = width * 5.2;
+  ctx.shadowColor = battleModernVfxRgba(accentRgb, .96);
+  ctx.shadowBlur = width * 7.2;
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(-Math.max(.45, width * .17), 0);
+  trace();
+  ctx.strokeStyle = `rgba(255,87,178,${battleModernVfxClamp(alpha * .22)})`;
+  ctx.lineWidth = width * 1.9;
+  ctx.shadowBlur = 0;
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  ctx.translate(Math.max(.45, width * .17), 0);
+  trace();
+  ctx.strokeStyle = `rgba(80,220,255,${battleModernVfxClamp(alpha * .24)})`;
+  ctx.lineWidth = width * 1.75;
+  ctx.shadowBlur = 0;
+  ctx.stroke();
+  ctx.restore();
+  trace();
+  ctx.strokeStyle = bodyGradient;
+  ctx.lineWidth = width * 1.72;
+  ctx.shadowColor = battleModernVfxRgba(rgb, .96);
+  ctx.shadowBlur = width * 3.5;
+  ctx.stroke();
+  trace();
+  ctx.strokeStyle = `rgba(255,255,255,${battleModernVfxClamp(alpha * .94)})`;
+  ctx.lineWidth = Math.max(.65, width * .28);
+  ctx.shadowColor = "rgba(255,255,255,.9)";
+  ctx.shadowBlur = width * 1.25;
+  ctx.stroke();
+  ctx.restore();
+}
+function battleModernVfxFillMaterial(ctx, trace, x, y, radius, rgb, accentRgb, alpha, glass = false) {
+  if (alpha <= 0 || radius <= 0) return;
+  const deepRgb = rgb.map(channel => Math.max(2, Math.round(channel * .12)));
+  const shadowRgb = accentRgb.map(channel => Math.max(4, Math.round(channel * .24)));
+  const body = ctx.createRadialGradient(x - radius * .32, y - radius * .38, radius * .04, x, y, radius);
+  body.addColorStop(0, `rgba(255,255,255,${battleModernVfxClamp(alpha * .98)})`);
+  body.addColorStop(.1, battleModernVfxRgba(accentRgb, alpha * .94));
+  body.addColorStop(.34, battleModernVfxRgba(rgb, alpha * (glass ? .66 : .92)));
+  body.addColorStop(.7, battleModernVfxRgba(shadowRgb, alpha * (glass ? .52 : .88)));
+  body.addColorStop(1, battleModernVfxRgba(deepRgb, alpha * (glass ? .28 : .82)));
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.translate(0, Math.max(1.2, radius * .045));
+  trace();
+  ctx.fillStyle = `rgba(1,4,14,${battleModernVfxClamp(alpha * .5)})`;
+  ctx.shadowColor = "rgba(1,4,14,.78)";
+  ctx.shadowBlur = radius * .22;
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  trace();
+  ctx.fillStyle = body;
+  ctx.shadowColor = battleModernVfxRgba(accentRgb, .9);
+  ctx.shadowBlur = radius * .36;
+  ctx.fill();
+  ctx.globalCompositeOperation = "lighter";
+  const sheen = ctx.createRadialGradient(x - radius * .34, y - radius * .4, 0, x - radius * .18, y - radius * .22, radius * .62);
+  sheen.addColorStop(0, `rgba(255,255,255,${battleModernVfxClamp(alpha * .94)})`);
+  sheen.addColorStop(.18, `rgba(255,255,255,${battleModernVfxClamp(alpha * .34)})`);
+  sheen.addColorStop(1, "rgba(255,255,255,0)");
+  trace();
+  ctx.fillStyle = sheen;
+  ctx.fill();
+  trace();
+  ctx.strokeStyle = `rgba(255,255,255,${battleModernVfxClamp(alpha * .8)})`;
+  ctx.lineWidth = Math.max(.75, radius * .026);
+  ctx.shadowColor = battleModernVfxRgba(accentRgb, .92);
+  ctx.shadowBlur = radius * .14;
+  ctx.stroke();
+  ctx.restore();
+}
+function battleModernVfxDrawLensFlare(ctx, x, y, rgb, accentRgb, alpha, size) {
+  if (alpha <= 0 || size <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  const horizontal = ctx.createLinearGradient(x - size, y, x + size, y);
+  horizontal.addColorStop(0, battleModernVfxRgba(rgb, 0));
+  horizontal.addColorStop(.32, battleModernVfxRgba(accentRgb, alpha * .22));
+  horizontal.addColorStop(.49, `rgba(255,255,255,${battleModernVfxClamp(alpha * .92)})`);
+  horizontal.addColorStop(.51, `rgba(255,255,255,${battleModernVfxClamp(alpha * .92)})`);
+  horizontal.addColorStop(.68, battleModernVfxRgba(accentRgb, alpha * .22));
+  horizontal.addColorStop(1, battleModernVfxRgba(rgb, 0));
+  ctx.fillStyle = horizontal;
+  ctx.fillRect(x - size, y - 1.15, size * 2, 2.3);
+  const vertical = ctx.createLinearGradient(x, y - size * .44, x, y + size * .44);
+  vertical.addColorStop(0, battleModernVfxRgba(rgb, 0));
+  vertical.addColorStop(.47, battleModernVfxRgba(accentRgb, alpha * .45));
+  vertical.addColorStop(.5, `rgba(255,255,255,${battleModernVfxClamp(alpha * .8)})`);
+  vertical.addColorStop(.53, battleModernVfxRgba(accentRgb, alpha * .45));
+  vertical.addColorStop(1, battleModernVfxRgba(rgb, 0));
+  ctx.fillStyle = vertical;
+  ctx.fillRect(x - .8, y - size * .44, 1.6, size * .88);
+  for (let index = 0; index < 4; index += 1) {
+    const offset = (index - 1.5) * size * .23;
+    ctx.beginPath();
+    ctx.arc(x + offset, y, Math.max(1, size * (.018 + index * .005)), 0, Math.PI * 2);
+    ctx.fillStyle = battleModernVfxRgba(index % 2 ? accentRgb : rgb, alpha * (.25 - index * .035));
+    ctx.fill();
+  }
+  ctx.restore();
+}
+function battleModernVfxStarPath(ctx, x, y, outerRadius, innerRadius, points = 5, rotation = -Math.PI / 2) {
+  ctx.beginPath();
+  for (let index = 0; index < points * 2; index += 1) {
+    const radius = index % 2 ? innerRadius : outerRadius;
+    const angle = rotation + index * Math.PI / points;
+    const pointX = x + Math.cos(angle) * radius;
+    const pointY = y + Math.sin(angle) * radius;
+    if (index === 0) ctx.moveTo(pointX, pointY);
+    else ctx.lineTo(pointX, pointY);
+  }
+  ctx.closePath();
+}
+function battleModernVfxPolygonPath(ctx, x, y, radius, sides, rotation = -Math.PI / 2) {
+  ctx.beginPath();
+  for (let index = 0; index < sides; index += 1) {
+    const angle = rotation + index * Math.PI * 2 / sides;
+    const pointX = x + Math.cos(angle) * radius;
+    const pointY = y + Math.sin(angle) * radius;
+    if (index === 0) ctx.moveTo(pointX, pointY);
+    else ctx.lineTo(pointX, pointY);
+  }
+  ctx.closePath();
+}
+function battleModernVfxDrawCaster(model) {
+  const { ctx, local, attackStart, impactTime, start, rgb, strength, motes } = model;
+  const fadeIn = battleModernVfxClamp(local / .32);
+  const fadeOut = battleModernVfxClamp((impactTime + .22 - local) / .82);
+  const alpha = fadeIn * fadeOut;
+  if (alpha <= 0) return;
+  const build = battleModernVfxClamp(local / Math.max(.45, attackStart));
+  const pulse = .86 + Math.sin(local * 7.4) * .08;
+  battleModernVfxBloom(ctx, start.x, start.y - 4, 46 * strength * pulse, rgb, alpha * .62);
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.translate(start.x, start.y + 21);
+  ctx.rotate(-.08);
+  for (let index = 0; index < 3; index += 1) {
+    const size = (25 + index * 12) * strength * (.62 + build * .42);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size, size * .28, local * (.5 + index * .16), 0, Math.PI * 2);
+    ctx.strokeStyle = index === 1 ? `rgba(255,255,255,${alpha * .7})` : battleModernVfxRgba(rgb, alpha * (.56 - index * .1));
+    ctx.lineWidth = Math.max(1, (3 - index * .7) * strength);
+    ctx.shadowColor = battleModernVfxRgba(rgb, .95);
+    ctx.shadowBlur = 12 + index * 4;
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.shadowColor = battleModernVfxRgba(rgb, .9);
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = battleModernVfxRgba(rgb, alpha * .78);
+  for (const mote of motes) {
+    const angle = mote.angle + local * mote.orbit;
+    const radius = mote.radius * (.58 + build * .44) * strength;
+    const x = start.x + Math.cos(angle) * radius;
+    const y = start.y - 5 + Math.sin(angle) * radius * .54;
+    ctx.beginPath();
+    ctx.arc(x, y, mote.size * strength, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+function battleModernVfxDrawTravel(model, opacityScale = 1) {
+  const { ctx, local, attackStart, impactTime, start, target, rgb, accentRgb = rgb, strength, curveHeight } = model;
+  if (local < attackStart) return null;
+  const raw = battleModernVfxClamp((local - attackStart) / Math.max(.2, impactTime - attackStart));
+  const progress = battleModernVfxEase(raw);
+  const fade = local <= impactTime ? 1 : battleModernVfxClamp(1 - ((local - impactTime) / .52));
+  const alpha = fade * opacityScale;
+  if (alpha <= 0) return null;
+  const tailStart = Math.max(0, progress - .46);
+  const tracePath = () => {
+    ctx.beginPath();
+    for (let index = 0; index <= 22; index += 1) {
+      const pointProgress = tailStart + ((progress - tailStart) * index / 22);
+      const point = battleModernVfxPoint(start, target, pointProgress, curveHeight);
+      if (index === 0) ctx.moveTo(point.x, point.y);
+      else ctx.lineTo(point.x, point.y);
+    }
+  };
+  battleModernVfxStrokeLayers(ctx, tracePath, rgb, accentRgb, alpha, 4.1 * strength);
+  const head = battleModernVfxPoint(start, target, progress, curveHeight);
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  for (let index = 1; index <= 9; index += 1) {
+    const trailProgress = Math.max(0, progress - index * .025);
+    const point = battleModernVfxPoint(start, target, trailProgress, curveHeight);
+    const trailAlpha = alpha * (1 - index / 10) * .52;
+    const prior = battleModernVfxPoint(start, target, Math.max(0, trailProgress - .018), curveHeight);
+    ctx.beginPath();
+    ctx.moveTo(prior.x, prior.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.strokeStyle = index % 3 === 0 ? `rgba(255,255,255,${trailAlpha})` : battleModernVfxRgba(index % 2 ? accentRgb : rgb, trailAlpha);
+    ctx.lineWidth = Math.max(.65, (4.8 - index * .4) * strength);
+    ctx.shadowColor = battleModernVfxRgba(accentRgb, .86);
+    ctx.shadowBlur = 7;
+    ctx.stroke();
+  }
+  ctx.restore();
+  battleModernVfxBloom(ctx, head.x, head.y, 30 * strength, rgb, alpha * .84);
+  return head;
+}
+function battleModernVfxDrawSlash(model) {
+  const { ctx, local, impactTime, target, rgb, accentRgb = rgb, strength, actorDirection, family } = model;
+  const startAt = impactTime - .88;
+  const progress = battleModernVfxClamp((local - startAt) / 1.08);
+  if (progress <= 0 || progress >= 1) return;
+  const alpha = Math.sin(progress * Math.PI);
+  const slashCount = family === "cross-slash" || strength > 1.2 ? 2 : 1;
+  for (let index = 0; index < slashCount; index += 1) {
+    const flip = index % 2 ? -1 : 1;
+    const offset = index ? 17 : -7;
+    const trace = () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x - actorDirection * 106, target.y + 47 * flip + offset);
+      ctx.quadraticCurveTo(target.x - actorDirection * 6, target.y - 72 * flip, target.x + actorDirection * 92, target.y - 39 * flip + offset);
+    };
+    battleModernVfxStrokeLayers(ctx, trace, rgb, accentRgb, alpha, 4.8 * strength);
+  }
+}
+function battleModernVfxDrawStarfall(model) {
+  const { ctx, local, attackStart, impactTime, target, rgb, strength, streaks } = model;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  for (const streak of streaks) {
+    const begin = attackStart + streak.delay * Math.max(.35, impactTime - attackStart - .2);
+    const progress = battleModernVfxClamp((local - begin) / streak.life);
+    if (progress <= 0 || progress >= 1) continue;
+    const alpha = Math.sin(progress * Math.PI);
+    const endX = target.x + streak.offset;
+    const endY = -18 + progress * (target.y + 30);
+    ctx.beginPath();
+    ctx.moveTo(endX - streak.slant, endY - streak.length);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = battleModernVfxRgba(rgb, alpha * .72);
+    ctx.lineWidth = streak.width * strength;
+    ctx.shadowColor = battleModernVfxRgba(rgb, .9);
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(endX - streak.slant * .72, endY - streak.length * .72);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = `rgba(255,255,255,${alpha * .9})`;
+    ctx.lineWidth = Math.max(.7, streak.width * .32 * strength);
+    ctx.shadowBlur = 4;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function battleModernVfxDrawWind(model, center) {
+  if (!center) return;
+  const { ctx, local, rgb, strength } = model;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.translate(center.x, center.y);
+  for (let index = 0; index < 4; index += 1) {
+    ctx.save();
+    ctx.rotate(local * (1.6 + index * .24) * (index % 2 ? -1 : 1));
+    ctx.beginPath();
+    ctx.ellipse(0, 0, (28 + index * 10) * strength, (10 + index * 4) * strength, 0, .22, Math.PI * 1.72);
+    ctx.strokeStyle = index === 1 ? `rgba(255,255,255,.78)` : battleModernVfxRgba(rgb, .62 - index * .08);
+    ctx.lineWidth = Math.max(1, (3.8 - index * .55) * strength);
+    ctx.shadowColor = battleModernVfxRgba(rgb, .9);
+    ctx.shadowBlur = 13;
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function battleModernVfxDrawWater(model, center) {
+  if (!center) return;
+  const { ctx, local, impactTime, target, rgb, strength } = model;
+  const alpha = battleModernVfxClamp((local - (impactTime - .82)) / .28) * battleModernVfxClamp((impactTime + .45 - local) / .55);
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  for (let index = 0; index < 3; index += 1) {
+    const width = (62 + index * 22) * strength;
+    const y = target.y + 24 + index * 8;
+    ctx.beginPath();
+    ctx.moveTo(target.x - width, y);
+    ctx.bezierCurveTo(target.x - width * .45, y - 34 - index * 5, target.x + width * .35, y + 20, target.x + width, y - 7);
+    ctx.strokeStyle = index === 0 ? `rgba(255,255,255,${alpha * .84})` : battleModernVfxRgba(rgb, alpha * (.7 - index * .12));
+    ctx.lineWidth = Math.max(1, (5.5 - index) * strength);
+    ctx.shadowColor = battleModernVfxRgba(rgb, .9);
+    ctx.shadowBlur = 16;
+    ctx.stroke();
+  }
+  ctx.restore();
+  battleModernVfxBloom(ctx, center.x, center.y, 26 * strength, rgb, alpha * .42);
+}
+function battleModernVfxDrawCity(model, center) {
+  if (!center) return;
+  const { ctx, local, impactTime, target, rgb, strength } = model;
+  const alpha = battleModernVfxClamp((local - (impactTime - 1.05)) / .35) * battleModernVfxClamp((impactTime + .3 - local) / .48);
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.translate(target.x, target.y + 34);
+  ctx.strokeStyle = battleModernVfxRgba(rgb, alpha * .6);
+  ctx.shadowColor = battleModernVfxRgba(rgb, .92);
+  ctx.shadowBlur = 11;
+  ctx.lineWidth = 1.2 * strength;
+  for (let index = -3; index <= 3; index += 1) {
+    ctx.beginPath();
+    ctx.moveTo(index * 12, -62);
+    ctx.lineTo(index * 25, 36);
+    ctx.stroke();
+  }
+  for (let index = 0; index < 5; index += 1) {
+    const y = -48 + index * 20;
+    const half = 38 + index * 12;
+    ctx.beginPath();
+    ctx.moveTo(-half, y);
+    ctx.lineTo(half, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+  battleModernVfxBloom(ctx, center.x, center.y, 24 * strength, rgb, alpha * .56);
+}
+function battleModernVfxDrawFlash(model, center) {
+  const { ctx, local, impactTime, target, rgb, strength } = model;
+  const alpha = battleModernVfxClamp((local - (impactTime - .48)) / .16) * battleModernVfxClamp((impactTime + .38 - local) / .48);
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.translate(target.x, target.y);
+  ctx.rotate(local * .44);
+  ctx.lineCap = "round";
+  const rayCount = strength > 1.2 ? 14 : 10;
+  for (let index = 0; index < rayCount; index += 1) {
+    const angle = (Math.PI * 2 * index / rayCount) + (index % 2 ? .08 : 0);
+    const inner = 18 * strength;
+    const outer = (52 + (index % 3) * 13) * strength;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+    ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    ctx.strokeStyle = index % 3 ? battleModernVfxRgba(rgb, alpha * .72) : `rgba(255,255,255,${alpha * .9})`;
+    ctx.lineWidth = Math.max(1, (3.6 - (index % 3) * .6) * strength);
+    ctx.shadowColor = battleModernVfxRgba(rgb, .95);
+    ctx.shadowBlur = 17;
+    ctx.stroke();
+  }
+  ctx.restore();
+  if (center) battleModernVfxBloom(ctx, center.x, center.y, 31 * strength, rgb, alpha * .76);
+}
+function battleModernVfxDrawThunder(model) {
+  const { ctx, local, impactTime, target, rgb, strength, lightning } = model;
+  const alpha = battleModernVfxClamp((local - (impactTime - .78)) / .12) * battleModernVfxClamp((impactTime + .28 - local) / .38);
+  if (alpha <= 0) return;
+  const trace = () => {
+    ctx.beginPath();
+    lightning.forEach((offset, index) => {
+      const progress = index / (lightning.length - 1);
+      const x = target.x + offset * (1 - progress * .72) * strength;
+      const y = -16 + progress * (target.y + 16);
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+  };
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  trace();
+  ctx.strokeStyle = battleModernVfxRgba(rgb, alpha * .32);
+  ctx.lineWidth = 17 * strength;
+  ctx.shadowColor = battleModernVfxRgba(rgb, .98);
+  ctx.shadowBlur = 30;
+  ctx.stroke();
+  trace();
+  ctx.strokeStyle = battleModernVfxRgba(rgb, alpha * .94);
+  ctx.lineWidth = 6 * strength;
+  ctx.shadowBlur = 14;
+  ctx.stroke();
+  trace();
+  ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+  ctx.lineWidth = 1.7 * strength;
+  ctx.shadowBlur = 5;
+  ctx.stroke();
+  ctx.restore();
+}
+function battleModernVfxDrawCinematicAtmosphere(model) {
+  const { ctx, width, height, local, attackStart, impactTime, start, target, rgb, accentRgb, strength, motes } = model;
+  const enter = battleModernVfxClamp((local - (attackStart - .34)) / .42);
+  const leave = battleModernVfxClamp((impactTime + .86 - local) / .92);
+  const alpha = enter * leave;
+  if (alpha <= 0) return;
+  const rawProgress = battleModernVfxClamp((local - attackStart) / Math.max(.28, impactTime - attackStart));
+  const progress = battleModernVfxEase(rawProgress);
+  const head = battleModernVfxPoint(start, target, progress, -height * .17);
+  const centerX = start.x + (target.x - start.x) * Math.min(1, progress * 1.08);
+  const centerY = start.y + (target.y - start.y) * Math.min(1, progress * 1.08);
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const groundShadow = ctx.createRadialGradient(target.x, target.y + 54 * strength, 0, target.x, target.y + 54 * strength, 86 * strength);
+  groundShadow.addColorStop(0, `rgba(1,4,14,${battleModernVfxClamp(alpha * .28)})`);
+  groundShadow.addColorStop(.55, `rgba(2,7,20,${battleModernVfxClamp(alpha * .12)})`);
+  groundShadow.addColorStop(1, "rgba(1,4,14,0)");
+  ctx.fillStyle = groundShadow;
+  ctx.beginPath();
+  ctx.ellipse(target.x, target.y + 54 * strength, 94 * strength, 24 * strength, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  for (let layer = 0; layer < 3; layer += 1) {
+    const radiusX = (58 + layer * 28) * strength;
+    const radiusY = (34 + layer * 17) * strength;
+    const driftX = Math.sin(local * (.6 + layer * .14) + layer * 1.8) * 8;
+    const driftY = Math.cos(local * (.48 + layer * .1) + layer) * 5;
+    const gradient = ctx.createRadialGradient(centerX + driftX, centerY + driftY, 0, centerX + driftX, centerY + driftY, radiusX);
+    gradient.addColorStop(0, battleModernVfxRgba(layer % 2 ? accentRgb : rgb, alpha * (.11 - layer * .018)));
+    gradient.addColorStop(.48, battleModernVfxRgba(layer % 2 ? rgb : accentRgb, alpha * (.05 - layer * .008)));
+    gradient.addColorStop(1, battleModernVfxRgba(rgb, 0));
+    ctx.save();
+    ctx.translate(centerX + driftX, centerY + driftY);
+    ctx.scale(1, radiusY / radiusX);
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, radiusX, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.lineCap = "round";
+  for (let index = 0; index < Math.min(14, motes.length); index += 1) {
+    const mote = motes[index];
+    const orbit = mote.angle + local * mote.orbit * .34;
+    const radius = (28 + mote.radius * (1.15 + progress * .35)) * strength;
+    const x = centerX + Math.cos(orbit) * radius;
+    const y = centerY + Math.sin(orbit) * radius * .48;
+    const tailAngle = orbit - mote.orbit * .18;
+    const tailX = centerX + Math.cos(tailAngle) * radius * .82;
+    const tailY = centerY + Math.sin(tailAngle) * radius * .4;
+    const moteAlpha = alpha * (.18 + (index % 4) * .035);
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.quadraticCurveTo((tailX + x) / 2 + Math.sin(local + index) * 7, (tailY + y) / 2 - 5, x, y);
+    ctx.strokeStyle = index % 3 === 0 ? `rgba(255,255,255,${moteAlpha})` : battleModernVfxRgba(index % 2 ? accentRgb : rgb, moteAlpha);
+    ctx.lineWidth = Math.max(.45, mote.size * strength * .55);
+    ctx.shadowColor = battleModernVfxRgba(accentRgb, .72);
+    ctx.shadowBlur = 5;
+    ctx.stroke();
+  }
+  const beam = ctx.createLinearGradient(start.x, start.y, head.x, head.y);
+  beam.addColorStop(0, battleModernVfxRgba(rgb, 0));
+  beam.addColorStop(.42, battleModernVfxRgba(accentRgb, alpha * .1));
+  beam.addColorStop(.8, battleModernVfxRgba(rgb, alpha * .2));
+  beam.addColorStop(1, `rgba(255,255,255,${battleModernVfxClamp(alpha * .28)})`);
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.quadraticCurveTo((start.x + head.x) / 2, Math.min(start.y, head.y) - height * .1, head.x, head.y);
+  ctx.strokeStyle = beam;
+  ctx.lineWidth = 1.1 * strength;
+  ctx.shadowColor = battleModernVfxRgba(accentRgb, .84);
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  ctx.restore();
+  const impactFlare = battleModernVfxClamp((local - (impactTime - .18)) / .12) * battleModernVfxClamp((impactTime + .34 - local) / .38);
+  if (impactFlare > 0) battleModernVfxDrawLensFlare(ctx, target.x, target.y, rgb, accentRgb, impactFlare, 118 * strength);
+}
+function battleModernVfxDrawMaterialBody(model) {
+  const { ctx, height, local, attackStart, impactTime, start, target, rgb, accentRgb, strength, profile, family, motes } = model;
+  const enter = battleModernVfxClamp((local - (attackStart - .12)) / .26);
+  const leave = battleModernVfxClamp((impactTime + .54 - local) / .64);
+  const alpha = enter * leave;
+  if (alpha <= 0) return;
+  const rawProgress = battleModernVfxClamp((local - attackStart) / Math.max(.24, impactTime - attackStart));
+  const progress = battleModernVfxEase(rawProgress);
+  const head = battleModernVfxPoint(start, target, progress, -height * .18);
+  const impactPulse = battleModernVfxClamp((local - (impactTime - .34)) / .18) * battleModernVfxClamp((impactTime + .42 - local) / .5);
+  const motif = profile?.motif || family;
+  const direction = target.x >= start.x ? 1 : -1;
+  const sphere = (x, y, radius, opacity = alpha, glass = false, primary = rgb, accent = accentRgb) => {
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+    }, x, y, radius, primary, accent, opacity, glass);
+  };
+  if (motif === "steps") {
+    for (let index = 0; index < 6; index += 1) {
+      const phase = progress * 6.7 - index;
+      if (phase <= 0 || phase > 1.6) continue;
+      const stepAlpha = alpha * battleModernVfxClamp(phase / .18) * battleModernVfxClamp((1.6 - phase) / .42);
+      const ratio = (index + 1) / 6.5;
+      const x = start.x + (target.x - start.x) * ratio;
+      const y = target.y + 53 * strength + Math.sin(index * 1.5) * 4;
+      battleModernVfxFillMaterial(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(x, y, 15 * strength, 5.4 * strength, -.08 * direction, 0, Math.PI * 2);
+      }, x, y, 17 * strength, rgb, accentRgb, stepAlpha, true);
+    }
+    return;
+  }
+  if (motif === "chevron") {
+    const radius = 27 * strength;
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(head.x + direction * radius, head.y);
+      ctx.lineTo(head.x - direction * radius * .3, head.y - radius * .72);
+      ctx.lineTo(head.x - direction * radius, head.y - radius * .36);
+      ctx.lineTo(head.x - direction * radius * .28, head.y);
+      ctx.lineTo(head.x - direction * radius, head.y + radius * .36);
+      ctx.lineTo(head.x - direction * radius * .3, head.y + radius * .72);
+      ctx.closePath();
+    }, head.x, head.y, radius, rgb, accentRgb, alpha, true);
+    return;
+  }
+  if (["comet", "starfall", "starCrest"].includes(motif)) {
+    const radius = (motif === "starCrest" ? 43 : 22 + impactPulse * 8) * strength;
+    const x = motif === "starCrest" ? target.x : head.x;
+    const y = motif === "starCrest" ? target.y : head.y;
+    battleModernVfxFillMaterial(ctx, () => {
+      battleModernVfxStarPath(ctx, x, y, radius, radius * .43, 5, local * .45);
+    }, x, y, radius, rgb, accentRgb, alpha, false);
+    return;
+  }
+  if (motif === "cloud") {
+    const centerX = start.x + (target.x - start.x) * Math.min(1, progress * 1.1);
+    const centerY = target.y - 7 + Math.sin(local * 2.1) * 3;
+    const puffs = [[-35, 7, 26], [-20, -13, 31], [7, -18, 36], [34, -4, 28], [19, 14, 31], [-10, 18, 29]];
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    for (let index = puffs.length - 1; index >= 0; index -= 1) {
+      const [offsetX, offsetY, radius] = puffs[index];
+      const x = centerX + offsetX * strength;
+      const y = centerY + offsetY * strength;
+      const gradient = ctx.createRadialGradient(x - radius * .28, y - radius * .32, radius * .06, x, y, radius * strength);
+      gradient.addColorStop(0, `rgba(255,255,255,${battleModernVfxClamp(alpha * .82)})`);
+      gradient.addColorStop(.28, battleModernVfxRgba(accentRgb, alpha * .52));
+      gradient.addColorStop(.7, battleModernVfxRgba(rgb, alpha * .18));
+      gradient.addColorStop(1, "rgba(18,28,48,0)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * strength, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+  if (["rune", "grid", "prism", "mirrors"].includes(motif)) {
+    const x = motif === "rune" ? head.x : target.x;
+    const y = motif === "rune" ? head.y : target.y;
+    const radius = (motif === "prism" ? 40 : motif === "grid" ? 34 : 28) * strength;
+    const sides = motif === "prism" ? 3 : motif === "grid" ? 4 : 6;
+    battleModernVfxFillMaterial(ctx, () => {
+      battleModernVfxPolygonPath(ctx, x, y, radius, sides, -Math.PI / 2 + local * .18);
+    }, x, y, radius, rgb, accentRgb, alpha * .88, true);
+    if (motif === "mirrors") {
+      for (let index = 0; index < 4; index += 1) {
+        const angle = index * Math.PI * .5 + .36;
+        const shardX = target.x + Math.cos(angle) * 55 * strength;
+        const shardY = target.y + Math.sin(angle) * 38 * strength;
+        battleModernVfxFillMaterial(ctx, () => {
+          battleModernVfxPolygonPath(ctx, shardX, shardY, (14 + index * 2) * strength, 3, angle + local * .08);
+        }, shardX, shardY, 18 * strength, rgb, accentRgb, alpha * .68, true);
+      }
+    }
+    return;
+  }
+  if (["sunColumn", "sunFan", "solarCrown", "flash"].includes(motif)) {
+    const radius = (31 + impactPulse * 15) * strength;
+    sphere(target.x, target.y - 4 * strength, radius, alpha, false, rgb, accentRgb);
+    battleModernVfxDrawLensFlare(ctx, target.x, target.y - 4 * strength, rgb, accentRgb, alpha * (.38 + impactPulse * .62), 92 * strength);
+    return;
+  }
+  if (motif === "phantomLanternArray") {
+    const panels = [[-58, -14], [-29, 18], [0, -33], [29, 18], [58, -14]];
+    for (let index = 0; index < panels.length; index += 1) {
+      const x = target.x + panels[index][0] * strength;
+      const y = target.y + panels[index][1] * strength + Math.sin(local * 1.35 + index * .8) * 3;
+      const radius = (index === 2 ? 17 : 14) * strength;
+      battleModernVfxFillMaterial(ctx, () => {
+        battleModernVfxPolygonPath(ctx, x, y, radius, 6, Math.PI / 6);
+      }, x, y, radius, rgb, accentRgb, alpha * (index === 2 ? .92 : .76), true);
+    }
+    return;
+  }
+  if (motif === "lamps") {
+    const positions = [[-.55, 10], [-.28, -4], [0, 4], [.28, -7], [.55, 8]];
+    for (let index = 0; index < positions.length; index += 1) {
+      const x = start.x + (target.x - start.x) * ((index + 1) / 6);
+      const y = target.y + positions[index][1] + 25 * strength;
+      sphere(x, y, (9 + (index % 2) * 2) * strength, alpha * (.7 + index * .05), true, rgb, accentRgb);
+    }
+    return;
+  }
+  if (motif === "tower" || motif === "city-spark") {
+    const x = target.x;
+    const y = target.y + 8 * strength;
+    const radius = 45 * strength;
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(x, y - radius);
+      ctx.lineTo(x + radius * .38, y - radius * .28);
+      ctx.lineTo(x + radius * .62, y + radius * .72);
+      ctx.lineTo(x - radius * .62, y + radius * .72);
+      ctx.lineTo(x - radius * .38, y - radius * .28);
+      ctx.closePath();
+    }, x, y, radius, rgb, accentRgb, alpha * .88, true);
+    return;
+  }
+  if (["drop", "water"].includes(motif)) {
+    const x = motif === "drop" ? head.x : target.x;
+    const y = motif === "drop" ? head.y : target.y;
+    const radius = 25 * strength;
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(x, y - radius);
+      ctx.bezierCurveTo(x + radius * .9, y - radius * .05, x + radius * .64, y + radius * .9, x, y + radius);
+      ctx.bezierCurveTo(x - radius * .64, y + radius * .9, x - radius * .9, y - radius * .05, x, y - radius);
+      ctx.closePath();
+    }, x, y, radius, rgb, accentRgb, alpha * .9, true);
+    return;
+  }
+  if (motif === "waterGate" || motif === "magicGate") {
+    const portalAlpha = alpha * (.72 + impactPulse * .28);
+    const portal = ctx.createRadialGradient(target.x - 10 * strength, target.y - 15 * strength, 4, target.x, target.y, 58 * strength);
+    portal.addColorStop(0, "rgba(2,7,20,.74)");
+    portal.addColorStop(.34, battleModernVfxRgba(rgb, portalAlpha * .22));
+    portal.addColorStop(.63, battleModernVfxRgba(accentRgb, portalAlpha * .7));
+    portal.addColorStop(.78, `rgba(255,255,255,${battleModernVfxClamp(portalAlpha * .82)})`);
+    portal.addColorStop(1, battleModernVfxRgba(accentRgb, 0));
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = portal;
+    ctx.beginPath();
+    ctx.ellipse(target.x, target.y, 47 * strength, 72 * strength, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+  if (motif === "tide") {
+    const y = target.y + 23 * strength;
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x - 105 * strength, y + 24 * strength);
+      ctx.bezierCurveTo(target.x - 67 * strength, y - 54 * strength, target.x - 13 * strength, y + 8 * strength, target.x + 15 * strength, y - 37 * strength);
+      ctx.bezierCurveTo(target.x + 44 * strength, y - 3 * strength, target.x + 66 * strength, y - 25 * strength, target.x + 108 * strength, y + 20 * strength);
+      ctx.lineTo(target.x + 108 * strength, y + 48 * strength);
+      ctx.lineTo(target.x - 105 * strength, y + 48 * strength);
+      ctx.closePath();
+    }, target.x, y, 112 * strength, rgb, accentRgb, alpha * .72, true);
+    return;
+  }
+  if (motif === "embers" || motif === "thunder") {
+    const radius = (22 + impactPulse * 12) * strength;
+    sphere(target.x, target.y, radius, alpha * .88, false, rgb, accentRgb);
+    for (let index = 0; index < Math.min(10, motes.length); index += 1) {
+      const mote = motes[index];
+      const rise = (local * (.38 + index * .012) + index / 10) % 1;
+      const x = target.x + Math.sin(mote.angle + local) * (24 + mote.radius * .45) * strength;
+      const y = target.y + 37 * strength - rise * 104 * strength;
+      battleModernVfxBloom(ctx, x, y, (4 + mote.size * 3) * strength, index % 2 ? accentRgb : rgb, alpha * Math.sin(rise * Math.PI) * .58);
+    }
+    return;
+  }
+  if (motif === "orbit" || motif === "wind" || motif === "route") {
+    const x = motif === "route" ? head.x : target.x;
+    const y = motif === "route" ? head.y : target.y;
+    sphere(x, y, 24 * strength, alpha * .82, true, rgb, accentRgb);
+    return;
+  }
+  if (["sprout", "forestCrest", "vineBloom"].includes(motif)) {
+    const leafCount = motif === "sprout" ? 3 : motif === "forestCrest" ? 7 : 9;
+    for (let index = 0; index < leafCount; index += 1) {
+      const angle = -Math.PI / 2 + (index - (leafCount - 1) / 2) * (motif === "sprout" ? .58 : .42);
+      const distance = (18 + (index % 3) * 16) * strength;
+      const x = target.x + Math.cos(angle) * distance;
+      const y = target.y + 34 * strength + Math.sin(angle) * distance;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + Math.PI / 2);
+      battleModernVfxFillMaterial(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 13 * strength, 5.5 * strength, 0, 0, Math.PI * 2);
+      }, 0, 0, 14 * strength, rgb, accentRgb, alpha * (.62 + index / leafCount * .25), true);
+      ctx.restore();
+    }
+    return;
+  }
+  if (motif === "slash" || motif === "cross-slash") {
+    const radius = 78 * strength;
+    battleModernVfxFillMaterial(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x - direction * radius, target.y + radius * .36);
+      ctx.quadraticCurveTo(target.x, target.y - radius, target.x + direction * radius, target.y - radius * .3);
+      ctx.quadraticCurveTo(target.x, target.y - radius * .48, target.x - direction * radius * .74, target.y + radius * .44);
+      ctx.closePath();
+    }, target.x, target.y, radius, rgb, accentRgb, alpha * .58, true);
+    return;
+  }
+  sphere(target.x, target.y, 28 * strength, alpha * .78, true, rgb, accentRgb);
+}
+function battleModernVfxDrawSignature(model) {
+  const { ctx, width, height, local, attackStart, impactTime, start, target, rgb, accentRgb, strength, profile, actorDirection, motes } = model;
+  if (!profile) return;
+  const enter = battleModernVfxClamp((local - (attackStart - .18)) / .3);
+  const leave = battleModernVfxClamp((impactTime + .62 - local) / .72);
+  const alpha = enter * leave;
+  if (alpha <= 0) return;
+  const rawProgress = battleModernVfxClamp((local - attackStart) / Math.max(.24, impactTime - attackStart));
+  const progress = battleModernVfxEase(rawProgress);
+  const head = battleModernVfxPoint(start, target, progress, -height * .18);
+  const impactPulse = battleModernVfxClamp((local - (impactTime - .38)) / .2) * battleModernVfxClamp((impactTime + .48 - local) / .58);
+  const direction = target.x >= start.x ? 1 : -1;
+  const groundY = target.y + 54 * strength;
+  const lineWidth = Math.max(1.6, 3.2 * strength);
+  if (profile.motif === "steps") {
+    for (let index = 0; index < 6; index += 1) {
+      const phase = progress * 6.8 - index;
+      if (phase <= 0 || phase >= 1.45) continue;
+      const stepAlpha = alpha * battleModernVfxClamp(phase / .16) * battleModernVfxClamp((1.45 - phase) / .42);
+      const stepProgress = (index + 1) / 6.5;
+      const x = start.x + (target.x - start.x) * stepProgress;
+      const y = groundY + Math.sin(index * 1.7) * 5;
+      battleModernVfxBloom(ctx, x, y, (18 + stepAlpha * 10) * strength, accentRgb, stepAlpha * .82);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(x, y, 13 * strength, 4.5 * strength, -.08 * direction, 0, Math.PI * 2);
+      }, rgb, accentRgb, stepAlpha, 2.2 * strength);
+    }
+    return;
+  }
+  if (profile.motif === "chevron") {
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.quadraticCurveTo((start.x + target.x) / 2, start.y - 18, head.x, head.y);
+    }, rgb, accentRgb, alpha * .78, lineWidth);
+    for (let index = 0; index < 4; index += 1) {
+      const arrowProgress = battleModernVfxClamp(progress - index * .09);
+      const point = battleModernVfxPoint(start, target, arrowProgress, -height * .11);
+      const arrowAlpha = alpha * (1 - index * .16);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(point.x - direction * 17 * strength, point.y - 11 * strength);
+        ctx.lineTo(point.x, point.y);
+        ctx.lineTo(point.x - direction * 17 * strength, point.y + 11 * strength);
+      }, rgb, accentRgb, arrowAlpha, 2.3 * strength);
+    }
+    battleModernVfxBloom(ctx, head.x, head.y, 27 * strength, accentRgb, alpha * .72);
+    return;
+  }
+  if (profile.motif === "comet") {
+    const starAlpha = alpha * (.66 + impactPulse * .34);
+    battleModernVfxBloom(ctx, head.x, head.y, 37 * strength, accentRgb, starAlpha * .88);
+    battleModernVfxStrokeLayers(ctx, () => {
+      battleModernVfxStarPath(ctx, head.x, head.y, 15 * strength, 6.4 * strength, 5, local * 2.1);
+    }, rgb, accentRgb, starAlpha, 2.4 * strength);
+    for (let index = 0; index < 4; index += 1) {
+      const tailPoint = battleModernVfxPoint(start, target, Math.max(0, progress - .08 - index * .045), -height * .18);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(head.x, head.y);
+        ctx.lineTo(tailPoint.x, tailPoint.y + (index - 1.5) * 5 * strength);
+      }, rgb, accentRgb, starAlpha * (.48 - index * .08), 1.5 * strength);
+    }
+    return;
+  }
+  if (profile.motif === "cloud") {
+    const cloudCenter = {
+      x: start.x + (target.x - start.x) * Math.min(1, progress * 1.12),
+      y: target.y - 12 + Math.sin(local * 3.2) * 4
+    };
+    const puffs = [[-34, 4, 24], [-18, -13, 30], [8, -18, 34], [31, -5, 27], [16, 13, 30], [-12, 17, 27]];
+    for (let index = 0; index < puffs.length; index += 1) {
+      const [offsetX, offsetY, radius] = puffs[index];
+      const puffAlpha = alpha * (.42 + (index % 3) * .1);
+      battleModernVfxBloom(ctx, cloudCenter.x + offsetX * strength, cloudCenter.y + offsetY * strength, radius * strength, index % 2 ? accentRgb : rgb, puffAlpha);
+    }
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(cloudCenter.x - 52 * strength, cloudCenter.y + 16 * strength);
+      ctx.bezierCurveTo(cloudCenter.x - 24 * strength, cloudCenter.y + 28 * strength, cloudCenter.x + 24 * strength, cloudCenter.y + 28 * strength, cloudCenter.x + 54 * strength, cloudCenter.y + 10 * strength);
+    }, rgb, accentRgb, alpha * .64, 2.1 * strength);
+    return;
+  }
+  if (profile.motif === "rune") {
+    battleModernVfxBloom(ctx, head.x, head.y, 34 * strength, accentRgb, alpha * .78);
+    ctx.save();
+    ctx.translate(head.x, head.y);
+    ctx.rotate(local * 1.8 * actorDirection);
+    for (let index = 0; index < 3; index += 1) {
+      const radius = (17 + index * 10) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxPolygonPath(ctx, 0, 0, radius, index === 1 ? 6 : 4, index * .22);
+      }, rgb, accentRgb, alpha * (1 - index * .16), (2.5 - index * .35) * strength);
+    }
+    for (let index = 0; index < 8; index += 1) {
+      const angle = index * Math.PI / 4;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(angle) * 34 * strength, Math.sin(angle) * 34 * strength);
+        ctx.lineTo(Math.cos(angle) * 43 * strength, Math.sin(angle) * 43 * strength);
+      }, rgb, accentRgb, alpha * .72, 1.4 * strength);
+    }
+    ctx.restore();
+    return;
+  }
+  if (profile.motif === "sunColumn") {
+    const columnAlpha = alpha * (.58 + impactPulse * .42);
+    const beamGradient = ctx.createLinearGradient(target.x, 0, target.x, target.y + 46);
+    beamGradient.addColorStop(0, battleModernVfxRgba(accentRgb, 0));
+    beamGradient.addColorStop(.28, battleModernVfxRgba(accentRgb, columnAlpha * .18));
+    beamGradient.addColorStop(.82, battleModernVfxRgba(rgb, columnAlpha * .54));
+    beamGradient.addColorStop(1, battleModernVfxRgba(accentRgb, 0));
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = beamGradient;
+    ctx.fillRect(target.x - 40 * strength, 0, 80 * strength, target.y + 54);
+    ctx.restore();
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x, 0);
+      ctx.lineTo(target.x, target.y + 30 * strength);
+    }, rgb, accentRgb, columnAlpha, 5.2 * strength);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.arc(target.x, target.y - 3 * strength, 36 * strength, 0, Math.PI * 2);
+    }, rgb, accentRgb, columnAlpha * .82, 2.8 * strength);
+    return;
+  }
+  if (profile.motif === "lamps") {
+    for (let index = 0; index < 5; index += 1) {
+      const lampProgress = (index + 1) / 6;
+      const phase = progress * 6 - index;
+      if (phase <= 0) continue;
+      const lampAlpha = alpha * battleModernVfxClamp(phase / .2);
+      const x = start.x + (target.x - start.x) * lampProgress;
+      const y = groundY - Math.sin(index * 1.25) * 7;
+      battleModernVfxBloom(ctx, x, y - 25 * strength, 25 * strength, accentRgb, lampAlpha * .82);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(x, y + 6 * strength);
+        ctx.lineTo(x, y - 23 * strength);
+        ctx.quadraticCurveTo(x + direction * 9 * strength, y - 34 * strength, x + direction * 15 * strength, y - 25 * strength);
+      }, rgb, accentRgb, lampAlpha, 2 * strength);
+    }
+    return;
+  }
+  if (profile.motif === "grid") {
+    const gridAlpha = alpha * (.52 + impactPulse * .48);
+    const horizonY = target.y - 24 * strength;
+    const floorY = Math.min(height - 8, target.y + 72 * strength);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      for (let index = -4; index <= 4; index += 1) {
+        ctx.moveTo(target.x + index * 7 * strength, horizonY);
+        ctx.lineTo(target.x + index * 30 * strength, floorY);
+      }
+      for (let index = 0; index < 6; index += 1) {
+        const ratio = index / 5;
+        const y = horizonY + Math.pow(ratio, 1.55) * (floorY - horizonY);
+        const half = (18 + ratio * 104) * strength;
+        ctx.moveTo(target.x - half, y);
+        ctx.lineTo(target.x + half, y);
+      }
+    }, rgb, accentRgb, gridAlpha, 1.4 * strength);
+    const scanY = horizonY + progress * (floorY - horizonY);
+    battleModernVfxBloom(ctx, target.x, scanY, 31 * strength, accentRgb, gridAlpha * .62);
+    return;
+  }
+  if (profile.motif === "tower") {
+    const towerAlpha = alpha * (.55 + impactPulse * .45);
+    const baseY = target.y + 48 * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x - 34 * strength, baseY);
+      ctx.lineTo(target.x - 25 * strength, target.y - 16 * strength);
+      ctx.lineTo(target.x - 11 * strength, target.y - 29 * strength);
+      ctx.lineTo(target.x, target.y - 61 * strength);
+      ctx.lineTo(target.x + 11 * strength, target.y - 29 * strength);
+      ctx.lineTo(target.x + 25 * strength, target.y - 16 * strength);
+      ctx.lineTo(target.x + 34 * strength, baseY);
+      ctx.closePath();
+      ctx.moveTo(target.x - 25 * strength, target.y - 4 * strength);
+      ctx.lineTo(target.x + 25 * strength, target.y - 4 * strength);
+    }, rgb, accentRgb, towerAlpha, 2.3 * strength);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x, 0);
+      ctx.lineTo(target.x, target.y - 55 * strength);
+    }, rgb, accentRgb, towerAlpha * .94, 4.5 * strength);
+    battleModernVfxBloom(ctx, target.x, target.y - 60 * strength, 34 * strength, accentRgb, towerAlpha * .9);
+    return;
+  }
+  if (profile.motif === "drop") {
+    battleModernVfxBloom(ctx, head.x, head.y, 32 * strength, accentRgb, alpha * .74);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(head.x, head.y - 20 * strength);
+      ctx.bezierCurveTo(head.x + 18 * strength, head.y - 1 * strength, head.x + 14 * strength, head.y + 17 * strength, head.x, head.y + 22 * strength);
+      ctx.bezierCurveTo(head.x - 14 * strength, head.y + 17 * strength, head.x - 18 * strength, head.y - 1 * strength, head.x, head.y - 20 * strength);
+      ctx.closePath();
+    }, rgb, accentRgb, alpha, 2.4 * strength);
+    return;
+  }
+  if (profile.motif === "waterGate" || profile.motif === "magicGate") {
+    const gateAlpha = alpha * (.58 + impactPulse * .42);
+    const gatePoints = profile.motif === "magicGate" ? [start, target] : [target];
+    for (const gatePoint of gatePoints) {
+      battleModernVfxBloom(ctx, gatePoint.x, gatePoint.y, 49 * strength, accentRgb, gateAlpha * .62);
+      for (let index = 0; index < 3; index += 1) {
+        const pulse = 1 + Math.sin(local * 4.2 + index) * .05;
+        battleModernVfxStrokeLayers(ctx, () => {
+          ctx.beginPath();
+          ctx.ellipse(gatePoint.x, gatePoint.y, (23 + index * 10) * strength * pulse, (46 + index * 11) * strength * pulse, local * .15 * (index % 2 ? -1 : 1), 0, Math.PI * 2);
+        }, rgb, accentRgb, gateAlpha * (1 - index * .19), (2.8 - index * .45) * strength);
+      }
+    }
+    if (profile.motif === "magicGate") {
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.bezierCurveTo((start.x + target.x) / 2, start.y - 48, (start.x + target.x) / 2, target.y + 48, target.x, target.y);
+      }, rgb, accentRgb, gateAlpha * .58, 2.6 * strength);
+    } else {
+      for (let index = 0; index < 3; index += 1) {
+        battleModernVfxStrokeLayers(ctx, () => {
+          ctx.beginPath();
+          ctx.ellipse(target.x, groundY + index * 5 * strength, (32 + progress * 54 + index * 12) * strength, (8 + index * 3) * strength, 0, 0, Math.PI * 2);
+        }, rgb, accentRgb, gateAlpha * (.65 - index * .13), 1.8 * strength);
+      }
+    }
+    return;
+  }
+  if (profile.motif === "tide") {
+    const tideAlpha = alpha * (.55 + impactPulse * .45);
+    for (let index = 0; index < 5; index += 1) {
+      const y = target.y - 22 * strength + index * 17 * strength;
+      const shift = Math.sin(local * 3.5 + index * .9) * 18 * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x - width * .43, y + shift * .12);
+        ctx.bezierCurveTo(target.x - width * .2, y - 31 * strength, target.x + width * .14, y + 28 * strength, target.x + width * .43, y - 4 * strength);
+      }, rgb, accentRgb, tideAlpha * (1 - index * .1), (3.8 - index * .42) * strength);
+    }
+    return;
+  }
+  if (profile.motif === "embers") {
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (let index = 0; index < motes.length; index += 1) {
+      const mote = motes[index];
+      const rise = (local * (.33 + (index % 5) * .035) + index / motes.length) % 1;
+      const x = target.x + Math.sin(mote.angle + local * .7) * (18 + mote.radius * .72) * strength;
+      const y = groundY - rise * 136 * strength;
+      const emberAlpha = alpha * Math.sin(rise * Math.PI) * .86;
+      ctx.fillStyle = index % 3 === 0 ? `rgba(255,255,255,${emberAlpha})` : battleModernVfxRgba(index % 2 ? accentRgb : rgb, emberAlpha);
+      ctx.shadowColor = battleModernVfxRgba(accentRgb, .95);
+      ctx.shadowBlur = 11;
+      ctx.beginPath();
+      ctx.ellipse(x, y, mote.size * 1.5 * strength, mote.size * 3.8 * strength, -.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+  if (profile.motif === "sunFan") {
+    const fanAlpha = alpha * (.54 + impactPulse * .46);
+    const originY = groundY + 8 * strength;
+    for (let index = 0; index < 11; index += 1) {
+      const angle = Math.PI + Math.PI * index / 10;
+      const length = (58 + (index % 3) * 17) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x + Math.cos(angle) * 14 * strength, originY + Math.sin(angle) * 14 * strength);
+        ctx.lineTo(target.x + Math.cos(angle) * length, originY + Math.sin(angle) * length);
+      }, rgb, accentRgb, fanAlpha * (.72 + (index % 2) * .2), (2.2 + (index % 3) * .35) * strength);
+    }
+    battleModernVfxBloom(ctx, target.x, originY, 43 * strength, accentRgb, fanAlpha * .9);
+    return;
+  }
+  if (profile.motif === "solarCrown") {
+    const crownAlpha = alpha * (.5 + impactPulse * .5);
+    const crownY = target.y - 10 * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.arc(target.x, crownY, 42 * strength, 0, Math.PI * 2);
+    }, rgb, accentRgb, crownAlpha, 3.2 * strength);
+    for (let index = 0; index < 14; index += 1) {
+      const angle = index * Math.PI * 2 / 14 + local * .12;
+      const inner = 49 * strength;
+      const outer = (66 + (index % 2) * 12) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x + Math.cos(angle) * inner, crownY + Math.sin(angle) * inner);
+        ctx.lineTo(target.x + Math.cos(angle) * outer, crownY + Math.sin(angle) * outer);
+      }, rgb, accentRgb, crownAlpha * .82, 2.1 * strength);
+    }
+    battleModernVfxBloom(ctx, target.x, crownY, 57 * strength, accentRgb, crownAlpha * .72);
+    return;
+  }
+  if (profile.motif === "orbit") {
+    const orbitAlpha = alpha * (.58 + impactPulse * .42);
+    ctx.save();
+    ctx.translate(target.x, target.y);
+    for (let index = 0; index < 3; index += 1) {
+      const rotation = local * (.62 + index * .21) * (index % 2 ? -1 : 1) + index * .65;
+      ctx.save();
+      ctx.rotate(rotation);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, (42 + index * 11) * strength, (16 + index * 7) * strength, 0, 0, Math.PI * 2);
+      }, rgb, accentRgb, orbitAlpha * (1 - index * .14), (2.4 - index * .3) * strength);
+      const orbX = Math.cos(local * (2.2 + index * .3)) * (42 + index * 11) * strength;
+      const orbY = Math.sin(local * (2.2 + index * .3)) * (16 + index * 7) * strength;
+      battleModernVfxBloom(ctx, orbX, orbY, 15 * strength, index % 2 ? accentRgb : rgb, orbitAlpha * .9);
+      ctx.restore();
+    }
+    ctx.restore();
+    return;
+  }
+  if (profile.motif === "phantomLanternArray") {
+    const panelAlpha = alpha * (.58 + impactPulse * .42);
+    const panelOffsets = [[-58, -14], [-29, 18], [0, -33], [29, 18], [58, -14]];
+    const panels = panelOffsets.map(([offsetX, offsetY], index) => ({
+      x: target.x + offsetX * strength,
+      y: target.y + offsetY * strength + Math.sin(local * 1.35 + index * .8) * 3
+    }));
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(panels[0].x, panels[0].y);
+      for (let index = 1; index < panels.length; index += 1) {
+        ctx.lineTo(panels[index].x, panels[index].y);
+      }
+      ctx.moveTo(panels[0].x, panels[0].y);
+      ctx.lineTo(panels[2].x, panels[2].y);
+      ctx.lineTo(panels[4].x, panels[4].y);
+    }, rgb, accentRgb, panelAlpha * .42, 1.15 * strength);
+    for (let index = 0; index < panels.length; index += 1) {
+      const panel = panels[index];
+      const radius = (index === 2 ? 17 : 14) * strength;
+      const panelRgb = index % 2 ? accentRgb : rgb;
+      battleModernVfxBloom(ctx, panel.x, panel.y, radius * 1.55, panelRgb, panelAlpha * .48);
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxPolygonPath(ctx, panel.x, panel.y, radius, 6, Math.PI / 6);
+      }, rgb, accentRgb, panelAlpha * (index === 2 ? 1 : .86), 1.65 * strength);
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxPolygonPath(
+          ctx,
+          panel.x,
+          panel.y,
+          radius * .43,
+          4,
+          Math.PI / 4 + local * .08 * (index % 2 ? -1 : 1)
+        );
+      }, accentRgb, [255, 255, 255], panelAlpha * .9, .9 * strength);
+    }
+    return;
+  }
+  if (profile.motif === "mirrors") {
+    const mirrorAlpha = alpha * (.56 + impactPulse * .44);
+    const shards = [[-58, -20, 22, .15], [-28, 29, 18, -.45], [8, -39, 27, .38], [42, 17, 21, -.18], [65, -29, 16, .62]];
+    for (let index = 0; index < shards.length; index += 1) {
+      const [offsetX, offsetY, radius, rotation] = shards[index];
+      const x = target.x + offsetX * strength;
+      const y = target.y + offsetY * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxPolygonPath(ctx, x, y, radius * strength, index % 2 ? 4 : 3, rotation + local * .08 * (index % 2 ? -1 : 1));
+      }, rgb, accentRgb, mirrorAlpha * (1 - index * .08), 2 * strength);
+      if (index < shards.length - 1) {
+        const next = shards[index + 1];
+        battleModernVfxStrokeLayers(ctx, () => {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(target.x + next[0] * strength, target.y + next[1] * strength);
+        }, rgb, accentRgb, mirrorAlpha * .42, 1.1 * strength);
+      }
+    }
+    return;
+  }
+  if (profile.motif === "sprout") {
+    const grow = battleModernVfxClamp((local - attackStart) / Math.max(.3, impactTime - attackStart));
+    const sproutAlpha = alpha * (.62 + impactPulse * .38);
+    const topY = groundY - 88 * grow * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x, groundY);
+      ctx.bezierCurveTo(target.x - 16 * direction * strength, groundY - 29 * grow * strength, target.x + 13 * direction * strength, groundY - 60 * grow * strength, target.x, topY);
+      if (grow > .35) {
+        ctx.moveTo(target.x - 2 * strength, groundY - 42 * grow * strength);
+        ctx.quadraticCurveTo(target.x - 28 * strength, groundY - 61 * grow * strength, target.x - 35 * strength, groundY - 39 * grow * strength);
+        ctx.quadraticCurveTo(target.x - 15 * strength, groundY - 34 * grow * strength, target.x - 2 * strength, groundY - 42 * grow * strength);
+      }
+      if (grow > .58) {
+        ctx.moveTo(target.x + 2 * strength, groundY - 61 * grow * strength);
+        ctx.quadraticCurveTo(target.x + 31 * strength, groundY - 77 * grow * strength, target.x + 37 * strength, groundY - 53 * grow * strength);
+        ctx.quadraticCurveTo(target.x + 17 * strength, groundY - 49 * grow * strength, target.x + 2 * strength, groundY - 61 * grow * strength);
+      }
+    }, rgb, accentRgb, sproutAlpha, 2.8 * strength);
+    battleModernVfxBloom(ctx, target.x, groundY, 34 * strength, accentRgb, sproutAlpha * .7);
+    return;
+  }
+  if (profile.motif === "forestCrest") {
+    const crestAlpha = alpha * (.55 + impactPulse * .45);
+    const baseY = groundY + 4 * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x, baseY);
+      ctx.lineTo(target.x, target.y - 66 * strength);
+      for (let level = 0; level < 4; level += 1) {
+        const branchY = target.y + 24 * strength - level * 22 * strength;
+        const reach = (27 + level * 7) * strength;
+        ctx.moveTo(target.x, branchY);
+        ctx.quadraticCurveTo(target.x - reach * .45, branchY - 15 * strength, target.x - reach, branchY - 6 * strength);
+        ctx.moveTo(target.x, branchY - 5 * strength);
+        ctx.quadraticCurveTo(target.x + reach * .45, branchY - 20 * strength, target.x + reach, branchY - 10 * strength);
+      }
+      ctx.moveTo(target.x - 34 * strength, baseY);
+      ctx.quadraticCurveTo(target.x, baseY - 18 * strength, target.x + 34 * strength, baseY);
+    }, rgb, accentRgb, crestAlpha, 2.5 * strength);
+    battleModernVfxBloom(ctx, target.x, target.y - 18 * strength, 58 * strength, accentRgb, crestAlpha * .48);
+    return;
+  }
+  if (profile.motif === "vineBloom") {
+    const bloomAlpha = alpha * (.56 + impactPulse * .44);
+    for (let side = -1; side <= 1; side += 2) {
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x, groundY);
+        ctx.bezierCurveTo(target.x + side * 74 * strength, target.y + 28 * strength, target.x - side * 64 * strength, target.y - 35 * strength, target.x + side * 18 * strength, target.y - 65 * strength);
+      }, rgb, accentRgb, bloomAlpha, 2.4 * strength);
+    }
+    const petals = [[-52, -8], [-23, -45], [12, -66], [43, -31], [57, 8], [4, -18]];
+    for (let index = 0; index < petals.length; index += 1) {
+      const x = target.x + petals[index][0] * strength;
+      const y = target.y + petals[index][1] * strength;
+      battleModernVfxBloom(ctx, x, y, 17 * strength, index % 2 ? accentRgb : rgb, bloomAlpha * .66);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(index * .8 + local * .16);
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        for (let petal = 0; petal < 4; petal += 1) {
+          const angle = petal * Math.PI / 2;
+          ctx.moveTo(0, 0);
+          ctx.ellipse(Math.cos(angle) * 7 * strength, Math.sin(angle) * 7 * strength, 7 * strength, 3 * strength, angle, 0, Math.PI * 2);
+        }
+      }, rgb, accentRgb, bloomAlpha, 1.45 * strength);
+      ctx.restore();
+    }
+    return;
+  }
+  if (profile.motif === "prism") {
+    const prismAlpha = alpha * (.52 + impactPulse * .48);
+    const prismX = target.x - direction * 8 * strength;
+    const prismY = target.y - 4 * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      battleModernVfxPolygonPath(ctx, prismX, prismY, 37 * strength, 3, -Math.PI / 2);
+    }, rgb, accentRgb, prismAlpha, 2.8 * strength);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(prismX - direction * 25 * strength, prismY);
+    }, [255, 255, 255], accentRgb, prismAlpha, 3.2 * strength);
+    const prismColors = [[255, 112, 152], [255, 216, 91], [112, 237, 171], [91, 191, 255], [190, 127, 255]];
+    for (let index = 0; index < prismColors.length; index += 1) {
+      const endY = prismY - 45 * strength + index * 22 * strength;
+      const rayRgb = prismColors[index];
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(prismX + direction * 24 * strength, prismY);
+        ctx.lineTo(prismX + direction * 112 * strength, endY);
+      }, rayRgb, rayRgb, prismAlpha * .78, 1.55 * strength);
+    }
+    battleModernVfxBloom(ctx, prismX, prismY, 42 * strength, accentRgb, prismAlpha * .86);
+    return;
+  }
+  if (profile.motif === "starCrest") {
+    const crestAlpha = alpha * (.52 + impactPulse * .48);
+    for (let index = 0; index < 3; index += 1) {
+      const radius = (30 + index * 14) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxStarPath(ctx, target.x, target.y, radius, radius * .44, 5, local * (.3 + index * .09) * (index % 2 ? -1 : 1));
+      }, rgb, accentRgb, crestAlpha * (1 - index * .18), (3 - index * .55) * strength);
+    }
+    battleModernVfxBloom(ctx, target.x, target.y, 62 * strength, accentRgb, crestAlpha * .72);
+  }
+}
+function battleModernVfxDrawImpact(model) {
+  const { ctx, local, impactTime, target, rgb, accentRgb = rgb, strength, particles, hit, profile } = model;
+  if (!hit) return;
+  const progress = battleModernVfxClamp((local - impactTime) / 1.08);
+  if (local < impactTime - .08 || progress >= 1) return;
+  const impactKind = profile?.impact || "ring";
+  const impactAlpha = battleModernVfxClamp(1 - progress);
+  const expand = battleModernVfxEase(progress);
+  const baseWidth = Math.max(1, (3.8 - progress * 1.5) * strength);
+  if (progress < .62) {
+    const bloomScale = ["ground", "wave", "grid"].includes(impactKind) ? .58 : .86;
+    battleModernVfxBloom(ctx, target.x, target.y, (39 + progress * 84) * strength, accentRgb, impactAlpha * bloomScale);
+  }
+  if (impactKind === "ground") {
+    for (let index = 0; index < 3; index += 1) {
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(target.x, target.y + 48 * strength, (25 + expand * 108 + index * 14) * strength, (6 + expand * 18 + index * 3) * strength, 0, 0, Math.PI * 2);
+      }, rgb, accentRgb, impactAlpha * (1 - index * .18), baseWidth * (1 - index * .14));
+    }
+  } else if (impactKind === "wave") {
+    for (let index = 0; index < 4; index += 1) {
+      const waveWidth = (42 + expand * 116 + index * 16) * strength;
+      const y = target.y + 22 * strength + index * 11 * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x - waveWidth, y);
+        ctx.bezierCurveTo(target.x - waveWidth * .45, y - (22 + index * 3) * strength, target.x + waveWidth * .34, y + 19 * strength, target.x + waveWidth, y - 5 * strength);
+      }, rgb, accentRgb, impactAlpha * (1 - index * .16), baseWidth * (1 - index * .12));
+    }
+  } else if (impactKind === "gate") {
+    for (let index = 0; index < 3; index += 1) {
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(target.x, target.y, (24 + expand * 58 + index * 8) * strength, (43 + expand * 83 + index * 12) * strength, 0, 0, Math.PI * 2);
+      }, rgb, accentRgb, impactAlpha * (1 - index * .18), baseWidth * (1 - index * .14));
+    }
+  } else if (impactKind === "column") {
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.moveTo(target.x, 0);
+      ctx.lineTo(target.x, target.y + 40 * strength);
+    }, rgb, accentRgb, impactAlpha, baseWidth * 1.65);
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.ellipse(target.x, target.y + 43 * strength, (31 + expand * 74) * strength, (8 + expand * 18) * strength, 0, 0, Math.PI * 2);
+    }, rgb, accentRgb, impactAlpha * .84, baseWidth);
+  } else if (impactKind === "grid") {
+    for (let index = 0; index < 4; index += 1) {
+      const radius = (28 + expand * 83 + index * 13) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x, target.y - radius * .42);
+        ctx.lineTo(target.x + radius, target.y + 42 * strength);
+        ctx.lineTo(target.x, target.y + 42 * strength + radius * .3);
+        ctx.lineTo(target.x - radius, target.y + 42 * strength);
+        ctx.closePath();
+      }, rgb, accentRgb, impactAlpha * (1 - index * .17), baseWidth * (1 - index * .14));
+    }
+  } else if (impactKind === "star") {
+    for (let index = 0; index < 3; index += 1) {
+      const radius = (25 + expand * 77 + index * 12) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxStarPath(ctx, target.x, target.y, radius, radius * .42, 5, progress * (1.2 + index * .3) * (index % 2 ? -1 : 1));
+      }, rgb, accentRgb, impactAlpha * (1 - index * .2), baseWidth * (1 - index * .16));
+    }
+  } else if (impactKind === "fan") {
+    const originY = target.y + 51 * strength;
+    for (let index = 0; index < 13; index += 1) {
+      const angle = Math.PI + index * Math.PI / 12;
+      const distance = (40 + expand * (64 + (index % 3) * 15)) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x, originY);
+        ctx.lineTo(target.x + Math.cos(angle) * distance, originY + Math.sin(angle) * distance);
+      }, rgb, accentRgb, impactAlpha * (.62 + (index % 2) * .22), baseWidth * .62);
+    }
+  } else if (impactKind === "crown") {
+    const radius = (31 + expand * 79) * strength;
+    battleModernVfxStrokeLayers(ctx, () => {
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, radius * .62, 0, Math.PI * 2);
+      for (let index = 0; index < 14; index += 1) {
+        const angle = index * Math.PI * 2 / 14;
+        ctx.moveTo(target.x + Math.cos(angle) * radius * .72, target.y + Math.sin(angle) * radius * .72);
+        ctx.lineTo(target.x + Math.cos(angle) * radius * (index % 2 ? 1 : 1.18), target.y + Math.sin(angle) * radius * (index % 2 ? 1 : 1.18));
+      }
+    }, rgb, accentRgb, impactAlpha, baseWidth);
+  } else if (impactKind === "shards" || impactKind === "prism") {
+    for (let index = 0; index < 9; index += 1) {
+      const angle = index * Math.PI * 2 / 9 + .18;
+      const inner = (19 + expand * 23) * strength;
+      const outer = (48 + expand * (45 + (index % 3) * 17)) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x + Math.cos(angle - .1) * inner, target.y + Math.sin(angle - .1) * inner);
+        ctx.lineTo(target.x + Math.cos(angle) * outer, target.y + Math.sin(angle) * outer);
+        ctx.lineTo(target.x + Math.cos(angle + .1) * inner, target.y + Math.sin(angle + .1) * inner);
+      }, rgb, accentRgb, impactAlpha * (.68 + (index % 2) * .2), baseWidth * .68);
+    }
+  } else if (impactKind === "petals") {
+    for (let index = 0; index < 12; index += 1) {
+      const angle = index * Math.PI * 2 / 12 + progress * .8;
+      const distance = (25 + expand * (61 + (index % 3) * 14)) * strength;
+      const x = target.x + Math.cos(angle) * distance;
+      const y = target.y + Math.sin(angle) * distance;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.ellipse(x, y, 11 * strength, 4 * strength, angle, 0, Math.PI * 2);
+      }, rgb, accentRgb, impactAlpha * .82, baseWidth * .54);
+    }
+  } else if (impactKind === "cloud") {
+    const cloudPuffs = [[-49, 7], [-27, -28], [4, -42], [36, -25], [52, 9], [15, 27], [-23, 31]];
+    for (let index = 0; index < cloudPuffs.length; index += 1) {
+      const radius = (17 + expand * (25 + index % 3 * 7)) * strength;
+      battleModernVfxBloom(ctx, target.x + cloudPuffs[index][0] * strength, target.y + cloudPuffs[index][1] * strength, radius, index % 2 ? accentRgb : rgb, impactAlpha * .62);
+    }
+  } else if (impactKind === "crest") {
+    for (let index = 0; index < 3; index += 1) {
+      const radius = (28 + expand * 74 + index * 12) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        battleModernVfxPolygonPath(ctx, target.x, target.y, radius, index === 1 ? 6 : 8, progress * (index % 2 ? -.5 : .5));
+      }, rgb, accentRgb, impactAlpha * (1 - index * .2), baseWidth * (1 - index * .15));
+    }
+  } else {
+    for (let index = 0; index < 12; index += 1) {
+      const angle = index * Math.PI * 2 / 12;
+      const inner = (17 + expand * 18) * strength;
+      const outer = (47 + expand * (61 + index % 3 * 12)) * strength;
+      battleModernVfxStrokeLayers(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(target.x + Math.cos(angle) * inner, target.y + Math.sin(angle) * inner);
+        ctx.lineTo(target.x + Math.cos(angle) * outer, target.y + Math.sin(angle) * outer);
+      }, rgb, accentRgb, impactAlpha * (.64 + (index % 2) * .2), baseWidth * .66);
+    }
+  }
+  ctx.save();
+  const motif = profile?.motif || "";
+  const particleMaterial = ["wave", "gate"].includes(impactKind) || ["drop", "waterGate", "tide"].includes(motif)
+    ? "water"
+    : motif === "cloud"
+      ? "vapor"
+      : ["embers", "sunFan", "sunColumn", "solarCrown"].includes(motif)
+        ? "fire"
+        : ["sprout", "forestCrest", "vineBloom"].includes(motif)
+          ? "leaf"
+          : ["rune", "grid", "mirrors", "prism", "magicGate", "phantomLanternArray"].includes(motif)
+            ? "glass"
+            : "energy";
+  ctx.globalCompositeOperation = particleMaterial === "leaf" ? "source-over" : "lighter";
+  ctx.lineCap = "round";
+  for (let index = 0; index < particles.length; index += 1) {
+    const particle = particles[index];
+    const age = local - impactTime - particle.delay;
+    if (age <= 0 || age >= particle.life) continue;
+    const life = 1 - age / particle.life;
+    const distance = particle.speed * age;
+    let angle = particle.angle;
+    if (impactKind === "ground") angle = Math.PI + (particle.angle % Math.PI);
+    if (impactKind === "wave") angle = (index % 2 ? Math.PI : 0) + (particle.angle - Math.PI) * .1;
+    if (impactKind === "column") angle = -Math.PI / 2 + (particle.angle - Math.PI) * .16;
+    if (particleMaterial === "fire") angle = -Math.PI / 2 + (particle.angle - Math.PI) * .23;
+    const gravity = particleMaterial === "water" ? 76 : particleMaterial === "fire" ? 10 : impactKind === "column" ? 18 : impactKind === "ground" ? 36 : 54;
+    const x = target.x + Math.cos(angle) * distance;
+    const y = target.y + Math.sin(angle) * distance + gravity * age * age;
+    const particleRgb = index % 2 ? accentRgb : rgb;
+    if (particleMaterial === "vapor") {
+      if (index % 2 === 0) battleModernVfxBloom(ctx, x, y, (6 + particle.size * 5) * strength, particleRgb, life * .24);
+      continue;
+    }
+    if (particleMaterial === "water") {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + Math.PI / 2);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, Math.max(.8, particle.size * .72 * strength), Math.max(1.6, particle.size * 1.85 * strength), 0, 0, Math.PI * 2);
+      ctx.fillStyle = particle.white ? `rgba(255,255,255,${life * .72})` : battleModernVfxRgba(particleRgb, life * .62);
+      ctx.shadowColor = battleModernVfxRgba(particleRgb, .86);
+      ctx.shadowBlur = 7;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(-particle.size * .18, -particle.size * .55, Math.max(.35, particle.size * .18), Math.max(.55, particle.size * .38), 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${life * .76})`;
+      ctx.fill();
+      ctx.restore();
+      continue;
+    }
+    if (particleMaterial === "leaf") {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + age * 5 * (index % 2 ? -1 : 1));
+      ctx.beginPath();
+      ctx.ellipse(0, 0, Math.max(1.2, particle.size * 1.35 * strength), Math.max(.55, particle.size * .48 * strength), 0, 0, Math.PI * 2);
+      ctx.fillStyle = battleModernVfxRgba(particleRgb, life * .7);
+      ctx.strokeStyle = `rgba(255,255,255,${life * .38})`;
+      ctx.lineWidth = .55;
+      ctx.shadowColor = battleModernVfxRgba(particleRgb, .64);
+      ctx.shadowBlur = 4;
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+      continue;
+    }
+    if (particleMaterial === "glass") {
+      const size = Math.max(1.5, particle.size * 2.2 * strength);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + age * 3.4);
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.lineTo(size * .55, size * .72);
+      ctx.lineTo(-size * .42, size * .38);
+      ctx.closePath();
+      ctx.fillStyle = battleModernVfxRgba(particleRgb, life * .28);
+      ctx.strokeStyle = particle.white ? `rgba(255,255,255,${life * .86})` : battleModernVfxRgba(particleRgb, life * .76);
+      ctx.lineWidth = .7;
+      ctx.shadowColor = battleModernVfxRgba(particleRgb, .9);
+      ctx.shadowBlur = 7;
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+      continue;
+    }
+    const tail = (particleMaterial === "fire" ? 11 : 8) * particle.size * strength;
+    ctx.beginPath();
+    ctx.moveTo(x - Math.cos(angle) * tail, y - Math.sin(angle) * tail);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = particle.white ? `rgba(255,255,255,${life * .92})` : battleModernVfxRgba(particleRgb, life * .82);
+    ctx.lineWidth = Math.max(.7, particle.size * strength);
+    ctx.shadowColor = battleModernVfxRgba(particleRgb, .92);
+    ctx.shadowBlur = particleMaterial === "fire" ? 13 : 9;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function startBattleModernVfx(field, scene, baseType, sceneType, magicStartDelay) {
+  stopBattleModernVfx();
+  if (!field || !scene || scene.type === "match" || typeof requestAnimationFrame !== "function") return;
+  const canvas = field.querySelector(".battle-modern-vfx");
+  const ctx = canvas?.getContext?.("2d", { alpha: true });
+  if (!canvas || !ctx) return;
+  const token = battleModernVfxToken;
+  const family = battleModernVfxFamily(baseType, sceneType);
+  const profile = battleModernVfxProfile(sceneType);
+  const color = magicColorFor(scene.tier, scene.actor);
+  const rgb = battleModernVfxRgb(color);
+  const accentRgb = battleModernVfxRgb(profile?.accent || color);
+  const strength = scene.tier === "strong" ? 1.34 : scene.tier === "medium" ? 1.1 : .9;
+  const actorDirection = scene.actor === "me" ? 1 : -1;
+  const routeTiming = baseType === "route";
+  const impactTime = routeTiming ? 4.8 : 2.62;
+  const familyAttackStart = {
+    route: routeTiming ? 2.58 : .88,
+    slash: 1.22,
+    "cross-slash": 1.16,
+    starfall: .84,
+    wind: .92,
+    water: .9,
+    "city-spark": .86,
+    flash: 1.02,
+    thunder: 1.3
+  };
+  const attackStart = familyAttackStart[family] ?? .9;
+  const finishTime = impactTime + 1.22;
+  const random = battleModernVfxRandom(battleModernVfxHash(`${scene.moveName}|${scene.name}|${scene.tier}|${sceneType}`));
+  const particleCount = scene.tier === "strong" ? 62 : scene.tier === "medium" ? 44 : 30;
+  const particles = Array.from({ length: particleCount }, (_, index) => ({
+    angle: random() * Math.PI * 2,
+    speed: (48 + random() * 126) * strength,
+    delay: random() * .2,
+    life: .42 + random() * .54,
+    size: .7 + random() * 2.1,
+    white: index % 4 === 0
+  }));
+  const motes = Array.from({ length: scene.tier === "strong" ? 30 : scene.tier === "medium" ? 23 : 17 }, () => ({
+    angle: random() * Math.PI * 2,
+    radius: 18 + random() * 44,
+    orbit: (random() > .5 ? 1 : -1) * (.7 + random() * 1.5),
+    size: .7 + random() * 1.8
+  }));
+  const streaks = Array.from({ length: scene.tier === "strong" ? 22 : scene.tier === "medium" ? 16 : 11 }, () => ({
+    offset: (random() - .5) * 190 * strength,
+    delay: random() * .72,
+    life: .38 + random() * .34,
+    length: 30 + random() * 62,
+    slant: 12 + random() * 28,
+    width: 1.2 + random() * 2.5
+  }));
+  const lightning = Array.from({ length: 16 }, (_, index) => index === 0 || index === 15 ? 0 : (random() - .5) * 70);
+  const startsAt = performance.now() + Math.max(0, Number(magicStartDelay) || 0) * 1000;
+  let lastPaint = 0;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  const resize = () => {
+    const bounds = canvas.getBoundingClientRect();
+    const nextWidth = Math.max(1, Math.round(bounds.width));
+    const nextHeight = Math.max(1, Math.round(bounds.height));
+    const nextDpr = Math.min(1.5, Math.max(1, Number(window.devicePixelRatio) || 1));
+    if (nextWidth === width && nextHeight === height && nextDpr === dpr) return;
+    width = nextWidth;
+    height = nextHeight;
+    dpr = nextDpr;
+    canvas.width = Math.max(1, Math.round(width * dpr));
+    canvas.height = Math.max(1, Math.round(height * dpr));
+  };
+  const render = now => {
+    if (token !== battleModernVfxToken || !canvas.isConnected) return;
+    battleModernVfxFrame = requestAnimationFrame(render);
+    if (now < startsAt || (lastPaint && now - lastPaint < 24)) return;
+    lastPaint = now;
+    const local = (now - startsAt) / 1000;
+    resize();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (local > finishTime) {
+      cancelAnimationFrame(battleModernVfxFrame);
+      battleModernVfxFrame = 0;
+      return;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const start = { x: scene.actor === "me" ? width * .25 : width * .75, y: height * .63 };
+    const target = { x: scene.target === "me" ? width * .25 : width * .75, y: height * .58 };
+    const model = {
+      ctx,
+      width,
+      height,
+      local,
+      attackStart,
+      impactTime,
+      start,
+      target,
+      rgb,
+      accentRgb,
+      strength,
+      actorDirection,
+      family,
+      profile,
+      curveHeight: -height * (family === "water" ? .1 : .22),
+      motes,
+      particles,
+      streaks,
+      lightning,
+      hit: Boolean(scene.hit)
+    };
+    battleModernVfxDrawCinematicAtmosphere(model);
+    battleModernVfxDrawCaster(model);
+    battleModernVfxDrawMaterialBody(model);
+    let center = null;
+    if (profile) {
+      if (profile.travel === "arc") center = battleModernVfxDrawTravel(model, .42);
+      battleModernVfxDrawSignature(model);
+    } else {
+      if (["route", "wind", "water", "city-spark", "flash"].includes(family)) {
+        center = battleModernVfxDrawTravel(model, family === "route" ? 1 : .72);
+      }
+      if (family === "slash" || family === "cross-slash") battleModernVfxDrawSlash(model);
+      if (family === "starfall") battleModernVfxDrawStarfall(model);
+      if (family === "wind") battleModernVfxDrawWind(model, center);
+      if (family === "water") battleModernVfxDrawWater(model, center);
+      if (family === "city-spark") battleModernVfxDrawCity(model, center);
+      if (family === "flash") battleModernVfxDrawFlash(model, center);
+      if (family === "thunder") battleModernVfxDrawThunder(model);
+    }
+    battleModernVfxDrawImpact(model);
+  };
+  battleModernVfxFrame = requestAnimationFrame(render);
+}
 function battleCueLine(tag, text, delay = 0, extraClass = "", durationScale = 1) {
   const content = escapeAttr(text);
   const steps = Math.max(1, [...String(text)].length);
@@ -49016,6 +51227,7 @@ function clearBattleAnimationTimer() {
   battleAnimationTimer = null;
   if (battleResultSfxTimer) clearTimeout(battleResultSfxTimer);
   battleResultSfxTimer = null;
+  stopBattleModernVfx();
   clearBattleHpCountTimers();
 }
 function clearBattleHpCountTimers() {
@@ -49189,8 +51401,10 @@ function playBattleAnimationStep(index) {
   const fighterStateFor = side => advantageStateFor(side);
   field.classList.remove("attack", "lose");
   field.className = `battle-field watching ${arenaClassFor(cup)} ${scene.type === "match" ? "magic-scene-ready" : magicSceneClassFor(scene)}`;
+  if (scene.type !== "match") field.classList.add(scene.hit ? "technique-hit" : "technique-miss");
   const magicStartDelay = scene.type === "match" ? 0 : 2.7;
   field.style.setProperty("--magic-start-delay", `${magicStartDelay}s`);
+  field.style.setProperty("--technique-color", scene.type === "match" ? "#8ee7ff" : magicColorFor(scene.tier, scene.actor));
   const actorClass = scene.actor === "me" ? "my-cast" : "enemy-cast";
   const targetClass = scene.target === "me" ? "target-me" : "target-enemy";
   const orbClass = scene.actor === "me" ? "from-me" : "from-enemy";
@@ -49269,12 +51483,12 @@ function playBattleAnimationStep(index) {
     <div class="fighter ${scene.actor === "me" ? "casting" : scene.target === "me" ? `struck${hitTierClass}` : ""}" id="myFighter">${tournamentPlayerFighter(profile, myPercent, "side", myAfterPercent, fighterStateFor("me"), myHpBeforeValue, myHpAfterValue, myMaxHp)}</div>
     <div class="fighter ${scene.actor === "enemy" ? "casting" : scene.target === "enemy" ? `struck${hitTierClass}` : ""}" id="enemyFighter">${tournamentEnemyFighter(cup, enemyOpponent || enemyName, enemyPercent, "side-left", enemyAfterPercent, fighterStateFor("enemy"), enemyHpBeforeValue, enemyHpAfterValue, enemyMaxHp)}</div>
     <div class="battle-effect-layer ${actorClass}">
-      ${magicSceneVisualFor(scene)}
+      ${scene.type === "match" ? "" : `<canvas class="battle-modern-vfx" aria-hidden="true"></canvas>`}
       <div class="battle-cue">${battleCueHtml}</div>
       ${isJudgedFinalDecision ? `<div class="battle-decision-cue" id="battleJudgementCue">判定</div>` : ""}
-      ${scene.type === "match" ? "" : `${visualBaseType === "route" ? `<i class="magic-orb ${orbClass} ${scene.tier} ${visualType}" style="--magic:${magicColorFor(scene.tier, scene.actor)}"></i>` : ""}`}
     </div>
   `;
+  startBattleModernVfx(field, scene, visualBaseType, visualType, magicStartDelay);
   playBattleMessageSfx(cueSoundDelays);
   if (scene.type !== "match") {
     playBattleMoveReleaseSfx(scene.tier, attackLeadDelay);
