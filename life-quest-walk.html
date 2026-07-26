@@ -21,6 +21,8 @@
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260718-22">
+  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260724-responsive-windmill-seesaw-solid-v37">
   <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
@@ -10144,6 +10146,405 @@
         linear-gradient(120deg, #9f6400 0%, #ffd85e 22%, #fff3ad 42%, #d99c12 62%, #fff6c9 82%, #b97900 100%) border-box;
       box-shadow: 0 0 0 1px #fff4ad, 0 0 7px rgba(255,207,56,.62), 0 3px 0 rgba(140,91,0,.28);
     }
+    .arcade-screen {
+      padding: 0;
+      overflow: hidden;
+      border-color: #292d3e;
+      background: #12141d;
+      color: #f8fbff;
+    }
+    #townArcade {
+      min-height: 620px;
+      background: #12141d;
+    }
+    .arcade-page-header {
+      position: relative;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 64px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      background: #252936;
+      box-shadow: 0 4px 12px rgba(0,0,0,.28);
+    }
+    .arcade-page-title {
+      min-width: 0;
+    }
+    .arcade-page-title small {
+      display: block;
+      color: #9ff2d1;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .arcade-page-title strong {
+      display: block;
+      margin-top: 2px;
+      color: #ffffff;
+      font-size: 18px;
+      line-height: 1.2;
+      text-shadow: 0 2px 0 #11131c;
+    }
+    .arcade-page-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+    .arcade-page-actions button,
+    .arcade-game-controls button {
+      min-height: 34px;
+      padding: 6px 11px;
+      border: 1px solid #f6cf59;
+      border-radius: 6px;
+      background: #fff3b8;
+      color: #402e0e;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 -3px 0 rgba(131,84,0,.16), 0 2px 0 rgba(0,0,0,.2);
+    }
+    .arcade-lobby-scene {
+      position: relative;
+      isolation: isolate;
+      min-height: 556px;
+      padding: 142px 12px 34px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #343847 0 36%, #1b1e29 36% 58%, #11131b 58% 100%);
+    }
+    .arcade-lobby-scene::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: 0 0 42% 0;
+      background:
+        linear-gradient(90deg, transparent 0 7%, rgba(255,111,172,.78) 7% 8%, transparent 8% 27%, rgba(114,239,198,.72) 27% 28%, transparent 28% 49%, rgba(255,211,78,.74) 49% 50%, transparent 50% 70%, rgba(94,184,255,.75) 70% 71%, transparent 71%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 2px, transparent 2px 22px);
+      opacity: .76;
+      pointer-events: none;
+    }
+    .arcade-lobby-scene::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      left: -18%;
+      right: -18%;
+      bottom: -9%;
+      height: 51%;
+      transform: perspective(240px) rotateX(42deg);
+      transform-origin: center bottom;
+      background:
+        repeating-linear-gradient(90deg, rgba(92,225,205,.17) 0 1px, transparent 1px 46px),
+        repeating-linear-gradient(0deg, rgba(255,207,77,.14) 0 1px, transparent 1px 42px),
+        #171a23;
+      box-shadow: inset 0 18px 28px rgba(0,0,0,.46);
+      pointer-events: none;
+    }
+    .arcade-building-layer {
+      position: absolute;
+      z-index: 2;
+      top: 4px;
+      left: 12px;
+      width: 132px;
+      height: auto;
+      filter: drop-shadow(0 7px 8px rgba(0,0,0,.42));
+      pointer-events: none;
+    }
+    .arcade-neon-sign {
+      position: absolute;
+      z-index: 3;
+      top: 24px;
+      left: 150px;
+      right: 14px;
+      min-height: 70px;
+      padding: 10px 8px;
+      border: 2px solid #f6cf59;
+      border-radius: 7px;
+      background: #202431;
+      color: #ffffff;
+      text-align: center;
+      box-shadow: 0 0 0 2px #202431, 0 0 13px rgba(246,207,89,.4), inset 0 0 14px rgba(93,229,203,.13);
+    }
+    .arcade-neon-sign strong {
+      display: block;
+      color: #ff83b7;
+      font-size: 17px;
+      line-height: 1.2;
+      text-shadow: 0 0 6px rgba(255,91,160,.7);
+    }
+    .arcade-neon-sign small {
+      display: block;
+      margin-top: 5px;
+      color: #9ff2d1;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .arcade-machine-row {
+      position: relative;
+      z-index: 4;
+      top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      gap: 9px;
+      width: min(100%, 720px);
+      margin: 0 auto;
+    }
+    .arcade-machine {
+      min-width: 0;
+      padding: 0 1px 9px;
+      border: 0;
+      background: transparent;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .arcade-cabinet {
+      --cabinet: #dc4f8d;
+      --cabinet-light: #ff98c3;
+      --cabinet-dark: #702042;
+      --screen-glow: #ff75b0;
+      position: relative;
+      display: block;
+      height: 268px;
+      min-width: 0;
+      overflow: hidden;
+      border: 3px solid #151722;
+      border-radius: 8px 8px 4px 4px;
+      background: var(--cabinet);
+      box-shadow:
+        inset 4px 0 0 rgba(255,255,255,.2),
+        inset -5px 0 0 var(--cabinet-dark),
+        0 9px 0 #090a0f,
+        0 13px 16px rgba(0,0,0,.48);
+      transform: translateY(0);
+      transition: transform .16s ease, filter .16s ease;
+    }
+    .arcade-machine:hover .arcade-cabinet,
+    .arcade-machine:focus-visible .arcade-cabinet {
+      transform: translateY(-4px);
+      filter: brightness(1.08);
+    }
+    .arcade-machine-tone-2 .arcade-cabinet {
+      --cabinet: #4bbf99;
+      --cabinet-light: #9af0d2;
+      --cabinet-dark: #1e6955;
+      --screen-glow: #69e6bd;
+    }
+    .arcade-machine-tone-3 .arcade-cabinet {
+      --cabinet: #e4a838;
+      --cabinet-light: #ffd873;
+      --cabinet-dark: #805214;
+      --screen-glow: #66bfff;
+    }
+    .arcade-cabinet-marquee {
+      display: grid;
+      place-items: center;
+      min-height: 48px;
+      padding: 5px;
+      border-bottom: 3px solid #151722;
+      background: var(--cabinet-light);
+      color: #222532;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+      text-align: center;
+      text-shadow: 0 1px 0 rgba(255,255,255,.6);
+    }
+    .arcade-cabinet-screen {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: calc(100% - 18px);
+      aspect-ratio: 4 / 3;
+      margin: 10px auto 0;
+      overflow: hidden;
+      border: 5px solid #20232e;
+      border-radius: 5px;
+      background: #111522;
+      color: var(--screen-glow);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.8), 0 0 9px var(--screen-glow);
+    }
+    .arcade-cabinet-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 0 47%, rgba(255,255,255,.25) 48% 52%, transparent 53%),
+        linear-gradient(0deg, transparent 0 47%, rgba(255,255,255,.18) 48% 52%, transparent 53%);
+      opacity: .44;
+    }
+    .arcade-cabinet-screen strong {
+      position: relative;
+      z-index: 1;
+      font-size: 27px;
+      line-height: 1;
+      text-shadow: 0 0 8px currentColor;
+    }
+    .arcade-cabinet-panel {
+      position: relative;
+      width: calc(100% - 16px);
+      height: 50px;
+      margin: 8px auto 0;
+      border: 2px solid #20232e;
+      border-radius: 5px;
+      background: var(--cabinet-light);
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.14);
+    }
+    .arcade-cabinet-panel::before {
+      content: "";
+      position: absolute;
+      left: 20%;
+      top: 11px;
+      width: 9px;
+      height: 9px;
+      border: 3px solid #1c1e27;
+      border-radius: 50%;
+      background: #f4f5f7;
+      box-shadow: 0 12px 0 -2px #1c1e27;
+    }
+    .arcade-cabinet-panel::after {
+      content: "";
+      position: absolute;
+      right: 17%;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #20232e;
+      border-radius: 50%;
+      background: #ffea5e;
+      box-shadow: -18px 5px 0 #ff6d9f, -18px 5px 0 2px #20232e;
+    }
+    .arcade-cabinet-base {
+      position: absolute;
+      left: 13px;
+      right: 13px;
+      bottom: 12px;
+      height: 32px;
+      border: 2px solid #20232e;
+      border-radius: 3px;
+      background: var(--cabinet-dark);
+      box-shadow: inset 0 6px 0 rgba(255,255,255,.07);
+    }
+    .arcade-game-stage {
+      position: relative;
+      min-height: 556px;
+      padding: 18px 14px 28px;
+      background:
+        linear-gradient(180deg, #1c202c, #11131b 68%),
+        #11131b;
+    }
+    .arcade-game-console {
+      width: min(100%, 390px);
+      margin: 0 auto;
+      padding: 12px;
+      border: 3px solid var(--arcade-console-light, #ff98c3);
+      border-radius: 8px;
+      background: var(--arcade-console, #702042);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.09), 0 10px 20px rgba(0,0,0,.38);
+    }
+    .arcade-game-console.tone-2 {
+      --arcade-console: #1e6955;
+      --arcade-console-light: #9af0d2;
+    }
+    .arcade-game-console.tone-3 {
+      --arcade-console: #805214;
+      --arcade-console-light: #ffd873;
+    }
+    .arcade-game-screen {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border: 6px solid #090b12;
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 18px 18px,
+        linear-gradient(0deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 18px 18px,
+        #101726;
+      box-shadow: inset 0 0 26px rgba(0,0,0,.82), 0 0 12px rgba(102,191,255,.28);
+    }
+    .arcade-game-ready,
+    .arcade-game-running {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 18px;
+      text-align: center;
+    }
+    .arcade-game-ready small,
+    .arcade-game-running small {
+      color: #9ff2d1;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .arcade-game-ready strong,
+    .arcade-game-running strong {
+      color: #ffffff;
+      font-size: 22px;
+      line-height: 1.2;
+      text-shadow: 0 0 10px rgba(102,191,255,.54);
+    }
+    .arcade-start-button {
+      min-width: 132px;
+      min-height: 44px;
+      padding: 8px 20px;
+      border: 2px solid #fff2a7;
+      border-radius: 7px;
+      background: #f6cf59;
+      color: #352606;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 -5px 0 rgba(134,86,0,.18), 0 4px 0 #76510a;
+    }
+    .arcade-running-mark {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      border: 3px solid #9ff2d1;
+      border-radius: 50%;
+      color: #ff83b7;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 0 15px rgba(159,242,209,.56), inset 0 0 12px rgba(255,131,183,.22);
+      animation: arcade-running-pulse 1.1s ease-in-out infinite alternate;
+    }
+    .arcade-game-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    @keyframes arcade-running-pulse {
+      from { transform: scale(.96); filter: brightness(.92); }
+      to { transform: scale(1.04); filter: brightness(1.18); }
+    }
+    @media (max-width: 370px) {
+      .arcade-lobby-scene { padding-left: 7px; padding-right: 7px; }
+      .arcade-building-layer { left: 6px; width: 112px; }
+      .arcade-neon-sign { left: 122px; right: 7px; }
+      .arcade-neon-sign strong { font-size: 14px; }
+      .arcade-machine-row { gap: 5px; }
+      .arcade-cabinet { height: 244px; }
+      .arcade-cabinet-marquee { min-height: 44px; padding: 4px 2px; font-size: 10px; }
+      .arcade-cabinet-panel { height: 45px; }
+      .arcade-game-controls { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .arcade-running-mark { animation: none; }
+      .arcade-cabinet { transition: none; }
+    }
     #townKaraoke .karaoke-heading {
       display: flex;
       align-items: center;
@@ -14390,6 +14791,10 @@
       <div class="mini-feature" id="imasoraDex"></div>
     </section>
 
+    <section class="panel screen arcade-screen" data-screen="arcade">
+      <div id="townArcade"></div>
+    </section>
+
     <section class="panel screen" data-screen="monster">
       <h2>散歩モンスター</h2>
       <p>イマソラ認識と日々の育成で、タネから育つ姿が変わります。</p>
@@ -14888,7 +15293,7 @@ const buildings = [
   ["soundShop", "音", "音楽プラザ", 22, "音楽や効果音を確認する特別施設", "special", "BGMや効果音を整理して聞ける場所の候補。"],
   ["bookstore", "本", "本屋", 23, "モンスター図鑑を本で閲覧できる", "special", "タネ期から白まで、進化段階ごとのモンスター図鑑を本で読める施設。"],
   ["retirePark", "縁", "広場", 24, "引退した相棒と会う特別施設", "special", "引退した相棒が街に残る場所の候補。"],
-  ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "ミニゲームや確認遊びを置く候補。"],
+  ["arcade", "遊", "ゲームセンター", 25, "街の遊び場になる特別施設", "special", "複数のゲーム機から遊びたいゲームを選べる施設。"],
   ["statue1", "像", "銅像1", 26, "街の記念物になる特別施設", "special", "左側に建てる記念の銅像。"],
   ["statue2", "像", "銅像2", 27, "街の記念物になる特別施設", "special", "右側に建てる記念の銅像。"]
 ];
@@ -15058,6 +15463,8 @@ let selectedDexStage = "";
 let selectedBookstoreDexStage = "";
 let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
+let selectedArcadeMachineId = "";
+let arcadeGameRunning = false;
 let pendingRetireParkPracticeRecordId = "";
 const memorialWallpaperChoices = [
   { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォークの街" },
@@ -40587,7 +40994,7 @@ function townBuildingSprite(id) {
   const sprite = townLayeredSpriteAssets[id];
   if (!sprite) return "";
   const style = townLayeredSpriteStyle(id, sprite);
-  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", bookstore: "本屋", retirePark: "広場", medalHall: "相棒記念館" };
+  const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", bookstore: "本屋", retirePark: "広場", medalHall: "相棒記念館", arcade: "ゲームセンター" };
   const enterButton = enterLabels[id]
     ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-enter="${id}" aria-label="${enterLabels[id]}" style="${style}"></button>`
     : "";
@@ -40954,6 +41361,10 @@ function enterTownBuilding(id) {
     toast("相棒記念館へ移動しました");
     return;
   }
+  if (id === "arcade") {
+    openTownArcadeFromMap();
+    return;
+  }
   playSfx("select");
   toast(`${building[2]}は試作準備中です`);
 }
@@ -41089,6 +41500,392 @@ function returnToTownMapFromBookstore() {
   selectedBookstoreDexStage = "";
   renderTownBookstore();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  playSfx("select");
+}
+let imasoraCompanionCatcherModulePromise = null;
+function ensureImasoraCompanionCatcherLoaded() {
+  if (window.ImasoraCompanionCatcher) return Promise.resolve(window.ImasoraCompanionCatcher);
+  if (!imasoraCompanionCatcherModulePromise) {
+    imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=20260721-148")
+      .then(() => {
+        if (!window.ImasoraCompanionCatcher) throw new Error("3D catcher module did not initialize");
+        return window.ImasoraCompanionCatcher;
+      })
+      .catch(error => {
+        imasoraCompanionCatcherModulePromise = null;
+        throw error;
+      });
+  }
+  return imasoraCompanionCatcherModulePromise;
+}
+let imasoraJackpotCoinPusherModulePromise = null;
+function ensureImasoraJackpotCoinPusherLoaded() {
+  if (window.ImasoraJackpotCoinPusher) return Promise.resolve(window.ImasoraJackpotCoinPusher);
+  if (!imasoraJackpotCoinPusherModulePromise) {
+    imasoraJackpotCoinPusherModulePromise = import("./assets/imasora-jackpot-coin-pusher.js?v=20260726-production-layout-v78")
+      .then(() => {
+        if (!window.ImasoraJackpotCoinPusher) throw new Error("3D coin pusher module did not initialize");
+        return window.ImasoraJackpotCoinPusher;
+      })
+      .catch(error => {
+        imasoraJackpotCoinPusherModulePromise = null;
+        throw error;
+      });
+  }
+  return imasoraJackpotCoinPusherModulePromise;
+}
+function imasoraArcadePlushColors(item, colorSettings = null) {
+  const colorStyle = `${item?.style || ""}${colorSettings ? companionColorInlineStyle(colorSettings) : ""}`;
+  const whiteBody = Boolean(item?.whiteVariant || item?.id?.includes("-white-"));
+  return {
+    body: whiteBody ? "#f7f9ff" : extractCssColor(colorStyle, "--body") || "#9ed8ff",
+    accent: extractCssColor(colorStyle, "--accent") || "#55ae73",
+    spark: extractCssColor(colorStyle, "--spark") || "#dff7ff"
+  };
+}
+function imasoraArcadeFallbackPlushSvg(item, colorSettings = null, view = "front") {
+  const colors = imasoraArcadePlushColors(item, colorSettings);
+  const back = view === "back";
+  const form = item?.form || "trail";
+  const bodyPath = form === "seed"
+    ? '<ellipse cx="58" cy="59" rx="32" ry="29"/>'
+    : form === "sprout"
+      ? '<path d="M31 75 C24 49 34 30 58 30 C82 30 92 49 85 75 C78 93 38 93 31 75 Z"/>'
+      : form === "skykid"
+        ? '<path d="M23 67 C30 35 48 28 58 37 C69 25 91 38 94 65 C92 88 29 91 23 67 Z"/>'
+        : '<path d="M29 79 C22 53 32 27 58 27 C84 27 94 53 87 79 C79 99 37 99 29 79 Z"/>';
+  const face = back ? "" : `<circle cx="46" cy="58" r="4.2" fill="#1f2b34"/><circle cx="70" cy="58" r="4.2" fill="#1f2b34"/>
+    <path d="M53 70 Q58 74 63 70" fill="none" stroke="#6f4550" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="58" cy="42" r="7" fill="${colors.spark}" stroke="${colors.accent}" stroke-width="2"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116 116" aria-hidden="true">
+    <g fill="${colors.body}" stroke="#2b3945" stroke-width="3" stroke-linejoin="round">${bodyPath}</g>
+    <path d="M34 78 Q58 92 82 78" fill="none" stroke="${colors.accent}" stroke-width="4" stroke-linecap="round"/>
+    ${face}
+    <ellipse cx="41" cy="91" rx="10" ry="5" fill="#8d6040"/><ellipse cx="75" cy="91" rx="10" ry="5" fill="#8d6040"/>
+  </svg>`;
+}
+function imasoraArcadePlushSvg(item, colorSettings = null, view = "front") {
+  const id = item?.id || "";
+  const unique = id.startsWith("hero-") || id.startsWith("star-");
+  if (!unique) return imasoraArcadeFallbackPlushSvg(item, colorSettings, view);
+  return view === "back"
+    ? turnaroundMonsterSvg(item, "back", colorSettings)
+    : uniqueMonsterSvg(item, true, colorSettings);
+}
+function getImasoraArcadePlushRoster() {
+  const roster = [];
+  const used = new Set();
+  const add = (item, name, art, physics, value, colorSettings = null, rosterId = "") => {
+    const id = rosterId || item?.id || "";
+    const sourceId = item?.id || id;
+    if (!id || !art || used.has(id) || used.has(sourceId)) return;
+    used.add(id);
+    used.add(sourceId);
+    const colors = imasoraArcadePlushColors(item, colorSettings);
+    roster.push({
+      id,
+      name: name || item.name || "記録相棒",
+      art,
+      physics,
+      value,
+      frontSvg: imasoraArcadePlushSvg(item, colorSettings, "front"),
+      backSvg: imasoraArcadePlushSvg(item, colorSettings, "back"),
+      bodyColor: colors.body,
+      accentColor: colors.accent,
+      sparkColor: colors.spark
+    });
+  };
+  try {
+    const profile = monsterProfile();
+    const growth = growthForecast();
+    const currentItem = currentCompanionArtItem(profile, growth);
+    add(
+      currentItem,
+      companionDisplayName(profile),
+      karaokeCurrentArtMarkup(profile, growth, "front"),
+      "balanced",
+      180,
+      companionColorSettings(),
+      `current-${currentItem?.id || profile.id || "companion"}`
+    );
+    const guideItem = karaokeGuideItem();
+    add(
+      guideItem || { id: "white-michi-guide" },
+      "白ミチロードセイバーレン",
+      karaokeGuideArtMarkup("front"),
+      "box",
+      240
+    );
+    ensureMonsterDexGroups();
+    const allItems = monsterDexGroups.flatMap(group => group.list || []);
+    const representatives = [
+      { prefixes: ["hero-young-seed-sky-", "star-hero-young-seed-sky-"], physics: "float", value: 170 },
+      { prefixes: ["hero-young-seed-leaf-", "star-hero-young-seed-leaf-"], physics: "round", value: 160 },
+      { prefixes: ["hero-young-seed-river-", "star-hero-young-seed-river-"], physics: "slippery", value: 190 },
+      { prefixes: ["hero-young-seed-night-", "star-hero-young-seed-night-"], physics: "heavy", value: 220 },
+      { prefixes: ["hero-young-seed-city-", "star-hero-young-seed-city-"], physics: "wide", value: 180 },
+      { prefixes: ["star-hero-young-seed-walk-", "hero-young-seed-walk-"], physics: "balanced", value: 210 }
+    ];
+    representatives.forEach(entry => {
+      const matchesPrefix = candidate => entry.prefixes.some(prefix => candidate.id.startsWith(prefix));
+      const item = allItems.find(candidate => !used.has(candidate.id) && matchesPrefix(candidate) && candidate.id.endsWith("-cute"))
+        || allItems.find(candidate => !used.has(candidate.id) && matchesPrefix(candidate));
+      if (!item) return;
+      add(item, item.name, karaokeDexArtMarkup(item, "front"), entry.physics, entry.value);
+    });
+  } catch (error) {
+    console.error("イマソラ相棒キャッチャーのぬいぐるみ準備に失敗しました。", error);
+  }
+  return roster.slice(0, 8);
+}
+function getImasoraJackpotWingArt() {
+  try {
+    ensureMonsterDexGroups();
+    const allItems = monsterDexGroups.flatMap(group => group.list || []);
+    const designId = "michimebanfuwana-representative-six-side-v1";
+    const item = allItems.find(candidate =>
+      candidate.id === "hero-young-seed-walk-walk-cute"
+      && candidate.name === "ミチメバンフワナ"
+    )
+      || allItems.find(candidate => candidate.id.startsWith("hero-young-seed-walk-walk-cute"));
+    if (!item || item.name !== "ミチメバンフワナ") {
+      throw new Error("指定したミチメバンフワナの左右デザインを取得できませんでした");
+    }
+    const colors = imasoraArcadePlushColors(item);
+    const standaloneTurnaroundSvg = view => String(turnaroundMonsterSvg(item, view) || "")
+      .replace(/<svg\b([^>]*)>/i, (match, attributes) => {
+        const namespace = /\bxmlns=/.test(attributes) ? "" : ' xmlns="http://www.w3.org/2000/svg"';
+        const width = /\bwidth=/.test(attributes) ? "" : ' width="116"';
+        const height = /\bheight=/.test(attributes) ? "" : ' height="116"';
+        return `<svg${namespace}${width}${height}${attributes}>`;
+      });
+    return {
+      designId,
+      sourceMonsterId: item.id,
+      sourceMonsterName: item.name,
+      leftView: "side-left",
+      rightView: "side",
+      leftSvg: standaloneTurnaroundSvg("side-left"),
+      rightSvg: standaloneTurnaroundSvg("side"),
+      bodyColor: colors.body,
+      accentColor: colors.accent,
+      sparkColor: colors.spark
+    };
+  } catch (error) {
+    console.error("イマソラジャックポットの羽根デザインを準備できませんでした。", error);
+    return {};
+  }
+}
+const townArcadeMachines = Object.freeze([
+  { id: "arcade-machine-1", name: "イマソラ相棒キャッチャー", number: "捕", tone: 1, game: "companionCatcher" },
+  { id: "arcade-machine-2", name: "イマソラジャックポット", number: "77", tone: 2, game: "coinPusher" },
+  { id: "arcade-machine-3", name: "ゲーム機3", number: "03", tone: 3 }
+]);
+function townArcadeMachineById(id) {
+  return townArcadeMachines.find(machine => machine.id === id) || null;
+}
+function townArcadeHeaderMarkup(title, showMachineSelect = false) {
+  const coinPusherHeaderClass = title === "イマソラジャックポット" ? " arcade-page-header-coin-pusher" : "";
+  return `<div class="arcade-page-header${coinPusherHeaderClass}">
+    <div class="arcade-page-title"><small>街の発展</small><strong>${escapeAttr(title)}</strong></div>
+    <div class="arcade-page-actions">
+      ${showMachineSelect ? '<button type="button" data-arcade-return-lobby>ゲーム機を選ぶ</button>' : ""}
+      <button type="button" data-arcade-return-town>街に戻る</button>
+    </div>
+  </div>`;
+}
+function townArcadeMachineMarkup(machine) {
+  return `<button class="arcade-machine arcade-machine-tone-${machine.tone}" type="button" data-arcade-machine="${escapeAttr(machine.id)}" aria-label="${escapeAttr(machine.name)}を開く">
+    <span class="arcade-cabinet">
+      <span class="arcade-cabinet-marquee">${escapeAttr(machine.name)}</span>
+      <span class="arcade-cabinet-screen"><strong>${escapeAttr(machine.number)}</strong></span>
+      <span class="arcade-cabinet-panel"></span>
+      <span class="arcade-cabinet-base"></span>
+    </span>
+  </button>`;
+}
+function renderTownArcade() {
+  const box = document.getElementById("townArcade");
+  if (!box) return;
+  if (window.ImasoraCompanionCatcher && typeof window.ImasoraCompanionCatcher.unmount === "function") {
+    window.ImasoraCompanionCatcher.unmount();
+  }
+  if (window.ImasoraJackpotCoinPusher && typeof window.ImasoraJackpotCoinPusher.unmount === "function") {
+    window.ImasoraJackpotCoinPusher.unmount();
+  }
+  let activeArcadeMachine = null;
+  if (!isTownBuildingBuilt("arcade")) {
+    box.innerHTML = `${townArcadeHeaderMarkup("ゲームセンター")}
+      <div class="arcade-game-stage"><div class="arcade-game-console"><div class="arcade-game-screen"><div class="arcade-game-ready"><small>CLOSED</small><strong>建設後に開きます</strong></div></div></div></div>`;
+  } else {
+    const selectedMachine = townArcadeMachineById(selectedArcadeMachineId);
+    activeArcadeMachine = selectedMachine;
+    if (!selectedMachine) {
+      selectedArcadeMachineId = "";
+      arcadeGameRunning = false;
+      box.innerHTML = `${townArcadeHeaderMarkup("ゲームセンター")}
+        <div class="arcade-lobby-scene">
+          <img class="arcade-building-layer" src="assets/town-layered-arcade-v1.png" alt="" aria-hidden="true">
+          <div class="arcade-neon-sign"><strong>イマソラゲームセンター</strong><small>GAME SELECT</small></div>
+          <div class="arcade-machine-row">${townArcadeMachines.map(townArcadeMachineMarkup).join("")}</div>
+        </div>`;
+    } else if (selectedMachine.game === "companionCatcher") {
+      if (arcadeGameRunning) {
+        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          <div class="arcade-game-stage companion-catcher-stage">
+            <div class="companion-catcher-host" id="imasoraCompanionCatcherMount"></div>
+            <div class="companion-catcher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
+          </div>`;
+      } else {
+        const previewRoster = getImasoraArcadePlushRoster().slice(0, 3);
+        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          <div class="arcade-game-stage companion-catcher-stage">
+            <div class="companion-catcher-intro">
+              <div class="companion-catcher-intro-machine" aria-hidden="true">
+                <span class="companion-catcher-intro-rail"></span>
+                <span class="companion-catcher-intro-claw"><i></i><b></b><b></b><b></b></span>
+                <div class="companion-catcher-intro-prizes">
+                  ${previewRoster.map(item => `<span class="companion-catcher-intro-plush" style="--plush-color:${escapeAttr(item.bodyColor)}">${item.art}</span>`).join("")}
+                </div>
+              </div>
+              <div class="companion-catcher-intro-copy">
+                <small>SWING. GRIP. CATCH.</small>
+                <strong>イマソラ相棒キャッチャー</strong>
+                <p>回り続けるベルト上の相棒ぬいぐるみを、揺れる3本爪で狙う3Dキャッチャー。</p>
+              </div>
+              <div class="companion-catcher-intro-tags"><span>3D物理</span><span>回転コンベア</span><span>弱い3本爪</span></div>
+              <button class="arcade-start-button" type="button" data-arcade-start>キャッチャーをはじめる</button>
+            </div>
+          </div>`;
+      }
+    } else if (selectedMachine.game === "coinPusher") {
+      if (arcadeGameRunning) {
+        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          <div class="arcade-game-stage coin-pusher-stage">
+            <div class="coin-pusher-host" id="imasoraJackpotCoinPusherMount"></div>
+            <div class="coin-pusher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
+          </div>`;
+      } else {
+        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          <div class="arcade-game-stage coin-pusher-stage">
+            <div class="coin-pusher-intro">
+              <div class="coin-pusher-intro-machine" aria-hidden="true">
+                <div class="coin-pusher-intro-board"></div>
+                <div class="coin-pusher-intro-seven"><span>7</span><span>7</span></div>
+                <div class="coin-pusher-intro-flow"><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="coin-pusher-intro-copy">
+                <small>PACHINKO × COIN PUSHER</small>
+                <strong>イマソラジャックポット</strong>
+                <p>釘盤へコインを放ち、SPINを引いて大量放出を狙う3Dコイン落とし。77は大当たり、33は小当たりです。</p>
+              </div>
+              <div class="coin-pusher-intro-tags"><span>77 大量放出</span><span>33 少量放出</span><span>ST5回・継続期待80%</span><span>相棒群は激アツ</span></div>
+              <button class="arcade-start-button" type="button" data-arcade-start>ジャックポットをはじめる</button>
+            </div>
+          </div>`;
+      }
+    } else {
+      const runningMarkup = arcadeGameRunning
+        ? `<div class="arcade-game-running" role="status"><small>PLAYING</small><strong>GAME START</strong><span class="arcade-running-mark">${escapeAttr(selectedMachine.number)}</span></div>`
+        : `<div class="arcade-game-ready"><small>READY</small><strong>${escapeAttr(selectedMachine.name)}</strong><button class="arcade-start-button" type="button" data-arcade-start>スタート</button></div>`;
+      box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+        <div class="arcade-game-stage">
+          <div class="arcade-game-console tone-${selectedMachine.tone}">
+            <div class="arcade-game-screen">${runningMarkup}</div>
+            ${arcadeGameRunning ? '<div class="arcade-game-controls"><button type="button" data-arcade-stop>ゲームを終了</button></div>' : ""}
+          </div>
+        </div>`;
+    }
+  }
+  box.querySelectorAll("[data-arcade-machine]").forEach(button => {
+    button.addEventListener("click", () => selectTownArcadeMachine(button.dataset.arcadeMachine));
+  });
+  box.querySelector("[data-arcade-start]")?.addEventListener("click", startTownArcadeGame);
+  box.querySelector("[data-arcade-stop]")?.addEventListener("click", stopTownArcadeGame);
+  box.querySelector("[data-arcade-return-lobby]")?.addEventListener("click", returnToTownArcadeLobby);
+  box.querySelector("[data-arcade-return-town]")?.addEventListener("click", returnToTownMapFromArcade);
+  if (activeArcadeMachine?.game === "companionCatcher" && arcadeGameRunning) {
+    requestAnimationFrame(() => {
+      const mount = document.getElementById("imasoraCompanionCatcherMount");
+      if (!mount) return;
+      mount.innerHTML = '<div class="icc-load-error"><div><strong>3Dキャッチャーを準備中</strong></div></div>';
+      ensureImasoraCompanionCatcherLoaded()
+        .then(game => {
+          if (!mount.isConnected) return;
+          game.mount(mount, { roster: getImasoraArcadePlushRoster() });
+        })
+        .catch(error => {
+          console.error("イマソラ相棒キャッチャー3Dの読み込みに失敗しました。", error);
+          if (!mount.isConnected) return;
+          mount.innerHTML = '<div class="icc-load-error"><div><strong>3Dキャッチャーを起動できませんでした</strong><p>ページを更新して、もう一度ゲームセンターから開いてください。</p></div></div>';
+      });
+    });
+  }
+  if (activeArcadeMachine?.game === "coinPusher" && arcadeGameRunning) {
+    requestAnimationFrame(() => {
+      const mount = document.getElementById("imasoraJackpotCoinPusherMount");
+      if (!mount) return;
+      mount.innerHTML = '<div class="icp-load-error"><div><strong>3Dジャックポットを準備中</strong></div></div>';
+      ensureImasoraJackpotCoinPusherLoaded()
+        .then(game => {
+          if (!mount.isConnected) return;
+          game.mount(mount, {
+            roster: getImasoraArcadePlushRoster(),
+            wingArt: getImasoraJackpotWingArt()
+          });
+        })
+        .catch(error => {
+          console.error("イマソラジャックポット3Dの読み込みに失敗しました。", error);
+          if (!mount.isConnected) return;
+          mount.innerHTML = '<div class="icp-load-error"><div><strong>3Dジャックポットを起動できませんでした</strong><p>ページを更新して、もう一度ゲームセンターから開いてください。</p></div></div>';
+        });
+    });
+  }
+}
+function openTownArcadeFromMap() {
+  if (!isTownBuildingBuilt("arcade")) {
+    playSfx("error");
+    toast("ゲームセンターはまだ建設されていません");
+    return;
+  }
+  selectedArcadeMachineId = "";
+  arcadeGameRunning = false;
+  switchScreen("arcade");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("select");
+  toast("ゲームセンターへ移動しました");
+}
+function selectTownArcadeMachine(id) {
+  if (!townArcadeMachineById(id)) return;
+  selectedArcadeMachineId = id;
+  arcadeGameRunning = false;
+  renderTownArcade();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("select");
+}
+function startTownArcadeGame() {
+  if (!townArcadeMachineById(selectedArcadeMachineId)) return;
+  arcadeGameRunning = true;
+  renderTownArcade();
+  playSfx("select");
+}
+function stopTownArcadeGame() {
+  arcadeGameRunning = false;
+  renderTownArcade();
+  playSfx("select");
+}
+function returnToTownArcadeLobby() {
+  selectedArcadeMachineId = "";
+  arcadeGameRunning = false;
+  renderTownArcade();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  playSfx("select");
+}
+function returnToTownMapFromArcade() {
+  selectedArcadeMachineId = "";
+  arcadeGameRunning = false;
+  switchScreen("town");
+  setTimeout(() => document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   playSfx("select");
 }
 const karaokeSongModes = [
@@ -52095,6 +52892,12 @@ function showHomeCenterNotice(text) {
 }
 function switchScreen(screen) {
   blurActiveTextInput();
+  if (screen !== "arcade" && window.ImasoraCompanionCatcher && typeof window.ImasoraCompanionCatcher.unmount === "function") {
+    window.ImasoraCompanionCatcher.unmount();
+  }
+  if (screen !== "arcade" && window.ImasoraJackpotCoinPusher && typeof window.ImasoraJackpotCoinPusher.unmount === "function") {
+    window.ImasoraJackpotCoinPusher.unmount();
+  }
   if (screen !== "walk") stopCompanionHomeDialogue();
   if (screen !== "monster") stopBattleResultBgm();
   const leavingRetirementBgm = screen !== "retirement" && sound.mode === "retirementCeremony";
@@ -52115,6 +52918,7 @@ function switchScreen(screen) {
     warmKaraokeTextCaches();
     if (!townVisualRenderedOnce) renderTown();
   }
+  if (screen === "arcade") renderTownArcade();
   if (screen === "retirement") renderRetirementCeremony();
   if (screen === "walk") syncHomeBgmMode();
   scheduleCaretCleanup();
