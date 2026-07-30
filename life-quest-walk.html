@@ -22,7 +22,7 @@
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260718-22">
-  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260724-responsive-windmill-seesaw-solid-v37">
+  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260727-jam-clear-step33-board-tokens-only">
   <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
@@ -41522,7 +41522,7 @@ let imasoraJackpotCoinPusherModulePromise = null;
 function ensureImasoraJackpotCoinPusherLoaded() {
   if (window.ImasoraJackpotCoinPusher) return Promise.resolve(window.ImasoraJackpotCoinPusher);
   if (!imasoraJackpotCoinPusherModulePromise) {
-    imasoraJackpotCoinPusherModulePromise = import("./assets/imasora-jackpot-coin-pusher.js?v=20260726-production-layout-v78")
+    imasoraJackpotCoinPusherModulePromise = import("./assets/imasora-jackpot-coin-pusher.js?v=20260730-pusher-traction-lock-step121")
       .then(() => {
         if (!window.ImasoraJackpotCoinPusher) throw new Error("3D coin pusher module did not initialize");
         return window.ImasoraJackpotCoinPusher;
@@ -41779,7 +41779,7 @@ function renderTownArcade() {
                 <strong>イマソラジャックポット</strong>
                 <p>釘盤へコインを放ち、SPINを引いて大量放出を狙う3Dコイン落とし。77は大当たり、33は小当たりです。</p>
               </div>
-              <div class="coin-pusher-intro-tags"><span>77 大量放出</span><span>33 少量放出</span><span>ST5回・継続期待80%</span><span>相棒群は激アツ</span></div>
+              <div class="coin-pusher-intro-tags"><span>77 大量放出</span><span>33 少量放出</span><span>ST5回・継続期待80%</span></div>
               <button class="arcade-start-button" type="button" data-arcade-start>ジャックポットをはじめる</button>
             </div>
           </div>`;
