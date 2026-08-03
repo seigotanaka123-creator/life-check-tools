@@ -803,4 +803,3 @@ export class World {
     this._rapierWorld.free();
   }
 }
-
