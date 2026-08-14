@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>満開期全144種 360°開発</title>
+  <link rel="stylesheet" href="./assets/imasora-character-360-dev.css?v=20260814-flowering-48-v1">
+</head>
+<body>
+  <main class="dev-shell">
+    <header class="dev-header">
+      <div>
+        <p class="eyebrow">IMASORA CHARACTER LAB</p>
+        <h1><span id="currentCharacterName" class="current-character-name">白ミチロードセイバーレン</span> <span id="growthStageTitleText">満開期全144種 360°開発</span></h1>
+        <p class="lead" id="growthStageLead">完成した白18種の立体形状を基準に、通常7系統126種を含む全満開期キャラを同じ品質で確認する専用ページです。</p>
+      </div>
+      <a class="back-link" href="./life-quest-walk.html?check=character-360-dev-return-20260813">ゲームへ戻る</a>
+    </header>
+
+    <nav class="growth-stage-tabs" id="growthStageTabs" aria-label="成長段階を選択">
+      <button type="button" data-growth-stage="flowering">開花期 <strong>48種</strong></button>
+      <button type="button" data-growth-stage="mature">満開期 <strong>144種</strong></button>
+    </nav>
+
+    <section class="character-roster" aria-labelledby="characterRosterTitle">
+      <div class="roster-heading">
+        <div>
+          <p class="eyebrow" id="rosterEyebrow">ALL MATURE STAR ROSTER</p>
+          <h2 id="characterRosterTitle">確認キャラクター</h2>
+        </div>
+        <strong id="characterIndex">18 / 144</strong>
+      </div>
+      <div class="roster-select-row">
+        <button id="previousCharacter" type="button" aria-label="前のキャラクター">‹</button>
+        <select id="characterSelect" aria-label="満開期キャラクターを選択"></select>
+        <button id="nextCharacter" type="button" aria-label="次のキャラクター">›</button>
+      </div>
+      <div class="family-filter-list" id="familyFilterList" aria-label="体色系統を選択"></div>
+      <div class="character-quick-list" id="characterQuickList" aria-label="選択中の系統18種を直接選択"></div>
+    </section>
+
+    <section class="workspace" aria-label="360度キャラクター開発画面">
+      <div class="stage-card">
+        <div class="stage-toolbar">
+          <div class="status-chip"><span class="status-dot"></span><span id="viewName">正面</span></div>
+          <div class="angle-readout"><strong id="yawValue">0°</strong><span id="pitchValue">上下 0°</span></div>
+        </div>
+        <div class="stage" id="stage">
+          <canvas id="characterCanvas" aria-label="白ミチロードセイバーレンの360度3Dモデル"></canvas>
+          <div class="drag-guide" id="dragGuide">指またはマウスでなぞって回転</div>
+        </div>
+        <div class="direction-strip" aria-label="8方向プリセット">
+          <button type="button" data-yaw="0">正面</button>
+          <button type="button" data-yaw="45">右斜め</button>
+          <button type="button" data-yaw="90">右</button>
+          <button type="button" data-yaw="135">右後ろ</button>
+          <button type="button" data-yaw="180">背面</button>
+          <button type="button" data-yaw="225">左後ろ</button>
+          <button type="button" data-yaw="270">左</button>
+          <button type="button" data-yaw="315">左斜め</button>
+        </div>
+      </div>
+
+      <aside class="control-card">
+        <div class="control-heading">
+          <p class="eyebrow">MODEL CONTROLS</p>
+          <h2>表示調整</h2>
+        </div>
+
+        <label class="range-row" for="yawRange">
+          <span>水平方向</span>
+          <input id="yawRange" type="range" min="0" max="359" step="1" value="0">
+        </label>
+        <label class="range-row" for="pitchRange">
+          <span>上下角度</span>
+          <input id="pitchRange" type="range" min="-30" max="30" step="1" value="0">
+        </label>
+        <label class="range-row" for="zoomRange">
+          <span>拡大率</span>
+          <input id="zoomRange" type="range" min="70" max="150" step="1" value="100">
+        </label>
+
+        <div class="toggle-grid">
+          <label><input id="autoRotate" type="checkbox"><span>自動回転</span></label>
+          <label><input id="wireframe" type="checkbox"><span>メッシュ</span></label>
+          <label id="primaryToggleRow"><input id="showCape" type="checkbox" checked><span id="primaryToggleLabel">マント</span></label>
+          <label id="secondaryToggleRow"><input id="showCord" type="checkbox" checked><span id="secondaryToggleLabel">紐・留め具</span></label>
+        </div>
+
+        <div class="action-grid">
+          <button id="resetView" type="button">表示をリセット</button>
+          <button id="saveImage" type="button">画像を保存</button>
+        </div>
+
+        <section class="part-check" aria-labelledby="partCheckTitle">
+          <h3 id="partCheckTitle">今回の確認項目</h3>
+          <ul>
+            <li><span class="ok-mark">✓</span><span id="bodyCheckText">胴体は頭から底まで一体の立体メッシュ</span></li>
+            <li><span class="ok-mark">✓</span><span id="decorCheckText">満開期装飾も厚みのある立体構造</span></li>
+            <li><span class="ok-mark">✓</span><span id="rearCheckText">背面・側面にも正しい構造が続く</span></li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+
+    <footer>
+      <span>共通モデルID</span>
+      <code id="modelIdReadout">star-white-hero-young-seed-walk-sky-cool-b-forest</code>
+    </footer>
+  </main>
+  <script type="module" src="./assets/imasora-character-360-dev.js?v=20260814-flowering-48-v1"></script>
+</body>
+</html>

@@ -21,9 +21,10 @@
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260718-22">
-  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260730-danger-room-uniform-step123c">
-  <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260803-machine3-collector-frame-dev-controls-step275">
+  <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260812-opening-redesign">
+  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260812-pachicoin-opening">
+  <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260804-machine3-floating-ring-position-editor-step306">
+  <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260813-initial-physics-game">
   <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
@@ -36,7 +37,109 @@
   <link rel="preload" as="image" href="assets/karaoke-room-evening-v01.png">
   <link rel="preload" as="image" href="assets/karaoke-room-morning-day-v01.png">
   <link rel="preload" as="image" href="assets/imasora-new-opening-v1.png">
+  <script>
+    /*
+     * Codex の注釈レイヤーが文章選択後に残留しても、通常のカーソルと
+     * ゲーム操作を奪わないようにする。注釈用 Shadow DOM はアプリ側から
+     * 後挿入・再設定されるため、生成時と style 更新時の両方を監視する。
+     */
+    (() => {
+      const ROOT_ID = 'codex-browser-sidebar-comments-root';
+      let watchedHost = null;
+      let watchedShadow = null;
+      let hostObserver = null;
+      let shadowObserver = null;
+
+      const forceStyle = (element, property, value) => {
+        if (!element) return;
+        if (
+          element.style.getPropertyValue(property) !== value ||
+          element.style.getPropertyPriority(property) !== 'important'
+        ) {
+          element.style.setProperty(property, value, 'important');
+        }
+      };
+
+
+      const enforceNormalCursor = () => {
+        const host = document.getElementById(ROOT_ID);
+        if (!host) return;
+
+        forceStyle(host, 'display', 'none');
+        forceStyle(host, 'pointer-events', 'none');
+        forceStyle(host, 'cursor', 'default');
+
+        if (watchedHost !== host) {
+          hostObserver?.disconnect();
+          watchedHost = host;
+          hostObserver = new MutationObserver(enforceNormalCursor);
+          hostObserver.observe(host, {
+            attributes: true,
+            attributeFilter: ['style'],
+          });
+        }
+
+        const shadow = host.shadowRoot;
+        if (!shadow) return;
+
+        const overlay = shadow.querySelector('[data-browser-comment-root="true"]');
+        forceStyle(overlay, 'pointer-events', 'none');
+        forceStyle(overlay, 'cursor', 'default');
+
+        if (watchedShadow !== shadow) {
+          shadowObserver?.disconnect();
+          watchedShadow = shadow;
+          shadowObserver = new MutationObserver(enforceNormalCursor);
+          shadowObserver.observe(shadow, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style'],
+          });
+        }
+      };
+
+      const documentObserver = new MutationObserver(enforceNormalCursor);
+      const startGuard = () => {
+        documentObserver.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+        });
+        enforceNormalCursor();
+        window.setInterval(enforceNormalCursor, 1000);
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startGuard, { once: true });
+      } else {
+        startGuard();
+      }
+    })();
+  </script>
   <style>
+    /* Codexの要素検査レイヤーが残留しても、ゲーム操作を遮断させない。 */
+    #codex-browser-sidebar-comments-root {
+      display: none !important;
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+
+    html,
+    body {
+      cursor: default !important;
+    }
+
+    button,
+    a,
+    [role="button"],
+    input[type="button"],
+    input[type="submit"],
+    input[type="range"],
+    select,
+    label[for] {
+      cursor: pointer !important;
+    }
+
     :root {
       --bg: #07121f;
       --sky: #d8f0ff;
@@ -9509,6 +9612,9 @@
       gap: 4px;
       margin-top: 6px;
     }
+    .town-dev-construction-buttons {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .town-dev-light-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -15485,6 +15591,12 @@ const townMapSlots = {
 const townFacilitySpriteReadyIds = ["warehouse", "fountain", "bridge", "bridge2", "clock", "shop", "guild", "station", "castle", "medalHall", "soundShop", "bookstore", "retirePark", "arcade", "statue1", "statue2"];
 let townFacilityNamesVisible = true;
 const townVacantMode = "background";
+const townConstructionPreviewOptions = [
+  { id: "normal", label: "通常", text: "現在の進行" },
+  { id: "before", label: "建設前", text: "表示確認" },
+  { id: "after", label: "建設後", text: "表示確認" }
+];
+let townConstructionPreviewMode = "normal";
 const townSceneOptions = [
   { id: "auto", label: "自動", text: "現在時刻" },
   { id: "morning", label: "朝", text: "06:00〜" },
@@ -15612,6 +15724,7 @@ let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
 let selectedArcadeMachineId = "";
 let arcadeGameRunning = false;
+let selectedTriLinkRetiredId = "";
 let pendingRetireParkPracticeRecordId = "";
 const memorialWallpaperChoices = [
   { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォークの街" },
@@ -37691,6 +37804,7 @@ function defaultState() {
     hpDrainSfxVersion: 3,
     soundVolumes: { normalBgm: 5, retirementBgm: 5, battleBgm: 5, sfx: 5 },
     jackpotEffects: { sharkShake: true, dangerIllumination: true },
+    triLinkMemories: [],
     companionColors: { hand: "standard", foot: "standard" },
     homeTalk: { age: "adult", theme: "prefecture", date: "", currentId: "", lastId: "", usedToday: [] },
     dex: ["seed-walk"],
@@ -37776,6 +37890,9 @@ function normalizeState() {
   state.townBuildings = Array.isArray(state.townBuildings) ? state.townBuildings.filter(id => buildings.some(([buildingId]) => buildingId === id)) : [];
   if (!state.townBuildings.includes("warehouse")) state.townBuildings.push("warehouse");
   state.retiredMonsters = Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [];
+  state.triLinkMemories = Array.isArray(state.triLinkMemories)
+    ? state.triLinkMemories.filter(item => item && typeof item === "object").slice(0, 20)
+    : [];
   state.retiredStorageLimit = Math.max(1, Math.min(500, Number(state.retiredStorageLimit || 20)));
   state.retirementStorageAdViews = Math.max(0, Math.min(2, Number(state.retirementStorageAdViews || 0)));
   state.pendingRetirementRecord = state.pendingRetirementRecord && typeof state.pendingRetirementRecord === "object" ? state.pendingRetirementRecord : null;
@@ -41157,9 +41274,15 @@ function townLayeredBuildingSprites(id) {
   if (id === "bridge2") return townBuildingSprite("bridge2Landing") + townBuildingSprite("bridge2Landing2") + townBuildingSprite("bridge2");
   return townBuildingSprite(id);
 }
-function shouldShowTownLayeredBuilding(id) {
+function isTownBuildingBuiltForMap(id) {
+  if (id === "warehouse") return true;
+  if (townConstructionPreviewMode === "before") return false;
+  if (townConstructionPreviewMode === "after") return true;
   if (id === "bridge2") return isTownBuildingBuilt("bridge2") || isTownBuildingBuilt("bridge");
   return isTownBuildingBuilt(id);
+}
+function shouldShowTownLayeredBuilding(id) {
+  return isTownBuildingBuiltForMap(id);
 }
 function renderTown() {
   if (!selectedTownBuildingId || (selectedTownBuildingId !== "warehouse" && !townBuildableBuildingIds.includes(selectedTownBuildingId))) {
@@ -41167,7 +41290,8 @@ function renderTown() {
     selectedTownBuildingId = (firstUnbuilt || townBuildableBuildings[0] || [])[0] || "";
   }
   const townView = document.getElementById("townView");
-  const fullyBuilt = townBuildableBuildings.every(([id]) => isTownBuildingBuilt(id));
+  const fullyBuilt = townConstructionPreviewMode === "after"
+    || (townConstructionPreviewMode === "normal" && townBuildableBuildings.every(([id]) => isTownBuildingBuilt(id)));
   townView.classList.toggle("town-developed", fullyBuilt);
   townView.classList.toggle("town-vacant-background", townVacantMode === "background");
   townView.classList.remove("town-vacant-layered");
@@ -41175,7 +41299,7 @@ function renderTown() {
   const vacantLayer = "";
   const buildingLayer = townBuildingSprite("warehouse") + townBuildableBuildings.map(([id]) => shouldShowTownLayeredBuilding(id) && townFacilitySpriteReadyIds.includes(id) ? townLayeredBuildingSprites(id) : "").join("");
   const labels = townFacilityNames.map(({ id, name, x, y, cls }) => {
-    const built = id === "bridge2" ? shouldShowTownLayeredBuilding("bridge2") : isTownBuildingBuilt(id);
+    const built = isTownBuildingBuiltForMap(id);
     if (id !== "warehouse" && !townMapSlots[id]) return "";
     const className = `town-facility-name ${cls || ""}${built ? "" : " town-facility-button"}`;
     const style = townFacilityLabelStyle(id, x, y);
@@ -41243,17 +41367,33 @@ function renderTownDevMenu() {
   const box = document.getElementById("townDevMenu");
   if (!box) return;
   box.hidden = false;
+  const constructionPreview = townConstructionPreviewOptions.find(item => item.id === townConstructionPreviewMode) || townConstructionPreviewOptions[0];
+  const constructionControls = `<div class="town-dev-card town-dev-scene-card">
+    <div class="town-dev-card-title"><span>街マップ建設状態</span><span class="town-dev-offset">表示: ${constructionPreview.label}（進行データは変更しません）</span></div>
+    <div class="town-dev-scene-buttons town-dev-construction-buttons">
+      ${townConstructionPreviewOptions.map(item => `<button class="${townConstructionPreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-construction-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
+    </div>
+  </div>`;
   const sceneControls = `<div class="town-dev-card town-dev-scene-card">
     <div class="town-dev-card-title"><span>街マップ時間帯</span><span class="town-dev-offset">表示: ${townSceneLabel(currentTownScene())}</span></div>
     <div class="town-dev-scene-buttons">
       ${townSceneOptions.map(item => `<button class="${townScenePreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-scene-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
     </div>
   </div>`;
-  box.innerHTML = sceneControls + townBridge2DevCardHtml();
+  box.innerHTML = constructionControls + sceneControls + townBridge2DevCardHtml();
+  box.querySelectorAll("[data-town-construction-preview]").forEach(button => {
+    button.addEventListener("click", () => setTownConstructionPreview(button.dataset.townConstructionPreview));
+  });
   box.querySelectorAll("[data-town-scene-preview]").forEach(button => {
     button.addEventListener("click", () => setTownScenePreview(button.dataset.townScenePreview));
   });
   bindTownLayeredSpriteDevControls(box);
+}
+function setTownConstructionPreview(id) {
+  if (!townConstructionPreviewOptions.some(item => item.id === id)) return;
+  townConstructionPreviewMode = id;
+  renderTown();
+  playSfx("select");
 }
 function setTownScenePreview(id) {
   if (!townSceneOptions.some(item => item.id === id)) return;
@@ -41654,7 +41794,7 @@ let imasoraCompanionCatcherModulePromise = null;
 function ensureImasoraCompanionCatcherLoaded() {
   if (window.ImasoraCompanionCatcher) return Promise.resolve(window.ImasoraCompanionCatcher);
   if (!imasoraCompanionCatcherModulePromise) {
-    imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=20260721-148")
+    imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=20260812-character-catcher-opening")
       .then(() => {
         if (!window.ImasoraCompanionCatcher) throw new Error("3D catcher module did not initialize");
         return window.ImasoraCompanionCatcher;
@@ -41682,11 +41822,27 @@ function ensureImasoraJackpotCoinPusherLoaded() {
   }
   return imasoraJackpotCoinPusherModulePromise;
 }
+let imasoraTriLinkModulePromise = null;
+function ensureImasoraTriLinkLoaded() {
+  if (window.ImasoraTriLink) return Promise.resolve(window.ImasoraTriLink);
+  if (!imasoraTriLinkModulePromise) {
+    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260813-white-michi-seamless-profile-v2")
+      .then(() => {
+        if (!window.ImasoraTriLink) throw new Error("Tri-Link module did not initialize");
+        return window.ImasoraTriLink;
+      })
+      .catch(error => {
+        imasoraTriLinkModulePromise = null;
+        throw error;
+      });
+  }
+  return imasoraTriLinkModulePromise;
+}
 let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260803-machine3-collector-frame-dev-controls-step275")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260809-center-j-checker-jack-pot-label")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;
@@ -41732,9 +41888,19 @@ function imasoraArcadePlushSvg(item, colorSettings = null, view = "front") {
   const id = item?.id || "";
   const unique = id.startsWith("hero-") || id.startsWith("star-");
   if (!unique) return imasoraArcadeFallbackPlushSvg(item, colorSettings, view);
-  return view === "back"
-    ? turnaroundMonsterSvg(item, "back", colorSettings)
-    : uniqueMonsterSvg(item, true, colorSettings);
+  return view === "front"
+    ? uniqueMonsterSvg(item, true, colorSettings)
+    : turnaroundMonsterSvg(item, view, colorSettings);
+}
+const TRI_LINK_VIEW_KEYS = Object.freeze([
+  "front", "front-right", "side", "back-right",
+  "back", "back-left", "side-left", "front-left"
+]);
+function triLinkDirectionalArt(item, colorSettings = null) {
+  return Object.fromEntries(TRI_LINK_VIEW_KEYS.map(view => [
+    view,
+    imasoraArcadePlushSvg(item, colorSettings, view)
+  ]));
 }
 function getImasoraArcadePlushRoster() {
   const roster = [];
@@ -41798,9 +41964,142 @@ function getImasoraArcadePlushRoster() {
       add(item, item.name, karaokeDexArtMarkup(item, "front"), entry.physics, entry.value);
     });
   } catch (error) {
-    console.error("イマソラ相棒キャッチャーのぬいぐるみ準備に失敗しました。", error);
+    console.error("イマソラキャラクターキャッチャーのぬいぐるみ準備に失敗しました。", error);
   }
   return roster.slice(0, 8);
+}
+function triLinkRetiredRecords() {
+  return [...(Array.isArray(state.retiredMonsters) ? state.retiredMonsters : [])]
+    .filter(record => record && typeof record === "object")
+    .sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0));
+}
+function triLinkCurrentParticipant() {
+  const profile = monsterProfile();
+  const growth = growthForecast();
+  const item = currentCompanionArtItem(profile, growth);
+  const artViews = triLinkDirectionalArt(item, companionColorSettings());
+  return {
+    id: `current-${item?.id || profile.id || "companion"}`,
+    name: companionDisplayName(profile),
+    role: "current",
+    roleLabel: "育成中の相棒・操作",
+    art: artViews.front,
+    artViews,
+    color: "#ff7180",
+    appearance: {
+      role: "current",
+      artId: item?.id || profile.id || "",
+      companionColors: {
+        hand: state.companionColors?.hand || "standard",
+        foot: state.companionColors?.foot || "standard"
+      }
+    }
+  };
+}
+function triLinkRetiredParticipant(record) {
+  ensureMonsterDexGroups();
+  const item = monsterDexGroups.flatMap(group => group.list || []).find(entry => entry.id === record?.artId);
+  const colors = retiredCompanionColorSettings(record);
+  const artViews = item ? triLinkDirectionalArt(item, colors) : {};
+  return {
+    id: String(record?.id || "retired-companion"),
+    name: String(record?.name || "記録相棒"),
+    role: "retired",
+    roleLabel: `引退記録・AI${record?.rank ? ` ${record.rank}` : ""}`,
+    art: artViews.front || `<span class="retired-record-mark">${escapeAttr(record?.rank || "?")}</span>`,
+    artViews,
+    color: "#ffd16c",
+    appearance: {
+      role: "retired",
+      recordId: String(record?.id || ""),
+      artId: String(record?.artId || ""),
+      companionColors: {
+        hand: record?.companionColors?.hand || record?.monster?.companionColors?.hand || "standard",
+        foot: record?.companionColors?.foot || record?.monster?.companionColors?.foot || "standard"
+      }
+    }
+  };
+}
+function triLinkPracticeParticipant() {
+  ensureMonsterDexGroups();
+  const items = monsterDexGroups.flatMap(group => group.list || []);
+  const item = items.find(entry => entry.id === "hero-young-seed-walk-walk-cute")
+    || items.find(entry => entry.id?.startsWith("hero-young-seed-walk-walk-"))
+    || items.find(entry => entry.id?.startsWith("young-seed-walk-"));
+  const artViews = item ? triLinkDirectionalArt(item) : {};
+  return {
+    id: `tri-link-practice-${item?.id || "companion"}`,
+    name: item?.name || "体験参加の記録相棒",
+    role: "practice",
+    roleLabel: "体験参加・AI",
+    art: artViews.front || "",
+    artViews,
+    color: "#ffd16c",
+    appearance: { role: "practice", artId: item?.id || "" }
+  };
+}
+function triLinkGuideParticipant() {
+  const item = karaokeGuideItem();
+  const artViews = triLinkDirectionalArt(item || { id: "white-michi-guide", whiteVariant: true });
+  return {
+    id: "white-michi-road-savior-ren",
+    name: "白ミチロードセイバーレン",
+    role: "guide",
+    roleLabel: "白レン・AI",
+    art: artViews.front,
+    artViews,
+    color: "#69dfc0",
+    appearance: { role: "guide", artId: item?.id || "" }
+  };
+}
+function getImasoraTriLinkParticipants(retiredId = selectedTriLinkRetiredId) {
+  const records = triLinkRetiredRecords();
+  let record = records.find(item => item.id === retiredId) || records[0] || null;
+  if (record) selectedTriLinkRetiredId = record.id;
+  return [
+    triLinkCurrentParticipant(),
+    record ? triLinkRetiredParticipant(record) : triLinkPracticeParticipant(),
+    triLinkGuideParticipant()
+  ];
+}
+function triLinkArtForAppearance(appearance = {}) {
+  try {
+    const role = String(appearance.role || "");
+    if (role === "retired") {
+      const record = triLinkRetiredRecords().find(item => item.id === appearance.recordId);
+      if (record) return triLinkRetiredParticipant(record).art;
+    }
+    if (role === "guide") return triLinkGuideParticipant().art;
+    ensureMonsterDexGroups();
+    const item = monsterDexGroups.flatMap(group => group.list || []).find(entry => entry.id === appearance.artId);
+    if (!item) return "";
+    const colors = appearance.companionColors
+      ? companionColorSettingsFromIds(appearance.companionColors)
+      : null;
+    return imasoraArcadePlushSvg(item, colors, "front");
+  } catch (error) {
+    console.error("トライリンク記念カードの相棒画像を準備できませんでした。", error);
+    return "";
+  }
+}
+function getImasoraTriLinkMemories() {
+  const memories = Array.isArray(state.triLinkMemories) ? state.triLinkMemories : [];
+  return memories.slice(0, 12).map(memory => ({
+    ...memory,
+    participants: (Array.isArray(memory?.participants) ? memory.participants : []).map(participant => ({
+      ...participant,
+      art: triLinkArtForAppearance(participant?.appearance)
+    }))
+  }));
+}
+function saveImasoraTriLinkMemory(memory) {
+  if (!memory || typeof memory !== "object" || !memory.id) return;
+  const current = Array.isArray(state.triLinkMemories) ? state.triLinkMemories : [];
+  state.triLinkMemories = [
+    memory,
+    ...current.filter(item => item?.id !== memory.id)
+  ].slice(0, 20);
+  saveState();
 }
 function getImasoraJackpotWingArt() {
   try {
@@ -41841,9 +42140,9 @@ function getImasoraJackpotWingArt() {
   }
 }
 const townArcadeMachines = Object.freeze([
-  { id: "arcade-machine-1", name: "イマソラ相棒キャッチャー", number: "捕", tone: 1, game: "companionCatcher" },
-  { id: "arcade-machine-2", name: "イマソラジャックポット", number: "77", tone: 2, game: "coinPusher" },
-  { id: "arcade-machine-3", name: "イマソラジャックポット検証版", number: "R3", tone: 3, game: "coinPusherRapierValidation" }
+  { id: "arcade-machine-1", name: "イマソラキャラクターキャッチャー", number: "捕", tone: 1, game: "companionCatcher" },
+  { id: "arcade-machine-2", name: "イマソラ・トライリンク", number: "△", tone: 2, game: "triLink" },
+  { id: "arcade-machine-3", name: "イマソラパチコイン落としゲーム", number: "P3", tone: 3, game: "coinPusherRapierValidation" }
 ]);
 function townArcadeMachineById(id) {
   return townArcadeMachines.find(machine => machine.id === id) || null;
@@ -41879,7 +42178,7 @@ function imasoraJackpotEffectCustomizationMarkup() {
   </dialog>`;
 }
 function townArcadeHeaderMarkup(title, showMachineSelect = false) {
-  const isCoinPusher = title.startsWith("イマソラジャックポット");
+  const isCoinPusher = title === "イマソラパチコイン落としゲーム";
   const coinPusherHeaderClass = isCoinPusher ? " arcade-page-header-coin-pusher" : "";
   const showEffectCustomization = showMachineSelect && isCoinPusher;
   return `<div class="arcade-page-header${coinPusherHeaderClass}">
@@ -41911,6 +42210,9 @@ function renderTownArcade() {
   if (window.ImasoraJackpotCoinPusher && typeof window.ImasoraJackpotCoinPusher.unmount === "function") {
     window.ImasoraJackpotCoinPusher.unmount();
   }
+  if (window.ImasoraTriLink && typeof window.ImasoraTriLink.unmount === "function") {
+    window.ImasoraTriLink.unmount();
+  }
   if (window.ImasoraJackpotRapierValidation && typeof window.ImasoraJackpotRapierValidation.unmount === "function") {
     window.ImasoraJackpotRapierValidation.unmount();
   }
@@ -41940,48 +42242,64 @@ function renderTownArcade() {
       } else {
         const previewRoster = getImasoraArcadePlushRoster().slice(0, 3);
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
-          <div class="arcade-game-stage companion-catcher-stage">
-            <div class="companion-catcher-intro">
-              <div class="companion-catcher-intro-machine" aria-hidden="true">
-                <span class="companion-catcher-intro-rail"></span>
-                <span class="companion-catcher-intro-claw"><i></i><b></b><b></b><b></b></span>
-                <div class="companion-catcher-intro-prizes">
-                  ${previewRoster.map(item => `<span class="companion-catcher-intro-plush" style="--plush-color:${escapeAttr(item.bodyColor)}">${item.art}</span>`).join("")}
+          <div class="arcade-game-stage companion-catcher-stage character-catcher-opening-stage">
+            <div class="character-catcher-opening">
+              <div class="cco-badge"><span>GAME 01</span><b>6 ACTION CHARACTER CATCH</b></div>
+              <div class="cco-cabinet" aria-hidden="true">
+                <div class="cco-marquee"><small>IMASORA ARCADE</small><strong>CHARACTER CATCHER</strong></div>
+                <div class="cco-window">
+                  <span class="cco-rail"></span>
+                  <span class="cco-claw"><i>★</i><b></b><b></b><b></b></span>
+                  <div class="cco-arena">
+                    ${previewRoster.map(item => `<span class="cco-prize" style="--plush-color:${escapeAttr(item.bodyColor)}">${item.art}</span>`).join("")}
+                  </div>
+                </div>
+                <div class="cco-console">
+                  <span class="cco-prize-hole"></span>
+                  <div class="cco-controls"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div>
                 </div>
               </div>
-              <div class="companion-catcher-intro-copy">
-                <small>SWING. GRIP. CATCH.</small>
-                <strong>イマソラ相棒キャッチャー</strong>
-                <p>回り続けるベルト上の相棒ぬいぐるみを、揺れる3本爪で狙う3Dキャッチャー。</p>
+              <div class="cco-copy">
+                <small>POSITION. FINE TUNE. DROP.</small>
+                <strong>イマソラキャラクターキャッチャー</strong>
+                <p>お気に入りのキャラクターを、星形の3本爪でつかみ取ろう。回転ステージを読み、6つの操作で狙いを研ぎ澄ませ――最後の「下降」に、すべてを託せ！</p>
               </div>
-              <div class="companion-catcher-intro-tags"><span>3D物理</span><span>回転コンベア</span><span>弱い3本爪</span></div>
-              <button class="arcade-start-button" type="button" data-arcade-start>キャッチャーをはじめる</button>
+              <div class="cco-guide" aria-label="操作の流れ">
+                <span><b>1—3</b>大きく位置と向きを決める</span>
+                <span><b>4—5</b>レバーで細かく合わせる</span>
+                <span><b>6</b>下降してキャッチ</span>
+              </div>
+              <button class="arcade-start-button cco-start" type="button" data-arcade-start>キャッチャーをはじめる</button>
             </div>
           </div>`;
       }
-    } else if (selectedMachine.game === "coinPusher") {
+    } else if (selectedMachine.game === "triLink") {
+      const triLinkParticipants = getImasoraTriLinkParticipants();
+      const retiredRecords = triLinkRetiredRecords();
       if (arcadeGameRunning) {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
-          <div class="arcade-game-stage coin-pusher-stage">
-            <div class="coin-pusher-host" id="imasoraJackpotCoinPusherMount"></div>
-            <div class="coin-pusher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
+          <div class="arcade-game-stage tri-link-stage">
+            <div class="tri-link-host" id="imasoraTriLinkMount"></div>
+            <div class="companion-catcher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
           </div>`;
       } else {
+        const retiredOptions = retiredRecords.map(record => `<option value="${escapeAttr(record.id)}"${record.id === selectedTriLinkRetiredId ? " selected" : ""}>${escapeAttr(record.name || "記録相棒")} ／ ${escapeAttr(record.rankLabel || record.rank || "引退記録")}</option>`).join("");
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
-          <div class="arcade-game-stage coin-pusher-stage">
-            <div class="coin-pusher-intro">
-              <div class="coin-pusher-intro-machine" aria-hidden="true">
-                <div class="coin-pusher-intro-board"></div>
-                <div class="coin-pusher-intro-seven"><span>7</span><span>7</span></div>
-                <div class="coin-pusher-intro-flow"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="arcade-game-stage tri-link-opening-stage">
+            <div class="tri-link-opening">
+              <div class="itl-opening-visual" aria-label="育成中の相棒、引退相棒、白ミチロードセイバーレンの三者対戦">
+                <div class="itl-opening-rink" aria-hidden="true"></div>
+                ${triLinkParticipants.map(participant => `<div class="itl-opening-person" style="--itl-color:${escapeAttr(participant.color)}"><div class="itl-opening-portrait">${participant.art}</div><b>${escapeAttr(participant.name)}</b><small>${escapeAttr(participant.roleLabel)}</small></div>`).join("")}
+                <div class="itl-opening-puck" aria-hidden="true"></div>
               </div>
-              <div class="coin-pusher-intro-copy">
-                <small>PACHINKO × COIN PUSHER</small>
-                <strong>イマソラジャックポット</strong>
-                <p>釘盤へコインを放ち、SPINを引いて大量放出を狙う3Dコイン落とし。77は大当たり、33は小当たりです。</p>
+              <div class="itl-opening-copy">
+                <small>TRACE. REBOUND. SURVIVE.</small>
+                <strong>イマソラ・トライリンク</strong>
+                <p>育成中の相棒を指で動かし、記録に残る引退相棒、白ミチロードセイバーレンと三つ巴の物理対戦。狙い、反射、守り方はすべてあなた次第です。</p>
+                <div class="itl-opening-rules"><span>3つのゴール</span><span>防衛ライト各3本</span><span>能力補正なしの同条件</span></div>
+                ${retiredRecords.length ? `<label class="itl-retired-picker"><span>一緒に遊ぶ引退相棒</span><select data-tri-link-retired>${retiredOptions}</select></label>` : '<div class="itl-no-record">引退相棒の記録がまだないため、今回は体験参加の相棒が入ります。記録ができると、ここで選べるようになります。</div>'}
+                <button class="arcade-start-button itl-opening-start" type="button" data-arcade-start>三者対戦をはじめる</button>
               </div>
-              <div class="coin-pusher-intro-tags"><span>77 大量放出</span><span>33 少量放出</span><span>ST5回・継続期待80%</span></div>
-              <button class="arcade-start-button" type="button" data-arcade-start>ジャックポットをはじめる</button>
             </div>
           </div>`;
       }
@@ -41994,20 +42312,32 @@ function renderTownArcade() {
           </div>`;
       } else {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
-          <div class="arcade-game-stage coin-pusher-stage">
-            <div class="coin-pusher-intro">
-              <div class="coin-pusher-intro-machine" aria-hidden="true">
-                <div class="coin-pusher-intro-board"></div>
-                <div class="coin-pusher-intro-seven"><span>R</span><span>3</span></div>
-                <div class="coin-pusher-intro-flow"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="arcade-game-stage coin-pusher-stage pachi-coin-opening-stage">
+            <div class="pachi-coin-opening">
+              <div class="pco-badge"><span>GAME 03</span><b>PACHINKO × COIN PUSHER</b></div>
+              <div class="pco-cabinet" aria-hidden="true">
+                <div class="pco-data-lamp"><span>START<b>0000</b></span><span>JACKPOT<b>000</b></span></div>
+                <div class="pco-frame">
+                  <div class="pco-board">
+                    <span class="pco-seven">00</span>
+                    <span class="pco-wings"></span>
+                    <span class="pco-checkers"><i>1</i><i>S</i><i>2</i></span>
+                  </div>
+                </div>
+                <div class="pco-pusher"><span class="pco-coins"><i></i><i></i><i></i><i></i><i></i></span></div>
+                <span class="pco-handle"></span>
               </div>
-              <div class="coin-pusher-intro-copy">
-                <small>RAPIER PHYSICS VALIDATION</small>
-                <strong>イマソラジャックポット検証版</strong>
-                <p>ゲーム機2と同じ盤面・演出・進行で、Rapier物理エンジンの速度とコイン挙動を確認します。</p>
+              <div class="pco-copy">
+                <small>TURN. SHOOT. PUSH.</small>
+                <strong>イマソラパチコイン落としゲーム</strong>
+                <p>回転ハンドルでコインを打ち出し、釘とチェッカーの物理抽選から青いコイン落とし盤へつなぐ。JACKPOTを狙うパチンコ×コイン落としゲーム。</p>
               </div>
-              <div class="coin-pusher-intro-tags"><span>Rapier 3D</span><span>同一盤面</span><span>性能表示</span></div>
-              <button class="arcade-start-button" type="button" data-arcade-start>検証版をはじめる</button>
+              <div class="pco-guide" aria-label="遊びの流れ">
+                <span><b>TURN</b>ハンドルでコインを発射</span>
+                <span><b>CHANCE</b>釘とチェッカーで抽選</span>
+                <span><b>PUSH</b>コインを押し出す</span>
+              </div>
+              <button class="arcade-start-button pco-start" type="button" data-arcade-start>ゲームをはじめる</button>
             </div>
           </div>`;
       }
@@ -42026,6 +42356,11 @@ function renderTownArcade() {
   }
   box.querySelectorAll("[data-arcade-machine]").forEach(button => {
     button.addEventListener("click", () => selectTownArcadeMachine(button.dataset.arcadeMachine));
+  });
+  box.querySelector("[data-tri-link-retired]")?.addEventListener("change", event => {
+    selectedTriLinkRetiredId = event.currentTarget.value || "";
+    renderTownArcade();
+    playSfx("select");
   });
   box.querySelector("[data-arcade-start]")?.addEventListener("click", startTownArcadeGame);
   box.querySelector("[data-arcade-stop]")?.addEventListener("click", stopTownArcadeGame);
@@ -42089,30 +42424,31 @@ function renderTownArcade() {
           game.mount(mount, { roster: getImasoraArcadePlushRoster() });
         })
         .catch(error => {
-          console.error("イマソラ相棒キャッチャー3Dの読み込みに失敗しました。", error);
+          console.error("イマソラキャラクターキャッチャー3Dの読み込みに失敗しました。", error);
           if (!mount.isConnected) return;
           mount.innerHTML = '<div class="icc-load-error"><div><strong>3Dキャッチャーを起動できませんでした</strong><p>ページを更新して、もう一度ゲームセンターから開いてください。</p></div></div>';
       });
     });
   }
-  if (activeArcadeMachine?.game === "coinPusher" && arcadeGameRunning) {
+  if (activeArcadeMachine?.game === "triLink" && arcadeGameRunning) {
     requestAnimationFrame(() => {
-      const mount = document.getElementById("imasoraJackpotCoinPusherMount");
+      const mount = document.getElementById("imasoraTriLinkMount");
       if (!mount) return;
-      mount.innerHTML = '<div class="icp-load-error"><div><strong>3Dジャックポットを準備中</strong></div></div>';
-      ensureImasoraJackpotCoinPusherLoaded()
+      mount.innerHTML = '<div class="icc-load-error"><div><strong>三者対戦の物理盤を準備中</strong></div></div>';
+      ensureImasoraTriLinkLoaded()
         .then(game => {
           if (!mount.isConnected) return;
           game.mount(mount, {
-            roster: getImasoraArcadePlushRoster(),
-            wingArt: getImasoraJackpotWingArt(),
-            effects: getImasoraJackpotEffectPreferences()
+            participants: getImasoraTriLinkParticipants(),
+            memories: getImasoraTriLinkMemories(),
+            onRecord: saveImasoraTriLinkMemory,
+            testMode: new URLSearchParams(window.location.search).has("triLinkTest")
           });
         })
         .catch(error => {
-          console.error("イマソラジャックポット3Dの読み込みに失敗しました。", error);
+          console.error("イマソラ・トライリンクの読み込みに失敗しました。", error);
           if (!mount.isConnected) return;
-          mount.innerHTML = '<div class="icp-load-error"><div><strong>3Dジャックポットを起動できませんでした</strong><p>ページを更新して、もう一度ゲームセンターから開いてください。</p></div></div>';
+          mount.innerHTML = '<div class="icc-load-error"><div><strong>トライリンクを起動できませんでした</strong><p>ページを更新して、もう一度ゲーム機2から開いてください。</p></div></div>';
         });
     });
   }
