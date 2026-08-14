@@ -499,7 +499,7 @@ const HANE_REPEAT_REOPEN_THRESHOLD = 0.001;
 const HANE_WING_LENGTH = 0.44;
 const HANE_WING_DESIGN_ID = "michimebanfuwana-representative-six-side-v1";
 const HANE_WING_SOURCE_ID = "hero-young-seed-walk-walk-cute";
-const HANE_WING_SOURCE_NAME = "繝溘メ繝｡繝舌Φ繝輔Ρ繝・;
+const HANE_WING_SOURCE_NAME = "ミチメバンフワナ";
 const HANE_WING_LEFT_VIEW = "side-left";
 const HANE_WING_RIGHT_VIEW = "side";
 const HANE_CHUCKER_PAYOUT = 3;
@@ -722,12 +722,12 @@ const PHYSICS_COLORS = Object.freeze({
 const markup = `
   <div class="icp-shell">
     <header class="icp-hud">
-      <div class="icp-hud-cell"><small>繧ゅ■繧ｳ繧､繝ｳ</small><strong data-icp-credits>250</strong></div>
+      <div class="icp-hud-cell"><small>もちコイン</small><strong data-icp-credits>250</strong></div>
       <div class="icp-hud-logo"><small>IMASORA</small><strong>JACKPOT</strong></div>
-      <div class="icp-hud-cell icp-hud-cell-right"><small>迯ｲ蠕・/small><strong data-icp-collected>0</strong></div>
+      <div class="icp-hud-cell icp-hud-cell-right"><small>獲得</small><strong data-icp-collected>0</strong></div>
     </header>
     <div class="icp-stage" data-icp-stage>
-      <canvas class="icp-canvas" data-icp-canvas aria-label="荳逋ｺ蜿ｰ蝙九ヱ繝√Φ繧ｳ逶､縺ｨ繧ｳ繧､繝ｳ繝励ャ繧ｷ繝｣繝ｼ縺ｮ3D繧ｲ繝ｼ繝逕ｻ髱｢"></canvas>
+      <canvas class="icp-canvas" data-icp-canvas aria-label="一発台型パチンコ盤とコインプッシャーの3Dゲーム画面"></canvas>
       <div class="icp-danger-room-overlay" data-icp-danger-room-overlay aria-hidden="true"></div>
       <div class="icp-seven-panel" hidden aria-hidden="true">
         <small data-icp-spin-label>CHANCE SLOT</small>
@@ -736,85 +736,85 @@ const markup = `
           <span class="icp-seven-digit" data-icp-digit-right>${segmentMarkup()}</span>
         </div>
       </div>
-      <div class="icp-st-badge" data-icp-st hidden><strong>ST</strong><span>谿九ｊ <b data-icp-st-count>5</b> 蝗・/span><small>邯咏ｶ壽悄蠕・80%</small></div>
+      <div class="icp-st-badge" data-icp-st hidden><strong>ST</strong><span>残り <b data-icp-st-count>5</b> 回</span><small>継続期待 80%</small></div>
       <div class="icp-callout" data-icp-callout hidden></div>
-      <div class="icp-payout-meter" data-icp-payout hidden><span>謾ｾ蜃ｺ荳ｭ</span><strong data-icp-payout-count>0</strong></div>
+      <div class="icp-payout-meter" data-icp-payout hidden><span>放出中</span><strong data-icp-payout-count>0</strong></div>
       <div class="icp-game-over" data-icp-game-over hidden>
         <div class="icp-game-over-panel">
           <small>COIN OUT</small>
-          <strong>繧ｲ繝ｼ繝繧ｪ繝ｼ繝舌・</strong>
-          <p>繧ゅ■繧ｳ繧､繝ｳ縺・譫壹↓縺ｪ繧翫∪縺励◆</p>
-          <button type="button" data-icp-restart>繧ゅ≧荳蠎ｦ驕翫・</button>
+          <strong>ゲームオーバー</strong>
+          <p>もちコインが0枚になりました</p>
+          <button type="button" data-icp-restart>もう一度遊ぶ</button>
         </div>
       </div>
     </div>
-    <div class="icp-collector-window" data-icp-collector aria-label="迯ｲ蠕励・繧ｱ繝・ヨ">
-      <small>迯ｲ蠕励・繧ｱ繝・ヨ</small>
+    <div class="icp-collector-window" data-icp-collector aria-label="獲得ポケット">
+      <small>獲得ポケット</small>
       <span class="icp-collector-mouth" aria-hidden="true"></span>
     </div>
     <div class="icp-controls">
       <label class="icp-stroke-control">
-        <span>繧ｹ繝医Ο繝ｼ繧ｯ</span>
-        <input type="range" min="20" max="100" value="58" step="1" data-icp-stroke aria-label="繧ｳ繧､繝ｳ逋ｺ蟆・・繧ｹ繝医Ο繝ｼ繧ｯ">
+        <span>ストローク</span>
+        <input type="range" min="20" max="100" value="58" step="1" data-icp-stroke aria-label="コイン発射のストローク">
         <output data-icp-stroke-value>58</output>
       </label>
       <div class="icp-action-row">
-        <button type="button" class="icp-auto-button" data-icp-auto aria-pressed="false"><span aria-hidden="true">笆ｶ</span><strong data-icp-auto-label>繧ｪ繝ｼ繝育匱蟆・OFF</strong><small>0.6遘・/ 1譫・/small></button>
-        <button type="button" class="icp-jam-clear-button" data-icp-clear-jam title="逶､髱｢荳翫・繧ｳ繧､繝ｳ繧偵い繧ｦ繝医↓縺吶ｋ"><span aria-hidden="true">竊ｺ</span><strong>邇芽ｩｰ縺ｾ繧願ｧ｣豸・/strong></button>
-        <button type="button" class="icp-dev-start-button" data-icp-dev-start title="繧ｹ繧ｿ繝ｼ繝医メ繧ｧ繝・き繝ｼ蜈･雉槭ｒ1蝗樒匱逕溘＆縺帙ｋ"><span aria-hidden="true">S</span><strong>髢狗匱逕ｨ S繝√ぉ繝・き繝ｼ蜈･雉・/strong></button>
+        <button type="button" class="icp-auto-button" data-icp-auto aria-pressed="false"><span aria-hidden="true">▶</span><strong data-icp-auto-label>オート発射 OFF</strong><small>0.6秒 / 1枚</small></button>
+        <button type="button" class="icp-jam-clear-button" data-icp-clear-jam title="盤面上のコインをアウトにする"><span aria-hidden="true">↺</span><strong>玉詰まり解消</strong></button>
+        <button type="button" class="icp-dev-start-button" data-icp-dev-start title="スタートチェッカー入賞を1回発生させる"><span aria-hidden="true">S</span><strong>開発用 Sチェッカー入賞</strong></button>
       </div>
-      <div class="icp-pocket-guide" aria-hidden="true"><span>繧｢繧ｦ繝・/span><span>襍､SPIN繝ｻ7譫・/span><span>繧｢繧ｦ繝・/span></div>
+      <div class="icp-pocket-guide" aria-hidden="true"><span>アウト</span><span>赤SPIN・7枚</span><span>アウト</span></div>
     </div>
     <details class="icp-layout-editor" data-icp-layout-editor>
-      <summary>逶､髱｢驟咲ｽｮ 髢狗匱繝｡繝九Η繝ｼ</summary>
+      <summary>盤面配置 開発メニュー</summary>
       <div class="icp-layout-editor-body" data-icp-editor-body>
-        <p class="icp-layout-editor-help">逶､髱｢縺ｮ驥題牡縺ｮ驥倥・鬚ｨ霆翫・繧ｷ繝ｼ繧ｽ繝ｼ繧堤峩謗･謚ｼ縺励※遘ｻ蜍輔〒縺阪∪縺吶ょ､画峩縺ｯ閾ｪ蜍穂ｿ晏ｭ倥＆繧後√後％縺ｮ遶ｯ譛ｫ縺ｫ菫晏ｭ倥阪・謌ｻ繧雁・縺ｨ縺励※菫晄戟縺輔ｌ縺ｾ縺吶・/p>
-        <div class="icp-layout-camera-select" aria-label="髢狗匱繧ｫ繝｡繝ｩ縺ｮ陦ｨ遉ｺ隗貞ｺｦ">
-          <span>繧ｫ繝｡繝ｩ</span>
-          <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="front" aria-pressed="false">豁｣髱｢</button>
-          <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="normal" aria-pressed="true">騾壼ｸｸ</button>
+        <p class="icp-layout-editor-help">盤面の金色の釘・風車・シーソーを直接押して移動できます。変更は自動保存され、「この端末に保存」は戻り先として保持されます。</p>
+        <div class="icp-layout-camera-select" aria-label="開発カメラの表示角度">
+          <span>カメラ</span>
+          <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="front" aria-pressed="false">正面</button>
+          <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="normal" aria-pressed="true">通常</button>
         </div>
-        <div class="icp-layout-object-select" aria-label="鬚ｨ霆翫→繧ｷ繝ｼ繧ｽ繝ｼ繧帝∈謚・>
-          <button type="button" data-icp-editor-select-object="windmill-left">蟾ｦ鬚ｨ霆・/button>
-          <button type="button" data-icp-editor-select-object="windmill-right">蜿ｳ鬚ｨ霆・/button>
-          <button type="button" data-icp-editor-select-object="seesaw-left">蟾ｦ繧ｷ繝ｼ繧ｽ繝ｼ</button>
-          <button type="button" data-icp-editor-select-object="seesaw-right">蜿ｳ繧ｷ繝ｼ繧ｽ繝ｼ</button>
-          <button type="button" data-icp-editor-select-object="seesaw-upper">荳翫す繝ｼ繧ｽ繝ｼ</button>
+        <div class="icp-layout-object-select" aria-label="風車とシーソーを選択">
+          <button type="button" data-icp-editor-select-object="windmill-left">左風車</button>
+          <button type="button" data-icp-editor-select-object="windmill-right">右風車</button>
+          <button type="button" data-icp-editor-select-object="seesaw-left">左シーソー</button>
+          <button type="button" data-icp-editor-select-object="seesaw-right">右シーソー</button>
+          <button type="button" data-icp-editor-select-object="seesaw-upper">上シーソー</button>
         </div>
         <div class="icp-layout-editor-status">
-          <strong data-icp-editor-selection>驥倥ｒ驕ｸ謚槭＠縺ｦ縺上□縺輔＞</strong>
-          <span data-icp-editor-save-state>蛻晄悄驟咲ｽｮ</span>
+          <strong data-icp-editor-selection>釘を選択してください</strong>
+          <span data-icp-editor-save-state>初期配置</span>
         </div>
         <div class="icp-layout-coordinate-row">
-          <label><span>X</span><input type="number" step="0.01" inputmode="decimal" data-icp-pin-x aria-label="驕ｸ謚樔ｸｭ縺ｮ驟咲ｽｮ迚ｩ縺ｮX蠎ｧ讓・></label>
-          <label><span>Y</span><input type="number" step="0.01" inputmode="decimal" data-icp-pin-y aria-label="驕ｸ謚樔ｸｭ縺ｮ驟咲ｽｮ迚ｩ縺ｮY蠎ｧ讓・></label>
-          <button type="button" data-icp-editor-action="apply">驕ｩ逕ｨ</button>
+          <label><span>X</span><input type="number" step="0.01" inputmode="decimal" data-icp-pin-x aria-label="選択中の配置物のX座標"></label>
+          <label><span>Y</span><input type="number" step="0.01" inputmode="decimal" data-icp-pin-y aria-label="選択中の配置物のY座標"></label>
+          <button type="button" data-icp-editor-action="apply">適用</button>
         </div>
-        <label class="icp-layout-step"><span>遏｢蜊ｰ縺ｮ遘ｻ蜍募ｹ・/span>
-          <select data-icp-editor-step aria-label="驟咲ｽｮ迚ｩ縺ｮ遘ｻ蜍募ｹ・>
+        <label class="icp-layout-step"><span>矢印の移動幅</span>
+          <select data-icp-editor-step aria-label="配置物の移動幅">
             <option value="0.01">0.01</option>
             <option value="0.05" selected>0.05</option>
             <option value="0.1">0.10</option>
           </select>
         </label>
-        <div class="icp-layout-dpad" aria-label="驕ｸ謚樔ｸｭ縺ｮ驟咲ｽｮ迚ｩ繧堤ｧｻ蜍・>
-          <button type="button" data-icp-editor-action="move" data-dx="0" data-dy="1" aria-label="荳翫∈遘ｻ蜍・>竊・/button>
-          <button type="button" data-icp-editor-action="move" data-dx="-1" data-dy="0" aria-label="蟾ｦ縺ｸ遘ｻ蜍・>竊・/button>
-          <span aria-hidden="true">蠕ｮ隱ｿ謨ｴ</span>
-          <button type="button" data-icp-editor-action="move" data-dx="1" data-dy="0" aria-label="蜿ｳ縺ｸ遘ｻ蜍・>竊・/button>
-          <button type="button" data-icp-editor-action="move" data-dx="0" data-dy="-1" aria-label="荳九∈遘ｻ蜍・>竊・/button>
+        <div class="icp-layout-dpad" aria-label="選択中の配置物を移動">
+          <button type="button" data-icp-editor-action="move" data-dx="0" data-dy="1" aria-label="上へ移動">↑</button>
+          <button type="button" data-icp-editor-action="move" data-dx="-1" data-dy="0" aria-label="左へ移動">←</button>
+          <span aria-hidden="true">微調整</span>
+          <button type="button" data-icp-editor-action="move" data-dx="1" data-dy="0" aria-label="右へ移動">→</button>
+          <button type="button" data-icp-editor-action="move" data-dx="0" data-dy="-1" aria-label="下へ移動">↓</button>
         </div>
         <div class="icp-layout-editor-actions">
-          <button type="button" data-icp-editor-action="add">・・驥倥ｒ霑ｽ蜉</button>
-          <button type="button" data-icp-editor-action="delete">驕ｸ謚槭＠縺滄∟繧貞炎髯､</button>
-          <button type="button" class="is-primary" data-icp-editor-action="save">縺薙・遶ｯ譛ｫ縺ｫ菫晏ｭ・/button>
-          <button type="button" data-icp-editor-action="restore-saved">菫晏ｭ倥＠縺滄・鄂ｮ縺ｸ謌ｻ縺・/button>
-          <button type="button" data-icp-editor-action="reset">蛻晄悄驟咲ｽｮ縺ｸ謌ｻ縺・/button>
+          <button type="button" data-icp-editor-action="add">＋ 釘を追加</button>
+          <button type="button" data-icp-editor-action="delete">選択した釘を削除</button>
+          <button type="button" class="is-primary" data-icp-editor-action="save">この端末に保存</button>
+          <button type="button" data-icp-editor-action="restore-saved">保存した配置へ戻す</button>
+          <button type="button" data-icp-editor-action="reset">初期配置へ戻す</button>
         </div>
-        <label class="icp-layout-data"><span>驟咲ｽｮ繝・・繧ｿ</span><textarea rows="4" spellcheck="false" data-icp-layout-output aria-label="逶､髱｢縺ｮ驟咲ｽｮ繝・・繧ｿ"></textarea></label>
+        <label class="icp-layout-data"><span>配置データ</span><textarea rows="4" spellcheck="false" data-icp-layout-output aria-label="盤面の配置データ"></textarea></label>
         <div class="icp-layout-data-actions">
-          <button type="button" data-icp-editor-action="copy">繝・・繧ｿ繧偵さ繝斐・</button>
-          <button type="button" data-icp-editor-action="import">蜈･蜉帙＠縺滄・鄂ｮ繧貞渚譏</button>
+          <button type="button" data-icp-editor-action="copy">データをコピー</button>
+          <button type="button" data-icp-editor-action="import">入力した配置を反映</button>
         </div>
       </div>
     </details>
@@ -1817,11 +1817,11 @@ async function createMemberRecruitmentPosterTexture(item, renderer) {
   context.textBaseline = "middle";
   context.strokeStyle = "#9d004e";
   context.lineWidth = 20;
-  context.strokeText("莨壼藤", canvas.width / 2, 112, canvas.width - 36);
-  context.strokeText("蜍滄寔荳ｭ", canvas.width / 2, 310, canvas.width - 36);
+  context.strokeText("会員", canvas.width / 2, 112, canvas.width - 36);
+  context.strokeText("募集中", canvas.width / 2, 310, canvas.width - 36);
   context.fillStyle = "#ffffff";
-  context.fillText("莨壼藤", canvas.width / 2, 112, canvas.width - 36);
-  context.fillText("蜍滄寔荳ｭ", canvas.width / 2, 310, canvas.width - 36);
+  context.fillText("会員", canvas.width / 2, 112, canvas.width - 36);
+  context.fillText("募集中", canvas.width / 2, 310, canvas.width - 36);
 
   const image = await loadPosterCharacterImage(item?.art || item?.frontSvg);
   const viewBox = image.naturalWidth && image.naturalHeight
@@ -4904,7 +4904,7 @@ class ImasoraJackpotCoinPusherGame {
         visual: pin,
         body,
         kind: "pin",
-        label: "驥・,
+        label: "釘",
         hitRadius: 0.24,
         markerScale: 1
       };
@@ -5436,7 +5436,7 @@ class ImasoraJackpotCoinPusherGame {
       && this.wingArt.rightView === HANE_WING_RIGHT_VIEW;
     if (!wingIdentityValid) {
       console.error(
-        "鄒ｽ譬ｹ繝・じ繧､繝ｳ縺ｮ隴伜挨諠・ｱ縺御ｸ閾ｴ縺励↑縺・◆繧√∬ｪ､縺｣縺溽ｾｽ譬ｹ逕ｻ蜒上・陦ｨ遉ｺ繧貞●豁｢縺励∪縺励◆縲・
+        "羽根デザインの識別情報が一致しないため、誤った羽根画像の表示を停止しました。"
       );
     }
     HANE_WING_PIN_PAIRS.forEach(config => {
@@ -5532,7 +5532,7 @@ class ImasoraJackpotCoinPusherGame {
       }).catch(error => {
         artMaterial.opacity = 0;
         artMaterial.needsUpdate = true;
-        console.error("繝溘メ繝｡繝舌Φ繝輔Ρ繝翫・鄒ｽ譬ｹSVG繧定｡ｨ遉ｺ縺ｧ縺阪∪縺帙ｓ縺ｧ縺励◆縲よ立繝・じ繧､繝ｳ縺ｫ縺ｯ謌ｻ縺励∪縺帙ｓ縲・, error);
+        console.error("ミチメバンフワナの羽根SVGを表示できませんでした。旧デザインには戻しません。", error);
       });
     });
 
@@ -5658,8 +5658,8 @@ class ImasoraJackpotCoinPusherGame {
       this.editableObjects.push(editableRecord);
     };
 
-    addWindmill("windmill-left", "蟾ｦ鬚ｨ霆・, Math.PI / 12);
-    addWindmill("windmill-right", "蜿ｳ鬚ｨ霆・, -Math.PI / 12);
+    addWindmill("windmill-left", "左風車", Math.PI / 12);
+    addWindmill("windmill-right", "右風車", -Math.PI / 12);
 
     const mouthMaterial = new THREE.MeshPhysicalMaterial({
       color: 0x061319,
@@ -5785,7 +5785,7 @@ class ImasoraJackpotCoinPusherGame {
 
       addSeesaw({
         key: side < 0 ? "seesaw-left" : "seesaw-right",
-        label: side < 0 ? "蟾ｦ繧ｷ繝ｼ繧ｽ繝ｼ" : "蜿ｳ繧ｷ繝ｼ繧ｽ繝ｼ",
+        label: side < 0 ? "左シーソー" : "右シーソー",
         name: side < 0 ? "icp-entry-seesaw-left" : "icp-entry-seesaw-right",
         routeSide: side,
         motionDirection: side,
@@ -5794,7 +5794,7 @@ class ImasoraJackpotCoinPusherGame {
     });
     addSeesaw({
       key: "seesaw-upper",
-      label: "荳翫す繝ｼ繧ｽ繝ｼ",
+      label: "上シーソー",
       name: "icp-entry-seesaw-upper",
       motionDirection: 1
     });
@@ -6188,7 +6188,7 @@ class ImasoraJackpotCoinPusherGame {
 
   createCompanionMarquee() {
     if (!this.roster.length) return;
-    const guidePosterItem = this.roster.find(item => item.name === "逋ｽ繝溘メ繝ｭ繝ｼ繝峨そ繧､繝舌・繝ｬ繝ｳ")
+    const guidePosterItem = this.roster.find(item => item.name === "白ミチロードセイバーレン")
       || this.roster[1]
       || this.roster[0];
     const entries = [
@@ -6227,7 +6227,7 @@ class ImasoraJackpotCoinPusherGame {
           artMaterial.map = texture;
           artMaterial.needsUpdate = true;
         }).catch(error => {
-          console.error("莨壼藤蜍滄寔繝昴せ繧ｿ繝ｼ縺ｮ豁｣隕上く繝｣繝ｩ繧ｯ繧ｿ繝ｼ陦ｨ遉ｺ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲・, error);
+          console.error("会員募集ポスターの正規キャラクター表示に失敗しました。", error);
         });
         return;
       }
@@ -6477,7 +6477,7 @@ class ImasoraJackpotCoinPusherGame {
   launchCoin() {
     if (this.gameOver || this.launchCooldown > 0) return false;
     if (this.credits <= 0) {
-      this.showCallout("繧ゅ■繧ｳ繧､繝ｳ縺後≠繧翫∪縺帙ｓ", 1.3, "warning");
+      this.showCallout("もちコインがありません", 1.3, "warning");
       this.autoEnabled = false;
       this.refreshHud();
       return false;
@@ -6692,14 +6692,14 @@ class ImasoraJackpotCoinPusherGame {
     if (hasSelection) {
       const { x, y } = this.selectedEditablePin.visual.position;
       this.els.editorSelection.textContent = selectedPinIndex >= 0
-        ? `驥・${selectedPinIndex + 1} / ${this.editablePins.length}`
+        ? `釘 ${selectedPinIndex + 1} / ${this.editablePins.length}`
         : this.selectedEditablePin.label;
       this.els.pinX.value = x.toFixed(3);
       this.els.pinY.value = y.toFixed(3);
     } else {
       this.els.editorSelection.textContent = this.editablePins.length
-        ? `驥倥ｒ驕ｸ謚槭＠縺ｦ縺上□縺輔＞・亥・${this.editablePins.length}譛ｬ・荏
-        : "驟咲ｽｮ縺吶ｋ驥倥′縺ゅｊ縺ｾ縺帙ｓ";
+        ? `釘を選択してください（全${this.editablePins.length}本）`
+        : "配置する釘がありません";
       this.els.pinX.value = "";
       this.els.pinY.value = "";
     }
@@ -6719,8 +6719,8 @@ class ImasoraJackpotCoinPusherGame {
       button.classList.toggle("is-selected", selected);
       button.setAttribute("aria-pressed", String(selected));
     });
-    if (this.pinLayoutDirty) this.els.editorSaveState.textContent = "譛ｪ菫晏ｭ・;
-    else this.els.editorSaveState.textContent = this.pinLayoutLoadedFromStorage ? "菫晏ｭ俶ｸ医∩" : "蛻晄悄驟咲ｽｮ";
+    if (this.pinLayoutDirty) this.els.editorSaveState.textContent = "未保存";
+    else this.els.editorSaveState.textContent = this.pinLayoutLoadedFromStorage ? "保存済み" : "初期配置";
   }
 
   selectEditablePin(record) {
@@ -6918,9 +6918,9 @@ class ImasoraJackpotCoinPusherGame {
       this.pinLayoutDirty = false;
       this.pinLayoutLoadedFromStorage = true;
       this.updatePinEditorUi();
-      if (createCheckpoint) this.els.editorSaveState.textContent = "菫晏ｭ伜慍轤ｹ繧呈峩譁ｰ縺励∪縺励◆";
+      if (createCheckpoint) this.els.editorSaveState.textContent = "保存地点を更新しました";
     } catch {
-      this.els.editorSaveState.textContent = "菫晏ｭ倥〒縺阪∪縺帙ｓ縺ｧ縺励◆";
+      this.els.editorSaveState.textContent = "保存できませんでした";
     }
   }
 
@@ -6932,7 +6932,7 @@ class ImasoraJackpotCoinPusherGame {
       if (source === null) {
         this.pinLayoutCheckpointAvailable = false;
         this.updatePinEditorUi();
-        this.els.editorSaveState.textContent = "菫晏ｭ倥＠縺滄・鄂ｮ縺後≠繧翫∪縺帙ｓ";
+        this.els.editorSaveState.textContent = "保存した配置がありません";
         return;
       }
       const layout = this.migratePinLayout(JSON.parse(source));
@@ -6947,9 +6947,9 @@ class ImasoraJackpotCoinPusherGame {
       this.pinLayoutLoadedFromStorage = true;
       this.pinLayoutCheckpointAvailable = true;
       this.updatePinEditorUi();
-      this.els.editorSaveState.textContent = "菫晏ｭ倥＠縺滄・鄂ｮ縺ｸ謌ｻ縺励∪縺励◆";
+      this.els.editorSaveState.textContent = "保存した配置へ戻しました";
     } catch {
-      this.els.editorSaveState.textContent = "菫晏ｭ倥＠縺滄・鄂ｮ繧定ｪｭ縺ｿ霎ｼ繧√∪縺帙ｓ縺ｧ縺励◆";
+      this.els.editorSaveState.textContent = "保存した配置を読み込めませんでした";
     }
   }
 
@@ -6962,20 +6962,20 @@ class ImasoraJackpotCoinPusherGame {
     this.pinLayoutDirty = true;
     this.savePinLayout();
     this.els.editorSaveState.textContent = this.pinLayoutCheckpointAvailable
-      ? "蛻晄悄驟咲ｽｮ縺ｫ謌ｻ縺励∪縺励◆・井ｿ晏ｭ伜慍轤ｹ縺ｯ菫晄戟・・
-      : "蛻晄悄驟咲ｽｮ縺ｫ謌ｻ縺励∪縺励◆";
+      ? "初期配置に戻しました（保存地点は保持）"
+      : "初期配置に戻しました";
   }
 
   async copyPinLayoutData() {
     const value = this.els.layoutOutput.value;
     try {
       await navigator.clipboard.writeText(value);
-      this.els.editorSaveState.textContent = "繧ｳ繝斐・縺励∪縺励◆";
+      this.els.editorSaveState.textContent = "コピーしました";
     } catch {
       this.els.layoutOutput.focus();
       this.els.layoutOutput.select();
       document.execCommand?.("copy");
-      this.els.editorSaveState.textContent = "驕ｸ謚槭＠縺ｾ縺励◆";
+      this.els.editorSaveState.textContent = "選択しました";
     }
   }
 
@@ -7008,7 +7008,7 @@ class ImasoraJackpotCoinPusherGame {
     }
     if (action === "add") {
       if (this.editablePins.length >= PIN_EDITOR_MAX_PINS) {
-        this.els.editorSaveState.textContent = `荳企剞${PIN_EDITOR_MAX_PINS}譛ｬ縺ｧ縺兪;
+        this.els.editorSaveState.textContent = `上限${PIN_EDITOR_MAX_PINS}本です`;
         return;
       }
       const base = this.selectedEditablePin?.visual.position;
@@ -7036,7 +7036,7 @@ class ImasoraJackpotCoinPusherGame {
     }
     if (action === "reset") {
       const confirmed = window.confirm(
-        "蛻晄悄驟咲ｽｮ縺ｸ謌ｻ縺励∪縺吶°・歃n縲後％縺ｮ遶ｯ譛ｫ縺ｫ菫晏ｭ倥阪＠縺滄・鄂ｮ縺ｯ谿九ｊ縲√御ｿ晏ｭ倥＠縺滄・鄂ｮ縺ｸ謌ｻ縺吶阪°繧牙ｾｩ蜈・〒縺阪∪縺吶・
+        "初期配置へ戻しますか？\n「この端末に保存」した配置は残り、「保存した配置へ戻す」から復元できます。"
       );
       if (!confirmed) return;
       this.resetPinLayout();
@@ -7055,7 +7055,7 @@ class ImasoraJackpotCoinPusherGame {
         this.applyEntryPlasticGuidePinNumbers(layout.entryPlasticGuidePins);
         this.applyBoardObjectLayout(layout.objects, true);
       } catch {
-        this.els.editorSaveState.textContent = "驟咲ｽｮ繝・・繧ｿ繧堤｢ｺ隱阪＠縺ｦ縺上□縺輔＞";
+        this.els.editorSaveState.textContent = "配置データを確認してください";
       }
     }
   }
@@ -7064,7 +7064,7 @@ class ImasoraJackpotCoinPusherGame {
     if (this.gameOver || this.credits <= 0 || this.layoutEditing) return;
     this.autoEnabled = !this.autoEnabled;
     this.autoTimer = 0;
-    this.showCallout(this.autoEnabled ? "繧ｪ繝ｼ繝育匱蟆・ON" : "繧ｪ繝ｼ繝育匱蟆・OFF", 0.7, this.autoEnabled ? "chance" : "normal");
+    this.showCallout(this.autoEnabled ? "オート発射 ON" : "オート発射 OFF", 0.7, this.autoEnabled ? "chance" : "normal");
     this.refreshHud();
   }
 
@@ -7077,9 +7077,9 @@ class ImasoraJackpotCoinPusherGame {
     if (this.autoEnabled) this.autoTimer = AUTO_FIRE_INTERVAL;
     if (removedCount > 0) {
       this.zeroCreditTimer = 0;
-      this.showCallout(`邇芽ｩｰ縺ｾ繧願ｧ｣豸医・${removedCount}譫壹い繧ｦ繝・, 1.15, "warning");
+      this.showCallout(`玉詰まり解消・${removedCount}枚アウト`, 1.15, "warning");
     } else {
-      this.showCallout("逶､髱｢縺ｫ繧ｳ繧､繝ｳ縺ｯ縺ゅｊ縺ｾ縺帙ｓ", 0.9, "normal");
+      this.showCallout("盤面にコインはありません", 0.9, "normal");
     }
     this.refreshHud();
     return removedCount;
@@ -7600,9 +7600,9 @@ class ImasoraJackpotCoinPusherGame {
       chucker.flash = 0.72;
       chucker.opened = opened;
     }
-    const openingLabel = openingCount === 2 ? "鄒ｽ譬ｹOPENﾃ・" : "鄒ｽ譬ｹOPEN";
+    const openingLabel = openingCount === 2 ? "羽根OPEN×2" : "羽根OPEN";
     this.showCallout(
-      opened ? `${openingLabel}繝ｻ雉樒帥${HANE_CHUCKER_PAYOUT}譫啻 : `雉樒帥${HANE_CHUCKER_PAYOUT}譫啻,
+      opened ? `${openingLabel}・賞球${HANE_CHUCKER_PAYOUT}枚` : `賞球${HANE_CHUCKER_PAYOUT}枚`,
       0.95,
       opened ? "chance" : "normal"
     );
@@ -7616,7 +7616,7 @@ class ImasoraJackpotCoinPusherGame {
       this.pendingPayout += pocket.payout;
       this.queueSpin();
       this.flashSlot(slot, true);
-      this.showCallout(`襍､SPIN繝ｻ${pocket.payout}譫壽叛蜃ｺ`, 1.1, "chance");
+      this.showCallout(`赤SPIN・${pocket.payout}枚放出`, 1.1, "chance");
     } else {
       this.flashSlot(slot, false);
     }
@@ -9286,7 +9286,7 @@ class ImasoraJackpotCoinPusherGame {
     this.root.classList.remove("is-coin-win");
     void this.root.offsetWidth;
     this.root.classList.add("is-coin-win");
-    this.showCallout(`繧ゅ■繧ｳ繧､繝ｳ +${value}`, 0.85, "win");
+    this.showCallout(`もちコイン +${value}`, 0.85, "win");
     this.refreshHud();
   }
 
@@ -9408,18 +9408,18 @@ class ImasoraJackpotCoinPusherGame {
     this.root.classList.remove("is-spinning", "is-jackpot-big", "is-jackpot-small");
     if (outcome.kind === "big") {
       this.root.classList.add("is-jackpot-big");
-      this.showCallout("77 JACKPOT繝ｻ48譫壼､ｧ驥乗叛蜃ｺ", 3.5, "jackpot");
+      this.showCallout("77 JACKPOT・48枚大量放出", 3.5, "jackpot");
       this.setSpinLabel("SUPER JACKPOT");
       this.cameraShake = 0.12;
       this.beginAttackerRound(outcome);
     } else if (outcome.kind === "small") {
       this.root.classList.add("is-jackpot-small");
-      this.showCallout("33 HIT繝ｻ14譫壽叛蜃ｺ", 2.6, "small-hit");
+      this.showCallout("33 HIT・14枚放出", 2.6, "small-hit");
       this.setSpinLabel("MINI JACKPOT");
       this.cameraShake = 0.075;
       this.beginAttackerRound(outcome);
     } else {
-      this.showCallout(this.stRemaining > 0 ? `ST谿九ｊ ${this.stRemaining} 蝗杼 : "谺｡縺ｮSPIN繧堤漁縺翫≧", 1.25, "normal");
+      this.showCallout(this.stRemaining > 0 ? `ST残り ${this.stRemaining} 回` : "次のSPINを狙おう", 1.25, "normal");
       this.setSpinLabel(this.stRemaining > 0 ? `ST ${this.stRemaining} / 5` : "CHANCE SLOT");
     }
     this.spin = null;
@@ -9631,7 +9631,7 @@ class ImasoraJackpotCoinPusherGame {
     this.els.stCount.textContent = String(this.stRemaining);
     this.els.auto.setAttribute("aria-pressed", String(this.autoEnabled));
     this.els.auto.classList.toggle("is-active", this.autoEnabled);
-    this.els.autoLabel.textContent = this.autoEnabled ? "繧ｪ繝ｼ繝育匱蟆・ON" : "繧ｪ繝ｼ繝育匱蟆・OFF";
+    this.els.autoLabel.textContent = this.autoEnabled ? "オート発射 ON" : "オート発射 OFF";
     this.els.auto.disabled = this.gameOver || this.credits <= 0 || this.layoutEditing;
     this.els.clearJam.disabled = this.gameOver || this.layoutEditing;
     this.els.devStart.disabled = this.gameOver || this.layoutEditing;

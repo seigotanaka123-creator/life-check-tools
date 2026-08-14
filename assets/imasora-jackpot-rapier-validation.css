@@ -246,6 +246,10 @@
   letter-spacing: 0;
 }
 
+.icp-floating-ring-editor .icp-collector-frame-row {
+  grid-template-columns: 48px repeat(3, minmax(0, 1fr));
+}
+
 .icp-collector-frame-editor > button {
   min-height: 29px;
   border: 1px solid rgba(201, 216, 224, .65);

@@ -255,6 +255,379 @@
   font-weight: 800;
 }
 
+/* Current machine presentation: six-step controls, circular stage and star claw. */
+.companion-catcher-stage.character-catcher-opening-stage {
+  min-height: 820px;
+  padding: 14px 8px 30px;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 199, 222, .72), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(171, 235, 225, .76), transparent 31%),
+    linear-gradient(180deg, #f9f4ff 0%, #e9f8f5 46%, #fff5e5 100%);
+}
+
+.character-catcher-opening {
+  display: grid;
+  justify-items: center;
+  gap: 13px;
+  width: min(100%, 430px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cco-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px 5px 6px;
+  border: 1px solid rgba(92, 75, 112, .28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .84);
+  color: #5d4b70;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .5px;
+  box-shadow: 0 5px 13px rgba(69, 52, 81, .1);
+}
+
+.cco-badge span {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #554568;
+  color: #fff8c9;
+}
+
+.cco-cabinet {
+  position: relative;
+  width: min(91vw, 350px);
+  height: 332px;
+  overflow: hidden;
+  border: 4px solid #50465f;
+  border-radius: 28px 28px 16px 16px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.28), transparent 14% 86%, rgba(67,50,76,.16)),
+    linear-gradient(180deg, #f7bdd4 0 18%, #d9cee9 18% 77%, #f5d68d 77%);
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.56),
+    0 9px 0 #382f45,
+    0 17px 25px rgba(59, 48, 70, .24);
+}
+
+.cco-marquee {
+  position: absolute;
+  top: 9px;
+  right: 14px;
+  left: 14px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  min-height: 45px;
+  border: 2px solid #f9e890;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #d94f8c, #8155a5 55%, #3aa18d);
+  color: #fff;
+  box-shadow: inset 0 0 14px rgba(255,255,255,.26), 0 3px 0 rgba(66,42,78,.28);
+}
+
+.cco-marquee small {
+  margin-bottom: -3px;
+  color: #fff7bd;
+  font-size: 7px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+
+.cco-marquee strong {
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 0 rgba(56, 35, 70, .35);
+}
+
+.cco-window {
+  position: absolute;
+  top: 61px;
+  right: 15px;
+  left: 15px;
+  height: 194px;
+  overflow: hidden;
+  border: 4px solid #685b75;
+  border-radius: 14px 14px 30px 30px;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.4), transparent 24%),
+    linear-gradient(145deg, #f0d5ee, #cdeee7 72%);
+  box-shadow: inset 0 0 24px rgba(79, 62, 91, .17);
+}
+
+.cco-window::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.42) 0 2px, transparent 2px) 25px 0 / 77px 100%,
+    linear-gradient(180deg, transparent 0 72%, rgba(255,255,255,.3));
+  pointer-events: none;
+}
+
+.cco-rail {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 220px;
+  height: 9px;
+  border: 2px solid #5f6772;
+  border-radius: 999px;
+  background: #b9c4c8;
+  box-shadow: 0 3px 0 rgba(55,61,68,.25);
+  transform: translateX(-50%);
+}
+
+.cco-claw {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  z-index: 4;
+  width: 96px;
+  height: 120px;
+  transform: translateX(-50%) rotate(-3deg);
+  transform-origin: 50% 0;
+  animation: cco-claw-sway 2.7s ease-in-out infinite alternate;
+}
+
+.cco-claw::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 45px;
+  width: 6px;
+  height: 57px;
+  border-radius: 999px;
+  background: #707985;
+  box-shadow: inset 2px 0 rgba(255,255,255,.45);
+}
+
+.cco-claw i {
+  position: absolute;
+  top: 45px;
+  left: 27px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #fff9a6;
+  font-size: 43px;
+  font-style: normal;
+  line-height: 1;
+  text-shadow: 0 0 8px #ffd54f, 0 2px 0 #a76f00;
+}
+
+.cco-claw b {
+  position: absolute;
+  top: 76px;
+  left: 45px;
+  width: 7px;
+  height: 39px;
+  border: 2px solid #555d67;
+  border-radius: 999px;
+  background: #e5ecef;
+  transform: rotate(39deg);
+  transform-origin: 50% 2px;
+}
+
+.cco-claw b:nth-of-type(2) { transform: rotate(-39deg); }
+.cco-claw b:nth-of-type(3) { transform: rotate(180deg) translateY(-2px) scale(.82); }
+
+.cco-arena {
+  position: absolute;
+  right: 31px;
+  bottom: -8px;
+  left: 31px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 105px;
+  padding: 15px 15px 18px;
+  border: 4px solid #d2aa42;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, #fff3b7 0 48%, #e9c96d 49% 63%, #a77a23 65% 69%, transparent 70%);
+  box-shadow: 0 -3px 0 rgba(255,255,255,.55), 0 7px 10px rgba(79,57,39,.2);
+}
+
+.cco-arena::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 14px;
+  left: -7px;
+  height: 42px;
+  border-radius: 18px 18px 32px 32px;
+  background:
+    repeating-linear-gradient(90deg, #80cfc1 0 5px, transparent 5px 19px),
+    linear-gradient(180deg, transparent 0 8px, rgba(255,255,255,.84) 8px 13px, #f0c7d8 13px 18px, transparent 18px);
+  pointer-events: none;
+}
+
+.cco-prize {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 65px;
+  height: 70px;
+  padding: 4px;
+  overflow: hidden;
+  border: 2px dashed rgba(80,65,92,.48);
+  border-radius: 34% 34% 29% 29%;
+  background: var(--plush-color, #aee7ff);
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.35), 0 5px 7px rgba(61,49,70,.22);
+}
+
+.cco-prize:nth-child(1) { transform: rotate(-9deg) translateY(6px); }
+.cco-prize:nth-child(2) { z-index: 3; transform: translateY(-4px); }
+.cco-prize:nth-child(3) { transform: rotate(9deg) translateY(7px); }
+
+.cco-prize .karaoke-dex-character,
+.cco-prize .gallery-monster-card,
+.cco-prize .monster-art,
+.cco-prize .unique-monster,
+.cco-prize .turnaround-monster {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cco-console {
+  position: absolute;
+  right: 13px;
+  bottom: 10px;
+  left: 13px;
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  gap: 8px;
+  height: 58px;
+  padding: 7px 9px;
+  border: 2px solid #ae8d43;
+  border-radius: 9px;
+  background: linear-gradient(150deg, #d7f1e9, #f2e1a8);
+  box-shadow: inset 0 -6px rgba(102,75,35,.08);
+}
+
+.cco-prize-hole {
+  display: block;
+  width: 66px;
+  height: 38px;
+  border: 4px solid #51616b;
+  border-radius: 7px;
+  background: #17212b;
+  box-shadow: inset 0 5px 8px #05090d;
+}
+
+.cco-controls {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.cco-controls i {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 2px solid #fff4a3;
+  border-radius: 50%;
+  background: var(--cco-control, #d9508f);
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 1000;
+  box-shadow: 0 2px 0 #67526d, 0 0 6px rgba(255,255,255,.45);
+}
+
+.cco-controls i:nth-child(2),
+.cco-controls i:nth-child(5) { --cco-control: #3aa996; }
+.cco-controls i:nth-child(3),
+.cco-controls i:nth-child(6) { --cco-control: #7254a4; }
+
+.cco-copy small {
+  display: block;
+  color: #3a9985;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 1.3px;
+}
+
+.cco-copy strong {
+  display: block;
+  margin-top: 4px;
+  color: #733b61;
+  font-size: clamp(23px, 6.2vw, 28px);
+  line-height: 1.22;
+  text-shadow: 0 3px 0 #ffd8e6;
+}
+
+.cco-copy p {
+  max-width: 390px;
+  margin: 8px auto 0;
+  color: #425f68;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.65;
+}
+
+.cco-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 400px);
+}
+
+.cco-guide span {
+  display: grid;
+  align-content: center;
+  min-height: 51px;
+  padding: 6px 4px;
+  border: 1px solid #d2c3d8;
+  border-radius: 9px;
+  background: rgba(255,255,255,.84);
+  color: #5d5266;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.3;
+  box-shadow: 0 3px 8px rgba(76,55,84,.08);
+}
+
+.cco-guide b {
+  color: #c2447c;
+  font-size: 12px;
+}
+
+.arcade-start-button.cco-start {
+  min-width: 246px;
+  min-height: 48px;
+  border-color: #fff5ad;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d94f8e, #8c57ad 54%, #3ba58f);
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: .4px;
+  box-shadow: inset 0 -5px 0 rgba(55,32,74,.2), 0 5px 0 #574363, 0 9px 15px rgba(68,48,79,.2);
+}
+
+@keyframes cco-claw-sway {
+  from { transform: translateX(-50%) rotate(-4deg); }
+  to { transform: translateX(-50%) rotate(4deg); }
+}
+
 .icc-shell {
   width: 100%;
   color: #f8fcfd;
@@ -359,7 +732,7 @@
 .icc-callout {
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  bottom: 22.5%;
   left: 12px;
   z-index: 7;
   min-height: 36px;
@@ -368,7 +741,7 @@
   border-radius: 6px;
   background: rgba(19, 42, 49, .92);
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   line-height: 1.45;
   text-align: center;
@@ -695,6 +1068,287 @@
   transform: translateY(18px);
 }
 
+/* Compact numbered control panel installed on the cabinet shelf beside the prize hole. */
+.icc-control-deck {
+  position: absolute;
+  right: 2.2%;
+  bottom: 1.8%;
+  z-index: 6;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 4px;
+  width: 59%;
+  height: 19.6%;
+  min-height: 0;
+  padding: 4px;
+  border: 1px solid rgba(246, 250, 249, .62);
+  border-radius: 9px;
+  background:
+    linear-gradient(150deg, rgba(240, 249, 247, .34), rgba(31, 48, 53, .18)),
+    rgba(40, 55, 61, .32);
+  box-shadow:
+    0 4px 10px rgba(31, 34, 47, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .48);
+  transform: rotate(-.2deg);
+  transform-origin: 100% 100%;
+  touch-action: none;
+  backdrop-filter: blur(1.5px);
+}
+
+.icc-axis-handle {
+  --icc-control-accent: #80dbe8;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  place-items: center;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid rgba(180, 218, 221, .82);
+  border-radius: 7px;
+  background: linear-gradient(160deg, rgba(75, 102, 108, .95), rgba(25, 40, 46, .96));
+  color: #f8ffff;
+  text-align: center;
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, .24),
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 1px 2px rgba(13, 29, 35, .28);
+  transition: border-color .14s ease, background .14s ease, box-shadow .14s ease, transform .08s ease;
+}
+
+.icc-axis-handle.is-active {
+  border-color: #fff9ba;
+  background: linear-gradient(160deg, #fffef2, #ffdd58 78%, #eeb92b);
+  color: #21373b;
+  box-shadow:
+    inset 0 -3px 0 rgba(154, 104, 9, .19),
+    inset 0 1px 0 rgba(255, 255, 255, .9),
+    0 0 0 2px var(--icc-control-accent),
+    0 0 14px 3px var(--icc-control-accent);
+  animation: icc-control-ready 1.05s ease-in-out infinite alternate;
+}
+
+.icc-axis-handle.is-complete:not(.is-active) {
+  border-color: rgba(131, 203, 181, .72);
+  background: linear-gradient(160deg, rgba(71, 128, 113, .9), rgba(32, 74, 67, .96));
+  color: rgba(237, 255, 250, .84);
+  box-shadow:
+    inset 0 -3px 0 rgba(9, 53, 44, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .2);
+}
+
+.icc-axis-handle.is-held,
+.icc-axis-handle:is(button):active:not(:disabled) {
+  transform: translateY(1px) scale(.975);
+}
+
+.icc-handle-number {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  z-index: 4;
+  width: 17px;
+  height: 17px;
+  border-color: rgba(255, 249, 194, .9);
+  background: #f5c83d;
+  color: #49370d;
+  font-size: 10px;
+  line-height: 1;
+  box-shadow:
+    inset 0 -2px 0 rgba(155, 105, 13, .18),
+    0 1px 2px rgba(0, 0, 0, .3);
+  pointer-events: none;
+}
+
+.icc-control-glyph {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 3px;
+  font: 900 27px/1 system-ui, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .34);
+  pointer-events: none;
+}
+
+.icc-axis-handle.is-active .icc-control-glyph {
+  text-shadow: none;
+}
+
+.icc-rotation-glyph {
+  margin-top: 1px;
+  font-size: 29px;
+}
+
+.icc-descent-glyph {
+  margin-top: 4px;
+}
+
+.icc-horizontal-handle {
+  --icc-control-accent: #ff7eb3;
+}
+
+.icc-vertical-handle {
+  --icc-control-accent: #6ce7ca;
+}
+
+.icc-rotation-handle {
+  --icc-control-accent: #c39aff;
+}
+
+.icc-fine-horizontal-handle {
+  --icc-control-accent: #ff86bc;
+}
+
+.icc-fine-vertical-handle {
+  --icc-control-accent: #b9ee6b;
+}
+
+.icc-stop-handle {
+  --icc-control-accent: #ffcc3f;
+}
+
+.icc-stop-handle > small {
+  display: none;
+}
+
+.icc-fine-buttons {
+  position: absolute;
+  inset: 2px;
+  z-index: 1;
+  display: grid;
+  align-self: stretch;
+  gap: 0;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.icc-horizontal-lever {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: 1fr;
+}
+
+.icc-vertical-lever {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.icc-fine-buttons button,
+.icc-fine-horizontal-handle .icc-fine-buttons button,
+.icc-fine-vertical-handle .icc-fine-buttons button {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #f7ffff;
+  font: 900 18px/1 system-ui, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .42);
+  box-shadow: none;
+  touch-action: none;
+}
+
+.icc-horizontal-lever button:first-child {
+  padding-right: 13px;
+}
+
+.icc-horizontal-lever button:last-child {
+  padding-left: 13px;
+}
+
+.icc-vertical-lever button:first-child {
+  padding-bottom: 11px;
+}
+
+.icc-vertical-lever button:last-child {
+  padding-top: 11px;
+}
+
+.icc-fine-buttons button:disabled {
+  filter: none;
+  opacity: .58;
+}
+
+.icc-fine-handle.is-active .icc-fine-buttons button:not(:disabled) {
+  color: #21373b;
+  text-shadow: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.icc-fine-buttons button:not(:disabled):active,
+.icc-fine-buttons button.is-held {
+  background: rgba(255, 255, 255, .26);
+  transform: none;
+  box-shadow: none;
+}
+
+.icc-lever-rail {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  border: 1px solid rgba(216, 241, 243, .8);
+  border-radius: 999px;
+  background: #172b31;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .54);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.icc-horizontal-lever .icc-lever-rail {
+  width: 32px;
+  height: 6px;
+}
+
+.icc-vertical-lever .icc-lever-rail {
+  width: 6px;
+  height: 30px;
+}
+
+.icc-lever-rail i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #f6ffff;
+  border-radius: 50%;
+  background: var(--icc-control-accent);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+  transform: translate(-50%, -50%);
+  transition: transform .1s ease;
+}
+
+.icc-fine-horizontal-handle:has([data-icc-fine="left"].is-held) .icc-lever-rail i {
+  transform: translate(calc(-50% - 8px), -50%);
+}
+
+.icc-fine-horizontal-handle:has([data-icc-fine="right"].is-held) .icc-lever-rail i {
+  transform: translate(calc(-50% + 8px), -50%);
+}
+
+.icc-fine-vertical-handle:has([data-icc-fine="up"].is-held) .icc-lever-rail i {
+  transform: translate(-50%, calc(-50% - 7px));
+}
+
+.icc-fine-vertical-handle:has([data-icc-fine="down"].is-held) .icc-lever-rail i {
+  transform: translate(-50%, calc(-50% + 7px));
+}
+
+@keyframes icc-control-ready {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.1); }
+}
+
 .icc-bottom-row {
   display: flex;
   align-items: center;
@@ -741,6 +1395,19 @@
 }
 
 @media (max-width: 370px) {
+  .cco-cabinet {
+    margin: -8px 0;
+    transform: scale(.94);
+  }
+
+  .cco-guide {
+    gap: 4px;
+  }
+
+  .cco-copy strong {
+    font-size: 22px;
+  }
+
   .companion-catcher-stage.arcade-game-stage {
     padding-right: 2px;
     padding-left: 2px;
@@ -751,55 +1418,166 @@
   }
 
   .icc-control-deck {
-    gap: 3px;
-    min-height: 224px;
-    padding: 8px 3px;
+    right: 1.5%;
+    bottom: 1.6%;
+    gap: 2px;
+    width: 60%;
+    height: 20%;
+    min-height: 0;
+    padding: 3px;
+    border-radius: 7px;
   }
 
   .icc-axis-handle {
-    grid-template-columns: 20px 1fr;
-    grid-template-rows: 27px 1fr;
-    min-height: 104px;
-    padding: 6px 3px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    min-height: 0;
+    padding: 0;
+    border-radius: 5px;
   }
 
   .icc-handle-number {
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
   }
 
-  .icc-axis-handle > strong {
-    padding-left: 1px;
-    font-size: 11px;
+  .icc-control-glyph {
+    font-size: 23px;
   }
 
-  .icc-axis-handle > small {
-    top: 38px;
-    right: 5px;
-    font-size: 8px;
-  }
-
-  .icc-handle-lever {
-    height: 56px;
-  }
-
-  .icc-fine-buttons,
-  .icc-fine-buttons button {
-    height: 56px;
-  }
-
-  .icc-fine-buttons {
-    gap: 4px;
+  .icc-rotation-glyph {
+    font-size: 25px;
   }
 
   .icc-fine-buttons button {
-    font-size: 24px;
+    height: auto;
+    font-size: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .icc-callout {
+  .cco-claw,
+  .icc-callout,
+  .icc-axis-handle.is-active {
+    animation: none;
     transition: none;
   }
+}
+
+/* The visible controls are genuine Three.js machine parts. These elements are touch targets only. */
+.icc-control-deck {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: block;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.icc-control-deck .icc-axis-handle,
+.icc-control-deck .icc-axis-handle.is-active,
+.icc-control-deck .icc-axis-handle.is-complete:not(.is-active) {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: transparent;
+  box-shadow: none;
+  filter: none;
+  animation: none;
+  transform: none;
+  transition: none;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.icc-control-deck .icc-axis-handle:is(button):not(:disabled),
+.icc-control-deck .icc-fine-buttons button:not(:disabled) {
+  cursor: pointer;
+}
+
+.icc-control-deck .icc-axis-handle.is-held,
+.icc-control-deck .icc-axis-handle:is(button):active:not(:disabled) {
+  transform: none;
+}
+
+.icc-control-deck .icc-handle-number,
+.icc-control-deck .icc-control-glyph,
+.icc-control-deck .icc-stop-handle > small,
+.icc-control-deck .icc-lever-rail {
+  display: none;
+}
+
+.icc-control-deck .icc-fine-buttons {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  width: auto;
+  height: auto;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.icc-control-deck .icc-horizontal-lever {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: 1fr;
+}
+
+.icc-control-deck .icc-vertical-lever {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.icc-control-deck .icc-fine-buttons button,
+.icc-control-deck .icc-fine-horizontal-handle .icc-fine-buttons button,
+.icc-control-deck .icc-fine-vertical-handle .icc-fine-buttons button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  text-shadow: none;
+  box-shadow: none;
+  opacity: 0;
+  transform: none;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.icc-control-deck .icc-horizontal-lever button:first-child,
+.icc-control-deck .icc-horizontal-lever button:last-child,
+.icc-control-deck .icc-vertical-lever button:first-child,
+.icc-control-deck .icc-vertical-lever button:last-child {
+  padding: 0;
+}
+
+.icc-control-deck .icc-axis-handle:is(button):focus-visible,
+.icc-control-deck .icc-fine-handle:has(button:focus-visible) {
+  outline: 2px solid rgba(255, 247, 170, .96);
+  outline-offset: 2px;
+  background: rgba(255, 247, 170, .1);
 }

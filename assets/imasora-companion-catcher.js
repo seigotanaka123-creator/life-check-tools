@@ -2,6 +2,14 @@ import * as THREE from "./three.module.min.js";
 import * as CANNON from "./cannon-es.js";
 
 const MAX_ATTEMPTS = 5;
+const NUMBER_PLAQUE_BASE_POSITIONS = Object.freeze({
+  1: Object.freeze({ x: -0.3, z: 3.23 }),
+  2: Object.freeze({ x: 4.72, z: 1.27 }),
+  3: Object.freeze({ x: 1.38, z: 3.23 }),
+  4: Object.freeze({ x: -0.3, z: 3.85 }),
+  5: Object.freeze({ x: 4.72, z: -0.06 }),
+  6: Object.freeze({ x: 1.38, z: 3.85 })
+});
 const BELT_RX = 3.18;
 const BELT_RZ = 1.95;
 const BELT_HALF_WIDTH = 0.76;
@@ -179,6 +187,9 @@ const TRACK_HARD_LIMIT = 0.66;
 const PRIMARY_HORIZONTAL_CONTROL_SPEED = 0.88;
 const HORIZONTAL_CONTROL_SPEED = 1.04;
 const VERTICAL_CONTROL_SPEED = 0.84;
+const FINE_LEVER_CENTER_DEAD_ZONE_RATIO = 0.38;
+const FINE_LEVER_CENTER_DRAG_THRESHOLD_PX = 8;
+const FINE_LEVER_CENTER_DRAG_DISTANCE_SCALE = 0.4;
 const ROTATION_CONTROL_SPEED = Math.PI * 0.42;
 const MAX_ROTATION_TRAVEL = Math.PI * 6;
 const AUTO_RETURN_ROTATION_SPEED = Math.PI * 0.32;
@@ -268,38 +279,42 @@ const gameMarkup = `
       <div class="icc-hud-item"><small>SCORE</small><strong data-icc-score>0</strong></div>
     </div>
     <div class="icc-viewport" data-icc-viewport>
-      <canvas class="icc-canvas" data-icc-canvas aria-label="3Dイマソラ相棒キャッチャー"></canvas>
-      <div class="icc-scene-label" aria-hidden="true"><strong>イマソラ相棒キャッチャー</strong><span>3-PRONG PHYSICS</span></div>
+      <canvas class="icc-canvas" data-icc-canvas aria-label="3Dイマソラキャラクターキャッチャー"></canvas>
+      <div class="icc-scene-label" aria-hidden="true"><strong>イマソラキャラクターキャッチャー</strong><span>3-PRONG PHYSICS</span></div>
+      <div class="icc-control-deck" role="group" aria-label="アーム操作盤">
+        <button class="icc-axis-handle icc-direct-button icc-horizontal-handle" type="button" data-icc-handle="horizontal" aria-label="1 右へ移動">
+          <span class="icc-handle-number">1</span><span class="icc-control-glyph" aria-hidden="true">→</span>
+        </button>
+        <button class="icc-axis-handle icc-direct-button icc-vertical-handle" type="button" data-icc-handle="vertical" aria-label="2 東側視点で右へ移動">
+          <span class="icc-handle-number">2</span><span class="icc-control-glyph" aria-hidden="true">→</span>
+        </button>
+        <button class="icc-axis-handle icc-direct-button icc-rotation-handle" type="button" data-icc-handle="rotation" aria-label="3 反時計回りに回転">
+          <span class="icc-handle-number">3</span><span class="icc-control-glyph icc-rotation-glyph" aria-hidden="true">↺</span>
+        </button>
+        <div class="icc-axis-handle icc-fine-handle icc-fine-horizontal-handle" data-icc-fine-group="horizontal" role="group" aria-label="4 左右移動レバー">
+          <span class="icc-handle-number">4</span>
+          <div class="icc-fine-buttons icc-horizontal-lever" style="touch-action:none">
+            <button type="button" data-icc-fine="left" aria-label="左へ移動">←</button>
+            <span class="icc-lever-rail" aria-hidden="true"><i></i></span>
+            <button type="button" data-icc-fine="right" aria-label="右へ移動">→</button>
+            <span data-icc-fine-center="horizontal" aria-hidden="true" style="position:absolute;inset:0 32%;z-index:4;pointer-events:auto;touch-action:none;background:transparent"></span>
+          </div>
+        </div>
+        <div class="icc-axis-handle icc-fine-handle icc-fine-vertical-handle" data-icc-fine-group="vertical" role="group" aria-label="5 東側視点の左右移動レバー">
+          <span class="icc-handle-number">5</span>
+          <div class="icc-fine-buttons icc-horizontal-lever" style="touch-action:none">
+            <span class="icc-lever-rail" aria-hidden="true"><i></i></span>
+            <button type="button" data-icc-fine="down" aria-label="東側視点で左へ移動">←</button>
+            <button type="button" data-icc-fine="up" aria-label="東側視点で右へ移動">→</button>
+            <span data-icc-fine-center="vertical" aria-hidden="true" style="position:absolute;inset:0 32%;z-index:4;pointer-events:auto;touch-action:none;background:transparent"></span>
+          </div>
+        </div>
+        <button class="icc-axis-handle icc-direct-button icc-stop-handle" type="button" data-icc-handle="stop" aria-label="6 アームの下降を開始する">
+          <span class="icc-handle-number">6</span><span class="icc-control-glyph icc-descent-glyph" aria-hidden="true">下降</span><small data-icc-stop-label>待機</small>
+        </button>
+      </div>
       <div class="icc-callout" data-icc-callout role="status"></div>
       <div class="icc-result" data-icc-result hidden></div>
-    </div>
-    <div class="icc-control-deck">
-      <button class="icc-axis-handle icc-horizontal-handle" type="button" data-icc-handle="horizontal" aria-label="1 横移動">
-        <span class="icc-handle-number">1</span><strong>横</strong><span class="icc-handle-lever" aria-hidden="true"><i></i></span>
-      </button>
-      <button class="icc-axis-handle icc-vertical-handle" type="button" data-icc-handle="vertical" aria-label="2 縦移動">
-        <span class="icc-handle-number">2</span><strong>縦</strong><span class="icc-handle-lever" aria-hidden="true"><i></i></span>
-      </button>
-      <button class="icc-axis-handle icc-rotation-handle" type="button" data-icc-handle="rotation" aria-label="3 アームの向きを回転">
-        <span class="icc-handle-number">3</span><strong>回転</strong><span class="icc-handle-lever" aria-hidden="true"><i></i></span>
-      </button>
-      <div class="icc-axis-handle icc-fine-handle icc-fine-horizontal-handle" data-icc-fine-group="horizontal" role="group" aria-label="4 左右移動">
-        <span class="icc-handle-number">4</span><strong>左右</strong>
-        <div class="icc-fine-buttons">
-          <button type="button" data-icc-fine="left" aria-label="左へ移動">←</button>
-          <button type="button" data-icc-fine="right" aria-label="右へ移動">→</button>
-        </div>
-      </div>
-      <div class="icc-axis-handle icc-fine-handle icc-fine-vertical-handle" data-icc-fine-group="vertical" role="group" aria-label="5 上下移動">
-        <span class="icc-handle-number">5</span><strong>上下</strong>
-        <div class="icc-fine-buttons">
-          <button type="button" data-icc-fine="up" aria-label="上へ移動">↑</button>
-          <button type="button" data-icc-fine="down" aria-label="下へ移動">↓</button>
-        </div>
-      </div>
-      <button class="icc-axis-handle icc-stop-handle" type="button" data-icc-handle="stop" aria-label="6 アームの下降を開始する">
-        <span class="icc-handle-number">6</span><strong>下降開始</strong><small data-icc-stop-label>待機</small><span class="icc-handle-lever" aria-hidden="true"><i></i></span>
-      </button>
     </div>
     <div class="icc-bottom-row">
       <button type="button" data-icc-action="restart" aria-label="最初からやり直す">↺ やり直す</button>
@@ -668,6 +683,233 @@ function createFabricTexture() {
   return texture;
 }
 
+function createMachineControlFaceTexture({
+  number,
+  glyph,
+  background = "#4c6f78",
+  foreground = "#ffffff",
+  layout = "button"
+}) {
+  const vertical = layout === "verticalLever";
+  const horizontal = layout === "horizontalLever";
+  const canvas = document.createElement("canvas");
+  canvas.width = horizontal ? 384 : 256;
+  canvas.height = vertical ? 384 : 256;
+  const context = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  context.clearRect(0, 0, width, height);
+
+  if (layout === "button") {
+    const gradient = context.createRadialGradient(
+      width * 0.36,
+      height * 0.28,
+      width * 0.04,
+      width * 0.5,
+      height * 0.5,
+      width * 0.7
+    );
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(0.08, background);
+    gradient.addColorStop(0.72, background);
+    gradient.addColorStop(1, "#22343a");
+    context.save();
+    context.beginPath();
+    context.arc(width * 0.5, height * 0.5, width * 0.47, 0, Math.PI * 2);
+    context.clip();
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
+    context.restore();
+    context.beginPath();
+    context.arc(width * 0.5, height * 0.5, width * 0.455, 0, Math.PI * 2);
+    context.strokeStyle = "rgba(255,255,255,.72)";
+    context.lineWidth = 9;
+    context.stroke();
+  }
+
+  const iconFill = "#16384b";
+  const iconOutline = "#fff9df";
+  const drawSolidArrow = (centerX, centerY, direction, scale = 1) => {
+    const angle = {
+      right: 0,
+      down: Math.PI / 2,
+      left: Math.PI,
+      up: -Math.PI / 2
+    }[direction] || 0;
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(angle);
+    context.scale(scale, scale);
+    context.beginPath();
+    context.moveTo(-72, -18);
+    context.lineTo(22, -18);
+    context.lineTo(22, -48);
+    context.lineTo(82, 0);
+    context.lineTo(22, 48);
+    context.lineTo(22, 18);
+    context.lineTo(-72, 18);
+    context.closePath();
+    context.fillStyle = iconFill;
+    context.strokeStyle = iconOutline;
+    context.lineJoin = "round";
+    context.lineWidth = 12;
+    context.stroke();
+    context.fill();
+    context.restore();
+  };
+  const drawRotationArrow = () => {
+    const centerX = width * 0.5;
+    const centerY = height * 0.52;
+    const radius = width * 0.22;
+    const startAngle = 0.2;
+    const endAngle = -Math.PI - 0.06;
+    const rotationFill = iconFill;
+    const rotationOutline = iconOutline;
+    context.save();
+    context.lineCap = "round";
+    context.beginPath();
+    context.arc(
+      centerX,
+      centerY,
+      radius,
+      startAngle,
+      endAngle,
+      true
+    );
+    context.strokeStyle = rotationOutline;
+    context.lineWidth = 51;
+    context.stroke();
+    context.strokeStyle = rotationFill;
+    context.lineWidth = 33;
+    context.stroke();
+    const tipX = centerX + radius * Math.cos(endAngle);
+    const tipY = centerY + radius * Math.sin(endAngle);
+    const tangentX = Math.sin(endAngle);
+    const tangentY = -Math.cos(endAngle);
+    const headRotation = Math.PI / 9;
+    const headRotationCos = Math.cos(headRotation);
+    const headRotationSin = Math.sin(headRotation);
+    const headTangentX = tangentX * headRotationCos - tangentY * headRotationSin;
+    const headTangentY = tangentX * headRotationSin + tangentY * headRotationCos;
+    const headNormalX = -headTangentY;
+    const headNormalY = headTangentX;
+    const headTipX = tipX + headTangentX * 54;
+    const headTipY = tipY + headTangentY * 54;
+    const headBaseAX = tipX - headTangentX * 33 + headNormalX * 47;
+    const headBaseAY = tipY - headTangentY * 33 + headNormalY * 47;
+    const headBaseBX = tipX - headTangentX * 33 - headNormalX * 47;
+    const headBaseBY = tipY - headTangentY * 33 - headNormalY * 47;
+    context.beginPath();
+    context.moveTo(headTipX, headTipY);
+    context.lineTo(headBaseAX, headBaseAY);
+    context.lineTo(headBaseBX, headBaseBY);
+    context.closePath();
+    context.fillStyle = rotationFill;
+    context.fill();
+    context.beginPath();
+    context.moveTo(headBaseAX, headBaseAY);
+    context.lineTo(headTipX, headTipY);
+    context.lineTo(headBaseBX, headBaseBY);
+    context.strokeStyle = rotationOutline;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.lineWidth = 18;
+    context.stroke();
+    context.restore();
+  };
+
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  if (horizontal) {
+    drawSolidArrow(width * 0.25, height * 0.52, "left", 1.06);
+    drawSolidArrow(width * 0.75, height * 0.52, "right", 1.06);
+  } else if (vertical) {
+    drawSolidArrow(width * 0.5, height * 0.25, "up", 1.06);
+    drawSolidArrow(width * 0.5, height * 0.75, "down", 1.06);
+  } else if (glyph === "下降") {
+    context.font = "900 106px 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif";
+    context.fillStyle = iconFill;
+    context.strokeStyle = iconOutline;
+    context.lineJoin = "round";
+    context.lineWidth = 13;
+    context.strokeText("下降", width * 0.5, height * 0.54);
+    context.fillText("下降", width * 0.5, height * 0.54);
+  } else if (glyph === "→") {
+    drawSolidArrow(width * 0.5, height * 0.52, "right", 1);
+  } else if (glyph === "↑") {
+    drawSolidArrow(width * 0.5, height * 0.52, "up", 1);
+  } else if (glyph === "↺") {
+    drawRotationArrow();
+  } else {
+    context.font = "900 166px system-ui, sans-serif";
+    context.fillStyle = iconFill;
+    context.strokeStyle = iconOutline;
+    context.lineJoin = "round";
+    context.lineWidth = 12;
+    context.strokeText(glyph, width * 0.5, height * 0.54);
+    context.fillText(glyph, width * 0.5, height * 0.54);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  return texture;
+}
+
+function createMachineControlNumberTexture(number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext("2d");
+  context.clearRect(0, 0, 128, 128);
+  const gradient = context.createRadialGradient(45, 35, 4, 64, 64, 60);
+  gradient.addColorStop(0, "#fff9c9");
+  gradient.addColorStop(0.2, "#ffd95c");
+  gradient.addColorStop(1, "#d59b18");
+  context.beginPath();
+  context.arc(64, 64, 55, 0, Math.PI * 2);
+  context.fillStyle = gradient;
+  context.fill();
+  context.lineWidth = 8;
+  context.strokeStyle = "#fff4ad";
+  context.stroke();
+  context.fillStyle = "#3d2b05";
+  context.font = "900 88px system-ui, sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.strokeStyle = "#3d2b05";
+  context.lineJoin = "round";
+  context.lineWidth = 2.4;
+  context.strokeText(String(number), 64, 68);
+  context.fillText(String(number), 64, 68);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  return texture;
+}
+
+function createMachineControlPlaqueGlowTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext("2d");
+  const gradient = context.createRadialGradient(64, 64, 4, 64, 64, 64);
+  gradient.addColorStop(0, "rgba(255,255,255,0)");
+  gradient.addColorStop(0.34, "rgba(255,249,183,.05)");
+  gradient.addColorStop(0.66, "rgba(255,225,91,.9)");
+  gradient.addColorStop(0.88, "rgba(255,184,24,.26)");
+  gradient.addColorStop(1, "rgba(255,170,0,0)");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  return texture;
+}
+
 function svgToFabricTexture(svg, renderer) {
   return new Promise((resolve, reject) => {
     const source = sanitizeSvg(svg);
@@ -765,8 +1007,12 @@ class ImasoraCompanionCatcherGame {
     this.plushMoundIdentity = new CANNON.Quaternion();
     this.timers = new Set();
     this.textureTasks = new Set();
+    this.machineControlNumberPlaques = {};
     this.controlPointerId = null;
     this.activeHandle = null;
+    this.controlCaptureElement = null;
+    this.pendingFineLever = null;
+    this.descentButtonPressedUntil = 0;
     this.carriage = {
       position: new THREE.Vector3(HOME_POSITION.x, CARRIAGE_Y, HOME_POSITION.z),
       target: new THREE.Vector3(HOME_POSITION.x, CARRIAGE_Y, HOME_POSITION.z),
@@ -807,6 +1053,7 @@ class ImasoraCompanionCatcherGame {
     this.boundLoop = this.loop.bind(this);
     this.boundClick = this.handleClick.bind(this);
     this.boundHandleDown = this.handleHandleDown.bind(this);
+    this.boundHandleMove = this.handleHandleMove.bind(this);
     this.boundHandleUp = this.handleHandleUp.bind(this);
     this.boundHandleKeyDown = this.handleHandleKeyDown.bind(this);
     this.boundHandleKeyUp = this.handleHandleKeyUp.bind(this);
@@ -837,6 +1084,7 @@ class ImasoraCompanionCatcherGame {
     };
     this.root.addEventListener("click", this.boundClick);
     this.root.addEventListener("pointerdown", this.boundHandleDown);
+    window.addEventListener("pointermove", this.boundHandleMove);
     window.addEventListener("pointerup", this.boundHandleUp);
     window.addEventListener("pointercancel", this.boundHandleUp);
     this.root.addEventListener("keydown", this.boundHandleKeyDown);
@@ -855,7 +1103,7 @@ class ImasoraCompanionCatcherGame {
       this.resize();
       this.frame = requestAnimationFrame(this.boundLoop);
     } catch (error) {
-      console.error("イマソラ相棒キャッチャー3Dの起動に失敗しました。", error);
+      console.error("イマソラキャラクターキャッチャー3Dの起動に失敗しました。", error);
       this.showFatalError();
     }
   }
@@ -869,6 +1117,7 @@ class ImasoraCompanionCatcherGame {
     window.removeEventListener("resize", this.boundResize);
     this.root.removeEventListener("click", this.boundClick);
     this.root.removeEventListener("pointerdown", this.boundHandleDown);
+    window.removeEventListener("pointermove", this.boundHandleMove);
     window.removeEventListener("pointerup", this.boundHandleUp);
     window.removeEventListener("pointercancel", this.boundHandleUp);
     this.root.removeEventListener("keydown", this.boundHandleKeyDown);
@@ -1065,6 +1314,7 @@ class ImasoraCompanionCatcherGame {
     this.createPlatform();
     this.createConveyor();
     this.createPrizeHole();
+    this.createMachineControlConsole();
     this.createGantry();
     this.createClaw();
   }
@@ -1349,6 +1599,577 @@ class ImasoraCompanionCatcherGame {
     innerGlow.position.y = 0.034;
     this.prizeHoleGroup.add(innerGlow);
     this.scene.add(this.prizeHoleGroup);
+  }
+
+  createMachineControlConsole() {
+    const frontPanel = {
+      centerX: 1.02,
+      centerZ: 3.59,
+      width: 3,
+      depth: 1.24,
+      fasciaSide: "south"
+    };
+    const eastPanel = {
+      centerX: 4.78,
+      centerZ: 0,
+      width: 1,
+      depth: 2.9,
+      fasciaSide: "east"
+    };
+    const consoleGroup = new THREE.Group();
+    consoleGroup.name = "companion-catcher-integrated-control-console";
+    this.machineControlConsole = consoleGroup;
+    this.machineControlVisuals = {};
+    this.machineControlAnchors = {};
+    this.machineControlNumberPlaques = {};
+    this.controlProjectionPoint = new THREE.Vector3();
+    this.nextControlProjectionTime = 0;
+
+    const trimMaterial = new THREE.MeshStandardMaterial({
+      color: 0xe4b64f,
+      emissive: 0x8a5f10,
+      emissiveIntensity: 0.06,
+      roughness: 0.34,
+      metalness: 0.62
+    });
+    const panelMaterial = new THREE.MeshStandardMaterial({
+      color: 0x8acdc3,
+      emissive: 0x2f796f,
+      emissiveIntensity: 0.08,
+      roughness: 0.54,
+      metalness: 0.24
+    });
+    const fasciaMaterial = new THREE.MeshStandardMaterial({
+      color: 0xd681a6,
+      roughness: 0.64,
+      metalness: 0.16
+    });
+    const screwMaterial = new THREE.MeshStandardMaterial({
+      color: 0xdfe6e5,
+      roughness: 0.22,
+      metalness: 0.84
+    });
+    const addConsoleDeck = ({ centerX, centerZ, width, depth, fasciaSide }) => {
+      const trim = new THREE.Mesh(
+        new THREE.BoxGeometry(width + 0.1, 0.075, depth + 0.1),
+        trimMaterial
+      );
+      trim.position.set(centerX, 0.57, centerZ);
+      trim.castShadow = true;
+      trim.receiveShadow = true;
+      consoleGroup.add(trim);
+
+      const panel = new THREE.Mesh(
+        new THREE.BoxGeometry(width, 0.09, depth),
+        panelMaterial
+      );
+      panel.position.set(centerX, 0.625, centerZ);
+      panel.castShadow = true;
+      panel.receiveShadow = true;
+      consoleGroup.add(panel);
+
+      const fascia = fasciaSide === "east"
+        ? new THREE.Mesh(
+          new THREE.BoxGeometry(0.1, 0.25, depth + 0.06),
+          fasciaMaterial
+        )
+        : new THREE.Mesh(
+          new THREE.BoxGeometry(width + 0.06, 0.25, 0.1),
+          fasciaMaterial
+        );
+      if (fasciaSide === "east") {
+        fascia.position.set(centerX + width * 0.5 + 0.03, 0.455, centerZ);
+      } else {
+        fascia.position.set(centerX, 0.455, centerZ + depth * 0.5 + 0.03);
+      }
+      fascia.castShadow = true;
+      fascia.receiveShadow = true;
+      consoleGroup.add(fascia);
+
+      [
+        [centerX - width * 0.43, centerZ - depth * 0.43],
+        [centerX + width * 0.43, centerZ - depth * 0.43],
+        [centerX - width * 0.43, centerZ + depth * 0.43],
+        [centerX + width * 0.43, centerZ + depth * 0.43]
+      ].forEach(([x, z]) => {
+        const screw = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.045, 0.045, 0.022, 18),
+          screwMaterial
+        );
+        screw.position.set(x, 0.69, z);
+        screw.castShadow = true;
+        consoleGroup.add(screw);
+      });
+    };
+    addConsoleDeck(frontPanel);
+    addConsoleDeck(eastPanel);
+
+    const numberPlaqueRimMaterial = new THREE.MeshStandardMaterial({
+      color: 0xd9a226,
+      emissive: 0x6d4300,
+      emissiveIntensity: 0.08,
+      roughness: 0.3,
+      metalness: 0.48
+    });
+    const numberPlaqueGlowTexture = createMachineControlPlaqueGlowTexture();
+    const addNumberPlaque = (number, x, z, rotationZ = 0) => {
+      const rimMaterial = numberPlaqueRimMaterial.clone();
+      const rim = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.135, 0.135, 0.035, 28),
+        rimMaterial
+      );
+      rim.position.set(x, 0.688, z);
+      rim.castShadow = true;
+      rim.receiveShadow = true;
+      consoleGroup.add(rim);
+      const faceMaterial = new THREE.MeshBasicMaterial({
+        map: createMachineControlNumberTexture(number),
+        color: 0xffffff,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(0.235, 0.235), faceMaterial);
+      face.rotation.x = -Math.PI / 2;
+      face.rotation.z = rotationZ;
+      face.position.set(x, 0.708, z);
+      face.renderOrder = 5;
+      consoleGroup.add(face);
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        map: numberPlaqueGlowTexture,
+        color: 0xffed78,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        depthTest: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending
+      });
+      const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.218, 0.218), glowMaterial);
+      glow.rotation.x = -Math.PI / 2;
+      glow.position.set(x, 0.711, z);
+      glow.renderOrder = 6;
+      consoleGroup.add(glow);
+      const haloMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffd33d,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.151, 0.025, 10, 32),
+        haloMaterial
+      );
+      halo.rotation.x = Math.PI / 2;
+      halo.position.set(x, 0.714, z);
+      halo.renderOrder = 4;
+      consoleGroup.add(halo);
+      this.machineControlNumberPlaques[number] = {
+        rim,
+        face,
+        glow,
+        halo,
+        rimMaterial,
+        faceMaterial,
+        glowMaterial,
+        haloMaterial
+      };
+    };
+
+    this.numberPlaqueNeonLight = new THREE.PointLight(0xffd45c, 0, 1.15, 2);
+    this.numberPlaqueNeonLight.position.y = 0.93;
+    consoleGroup.add(this.numberPlaqueNeonLight);
+
+    const addPushControl = ({
+      key,
+      phase,
+      x,
+      z,
+      color,
+      background,
+      glyph,
+      radius = 0.205,
+      halfWidth = 0.36,
+      faceRotationZ = 0
+    }) => {
+      const baseMaterial = new THREE.MeshStandardMaterial({
+        color: 0x263f46,
+        emissive: color,
+        emissiveIntensity: 0.03,
+        roughness: 0.28,
+        metalness: 0.68
+      });
+      const sideMaterial = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 0.04,
+        roughness: 0.25,
+        metalness: 0.36
+      });
+      const controlNumber = key === "stop" ? 6 : ({ horizontal: 1, vertical: 2, rotation: 3 })[key];
+      const faceTexture = createMachineControlFaceTexture({
+        number: controlNumber,
+        glyph,
+        background,
+        foreground: "#ffffff"
+      });
+      const faceMaterial = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 0.06,
+        roughness: 0.25,
+        metalness: 0.18
+      });
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius + 0.075, radius + 0.088, 0.07, 36),
+        baseMaterial
+      );
+      base.position.set(x, 0.695, z);
+      base.castShadow = true;
+      base.receiveShadow = true;
+      consoleGroup.add(base);
+
+      const capGroup = new THREE.Group();
+      const cap = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius * 0.9, radius, 0.095, 36),
+        [sideMaterial, faceMaterial, sideMaterial]
+      );
+      cap.castShadow = true;
+      cap.receiveShadow = true;
+      capGroup.add(cap);
+      const faceLabel = new THREE.Mesh(
+        new THREE.PlaneGeometry(radius * 1.84, radius * 1.84),
+        new THREE.MeshBasicMaterial({
+          map: faceTexture,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        })
+      );
+      faceLabel.rotation.x = -Math.PI / 2;
+      faceLabel.rotation.z = faceRotationZ;
+      faceLabel.position.y = 0.049;
+      faceLabel.renderOrder = 4;
+      capGroup.add(faceLabel);
+      capGroup.position.set(x, 0.775, z);
+      consoleGroup.add(capGroup);
+
+      const haloMaterial = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.045,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(radius + 0.085, 0.03, 10, 36),
+        haloMaterial
+      );
+      halo.rotation.x = Math.PI / 2;
+      halo.position.set(x, 0.79, z);
+      consoleGroup.add(halo);
+      const plaquePosition = NUMBER_PLAQUE_BASE_POSITIONS[controlNumber];
+      addNumberPlaque(controlNumber, plaquePosition.x, plaquePosition.z, faceRotationZ);
+
+      this.machineControlVisuals[key] = {
+        key,
+        number: controlNumber,
+        phase,
+        kind: "button",
+        baseMaterial,
+        faceMaterial,
+        sideMaterial,
+        haloMaterial,
+        capGroup,
+        restY: capGroup.position.y
+      };
+      this.machineControlAnchors[key] = {
+        x,
+        y: 0.79,
+        z,
+        halfWidth,
+        halfDepth: 0.33
+      };
+    };
+
+    const createRectangularHalo = (width, depth, color) => {
+      const haloMaterial = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.045,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const haloGroup = new THREE.Group();
+      const thickness = 0.03;
+      [
+        { w: width, d: thickness, x: 0, z: -depth * 0.5 },
+        { w: width, d: thickness, x: 0, z: depth * 0.5 },
+        { w: thickness, d: depth, x: -width * 0.5, z: 0 },
+        { w: thickness, d: depth, x: width * 0.5, z: 0 }
+      ].forEach(part => {
+        const strip = new THREE.Mesh(
+          new THREE.BoxGeometry(part.w, 0.018, part.d),
+          haloMaterial
+        );
+        strip.position.set(part.x, 0, part.z);
+        haloGroup.add(strip);
+      });
+      return { haloGroup, haloMaterial };
+    };
+
+    const addLeverControl = ({
+      key,
+      phase,
+      x,
+      z,
+      number,
+      color,
+      layout,
+      sideFacing = false,
+      faceRotationZ = 0,
+      indicatorOffsetX = 0,
+      indicatorOffsetZ = 0
+    }) => {
+      const horizontal = layout === "horizontalLever";
+      const frameWidth = horizontal ? 0.7 : 0.35;
+      const frameDepth = horizontal ? 0.35 : 0.7;
+      const slotWidth = horizontal ? 0.52 : 0.1;
+      const slotDepth = horizontal ? 0.1 : 0.52;
+      const frameMaterial = new THREE.MeshStandardMaterial({
+        color: 0xb9cece,
+        emissive: color,
+        emissiveIntensity: 0.03,
+        roughness: 0.34,
+        metalness: 0.62
+      });
+      const slotMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1c3036,
+        roughness: 0.52,
+        metalness: 0.44
+      });
+      const frame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameWidth, 0.065, frameDepth),
+        frameMaterial
+      );
+      frame.position.set(x, 0.695, z);
+      frame.castShadow = true;
+      frame.receiveShadow = true;
+      consoleGroup.add(frame);
+      const slot = new THREE.Mesh(
+        new THREE.BoxGeometry(slotWidth, 0.045, slotDepth),
+        slotMaterial
+      );
+      slot.position.set(x, 0.73, z);
+      slot.receiveShadow = true;
+      consoleGroup.add(slot);
+
+      const labelTexture = createMachineControlFaceTexture({
+        number,
+        glyph: "",
+        foreground: "#fff5a6",
+        layout: sideFacing ? "horizontalLever" : layout
+      });
+      const embedDirectionsBelowLever = number === 4 || sideFacing;
+      const embedDirectionsOnEastSide = embedDirectionsBelowLever && sideFacing;
+      const label = new THREE.Mesh(
+        new THREE.PlaneGeometry(
+          embedDirectionsBelowLever ? 0.62 : horizontal ? 0.45 : 0.24,
+          embedDirectionsBelowLever ? 0.2 : horizontal ? 0.24 : 0.45
+        ),
+        new THREE.MeshBasicMaterial({
+          map: labelTexture,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        })
+      );
+      label.rotation.x = -Math.PI / 2;
+      label.rotation.z = faceRotationZ;
+      label.position.set(
+        embedDirectionsOnEastSide
+          ? x + 0.28
+          : embedDirectionsBelowLever
+            ? x
+            : x + indicatorOffsetX,
+        embedDirectionsBelowLever ? 0.686 : 0.78,
+        embedDirectionsOnEastSide
+          ? z
+          : embedDirectionsBelowLever
+            ? z + 0.28
+            : z + indicatorOffsetZ
+      );
+      label.renderOrder = 5;
+      const directionPlateColor = new THREE.Color(0xf2b39f);
+      const directionPlateRim = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.018, 0.29),
+        new THREE.MeshStandardMaterial({
+          color: 0xd3a646,
+          emissive: 0x74500f,
+          emissiveIntensity: 0.04,
+          roughness: 0.42,
+          metalness: 0.46
+        })
+      );
+      directionPlateRim.position.set(
+        x + indicatorOffsetX,
+        0.744,
+        z + indicatorOffsetZ
+      );
+      directionPlateRim.castShadow = true;
+      directionPlateRim.receiveShadow = true;
+      const directionPlate = new THREE.Mesh(
+        new THREE.BoxGeometry(0.46, 0.03, 0.25),
+        new THREE.MeshStandardMaterial({
+          color: directionPlateColor,
+          emissive: 0x9f4e3f,
+          emissiveIntensity: 0.04,
+          roughness: 0.62,
+          metalness: 0.08
+        })
+      );
+      directionPlate.position.set(
+        x + indicatorOffsetX,
+        0.76,
+        z + indicatorOffsetZ
+      );
+      directionPlate.castShadow = true;
+      directionPlate.receiveShadow = true;
+      if (!embedDirectionsBelowLever) {
+        consoleGroup.add(directionPlateRim);
+        consoleGroup.add(directionPlate);
+      }
+      consoleGroup.add(label);
+
+      const mover = new THREE.Group();
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.047, 0.2, 16),
+        new THREE.MeshStandardMaterial({
+          color: 0xdfe8e8,
+          roughness: 0.22,
+          metalness: 0.78
+        })
+      );
+      stem.position.y = 0.1;
+      stem.castShadow = true;
+      mover.add(stem);
+      const knobMaterial = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 0.08,
+        roughness: 0.27,
+        metalness: 0.24
+      });
+      const knob = new THREE.Mesh(new THREE.SphereGeometry(0.095, 22, 16), knobMaterial);
+      knob.position.y = 0.225;
+      knob.castShadow = true;
+      mover.add(knob);
+      mover.position.set(x, 0.725, z);
+      consoleGroup.add(mover);
+
+      const { haloGroup, haloMaterial } = createRectangularHalo(
+        frameWidth + 0.08,
+        frameDepth + 0.08,
+        color
+      );
+      haloGroup.position.set(x, 0.772, z);
+      consoleGroup.add(haloGroup);
+      const plaquePosition = NUMBER_PLAQUE_BASE_POSITIONS[number];
+      addNumberPlaque(number, plaquePosition.x, plaquePosition.z, faceRotationZ);
+
+      this.machineControlVisuals[key] = {
+        key,
+        number,
+        phase,
+        kind: horizontal ? "horizontalLever" : "verticalLever",
+        frameMaterial,
+        knobMaterial,
+        haloMaterial,
+        mover,
+        restX: x,
+        restZ: z,
+        sideFacing
+      };
+      this.machineControlAnchors[key] = {
+        x,
+        y: 0.79,
+        z,
+        halfWidth: horizontal ? 0.98 : sideFacing ? 0.44 : 0.32,
+        halfDepth: horizontal ? 0.32 : sideFacing ? 0.75 : 0.42
+      };
+    };
+
+    const backRowZ = 3.23;
+    const frontRowZ = 3.85;
+    const frontLeftX = 0.2;
+    const frontRightX = 1.86;
+    const eastControlX = 4.72;
+    const eastButtonZ = 0.78;
+    const eastLeverZ = -0.58;
+
+    addPushControl({
+      key: "horizontal",
+      phase: "horizontal",
+      x: frontLeftX,
+      z: backRowZ,
+      color: 0xe85f97,
+      background: "#e85f97",
+      glyph: "→"
+    });
+    addPushControl({
+      key: "rotation",
+      phase: "rotation",
+      x: frontRightX,
+      z: backRowZ,
+      color: 0x9f76d7,
+      background: "#9f76d7",
+      glyph: "↺"
+    });
+    addLeverControl({
+      key: "fineHorizontal",
+      phase: "fineHorizontal",
+      x: frontLeftX,
+      z: frontRowZ,
+      number: 4,
+      color: 0xeb5f9a,
+      layout: "horizontalLever",
+      indicatorOffsetX: 0.62
+    });
+    addPushControl({
+      key: "stop",
+      phase: "fineSettle",
+      x: frontRightX,
+      z: frontRowZ,
+      color: 0xd8495c,
+      background: "#d8495c",
+      glyph: "下降",
+      radius: 0.225,
+      halfWidth: 0.34
+    });
+    addPushControl({
+      key: "vertical",
+      phase: "vertical",
+      x: eastControlX,
+      z: eastButtonZ,
+      color: 0x47bda0,
+      background: "#47bda0",
+      glyph: "→",
+      faceRotationZ: Math.PI / 2
+    });
+    addLeverControl({
+      key: "fineVertical",
+      phase: "fineVertical",
+      x: eastControlX,
+      z: eastLeverZ,
+      number: 5,
+      color: 0x82bf4b,
+      layout: "verticalLever",
+      sideFacing: true,
+      faceRotationZ: Math.PI / 2
+    });
+
+    this.scene.add(consoleGroup);
   }
 
   createGantry() {
@@ -1844,7 +2665,7 @@ class ImasoraCompanionCatcherGame {
     this.createPlushes();
     this.refreshHud();
     this.refreshControls();
-    this.showCallout("1 横を押している間、アームが横へ動きます", 1600);
+    this.showCallout("1 →ボタンを押している間、アームが右へ動きます", 2000);
   }
 
   clearPlushes() {
@@ -2369,10 +3190,33 @@ class ImasoraCompanionCatcherGame {
 
   handleHandleDown(event) {
     const fineButton = event.target.closest("[data-icc-fine]");
-    if (fineButton && this.root.contains(fineButton) && !fineButton.disabled) {
-      if (!this.activateFineHandle(fineButton.dataset.iccFine, fineButton, event.pointerId)) return;
+    const fineCenter = event.target.closest("[data-icc-fine-center]");
+    const fineGroup = fineButton?.closest("[data-icc-fine-group]")
+      || event.target.closest("[data-icc-fine-group]");
+    if (fineGroup && this.root.contains(fineGroup)) {
       event.preventDefault();
-      fineButton.setPointerCapture?.(event.pointerId);
+      const groupAxis = fineGroup?.dataset.iccFineGroup;
+      const geometry = this.getFineLeverGeometry(fineGroup);
+      if (!fineGroup || !geometry || !["horizontal", "vertical"].includes(groupAxis)) return;
+      const expectedPhase = groupAxis === "horizontal" ? "fineHorizontal" : "fineVertical";
+      if (this.phase !== expectedPhase || this.controlPointerId !== null || this.pendingFineLever) return;
+      if (fineButton && !fineCenter) {
+        const direction = fineButton.dataset.iccFine;
+        const directionButton = this.getFineHandleButton(direction);
+        if (!directionButton || directionButton.disabled) return;
+        if (!this.activateFineHandle(direction, directionButton, event.pointerId)) return;
+        fineGroup.setPointerCapture?.(event.pointerId);
+        this.controlCaptureElement = fineGroup;
+        return;
+      }
+      this.pendingFineLever = {
+        pointerId: event.pointerId,
+        group: fineGroup,
+        geometry,
+        startAxisOffset: this.getFineLeverPointerOffset(geometry, event.clientX, event.clientY)
+      };
+      fineGroup.setPointerCapture?.(event.pointerId);
+      this.controlCaptureElement = fineGroup;
       return;
     }
     const handle = event.target.closest("[data-icc-handle]");
@@ -2386,13 +3230,95 @@ class ImasoraCompanionCatcherGame {
     if (!this.activateHandle(axis, handle, event.pointerId)) return;
     event.preventDefault();
     handle.setPointerCapture?.(event.pointerId);
+    this.controlCaptureElement = handle;
+  }
+
+  handleHandleMove(event) {
+    if (
+      event.pointerId === this.controlPointerId
+      && ["left", "right", "up", "down"].includes(this.activeHandle)
+    ) {
+      event.preventDefault();
+      return;
+    }
+    const pending = this.pendingFineLever;
+    if (!pending || event.pointerId !== pending.pointerId) return;
+    const axisOffset = this.getFineLeverPointerOffset(
+      pending.geometry,
+      event.clientX,
+      event.clientY
+    );
+    const dragOffset = axisOffset - pending.startAxisOffset;
+    if (Math.abs(dragOffset) <= pending.geometry.threshold) return;
+    const direction = dragOffset < 0
+      ? pending.geometry.firstDirection
+      : pending.geometry.secondDirection;
+    const directionButton = this.getFineHandleButton(direction);
+    if (!directionButton || directionButton.disabled) return;
+    this.pendingFineLever = null;
+    if (!this.activateFineHandle(direction, directionButton, event.pointerId)) return;
+    this.controlCaptureElement = pending.group;
+    event.preventDefault();
   }
 
   handleHandleUp(event) {
+    if (this.pendingFineLever) {
+      if (event?.pointerId !== undefined && event.pointerId !== this.pendingFineLever.pointerId) return;
+      event?.preventDefault?.();
+      const pending = this.pendingFineLever;
+      this.pendingFineLever = null;
+      if (typeof pending.pointerId === "number" && pending.group.hasPointerCapture?.(pending.pointerId)) {
+        pending.group.releasePointerCapture(pending.pointerId);
+      }
+      this.controlCaptureElement = null;
+      return;
+    }
     if (this.controlPointerId === null) return;
     if (event?.pointerId !== undefined && event.pointerId !== this.controlPointerId) return;
     event?.preventDefault?.();
     this.completeActiveHandle();
+  }
+
+  getFineLeverGeometry(group) {
+    if (!group) return null;
+    const buttons = Array.from(group.querySelectorAll("[data-icc-fine]"));
+    if (buttons.length < 2) return null;
+    const firstBounds = buttons[0].getBoundingClientRect();
+    const secondBounds = buttons[1].getBoundingClientRect();
+    const firstX = firstBounds.left + firstBounds.width * 0.5;
+    const firstY = firstBounds.top + firstBounds.height * 0.5;
+    const secondX = secondBounds.left + secondBounds.width * 0.5;
+    const secondY = secondBounds.top + secondBounds.height * 0.5;
+    const deltaX = secondX - firstX;
+    const deltaY = secondY - firstY;
+    const centerDistance = Math.hypot(deltaX, deltaY);
+    if (centerDistance < 1) return null;
+    return {
+      centerX: (firstX + secondX) * 0.5,
+      centerY: (firstY + secondY) * 0.5,
+      unitX: deltaX / centerDistance,
+      unitY: deltaY / centerDistance,
+      firstDirection: buttons[0].dataset.iccFine,
+      secondDirection: buttons[1].dataset.iccFine,
+      threshold: Math.max(
+        FINE_LEVER_CENTER_DRAG_THRESHOLD_PX,
+        centerDistance * FINE_LEVER_CENTER_DEAD_ZONE_RATIO
+      ) * FINE_LEVER_CENTER_DRAG_DISTANCE_SCALE
+    };
+  }
+
+  getFineLeverPointerOffset(geometry, clientX, clientY) {
+    return (clientX - geometry.centerX) * geometry.unitX
+      + (clientY - geometry.centerY) * geometry.unitY;
+  }
+
+  getFineHandleButton(direction) {
+    return {
+      left: this.els?.fineLeft,
+      right: this.els?.fineRight,
+      up: this.els?.fineUp,
+      down: this.els?.fineDown
+    }[direction] || null;
   }
 
   handleHandleKeyDown(event) {
@@ -2452,6 +3378,14 @@ class ImasoraCompanionCatcherGame {
   }
 
   releaseActiveHandle(advance = true) {
+    if (this.pendingFineLever) {
+      const pending = this.pendingFineLever;
+      this.pendingFineLever = null;
+      if (typeof pending.pointerId === "number" && pending.group.hasPointerCapture?.(pending.pointerId)) {
+        pending.group.releasePointerCapture(pending.pointerId);
+      }
+      this.controlCaptureElement = null;
+    }
     if (this.controlPointerId === null && !this.activeHandle) return;
     const axis = this.activeHandle;
     const pointerId = this.controlPointerId;
@@ -2462,13 +3396,15 @@ class ImasoraCompanionCatcherGame {
       down: this.els?.fineDown
     };
     const handle = axis ? (this.els?.[axis] || fineHandles[axis]) : null;
-    if (handle && typeof pointerId === "number" && handle.hasPointerCapture?.(pointerId)) {
-      handle.releasePointerCapture(pointerId);
+    const captureElement = this.controlCaptureElement || handle;
+    if (captureElement && typeof pointerId === "number" && captureElement.hasPointerCapture?.(pointerId)) {
+      captureElement.releasePointerCapture(pointerId);
     }
     handle?.classList.remove("is-held");
     handle?.setAttribute("aria-pressed", "false");
     this.controlPointerId = null;
     this.activeHandle = null;
+    this.controlCaptureElement = null;
     if (!advance || !axis) {
       this.refreshControls();
       return;
@@ -2477,7 +3413,7 @@ class ImasoraCompanionCatcherGame {
       this.phase = "vertical";
       this.phaseTime = 0;
       this.refreshControls();
-      this.showCallout("2 縦を押している間、アームが奥へ動きます", 1500);
+      this.showCallout("2 →ボタンを押している間、東側視点でアームが右へ動きます", 1900);
       return;
     }
     if (axis === "vertical" && this.phase === "vertical") {
@@ -2485,7 +3421,7 @@ class ImasoraCompanionCatcherGame {
       this.phaseTime = 0;
       this.rotationTravel = 0;
       this.refreshControls();
-      this.showCallout("3 回転を押している間、アームの向きが回ります", 1700);
+      this.showCallout("3 ↺ボタンを押している間、アームが反時計回りに回ります", 2100);
       return;
     }
     if (axis === "rotation" && this.phase === "rotation") {
@@ -2493,7 +3429,7 @@ class ImasoraCompanionCatcherGame {
       this.phaseTime = 0;
       this.setClawStarNeonMode("horizontal");
       this.refreshControls();
-      this.showCallout("4 左右のどちらかを押している間、アームが動きます", 1900);
+      this.showCallout("4 左右レバーを倒している間、アームが左右に動きます", 2300);
       return;
     }
     if (["left", "right"].includes(axis) && this.phase === "fineHorizontal") {
@@ -2511,7 +3447,7 @@ class ImasoraCompanionCatcherGame {
     this.phaseTime = 0;
     this.setClawStarNeonMode("vertical");
     this.refreshControls();
-    this.showCallout("5 上下のどちらかを押している間、アームが動きます", 1900);
+    this.showCallout("5 左右レバーを倒している間、東側視点でアームが左右に動きます", 2300);
   }
 
   enterDescentReadyStage() {
@@ -2519,7 +3455,7 @@ class ImasoraCompanionCatcherGame {
     this.phaseTime = 0;
     this.setClawStarNeonMode("default");
     this.refreshControls();
-    this.showCallout("位置を確定。タイミングを見て6 下降開始を押します", 1700);
+    this.showCallout("位置を確定。タイミングを見て6 下降ボタンを押します", 2100);
   }
 
   completeActiveHandle() {
@@ -2528,6 +3464,7 @@ class ImasoraCompanionCatcherGame {
 
   startAutomaticGrab() {
     if (this.phase !== "fineSettle" || this.attemptsRemaining <= 0) return;
+    this.descentButtonPressedUntil = this.elapsed + 0.24;
     this.attemptsRemaining -= 1;
     this.attemptCaught = 0;
     this.plushes.forEach(plush => {
@@ -2556,7 +3493,6 @@ class ImasoraCompanionCatcherGame {
     this.grabCableLength = MAX_GRAB_CABLE_LENGTH;
     this.refreshHud();
     this.refreshControls();
-    this.showCallout("下降開始。最大位置で3本爪が自動で閉じます", 1700);
     safeSelectSound();
   }
 
@@ -2586,7 +3522,9 @@ class ImasoraCompanionCatcherGame {
   }
 
   updatePhase(delta) {
-    this.phaseTime += delta;
+    const fineLeverPointerActive = ["fineHorizontal", "fineVertical"].includes(this.phase)
+      && (this.controlPointerId !== null || Boolean(this.pendingFineLever));
+    if (!fineLeverPointerActive) this.phaseTime += delta;
     if (this.phase === "horizontal") {
       this.cableTarget = 1.25;
       this.prongClosure = 0;
@@ -2634,7 +3572,7 @@ class ImasoraCompanionCatcherGame {
     if (this.phase === "fineHorizontal") {
       this.cableTarget = 1.25;
       this.prongClosure = 0;
-      if (this.phaseTime >= TIMED_STAGE_LIMIT_SECONDS) {
+      if (!fineLeverPointerActive && this.phaseTime >= TIMED_STAGE_LIMIT_SECONDS) {
         this.releaseActiveHandle(false);
         this.enterFineVerticalStage();
         return;
@@ -2646,17 +3584,13 @@ class ImasoraCompanionCatcherGame {
           AIM_LIMITS.minX,
           AIM_LIMITS.maxX
         );
-        const atLimit = direction < 0
-          ? this.carriage.target.x <= AIM_LIMITS.minX + 0.005
-          : this.carriage.target.x >= AIM_LIMITS.maxX - 0.005;
-        if (atLimit) this.completeActiveHandle();
       }
       return;
     }
     if (this.phase === "fineVertical") {
       this.cableTarget = 1.25;
       this.prongClosure = 0;
-      if (this.phaseTime >= TIMED_STAGE_LIMIT_SECONDS) {
+      if (!fineLeverPointerActive && this.phaseTime >= TIMED_STAGE_LIMIT_SECONDS) {
         this.releaseActiveHandle(false);
         this.enterDescentReadyStage();
         return;
@@ -2668,10 +3602,6 @@ class ImasoraCompanionCatcherGame {
           AIM_LIMITS.minZ,
           AIM_LIMITS.maxZ
         );
-        const atLimit = direction < 0
-          ? this.carriage.target.z <= AIM_LIMITS.minZ + 0.005
-          : this.carriage.target.z >= AIM_LIMITS.maxZ - 0.005;
-        if (atLimit) this.completeActiveHandle();
       }
       return;
     }
@@ -4992,14 +5922,11 @@ class ImasoraCompanionCatcherGame {
       const sideOnlyGrip = bestContactCount === 3 && bestSupportContactCount === 0;
       this.rejectPartialGrip(bestCandidate?.plush);
       if (sideOnlyGrip) {
-        this.showCallout("3点とも横からで支えられず、ぬいぐるみが滑った", 1200);
         return false;
       }
       if (bestContactCount === 2) {
-        this.showCallout("2点では支えきれず、ぬいぐるみが滑った", 1100);
         return false;
       }
-      this.showCallout("爪がぬいぐるみを押して外れた", 1050);
       return false;
     }
     const body = candidate.plush.body;
@@ -5044,7 +5971,6 @@ class ImasoraCompanionCatcherGame {
     this.updateProngBodies(0);
     candidate.plush.clawContained = true;
     candidate.plush.slipReleaseTime = 0;
-    this.showCallout(`${candidate.plush.name}を3本爪で挟んだ`, 900);
     safeSelectSound();
     return true;
   }
@@ -5063,12 +5989,10 @@ class ImasoraCompanionCatcherGame {
     }
     this.captureGripReleaseInfluence(grip, delta);
     if (this.isPlushFullyBelowProngTips(grip.plush)) {
-      const name = grip.plush.name;
       if (grip.holeDropGuaranteed) {
         this.releaseGrip(false, true);
       } else {
-        const released = this.releaseSlippedPlush(grip, false);
-        if (released) this.showCallout(`${name}が爪から滑り落ちた`, 1100);
+        this.releaseSlippedPlush(grip, false);
       }
       return;
     }
@@ -5150,14 +6074,12 @@ class ImasoraCompanionCatcherGame {
         );
       }
       if (grip.physicalHoldLossTime >= 0.26) {
-        const name = grip.plush.name;
         if (grip.holeDropGuaranteed) {
           this.releaseGrip(false, true);
           return;
         } else {
           const released = this.releaseSlippedPlush(grip, insideClaw);
           if (released) {
-            this.showCallout(`${name}が爪から滑り落ちた`, 1100);
             return;
           }
           grip.physicalHoldLossTime = 0;
@@ -5190,10 +6112,8 @@ class ImasoraCompanionCatcherGame {
         + sustainedInstabilityWear;
       grip.integrity -= slipRate * delta;
       if (grip.integrity <= 0.055 || offset > 1.45 * CLAW_SIZE_SCALE) {
-        const name = grip.plush.name;
         const released = this.releaseSlippedPlush(grip);
         if (released) {
-          this.showCallout(`${name}が爪から滑り落ちた`, 1100);
           return;
         }
         grip.integrity = Math.max(grip.integrity, 0.085);
@@ -5328,7 +6248,6 @@ class ImasoraCompanionCatcherGame {
   releaseGrip(showMessage = false, dropImmediately = false) {
     if (!this.grip) return;
     const releasedPlush = this.grip.plush;
-    const name = releasedPlush?.name || "";
     if (dropImmediately && releasedPlush) {
       const body = releasedPlush.body;
       releasedPlush.clawContained = false;
@@ -5353,7 +6272,6 @@ class ImasoraCompanionCatcherGame {
       body.wakeUp();
     }
     this.grip = null;
-    if (showMessage && name) this.showCallout(`${name}を離した`, 750);
   }
 
   detectPrizes(delta) {
@@ -5408,7 +6326,6 @@ class ImasoraCompanionCatcherGame {
     this.score += value;
     this.caughtNames.push(plush.name);
     this.refreshHud();
-    this.showCallout(`${plush.name} GET! +${value}`, 1200);
     safeCatchSound();
   }
 
@@ -5424,9 +6341,6 @@ class ImasoraCompanionCatcherGame {
     this.releaseStarted = false;
     this.releaseActiveHandle(false);
     this.setClawStarNeonMode("default");
-    if (!this.attemptCaught) {
-      this.showCallout("簡単には取れない。次の周回を狙おう", 1100);
-    }
     this.attemptCaught = 0;
     if (this.attemptsRemaining <= 0 || this.activePlushCount() <= 0) {
       this.showResult();
@@ -5728,6 +6642,112 @@ class ImasoraCompanionCatcherGame {
     });
   }
 
+  updateMachineControlVisuals() {
+    if (!this.machineControlVisuals) return;
+    const pulse = 0.5 + Math.sin(this.elapsed * 5.2) * 0.5;
+    if (this.numberPlaqueNeonLight) this.numberPlaqueNeonLight.intensity = 0;
+    Object.values(this.machineControlVisuals).forEach(visual => {
+      const active = this.phase === visual.phase && this.attemptsRemaining > 0;
+      const glowPower = active ? 0.68 + pulse * 0.52 : 0.025;
+      visual.haloMaterial.opacity = active ? 0.38 + pulse * 0.25 : 0.035;
+      const plaque = this.machineControlNumberPlaques?.[visual.number];
+      if (plaque) {
+        plaque.rimMaterial.emissive.setHex(0x6d4300);
+        plaque.rimMaterial.emissiveIntensity = 0.08;
+        plaque.glowMaterial.opacity = active ? 0.42 + pulse * 0.3 : 0;
+        plaque.glow.scale.setScalar(1);
+        plaque.haloMaterial.opacity = 0;
+        plaque.halo.scale.setScalar(1);
+      }
+      if (visual.kind === "button") {
+        visual.baseMaterial.emissiveIntensity = active ? 0.42 + pulse * 0.34 : 0.025;
+        visual.faceMaterial.emissiveIntensity = glowPower;
+        visual.sideMaterial.emissiveIntensity = active ? 0.38 + pulse * 0.3 : 0.035;
+        const pressed = this.activeHandle === visual.key
+          || (visual.key === "stop" && Number(this.descentButtonPressedUntil || 0) > this.elapsed);
+        const targetY = visual.restY - (pressed ? 0.035 : 0);
+        visual.capGroup.position.y = lerp(visual.capGroup.position.y, targetY, 0.34);
+        return;
+      }
+      visual.frameMaterial.emissiveIntensity = active ? 0.5 + pulse * 0.38 : 0.025;
+      visual.knobMaterial.emissiveIntensity = active ? 0.48 + pulse * 0.34 : 0.055;
+      if (visual.kind === "horizontalLever") {
+        const direction = this.activeHandle === "left" ? -1 : this.activeHandle === "right" ? 1 : 0;
+        visual.mover.position.x = lerp(visual.mover.position.x, visual.restX + direction * 0.155, 0.28);
+        visual.mover.rotation.z = lerp(visual.mover.rotation.z, -direction * 0.32, 0.28);
+      } else {
+        const direction = this.activeHandle === "up" ? -1 : this.activeHandle === "down" ? 1 : 0;
+        visual.mover.position.z = lerp(
+          visual.mover.position.z,
+          visual.restZ + direction * 0.155,
+          0.28
+        );
+        visual.mover.rotation.x = lerp(
+          visual.mover.rotation.x,
+          direction * 0.32,
+          0.28
+        );
+      }
+    });
+  }
+
+  updateControlHitTargets(force = false) {
+    if (
+      !this.machineControlAnchors
+      || !this.controlProjectionPoint
+      || !this.els?.viewport
+      || !this.camera
+    ) return;
+    if (!force && this.elapsed < this.nextControlProjectionTime) return;
+    this.nextControlProjectionTime = this.elapsed + 0.05;
+    const width = Math.max(1, this.els.viewport.clientWidth);
+    const height = Math.max(1, this.els.viewport.clientHeight);
+    const elements = {
+      horizontal: this.els.horizontal,
+      vertical: this.els.vertical,
+      rotation: this.els.rotation,
+      fineHorizontal: this.els.fineHorizontal,
+      fineVertical: this.els.fineVertical,
+      stop: this.els.stop
+    };
+    Object.entries(this.machineControlAnchors).forEach(([key, anchor]) => {
+      const element = elements[key];
+      if (!element) return;
+      let minX = Infinity;
+      let maxX = -Infinity;
+      let minY = Infinity;
+      let maxY = -Infinity;
+      let visibleDepth = false;
+      [-1, 1].forEach(xDirection => {
+        [-1, 1].forEach(zDirection => {
+          this.controlProjectionPoint.set(
+            anchor.x + anchor.halfWidth * xDirection,
+            anchor.y,
+            anchor.z + anchor.halfDepth * zDirection
+          ).project(this.camera);
+          if (this.controlProjectionPoint.z >= -1 && this.controlProjectionPoint.z <= 1) {
+            visibleDepth = true;
+          }
+          const screenX = (this.controlProjectionPoint.x * 0.5 + 0.5) * width;
+          const screenY = (-this.controlProjectionPoint.y * 0.5 + 0.5) * height;
+          minX = Math.min(minX, screenX);
+          maxX = Math.max(maxX, screenX);
+          minY = Math.min(minY, screenY);
+          maxY = Math.max(maxY, screenY);
+        });
+      });
+      const targetWidth = Math.max(44, maxX - minX + 10);
+      const targetHeight = Math.max(44, maxY - minY + 12);
+      const centerX = (minX + maxX) * 0.5;
+      const centerY = (minY + maxY) * 0.5;
+      element.style.left = `${clamp(centerX - targetWidth * 0.5, 0, width - targetWidth)}px`;
+      element.style.top = `${clamp(centerY - targetHeight * 0.5, 0, height - targetHeight)}px`;
+      element.style.width = `${Math.min(width, targetWidth)}px`;
+      element.style.height = `${Math.min(height, targetHeight)}px`;
+      element.style.visibility = visibleDepth ? "visible" : "hidden";
+    });
+  }
+
   updateCameraView(delta) {
     if (!this.camera || !this.cameraLookTarget) return;
     const enteringSideView = (
@@ -5754,6 +6774,7 @@ class ImasoraCompanionCatcherGame {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    this.updateControlHitTargets(true);
   }
 
   loop(timestamp) {
@@ -5815,6 +6836,8 @@ class ImasoraCompanionCatcherGame {
     this.updateClawVisual();
     this.syncPlushVisuals(delta);
     this.updateCameraView(delta);
+    this.updateMachineControlVisuals();
+    this.updateControlHitTargets();
     this.renderer.render(this.scene, this.camera);
     this.frame = requestAnimationFrame(this.boundLoop);
   }
