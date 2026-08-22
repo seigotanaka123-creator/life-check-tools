@@ -21,10 +21,43 @@
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260812-opening-redesign">
-  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260812-pachicoin-opening">
+  <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260820-live-opening-preview">
+  <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260820-live-opening-preview">
   <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260804-machine3-floating-ring-position-editor-step306">
-  <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260813-initial-physics-game">
+  <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260819-opening-recorded-partner-v4">
+  <link rel="stylesheet" href="assets/imasora-sky-map.css?v=20260821-cloud-workshop-sky-station-v15">
+  <script src="assets/imasora-sky-map.js?v=20260821-cloud-workshop-sky-station-v15"></script>
+  <link rel="stylesheet" href="assets/imasora-coastal-town-map.css?v=20260822-coastal-night-lift-v3">
+  <script src="assets/imasora-coastal-town-map.js?v=20260821-coastal-town-bridge2-route-v2"></script>
+  <link rel="stylesheet" href="assets/imasora-land-map.css?v=20260822-land-night-lift-v2">
+  <script src="assets/imasora-land-map.js?v=20260822-land-map-bridge1-v1"></script>
+  <style id="map-night-ambient-lighting">
+    /* External stylesheet responses can remain cached by the local preview server.
+       Keep the night accessibility baseline here so every preview uses the same readable level. */
+    #imasoraLandMapScreen .landMapWorld[data-land-scene="night"] {
+      --land-scene-tint:
+        radial-gradient(circle at 78% 6%, rgba(150,184,228,.25), transparent 32%),
+        linear-gradient(180deg, rgba(22,42,82,.19), rgba(11,27,56,.29));
+      --land-scene-shadow: inset 0 0 44px rgba(5,17,43,.32);
+    }
+    #imasoraLandMapScreen .landMapWorld[data-land-scene="night"] .landMapBase {
+      filter: brightness(.78) saturate(.86) contrast(1.03) hue-rotate(3deg);
+    }
+    #imasoraLandMapScreen .landMapWorld[data-land-scene="night"] .landMapDustVeil { opacity: .08; }
+
+    #imasoraCoastalTownScreen .coastalTownWorld[data-coastal-scene="night"] {
+      --coastal-scene-tint:
+        radial-gradient(circle at 76% 8%, rgba(145,183,228,.23), transparent 30%),
+        linear-gradient(180deg, rgba(18,39,78,.17), rgba(8,25,55,.27));
+      --coastal-scene-shadow: inset 0 0 44px rgba(4,16,39,.32);
+      --coastal-fixed-light-opacity: .88;
+    }
+    #imasoraCoastalTownScreen .coastalTownWorld[data-coastal-scene="night"] .coastalTownBase {
+      filter: brightness(.8) saturate(.98) contrast(1.03) hue-rotate(2deg);
+    }
+    #imasoraCoastalTownScreen .coastalTownWorld[data-coastal-scene="night"] .coastalTownSeaShimmer { opacity: .13; }
+  </style>
+  <link rel="preload" as="image" href="assets/imasora-land-map-base-v1.png">
   <link rel="preload" as="image" href="assets/town-layered-prebuild-v1.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-station-v2.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/town-layered-medal-hall-v3.png">
@@ -1126,6 +1159,15 @@
       display: grid;
       place-items: center;
       z-index: 5;
+    }
+    .map .map-hero-view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+    }
+    .map .map-hero-view[data-hero-view="front"] {
+      display: grid;
     }
     .map-hero-art svg {
       width: 48px;
@@ -9327,6 +9369,735 @@
     .town-layer-click-target-guild {
       z-index: 28;
     }
+    .town-railway-destination {
+      position: absolute;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      pointer-events: auto;
+      background:
+        radial-gradient(circle at 50% 24%, rgba(117, 216, 255, .22), transparent 42%),
+        rgba(8, 22, 45, .7);
+      backdrop-filter: blur(2px);
+    }
+    .town-railway-card {
+      width: min(82%, 310px);
+      padding: 15px;
+      border: 2px solid rgba(218, 245, 255, .92);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(31, 72, 112, .97), rgba(16, 40, 75, .98));
+      box-shadow:
+        inset 0 0 0 2px rgba(89, 190, 230, .3),
+        0 0 24px rgba(91, 207, 255, .38),
+        0 16px 32px rgba(3, 12, 29, .48);
+      color: #eefaff;
+      text-align: center;
+    }
+    .town-railway-card small {
+      display: block;
+      color: #8de5ff;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .14em;
+    }
+    .town-railway-card strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 19px;
+      letter-spacing: .06em;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .38);
+    }
+    .town-railway-card > span {
+      display: block;
+      margin-top: 4px;
+      color: #c9eaf6;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .town-railway-routes {
+      display: grid;
+      gap: 5px;
+      max-height: 112px;
+      margin-top: 10px;
+      padding: 2px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .town-railway-option {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      align-items: center;
+      min-height: 37px;
+      padding: 6px 10px 6px 5px;
+      border: 1px solid rgba(183, 232, 250, .32);
+      border-radius: 9px;
+      background: rgba(5, 24, 49, .62);
+      color: #e9faff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      transition: background .14s ease, color .14s ease, border-color .14s ease;
+    }
+    .town-railway-option.is-selected {
+      border-color: rgba(255,255,255,.95);
+      background: linear-gradient(90deg, #dffaff, #79dff5);
+      color: #104a67;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.96),
+        0 0 12px rgba(102, 225, 255, .52);
+    }
+    .town-railway-cursor {
+      display: inline-block;
+      color: #0e5274;
+      font-size: 16px;
+      line-height: 1;
+      opacity: 0;
+      transform: translateX(-3px);
+    }
+    .town-railway-option.is-selected .town-railway-cursor {
+      opacity: 1;
+      animation: townRailwayCursor .72s ease-in-out infinite alternate;
+    }
+    @keyframes townRailwayCursor {
+      to { transform: translateX(2px); }
+    }
+    .town-railway-option:focus-visible {
+      outline: 2px solid rgba(255,255,255,.92);
+      outline-offset: 1px;
+    }
+    .town-railway-controls {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .town-railway-control {
+      min-height: 36px;
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #f4fbff, #a9ddeb);
+      color: #174a63;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 4px 9px rgba(0,0,0,.2);
+    }
+    .town-railway-confirm {
+      background: linear-gradient(180deg, #fff5cb, #efc76f);
+      color: #65420c;
+    }
+    .town-railway-control:hover,
+    .town-railway-control:focus-visible {
+      filter: brightness(1.08);
+      outline: 2px solid rgba(255,255,255,.86);
+      outline-offset: 1px;
+    }
+    body.town-railway-journey-active {
+      overflow: hidden;
+    }
+    .town-railway-journey {
+      --railway-sky-top: #72b9ee;
+      --railway-sky-middle: #c7eaff;
+      --railway-sky-horizon: #ffe8bd;
+      --railway-haze: rgba(255,255,255,.3);
+      --railway-celestial: #fff1ae;
+      --railway-celestial-glow: rgba(255,229,138,.55);
+      --railway-town-filter: brightness(1.04) saturate(1.08);
+      --railway-station-filter: brightness(1.03) saturate(1.05);
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #08172d;
+      opacity: 0;
+      transition: opacity .32s ease;
+      isolation: isolate;
+    }
+    .town-railway-journey.is-running {
+      opacity: 1;
+    }
+    .town-railway-journey.is-ending {
+      opacity: 0;
+      transition-duration: .48s;
+    }
+    .town-railway-journey.railway-journey-morning {
+      --railway-sky-top: #6cbaf2;
+      --railway-sky-middle: #ccecff;
+      --railway-sky-horizon: #ffe6b6;
+      --railway-haze: rgba(255,244,211,.38);
+      --railway-celestial: #fff0a5;
+      --railway-celestial-glow: rgba(255,218,119,.56);
+      --railway-town-filter: brightness(1.08) saturate(1.04) sepia(.04);
+      --railway-station-filter: brightness(1.07) saturate(1.04);
+    }
+    .town-railway-journey.railway-journey-day {
+      --railway-sky-top: #248be0;
+      --railway-sky-middle: #83cef7;
+      --railway-sky-horizon: #d9f3ff;
+      --railway-haze: rgba(221,248,255,.28);
+      --railway-celestial: #fff9c9;
+      --railway-celestial-glow: rgba(255,246,178,.62);
+      --railway-town-filter: brightness(1.08) saturate(1.12);
+      --railway-station-filter: brightness(1.08) saturate(1.08);
+    }
+    .town-railway-journey.railway-journey-evening {
+      --railway-sky-top: #4f4c9b;
+      --railway-sky-middle: #e07c87;
+      --railway-sky-horizon: #ffcb8c;
+      --railway-haze: rgba(255,189,138,.32);
+      --railway-celestial: #ffb15e;
+      --railway-celestial-glow: rgba(255,119,74,.62);
+      --railway-town-filter: brightness(.92) saturate(1.18) sepia(.12);
+      --railway-station-filter: brightness(.95) saturate(1.12) sepia(.1);
+    }
+    .town-railway-journey.railway-journey-night {
+      --railway-sky-top: #07152f;
+      --railway-sky-middle: #152d58;
+      --railway-sky-horizon: #45668d;
+      --railway-haze: rgba(125,174,225,.18);
+      --railway-celestial: #f4f2dc;
+      --railway-celestial-glow: rgba(184,213,255,.52);
+      --railway-town-filter: brightness(.62) saturate(.9) contrast(1.08) hue-rotate(5deg);
+      --railway-station-filter: brightness(.76) saturate(.92) contrast(1.06);
+    }
+    .town-railway-journey-stage {
+      position: relative;
+      width: min(100vw, 760px);
+      height: 100dvh;
+      min-height: 520px;
+      max-height: 980px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 57%, var(--railway-haze), transparent 35%),
+        linear-gradient(180deg, var(--railway-sky-top) 0%, var(--railway-sky-middle) 50%, var(--railway-sky-horizon) 77%, #8fb27a 100%);
+      box-shadow: 0 0 70px rgba(0,0,0,.58);
+    }
+    .railway-journey-sky-rays {
+      position: absolute;
+      inset: -20%;
+      z-index: 1;
+      background: conic-gradient(from 204deg at 15% 13%, transparent 0 3deg, rgba(255,255,255,.13) 4deg 7deg, transparent 8deg 14deg, rgba(255,255,255,.08) 15deg 18deg, transparent 19deg 360deg);
+      opacity: .65;
+      animation: railwaySkyRayDrift 7s ease-in-out both;
+      pointer-events: none;
+    }
+    .railway-journey-evening .railway-journey-sky-rays { opacity: .34; }
+    .railway-journey-night .railway-journey-sky-rays { opacity: .08; }
+    @keyframes railwaySkyRayDrift {
+      from { transform: rotate(-1deg) scale(1.02); }
+      to { transform: rotate(2deg) scale(1.08); }
+    }
+    .railway-journey-stars {
+      position: absolute;
+      inset: 0 0 36%;
+      z-index: 1;
+      opacity: 0;
+      background:
+        radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.7px),
+        radial-gradient(circle at 28% 8%, #d9eaff 0 1.2px, transparent 1.8px),
+        radial-gradient(circle at 44% 22%, #fff 0 .9px, transparent 1.5px),
+        radial-gradient(circle at 67% 11%, #e8f2ff 0 1.1px, transparent 1.7px),
+        radial-gradient(circle at 84% 26%, #fff 0 1.2px, transparent 1.9px),
+        radial-gradient(circle at 76% 6%, #fff 0 .8px, transparent 1.5px),
+        radial-gradient(circle at 20% 36%, #d8e9ff 0 1px, transparent 1.7px),
+        radial-gradient(circle at 58% 34%, #fff 0 1px, transparent 1.8px),
+        radial-gradient(circle at 92% 43%, #d9eaff 0 1px, transparent 1.7px);
+      filter: drop-shadow(0 0 3px rgba(190,220,255,.86));
+      animation: railwayStarsTwinkle 1.7s ease-in-out infinite alternate;
+    }
+    .railway-journey-night .railway-journey-stars { opacity: .86; }
+    @keyframes railwayStarsTwinkle { to { opacity: .56; } }
+    .railway-journey-celestial {
+      position: absolute;
+      left: 13%;
+      top: 10%;
+      z-index: 2;
+      width: clamp(42px, 10vw, 68px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--railway-celestial);
+      box-shadow: 0 0 22px 8px var(--railway-celestial-glow), 0 0 64px 22px color-mix(in srgb, var(--railway-celestial-glow) 55%, transparent);
+    }
+    .railway-journey-day .railway-journey-celestial { left: 76%; top: 8%; }
+    .railway-journey-evening .railway-journey-celestial { left: 10%; top: 47%; }
+    .railway-journey-night .railway-journey-celestial {
+      left: 78%;
+      top: 10%;
+      overflow: hidden;
+    }
+    .railway-journey-night .railway-journey-celestial::after {
+      content: "";
+      position: absolute;
+      width: 88%;
+      height: 88%;
+      left: 32%;
+      top: -12%;
+      border-radius: 50%;
+      background: #10254b;
+    }
+    .railway-journey-far-cloud {
+      position: absolute;
+      z-index: 2;
+      width: 32%;
+      height: 7%;
+      border-radius: 999px;
+      background: rgba(255,255,255,.68);
+      box-shadow: 0 8px 22px rgba(35,76,108,.13);
+      filter: blur(.2px);
+      opacity: .76;
+    }
+    .railway-journey-far-cloud::before,
+    .railway-journey-far-cloud::after {
+      content: "";
+      position: absolute;
+      bottom: 17%;
+      border-radius: 50%;
+      background: inherit;
+    }
+    .railway-journey-far-cloud::before { left: 13%; width: 32%; aspect-ratio: 1; }
+    .railway-journey-far-cloud::after { right: 15%; width: 40%; aspect-ratio: 1; }
+    .railway-journey-far-cloud.cloud-a { left: -7%; top: 28%; transform: scale(.78); }
+    .railway-journey-far-cloud.cloud-b { right: -9%; top: 39%; transform: scale(.92); }
+    .railway-journey-town {
+      position: absolute;
+      left: -4%;
+      right: -4%;
+      bottom: -5%;
+      z-index: 3;
+      height: 38%;
+      background: url("assets/town-layered-prebuild-v1.png") center 48% / cover no-repeat;
+      transform: scale(1.03);
+      transform-origin: center center;
+      filter: var(--railway-town-filter);
+      box-shadow: 0 -16px 36px rgba(49,82,88,.2);
+      animation: railwayTownCinematic 6.4s ease-out both;
+    }
+    .railway-journey-night .railway-journey-town {
+      box-shadow: 0 -24px 48px rgba(5,17,40,.42), inset 0 12px 36px rgba(83,133,194,.12);
+    }
+    @keyframes railwayTownCinematic {
+      from { transform: scale(1.02); }
+      to { transform: scale(1.08); }
+    }
+    .railway-journey-station {
+      position: absolute;
+      left: 80%;
+      bottom: -4%;
+      z-index: 5;
+      width: min(38%, 290px);
+      height: auto;
+      transform: translateX(-50%);
+      transform-origin: center bottom;
+      filter: var(--railway-station-filter) drop-shadow(0 14px 12px rgba(10,25,38,.34));
+      animation: railwayStationSettle 6.2s ease-out both;
+      pointer-events: none;
+    }
+    @keyframes railwayStationSettle {
+      from { transform: translateX(-50%) scale(1.02); }
+      to { transform: translateX(-50%) scale(.95); }
+    }
+    .railway-journey-station-glow {
+      position: absolute;
+      left: 80%;
+      bottom: 5%;
+      z-index: 6;
+      width: 22%;
+      height: 12%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,199,88,.58), transparent 68%);
+      mix-blend-mode: screen;
+      opacity: .14;
+      pointer-events: none;
+    }
+    .railway-journey-night .railway-journey-station-glow,
+    .railway-journey-evening .railway-journey-station-glow { opacity: .76; }
+    .railway-journey-track {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 5px rgba(17,28,35,.32));
+    }
+    .railway-track-bed {
+      fill: none;
+      stroke: rgba(74,66,57,.9);
+      stroke-width: 42;
+      stroke-linecap: butt;
+      stroke-linejoin: round;
+    }
+    .railway-track-ties {
+      fill: none;
+      stroke: rgba(43,39,37,.96);
+      stroke-width: 54;
+      stroke-dasharray: 5 18;
+      stroke-linecap: butt;
+      stroke-linejoin: round;
+    }
+    .railway-track-rail-shadow,
+    .railway-track-rail {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .railway-track-rail-shadow { stroke: rgba(36,40,45,.9); stroke-width: 9; }
+    .railway-track-rail { stroke: url(#railwayJourneyRailMetal); stroke-width: 5; }
+    .railway-track-sky-glint {
+      fill: none;
+      stroke: rgba(204,240,255,.52);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 2 17;
+      animation: railwayTrackGlint 1.05s linear infinite;
+    }
+    @keyframes railwayTrackGlint { to { stroke-dashoffset: -38; } }
+    .railway-journey-train {
+      position: absolute;
+      left: 89%;
+      top: 77%;
+      z-index: 9;
+      width: min(47%, 370px);
+      transform: translate(-50%, -50%) scale(.74) rotate(0deg);
+      transform-origin: 50% 50%;
+      animation: railwayTrainToSky 5.55s cubic-bezier(.28,.05,.4,1) .38s both;
+      filter: brightness(1.02) saturate(1.08) drop-shadow(0 14px 10px rgba(8,19,34,.38));
+      pointer-events: none;
+      will-change: left, top, transform, opacity;
+    }
+    .railway-journey-night .railway-journey-train {
+      filter: brightness(.88) saturate(1.08) drop-shadow(0 0 12px rgba(255,206,94,.36)) drop-shadow(0 14px 10px rgba(2,9,22,.55));
+    }
+    .railway-journey-train > img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    @keyframes railwayTrainToSky {
+      0% { left: 91%; top: 78%; transform: translate(-50%, -50%) scale(.78) rotate(0deg); opacity: 0; }
+      7% { opacity: 1; }
+      25% { left: 67%; top: 75%; transform: translate(-50%, -50%) scale(.67) rotate(2deg); opacity: 1; }
+      48% { left: 49%; top: 66%; transform: translate(-50%, -50%) scale(.53) rotate(14deg); opacity: 1; }
+      70% { left: 33%; top: 49%; transform: translate(-50%, -50%) scale(.35) rotate(31deg); opacity: .98; }
+      90% { left: 20%; top: 31%; transform: translate(-50%, -50%) scale(.19) rotate(47deg); opacity: .8; }
+      100% { left: 15%; top: 23%; transform: translate(-50%, -50%) scale(.09) rotate(54deg); opacity: 0; }
+    }
+    .railway-journey-smoke {
+      position: absolute;
+      left: 18%;
+      top: 54%;
+      z-index: 8;
+      width: clamp(18px, 4.4vw, 34px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(239,247,252,.78);
+      box-shadow: 0 0 10px rgba(255,255,255,.3);
+      opacity: 0;
+      animation: railwaySmokePuff 1.05s ease-out infinite;
+    }
+    .railway-journey-smoke.smoke-b { animation-delay: .34s; }
+    .railway-journey-smoke.smoke-c { animation-delay: .68s; }
+    @keyframes railwaySmokePuff {
+      0% { opacity: 0; transform: translate(0, 0) scale(.35); }
+      18% { opacity: .72; }
+      100% { opacity: 0; transform: translate(-48px, -42px) scale(1.35); }
+    }
+    .railway-journey-star-trail {
+      position: absolute;
+      left: 66%;
+      top: 42%;
+      width: 68%;
+      height: 16%;
+      transform: rotate(-4deg);
+      transform-origin: right center;
+      background:
+        radial-gradient(circle at 12% 50%, rgba(255,244,160,.95) 0 1.3px, transparent 2px),
+        radial-gradient(circle at 27% 25%, rgba(154,221,255,.9) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 43% 72%, rgba(255,190,246,.86) 0 1.4px, transparent 2px),
+        radial-gradient(circle at 59% 34%, rgba(255,255,255,.9) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 77% 65%, rgba(255,225,123,.9) 0 1.2px, transparent 2px),
+        linear-gradient(90deg, transparent, rgba(123,210,255,.13) 58%, rgba(255,238,164,.42));
+      filter: drop-shadow(0 0 5px rgba(103,190,255,.75));
+      opacity: .76;
+      animation: railwayStarTrail 1s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes railwayStarTrail {
+      to { opacity: .38; transform: rotate(-4deg) scaleX(.9); }
+    }
+    .railway-journey-destination-cloud {
+      position: absolute;
+      left: 15%;
+      top: 12%;
+      z-index: 12;
+      width: min(48%, 365px);
+      height: 13%;
+      min-height: 76px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff 0%, #f7fbff 58%, #ddecf5 100%);
+      box-shadow: 0 13px 24px rgba(30,77,112,.18), 0 0 38px rgba(255,255,255,.42);
+      animation: railwayCloudBreathe 3.1s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .railway-journey-destination-cloud::before,
+    .railway-journey-destination-cloud::after {
+      content: "";
+      position: absolute;
+      bottom: 13%;
+      border-radius: 50%;
+      background: inherit;
+      box-shadow: inherit;
+    }
+    .railway-journey-destination-cloud::before {
+      left: 7%;
+      width: 43%;
+      aspect-ratio: 1;
+    }
+    .railway-journey-destination-cloud::after {
+      right: 4%;
+      width: 51%;
+      aspect-ratio: 1;
+    }
+    .railway-journey-cloud-core {
+      position: absolute;
+      left: 50%;
+      bottom: 8%;
+      width: 42%;
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff, #f2f8fc);
+      box-shadow: 0 -10px 24px rgba(255,255,255,.75);
+    }
+    @keyframes railwayCloudBreathe {
+      from { transform: translateX(-50%) scale(1); }
+      to { transform: translateX(-50%) scale(1.035); }
+    }
+    .railway-journey-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 14;
+      pointer-events: none;
+      box-shadow: inset 0 0 70px rgba(4,16,31,.2), inset 0 -55px 80px rgba(5,18,27,.26);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 16% 80%, rgba(0,0,0,.14));
+    }
+    .railway-journey-time {
+      position: absolute;
+      left: max(14px, env(safe-area-inset-left));
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 18;
+      display: grid;
+      gap: 1px;
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,.58);
+      border-radius: 11px;
+      background: rgba(11,31,56,.48);
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      box-shadow: 0 5px 18px rgba(0,0,0,.15);
+      backdrop-filter: blur(5px);
+    }
+    .railway-journey-time small { font-size: 9px; font-weight: 900; letter-spacing: .15em; opacity: .82; }
+    .railway-journey-time strong { font-size: 13px; letter-spacing: .06em; }
+    .railway-journey-caption {
+      position: absolute;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 18;
+      transform: translateX(-50%);
+      color: #fff;
+      font-weight: 900;
+      font-size: clamp(17px, 4vw, 24px);
+      letter-spacing: .18em;
+      white-space: nowrap;
+      text-shadow: 0 2px 10px rgba(0,0,0,.72), 0 0 18px rgba(114,213,255,.45);
+      opacity: 0;
+      animation: railwayCaption 5.8s ease both;
+    }
+    @keyframes railwayCaption {
+      0%, 5% { opacity: 0; transform: translate(-50%, 8px); }
+      15%, 70% { opacity: 1; transform: translate(-50%, 0); }
+      88%, 100% { opacity: 0; transform: translate(-50%, -5px); }
+    }
+    .railway-journey-skip {
+      position: absolute;
+      right: max(12px, env(safe-area-inset-right));
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 20;
+      min-width: 64px;
+      min-height: 34px;
+      border: 1px solid rgba(255,255,255,.58);
+      border-radius: 999px;
+      background: rgba(9,27,51,.45);
+      color: #fff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    }
+    .railway-journey-skip:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    @media (max-height: 620px) {
+      .railway-journey-destination-cloud { top: 7%; height: 12%; min-height: 65px; }
+      .railway-journey-station { width: min(33%, 250px); bottom: -7%; }
+      .railway-journey-caption { bottom: 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .railway-journey-sky-rays,
+      .railway-journey-town,
+      .railway-journey-station,
+      .railway-journey-destination-cloud,
+      .railway-journey-caption { animation: none; }
+      .railway-journey-train { animation-duration: 2.8s; animation-delay: .1s; }
+    }
+
+    /* Railway-to-sky scene v4: wheel-line alignment, gentler perspective and visible steam. */
+    .town-railway-journey {
+      --railway-sky-image: url("assets/imasora-railway-sky-day-v2.png");
+      --railway-sky-overlay: rgba(7, 23, 39, .02);
+      --railway-train-rotation: 60deg;
+    }
+    .town-railway-journey.railway-journey-morning {
+      --railway-sky-image: url("assets/imasora-railway-sky-morning-v2.png");
+      --railway-sky-overlay: rgba(18, 38, 61, .03);
+    }
+    .town-railway-journey.railway-journey-day {
+      --railway-sky-image: url("assets/imasora-railway-sky-day-v2.png");
+      --railway-sky-overlay: rgba(7, 35, 57, .015);
+    }
+    .town-railway-journey.railway-journey-evening {
+      --railway-sky-image: url("assets/imasora-railway-sky-evening-v2.png");
+      --railway-sky-overlay: rgba(24, 13, 45, .045);
+    }
+    .town-railway-journey.railway-journey-night {
+      --railway-sky-image: url("assets/imasora-railway-sky-night-v2.png");
+      --railway-sky-overlay: rgba(0, 8, 22, .08);
+    }
+    .town-railway-journey-stage {
+      background:
+        linear-gradient(var(--railway-sky-overlay), var(--railway-sky-overlay)),
+        var(--railway-sky-image) 50% 50% / cover no-repeat;
+    }
+    .railway-journey-sky-rays,
+    .railway-journey-stars,
+    .railway-journey-celestial,
+    .railway-journey-far-cloud,
+    .railway-journey-town,
+    .railway-journey-station,
+    .railway-journey-station-glow,
+    .railway-journey-destination-cloud,
+    .railway-journey-star-trail {
+      display: none !important;
+    }
+    .railway-journey-track {
+      z-index: 5;
+      filter: drop-shadow(0 5px 5px rgba(4, 12, 22, .46));
+    }
+    .railway-track-bed-shape {
+      fill: rgba(34, 43, 52, .82);
+      stroke: rgba(10, 18, 27, .64);
+      stroke-width: 2;
+      stroke-linejoin: round;
+    }
+    .railway-track-ties { display: none; }
+    .railway-track-rail-shadow {
+      stroke: rgba(18, 25, 32, .9);
+      stroke-width: 6;
+    }
+    .railway-track-rail {
+      stroke-width: 3.4;
+    }
+    .railway-track-sky-glint {
+      stroke: rgba(232, 248, 255, .54);
+      stroke-width: 1.15;
+      stroke-dasharray: 1 31;
+      animation-duration: 1.8s;
+    }
+    .railway-journey-train {
+      left: var(--railway-track-start-x);
+      top: var(--railway-track-start-y);
+      z-index: 9;
+      width: min(60%, 470px);
+      transform: translate(-50%, -50%) rotate(var(--railway-train-rotation)) scale(.78);
+      transform-origin: 50% 50%;
+      animation: railwayTrainToSky 11.2s cubic-bezier(.28,.04,.38,1) .45s both;
+      filter: brightness(1.02) saturate(1.06) drop-shadow(0 11px 10px rgba(4,14,27,.48));
+      will-change: left, top, transform, opacity;
+    }
+    .railway-journey-night .railway-journey-train {
+      filter: brightness(.94) saturate(1.08) drop-shadow(0 0 9px rgba(255,207,103,.3)) drop-shadow(0 11px 10px rgba(0,5,18,.62));
+    }
+    @keyframes railwayTrainToSky {
+      0% {
+        left: var(--railway-track-start-x);
+        top: var(--railway-track-start-y);
+        transform: translate(-50%, -50%) rotate(var(--railway-train-rotation)) scale(.78);
+        opacity: 0;
+      }
+      7% { opacity: 1; }
+      96% { opacity: 1; }
+      100% {
+        left: var(--railway-track-end-x);
+        top: var(--railway-track-end-y);
+        transform: translate(-50%, -50%) rotate(var(--railway-train-rotation)) scale(.42);
+        opacity: 0;
+      }
+    }
+    .railway-journey-train > img {
+      /* Seat the visible (near-side) wheel line on the near rail, not between both rails. */
+      transform: translateY(-9.5%);
+      transform-origin: 50% 50%;
+    }
+    .railway-journey-smoke {
+      left: 12.7%;
+      top: 49.4%;
+      z-index: 10;
+      width: clamp(17px, 4.5vw, 35px);
+      background: radial-gradient(circle at 42% 42%, rgba(255,255,255,.96) 0 20%, rgba(238,246,250,.82) 42%, rgba(183,202,214,.28) 70%, transparent 76%);
+      box-shadow: 0 0 10px rgba(231,245,255,.34);
+      filter: blur(.45px);
+      mix-blend-mode: screen;
+      transform-origin: 50% 50%;
+      animation: railwaySteamPuff 1.55s cubic-bezier(.18,.52,.3,1) infinite;
+    }
+    .railway-journey-smoke.smoke-a { animation-delay: 0s; }
+    .railway-journey-smoke.smoke-b { animation-delay: -.31s; }
+    .railway-journey-smoke.smoke-c { animation-delay: -.62s; }
+    .railway-journey-smoke.smoke-d { animation-delay: -.93s; }
+    .railway-journey-smoke.smoke-e { animation-delay: -1.24s; }
+    @keyframes railwaySteamPuff {
+      0% { opacity: 0; transform: translate(0, 0) scale(.22); }
+      10% { opacity: .9; }
+      38% { opacity: .72; }
+      100% { opacity: 0; transform: translate(58px, -30px) scale(1.72); }
+    }
+    .railway-journey-vignette {
+      box-shadow: inset 0 0 54px rgba(4,16,31,.16), inset 0 -36px 64px rgba(5,18,27,.16);
+      background: linear-gradient(180deg, rgba(255,255,255,.018), transparent 20% 82%, rgba(0,0,0,.1));
+    }
+    @media (max-height: 620px) {
+      .railway-journey-train { width: min(54%, 420px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .railway-journey-train { animation-duration: 2.8s; animation-delay: .1s; }
+    }
     .town-layer-sprite-bridgeLanding,
     .town-layer-sprite-bridgeLanding2,
     .town-layer-sprite-bridge2Landing,
@@ -10561,6 +11332,82 @@
       transform: translateY(-4px);
       filter: brightness(1.08);
     }
+    .arcade-machine:disabled {
+      cursor: not-allowed;
+    }
+    .arcade-machine.is-closed .arcade-cabinet,
+    .arcade-machine.is-closed:hover .arcade-cabinet,
+    .arcade-machine.is-closed:focus-visible .arcade-cabinet {
+      transform: none;
+      filter: grayscale(.72) brightness(.58);
+      box-shadow:
+        inset 4px 0 0 rgba(255,255,255,.08),
+        inset -5px 0 0 #20242b,
+        0 9px 0 #090a0f,
+        0 13px 16px rgba(0,0,0,.48);
+    }
+    .arcade-machine.is-closed .arcade-cabinet-screen {
+      color: #ffcf69;
+      box-shadow: inset 0 0 22px rgba(0,0,0,.92), 0 0 8px rgba(255,176,66,.42);
+    }
+    .arcade-machine-closed-screen {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 5px;
+      place-items: center;
+      padding: 5px;
+      color: #ffd37a;
+      text-align: center;
+    }
+    .arcade-machine-closed-screen b {
+      font-size: clamp(14px, 4vw, 21px);
+      font-weight: 1000;
+      letter-spacing: .08em;
+      line-height: 1;
+      text-shadow: 0 0 9px rgba(255,185,72,.78);
+    }
+    .arcade-machine-closed-screen small {
+      color: #fff2ce;
+      font-size: clamp(7px, 2.3vw, 10px);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .arcade-tri-link-closed-notice {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 3px 10px;
+      align-items: center;
+      width: min(100%, 510px);
+      margin: 38px auto 0;
+      padding: 11px 14px;
+      border: 2px solid #f0bc55;
+      border-radius: 8px;
+      background: rgba(16,20,29,.94);
+      color: #fff6dd;
+      box-shadow: 0 0 16px rgba(240,188,85,.3), inset 0 0 16px rgba(255,198,88,.06);
+    }
+    .arcade-tri-link-closed-notice strong {
+      grid-row: 1 / 3;
+      color: #ffd16e;
+      font-size: 17px;
+      font-weight: 1000;
+      letter-spacing: .08em;
+      text-shadow: 0 0 8px rgba(255,193,76,.6);
+    }
+    .arcade-tri-link-closed-notice span {
+      font-size: 13px;
+      font-weight: 1000;
+      line-height: 1.25;
+    }
+    .arcade-tri-link-closed-notice small {
+      color: #cbd4df;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
     .arcade-machine-tone-2 .arcade-cabinet {
       --cabinet: #4bbf99;
       --cabinet-light: #9af0d2;
@@ -10663,6 +11510,1624 @@
       background: var(--cabinet-dark);
       box-shadow: inset 0 6px 0 rgba(255,255,255,.07);
     }
+    .arcade-lobby-scene.arcade-rpg-lobby {
+      --arcade-hero-x: 50%;
+      --arcade-hero-y: 87%;
+      min-height: 640px;
+      padding: 0;
+      overflow: hidden;
+      background: #0b101c;
+      color: #fff;
+      box-shadow: inset 0 16px 26px rgba(0,0,0,.38);
+    }
+    .arcade-lobby-scene.arcade-rpg-lobby::before {
+      z-index: 0;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 18% 14%, rgba(255,80,164,.34), transparent 18%),
+        radial-gradient(ellipse at 82% 14%, rgba(58,213,255,.32), transparent 19%),
+        repeating-linear-gradient(90deg, transparent 0 54px, rgba(147,187,215,.13) 55px 57px, transparent 58px 112px),
+        linear-gradient(180deg, #070b13 0 5%, #27344c 5% 17%, #11192a 17% 100%);
+      opacity: 1;
+    }
+    .arcade-lobby-scene.arcade-rpg-lobby::after {
+      z-index: 1;
+      left: 4%;
+      right: 4%;
+      top: 104px;
+      bottom: 18px;
+      height: auto;
+      border: 4px solid #29354f;
+      border-radius: 13px 13px 24px 24px;
+      transform: none;
+      background:
+        radial-gradient(circle at 19% 36%, rgba(255,78,160,.15), transparent 19%),
+        radial-gradient(circle at 80% 38%, rgba(65,211,255,.15), transparent 20%),
+        repeating-linear-gradient(90deg, transparent 0 43px, rgba(113,205,225,.08) 44px 45px),
+        repeating-linear-gradient(0deg, transparent 0 43px, rgba(198,124,212,.07) 44px 45px),
+        linear-gradient(155deg, #152137, #0c1728 64%, #080f1d);
+      box-shadow:
+        inset 0 0 0 3px #111827,
+        inset 0 22px 36px rgba(3,8,18,.58),
+        inset 0 -16px 28px rgba(46,95,124,.13),
+        0 18px 30px rgba(4,9,19,.42);
+      opacity: 1;
+    }
+    .arcade-rpg-wall-lights {
+      position: absolute;
+      z-index: 2;
+      top: 104px;
+      left: 7%;
+      right: 7%;
+      height: 17px;
+      border: 2px solid #202c43;
+      border-radius: 4px 4px 11px 11px;
+      background: repeating-linear-gradient(90deg, #ff5ca3 0 10%, #ffcf55 10% 20%, #4ee2bd 20% 30%, #5bbcff 30% 40%);
+      box-shadow: 0 4px 17px rgba(87,224,255,.5), inset 0 3px 0 rgba(255,255,255,.38);
+      opacity: .92;
+    }
+    .arcade-rpg-back-row {
+      position: absolute;
+      z-index: 2;
+      left: 7%;
+      right: 7%;
+      top: 128px;
+      height: 92px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 0 9px;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: .72;
+      filter: saturate(.82);
+    }
+    .arcade-rpg-back-row i {
+      position: relative;
+      width: 48px;
+      height: 78px;
+      border: 3px solid #101827;
+      border-radius: 9px 9px 3px 3px;
+      background: linear-gradient(90deg, #17243a, #52687b 48%, #152238);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.17), 0 5px 0 #070c16, 0 0 10px rgba(93,223,255,.23);
+    }
+    .arcade-rpg-back-row i::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 10px;
+      height: 37px;
+      border: 2px solid #090f1b;
+      border-radius: 4px;
+      background: radial-gradient(circle at 50% 48%, #fff06f 0 5px, transparent 6px), repeating-conic-gradient(from 0deg, #ed589b 0 14deg, #45cfd2 15deg 28deg, #445b89 29deg 42deg);
+      box-shadow: 0 0 7px currentColor;
+    }
+    .arcade-rpg-back-row i::after {
+      content: "";
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      bottom: 9px;
+      height: 13px;
+      transform: perspective(30px) rotateX(27deg);
+      border: 2px solid #0c1422;
+      border-radius: 2px;
+      background: radial-gradient(circle at 29% 50%, currentColor 0 3px, transparent 4px), radial-gradient(circle at 70% 50%, #f8de62 0 3px, transparent 4px), #24384d;
+    }
+    .arcade-rpg-back-row i:nth-child(1) { color: #ff67a4; transform: translateY(8px) rotate(-2deg); }
+    .arcade-rpg-back-row i:nth-child(2) { color: #66dfff; transform: translateY(-2px); }
+    .arcade-rpg-back-row i:nth-child(3) { color: #ffe066; transform: translateY(-2px); }
+    .arcade-rpg-back-row i:nth-child(4) { color: #52e0bd; transform: translateY(8px) rotate(2deg); }
+    .arcade-rpg-title {
+      position: absolute;
+      z-index: 9;
+      top: 16px;
+      left: 50%;
+      width: min(88%, 470px);
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .arcade-rpg-title small {
+      display: block;
+      color: #9df5dd;
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: .2em;
+      text-shadow: 0 0 8px rgba(107,238,208,.65);
+    }
+    .arcade-rpg-title strong {
+      display: block;
+      margin-top: 4px;
+      color: #fff9e7;
+      font-size: clamp(19px, 5vw, 27px);
+      font-weight: 1000;
+      letter-spacing: .04em;
+      text-shadow: 0 2px 0 #5c315b, 0 0 14px rgba(255,128,186,.55);
+    }
+    .arcade-rpg-title span {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 3px 12px;
+      border: 1px solid rgba(255,231,164,.65);
+      border-radius: 999px;
+      background: rgba(11,21,39,.76);
+      color: #ffe7a4;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    .arcade-rpg-paths {
+      position: absolute;
+      z-index: 3;
+      left: 7%;
+      right: 7%;
+      top: 120px;
+      bottom: 24px;
+      width: 86%;
+      height: calc(100% - 144px);
+      overflow: visible;
+      pointer-events: none;
+      filter: drop-shadow(0 0 8px rgba(88,239,216,.52));
+    }
+    .arcade-rpg-paths .path-edge {
+      fill: none;
+      stroke: rgba(5,11,21,.98);
+      stroke-width: 8.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .arcade-rpg-paths .path-core {
+      fill: none;
+      stroke: #61e7d2;
+      stroke-width: 4.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: .6 2.6;
+    }
+    .arcade-rpg-plaza {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      bottom: 34px;
+      width: 164px;
+      height: 74px;
+      transform: translateX(-50%) perspective(180px) rotateX(54deg);
+      border: 4px solid rgba(82,221,207,.78);
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(from 0deg, rgba(255,100,170,.32) 0 10deg, rgba(75,225,205,.18) 11deg 20deg),
+        radial-gradient(circle, #263b51 0 34%, #101d31 35% 100%);
+      box-shadow: 0 0 24px rgba(83,235,214,.42), inset 0 0 18px rgba(5,11,24,.72);
+    }
+    .arcade-rpg-decor {
+      position: absolute;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .arcade-rpg-decor-counter {
+      left: 8%;
+      bottom: 44px;
+      width: 72px;
+      height: 44px;
+      border: 3px solid #182237;
+      border-radius: 8px 8px 4px 4px;
+      background: linear-gradient(180deg, #79ecdd 0 23%, #32465e 24% 38%, #152339 39% 100%);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.28), 0 7px 0 #080d18, 0 9px 14px rgba(0,0,0,.48), 0 0 10px rgba(91,234,213,.25);
+    }
+    .arcade-rpg-decor-counter::before {
+      content: "MEDAL";
+      position: absolute;
+      inset: 5px 4px auto;
+      color: #102635;
+      font-size: 8px;
+      font-weight: 1000;
+      letter-spacing: .12em;
+      text-align: center;
+    }
+    .arcade-rpg-decor-plant {
+      right: 9%;
+      bottom: 42px;
+      width: 38px;
+      height: 56px;
+      border: 3px solid #172239;
+      border-radius: 8px 8px 4px 4px;
+      background: linear-gradient(90deg, #263a52, #526f82 46%, #192c43);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.2), 0 6px 0 #080d18, 0 0 10px rgba(255,94,163,.3);
+    }
+    .arcade-rpg-decor-plant::before {
+      content: "COIN";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 5px;
+      height: 14px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #ff70ae;
+      border-radius: 3px;
+      background: #101929;
+      color: #ff91bf;
+      font-size: 6px;
+      font-weight: 1000;
+      letter-spacing: .1em;
+      box-shadow: 0 0 7px #ff5c9f;
+    }
+    .arcade-rpg-decor-plant::after {
+      content: "";
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 9px;
+      height: 15px;
+      border: 2px solid #0f1726;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #c9dce1 0 25%, #111b2c 26% 67%, #efc95b 68% 78%, #142338 79%);
+    }
+    /* Modern arcade interior map: free shop floor, no road or route graphic. */
+    .arcade-lobby-scene.arcade-rpg-lobby {
+      min-height: 680px;
+      background: #060a12;
+    }
+    .arcade-lobby-scene.arcade-rpg-lobby::before {
+      background:
+        radial-gradient(ellipse at 13% 16%, rgba(255,59,146,.36), transparent 17%),
+        radial-gradient(ellipse at 87% 16%, rgba(54,205,255,.36), transparent 17%),
+        linear-gradient(90deg, transparent 0 5%, rgba(255,255,255,.05) 5.3% 5.7%, transparent 6% 94%, rgba(255,255,255,.05) 94.3% 94.7%, transparent 95%),
+        repeating-linear-gradient(90deg, #151e31 0 52px, #202c43 53px 56px, #101827 57px 108px),
+        linear-gradient(180deg, #080c15 0 5%, #222d43 5% 18%, #0d1422 18% 100%);
+    }
+    .arcade-lobby-scene.arcade-rpg-lobby::after {
+      left: 4%;
+      right: 4%;
+      top: 116px;
+      bottom: 17px;
+      border: 3px solid #26364e;
+      border-radius: 9px 9px 22px 22px;
+      clip-path: polygon(2.5% 0,97.5% 0,100% 100%,0 100%);
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(255,75,154,.17), transparent 22%),
+        radial-gradient(ellipse at 50% 18%, rgba(80,236,211,.16), transparent 25%),
+        radial-gradient(ellipse at 80% 30%, rgba(75,188,255,.17), transparent 22%),
+        linear-gradient(116deg, transparent 0 48%, rgba(88,210,222,.055) 49% 51%, transparent 52%) 0 0 / 54px 54px,
+        linear-gradient(64deg, transparent 0 48%, rgba(225,89,177,.05) 49% 51%, transparent 52%) 0 0 / 54px 54px,
+        radial-gradient(circle, rgba(255,255,255,.075) 0 1.5px, transparent 2px) 0 0 / 20px 20px,
+        linear-gradient(180deg, #18243a 0, #0e192b 46%, #080f1c 100%);
+      box-shadow: inset 0 0 0 2px #090f1a, inset 0 22px 32px rgba(0,0,0,.42), inset 0 -18px 32px rgba(25,84,111,.14), 0 18px 32px rgba(0,0,0,.5);
+    }
+    .arcade-rpg-paths,
+    .arcade-rpg-plaza { display: none; }
+    .arcade-rpg-wall-lights {
+      top: 111px;
+      left: 6%;
+      right: 6%;
+      z-index: 5;
+      height: 13px;
+      border-radius: 5px;
+      background: repeating-linear-gradient(90deg, #fa4696 0 9%, #f8c93f 9% 18%, #39d9b1 18% 27%, #48baf4 27% 36%);
+      box-shadow: 0 0 8px #fff, 0 0 20px rgba(83,222,255,.55);
+    }
+    .arcade-rpg-back-row {
+      top: 135px;
+      left: 9%;
+      right: 9%;
+      height: 91px;
+      padding: 0 7px;
+      opacity: .62;
+      filter: saturate(.72) brightness(.76);
+    }
+    .arcade-rpg-back-row i {
+      width: 43px;
+      height: 74px;
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.14), 0 5px 0 #050811, 0 0 8px currentColor;
+    }
+    .arcade-modern-wall-display {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      top: 121px;
+      width: 176px;
+      height: 29px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transform: translateX(-50%);
+      border: 2px solid #263850;
+      border-radius: 3px 3px 9px 9px;
+      background: linear-gradient(180deg, rgba(7,12,22,.98), rgba(20,34,52,.94));
+      color: #8df9e5;
+      box-shadow: 0 0 13px rgba(83,232,215,.32), inset 0 -3px 8px rgba(0,0,0,.6);
+    }
+    .arcade-modern-wall-display span {
+      font-size: 7px;
+      font-weight: 1000;
+      letter-spacing: .2em;
+      text-shadow: 0 0 7px currentColor;
+    }
+    .arcade-modern-wall-display i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ff5b9f;
+      box-shadow: 0 0 5px currentColor;
+    }
+    .arcade-modern-wall-display i:nth-of-type(2) { background: #ffe063; }
+    .arcade-modern-wall-display i:nth-of-type(3) { background: #56e3c1; }
+    .arcade-modern-pillar {
+      position: absolute;
+      z-index: 4;
+      top: 117px;
+      bottom: 24px;
+      width: 15px;
+      border: 2px solid #17233a;
+      background: linear-gradient(90deg, #0b1220, #3c536a 50%, #111d30);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.05), 0 0 12px rgba(82,219,229,.18);
+    }
+    .arcade-modern-pillar::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 12px;
+      bottom: 12px;
+      width: 3px;
+      border-radius: 3px;
+      background: repeating-linear-gradient(180deg, #ff5b9e 0 22px, #ffd95a 23px 45px, #50dfbe 46px 68px, #58bcf4 69px 91px);
+      box-shadow: 0 0 7px currentColor;
+      opacity: .7;
+    }
+    .arcade-modern-pillar-left { left: 4.5%; border-radius: 9px 2px 2px 9px; }
+    .arcade-modern-pillar-right { right: 4.5%; border-radius: 2px 9px 9px 2px; transform: scaleX(-1); }
+    .arcade-modern-floor-logo {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      top: 61%;
+      width: 184px;
+      height: 88px;
+      display: grid;
+      place-content: center;
+      transform: translate(-50%,-50%) perspective(180px) rotateX(57deg);
+      border: 3px solid rgba(82,231,210,.55);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(31,63,82,.74), rgba(6,14,26,.35) 67%, transparent 70%);
+      color: rgba(158,255,240,.6);
+      text-align: center;
+      box-shadow: 0 0 20px rgba(69,231,209,.2), inset 0 0 16px rgba(73,207,233,.17);
+      pointer-events: none;
+    }
+    .arcade-modern-floor-logo small,
+    .arcade-modern-floor-logo strong { display: block; line-height: 1; }
+    .arcade-modern-floor-logo small { font-size: 7px; letter-spacing: .32em; }
+    .arcade-modern-floor-logo strong { margin-top: 7px; font-size: 14px; letter-spacing: .16em; }
+    .arcade-modern-floor-logo i {
+      position: absolute;
+      inset: 11px;
+      border: 2px dashed rgba(255,98,167,.35);
+      border-radius: 50%;
+    }
+    .arcade-modern-side-bank {
+      position: absolute;
+      z-index: 4;
+      top: 275px;
+      display: grid;
+      gap: 15px;
+      opacity: .48;
+      pointer-events: none;
+      filter: saturate(.72) brightness(.72);
+    }
+    .arcade-modern-side-bank-left { left: 5.6%; transform: perspective(160px) rotateY(16deg); }
+    .arcade-modern-side-bank-right { right: 5.6%; transform: perspective(160px) rotateY(-16deg); }
+    .arcade-modern-side-bank i {
+      position: relative;
+      width: 39px;
+      height: 58px;
+      border: 3px solid #0b1220;
+      border-radius: 7px 7px 3px 3px;
+      background: linear-gradient(90deg, #17273c, #526c7d 48%, #142237);
+      box-shadow: 0 4px 0 #050912, 0 0 8px rgba(87,217,234,.23);
+    }
+    .arcade-modern-side-bank i::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 8px;
+      height: 28px;
+      border: 2px solid #0a111d;
+      border-radius: 3px;
+      background: radial-gradient(circle, #ffe866 0 4px, transparent 5px), conic-gradient(#ef5c9e, #4ddabe, #526dc1, #ef5c9e);
+      box-shadow: 0 0 6px #5ce4d3;
+    }
+    .arcade-modern-side-bank i::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 7px;
+      height: 8px;
+      border-radius: 2px;
+      background: radial-gradient(circle at 28% 50%, #ff5c9e 0 2px, transparent 3px), radial-gradient(circle at 72% 50%, #56e5c0 0 2px, transparent 3px), #20354a;
+    }
+    .arcade-modern-entrance {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      bottom: 20px;
+      width: 148px;
+      height: 54px;
+      transform: translateX(-50%);
+      border: 3px solid #18263d;
+      border-radius: 11px 11px 3px 3px;
+      background: linear-gradient(180deg, rgba(66,125,151,.28), rgba(15,28,44,.88));
+      box-shadow: inset 0 5px 0 rgba(154,246,244,.16), 0 0 13px rgba(80,221,213,.18);
+      pointer-events: none;
+    }
+    .arcade-modern-entrance span {
+      position: absolute;
+      left: 50%;
+      top: -17px;
+      transform: translateX(-50%);
+      color: #9af3e4;
+      font-size: 7px;
+      font-weight: 1000;
+      letter-spacing: .22em;
+      text-shadow: 0 0 7px currentColor;
+    }
+    .arcade-modern-entrance i,
+    .arcade-modern-entrance b {
+      position: absolute;
+      top: 5px;
+      bottom: 4px;
+      width: calc(50% - 7px);
+      border: 1px solid rgba(129,236,239,.32);
+      background: linear-gradient(135deg, rgba(166,241,250,.13), rgba(19,45,62,.28));
+    }
+    .arcade-modern-entrance i { left: 4px; border-radius: 6px 1px 1px 2px; }
+    .arcade-modern-entrance b { right: 4px; border-radius: 1px 6px 2px 1px; }
+    .arcade-rpg-decor-counter { left: 7%; bottom: 53px; }
+    .arcade-rpg-decor-plant { right: 7%; bottom: 52px; }
+    .arcade-rpg-machine-field {
+      position: absolute;
+      z-index: 6;
+      inset: 0;
+    }
+    .arcade-map-machine {
+      --machine-color: #f06ea9;
+      --machine-light: #ffc0dd;
+      --machine-dark: #783256;
+      position: absolute;
+      left: var(--machine-x);
+      top: var(--machine-y);
+      width: min(29%, 148px);
+      min-width: 0;
+      height: 180px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .arcade-map-machine-tone-2 {
+      --machine-color: #55d2b1;
+      --machine-light: #b8ffeb;
+      --machine-dark: #247663;
+    }
+    .arcade-map-machine-tone-3 {
+      --machine-color: #f2b94e;
+      --machine-light: #ffe49a;
+      --machine-dark: #8d5a19;
+    }
+    .arcade-mini-platform {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      width: 92%;
+      height: 34px;
+      transform: translateX(-50%) perspective(140px) rotateX(58deg);
+      border: 3px solid #322a48;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--machine-light), var(--machine-dark));
+      box-shadow: 0 9px 12px rgba(2,8,18,.42), 0 0 16px color-mix(in srgb, var(--machine-color) 55%, transparent);
+    }
+    .arcade-miniature {
+      position: absolute;
+      left: 50%;
+      bottom: 42px;
+      width: 94px;
+      height: 104px;
+      transform: translateX(-50%);
+      transform-origin: center bottom;
+      filter: drop-shadow(0 9px 7px rgba(2,8,18,.42));
+      transition: transform .22s ease, filter .22s ease;
+    }
+    .arcade-map-machine:hover .arcade-miniature,
+    .arcade-map-machine:focus-visible .arcade-miniature,
+    .arcade-map-machine.is-destination .arcade-miniature {
+      transform: translateX(-50%) translateY(-6px) scale(1.06);
+      filter: drop-shadow(0 12px 9px rgba(2,8,18,.48)) brightness(1.12);
+    }
+    .arcade-map-machine:focus-visible {
+      outline: 3px solid #fff4a5;
+      outline-offset: 4px;
+      border-radius: 18px;
+    }
+    .arcade-map-machine.is-closed {
+      cursor: not-allowed;
+      filter: grayscale(.82) brightness(.64);
+    }
+    .arcade-map-machine.is-closed .arcade-miniature {
+      transform: translateX(-50%);
+    }
+    .arcade-mini-name {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      bottom: 0;
+      width: 108%;
+      min-height: 38px;
+      padding: 5px 5px 4px;
+      transform: translateX(-50%);
+      border: 2px solid #382b4d;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff7d9, #f2d9ad);
+      color: #30263c;
+      box-shadow: 0 4px 0 #16182a, 0 7px 12px rgba(0,0,0,.32);
+      text-align: center;
+    }
+    .arcade-mini-name small {
+      display: block;
+      color: var(--machine-dark);
+      font-size: 7px;
+      font-weight: 1000;
+      letter-spacing: .1em;
+      line-height: 1;
+    }
+    .arcade-mini-name strong {
+      display: block;
+      margin-top: 3px;
+      font-size: clamp(8px, 2.2vw, 11px);
+      font-weight: 1000;
+      line-height: 1.1;
+    }
+    .arcade-mini-select {
+      position: absolute;
+      z-index: 9;
+      left: 50%;
+      top: -8px;
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      transform: translateX(-50%);
+      border: 2px solid #fff8c7;
+      border-radius: 50%;
+      background: var(--machine-color);
+      color: #241d34;
+      font-size: 13px;
+      font-weight: 1000;
+      box-shadow: 0 0 0 3px rgba(20,28,47,.72), 0 0 12px var(--machine-color);
+      animation: arcadeSelectPulse 1.4s ease-in-out infinite;
+    }
+    .arcade-map-machine.is-closed .arcade-mini-select {
+      background: #657080;
+      color: #f6d377;
+      animation: none;
+    }
+    @keyframes arcadeSelectPulse {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-4px); }
+    }
+    .arcade-mini-catcher {
+      border: 4px solid #492d53;
+      border-radius: 22px 22px 7px 7px;
+      background: linear-gradient(180deg, var(--machine-light) 0 24%, rgba(168,234,255,.82) 25% 72%, var(--machine-color) 73% 100%);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.22);
+    }
+    .arcade-mini-catcher::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      top: 30px;
+      height: 43px;
+      border: 3px solid #4a3658;
+      border-radius: 5px;
+      background:
+        radial-gradient(circle at 22% 78%, #fff06d 0 7px, transparent 8px),
+        radial-gradient(circle at 50% 74%, #ff7cb7 0 8px, transparent 9px),
+        radial-gradient(circle at 77% 79%, #72e1bd 0 7px, transparent 8px),
+        linear-gradient(145deg, rgba(255,255,255,.72), rgba(115,198,239,.24));
+      box-shadow: inset 0 0 10px rgba(65,126,176,.34);
+    }
+    .arcade-mini-catcher::after {
+      content: "⌄";
+      position: absolute;
+      left: 50%;
+      top: 31px;
+      transform: translateX(-50%);
+      color: #45324f;
+      font-size: 24px;
+      font-weight: 1000;
+      line-height: 1;
+      text-shadow: 0 -13px 0 #45324f;
+    }
+    .arcade-mini-tri {
+      width: 116px;
+      height: 88px;
+      bottom: 45px;
+    }
+    .arcade-mini-tri::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 3px;
+      width: 98px;
+      height: 68px;
+      transform: translateX(-50%) perspective(130px) rotateX(55deg);
+      border: 7px solid #3e3150;
+      border-radius: 50%;
+      background:
+        conic-gradient(from 30deg, rgba(255,112,171,.82) 0 33%, rgba(95,225,194,.82) 33% 66%, rgba(255,205,82,.86) 66% 100%);
+      box-shadow: inset 0 0 0 6px #12263e, 0 0 18px var(--machine-color);
+    }
+    .arcade-mini-tri::after {
+      content: "△";
+      position: absolute;
+      left: 50%;
+      top: 26px;
+      transform: translate(-50%,-50%);
+      color: #fff6bc;
+      font-size: 34px;
+      font-weight: 1000;
+      text-shadow: 0 0 9px #fff, 0 0 18px #5ff0cd;
+    }
+    .arcade-mini-tri-stand {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 0;
+      height: 48px;
+      clip-path: polygon(18% 0,82% 0,100% 100%,0 100%);
+      background: linear-gradient(90deg, var(--machine-dark), var(--machine-color), var(--machine-dark));
+      border-bottom: 5px solid #342943;
+    }
+    .arcade-mini-pachi {
+      border: 4px solid #4d324b;
+      border-radius: 35px 35px 9px 9px;
+      background: linear-gradient(180deg, var(--machine-light), var(--machine-color) 68%, var(--machine-dark));
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.22);
+    }
+    .arcade-mini-pachi::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 11px;
+      aspect-ratio: 1;
+      border: 5px solid #3d3150;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 52%, #fff3a5 0 5px, transparent 6px),
+        repeating-conic-gradient(from 0deg, #66d8ff 0 8deg, #ff8aab 9deg 17deg, #ffe16b 18deg 26deg);
+      box-shadow: inset 0 0 0 6px #17304a, 0 0 10px #6bc8ff;
+    }
+    .arcade-mini-pachi::after {
+      content: "";
+      position: absolute;
+      left: 15px;
+      right: 15px;
+      bottom: 9px;
+      height: 18px;
+      border: 3px solid #3d3150;
+      border-radius: 4px 4px 11px 11px;
+      background: linear-gradient(180deg, #fff2a5, #bd7124);
+      box-shadow: inset 0 -5px 0 rgba(69,42,32,.28);
+    }
+    /* Finished-game miniature: rotating-stage character catcher cabinet. */
+    .arcade-mini-catcher {
+      width: 96px;
+      height: 111px;
+      bottom: 41px;
+      border: 3px solid #31263e;
+      border-radius: 15px 15px 6px 6px;
+      background: linear-gradient(90deg, #7d335b, #f58bb9 12%, #ffe5f2 50%, #e772aa 88%, #652c50);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.38), 0 0 13px rgba(255,111,180,.5);
+    }
+    .arcade-mini-catcher::before,
+    .arcade-mini-catcher::after { content: none; }
+    .mini-catcher-marquee {
+      position: absolute;
+      z-index: 5;
+      left: 5px;
+      right: 5px;
+      top: 4px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #5e3155;
+      border-radius: 9px 9px 3px 3px;
+      background: linear-gradient(180deg, #fff9d9, #ffc55e);
+      color: #6a2a58;
+      font-size: 5px;
+      font-weight: 1000;
+      letter-spacing: .07em;
+      text-shadow: 0 1px 0 #fff;
+      box-shadow: 0 0 8px #fff4a8;
+    }
+    .mini-catcher-glass {
+      position: absolute;
+      z-index: 3;
+      left: 8px;
+      right: 8px;
+      top: 23px;
+      height: 56px;
+      overflow: hidden;
+      border: 2px solid #443451;
+      border-radius: 4px;
+      background: linear-gradient(115deg, rgba(255,255,255,.78) 0 7%, transparent 8% 31%, rgba(255,255,255,.28) 32% 38%, transparent 39%), linear-gradient(180deg, rgba(157,233,255,.62), rgba(222,249,255,.82));
+      box-shadow: inset 0 0 12px rgba(45,113,155,.28);
+    }
+    .mini-catcher-rail {
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      top: 8px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #fff, #7b7690 48%, #322d40 52%, #d9d8e1);
+      box-shadow: 0 5px 0 -1px rgba(68,61,80,.5);
+    }
+    .mini-catcher-claw {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      top: 10px;
+      width: 18px;
+      height: 27px;
+      transform: translateX(-50%);
+      border-top: 5px solid #cfd5e2;
+      border-radius: 50%;
+      box-shadow: 0 -4px 0 -1px #4b4255;
+    }
+    .mini-catcher-claw::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: -13px;
+      width: 4px;
+      height: 12px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #6e6879, #fafcff, #8b8798);
+    }
+    .mini-catcher-claw i {
+      position: absolute;
+      left: 7px;
+      top: 1px;
+      width: 4px;
+      height: 20px;
+      transform-origin: 2px 2px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #5d5868, #f4f6fb 50%, #777384);
+    }
+    .mini-catcher-claw i:nth-child(1) { transform: rotate(43deg); }
+    .mini-catcher-claw i:nth-child(2) { transform: rotate(-43deg); }
+    .mini-catcher-claw i:nth-child(3) { transform: rotate(180deg) scaleY(.74); }
+    .mini-catcher-stage {
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      bottom: -5px;
+      height: 21px;
+      border: 2px solid #5b3a59;
+      border-radius: 50%;
+      background: repeating-conic-gradient(from 8deg, #ffde62 0 18deg, #f86eac 19deg 36deg);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.4), 0 -3px 8px rgba(255,106,171,.4);
+    }
+    .mini-catcher-stage i {
+      position: absolute;
+      top: -9px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid #55405c;
+      border-radius: 46% 54% 50% 50%;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.5);
+    }
+    .mini-catcher-stage i:nth-child(1) { left: 8px; background: #ffe462; }
+    .mini-catcher-stage i:nth-child(2) { left: 28px; top: -12px; background: #ff7fb8; }
+    .mini-catcher-stage i:nth-child(3) { right: 7px; background: #65dbbd; }
+    .mini-catcher-control {
+      position: absolute;
+      z-index: 5;
+      left: 7px;
+      right: 7px;
+      bottom: 17px;
+      height: 15px;
+      transform: perspective(50px) rotateX(24deg);
+      border: 2px solid #4b314b;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #fff7d9, #efa059);
+      box-shadow: 0 2px 0 #8f3d62;
+    }
+    .mini-catcher-control i,
+    .mini-catcher-control b {
+      position: absolute;
+      top: 3px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #4d354d;
+      border-radius: 50%;
+      box-shadow: 0 0 5px currentColor;
+    }
+    .mini-catcher-control i { left: 20px; color: #62d9ff; background: #62d9ff; }
+    .mini-catcher-control b { right: 18px; color: #ff527f; background: #ff527f; }
+    .mini-catcher-base {
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 2px;
+      height: 14px;
+      border: 2px solid #473243;
+      border-radius: 2px 2px 5px 5px;
+      background: linear-gradient(90deg, #842d5c, #ff83b2 48%, #832e5c);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.28);
+    }
+    /* TRI-LINK is a low, three-seat arcade arena rather than an upright cabinet. */
+    .arcade-mini-tri {
+      width: 136px;
+      height: 108px;
+      bottom: 39px;
+    }
+    .arcade-mini-tri::before,
+    .arcade-mini-tri::after { content: none; }
+    .mini-tri-marquee {
+      position: absolute;
+      z-index: 7;
+      left: 50%;
+      top: 0;
+      width: 80px;
+      height: 28px;
+      display: grid;
+      place-content: center;
+      transform: translateX(-50%) perspective(90px) rotateX(-8deg);
+      border: 2px solid #a8fff1;
+      border-radius: 8px 8px 3px 3px;
+      background: linear-gradient(180deg, #16273d, #07101e);
+      color: #c4fff4;
+      text-align: center;
+      box-shadow: 0 0 10px #5df2d1, inset 0 0 8px rgba(75,237,211,.3);
+    }
+    .mini-tri-marquee small {
+      display: block;
+      font-size: 4px;
+      font-weight: 900;
+      letter-spacing: .13em;
+      line-height: 1;
+    }
+    .mini-tri-marquee b {
+      display: block;
+      margin-top: 3px;
+      color: #fff8a0;
+      font-size: 9px;
+      font-weight: 1000;
+      letter-spacing: .08em;
+      line-height: 1;
+      text-shadow: 0 0 7px #ffd75d;
+    }
+    .mini-tri-arena {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      top: 26px;
+      width: 112px;
+      height: 70px;
+      overflow: hidden;
+      transform: translateX(-50%) perspective(150px) rotateX(56deg);
+      border: 7px solid #293349;
+      border-radius: 50%;
+      background: radial-gradient(circle, #17263c 0 12%, transparent 13%), conic-gradient(from 30deg, #ee5e9f 0 33.333%, #47d7b0 33.334% 66.666%, #f6c34f 66.667% 100%);
+      box-shadow: inset 0 0 0 5px #0a1628, inset 0 0 14px #72e9ff, 0 0 13px #5ce7d0;
+    }
+    .mini-tri-arena::before,
+    .mini-tri-arena::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 47%;
+      height: 2px;
+      background: rgba(209,255,247,.8);
+      transform-origin: 0 50%;
+    }
+    .mini-tri-arena::before { transform: rotate(30deg); }
+    .mini-tri-arena::after { transform: rotate(150deg); }
+    .mini-tri-sector {
+      position: absolute;
+      z-index: 4;
+      width: 8px;
+      height: 12px;
+      border: 2px solid #fff;
+      border-radius: 45%;
+      background: #192235;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .mini-tri-sector-a { left: 17px; top: 35px; color: #ff72ac; }
+    .mini-tri-sector-b { right: 17px; top: 35px; color: #57ebc5; }
+    .mini-tri-sector-c { left: 50%; top: 8px; transform: translateX(-50%); color: #ffda67; }
+    .mini-tri-puck {
+      position: absolute;
+      z-index: 6;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      transform: translate(-50%,-50%);
+      border: 2px solid #d7fbff;
+      border-radius: 50%;
+      background: #66d9ff;
+      box-shadow: 0 0 8px #74e8ff;
+    }
+    .mini-tri-control {
+      position: absolute;
+      z-index: 8;
+      width: 31px;
+      height: 28px;
+      border: 2px solid #1c2536;
+      border-radius: 7px 7px 3px 3px;
+      background: linear-gradient(160deg, #667086, #1b2639 55%, #0b101d);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.23), 0 3px 5px rgba(0,0,0,.42);
+    }
+    .mini-tri-control::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 4px;
+      height: 8px;
+      border: 1px solid currentColor;
+      border-radius: 2px;
+      background: #09111d;
+      box-shadow: inset 0 0 5px currentColor;
+    }
+    .mini-tri-control i {
+      position: absolute;
+      left: 50%;
+      bottom: 3px;
+      width: 9px;
+      height: 9px;
+      transform: translateX(-50%);
+      border: 2px solid #eafcff;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 7px currentColor;
+    }
+    .mini-tri-control-a { left: 2px; bottom: 4px; color: #ff70ad; transform: rotate(-10deg); }
+    .mini-tri-control-b { right: 2px; bottom: 4px; color: #56e7c1; transform: rotate(10deg); }
+    .mini-tri-control-c { left: 50%; top: 51px; color: #ffd661; transform: translateX(-50%) scale(.92); }
+    .mini-tri-cabinet-base {
+      position: absolute;
+      z-index: 3;
+      left: 18px;
+      right: 18px;
+      bottom: 3px;
+      height: 42px;
+      clip-path: polygon(12% 0,88% 0,100% 100%,0 100%);
+      border-radius: 6px;
+      background: linear-gradient(90deg, #121928, #3e5265 45%, #182638 72%, #0d1422);
+      box-shadow: inset 0 5px 0 #59748a, 0 5px 7px rgba(0,0,0,.42);
+    }
+    /* Combined pachinko board and lower coin-pusher cabinet. */
+    .arcade-mini-pachi {
+      width: 100px;
+      height: 113px;
+      bottom: 40px;
+      border: 3px solid #34293f;
+      border-radius: 20px 20px 6px 6px;
+      background: linear-gradient(90deg, #67451d, #f2bc48 11%, #fff0a0 48%, #c98525 89%, #5f3b18);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), 0 0 13px rgba(255,198,78,.5);
+    }
+    .arcade-mini-pachi::before,
+    .arcade-mini-pachi::after { content: none; }
+    .mini-pachi-data {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      top: -4px;
+      width: 58px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      transform: translateX(-50%);
+      border: 2px solid #f5cf67;
+      border-radius: 9px 9px 3px 3px;
+      background: #101622;
+      color: #ff596f;
+      font: 1000 9px/1 ui-monospace, monospace;
+      letter-spacing: .12em;
+      text-shadow: 0 0 6px #ff3e58;
+      box-shadow: 0 0 8px #f4d46d;
+    }
+    .mini-pachi-frame {
+      position: absolute;
+      z-index: 4;
+      left: 8px;
+      right: 8px;
+      top: 15px;
+      height: 61px;
+      border: 2px solid #493444;
+      border-radius: 15px 15px 4px 4px;
+      background: linear-gradient(145deg, rgba(255,255,255,.65), rgba(88,194,232,.3));
+      box-shadow: inset 0 0 8px rgba(37,76,108,.45);
+    }
+    .mini-pachi-board {
+      position: absolute;
+      left: 50%;
+      top: 3px;
+      width: 53px;
+      height: 53px;
+      transform: translateX(-50%);
+      border: 4px solid #30354c;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #fff1a3 0 5px, #2f75aa 6px 9px, transparent 10px), radial-gradient(circle at 25% 36%, #f7f3de 0 1px, transparent 2px), radial-gradient(circle at 72% 29%, #f7f3de 0 1px, transparent 2px), radial-gradient(circle at 68% 72%, #f7f3de 0 1px, transparent 2px), repeating-conic-gradient(from 0deg, #4ac8ed 0 9deg, #2771ae 10deg 18deg);
+      box-shadow: inset 0 0 0 3px #95efff, 0 0 8px #4bdcff;
+    }
+    .mini-pachi-board i {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 3px #fff;
+    }
+    .mini-pachi-board i:nth-child(1) { left: 11px; top: 24px; }
+    .mini-pachi-board i:nth-child(2) { right: 10px; top: 20px; }
+    .mini-pachi-board i:nth-child(3) { left: 25px; bottom: 7px; }
+    .mini-pachi-attacker {
+      position: absolute;
+      z-index: 6;
+      left: 50%;
+      bottom: 1px;
+      width: 22px;
+      height: 6px;
+      transform: translateX(-50%);
+      border: 1px solid #63394a;
+      border-radius: 2px;
+      background: #ff6579;
+      box-shadow: 0 0 5px #ff536f;
+    }
+    .mini-pachi-pusher {
+      position: absolute;
+      z-index: 6;
+      left: 9px;
+      right: 9px;
+      bottom: 8px;
+      height: 28px;
+      border: 2px solid #423744;
+      border-radius: 3px 3px 7px 7px;
+      background: linear-gradient(180deg, rgba(177,238,255,.7), rgba(46,106,139,.8));
+      box-shadow: inset 0 0 7px rgba(255,255,255,.5);
+    }
+    .mini-pachi-shelf {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 11px;
+      height: 8px;
+      transform: perspective(35px) rotateX(35deg);
+      border: 1px solid #47384a;
+      background: linear-gradient(180deg, #d8e2df, #6f7778);
+      box-shadow: 0 3px 0 #4b4850;
+    }
+    .mini-pachi-coins {
+      position: absolute;
+      z-index: 2;
+      left: 8px;
+      right: 8px;
+      bottom: 4px;
+      height: 9px;
+      background: radial-gradient(circle at 8% 50%, #ffd84c 0 3px, #8b5812 4px, transparent 5px), radial-gradient(circle at 25% 50%, #ffd84c 0 3px, #8b5812 4px, transparent 5px), radial-gradient(circle at 43% 50%, #ffd84c 0 3px, #8b5812 4px, transparent 5px), radial-gradient(circle at 62% 50%, #ffd84c 0 3px, #8b5812 4px, transparent 5px), radial-gradient(circle at 81% 50%, #ffd84c 0 3px, #8b5812 4px, transparent 5px);
+    }
+    .mini-pachi-handle {
+      position: absolute;
+      z-index: 8;
+      right: -6px;
+      bottom: 22px;
+      width: 15px;
+      height: 15px;
+      border: 3px solid #34303b;
+      border-radius: 50%;
+      background: radial-gradient(circle, #8eeaff 0 23%, #225f86 25% 53%, #e6f8ff 55% 66%, #293044 68%);
+      box-shadow: 0 0 7px #5ee5ff;
+    }
+    .mini-pachi-tray {
+      position: absolute;
+      z-index: 7;
+      left: 17px;
+      right: 17px;
+      bottom: -2px;
+      height: 11px;
+      border: 2px solid #3e3040;
+      border-radius: 3px 3px 8px 8px;
+      background: linear-gradient(180deg, #ffe68a, #a96720);
+      box-shadow: inset 0 -3px 0 rgba(64,38,23,.3);
+    }
+    /* TRI-LINK: recognisable upright arcade cabinet showing the actual three-way arena. */
+    .arcade-mini-tri {
+      width: 108px;
+      height: 116px;
+      bottom: 39px;
+      border: 3px solid #20283a;
+      border-radius: 17px 17px 8px 8px;
+      background: linear-gradient(90deg, #0a101d, #39506a 12%, #9ac9cf 49%, #314a63 86%, #080f1c);
+      box-shadow: inset 0 0 0 2px rgba(218,255,252,.24), 0 0 15px rgba(75,239,211,.55);
+    }
+    .arcade-mini-tri::before {
+      content: "";
+      position: absolute;
+      z-index: 9;
+      left: 5px;
+      right: 5px;
+      top: 16px;
+      height: 4px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #ff6aa9 0 30%, #ffe46f 31% 66%, #55e7c2 67% 100%);
+      box-shadow: 0 0 8px rgba(255,255,255,.8);
+    }
+    .arcade-mini-tri::after {
+      content: none;
+    }
+    .mini-tri-marquee {
+      top: -6px;
+      width: 91px;
+      height: 26px;
+      border-width: 2px;
+      border-color: #7ff8e1;
+      border-radius: 12px 12px 4px 4px;
+      background: linear-gradient(180deg, #263b53, #07101e 72%);
+      box-shadow: 0 0 10px #5df2d1, inset 0 0 9px rgba(75,237,211,.32);
+    }
+    .mini-tri-marquee small { font-size: 4px; letter-spacing: .1em; }
+    .mini-tri-marquee b { margin-top: 3px; font-size: 10px; }
+    .mini-tri-cabinet-shell {
+      position: absolute;
+      z-index: 5;
+      left: 8px;
+      right: 8px;
+      top: 23px;
+      bottom: 17px;
+      border: 2px solid #101827;
+      border-radius: 8px 8px 4px 4px;
+      background: linear-gradient(155deg, #54758b, #17283b 31%, #07101c 74%, #29465d);
+      box-shadow: inset 3px 0 0 #f05f9d, inset -3px 0 0 #4bdcba, inset 0 3px 0 rgba(210,254,255,.25), inset 0 -5px 8px rgba(0,0,0,.46);
+    }
+    .mini-tri-screen {
+      position: absolute;
+      z-index: 4;
+      left: 7px;
+      right: 7px;
+      top: 6px;
+      height: 56px;
+      overflow: hidden;
+      transform: perspective(95px) rotateX(-3deg);
+      border: 3px solid #060b14;
+      border-radius: 7px;
+      background: #071522;
+      box-shadow: 0 0 0 2px #42687b, inset 0 0 10px #09111f, 0 0 8px rgba(76,234,220,.58);
+    }
+    .mini-tri-field {
+      position: absolute;
+      inset: 3px 6px;
+      overflow: hidden;
+      border: 2px solid #5fe6dc;
+      border-radius: 50%;
+      background:
+        linear-gradient(31deg, transparent 48%, rgba(231,255,247,.9) 49% 51%, transparent 52%),
+        linear-gradient(-31deg, transparent 48%, rgba(231,255,247,.9) 49% 51%, transparent 52%),
+        linear-gradient(90deg, transparent 48%, rgba(231,255,247,.72) 49% 51%, transparent 52%),
+        conic-gradient(from 30deg, rgba(237,65,137,.83) 0 33.333%, rgba(54,206,170,.84) 33.334% 66.666%, rgba(241,183,48,.9) 66.667% 100%);
+      box-shadow: inset 0 0 0 3px #0d1d30, inset 0 0 13px #75f6e2;
+    }
+    .mini-tri-goal {
+      position: absolute;
+      z-index: 5;
+      width: 18px;
+      height: 6px;
+      border: 2px solid currentColor;
+      border-radius: 2px;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,.8) 0 1px, transparent 1px 4px), rgba(5,12,23,.84);
+      box-shadow: 0 0 6px currentColor;
+    }
+    .mini-tri-goal-a { left: 3px; bottom: 7px; color: #ff6da9; transform: rotate(58deg); }
+    .mini-tri-goal-b { right: 3px; bottom: 7px; color: #54e7c1; transform: rotate(-58deg); }
+    .mini-tri-goal-c { left: 50%; top: 1px; color: #ffdc5c; transform: translateX(-50%); }
+    .mini-tri-mallet {
+      position: absolute;
+      z-index: 6;
+      width: 8px;
+      height: 8px;
+      border: 2px solid #efffff;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .mini-tri-mallet-a { left: 15px; bottom: 12px; color: #ff6ca8; }
+    .mini-tri-mallet-b { right: 15px; bottom: 12px; color: #4de1bd; }
+    .mini-tri-mallet-c { left: 50%; top: 8px; color: #ffdc5d; transform: translateX(-50%); }
+    .mini-tri-propeller {
+      position: absolute;
+      z-index: 5;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #d7fbff;
+      border-radius: 50%;
+      background: conic-gradient(#89f4ff 0 14%, transparent 15% 33%, #89f4ff 34% 47%, transparent 48% 66%, #89f4ff 67% 80%, transparent 81%);
+      box-shadow: 0 0 5px #79ecff;
+    }
+    .mini-tri-propeller-a { left: 24px; top: 20px; }
+    .mini-tri-propeller-b { right: 24px; top: 20px; }
+    .mini-tri-propeller-c { left: 50%; bottom: 8px; transform: translateX(-50%); }
+    .mini-tri-puck {
+      width: 9px;
+      height: 9px;
+      border-width: 2px;
+      background: #86eaff;
+      box-shadow: 0 0 7px #b8f6ff, 0 0 10px #63d9ff;
+    }
+    .mini-tri-control-deck {
+      position: absolute;
+      z-index: 7;
+      left: 4px;
+      right: 4px;
+      bottom: 1px;
+      height: 14px;
+      transform: perspective(60px) rotateX(28deg);
+      border: 2px solid #0c1422;
+      border-radius: 3px 3px 7px 7px;
+      background: linear-gradient(180deg, #7b9bae, #1b3046 48%, #0c1828);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.35), 0 3px 0 #09101c;
+    }
+    .mini-tri-control-deck i,
+    .mini-tri-control-deck b,
+    .mini-tri-control-deck em {
+      position: absolute;
+      top: 3px;
+      border-radius: 50%;
+      box-shadow: 0 0 5px currentColor;
+    }
+    .mini-tri-control-deck i { left: 15px; width: 7px; height: 7px; color: #ff66a3; background: currentColor; }
+    .mini-tri-control-deck b { left: 50%; width: 11px; height: 7px; transform: translateX(-50%); border: 1px solid #d7ffff; color: #ffe46c; background: currentColor; }
+    .mini-tri-control-deck em { right: 15px; width: 7px; height: 7px; color: #4ce6be; background: currentColor; }
+    .mini-tri-cabinet-base {
+      left: 11px;
+      right: 11px;
+      bottom: -2px;
+      height: 21px;
+      clip-path: polygon(7% 0,93% 0,100% 100%,0 100%);
+      border: 2px solid #0c1421;
+      border-radius: 3px 3px 7px 7px;
+      background: linear-gradient(90deg, #0b1321, #36546a 45%, #182b41 72%, #09111e);
+      box-shadow: inset 0 4px 0 #4a7184, 0 5px 7px rgba(0,0,0,.42);
+    }
+    .arcade-mini-closed-flag {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      top: 45%;
+      transform: translate(-50%,-50%) rotate(-8deg);
+      padding: 4px 7px;
+      border: 2px solid #ffe099;
+      border-radius: 4px;
+      background: rgba(33,35,45,.94);
+      color: #ffd36d;
+      font-size: 9px;
+      font-weight: 1000;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .arcade-map-hero {
+      position: absolute;
+      z-index: 12;
+      left: var(--arcade-hero-x);
+      top: var(--arcade-hero-y);
+      width: 70px;
+      height: 76px;
+      transform: translate(-50%,-76%);
+      transition:
+        left var(--arcade-hero-step-duration, .9s) linear,
+        top var(--arcade-hero-step-duration, .9s) linear;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 6px rgba(0,0,0,.3));
+      will-change: left, top;
+    }
+    .arcade-map-hero .hero-token {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      display: block;
+      width: 70px;
+      height: 76px;
+      animation: arcadeHeroIdle 1.1s ease-in-out infinite;
+      filter: none;
+    }
+    .arcade-map-hero .hero-token i {
+      left: 13px;
+      bottom: 8px;
+      width: 44px;
+      height: 6px;
+      z-index: 1;
+      background: rgba(4,13,26,.29);
+      filter: blur(.8px);
+    }
+    .arcade-map-hero .map-hero-view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+    }
+    .arcade-map-hero[data-hero-facing="front"] .map-hero-view[data-hero-view="front"],
+    .arcade-map-hero[data-hero-facing="front-right"] .map-hero-view[data-hero-view="front-right"],
+    .arcade-map-hero[data-hero-facing="right"] .map-hero-view[data-hero-view="right"],
+    .arcade-map-hero[data-hero-facing="back-right"] .map-hero-view[data-hero-view="back-right"],
+    .arcade-map-hero[data-hero-facing="back"] .map-hero-view[data-hero-view="back"],
+    .arcade-map-hero[data-hero-facing="back-left"] .map-hero-view[data-hero-view="back-left"],
+    .arcade-map-hero[data-hero-facing="left"] .map-hero-view[data-hero-view="left"],
+    .arcade-map-hero[data-hero-facing="front-left"] .map-hero-view[data-hero-view="front-left"] {
+      display: grid;
+    }
+    .arcade-map-hero .map-hero-art svg {
+      width: 70px;
+      height: 76px;
+    }
+    .arcade-rpg-lobby.is-moving .arcade-map-hero .hero-token {
+      animation: arcadeHeroWalk .28s ease-in-out infinite alternate;
+    }
+    @keyframes arcadeHeroIdle {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    @keyframes arcadeHeroWalk {
+      from { transform: translateY(0) rotate(-1.4deg); }
+      to { transform: translateY(-3px) rotate(1.4deg); }
+    }
+    .arcade-map-command {
+      position: absolute;
+      z-index: 13;
+      left: 50%;
+      bottom: 14px;
+      min-width: 184px;
+      padding: 7px 12px;
+      transform: translateX(-50%);
+      border: 2px solid #f7dd8c;
+      border-radius: 999px;
+      background: rgba(14,24,43,.92);
+      color: #fff6d2;
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: .04em;
+      text-align: center;
+      box-shadow: 0 5px 12px rgba(0,0,0,.34), 0 0 13px rgba(247,221,140,.25);
+      pointer-events: none;
+    }
+    .arcade-rpg-lobby.is-moving .arcade-map-command {
+      border-color: #8af2d6;
+      color: #bffff0;
+    }
+    .arcade-rpg-lobby .arcade-tri-link-closed-notice {
+      position: absolute;
+      z-index: 15;
+      left: 50%;
+      bottom: 58px;
+      width: min(86%, 470px);
+      margin: 0;
+      transform: translateX(-50%);
+    }
+    @media (max-width: 430px) {
+      .arcade-lobby-scene.arcade-rpg-lobby { min-height: 650px; }
+      .arcade-rpg-title { top: 14px; width: 92%; }
+      .arcade-rpg-back-row { left: 7%; right: 7%; top: 132px; padding: 0 3px; }
+      .arcade-rpg-back-row i { width: 34px; height: 65px; }
+      .arcade-modern-wall-display { top: 120px; width: 150px; }
+      .arcade-modern-pillar { width: 12px; }
+      .arcade-modern-side-bank { top: 274px; gap: 12px; }
+      .arcade-modern-side-bank i { width: 29px; height: 50px; }
+      .arcade-modern-floor-logo { top: 62%; width: 148px; height: 72px; }
+      .arcade-modern-entrance { width: 128px; height: 48px; bottom: 18px; }
+      .arcade-map-machine { width: 28%; height: 164px; }
+      .arcade-miniature { width: 78px; height: 90px; bottom: 41px; }
+      .arcade-mini-tri { width: 94px; height: 78px; }
+      .arcade-mini-tri::before { width: 82px; height: 58px; }
+      .arcade-mini-tri::after { top: 23px; font-size: 29px; }
+      .arcade-mini-tri-stand { left: 23px; right: 23px; height: 42px; }
+      .arcade-mini-catcher { width: 76px; height: 91px; }
+      .mini-catcher-marquee { font-size: 4px; }
+      .mini-catcher-glass { height: 45px; }
+      .mini-catcher-control { bottom: 15px; }
+      .mini-catcher-base { height: 12px; }
+      .arcade-mini-tri { width: 90px; height: 99px; bottom: 40px; }
+      .arcade-mini-tri::before { left: 5px; right: 5px; top: 16px; width: auto; height: 4px; }
+      .arcade-mini-tri::after { content: none; }
+      .mini-tri-marquee { width: 76px; height: 23px; }
+      .mini-tri-marquee b { font-size: 8px; }
+      .mini-tri-cabinet-shell { top: 20px; bottom: 15px; }
+      .mini-tri-screen { height: 48px; }
+      .mini-tri-cabinet-base { height: 18px; }
+      .arcade-mini-pachi { width: 80px; height: 93px; }
+      .mini-pachi-frame { top: 14px; height: 49px; }
+      .mini-pachi-board { width: 43px; height: 43px; }
+      .mini-pachi-pusher { height: 23px; }
+      .arcade-mini-name { min-height: 40px; width: 108%; padding-left: 3px; padding-right: 3px; }
+      .arcade-mini-name strong { font-size: 8px; }
+      .arcade-rpg-decor-counter { left: 6%; transform: scale(.86); transform-origin: left bottom; }
+      .arcade-rpg-decor-plant { right: 6%; transform: scale(.86); transform-origin: right bottom; }
+    }
+    /* Cohesive rendered arcade map: one scene, with only interaction layers above it. */
+    .arcade-lobby-scene.arcade-rpg-lobby {
+      --arcade-hero-x: 50%;
+      --arcade-hero-y: 89%;
+      width: 100%;
+      min-height: 0;
+      aspect-ratio: 4 / 5;
+      border: 1px solid rgba(111,142,165,.48);
+      border-radius: 18px;
+      background: #10131a url("assets/arcade-center-map-v2.png") center / 100% 100% no-repeat;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.12), 0 16px 32px rgba(11,22,35,.28);
+      isolation: isolate;
+    }
+    .arcade-lobby-scene.arcade-rpg-lobby::before,
+    .arcade-lobby-scene.arcade-rpg-lobby::after { content: none; }
+    .arcade-rpg-wall-lights,
+    .arcade-rpg-back-row,
+    .arcade-modern-wall-display,
+    .arcade-modern-pillar,
+    .arcade-modern-floor-logo,
+    .arcade-modern-side-bank,
+    .arcade-modern-entrance,
+    .arcade-rpg-paths,
+    .arcade-rpg-plaza,
+    .arcade-rpg-decor { display: none; }
+    .arcade-rpg-title {
+      z-index: 14;
+      top: 13px;
+      left: 14px;
+      width: auto;
+      max-width: 48%;
+      padding: 7px 10px 8px;
+      transform: none;
+      border: 1px solid rgba(196,226,235,.64);
+      border-radius: 11px;
+      background: linear-gradient(145deg, rgba(16,27,38,.9), rgba(30,45,58,.76));
+      box-shadow: 0 7px 17px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.2);
+      text-align: left;
+      backdrop-filter: blur(5px);
+    }
+    .arcade-rpg-title small {
+      color: #93f2e2;
+      font-size: 7px;
+      letter-spacing: .15em;
+    }
+    .arcade-rpg-title strong {
+      margin-top: 3px;
+      color: #fff;
+      font-size: clamp(12px, 3.2vw, 16px);
+      letter-spacing: .03em;
+      text-shadow: 0 2px 5px rgba(0,0,0,.58);
+    }
+    .arcade-rpg-title span {
+      margin-top: 4px;
+      padding: 2px 7px;
+      border-color: rgba(255,220,130,.55);
+      background: rgba(3,9,15,.5);
+      font-size: 6px;
+      letter-spacing: .05em;
+    }
+    .arcade-rpg-machine-field { z-index: 6; }
+    .arcade-map-machine {
+      width: 31%;
+      height: 34%;
+      border-radius: 18px;
+    }
+    .arcade-map-machine::before {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 5%;
+      border: 2px solid transparent;
+      border-radius: 17px;
+      background: transparent;
+      box-shadow: none;
+      transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+    }
+    .arcade-map-machine:hover::before,
+    .arcade-map-machine:focus-visible::before,
+    .arcade-map-machine.is-destination::before {
+      border-color: rgba(255,255,255,.86);
+      background: rgba(101,232,220,.07);
+      box-shadow: 0 0 0 3px rgba(22,39,52,.35), 0 0 19px var(--machine-color), inset 0 0 15px rgba(255,255,255,.1);
+    }
+    .arcade-mini-platform,
+    .arcade-miniature { display: none; }
+    .arcade-mini-select {
+      top: 5px;
+      width: 25px;
+      height: 25px;
+      border-color: #fff;
+      color: #14202c;
+      font-size: 12px;
+      box-shadow: 0 0 0 3px rgba(13,23,32,.68), 0 0 12px var(--machine-color);
+    }
+    .arcade-mini-name {
+      z-index: 8;
+      bottom: -3px;
+      width: 106%;
+      min-height: 36px;
+      padding: 5px 7px;
+      border: 1px solid rgba(109,126,141,.72);
+      border-radius: 999px;
+      background: rgba(255,255,255,.94);
+      color: #24313d;
+      box-shadow: 0 5px 13px rgba(3,11,18,.25), inset 0 1px 0 #fff;
+      backdrop-filter: blur(5px);
+    }
+    .arcade-mini-name small {
+      color: var(--machine-dark);
+      font-size: 6px;
+      letter-spacing: .08em;
+    }
+    .arcade-mini-name strong {
+      margin-top: 2px;
+      font-size: clamp(8px, 2vw, 10px);
+      line-height: 1.08;
+    }
+    .arcade-map-hero {
+      width: 56px;
+      height: 62px;
+      transform: translate(-50%,-80%);
+      filter: drop-shadow(0 7px 5px rgba(0,0,0,.42));
+    }
+    .arcade-map-hero .hero-token,
+    .arcade-map-hero .map-hero-art svg {
+      width: 56px;
+      height: 62px;
+    }
+    .arcade-map-hero .hero-token i {
+      left: 11px;
+      bottom: 7px;
+      width: 34px;
+      height: 5px;
+    }
+    .arcade-map-command {
+      bottom: 10px;
+      min-width: 178px;
+      padding: 6px 11px;
+      border-color: rgba(255,221,124,.88);
+      background: rgba(13,22,29,.86);
+      font-size: 9px;
+      box-shadow: 0 5px 13px rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+    }
+    .arcade-mini-closed-flag { top: 47%; }
+    @media (max-width: 430px) {
+      .arcade-lobby-scene.arcade-rpg-lobby { min-height: 0; border-radius: 14px; }
+      .arcade-rpg-title { top: 9px; left: 9px; max-width: 54%; padding: 5px 7px 6px; }
+      .arcade-rpg-title strong { font-size: 11px; }
+      .arcade-rpg-title span { display: none; }
+      .arcade-map-machine { width: 31%; height: 34%; }
+      .arcade-mini-name { width: 106%; min-height: 31px; padding: 4px 5px; }
+      .arcade-mini-name strong { font-size: 7px; }
+      .arcade-mini-select { top: 3px; width: 22px; height: 22px; font-size: 10px; }
+      .arcade-map-hero,
+      .arcade-map-hero .hero-token,
+      .arcade-map-hero .map-hero-art svg { width: 48px; height: 54px; }
+      .arcade-map-command { bottom: 7px; min-width: 168px; font-size: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .arcade-map-hero { transition-duration: .01ms; }
+      .arcade-map-hero .hero-token,
+      .arcade-mini-select { animation: none; }
+    }
     .arcade-game-stage {
       position: relative;
       min-height: 556px;
@@ -10670,6 +13135,49 @@
       background:
         linear-gradient(180deg, #1c202c, #11131b 68%),
         #11131b;
+    }
+    .tri-link-closed-stage {
+      display: grid;
+      place-items: center;
+    }
+    .tri-link-closed-card {
+      display: grid;
+      justify-items: center;
+      width: min(100%, 460px);
+      padding: 30px 22px;
+      border: 2px solid #f0bc55;
+      border-radius: 14px;
+      background: radial-gradient(circle at 50% 0, rgba(240,188,85,.12), transparent 52%), #111722;
+      color: #f5f7fb;
+      text-align: center;
+      box-shadow: 0 0 24px rgba(240,188,85,.2), inset 0 0 25px rgba(0,0,0,.36);
+    }
+    .tri-link-closed-card small {
+      color: #9eabb9;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+    }
+    .tri-link-closed-card strong {
+      margin-top: 8px;
+      color: #ffd16e;
+      font-size: clamp(34px, 10vw, 58px);
+      font-weight: 1000;
+      letter-spacing: .08em;
+      line-height: 1;
+      text-shadow: 0 0 16px rgba(255,193,76,.52);
+    }
+    .tri-link-closed-card p {
+      margin: 18px 0 0;
+      font-size: clamp(15px, 4vw, 19px);
+      font-weight: 1000;
+      line-height: 1.45;
+    }
+    .tri-link-closed-card span {
+      margin-top: 10px;
+      color: #c9d3de;
+      font-size: 12px;
+      font-weight: 800;
     }
     .arcade-game-console {
       width: min(100%, 390px);
@@ -15044,6 +17552,79 @@
       <div class="mini-feature" id="imasoraDex"></div>
     </section>
 
+    <section class="panel screen" id="imasoraSkyMapScreen" data-screen="skyMap" aria-label="空のマップ">
+      <div class="skyMapHeading">
+        <div class="skyMapHeadingCopy">
+          <small class="skyMapKicker">IMASORA SKY AREA</small>
+          <h2>空のマップ</h2>
+        </div>
+        <button class="skyMapReturn" type="button" data-sky-return>街へ戻る</button>
+      </div>
+      <p class="skyMapIntro">空に浮かぶ雲の大地。朝・昼・夕方・夜で、雲海の色と光が変化します。</p>
+      <div class="skyMapWorldShell">
+        <div class="skyMapWorld" id="imasoraSkyMapWorld" role="img" aria-label="空に浮かぶ雲の大地とイマソラ鉄道"></div>
+        <button class="town-facility-toggle skyMapBuildingToggle" type="button" data-sky-building-toggle aria-pressed="true">建造物名を消す</button>
+      </div>
+      <div class="skyMapSceneControl" aria-label="空マップ時間帯表示確認">
+        <div class="skyMapSceneTitle"><span>空マップ時間帯</span><span data-sky-scene-readout>自動</span></div>
+        <div class="skyMapSceneButtons">
+          <button class="skyMapSceneButton isActive" type="button" data-sky-scene="auto" aria-pressed="true">自動</button>
+          <button class="skyMapSceneButton" type="button" data-sky-scene="morning" aria-pressed="false">朝</button>
+          <button class="skyMapSceneButton" type="button" data-sky-scene="day" aria-pressed="false">昼</button>
+          <button class="skyMapSceneButton" type="button" data-sky-scene="evening" aria-pressed="false">夕方</button>
+          <button class="skyMapSceneButton" type="button" data-sky-scene="night" aria-pressed="false">夜</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel screen" id="imasoraLandMapScreen" data-screen="landMap" aria-label="陸のマップ">
+      <div class="landMapHeading">
+        <div class="landMapHeadingCopy">
+          <small class="landMapKicker">IMASORA LAND DEVELOPMENT</small>
+          <h2>陸のマップ</h2>
+        </div>
+        <button class="landMapReturn" type="button" data-land-map-return>街の発展へ戻る</button>
+      </div>
+      <p class="landMapIntro">橋1から続く道の先に、まだ何も建っていない広い土の造成地が広がっています。</p>
+      <div class="landMapWorldShell">
+        <div class="landMapWorld" id="imasoraLandMapWorld" role="img" aria-label="左上から道が伸びる、何も建っていない広い土の造成地"></div>
+      </div>
+      <div class="landMapSceneControl" aria-label="陸のマップの時間帯表示確認">
+        <div class="landMapSceneTitle"><span>陸マップ時間帯</span><span data-land-map-scene-readout>自動</span></div>
+        <div class="landMapSceneButtons">
+          <button class="landMapSceneButton isActive" type="button" data-land-map-scene="auto" aria-pressed="true">自動</button>
+          <button class="landMapSceneButton" type="button" data-land-map-scene="morning" aria-pressed="false">朝</button>
+          <button class="landMapSceneButton" type="button" data-land-map-scene="day" aria-pressed="false">昼</button>
+          <button class="landMapSceneButton" type="button" data-land-map-scene="evening" aria-pressed="false">夕方</button>
+          <button class="landMapSceneButton" type="button" data-land-map-scene="night" aria-pressed="false">夜</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel screen" id="imasoraCoastalTownScreen" data-screen="coastalTown" aria-label="海岸の街">
+      <div class="coastalTownHeading">
+        <div class="coastalTownHeadingCopy">
+          <small class="coastalTownKicker">IMASORA COASTAL DISTRICT</small>
+          <h2>海岸の街</h2>
+        </div>
+        <button class="coastalTownReturn" type="button" data-coastal-town-return>街の発展へ戻る</button>
+      </div>
+      <p class="coastalTownIntro">橋2の先に広がる海辺の街区。新しい道が海岸通りと港へつながっています。</p>
+      <div class="coastalTownWorldShell">
+        <div class="coastalTownWorld" id="imasoraCoastalTownWorld" role="img" aria-label="橋2から向かう海岸の街と海"></div>
+      </div>
+      <div class="coastalTownSceneControl" aria-label="海岸の街の時間帯表示確認">
+        <div class="coastalTownSceneTitle"><span>海岸街マップ時間帯</span><span data-coastal-town-scene-readout>自動</span></div>
+        <div class="coastalTownSceneButtons">
+          <button class="coastalTownSceneButton isActive" type="button" data-coastal-town-scene="auto" aria-pressed="true">自動</button>
+          <button class="coastalTownSceneButton" type="button" data-coastal-town-scene="morning" aria-pressed="false">朝</button>
+          <button class="coastalTownSceneButton" type="button" data-coastal-town-scene="day" aria-pressed="false">昼</button>
+          <button class="coastalTownSceneButton" type="button" data-coastal-town-scene="evening" aria-pressed="false">夕方</button>
+          <button class="coastalTownSceneButton" type="button" data-coastal-town-scene="night" aria-pressed="false">夜</button>
+        </div>
+      </div>
+    </section>
+
     <section class="panel screen arcade-screen" data-screen="arcade">
       <div id="townArcade"></div>
     </section>
@@ -15682,6 +18263,29 @@ const townNightLightObjects = [
   { id: "window39", kind: "window", name: "窓型発光体39", x: 51.7, y: 67, w: 1.1, h: 0.8, z: 24, r: 90 },
   { id: "window40", kind: "window", name: "窓型発光体40", x: 9.7, y: 27.55, w: 1.54, h: 1.12, z: 24, r: 208 }
 ];
+// 夜間の発光は、その場所を照らす施設が建っている時だけ表示する。
+// 窓は建物本体へ、道路沿いの丸型街灯は最寄りの施設・敷地へ対応付ける。
+const townNightLightOwners = {
+  station: ["orb8", "orb31", "window1", "window2", "window3", "window4", "window5", "window6", "window7", "window8", "window9", "window10", "window11", "window12", "window13", "window40"],
+  shop: ["orb7", "orb32", "orb33", "window14", "window15", "window16", "window17", "window18", "window19", "window28", "window29", "window30", "window31"],
+  warehouse: ["orb3", "orb34"],
+  soundShop: ["orb13", "orb14", "orb23", "orb25"],
+  bookstore: ["orb22", "orb24", "orb27", "orb28", "window32", "window33"],
+  arcade: ["orb4", "orb35", "window20", "window21", "window22", "window24", "window25"],
+  fountain: ["orb20", "orb21"],
+  clock: ["orb10", "orb18", "orb19", "window23", "window26", "window27"],
+  medalHall: ["orb12", "orb15", "window34", "window35", "window36", "window37", "window38", "window39"],
+  retirePark: ["orb11", "orb16", "orb17"],
+  guild: ["orb26"],
+  statue1: ["orb9", "orb29"],
+  statue2: ["orb5", "orb6"],
+  bridge: ["orb2"],
+  bridge2: ["orb1"],
+  castle: ["orb30"]
+};
+const townNightLightOwnerById = Object.fromEntries(
+  Object.entries(townNightLightOwners).flatMap(([ownerId, lightIds]) => lightIds.map(lightId => [lightId, ownerId]))
+);
 const townNightLightStorageKey = "imasoraWalkTownNightLightOffsetsV2";
 const townNightLightNudgeStep = 0.35;
 const townNightLightScaleStep = 0.08;
@@ -15722,8 +18326,32 @@ let selectedDexStage = "";
 let selectedBookstoreDexStage = "";
 let selectedItemGuideTab = "inventory";
 let selectedTownBuildingId = "";
+const townRailwayDestinations = [
+  { id: "sky", label: "空へ行く" },
+  { id: "town", label: "街へ戻る" }
+];
+let townRailwayDestinationOpen = false;
+let townRailwayDestinationIndex = 0;
+const townCoastalRouteOptions = [
+  { id: "coast", label: "海岸へ行く" },
+  { id: "back", label: "もどる" }
+];
+let townCoastalRouteOpen = false;
+let townCoastalRouteIndex = 0;
+const townLandRouteOptions = [
+  { id: "land", label: "工事現場に行く" },
+  { id: "back", label: "もどる" }
+];
+let townLandRouteOpen = false;
+let townLandRouteIndex = 0;
+let townRailwayJourneyTimer = 0;
+let townRailwayJourneyFinishTimer = 0;
+let townRailwayJourneyActive = false;
+let townRailwayJourneyResizeHandler = null;
 let selectedArcadeMachineId = "";
 let arcadeGameRunning = false;
+let townArcadeLobbyMoveTimer = 0;
+let townArcadeLobbyStepTimer = 0;
 let selectedTriLinkRetiredId = "";
 let pendingRetireParkPracticeRecordId = "";
 const memorialWallpaperChoices = [
@@ -41011,7 +43639,19 @@ function mapCurrentHeroTokenArt() {
   }
   const items = monsterDexGroups.flatMap(group => group.list || []);
   const item = items.find(entry => entry.id === tokenId) || items.find(entry => entry.name === tokenName);
-  const art = item ? turnaroundMonsterSvg(item, "front-right") : `<span class="map-token-fallback"></span>`;
+  const heroViews = [
+    ["front", () => uniqueMonsterSvg(item, true)],
+    ["front-right", () => turnaroundMonsterSvg(item, "front-right")],
+    ["right", () => turnaroundMonsterSvg(item, "side")],
+    ["back-right", () => turnaroundMonsterSvg(item, "back-right")],
+    ["back", () => turnaroundMonsterSvg(item, "back")],
+    ["back-left", () => turnaroundMonsterSvg(item, "back-left")],
+    ["left", () => turnaroundMonsterSvg(item, "side-left")],
+    ["front-left", () => turnaroundMonsterSvg(item, "front-left")]
+  ];
+  const art = item
+    ? heroViews.map(([direction, draw]) => `<span class="map-hero-view" data-hero-view="${direction}">${draw()}</span>`).join("")
+    : `<span class="map-token-fallback"></span>`;
   return `<span class="hero-token" aria-label="現在地: ${tokenName}"><span class="map-hero-art">${art}</span><i></i></span>`;
 }
 function townSlotStyle(slot) {
@@ -41070,8 +43710,20 @@ function townNightLightStyle(item) {
   const scale = Number.isFinite(Number(offset.s)) ? Number(offset.s) : 1;
   return `--light-x:${(item.x + offset.x).toFixed(2)}%;--light-y:${(item.y + offset.y).toFixed(2)}%;--light-w:${(item.w * scale).toFixed(2)}%;--light-h:${(item.h * scale).toFixed(2)}%;--light-z:${item.z};--light-r:${((item.r || 0) + (offset.r || 0)).toFixed(1)}deg;`;
 }
+function shouldShowTownNightLight(item) {
+  // 「建設前」は、常設の街づくり工房を含めて完全な消灯状態を確認するための表示。
+  if (townConstructionPreviewMode === "before") return false;
+  const ownerId = townNightLightOwnerById[item.id];
+  return Boolean(ownerId && isTownBuildingBuiltForMap(ownerId));
+}
 function townNightLightMarkup() {
-  return townNightLightObjects.map(item => `<span class="town-night-light-object town-night-light-${item.kind}" aria-label="${escapeAttr(item.name)}" style="${townNightLightStyle(item)}"></span>`).join("");
+  return townNightLightObjects
+    .filter(shouldShowTownNightLight)
+    .map(item => {
+      const ownerId = townNightLightOwnerById[item.id];
+      return `<span class="town-night-light-object town-night-light-${item.kind}" data-town-light-id="${item.id}" data-town-light-owner="${ownerId}" aria-label="${escapeAttr(item.name)}" style="${townNightLightStyle(item)}"></span>`;
+    })
+    .join("");
 }
 function townVacantSiteMarkup(id, mode) {
   const slot = townMapSlots[id];
@@ -41259,20 +43911,465 @@ function townBuildingSprite(id) {
   const sprite = townLayeredSpriteAssets[id];
   if (!sprite) return "";
   const style = townLayeredSpriteStyle(id, sprite);
+  if (id === "train") {
+    return `<img class="town-layer-sprite town-layer-sprite-train" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}"><button class="town-layer-sprite town-layer-click-target town-layer-click-target-train" type="button" data-town-railway aria-label="鉄道の行先を選ぶ" style="${style}"></button>`;
+  }
   const enterLabels = { warehouse: "街づくり工房", shop: "アイテムショップ", soundShop: "音楽プラザ", bookstore: "本屋", retirePark: "広場", medalHall: "相棒記念館", arcade: "ゲームセンター" };
   const enterButton = enterLabels[id]
     ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-enter="${id}" aria-label="${enterLabels[id]}" style="${style}"></button>`
     : "";
-  const selectButton = enterLabels[id]
+  const coastalRouteButton = id === "bridge2"
+    ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-coastal-route-open aria-label="橋2の行先を選ぶ" style="${style}"></button>`
+    : "";
+  const landRouteButton = id === "bridge"
+    ? `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-land-route-open aria-label="橋1の行先を選ぶ" style="${style}"></button>`
+    : "";
+  const selectButton = enterLabels[id] || id === "bridge" || id === "bridge2"
     ? ""
     : `<button class="town-layer-sprite town-layer-click-target town-layer-click-target-${id}" type="button" data-town-layer-select="${id}" aria-label="${townFacilityDisplayName(id)}を選ぶ" style="${style}"></button>`;
-  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}">${enterButton}${selectButton}`;
+  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${style}">${enterButton}${landRouteButton}${coastalRouteButton}${selectButton}`;
 }
+function townRailwayVisualSpriteMarkup(id) {
+  const sprite = townLayeredSpriteAssets[id];
+  if (!sprite) return "";
+  return `<img class="town-layer-sprite town-layer-sprite-${id}" src="assets/${sprite.file}" alt="" aria-hidden="true" style="${townLayeredSpriteStyle(id, sprite)}">`;
+}
+window.ImasoraTownRailwayLayerMarkup = () => `
+  <div class="town-map-layer town-base-layer skyMapSharedTownTrack" aria-hidden="true"></div>
+  ${townRailwayVisualSpriteMarkup("station")}
+  ${townRailwayVisualSpriteMarkup("train")}
+  ${townRailwayVisualSpriteMarkup("warehouse")}
+`;
+window.ImasoraSkyWorkshopLabelStyle = () => townFacilityLabelStyle("warehouse", 0, 0);
+window.ImasoraSkyStationLabelStyle = () => townFacilityLabelStyle("station", 0, 0);
 function townLayeredBuildingSprites(id) {
   if (id === "station") return townBuildingSprite("station") + townBuildingSprite("train");
   if (id === "bridge") return townBuildingSprite("bridgeLanding") + townBuildingSprite("bridgeLanding2") + townBuildingSprite("bridge");
   if (id === "bridge2") return townBuildingSprite("bridge2Landing") + townBuildingSprite("bridge2Landing2") + townBuildingSprite("bridge2");
   return townBuildingSprite(id);
+}
+function townRailwayDestinationMarkup() {
+  if (!townRailwayDestinationOpen) return "";
+  return `
+    <div class="town-railway-destination" role="dialog" aria-modal="true" aria-labelledby="townRailwayDestinationTitle" tabindex="-1">
+      <div class="town-railway-card">
+        <small>IMASORA RAILWAY</small>
+        <strong id="townRailwayDestinationTitle">行先を選ぶ</strong>
+        <span>上下で選んで決定してください</span>
+        <div class="town-railway-routes" role="listbox" aria-label="鉄道の行先">
+          ${townRailwayDestinations.map((destination, index) => `
+            <button class="town-railway-option ${index === townRailwayDestinationIndex ? "is-selected" : ""}" type="button" role="option" aria-selected="${index === townRailwayDestinationIndex ? "true" : "false"}" tabindex="${index === townRailwayDestinationIndex ? "0" : "-1"}" data-town-railway-option="${index}">
+              <span class="town-railway-cursor" aria-hidden="true">▶</span>
+              <span>${escapeAttr(destination.label)}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="town-railway-controls" aria-label="行先カーソル操作">
+          <button class="town-railway-control" type="button" data-town-railway-move="-1" aria-label="上の行先へ">▲</button>
+          <button class="town-railway-control town-railway-confirm" type="button" data-town-railway-confirm>決定</button>
+          <button class="town-railway-control" type="button" data-town-railway-move="1" aria-label="下の行先へ">▼</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function townCoastalRouteMarkup() {
+  if (!townCoastalRouteOpen) return "";
+  return `
+    <div class="town-railway-destination town-coastal-route" role="dialog" aria-modal="true" aria-labelledby="townCoastalRouteTitle" tabindex="-1">
+      <div class="town-railway-card">
+        <small>BRIDGE 2 ROUTE</small>
+        <strong id="townCoastalRouteTitle">橋2からの行先</strong>
+        <span>行先を選んでください</span>
+        <div class="town-railway-routes" role="listbox" aria-label="橋2の行先">
+          ${townCoastalRouteOptions.map((option, index) => `
+            <button class="town-railway-option ${index === townCoastalRouteIndex ? "is-selected" : ""}" type="button" role="option" aria-selected="${index === townCoastalRouteIndex ? "true" : "false"}" tabindex="${index === townCoastalRouteIndex ? "0" : "-1"}" data-town-coastal-route-option="${index}">
+              <span class="town-railway-cursor" aria-hidden="true">▶</span>
+              <span>${escapeAttr(option.label)}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="town-railway-controls" aria-label="橋2の行先カーソル操作">
+          <button class="town-railway-control" type="button" data-town-coastal-route-move="-1" aria-label="上の行先へ">▲</button>
+          <button class="town-railway-control town-railway-confirm" type="button" data-town-coastal-route-confirm>決定</button>
+          <button class="town-railway-control" type="button" data-town-coastal-route-move="1" aria-label="下の行先へ">▼</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function syncTownCoastalRouteCursor({ focus = true } = {}) {
+  const options = [...document.querySelectorAll("[data-town-coastal-route-option]")];
+  options.forEach((option, index) => {
+    const selected = index === townCoastalRouteIndex;
+    option.classList.toggle("is-selected", selected);
+    option.setAttribute("aria-selected", selected ? "true" : "false");
+    option.tabIndex = selected ? 0 : -1;
+  });
+  const selectedOption = options[townCoastalRouteIndex];
+  selectedOption?.scrollIntoView({ block: "nearest" });
+  if (focus) selectedOption?.focus();
+}
+function setTownCoastalRouteCursor(index, { focus = true, sound = true } = {}) {
+  if (!townCoastalRouteOptions.length) return;
+  townCoastalRouteIndex = Math.max(0, Math.min(townCoastalRouteOptions.length - 1, Number(index) || 0));
+  syncTownCoastalRouteCursor({ focus });
+  if (sound) playSfx("select");
+}
+function moveTownCoastalRouteCursor(direction) {
+  const count = townCoastalRouteOptions.length;
+  if (!count) return;
+  townCoastalRouteIndex = (townCoastalRouteIndex + Number(direction) + count) % count;
+  syncTownCoastalRouteCursor();
+  playSfx("select");
+}
+function chooseTownCoastalRoute(destination) {
+  townCoastalRouteOpen = false;
+  if (destination === "coast") {
+    window.ImasoraCoastalTown?.open();
+    return;
+  }
+  renderTown();
+  playSfx("select");
+  requestAnimationFrame(() => document.querySelector("[data-town-coastal-route-open]")?.focus());
+}
+function confirmTownCoastalRoute() {
+  const destination = townCoastalRouteOptions[townCoastalRouteIndex];
+  if (destination) chooseTownCoastalRoute(destination.id);
+}
+function handleTownCoastalRouteKeydown(event) {
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    moveTownCoastalRouteCursor(-1);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    moveTownCoastalRouteCursor(1);
+  } else if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    confirmTownCoastalRoute();
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    chooseTownCoastalRoute("back");
+  }
+}
+function openTownCoastalRoute() {
+  if (!isTownBuildingBuiltForMap("bridge2")) {
+    playSfx("error");
+    toast("橋2はまだ建設されていません");
+    return;
+  }
+  townRailwayDestinationOpen = false;
+  townLandRouteOpen = false;
+  townCoastalRouteIndex = 0;
+  townCoastalRouteOpen = true;
+  renderTown();
+  playSfx("select");
+  requestAnimationFrame(() => syncTownCoastalRouteCursor());
+}
+function townLandRouteMarkup() {
+  if (!townLandRouteOpen) return "";
+  return `
+    <div class="town-railway-destination town-land-route" role="dialog" aria-modal="true" aria-labelledby="townLandRouteTitle" tabindex="-1">
+      <div class="town-railway-card">
+        <small>BRIDGE 1 ROUTE</small>
+        <strong id="townLandRouteTitle">橋1からの行先</strong>
+        <span>行先を選んでください</span>
+        <div class="town-railway-routes" role="listbox" aria-label="橋1の行先">
+          ${townLandRouteOptions.map((option, index) => `
+            <button class="town-railway-option ${index === townLandRouteIndex ? "is-selected" : ""}" type="button" role="option" aria-selected="${index === townLandRouteIndex ? "true" : "false"}" tabindex="${index === townLandRouteIndex ? "0" : "-1"}" data-town-land-route-option="${index}">
+              <span class="town-railway-cursor" aria-hidden="true">▶</span>
+              <span>${escapeAttr(option.label)}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="town-railway-controls" aria-label="橋1の行先カーソル操作">
+          <button class="town-railway-control" type="button" data-town-land-route-move="-1" aria-label="上の行先へ">▲</button>
+          <button class="town-railway-control town-railway-confirm" type="button" data-town-land-route-confirm>決定</button>
+          <button class="town-railway-control" type="button" data-town-land-route-move="1" aria-label="下の行先へ">▼</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function syncTownLandRouteCursor({ focus = true } = {}) {
+  const options = [...document.querySelectorAll("[data-town-land-route-option]")];
+  options.forEach((option, index) => {
+    const selected = index === townLandRouteIndex;
+    option.classList.toggle("is-selected", selected);
+    option.setAttribute("aria-selected", selected ? "true" : "false");
+    option.tabIndex = selected ? 0 : -1;
+  });
+  const selectedOption = options[townLandRouteIndex];
+  selectedOption?.scrollIntoView({ block: "nearest" });
+  if (focus) selectedOption?.focus();
+}
+function moveTownLandRouteCursor(direction) {
+  const count = townLandRouteOptions.length;
+  if (!count) return;
+  townLandRouteIndex = (townLandRouteIndex + Number(direction) + count) % count;
+  syncTownLandRouteCursor();
+  playSfx("select");
+}
+function chooseTownLandRoute(destination) {
+  townLandRouteOpen = false;
+  if (destination === "land") {
+    window.ImasoraLandMap?.open();
+    return;
+  }
+  renderTown();
+  playSfx("select");
+  requestAnimationFrame(() => document.querySelector("[data-town-land-route-open]")?.focus());
+}
+function confirmTownLandRoute() {
+  const destination = townLandRouteOptions[townLandRouteIndex];
+  if (destination) chooseTownLandRoute(destination.id);
+}
+function handleTownLandRouteKeydown(event) {
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    moveTownLandRouteCursor(-1);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    moveTownLandRouteCursor(1);
+  } else if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    confirmTownLandRoute();
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    chooseTownLandRoute("back");
+  }
+}
+function openTownLandRoute() {
+  if (!isTownBuildingBuiltForMap("bridge")) {
+    playSfx("error");
+    toast("橋1はまだ建設されていません");
+    return;
+  }
+  townRailwayDestinationOpen = false;
+  townCoastalRouteOpen = false;
+  townLandRouteIndex = 0;
+  townLandRouteOpen = true;
+  renderTown();
+  playSfx("select");
+  requestAnimationFrame(() => syncTownLandRouteCursor());
+}
+function syncTownRailwayCursor({ focus = true } = {}) {
+  const options = [...document.querySelectorAll("[data-town-railway-option]")];
+  options.forEach((option, index) => {
+    const selected = index === townRailwayDestinationIndex;
+    option.classList.toggle("is-selected", selected);
+    option.setAttribute("aria-selected", selected ? "true" : "false");
+    option.tabIndex = selected ? 0 : -1;
+  });
+  const selectedOption = options[townRailwayDestinationIndex];
+  selectedOption?.scrollIntoView({ block: "nearest" });
+  if (focus) selectedOption?.focus();
+}
+function setTownRailwayCursor(index, { focus = true, sound = true } = {}) {
+  if (!townRailwayDestinations.length) return;
+  const nextIndex = Math.max(0, Math.min(townRailwayDestinations.length - 1, Number(index) || 0));
+  townRailwayDestinationIndex = nextIndex;
+  syncTownRailwayCursor({ focus });
+  if (sound) playSfx("select");
+}
+function moveTownRailwayCursor(direction) {
+  const count = townRailwayDestinations.length;
+  if (!count) return;
+  townRailwayDestinationIndex = (townRailwayDestinationIndex + Number(direction) + count) % count;
+  syncTownRailwayCursor();
+  playSfx("select");
+}
+function confirmTownRailwayDestination() {
+  const destination = townRailwayDestinations[townRailwayDestinationIndex];
+  if (destination) chooseTownRailwayDestination(destination.id);
+}
+function handleTownRailwayKeydown(event) {
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    moveTownRailwayCursor(-1);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    moveTownRailwayCursor(1);
+  } else if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    confirmTownRailwayDestination();
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    chooseTownRailwayDestination("town");
+  }
+}
+function openTownRailwayDestination() {
+  if (!isTownBuildingBuiltForMap("station")) {
+    playSfx("error");
+    toast("駅はまだ建設されていません");
+    return;
+  }
+  townCoastalRouteOpen = false;
+  townLandRouteOpen = false;
+  townRailwayDestinationIndex = 0;
+  townRailwayDestinationOpen = true;
+  renderTown();
+  playSfx("select");
+  requestAnimationFrame(() => syncTownRailwayCursor());
+}
+function townRailwayJourneyTimeText(now = new Date()) {
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${townSceneLabel(townSceneForDate(now))} ${hours}:${minutes}`;
+}
+const TOWN_RAILWAY_JOURNEY_TRACK = Object.freeze({
+  viewWidth: 1000,
+  viewHeight: 1200,
+  startX: 1080,
+  startY: 765,
+  // Continue both the rails and the large train beyond the left edge. The
+  // shallower 7-degree climb keeps the train from looking tipped upright.
+  endX: -360,
+  endY: 588,
+  startHalfGauge: 18,
+  endHalfGauge: 3,
+  startHalfBed: 26,
+  endHalfBed: 5,
+  // Measured from the actual wheel-contact line in town-layered-train-v2.png.
+  trainImageAxisCorrectionDeg: 25.6
+});
+function townRailwayJourneyMarkup(scene, now = new Date()) {
+  const sceneLabel = townSceneLabel(scene);
+  const track = TOWN_RAILWAY_JOURNEY_TRACK;
+  const startXPercent = (track.startX / track.viewWidth * 100).toFixed(4);
+  const startYPercent = (track.startY / track.viewHeight * 100).toFixed(4);
+  const endXPercent = (track.endX / track.viewWidth * 100).toFixed(4);
+  const endYPercent = (track.endY / track.viewHeight * 100).toFixed(4);
+  const upperRail = `M${track.startX} ${track.startY - track.startHalfGauge} L${track.endX} ${track.endY - track.endHalfGauge}`;
+  const lowerRail = `M${track.startX} ${track.startY + track.startHalfGauge} L${track.endX} ${track.endY + track.endHalfGauge}`;
+  const bedPoints = [
+    `${track.startX},${track.startY - track.startHalfBed}`,
+    `${track.startX},${track.startY + track.startHalfBed}`,
+    `${track.endX},${track.endY + track.endHalfBed}`,
+    `${track.endX},${track.endY - track.endHalfBed}`
+  ].join(" ");
+  return `
+    <div class="town-railway-journey railway-journey-${scene}" role="dialog" aria-modal="true" aria-label="${escapeAttr(sceneLabel)}の街から空へ向かう鉄道シーン" data-railway-journey data-railway-scene="${escapeAttr(scene)}" style="--railway-track-start-x:${startXPercent}%;--railway-track-start-y:${startYPercent}%;--railway-track-end-x:${endXPercent}%;--railway-track-end-y:${endYPercent}%">
+      <div class="town-railway-journey-stage">
+        <svg class="railway-journey-track" viewBox="0 0 ${track.viewWidth} ${track.viewHeight}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="railwayJourneyRailMetal" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#5f6971"></stop>
+              <stop offset=".38" stop-color="#f2f5f6"></stop>
+              <stop offset=".62" stop-color="#aeb7bd"></stop>
+              <stop offset="1" stop-color="#4a545d"></stop>
+            </linearGradient>
+          </defs>
+          <polygon class="railway-track-bed-shape" points="${bedPoints}"></polygon>
+          <path class="railway-track-rail-shadow" d="${upperRail}"></path>
+          <path class="railway-track-rail-shadow" d="${lowerRail}"></path>
+          <path class="railway-track-rail" d="${upperRail}"></path>
+          <path class="railway-track-rail" d="${lowerRail}"></path>
+          <path class="railway-track-sky-glint" d="${upperRail}"></path>
+          <path class="railway-track-sky-glint" d="${lowerRail}"></path>
+        </svg>
+        <div class="railway-journey-train" aria-hidden="true">
+          <span class="railway-journey-smoke smoke-a"></span>
+          <span class="railway-journey-smoke smoke-b"></span>
+          <span class="railway-journey-smoke smoke-c"></span>
+          <span class="railway-journey-smoke smoke-d"></span>
+          <span class="railway-journey-smoke smoke-e"></span>
+          <img src="assets/town-layered-train-v2.png" alt="">
+        </div>
+        <div class="railway-journey-vignette" aria-hidden="true"></div>
+        <div class="railway-journey-time"><small>IMASORA RAILWAY</small><strong>${escapeAttr(townRailwayJourneyTimeText(now))}</strong></div>
+        <div class="railway-journey-caption" role="status">空へ出発</div>
+        <button class="railway-journey-skip" type="button" data-railway-journey-skip>スキップ</button>
+      </div>
+    </div>
+  `;
+}
+function syncTownRailwayJourneyGeometry(journey) {
+  const stage = journey?.querySelector(".town-railway-journey-stage");
+  if (!journey || !stage) return;
+  const track = TOWN_RAILWAY_JOURNEY_TRACK;
+  // Match SVG preserveAspectRatio="xMidYMid slice" exactly so the train and rails
+  // share one uniformly scaled coordinate system on every device aspect ratio.
+  const renderedScale = Math.max(stage.clientWidth / track.viewWidth, stage.clientHeight / track.viewHeight);
+  const renderedOffsetX = (stage.clientWidth - track.viewWidth * renderedScale) / 2;
+  const renderedOffsetY = (stage.clientHeight - track.viewHeight * renderedScale) / 2;
+  const renderedStartX = renderedOffsetX + track.startX * renderedScale;
+  const renderedStartY = renderedOffsetY + track.startY * renderedScale;
+  const renderedEndX = renderedOffsetX + track.endX * renderedScale;
+  const renderedEndY = renderedOffsetY + track.endY * renderedScale;
+  const renderedDx = Math.abs(renderedStartX - renderedEndX);
+  const renderedDy = Math.abs(renderedStartY - renderedEndY);
+  const renderedTrackAngle = Math.atan2(renderedDy, renderedDx) * 180 / Math.PI;
+  const trainRotation = track.trainImageAxisCorrectionDeg + renderedTrackAngle;
+  journey.style.setProperty("--railway-track-start-x", `${renderedStartX.toFixed(3)}px`);
+  journey.style.setProperty("--railway-track-start-y", `${renderedStartY.toFixed(3)}px`);
+  journey.style.setProperty("--railway-track-end-x", `${renderedEndX.toFixed(3)}px`);
+  journey.style.setProperty("--railway-track-end-y", `${renderedEndY.toFixed(3)}px`);
+  journey.style.setProperty("--railway-train-rotation", `${trainRotation.toFixed(3)}deg`);
+  journey.dataset.railwayTrackAngle = renderedTrackAngle.toFixed(3);
+  journey.dataset.railwayTrainRotation = trainRotation.toFixed(3);
+}
+function clearTownRailwayJourneyTimers() {
+  clearTimeout(townRailwayJourneyTimer);
+  clearTimeout(townRailwayJourneyFinishTimer);
+  townRailwayJourneyTimer = 0;
+  townRailwayJourneyFinishTimer = 0;
+  if (townRailwayJourneyResizeHandler) {
+    window.removeEventListener("resize", townRailwayJourneyResizeHandler);
+    townRailwayJourneyResizeHandler = null;
+  }
+}
+function completeTownRailwayJourney() {
+  clearTownRailwayJourneyTimers();
+  townRailwayJourneyActive = false;
+  document.body.classList.remove("town-railway-journey-active");
+  document.querySelector("[data-railway-journey]")?.remove();
+  switchScreen("skyMap");
+  requestAnimationFrame(() => document.getElementById("imasoraSkyMapWorld")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  toast("空のマップへ到着しました");
+}
+function finishTownRailwayJourney({ immediate = false } = {}) {
+  if (!townRailwayJourneyActive) return;
+  clearTownRailwayJourneyTimers();
+  const journey = document.querySelector("[data-railway-journey]");
+  if (immediate || !journey) {
+    completeTownRailwayJourney();
+    return;
+  }
+  journey.classList.add("is-ending");
+  townRailwayJourneyFinishTimer = setTimeout(completeTownRailwayJourney, 500);
+}
+function startTownRailwayJourney() {
+  clearTownRailwayJourneyTimers();
+  document.querySelector("[data-railway-journey]")?.remove();
+  townRailwayDestinationOpen = false;
+  renderTown();
+  const now = new Date();
+  const scene = townSceneForDate(now);
+  document.body.insertAdjacentHTML("beforeend", townRailwayJourneyMarkup(scene, now));
+  const journey = document.querySelector("[data-railway-journey]");
+  townRailwayJourneyActive = true;
+  document.body.classList.add("town-railway-journey-active");
+  journey?.querySelector("[data-railway-journey-skip]")?.addEventListener("click", () => finishTownRailwayJourney({ immediate: true }));
+  townRailwayJourneyResizeHandler = () => syncTownRailwayJourneyGeometry(journey);
+  syncTownRailwayJourneyGeometry(journey);
+  window.addEventListener("resize", townRailwayJourneyResizeHandler, { passive: true });
+  requestAnimationFrame(() => {
+    syncTownRailwayJourneyGeometry(journey);
+    journey?.classList.add("is-running");
+  });
+  playSfx("select");
+  const journeyDuration = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? 3500 : 12150;
+  townRailwayJourneyTimer = setTimeout(finishTownRailwayJourney, journeyDuration);
+}
+function chooseTownRailwayDestination(destination) {
+  townRailwayDestinationOpen = false;
+  if (destination === "sky") {
+    startTownRailwayJourney();
+    return;
+  }
+  renderTown();
+  playSfx("select");
 }
 function isTownBuildingBuiltForMap(id) {
   if (id === "warehouse") return true;
@@ -41309,12 +44406,33 @@ function renderTown() {
       ? ""
       : `<button class="${className}" type="button" data-town-facility="${id}" style="${style}">${name}</button>`;
   }).join("");
-  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-home-button" type="button" id="townHomeButton">ホームに戻る</button><button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>`;
+  townView.innerHTML = townBaseLayerMarkup() + `<div class="town-map-layer town-vacant-layer">${vacantLayer}</div><div class="town-map-layer town-building-layer">${buildingLayer}</div>` + townNightLightMarkup() + labels + `<button class="town-home-button" type="button" id="townHomeButton">ホームに戻る</button><button class="town-facility-toggle" type="button" id="townFacilityToggle">${townFacilityNamesVisible ? "施設名を消す" : "施設名を表示"}</button>` + townRailwayDestinationMarkup() + townLandRouteMarkup() + townCoastalRouteMarkup();
   document.getElementById("townHomeButton")?.addEventListener("click", returnHomeFromTownScreen);
   document.getElementById("townFacilityToggle")?.addEventListener("click", toggleTownFacilityNames);
   document.querySelectorAll("[data-town-facility]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townFacility)));
   document.querySelectorAll("[data-town-layer-enter]").forEach(button => button.addEventListener("click", () => enterTownBuilding(button.dataset.townLayerEnter)));
   document.querySelectorAll("[data-town-layer-select]").forEach(button => button.addEventListener("click", () => selectTownFacility(button.dataset.townLayerSelect)));
+  document.querySelector("[data-town-land-route-open]")?.addEventListener("click", openTownLandRoute);
+  document.querySelectorAll("[data-town-land-route-option]").forEach(button => button.addEventListener("click", () => {
+    const option = townLandRouteOptions[Number(button.dataset.townLandRouteOption)];
+    if (option) chooseTownLandRoute(option.id);
+  }));
+  document.querySelectorAll("[data-town-land-route-move]").forEach(button => button.addEventListener("click", () => moveTownLandRouteCursor(button.dataset.townLandRouteMove)));
+  document.querySelector("[data-town-land-route-confirm]")?.addEventListener("click", confirmTownLandRoute);
+  document.querySelector(".town-land-route")?.addEventListener("keydown", handleTownLandRouteKeydown);
+  document.querySelector("[data-town-coastal-route-open]")?.addEventListener("click", openTownCoastalRoute);
+  document.querySelectorAll("[data-town-coastal-route-option]").forEach(button => button.addEventListener("click", () => {
+    const option = townCoastalRouteOptions[Number(button.dataset.townCoastalRouteOption)];
+    if (option) chooseTownCoastalRoute(option.id);
+  }));
+  document.querySelectorAll("[data-town-coastal-route-move]").forEach(button => button.addEventListener("click", () => moveTownCoastalRouteCursor(button.dataset.townCoastalRouteMove)));
+  document.querySelector("[data-town-coastal-route-confirm]")?.addEventListener("click", confirmTownCoastalRoute);
+  document.querySelector(".town-coastal-route")?.addEventListener("keydown", handleTownCoastalRouteKeydown);
+  document.querySelector("[data-town-railway]")?.addEventListener("click", openTownRailwayDestination);
+  document.querySelectorAll("[data-town-railway-option]").forEach(button => button.addEventListener("click", () => setTownRailwayCursor(button.dataset.townRailwayOption)));
+  document.querySelectorAll("[data-town-railway-move]").forEach(button => button.addEventListener("click", () => moveTownRailwayCursor(button.dataset.townRailwayMove)));
+  document.querySelector("[data-town-railway-confirm]")?.addEventListener("click", confirmTownRailwayDestination);
+  document.querySelector(".town-railway-destination:not(.town-coastal-route):not(.town-land-route)")?.addEventListener("keydown", handleTownRailwayKeydown);
   renderTownDevMenu();
   renderTownBuildingDetail();
   renderTownWorkshop();
@@ -41826,7 +44944,7 @@ let imasoraTriLinkModulePromise = null;
 function ensureImasoraTriLinkLoaded() {
   if (window.ImasoraTriLink) return Promise.resolve(window.ImasoraTriLink);
   if (!imasoraTriLinkModulePromise) {
-    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260813-white-michi-seamless-profile-v2")
+    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260820-direct-match-start-v2")
       .then(() => {
         if (!window.ImasoraTriLink) throw new Error("Tri-Link module did not initialize");
         return window.ImasoraTriLink;
@@ -42140,9 +45258,9 @@ function getImasoraJackpotWingArt() {
   }
 }
 const townArcadeMachines = Object.freeze([
-  { id: "arcade-machine-1", name: "イマソラキャラクターキャッチャー", number: "捕", tone: 1, game: "companionCatcher" },
-  { id: "arcade-machine-2", name: "イマソラ・トライリンク", number: "△", tone: 2, game: "triLink" },
-  { id: "arcade-machine-3", name: "イマソラパチコイン落としゲーム", number: "P3", tone: 3, game: "coinPusherRapierValidation" }
+  { id: "arcade-machine-1", name: "イマソラキャラクターキャッチャー", number: "捕", tone: 1, game: "companionCatcher", mapX: 18, mapY: 40, heroX: 31, heroY: 61, mapLabel: "GAME 01" },
+  { id: "arcade-machine-2", name: "イマソラ・トライリンク", number: "△", tone: 2, game: "triLink", mapX: 50, mapY: 23, heroX: 50, heroY: 47, mapLabel: "GAME 02" },
+  { id: "arcade-machine-3", name: "イマソラパチコイン落としゲーム", number: "P3", tone: 3, game: "coinPusherRapierValidation", mapX: 80, mapY: 40, heroX: 69, heroY: 61, mapLabel: "GAME 03" }
 ]);
 function townArcadeMachineById(id) {
   return townArcadeMachines.find(machine => machine.id === id) || null;
@@ -42191,19 +45309,137 @@ function townArcadeHeaderMarkup(title, showMachineSelect = false) {
   </div>
   ${showEffectCustomization ? imasoraJackpotEffectCustomizationMarkup() : ""}`;
 }
-function townArcadeMachineMarkup(machine) {
-  return `<button class="arcade-machine arcade-machine-tone-${machine.tone}" type="button" data-arcade-machine="${escapeAttr(machine.id)}" aria-label="${escapeAttr(machine.name)}を開く">
-    <span class="arcade-cabinet">
-      <span class="arcade-cabinet-marquee">${escapeAttr(machine.name)}</span>
-      <span class="arcade-cabinet-screen"><strong>${escapeAttr(machine.number)}</strong></span>
-      <span class="arcade-cabinet-panel"></span>
-      <span class="arcade-cabinet-base"></span>
-    </span>
+function imasoraTriLinkGrowthAccess() {
+  const stage = String(monsterProfile()?.stage || "");
+  return {
+    stage,
+    playable: ["開花期", "満開期"].includes(stage),
+    message: "このゲームは開花期以降でしか遊べません"
+  };
+}
+function townArcadeMachineMarkup(machine, triLinkAccess = imasoraTriLinkGrowthAccess()) {
+  const triLinkClosed = machine.game === "triLink" && !triLinkAccess.playable;
+  const machineLabel = triLinkClosed
+    ? `${machine.name} CLOSED。${triLinkAccess.message}`
+    : `${machine.name}を開く`;
+  const miniature = machine.game === "companionCatcher"
+    ? `<span class="arcade-miniature arcade-mini-catcher" aria-hidden="true">
+        <span class="mini-catcher-marquee">CHARACTER CATCHER</span>
+        <span class="mini-catcher-glass">
+          <span class="mini-catcher-rail"></span>
+          <span class="mini-catcher-claw"><i></i><i></i><i></i></span>
+          <span class="mini-catcher-stage"><i></i><i></i><i></i></span>
+        </span>
+        <span class="mini-catcher-control"><i></i><b></b></span>
+        <span class="mini-catcher-base"></span>
+      </span>`
+    : machine.game === "triLink"
+      ? `<span class="arcade-miniature arcade-mini-tri" aria-hidden="true">
+          <span class="mini-tri-marquee"><small>3-PLAYER BATTLE</small><b>TRI-LINK</b></span>
+          <span class="mini-tri-cabinet-shell">
+            <span class="mini-tri-screen">
+              <span class="mini-tri-field">
+                <span class="mini-tri-goal mini-tri-goal-a"></span>
+                <span class="mini-tri-goal mini-tri-goal-b"></span>
+                <span class="mini-tri-goal mini-tri-goal-c"></span>
+                <i class="mini-tri-mallet mini-tri-mallet-a"></i>
+                <i class="mini-tri-mallet mini-tri-mallet-b"></i>
+                <i class="mini-tri-mallet mini-tri-mallet-c"></i>
+                <i class="mini-tri-propeller mini-tri-propeller-a"></i>
+                <i class="mini-tri-propeller mini-tri-propeller-b"></i>
+                <i class="mini-tri-propeller mini-tri-propeller-c"></i>
+                <i class="mini-tri-puck"></i>
+              </span>
+            </span>
+            <span class="mini-tri-control-deck"><i></i><b></b><em></em></span>
+          </span>
+          <span class="mini-tri-cabinet-base"></span>
+        </span>`
+      : `<span class="arcade-miniature arcade-mini-pachi" aria-hidden="true">
+          <span class="mini-pachi-data">777</span>
+          <span class="mini-pachi-frame">
+            <span class="mini-pachi-board"><i></i><i></i><i></i></span>
+            <span class="mini-pachi-attacker"></span>
+          </span>
+          <span class="mini-pachi-pusher"><span class="mini-pachi-shelf"></span><span class="mini-pachi-coins"></span></span>
+          <span class="mini-pachi-handle"></span>
+          <span class="mini-pachi-tray"></span>
+        </span>`;
+  return `<button class="arcade-map-machine arcade-map-machine-tone-${machine.tone}${triLinkClosed ? " is-closed" : ""}" type="button" data-arcade-machine="${escapeAttr(machine.id)}" data-arcade-hero-x="${machine.heroX}" data-arcade-hero-y="${machine.heroY}" style="--machine-x:${machine.mapX}%;--machine-y:${machine.mapY}%;" aria-label="${escapeAttr(machineLabel)}"${triLinkClosed ? " disabled aria-disabled=\"true\"" : ""}>
+    <span class="arcade-mini-select" aria-hidden="true">${triLinkClosed ? "×" : "!"}</span>
+    <span class="arcade-mini-platform" aria-hidden="true"></span>
+    ${miniature}
+    ${triLinkClosed ? '<span class="arcade-mini-closed-flag" aria-hidden="true">CLOSED</span>' : ""}
+    <span class="arcade-mini-name"><small>${escapeAttr(machine.mapLabel)}</small><strong>${escapeAttr(machine.name)}</strong></span>
   </button>`;
+}
+function setTownArcadeHeroFacing(lobby, direction) {
+  if (!lobby) return;
+  lobby.dataset.heroFacing = direction;
+  lobby.querySelector("[data-arcade-map-hero]")?.setAttribute("data-hero-facing", direction);
+}
+function clearTownArcadeLobbyMoveTimers() {
+  if (townArcadeLobbyStepTimer) {
+    window.clearTimeout(townArcadeLobbyStepTimer);
+    townArcadeLobbyStepTimer = 0;
+  }
+  if (townArcadeLobbyMoveTimer) {
+    window.clearTimeout(townArcadeLobbyMoveTimer);
+    townArcadeLobbyMoveTimer = 0;
+  }
+}
+function moveTownArcadeHeroToMachine(button) {
+  const machine = townArcadeMachineById(button?.dataset?.arcadeMachine || "");
+  if (!machine || button.disabled) return;
+  const lobby = button.closest("[data-arcade-rpg-lobby]");
+  if (!lobby) {
+    selectTownArcadeMachine(machine.id);
+    return;
+  }
+  if (lobby.dataset.arcadeMoving === "1") return;
+  lobby.dataset.arcadeMoving = "1";
+  lobby.dataset.arcadeDestination = machine.id;
+  lobby.classList.add("is-moving");
+  button.classList.add("is-destination");
+  const command = lobby.querySelector("[data-arcade-map-command]");
+  if (command) command.textContent = `${machine.name}へ移動中…`;
+  playSfx("select");
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const sideDestination = Math.abs(machine.heroX - 50) > 1;
+  const firstLegDuration = reducedMotion ? 15 : sideDestination ? 1260 : 2180;
+  const secondLegDuration = reducedMotion ? 15 : 980;
+  const settleDuration = reducedMotion ? 0 : 170;
+  setTownArcadeHeroFacing(lobby, "back");
+  lobby.style.setProperty("--arcade-hero-step-duration", `${firstLegDuration}ms`);
+  window.requestAnimationFrame(() => {
+    if (!lobby.isConnected) return;
+    lobby.style.setProperty("--arcade-hero-x", sideDestination ? "50%" : `${machine.heroX}%`);
+    lobby.style.setProperty("--arcade-hero-y", sideDestination ? "67%" : `${machine.heroY}%`);
+  });
+  if (sideDestination) {
+    townArcadeLobbyStepTimer = window.setTimeout(() => {
+      townArcadeLobbyStepTimer = 0;
+      if (!lobby.isConnected) return;
+      setTownArcadeHeroFacing(lobby, machine.heroX < 50 ? "back-left" : "back-right");
+      lobby.style.setProperty("--arcade-hero-step-duration", `${secondLegDuration}ms`);
+      lobby.style.setProperty("--arcade-hero-x", `${machine.heroX}%`);
+      lobby.style.setProperty("--arcade-hero-y", `${machine.heroY}%`);
+    }, firstLegDuration);
+  }
+  const moveDuration = firstLegDuration + (sideDestination ? secondLegDuration : 0) + settleDuration;
+  townArcadeLobbyMoveTimer = window.setTimeout(() => {
+    townArcadeLobbyMoveTimer = 0;
+    if (!lobby.isConnected) return;
+    selectTownArcadeMachine(machine.id, { silent: true });
+  }, moveDuration);
 }
 function renderTownArcade() {
   const box = document.getElementById("townArcade");
   if (!box) return;
+  clearTownArcadeLobbyMoveTimers();
+  const triLinkAccess = imasoraTriLinkGrowthAccess();
+  box.dataset.triLinkPlayerStage = triLinkAccess.stage || "unknown";
+  box.dataset.triLinkAvailability = triLinkAccess.playable ? "open" : "closed";
   if (window.ImasoraCompanionCatcher && typeof window.ImasoraCompanionCatcher.unmount === "function") {
     window.ImasoraCompanionCatcher.unmount();
   }
@@ -42227,10 +45463,12 @@ function renderTownArcade() {
       selectedArcadeMachineId = "";
       arcadeGameRunning = false;
       box.innerHTML = `${townArcadeHeaderMarkup("ゲームセンター")}
-        <div class="arcade-lobby-scene">
-          <img class="arcade-building-layer" src="assets/town-layered-arcade-v1.png" alt="" aria-hidden="true">
-          <div class="arcade-neon-sign"><strong>イマソラゲームセンター</strong><small>GAME SELECT</small></div>
-          <div class="arcade-machine-row">${townArcadeMachines.map(townArcadeMachineMarkup).join("")}</div>
+        <div class="arcade-lobby-scene arcade-rpg-lobby" data-arcade-rpg-lobby role="region" aria-label="主人公が歩いてゲーム機を選ぶゲームセンター店内マップ">
+          <div class="arcade-rpg-title"><small>IMASORA GAME CENTER</small><strong>ゲームセンターマップ</strong><span>ゲーム機をタップして移動</span></div>
+          <div class="arcade-rpg-machine-field">${townArcadeMachines.map(machine => townArcadeMachineMarkup(machine, triLinkAccess)).join("")}</div>
+          <div class="arcade-map-hero" data-arcade-map-hero data-hero-facing="front">${mapCurrentHeroTokenArt()}</div>
+          <div class="arcade-map-command" data-arcade-map-command>ゲーム機をタップすると主人公が移動します</div>
+          ${triLinkAccess.playable ? "" : `<div class="arcade-tri-link-closed-notice" role="status" data-tri-link-closed-notice><strong>CLOSED</strong><span>${escapeAttr(triLinkAccess.message)}</span><small>現在の相棒：${escapeAttr(triLinkAccess.stage || "成長前")}</small></div>`}
         </div>`;
     } else if (selectedMachine.game === "companionCatcher") {
       if (arcadeGameRunning) {
@@ -42240,29 +45478,20 @@ function renderTownArcade() {
             <div class="companion-catcher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
           </div>`;
       } else {
-        const previewRoster = getImasoraArcadePlushRoster().slice(0, 3);
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
           <div class="arcade-game-stage companion-catcher-stage character-catcher-opening-stage">
             <div class="character-catcher-opening">
               <div class="cco-badge"><span>GAME 01</span><b>6 ACTION CHARACTER CATCH</b></div>
-              <div class="cco-cabinet" aria-hidden="true">
-                <div class="cco-marquee"><small>IMASORA ARCADE</small><strong>CHARACTER CATCHER</strong></div>
-                <div class="cco-window">
-                  <span class="cco-rail"></span>
-                  <span class="cco-claw"><i>★</i><b></b><b></b><b></b></span>
-                  <div class="cco-arena">
-                    ${previewRoster.map(item => `<span class="cco-prize" style="--plush-color:${escapeAttr(item.bodyColor)}">${item.art}</span>`).join("")}
-                  </div>
+              <div class="cco-opening-live-visual" aria-label="ゲーム本体と同じ3Dキャッチャーのライブ映像">
+                <div class="cco-opening-live-mount" id="imasoraCompanionCatcherOpeningPreviewMount" aria-hidden="true">
+                  <div class="arcade-opening-live-loading"><i></i><span>3D CATCHER CONNECTING</span></div>
                 </div>
-                <div class="cco-console">
-                  <span class="cco-prize-hole"></span>
-                  <div class="cco-controls"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div>
-                </div>
+                <span class="arcade-opening-live-badge" aria-hidden="true"><i></i><b>LIVE 3D CATCHER</b></span>
               </div>
               <div class="cco-copy">
                 <small>POSITION. FINE TUNE. DROP.</small>
                 <strong>イマソラキャラクターキャッチャー</strong>
-                <p>お気に入りのキャラクターを、星形の3本爪でつかみ取ろう。回転ステージを読み、6つの操作で狙いを研ぎ澄ませ――最後の「下降」に、すべてを託せ！</p>
+                <p>6つの操作でアームの位置と向きを決め、回転ステージのキャラクターを星形の3本爪でつかむ。最後は「下降」で勝負。</p>
               </div>
               <div class="cco-guide" aria-label="操作の流れ">
                 <span><b>1—3</b>大きく位置と向きを決める</span>
@@ -42274,34 +45503,76 @@ function renderTownArcade() {
           </div>`;
       }
     } else if (selectedMachine.game === "triLink") {
-      const triLinkParticipants = getImasoraTriLinkParticipants();
-      const retiredRecords = triLinkRetiredRecords();
-      if (arcadeGameRunning) {
+      if (!triLinkAccess.playable) {
+        arcadeGameRunning = false;
+        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          <div class="arcade-game-stage tri-link-closed-stage">
+            <div class="tri-link-closed-card" role="status" data-tri-link-closed-card>
+              <small>GAME 02 / 360° CHARACTER ARENA</small>
+              <strong>CLOSED</strong>
+              <p>${escapeAttr(triLinkAccess.message)}</p>
+              <span>現在の相棒：${escapeAttr(triLinkAccess.stage || "成長前")} ／ 開花期・満開期に対応</span>
+            </div>
+          </div>`;
+      } else {
+        const triLinkParticipants = getImasoraTriLinkParticipants();
+        const retiredRecords = triLinkRetiredRecords();
+        if (arcadeGameRunning) {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
           <div class="arcade-game-stage tri-link-stage">
             <div class="tri-link-host" id="imasoraTriLinkMount"></div>
             <div class="companion-catcher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
           </div>`;
-      } else {
-        const retiredOptions = retiredRecords.map(record => `<option value="${escapeAttr(record.id)}"${record.id === selectedTriLinkRetiredId ? " selected" : ""}>${escapeAttr(record.name || "記録相棒")} ／ ${escapeAttr(record.rankLabel || record.rank || "引退記録")}</option>`).join("");
-        box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+        } else {
+          const retiredOptions = retiredRecords.map(record => {
+            return `<option value="${escapeAttr(record.id)}"${record.id === selectedTriLinkRetiredId ? " selected" : ""}>${escapeAttr(record.name || "記録したモンスター")}</option>`;
+          }).join("");
+          const openingRoleLabels = {
+            current: "あなたが操作",
+            retired: "思い出から参戦",
+            practice: "体験参加",
+            guide: "白レンと対戦"
+          };
+          box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
           <div class="arcade-game-stage tri-link-opening-stage">
             <div class="tri-link-opening">
-              <div class="itl-opening-visual" aria-label="育成中の相棒、引退相棒、白ミチロードセイバーレンの三者対戦">
-                <div class="itl-opening-rink" aria-hidden="true"></div>
-                ${triLinkParticipants.map(participant => `<div class="itl-opening-person" style="--itl-color:${escapeAttr(participant.color)}"><div class="itl-opening-portrait">${participant.art}</div><b>${escapeAttr(participant.name)}</b><small>${escapeAttr(participant.roleLabel)}</small></div>`).join("")}
-                <div class="itl-opening-puck" aria-hidden="true"></div>
+              <div class="itl-opening-topline">
+                <div class="itl-opening-brand">
+                  <span class="itl-opening-logo" aria-hidden="true"><i></i></span>
+                  <span><small>GAME 02 / IMASORA PHYSICS ARENA</small><strong>TRI-LINK</strong></span>
+                </div>
+                <div class="itl-opening-time"><small>BATTLE TIME</small><b>120</b><span>SEC</span></div>
               </div>
-              <div class="itl-opening-copy">
-                <small>TRACE. REBOUND. SURVIVE.</small>
-                <strong>イマソラ・トライリンク</strong>
-                <p>育成中の相棒を指で動かし、記録に残る引退相棒、白ミチロードセイバーレンと三つ巴の物理対戦。狙い、反射、守り方はすべてあなた次第です。</p>
-                <div class="itl-opening-rules"><span>3つのゴール</span><span>防衛ライト各3本</span><span>能力補正なしの同条件</span></div>
-                ${retiredRecords.length ? `<label class="itl-retired-picker"><span>一緒に遊ぶ引退相棒</span><select data-tri-link-retired>${retiredOptions}</select></label>` : '<div class="itl-no-record">引退相棒の記録がまだないため、今回は体験参加の相棒が入ります。記録ができると、ここで選べるようになります。</div>'}
-                <button class="arcade-start-button itl-opening-start" type="button" data-arcade-start>三者対戦をはじめる</button>
+              <div class="itl-opening-main">
+                <div class="itl-opening-copy">
+                  <span class="itl-opening-live"><i></i>THREE PARTNERS / ONE PUCK</span>
+                  <small>TRACE. REBOUND. TAKE THE FIELD.</small>
+                  <strong>ゴールを決めて、<em>光る陣を奪え。</em></strong>
+                  <p>いま育てている相棒と、思い出に残る引退相棒、白ミチロードセイバーレンが同じアリーナへ。パットを弾き、ゴールで12の陣を奪い合う、120秒の三つ巴バトルです。</p>
+                  <div class="itl-opening-rules" aria-label="ゲームの特徴">
+                    <span><b>12</b><small>光る陣を奪取</small></span>
+                    <span><b>3</b><small>匹で最後まで対戦</small></span>
+                    <span><b>360°</b><small>相棒がパットを追う</small></span>
+                  </div>
+                </div>
+                <div class="itl-opening-visual" aria-label="試合本体と同じ3D円形アリーナのライブ映像">
+                  <div class="itl-opening-live-mount" id="imasoraTriLinkOpeningPreviewMount" aria-hidden="true">
+                    <div class="itl-opening-live-loading"><i></i><span>3D ARENA CONNECTING</span></div>
+                  </div>
+                  <span class="itl-opening-live-badge" aria-hidden="true"><i></i><b>LIVE 3D ARENA</b></span>
+                </div>
+              </div>
+              <div class="itl-opening-lineup" aria-label="今回の参加相棒">
+                ${triLinkParticipants.map((participant, index) => `<div class="itl-opening-lineup-card" style="--itl-color:${escapeAttr(participant.color)}"><span>0${index + 1}</span><div><small>${escapeAttr(openingRoleLabels[participant.role] || "アリーナに参戦")}</small><b>${escapeAttr(participant.name)}</b></div></div>`).join("")}
+              </div>
+              ${retiredRecords.length ? `<label class="itl-retired-picker"><span><small>RECORDED PARTNER</small><strong>記録した相棒を選ぶ</strong><em>これまで育てて記録に残した相棒から選べます。</em></span><select data-tri-link-retired>${retiredOptions}</select></label>` : '<div class="itl-no-record"><strong>相棒を記録すると選べます</strong><span>今回は体験参加の相棒がアリーナに入ります。</span></div>'}
+              <div class="itl-opening-action">
+                <span><small>DRAG TO CONTROL</small>育成中の相棒を指で動かして勝負</span>
+                <button class="arcade-start-button itl-opening-start" type="button" data-arcade-start><small>START THE MATCH</small><strong>この3匹で試合開始</strong><i aria-hidden="true">›</i></button>
               </div>
             </div>
           </div>`;
+        }
       }
     } else if (selectedMachine.game === "coinPusherRapierValidation") {
       if (arcadeGameRunning) {
@@ -42315,17 +45586,11 @@ function renderTownArcade() {
           <div class="arcade-game-stage coin-pusher-stage pachi-coin-opening-stage">
             <div class="pachi-coin-opening">
               <div class="pco-badge"><span>GAME 03</span><b>PACHINKO × COIN PUSHER</b></div>
-              <div class="pco-cabinet" aria-hidden="true">
-                <div class="pco-data-lamp"><span>START<b>0000</b></span><span>JACKPOT<b>000</b></span></div>
-                <div class="pco-frame">
-                  <div class="pco-board">
-                    <span class="pco-seven">00</span>
-                    <span class="pco-wings"></span>
-                    <span class="pco-checkers"><i>1</i><i>S</i><i>2</i></span>
-                  </div>
+              <div class="pco-opening-live-visual" aria-label="ゲーム本体と同じパチンコ・コイン落とし盤のライブ映像">
+                <div class="pco-opening-live-mount" id="imasoraJackpotOpeningPreviewMount" aria-hidden="true">
+                  <div class="arcade-opening-live-loading"><i></i><span>PACHINKO CONNECTING</span></div>
                 </div>
-                <div class="pco-pusher"><span class="pco-coins"><i></i><i></i><i></i><i></i><i></i></span></div>
-                <span class="pco-handle"></span>
+                <span class="arcade-opening-live-badge is-gold" aria-hidden="true"><i></i><b>LIVE PACHINKO × PUSHER</b></span>
               </div>
               <div class="pco-copy">
                 <small>TURN. SHOOT. PUSH.</small>
@@ -42355,7 +45620,7 @@ function renderTownArcade() {
     }
   }
   box.querySelectorAll("[data-arcade-machine]").forEach(button => {
-    button.addEventListener("click", () => selectTownArcadeMachine(button.dataset.arcadeMachine));
+    button.addEventListener("click", () => moveTownArcadeHeroToMachine(button));
   });
   box.querySelector("[data-tri-link-retired]")?.addEventListener("change", event => {
     selectedTriLinkRetiredId = event.currentTarget.value || "";
@@ -42413,6 +45678,73 @@ function renderTownArcade() {
       playSfx("select");
     });
   });
+  if (activeArcadeMachine?.game === "triLink" && !arcadeGameRunning && triLinkAccess.playable) {
+    requestAnimationFrame(() => {
+      const mount = document.getElementById("imasoraTriLinkOpeningPreviewMount");
+      if (!mount) return;
+      mount.innerHTML = '<div class="itl-opening-live-loading"><i></i><span>3D ARENA CONNECTING</span></div>';
+      ensureImasoraTriLinkLoaded()
+        .then(game => {
+          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
+          game.mount(mount, {
+            participants: getImasoraTriLinkParticipants(),
+            memories: [],
+            testMode: false,
+            previewOnly: true
+          });
+          mount.dataset.liveArena = "ready";
+        })
+        .catch(error => {
+          console.error("イマソラ・トライリンクの3D導入映像を起動できませんでした。", error);
+          if (!mount.isConnected) return;
+          mount.innerHTML = '<div class="itl-opening-live-loading is-error"><span>3D ARENA RETRY</span></div>';
+        });
+    });
+  }
+  if (activeArcadeMachine?.game === "companionCatcher" && !arcadeGameRunning) {
+    requestAnimationFrame(() => {
+      const mount = document.getElementById("imasoraCompanionCatcherOpeningPreviewMount");
+      if (!mount) return;
+      mount.innerHTML = '<div class="arcade-opening-live-loading"><i></i><span>3D CATCHER CONNECTING</span></div>';
+      ensureImasoraCompanionCatcherLoaded()
+        .then(game => {
+          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
+          game.mount(mount, {
+            roster: getImasoraArcadePlushRoster(),
+            previewOnly: true
+          });
+          mount.dataset.liveCatcher = "ready";
+        })
+        .catch(error => {
+          console.error("イマソラキャラクターキャッチャーの3D導入映像を起動できませんでした。", error);
+          if (!mount.isConnected) return;
+          mount.innerHTML = '<div class="arcade-opening-live-loading is-error"><span>3D CATCHER RETRY</span></div>';
+        });
+    });
+  }
+  if (activeArcadeMachine?.game === "coinPusherRapierValidation" && !arcadeGameRunning) {
+    requestAnimationFrame(() => {
+      const mount = document.getElementById("imasoraJackpotOpeningPreviewMount");
+      if (!mount) return;
+      mount.innerHTML = '<div class="arcade-opening-live-loading"><i></i><span>PACHINKO CONNECTING</span></div>';
+      ensureImasoraJackpotRapierValidationLoaded()
+        .then(game => {
+          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
+          game.mount(mount, {
+            roster: getImasoraArcadePlushRoster(),
+            wingArt: getImasoraJackpotWingArt(),
+            effects: getImasoraJackpotEffectPreferences(),
+            previewOnly: true
+          });
+          mount.dataset.livePachinko = "ready";
+        })
+        .catch(error => {
+          console.error("イマソラパチコイン落としゲームの3D導入映像を起動できませんでした。", error);
+          if (!mount.isConnected) return;
+          mount.innerHTML = '<div class="arcade-opening-live-loading is-error"><span>PACHINKO RETRY</span></div>';
+        });
+    });
+  }
   if (activeArcadeMachine?.game === "companionCatcher" && arcadeGameRunning) {
     requestAnimationFrame(() => {
       const mount = document.getElementById("imasoraCompanionCatcherMount");
@@ -42442,7 +45774,8 @@ function renderTownArcade() {
             participants: getImasoraTriLinkParticipants(),
             memories: getImasoraTriLinkMemories(),
             onRecord: saveImasoraTriLinkMemory,
-            testMode: new URLSearchParams(window.location.search).has("triLinkTest")
+            testMode: new URLSearchParams(window.location.search).has("triLinkTest"),
+            autoStart: true
           });
         })
         .catch(error => {
@@ -42487,16 +45820,27 @@ function openTownArcadeFromMap() {
   playSfx("select");
   toast("ゲームセンターへ移動しました");
 }
-function selectTownArcadeMachine(id) {
+function selectTownArcadeMachine(id, options = {}) {
   if (!townArcadeMachineById(id)) return;
   selectedArcadeMachineId = id;
   arcadeGameRunning = false;
   renderTownArcade();
   window.scrollTo({ top: 0, behavior: "smooth" });
-  playSfx("select");
+  if (!options.silent) playSfx("select");
 }
 function startTownArcadeGame() {
-  if (!townArcadeMachineById(selectedArcadeMachineId)) return;
+  const machine = townArcadeMachineById(selectedArcadeMachineId);
+  if (!machine) return;
+  if (machine.game === "triLink") {
+    const access = imasoraTriLinkGrowthAccess();
+    if (!access.playable) {
+      arcadeGameRunning = false;
+      renderTownArcade();
+      playSfx("error");
+      toast(access.message);
+      return;
+    }
+  }
   arcadeGameRunning = true;
   renderTownArcade();
   playSfx("select");
@@ -42514,6 +45858,7 @@ function returnToTownArcadeLobby() {
   playSfx("select");
 }
 function returnToTownMapFromArcade() {
+  clearTownArcadeLobbyMoveTimers();
   selectedArcadeMachineId = "";
   arcadeGameRunning = false;
   switchScreen("town");
@@ -49559,6 +52904,7 @@ function renderPlaytestBoost() {
       <div class="playtest-boost-chip"><strong>${state.playtestInsideHoursHomeMode ? "時間内" : state.playtestOutsideHoursHomeMode ? "時間外" : "実時間"}</strong><small>ホーム表示</small></div>
     </div>
     <div class="actions">
+      <button class="secondary" id="openCharacter360DevBtn" type="button">360度キャラ開発ページを開く</button>
       <button class="secondary" id="playtestGrowingMonsterBtn" type="button">通常育成中テスト状態にする</button>
       <button class="secondary" id="playtestInsideHoursHomeBtn" type="button">時間内ホームを開く</button>
       <button class="secondary" id="playtestOutsideHoursHomeBtn" type="button">時間外ホームを開く</button>
@@ -49584,6 +52930,9 @@ function renderPlaytestBoost() {
     </div>
     <div class="playtest-status">${tournamentBypass ? "大会確認モード中です。正式版条件は残したまま、ローカル試作では全大会の試合を確認できます。" : canBattle ? "開花期以降です。大会参加、アイテム使用、店の購入導線を確認できます。" : "大会確認は、確認モードをONにするか、開花期相当まで育てると触れます。アイテムと店は単独でも確認できます。"}</div>
   `;
+  document.getElementById("openCharacter360DevBtn")?.addEventListener("click", () => {
+    window.location.href = "./imasora-character-360-dev.html?check=character360-dev-entry-20260814";
+  });
   document.getElementById("playtestGrowingMonsterBtn")?.addEventListener("click", setPlaytestGrowingMonster);
   document.getElementById("playtestInsideHoursHomeBtn")?.addEventListener("click", setPlaytestInsideHoursHome);
   document.getElementById("playtestOutsideHoursHomeBtn")?.addEventListener("click", setPlaytestOutsideHoursHome);
@@ -53524,6 +56873,15 @@ function showHomeCenterNotice(text) {
 }
 function switchScreen(screen) {
   blurActiveTextInput();
+  if (screen !== "skyMap") window.ImasoraSkyMap?.unmount();
+  if (screen !== "landMap") window.ImasoraLandMap?.unmount();
+  if (screen !== "coastalTown") window.ImasoraCoastalTown?.unmount();
+  if (screen !== "town") {
+    townRailwayDestinationOpen = false;
+    townLandRouteOpen = false;
+    townCoastalRouteOpen = false;
+    document.querySelectorAll(".town-railway-destination").forEach(dialog => dialog.remove());
+  }
   if (screen !== "arcade" && window.ImasoraCompanionCatcher && typeof window.ImasoraCompanionCatcher.unmount === "function") {
     window.ImasoraCompanionCatcher.unmount();
   }
@@ -53549,6 +56907,37 @@ function switchScreen(screen) {
     preloadKaraokeVisualAssets();
     warmKaraokeTextCaches();
     if (!townVisualRenderedOnce) renderTown();
+  }
+  if (screen === "skyMap") {
+    preloadTownVisualAssets();
+    window.ImasoraSkyMap?.mount({
+      onReturn: () => {
+        switchScreen("town");
+        renderTown();
+        requestAnimationFrame(() => document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        playSfx("select");
+      }
+    });
+  }
+  if (screen === "landMap") {
+    window.ImasoraLandMap?.mount({
+      onReturn: () => {
+        switchScreen("town");
+        renderTown();
+        requestAnimationFrame(() => document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        playSfx("select");
+      }
+    });
+  }
+  if (screen === "coastalTown") {
+    window.ImasoraCoastalTown?.mount({
+      onReturn: () => {
+        switchScreen("town");
+        renderTown();
+        requestAnimationFrame(() => document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        playSfx("select");
+      }
+    });
   }
   if (screen === "arcade") renderTownArcade();
   if (screen === "retirement") renderRetirementCeremony();

@@ -16,7 +16,10 @@ const PACHINKO_LAUNCH_FRAME_GAP_ANGLE = 0.52;
 const TABLE_TOP_Y = 0.56;
 const STATIC_BED_SURFACE_Y = 0.625;
 const MACHINE_CABINET_WIDTH = 6.1;
-const FRONT_EDGE_Z = 2.38;
+const MACHINE_CABINET_ORIGINAL_DEPTH = 5.5;
+const MACHINE_CABINET_ORIGINAL_CENTER_Z = 0.12;
+const FRONT_EDGE_ORIGINAL_Z = 2.38;
+const FRONT_OCHRE_BOARD_ORIGINAL_CENTER_Z = 2.7;
 const NORMAL_BIG_RATE = 0.02;
 const NORMAL_SMALL_RATE = 0.075;
 const AUTO_FIRE_INTERVAL = 0.6;
@@ -38,12 +41,52 @@ export const PUSHER_PLATE_DEPTH = PUSHER_PLATE_ORIGINAL_DEPTH * PUSHER_PLATE_DEP
 export const PUSHER_PLATE_REAR_OFFSET_Z = -0.66;
 export const PUSHER_PLATE_CENTER_OFFSET_Z = PUSHER_PLATE_REAR_OFFSET_Z + PUSHER_PLATE_DEPTH / 2;
 export const PUSHER_PLATE_FRONT_OFFSET_Z = PUSHER_PLATE_REAR_OFFSET_Z + PUSHER_PLATE_DEPTH;
+const PUSHER_PLATE_HALF_WIDTH = 2.42;
 const PUSHER_BODY_REAR_Z = -1.56;
 const PUSHER_BODY_NEAREST_Z = -0.48;
 const NEXT_ROLE_RAIL_STAGE_DEPTH = (PUSHER_BODY_NEAREST_Z - PUSHER_BODY_REAR_Z) / 3;
-const NEXT_ROLE_RAIL_Z = PUSHER_BODY_NEAREST_Z
+const NEXT_ROLE_RAIL_ORIGINAL_Z = PUSHER_BODY_NEAREST_Z
   + PUSHER_PLATE_FRONT_OFFSET_Z
   + NEXT_ROLE_RAIL_STAGE_DEPTH * 2.5;
+// Shorten only the fixed emerald floor between the pusher's nearest front
+// edge and the wavy black rail. The pusher itself keeps its approved size and
+// travel. Everything from the rail toward the cabinet front moves rearward by
+// the removed 2/5, so no empty strip or stretched front section is introduced.
+const EMERALD_FLOOR_GAP_REAR_Z = (
+  PUSHER_BODY_NEAREST_Z + PUSHER_PLATE_FRONT_OFFSET_Z
+);
+export const EMERALD_FLOOR_GAP_ORIGINAL_DEPTH = (
+  NEXT_ROLE_RAIL_ORIGINAL_Z - EMERALD_FLOOR_GAP_REAR_Z
+);
+export const EMERALD_FLOOR_GAP_TRIM_RATIO = 2 / 5;
+export const EMERALD_FLOOR_GAP_TRIM_DEPTH = (
+  EMERALD_FLOOR_GAP_ORIGINAL_DEPTH * EMERALD_FLOOR_GAP_TRIM_RATIO
+);
+const FRONT_ASSEMBLY_Z_SHIFT = -EMERALD_FLOOR_GAP_TRIM_DEPTH;
+const NEXT_ROLE_RAIL_Z = NEXT_ROLE_RAIL_ORIGINAL_Z + FRONT_ASSEMBLY_Z_SHIFT;
+const MACHINE_CABINET_DEPTH = (
+  MACHINE_CABINET_ORIGINAL_DEPTH - EMERALD_FLOOR_GAP_TRIM_DEPTH
+);
+const MACHINE_CABINET_CENTER_Z = (
+  MACHINE_CABINET_ORIGINAL_CENTER_Z + FRONT_ASSEMBLY_Z_SHIFT / 2
+);
+const FRONT_EDGE_Z = FRONT_EDGE_ORIGINAL_Z + FRONT_ASSEMBLY_Z_SHIFT;
+const FRONT_OCHRE_BOARD_CENTER_Z = (
+  FRONT_OCHRE_BOARD_ORIGINAL_CENTER_Z + FRONT_ASSEMBLY_Z_SHIFT
+);
+
+function shiftFrontAssemblyZ(z) {
+  return z + FRONT_ASSEMBLY_Z_SHIFT;
+}
+
+function compressEmeraldFloorGapZ(z) {
+  if (z <= EMERALD_FLOOR_GAP_REAR_Z) return z;
+  if (z >= NEXT_ROLE_RAIL_ORIGINAL_Z) return shiftFrontAssemblyZ(z);
+  const progress = (
+    (z - EMERALD_FLOOR_GAP_REAR_Z) / EMERALD_FLOOR_GAP_ORIGINAL_DEPTH
+  );
+  return lerp(EMERALD_FLOOR_GAP_REAR_Z, NEXT_ROLE_RAIL_Z, progress);
+}
 const NEXT_ROLE_RAIL_SLOT_WIDTH = 0.04;
 const SHARK_ROLE_RAIL_FLOW_SPEED = 0.72;
 const SHARK_ROLE_RAIL_WAVE_COUNT = 2;
@@ -241,12 +284,34 @@ const PAYOUT_SIDE_WALL_WIDTH = 0.12;
 const PAYOUT_SIDE_WALL_COLLIDER_HALF_WIDTH = 0.07;
 const PAYOUT_SIDE_WALL_HEIGHT = 1.07;
 const PAYOUT_SIDE_WALL_CENTER_Y = 1.11;
-const PAYOUT_SIDE_WALL_DEPTH = 4.92;
-const PAYOUT_SIDE_WALL_CENTER_Z = 0.05;
+const PAYOUT_SIDE_WALL_ORIGINAL_DEPTH = 4.92;
+const PAYOUT_SIDE_WALL_ORIGINAL_CENTER_Z = 0.05;
+const PAYOUT_SIDE_WALL_DEPTH = (
+  PAYOUT_SIDE_WALL_ORIGINAL_DEPTH - EMERALD_FLOOR_GAP_TRIM_DEPTH
+);
+const PAYOUT_SIDE_WALL_CENTER_Z = (
+  PAYOUT_SIDE_WALL_ORIGINAL_CENTER_Z + FRONT_ASSEMBLY_Z_SHIFT / 2
+);
 const PAYOUT_SIDE_WALL_MIN_Y = PAYOUT_SIDE_WALL_CENTER_Y - PAYOUT_SIDE_WALL_HEIGHT / 2;
 const PAYOUT_SIDE_WALL_MAX_Y = PAYOUT_SIDE_WALL_CENTER_Y + PAYOUT_SIDE_WALL_HEIGHT / 2;
 const PAYOUT_SIDE_WALL_MIN_Z = PAYOUT_SIDE_WALL_CENTER_Z - PAYOUT_SIDE_WALL_DEPTH / 2;
 const PAYOUT_SIDE_WALL_MAX_Z = PAYOUT_SIDE_WALL_CENTER_Z + PAYOUT_SIDE_WALL_DEPTH / 2;
+const PUSHER_SIDE_CHANNEL_INNER_X = PUSHER_PLATE_HALF_WIDTH;
+const PUSHER_SIDE_CHANNEL_OUTER_X = (
+  PAYOUT_SIDE_WALL_X - PAYOUT_SIDE_WALL_COLLIDER_HALF_WIDTH
+);
+const PUSHER_SIDE_CHANNEL_REAR_Z = (
+  PUSHER_BODY_REAR_Z + PUSHER_PLATE_REAR_OFFSET_Z
+);
+const PUSHER_SIDE_CHANNEL_FRONT_Z = (
+  PUSHER_BODY_NEAREST_Z + PUSHER_PLATE_FRONT_OFFSET_Z
+);
+const PUSHER_SIDE_CHANNEL_CENTER_X = (
+  (PUSHER_SIDE_CHANNEL_INNER_X + PUSHER_SIDE_CHANNEL_OUTER_X) / 2
+);
+const PUSHER_SIDE_CHANNEL_WIDTH = (
+  PUSHER_SIDE_CHANNEL_OUTER_X - PUSHER_SIDE_CHANNEL_INNER_X
+);
 const SHARK_SIDE_WALL_OPENING_REAR_Z = NEXT_ROLE_RAIL_Z - 0.72;
 const SHARK_SIDE_WALL_OPENING_FRONT_Z = NEXT_ROLE_RAIL_Z + 1.16;
 // The collector pocket opening is intentionally one world unit deep.
@@ -255,6 +320,17 @@ const SHARK_SIDE_WALL_OPENING_BOTTOM_Y = PAYOUT_SIDE_WALL_MIN_Y;
 const SHARK_SIDE_WALL_OPENING_TOP_Y = PAYOUT_SIDE_WALL_MAX_Y;
 const SHARK_SIDE_WALL_COIN_GUARD_TOP_Y = STATIC_BED_SURFACE_Y + TABLE_COIN_RADIUS * 1.75;
 const SHARK_SIDE_WALL_RIM_THICKNESS = 0.035;
+
+function pusherSideOutChannelContains(position, radius = TABLE_COIN_RADIUS) {
+  const absoluteX = Math.abs(position.x);
+  return (
+    absoluteX >= PUSHER_SIDE_CHANNEL_INNER_X - radius * 0.9
+    && absoluteX <= PUSHER_SIDE_CHANNEL_OUTER_X + radius * 0.9
+    && position.z >= PUSHER_SIDE_CHANNEL_REAR_Z - radius
+    && position.z <= PUSHER_SIDE_CHANNEL_FRONT_Z + radius
+    && position.y <= STATIC_BED_SURFACE_Y + radius * 0.25
+  );
+}
 export const SHARK_SIDE_WALL_OPENING = Object.freeze({
   wallX: PAYOUT_SIDE_WALL_X,
   rearZ: SHARK_SIDE_WALL_OPENING_REAR_Z,
@@ -366,7 +442,7 @@ function sharkRoleRailPoseAtX(x, path, elapsed, velocityX) {
 const PAYOUT_STATIC_BED_HALF_WIDTH = PAYOUT_SIDE_WALL_X
   - PAYOUT_SIDE_WALL_COLLIDER_HALF_WIDTH
   + 0.01;
-const STATIC_BED_SHELF_CENTER_Z = 0.05;
+const STATIC_BED_SHELF_CENTER_Z = PAYOUT_SIDE_WALL_CENTER_Z;
 // Match the shelf span to the side walls so the front collector opening has the same depth as their front sections.
 const STATIC_BED_SHELF_HALF_DEPTH = PAYOUT_SIDE_WALL_DEPTH / 2;
 const STATIC_BED_FLOOR_REAR_Z = (
@@ -388,12 +464,22 @@ const COLLECTOR_FRAME_GUIDE_LINE_HEIGHT = 0.018;
 const COLLECTOR_FRAME_GUIDE_LINE_DEPTH = 0.038;
 const COLLECTOR_ALUMINUM_FRAME_THICKNESS = 0.012;
 const COLLECTOR_ALUMINUM_FRAME_SPLIT_GAP = 0.04;
+const COLLECTOR_ALUMINUM_COIN_FRICTION = 0.005;
 const COLLECTOR_ALUMINUM_FRAME_VISUAL_WIDTH = (
   PAYOUT_SIDE_WALL_X * 2 + PAYOUT_SIDE_WALL_WIDTH
 );
 const COLLECTOR_ALUMINUM_FRAME_COLLIDER_HALF_WIDTH = (
   PAYOUT_SIDE_WALL_X - PAYOUT_SIDE_WALL_COLLIDER_HALF_WIDTH
 );
+// The visible aluminum can remain paper-thin, but its physics surface must
+// be thick enough that a fast coin cannot tunnel through it between steps.
+const COLLECTOR_ALUMINUM_FRAME_PHYSICAL_THICKNESS = 0.14;
+// The editor-approved meshes stay untouched. Their hidden collision surfaces
+// form one continuous downhill lane beginning exactly at the slide-bed edge.
+const COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY = "pair-1-front";
+const COLLECTOR_ALUMINUM_LANE_ENTRY_Y = STATIC_BED_SURFACE_Y;
+const COLLECTOR_ALUMINUM_LANE_ENTRY_Z = STATIC_BED_FLOOR_FRONT_Z;
+const FLOATING_RING_OCCLUSION_OVERLAY_RENDER_ORDER = -9;
 const COLLECTOR_FRAME_GUIDE_EDGES = Object.freeze([
   "upper1",
   "lower1"
@@ -407,32 +493,65 @@ const COLLECTOR_FRAME_GUIDE_DEFAULTS = Object.freeze({
   lower1: Object.freeze({
     x: 0,
     y: 0.465,
-    z: 2.7 - COLLECTOR_POCKET_OPENING_DEPTH / 2
+    z: FRONT_OCHRE_BOARD_CENTER_Z - COLLECTOR_POCKET_OPENING_DEPTH / 2
   })
 });
 const COLLECTOR_FRAME_EDITOR_STORAGE_KEY = (
-  "imasoraJackpotRapierValidationCollectorFrameEditorV1"
+  "imasoraJackpotRapierValidationCollectorFrameEditorV2FrontTrim036"
 );
+const CENTER_PACHINKO_PIN_EDITOR_STORAGE_KEY = (
+  "imasoraJackpotRapierValidationCenterPachinkoPinsV2FrontTrim036"
+);
+const CENTER_PACHINKO_PIN_EDITOR_DEFAULTS = Object.freeze([
+  Object.freeze({ x: -0.11, y: 0.43, z: shiftFrontAssemblyZ(1.8) }),
+  Object.freeze({ x: 0.11, y: 0.45, z: shiftFrontAssemblyZ(1.8) })
+]);
+const CENTER_J_CHECKER_EDITOR_STORAGE_KEY = (
+  "imasoraJackpotRapierValidationCenterJCheckerV2FrontTrim036"
+);
+// The J checker reuses the 1/2 checker dimensions and their front-facing
+// orientation. Its editor moves and rotates the visual and physical mouth as
+// one unit so the displayed checker never diverges from its collision body.
+const CENTER_J_CHECKER_LAYOUT = Object.freeze({
+  visualX: 0,
+  visualY: 0.35,
+  visualZ: shiftFrontAssemblyZ(2),
+  sensorX: 0,
+  sensorSurfaceY: 0.5475,
+  sensorZ: shiftFrontAssemblyZ(2.335),
+  frameWidth: 0.38,
+  frameHeight: 0.22,
+  frameDepth: 0.09,
+  bottomTrim: 0.03,
+  mouthWidth: 0.28,
+  mouthHeight: 0.15,
+  mouthDepth: 0.055,
+  mouthLocalZ: 0.065,
+  sensorHalfThickness: 0.04
+});
+const CENTER_J_CHECKER_EDITOR_DEFAULTS = Object.freeze({
+  x: CENTER_J_CHECKER_LAYOUT.visualX,
+  y: CENTER_J_CHECKER_LAYOUT.visualY,
+  z: CENTER_J_CHECKER_LAYOUT.visualZ,
+  rotationX: 0,
+  rotationY: 0,
+  rotationZ: 0
+});
 const COLLECTOR_FRAME_EDITOR_BOOTSTRAP = Object.freeze({
   guide: Object.freeze({
-    upper1: Object.freeze({ x: 0.07, y: 0.57, z: 1.51 }),
-    lower1: Object.freeze({ x: -0.09, y: 0.75, z: 2.19 })
+    upper1: Object.freeze({ x: 0.07, y: 0.57, z: STATIC_BED_FLOOR_FRONT_Z }),
+    lower1: Object.freeze({ x: -0.09, y: 0.75, z: shiftFrontAssemblyZ(2.19) })
   }),
   frames: Object.freeze({
     "pair-1-front": Object.freeze({
       x: -0.14,
-      y: 0.74,
-      z: 1.62,
-      width: 4.77,
-      depth: 0.4,
-      thickness: 0.001
-    }),
-    "pair-1-back": Object.freeze({
-      x: 0,
-      y: 0.506,
-      z: 2.037,
-      width: 5.48,
-      depth: 0.53,
+      // The front ramp must meet the coin's bed surface at its entry edge;
+      // keeping this at the old editor height leaves the coin-sized collider
+      // above the coin, so the coin passes underneath it.
+      y: 0.54,
+      z: STATIC_BED_FLOOR_FRONT_Z + 0.065,
+      width: 4.71,
+      depth: 0.8,
       thickness: 0.001
     })
   })
@@ -762,6 +881,13 @@ export const ST_HIT_RATE = 1 - Math.pow(1 - ST_CONTINUATION_RATE, 1 / ST_SPINS);
 export const JACKPOT_PAYOUTS = Object.freeze({ "77": 48, "33": 14 });
 export const RED_SPIN_PAYOUT = 7;
 export const START_SPIN_SEQUENCE_DURATION = 1.95 * 4;
+const CENTER_J_CHECKER_JACKPOT_PAYOUT = JACKPOT_PAYOUTS["77"];
+const CENTER_J_CHECKER_JACKPOT_RELEASE_DELAY = 5;
+const CENTER_J_CHECKER_JACKPOT_COOLDOWN = (
+  CENTER_J_CHECKER_JACKPOT_RELEASE_DELAY
+  + CENTER_J_CHECKER_JACKPOT_PAYOUT * PAYOUT_RELEASE_INTERVAL
+  + 0.8
+);
 
 const SPIN_PHASE_DURATION = START_SPIN_SEQUENCE_DURATION / 2;
 const SPIN_FIRST_LOCK_AT = SPIN_PHASE_DURATION * 0.68;
@@ -918,7 +1044,7 @@ const markup = `
     <header class="icp-hud">
       <div class="icp-hud-cell"><small>もちコイン</small><strong data-icp-credits>250</strong></div>
       <div class="icp-hud-logo"><small>IMASORA</small><strong>JACKPOT</strong></div>
-      <div class="icp-hud-cell icp-hud-cell-right"><small>獲得</small><strong data-icp-collected>0</strong></div>
+      <div class="icp-hud-cell icp-hud-cell-right" hidden aria-hidden="true"><small>獲得</small><strong data-icp-collected>0</strong></div>
     </header>
     <div class="icp-stage" data-icp-stage>
       <canvas class="icp-canvas" data-icp-canvas aria-label="一発台型パチンコ盤とコインプッシャーの3Dゲーム画面"></canvas>
@@ -970,22 +1096,6 @@ const markup = `
           <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="front" aria-pressed="false">正面</button>
           <button type="button" data-icp-editor-action="camera" data-icp-camera-mode="normal" aria-pressed="true">通常</button>
         </div>
-        <section class="icp-collector-guide-editor" data-icp-collector-guide-editor aria-label="獲得ポケット用アルミ枠の位置決め">
-          <header><strong>獲得ポケット枠 位置決め</strong><output data-icp-collector-guide-readout></output></header>
-          <div class="icp-collector-guide-coordinate-row is-upper">
-            <span>上辺</span>
-            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="upper1" data-icp-collector-guide-axis="x" aria-label="赤い上辺のX座標"></label>
-            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="upper1" data-icp-collector-guide-axis="y" aria-label="赤い上辺のY座標"></label>
-            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="upper1" data-icp-collector-guide-axis="z" aria-label="赤い上辺のZ座標"></label>
-          </div>
-          <div class="icp-collector-guide-coordinate-row is-lower">
-            <span>下辺</span>
-            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="lower1" data-icp-collector-guide-axis="x" aria-label="緑の下辺のX座標"></label>
-            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="lower1" data-icp-collector-guide-axis="y" aria-label="緑の下辺のY座標"></label>
-            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-guide-edge="lower1" data-icp-collector-guide-axis="z" aria-label="緑の下辺のZ座標"></label>
-          </div>
-          <button type="button" data-icp-editor-action="reset-collector-guides">基準位置へ戻す</button>
-        </section>
         <section class="icp-collector-frame-editor" data-icp-collector-frame-editor aria-label="分割アルミ枠の位置とサイズ">
           <header><strong>分割アルミ枠 位置・サイズ</strong><output data-icp-collector-frame-readout></output></header>
           <div class="icp-collector-frame-row" data-icp-collector-frame-row="pair-1-front">
@@ -997,16 +1107,39 @@ const markup = `
             <label><b>奥行</b><input type="number" step="0.01" min="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-front" data-icp-collector-frame-axis="depth" aria-label="前側アルミ枠の奥行"></label>
             <label><b>厚み</b><input type="number" step="0.001" min="0.001" inputmode="decimal" data-icp-collector-frame-key="pair-1-front" data-icp-collector-frame-axis="thickness" aria-label="前側アルミ枠の厚み"></label>
           </div>
-          <div class="icp-collector-frame-row" data-icp-collector-frame-row="pair-1-back">
-            <span>後側</span>
-            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="x" aria-label="後側アルミ枠のX座標"></label>
-            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="y" aria-label="後側アルミ枠のY座標"></label>
-            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="z" aria-label="後側アルミ枠のZ座標"></label>
-            <label><b>幅</b><input type="number" step="0.01" min="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="width" aria-label="後側アルミ枠の幅"></label>
-            <label><b>奥行</b><input type="number" step="0.01" min="0.01" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="depth" aria-label="後側アルミ枠の奥行"></label>
-            <label><b>厚み</b><input type="number" step="0.001" min="0.001" inputmode="decimal" data-icp-collector-frame-key="pair-1-back" data-icp-collector-frame-axis="thickness" aria-label="後側アルミ枠の厚み"></label>
-          </div>
           <button type="button" data-icp-editor-action="reset-collector-frames">基準位置へ戻す</button>
+        </section>
+        <section class="icp-collector-frame-editor icp-floating-ring-editor" data-icp-center-pin-editor aria-label="中央パチンコ釘の位置">
+          <header><strong>中央パチンコ釘 位置決め</strong><output data-icp-center-pin-readout></output></header>
+          <div class="icp-collector-frame-row">
+            <span>釘1</span>
+            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="0" data-icp-center-pin-axis="x" aria-label="中央パチンコ釘1のX座標"></label>
+            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="0" data-icp-center-pin-axis="y" aria-label="中央パチンコ釘1のY座標"></label>
+            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="0" data-icp-center-pin-axis="z" aria-label="中央パチンコ釘1のZ座標"></label>
+          </div>
+          <div class="icp-collector-frame-row">
+            <span>釘2</span>
+            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="1" data-icp-center-pin-axis="x" aria-label="中央パチンコ釘2のX座標"></label>
+            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="1" data-icp-center-pin-axis="y" aria-label="中央パチンコ釘2のY座標"></label>
+            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-pin-index="1" data-icp-center-pin-axis="z" aria-label="中央パチンコ釘2のZ座標"></label>
+          </div>
+          <button type="button" data-icp-editor-action="reset-center-pins">基準位置へ戻す</button>
+        </section>
+        <section class="icp-collector-frame-editor icp-floating-ring-editor" data-icp-center-j-checker-editor aria-label="J checker position and rotation">
+          <header><strong>J&#12481;&#12455;&#12483;&#12459;&#12540; &#20301;&#32622;&#12539;&#21521;&#12365;</strong><output data-icp-center-j-checker-readout></output></header>
+          <div class="icp-collector-frame-row">
+            <span>&#20301;&#32622;</span>
+            <label><b>X</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-j-checker-axis="x" aria-label="J checker X position"></label>
+            <label><b>Y</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-j-checker-axis="y" aria-label="J checker Y position"></label>
+            <label><b>Z</b><input type="number" step="0.01" inputmode="decimal" data-icp-center-j-checker-axis="z" aria-label="J checker Z position"></label>
+          </div>
+          <div class="icp-collector-frame-row">
+            <span>&#22238;&#36578;&deg;</span>
+            <label><b>X</b><input type="number" step="1" inputmode="decimal" data-icp-center-j-checker-axis="rotationX" aria-label="J checker X rotation in degrees"></label>
+            <label><b>Y</b><input type="number" step="1" inputmode="decimal" data-icp-center-j-checker-axis="rotationY" aria-label="J checker Y rotation in degrees"></label>
+            <label><b>Z</b><input type="number" step="1" inputmode="decimal" data-icp-center-j-checker-axis="rotationZ" aria-label="J checker Z rotation in degrees"></label>
+          </div>
+          <button type="button" data-icp-editor-action="reset-center-j-checker">&#22522;&#28310;&#20301;&#32622;&#12539;&#21521;&#12365;&#12408;&#25147;&#12377;</button>
         </section>
         <div class="icp-layout-object-select" aria-label="風車とシーソーを選択">
           <button type="button" data-icp-editor-select-object="windmill-left">左風車</button>
@@ -1867,6 +2000,24 @@ function createCheckerMarkMesh(mark, width, height, material) {
     addBar(width * 0.72, thickness, 0, 0);
     addBar(thickness, height * 0.36, -width * 0.33, -height * 0.18);
     addBar(width * 0.72, thickness, 0, -height * 0.35);
+  } else if (mark === "J" || mark === "Ｊ") {
+    // Build J explicitly. The former generic fallback draws the curved S mark,
+    // which can look like the Japanese character "し" when reused for J.
+    addBar(width * 0.78, thickness, 0, height * 0.38);
+    addBar(thickness, height * 0.58, width * 0.24, height * 0.04);
+    const hook = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(width * 0.24, -height * 0.17, 0),
+      new THREE.Vector3(width * 0.22, -height * 0.31, 0),
+      new THREE.Vector3(width * 0.08, -height * 0.41, 0),
+      new THREE.Vector3(-width * 0.12, -height * 0.39, 0),
+      new THREE.Vector3(-width * 0.28, -height * 0.25, 0)
+    ], false, "centripetal");
+    const hookMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(hook, 18, thickness * 0.48, 8, false),
+      material
+    );
+    hookMesh.renderOrder = 4;
+    group.add(hookMesh);
   } else {
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(width * 0.42, height * 0.32, 0),
@@ -2468,6 +2619,47 @@ class ImasoraJackpotCoinPusherGame {
     this.collectorAluminumFrames = [];
     this.collectorAluminumFrameEditorDefaults = {};
     this.collectorAluminumFrameEditorState = {};
+    this.centerPachinkoPins = [];
+    this.centerJChecker = null;
+    this.centerJCheckerJackpotCooldown = 0;
+    this.centerJCheckerJackpotReleaseTimer = 0;
+    this.centerJCheckerJackpotPendingPayout = 0;
+    this.centerJCheckerGateGeometry = {
+      valid: false,
+      centerX: 0,
+      centerZ: 0,
+      tangentX: 1,
+      tangentZ: 0,
+      normalX: 0,
+      normalZ: 1,
+      length: 0,
+      minimumY: 0,
+      maximumY: 0
+    };
+    this.centerJCheckerEditorDefaults = { ...CENTER_J_CHECKER_EDITOR_DEFAULTS };
+    const savedCenterJChecker = this.readCenterJCheckerEditorState();
+    this.centerJCheckerEditorState = { ...this.centerJCheckerEditorDefaults };
+    ["x", "y", "z", "rotationX", "rotationY", "rotationZ"].forEach(axis => {
+      if (Number.isFinite(Number(savedCenterJChecker?.[axis]))) {
+        this.centerJCheckerEditorState[axis] = Number(savedCenterJChecker[axis]);
+      }
+    });
+    this.centerPachinkoPinEditorDefaults = CENTER_PACHINKO_PIN_EDITOR_DEFAULTS.map(
+      point => ({ ...point })
+    );
+    const savedCenterPachinkoPins = this.readCenterPachinkoPinEditorState();
+    this.centerPachinkoPinEditorState = this.centerPachinkoPinEditorDefaults.map(
+      (defaults, index) => {
+        const saved = savedCenterPachinkoPins?.pins?.[index];
+        const state = { ...defaults };
+        ["x", "y", "z"].forEach(axis => {
+          if (Number.isFinite(Number(saved?.[axis]))) {
+            state[axis] = Number(saved[axis]);
+          }
+        });
+        return state;
+      }
+    );
     this.pachinkoFrameMaterial = null;
     this.collectorFrameGuideDefaults = {
       upper1: { ...COLLECTOR_FRAME_GUIDE_DEFAULTS.upper1 },
@@ -2586,6 +2778,10 @@ class ImasoraJackpotCoinPusherGame {
       collectorGuideReadout: this.root.querySelector("[data-icp-collector-guide-readout]"),
       collectorFrameInputs: Array.from(this.root.querySelectorAll("[data-icp-collector-frame-key][data-icp-collector-frame-axis]")),
       collectorFrameReadout: this.root.querySelector("[data-icp-collector-frame-readout]"),
+      centerPinInputs: Array.from(this.root.querySelectorAll("[data-icp-center-pin-index][data-icp-center-pin-axis]")),
+      centerPinReadout: this.root.querySelector("[data-icp-center-pin-readout]"),
+      centerJCheckerInputs: Array.from(this.root.querySelectorAll("[data-icp-center-j-checker-axis]")),
+      centerJCheckerReadout: this.root.querySelector("[data-icp-center-j-checker-readout]"),
       pinX: this.root.querySelector("[data-icp-pin-x]"),
       pinY: this.root.querySelector("[data-icp-pin-y]"),
       editorStep: this.root.querySelector("[data-icp-editor-step]"),
@@ -2597,6 +2793,8 @@ class ImasoraJackpotCoinPusherGame {
     this.createMachine();
     this.createPachinkoBoard();
     this.createCollectorAluminumFrames();
+    this.createCenterPachinkoPins();
+    this.createCenterJChecker();
     this.createCompanionMarquee();
     this.bindEvents();
     this.setDigits("00");
@@ -2640,6 +2838,9 @@ class ImasoraJackpotCoinPusherGame {
 
     this.coinMaterial = new CANNON.Material("coin");
     this.tableMaterial = new CANNON.Material("table");
+    this.collectorAluminumMaterial = new CANNON.Material(
+      "collector-aluminum"
+    );
     this.pusherMaterial = new CANNON.Material("pusher");
     this.pusherPlateMaterial = new CANNON.Material("pusher-plate");
     this.payoutChutePhysicsMaterial = new CANNON.Material("payout-chute");
@@ -2654,6 +2855,16 @@ class ImasoraJackpotCoinPusherGame {
       contactEquationStiffness: 8e6,
       contactEquationRelaxation: 4
     }));
+    this.world.addContactMaterial(new CANNON.ContactMaterial(
+      this.coinMaterial,
+      this.collectorAluminumMaterial,
+      {
+        friction: COLLECTOR_ALUMINUM_COIN_FRICTION,
+        restitution: 0.03,
+        contactEquationStiffness: 8e6,
+        contactEquationRelaxation: 4
+      }
+    ));
     this.world.addContactMaterial(new CANNON.ContactMaterial(this.coinMaterial, this.pusherMaterial, {
       friction: 0.42,
       restitution: 0.04
@@ -2677,6 +2888,12 @@ class ImasoraJackpotCoinPusherGame {
     this.world.addContactMaterial(new CANNON.ContactMaterial(this.tokenMaterial, this.pinMaterial, {
       friction: 0.01,
       restitution: 0.44
+    }));
+    this.world.addContactMaterial(new CANNON.ContactMaterial(this.coinMaterial, this.pinMaterial, {
+      friction: 0.01,
+      restitution: 0.44,
+      contactEquationStiffness: 8e6,
+      contactEquationRelaxation: 4
     }));
     this.world.addContactMaterial(new CANNON.ContactMaterial(this.tokenMaterial, this.railMaterial, {
       friction: 0.006,
@@ -2857,7 +3074,7 @@ class ImasoraJackpotCoinPusherGame {
     });
 
     const cabinet = new THREE.Mesh(
-      new THREE.BoxGeometry(MACHINE_CABINET_WIDTH, 1.35, 5.5),
+      new THREE.BoxGeometry(MACHINE_CABINET_WIDTH, 1.35, MACHINE_CABINET_DEPTH),
       [
         baseMaterial,
         baseMaterial,
@@ -2868,12 +3085,14 @@ class ImasoraJackpotCoinPusherGame {
       ]
     );
     cabinet.name = "icp-static-bed-surface";
-    cabinet.position.set(0, -0.05, 0.12);
+    cabinet.position.set(0, -0.05, MACHINE_CABINET_CENTER_Z);
     cabinet.castShadow = true;
     cabinet.receiveShadow = true;
     this.scene.add(cabinet);
 
-    const cabinetFrontZ = 0.12 + 5.5 / 2 + 0.001;
+    const cabinetFrontZ = (
+      MACHINE_CABINET_CENTER_Z + MACHINE_CABINET_DEPTH / 2 + 0.001
+    );
     const cabinetBottomY = -0.05 - 1.35 / 2;
     const collectorBoardWidth = 5.12;
     const cabinetFrontSideWidth = (
@@ -2911,17 +3130,77 @@ class ImasoraJackpotCoinPusherGame {
     });
     this.scene.add(cabinetFrontPanels);
 
-    const shelf = new THREE.Mesh(
-      new THREE.BoxGeometry(5.15, 0.22, STATIC_BED_FLOOR_DEPTH),
-      bedMaterial
-    );
+    const shelf = new THREE.Group();
     shelf.name = "icp-static-bed-underlay";
-    shelf.position.set(
+    const visualShelfHalfWidth = 5.15 / 2;
+    const addShelfVisualSegment = (width, x, minZ, maxZ, name) => {
+      if (width <= 1e-6 || maxZ - minZ <= 1e-6) return;
+      const segment = new THREE.Mesh(
+        new THREE.BoxGeometry(width, 0.22, maxZ - minZ),
+        bedMaterial
+      );
+      segment.name = name;
+      segment.position.set(
+        x,
+        STATIC_BED_SURFACE_Y - 0.11,
+        (minZ + maxZ) / 2
+      );
+      segment.receiveShadow = true;
+      shelf.add(segment);
+    };
+    addShelfVisualSegment(
+      PUSHER_SIDE_CHANNEL_INNER_X * 2,
       0,
-      STATIC_BED_SURFACE_Y - 0.11,
-      STATIC_BED_FLOOR_CENTER_Z
+      STATIC_BED_FLOOR_REAR_Z,
+      STATIC_BED_FLOOR_FRONT_Z,
+      "icp-static-bed-underlay-center"
     );
-    shelf.receiveShadow = true;
+    const visualSideFloorWidth = Math.max(
+      0,
+      visualShelfHalfWidth - PUSHER_SIDE_CHANNEL_INNER_X
+    );
+    const sideFloorRanges = [
+      [STATIC_BED_FLOOR_REAR_Z, PUSHER_SIDE_CHANNEL_REAR_Z],
+      [PUSHER_SIDE_CHANNEL_FRONT_Z, STATIC_BED_FLOOR_FRONT_Z]
+    ];
+    PAYOUT_CHUTE_WALL_SIDES.forEach(wallSide => {
+      sideFloorRanges.forEach(([minZ, maxZ], rangeIndex) => {
+        addShelfVisualSegment(
+          visualSideFloorWidth,
+          wallSide * (
+            PUSHER_SIDE_CHANNEL_INNER_X + visualSideFloorWidth / 2
+          ),
+          minZ,
+          maxZ,
+          `icp-static-bed-underlay-side-${wallSide > 0 ? "right" : "left"}-${rangeIndex + 1}`
+        );
+      });
+    });
+    const sideOutChannelMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x02070b,
+      emissive: 0x001a22,
+      emissiveIntensity: 0.25,
+      metalness: 0.16,
+      roughness: 0.46
+    });
+    PAYOUT_CHUTE_WALL_SIDES.forEach(wallSide => {
+      const channel = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          PUSHER_SIDE_CHANNEL_WIDTH,
+          0.018,
+          PUSHER_SIDE_CHANNEL_FRONT_Z - PUSHER_SIDE_CHANNEL_REAR_Z
+        ),
+        sideOutChannelMaterial
+      );
+      channel.name = `icp-pusher-side-out-channel-${wallSide > 0 ? "right" : "left"}`;
+      channel.position.set(
+        wallSide * PUSHER_SIDE_CHANNEL_CENTER_X,
+        STATIC_BED_SURFACE_Y - 0.006,
+        (PUSHER_SIDE_CHANNEL_REAR_Z + PUSHER_SIDE_CHANNEL_FRONT_Z) / 2
+      );
+      channel.receiveShadow = true;
+      shelf.add(channel);
+    });
     this.scene.add(shelf);
 
     const railWaveCount = SHARK_ROLE_RAIL_WAVE_COUNT;
@@ -3002,18 +3281,39 @@ class ImasoraJackpotCoinPusherGame {
       ) * Math.PI * 2 * railWaveCount
     };
 
-    // Leave the front floor open between the two front side walls for the collector pocket.
+    // Keep the collector pocket open and remove only the two floor channels alongside the pusher travel.
     const shelfBody = new CANNON.Body({ mass: 0, material: this.tableMaterial });
-    shelfBody.addShape(new CANNON.Box(new CANNON.Vec3(
-      PAYOUT_STATIC_BED_HALF_WIDTH,
-      0.11,
-      STATIC_BED_FLOOR_DEPTH / 2
-    )));
-    shelfBody.position.set(
+    const addShelfPhysicsSegment = (halfWidth, x, minZ, maxZ) => {
+      if (halfWidth <= 1e-6 || maxZ - minZ <= 1e-6) return;
+      shelfBody.addShape(
+        new CANNON.Box(new CANNON.Vec3(
+          halfWidth,
+          0.11,
+          (maxZ - minZ) / 2
+        )),
+        new CANNON.Vec3(
+          x,
+          STATIC_BED_SURFACE_Y - 0.11,
+          (minZ + maxZ) / 2
+        )
+      );
+    };
+    addShelfPhysicsSegment(
+      PUSHER_SIDE_CHANNEL_INNER_X,
       0,
-      STATIC_BED_SURFACE_Y - 0.11,
-      STATIC_BED_FLOOR_CENTER_Z
+      STATIC_BED_FLOOR_REAR_Z,
+      STATIC_BED_FLOOR_FRONT_Z
     );
+    sideFloorRanges.forEach(([minZ, maxZ]) => {
+      PAYOUT_CHUTE_WALL_SIDES.forEach(wallSide => {
+        addShelfPhysicsSegment(
+          PUSHER_SIDE_CHANNEL_WIDTH / 2,
+          wallSide * PUSHER_SIDE_CHANNEL_CENTER_X,
+          minZ,
+          maxZ
+        );
+      });
+    });
     this.world.addBody(shelfBody);
     this.staticBedBody = shelfBody;
     this.createSharkMechanism();
@@ -3377,7 +3677,7 @@ class ImasoraJackpotCoinPusherGame {
       goldMaterial
     );
     frontOchreBoard.name = "icp-front-ochre-board";
-    frontOchreBoard.position.set(0, 0.4, 2.7);
+    frontOchreBoard.position.set(0, 0.4, FRONT_OCHRE_BOARD_CENTER_Z);
     this.scene.add(frontOchreBoard);
     this.createCollectorFramePositionGuides();
 
@@ -6982,7 +7282,7 @@ class ImasoraJackpotCoinPusherGame {
     for (let row = 0; row < rows; row += 1) {
       for (let column = 0; column < columns; column += 1) {
         const x = (column - (columns - 1) / 2) * 0.38 + (row % 2 ? 0.095 : -0.095);
-        const z = INITIAL_COIN_REAR_Z + row * 0.27;
+        const z = compressEmeraldFloorGapZ(INITIAL_COIN_REAR_Z + row * 0.27);
         if (Math.abs(x) > 2.32) continue;
         this.spawnTableCoin(x, z, {
           y: TABLE_TOP_Y + TABLE_COIN_COLLIDER_THICKNESS / 2 + INITIAL_COIN_CLEARANCE,
@@ -7014,7 +7314,7 @@ class ImasoraJackpotCoinPusherGame {
       const row = Math.floor(slot / columns);
       const column = slot % columns;
       const x = (column - (columns - 1) / 2) * 0.38 + (row % 2 ? 0.095 : -0.095);
-      const z = INITIAL_COIN_REAR_Z + row * 0.27;
+      const z = compressEmeraldFloorGapZ(INITIAL_COIN_REAR_Z + row * 0.27);
       const y = TABLE_TOP_Y
         + TABLE_COIN_COLLIDER_THICKNESS / 2
         + INITIAL_COIN_CLEARANCE
@@ -7231,6 +7531,9 @@ class ImasoraJackpotCoinPusherGame {
       pusherPlateSupportFrames: 0,
       pusherPlateGraceFrames: 0,
       sharkMouthEntryArmed: false,
+      centerJCheckerPreviousX: body.position.x,
+      centerJCheckerPreviousY: body.position.y,
+      centerJCheckerPreviousZ: body.position.z,
       collected: false
     };
     this.ensureTableCoinInstanceCapacity(this.tableCoins.length + 1);
@@ -7784,6 +8087,73 @@ class ImasoraJackpotCoinPusherGame {
     }
   }
 
+  readCenterPachinkoPinEditorState() {
+    try {
+      const source = window.localStorage.getItem(
+        CENTER_PACHINKO_PIN_EDITOR_STORAGE_KEY
+      );
+      if (!source) return null;
+      const parsed = JSON.parse(source);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  saveCenterPachinkoPinEditorState() {
+    const payload = {
+      version: 1,
+      pins: this.centerPachinkoPinEditorState.map(point => ({
+        x: point.x,
+        y: point.y,
+        z: point.z
+      }))
+    };
+    try {
+      window.localStorage.setItem(
+        CENTER_PACHINKO_PIN_EDITOR_STORAGE_KEY,
+        JSON.stringify(payload)
+      );
+    } catch {
+      // Keep the live editor usable when storage is unavailable.
+    }
+  }
+
+  readCenterJCheckerEditorState() {
+    try {
+      const source = window.localStorage.getItem(
+        CENTER_J_CHECKER_EDITOR_STORAGE_KEY
+      );
+      if (!source) return null;
+      const parsed = JSON.parse(source);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  saveCenterJCheckerEditorState() {
+    const state = this.centerJCheckerEditorState;
+    if (!state) return;
+    const payload = {
+      version: 1,
+      x: state.x,
+      y: state.y,
+      z: state.z,
+      rotationX: state.rotationX,
+      rotationY: state.rotationY,
+      rotationZ: state.rotationZ
+    };
+    try {
+      window.localStorage.setItem(
+        CENTER_J_CHECKER_EDITOR_STORAGE_KEY,
+        JSON.stringify(payload)
+      );
+    } catch {
+      // Keep the live editor usable when storage is unavailable.
+    }
+  }
+
   createCollectorFramePositionGuides() {
     const group = new THREE.Group();
     group.name = "icp-collector-frame-position-guides";
@@ -7820,11 +8190,330 @@ class ImasoraJackpotCoinPusherGame {
     this.syncCollectorFrameGuideEditor();
   }
 
+  createCenterPachinkoPins() {
+    if (!this.pinMaterial) return;
+
+    // Use the same dimensions and orientation as the existing pachinko pins.
+    // Match the existing pachinko-pin gold; the collision body remains the
+    // same static sphere used by addPin(), so coins interact with real pins.
+    const pinMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffed78,
+      emissive: 0xffb20a,
+      emissiveIntensity: 1.15,
+      metalness: 1,
+      roughness: 0.07,
+      clearcoat: 1,
+      clearcoatRoughness: 0.025,
+      reflectivity: 1
+    });
+    const pinGeometry = new THREE.CylinderGeometry(0.033, 0.038, 0.38, 16);
+    pinGeometry.rotateX(Math.PI / 2);
+    this.centerPachinkoPins = [];
+    this.centerPachinkoPinEditorState.forEach((state, index) => {
+      const visual = new THREE.Mesh(pinGeometry, pinMaterial);
+      visual.name = `icp-center-pachinko-pin-${index + 1}`;
+      visual.position.set(state.x, state.y, state.z);
+      visual.castShadow = true;
+      visual.receiveShadow = true;
+      visual.userData.centerPachinkoPin = true;
+      this.scene.add(visual);
+
+      const body = new CANNON.Body({ mass: 0, material: this.pinMaterial });
+      body.addShape(new CANNON.Sphere(0.044));
+      body.position.set(state.x, state.y, state.z);
+      body.centerPachinkoPin = true;
+      this.world.addBody(body);
+      this.centerPachinkoPins.push({ visual, body });
+    });
+    this.syncCenterPachinkoPinEditor();
+  }
+
+  createCenterJChecker() {
+    const layout = CENTER_J_CHECKER_LAYOUT;
+    const contentCenterY = layout.bottomTrim / 2;
+    const frameMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x57e5c5,
+      emissive: 0x075b50,
+      emissiveIntensity: 0.58,
+      metalness: 0.5,
+      roughness: 0.2,
+      clearcoat: 0.9
+    });
+    const mouthMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x031014,
+      emissive: 0x001c24,
+      emissiveIntensity: 0.46,
+      metalness: 0.28,
+      roughness: 0.22,
+      clearcoat: 0.72
+    });
+    const markMaterial = new THREE.MeshBasicMaterial({
+      color: 0xd4dcda,
+      toneMapped: false
+    });
+    const indicatorMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x566669,
+      emissive: 0x11191a,
+      emissiveIntensity: 0.12,
+      metalness: 0.34,
+      roughness: 0.68,
+      clearcoat: 0.18
+    });
+
+    const checker = new THREE.Group();
+    checker.name = "icp-center-j-checker";
+    checker.userData.centerJChecker = {
+      label: "Ｊ",
+      orientation: "pachinko-board-front",
+      physicalEntryOnly: true
+    };
+
+    const frame = new THREE.Mesh(
+      new THREE.BoxGeometry(
+        layout.frameWidth,
+        layout.frameHeight,
+        layout.frameDepth
+      ),
+      frameMaterial
+    );
+    frame.name = "icp-center-j-checker-frame";
+    frame.position.y = contentCenterY;
+    frame.castShadow = true;
+    frame.receiveShadow = true;
+    checker.add(frame);
+
+    const mouth = new THREE.Mesh(
+      new THREE.BoxGeometry(
+        layout.mouthWidth,
+        layout.mouthHeight,
+        layout.mouthDepth
+      ),
+      mouthMaterial
+    );
+    mouth.name = "icp-center-j-checker-mouth";
+    mouth.position.set(0, contentCenterY, layout.mouthLocalZ);
+    mouth.castShadow = true;
+    mouth.receiveShadow = true;
+    checker.add(mouth);
+
+    const mark = createCheckerMarkMesh("Ｊ", 0.18, 0.13, markMaterial);
+    mark.name = "icp-center-j-checker-mark-fullwidth-j";
+    mark.position.y = contentCenterY;
+    mark.position.z = layout.mouthLocalZ + layout.mouthDepth / 2 + 0.006;
+    mark.userData.checkerMark = "Ｊ";
+    checker.add(mark);
+
+    const indicator = new THREE.Mesh(
+      new THREE.SphereGeometry(0.018, 14, 10),
+      indicatorMaterial
+    );
+    indicator.name = "icp-center-j-checker-indicator";
+    indicator.position.set(0, 0.165, 0.035);
+    indicator.castShadow = true;
+    checker.add(indicator);
+    this.scene.add(checker);
+
+    // Match the physical sensor to the visible dark mouth's local dimensions.
+    // The editor applies the same position and Euler rotation to both objects.
+    const sensorHalfExtents = new CANNON.Vec3(
+      layout.mouthWidth / 2,
+      layout.mouthHeight / 2,
+      layout.sensorHalfThickness
+    );
+    const sensorBody = new CANNON.Body({
+      mass: 0,
+      material: this.tableMaterial
+    });
+    sensorBody.addShape(new CANNON.Box(sensorHalfExtents));
+    sensorBody.centerJCheckerSensor = true;
+    this.world.addBody(sensorBody);
+
+    this.centerJChecker = {
+      label: "Ｊ",
+      visual: checker,
+      frame,
+      mouth,
+      indicator,
+      indicatorMaterial,
+      sensorBody,
+      sensorHalfExtents,
+      sensorLocalPosition: new THREE.Vector3(
+        0,
+        contentCenterY,
+        layout.mouthLocalZ
+      ),
+      flash: 0,
+      hitCount: 0
+    };
+    this.applyCenterJCheckerEditorState();
+    this.syncCenterJCheckerEditor();
+  }
+
+  updateCenterJCheckerGateGeometry() {
+    const gate = this.centerJCheckerGateGeometry;
+    const first = this.centerPachinkoPins?.[0]?.body?.position;
+    const second = this.centerPachinkoPins?.[1]?.body?.position;
+    if (!gate || !first || !second) {
+      if (gate) gate.valid = false;
+      return gate;
+    }
+
+    const deltaX = second.x - first.x;
+    const deltaZ = second.z - first.z;
+    const length = Math.hypot(deltaX, deltaZ);
+    if (length <= 0.0001) {
+      gate.valid = false;
+      return gate;
+    }
+
+    const centerX = (first.x + second.x) / 2;
+    const centerZ = (first.z + second.z) / 2;
+    const tangentX = deltaX / length;
+    const tangentZ = deltaZ / length;
+    let normalX = -tangentZ;
+    let normalZ = tangentX;
+    const checkerPosition = this.centerJChecker?.visual?.position;
+    if (
+      checkerPosition
+      && (
+        (checkerPosition.x - centerX) * normalX
+        + (checkerPosition.z - centerZ) * normalZ
+      ) < 0
+    ) {
+      normalX *= -1;
+      normalZ *= -1;
+    }
+
+    gate.valid = true;
+    gate.centerX = centerX;
+    gate.centerZ = centerZ;
+    gate.tangentX = tangentX;
+    gate.tangentZ = tangentZ;
+    gate.normalX = normalX;
+    gate.normalZ = normalZ;
+    gate.length = length;
+    gate.minimumY = Math.min(first.y, second.y);
+    gate.maximumY = Math.max(first.y, second.y);
+    return gate;
+  }
+
+  didCoinPassBetweenCenterPins(coin, gate) {
+    if (!coin?.body) return false;
+    const current = coin.body.position;
+    const previousX = coin.centerJCheckerPreviousX;
+    const previousY = coin.centerJCheckerPreviousY;
+    const previousZ = coin.centerJCheckerPreviousZ;
+    coin.centerJCheckerPreviousX = current.x;
+    coin.centerJCheckerPreviousY = current.y;
+    coin.centerJCheckerPreviousZ = current.z;
+    if (
+      !gate?.valid
+      || !Number.isFinite(previousX)
+      || !Number.isFinite(previousY)
+      || !Number.isFinite(previousZ)
+    ) return false;
+
+    const previousDistance = (
+      (previousX - gate.centerX) * gate.normalX
+      + (previousZ - gate.centerZ) * gate.normalZ
+    );
+    const currentDistance = (
+      (current.x - gate.centerX) * gate.normalX
+      + (current.z - gate.centerZ) * gate.normalZ
+    );
+    const forwardDistance = currentDistance - previousDistance;
+    if (
+      previousDistance >= 0
+      || currentDistance < 0
+      || forwardDistance <= 0.000001
+    ) return false;
+
+    const crossingProgress = clamp(
+      -previousDistance / forwardDistance,
+      0,
+      1
+    );
+    const crossingX = lerp(previousX, current.x, crossingProgress);
+    const crossingY = lerp(previousY, current.y, crossingProgress);
+    const crossingZ = lerp(previousZ, current.z, crossingProgress);
+    const alongGate = (
+      (crossingX - gate.centerX) * gate.tangentX
+      + (crossingZ - gate.centerZ) * gate.tangentZ
+    );
+    const radius = coin.radius || TABLE_COIN_RADIUS;
+    return (
+      Math.abs(alongGate) <= gate.length / 2 + 0.000001
+      && crossingY >= gate.minimumY - radius * 1.25
+      && crossingY <= gate.maximumY + radius * 2.5
+    );
+  }
+
+  triggerCenterJCheckerJackpot(index) {
+    const coin = this.tableCoins[index];
+    if (
+      !coin
+      || coin.collected
+      || this.centerJCheckerJackpotCooldown > 0
+      || this.attackerRound
+    ) return false;
+    this.removeCoin(index);
+    this.centerJCheckerJackpotCooldown = CENTER_J_CHECKER_JACKPOT_COOLDOWN;
+    this.centerJCheckerJackpotReleaseTimer = CENTER_J_CHECKER_JACKPOT_RELEASE_DELAY;
+    this.centerJCheckerJackpotPendingPayout += CENTER_J_CHECKER_JACKPOT_PAYOUT;
+    if (this.centerJChecker) {
+      this.centerJChecker.flash = CENTER_J_CHECKER_JACKPOT_RELEASE_DELAY + 0.9;
+      this.centerJChecker.hitCount += 1;
+    }
+    this.root.classList.remove("is-jackpot-small");
+    this.root.classList.add("is-jackpot-big");
+    this.showCallout(
+      `中央釘1・2間通過 JACKPOT認定・5秒後に${CENTER_J_CHECKER_JACKPOT_PAYOUT}枚放出`,
+      CENTER_J_CHECKER_JACKPOT_RELEASE_DELAY + 0.5,
+      "jackpot"
+    );
+    this.setSpinLabel("J CHECKER JACKPOT");
+    this.cameraShake = Math.max(this.cameraShake, 0.12);
+    this.refreshHud();
+    return true;
+  }
+
+  updateCenterJChecker(delta) {
+    const checker = this.centerJChecker;
+    if (!checker) return;
+    this.centerJCheckerJackpotCooldown = Math.max(
+      0,
+      this.centerJCheckerJackpotCooldown - delta
+    );
+    if (this.centerJCheckerJackpotReleaseTimer > 0) {
+      this.centerJCheckerJackpotReleaseTimer = Math.max(
+        0,
+        this.centerJCheckerJackpotReleaseTimer - delta
+      );
+      if (this.centerJCheckerJackpotReleaseTimer <= 0) {
+        const payout = this.centerJCheckerJackpotPendingPayout;
+        this.centerJCheckerJackpotPendingPayout = 0;
+        this.pendingPayout += payout;
+        if (payout > 0) {
+          this.payoutAccumulator = Math.max(
+            this.payoutAccumulator,
+            PAYOUT_RELEASE_INTERVAL
+          );
+        }
+      }
+    }
+    checker.flash = Math.max(0, checker.flash - delta);
+    const active = checker.flash > 0;
+    checker.indicatorMaterial.color.setHex(active ? 0x57e5c5 : 0x566669);
+    checker.indicatorMaterial.emissive.setHex(active ? 0x57e5c5 : 0x11191a);
+    checker.indicatorMaterial.emissiveIntensity = active ? 1.35 : 0.12;
+    const pulse = active ? 1 + Math.sin(this.elapsed * 22) * 0.12 : 1;
+    checker.indicator.scale.setScalar(pulse);
+  }
+
   createCollectorAluminumFrames() {
     if (!this.pachinkoFrameMaterial) return;
     const frameSpecs = [
-      { key: "pair-1-front", edges: ["upper1", "lower1"], side: -1 },
-      { key: "pair-1-back", edges: ["upper1", "lower1"], side: 1 }
+      { key: COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY, edges: ["upper1", "lower1"], side: -1 }
     ];
     this.collectorAluminumFrameEditorDefaults = {};
     this.collectorAluminumFrameEditorState = {};
@@ -7834,7 +8523,14 @@ class ImasoraJackpotCoinPusherGame {
       const deltaY = second.y - first.y;
       const deltaZ = second.z - first.z;
       const span = Math.max(0.01, Math.hypot(deltaY, deltaZ));
-      const rotationX = Math.atan2(-deltaY, deltaZ);
+      const guideRotationX = Math.atan2(-deltaY, deltaZ);
+      // These opposite signs belong only to the approved visible meshes.
+      // applyCollectorAluminumFrameState derives a separate, continuous
+      // downhill collision plane; never infer physical flow from this sign.
+      const entryVisualRotationX = Math.abs(guideRotationX);
+      const rotationX = key === COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY
+        ? entryVisualRotationX
+        : guideRotationX;
       const segmentSpan = Math.max(
         0.01,
         (span - COLLECTOR_ALUMINUM_FRAME_SPLIT_GAP) / 2
@@ -7858,10 +8554,8 @@ class ImasoraJackpotCoinPusherGame {
         thickness: COLLECTOR_ALUMINUM_FRAME_THICKNESS,
         rotationX
       };
-      const savedState = (
-        this.collectorFrameEditorPersistedState?.frames?.[key]
-        ?? COLLECTOR_FRAME_EDITOR_BOOTSTRAP.frames[key]
-      );
+      const persistedState = this.collectorFrameEditorPersistedState?.frames?.[key];
+      const savedState = persistedState ?? COLLECTOR_FRAME_EDITOR_BOOTSTRAP.frames[key];
       ["x", "y", "z", "width", "depth", "thickness"].forEach(axis => {
         if (Number.isFinite(Number(savedState?.[axis]))) {
           state[axis] = Number(savedState[axis]);
@@ -7869,12 +8563,426 @@ class ImasoraJackpotCoinPusherGame {
       });
       this.collectorAluminumFrameEditorDefaults[key] = { ...state };
       this.collectorAluminumFrameEditorState[key] = { ...state };
-      const frame = { key, edges, mesh: null, body: null };
+      const frame = {
+        key,
+        edges,
+        mesh: null,
+        ringOcclusionOverlay: null,
+        body: null
+      };
       this.applyCollectorAluminumFrameState(frame, state);
       return frame;
     });
     this.syncCollectorAluminumFrameEditor();
     this.saveCollectorFrameEditorState();
+  }
+
+  createFloatingRingMechanism() {
+    const defaults = { ...FLOATING_RING_EDITOR_DEFAULT_POSITION };
+    const persistedState = this.readFloatingRingEditorState();
+    const savedPosition = persistedState?.position;
+    const position = { ...defaults };
+    ["x", "y", "z"].forEach(axis => {
+      if (Number.isFinite(Number(savedPosition?.[axis]))) {
+        position[axis] = Number(savedPosition[axis]);
+      }
+    });
+    // The previously saved Z placed the ring past the front-frame exit, so
+    // coins visually passed behind it. Migrate only that old ring coordinate;
+    // user-adjusted X/Y values and all aluminum-frame values remain intact.
+    if (Number(position.z) === FLOATING_RING_LEGACY_Z) {
+      position.z = FLOATING_RING_EDITOR_DEFAULT_POSITION.z;
+    }
+    this.floatingRingEditorDefaults = defaults;
+    this.floatingRingEditorState = position;
+    this.floatingRingEditorPersistedState = persistedState;
+    const ringZ = position.z;
+    const travelHalf = Math.max(
+      0.2,
+      PAYOUT_SIDE_WALL_X
+        - PAYOUT_SIDE_WALL_WIDTH / 2
+        - FLOATING_RING_OUTER_RADIUS
+        - FLOATING_RING_SIDE_CLEARANCE
+    );
+    const group = new THREE.Group();
+    group.name = "icp-floating-ring-jackpot-role";
+    group.renderOrder = -20;
+    group.rotation.x = Math.PI / 2;
+    group.position.set(position.x, position.y, ringZ);
+
+    const cyanMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x78e6f7,
+      emissive: 0x146c83,
+      emissiveIntensity: 0.3,
+      roughness: 0.25,
+      metalness: 0.04,
+      clearcoat: 0.55,
+      clearcoatRoughness: 0.2
+    });
+    const mesh = new THREE.Mesh(
+      new THREE.TorusGeometry(
+        FLOATING_RING_MAJOR_RADIUS,
+        FLOATING_RING_TUBE_RADIUS,
+        14,
+        48
+      ),
+      cyanMaterial
+    );
+    mesh.name = "icp-floating-ring";
+    mesh.renderOrder = -20;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData.floatingRingSegment = {
+      index: 0,
+      color: "bright-cyan"
+    };
+    group.add(mesh);
+    const segments = [mesh];
+    const trapdoorLocalZ = FLOATING_RING_Y - FLOATING_RING_TRAPDOOR_Y;
+    const trapdoorGroup = new THREE.Group();
+    trapdoorGroup.name = "icp-floating-ring-jackpot-trapdoor";
+    trapdoorGroup.renderOrder = -20;
+    trapdoorGroup.position.set(0, -FLOATING_RING_TRAPDOOR_DEPTH / 2, trapdoorLocalZ);
+    const trapdoorMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      emissive: 0x2c3138,
+      emissiveIntensity: 0.12,
+      roughness: 0.34,
+      metalness: 0.02,
+      clearcoat: 0.25,
+      clearcoatRoughness: 0.22
+    });
+    const trapdoorMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(
+        FLOATING_RING_TRAPDOOR_COVER_SIZE / 2,
+        FLOATING_RING_TRAPDOOR_COVER_SIZE / 2,
+        FLOATING_RING_TRAPDOOR_THICKNESS,
+        64
+      ),
+      trapdoorMaterial
+    );
+    trapdoorMesh.name = "icp-floating-ring-jackpot-trapdoor-board";
+    trapdoorMesh.renderOrder = -20;
+    trapdoorMesh.rotation.x = Math.PI / 2;
+    trapdoorMesh.position.y = FLOATING_RING_TRAPDOOR_DEPTH / 2;
+    trapdoorMesh.castShadow = true;
+    trapdoorMesh.receiveShadow = true;
+
+    const labelCanvas = document.createElement("canvas");
+    labelCanvas.width = 256;
+    labelCanvas.height = 256;
+    const labelContext = labelCanvas.getContext("2d");
+    labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+    labelContext.fillStyle = "#11151a";
+    labelContext.font = '900 176px "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif';
+    labelContext.textAlign = "center";
+    labelContext.textBaseline = "middle";
+    labelContext.fillText("Ｊ", labelCanvas.width / 2, labelCanvas.height / 2 + 4);
+    const labelTexture = new THREE.CanvasTexture(labelCanvas);
+    labelTexture.colorSpace = THREE.SRGBColorSpace;
+    labelTexture.minFilter = THREE.LinearFilter;
+    labelTexture.magFilter = THREE.LinearFilter;
+    labelTexture.needsUpdate = true;
+    labelTexture.userData.floatingRingTrapdoorLabel = "Ｊ";
+    this.textures.add(labelTexture);
+    const labelMaterial = new THREE.MeshBasicMaterial({
+      map: labelTexture,
+      transparent: false,
+      alphaTest: 0.01,
+      side: THREE.FrontSide,
+      depthWrite: false
+    });
+    const trapdoorLabel = new THREE.Mesh(
+      new THREE.CircleGeometry(
+        FLOATING_RING_TRAPDOOR_COVER_SIZE * 0.39,
+        64
+      ),
+      labelMaterial
+    );
+    trapdoorLabel.name = "icp-floating-ring-jackpot-trapdoor-label-j";
+    trapdoorLabel.renderOrder = -20;
+    trapdoorLabel.rotation.x = Math.PI;
+    trapdoorLabel.position.set(
+      0,
+      FLOATING_RING_TRAPDOOR_DEPTH / 2,
+      -FLOATING_RING_TRAPDOOR_THICKNESS / 2 - 0.003
+    );
+    trapdoorGroup.add(trapdoorMesh, trapdoorLabel);
+    group.add(trapdoorGroup);
+
+    const trapdoorBody = new CANNON.Body({
+      mass: 0,
+      type: CANNON.Body.KINEMATIC,
+      material: this.tableMaterial
+    });
+    trapdoorBody.addShape(new CANNON.Cylinder(
+      FLOATING_RING_TRAPDOOR_COVER_SIZE / 2,
+      FLOATING_RING_TRAPDOOR_COVER_SIZE / 2,
+      FLOATING_RING_TRAPDOOR_THICKNESS,
+      64
+    ));
+    trapdoorBody.position.set(
+      position.x,
+      position.y - trapdoorLocalZ,
+      ringZ
+    );
+    trapdoorBody.floatingRingTrapdoor = true;
+    this.world.addBody(trapdoorBody);
+    this.scene.add(group);
+    this.floatingRingMechanism = {
+      group,
+      segments,
+      trapdoor: {
+        group: trapdoorGroup,
+        body: trapdoorBody,
+        localZ: trapdoorLocalZ,
+        openProgress: 0,
+        physicsActive: true
+      },
+      z: ringZ,
+      y: position.y,
+      centerX: position.x,
+      travelHalf,
+      minX: position.x - travelHalf,
+      maxX: position.x + travelHalf,
+      innerRadius: FLOATING_RING_INNER_RADIUS,
+      flash: 0
+    };
+    this.syncFloatingRingEditor();
+  }
+
+  updateFloatingRingDirectApproachRamp() {
+    const ring = this.floatingRingMechanism;
+    if (!ring || !ring.trapdoor) return;
+
+    if (this.floatingRingDirectApproachRampBody) {
+      this.world.removeBody(this.floatingRingDirectApproachRampBody);
+      this.floatingRingDirectApproachRampBody = null;
+    }
+
+    const directionToRing = ring.z >= COLLECTOR_ALUMINUM_LANE_ENTRY_Z ? 1 : -1;
+    const approachFrames = (this.collectorAluminumFrames || [])
+      .map(frame => {
+        const body = frame?.body;
+        const halfExtents = body?.shapes?.[0]?.halfExtents;
+        if (!body || !halfExtents) return null;
+        const rotationX = 2 * Math.atan2(
+          Number(body.quaternion.x) || 0,
+          Number(body.quaternion.w) || 1
+        );
+        const localEdge = directionToRing * halfExtents.z;
+        return {
+          frame,
+          halfExtents,
+          edgeY: (
+            body.position.y
+            + Math.cos(rotationX) * halfExtents.y
+            - Math.sin(rotationX) * localEdge
+          ),
+          edgeZ: (
+            body.position.z
+            + Math.sin(rotationX) * halfExtents.y
+            + Math.cos(rotationX) * localEdge
+          )
+        };
+      })
+      .filter(Boolean)
+      .sort((left, right) => (
+        directionToRing * (right.edgeZ - left.edgeZ)
+      ));
+    const approach = approachFrames[0];
+    if (!approach) return;
+
+    const endZ = (
+      ring.z
+      - directionToRing * (
+        FLOATING_RING_TRAPDOOR_DEPTH / 2 - 0.01
+      )
+    );
+    // The approved aluminum already overlaps the J-board entrance. In that
+    // case no extra collider is needed. The previous code built a 91-degree
+    // hidden wall here because it treated the overlap as a bridgeable gap.
+    const openGap = directionToRing * (endZ - approach.edgeZ);
+    if (openGap <= 0.02) return;
+
+    const startZ = approach.edgeZ + directionToRing * 0.01;
+    const startY = approach.edgeY;
+    const endY = (
+      ring.y
+      - ring.trapdoor.localZ
+      + FLOATING_RING_TRAPDOOR_THICKNESS / 2
+    );
+    const deltaZ = endZ - startZ;
+    const deltaY = endY - startY;
+    const rampLength = Math.hypot(deltaZ, deltaY);
+    if (rampLength < 0.08) return;
+
+    // An X-axis rotation maps local +Z to world Y by -sin(rotationX), so the
+    // endpoint slope requires the opposite sign of deltaY.
+    const rampRotationX = Math.atan2(-deltaY, deltaZ);
+    const rampHalfDepth = rampLength / 2;
+    const rampHalfWidth = Math.max(
+      TABLE_COIN_RADIUS * 1.5,
+      approach.halfExtents.x
+    );
+    const rampHalfThickness = FLOATING_RING_DIRECT_RAMP_THICKNESS / 2;
+    const rampBody = new CANNON.Body({
+      mass: 0,
+      // This is a physics-only continuation of the aluminum lane.
+      material: this.collectorAluminumMaterial
+    });
+    rampBody.addShape(new CANNON.Box(new CANNON.Vec3(
+      rampHalfWidth,
+      rampHalfThickness,
+      rampHalfDepth
+    )));
+    const lineCenterY = (startY + endY) / 2;
+    const lineCenterZ = (startZ + endZ) / 2;
+    rampBody.position.set(
+      0,
+      lineCenterY - Math.cos(rampRotationX) * rampHalfThickness,
+      lineCenterZ - Math.sin(rampRotationX) * rampHalfThickness
+    );
+    rampBody.quaternion.setFromAxisAngle(
+      new CANNON.Vec3(1, 0, 0),
+      rampRotationX
+    );
+    rampBody.floatingRingDirectApproachRamp = true;
+    this.world.addBody(rampBody);
+    this.floatingRingDirectApproachRampBody = rampBody;
+  }
+
+  updateFloatingRing(delta) {
+    const ring = this.floatingRingMechanism;
+    if (!ring) return;
+    if (this.floatingRingJackpotReleaseTimer > 0) {
+      this.floatingRingJackpotReleaseTimer = Math.max(
+        0,
+        this.floatingRingJackpotReleaseTimer - delta
+      );
+      if (this.floatingRingJackpotReleaseTimer <= 0) {
+        const jackpotPayout = this.floatingRingJackpotPendingPayout;
+        this.pendingPayout += jackpotPayout;
+        this.floatingRingJackpotPendingPayout = 0;
+        this.floatingRingJackpotPayoutActive = jackpotPayout > 0;
+        // Start the first payout release on the same frame that the trapdoor
+        // begins opening, instead of waiting another payout interval.
+        this.payoutAccumulator = Math.max(
+          this.payoutAccumulator,
+          PAYOUT_RELEASE_INTERVAL
+        );
+      }
+    }
+    this.floatingRingJackpotCooldown = Math.max(
+      0,
+      this.floatingRingJackpotCooldown - delta
+    );
+    const progress = (Math.sin(this.elapsed * FLOATING_RING_TRAVEL_SPEED) + 1) / 2;
+    const bob = Math.sin(this.elapsed * 3.6) * 0.012;
+    ring.group.position.set(
+      lerp(ring.minX, ring.maxX, progress),
+      ring.y + bob,
+      ring.z
+    );
+    const trapdoor = ring.trapdoor;
+    const trapdoorTarget = (
+      this.floatingRingJackpotPayoutActive
+    ) ? 1 : 0;
+    if (trapdoorTarget > 0 && trapdoor.physicsActive) {
+      this.world.removeBody(trapdoor.body);
+      trapdoor.physicsActive = false;
+    }
+    trapdoor.openProgress = clamp(
+      trapdoor.openProgress + (trapdoorTarget - trapdoor.openProgress)
+        * Math.min(1, delta * FLOATING_RING_TRAPDOOR_OPEN_SPEED),
+      0,
+      1
+    );
+    trapdoor.group.rotation.x = (
+      trapdoor.openProgress * FLOATING_RING_TRAPDOOR_OPEN_ANGLE
+    );
+    if (trapdoorTarget === 0 && trapdoor.openProgress <= 0.002) {
+      trapdoor.openProgress = 0;
+      if (!trapdoor.physicsActive) {
+        this.world.addBody(trapdoor.body);
+        trapdoor.physicsActive = true;
+      }
+    }
+    if (trapdoor.physicsActive) {
+      const previousX = trapdoor.body.position.x;
+      const previousY = trapdoor.body.position.y;
+      trapdoor.body.position.set(
+        ring.group.position.x,
+        ring.group.position.y - trapdoor.localZ,
+        ring.group.position.z
+      );
+      const velocityScale = 1 / Math.max(delta, FIXED_STEP);
+      trapdoor.body.velocity.set(
+        (trapdoor.body.position.x - previousX) * velocityScale,
+        (trapdoor.body.position.y - previousY) * velocityScale,
+        0
+      );
+      trapdoor.body.aabbNeedsUpdate = true;
+    }
+    ring.flash = Math.max(0, ring.flash - delta);
+    const flashProgress = ring.flash > 0
+      ? Math.sin((ring.flash / 0.9) * Math.PI)
+      : 0;
+    ring.group.scale.setScalar(1 + flashProgress * 0.12);
+    ring.segments.forEach(mesh => {
+      const material = mesh.material;
+      material.emissiveIntensity = 0.3 + flashProgress * 1.4;
+    });
+  }
+
+  isInsideFloatingRing(position, radius = TABLE_COIN_RADIUS) {
+    const ring = this.floatingRingMechanism;
+    if (!ring || !position) return false;
+    const dx = position.x - ring.group.position.x;
+    const dz = position.z - ring.group.position.z;
+    const captureRadius = Math.max(
+      0.03,
+      ring.innerRadius - Math.max(radius, TABLE_COIN_RADIUS) * 0.35
+    );
+    return (
+      dx * dx + dz * dz <= captureRadius * captureRadius
+      && Math.abs(position.y - ring.group.position.y) <= 0.16
+    );
+  }
+
+  isCoinOnFloatingRingTrapdoor(coin) {
+    const trapdoor = this.floatingRingMechanism?.trapdoor;
+    if (!trapdoor?.body || !trapdoor.physicsActive || !coin?.body) return false;
+    return (this.world.contacts || []).some(contact => (
+      (contact.bi === coin.body && contact.bj === trapdoor.body)
+      || (contact.bj === coin.body && contact.bi === trapdoor.body)
+    ));
+  }
+
+  triggerFloatingRingJackpot(index) {
+    const coin = this.tableCoins[index];
+    if (
+      !coin
+      || coin.collected
+      || this.floatingRingJackpotCooldown > 0
+      || this.attackerRound
+    ) return false;
+    this.removeCoin(index);
+    this.floatingRingJackpotCooldown = FLOATING_RING_JACKPOT_COOLDOWN;
+    this.floatingRingJackpotReleaseTimer = FLOATING_RING_JACKPOT_RELEASE_DELAY;
+    this.floatingRingJackpotPendingPayout += FLOATING_RING_JACKPOT_PAYOUT;
+    if (this.floatingRingMechanism) this.floatingRingMechanism.flash = 0.9;
+    this.root.classList.remove("is-jackpot-small");
+    this.root.classList.add("is-jackpot-big");
+    this.showCallout(
+      `浮き輪 JACKPOT認定・5秒後に板開放／${FLOATING_RING_JACKPOT_PAYOUT}枚放出`,
+      FLOATING_RING_JACKPOT_RELEASE_DELAY + 0.5,
+      "jackpot"
+    );
+    this.setSpinLabel("FLOATING RING JACKPOT");
+    this.cameraShake = Math.max(this.cameraShake, 0.12);
+    this.refreshHud();
+    return true;
   }
 
   applyCollectorAluminumFrameState(frame, state) {
@@ -7893,6 +9001,28 @@ class ImasoraJackpotCoinPusherGame {
         edges: [...frame.edges],
         hiddenBehindSideWalls: true
       };
+      const ringOcclusionMaterial = this.pachinkoFrameMaterial.clone();
+      ringOcclusionMaterial.depthTest = false;
+      ringOcclusionMaterial.depthWrite = false;
+      ringOcclusionMaterial.needsUpdate = true;
+      frame.ringOcclusionOverlay = new THREE.Mesh(
+        frame.mesh.geometry.clone(),
+        ringOcclusionMaterial
+      );
+      frame.ringOcclusionOverlay.name = (
+        `icp-floating-ring-occlusion-overlay-${frame.key}`
+      );
+      frame.ringOcclusionOverlay.renderOrder = (
+        FLOATING_RING_OCCLUSION_OVERLAY_RENDER_ORDER
+      );
+      frame.ringOcclusionOverlay.castShadow = false;
+      frame.ringOcclusionOverlay.receiveShadow = false;
+      frame.ringOcclusionOverlay.userData = {
+        key: frame.key,
+        floatingRingOcclusionOverlay: true,
+        visualOnly: true
+      };
+      frame.mesh.add(frame.ringOcclusionOverlay);
       this.scene.add(frame.mesh);
     } else {
       frame.mesh.geometry.dispose();
@@ -7901,6 +9031,10 @@ class ImasoraJackpotCoinPusherGame {
         state.thickness,
         state.depth
       );
+      if (frame.ringOcclusionOverlay) {
+        frame.ringOcclusionOverlay.geometry.dispose();
+        frame.ringOcclusionOverlay.geometry = frame.mesh.geometry.clone();
+      }
     }
     frame.mesh.position.set(state.x, state.y, state.z);
     frame.mesh.rotation.set(state.rotationX, 0, 0);
@@ -7913,14 +9047,51 @@ class ImasoraJackpotCoinPusherGame {
         / COLLECTOR_ALUMINUM_FRAME_VISUAL_WIDTH
       )
     );
-    const body = new CANNON.Body({ mass: 0, material: this.tableMaterial });
+    // Keep the narrow entry strip unchanged visually, but give it a coin-sized
+    // static contact surface so a coin can actually land on the strip.
+    const physicalDepth = frame.key === COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY
+      ? Math.max(state.depth, TABLE_COIN_RADIUS * 2 + 0.02)
+      : state.depth;
+    const physicalThickness = Math.max(
+      state.thickness,
+      COLLECTOR_ALUMINUM_FRAME_PHYSICAL_THICKNESS
+    );
+    const body = new CANNON.Body({
+      mass: 0,
+      material: this.collectorAluminumMaterial
+    });
     body.addShape(new CANNON.Box(new CANNON.Vec3(
       physicalHalfWidth,
-      state.thickness / 2,
-      state.depth / 2
+      physicalThickness / 2,
+      physicalDepth / 2
     )));
-    body.position.set(state.x, state.y, state.z);
-    body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), state.rotationX);
+    // Both hidden surfaces descend from the slide bed toward the moving J-board.
+    // Gravity alone drives the coin; no position or velocity correction is used.
+    const directionToRing = 1;
+    const physicsRotationX = directionToRing * Math.abs(state.rotationX);
+    body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), physicsRotationX);
+    // Anchor the entry collider exactly to the slide-bed edge, then place every
+    // other collider on that same plane. This removes the old 7 cm uphill step
+    // while preserving all editor-approved mesh positions and dimensions.
+    const rotationCos = Math.cos(physicsRotationX);
+    const rotationSin = Math.sin(physicsRotationX);
+    const physicalSurfaceZ = frame.key === COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY
+      ? (
+        COLLECTOR_ALUMINUM_LANE_ENTRY_Z
+        + directionToRing * rotationCos * physicalDepth / 2
+      )
+      : state.z;
+    const physicalSurfaceY = (
+      COLLECTOR_ALUMINUM_LANE_ENTRY_Y
+      - Math.tan(physicsRotationX) * (
+        physicalSurfaceZ - COLLECTOR_ALUMINUM_LANE_ENTRY_Z
+      )
+    );
+    body.position.set(
+      state.x,
+      physicalSurfaceY - rotationCos * physicalThickness / 2,
+      physicalSurfaceZ - rotationSin * physicalThickness / 2
+    );
     body.collectorAluminumFrame = {
       key: frame.key,
       edges: [...frame.edges]
@@ -7937,7 +9108,7 @@ class ImasoraJackpotCoinPusherGame {
       return `${state.x.toFixed(2)}, ${state.y.toFixed(2)}, ${state.z.toFixed(2)} / ${state.width.toFixed(2)} x ${state.depth.toFixed(2)} x ${state.thickness.toFixed(3)}`;
     };
     this.els.collectorFrameReadout.textContent = (
-      `前 ${format("pair-1-front")} / 後 ${format("pair-1-back")}`
+      `前 ${format(COLLECTOR_ALUMINUM_ENTRY_FRAME_KEY)}`
     );
   }
 
@@ -7949,6 +9120,172 @@ class ImasoraJackpotCoinPusherGame {
       if (Number.isFinite(value)) input.value = value.toFixed(3);
     });
     this.updateCollectorAluminumFrameReadout();
+  }
+
+  updateCenterPachinkoPinEditorReadout() {
+    if (!this.els?.centerPinReadout) return;
+    const format = index => {
+      const state = this.centerPachinkoPinEditorState?.[index];
+      if (!state) return "";
+      return `${state.x.toFixed(2)}, ${state.y.toFixed(2)}, ${state.z.toFixed(2)}`;
+    };
+    this.els.centerPinReadout.textContent = (
+      `釘1 ${format(0)} / 釘2 ${format(1)}`
+    );
+  }
+
+  syncCenterPachinkoPinEditor() {
+    this.els?.centerPinInputs?.forEach(input => {
+      const index = Number(input.dataset.icpCenterPinIndex);
+      const axis = input.dataset.icpCenterPinAxis;
+      const value = this.centerPachinkoPinEditorState?.[index]?.[axis];
+      if (Number.isFinite(value)) input.value = value.toFixed(3);
+    });
+    this.updateCenterPachinkoPinEditorReadout();
+  }
+
+  applyCenterPachinkoPinEditorState() {
+    this.centerPachinkoPins.forEach((pin, index) => {
+      const state = this.centerPachinkoPinEditorState?.[index];
+      if (!state) return;
+      pin.visual.position.set(state.x, state.y, state.z);
+      pin.body.position.set(state.x, state.y, state.z);
+      pin.body.velocity.set(0, 0, 0);
+      pin.body.angularVelocity.set(0, 0, 0);
+      pin.body.aabbNeedsUpdate = true;
+      pin.body.wakeUp();
+    });
+    this.updateCenterPachinkoPinEditorReadout();
+  }
+
+  resetCenterPachinkoPins() {
+    this.centerPachinkoPinEditorState.forEach((state, index) => {
+      Object.assign(state, this.centerPachinkoPinEditorDefaults[index]);
+    });
+    this.applyCenterPachinkoPinEditorState();
+    this.syncCenterPachinkoPinEditor();
+    this.saveCenterPachinkoPinEditorState();
+  }
+
+  updateCenterJCheckerEditorReadout() {
+    if (!this.els?.centerJCheckerReadout || !this.centerJCheckerEditorState) return;
+    const state = this.centerJCheckerEditorState;
+    this.els.centerJCheckerReadout.textContent = (
+      `Pos ${state.x.toFixed(2)}, ${state.y.toFixed(2)}, ${state.z.toFixed(2)}`
+      + ` / Rot ${state.rotationX.toFixed(1)}, ${state.rotationY.toFixed(1)}, ${state.rotationZ.toFixed(1)} deg`
+    );
+  }
+
+  syncCenterJCheckerEditor() {
+    this.els?.centerJCheckerInputs?.forEach(input => {
+      const axis = input.dataset.icpCenterJCheckerAxis;
+      const value = this.centerJCheckerEditorState?.[axis];
+      if (!Number.isFinite(value)) return;
+      input.value = axis.startsWith("rotation")
+        ? value.toFixed(1)
+        : value.toFixed(3);
+    });
+    this.updateCenterJCheckerEditorReadout();
+  }
+
+  applyCenterJCheckerEditorState() {
+    const checker = this.centerJChecker;
+    const state = this.centerJCheckerEditorState;
+    if (!checker?.visual || !checker?.sensorBody || !state) return;
+    const rotationX = THREE.MathUtils.degToRad(state.rotationX);
+    const rotationY = THREE.MathUtils.degToRad(state.rotationY);
+    const rotationZ = THREE.MathUtils.degToRad(state.rotationZ);
+    checker.visual.position.set(state.x, state.y, state.z);
+    checker.visual.rotation.set(rotationX, rotationY, rotationZ);
+    checker.visual.updateMatrixWorld(true);
+
+    const sensorPosition = checker.sensorLocalPosition
+      .clone()
+      .applyEuler(checker.visual.rotation)
+      .add(checker.visual.position);
+    checker.sensorBody.position.set(
+      sensorPosition.x,
+      sensorPosition.y,
+      sensorPosition.z
+    );
+    checker.sensorBody.quaternion.setFromEuler(
+      rotationX,
+      rotationY,
+      rotationZ
+    );
+    checker.sensorBody.velocity.set(0, 0, 0);
+    checker.sensorBody.angularVelocity.set(0, 0, 0);
+    checker.sensorBody.aabbNeedsUpdate = true;
+    checker.sensorBody.wakeUp();
+    checker.visual.userData.centerJChecker.rotationDegrees = {
+      x: state.rotationX,
+      y: state.rotationY,
+      z: state.rotationZ
+    };
+    this.updateCenterJCheckerEditorReadout();
+  }
+
+  resetCenterJCheckerEditor() {
+    if (!this.centerJCheckerEditorState || !this.centerJCheckerEditorDefaults) return;
+    Object.assign(
+      this.centerJCheckerEditorState,
+      this.centerJCheckerEditorDefaults
+    );
+    this.applyCenterJCheckerEditorState();
+    this.syncCenterJCheckerEditor();
+    this.saveCenterJCheckerEditorState();
+  }
+
+  updateFloatingRingEditorReadout() {
+    if (!this.els?.floatingRingReadout || !this.floatingRingEditorState) return;
+    const state = this.floatingRingEditorState;
+    this.els.floatingRingReadout.textContent = (
+      `中心X ${state.x.toFixed(2)} / Y ${state.y.toFixed(2)} / Z ${state.z.toFixed(2)}`
+    );
+  }
+
+  syncFloatingRingEditor() {
+    this.els?.floatingRingInputs?.forEach(input => {
+      const axis = input.dataset.icpFloatingRingAxis;
+      const value = this.floatingRingEditorState?.[axis];
+      if (Number.isFinite(value)) input.value = value.toFixed(3);
+    });
+  }
+
+  applyFloatingRingEditorState() {
+    const ring = this.floatingRingMechanism;
+    const state = this.floatingRingEditorState;
+    if (!ring || !state) return;
+    ring.centerX = state.x;
+    ring.y = state.y;
+    ring.z = state.z;
+    ring.minX = state.x - ring.travelHalf;
+    ring.maxX = state.x + ring.travelHalf;
+    const progress = (Math.sin(this.elapsed * FLOATING_RING_TRAVEL_SPEED) + 1) / 2;
+    const bob = Math.sin(this.elapsed * 3.6) * 0.012;
+    ring.group.position.set(
+      lerp(ring.minX, ring.maxX, progress),
+      ring.y + bob,
+      ring.z
+    );
+    const trapdoor = ring.trapdoor;
+    if (trapdoor?.physicsActive) {
+      trapdoor.body.position.set(
+        ring.group.position.x,
+        ring.group.position.y - trapdoor.localZ,
+        ring.group.position.z
+      );
+      trapdoor.body.velocity.set(0, 0, 0);
+      trapdoor.body.aabbNeedsUpdate = true;
+    }
+  }
+
+  resetFloatingRingPosition() {
+    if (!this.floatingRingEditorDefaults || !this.floatingRingEditorState) return;
+    Object.assign(this.floatingRingEditorState, this.floatingRingEditorDefaults);
+    this.applyFloatingRingEditorState();
+    this.syncFloatingRingEditor();
+    this.saveFloatingRingEditorState();
   }
 
   resetCollectorAluminumFrames() {
@@ -7995,6 +9332,44 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   onLayoutEditorInput(event) {
+    const centerJCheckerInput = event.target.closest?.(
+      "[data-icp-center-j-checker-axis]"
+    );
+    if (centerJCheckerInput && this.els.editorBody.contains(centerJCheckerInput)) {
+      const axis = centerJCheckerInput.dataset.icpCenterJCheckerAxis;
+      const value = Number(centerJCheckerInput.value);
+      const state = this.centerJCheckerEditorState;
+      const allowedAxes = [
+        "x",
+        "y",
+        "z",
+        "rotationX",
+        "rotationY",
+        "rotationZ"
+      ];
+      if (!state || !allowedAxes.includes(axis) || !Number.isFinite(value)) return;
+      const limit = axis.startsWith("rotation") ? 360 : 10;
+      state[axis] = clamp(value, -limit, limit);
+      this.applyCenterJCheckerEditorState();
+      this.syncCenterJCheckerEditor();
+      this.saveCenterJCheckerEditorState();
+      return;
+    }
+    const centerPinInput = event.target.closest?.(
+      "[data-icp-center-pin-index][data-icp-center-pin-axis]"
+    );
+    if (centerPinInput && this.els.editorBody.contains(centerPinInput)) {
+      const index = Number(centerPinInput.dataset.icpCenterPinIndex);
+      const axis = centerPinInput.dataset.icpCenterPinAxis;
+      const value = Number(centerPinInput.value);
+      const state = this.centerPachinkoPinEditorState?.[index];
+      if (!state || !["x", "y", "z"].includes(axis) || !Number.isFinite(value)) return;
+      state[axis] = clamp(value, -10, 10);
+      this.applyCenterPachinkoPinEditorState();
+      this.syncCenterPachinkoPinEditor();
+      this.saveCenterPachinkoPinEditorState();
+      return;
+    }
     const frameInput = event.target.closest?.("[data-icp-collector-frame-key][data-icp-collector-frame-axis]");
     if (frameInput && this.els.editorBody.contains(frameInput)) {
       const key = frameInput.dataset.icpCollectorFrameKey;
@@ -8042,12 +9417,15 @@ class ImasoraJackpotCoinPusherGame {
     this.layoutEditing = Boolean(this.els.layoutEditor.open);
     this.root.classList.toggle("is-layout-editing", this.layoutEditing);
     if (this.collectorFrameGuide?.group) {
-      this.collectorFrameGuide.group.visible = this.layoutEditing;
+      this.collectorFrameGuide.group.visible = false;
     }
     if (this.layoutEditing) {
       this.autoEnabled = false;
       this.syncCollectorFrameGuideEditor();
       this.syncCollectorAluminumFrameEditor();
+      this.syncCenterPachinkoPinEditor();
+      this.syncCenterJCheckerEditor();
+      this.syncFloatingRingEditor();
       if (!this.selectedEditablePin) this.selectEditablePin(this.editablePins[0] ?? null);
       else this.selectEditablePin(this.selectedEditablePin);
     } else {
@@ -8193,6 +9571,14 @@ class ImasoraJackpotCoinPusherGame {
     }
     if (action === "reset-collector-frames") {
       this.resetCollectorAluminumFrames();
+      return;
+    }
+    if (action === "reset-center-pins") {
+      this.resetCenterPachinkoPins();
+      return;
+    }
+    if (action === "reset-center-j-checker") {
+      this.resetCenterJCheckerEditor();
       return;
     }
     if (action === "move" && this.selectedEditablePin) {
@@ -10536,6 +11922,7 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   updateTableCoins(delta) {
+    const centerJCheckerGate = this.updateCenterJCheckerGateGeometry();
     for (let index = this.tableCoins.length - 1; index >= 0; index -= 1) {
       const coin = this.tableCoins[index];
       coin.age += delta;
@@ -10637,6 +12024,20 @@ class ImasoraJackpotCoinPusherGame {
       coin.visual.position.copy(body.position);
       coin.visual.quaternion.copy(body.quaternion);
 
+      // Observe the coin's real trajectory without pulling or redirecting it.
+      // The gate is rebuilt from both live center-pin positions every frame,
+      // so a future left/right slide keeps the same between-the-pins rule.
+      if (
+        this.didCoinPassBetweenCenterPins(coin, centerJCheckerGate)
+        && this.triggerCenterJCheckerJackpot(index)
+      ) {
+        continue;
+      }
+
+      if (pusherSideOutChannelContains(body.position, coin.radius)) {
+        this.removeCoin(index);
+        continue;
+      }
       const enteredCollector = this.isInsideCollectorPocket(body.position);
       const lost = body.position.y < -2.4 || Math.abs(body.position.x) > 4.2 || body.position.z < -3.8;
       if (enteredCollector) {
@@ -10693,7 +12094,6 @@ class ImasoraJackpotCoinPusherGame {
     this.collected += value;
     this.credits += value;
     this.zeroCreditTimer = 0;
-    this.showCallout(`もちコイン +${value}`, 0.85, "win");
     this.refreshHud();
   }
 
@@ -11137,6 +12537,7 @@ class ImasoraJackpotCoinPusherGame {
     this.updateEntryPlasticGuides();
     this.updateHanemonoWings(delta);
     this.updateHakamaChuckers(delta);
+    this.updateCenterJChecker(delta);
     this.updateRoleRotator(delta);
     this.pachinkoTokens.forEach(token => {
       token.prePhysicsX = token.body.position.x;
@@ -11224,7 +12625,37 @@ window.ImasoraJackpotRapierValidation = Object.freeze({
     const stats = mountedValidationGame?.world?.getValidationStats?.();
     return stats ? {
       ...stats,
-      tableCoins: mountedValidationGame.tableCoins.length
+      tableCoins: mountedValidationGame.tableCoins.length,
+      centerJChecker: mountedValidationGame.centerJChecker ? {
+        label: mountedValidationGame.centerJChecker.label,
+        visualPosition: {
+          x: mountedValidationGame.centerJChecker.visual.position.x,
+          y: mountedValidationGame.centerJChecker.visual.position.y,
+          z: mountedValidationGame.centerJChecker.visual.position.z
+        },
+        sensorPosition: {
+          x: mountedValidationGame.centerJChecker.sensorBody.position.x,
+          y: mountedValidationGame.centerJChecker.sensorBody.position.y,
+          z: mountedValidationGame.centerJChecker.sensorBody.position.z
+        },
+        rotationDegrees: {
+          x: mountedValidationGame.centerJCheckerEditorState.rotationX,
+          y: mountedValidationGame.centerJCheckerEditorState.rotationY,
+          z: mountedValidationGame.centerJCheckerEditorState.rotationZ
+        },
+        triggerMode: "between-live-center-pins",
+        physicalPassageRequired: true,
+        checkerContactRequired: false,
+        gate: {
+          valid: mountedValidationGame.centerJCheckerGateGeometry.valid,
+          centerX: mountedValidationGame.centerJCheckerGateGeometry.centerX,
+          centerZ: mountedValidationGame.centerJCheckerGateGeometry.centerZ,
+          length: mountedValidationGame.centerJCheckerGateGeometry.length,
+          normalX: mountedValidationGame.centerJCheckerGateGeometry.normalX,
+          normalZ: mountedValidationGame.centerJCheckerGateGeometry.normalZ
+        },
+        hitCount: mountedValidationGame.centerJChecker.hitCount
+      } : null
     } : null;
   }
 });
