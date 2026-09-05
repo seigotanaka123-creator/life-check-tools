@@ -8,6 +8,11 @@ const MAX_SUB_STEPS = 5;
 const TABLE_COIN_CLEANUP_THRESHOLD = 180;
 const TABLE_COIN_INSTANCE_INITIAL_CAPACITY = 256;
 const STARTING_CREDITS = 250;
+// コイン落としは難度が高いため、受け皿ごとの小報酬ではなく
+// もちコインを維持して換金ラインへ到達した時だけ大きな報酬にする。
+const UFO_WORKSHOP_EXCHANGE_MIN_CREDITS = 350;
+const UFO_WORKSHOP_EXCHANGE_COST = 150;
+const UFO_WORKSHOP_EXCHANGE_REWARD = 18;
 const BOARD_Z = -2.02;
 const PACHINKO_FIELD_CENTER_Y = 3.31;
 const PACHINKO_FIELD_RADIUS = 2.3;
@@ -1044,7 +1049,7 @@ const markup = `
     <header class="icp-hud">
       <div class="icp-hud-cell"><small>もちコイン</small><strong data-icp-credits>250</strong></div>
       <div class="icp-hud-logo"><small>IMASORA</small><strong>JACKPOT</strong></div>
-      <div class="icp-hud-cell icp-hud-cell-right" hidden aria-hidden="true"><small>獲得</small><strong data-icp-collected>0</strong></div>
+      <div class="icp-hud-cell icp-hud-cell-right" title="もちコイン350枚以上で150枚を整備パーツ18個へ換金します"><small>換金ライン</small><strong data-icp-exchange>350枚</strong><span data-icp-collected hidden>0</span></div>
     </header>
     <div class="icp-stage" data-icp-stage>
       <canvas class="icp-canvas" data-icp-canvas aria-label="一発台型パチンコ盤とコインプッシャーの3Dゲーム画面"></canvas>
@@ -2552,6 +2557,9 @@ class ImasoraJackpotCoinPusherGame {
       sharkShake: options.effects?.sharkShake !== false,
       dangerIllumination: options.effects?.dangerIllumination !== false
     };
+    this.onWorkshopExchange = typeof options.onWorkshopExchange === "function"
+      ? options.onWorkshopExchange
+      : null;
     this.random = typeof options.random === "function" ? options.random : Math.random;
     this.destroyed = false;
     this.elapsed = 0;
@@ -12094,7 +12102,33 @@ class ImasoraJackpotCoinPusherGame {
     this.collected += value;
     this.credits += value;
     this.zeroCreditTimer = 0;
+    const exchange = this.tryWorkshopCoinExchange();
     this.refreshHud();
+    if (exchange) {
+      this.showCallout(
+        `換金成立！もちコイン${exchange.spentCredits}枚 → 整備パーツ +${exchange.arcadeParts}`,
+        2.2,
+        "jackpot"
+      );
+      try {
+        this.onWorkshopExchange?.(exchange);
+      } catch (error) {
+        console.error("UFO整備素材の換金処理に失敗しました。", error);
+      }
+    }
+  }
+
+  tryWorkshopCoinExchange() {
+    if (this.credits < UFO_WORKSHOP_EXCHANGE_MIN_CREDITS) return null;
+    const heldCreditsBefore = this.credits;
+    this.credits = Math.max(0, this.credits - UFO_WORKSHOP_EXCHANGE_COST);
+    return {
+      heldCreditsBefore,
+      heldCreditsAfter: this.credits,
+      spentCredits: UFO_WORKSHOP_EXCHANGE_COST,
+      arcadeParts: UFO_WORKSHOP_EXCHANGE_REWARD,
+      elapsed: this.elapsed
+    };
   }
 
   removeCoin(index) {
@@ -12419,7 +12453,8 @@ class ImasoraJackpotCoinPusherGame {
     window.ImasoraJackpotRapierValidation.mount(this.root, {
       roster: this.roster,
       random: this.random,
-      effects: this.effectPreferences
+      effects: this.effectPreferences,
+      onWorkshopExchange: this.onWorkshopExchange
     });
   }
 
