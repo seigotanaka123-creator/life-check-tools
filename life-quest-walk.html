@@ -11,13 +11,13 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>イマソラウォーク</title>
-  <meta name="description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーク。歩いて、立ち止まり、イマソラ認識で町と相棒を育てるローカル試作です。">
+  <title>イマソラウォーカーズ</title>
+  <meta name="description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーカーズ。歩いて、立ち止まり、イマソラ認識で町と相棒を育てるローカル試作です。">
   <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Life Check Tools">
-  <meta property="og:title" content="イマソラウォーク">
-  <meta property="og:description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーク。25マスマップを進め、重要マスではイマソラ認識で進化やタネ召喚を楽しむ散歩ゲーム試作です。">
+  <meta property="og:title" content="イマソラウォーカーズ">
+  <meta property="og:description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーカーズ。25マスマップを進め、重要マスではイマソラ認識で進化やタネ召喚を楽しむ散歩ゲーム試作です。">
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
@@ -337,6 +337,13 @@
       object-position: center center;
       z-index: -1;
     }
+    @font-face {
+      font-family: "Imasora Rounded Pop";
+      src: url("https://fonts.gstatic.com/l/font?kit=QdVPSTA9Jh-gg-5XZP2UmU4O9kwwF1XR5yHA8LpL6-KvDfRG4xT4y5oqTEUa1oXE3EkWy1gszmqOx8CUF6uW9_0&skey=2cc05ce17d12c026&v=v12") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+    }
     .new-opening-title {
       position: absolute;
       top: max(70px, calc(env(safe-area-inset-top) + 60px));
@@ -348,9 +355,9 @@
       align-items: center;
       justify-content: flex-start;
       color: #ff8abe;
-      font-family: "HGP創英角ﾎﾟｯﾌﾟ体", "HG創英角ﾎﾟｯﾌﾟ体", "HG丸ｺﾞｼｯｸM-PRO", "UD Digi Kyokasho NK-B", "Meiryo", sans-serif;
+      font-family: "Imasora Rounded Pop", "HGP創英角ﾎﾟｯﾌﾟ体", "HG創英角ﾎﾟｯﾌﾟ体", "Meiryo", sans-serif;
       font-size: 82px;
-      font-weight: 900;
+      font-weight: 400;
       line-height: .94;
       letter-spacing: 0;
       text-align: center;
@@ -375,7 +382,7 @@
       z-index: -1;
       color: transparent;
       -webkit-text-fill-color: transparent;
-      -webkit-text-stroke: 7px #9284c0;
+      -webkit-text-stroke: 4.5px #9284c0;
       paint-order: stroke fill;
       pointer-events: none;
     }
@@ -385,8 +392,15 @@
     }
     .new-opening-title-part.walk {
       margin-top: -2px;
-      color: #72edbd;
+      color: #58dfc0;
       transform: translateX(26px) rotate(2deg);
+    }
+    .new-opening-title-part.walk.walkers {
+      font-size: 1em;
+      transform: translateX(4px) rotate(2deg);
+    }
+    .new-opening-title-part.walk.walkers::before {
+      content: "ウォーカーズ";
     }
     .new-opening-logo-char {
       display: inline-block;
@@ -399,10 +413,12 @@
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(2) { color: #f47cdf; transform: translateY(-2px) rotate(2deg); }
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(3) { color: #db82f6; transform: translateY(1px) rotate(-1deg); }
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(4) { color: #b58cf8; transform: translateY(-1px) rotate(3deg); }
-    .new-opening-title-part.walk .new-opening-logo-char:nth-child(1) { color: #8ff8dc; transform: translateY(-1px) rotate(-2deg); }
-    .new-opening-title-part.walk .new-opening-logo-char:nth-child(2) { color: #76efca; transform: translateY(2px) rotate(2deg); }
-    .new-opening-title-part.walk .new-opening-logo-char:nth-child(3) { color: #61e5b1; transform: translateY(-2px) rotate(-1deg); }
-    .new-opening-title-part.walk .new-opening-logo-char:nth-child(4) { color: #4dd49a; transform: translateY(1px) rotate(3deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(1) { color: #63e7cb; transform: translateY(-1px) rotate(-2deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(2) { color: #63e7cb; transform: translateY(2px) rotate(2deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(3) { color: #63e7cb; transform: translateY(-2px) rotate(-1deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(4) { color: #63e7cb; transform: translateY(1px) rotate(3deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(5) { color: #63e7cb; transform: translateY(-1px) rotate(-2deg); }
+    .new-opening-title-part.walk .new-opening-logo-char:nth-child(6) { color: #63e7cb; transform: translateY(2px) rotate(2deg); }
     .new-opening-stage {
       position: absolute;
       left: 0;
@@ -17407,9 +17423,9 @@
 </head>
 <body class="loading-screen-active">
 <div class="app">
-  <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラウォークのオープニング画面" hidden>
+  <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラウォーカーズのオープニング画面" hidden>
     <img class="new-opening-background" src="assets/imasora-new-opening-v1.png" alt="">
-    <h1 class="new-opening-title" aria-label="イマソラウォーク"><span class="new-opening-title-part imasora" data-text="イマソラ" aria-hidden="true"><span class="new-opening-logo-char">イ</span><span class="new-opening-logo-char">マ</span><span class="new-opening-logo-char">ソ</span><span class="new-opening-logo-char">ラ</span></span><span class="new-opening-title-part walk" data-text="ウォーク" aria-hidden="true"><span class="new-opening-logo-char">ウ</span><span class="new-opening-logo-char">ォ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ク</span></span></h1>
+    <h1 class="new-opening-title" aria-label="イマソラウォーカーズ"><span class="new-opening-title-part imasora" data-text="イマソラ" aria-hidden="true"><span class="new-opening-logo-char">イ</span><span class="new-opening-logo-char">マ</span><span class="new-opening-logo-char">ソ</span><span class="new-opening-logo-char">ラ</span></span><span class="new-opening-title-part walk walkers" data-text="ウォーカーズ" aria-hidden="true"><span class="new-opening-logo-char">ウ</span><span class="new-opening-logo-char">ォ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">カ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ズ</span></span></h1>
     <div class="new-opening-stage">
       <div class="new-opening-guide" id="newOpeningGuide" role="img" aria-label="白ミチロードセイバーレン"></div>
       <button class="new-opening-start" id="newOpeningStartBtn" type="button">はじめる</button>
@@ -17418,8 +17434,8 @@
   <header>
     <section class="hero">
       <p class="eyebrow">大人もハマる、今の空で進化する散歩ゲームアプリ</p>
-      <h1>イマソラウォーク</h1>
-      <div class="core-loop" aria-label="イマソラウォークの基本の遊び方">
+      <h1>イマソラウォーカーズ</h1>
+      <div class="core-loop" aria-label="イマソラウォーカーズの基本の遊び方">
         <div class="loop-step walk">
           <span class="loop-num">1</span><div class="loop-icon walker-icon" aria-hidden="true"><span class="walker"><i class="walker-head"></i><i class="walker-body"></i><i class="walker-arm front"></i><i class="walker-arm back"></i><i class="walker-leg front"></i><i class="walker-leg back"></i></span></div>
           <b>歩く</b>
@@ -17440,7 +17456,7 @@
     </section>
   </header>
 
-  <nav class="app-nav" aria-label="イマソラウォーク menu">
+  <nav class="app-nav" aria-label="イマソラウォーカーズ menu">
     <button class="nav-tab active" type="button" data-tab="walk">歩く</button>
     <button class="nav-tab" type="button" data-tab="monster">育成・大会</button>
     <button class="nav-tab" type="button" data-tab="town">街・記録</button>
@@ -17511,7 +17527,7 @@
       </div>
       <div class="imasora-definition" id="imasoraDefinition">
         <b>イマソラとは</b>
-        <span>イマソラは「今の空」のことであり、イマソラウォークではその空をスマホで認識することがタネ報酬の獲得やモンスターの進化には必要不可欠な行動となります。端末内で空らしさ、明るさ、雲量、時間帯などを判定するための結果だけに使われます。</span>
+        <span>イマソラは「今の空」のことであり、イマソラウォーカーズではその空をスマホで認識することがタネ報酬の獲得やモンスターの進化には必要不可欠な行動となります。端末内で空らしさ、明るさ、雲量、時間帯などを判定するための結果だけに使われます。</span>
       </div>
       <div class="safety-note">
         <b>安全ルール</b>
@@ -17714,7 +17730,7 @@
 
     <section class="panel screen" data-screen="rules">
       <h2>規約・設定</h2>
-      <p>イマソラウォークは現実の散歩とつながるため、安全ルールをゲーム進行より上位に置きます。</p>
+      <p>イマソラウォーカーズは現実の散歩とつながるため、安全ルールをゲーム進行より上位に置きます。</p>
       <div class="settings-panel-stack" id="homeSettingsPanel">
         <div class="policy-card" id="talkSettings"></div>
         <div class="policy-card" id="companionColorSettings"></div>
@@ -18073,6 +18089,77 @@
 
 <script>
 const storeKey = "lifeQuestWalkV1";
+// UFO装備素材は、日々の散歩とゲームセンターの遊びを無理に一体化せず、
+// それぞれで得た成果だけを整備の選択肢へ渡すための共有台帳に保存する。
+const ufoWorkshopMaterialStoreKey = "imasora-ufo-workshop-materials-v1";
+const ufoWorkshopMaterialLabels = Object.freeze({
+  cloudFiber: "雲繊維",
+  skySightCrystal: "空見結晶",
+  arcadeParts: "整備パーツ"
+});
+const ufoWorkshopWalkReward = Object.freeze({ cloudFiber: 2, skySightCrystal: 2 });
+function normalizeUfoWorkshopMaterialLedger(value) {
+  const raw = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const amount = candidate => Math.max(0, Math.floor(Number(candidate) || 0));
+  // 旧版のゲーム別素材は、共通の整備パーツへ合算して引き継ぐ。
+  const legacyArcadeParts = amount(raw.arcadeAlloy) + amount(raw.controlChip);
+  const ledger = {
+    version: 2,
+    cloudFiber: 0,
+    skySightCrystal: 0,
+    arcadeParts: amount(raw.arcadeParts) + legacyArcadeParts,
+    updatedAt: amount(raw.updatedAt)
+  };
+  Object.keys(ufoWorkshopMaterialLabels).forEach(id => {
+    if (id !== "arcadeParts") ledger[id] = amount(raw[id]);
+  });
+  return ledger;
+}
+function readUfoWorkshopMaterialLedger() {
+  try {
+    return normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}") || {});
+  } catch (error) {
+    return normalizeUfoWorkshopMaterialLedger({});
+  }
+}
+function writeUfoWorkshopMaterialLedger(value) {
+  const ledger = normalizeUfoWorkshopMaterialLedger(value);
+  ledger.updatedAt = Date.now();
+  localStorage.setItem(ufoWorkshopMaterialStoreKey, JSON.stringify(ledger));
+  return ledger;
+}
+function awardUfoWorkshopMaterials(reward) {
+  const ledger = readUfoWorkshopMaterialLedger();
+  Object.keys(ufoWorkshopMaterialLabels).forEach(id => {
+    const amount = Math.max(0, Math.floor(Number(reward?.[id]) || 0));
+    if (amount) ledger[id] += amount;
+  });
+  return writeUfoWorkshopMaterialLedger(ledger);
+}
+function formatUfoWorkshopMaterialReward(reward) {
+  return Object.entries(reward || {})
+    .map(([id, amount]) => ({ label: ufoWorkshopMaterialLabels[id], amount: Math.max(0, Math.floor(Number(amount) || 0)) }))
+    .filter(entry => entry.label && entry.amount > 0)
+    .map(entry => `${entry.label} +${entry.amount}`)
+    .join(" / ");
+}
+function awardUfoWorkshopArcadeMaterials(reward, source = "") {
+  const rewardText = formatUfoWorkshopMaterialReward(reward);
+  if (!rewardText) return readUfoWorkshopMaterialLedger();
+  const ledger = awardUfoWorkshopMaterials(reward);
+  addLog(`ゲームセンター報酬${source ? `（${source}）` : ""}: ${rewardText}`);
+  saveState();
+  toast(`UFO整備素材を獲得：${rewardText}`);
+  return ledger;
+}
+function awardUfoWorkshopCoinPusherExchange(exchange) {
+  const arcadeParts = Math.max(0, Math.floor(Number(exchange?.arcadeParts) || 0));
+  if (!arcadeParts) return readUfoWorkshopMaterialLedger();
+  return awardUfoWorkshopArcadeMaterials(
+    { arcadeParts },
+    `コイン落とし・${Math.max(0, Math.floor(Number(exchange?.spentCredits) || 0))}枚換金`
+  );
+}
 const todayKey = () => new Date().toLocaleDateString("sv-SE");
 const weekKey = () => {
   const d = new Date();
@@ -18355,10 +18442,10 @@ let townArcadeLobbyStepTimer = 0;
 let selectedTriLinkRetiredId = "";
 let pendingRetireParkPracticeRecordId = "";
 const memorialWallpaperChoices = [
-  { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォークの街" },
-  { id: "wallpaper2", name: "壁紙2", src: "assets/imasora-wallpaper-workshop-dawn-v1.png", alt: "朝焼けのイマソラウォークの街" },
-  { id: "wallpaper3", name: "壁紙3", src: "assets/imasora-wallpaper-workshop-home-v1.png", alt: "イマソラウォークの相棒の部屋" },
-  { id: "wallpaper4", name: "壁紙4", src: "assets/imasora-wallpaper-workshop-karaoke-v1.png", alt: "イマソラウォークのカラオケラウンジ" }
+  { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォーカーズの街" },
+  { id: "wallpaper2", name: "壁紙2", src: "assets/imasora-wallpaper-workshop-dawn-v1.png", alt: "朝焼けのイマソラウォーカーズの街" },
+  { id: "wallpaper3", name: "壁紙3", src: "assets/imasora-wallpaper-workshop-home-v1.png", alt: "イマソラウォーカーズの相棒の部屋" },
+  { id: "wallpaper4", name: "壁紙4", src: "assets/imasora-wallpaper-workshop-karaoke-v1.png", alt: "イマソラウォーカーズのカラオケラウンジ" }
 ];
 let memorialWallpaperSelectedBackgroundId = "wallpaper2";
 let memorialWallpaperSelectedRecordId = "memorial-wallpaper-test-4";
@@ -42175,7 +42262,7 @@ function shareDraftText() {
   const diary = [state.imasoraDiary?.mood, state.imasoraDiary?.note].filter(Boolean).join("。");
   const diaryText = diary ? `${diary}。` : "";
   const baseText = diaryText || "大人もハマる、今の空で進化する散歩ゲームアプリ。";
-  return `${baseText} #イマソラウォーク#イマソラ`;
+  return `${baseText} #イマソラウォーカーズ#イマソラ`;
 }
 function shareDraftUrl(target = "x") {
   const text = encodeURIComponent(shareDraftText());
@@ -44924,6 +45011,35 @@ function ensureImasoraCompanionCatcherLoaded() {
   }
   return imasoraCompanionCatcherModulePromise;
 }
+function observeImasoraCompanionCatcherWorkshopRewards(mount) {
+  if (!mount || typeof MutationObserver === "undefined") return;
+  mount.__ufoWorkshopCatcherObserver?.disconnect?.();
+  let previousCaught = 0;
+  let observer = null;
+  const readCaughtPrizes = () => {
+    if (!mount.isConnected) {
+      observer?.disconnect();
+      delete mount.__ufoWorkshopCatcherObserver;
+      return;
+    }
+    const caught = Math.max(
+      0,
+      Math.floor(Number(mount.querySelector("[data-icc-caught]")?.textContent) || 0)
+    );
+    if (caught > previousCaught) {
+      const newlyCaught = caught - previousCaught;
+      awardUfoWorkshopArcadeMaterials(
+        { arcadeParts: newlyCaught * 6 },
+        `キャッチャー・賞品${newlyCaught}体`
+      );
+    }
+    previousCaught = caught;
+  };
+  observer = new MutationObserver(readCaughtPrizes);
+  mount.__ufoWorkshopCatcherObserver = observer;
+  observer.observe(mount, { childList: true, characterData: true, subtree: true });
+  readCaughtPrizes();
+}
 let imasoraJackpotCoinPusherModulePromise = null;
 function ensureImasoraJackpotCoinPusherLoaded() {
   if (window.ImasoraJackpotCoinPusher) return Promise.resolve(window.ImasoraJackpotCoinPusher);
@@ -44960,7 +45076,7 @@ let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260809-center-j-checker-jack-pot-label")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260905-ufo-workshop-common-arcade-v408")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;
@@ -45213,11 +45329,21 @@ function getImasoraTriLinkMemories() {
 function saveImasoraTriLinkMemory(memory) {
   if (!memory || typeof memory !== "object" || !memory.id) return;
   const current = Array.isArray(state.triLinkMemories) ? state.triLinkMemories : [];
+  const alreadyRecorded = current.some(item => item?.id === memory.id);
   state.triLinkMemories = [
     memory,
     ...current.filter(item => item?.id !== memory.id)
   ].slice(0, 20);
   saveState();
+  if (alreadyRecorded) return;
+  const currentParticipantId = (Array.isArray(memory.participants) ? memory.participants : [])
+    .find(participant => participant?.role === "current")?.id || triLinkCurrentParticipant().id;
+  const playerWon = memory.winnerId === currentParticipantId;
+  const reward = { arcadeParts: playerWon ? 3 : 2 };
+  awardUfoWorkshopArcadeMaterials(
+    reward,
+    `三者対戦${playerWon ? "・勝利ボーナス込み" : "・完走"}`
+  );
 }
 function getImasoraJackpotWingArt() {
   try {
@@ -45754,6 +45880,7 @@ function renderTownArcade() {
         .then(game => {
           if (!mount.isConnected) return;
           game.mount(mount, { roster: getImasoraArcadePlushRoster() });
+          observeImasoraCompanionCatcherWorkshopRewards(mount);
         })
         .catch(error => {
           console.error("イマソラキャラクターキャッチャー3Dの読み込みに失敗しました。", error);
@@ -45796,7 +45923,8 @@ function renderTownArcade() {
           game.mount(mount, {
             roster: getImasoraArcadePlushRoster(),
             wingArt: getImasoraJackpotWingArt(),
-            effects: getImasoraJackpotEffectPreferences()
+            effects: getImasoraJackpotEffectPreferences(),
+            onWorkshopExchange: awardUfoWorkshopCoinPusherExchange
           });
         })
         .catch(error => {
@@ -47239,7 +47367,7 @@ function renderTownKaraoke() {
   }
   box.innerHTML = `
     <div class="karaoke-heading"><b>カラオケボックス</b><button type="button" data-karaoke-return-town>町に戻る</button></div>
-    <span>育成中の相棒、白ミチロードセイバーレン、引退した相棒最大2匹まで一緒に、イマソラウォークの曲を歌詞表示ありで試聴できます。</span>
+    <span>育成中の相棒、白ミチロードセイバーレン、引退した相棒最大2匹まで一緒に、イマソラウォーカーズの曲を歌詞表示ありで試聴できます。</span>
     <div class="karaoke-room">
       <div class="karaoke-singers">
         ${participants.map(item => `<div class="karaoke-singer"><strong>${escapeAttr(item.name)}</strong><small>${escapeAttr(item.role)}</small></div>`).join("")}
@@ -48084,7 +48212,7 @@ async function saveMemorialWallpaperImage(button, blob, url, fileName) {
   button.textContent = "保存画面を開いています...";
   try {
     const file = new File([blob], fileName, { type: "image/png" });
-    const shareData = { title: "イマソラウォーク壁紙", files: [file] };
+    const shareData = { title: "イマソラウォーカーズ壁紙", files: [file] };
     const canShareFile = Boolean(navigator.share)
       && (typeof navigator.canShare !== "function" || navigator.canShare(shareData));
     if (canShareFile) {
@@ -49755,7 +49883,7 @@ function renderRetirementSendoff() {
           <span id="retirementSendoffWish"></span>
         </div>
         <div class="retirement-sendoff-endroll" aria-hidden="true">
-          <span>主演　${escapeAttr(name)}　　白ミチロードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーク制作委員会の提供でお送りしました。</span>
+          <span>主演　${escapeAttr(name)}　　白ミチロードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーカーズ制作委員会の提供でお送りしました。</span>
         </div>
       </div>
     </div>
@@ -52626,6 +52754,8 @@ function confirmSkyRecognition() {
   const mapProgress = skyGateCleared ? { latestReward: null, moved: 0, stoppedForSky: null } : advanceMap(1, "イマソラ認識");
   const mapReward = mapProgress.latestReward;
   const mapMoveText = mapProgress.moved ? ` / Map +${mapProgress.moved}` : "";
+  const ufoWorkshopRewardText = formatUfoWorkshopMaterialReward(ufoWorkshopWalkReward);
+  awardUfoWorkshopMaterials(ufoWorkshopWalkReward);
   setTodayResult({
     kind: "sky",
     title: "イマソラ認識を確定",
@@ -52638,10 +52768,11 @@ function confirmSkyRecognition() {
       `今日の空ボーナス: ${skyBonus.title}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label} 相棒経験値+${stepBonus.xp} Coin+${stepBonus.coin}` : ""}${itemWalkXp || itemWalkCoin ? ` / アイテム補助 相棒経験値+${itemWalkXp} Coin+${itemWalkCoin}` : ""}`,
       `${summonSeed ? `召喚タネ: ${summonSeed.name}` : evolutionResult ? `進化: ${evolutionResult.text}` : "直接付与なし"}`,
       "今日の空: 気配を記録",
+      `UFO整備素材: ${ufoWorkshopRewardText}`,
       "投稿テンプレ補助は任意共有用として扱い、投稿による報酬は付与しません。"
     ]
   });
-  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / 相棒経験値 +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""}`);
+  addLog(`イマソラ認識: ${current.name}から${current.result}を確認。空の気配: ${imasoraTraitNames(imasoraTraits)} / 相棒経験値 +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ: ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化: ${evolutionResult.text}` : ""} / UFO整備素材: ${ufoWorkshopRewardText}`);
   [document.getElementById("skyResult"), document.getElementById("walkSkyResult")].filter(Boolean).forEach(box => { box.innerHTML = `
     <strong>${current.result}</strong>
     <p>${current.name}を認識しました。人・私物・建造物が入らない空だけを対象にし、写真そのものは保存しない方針です。空の気配: ${imasoraTraitNames(imasoraTraits)} / 相棒経験値 +${xpGain} / Coin +${coinGain}${mapMoveText}${stepBonus.xp || stepBonus.coin ? ` / ${stepBonus.label}` : ""}${summonSeed ? ` / 召喚タネ ${summonSeed.name}` : ""}${evolutionResult ? ` / 進化 ${evolutionResult.text}` : ""}</p>
@@ -57026,7 +57157,7 @@ document.getElementById("stepBtn").addEventListener("click", checkStepProof);
 document.getElementById("skySummonBtn").addEventListener("click", skySummon);
 document.getElementById("walkSkySummonBtn").addEventListener("click", skySummon);
 document.getElementById("resetBtn").addEventListener("click", () => {
-  if (confirm("イマソラウォークの保存データを削除しますか？")) {
+  if (confirm("イマソラウォーカーズの保存データを削除しますか？")) {
     localStorage.removeItem(storeKey);
     Object.assign(state, defaultState());
     normalizeState();

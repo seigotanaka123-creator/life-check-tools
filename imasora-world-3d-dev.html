@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>イマソラ3Dワールド基盤 開発</title>
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=20260905-ufo-workshop-common-arcade-v407">
+</head>
+<body>
+  <main class="world-shell">
+    <header class="world-header">
+      <div>
+        <p class="eyebrow">IMASORA WORLD FOUNDATION</p>
+        <h1>白ミチロードセイバーレンと歩く3Dマップ</h1>
+        <p class="lead">空・海岸・工事現場の正式マップ座標を共有し、歩行・物理・建築・保存を一体化した3Dワールドです。</p>
+      </div>
+      <div class="status-stack">
+        <span class="status-pill"><i></i><span id="statusText">ワールド準備中</span></span>
+        <span class="save-state" id="saveState">未保存</span>
+      </div>
+    </header>
+
+    <section class="world-toolbar" aria-label="ワールド操作">
+      <div class="map-tabs" id="mapTabs">
+        <button type="button" data-map="sky" class="is-active">空マップ</button>
+        <button type="button" data-map="mars">火星マップ</button>
+        <button type="button" data-map="coast">海岸マップ</button>
+        <button type="button" data-map="construction">工事現場</button>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" id="cameraModeButton">視点：三人称</button>
+        <button type="button" id="labelsButton">建物名：表示</button>
+        <button type="button" id="physicsDebugButton">物理表示：OFF</button>
+        <button type="button" id="saveButton">保存</button>
+        <button type="button" id="resetButton">このマップを初期化</button>
+      </div>
+    </section>
+
+    <section class="world-layout">
+      <div class="viewport-card">
+        <div class="viewport-toolbar">
+          <span class="scene-title" id="sceneTitle">空マップ・正式3D区画</span>
+          <span class="coords" id="coords">X 0.0 / Z 0.0</span>
+        </div>
+        <div class="viewport" id="viewport">
+          <canvas id="worldCanvas" aria-label="白ミチロードセイバーレンが歩く3Dワールド"></canvas>
+          <div class="camera-reticle" id="cameraReticle" aria-hidden="true"></div>
+          <div class="look-pad" id="lookPad" aria-hidden="true"><span>視点</span></div>
+          <div class="toast" id="toast" role="status"></div>
+          <div class="ufo-forward-scroll-reward-feed" id="ufoForwardScrollRewardFeed" aria-live="polite" aria-label="獲得アイテム"></div>
+          <div class="ufo-engine-overlay" id="ufoEngineOverlay" aria-live="polite">
+            <span>ENGINE START MODE</span>
+            <strong id="ufoEnginePhase">着座位置を固定</strong>
+            <small id="ufoEngineDetail">白ミチロードセイバーレンを操縦席へ固定しています</small>
+            <i aria-hidden="true"></i>
+          </div>
+          <div class="space-transition-overlay" id="spaceTransitionOverlay" aria-live="polite">
+            <span>SKY LIMIT PASSED</span>
+            <strong>宇宙マップへ移動</strong>
+            <small>空の外周を越えました。UFOの航行状態を維持したまま宇宙へ接続します。</small>
+            <i aria-hidden="true"></i>
+          </div>
+          <section class="sky-station-guide-dialog" id="skyStationGuideDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="ミチメバンブレイブルとの会話">
+            <div class="sky-station-guide-dialog-name" id="skyStationGuideDialogSpeaker">ミチメバンブレイブル</div>
+            <p class="sky-station-guide-dialog-text" id="skyStationGuideDialogText"></p>
+            <div class="sky-station-guide-dialog-choices" id="skyStationGuideDialogChoices" aria-label="会話の選択肢">
+              <button type="button" data-guide-dialog-topic="sky-map">空マップについて</button>
+              <button type="button" data-guide-dialog-topic="ufo">UFOについて</button>
+              <button type="button" data-guide-dialog-topic="ufo-equipment">UFO装備倉庫について</button>
+              <button type="button" data-guide-dialog-topic="visit">ミチメバンブレイブルに会いに来た</button>
+            </div>
+            <div class="sky-station-guide-dialog-footer" id="skyStationGuideDialogFooter" hidden>
+              <span class="sky-station-guide-dialog-page" id="skyStationGuideDialogPage" aria-live="off"></span>
+              <button class="sky-station-guide-dialog-next" type="button" id="skyStationGuideDialogNext">つぎへ</button>
+            </div>
+          </section>
+          <section class="ufo-equipment-workshop-menu" id="ufoEquipmentWorkshopMenu" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="UFO倉庫装備メニュー">
+            <header class="ufo-equipment-workshop-heading">
+              <div>
+                <span>UFO EQUIPMENT WORKSHOP</span>
+                <h2>UFO倉庫装備メニュー</h2>
+                <p>日々の散歩とゲームセンターで集めた素材を使うと、装備をすぐにUFOへ装着できます。</p>
+              </div>
+              <button type="button" id="ufoEquipmentWorkshopClose" aria-label="UFO倉庫装備メニューを閉じる">とじる</button>
+            </header>
+            <div class="ufo-equipment-workshop-resources" aria-label="所持資源">
+              <span>雲繊維 <strong id="ufoEquipmentWorkshopCloudFiberCount">0</strong></span>
+              <span>空見結晶 <strong id="ufoEquipmentWorkshopSkySightCrystalCount">0</strong></span>
+              <span>整備パーツ <strong id="ufoEquipmentWorkshopArcadePartsCount">0</strong></span>
+            </div>
+            <div class="ufo-equipment-workshop-list" id="ufoEquipmentWorkshopList" aria-label="作成できるUFO装備"></div>
+            <p class="ufo-equipment-workshop-status" id="ufoEquipmentWorkshopStatus">作成する装備を選んでください。</p>
+          </section>
+          <div class="ufo-space-life" id="ufoSpaceLife" hidden aria-live="polite">
+            <div class="ufo-space-life-heading"><span id="ufoSpaceLifeLabel">救助ユニット</span><strong id="ufoSpaceLifeValue">100</strong></div>
+            <div class="ufo-space-life-track" aria-hidden="true"><i id="ufoSpaceLifeFill"></i></div>
+            <small id="ufoSpaceLifeNote">開拓ユニットを安全に牽引します</small>
+          </div>
+          <div class="ufo-space-combat" id="ufoSpaceCombat" hidden aria-live="polite">
+            <div class="ufo-space-combat-heading"><span id="ufoSpaceModeTitle">火星突入航路</span><strong id="ufoSpaceWave">待機</strong></div>
+            <div class="ufo-space-combat-stats"><span><i id="ufoSpaceStatOneLabel">接続</i> <b id="ufoSpaceDustDestroyed">0</b></span><span><i id="ufoSpaceStatTwoLabel">安定</i> <b id="ufoSpaceDeflectionCount">0</b></span><span><i id="ufoSpaceStatThreeLabel">距離</i> <b id="ufoSpaceThreatCount">--</b></span></div>
+            <div class="ufo-space-wave-track" aria-hidden="true"><i id="ufoSpaceWaveFill"></i></div>
+            <button type="button" id="ufoSpaceStartButton" aria-label="火星突入航路を開始">火星突入航路を開始</button>
+            <button type="button" id="ufoSpaceReturnButton" hidden aria-label="空マップの空駅入口へ戻る">空マップに戻る</button>
+            <button type="button" id="ufoSpaceFireButton" aria-label="開拓ユニットへ牽引索を接続">牽引索を接続</button>
+            <small id="ufoSpaceCombatNote">任務を開始すると、回転中の開拓ユニットが出現します。</small>
+          </div>
+          <div class="ufo-space-reticle" id="ufoSpaceReticle" hidden aria-hidden="true"><i></i></div>
+          <button type="button" id="cameraDistanceButton" class="camera-distance-control">距離：標準</button>
+          <button type="button" id="emergencyEscapeButton" class="emergency-escape-control" title="どこにいても雲マップの空駅入口へ帰還します">緊急帰還</button>
+          <div class="ufo-flight-controls" id="ufoFlightControls" hidden aria-label="UFO操縦コクピット">
+            <div class="flight-lever-list" role="group" aria-label="UFO飛行レバー一覧">
+              <button type="button" class="flight-lever" data-ufo-flight="lift-up" aria-label="上昇" title="上昇"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>▲</b><small>上昇</small></button>
+              <button type="button" class="flight-lever" data-ufo-flight="lift-down" aria-label="下降" title="下降"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>▼</b><small>下降</small></button>
+              <button type="button" class="flight-lever" data-ufo-flight="turn-left" aria-label="左回転" title="左回転"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>↶</b><small>左回転</small></button>
+              <button type="button" class="flight-lever" data-ufo-flight="turn-right" aria-label="右回転" title="右回転"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>↷</b><small>右回転</small></button>
+              <span class="flight-console-inline-title">飛行操縦</span>
+              <div class="ufo-flight-pad" id="ufoFlightPad" aria-label="UFO前後左右移動パッド">
+                <div class="ufo-flight-stick" id="ufoFlightStick"></div>
+              </div>
+            </div>
+            <div class="space-shooter-control-list" role="group" aria-label="宇宙救助の左右操縦レバー">
+              <button type="button" class="flight-lever space-strafe-lever" data-ufo-flight="strafe-left" aria-label="左へ移動" title="左へ移動"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>◀</b><small>左へ</small></button>
+              <span class="space-shooter-inline-title"><strong id="ufoSpaceControlTitle">救助航行</strong><small id="ufoSpaceControlDetail">左右操縦</small></span>
+              <button type="button" class="flight-lever space-strafe-lever" data-ufo-flight="strafe-right" aria-label="右へ移動" title="右へ移動"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>▶</b><small>右へ</small></button>
+            </div>
+          </div>
+          <div class="touch-pad" id="touchPad" aria-label="タッチ移動パッド">
+            <div class="touch-stick" id="touchStick"></div>
+          </div>
+          <div class="touch-hint" id="touchHint">左パッド：画面基準で移動　Space：最大3段ジャンプ　右側ドラッグ：カメラ回転（上下左右）</div>
+        </div>
+        <div class="viewport-footer">
+          <span id="mapDescription">雲の床を歩き、雲づくり工房を建てます。</span>
+          <span class="physics-badge">物理：地面・建物・建築判定ON</span>
+        </div>
+      </div>
+
+      <aside class="control-card">
+        <section class="panel-section">
+          <p class="eyebrow">CHARACTER</p>
+          <h2>白ミチロードセイバーレン</h2>
+          <p class="muted">既存の360度立体モデルを、移動方向に合わせて回転させています。</p>
+          <div class="readout-grid">
+            <div><span>視点</span><strong id="viewReadout">三人称</strong></div>
+            <div><span>向き</span><strong id="headingReadout">正面</strong></div>
+            <div><span>位置</span><strong id="positionReadout">0, 0</strong></div>
+            <div><span>状態</span><strong id="motionReadout">待機</strong></div>
+          </div>
+        </section>
+
+        <section class="panel-section build-section">
+          <p class="eyebrow">BUILD</p>
+          <h2>建造</h2>
+          <p class="muted">建築候補を選び、緑色のプレビューを確認してから配置します。</p>
+          <div class="build-list" id="buildList"></div>
+          <div class="build-actions">
+            <button type="button" id="placeButton" class="primary-button" disabled>ここに建てる</button>
+            <button type="button" id="cancelBuildButton" disabled>キャンセル</button>
+          </div>
+          <p class="build-message" id="buildMessage">建物を選択してください。</p>
+        </section>
+
+        <section class="panel-section ufo-section">
+          <p class="eyebrow">UFO ACCESS</p>
+          <h2>UFO乗り場</h2>
+          <p class="muted">乗り場にUFOを建造すると、右側に白ミチロードセイバーレン専用の顔認証装置が現れます。装置の前に立つと認証され、収納式の搭乗足場が引き出されて側面ハッチが開きます。</p>
+          <div class="ufo-actions" id="ufoActions">
+            <button type="button" id="ufoDoorButton" disabled>右側搭乗足場を手動切替</button>
+            <button type="button" id="ufoBoardButton" class="primary-button" disabled>UFOに乗る</button>
+          </div>
+          <p class="build-message" id="ufoStatus">UFO乗り場を建造してください。</p>
+        </section>
+
+        <section class="panel-section checklist">
+          <p class="eyebrow">FOUNDATION CHECK</p>
+          <h2>共通基盤の確認</h2>
+          <ul>
+            <li><span>✓</span>3マップ共通の座標系</li>
+            <li><span>✓</span>360度キャラクターの向き</li>
+            <li><span>✓</span>地面・建物の衝突判定</li>
+            <li><span>✓</span>一人称の視線・視線基準歩行</li>
+            <li><span>✓</span>建物名の表示切り替え</li>
+            <li><span>✓</span>建築状態の保存・復元</li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+
+    <footer>
+      <span>正式マップ連動3D版：既存のイマソラウォーク座標と共通化</span>
+      <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
+    </footer>
+  </main>
+<script type="module" src="./imasora-world-3d-dev.js?v=20260905-ufo-workshop-common-arcade-v407"></script>
+</body>
+</html>

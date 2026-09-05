@@ -1,0 +1,306 @@
+:root {
+  color-scheme: dark;
+  --ink: #f6fbff;
+  --muted: #a8bfd2;
+  --panel: rgba(10, 25, 49, .82);
+  --panel-strong: rgba(8, 20, 42, .95);
+  --line: rgba(172, 222, 255, .18);
+  --accent: #85e8ff;
+  --accent-strong: #37c4ff;
+  --good: #8dffbe;
+  --warning: #ffd78d;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--ink);
+  background: #071327;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .42; cursor: not-allowed; }
+
+.world-shell {
+  width: min(1500px, 100%);
+  margin: 0 auto;
+  padding: 24px clamp(16px, 3vw, 46px) 36px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(91, 181, 255, .16), transparent 30%),
+    linear-gradient(160deg, #0a1c37, #071123 70%);
+  min-height: 100vh;
+}
+.world-header, .world-toolbar, .world-layout, .viewport-footer, footer { position: relative; z-index: 2; }
+.world-header { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 18px; }
+.eyebrow { margin: 0 0 7px; font-size: 11px; letter-spacing: .18em; font-weight: 900; color: #8edfff; }
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 10px; font-size: clamp(25px, 4vw, 46px); line-height: 1.06; letter-spacing: -.04em; }
+h2 { margin-bottom: 8px; font-size: 18px; }
+.lead { max-width: 760px; margin-bottom: 0; color: var(--muted); line-height: 1.7; }
+.status-stack { display: flex; align-items: end; flex-direction: column; gap: 8px; white-space: nowrap; }
+.status-pill, .save-state, .physics-badge { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; background: rgba(10, 30, 57, .7); font-size: 12px; }
+.status-pill { display: inline-flex; align-items: center; gap: 8px; }
+.status-pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px var(--good); }
+.save-state { color: var(--muted); padding: 5px 10px; }
+
+.world-toolbar { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 16px; background: rgba(6, 18, 37, .68); }
+.map-tabs, .toolbar-actions, .build-actions, .ufo-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.world-toolbar button, .directionless-button { border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; background: rgba(113, 198, 255, .08); }
+.world-toolbar button:hover, .world-toolbar button.is-active { border-color: rgba(133, 232, 255, .78); background: rgba(75, 205, 255, .2); box-shadow: 0 0 18px rgba(65, 205, 255, .13); }
+.world-toolbar button[data-debug-active="true"] { border-color: rgba(255, 224, 117, .92); color: #fff5bd; background: rgba(255, 201, 64, .2); box-shadow: 0 0 18px rgba(255, 196, 64, .18); }
+
+.world-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: 16px; align-items: start; }
+.viewport-card, .control-card { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 20px 70px rgba(0, 0, 0, .24); overflow: hidden; }
+.viewport-toolbar, .viewport-footer { display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 12px 16px; background: rgba(3, 12, 27, .55); }
+.scene-title { font-weight: 900; }
+.coords { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+.viewport { position: relative; min-height: min(70vh, 720px); height: 720px; background: #0a1d3a; }
+#worldCanvas { width: 100%; height: 100%; display: block; touch-action: none; }
+.camera-reticle { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.36); border-radius: 50%; pointer-events: none; opacity: .55; }
+.camera-distance-control { position: absolute; z-index: 4; left: 20px; bottom: 158px; border: 1px solid rgba(177,239,255,.52); border-radius: 10px; padding: 8px 12px; background: rgba(6, 24, 48, .88); color: #e8fbff; box-shadow: 0 0 18px rgba(47,190,255,.2), inset 0 0 12px rgba(111,219,255,.08); font-size: 12px; font-weight: 800; white-space: nowrap; pointer-events: auto; touch-action: manipulation; }
+.camera-distance-control:hover { border-color: rgba(133,232,255,.92); background: rgba(20, 65, 102, .94); }
+.emergency-escape-control { position: absolute; z-index: 4; left: 20px; right: auto; bottom: 200px; border: 1px solid rgba(255, 214, 135, .72); border-radius: 10px; padding: 8px 12px; background: rgba(65, 32, 22, .92); color: #fff2cf; box-shadow: 0 0 18px rgba(255, 157, 72, .2), inset 0 0 12px rgba(255, 204, 117, .08); font-size: 12px; font-weight: 900; white-space: nowrap; pointer-events: auto; touch-action: manipulation; }
+.emergency-escape-control:hover { border-color: rgba(255, 231, 173, .98); background: rgba(106, 52, 28, .96); }
+.look-pad { position: absolute; right: 26px; bottom: 42px; width: 112px; height: 112px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: radial-gradient(circle, rgba(96,211,255,.11), rgba(8,28,55,.16) 58%, transparent 60%); color: rgba(255,255,255,.56); font-size: 11px; font-weight: 900; letter-spacing: .12em; opacity: 0; transform: scale(.88); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+.viewport.is-first-person .look-pad { opacity: .76; transform: scale(1); }
+.viewport.is-looking .look-pad { border-color: rgba(133,232,255,.7); color: #d9f8ff; box-shadow: 0 0 30px rgba(55,196,255,.24), inset 0 0 28px rgba(55,196,255,.1); }
+.viewport:not(.is-first-person) .camera-reticle { opacity: .24; }
+.toast { position: absolute; left: 50%; top: 18px; transform: translateX(-50%) translateY(-8px); opacity: 0; padding: 10px 15px; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; background: rgba(6, 18, 33, .85); color: #fff; pointer-events: none; transition: .2s ease; font-size: 13px; }
+.toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.ufo-forward-scroll-reward-feed { position: absolute; z-index: 6; top: 126px; right: 18px; width: min(240px, calc(100% - 36px)); display: grid; justify-items: end; gap: 8px; pointer-events: none; }
+.ufo-forward-scroll-reward { width: min(100%, 222px); box-sizing: border-box; overflow: hidden; padding: 9px 12px 8px; border: 1px solid rgba(184,232,245,.5); border-right-width: 4px; border-radius: 10px; background: linear-gradient(145deg, rgba(4,17,35,.92), rgba(8,40,57,.86)); box-shadow: 0 0 22px rgba(45,181,229,.18), inset 0 0 16px rgba(136,232,255,.06); color: #eafcff; opacity: 0; transform: translateX(20px) scale(.96); animation: ufo-forward-scroll-reward-enter .23s cubic-bezier(.2,.8,.25,1) forwards; transition: opacity .18s ease, transform .18s ease; }
+.ufo-forward-scroll-reward strong { display: block; font-size: 13px; font-weight: 1000; letter-spacing: .03em; text-shadow: 0 0 10px currentColor; }
+.ufo-forward-scroll-reward small { display: block; margin-top: 3px; color: rgba(231,249,255,.8); font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ufo-forward-scroll-reward[data-type="energy"] { border-color: rgba(111,236,255,.9); border-right-color: #62e7ff; color: #aaf5ff; }
+.ufo-forward-scroll-reward[data-type="coin"] { border-color: rgba(255,211,105,.92); border-right-color: #ffd46c; color: #ffe5a3; }
+.ufo-forward-scroll-reward[data-type="material"] { border-color: rgba(205,166,255,.92); border-right-color: #c091ff; color: #e2cbff; }
+.ufo-forward-scroll-reward.is-leaving { opacity: 0; transform: translateX(16px) scale(.96); }
+@keyframes ufo-forward-scroll-reward-enter { to { opacity: 1; transform: translateX(0) scale(1); } }
+.ufo-engine-overlay { position: absolute; z-index: 6; left: 50%; top: 11%; width: min(440px, calc(100% - 34px)); transform: translate(-50%, -14px); opacity: 0; pointer-events: none; padding: 16px 18px 14px; overflow: hidden; border: 1px solid rgba(139,239,255,.62); border-radius: 16px; background: linear-gradient(135deg, rgba(4,18,34,.94), rgba(9,55,75,.88)); box-shadow: 0 0 40px rgba(39,211,255,.25), inset 0 0 26px rgba(94,228,255,.08); transition: opacity .2s ease, transform .2s ease; text-align: center; }
+.ufo-engine-overlay.is-active { opacity: 1; transform: translate(-50%, 0); }
+.ufo-engine-overlay span { display: block; margin-bottom: 5px; color: #7feaff; font-size: 10px; font-weight: 900; letter-spacing: .22em; }
+.ufo-engine-overlay strong { display: block; color: #f4feff; font-size: clamp(17px, 2.8vw, 24px); letter-spacing: .04em; }
+.ufo-engine-overlay small { display: block; margin-top: 6px; color: #b7dce6; font-size: 11px; line-height: 1.55; }
+.ufo-engine-overlay i { display: block; width: 38%; height: 3px; margin: 12px auto 0; border-radius: 999px; background: #75edff; box-shadow: 0 0 14px #45dfff; transform-origin: left center; animation: ufo-engine-scan .7s ease-in-out infinite alternate; }
+@keyframes ufo-engine-scan { from { transform: scaleX(.18); opacity: .45; } to { transform: scaleX(1); opacity: 1; } }
+.space-transition-overlay { position: absolute; z-index: 8; left: 50%; top: 50%; width: min(520px, calc(100% - 34px)); transform: translate(-50%, -44%) scale(.96); opacity: 0; pointer-events: none; padding: 22px 24px 19px; overflow: hidden; border: 1px solid rgba(161,220,255,.72); border-radius: 18px; background: radial-gradient(circle at 50% 120%, rgba(62,125,197,.3), transparent 58%), linear-gradient(145deg, rgba(2,6,20,.97), rgba(8,24,55,.94)); box-shadow: 0 0 80px rgba(80,172,255,.25), inset 0 0 42px rgba(125,218,255,.08); transition: opacity .32s ease, transform .42s cubic-bezier(.2,.8,.2,1); text-align: center; }
+.space-transition-overlay.is-active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.space-transition-overlay.is-earth-departure { top: 9%; width: min(390px, calc(100% - 34px)); padding: 10px 16px 9px; border-color: rgba(123,219,255,.78); border-radius: 14px; background: radial-gradient(circle at 50% 130%, rgba(40,143,220,.24), transparent 65%), linear-gradient(145deg, rgba(2,9,24,.76), rgba(7,33,65,.7)); box-shadow: 0 0 34px rgba(86,189,255,.2), inset 0 0 22px rgba(137,231,255,.08); backdrop-filter: blur(5px); }
+.space-transition-overlay.is-earth-departure.is-active { transform: translate(-50%, 0) scale(1); }
+.space-transition-overlay.is-earth-departure span { margin-bottom: 3px; font-size: 9px; }
+.space-transition-overlay.is-earth-departure strong { font-size: clamp(16px, 2.6vw, 21px); }
+.space-transition-overlay.is-earth-departure small { margin-top: 4px; max-width: 330px; font-size: 10px; line-height: 1.42; }
+.space-transition-overlay.is-earth-departure i { width: 42%; margin-top: 8px; }
+.space-transition-overlay.is-mars-atmosphere { border-color: rgba(255,166,108,.9); background: radial-gradient(circle at 50% 120%, rgba(255,104,50,.44), transparent 61%), linear-gradient(145deg, rgba(35,5,8,.97), rgba(103,29,18,.94)); box-shadow: 0 0 92px rgba(255,104,50,.4), inset 0 0 46px rgba(255,191,123,.13); }
+.space-transition-overlay.is-mars-atmosphere span { color: #ffc183; }
+.space-transition-overlay.is-mars-atmosphere strong { color: #fff2e5; text-shadow: 0 0 20px rgba(255,160,93,.72); }
+.space-transition-overlay.is-mars-atmosphere small { color: #ffd5b8; }
+.space-transition-overlay.is-mars-atmosphere i { background: linear-gradient(90deg, transparent, #ff9259 25% 75%, transparent); box-shadow: 0 0 20px rgba(255,111,61,.95); }
+.space-transition-overlay span { display: block; margin-bottom: 7px; color: #80dcff; font-size: 10px; font-weight: 900; letter-spacing: .24em; }
+.space-transition-overlay strong { display: block; color: #f4fbff; font-size: clamp(19px, 3.2vw, 28px); letter-spacing: .06em; text-shadow: 0 0 18px rgba(157,224,255,.48); }
+.space-transition-overlay small { display: block; margin: 8px auto 0; max-width: 410px; color: #bfd5e8; font-size: 11px; line-height: 1.7; }
+.space-transition-overlay i { display: block; width: 52%; height: 2px; margin: 15px auto 0; border-radius: 999px; background: linear-gradient(90deg, transparent, #8de9ff 25% 75%, transparent); box-shadow: 0 0 18px rgba(97,218,255,.9); animation: space-transition-line .75s ease-in-out infinite alternate; }
+@keyframes space-transition-line { from { transform: scaleX(.18); opacity: .35; } to { transform: scaleX(1); opacity: 1; } }
+.sky-station-guide-dialog { position: absolute; z-index: 16; left: 50%; bottom: 14px; width: min(760px, calc(100% - 36px)); box-sizing: border-box; transform: translateX(-50%); padding: 14px 16px 15px; border: 2px solid rgba(154, 223, 255, .82); border-radius: 14px; background: linear-gradient(135deg, rgba(4, 17, 39, .96), rgba(10, 53, 82, .93)); box-shadow: 0 0 34px rgba(48, 191, 255, .28), inset 0 0 26px rgba(149, 235, 255, .09); color: #f2fcff; backdrop-filter: blur(8px); }
+.sky-station-guide-dialog[hidden] { display: none; }
+.sky-station-guide-dialog-name { display: inline-flex; align-items: center; min-height: 28px; margin: -29px 0 8px -2px; padding: 0 12px; border: 1px solid rgba(186, 237, 255, .82); border-radius: 8px 8px 8px 2px; background: linear-gradient(135deg, #1c78a6, #123a71); box-shadow: 0 0 17px rgba(86, 204, 255, .32); color: #ffffff; font-size: 14px; font-weight: 1000; letter-spacing: .05em; }
+.sky-station-guide-dialog-text { min-height: 2.95em; margin: 0; color: #f4fdff; font-size: clamp(16px, 2.15vw, 20px); font-weight: 800; line-height: 1.64; letter-spacing: .025em; text-shadow: 0 1px 0 rgba(0, 0, 0, .42); }
+.sky-station-guide-dialog-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.sky-station-guide-dialog-choices[hidden] { display: none; }
+.sky-station-guide-dialog-choices button { min-height: 42px; padding: 8px 12px; border: 1px solid rgba(181, 235, 255, .62); border-radius: 9px; background: linear-gradient(145deg, rgba(20, 82, 116, .96), rgba(10, 38, 71, .96)); box-shadow: inset 0 0 13px rgba(151, 236, 255, .09); color: #f6fdff; cursor: pointer; font: inherit; font-size: 14px; font-weight: 900; line-height: 1.35; text-align: left; transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease; }
+.sky-station-guide-dialog-choices button::before { content: "▶"; margin-right: 7px; color: #84e7ff; font-size: 11px; text-shadow: 0 0 8px #55dfff; }
+.sky-station-guide-dialog-choices button:hover, .sky-station-guide-dialog-choices button:focus-visible { border-color: #e9fbff; outline: none; background: linear-gradient(145deg, rgba(38, 121, 158, .98), rgba(15, 59, 102, .98)); box-shadow: 0 0 18px rgba(104, 218, 255, .34), inset 0 0 15px rgba(183, 244, 255, .16); transform: translateY(-1px); }
+.sky-station-guide-dialog-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+.sky-station-guide-dialog-footer[hidden] { display: none; }
+.sky-station-guide-dialog-page { margin-right: auto; color: rgba(197, 239, 255, .76); font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: .1em; }
+.sky-station-guide-dialog-next { min-width: 118px; min-height: 38px; padding: 7px 16px; border: 1px solid rgba(198, 242, 255, .78); border-radius: 9px; background: linear-gradient(145deg, #2d91bc, #164a83); box-shadow: 0 0 14px rgba(93, 210, 255, .22), inset 0 0 11px rgba(202, 246, 255, .14); color: #ffffff; cursor: pointer; font: inherit; font-size: 14px; font-weight: 1000; letter-spacing: .07em; transition: transform .12s ease, border-color .12s ease, background .12s ease; }
+.sky-station-guide-dialog-next::after { content: " ▶"; color: #b9f4ff; font-size: 11px; }
+.sky-station-guide-dialog-next[data-last-page="true"]::after { content: ""; }
+.sky-station-guide-dialog-next:hover, .sky-station-guide-dialog-next:focus-visible { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #43acd1, #1c5d9d); transform: translateY(-1px); }
+.sky-station-guide-dialog[data-typing="true"] .sky-station-guide-dialog-text::after { content: ""; display: inline-block; width: .52em; height: 1.12em; margin-left: .16em; vertical-align: -.18em; border-radius: 1px; background: #9ceeff; box-shadow: 0 0 9px rgba(129, 231, 255, .9); animation: sky-station-guide-dialog-caret .58s step-end infinite; }
+@keyframes sky-station-guide-dialog-caret { 50% { opacity: .12; } }
+.ufo-equipment-workshop-menu { position: absolute; z-index: 18; left: 50%; top: 50%; width: min(860px, calc(100% - 34px)); max-height: min(650px, calc(100% - 34px)); box-sizing: border-box; overflow: auto; transform: translate(-50%, -50%); padding: 18px; border: 1px solid rgba(161, 235, 255, .88); border-radius: 18px; background: radial-gradient(circle at 92% 3%, rgba(120, 223, 255, .18), transparent 32%), linear-gradient(145deg, rgba(3, 16, 39, .98), rgba(9, 47, 75, .96)); box-shadow: 0 0 54px rgba(70, 210, 255, .32), inset 0 0 35px rgba(145, 236, 255, .1); color: #f1fcff; backdrop-filter: blur(10px); }
+.ufo-equipment-workshop-menu[hidden] { display: none; }
+.ufo-equipment-workshop-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(161, 231, 255, .28); }
+.ufo-equipment-workshop-heading span { display: block; color: #8eeeff; font-size: 10px; font-weight: 1000; letter-spacing: .2em; }
+.ufo-equipment-workshop-heading h2 { margin: 4px 0 3px; color: #ffffff; font-size: clamp(21px, 3.2vw, 29px); line-height: 1.1; letter-spacing: .035em; }
+.ufo-equipment-workshop-heading p { margin: 0; color: rgba(211, 242, 255, .82); font-size: 13px; font-weight: 700; line-height: 1.55; }
+.ufo-equipment-workshop-heading button { flex: 0 0 auto; min-height: 36px; padding: 7px 14px; border: 1px solid rgba(202, 242, 255, .74); border-radius: 9px; background: linear-gradient(145deg, rgba(47, 127, 163, .98), rgba(18, 58, 100, .98)); color: #ffffff; cursor: pointer; font: inherit; font-size: 13px; font-weight: 1000; }
+.ufo-equipment-workshop-heading button:hover, .ufo-equipment-workshop-heading button:focus-visible { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #43acd1, #1c5d9d); }
+.ufo-equipment-workshop-resources { display: flex; flex-wrap: wrap; gap: 8px; margin: 13px 0; }
+.ufo-equipment-workshop-resources span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border: 1px solid rgba(181, 233, 255, .36); border-radius: 999px; background: rgba(8, 42, 68, .62); color: #c9efff; font-size: 12px; font-weight: 800; }
+.ufo-equipment-workshop-resources strong { color: #ffffff; font-size: 16px; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(132, 230, 255, .58); }
+.ufo-equipment-workshop-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ufo-equipment-workshop-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; min-height: 118px; padding: 13px; border: 1px solid rgba(154, 223, 255, .38); border-radius: 12px; background: linear-gradient(145deg, rgba(15, 67, 98, .72), rgba(7, 27, 58, .78)); box-shadow: inset 0 0 17px rgba(142, 238, 255, .06); }
+.ufo-equipment-workshop-card[data-status="crafted"] { border-color: rgba(133, 255, 201, .72); background: linear-gradient(145deg, rgba(22, 102, 89, .7), rgba(7, 55, 65, .8)); }
+.ufo-equipment-workshop-card[data-status="locked"] { filter: saturate(.62); }
+.ufo-equipment-workshop-card h3 { margin: 0; color: #ffffff; font-size: 16px; line-height: 1.35; letter-spacing: .02em; }
+.ufo-equipment-workshop-card p { grid-column: 1 / -1; margin: -2px 0 0; color: rgba(221, 245, 255, .85); font-size: 13px; font-weight: 700; line-height: 1.55; }
+.ufo-equipment-workshop-cost { align-self: start; padding: 4px 8px; border: 1px solid rgba(218, 184, 255, .62); border-radius: 999px; color: #e6d2ff; font-size: 11px; font-weight: 1000; line-height: 1.4; text-align: right; }
+.ufo-equipment-workshop-card button { align-self: end; justify-self: start; min-height: 34px; padding: 6px 12px; border: 1px solid rgba(192, 240, 255, .72); border-radius: 8px; background: linear-gradient(145deg, #2f9fc5, #1a5c94); color: #ffffff; cursor: pointer; font: inherit; font-size: 13px; font-weight: 1000; }
+.ufo-equipment-workshop-card button:hover:not(:disabled), .ufo-equipment-workshop-card button:focus-visible:not(:disabled) { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #4fb9d8, #2070ad); }
+.ufo-equipment-workshop-card button:disabled { border-color: rgba(183, 218, 232, .28); background: rgba(64, 87, 110, .58); color: rgba(219, 239, 247, .62); cursor: default; }
+.ufo-equipment-workshop-status { min-height: 1.5em; margin: 13px 1px 0; color: #a9eaff; font-size: 13px; font-weight: 800; }
+.ufo-space-life { position: absolute; z-index: 5; top: 18px; right: 18px; width: min(240px, calc(100% - 36px)); padding: 10px 12px 9px; border: 1px solid rgba(159,225,255,.52); border-radius: 12px; background: linear-gradient(145deg, rgba(4,17,35,.9), rgba(8,40,57,.84)); box-shadow: 0 0 24px rgba(45,181,229,.16), inset 0 0 18px rgba(136,232,255,.06); pointer-events: none; }
+.ufo-space-life[hidden] { display: none; }
+.ufo-space-life-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: #e8fbff; font-size: 12px; font-weight: 900; }
+.ufo-space-life-heading strong { color: #bff4ff; font-size: 18px; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(109,224,255,.5); }
+.ufo-space-life-track { height: 9px; margin-top: 7px; overflow: hidden; border: 1px solid rgba(184,232,245,.34); border-radius: 999px; background: rgba(1,9,21,.76); }
+.ufo-space-life-track i { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #73efff, #b5ffd9); box-shadow: 0 0 14px rgba(91,228,255,.72); transition: width .18s ease, background .18s ease; }
+.ufo-space-life small { display: block; margin-top: 6px; color: rgba(218,242,249,.72); font-size: 10px; line-height: 1.35; }
+.ufo-space-life[data-danger="true"] { border-color: rgba(255,145,126,.78); box-shadow: 0 0 28px rgba(255,91,74,.2), inset 0 0 18px rgba(255,117,92,.08); }
+.ufo-space-life[data-danger="true"] .ufo-space-life-heading strong { color: #ffd0c4; text-shadow: 0 0 12px rgba(255,115,91,.58); }
+.ufo-space-life[data-danger="true"] .ufo-space-life-track i { background: linear-gradient(90deg, #ff8a70, #ffd17f); box-shadow: 0 0 14px rgba(255,117,92,.72); }
+.ufo-space-combat { position: absolute; z-index: 5; left: 18px; top: 18px; width: min(226px, calc(100% - 36px)); padding: 12px 12px 10px; box-sizing: border-box; border: 1px solid rgba(103,233,255,.72); border-radius: 14px; background: linear-gradient(145deg, rgba(2,13,29,.94), rgba(8,47,68,.87)); box-shadow: 0 0 34px rgba(41,198,237,.23), inset 0 0 22px rgba(117,232,255,.1); pointer-events: auto; overflow: hidden; }
+.ufo-space-combat[hidden] { display: none; }
+.ufo-space-combat::before { content: ""; position: absolute; inset: 0; opacity: .74; pointer-events: none; background: linear-gradient(120deg, transparent 8%, rgba(119,239,255,.08) 9% 10%, transparent 11% 30%, rgba(119,239,255,.045) 31% 32%, transparent 33%); }
+.ufo-space-combat-heading { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; color: #e8fbff; font-size: 12px; font-weight: 1000; letter-spacing: .04em; }
+.ufo-space-combat-heading strong { max-width: 120px; overflow: hidden; color: #a9f4ff; font-size: 10px; font-variant-numeric: tabular-nums; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 0 9px rgba(108,238,255,.52); }
+.ufo-space-combat-stats { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 9px; }
+.ufo-space-combat-stats span { padding: 5px 7px; border: 1px solid rgba(149,226,243,.16); border-radius: 7px; background: rgba(0,8,19,.38); color: rgba(215,245,251,.72); font-size: 9px; font-weight: 800; }
+.ufo-space-combat-stats i { font-style: normal; }
+.ufo-space-combat-stats b { float: right; color: #d9ffff; font-size: 12px; font-variant-numeric: tabular-nums; text-shadow: 0 0 8px rgba(124,233,255,.6); }
+.ufo-space-wave-track { position: relative; height: 4px; margin-top: 9px; overflow: hidden; border-radius: 999px; background: rgba(0,7,18,.88); box-shadow: inset 0 0 0 1px rgba(153,232,246,.17); }
+.ufo-space-wave-track i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #60dfff, #beffed); box-shadow: 0 0 11px rgba(90,235,255,.85); transition: width .18s linear; }
+.ufo-space-combat button { position: relative; width: 100%; margin-top: 8px; border: 1px solid rgba(181,246,255,.78); border-radius: 9px; padding: 8px 10px; color: #032334; background: linear-gradient(180deg, #d8ffff, #6ee5ff); box-shadow: 0 0 16px rgba(97,224,255,.5), inset 0 1px 0 rgba(255,255,255,.8); font-size: 12px; font-weight: 1000; letter-spacing: .08em; touch-action: manipulation; }
+.ufo-space-combat #ufoSpaceFireButton { border-color: rgba(151,255,221,.82); color: #032f2a; background: linear-gradient(180deg, #dcfff2, #6be0c0); box-shadow: 0 0 16px rgba(83,238,194,.42), inset 0 1px 0 rgba(255,255,255,.8); }
+.ufo-space-combat #ufoSpaceReturnButton { border-color: rgba(255,214,135,.78); color: #fff2cf; background: linear-gradient(180deg, rgba(113,58,31,.98), rgba(63,29,20,.98)); box-shadow: 0 0 16px rgba(255,157,72,.24), inset 0 1px 0 rgba(255,225,167,.22); }
+.ufo-space-combat button:hover, .ufo-space-combat button.is-pressed { background: linear-gradient(180deg, #f1ffff, #9af2ff); box-shadow: 0 0 24px rgba(112,236,255,.8); }
+.ufo-space-combat #ufoSpaceFireButton:hover, .ufo-space-combat #ufoSpaceFireButton.is-pressed { background: linear-gradient(180deg, #effff8, #9ff4d9); box-shadow: 0 0 24px rgba(91,247,207,.72); }
+.ufo-space-combat #ufoSpaceReturnButton:hover, .ufo-space-combat #ufoSpaceReturnButton.is-pressed { border-color: rgba(255,231,173,.98); background: linear-gradient(180deg, rgba(145,72,38,.98), rgba(86,37,23,.98)); box-shadow: 0 0 24px rgba(255,157,72,.48), inset 0 1px 0 rgba(255,235,187,.3); }
+.ufo-space-combat small { position: relative; display: block; min-height: 24px; margin-top: 7px; color: rgba(218,242,249,.78); font-size: 9px; line-height: 1.35; }
+.ufo-space-combat[data-hit="true"] { border-color: rgba(181,255,207,.9); box-shadow: 0 0 30px rgba(103,255,179,.34), inset 0 0 18px rgba(139,255,193,.12); }
+.ufo-space-combat[data-tethered="true"] { border-color: rgba(151,255,221,.88); box-shadow: 0 0 30px rgba(74,246,194,.27), inset 0 0 22px rgba(111,255,207,.12); }
+.ufo-space-combat[data-complete="true"] { border-color: rgba(255,238,156,.9); box-shadow: 0 0 34px rgba(255,213,86,.32), inset 0 0 22px rgba(255,239,159,.13); }
+.ufo-space-combat[data-cooldown="true"] button { filter: saturate(.65); opacity: .72; }
+.ufo-space-reticle { position: absolute; z-index: 4; left: 50%; top: 50%; width: 80px; height: 80px; transform: translate(-50%, -50%) scale(var(--ufo-reticle-scale, 1)); transform-origin: center; color: #c7fffb; pointer-events: none; filter: drop-shadow(0 0 9px currentColor); transition: color .14s ease, filter .14s ease, transform .14s ease; }
+.ufo-space-reticle[hidden] { display: none; }
+.ufo-space-reticle i::before, .ufo-space-reticle i::after { content: ""; position: absolute; background: currentColor; }
+.ufo-space-reticle i::before { left: 39px; top: 0; width: 1px; height: 21px; }
+.ufo-space-reticle i::after { left: 39px; bottom: 0; width: 1px; height: 21px; }
+.ufo-space-reticle i { position: absolute; inset: 23px; border: 1px solid currentColor; border-radius: 50%; background: radial-gradient(circle, currentColor 0 1px, transparent 1.5px); box-shadow: inset 0 0 8px currentColor; }
+.ufo-space-reticle[data-lock="true"] i { animation: ufo-space-reticle-lock .72s ease-in-out infinite; }
+.ufo-space-reticle[data-firing="true"] { filter: drop-shadow(0 0 13px currentColor) drop-shadow(0 0 22px currentColor); }
+@keyframes ufo-space-reticle-lock { 0%, 100% { transform: scale(1); opacity: .88; } 50% { transform: scale(1.1); opacity: 1; } }
+.touch-pad { position: absolute; left: 20px; bottom: 28px; width: 118px; height: 118px; overflow: hidden; border: 1px solid rgba(177,239,255,.42); border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(125,226,255,.1) 0 28%, transparent 29%), radial-gradient(circle, rgba(8,28,55,.28) 0 57%, rgba(5,19,38,.5) 58% 100%); box-shadow: 0 0 22px rgba(47,190,255,.14), inset 0 0 30px rgba(111,219,255,.12); touch-action: none; }
+.touch-pad::before, .touch-pad::after { content: ""; position: absolute; pointer-events: none; opacity: .48; }
+.touch-pad::before { inset: 13px 50%; width: 1px; background: linear-gradient(transparent, rgba(181,239,255,.72) 18%, transparent 41% 59%, rgba(181,239,255,.72) 82%, transparent); }
+.touch-pad::after { inset: 50% 13px; height: 1px; background: linear-gradient(90deg, transparent, rgba(181,239,255,.72) 18%, transparent 41% 59%, rgba(181,239,255,.72) 82%, transparent); }
+.touch-stick { position: absolute; z-index: 1; left: 50%; top: 50%; width: 48px; height: 48px; transform: translate(-50%, -50%); border: 1px solid rgba(225,251,255,.68); border-radius: 50%; background: radial-gradient(circle at 36% 30%, rgba(238,253,255,.9), rgba(126,228,255,.74) 38%, rgba(55,169,223,.78)); box-shadow: 0 3px 10px rgba(1,14,33,.38), 0 0 24px rgba(71,215,255,.5), inset 0 0 10px rgba(255,255,255,.28); }
+.touch-hint { position: absolute; right: 14px; bottom: 12px; max-width: 70%; color: rgba(255,255,255,.64); font-size: 11px; line-height: 1.4; text-align: right; pointer-events: none; }
+.viewport-footer { color: var(--muted); font-size: 12px; }
+.physics-badge { color: var(--good); font-size: 11px; padding: 5px 9px; }
+
+.control-card { padding: 18px; position: sticky; top: 12px; }
+.panel-section + .panel-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+.muted { color: var(--muted); font-size: 13px; line-height: 1.65; }
+.readout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.readout-grid div { padding: 10px; border: 1px solid var(--line); border-radius: 11px; background: rgba(112, 205, 255, .055); }
+.readout-grid span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.readout-grid strong { font-size: 13px; }
+.build-list { display: grid; gap: 8px; }
+.build-choice { width: 100%; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: rgba(137, 225, 255, .06); }
+.build-choice strong, .build-choice span { display: block; }
+.build-choice span { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.build-choice.is-selected { border-color: var(--good); background: rgba(102, 255, 173, .12); }
+.primary-button { border: 0; border-radius: 10px; padding: 10px 13px; color: #06223a; background: var(--good); font-weight: 900; }
+.build-actions { margin-top: 12px; }
+.build-actions button:not(.primary-button) { border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; background: rgba(255,255,255,.07); }
+.ufo-actions { margin-top: 12px; }
+.ufo-actions button { border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; background: rgba(255,255,255,.07); }
+.ufo-actions button.primary-button { border: 0; background: var(--good); }
+.ufo-flight-controls { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; width: 100%; box-sizing: border-box; padding: 4px 7px; border: 1px solid rgba(183,226,238,.5); border-bottom: 0; border-radius: 13px 13px 0 0; background: linear-gradient(155deg, rgba(18,32,43,.97), rgba(4,17,27,.96)); box-shadow: 0 -8px 28px rgba(0,0,0,.34), 0 0 22px rgba(80,207,238,.1), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(12px); }
+.ufo-flight-controls[hidden] { display: none; }
+.flight-lever-list { display: grid; grid-template-columns: repeat(4, minmax(58px, 1fr)) minmax(66px, .72fr) 78px; align-items: stretch; gap: 4px; min-height: 74px; }
+.space-shooter-control-list { display: none; grid-template-columns: minmax(108px, 1fr) minmax(116px, .8fr) minmax(108px, 1fr); align-items: stretch; gap: 6px; min-height: 74px; }
+.ufo-flight-controls.is-space-shooter .flight-lever-list { display: none; }
+.ufo-flight-controls.is-space-shooter .space-shooter-control-list { display: grid; }
+.space-shooter-inline-title { display: grid; place-items: center; align-content: center; gap: 4px; border: 1px solid rgba(119,231,255,.28); border-radius: 10px; background: radial-gradient(circle at 50% 38%, rgba(75,214,255,.15), transparent 62%), rgba(5,17,28,.62); color: #e9fcff; text-align: center; box-shadow: inset 0 0 18px rgba(92,224,255,.08); }
+.space-shooter-inline-title strong { font-size: 13px; letter-spacing: .14em; text-shadow: 0 0 11px rgba(113,235,255,.46); }
+.space-shooter-inline-title small { color: rgba(195,240,250,.7); font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+.space-strafe-lever { min-width: 108px; }
+.flight-console-inline-title { display: grid; place-items: center; color: #f0fdff; font-size: 11px; font-weight: 900; white-space: nowrap; }
+.ufo-flight-controls button { position: relative; min-width: 0; min-height: 74px; display: grid; grid-template-rows: 43px 11px auto; align-items: end; overflow: hidden; border: 1px solid rgba(174,202,211,.34); border-radius: 9px; padding: 3px 2px; background: linear-gradient(150deg, #263946 0%, #122431 44%, #07131d 100%); color: #edfaff; font-size: 11px; font-weight: 800; touch-action: none; user-select: none; perspective: 150px; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -7px 12px rgba(0,0,0,.34), 0 1px 5px rgba(0,0,0,.28); }
+/* Fixed shift gate. This part never moves and visually anchors the mechanism. */
+.ufo-flight-controls button::before { content: ""; position: absolute; left: 50%; top: 3px; width: 31px; height: 42px; transform: translateX(-50%); border: 1px solid #6f858d; border-radius: 11px 11px 8px 8px; background: linear-gradient(90deg, #101b22 0%, #263841 18%, #050a0e 50%, #2e424b 82%, #101b22 100%); box-shadow: inset 0 0 0 2px #18262e, inset 0 2px 7px rgba(0,0,0,.88), 0 1px 0 rgba(255,255,255,.15); }
+/* The old round root duplicated the head shape, so the gate itself now houses
+   an invisible fixed fulcrum. Only the upper shaft rotates around that point. */
+.ufo-flight-controls button::after { content: none; }
+.flight-lever-shaft { position: relative; z-index: 2; width: 30px; height: 44px; justify-self: center; transform: rotateX(0deg); transform-origin: 50% 40px; transform-style: preserve-3d; transition: transform .26s cubic-bezier(.16,.84,.2,1.12), filter .12s ease; }
+.flight-lever-shaft::before { content: ""; position: absolute; left: 50%; top: 13px; bottom: 4px; width: 6px; transform: translateX(-50%); border: 1px solid rgba(238,250,252,.52); border-radius: 999px; background: linear-gradient(90deg, #26343a 0%, #e1edef 44%, #70868d 68%, #172228 100%); box-shadow: 0 2px 5px rgba(0,0,0,.68), 0 0 5px rgba(187,236,245,.18); }
+.flight-lever-shaft i { position: absolute; left: 50%; top: 0; width: 27px; height: 15px; transform: translateX(-50%); border: 1px solid rgba(238,250,252,.78); border-radius: 8px 8px 5px 5px; background: linear-gradient(145deg, #f4ffff 0%, #9fb2b7 22%, #35474e 52%, #0d171c 100%); box-shadow: 0 3px 6px rgba(0,0,0,.64), inset 0 1px 0 rgba(255,255,255,.62), 0 0 7px rgba(144,234,255,.14); }
+.flight-lever-shaft i::after { content: ""; position: absolute; inset: 4px 6px 8px; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,.62), rgba(255,255,255,.08)); }
+.ufo-flight-controls button b, .ufo-flight-controls button small { position: relative; z-index: 1; display: block; line-height: 1; }
+.ufo-flight-controls button b { margin-bottom: 1px; color: #bdf5ff; font-size: 13px; font-weight: 700; text-shadow: 0 0 8px rgba(115,235,255,.36); }
+.ufo-flight-controls button small { color: rgba(235,252,255,.8); font-size: 8px; font-weight: 900; white-space: nowrap; }
+.ufo-flight-controls button:hover, .ufo-flight-controls button.is-pressed { border-color: rgba(150,232,248,.88); background: linear-gradient(150deg, #304a58 0%, #173545 46%, #091a25 100%); box-shadow: 0 0 15px rgba(61,218,255,.22), inset 0 0 13px rgba(159,245,255,.08); }
+.ufo-flight-controls button.is-pressed .flight-lever-shaft { transform: rotateX(76deg); filter: brightness(1.18); animation: ufo-lever-clunk .28s cubic-bezier(.12,.84,.18,1.12) both; }
+.ufo-flight-controls button.is-pressed .flight-lever-shaft i { box-shadow: 0 3px 7px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.7), 0 0 14px rgba(142,239,255,.72); }
+@keyframes ufo-lever-clunk { 0% { transform: rotateX(0deg); } 72% { transform: rotateX(84deg); } 100% { transform: rotateX(76deg); } }
+.ufo-flight-controls button.flight-primary { color: #042538; background: linear-gradient(150deg, #c9f8ff 0%, #7ed9e9 36%, #26647a 100%); border-color: #e4fcff; box-shadow: 0 0 18px rgba(94,226,255,.2), inset 0 1px 0 rgba(255,255,255,.42); }
+.ufo-flight-controls button.flight-primary b, .ufo-flight-controls button.flight-primary small { color: #06324c; }
+.ufo-flight-pad { position: relative; min-width: 0; width: 74px; height: 74px; align-self: center; justify-self: end; overflow: hidden; border: 1px solid rgba(177,239,255,.48); border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(125,226,255,.1) 0 27%, transparent 28%), radial-gradient(circle, rgba(8,28,55,.34) 0 57%, rgba(5,19,38,.72) 58% 100%); box-shadow: 0 0 15px rgba(47,190,255,.16), inset 0 0 19px rgba(111,219,255,.14); touch-action: none; }
+.ufo-flight-pad::before, .ufo-flight-pad::after { content: ""; position: absolute; pointer-events: none; opacity: .52; }
+.ufo-flight-pad::before { inset: 8px 50%; width: 1px; background: linear-gradient(transparent, rgba(181,239,255,.8) 16%, transparent 40% 60%, rgba(181,239,255,.8) 84%, transparent); }
+.ufo-flight-pad::after { inset: 50% 8px; height: 1px; background: linear-gradient(90deg, transparent, rgba(181,239,255,.8) 16%, transparent 40% 60%, rgba(181,239,255,.8) 84%, transparent); }
+.ufo-flight-stick { position: absolute; z-index: 1; left: 50%; top: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); border: 1px solid rgba(225,251,255,.72); border-radius: 50%; background: radial-gradient(circle at 36% 30%, rgba(238,253,255,.96), rgba(126,228,255,.8) 38%, rgba(55,169,223,.84)); box-shadow: 0 2px 7px rgba(1,14,33,.4), 0 0 15px rgba(71,215,255,.52), inset 0 0 8px rgba(255,255,255,.3); }
+.build-message { min-height: 20px; margin: 10px 0 0; color: var(--warning); font-size: 12px; line-height: 1.5; }
+.checklist ul { display: grid; gap: 9px; list-style: none; padding: 0; margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+.checklist li { display: flex; align-items: center; gap: 8px; }
+.checklist li span { color: var(--good); font-weight: 900; }
+footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; color: var(--muted); font-size: 11px; }
+code { color: #8edfff; }
+
+@media (max-width: 980px) {
+  .world-header { align-items: start; flex-direction: column; }
+  .status-stack { align-items: start; flex-direction: row; }
+  .world-layout { grid-template-columns: 1fr; }
+  .control-card { position: static; }
+  .viewport { height: min(72vh, 650px); }
+}
+@media (max-width: 560px) {
+  .world-shell { padding: 16px 10px 24px; }
+  .world-toolbar { padding: 8px; }
+  .toolbar-actions button, .map-tabs button { flex: 1; padding-inline: 8px; font-size: 12px; }
+  .viewport { min-height: 58vh; height: 58vh; }
+  .viewport-footer { align-items: start; flex-direction: column; }
+  .touch-pad { transform: scale(.88); transform-origin: bottom left; left: 11px; bottom: 16px; }
+  .camera-distance-control { left: 11px; bottom: 126px; transform: scale(.92); transform-origin: bottom left; }
+  .emergency-escape-control { left: 11px; right: auto; bottom: 166px; transform: scale(.92); transform-origin: bottom left; }
+  .ufo-flight-controls { left: 0; right: 0; bottom: 0; width: 100%; padding: 3px 4px; }
+  .ufo-space-life { top: 11px; right: 11px; width: min(205px, calc(100% - 22px)); }
+  .ufo-forward-scroll-reward-feed { top: 108px; right: 11px; width: min(205px, calc(100% - 22px)); gap: 6px; }
+  .ufo-forward-scroll-reward { padding: 7px 10px 6px; }
+  .ufo-forward-scroll-reward strong { font-size: 12px; }
+  .sky-station-guide-dialog { bottom: 9px; width: calc(100% - 22px); padding: 12px 12px 13px; border-radius: 11px; }
+  .sky-station-guide-dialog-name { min-height: 26px; margin-top: -26px; padding-inline: 10px; font-size: 12px; }
+  .sky-station-guide-dialog-text { min-height: 3.05em; font-size: 15px; line-height: 1.55; }
+  .sky-station-guide-dialog-choices { gap: 6px; margin-top: 9px; }
+  .sky-station-guide-dialog-choices button { min-height: 38px; padding: 7px 8px; font-size: 12px; }
+  .ufo-equipment-workshop-menu { width: calc(100% - 22px); max-height: calc(100% - 22px); padding: 13px; border-radius: 13px; }
+  .ufo-equipment-workshop-heading { gap: 9px; padding-bottom: 10px; }
+  .ufo-equipment-workshop-heading h2 { font-size: 20px; }
+  .ufo-equipment-workshop-heading p { font-size: 11px; }
+  .ufo-equipment-workshop-heading button { min-height: 33px; padding: 6px 10px; font-size: 12px; }
+  .ufo-equipment-workshop-resources { gap: 5px; margin: 10px 0; }
+  .ufo-equipment-workshop-resources span { padding: 5px 8px; font-size: 10px; }
+  .ufo-equipment-workshop-resources strong { font-size: 14px; }
+  .ufo-equipment-workshop-list { grid-template-columns: 1fr; gap: 7px; }
+  .ufo-equipment-workshop-card { min-height: 0; gap: 7px 9px; padding: 10px; }
+  .ufo-equipment-workshop-card h3 { font-size: 14px; }
+  .ufo-equipment-workshop-card p { font-size: 12px; }
+  .ufo-equipment-workshop-cost { padding: 3px 6px; font-size: 10px; }
+  .ufo-equipment-workshop-card button { min-height: 31px; padding: 5px 10px; font-size: 12px; }
+  .flight-lever-list { grid-template-columns: repeat(4, minmax(0, 1fr)) 42px 66px; gap: 2px; min-height: 66px; }
+  .space-shooter-control-list { grid-template-columns: minmax(84px, 1fr) minmax(82px, .7fr) minmax(84px, 1fr); gap: 3px; min-height: 66px; }
+  .space-strafe-lever { min-width: 0; }
+  .space-shooter-inline-title strong { font-size: 10px; }
+  .space-shooter-inline-title small { font-size: 8px; }
+  .flight-console-inline-title { font-size: 8px; white-space: normal; text-align: center; line-height: 1.2; }
+  .ufo-flight-controls button { min-height: 66px; padding-inline: 1px; }
+  .ufo-flight-pad { width: 64px; height: 64px; }
+  .look-pad { right: 11px; bottom: 16px; transform: scale(.78); transform-origin: bottom right; }
+  .viewport.is-first-person .look-pad { transform: scale(.88); }
+  .touch-hint { left: 12px; right: auto; bottom: 4px; }
+}
