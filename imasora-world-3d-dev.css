@@ -102,6 +102,13 @@ h2 { margin-bottom: 8px; font-size: 18px; }
 .space-transition-overlay small { display: block; margin: 8px auto 0; max-width: 410px; color: #bfd5e8; font-size: 11px; line-height: 1.7; }
 .space-transition-overlay i { display: block; width: 52%; height: 2px; margin: 15px auto 0; border-radius: 999px; background: linear-gradient(90deg, transparent, #8de9ff 25% 75%, transparent); box-shadow: 0 0 18px rgba(97,218,255,.9); animation: space-transition-line .75s ease-in-out infinite alternate; }
 @keyframes space-transition-line { from { transform: scaleX(.18); opacity: .35; } to { transform: scaleX(1); opacity: 1; } }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-earth-departure { border-color: #ffb288; background: linear-gradient(145deg, rgba(43, 14, 10, .84), rgba(91, 35, 18, .78)); box-shadow: 0 0 34px #ff935633; }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-earth-departure span { color: #ffd4b2; }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere { border-color: #9eddff; background: linear-gradient(145deg, rgba(3, 23, 46, .95), rgba(13, 66, 102, .91)); box-shadow: 0 0 70px #75caff55; }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere span,
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere small { color: #c7edff; }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere strong { color: #f3fbff; text-shadow: 0 0 20px #9cdaffbb; }
+body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere i { background: linear-gradient(90deg, transparent, #95dcff 25% 75%, transparent); box-shadow: 0 0 20px #8dccff; }
 .sky-station-guide-dialog { position: absolute; z-index: 16; left: 50%; bottom: 14px; width: min(760px, calc(100% - 36px)); box-sizing: border-box; transform: translateX(-50%); padding: 14px 16px 15px; border: 2px solid rgba(154, 223, 255, .82); border-radius: 14px; background: linear-gradient(135deg, rgba(4, 17, 39, .96), rgba(10, 53, 82, .93)); box-shadow: 0 0 34px rgba(48, 191, 255, .28), inset 0 0 26px rgba(149, 235, 255, .09); color: #f2fcff; backdrop-filter: blur(8px); }
 .sky-station-guide-dialog[hidden] { display: none; }
 .sky-station-guide-dialog-name { display: inline-flex; align-items: center; min-height: 28px; margin: -29px 0 8px -2px; padding: 0 12px; border: 1px solid rgba(186, 237, 255, .82); border-radius: 8px 8px 8px 2px; background: linear-gradient(135deg, #1c78a6, #123a71); box-shadow: 0 0 17px rgba(86, 204, 255, .32); color: #ffffff; font-size: 14px; font-weight: 1000; letter-spacing: .05em; }
@@ -132,12 +139,12 @@ h2 { margin-bottom: 8px; font-size: 18px; }
 .ufo-equipment-workshop-resources span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border: 1px solid rgba(181, 233, 255, .36); border-radius: 999px; background: rgba(8, 42, 68, .62); color: #c9efff; font-size: 12px; font-weight: 800; }
 .ufo-equipment-workshop-resources strong { color: #ffffff; font-size: 16px; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(132, 230, 255, .58); }
 .ufo-equipment-workshop-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ufo-equipment-workshop-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; min-height: 118px; padding: 13px; border: 1px solid rgba(154, 223, 255, .38); border-radius: 12px; background: linear-gradient(145deg, rgba(15, 67, 98, .72), rgba(7, 27, 58, .78)); box-shadow: inset 0 0 17px rgba(142, 238, 255, .06); }
+.ufo-equipment-workshop-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-height: 118px; padding: 13px; border: 1px solid rgba(154, 223, 255, .38); border-radius: 12px; background: linear-gradient(145deg, rgba(15, 67, 98, .72), rgba(7, 27, 58, .78)); box-shadow: inset 0 0 17px rgba(142, 238, 255, .06); }
 .ufo-equipment-workshop-card[data-status="crafted"] { border-color: rgba(133, 255, 201, .72); background: linear-gradient(145deg, rgba(22, 102, 89, .7), rgba(7, 55, 65, .8)); }
 .ufo-equipment-workshop-card[data-status="locked"] { filter: saturate(.62); }
 .ufo-equipment-workshop-card h3 { margin: 0; color: #ffffff; font-size: 16px; line-height: 1.35; letter-spacing: .02em; }
-.ufo-equipment-workshop-card p { grid-column: 1 / -1; margin: -2px 0 0; color: rgba(221, 245, 255, .85); font-size: 13px; font-weight: 700; line-height: 1.55; }
-.ufo-equipment-workshop-cost { align-self: start; padding: 4px 8px; border: 1px solid rgba(218, 184, 255, .62); border-radius: 999px; color: #e6d2ff; font-size: 11px; font-weight: 1000; line-height: 1.4; text-align: right; }
+.ufo-equipment-workshop-card p { margin: -2px 0 0; color: rgba(221, 245, 255, .85); font-size: 13px; font-weight: 700; line-height: 1.55; }
+.ufo-equipment-workshop-cost { justify-self: start; padding: 4px 8px; border: 1px solid rgba(218, 184, 255, .62); border-radius: 999px; color: #e6d2ff; font-size: 11px; font-weight: 1000; line-height: 1.4; text-align: left; }
 .ufo-equipment-workshop-card button { align-self: end; justify-self: start; min-height: 34px; padding: 6px 12px; border: 1px solid rgba(192, 240, 255, .72); border-radius: 8px; background: linear-gradient(145deg, #2f9fc5, #1a5c94); color: #ffffff; cursor: pointer; font: inherit; font-size: 13px; font-weight: 1000; }
 .ufo-equipment-workshop-card button:hover:not(:disabled), .ufo-equipment-workshop-card button:focus-visible:not(:disabled) { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #4fb9d8, #2070ad); }
 .ufo-equipment-workshop-card button:disabled { border-color: rgba(183, 218, 232, .28); background: rgba(64, 87, 110, .58); color: rgba(219, 239, 247, .62); cursor: default; }
@@ -210,6 +217,19 @@ h2 { margin-bottom: 8px; font-size: 18px; }
 .ufo-actions { margin-top: 12px; }
 .ufo-actions button { border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; background: rgba(255,255,255,.07); }
 .ufo-actions button.primary-button { border: 0; background: var(--good); }
+.ufo-equipment-development-section { border-color: rgba(132, 231, 255, .3); }
+.ufo-equipment-development-profiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
+.ufo-equipment-development-profiles button { min-height: 39px; border: 1px solid rgba(163, 225, 255, .34); border-radius: 9px; padding: 7px 8px; background: linear-gradient(145deg, rgba(16, 60, 91, .7), rgba(7, 28, 58, .76)); color: #e8fbff; font: inherit; font-size: 12px; font-weight: 900; line-height: 1.25; text-align: left; transition: border-color .14s ease, background .14s ease, box-shadow .14s ease, transform .14s ease; }
+.ufo-equipment-development-profiles button:hover, .ufo-equipment-development-profiles button:focus-visible { border-color: rgba(177, 243, 255, .86); outline: none; background: linear-gradient(145deg, rgba(30, 111, 145, .88), rgba(13, 52, 91, .88)); transform: translateY(-1px); }
+.ufo-equipment-development-profiles button[data-active="true"] { border-color: rgba(124, 255, 205, .92); background: linear-gradient(145deg, rgba(28, 122, 103, .88), rgba(9, 71, 77, .9)); color: #effff7; box-shadow: 0 0 18px rgba(86, 250, 191, .17), inset 0 0 12px rgba(142, 255, 210, .1); }
+.ufo-equipment-development-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 10px; }
+.ufo-equipment-development-actions button { min-height: 40px; border: 1px solid rgba(164, 229, 255, .45); border-radius: 10px; padding: 7px 9px; background: rgba(91, 196, 255, .09); color: #eafcff; font: inherit; font-size: 12px; font-weight: 1000; line-height: 1.25; }
+.ufo-equipment-development-actions button:hover, .ufo-equipment-development-actions button:focus-visible { border-color: rgba(186, 244, 255, .9); outline: none; background: rgba(77, 185, 237, .22); }
+.ufo-equipment-development-actions .primary-button { border: 0; background: linear-gradient(145deg, #94ffd0, #48d9a0); color: #04261d; box-shadow: 0 0 17px rgba(101, 255, 190, .17); }
+.ufo-equipment-development-actions .primary-button:hover, .ufo-equipment-development-actions .primary-button:focus-visible { background: linear-gradient(145deg, #c0ffe1, #62edb6); }
+.ufo-equipment-development-status { min-height: 3.2em; margin: 11px 1px 0; color: #aeefff; font-size: 12px; font-weight: 750; line-height: 1.55; }
+.ufo-equipment-development-status[data-test-active="true"] { color: #a8ffd1; }
+.ufo-equipment-development-status[data-camera-active="true"] { color: #ffe1a6; }
 .ufo-flight-controls { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; width: 100%; box-sizing: border-box; padding: 4px 7px; border: 1px solid rgba(183,226,238,.5); border-bottom: 0; border-radius: 13px 13px 0 0; background: linear-gradient(155deg, rgba(18,32,43,.97), rgba(4,17,27,.96)); box-shadow: 0 -8px 28px rgba(0,0,0,.34), 0 0 22px rgba(80,207,238,.1), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(12px); }
 .ufo-flight-controls[hidden] { display: none; }
 .flight-lever-list { display: grid; grid-template-columns: repeat(4, minmax(58px, 1fr)) minmax(66px, .72fr) 78px; align-items: stretch; gap: 4px; min-height: 74px; }

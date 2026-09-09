@@ -20,8 +20,8 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     world: { width: 1200, depth: 800 },
     source: {
       title: "空マップ",
-      description: "雲の床を歩き、雲づくり工房を建てます。",
-      layout: "正式マップと同一の1536×1024座標、駅・線路・鉄道・工房レイヤー",
+      description: "雲の床を歩き、UFO装備倉庫で航路装備を整えます。",
+      layout: "正式マップと同一の1536×1024座標、駅・線路・鉄道・UFO装備倉庫レイヤー",
       pixelSize: [1536, 1024],
       composite: "official-sky-layer-composite-v1",
       references: ["assets/imasora-sky-map.js", "assets/imasora-sky-map.css"],
@@ -50,7 +50,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
         reverseRollingStock: true,
       },
       {
-        id: "cloud-workshop", name: "雲づくり工房", type: "cloud-workshop",
+        id: "ufo-equipment-warehouse", name: "UFO装備倉庫", type: "cloud-workshop",
         point: [.86585, .2802], sourceRect: [.7861, .1894, .1595, .1816],
         footprint: [78, 55], size: [78, 60, 55],
       },
@@ -71,6 +71,89 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
       { id: "sky-garden", name: "空中庭園", note: "白レンが歩ける大型休憩所", color: 0xa8efcf, size: [74, 48, 62] },
       { id: "ufo-pad", name: "UFO乗り場", note: "今いる場所に設置する着陸パッド", color: 0x8de9ff, size: [92, 8, 92], placement: "current" },
     ],
+  }),
+  mars: map({
+    // 空マップより一段階広い実寸・比率を使う。到着後も徒歩で端まで
+    // 探索でき、マップ外には表示と一致する柵を置く。
+    // 外周は X/Z とも25%拡張し、既存のUFO・安全地点は世界座標を
+    // 変えずに維持する。
+    world: { width: 1500, depth: 1000 },
+    source: {
+      title: "火星マップ",
+      description: "火星の赤い着陸地を歩いて探索し、火星素材ショップと常設のUFO乗り場から地球側へ帰還できます。",
+      layout: "拡張した火星歩行範囲・火星地表・外周柵・火星素材ショップ・常設UFO乗り場と顔認証システム",
+      pixelSize: [1536, 1024],
+      composite: "mars-surface-terrain-v1",
+      references: [],
+    },
+    palette: { ground: 0xa64c2d, edge: 0x4a2119, fog: 0x01040d, accent: 0xffb36d },
+    // 到着演出を使わない内部フォールバック用の火星地表開始地点。UFOの
+    // 外殻・床の中に生成されないよう、常設UFO乗り場の十分外側に置く。
+    // 開発タブの「火星マップ」は、この座標ではなく宇宙からの到着演出を
+    // 再生して、操縦席から既存の引き戸・搭乗足場へ降りる経路を検証する。
+    // 旧範囲での安全スポーン X -318.0 / Z 118.4 を保つよう、
+    // 拡張後の正規化座標へ換算する。
+    spawn: { point: [.288, .6184], heading: Math.PI / 2 },
+    entry: {
+      id: "mars-landing-site",
+      name: "火星着陸地",
+      type: "landing-site",
+      // 着陸地も同じワールド座標を保つ。
+      point: [.3568, .6184],
+      platformSize: [0, 0],
+      footprint: [0, 0],
+      terrainOnly: true,
+    },
+    fixedStructures: [
+      {
+        id: "mars-material-shop",
+        name: "火星素材ショップ",
+        type: "mars-material-shop",
+        // X 280 / Z -160。常設UFO、顔認証、安全スポーンのいずれにも
+        // 重ならない火星側の空き地に置き、入口をUFO側へ向ける。
+        point: [.6866667, .34],
+        rotationDeg: -58,
+        footprint: [104, 88],
+        size: [104, 60, 88],
+      },
+    ],
+    buildZones: [],
+    decoration: { marsTerrain: true, perimeterFence: true },
+    buildCatalog: [
+      // 常設設備。UI の建造候補には出さず、再構築時に必ず同じ位置へ復元する。
+      { id: "ufo-pad", name: "UFO乗り場", note: "火星から帰還する常設乗り場", color: 0x8de9ff, size: [92, 8, 92], placement: "current", internal: true },
+    ],
+  }),
+  space: map({
+    // UFOで空マップの外周を越えた時だけ入る飛行専用マップ。
+    // 前進スクロールはジェット機・ジェットコースター級の実移動速度に
+    // 引き上げる。そのままでは到着時間だけが短くなるため、火星の配置・
+    // 前進をさらに25%上げる分だけ、火星と境界も同じ比率で遠方へ広げる。
+    // 前進の体感速度を上げても、火星までの航行時間は実時間で約3分に固定する。
+    world: { width: 3000000, depth: 2000000 },
+    source: {
+      title: "宇宙マップ",
+      description: "見えている星すべてが実座標を持つ立体星空を、UFOで自由に航行します。遠方の火星を目指せます。",
+      layout: "UFO専用の境界遷移先・飛行空間",
+      pixelSize: [1536, 1024],
+      composite: "ufo-space-flight-foundation-v1",
+      references: [],
+    },
+    palette: { ground: 0x020713, edge: 0x15234a, fog: 0x01040d, accent: 0x8de9ff },
+    spawn: { point: [.5, .5], heading: 0 },
+    entry: {
+      id: "space-entry",
+      name: "空域境界",
+      type: "flight-transition",
+      point: [.5, .5],
+      platformSize: [0, 0],
+      footprint: [0, 0],
+      terrainOnly: true,
+    },
+    fixedStructures: [],
+    buildZones: [],
+    decoration: { starField: true },
+    buildCatalog: [],
   }),
   coast: map({
     source: {
@@ -111,9 +194,11 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     ],
   }),
   construction: map({
+    // Expand walkable land, not the source-image coordinate system or saved buildings.
+    world: { width: 5400, depth: 3600, layoutWidth: 540, layoutDepth: 360 },
     source: {
       title: "工事現場",
-      description: "橋1から続く正式な造成地を、そのまま歩いて建造できる3Dワールドです。",
+      description: "橋1と元の造成地を残して、四方へ縦横10倍・面積100倍（5,400×3,600）に広がった工事現場です。",
       layout: "工事現場ベース画像に描かれた左上の橋1接続路と造成地を同一比率で投影",
       pixelSize: [1536, 1024],
       texture: "./assets/imasora-land-map-base-v1.png",
@@ -138,6 +223,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
       { id: "construction-south-zone", name: "南造成区画", point: [.43, .72], size: [116, 96] },
     ],
     decoration: {
+      expandedConstruction: true,
       tireTracks: [-.34, -.17, 0, .17, .34],
       materialPiles: [
         { point: [.28, .4] }, { point: [.52, .49] }, { point: [.76, .64] },
@@ -145,16 +231,19 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     },
     buildCatalog: [
       { id: "workshop", name: "街づくり工房", note: "白レンが作業できる実寸の拠点", color: 0xffc16e, size: [82, 62, 70] },
-      { id: "storage", name: "資材倉庫", note: "大型資材を保管できる倉庫", color: 0xc7d8dd, size: [76, 52, 64] },
+      { id: "storage", name: "UFO装備倉庫", note: "UFO装備を保管する倉庫", color: 0xc7d8dd, size: [76, 52, 64] },
     ],
   }),
 });
 
 export function normalizedPoint(config, point, y = 0) {
+  // Legacy authored points remain anchored even when surrounding land grows.
+  const width = config.world.layoutWidth ?? config.world.width;
+  const depth = config.world.layoutDepth ?? config.world.depth;
   return [
-    (point[0] - .5) * config.world.width,
+    (point[0] - .5) * width,
     y,
-    (point[1] - .5) * config.world.depth,
+    (point[1] - .5) * depth,
   ];
 }
 

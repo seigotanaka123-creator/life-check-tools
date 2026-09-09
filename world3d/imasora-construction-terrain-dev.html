@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>工事現場・掘って歩く｜イマソラウォーカーズ</title>
+  <link rel="stylesheet" href="imasora-construction-terrain-dev.css?v=428">
+</head>
+<body>
+  <canvas id="scene" aria-label="レンが歩ける立体の工事区画"></canvas>
+  <header>
+    <div><span class="eyebrow">イマソラウォーカーズ · 工事現場 / 段階2-2</span><h1>掘って、歩いて、つくる。</h1><p>土の面をタップ →「掘る」か「置く」。ドラッグで視点を回転。</p></div>
+    <div class="corner"><button id="home">入口へ戻る</button><button id="camera">見下ろす</button><button id="tools" aria-expanded="false">保存・説明</button></div>
+  </header>
+  <section class="inventory" aria-label="土と保存の状態"><div>手持ちの土 <strong id="stock">—</strong></div><div>地形の土 <strong id="terrain-count">—</strong></div><span id="save-state">読み込み中</span></section>
+  <div id="status" role="status">保存内容を読み込んでいます。</div>
+  <div id="selection" class="selection">土の面をタップして選択</div>
+  <nav class="editbar" aria-label="土の編集">
+    <div class="switch"><button id="dig-mode" aria-pressed="true">掘る</button><button id="place-mode" aria-pressed="false">置く</button></div>
+    <button id="brush" title="編集する面の幅を切り替える">幅広 6×6</button>
+    <button id="apply" class="primary" disabled>選んだ土を掘る</button>
+    <button id="undo" disabled>戻す</button><button id="redo" disabled>やり直す</button>
+  </nav>
+  <nav class="dpad" aria-label="歩行操作"><button data-direction="forward" aria-label="前へ歩く">▲</button><button data-direction="left" aria-label="左へ歩く">◀</button><span>歩く</span><button data-direction="right" aria-label="右へ歩く">▶</button><button data-direction="back" aria-label="後ろへ歩く">▼</button></nav>
+  <button id="jump" class="jump">ジャンプ</button>
+  <aside id="help" hidden>
+    <div class="help-heading"><h2>この区画の使い方</h2><button id="close-help" aria-label="説明を閉じる">閉じる</button></div>
+    <p>茶色い土を選んで掘ると、手持ちに戻ります。穴の上の床もなくなるので、そのまま歩いて降りられます。</p>
+    <p>「幅広」は6×6マスを一層ずつ、「1マス」は細かい作業用。掘り下げた後は側面を選んで横穴も掘れます。置いた土で階段や屋根も作れます。</p>
+    <p>外周の灰色の通路・岩盤・柵は編集できません。囲われた場合は「入口へ戻る」。戻す操作で体が埋まる場合は、先に移動してください。</p>
+    <p>操作：左下の歩行パッド、右下のジャンプ。画面ドラッグで視点回転、ホイールで距離調整。開発用キーボードはWASD／矢印で歩行、Spaceでジャンプ。</p>
+    <p class="notice">これは地形と物理の独立した試作です。車両は次の段階です。確認用の土だけを使い、通常ゲームや前段階の32個の確認セーブとは分離しています。再読み込み時は安全な入口から再開します。</p>
+    <dl><dt>現在位置</dt><dd id="coordinates">—</dd><dt>接触状態</dt><dd id="contact">—</dd><dt>土の総量</dt><dd id="total">—</dd><dt>保存先</dt><dd id="database">—</dd></dl>
+    <div class="actions"><button id="read-save">保存を読み直す</button><button id="export">バックアップを表示</button><button id="recover" hidden>正常な保存で復旧</button></div>
+    <label for="backup">地形バックアップ（別の場所へコピーして保管）</label><textarea id="backup" readonly rows="3"></textarea>
+    <label for="restore-text">バックアップから復元</label><textarea id="restore-text" rows="3" placeholder="この地形確認画面のバックアップ文字列"></textarea><button id="restore">確認して復元</button>
+    <a href="imasora-construction-save-dev.html?check=construction-foundation-v427">前段階の保存確認画面</a>
+  </aside>
+  <dialog id="confirm"><h2>地形の復元</h2><p>この小区画の地形と手持ちの土を戻します。変更前の保存も保管します。通常ゲームの素材には触れません。</p><button id="cancel-restore">キャンセル</button><button id="accept-restore" class="primary">復元する</button></dialog>
+  <script type="module" src="imasora-construction-terrain-dev.js?v=428"></script>
+</body>
+</html>

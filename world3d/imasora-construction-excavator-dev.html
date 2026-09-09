@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ショベルカー・掘削と旋回｜イマソラウォーカーズ</title><link rel="stylesheet" href="imasora-construction-excavator-dev.css?v=465"></head><body>
+<canvas id="scene" aria-label="正式なレンと2席のショベルカー、普通の土の掘削区画"></canvas>
+<header><small>工事現場 · 9-1a</small><h1>ショベルカー</h1><p>掘る。持ち上げる。旋回して、こぼす。</p></header>
+<nav class="views"><button id="camera">視点：斜め後ろ</button><button id="roof">屋根を透かす</button><button id="home">安全エリアへ</button><button id="help-open">操作ガイド</button></nav>
+<section class="readout" aria-label="掘削作業の状態"><b id="mode">徒歩</b><span id="load">バケット 0 / 6</span><span id="bin">受け箱 0</span><span id="total">土の合計 —</span></section>
+<p id="status" role="status">準備中…</p><p id="aim">バケット先端の枠が緑なら掘れます</p>
+<section class="controls" aria-label="ショベルカーの操作">
+<div class="moving"><div class="row"><button data-hold="forward">前へ</button><button data-hold="back">後ろへ</button></div><div class="row"><button data-hold="left">左へ</button><button data-hold="right">右へ</button><button data-hold="brake">停止</button></div></div>
+<div class="main"><button id="interact">運転席に乗る</button><button id="work">作業モード</button><span id="operation">乗車するとアームを操作できます</span></div>
+<div class="working" hidden><div class="row"><button data-hold="boom-up">ブーム上げ</button><button data-hold="boom-down">ブーム下げ</button><button data-hold="stick-out">アーム伸ばす</button><button data-hold="stick-in">アーム寄せる</button></div><div class="row"><button data-hold="slew-left">左旋回</button><button data-hold="slew-right">右旋回</button><button id="scoop" class="gold">すくう</button><button id="dump" class="gold">こぼす</button></div></div>
+</section>
+<aside id="help" hidden><h2>土を掘って運ぼう</h2><button id="help-close">閉じる</button><ol><li>「運転席に乗る」→「作業モード」。助手席は空けています。</li><li>最初は土の前に止まっています。緑の枠を確認して「すくう」を1回押すと、油圧で巻き込みます。</li><li>「ブーム上げ」で土から離し、「右旋回」で青い受け箱へ。目安は旋回−90°です。</li><li>受け箱の上で「こぼす」。土が重力で落ち、保管数が増えます。外に落とした土も、バケットを近づければすくい直せます。</li><li>地面に当たったら上げる・戻す操作で離れてください。軽く押すと少し動き、長押しは連続して動きます。</li></ol><p>画面をドラッグして視点回転。「屋根を透かす」で操縦席を確認できます。「走行モード」でキャビンがゆっくり正面に戻り、走行・降車できるようになります。接触した場合は止まります。</p><p>独立した開発区画です。土・車両はこの画面だけの貸出。本体の作品・金貨・素材は変わりません。再読込でこの練習だけ最初に戻ります。</p><p>本体への接続、掘った空洞内の徒歩・横穴工事は次段階です。区画へ車両や徒歩では進入しません。</p><details><summary>開発操作・数値</summary><p>W/S：前後、A/D：左右、Space：停止。作業時はR/F：ブーム、T/G：アーム、Q/E：旋回。画面の「すくう」「こぼす」は1回押し。</p><pre id="debug"></pre></details></aside>
+<script type="module" src="imasora-construction-excavator-dev.js?v=465"></script></body></html>

@@ -1,18 +1,78 @@
 import * as THREE from "./assets/three.module.min.js";
+import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=476';
+import {createUfoFlightSurveyView} from './assets/imasora-ufo-flight-survey.js?v=464';
+import {WorldSaveService,worldSaveMode,WORKSHOP_MATERIAL_KEY} from './assets/imasora-world-save-service.js?v=460';
+import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=463';
+import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=463';
+import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=463';
+import {DELIVERY_SITES,DELIVERY_SIZE,deliveryAccess,chooseDeliverySite} from './assets/imasora-construction-delivery.js?v=456';
+import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=457';
+import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=452';
+import { createSpaceMaterialGuide } from './assets/imasora-space-material-guide.js?v=450';
+import { createMaterialBookContact } from './assets/imasora-space-material-catalog.js?v=441';
+import { createSpaceMaterialBook, disposeSpaceMaterialBook, MATERIAL_BOOK_SIZE } from './assets/imasora-space-material-book.js?v=440';
+import { createConstructionGround, disposeConstructionGround } from './assets/imasora-construction-ground.js?v=471';
+import { createMarsSky, updateMarsSky } from './assets/imasora-mars-sky.js?v=20260905-mars-landscape-v424';
+import { createMarsLandscape, disposeMarsLandscape } from './assets/imasora-mars-landscape.js?v=20260905-mars-landscape-v424';
+import { addSkyStationInterior, skyStationRampHeightAt, updateSkyStationCutaway } from './assets/imasora-sky-station-interior.js?v=20260905-station-interior-v422';
+import { interplanetaryRoute, interplanetaryForward, planetDeparturePath, planetSurfaceArrival } from './assets/imasora-ufo-interplanetary-route.js?v=20260905-return-v416';
 import {
   WHITE_MICHI_ROAD_SABER_REN_ID,
   buildMatureStarCharacter360,
   disposeMatureCharacterModel,
 } from "./assets/imasora-character-360.js";
+import { buildMarsShopkeeperAtEntrance360 } from './assets/imasora-mars-shopkeeper-360.js?v=20260905-back-apron-v415';
+import { buildMarsShopDisplays, disposeMarsShopDisplays } from './assets/imasora-mars-shop-displays.js?v=20260905-no-product-labels-v413';
+import { createMarsShopDialogState, MARS_SHOP_DIALOG_GREETING, MARS_SHOP_DIALOG_CHOICES } from './assets/imasora-mars-shop-dialog.js?v=20260905-greeting-v417';
 import {
   IMASORA_WORLD_MAPS,
   IMASORA_WORLD_SCHEMA_VERSION,
   mapBuildZone,
   mapSpawn,
   normalizedPoint,
-} from "./assets/imasora-world-map-schema.js?v=20260905-ufo-equipment-workshop-v404";
+} from "./assets/imasora-world-map-schema.js?v=20260906-construction-expansion-v426";
 
-const SAVE_KEY = "imasora-world-foundation-v3";
+const MATERIAL_GUIDE_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname)
+  ? ['mars','construction'].find(map=>new URLSearchParams(location.search).get('materialGuidePreview')===map) : undefined;
+// All world-save paths use a separate key in the local manual preview.
+const SAVE_KEY = MATERIAL_GUIDE_PREVIEW ? 'imasora-material-guide-preview-v440' : "imasora-world-foundation-v3";
+const WORLD_SHOP_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname) && new URLSearchParams(location.search).get('worldShopPreview') === '1';
+let worldSaveService=null,worldShopOverlay=null,worldSaveErrorUI=null,worldBooted=false;
+const CONSTRUCTION_WATER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionWaterPreview')==='1';
+const CONSTRUCTION_WATER_PRACTICE=CONSTRUCTION_WATER_PREVIEW&&new URLSearchParams(location.search).get('constructionWaterPractice')==='1';
+let worldWaterController=null;
+const CONSTRUCTION_SOIL_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionSoilPreview')==='1';
+const CONSTRUCTION_SOIL_PRACTICE=CONSTRUCTION_SOIL_PREVIEW&&new URLSearchParams(location.search).get('constructionSoilPractice')==='1';
+let worldSoilController=null;
+const CONSTRUCTION_TIMBER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionTimberPreview')==='1';
+const CONSTRUCTION_TIMBER_PRACTICE=CONSTRUCTION_TIMBER_PREVIEW&&new URLSearchParams(location.search).get('constructionTimberPractice')==='1';
+let worldTimberController=null;
+const CONSTRUCTION_EXCAVATION_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionExcavationPreview')==='1';
+let worldExcavationController=null;
+const CONSTRUCTION_DELIVERY_PREVIEW=WORLD_SHOP_PREVIEW && new URLSearchParams(location.search).get('constructionDeliveryPreview')==='1';
+let constructionDeliveryMenu=null,constructionDeliveryDock=null,constructionDeliveryCollider=null,constructionDeliverySite=-1;
+const constructionDeliveryContact=createMaterialBookContact();
+let constructionDeliveryWalk=null;
+const CONSTRUCTION_EXPANSION_PREVIEW = ['127.0.0.1', 'localhost'].includes(location.hostname)
+  && new URLSearchParams(location.search).get('constructionExpansionPreview') === '1';
+let constructionOverview = false;
+let constructionWalkPreview = null;
+let constructionPreviewGuides = null;
+const MARS_RETURN_PREVIEW = ['127.0.0.1', 'localhost'].includes(location.hostname)
+  && new URLSearchParams(location.search).get('ufoMarsReturnTest') === '1';
+if (MARS_RETURN_PREVIEW) window.addEventListener('error', event => {
+  const panel = document.getElementById('marsReturnPreviewError') || document.createElement('pre');
+  panel.id = 'marsReturnPreviewError';
+  panel.textContent = `帰路確認エラー: ${event.error?.stack || event.message}`;
+  Object.assign(panel.style, { position: 'fixed', top: '0', left: '0', zIndex: '9999', color: 'white', background: '#711', maxWidth: '100%', whiteSpace: 'pre-wrap' });
+  document.body.append(panel);
+});
+let ufoOutboundWorldForward = null;
+// Optional local-only placement inspection. It must never replace saved spawns.
+const MARS_SHOPKEEPER_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname)
+  && new URLSearchParams(location.search).get('marsShopkeeperPreview') === '1';
+const SKY_STATION_INTERIOR_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname)
+  && new URLSearchParams(location.search).get('stationInteriorPreview') === '1';
 const CHARACTER_ID = WHITE_MICHI_ROAD_SABER_REN_ID;
 const WORLD_PHYSICS_REVISION = 12;
 const PLAYER_RADIUS = 7;
@@ -96,8 +156,8 @@ const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
     label: "UFOについて",
     pages: [
       "UFOに乗るには、近くの顔認証システムの前に立って、カメラへ顔を向けて認証に合格しないとだめなんだ！認証が通ると、UFOの足場が下りるよ。",
-      "操縦は、スマホでは画面下の飛行操縦レバーとパッドを使うんだ。キーボードでは、W/Sで上昇・下降、A/Dで左右移動、矢印キーで前後移動と左右回転ができるよ。",
-      "宇宙マップでは、スマホの「射撃」ボタンかSpaceキーで射撃できるよ。星をロックONして壊し、エネルギーや宇宙金貨、素材を回収しながら、残りのエネルギーにも気をつけて火星を目指してね！",
+      "操縦は、画面下の飛行操縦レバーとパッドを使うんだ。機体の向きと動きを調整しながら、行きたい方向へ進んでね。",
+      "宇宙マップでは、画面の「射撃」ボタンで星を撃てるよ。照準に星をとらえるとロックONできるから、エネルギーや宇宙金貨、素材を回収しながら、残りのエネルギーにも気をつけて火星を目指してね！",
     ],
   },
   "ufo-equipment": {
@@ -160,6 +220,68 @@ const UFO_EQUIPMENT_RECIPES = Object.freeze([
     label: "ロックオン探知距離1.2倍拡張レーダー",
     effect: "ロックONできる探知距離を1.2倍に拡張する。",
     costs: Object.freeze({ skySightCrystal: 5, arcadeParts: 6 }),
+  }),
+]);
+// 開発画面専用の一時装備プロファイル。保存データや素材台帳は一切変更せず、
+// 外観と宇宙航行中の実効果を比較するためだけに使う。
+const UFO_EQUIPMENT_DEVELOPMENT_PROFILES = Object.freeze([
+  Object.freeze({
+    id: "saved",
+    label: "保存済み装備",
+    description: "実際に作成・保存している装備状態を表示します。",
+    equipment: null,
+  }),
+  Object.freeze({
+    id: "none",
+    label: "未装備",
+    description: "追加装備なしの標準UFOです。",
+    equipment: Object.freeze({
+      energyAbsorptionTankLevel: 0,
+      simultaneousShotEnabled: false,
+      lockOnReticleMultiplier: 1,
+      lockOnDetectionMultiplier: 1,
+    }),
+  }),
+  Object.freeze({
+    id: "energy-tank-1",
+    label: "タンク I",
+    description: "後部の発光エネルギー槽と、回復量 10 → 12 を確認します。",
+    equipment: Object.freeze({ energyAbsorptionTankLevel: 1 }),
+  }),
+  Object.freeze({
+    id: "energy-tank-2",
+    label: "タンク II",
+    description: "補助タンクを含む増槽と、回復量 10 → 15 を確認します。",
+    equipment: Object.freeze({ energyAbsorptionTankLevel: 2 }),
+  }),
+  Object.freeze({
+    id: "simultaneous-shot",
+    label: "同時発射装置",
+    description: "コックピットの発光ボタンと、射撃時の2発同時発射を確認します。",
+    equipment: Object.freeze({ simultaneousShotEnabled: true }),
+  }),
+  Object.freeze({
+    id: "reticle-radar",
+    label: "照準拡大レーダー",
+    description: "シアンの照準投影器と、照準枠・ロック判定 1.2倍を確認します。",
+    equipment: Object.freeze({ lockOnReticleMultiplier: 1.2 }),
+  }),
+  Object.freeze({
+    id: "range-radar",
+    label: "探知距離レーダー",
+    description: "緑の長距離スキャナーと、ロック探知距離 1.2倍を確認します。",
+    equipment: Object.freeze({ lockOnDetectionMultiplier: 1.2 }),
+  }),
+  Object.freeze({
+    id: "all",
+    label: "全装備",
+    description: "全パーツと、全ての装備効果を同時に確認します。",
+    equipment: Object.freeze({
+      energyAbsorptionTankLevel: 2,
+      simultaneousShotEnabled: true,
+      lockOnReticleMultiplier: 1.2,
+      lockOnDetectionMultiplier: 1.2,
+    }),
   }),
 ]);
 const CHARACTER_GROUND_CLEARANCE = .12;
@@ -238,6 +360,9 @@ const UFO_ENGINE_SEAT_TOUCH_SKIN = .55;
 const UFO_ENGINE_SEAT_PHASE_SECONDS = 1.8;
 const UFO_ENGINE_CLOSING_PHASE_SECONDS = 2.5;
 const UFO_ENGINE_LIGHT_PHASE_SECONDS = 2.2;
+// 火星到着は離陸と逆の順序にする。始動演出を再利用せず、停止を見せて
+// から既存の引き戸と搭乗足場を展開するための短い専用フェーズ。
+const UFO_MARS_ARRIVAL_SHUTDOWN_PHASE_SECONDS = 1.05;
 const UFO_ENGINE_DOOR_CLOSE_RESPONSE = 1.6;
 const UFO_ENGINE_START_AUDIO_URL = "./assets/audio/ufo-engine-start-caterpillar-01-04-high.mp3";
 const UFO_ENGINE_START_AUDIO_VOLUME = .86;
@@ -285,6 +410,10 @@ const UFO_SPACE_FREE_FLIGHT_TURN_MULTIPLIER = 1.65;
 // ルート所要時間を勝手に縮めず、体感は画角・機体姿勢・相対操作量で高める。
 const UFO_FORWARD_SCROLL_LAUNCH_SECONDS = 3.8;
 const UFO_FORWARD_SCROLL_LAUNCH_CLIMB_WORLD = 330;
+// 火星到着は大気圏へ触れた瞬間に画面を切り替えず、地球離脱と対になる
+// 降下カットを経由して火星マップへ着地する。各距離モードの総所要時間は
+// この演出も含むため、3分／2分30秒という約束は変わらない。
+const UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS = 4.6;
 // 火星までの距離は出発ごとに変動する。選択された距離・到着時間・
 // 火星の実座標を同じ航路モードから決めるため、HUDだけが変わったり
 // 時間だけを縮めて早く到着したりしない。
@@ -302,14 +431,16 @@ const UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES = Object.freeze([
 ]);
 const UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE = UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES[0];
 const UFO_FORWARD_SCROLL_TARGET_SECONDS = UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE.totalSeconds;
-// 各モードの総所要時間には離脱アニメーションも含める。巡航距離はその
-// 正味時間に対して実時間で同期し、更新回数やローカル座標の倍率で到着が
-// 早まらないようにする。
+// 各モードの総所要時間には地球離脱・火星降下の両アニメーションを含める。
+// 巡航距離はその正味時間に対して実時間で同期し、更新回数やローカル座標の
+// 倍率で到着が早まらないようにする。
 const UFO_FORWARD_SCROLL_CRUISE_SECONDS = UFO_FORWARD_SCROLL_TARGET_SECONDS
-  - UFO_FORWARD_SCROLL_LAUNCH_SECONDS;
+  - UFO_FORWARD_SCROLL_LAUNCH_SECONDS
+  - UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS;
 const UFO_FORWARD_SCROLL_REFERENCE_TARGET_SECONDS = 212;
 const UFO_FORWARD_SCROLL_REFERENCE_CRUISE_SECONDS = UFO_FORWARD_SCROLL_REFERENCE_TARGET_SECONDS
-  - UFO_FORWARD_SCROLL_LAUNCH_SECONDS;
+  - UFO_FORWARD_SCROLL_LAUNCH_SECONDS
+  - UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS;
 const UFO_FORWARD_SCROLL_CRUISE_SPEED_REFERENCE_RATIO = .97;
 // 火星の見た目と到達判定を別々のタイミングにしない。航路終端の少し前から
 // 火星大気圏の縁を薄く見せ、終端を越えた瞬間に同じ層を強く発光させる。
@@ -389,6 +520,9 @@ const UFO_FORWARD_SCROLL_COIN_STAR_RATIO = .62;
 // 大型の実体恒星をエネルギー星にする割合。すべての近傍恒星を対象化
 // せず少し絞り、宇宙金貨星を狙う場面との偏りを緩和する。
 const UFO_FORWARD_SCROLL_ENERGY_STAR_RATIO = .7;
+// 帰路は補給機会を増やす。金貨・素材の配置や1個の回復量は変えず、
+// 既存の大型恒星がエネルギー星になる割合だけを上げる。
+const UFO_FORWARD_SCROLL_RETURN_ENERGY_STAR_RATIO = 1;
 // 回収星は射撃対象であると同時に、UFOと実際にぶつかる実体として扱う。
 // 接触ごとに航行エネルギーを30失い、星の中心へ食い込まず横・上下へ押し戻す。
 const UFO_FORWARD_SCROLL_PICKUP_CONTACT_ENERGY_DAMAGE = 30;
@@ -691,6 +825,8 @@ const UFO_SKY_RETURN_FLIGHT_Y = 140;
 // 実体として生成する。遠景の星点と接近時の表面は、同じ物理半径から
 // 計算する。距離の閾値で別モデルへ拡大表示することは絶対にしない。
 const UFO_SPACE_EXPLORABLE_STAR_COUNT = 36000;
+// 帰路は大型の実体恒星そのものを追加する。小型回収星の配分とは独立。
+const UFO_SPACE_RETURN_LARGE_STAR_COUNT_MULTIPLIER = 1.5;
 const UFO_SPACE_EXPLORABLE_STAR_DETAIL_LIMIT = 96;
 const UFO_SPACE_EXPLORABLE_STAR_CLOSE_EXCLUSION = 9000;
 const UFO_SPACE_EXPLORABLE_STAR_LOD_INTERVAL = .075;
@@ -887,6 +1023,11 @@ const state = {
   buildPreview: null,
   physicsDebug: false,
   ufoDoorOpen: false,
+  // 引き戸のアニメーション量。搭乗足場とは必ず同じ開閉状態へ同期する。
+  // 別々の状態にすると、見える坂と足元の物理が食い違う。
+  ufoHatchOpen: false,
+  ufoMarsArrivalExitPending: false,
+  ufoMarsHatchRequiresFaceAuth: false,
   ufoBoarded: false,
   ufoFaceAuth: false,
   ufoFaceAuthLatched: false,
@@ -1010,6 +1151,10 @@ const els = {
   ufoDoorButton: document.getElementById("ufoDoorButton"),
   ufoBoardButton: document.getElementById("ufoBoardButton"),
   ufoActions: document.getElementById("ufoActions"),
+  ufoEquipmentDevelopmentProfiles: document.getElementById("ufoEquipmentDevelopmentProfiles"),
+  ufoEquipmentComparisonCameraButton: document.getElementById("ufoEquipmentComparisonCameraButton"),
+  ufoEquipmentSpaceTestButton: document.getElementById("ufoEquipmentSpaceTestButton"),
+  ufoEquipmentDevelopmentStatus: document.getElementById("ufoEquipmentDevelopmentStatus"),
   ufoFlightControls: document.getElementById("ufoFlightControls"),
   ufoEngineOverlay: document.getElementById("ufoEngineOverlay"),
   ufoEnginePhase: document.getElementById("ufoEnginePhase"),
@@ -1022,6 +1167,11 @@ const els = {
   skyStationGuideDialogFooter: document.getElementById("skyStationGuideDialogFooter"),
   skyStationGuideDialogPage: document.getElementById("skyStationGuideDialogPage"),
   skyStationGuideDialogNext: document.getElementById("skyStationGuideDialogNext"),
+  marsShopDialog: document.getElementById("marsShopDialog"),
+  marsShopDialogSpeaker: document.getElementById("marsShopDialogSpeaker"),
+  marsShopDialogText: document.getElementById("marsShopDialogText"),
+  marsShopDialogChoices: document.getElementById("marsShopDialogChoices"),
+  marsShopDialogClose: document.getElementById("marsShopDialogClose"),
   ufoEquipmentWorkshopMenu: document.getElementById("ufoEquipmentWorkshopMenu"),
   ufoEquipmentWorkshopClose: document.getElementById("ufoEquipmentWorkshopClose"),
   ufoEquipmentWorkshopCloudFiberCount: document.getElementById("ufoEquipmentWorkshopCloudFiberCount"),
@@ -1085,6 +1235,13 @@ let physicsContactMarker;
 let character;
 let characterShadow;
 let skyStationGuide = null;
+let marsShopkeeper = null;
+let marsShopDisplays = null;
+let spaceMaterialBook = null;
+let spaceMaterialGuide = null;
+let spaceMaterialBookCollider = null;
+const spaceMaterialBookContact = createMaterialBookContact();
+const marsShopDialogState = createMarsShopDialogState();
 const skyStationGuideDialogState = {
   open: false,
   phase: "idle",
@@ -1098,15 +1255,30 @@ const ufoEquipmentWorkshopMenuState = {
   open: false,
   touchLatched: false,
 };
+const ufoEquipmentDevelopmentTestState = {
+  profileId: "saved",
+  comparisonCamera: false,
+};
+const ufoFlightSurvey=createUfoFlightSurveyView(document.getElementById('ufoFlightSurvey'),{
+  enabled:['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('ufoFlightSurveyPreview')==='1',
+});
 let previewGroup;
 let labelsGroup;
 // 雲マップの空駅にあるアナログ時計。時計本体を再構築した際だけ差し替え、
 // 毎フレームは針の回転だけを日本時間へ同期する。
 let skyStationClock = null;
+let skyStationBuilding = null;
+let marsSky = null;
+let marsDistantLandscape = null;
+let stationWalkPreview = null;
 let ufoDoorControls = [];
 let ufoRampPhysicsIds = [];
 let colliders = [];
 let walkableSurfaces = [];
+// Overhead geometry is intentionally separate from floors and walls.  A roof
+// must stop a rising character at its rendered underside, but it must not
+// become a horizontal obstacle in the open space below it.
+let ceilingSurfaces = [];
 // The authoritative physics layer is explicitly partitioned by role. These
 // buckets are populated together with the single collider/surface arrays used
 // by movement, so floors, risers, and walls cannot silently become one generic
@@ -1115,6 +1287,7 @@ const physicsElements = {
   floors: [],
   risers: [],
   walls: [],
+  ceilings: [],
 };
 let builtByMap = {};
 let keys = new Set();
@@ -1793,15 +1966,38 @@ function resetPlayerToMapSpawn(mapKey = state.map, options = {}) {
   state.ufoFaceAuthLatched = false;
 }
 
-function saveState() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-  state.saved = true;
-  els.saveState.textContent = "保存済み";
-  showToast("建造状態と位置を保存しました");
+function updateEmergencyReturnControl() {
+  if (!els.emergencyEscapeButton) return;
+  // 火星と工事現場では、そのマップ内で復帰する。作業途中の資材は
+  // 各作業の保存を完了させてから停止し、復帰先へ持ち運んだり消したりしない。
+  const destination = state.map === "mars"
+    ? "火星マップの安全地点へ戻ります"
+    : state.map === "construction"
+    ? "作業中の資材を残して工事現場の安全地点へ戻ります"
+    : "どこにいても雲マップの空駅入口へ帰還します";
+  els.emergencyEscapeButton.title = destination;
+  els.emergencyEscapeButton.setAttribute("aria-label", `緊急帰還：${destination}`);
 }
 
-function loadState() {
-  const saved = safeJson(localStorage.getItem(SAVE_KEY));
+function persistWorldSnapshot(reward=null) {
+  if(!worldSaveService)return Promise.resolve();
+  const pending=worldSaveService.saveWorld(worldStateSnapshot(),reward);
+  pending.catch(error=>{state.saved=false;els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});
+  return pending;
+}
+
+function saveState() {
+  if(typeof worldWaterController!=='undefined'&&worldWaterController?.active){void worldWaterController.save();return;}
+  if(typeof worldSoilController!=='undefined'&&worldSoilController?.active){void worldSoilController.save();return;}
+  if(typeof worldTimberController!=='undefined'&&worldTimberController?.dirty&&state.map==='construction'){void worldTimberController.save();return;}
+  if (CONSTRUCTION_EXPANSION_PREVIEW) { els.saveState.textContent = '工事現場の拡張確認中（保存しません）'; return; }
+  if (SKY_STATION_INTERIOR_PREVIEW) { els.saveState.textContent = '駅内部の確認中（保存しません）'; return; }
+  if (MARS_RETURN_PREVIEW) { els.saveState.textContent = '火星帰路の確認中（保存しません）'; return; }
+  if (MARS_SHOPKEEPER_PREVIEW) { els.saveState.textContent='店主の配置確認中（保存しません）'; return; }
+  void persistWorldSnapshot().then(()=>showToast(worldSaveService.mode==='readonly'?'確認中のため本体へ保存しません':'建造状態と位置を保存しました')).catch(()=>{});
+}
+
+function loadState(saved) {
   if (!saved || saved.version !== 3 || saved.mapSchemaVersion !== IMASORA_WORLD_SCHEMA_VERSION) {
     state.map = "sky";
     state.pendingSafeEntry = true;
@@ -1848,6 +2044,15 @@ function loadState() {
 }
 
 function emergencyEscape() {
+  if(typeof worldExcavationController!=='undefined'&&worldExcavationController?.active){worldExcavationController.leave({force:true,then:emergencyEscape});return;}
+  if(typeof worldWaterController!=='undefined'&&worldWaterController?.active){void worldWaterController.leave({force:true,then:emergencyEscape});return;}
+  if(typeof worldSoilController!=='undefined'&&worldSoilController?.active){void worldSoilController.leave({force:true,then:emergencyEscape});return;}
+  if(typeof worldTimberController!=='undefined'&&state.map==='construction'&&worldTimberController?.dirty&&worldSaveService.mode!=='readonly'){void worldTimberController.leave({force:true,then:emergencyEscape});return;}
+  if(typeof worldTimberController!=='undefined'&&worldTimberController?.active){void worldTimberController.leave({force:true,then:emergencyEscape});return;}
+  // The return destination is decided before the engine runtime resets its
+  // map-dependent state. Construction recovery, like Mars recovery, stays
+  // on the current surface. The controllers above checkpoint cargo first.
+  const returnMap = ["mars", "construction"].includes(state.map) ? state.map : "sky";
   resetUfoSpaceHazardState();
   // 移動入力と視点ドラッグを同時に解除し、ワープ直後に同じ入力で
   // 再び壁へ押し付けられないようにする。
@@ -1859,7 +2064,7 @@ function emergencyEscape() {
   els.viewport.classList.remove("is-looking");
 
   resetUfoEngineRuntime();
-  state.map = "sky";
+  state.map = returnMap;
   state.selectedBuildId = null;
   state.ufoBoarded = false;
   state.ufoDoorOpen = false;
@@ -1868,17 +2073,25 @@ function emergencyEscape() {
   state.fastWalking = false;
   state.pendingSafeEntry = false;
   cancelBuild();
-  resetPlayerToMapSpawn("sky", { fromEmergency: true });
+  resetPlayerToMapSpawn(
+    returnMap,
+    returnMap === "sky" ? { fromEmergency: true } : {},
+  );
   if (scene) {
-    scene.background = color(MAPS.sky.palette.fog);
-    scene.fog = new THREE.Fog(MAPS.sky.palette.fog, 360, 780);
+    scene.background = color(MAPS[returnMap].palette.fog);
+    scene.fog = returnMap === 'mars' ? null : new THREE.Fog(MAPS[returnMap].palette.fog, 360, 780);
   }
   rebuildMap();
   updateCharacter(0);
   updateCamera();
+  updateEmergencyReturnControl();
   updateUfoControls();
   saveState();
-  showToast("緊急帰還：雲マップの空駅入口へ戻りました");
+  showToast(returnMap === "mars"
+    ? "緊急帰還：火星マップの安全地点へ戻りました"
+    : returnMap === "construction"
+    ? "緊急帰還：資材を残して工事現場の安全地点へ戻りました"
+    : "緊急帰還：雲マップの空駅入口へ戻りました");
 }
 
 function repairLegacySkyStationApproach(saved) {
@@ -1896,6 +2109,7 @@ function repairLegacySkyStationApproach(saved) {
 }
 
 function clearCurrentMapSave() {
+  if (CONSTRUCTION_EXPANSION_PREVIEW) return;
   resetUfoEngineRuntime();
   builtByMap[state.map] = [];
   state.selectedBuildId = null;
@@ -1904,9 +2118,7 @@ function clearCurrentMapSave() {
   state.ufoFaceAuth = false;
   state.ufoFaceAuthLatched = false;
   state.saved = false;
-  localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-  state.saved = true;
-  els.saveState.textContent = "保存済み";
+  void persistWorldSnapshot();
   rebuildMap();
   showToast("このマップの建造物を初期化しました");
 }
@@ -1943,6 +2155,7 @@ function addCloudCluster(parent, x, z, scale = 1, tint = 0xf6fbff) {
 }
 
 function makeGround(config) {
+  if (config.decoration.expandedConstruction) return createConstructionGround(config);
   const group = new THREE.Group();
   const { width, depth } = config.world;
   const sourceTexture = sourceTextureFor(config);
@@ -1964,6 +2177,10 @@ function makeGround(config) {
   );
   rim.position.y = -3.1;
   group.add(rim);
+  if(config.decoration.marsTerrain) {
+    marsDistantLandscape=createMarsLandscape(config,sourceTexture);
+    group.add(marsDistantLandscape);
+  }
   (config.decoration.cloudClusters || []).forEach(item => {
     const [x, , z] = normalizedPoint(config, item.point);
     // 雲は土地ではなく景観パーツ。ワールド3倍化をそのまま掛けると
@@ -2080,6 +2297,12 @@ function clearThreeGroup(group) {
 function registerPhysicsFloor(surface) {
   walkableSurfaces.push(surface);
   physicsElements.floors.push(surface);
+  return surface;
+}
+
+function registerPhysicsCeiling(surface) {
+  ceilingSurfaces.push(surface);
+  physicsElements.ceilings.push(surface);
   return surface;
 }
 
@@ -2238,6 +2461,7 @@ function refreshPhysicsDebugVisuals() {
   const solidMaterial = new THREE.MeshBasicMaterial({ color: 0xff4f6d, wireframe: true, transparent: true, opacity: .82, depthTest: false });
   const riserMaterial = new THREE.MeshBasicMaterial({ color: 0xffd34e, wireframe: true, transparent: true, opacity: .95, depthTest: false });
   const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x37e6ff, transparent: true, opacity: .2, side: THREE.DoubleSide, depthTest: false });
+  const ceilingMaterial = new THREE.MeshBasicMaterial({ color: 0xb58cff, transparent: true, opacity: .38, side: THREE.DoubleSide, depthTest: false });
   colliders.forEach(collider => {
     const exactPrism = addPolygonDebugPrism(
       collider,
@@ -2264,6 +2488,9 @@ function refreshPhysicsDebugVisuals() {
   });
   walkableSurfaces.forEach(surface => {
     physicsDebugGroup.add(addSurfaceDebugMesh(surface, surfaceMaterial));
+  });
+  ceilingSurfaces.forEach(ceiling => {
+    physicsDebugGroup.add(addSurfaceDebugMesh({ ...ceiling, height: ceiling.underside }, ceilingMaterial));
   });
   physicsContactMarker = new THREE.Mesh(
     new THREE.SphereGeometry(1.6, 16, 10),
@@ -2466,6 +2693,99 @@ function addLocalStructureCollider(
   );
 }
 
+function addRotatedCeiling(x, z, footprint, rotationY, underside, id, metadata = null) {
+  if (![x, z, footprint?.[0], footprint?.[1], rotationY, underside].every(Number.isFinite)) return null;
+  const halfWidth = footprint[0] / 2;
+  const halfDepth = footprint[1] / 2;
+  return registerPhysicsCeiling({
+    x,
+    z,
+    rotation: rotationY,
+    localHalfX: halfWidth,
+    localHalfZ: halfDepth,
+    halfX: halfWidth,
+    halfZ: halfDepth,
+    underside,
+    id,
+    ...(metadata || {}),
+    physicsSource: metadata?.physicsSource || "authored-ceiling-mesh",
+    polygon: rectanglePolygon(x, z, footprint, rotationY),
+  });
+}
+
+function addLocalStructureCeiling(
+  x,
+  z,
+  rotationY,
+  structureScale,
+  center,
+  size,
+  localUnderside,
+  id,
+  metadata = null,
+) {
+  const [localX, localZ] = center;
+  const worldX = x + (Math.cos(rotationY) * localX + Math.sin(rotationY) * localZ) * structureScale;
+  const worldZ = z + (-Math.sin(rotationY) * localX + Math.cos(rotationY) * localZ) * structureScale;
+  return addRotatedCeiling(
+    worldX,
+    worldZ,
+    scaleFootprint(size, structureScale),
+    rotationY,
+    localUnderside * structureScale,
+    id,
+    metadata,
+  );
+}
+
+function addLocalBarrelRoofCeilings(
+  x,
+  z,
+  rotationY,
+  structureScale,
+  center,
+  width,
+  depth,
+  rise,
+  baseY,
+  id,
+  options = {},
+) {
+  // makeBarrelRoofGeometry() uses y = sin(t * PI) * rise.  Build the same
+  // curve as narrow underside strips rather than a single flat rectangle, so
+  // only the visible roof above the character becomes a ceiling.
+  const segmentCount = Math.max(4, Math.floor(options.segmentCount || 16));
+  const contactInset = Number.isFinite(options.contactInset) ? options.contactInset : .12;
+  const overlap = Number.isFinite(options.segmentOverlap) ? options.segmentOverlap : .18;
+  const [centerX, centerZ] = center;
+  for (let index = 0; index < segmentCount; index += 1) {
+    const t0 = index / segmentCount;
+    const t1 = (index + 1) / segmentCount;
+    const x0 = -width / 2 + width * t0;
+    const x1 = -width / 2 + width * t1;
+    // The lower endpoint of each physical strip is deliberately used as the
+    // contact plane. It is only a small fraction below the curved display
+    // mesh, but it prevents a fast jump from tunnelling through between strips.
+    const localUnderside = baseY
+      + Math.min(Math.sin(t0 * Math.PI), Math.sin(t1 * Math.PI)) * rise
+      - contactInset;
+    addLocalStructureCeiling(
+      x,
+      z,
+      rotationY,
+      structureScale,
+      [centerX + (x0 + x1) / 2, centerZ],
+      [Math.abs(x1 - x0) + overlap, depth],
+      localUnderside,
+      `${id}-ceiling-${index}`,
+      {
+        buildingId: options.buildingId || null,
+        physicsSource: "barrel-roof-underside",
+      },
+    );
+  }
+}
+
 function addUfoRingCollision(
   control,
   buildingId,
@@ -2583,21 +2903,44 @@ function ufoCapsuleOpeningHalfAngle(control) {
   );
 }
 
+function ufoBoardingBodyClearanceLocal(control) {
+  // 表示された通路は、根元の一点ではなく白ミチロードセイバーレンの
+  // 実際の360度モデル全体が通るためのもの。モデルを差し替えても同じ
+  // 入口設計を使えるよう、表示モデルから測定した水平外周をローカル
+  // 座標へ戻して、物理開口の接触余白に使う。
+  const scale = Math.max(.001, control?.scale || BUILDING_SCALE);
+  const footprint = character?.userData?.collisionFootprint;
+  const worldHalfExtent = Math.max(
+    PLAYER_RADIUS,
+    CHARACTER_COLLISION_RADIUS,
+    footprint?.halfX || 0,
+    footprint?.halfZ || 0,
+  );
+  return worldHalfExtent / scale + CHARACTER_STRUCTURE_CONTACT_SKIN / scale;
+}
+
 function ufoCapsuleSeamOpeningHalfAngle(control) {
-  // The visible drawer's white walking face is narrower than its outer body.
-  // The old capsule opening angle was calculated at radius 24 and then reused
-  // at the larger full-ring radius 29, plus another 4.5 degrees. That removed
-  // almost twice the required arc and allowed entry beside the actual ramp.
-  // Derive this opening at the ring itself and leave only a sub-unit assembly
-  // tolerance, so the legal +X walkway stays usable without opening either
-  // side of it to the outside.
-  const rampWidth = control.rampWidth || 18;
-  const visibleSurfaceHalfWidth = Math.max(0, (rampWidth - 4) / 2);
-  const assemblyTolerance = .35;
-  return Math.asin(Math.min(
-    .92,
-    (visibleSurfaceHalfWidth + assemblyTolerance) / UFO_CAPSULE_SEAM_RADIUS,
-  ));
+  // 開口の幅は、引き出し足場の白い上面だけではなく、そのまま続く
+  // 「船内の表示デッキ」の幅を基準にする。以前は白い上面（14）だけから
+  // 算出していたため、実際には幅18で表示されているデッキより全周リングの
+  // 物理開口が狭くなり、出口を直進する身体が左右のリングに当たっていた。
+  // 外側の実際のハッチ開口より広げず、表示された一続きの通路だけを通す。
+  const shellOpening = control.hatchGapHalfAngle || THREE.MathUtils.degToRad(15);
+  const outerShellRadius = control.lowerShellRadius || 39;
+  const outerHatchHalfWidth = Math.max(0, outerShellRadius * Math.sin(shellOpening));
+  const entryHalfWidth = Math.max(0, (control.interiorEntryWidth || control.rampWidth || 18) / 2);
+  const hatchPanelHalfWidth = Math.max(outerHatchHalfWidth, control.hatchDoorHalfWidth || 0);
+  // 継ぎ目リングは外殻より内側にあり、外殻と同じ角度で切るだけでは
+  // デッキ上を歩く身体の側面に、最初の分割リングが当たってしまう。
+  // 表示デッキと実際の身体外周を一体の通行断面として扱う。これは
+  // 座標例外ではなく、どの搭乗口にも適用できる入口物理の共通ルール。
+  const bodyClearance = ufoBoardingBodyClearanceLocal(control);
+  const visiblePassageHalfWidth = Math.max(outerHatchHalfWidth, entryHalfWidth);
+  const seamHalfWidth = Math.min(
+    hatchPanelHalfWidth + bodyClearance,
+    visiblePassageHalfWidth + bodyClearance,
+  );
+  return Math.asin(Math.min(.92, seamHalfWidth / UFO_CAPSULE_SEAM_RADIUS));
 }
 
 function isInsideUfoCapsuleOpening(control, localX, localZ) {
@@ -2608,11 +2951,13 @@ function isInsideUfoCapsuleOpening(control, localX, localZ) {
 function addUfoStructuralColliders(control, buildingId) {
   if (!control) return;
   const openingHalfAngle = control.hatchGapHalfAngle || THREE.MathUtils.degToRad(15);
+  const lowerShellRadius = control.lowerShellRadius || 39;
+  const upperShellRadius = control.upperShellRadius || 37;
   // Lower and upper saucers are split into narrow outer-shell prisms. The
   // central cockpit remains open, while every visible outer shell segment is
   // solid at its actual height.
-  addUfoRingCollision(control, buildingId, 39, 7.5, 16.5, 40, 5.5, openingHalfAngle, "lower-shell");
-  addUfoRingCollision(control, buildingId, 37, 17.5, 22.5, 40, 5.2, openingHalfAngle, "upper-shell");
+  addUfoRingCollision(control, buildingId, lowerShellRadius, 7.5, 16.5, 40, 5.5, openingHalfAngle, "lower-shell");
+  addUfoRingCollision(control, buildingId, upperShellRadius, 17.5, 22.5, 40, 5.2, openingHalfAngle, "upper-shell");
 
   // The bright full-circumference trim and the glass capsule form one real
   // structural seam.  Previously only the outer shell and capsule were
@@ -2676,10 +3021,10 @@ function addUfoClosedHatchCollider(control) {
   if (!control) return;
   const scale = control.scale || BUILDING_SCALE;
   const rotationY = control.rotation || 0;
-  const localCenterX = 39;
+  const localCenterX = control.hatchDoorLocalX ?? 39;
   const localCenterZ = 0;
-  const localWidth = 24;
-  const localDepth = 5.5;
+  const localWidth = (control.hatchDoorHalfWidth ?? 12) * 2;
+  const localDepth = (control.hatchDoorHalfDepth ?? 2.75) * 2;
   const minY = (control.originY || 0) + 7.5 * scale;
   // The closed panel also covers the full-ring seam height. Stopping at the
   // upper-shell height left a thin jump-through slit above the closed hatch.
@@ -2792,6 +3137,8 @@ function getStepTransition(fromX, fromZ, toX, toZ) {
     toZ,
     fromHeight,
     toHeight,
+    probeX,
+    probeZ,
     probeHeight,
     lookAheadHeight,
     // Only the surface actually reached by the movement sample defines an
@@ -2854,6 +3201,18 @@ function matchingWalkableSurfaceHeight(collider, referenceHeight = state.groundY
 }
 
 function canPassStepCollider(collider, transition) {
+  if (collider?.surfaceEdge && collider.buildingId === 'sky-station' && isStationAccessRampTransition(transition)) {
+    // The front slope covers the old plinth/stair edges. Test the slope at
+    // the actual nearest edge contact, not at the root behind that edge.
+    const local = colliderLocalPoint(transition.toX, transition.toZ, collider);
+    const half = colliderHalfSize(collider);
+    const lx = clamp(local.x, -half.x, half.x), lz = clamp(local.z, -half.z, half.z);
+    const r = collider.rotation || 0;
+    const contactX = collider.x + Math.cos(r) * lx + Math.sin(r) * lz;
+    const contactZ = collider.z - Math.sin(r) * lx + Math.cos(r) * lz;
+    const rampHeight = skyStationRampHeightAt(skyStationBuilding, contactX, contactZ);
+    if (Number.isFinite(rampHeight) && rampHeight + .25 >= collider.obstacleHeight) return true;
+  }
   // A continuous authored slope can touch the thin perimeter of its landing
   // before the character root reaches that landing.  At that instant the
   // from/to ground samples still belong to the slope, so the ordinary step
@@ -3298,7 +3657,7 @@ function surfaceContainsPoint(x, z, surface, edgeEpsilon = 0.02) {
 
 function authoredUfoRampHeightAt(x, z) {
   if (!Number.isFinite(x) || !Number.isFinite(z)) return null;
-  let highest = null;
+  let highest = state.map === 'sky' ? skyStationRampHeightAt(skyStationBuilding, x, z) : null;
   const includeHeight = height => {
     if (Number.isFinite(height) && (highest === null || height > highest)) highest = height;
   };
@@ -3415,6 +3774,8 @@ function highestReachableSurface(candidates, referenceHeight, availableRise = ge
 }
 
 function getGroundHeight(x, z) {
+  const stationSlope = state.map === 'sky' ? skyStationRampHeightAt(skyStationBuilding, x, z) : null;
+  if (Number.isFinite(stationSlope)) return stationSlope;
   const candidates = groundHeightCandidates(x, z);
   const referenceHeight = Number.isFinite(state.groundY) ? state.groundY : 0;
   const atCurrentRoot = Math.hypot(x - state.position.x, z - state.position.z) < .01;
@@ -3985,6 +4346,14 @@ function characterColliderContact(x, z, collider, groundY = state.groundY, jumpY
   return obbContact(characterObb, structureCollisionObb(collider));
 }
 
+function characterHorizontalColliderContact(x, z, collider) {
+  const characterObb = characterCollisionObb(x, z);
+  if (collider.polygon?.length >= 3) {
+    return polygonContact(characterObb, collider.polygon, CHARACTER_STRUCTURE_CONTACT_SKIN);
+  }
+  return obbContact(characterObb, structureCollisionObb(collider));
+}
+
 function isHigherOverlappingSurfaceEdge(collider, x, z, groundY) {
   // A building can contain several real, nested floor slabs: the outer step,
   // its next landing, and the upper landing. Once the character has landed on
@@ -4265,7 +4634,7 @@ function buildSkyStation(entry) {
   // 周囲の石床と建物基礎。公式レイヤーの占有範囲をそのまま使う。
   addWalkableBox(group, [width, 3.6, depth], [0, 1.8, 0], stone);
   addWalkableBox(group, [92, 2.2, 63], [0, 4.6, -1], darkStone);
-  addBox(group, [86, 28, 54], [0, 19, -2], stone);
+  addSkyStationInterior(group, { stone, stoneLight, darkStone, gold, blue, wood, door }, { addBox, addWalkableBox });
   addBox(group, [88, 2.2, 56], [0, 32.8, -2], gold);
   addWalkableBox(group, [88, 2.4, 56], [0, 6.1, -2], stoneLight);
 
@@ -4280,7 +4649,7 @@ function buildSkyStation(entry) {
   });
 
   // 正面の時計塔。元画像同様、中央だけ前へ張り出す。
-  addBox(group, [34, 47, 18], [0, 29.5, 20], stoneLight);
+  // 時計塔の下部は実際の通路。左右壁と上部だけを内装モジュールで作る。
   addBox(group, [38, 3, 20], [0, 53.2, 20], gold);
   addFrontArch(group, 0, 42, 29.5, 17, stoneLight, 3.4);
   addFrontArch(group, 0, 42, 30.4, 13.5, gold, 1.3);
@@ -4291,7 +4660,7 @@ function buildSkyStation(entry) {
   for (let z = -23; z <= 5; z += 7) addBox(group, [38, 1, 1], [0, 49.3, z], gold);
   addStationRailing(group, -18, 18, -24, 49, stone, gold);
   addStationRailing(group, -18, 18, 6, 49, stone, gold);
-  addBox(group, [30, 37, 15], [0, 32, -23], stoneLight);
+  addBox(group, [30, 18.5, 15], [0, 41.25, -23], stoneLight);
   const rearRoof = new THREE.Mesh(makeBarrelRoofGeometry(32, 17, 12), glass);
   rearRoof.position.set(0, 50.5, -23);
   rearRoof.castShadow = true;
@@ -4303,38 +4672,36 @@ function buildSkyStation(entry) {
   // 石柱。大面積の無地壁を残さず、元絵のリズムで外周を分節する。
   [-41, -28, 28, 41].forEach(px => {
     [-27, 25].forEach(pz => {
-      addBox(group, [6.2, 39, 6.2], [px, 24, pz], darkStone);
+      // Same exterior silhouette, split at the wall top for the indoor cutaway.
+      addBox(group, [6.2, 28.8, 6.2], [px, 18.9, pz], darkStone);
+      addBox(group, [6.2, 10.2, 6.2], [px, 38.4, pz], darkStone);
       addBox(group, [8, 3, 8], [px, 6.8, pz], stoneLight);
       addBox(group, [8, 3, 8], [px, 43.2, pz], stoneLight);
     });
   });
   [-17, 17].forEach(px => {
-    addBox(group, [6.6, 44, 6], [px, 27.5, 28], darkStone);
+    addBox(group, [6.6, 27.8, 6], [px, 19.4, 28], darkStone);
+    addBox(group, [6.6, 16.2, 6], [px, 41.4, 28], darkStone);
     addBox(group, [8.3, 3, 7.4], [px, 50.5, 28], stoneLight);
   });
 
   // 正面扉、左右扉、窓、庇。
-  addBox(group, [20, 24, 1.8], [0, 18, 30], door);
-  addFrontArch(group, 0, 29, 31.2, 10, gold, 1.2);
-  addBox(group, [2, 24, 2.2], [0, 18, 31.2], gold);
-  [-8.5, 8.5].forEach(px => addBox(group, [1.25, 22, 2.2], [px, 18, 31.2], gold));
+  addFrontArch(group, 0, 29, 31.2, 10, gold, 1.2).userData.indoorCutaway = true;
   [-25.5, 25.5].forEach(px => {
     addStationWindow(group, px, 20, 26.4, 11, 15, "front", glass, gold);
   });
   [-18, 0, 18].forEach(pz => {
-    addStationWindow(group, -43.2, 21, pz, 10, 14, "side", glass, gold);
+    if (pz !== 0) addStationWindow(group, -43.2, 21, pz < 0 ? -24 : 18, pz < 0 ? 6 : 8, 14, "side", glass, gold);
     addStationWindow(group, 43.2, 21, pz, 10, 14, "side", glass, gold);
   });
 
   // 鉄道側（西側）の乗り場出口。ホームが駅舎の裏へ突然消えず、
   // 駅→改札出口→ホーム→車両という導線が外観から読めるようにする。
   const platformDoorZ = -3;
-  addBox(group, [2.4, 25, 16], [-44.5, 17, platformDoorZ], darkStone);
-  addBox(group, [2.8, 21, 12.5], [-45.1, 16.5, platformDoorZ], glass);
-  [-1, 1].forEach(side => addBox(group, [3.1, 23, 1.15], [-45.5, 17, platformDoorZ + side * 6.7], gold));
-  addBox(group, [3.1, 1.15, 14.5], [-45.5, 28.2, platformDoorZ], gold);
-  addBox(group, [8, 1.4, 18], [-48.3, 30, platformDoorZ], blue);
-  addBox(group, [8.4, .75, 18.5], [-48.5, 31, platformDoorZ], gold);
+  [-1, 1].forEach(side => addBox(group, [3.1, 23, 1.15], [-45.5, 18.8, platformDoorZ + side * 14.8], gold));
+  addBox(group, [3.1, 1.15, 30.5], [-45.5, 30.2, platformDoorZ], gold);
+  addBox(group, [8, 1.4, 31], [-48.3, 32, platformDoorZ], blue);
+  addBox(group, [8.4, .75, 31.5], [-48.5, 33, platformDoorZ], gold);
   addWalkableBox(group, [4.5, 1.3, 18], [-47.2, 4.6, platformDoorZ], stoneLight);
   addWalkableBox(group, [4.5, 1.1, 18], [-50.5, 3.1, platformDoorZ], stone);
   addWalkableBox(group, [4.5, .9, 18], [-53.5, 1.7, platformDoorZ], darkStone);
@@ -4387,9 +4754,11 @@ function buildSkyStation(entry) {
   const crest = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.2, 1.3, 28), blue);
   crest.rotation.x = Math.PI / 2;
   crest.position.set(0, 29.6, 31.4);
+  crest.userData.indoorCutaway = true;
   group.add(crest);
   const crestRim = new THREE.Mesh(new THREE.TorusGeometry(5.6, .75, 10, 32), gold);
   crestRim.position.copy(crest.position);
+  crestRim.userData.indoorCutaway = true;
   group.add(crestRim);
 
   // 青い垂れ幕と金模様。
@@ -4434,6 +4803,12 @@ function buildSkyStation(entry) {
     addStationFinial(group, x, z < -20 ? 43 : 48, z, stoneLight, gold, z < -20 ? 14 : 17);
   });
   addStationFinial(group, 0, 62, -23, stoneLight, gold, 16);
+  group.name = 'sky-station-building';
+  group.updateMatrixWorld(true);
+  group.userData.cutawayMeshes = [];
+  group.traverse(mesh => {
+    if (mesh.isMesh && (mesh.userData.indoorCutaway || new THREE.Box3().setFromObject(mesh).min.y >= 29)) group.userData.cutawayMeshes.push(mesh);
+  });
   return group;
 }
 
@@ -4688,6 +5063,13 @@ function buildSkyTrain(structure) {
   const rollingStockChildren = group.children.slice(rollingStockStart);
   rollingStockChildren.forEach(child => rollingStock.add(child));
   if (structure.reverseRollingStock) rollingStock.rotation.y = Math.PI;
+  // Every rendered member of the train is the source of its collision shape.
+  // This keeps the locomotive nose, boiler, chimney, wheels, and cowcatcher
+  // registered with their actual world matrix instead of treating the whole
+  // front vehicle as one loose rectangular approximation.
+  rollingStock.traverse(object => {
+    if (object.isMesh) object.userData.skyTrainRollingStockCollider = true;
+  });
   group.add(rollingStock);
   return group;
 }
@@ -4780,35 +5162,241 @@ function buildCloudWorkshop(structure) {
   return group;
 }
 
+function buildMarsMaterialShop(structure) {
+  const [width, height, depth] = structure.size;
+  const group = new THREE.Group();
+  group.name = "mars-material-shop";
+
+  // 火星の荒地に建つ素材ショップ。店主は入口の脇に常設し、
+  // 商品棚は奥と左右に限定。中央48幅の通路は什器で塞がない。
+  const wallHeight = height * .78;
+  const roofWidth = width - 8;
+  const roofDepth = depth - 10;
+  const roofRise = height * .2;
+  const entranceWidth = 48;
+  const entranceHeight = wallHeight - 7;
+  const frontWallZ = roofDepth / 2 - 4;
+  const sideWallX = width / 2 - 4;
+  const shopkeeperReserve = [roofWidth - 8, roofDepth - 8];
+
+  const floor = physicalMaterial(0x6e3029, .78, .08);
+  const floorInset = physicalMaterial(0x9c4934, .74, .08);
+  const wall = physicalMaterial(0x7a3328, .58, .2);
+  const wallLight = physicalMaterial(0xb6593a, .48, .19);
+  const roofMaterial = physicalMaterial(0x4a2529, .42, .47, 0x1a0908, .1);
+  const frame = physicalMaterial(0x23191b, .4, .68);
+  const trim = physicalMaterial(0xf0b86a, .26, .66, 0x7a3512, .18);
+  const lamp = physicalMaterial(0xffd991, .17, .08, 0xff9b31, 1.5);
+  const glass = new THREE.MeshStandardMaterial({
+    color: 0x73cfdf,
+    roughness: .16,
+    metalness: .18,
+    emissive: 0x155267,
+    emissiveIntensity: .45,
+    transparent: true,
+    opacity: .72,
+  });
+  const markSolid = mesh => {
+    mesh.userData.marsMaterialShopCollision = true;
+    return mesh;
+  };
+  const addSolidBox = (size, position, material, rotationY = 0) => (
+    markSolid(addBox(group, size, position, material, rotationY))
+  );
+  const addDecorationBox = (size, position, material, rotationY = 0) => {
+    const mesh = addBox(group, size, position, material, rotationY);
+    mesh.userData.nonCollidable = true;
+    return mesh;
+  };
+
+  // 地面と段差を作らない薄い外床と、店内全体の内床。
+  // 床は火星の地面と同じ高さに扱うため、見えていない台座判定は足さない。
+  addDecorationBox([width, .18, depth], [0, .09, 0], floor);
+  const clearInteriorFloor = addDecorationBox(
+    [shopkeeperReserve[0], .18, shopkeeperReserve[1]],
+    [0, .19, -1],
+    floorInset,
+  );
+  clearInteriorFloor.name = "mars-material-shop-shopkeeper-clear-floor";
+  group.userData.shopkeeperReserve = {
+    center: [0, 10],
+    size: [48, 52],
+    // 中央の来客動線には什器を置かない。店主は既存の入口脇のまま。
+    openForFutureShopkeeper: true,
+  };
+  addDecorationBox([entranceWidth, .12, 16], [0, .06, roofDepth / 2 + 8], floorInset);
+
+  // 壁は入口だけを開けた別部材。建物全体を一つの箱で当てないため、
+  // 店内へ真っ直ぐ歩いて入れる。
+  addSolidBox([8, wallHeight, roofDepth], [-sideWallX, wallHeight / 2, 0], wall);
+  addSolidBox([8, wallHeight, roofDepth], [sideWallX, wallHeight / 2, 0], wall);
+  addSolidBox([roofWidth, wallHeight, 8], [0, wallHeight / 2, -frontWallZ], wall);
+  const frontPanelWidth = (roofWidth - entranceWidth) / 2;
+  [-1, 1].forEach(side => {
+    addSolidBox(
+      [frontPanelWidth, wallHeight, 8],
+      [side * (entranceWidth / 2 + frontPanelWidth / 2), wallHeight / 2, frontWallZ],
+      wall,
+    );
+  });
+  // 引き戸はまだ置かず、将来の店主や来客が出入りできる開放入口のままにする。
+  addSolidBox([entranceWidth, 7, 8], [0, entranceHeight + 3.5, frontWallZ], frame);
+
+  // 表示上の入口フレーム、窓、火星用の暖色灯。これらは壁の表面装飾で、
+  // 入口の空間に余計なコライダーを作らない。
+  [-1, 1].forEach(side => {
+    addDecorationBox([2.2, entranceHeight + 2, 2.4], [side * (entranceWidth / 2 + .7), (entranceHeight + 2) / 2, frontWallZ + .55], trim);
+    addDecorationBox([1.3, entranceHeight + 4, 1.4], [side * (roofWidth / 2 - 6), wallHeight / 2, frontWallZ + .7], trim);
+    const entranceLamp = new THREE.Mesh(new THREE.SphereGeometry(2.25, 16, 11), lamp);
+    entranceLamp.position.set(side * (entranceWidth / 2 - 5), entranceHeight - 4, frontWallZ + 1.1);
+    entranceLamp.userData.nonCollidable = true;
+    entranceLamp.castShadow = true;
+    group.add(entranceLamp);
+  });
+  addDecorationBox([entranceWidth + 6, 1.5, 2.7], [0, entranceHeight + 7.7, frontWallZ + .55], trim);
+  [-1, 1].forEach(side => {
+    addDecorationBox([.9, 15, 22], [side * (sideWallX + 4.1), 24, -2], glass);
+    addDecorationBox([1.35, 18, 1.4], [side * (sideWallX + 4.55), 24, -18], trim);
+    addDecorationBox([1.35, 18, 1.4], [side * (sideWallX + 4.55), 24, 14], trim);
+  });
+  addDecorationBox([34, 13, 1], [0, 26, -frontWallZ - .55], glass);
+  [-28, 28].forEach(x => {
+    const beacon = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.7, 9, 14), trim);
+    beacon.position.set(x, 4.6, -frontWallZ - 8);
+    beacon.userData.nonCollidable = true;
+    beacon.castShadow = true;
+    group.add(beacon);
+  });
+
+  // 低い両端から中央へ丸く持ち上がる屋根。物理側にも同じ曲線の
+  // 分割天井を登録するので、ジャンプで屋根だけを通り抜けない。
+  const roof = new THREE.Mesh(makeBarrelRoofGeometry(roofWidth, roofDepth, roofRise), roofMaterial);
+  roof.name = "mars-material-shop-barrel-roof";
+  roof.position.set(0, wallHeight, 0);
+  roof.userData.nonCollidable = true;
+  roof.castShadow = true;
+  roof.receiveShadow = true;
+  group.add(roof);
+  addBarrelRoofGrid(group, 0, wallHeight, 0, roofWidth, roofDepth, roofRise, trim);
+
+  // 看板は建物本体へ固定し、ラベル表示設定を切っていても店の用途が分かる。
+  const sign = makeTextLabel(structure.name, "#fff3d0");
+  sign.name = "mars-material-shop-sign";
+  sign.position.set(0, wallHeight + 7, roofDepth / 2 + 1.4);
+  sign.scale.set(44, 11, 1);
+  sign.material.depthTest = true;
+  sign.userData.nonCollidable = true;
+  group.add(sign);
+
+  marsShopDisplays = buildMarsShopDisplays(structure);
+  group.add(marsShopDisplays);
+  marsShopkeeper = buildMarsShopkeeperAtEntrance360(structure, CHARACTER_GROUND_CLEARANCE);
+  group.add(marsShopkeeper);
+  group.userData.shopkeeper = marsShopkeeper;
+
+  return group;
+}
+
+function addMarsMaterialShopCeilings(x, z, rotationY, structureScale, structureId, structure) {
+  const [width, height, depth] = structure.size;
+  const wallHeight = height * .78;
+  const roofWidth = width - 8;
+  const roofDepth = depth - 10;
+  const roofRise = height * .2;
+  const entranceWidth = 48;
+  const entranceHeight = wallHeight - 7;
+  const frontWallZ = roofDepth / 2 - 4;
+
+  // 表示された樽型屋根の下側を同じ寸法・高さで物理化する。
+  addLocalBarrelRoofCeilings(
+    x,
+    z,
+    rotationY,
+    structureScale,
+    [0, 0],
+    roofWidth,
+    roofDepth,
+    roofRise,
+    wallHeight,
+    `${structureId}-roof`,
+    { buildingId: structureId, segmentCount: 20 },
+  );
+  // 入口上の梁だけは屋根より低いので、その下面も別に登録する。
+  addLocalStructureCeiling(
+    x,
+    z,
+    rotationY,
+    structureScale,
+    [0, frontWallZ],
+    [entranceWidth, 8],
+    entranceHeight,
+    `${structureId}-entrance-lintel`,
+    { buildingId: structureId, physicsSource: "mars-material-shop-lintel" },
+  );
+}
+
 function addFixedStructure(parent, config, structure) {
   const [x, , z] = normalizedPoint(config, structure.point);
   const rotationY = THREE.MathUtils.degToRad(structure.rotationDeg || 0);
   let group = null;
   if (structure.type === "sky-train") group = buildSkyTrain(structure);
   if (structure.type === "cloud-workshop") group = buildCloudWorkshop(structure);
+  if (structure.type === "mars-material-shop") group = buildMarsMaterialShop(structure);
   if (!group) return;
   const structureScale = Number(structure.scale) || (structure.type === "cloud-workshop" ? BUILDING_SCALE : 1);
   group.scale.setScalar(structureScale);
   group.position.set(x, 0, z);
   group.rotation.y = rotationY;
-  // Fixed structures use the same visible-mesh surface extraction as every
-  // player-built structure. Existing detailed obstacle colliders stay intact;
-  // only low floors, platforms and decks are added as climbable top surfaces.
-  addVisualBuildingColliders(group, structure.id, {
-    // The workshop contains a large visible rear/body wall in addition to
-    // the hand-authored fence, tanks, and crates below.  Keep the detailed
-    // manual pieces, but also register the visible meshes themselves so no
-    // part of a fixed building can be entered through an unregistered face.
-    // This is class-wide for fixed structures, not a location exception.
-    registerObstacles: structure.type === "cloud-workshop",
-    registerSurfaces: false,
-    maximumSurfaceHeight: 28,
-  });
+  // Fixed structures use their rendered meshes as the physical source.
+  // The train is deliberately narrowed to its rolling stock here: the open
+  // platform must remain walkable, while every visible locomotive/coach part
+  // (including the boiler and chimney) becomes a matching solid.
+  if (structure.type === "sky-train") {
+    addVisualBuildingColliders(group, `${structure.id}-rolling-stock`, {
+      registerObstacles: true,
+      registerSurfaces: false,
+      registerSurfaceEdges: false,
+      includeObject: object => object.userData?.skyTrainRollingStockCollider === true,
+    });
+  } else if (structure.type === "mars-material-shop") {
+    // 火星素材ショップは入口を持つ建物。壁・梁だけを表示メッシュから
+    // 物理化し、店内の空き床や入口まで箱の当たり判定で塞がない。
+    addVisualBuildingColliders(group, structure.id, {
+      registerObstacles: true,
+      registerSurfaces: false,
+      registerSurfaceEdges: false,
+      includeObject: object => object.userData?.marsMaterialShopCollision === true,
+    });
+    const keeper=group.userData.shopkeeper;
+    const stableParts=new Set([keeper.userData.body,keeper.userData.bell,...keeper.userData.feet]);
+    const keeperColliderStart = colliders.length;
+    addVisualBuildingColliders(keeper, `${structure.id}-shopkeeper`, {
+      registerSurfaces:false,
+      registerSurfaceEdges:false,
+      includeObject:object=>stableParts.has(object),
+    });
+    // The conversation uses these existing physical faces, not the shop walls
+    // or an unrelated circular proximity zone.
+    keeper.userData.dialogColliders = colliders.slice(keeperColliderStart);
+  } else {
+    addVisualBuildingColliders(group, structure.id, {
+      // The workshop contains a large visible rear/body wall in addition to
+      // the hand-authored fence, tanks, and crates below. Keep the detailed
+      // manual pieces, but also register the visible meshes themselves so no
+      // part of a fixed building can be entered through an unregistered face.
+      registerObstacles: structure.type === "cloud-workshop",
+      registerSurfaces: false,
+      maximumSurfaceHeight: 28,
+    });
+  }
   if (structure.type === "cloud-workshop") {
     // 工房全体を一つの箱にせず、壁・搬入口・タンク・資材・柵を個別に判定する。
     addCloudWorkshopCollisionColliders(x, z, rotationY, structureScale, structure.id, structure);
   }
-  if (state.labels) {
+  if (structure.type === "mars-material-shop") {
+    addMarsMaterialShopCeilings(x, z, rotationY, structureScale, structure.id, structure);
+  }
+  if (state.labels && structure.type !== "mars-material-shop") {
     const label = makeTextLabel(structure.name, "#ffe5a2");
     label.position.set(0, structure.type === "sky-train" ? 42 : 74, 0);
     setLabelWorldScale(label, structureScale);
@@ -4816,9 +5404,6 @@ function addFixedStructure(parent, config, structure) {
   }
   parent.add(group);
   if (structure.type === "sky-train") {
-    // 線路とホームは歩行可能にし、車両本体だけを3分割して物理障害物にする。
-    // 長い線路全体を1個のAABBにすると、ホームへ近づけなくなるため分離する。
-    const rollingStockDirection = structure.reverseRollingStock ? -1 : 1;
     // ホーム天面は表示モデルと同じローカル寸法・回転・高さで一度だけ登録する。
     // Three.js のY回転で表示される platformCenterX=40.5 と同じ変換を
     // そのまま使う。以前はX/Zの係数を逆にしていたため、表示ホームと
@@ -4835,6 +5420,22 @@ function addFixedStructure(parent, config, structure) {
       size: scaleFootprint([53.8, 203], structureScale),
       height: platformSurfaceHeight,
     });
+    // The rain shelter is a curved barrel roof. Its underside is registered
+    // in the same local dimensions as makeBarrelRoofGeometry(), segmented
+    // across the visible arch instead of filled by a flat invisible box.
+    addLocalBarrelRoofCeilings(
+      x,
+      z,
+      rotationY,
+      structureScale,
+      [42, 11],
+      48,
+      150,
+      4.2,
+      27.8,
+      `${structure.id}-platform-canopy`,
+      { buildingId: structure.id, segmentCount: 16 },
+    );
     // ホーム屋根の4本の支柱。車両本体だけを当てる設計では、
     // 見えている支柱をキャラクターがすり抜けてしまうため、1本ずつ登録する。
     // ホーム床・屋根・線路は歩けるままにし、細い柱の footprint だけを止める。
@@ -4868,23 +5469,10 @@ function addFixedStructure(parent, config, structure) {
         surfaceEdge: true,
       },
     );
-    [
-      { z: -55, size: [27, 98], id: "engine" },
-      { z: 30, size: [26, 48], id: "coach-1" },
-      { z: 82, size: [26, 48], id: "coach-2" },
-    ].forEach(segment => {
-      const localZ = segment.z * structureScale * rollingStockDirection;
-      const segmentX = x + Math.sin(rotationY) * localZ;
-      const segmentZ = z + Math.cos(rotationY) * localZ;
-      addRotatedCollider(
-        segmentX,
-        segmentZ,
-        scaleFootprint(segment.size, structureScale),
-        rotationY,
-        `${structure.id}-${segment.id}`,
-      );
-    });
-  } else if (structure.type !== "cloud-workshop") {
+    // Rolling stock collision is registered above from every displayed mesh.
+    // Do not add the old, oversized three-box approximation here: its gap
+    // around the locomotive front was the source of the pass-through report.
+  } else if (structure.type !== "cloud-workshop" && structure.type !== "mars-material-shop") {
     addRotatedCollider(x, z, scaleFootprint(structure.footprint, structureScale), rotationY, structure.id);
   }
 }
@@ -4925,6 +5513,9 @@ function addMapEntry(parent, config) {
   parent.add(group);
   if (entry.type === "rail-station") {
     // 駅の物理は上の表示メッシュ複製だけを情報源にする。
+    skyStationBuilding = group;
+    addLocalStructureCeiling(x, z, rotationY, entryScale, [0, -2], [88, 56], 31.7, `${entry.id}-hall-ceiling`, { buildingId: entry.id });
+    addLocalStructureCeiling(x, z, rotationY, entryScale, [0, 20], [24, 18], 29.3, `${entry.id}-entrance-ceiling`, { buildingId: entry.id });
   } else {
     addRotatedCollider(x, z, scaleFootprint(entry.footprint, entryScale), rotationY, entry.id);
   }
@@ -5716,6 +6307,191 @@ function buildCatalogModel(source) {
     const yokeStem = new THREE.Mesh(new THREE.CylinderGeometry(.8, .8, 7, 12), cockpitAmber);
     yokeStem.position.set(0, 26, -22); addUfoPart(yokeStem, { collidable: true });
 
+    // 作成済みのUFO装備は、効果だけを内部状態へ保存するのではなく、機体と
+    // コックピットに実際の専用パーツとして現れる。すべて装飾専用であり、
+    // 既存の乗降路・椅子・カプセルの物理判定を増やさない。
+    const ufoEquipmentVisualAssembly = new THREE.Group();
+    ufoEquipmentVisualAssembly.name = "ufo-crafted-equipment-visuals";
+    ufoEquipmentVisualAssembly.userData.nonCollidable = true;
+    craftAssembly.add(ufoEquipmentVisualAssembly);
+    const addEquipmentVisual = mesh => {
+      mesh.userData.nonCollidable = true;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      ufoEquipmentVisualAssembly.add(mesh);
+      return mesh;
+    };
+    const tankMetal = physicalMaterial(0x172b3d, .24, .74, 0x0c4261, .18);
+    const tankBand = physicalMaterial(0xd6f8ff, .18, .46, 0x68e9ff, 1.12);
+    const tankFluid = new THREE.MeshBasicMaterial({
+      color: 0x36dfff,
+      transparent: true,
+      opacity: .82,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    const radarFrame = physicalMaterial(0x102633, .2, .66, 0x0b617d, .4);
+    const radarCyan = physicalMaterial(0x59efff, .1, .2, 0x21d9ff, 2.2);
+    const radarGreen = physicalMaterial(0xa6ffca, .14, .16, 0x32e890, 1.85);
+    const buttonBaseMaterial = physicalMaterial(0x0b1720, .2, .74, 0x06111a, .32);
+    const buttonCapMaterial = physicalMaterial(0xffb353, .2, .3, 0xff6719, 2.1);
+    const buttonHaloMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffcf7c,
+      transparent: true,
+      opacity: .9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+    });
+
+    // エネルギー吸収増タンク I：機体後方に固定する発光エネルギー槽。
+    const energyTankOne = new THREE.Group();
+    energyTankOne.name = "ufo-energy-absorption-tank-1";
+    energyTankOne.position.set(-35, 15.5, 0);
+    energyTankOne.userData.nonCollidable = true;
+    ufoEquipmentVisualAssembly.add(energyTankOne);
+    const addTankOnePart = mesh => {
+      mesh.userData.nonCollidable = true;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      energyTankOne.add(mesh);
+      return mesh;
+    };
+    const tankOneMount = addTankOnePart(new THREE.Mesh(new THREE.BoxGeometry(4.5, 8.5, 13), tankMetal));
+    tankOneMount.position.x = 2.4;
+    const tankOneBody = addTankOnePart(new THREE.Mesh(new THREE.CylinderGeometry(4.25, 4.25, 14, 20), tankMetal));
+    tankOneBody.rotation.z = Math.PI / 2;
+    const tankOneFluid = addTankOnePart(new THREE.Mesh(new THREE.CylinderGeometry(2.85, 2.85, 14.35, 20), tankFluid));
+    tankOneFluid.rotation.z = Math.PI / 2;
+    const tankOneFrontBand = addTankOnePart(new THREE.Mesh(new THREE.TorusGeometry(4.35, .5, 10, 24), tankBand));
+    tankOneFrontBand.rotation.y = Math.PI / 2;
+    tankOneFrontBand.position.x = -7.2;
+    const tankOneRearBand = addTankOnePart(new THREE.Mesh(new THREE.TorusGeometry(4.35, .5, 10, 24), tankBand));
+    tankOneRearBand.rotation.y = Math.PI / 2;
+    tankOneRearBand.position.x = 7.2;
+
+    // エネルギー吸収増タンク II：Iの本体に加え、左右の補助タンクが装着される。
+    const energyTankTwo = new THREE.Group();
+    energyTankTwo.name = "ufo-energy-absorption-tank-2";
+    energyTankTwo.position.set(-28.5, 14, 0);
+    energyTankTwo.userData.nonCollidable = true;
+    ufoEquipmentVisualAssembly.add(energyTankTwo);
+    [-1, 1].forEach(side => {
+      const support = new THREE.Mesh(new THREE.BoxGeometry(7, 4.5, 4.8), tankMetal);
+      support.position.set(0, 0, side * 18);
+      support.userData.nonCollidable = true;
+      support.castShadow = true;
+      support.receiveShadow = true;
+      energyTankTwo.add(support);
+      const pod = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 10.5, 18), tankMetal);
+      pod.rotation.z = Math.PI / 2;
+      pod.position.set(-4.7, 0, side * 18);
+      pod.userData.nonCollidable = true;
+      pod.castShadow = true;
+      pod.receiveShadow = true;
+      energyTankTwo.add(pod);
+      const podCore = new THREE.Mesh(new THREE.CylinderGeometry(1.55, 1.55, 10.75, 18), tankFluid);
+      podCore.rotation.z = Math.PI / 2;
+      podCore.position.set(-4.8, 0, side * 18);
+      podCore.userData.nonCollidable = true;
+      energyTankTwo.add(podCore);
+      const podBand = new THREE.Mesh(new THREE.TorusGeometry(2.72, .36, 10, 20), tankBand);
+      podBand.rotation.y = Math.PI / 2;
+      podBand.position.set(-10.15, 0, side * 18);
+      podBand.userData.nonCollidable = true;
+      podBand.castShadow = true;
+      podBand.receiveShadow = true;
+      energyTankTwo.add(podBand);
+    });
+
+    // 照準拡大レーダー：コックピット前面のシアン色の照準投影器。
+    const reticleRadar = new THREE.Group();
+    reticleRadar.name = "ufo-lock-on-reticle-radar";
+    reticleRadar.userData.nonCollidable = true;
+    ufoEquipmentVisualAssembly.add(reticleRadar);
+    const reticleFrame = new THREE.Mesh(new THREE.BoxGeometry(11.4, 7.4, .7), radarFrame);
+    reticleFrame.position.set(-2.2, 33.1, -20.05);
+    reticleFrame.userData.nonCollidable = true;
+    reticleRadar.add(reticleFrame);
+    const reticleLens = new THREE.Mesh(new THREE.TorusGeometry(3.05, .36, 10, 32), radarCyan);
+    reticleLens.position.set(-2.2, 33.1, -20.48);
+    reticleLens.userData.nonCollidable = true;
+    reticleRadar.add(reticleLens);
+    [-1, 1].forEach(axis => {
+      const crossbar = new THREE.Mesh(
+        new THREE.BoxGeometry(axis < 0 ? 8.2 : .42, axis < 0 ? .42 : 5.4, .26),
+        radarCyan,
+      );
+      crossbar.position.set(-2.2, 33.1, -20.72);
+      crossbar.userData.nonCollidable = true;
+      reticleRadar.add(crossbar);
+    });
+
+    // 探知距離拡張レーダー：右側コンソールに載る緑色の長距離スキャナー。
+    const rangeRadar = new THREE.Group();
+    rangeRadar.name = "ufo-lock-on-range-radar";
+    rangeRadar.userData.nonCollidable = true;
+    ufoEquipmentVisualAssembly.add(rangeRadar);
+    const rangeConsole = new THREE.Mesh(new THREE.BoxGeometry(7.6, 3.8, 1.4), radarFrame);
+    rangeConsole.position.set(11.2, 31.8, -20.1);
+    rangeConsole.userData.nonCollidable = true;
+    rangeRadar.add(rangeConsole);
+    const rangeScreen = new THREE.Mesh(new THREE.CylinderGeometry(2.45, 2.45, .34, 24), radarGreen);
+    rangeScreen.rotation.x = Math.PI / 2;
+    rangeScreen.position.set(11.2, 32, -20.94);
+    rangeScreen.userData.nonCollidable = true;
+    rangeRadar.add(rangeScreen);
+    const rangeSweep = new THREE.Mesh(new THREE.BoxGeometry(.34, 3.7, .2), radarCyan);
+    rangeSweep.position.set(11.2, 32, -21.22);
+    rangeSweep.rotation.z = Math.PI / 4;
+    rangeSweep.userData.nonCollidable = true;
+    rangeRadar.add(rangeSweep);
+    const rangeAntenna = new THREE.Mesh(new THREE.CylinderGeometry(.38, .6, 5.8, 12), radarFrame);
+    rangeAntenna.position.set(14.3, 35, -19.8);
+    rangeAntenna.userData.nonCollidable = true;
+    rangeRadar.add(rangeAntenna);
+    const rangeAntennaTip = new THREE.Mesh(new THREE.SphereGeometry(.72, 12, 8), radarGreen);
+    rangeAntennaTip.position.set(14.3, 38, -19.8);
+    rangeAntennaTip.userData.nonCollidable = true;
+    rangeRadar.add(rangeAntennaTip);
+
+    // ＋α同時発射弾丸装置：押せない演出専用の発光ボタン。実際の射撃処理へは
+    // 一切イベントをつながず、作成済みであることだけをコックピットに示す。
+    const simultaneousShotButton = new THREE.Group();
+    simultaneousShotButton.name = "ufo-simultaneous-shot-effect-button";
+    simultaneousShotButton.userData.nonCollidable = true;
+    ufoEquipmentVisualAssembly.add(simultaneousShotButton);
+    const shotButtonBase = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 3.35, .9, 24), buttonBaseMaterial);
+    shotButtonBase.rotation.x = Math.PI / 2;
+    shotButtonBase.position.set(8.8, 27.7, -20.25);
+    shotButtonBase.userData.nonCollidable = true;
+    simultaneousShotButton.add(shotButtonBase);
+    const shotButtonCap = new THREE.Mesh(new THREE.CylinderGeometry(2.08, 2.08, .78, 24), buttonCapMaterial);
+    shotButtonCap.rotation.x = Math.PI / 2;
+    shotButtonCap.position.set(8.8, 27.7, -20.9);
+    shotButtonCap.userData.nonCollidable = true;
+    simultaneousShotButton.add(shotButtonCap);
+    const shotButtonHalo = new THREE.Mesh(new THREE.TorusGeometry(2.42, .28, 10, 28), buttonHaloMaterial);
+    shotButtonHalo.position.set(8.8, 27.7, -21.36);
+    shotButtonHalo.userData.nonCollidable = true;
+    simultaneousShotButton.add(shotButtonHalo);
+    [-.78, .78].forEach(offset => {
+      const shotStatusLamp = new THREE.Mesh(new THREE.SphereGeometry(.22, 10, 8), radarCyan);
+      shotStatusLamp.position.set(8.8 + offset, 27.7, -21.42);
+      shotStatusLamp.userData.nonCollidable = true;
+      simultaneousShotButton.add(shotStatusLamp);
+    });
+
+    const ufoEquipmentVisuals = {
+      assembly: ufoEquipmentVisualAssembly,
+      energyTankOne,
+      energyTankTwo,
+      reticleRadar,
+      rangeRadar,
+      simultaneousShotButton,
+    };
+    applyUfoEquipmentVisualState(ufoEquipmentVisuals);
+
     // Cabin lights remain physically present but unlit until the engine-start
     // sequence reaches its lighting phase. Warm incandescent panels and three
     // overlapping local lights illuminate Ren, the controls, and the complete
@@ -5773,6 +6549,10 @@ function buildCatalogModel(source) {
       rampWidth,
       rampRise,
       hatchGapHalfAngle,
+      // 外側の本体シェルと同じ値を、入口の物理開口にも渡す。見た目の
+      // 本体を越える穴を作らず、表示された搭乗通路の幅だけを保証する。
+      lowerShellRadius: 39,
+      upperShellRadius: 37,
       ufoBottomTopY,
       ufoBottomTopRadius,
       ufoBottomLowerRadius,
@@ -5824,6 +6604,7 @@ function buildCatalogModel(source) {
         glowMaterial: cabinGlowMaterial,
         amount: 0,
       },
+      equipmentVisuals: ufoEquipmentVisuals,
       flight: {
         heading: 0,
         forwardInput: 0,
@@ -5875,8 +6656,16 @@ function buildCatalogModel(source) {
       hatchCover,
       hatchClosedPosition,
       hatchOpenPosition,
+      // These values are shared by the original rendered sliding hatch and
+      // its collider.  They are also used only to detect that Ren has fully
+      // cleared that same hatch after a Mars landing.
+      hatchDoorLocalX: 39,
+      hatchDoorHalfWidth: 12,
+      hatchDoorHalfDepth: 2.75,
       amount: state.ufoDoorOpen ? 1 : 0,
       target: state.ufoDoorOpen ? 1 : 0,
+      hatchAmount: state.ufoHatchOpen ? 1 : 0,
+      hatchTarget: state.ufoHatchOpen ? 1 : 0,
       faceAuth: {
         assembly: faceAuthAssembly,
         markerAssembly: footMarkerAssembly,
@@ -5936,6 +6725,23 @@ function buildCatalogModel(source) {
     [-sx * .29, sx * .29].forEach(x => addBox(group, [sx * .2, sy * .24, 1.3], [x, sy * .63, sz / 2 + 1], glass));
   }
   return group;
+}
+
+function applyUfoEquipmentVisualState(visuals) {
+  if (!visuals) return;
+  const equipment = getUfoEffectiveEquipmentState();
+  const tankLevel = clamp(Math.round(Number(equipment.energyAbsorptionTankLevel) || 0), 0, 2);
+  if (visuals.energyTankOne) visuals.energyTankOne.visible = tankLevel >= 1;
+  if (visuals.energyTankTwo) visuals.energyTankTwo.visible = tankLevel >= 2;
+  if (visuals.reticleRadar) visuals.reticleRadar.visible = equipment.lockOnReticleMultiplier >= 1.2;
+  if (visuals.rangeRadar) visuals.rangeRadar.visible = equipment.lockOnDetectionMultiplier >= 1.2;
+  if (visuals.simultaneousShotButton) {
+    visuals.simultaneousShotButton.visible = equipment.simultaneousShotEnabled === true;
+  }
+}
+
+function refreshUfoEquipmentVisuals() {
+  ufoDoorControls.forEach(control => applyUfoEquipmentVisualState(control?.equipmentVisuals));
 }
 
 function addCatalogCollisionColliders(item, source) {
@@ -6035,9 +6841,9 @@ function addUfoBottomOpenFloor(control) {
 function setUfoRampPhysics(open) {
   clearUfoRampPhysics();
   if (!open) {
-    // The static shell intentionally leaves the +X boarding opening clear.
-    // When the physical hatch is closed, add only the matching door section;
-    // when it opens, remove this section together with the visual hatch.
+    // 搭乗足場と既存の引き戸は同じ開閉状態で扱う。足場だけ、あるいは
+    // 引き戸だけを別状態にすると、表示と物理床が食い違って落下経路を
+    // 作ってしまうため、閉じる時は両方の閉状態の物理を戻す。
     ufoDoorControls.forEach(control => {
       addUfoBottomClosedCollider(control);
       addUfoClosedHatchCollider(control);
@@ -6247,8 +7053,22 @@ function ufoSeatRampLandingAllowance(transition) {
   ), 0);
 }
 
+function isStationAccessRampTransition(transition) {
+  if (!transition || state.map !== 'sky' || !skyStationBuilding) return false;
+  const from = skyStationRampHeightAt(skyStationBuilding, transition.fromX, transition.fromZ);
+  const to = skyStationRampHeightAt(skyStationBuilding, transition.toX, transition.toZ);
+  // Normal walking also samples just ahead of the next step. At the lower
+  // lip that probe reaches the real slope before the root does.
+  const probe = Number.isFinite(transition.probeX) && Number.isFinite(transition.probeZ)
+    ? skyStationRampHeightAt(skyStationBuilding, transition.probeX, transition.probeZ) : null;
+  if (!Number.isFinite(from) && !Number.isFinite(to) && !Number.isFinite(probe)) return false;
+  const distance = Math.hypot(transition.toX - transition.fromX, transition.toZ - transition.fromZ);
+  return Math.abs(transition.toHeight - transition.fromHeight) <= distance * .65 + .25;
+}
+
 function isContinuousUfoRampTransition(transition) {
   if (!transition) return false;
+  if (isStationAccessRampTransition(transition)) return true;
   // The first movement sample at the outer lip can still be outside every
   // small support strip even though the character is visibly on the ramp
   // entrance. Treat the authored ramp rectangle as one continuous walkable
@@ -6378,6 +7198,12 @@ function ufoPlanetMapSpaceExitAt(control, flightX, flightY, flightZ) {
     || !state.ufoBoarded) return null;
   const metrics = ufoFlightBoundaryMetrics(control, flightX, flightY, flightZ);
   if (!metrics) return null;
+  // The Mars fence is 16 world units inside the terrain edge. Use that visible
+  // boundary for departure, while retaining its normal physical collision.
+  if (state.map === 'mars') {
+    metrics.overhangX += 16;
+    metrics.overhangZ += 16;
+  }
   const maximumOverhang = Math.max(metrics.overhangX, metrics.overhangZ);
   if (maximumOverhang < UFO_SKY_SPACE_TRIGGER_OVERHANG) return null;
   const exitsOnX = metrics.overhangX >= metrics.overhangZ;
@@ -6799,7 +7625,8 @@ function getUfoForwardScrollCruiseSeconds(routeMode) {
   return Math.max(
     1,
     (routeMode?.totalSeconds || UFO_FORWARD_SCROLL_TARGET_SECONDS)
-      - UFO_FORWARD_SCROLL_LAUNCH_SECONDS,
+      - UFO_FORWARD_SCROLL_LAUNCH_SECONDS
+      - UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS,
   );
 }
 
@@ -6811,16 +7638,21 @@ function getUfoForwardScrollRouteDistanceRatio(routeMode) {
   );
 }
 
-function isUfoForwardScrollEnergyStarEligible(routeSeed, renderIndex) {
+function isUfoForwardScrollEnergyStarEligible(routeSeed, renderIndex, route = null) {
   const mixedIndex = ((Number(renderIndex) + 1) ^ (Number(routeSeed) >>> 0)) >>> 0;
   const roll = (Math.imul(mixedIndex, 1103515245) + 12345) >>> 0;
-  return roll / 0x100000000 < UFO_FORWARD_SCROLL_ENERGY_STAR_RATIO;
+  const ratio = route?.origin === 'mars' && route?.destination === 'earth'
+    ? UFO_FORWARD_SCROLL_RETURN_ENERGY_STAR_RATIO : UFO_FORWARD_SCROLL_ENERGY_STAR_RATIO;
+  return roll / 0x100000000 < ratio;
 }
 
-function makeSpaceEnvironment(entryCraftCenter, routeSeed = 0) {
+function makeSpaceEnvironment(entryCraftCenter, routeSeed = 0, route = null) {
   const group = new THREE.Group();
   group.name = "ufo-space-explorable-planetarium";
   group.userData.nonCollidable = true;
+  const starCount = Math.round(UFO_SPACE_EXPLORABLE_STAR_COUNT
+    * (route?.origin === 'mars' && route?.destination === 'earth'
+      ? UFO_SPACE_RETURN_LARGE_STAR_COUNT_MULTIPLIER : 1));
   const random = makeUfoSpaceSeededRandom(mixUfoSpaceRouteSeed(routeSeed, 0x6d617273));
   const colors = [0x9ebdff, 0xc7eaff, 0xfff1c9, 0xffc893, 0xa8e9ff];
   const pointPositions = [];
@@ -6828,13 +7660,13 @@ function makeSpaceEnvironment(entryCraftCenter, routeSeed = 0) {
   const pointRadii = [];
   const pointBrightness = [];
   const pointPhases = [];
-  const pointDetailReady = new Float32Array(UFO_SPACE_EXPLORABLE_STAR_COUNT);
+  const pointDetailReady = new Float32Array(starCount);
   const stars = [];
   const starById = new Map();
   const halfWidth = MAPS.space.world.width * .47;
   const halfDepth = MAPS.space.world.depth * .47;
   const origin = entryCraftCenter.clone();
-  for (let index = 0; index < UFO_SPACE_EXPLORABLE_STAR_COUNT; index += 1) {
+  for (let index = 0; index < starCount; index += 1) {
     const brightnessRoll = random();
     const brightStar = brightnessRoll > .985;
     const mediumStar = !brightStar && brightnessRoll > .89;
@@ -6894,7 +7726,7 @@ function makeSpaceEnvironment(entryCraftCenter, routeSeed = 0) {
       brightness,
       // 航路シードから決めるため、同じ航行中は固定だが次の出発では
       // エネルギー星の候補も別の星へ入れ替わる。
-      energyTargetEligible: isUfoForwardScrollEnergyStarEligible(routeSeed, index),
+      energyTargetEligible: isUfoForwardScrollEnergyStarEligible(routeSeed, index, route),
       energyTarget: false,
       energyDestroyed: false,
     };
@@ -7560,6 +8392,9 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
   const normal = forward.clone();
   if (normal.lengthSq() < 1e-6) normal.set(0, 0, -1);
   normal.normalize();
+  const earthDestination = mars.name === 'space-earth';
+  mars.updateWorldMatrix(true, false);
+  normal.applyQuaternion(mars.getWorldQuaternion(new THREE.Quaternion()).invert());
   const group = new THREE.Group();
   group.name = "ufo-forward-scroll-mars-atmosphere-entry";
   group.userData.nonCollidable = true;
@@ -7572,6 +8407,9 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
   const makeLayer = (scale, color, edgeStart, baseIntensity) => {
     const uniforms = {
       uColor: { value: new THREE.Color(color) },
+      uHotColor: { value: earthDestination
+        ? new THREE.Color().setRGB(.77, .94, 1)
+        : new THREE.Color().setRGB(1, .83, .56) },
       uIntensity: { value: 0 },
       uTime: { value: 0 },
       uEdgeStart: { value: edgeStart },
@@ -7587,6 +8425,7 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
       `,
       fragmentShader: `
         uniform vec3 uColor;
+        uniform vec3 uHotColor;
         uniform float uIntensity;
         uniform float uTime;
         uniform float uEdgeStart;
@@ -7600,7 +8439,7 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
           float haze = (1.0 - smoothstep(.18, .9, radius)) * .055;
           float angle = atan(point.y, point.x);
           float ripples = .78 + .22 * sin(angle * 15.0 + radius * 26.0 - uTime * 2.8);
-          vec3 hot = mix(uColor, vec3(1.0, .83, .56), clamp(rim * 1.3, 0.0, 1.0));
+          vec3 hot = mix(uColor, uHotColor, clamp(rim * 1.3, 0.0, 1.0));
           float alpha = (rim * (.72 + .28 * ripples) + haze) * uIntensity;
           gl_FragColor = vec4(hot, alpha);
         }
@@ -7619,9 +8458,9 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
   };
 
   const layers = [
-    makeLayer(1.16, 0xc85035, .58, .24),
-    makeLayer(1.075, 0xee7e45, .5, .44),
-    makeLayer(.995, 0xffbb75, .44, .64),
+    makeLayer(1.16, earthDestination ? 0x357fc8 : 0xc85035, .58, .24),
+    makeLayer(1.075, earthDestination ? 0x68bcff : 0xee7e45, .5, .44),
+    makeLayer(.995, earthDestination ? 0xbbecff : 0xffbb75, .44, .64),
   ];
   const waveMaterial = new THREE.MeshBasicMaterial({
     color: 0xffc17c,
@@ -7640,6 +8479,10 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
   completionWave.renderOrder = 4;
   group.add(completionWave);
   const light = new THREE.PointLight(0xff864b, 0, radius * 2.8, 1.4);
+  if (earthDestination) {
+    light.color.setHex(0x83cfff);
+    waveMaterial.color.setHex(0xc1efff);
+  }
   light.name = "mars-atmosphere-entry-light";
   light.position.z = -radius * .035;
   light.userData.nonCollidable = true;
@@ -7656,6 +8499,13 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
     elapsed: 0,
     flashElapsed: 0,
     overlayUntil: 0,
+    descentStarted: false,
+    descentElapsed: 0,
+    descentSequence: 0,
+    descentStartWorld: new THREE.Vector3(),
+    descentEndWorld: new THREE.Vector3(),
+    descentCamera: new THREE.Vector3(),
+    descentTarget: new THREE.Vector3(),
   };
 }
 
@@ -7728,9 +8578,9 @@ function finishUfoForwardScrollEarthDepartureVisuals(mission, earth) {
 // This route is intentionally separate from every older space prototype.  The UFO
 // advances through one real 3D course; the blue, gold, and violet stars are world
 // objects with fixed coordinates from the start, never screen overlays or a LOD swap.
-function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, starfield, routeSeed = 0) {
+function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, starfield, routeSeed = 0, route = interplanetaryRoute('sky')) {
   const group = new THREE.Group();
-  group.name = "ufo-earth-mars-forward-scroll";
+  group.name = `ufo-${route.id}`;
   group.visible = false;
   group.userData.nonCollidable = true;
 
@@ -7959,6 +8809,8 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
   effectGroup.add(lockIndicator);
 
   const mission = {
+    route,
+    destinationPlanet: mars,
     active: false,
     phase: "idle",
     elapsed: 0,
@@ -8100,7 +8952,7 @@ function rerollUfoForwardScrollEnergyStarCandidates(mission, routeSeed) {
   if (!starfield?.stars) return;
   starfield.routeSeed = routeSeed;
   starfield.stars.forEach(star => {
-    star.energyTargetEligible = isUfoForwardScrollEnergyStarEligible(routeSeed, star.renderIndex);
+    star.energyTargetEligible = isUfoForwardScrollEnergyStarEligible(routeSeed, star.renderIndex, mission.route);
   });
 }
 
@@ -8714,7 +9566,7 @@ function fireUfoForwardScrollLockOn({ silent = false } = {}) {
       UFO_FORWARD_SCROLL_SHOT_MAX_SECONDS,
     )
     : UFO_FORWARD_SCROLL_FREE_SHOT_RANGE / UFO_FORWARD_SCROLL_SHOT_SPEED;
-  const shotCount = state.ufoEquipment.simultaneousShotEnabled ? 2 : 1;
+  const shotCount = isUfoEquipmentSimultaneousShotEnabled() ? 2 : 1;
   const craftQuaternion = craft.getWorldQuaternion(new THREE.Quaternion());
   const craftRight = new THREE.Vector3(1, 0, 0).applyQuaternion(craftQuaternion).normalize();
   for (let shotIndex = 0; shotIndex < shotCount; shotIndex += 1) {
@@ -8775,6 +9627,7 @@ function fireUfoForwardScrollLockOn({ silent = false } = {}) {
     (mission.shots || (mission.shots = [])).push(shot);
   }
   mission.holdFireReadyAt = mission.elapsed + UFO_FORWARD_SCROLL_HOLD_FIRE_INTERVAL;
+  ufoFlightSurvey?.fire(mission, shotCount, isLockedShot);
   document.body.dataset.ufoForwardScrollLock = isLockedShot ? pickup.typeId : "free";
   document.body.dataset.ufoSpaceShooting = isLockedShot ? "lock-shot" : "free-shot";
   if (!silent) {
@@ -8838,6 +9691,7 @@ function doesUfoForwardScrollShotSegmentHitPickup(start, end, pickup, contactRad
 function resolveUfoForwardScrollShotHit(mission, pickup, shot) {
   clearUfoForwardScrollShot(mission, shot);
   if (!pickup || pickup.collected) return;
+  ufoFlightSurvey?.hit(mission);
   pickup.hitCount = Math.min(pickup.hitsRequired, pickup.hitCount + 1);
   pickup.hitFlashUntil = mission.elapsed + .24;
   pickup.spin = (pickup.spin || 0) + .62;
@@ -8933,7 +9787,7 @@ function isUfoForwardScrollActive(control = ufoDoorControls[0]) {
 }
 
 function applyUfoForwardScrollMarsDistanceMode(control, mission, routeMode) {
-  const mars = control?.spaceMars;
+  const mars = mission?.destinationPlanet || control?.spaceMars;
   if (!control || !mission || !mars) return false;
   const selectedMode = routeMode || UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE;
   const scale = control.scale || BUILDING_SCALE;
@@ -8980,14 +9834,15 @@ function applyUfoForwardScrollMarsDistanceMode(control, mission, routeMode) {
 }
 
 function configureUfoForwardScrollCruise(control, mission, craftCenter) {
-  if (!control || !mission || !craftCenter || !control.spaceMars) return false;
+  const destination = mission?.destinationPlanet || control?.spaceMars;
+  if (!control || !mission || !craftCenter || !destination) return false;
   const scale = control.scale || BUILDING_SCALE;
-  control.spaceMars.updateWorldMatrix(true, true);
-  const marsCenter = control.spaceMars.getWorldPosition(new THREE.Vector3());
+  destination.updateWorldMatrix(true, true);
+  const marsCenter = destination.getWorldPosition(new THREE.Vector3());
   const routeLength = Math.max(
     12000,
     marsCenter.clone().sub(craftCenter).dot(mission.forward)
-      - (control.spaceMars.userData.radius || UFO_SPACE_MARS_RADIUS)
+      - (destination.userData.radius || UFO_SPACE_MARS_RADIUS)
       - mission.craftRadius
       - 180,
   );
@@ -9036,6 +9891,7 @@ function synchronizeUfoForwardScrollCruisePosition(control, mission, craft) {
 
 function resetUfoForwardScrollMission(mission) {
   if (!mission) return;
+  ufoFlightSurvey?.finish(mission, 'interrupted');
   cancelUfoForwardScrollEnergyEmergencyReturn(mission);
   clearUfoForwardScrollShot(mission);
   resetUfoForwardScrollEnergyStars(mission);
@@ -9122,6 +9978,13 @@ function resetUfoForwardScrollMarsAtmosphereEntry(mission) {
   entry.elapsed = 0;
   entry.flashElapsed = 0;
   entry.overlayUntil = 0;
+  entry.descentStarted = false;
+  entry.descentElapsed = 0;
+  entry.descentSequence = 0;
+  entry.descentStartWorld.set(0, 0, 0);
+  entry.descentEndWorld.set(0, 0, 0);
+  entry.descentCamera.set(0, 0, 0);
+  entry.descentTarget.set(0, 0, 0);
   entry.group.visible = false;
   entry.layers.forEach(layer => {
     layer.uniforms.uIntensity.value = 0;
@@ -9149,11 +10012,200 @@ function triggerUfoForwardScrollMarsAtmosphereEntry(mission) {
   entry.group.visible = true;
   document.body.dataset.ufoMarsAtmosphereEntry = "entered";
   setSpaceTransitionMessage(
-    "MARS ATMOSPHERE ENTRY",
-    "火星大気圏へ突入",
-    "火星と同じ進行ラインに到達しました。機体は火星の大気層へ入ります。",
+    `${mission.route.destination.toUpperCase()} ATMOSPHERE ENTRY`,
+    `${mission.route.destinationName}大気圏へ突入`,
+    `${mission.route.destinationName}に到達しました。機体は大気層へ入ります。`,
   );
   els.spaceTransitionOverlay?.classList.add("is-mars-atmosphere", "is-active");
+}
+
+function beginUfoForwardScrollMarsDescent(control, mission, craftCenter) {
+  const entry = mission?.marsAtmosphereEntry;
+  const mars = mission?.destinationPlanet || control?.spaceMars;
+  if (!entry || !mars || !craftCenter || entry.descentStarted || state.map !== "space") return false;
+
+  triggerUfoForwardScrollMarsAtmosphereEntry(mission);
+  mars.updateWorldMatrix(true, true);
+  const marsCenter = mars.getWorldPosition(new THREE.Vector3());
+  const radius = mars.userData.radius || UFO_SPACE_MARS_RADIUS;
+  // 巡航中に上下左右へ避けていても、着陸カットではその実位置から火星の
+  // 手前側の着陸点へ滑らかに収束する。火星面の内側へ埋めない余白も残す。
+  const surfaceClearance = Math.max(20, mission.craftRadius * .32);
+  entry.descentStartWorld.copy(craftCenter);
+  entry.descentEndWorld.copy(marsCenter)
+    .addScaledVector(mission.forward, -(radius + surfaceClearance))
+    .addScaledVector(mission.up, -UFO_FORWARD_SCROLL_LAUNCH_CLIMB_WORLD * .66);
+  if (mission.route.destination === 'earth') {
+    entry.descentEndWorld.copy(planetSurfaceArrival(marsCenter, mission.forward,
+      mission.up, radius, surfaceClearance + radius * .014, UFO_FORWARD_SCROLL_LAUNCH_CLIMB_WORLD * .66));
+    alignSpaceEarthCloudLayerToLaunch(mars, entry.descentEndWorld.clone().sub(marsCenter).normalize());
+  }
+  entry.descentStarted = true;
+  entry.descentElapsed = 0;
+  // この関数を呼んだ時点で、必ず火星降下フェーズへ切り替える。
+  // 通常航路では呼び出し元も同じ代入をしているが、開発用の「火星マップ」
+  // 直行経路ではここで確定しないと、地球離脱フェーズが残ってしまう。
+  mission.phase = "mars-descent";
+  mission.phaseElapsed = 0;
+  entry.descentSequence = ++ufoSpaceTransitionSequence;
+  entry.overlayUntil = performance.now() + Math.min(2.15, UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS * .54) * 1000;
+  state.ufoSpaceTransitioning = true;
+  keys.clear();
+  touchVector.set(0, 0);
+  ufoFlightPointerInput.forward = 0;
+  ufoFlightPointerInput.turn = 0;
+  ufoFlightPointerInput.lift = 0;
+  ufoFlightPointerInput.strafe = 0;
+  resetUfoFlightHoldAcceleration();
+  if (control.flight) {
+    control.flight.inertialStrafeVelocity = 0;
+    control.flight.inertialLiftVelocity = 0;
+  }
+  state.ufoFlightDirectionalYaw = 0;
+  state.ufoFlightBasePitch = 0;
+  state.ufoFlightBaseRoll = 0;
+  state.ufoFlightPitch = 0;
+  state.ufoFlightRoll = 0;
+  document.body.dataset.ufoForwardScroll = "mars-descent";
+  document.body.dataset.ufoMarsAtmosphereEntry = "descending";
+  document.body.dataset.ufoSpaceTransition = "mars-descent";
+  setSpaceTransitionMessage(
+    `${mission.route.destination.toUpperCase()} ATMOSPHERE DESCENT`,
+    `${mission.route.destinationName}大気圏を降下中`,
+    mission.route.destination === 'earth'
+      ? '地球の雲海へ降下しています。まもなく空マップへ帰還します。'
+      : '火星の着陸地へ降下しています。まもなく火星マップに着陸します。',
+  );
+  els.spaceTransitionOverlay?.classList.add("is-mars-atmosphere", "is-active");
+  return true;
+}
+
+function completeUfoForwardScrollMarsLanding(mission, sequence) {
+  if (sequence !== ufoSpaceTransitionSequence
+    || !state.ufoSpaceTransitioning
+    || state.map !== "space") return false;
+
+  const wasAtmospherePreviewTest = Boolean(mission?.marsAtmospherePreviewTest);
+  keys.clear();
+  touchVector.set(0, 0);
+  resetUfoForwardScrollMission(mission);
+  resetUfoEngineRuntime();
+  state.map = "mars";
+  state.selectedBuildId = null;
+  state.ufoBoarded = false;
+  state.ufoDoorOpen = false;
+  state.ufoFaceAuth = false;
+  state.ufoFaceAuthLatched = false;
+  state.fastWalking = false;
+  // 再構築中だけ、火星のUFO中心へ誤って救済ワープされないようにする。
+  // 再構築後に実在する椅子の床面へ配置してから降車経路を開く。
+  state.ufoMarsArrivalExitPending = true;
+  state.ufoMarsHatchRequiresFaceAuth = false;
+  state.pendingSafeEntry = false;
+  cancelBuild();
+  resetPlayerToMapSpawn("mars");
+  if (scene) {
+    scene.background = color(MAPS.mars.palette.fog);
+    scene.fog = null;
+  }
+  if (camera) {
+    camera.far = 6000;
+    camera.updateProjectionMatrix();
+  }
+  rebuildMap();
+  const landingControl = ufoDoorControls[0];
+  if (landingControl) {
+    // 到着時は、飛行中に座っていた実際の椅子の上から開始する。
+    // 地面やUFO底面ではなく、表示された椅子の歩行面と同じ座標・高さを
+    // 使うため、直後にUFO下へ落ちることはない。
+    const seatAnchor = ufoSeatWorldAnchor(landingControl);
+    state.position.set(seatAnchor.x, 0, seatAnchor.z);
+    state.groundY = seatAnchor.y;
+    state.jumpY = 0;
+    state.jumpVelocity = 0;
+    state.falling = false;
+    state.jumpCount = 0;
+    state.supportSurfaceId = null;
+    state.heading = landingControl.seatHeadingLocal + landingControl.rotation;
+    state.viewHeading = state.heading;
+    state.viewPitch = 0;
+    // `rebuildMap()` creates/keeps the visible Ren with the Mars map spawn
+    // heading.  Updating only state.heading leaves that rendered model facing
+    // the old spawn direction until the player walks.  Arrival must begin with
+    // Ren already facing the cockpit (local -Z), so synchronise the actual
+    // 360-degree model at the same moment and clear its in-flight body tilt.
+    if (character) character.rotation.set(0, state.heading, 0);
+    // 椅子に触れている間に通常の「着座→始動」判定を再発火させない。
+    // 到着は始動の逆順で、まずエンジン停止を明示してから降車経路を開く。
+    // 降車が完了するまでだけ専用の到着状態にし、歩行そのものは許可する。
+    state.ufoEngineMode = "arrival-shutdown";
+    state.ufoEngineTimer = 0;
+    state.ufoEngineRunning = false;
+    state.ufoCabinLightAmount = 0;
+  }
+  // 引き戸と足場は、上の停止フェーズが完了してから開く。到着直後に
+  // 離陸用の「閉じる→始動」に見える順序へ戻さない。
+  document.body.dataset.ufoMarsArrivalHatch = "engine-off-before-disembark";
+  document.body.dataset.ufoWorldMap = "mars";
+  document.body.dataset.ufoSpaceTransition = "mars-landing-complete";
+  document.body.dataset.ufoMarsLanding = "complete";
+  if (wasAtmospherePreviewTest) document.body.dataset.ufoMarsAtmosphereEntryTest = "pass";
+  [
+    "ufoSpaceExitSide",
+    "ufoSpaceMars",
+    "ufoSpaceMarsRadius",
+    "ufoSpaceMarsEdgeDistance",
+    "ufoEarthApproach",
+    "ufoEarthHorizontalDistance",
+    "ufoEarthVerticalDistance",
+    "ufoEarthReveal",
+    "ufoForwardScroll",
+  ].forEach(key => delete document.body.dataset[key]);
+  els.spaceTransitionOverlay?.classList.remove(
+    "is-active",
+    "is-earth-departure",
+    "is-mars-atmosphere",
+    "is-energy-empty",
+  );
+  updateUfoEngineOverlay();
+  updateCharacter(0);
+  updateCamera();
+  updateUfoControls();
+  showToast("火星へ着陸しました。エンジンを停止しています");
+  return true;
+}
+
+function updateUfoForwardScrollMarsDescent(control, mission, delta) {
+  const entry = mission?.marsAtmosphereEntry;
+  if (!entry?.descentStarted || !control?.craftAssembly) return false;
+  entry.descentElapsed += delta;
+  const progress = clamp(
+    entry.descentElapsed / Math.max(.001, UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS),
+    0,
+    1,
+  );
+  // 出発の加速感とは逆に、火星へ近づくにつれて減速して着地へ収束する。
+  const eased = THREE.MathUtils.smoothstep(progress, 0, 1);
+  const nextWorld = entry.descentStartWorld.clone().lerp(entry.descentEndWorld, eased);
+  const nextLocal = ufoWorldToLocal(control, nextWorld.x, nextWorld.z);
+  const scale = control.scale || BUILDING_SCALE;
+  state.ufoFlightX = nextLocal.x;
+  state.ufoFlightY = clampUfoSpaceFlightY((nextWorld.y - (control.originY || 0)) / scale);
+  state.ufoFlightZ = nextLocal.z;
+  state.ufoFlightHeading = mission.courseHeading;
+  state.ufoFlightDirectionalYaw = 0;
+  applyUfoCraftWorldTransform(control);
+  enforceUfoTurbineAttachment(control);
+  document.body.dataset.ufoMarsDescentProgress = progress.toFixed(3);
+  if (progress < 1) return false;
+  ufoFlightSurvey?.finish(mission, 'arrived');
+  if (mission.route.destination === 'earth') {
+    const sequence = entry.descentSequence;
+    resetUfoForwardScrollMission(mission);
+    returnUfoToSkyMap(sequence);
+    return true;
+  }
+  return completeUfoForwardScrollMarsLanding(mission, entry.descentSequence);
 }
 
 function updateUfoForwardScrollMarsAtmosphereEntry(mission, delta) {
@@ -9241,6 +10293,7 @@ function formatUfoForwardScrollMarsDistance(distanceKm) {
 function updateUfoForwardScrollHud() {
   const control = ufoDoorControls[0];
   const mission = control?.spaceForwardScroll;
+  const route = mission?.route || interplanetaryRoute('sky');
   const visible = Boolean(
     mission?.active
     && state.map === "space"
@@ -9286,14 +10339,21 @@ function updateUfoForwardScrollHud() {
         : lockedPickup
           ? `LOCK ON：${lockedPickup.type.label} ${lockedHitLabel}`
           : "資源星を探索中"
+      : mission.phase === "mars-descent"
+        ? `${route.destinationName}大気圏・降下中`
       : mission.phase === "complete"
-        ? "火星到着"
+        ? `${route.destinationName}到着`
         : mission.phase === "empty"
           ? energyReturnPending
             ? "緊急帰還中"
             : "エネルギー切れ"
           : "待機";
-  setUfoSpaceHudLabels({ title: "地球→火星 航行", first: "宇宙金貨", second: "素材", third: "火星まであと" });
+  setUfoSpaceHudLabels({
+    title: mission.phase === "mars-descent" ? `${route.destinationName}到着` : `${route.originName}→${route.destinationName} 航行`,
+    first: "宇宙金貨",
+    second: "素材",
+    third: `${route.destinationName}まであと`,
+  });
   if (els.ufoSpaceWave) els.ufoSpaceWave.textContent = phaseLabel;
   if (els.ufoSpaceDustDestroyed) els.ufoSpaceDustDestroyed.textContent = String(state.ufoResources.spaceCoins);
   if (els.ufoSpaceDeflectionCount) els.ufoSpaceDeflectionCount.textContent = String(state.ufoResources.starMaterials);
@@ -9303,23 +10363,25 @@ function updateUfoForwardScrollHud() {
   if (els.ufoSpaceWaveFill) els.ufoSpaceWaveFill.style.width = `${Math.round(progress * 100)}%`;
   if (els.ufoSpaceCombatNote) {
     els.ufoSpaceCombatNote.textContent = mission.phase === "launch"
-      ? "地球の大気圏を離脱しています。まもなく火星航路へ入ります。"
+      ? `${route.originName}の大気圏を離脱しています。まもなく${route.destinationName}航路へ入ります。`
       : mission.phase === "playing"
         ? lockedPickup
           ? `${lockedPickup.type.label}をロックON中。${lockedHitLabel}命中済みで、残り${Math.max(0, lockedPickup.hitsRequired - lockedPickup.hitCount)}発で報酬を獲得します。`
           : "大型の青いエネルギー星、金色の宇宙金貨星、紫色の素材星を照準内でロックONできます。各星は追尾ミサイルを3発命中させると回収できます。"
+        : mission.phase === "mars-descent"
+          ? `${route.destinationName}大気圏を降下中です。まもなく${route.destination === 'earth' ? '空マップへ帰還' : '火星マップへ着陸'}します。`
         : mission.phase === "complete"
-          ? "火星に到着しました。地球から再出発して、別の回収ルートを走れます。"
+          ? `${route.destinationName}に到着しました。${route.originName}から再出発して、別の回収ルートを走れます。`
           : energyReturnPending
             ? "エネルギー切れのため緊急帰還します"
-            : "エネルギーが尽きました。地球から再出発して、大型の青いエネルギー星を3発で破壊してください。";
+            : `エネルギーが尽きました。${route.originName}から再出発して、大型の青いエネルギー星を3発で破壊してください。`;
   }
   const canRestart = ["complete", "empty"].includes(mission.phase) && !energyReturnPending;
   if (els.ufoSpaceStartButton) {
     els.ufoSpaceStartButton.hidden = !canRestart;
     els.ufoSpaceStartButton.disabled = !canRestart;
-    els.ufoSpaceStartButton.textContent = "地球から再出発";
-    els.ufoSpaceStartButton.setAttribute("aria-label", "地球から火星航路を再出発する");
+    els.ufoSpaceStartButton.textContent = `${route.originName}から再出発`;
+    els.ufoSpaceStartButton.setAttribute("aria-label", `${route.originName}から${route.destinationName}航路を再出発する`);
   }
   setUfoSpaceReturnButtonVisible(canRestart);
   if (els.ufoSpaceFireButton) {
@@ -9462,13 +10524,16 @@ function updateUfoForwardScrollEnergyHud() {
   if (els.ufoSpaceLifeFill) els.ufoSpaceLifeFill.style.width = `${percentage}%`;
   if (els.ufoSpaceLifeNote) {
     const energyReturnPending = mission.phase === "empty" && mission.energyEmergencyReturnPending;
-    els.ufoSpaceLifeNote.textContent = mission.phase === "complete"
-      ? "火星到着。回収した素材は空マップの整備に使えるよう保存されます。"
+    const energyRecoveryAmount = getUfoEquipmentEnergyRecoveryAmount();
+    els.ufoSpaceLifeNote.textContent = mission.phase === "mars-descent"
+      ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '降下後は空マップへ帰還します。' : '着陸後は火星マップを徒歩で探索できます。'}`
+      : mission.phase === "complete"
+      ? `${mission.route.destinationName}到着。回収した素材は空マップの整備に使えます。`
       : mission.phase === "empty"
         ? energyReturnPending
           ? "エネルギー切れのため緊急帰還します"
           : "エネルギー切れ。大型の青いエネルギー星を3発で破壊して回復します。"
-        : "前進・左右・上下の実移動距離に応じて消費。大型の青いエネルギー星を3発で破壊すると航行エネルギーが10回復します。";
+        : `前進・左右・上下の実移動距離に応じて消費。大型の青いエネルギー星を3発で破壊すると航行エネルギーが${energyRecoveryAmount}回復します。`;
   }
   els.ufoSpaceLife.dataset.danger = String(
     (percentage <= 22 && mission.phase === "playing") || mission.energyEmergencyReturnPending,
@@ -9478,9 +10543,14 @@ function updateUfoForwardScrollEnergyHud() {
 function refreshUfoForwardScrollHud() {
   updateUfoForwardScrollEnergyHud();
   updateUfoForwardScrollHud();
+  ufoFlightSurvey?.refresh(ufoDoorControls[0]?.spaceForwardScroll);
 }
 
-function activateUfoForwardScrollMission(control, { testMode = false, silent = false } = {}) {
+function activateUfoForwardScrollMission(control, {
+  testMode = false,
+  silent = false,
+  marsArrivalPreview = false,
+} = {}) {
   const mission = control?.spaceForwardScroll;
   if (!mission || state.map !== "space" || !state.ufoInSpace || !control?.craftAssembly) return false;
   hideLegacyUfoSpaceMissionVisuals(control);
@@ -9491,9 +10561,10 @@ function activateUfoForwardScrollMission(control, { testMode = false, silent = f
   applyUfoForwardScrollMarsDistanceMode(control, mission, routeMode);
   if (rerollRoute) {
     rerollUfoForwardScrollPickupRoute(mission, routeSeed);
-    rerollUfoForwardScrollEnergyStarCandidates(mission, routeSeed);
     control.spaceRouteSeed = routeSeed;
   }
+  // 初回出発にも帰路の補給比率を反映する。再出発時だけに適用しない。
+  rerollUfoForwardScrollEnergyStarCandidates(mission, routeSeed);
   mission.hasStarted = true;
   state.ufoFlightX = mission.entryFlight.x;
   state.ufoFlightY = mission.entryFlight.y;
@@ -9513,42 +10584,54 @@ function activateUfoForwardScrollMission(control, { testMode = false, silent = f
   mission.active = true;
   mission.phase = "launch";
   mission.testMode = testMode;
+  mission.departurePreviewSpeed = MARS_RETURN_PREVIEW
+    && new URLSearchParams(location.search).get('ufoDepartureSlowPreview') === '1' ? .025 : 1;
   mission.energySystemEnabled = true;
-  mission.marsAtmospherePreviewTest = testMode
-    && new URLSearchParams(location.search).get("ufoMarsAtmosphereEntryTest") === "1";
+  // 火星到着だけを確認する開発経路では、地球離脱を再生しない。
+  // 地球→火星の通常航路プレビューとは別物として扱う。
+  mission.marsArrivalDevelopmentPreview = Boolean(marsArrivalPreview);
+  mission.marsAtmospherePreviewTest = Boolean(marsArrivalPreview) || (testMode
+    && new URLSearchParams(location.search).get("ufoMarsAtmosphereEntryTest") === "1")
+    || (MARS_RETURN_PREVIEW && new URLSearchParams(location.search).get('ufoEarthArrivalPreview') === '1');
   if (mission.marsAtmospherePreviewTest) mission.energySystemEnabled = false;
   mission.group.visible = true;
   mission.lastCraftCenter.copy(mission.entryCraftCenter);
-  if (control.spaceMars) {
-    control.spaceMars.position.y = mission.origin.y;
-    control.spaceMars.visible = true;
+  const departurePlanet = mission.departurePlanet || control.spaceEarth;
+  const destinationPlanet = mission.destinationPlanet || control.spaceMars;
+  if (destinationPlanet) {
+    destinationPlanet.position.y = mission.origin.y;
+    destinationPlanet.visible = true;
   }
-  if (control.spaceEarth) {
+  if (departurePlanet && !mission.marsArrivalDevelopmentPreview) {
     // 発進時は地球の白雲の直上から始める。地球そのものを離陸演出の間に
     // 実座標で遠ざけるため、別の雲や画面用の飾りは使わない。
-    const earthLaunchNormal = mission.forward.clone()
-      .multiplyScalar(UFO_FORWARD_SCROLL_DEPARTURE_EARTH_FORWARD_OFFSET)
-      .addScaledVector(mission.up, UFO_FORWARD_SCROLL_DEPARTURE_EARTH_UP_OFFSET)
-      .normalize();
-    const launchCloudRadius = UFO_SPACE_EARTH_RADIUS * 1.011;
-    mission.earthDepartureStartCenter = mission.entryCraftCenter.clone()
-      .addScaledVector(earthLaunchNormal, -(launchCloudRadius + 34));
-    mission.earthDepartureEndCenter = mission.entryCraftCenter.clone()
-      .addScaledVector(mission.forward, -UFO_FORWARD_SCROLL_DEPARTURE_EARTH_FORWARD_OFFSET)
-      .addScaledVector(mission.up, -UFO_FORWARD_SCROLL_DEPARTURE_EARTH_UP_OFFSET);
+    const path = planetDeparturePath(mission.entryCraftCenter, mission.forward,
+      mission.up, departurePlanet.userData.radius, mission.route);
+    const earthLaunchNormal = path.normal;
+    mission.earthDepartureStartCenter = path.start;
+    mission.earthDepartureEndCenter = path.end;
     mission.earthDepartureLaunchNormal = earthLaunchNormal;
-    control.spaceEarth.visible = true;
-    control.spaceEarth.position.copy(mission.earthDepartureStartCenter);
-    alignSpaceEarthCloudLayerToLaunch(control.spaceEarth, earthLaunchNormal);
-    control.spaceEarth.userData.departureActive = true;
-    control.spaceEarth.userData.departureProgress = 0;
+    departurePlanet.visible = true;
+    departurePlanet.position.copy(mission.earthDepartureStartCenter);
+    if (mission.route.origin === 'earth') alignSpaceEarthCloudLayerToLaunch(departurePlanet, earthLaunchNormal);
+    departurePlanet.userData.departureActive = true;
+    departurePlanet.userData.departureProgress = 0;
+  } else if (departurePlanet) {
+    // 到着確認中は地球を表示も移動もさせない。火星降下だけを見せる。
+    departurePlanet.visible = false;
+    departurePlanet.userData.departureActive = false;
+    departurePlanet.userData.departureProgress = 0;
   }
-  prepareUfoForwardScrollEarthDepartureVisuals(mission, control.spaceEarth);
+  if (!mission.marsArrivalDevelopmentPreview) {
+    prepareUfoForwardScrollEarthDepartureVisuals(mission, departurePlanet);
+  }
   applyUfoCraftWorldTransform(control);
   enforceUfoTurbineAttachment(control);
   state.ufoSpaceCombatStarted = false;
-  document.body.dataset.ufoSpaceMission = "earth-mars-forward-scroll";
-  document.body.dataset.ufoForwardScroll = "launch";
+  document.body.dataset.ufoSpaceMission = mission.route.id;
+  document.body.dataset.ufoForwardScroll = mission.marsArrivalDevelopmentPreview
+    ? "mars-arrival-development"
+    : "launch";
   document.body.dataset.ufoForwardScrollRouteLength = mission.routeLength.toFixed(1);
   document.body.dataset.ufoForwardScrollRouteSeed = String(mission.routeSeed >>> 0);
   document.body.dataset.ufoForwardScrollTargetSeconds = String(mission.totalDurationSeconds);
@@ -9557,29 +10640,41 @@ function activateUfoForwardScrollMission(control, { testMode = false, silent = f
   document.body.dataset.ufoForwardScrollExpectedWorldSpeed = mission.cruiseWorldSpeed.toFixed(2);
   document.body.dataset.ufoForwardScrollEnergy = mission.energy.toFixed(2);
   document.body.dataset.ufoSpaceShooting = "lock-on";
-  setUfoSpaceControlLabels("高速火星航行", "自動前進・G軌道補正・近距離ロック射撃");
-  setSpaceTransitionMessage(
-    "EARTH ATMOSPHERE EXIT",
-    "地球大気圏を離脱",
-    "空マップの雲海を抜けて上昇し、火星航路へ加速します。",
-  );
-  els.spaceTransitionOverlay?.classList.remove("is-mars-atmosphere");
-  els.spaceTransitionOverlay?.classList.add("is-earth-departure", "is-active");
+  if (mission.marsArrivalDevelopmentPreview) {
+    setUfoSpaceControlLabels("火星大気圏降下", "降下演出後、操縦席から降車");
+    els.spaceTransitionOverlay?.classList.remove("is-earth-departure");
+  } else {
+    setUfoSpaceControlLabels(`高速${mission.route.destinationName}航行`, "自動前進・G軌道補正・近距離ロック射撃");
+    setSpaceTransitionMessage(
+      `${mission.route.origin.toUpperCase()} ATMOSPHERE EXIT`,
+      `${mission.route.originName}大気圏を離脱`,
+      mission.route.origin === 'mars'
+        ? '火星の赤い大気を抜けて上昇し、地球への帰路へ加速します。'
+        : '空マップの雲海を抜けて上昇し、火星航路へ加速します。',
+    );
+    els.spaceTransitionOverlay?.classList.remove("is-mars-atmosphere");
+    els.spaceTransitionOverlay?.classList.add("is-earth-departure", "is-active");
+  }
+  ufoFlightSurvey?.begin(mission, getUfoEffectiveEquipmentState());
   updateUfoForwardScrollLowEnergyAlert(control, mission);
   refreshUfoForwardScrollHud();
   updateUfoControls();
-  if (!silent) showToast("地球大気圏を離脱。高速火星航行テストを開始します");
+  if (!silent) showToast(`${mission.route.originName}大気圏を離脱。${mission.route.destinationName}への航行を開始します`);
   return true;
 }
 
 function triggerUfoForwardScrollHazard(mission, pickup) {
   mission.hazardHits += 1;
+  const energyBefore = mission.energy;
   mission.energy = Math.max(0, mission.energy - UFO_FORWARD_SCROLL_HAZARD_ENERGY_DAMAGE);
+  ufoFlightSurvey?.energy(mission, 'collision', energyBefore, mission.energy);
   spawnUfoForwardScrollHazardBurst(mission, pickup.position);
   // There is no crafted enhancement in the first playable run. Once the
   // coin booster has been fitted at the future workshop, an incorrect mining
   // hit disables that equipment and requires materials to restore it.
-  const damagedCoinBooster = state.ufoEquipment.coinGainMultiplier > 1;
+  // 装備テストは実プレイの装備状態を壊さない。衝突・警報の挙動だけを
+  // 見せ、実際の金貨ブースター損傷は本番航行だけで処理する。
+  const damagedCoinBooster = !mission.testMode && state.ufoEquipment.coinGainMultiplier > 1;
   if (damagedCoinBooster) {
     state.ufoEquipment.coinGainMultiplier = 1;
     state.ufoEquipment.coinGainDamaged = true;
@@ -9588,9 +10683,7 @@ function triggerUfoForwardScrollHazard(mission, pickup) {
   document.body.dataset.ufoForwardScrollEnergy = mission.energy.toFixed(2);
   document.body.dataset.ufoForwardScrollHazards = String(mission.hazardHits);
   if (!mission.testMode && damagedCoinBooster) {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-    state.saved = true;
-    if (els.saveState) els.saveState.textContent = "保存済み";
+    void persistWorldSnapshot();
   }
   showToast(damagedCoinBooster
     ? "不安定星が崩壊。航行エネルギー -42、宇宙金貨ブースターが損傷しました"
@@ -9602,23 +10695,26 @@ function collectUfoForwardScrollPickup(mission, pickup) {
   pickup.collected = true;
   setUfoForwardScrollPickupVisible(mission, pickup, false);
   markUfoForwardScrollPickupRenderDirty(mission, pickup);
-  let reward;
+  let reward, walletReward;
   if (pickup.typeId === "energy") {
-    const gain = Math.max(1, Math.round(
-      pickup.type.reward * getUfoEquipmentEnergyAbsorptionMultiplier(),
-    ));
+    const gain = getUfoEquipmentEnergyRecoveryAmount(pickup.type.reward);
+    const energyBefore = mission.energy;
     mission.energy = Math.min(mission.maxEnergy, mission.energy + gain);
+    ufoFlightSurvey?.energy(mission, 'recovery', energyBefore, mission.energy, gain);
     mission.energyCollected += gain;
-    state.ufoResources.energyCells += 1;
+    if (!mission.testMode) state.ufoResources.energyCells += 1;
+    walletReward={resource:'energyCells',amount:1};
     reward = `エネルギー +${gain}`;
   } else if (pickup.typeId === "coin") {
     const gain = Math.max(1, Math.round(pickup.type.reward * state.ufoEquipment.coinGainMultiplier));
     mission.coinsCollected += gain;
-    state.ufoResources.spaceCoins += gain;
+    if (!mission.testMode) state.ufoResources.spaceCoins += gain;
+    walletReward={resource:'spaceCoins',amount:gain};
     reward = `宇宙金貨 +${gain}`;
   } else {
     mission.materialsCollected += pickup.type.reward;
-    state.ufoResources.starMaterials += pickup.type.reward;
+    if (!mission.testMode) state.ufoResources.starMaterials += pickup.type.reward;
+    walletReward={resource:'starMaterials',amount:pickup.type.reward};
     reward = `素材 +${pickup.type.reward}`;
   }
   showUfoForwardScrollReward(pickup.typeId, reward);
@@ -9628,9 +10724,8 @@ function collectUfoForwardScrollPickup(mission, pickup) {
   // The dedicated URL-driven development route must never add test rewards to
   // the user's real save data.
   if (!mission.testMode) {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-    state.saved = true;
-    if (els.saveState) els.saveState.textContent = "保存済み";
+    pickup.worldRewardId ||= crypto.randomUUID();
+    void persistWorldSnapshot({...walletReward,id:pickup.worldRewardId});
   }
   if (mission.elapsed - mission.lastRewardToastAt >= .9) {
     showToast(`${pickup.type.label}を回収：${reward}`);
@@ -9726,7 +10821,9 @@ function resolveUfoForwardScrollPickupContact(control, mission, craftCenter) {
   pickup.hitFlashUntil = mission.elapsed + .34;
   mission.pickupCollisionCount = (mission.pickupCollisionCount || 0) + 1;
   mission.pickupImpactUntil = mission.elapsed + .5;
+  const energyBefore = mission.energy;
   mission.energy = Math.max(0, mission.energy - UFO_FORWARD_SCROLL_PICKUP_CONTACT_ENERGY_DAMAGE);
+  ufoFlightSurvey?.energy(mission, 'collision', energyBefore, mission.energy);
   mission.lastCraftCenter.copy(resolvedCenter);
   previousCenter.copy(resolvedCenter);
   spawnUfoForwardScrollPickupHitBurst(mission, pickup);
@@ -9741,17 +10838,20 @@ function updateUfoForwardScrollMission(delta) {
   const mission = control?.spaceForwardScroll;
   const craft = control?.craftAssembly;
   if (!mission?.active || !craft || state.map !== "space" || !state.ufoInSpace) return;
-  const frameDelta = Math.min(.05, Math.max(0, delta || 0));
+  ufoFlightSurvey?.frame(mission);
+  const frameDelta = Math.min(.05, Math.max(0, delta || 0))
+    * (mission.phase === 'launch' ? (mission.departurePreviewSpeed || 1) : 1);
   mission.elapsed += frameDelta;
   mission.phaseElapsed += frameDelta;
   if (mission.phase === "launch") {
+    const departurePlanet = mission.departurePlanet || control.spaceEarth;
     const progress = clamp(mission.phaseElapsed / UFO_FORWARD_SCROLL_LAUNCH_SECONDS, 0, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    if (control.spaceEarth) {
-      control.spaceEarth.userData.departureActive = true;
-      control.spaceEarth.userData.departureProgress = progress;
+    if (departurePlanet) {
+      departurePlanet.userData.departureActive = true;
+      departurePlanet.userData.departureProgress = progress;
     }
-    updateUfoForwardScrollEarthDepartureVisuals(mission, control.spaceEarth, progress);
+    updateUfoForwardScrollEarthDepartureVisuals(mission, departurePlanet, progress);
     document.body.dataset.ufoEarthDeparture = progress.toFixed(3);
     state.ufoFlightY = THREE.MathUtils.lerp(
       mission.entryFlight.y,
@@ -9764,9 +10864,9 @@ function updateUfoForwardScrollMission(delta) {
       mission.phase = "playing";
       mission.phaseElapsed = 0;
       mission.cruiseElapsed = 0;
-      finishUfoForwardScrollEarthDepartureVisuals(mission, control.spaceEarth);
-      control.spaceEarth.visible = false;
-      control.spaceEarth.userData.departureActive = false;
+      finishUfoForwardScrollEarthDepartureVisuals(mission, departurePlanet);
+      departurePlanet.visible = false;
+      departurePlanet.userData.departureActive = false;
       craft.updateWorldMatrix(true, true);
       mission.lastCraftCenter.copy(craft.getWorldPosition(new THREE.Vector3()));
       mission.pickupContactCenter.copy(mission.lastCraftCenter);
@@ -9785,8 +10885,17 @@ function updateUfoForwardScrollMission(delta) {
       els.spaceTransitionOverlay?.classList.remove("is-active", "is-earth-departure");
       delete document.body.dataset.ufoEarthDeparture;
       document.body.dataset.ufoForwardScroll = "playing";
-      showToast("火星航路開始。大型の青いエネルギー星、金色の宇宙金貨星、紫色の素材星を照準に入れ、追尾ミサイル3発で回収してください");
+      showToast(`${mission.route.destinationName}航路開始。大型の青いエネルギー星、金色の宇宙金貨星、紫色の素材星を照準に入れ、追尾ミサイル3発で回収してください`);
     }
+    updateUfoForwardScrollLowEnergyAlert(control, mission);
+    refreshUfoForwardScrollHud();
+    return;
+  }
+
+  if (mission.phase === "mars-descent") {
+    const landed = updateUfoForwardScrollMarsDescent(control, mission, frameDelta);
+    if (landed) return;
+    updateUfoForwardScrollMarsAtmosphereEntry(mission, frameDelta);
     updateUfoForwardScrollLowEnergyAlert(control, mission);
     refreshUfoForwardScrollHud();
     return;
@@ -9810,7 +10919,9 @@ function updateUfoForwardScrollMission(delta) {
     }
     const movedDistance = craftCenter.distanceTo(mission.lastCraftCenter);
     if (mission.energySystemEnabled && movedDistance > 1e-4) {
+      const energyBefore = mission.energy;
       mission.energy = Math.max(0, mission.energy - movedDistance * mission.energyPerWorldUnit);
+      ufoFlightSurvey?.energy(mission, 'propulsion', energyBefore, mission.energy);
       mission.lastCraftCenter.copy(craftCenter);
       document.body.dataset.ufoForwardScrollEnergy = mission.energy.toFixed(2);
     } else {
@@ -9836,15 +10947,17 @@ function updateUfoForwardScrollMission(delta) {
     if (mission.energySystemEnabled && mission.energy <= 0) {
       mission.energy = 0;
       mission.phase = "empty";
+      ufoFlightSurvey?.finish(mission, 'empty');
       document.body.dataset.ufoForwardScroll = "empty";
       mission.lockedPickup = null;
       resetUfoForwardScrollLockTracking(mission);
       if (mission.lockIndicator) mission.lockIndicator.visible = false;
       triggerUfoForwardScrollEnergyEmergencyReturn(control, mission);
     } else if (mission.cruiseElapsed >= mission.cruiseDurationSeconds) {
-      mission.phase = "complete";
+      mission.phase = "mars-descent";
+      mission.phaseElapsed = 0;
       mission.cruiseCompletedAt = performance.now();
-      document.body.dataset.ufoForwardScroll = "complete";
+      document.body.dataset.ufoForwardScroll = "mars-descent";
       document.body.dataset.ufoForwardScrollCompletionSimulationSeconds = mission.cruiseElapsed.toFixed(3);
       document.body.dataset.ufoForwardScrollCompletionWallSeconds = (
         Math.max(0, (mission.cruiseCompletedAt - (mission.cruiseStartedAt || mission.cruiseCompletedAt)) / 1000)
@@ -9854,10 +10967,11 @@ function updateUfoForwardScrollMission(delta) {
       resetUfoForwardScrollLockTracking(mission);
       if (mission.lockIndicator) mission.lockIndicator.visible = false;
       triggerUfoForwardScrollMarsAtmosphereEntry(mission);
+      beginUfoForwardScrollMarsDescent(control, mission, craftCenter);
       if (mission.marsAtmospherePreviewTest) {
-        document.body.dataset.ufoMarsAtmosphereEntryTest = "complete";
+        document.body.dataset.ufoMarsAtmosphereEntryTest = "descent";
       }
-      showToast("火星に到着しました。回収した素材は空マップのUFO整備へ使えるよう保存されています");
+      showToast(`${mission.route.destinationName}大気圏へ突入。${mission.route.destination === 'earth' ? '地球の雲海' : '火星の着陸地'}へ降下します`);
     }
     // 長押しだけは一定間隔の連射にする。手動入力はkeydown時に即時発射済みで、
     // ここでは予約弾や待機中の入力を処理しない。
@@ -19376,6 +20490,21 @@ function enterUfoSpaceMap(control, exit, sequence) {
     || !control?.craftAssembly) return;
   const launchMap = state.map;
   const craft = control.craftAssembly;
+  const route = interplanetaryRoute(launchMap);
+  const departureOrientation = craft.getWorldQuaternion(new THREE.Quaternion());
+  const currentForward = new THREE.Vector3(0, 0, -1).applyQuaternion(departureOrientation);
+  const routeForward = interplanetaryForward(route, currentForward, ufoOutboundWorldForward);
+  if (launchMap === 'mars') {
+    // Reverse the outbound world heading, independently of which fence side
+    // was crossed. Keep the ship, pilot and attached equipment together.
+    state.ufoFlightHeading = Math.atan2(-routeForward.x, -routeForward.z) - (control.rotation || 0);
+    state.ufoFlightPitch = 0;
+    state.ufoFlightRoll = 0;
+    state.ufoFlightDirectionalYaw = 0;
+    applyUfoCraftWorldTransform(control);
+  } else {
+    ufoOutboundWorldForward = routeForward.clone();
+  }
   craft.updateWorldMatrix(true, true);
   const craftCenter = craft.getWorldPosition(new THREE.Vector3());
 
@@ -19388,9 +20517,11 @@ function enterUfoSpaceMap(control, exit, sequence) {
   if (craft.parent !== mapGroup) mapGroup.attach(craft);
   colliders.length = 0;
   walkableSurfaces.length = 0;
+  ceilingSurfaces.length = 0;
   physicsElements.floors.length = 0;
   physicsElements.risers.length = 0;
   physicsElements.walls.length = 0;
+  physicsElements.ceilings.length = 0;
   ufoRampPhysicsIds.length = 0;
   clearThreeGroup(physicsMeshGroup);
   clearThreeGroup(physicsDebugGroup);
@@ -19399,7 +20530,7 @@ function enterUfoSpaceMap(control, exit, sequence) {
   // 宇宙へ入るたびに新しい航路シードを発行する。星空と回収星はその
   // 出発中だけ同じ位置を保ち、次の出発では別の配置になる。
   const spaceRouteSeed = nextUfoSpaceRouteSeed();
-  const spaceEnvironment = makeSpaceEnvironment(craftCenter, spaceRouteSeed);
+  const spaceEnvironment = makeSpaceEnvironment(craftCenter, spaceRouteSeed, route);
   mapGroup.add(spaceEnvironment);
   // Anchor Earth to the actual flying craft centre, not Ren's seated point.
   // The readout may use the seat anchor, but the approach detector must share
@@ -19418,6 +20549,13 @@ function enterUfoSpaceMap(control, exit, sequence) {
   // direction, not from a fixed screen direction.
   const mars = makeSpaceMars(craftCenter, craft);
   mapGroup.add(mars);
+  if (launchMap === 'mars') {
+    // Use the actual Earth model as the destination, at the same surface-to-
+    // surface route distance as outbound (the planets keep their own sizes).
+    earth.position.copy(mars.position)
+      .addScaledVector(routeForward, UFO_SPACE_EARTH_RADIUS - UFO_SPACE_MARS_RADIUS);
+    earth.visible = true;
+  }
   earth.updateWorldMatrix(true, true);
   mars.updateWorldMatrix(true, true);
   const spaceDust = makeSpaceDustStream(earth, mars, control);
@@ -19450,10 +20588,12 @@ function enterUfoSpaceMap(control, exit, sequence) {
     control,
     craftCenter,
     craft,
-    mars,
+    launchMap === 'mars' ? earth : mars,
     spaceEnvironment.userData.starfield,
     spaceRouteSeed,
+    route,
   );
+  spaceForwardScroll.departurePlanet = launchMap === 'mars' ? mars : earth;
   mapGroup.add(spaceForwardScroll.group);
   mapGroup.add(labelsGroup);
   control.buildingGroup = null;
@@ -19541,11 +20681,11 @@ function enterUfoSpaceMap(control, exit, sequence) {
     window.setTimeout(() => keys.delete("a"), 22400);
   }
   els.spaceTransitionOverlay?.classList.remove("is-active");
-  // 火星側からの出発は帰還航行。地球→火星用の自動スクロール任務を
-  // 勝手に再開せず、通常の自由飛行と地球接近判定を使う。
-  if (launchMap !== "mars" && shouldAutoActivateUfoForwardScroll()) {
+  // Both planets start the same shooting systems, with separate departure and
+  // destination objects. Mars departure must never replay Earth's launch.
+  if (launchMap === 'mars' || shouldAutoActivateUfoForwardScroll()) {
     activateUfoForwardScrollMission(control, {
-      testMode: new URLSearchParams(location.search).get("ufoForwardScrollTest") === "1",
+      testMode: MARS_RETURN_PREVIEW || new URLSearchParams(location.search).get("ufoForwardScrollTest") === "1",
       silent: true,
     });
   }
@@ -19656,6 +20796,8 @@ function returnUfoToSkyMap(sequence) {
     || !state.ufoSpaceTransitioning
     || state.map !== "space") return;
   const preservedHeading = state.ufoFlightHeading;
+  const completedMission = ufoDoorControls[0]?.spaceForwardScroll;
+  if (completedMission) resetUfoForwardScrollMission(completedMission);
   keys.clear();
   state.map = "sky";
   state.ufoInSpace = false;
@@ -19675,6 +20817,9 @@ function returnUfoToSkyMap(sequence) {
   state.ufoFlightRockBlend = 0;
   state.ufoFlightWarningRockBlend = 0;
   state.ufoDoorOpen = false;
+  state.ufoHatchOpen = false;
+  state.ufoMarsArrivalExitPending = false;
+  state.ufoMarsHatchRequiresFaceAuth = false;
   state.ufoFaceAuth = false;
   state.ufoFaceAuthLatched = false;
   state.ufoBoarded = true;
@@ -19693,6 +20838,8 @@ function returnUfoToSkyMap(sequence) {
   }
   control.amount = 0;
   control.target = 0;
+  control.hatchAmount = 0;
+  control.hatchTarget = 0;
   setUfoCabinLightAmount(control, 1);
   applyUfoCraftWorldTransform(control);
   enforceUfoTurbineAttachment(control);
@@ -19909,6 +21056,9 @@ function addBuilding(parent, item, source = item) {
       );
       addFaceAuthPhysicsColliders(faceAuth, item.id);
       ufoDoorControls.push(control);
+      // 保存済み装備を復元した直後のマップ再構築でも、機体側の見た目を
+      // 必ず現在の装備状態へ同期する。
+      refreshUfoEquipmentVisuals();
       runUfoLiftAttachmentSelfTest(control);
     }
   }
@@ -19966,15 +21116,18 @@ function updateUfoDoorAnimation(delta) {
     const response = state.ufoEngineMode === "closing" ? UFO_ENGINE_DOOR_CLOSE_RESPONSE : 8;
     control.amount += (control.target - control.amount) * Math.min(1, delta * response);
     const amount = control.amount;
+    const hatchTarget = Number.isFinite(control.hatchTarget) ? control.hatchTarget : control.target;
+    const hatchAmount = Number.isFinite(control.hatchAmount) ? control.hatchAmount : amount;
+    control.hatchAmount = hatchAmount + (hatchTarget - hatchAmount) * Math.min(1, delta * response);
     control.rampAssembly.visible = amount > .001 || control.target > .001;
     control.rampAssembly.position.copy(control.rampClosedPosition).lerp(control.rampOpenPosition, amount);
     control.rampAssembly.rotation.z = THREE.MathUtils.lerp(control.rampClosedRotation, control.rampOpenRotation, amount);
     if (control.hatchCover) {
       // パネルが外殻の内側へ入った後は外から見せない。これにより、
       // 開口部の中で宙に浮くような見え方を防ぎ、閉じる時だけ外殻へ戻す。
-      control.hatchCover.visible = amount < .86;
+      control.hatchCover.visible = control.hatchAmount < .86;
       if (control.hatchCover.visible) {
-        control.hatchCover.position.copy(control.hatchClosedPosition).lerp(control.hatchOpenPosition, amount);
+        control.hatchCover.position.copy(control.hatchClosedPosition).lerp(control.hatchOpenPosition, control.hatchAmount);
       } else {
         control.hatchCover.position.copy(control.hatchOpenPosition);
       }
@@ -20023,6 +21176,7 @@ function setUfoCabinLightAmount(control, amount) {
 }
 
 function resetUfoEngineRuntime({ resetCraft = true } = {}) {
+  ufoFlightSurvey?.finish(ufoDoorControls[0]?.spaceForwardScroll, 'interrupted');
   cancelUfoForwardScrollEnergyEmergencyReturn();
   ufoSpaceTransitionSequence += 1;
   state.ufoSpaceTransitioning = false;
@@ -20128,6 +21282,10 @@ function resetUfoEngineRuntime({ resetCraft = true } = {}) {
   stopUfoFlightLoopAudio();
   stopUfoMechEquipAudio();
   state.ufoBoarded = false;
+  state.ufoHatchOpen = false;
+  state.ufoMarsArrivalExitPending = false;
+  state.ufoMarsHatchRequiresFaceAuth = false;
+  delete document.body.dataset.ufoMarsArrivalHatch;
   state.ufoEngineMode = "idle";
   state.ufoEngineTimer = 0;
   state.ufoEngineRunning = false;
@@ -20172,6 +21330,8 @@ function resetUfoEngineRuntime({ resetCraft = true } = {}) {
       enforceUfoTurbineAttachment(control);
     }
     control.seatedViewBlockers?.forEach(mesh => { mesh.visible = true; });
+    control.hatchAmount = 0;
+    control.hatchTarget = 0;
     setUfoCabinLightAmount(control, 0);
   });
   updateUfoEngineOverlay();
@@ -20236,11 +21396,17 @@ function isCharacterTouchingUfoSeat(control) {
 function updateUfoEngineOverlay() {
   if (!els.ufoEngineOverlay) return;
   const mode = state.ufoEngineMode;
-  const active = mode === "seating" || mode === "closing" || mode === "lighting";
+  const active = mode === "seating"
+    || mode === "closing"
+    || mode === "lighting"
+    || mode === "arrival-shutdown";
   els.ufoEngineOverlay.classList.toggle("is-active", active);
   els.viewport.classList.toggle("is-ufo-engine", active || mode === "ready");
   if (!active) return;
-  if (mode === "seating") {
+  if (mode === "arrival-shutdown") {
+    els.ufoEnginePhase.textContent = "ENGINE OFF";
+    els.ufoEngineDetail.textContent = "火星へ着陸。エンジンを停止してから降車用の引き戸を開きます";
+  } else if (mode === "seating") {
     els.ufoEnginePhase.textContent = "着座位置を固定";
     els.ufoEngineDetail.textContent = "白ミチロードセイバーレンを操縦席へ固定しています";
   } else if (mode === "closing") {
@@ -20295,8 +21461,31 @@ function detectUfoEngineSeatArrival() {
 function updateUfoEngineSequence(delta) {
   const control = ufoDoorControls[0];
   const mode = state.ufoEngineMode;
-  if (!control || mode === "idle" || mode === "ready") {
+  if (!control || mode === "idle" || mode === "ready" || mode === "arrival-disembark") {
     updateUfoEngineOverlay();
+    return;
+  }
+  if (mode === "arrival-shutdown") {
+    // 火星到着は「停止 → 開放」。離陸用の着座・密閉・始動シーケンスへ
+    // 入らず、エンジンと車内灯を停止したまま短く停止演出を見せる。
+    state.ufoEngineTimer += delta;
+    state.ufoEngineRunning = false;
+    state.ufoCabinLightAmount = 0;
+    setUfoCabinLightAmount(control, 0);
+    if (state.ufoEngineTimer >= UFO_MARS_ARRIVAL_SHUTDOWN_PHASE_SECONDS) {
+      state.ufoEngineMode = "arrival-disembark";
+      state.ufoEngineTimer = 0;
+      // 到着時も顔認証で使う既存の引き戸と、同じ既存の搭乗足場を一緒に開く。
+      // 新しい足場や別の開口は作らない。
+      setUfoDoorState(true);
+      document.body.dataset.ufoMarsArrivalHatch = "open-for-disembark";
+      updateUfoEngineOverlay();
+      updateUfoControls();
+      showToast("エンジンを停止しました。UFO本体の引き戸と搭乗足場を開きました");
+    } else {
+      updateUfoEngineOverlay();
+      updateUfoControls();
+    }
     return;
   }
   state.ufoEngineTimer += delta;
@@ -20905,6 +22094,48 @@ function updateUfoFlight(delta) {
   if (earthApproach) beginUfoSkyReturn(control, earthApproach);
 }
 
+function runSkyTrainCollisionSelfTestIfRequested() {
+  const params = new URLSearchParams(location.search);
+  if (params.get("skyTrainCollisionTest") !== "1") return;
+  const trainColliderId = "sky-train-rolling-stock";
+  const trainParts = colliders.filter(collider => collider.buildingId === trainColliderId);
+  const canopy = ceilingSurfaces.filter(surface => surface.id?.startsWith("sky-train-platform-canopy-ceiling-"));
+  const platform = walkableSurfaces.find(surface => surface.id === "sky-train-platform-surface");
+  const ceilingSample = canopy.reduce((highest, surface) => (
+    !highest || surface.underside > highest.underside ? surface : highest
+  ), null);
+  let ceilingClamped = false;
+  if (ceilingSample && platform && character) {
+    const savedPosition = state.position.clone();
+    const savedGroundY = state.groundY;
+    const savedJumpY = state.jumpY;
+    const savedJumpVelocity = state.jumpVelocity;
+    const characterTop = character.userData?.collisionFootprint?.maxY ?? 0;
+    state.position.set(ceilingSample.x, 0, ceilingSample.z);
+    state.groundY = platform.height;
+    const ceiling = authoredCeilingHeightForCharacter(state.position.x, state.position.z);
+    const expectedJumpY = Number.isFinite(ceiling)
+      ? Math.max(0, ceiling - state.groundY - characterTop - .12)
+      : null;
+    if (Number.isFinite(expectedJumpY)) {
+      state.jumpY = expectedJumpY + 5;
+      state.jumpVelocity = 1;
+      ceilingClamped = constrainCharacterBelowAuthoredCeilings()
+        && Math.abs(state.jumpY - expectedJumpY) < .02
+        && state.jumpVelocity === 0;
+    }
+    state.position.copy(savedPosition);
+    state.groundY = savedGroundY;
+    state.jumpY = savedJumpY;
+    state.jumpVelocity = savedJumpVelocity;
+  }
+  const passed = trainParts.length >= 40 && canopy.length === 16 && ceilingClamped;
+  document.body.dataset.skyTrainCollisionSelfTest = passed ? "pass" : "fail";
+  document.body.dataset.skyTrainCollisionPartCount = String(trainParts.length);
+  document.body.dataset.skyTrainCeilingCount = String(canopy.length);
+  document.title = `鉄道物理テスト: ${passed ? "PASS" : "FAIL"} (${trainParts.length}/${canopy.length})`;
+}
+
 function runUfoFlightCollisionSelfTestIfRequested() {
   const params = new URLSearchParams(location.search);
   if (params.get("ufoFlightCollisionTest") !== "1") return;
@@ -21204,6 +22435,40 @@ function constrainCharacterBelowUfoCapsule() {
   return true;
 }
 
+function authoredCeilingHeightForCharacter(rootX, rootZ, groundY = state.groundY) {
+  if (!character || !ceilingSurfaces.length) return null;
+  const characterTop = character.userData?.collisionFootprint?.maxY ?? 0;
+  const standingTop = groundY + characterTop;
+  let lowestCeiling = null;
+  ceilingSurfaces.forEach(ceiling => {
+    if (!Number.isFinite(ceiling.underside)) return;
+    // A ceiling that already intersects the standing model cannot describe a
+    // usable covered passage. Ignore it instead of snapping the player down;
+    // authored roofs must be high enough for the displayed character first.
+    if (ceiling.underside <= standingTop + .04) return;
+    if (!characterHorizontalColliderContact(rootX, rootZ, ceiling).intersects) return;
+    if (lowestCeiling === null || ceiling.underside < lowestCeiling) {
+      lowestCeiling = ceiling.underside;
+    }
+  });
+  return lowestCeiling;
+}
+
+function constrainCharacterBelowAuthoredCeilings() {
+  if (state.jumpY <= 0 && state.jumpVelocity <= 0) return false;
+  const ceiling = authoredCeilingHeightForCharacter(state.position.x, state.position.z);
+  if (!Number.isFinite(ceiling)) return false;
+  const characterTop = character?.userData?.collisionFootprint?.maxY ?? 0;
+  const maximumJumpY = Math.max(0, ceiling - state.groundY - characterTop - .12);
+  if (state.jumpY <= maximumJumpY) return false;
+  // This is a vertical clamp only. The accepted X/Z movement is never moved
+  // backward, so a head contact cannot create the camera-sickening bounce that
+  // ordinary collision recovery used to cause.
+  state.jumpY = maximumJumpY;
+  if (state.jumpVelocity > 0) state.jumpVelocity = 0;
+  return true;
+}
+
 function isUfoFaceAuthAnchorOutside(control, worldPosition) {
   if (!Array.isArray(worldPosition) || worldPosition.length < 2) return false;
   const local = ufoWorldToLocal(control, Number(worldPosition[0]), Number(worldPosition[1]));
@@ -21275,14 +22540,65 @@ function isWhiteRenAtFaceScanner(control) {
 }
 
 function setUfoDoorState(open, message = null) {
-  if (state.ufoDoorOpen === open) return;
-  state.ufoDoorOpen = open;
+  const nextOpen = Boolean(open);
+  if (state.ufoDoorOpen === nextOpen && state.ufoHatchOpen === nextOpen) return false;
+  state.ufoDoorOpen = nextOpen;
+  state.ufoHatchOpen = nextOpen;
   ufoDoorControls.forEach(control => {
-    control.target = open ? 1 : 0;
-    if (control.faceAuth) control.faceAuth.active = open && state.ufoFaceAuth;
+    control.target = nextOpen ? 1 : 0;
+    control.hatchTarget = nextOpen ? 1 : 0;
+    if (control.faceAuth) control.faceAuth.active = nextOpen && state.ufoFaceAuth;
   });
-  setUfoRampPhysics(open);
+  setUfoRampPhysics(nextOpen);
   if (message) showToast(message);
+  return true;
+}
+
+function hasReachedMarsGroundAfterDisembark(control) {
+  if (!control || state.map !== "mars") return false;
+  // 体の一部が出口を抜けたかではなく、両足が落下もジャンプもしていない
+  // 実在の火星地面に着地したことを閉鎖条件にする。
+  const grounded = state.jumpY <= .001
+    && state.jumpVelocity === 0
+    && !state.falling;
+  if (!grounded || state.groundY > .24) return false;
+
+  const scale = control.scale || BUILDING_SCALE;
+  const localFootRadius = PLAYER_RADIUS / scale;
+  const footSurface = getFootSupportSurface(state.position.x, state.position.z, {
+    referenceHeight: state.groundY,
+    allowHigher: false,
+  });
+  // 地面ではなくUFOの床・椅子・足場が足元に残っている間は閉じない。
+  if (footSurface?.buildingId === control.buildingId) return false;
+  if (isWithinOpenUfoRampCorridor(state.position.x, state.position.z, localFootRadius)) return false;
+  if (isWithinUfoInteriorEntryCorridor(state.position.x, state.position.z, localFootRadius)) return false;
+  if (isWithinUfoSeatRampCorridor(state.position.x, state.position.z, localFootRadius)) return false;
+  return true;
+}
+
+function updateMarsArrivalHatchExit() {
+  if (!state.ufoMarsArrivalExitPending) return;
+  const control = ufoDoorControls[0];
+  if (state.map !== "mars" || !control) {
+    state.ufoMarsArrivalExitPending = false;
+    return;
+  }
+  // 停止演出中はまだ開かないが、降車待ち状態は維持する。
+  if (!state.ufoDoorOpen) return;
+  // 既存の引き戸と足場が十分に開いた後、身体が出口を抜けたことではなく
+  // 足が火星地面へ着地したことを確認してから初めて閉じる。
+  if ((control.amount || 0) < .82 || !hasReachedMarsGroundAfterDisembark(control)) return;
+  state.ufoMarsArrivalExitPending = false;
+  state.ufoMarsHatchRequiresFaceAuth = true;
+  // 降車後は通常の徒歩状態へ戻す。以後の再搭乗は顔認証だけが入口になる。
+  state.ufoEngineMode = "idle";
+  state.ufoEngineTimer = 0;
+  state.ufoEngineRunning = false;
+  state.ufoCabinLightAmount = 0;
+  setUfoDoorState(false, "火星の地面への降車を確認。UFOの引き戸と搭乗足場を収納しました");
+  document.body.dataset.ufoMarsArrivalHatch = "closed-after-exit";
+  updateUfoControls();
 }
 
 function updateUfoFaceAuthentication() {
@@ -21320,7 +22636,7 @@ function setUfoFlightLeverText(command, glyph, label, ariaLabel) {
   button.title = ariaLabel;
 }
 
-function updateUfoFlightControlPresentation(forwardScroll) {
+function updateUfoFlightControlPresentation(forwardScroll, mission = null) {
   if (!els.ufoFlightControls) return;
   const title = els.ufoFlightControls.querySelector(".flight-console-inline-title");
   const pad = els.ufoFlightPad;
@@ -21329,8 +22645,17 @@ function updateUfoFlightControlPresentation(forwardScroll) {
     setUfoFlightLeverText("lift-down", "▼", "下へ", "下へ移動");
     setUfoFlightLeverText("turn-left", "◀", "左へ", "左へ移動");
     setUfoFlightLeverText("turn-right", "▶", "右へ", "右へ移動");
-    if (title) title.textContent = "高速火星航行";
-    if (pad) pad.setAttribute("aria-label", "高速前進中の上下左右・G軌道補正パッド");
+    const marsDescent = mission?.phase === "mars-descent";
+    const destinationName = mission?.route?.destinationName || '火星';
+    if (title) title.textContent = marsDescent ? `${destinationName}大気圏降下` : `高速${destinationName}航行`;
+    if (pad) {
+      pad.setAttribute(
+        "aria-label",
+        marsDescent
+          ? `${destinationName}大気圏を自動降下中`
+          : "高速前進中の上下左右・G軌道補正パッド",
+      );
+    }
     return;
   }
   setUfoFlightLeverText("lift-up", "▲", "上昇", "上昇");
@@ -21342,6 +22667,7 @@ function updateUfoFlightControlPresentation(forwardScroll) {
 }
 
 function updateUfoControls() {
+  updateEmergencyReturnControl();
   if (!els.ufoDoorButton || !els.ufoBoardButton || !els.ufoStatus) return;
   updateUfoSpaceLifeHud();
   if (state.ufoEngineMode === "idle") updateUfoFaceAuthentication();
@@ -21363,25 +22689,44 @@ function updateUfoControls() {
         && isUfoSpaceLateralLegacyMissionActive(),
     );
     els.ufoFlightControls.classList.toggle("is-forward-scroll", forwardScroll);
-    updateUfoFlightControlPresentation(forwardScroll);
+    const forwardScrollMission = forwardScroll ? ufoDoorControls[0]?.spaceForwardScroll : null;
+    updateUfoFlightControlPresentation(forwardScroll, forwardScrollMission);
   }
   if (els.touchPad) els.touchPad.hidden = cockpitActive;
   if (els.touchHint) els.touchHint.hidden = cockpitActive;
-  els.ufoDoorButton.disabled = !hasPad || state.ufoBoarded || state.ufoEngineMode !== "idle";
-  els.ufoDoorButton.textContent = state.ufoDoorOpen ? "右側搭乗足場を収納" : "右側搭乗足場を手動で展開";
+  const marsArrivalHatchOpen = state.map === "mars"
+    && state.ufoDoorOpen
+    && state.ufoMarsArrivalExitPending;
+  const marsFaceAuthOnly = state.map === "mars"
+    && state.ufoMarsHatchRequiresFaceAuth
+    && !state.ufoDoorOpen;
+  els.ufoDoorButton.disabled = !hasPad
+    || state.ufoBoarded
+    || state.ufoEngineMode !== "idle"
+    || marsArrivalHatchOpen
+    || marsFaceAuthOnly;
+  els.ufoDoorButton.textContent = marsArrivalHatchOpen
+    ? "降車後に引き戸を閉じます"
+    : marsFaceAuthOnly
+      ? "顔認証で引き戸を開く"
+      : state.ufoDoorOpen
+        ? "右側搭乗足場を収納"
+        : "右側搭乗足場を手動で展開";
   els.ufoBoardButton.textContent = sequenceActive ? "エンジン始動中" : "操縦席へ歩いて着座";
   els.ufoBoardButton.disabled = true;
   if (flightReady && state.map === "space" && isUfoForwardScrollActive()) {
     const mission = ufoDoorControls[0].spaceForwardScroll;
     els.ufoStatus.textContent = mission.phase === "launch"
-      ? "地球大気圏を離脱しています。まもなく前進スクロール航行を開始します。"
+      ? `${mission.route.originName}大気圏を離脱しています。まもなく前進スクロール航行を開始します。`
       : mission.phase === "playing"
         ? "高速自動前進中。左右・上下はGの掛かる軌道補正です。急な切り返しではなく、先を読んで機体を流してください。"
+        : mission.phase === "mars-descent"
+          ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '空マップへ帰還' : '火星の着陸地へ自動降下'}しています。`
         : mission.phase === "complete"
-          ? "火星大気圏へ到達しました。今回の操縦感テストはここで完了です。"
+          ? `${mission.route.destinationName}大気圏へ到達しました。`
           : mission.energyEmergencyReturnPending
             ? "エネルギー切れのため緊急帰還します"
-          : "高速火星航行を停止しました。";
+          : `${mission.route.destinationName}への航行を停止しました。`;
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceStarMining?.active) {
     const mission = ufoDoorControls[0].spaceStarMining;
     const star = mission.nearestStar;
@@ -21414,6 +22759,9 @@ function updateUfoControls() {
   else if (state.ufoEngineMode === "lighting") els.ufoStatus.textContent = "エンジン始動。カプセル内部の車内灯を点灯しています。";
   else if (state.ufoEngineMode === "closing") els.ufoStatus.textContent = "搭乗足場を収納し、UFOの入口を閉じています。";
   else if (state.ufoEngineMode === "seating") els.ufoStatus.textContent = "白ミチロードセイバーレンを固定着座位置へ合わせています。";
+  else if (state.ufoEngineMode === "arrival-shutdown") els.ufoStatus.textContent = "火星へ到着。エンジンを停止してから、UFO本体の引き戸を開きます。";
+  else if (marsArrivalHatchOpen) els.ufoStatus.textContent = "火星へ到着。火星の地面に足が着くまで、UFO本体の引き戸と搭乗足場は開いたままです。";
+  else if (marsFaceAuthOnly) els.ufoStatus.textContent = "火星のUFO本体の引き戸は、顔認証で開けられます。";
   else if (state.ufoFaceAuth) els.ufoStatus.textContent = "顔認証済み。右側搭乗足場を引き出しています。";
   else if (!nearPad) els.ufoStatus.textContent = "顔認証装置の前まで移動してください。";
   else if (!state.ufoDoorOpen) els.ufoStatus.textContent = "顔認証装置の前に立つと、搭乗足場が自動で引き出されます。";
@@ -21422,6 +22770,12 @@ function updateUfoControls() {
 
 function toggleUfoDoor() {
   if (!currentUfoPadItem() || state.ufoBoarded) return;
+  if (state.map === "mars"
+    && !state.ufoDoorOpen
+    && (state.ufoMarsArrivalExitPending || state.ufoMarsHatchRequiresFaceAuth)) {
+    showToast("火星のUFO本体の引き戸は、顔認証で開けられます");
+    return;
+  }
   const open = !state.ufoDoorOpen;
   if (!open) state.ufoFaceAuth = false;
   setUfoDoorState(open);
@@ -21465,12 +22819,113 @@ function toggleUfoBoarding() {
   showToast("白ミチロードセイバーレンが操縦席に乗り込みました");
 }
 
+function installSpaceMaterialBook() {
+  if (!['mars','construction'].includes(state.map)) return;
+  const book=createSpaceMaterialBook();
+  if (state.map==='mars' && marsShopkeeper) {
+    const shop=marsShopkeeper.parent;shop.updateMatrixWorld(true);
+    book.position.copy(shop.localToWorld(new THREE.Vector3(-36,0,58)));
+    book.rotation.y=shop.rotation.y;
+  } else {
+    // Keep the entrance, bridge and existing user buildings clear.
+    const candidates=[[-156,-62],[-175,-42],[-206,-30],[-235,8],[-268,30]];
+    const position=candidates.find(([x,z])=>!colliders.some(c=>pointInsideCollider(x,z,c,26)));
+    if(!position){disposeSpaceMaterialBook(book);return;} // The menu remains available.
+    book.position.set(position[0],0,position[1]);
+  }
+  mapGroup.add(book);spaceMaterialBook=book;
+  addRotatedCollider(book.position.x,book.position.z,[MATERIAL_BOOK_SIZE[0],MATERIAL_BOOK_SIZE[2]],book.rotation.y,'space-material-book',0,{minY:0,maxY:MATERIAL_BOOK_SIZE[1],obstacleHeight:MATERIAL_BOOK_SIZE[1]});
+  spaceMaterialBookCollider=colliders[colliders.length-1];
+}
+
+function constructionDeliveryContext(){
+  return {map:state.map,aboard:state.ufoBoarded,siteIndex:constructionDeliverySite,
+    position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}};
+}
+function installConstructionDeliveryDock(){
+  if(state.map!=='construction')return;
+  constructionDeliverySite=chooseDeliverySite((x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)));
+  if(constructionDeliverySite<0)return; // Never move/destroy a saved building to make room.
+  const [x,z]=DELIVERY_SITES[constructionDeliverySite];
+  constructionDeliveryDock=createConstructionDeliveryDock();constructionDeliveryDock.position.set(x,0,z);mapGroup.add(constructionDeliveryDock);
+  addRotatedCollider(x,z,[DELIVERY_SIZE[0],DELIVERY_SIZE[2]],0,'construction-delivery-dock',0,{minY:0,maxY:DELIVERY_SIZE[1],obstacleHeight:DELIVERY_SIZE[1]});
+  constructionDeliveryCollider=colliders[colliders.length-1];
+}
+function showConstructionDelivery(){
+  if(state.map!=='construction'||state.ufoBoarded||spaceMaterialGuide?.open||worldShopOverlay?.open)return;
+  if(constructionDeliveryWalk)constructionDeliveryWalk.output.textContent='カウンターへの接触を確認しました。歩行を止めてメニューを開きます。';
+  constructionDeliveryWalk=null;
+  void constructionDeliveryMenu?.show();
+}
+function setupConstructionDeliveryPreview(){
+  if(!CONSTRUCTION_DELIVERY_PREVIEW)return;
+  const panel=document.createElement('div');panel.className='construction-delivery-preview';
+  panel.innerHTML='<strong>建材受取所の接続確認</strong><span>本体の購入品・貸出材は持ち込みません。</span><button type="button" data-delivery-walk="1">受取所へ歩く（確認）</button><button type="button" data-delivery-walk="-1">後ろへ下がる（確認）</button><button type="button" data-delivery-walk="0">歩行を止める</button><output>カウンターに触れるとメニューが開きます。</output>';
+  document.querySelector('.world-toolbar').after(panel);
+  panel.querySelectorAll('[data-delivery-walk]').forEach(button=>button.addEventListener('click',()=>{
+    const direction=Number(button.dataset.deliveryWalk);clearMarsShopDialogInput();constructionDeliveryWalk=null;
+    if(!direction){panel.querySelector('output').textContent='歩行を停止しました。';return;}
+    if(state.map!=='construction'||!constructionDeliveryDock||state.ufoBoarded||constructionDeliveryMenu?.open){panel.querySelector('output').textContent='工事現場でメニューを閉じてから確認してください。';return;}
+    const dx=state.position.x-constructionDeliveryDock.position.x,dz=state.position.z-constructionDeliveryDock.position.z;
+    if(Math.abs(dx)>20||dz<14||dz>100){panel.querySelector('output').textContent='受取所の正面で確認してください。';return;}
+    constructionDeliveryWalk={direction,elapsed:0,output:panel.querySelector('output')};
+  }));
+}
+function updateConstructionDeliveryWalk(delta){
+  const walk=constructionDeliveryWalk;if(!walk)return;
+  walk.elapsed+=delta;
+  if(state.map!=='construction'||state.ufoBoarded||state.falling||state.jumpY>0||walk.elapsed>2){
+    touchVector.set(0,0);constructionDeliveryWalk=null;walk.output.textContent='歩行確認を終了しました。';return;
+  }
+  state.fastWalking=false;state.viewHeading=Math.PI;touchVector.set(0,-walk.direction*.45);
+  walk.output.textContent=`徒歩で${walk.direction>0?'受取所に接近':'後退'}中 · X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
+}
+function updateConstructionDelivery(){
+  const button=document.getElementById('constructionDeliveryButton'),eligible=state.map==='construction'&&!state.ufoBoarded;
+  if(button)button.hidden=!eligible;
+  if(constructionDeliveryMenu?.open)return;
+  const c=constructionDeliveryCollider;
+  const touching=!!(eligible&&c&&character&&deliveryAccess(constructionDeliveryContext())
+    &&characterVerticallyOverlapsCollider(c)&&polygonContact(characterCollisionObb(state.position.x,state.position.z),c.polygon,1.2)?.intersects);
+  if(constructionDeliveryContact.update(touching,eligible,spaceMaterialGuide?.open||worldShopOverlay?.open))showConstructionDelivery();
+}
+
+function showSpaceMaterialGuide() {
+  if (!['mars','construction'].includes(state.map) || state.ufoBoarded) return;
+  if(constructionDeliveryMenu?.open)return;
+  constructionDeliveryWalk=null;
+  if (marsShopDialogState.open || isSkyStationGuideDialogOpen() || isUfoEquipmentWorkshopMenuOpen()) return;
+  spaceMaterialGuide?.show(state.map==='mars'?'火星素材ショップ · 入口の図鑑台':'工事現場 · 入口の図鑑台');
+}
+
+function updateSpaceMaterialBook() {
+  const button=document.getElementById('materialGuideButton');
+  const eligible=['mars','construction'].includes(state.map) && !state.ufoBoarded;
+  if(button){button.hidden=!eligible;button.disabled=marsShopDialogState.open||isSkyStationGuideDialogOpen()||isUfoEquipmentWorkshopMenuOpen();}
+  if(spaceMaterialGuide?.open)return;
+  const c=spaceMaterialBookCollider;
+  const touching=!!(eligible && c && character && characterVerticallyOverlapsCollider(c)
+    && polygonContact(characterCollisionObb(state.position.x,state.position.z),c.polygon,1.2)?.intersects);
+  if(spaceMaterialBookContact.update(touching,eligible,button?.disabled))showSpaceMaterialGuide();
+}
+
 function rebuildMap() {
   if (!mapGroup) return;
+  constructionDeliveryWalk=null;
+  constructionDeliveryMenu?.close();constructionDeliveryContact.reset();
+  disposeSpaceMaterialBook(constructionDeliveryDock);constructionDeliveryDock=null;constructionDeliveryCollider=null;constructionDeliverySite=-1;
+  spaceMaterialGuide?.close();spaceMaterialBookContact.reset();
+  disposeSpaceMaterialBook(spaceMaterialBook);spaceMaterialBook=null;spaceMaterialBookCollider=null;
+  disposeConstructionGround(mapGroup.getObjectByName('construction-expanded-ground'));
+  if(marsDistantLandscape) { disposeMarsLandscape(marsDistantLandscape); marsDistantLandscape=null; }
+  closeMarsShopDialog({ resetTouchLatch: true });
+  if (marsShopDisplays) { disposeMarsShopDisplays(marsShopDisplays); marsShopDisplays=null; }
+  if (marsShopkeeper) { disposeMatureCharacterModel(marsShopkeeper); marsShopkeeper=null; }
   closeSkyStationGuideDialog({ resetTouchLatch: true });
   closeUfoEquipmentWorkshopMenu({ resetTouchLatch: true });
   while (mapGroup.children.length) mapGroup.remove(mapGroup.children[0]);
   skyStationClock = null;
+  skyStationBuilding = null;
   skyStationGuide = null;
   ufoDoorControls.length = 0;
   ufoRampPhysicsIds.length = 0;
@@ -21478,14 +22933,16 @@ function rebuildMap() {
   // 前マップの床や段差を残したまま次のマップへ持ち越さない。
   colliders.length = 0;
   walkableSurfaces.length = 0;
+  ceilingSurfaces.length = 0;
   physicsElements.floors.length = 0;
   physicsElements.risers.length = 0;
   physicsElements.walls.length = 0;
+  physicsElements.ceilings.length = 0;
   clearThreeGroup(physicsMeshGroup);
   clearThreeGroup(physicsDebugGroup);
   ensureMarsReturnUfoPad();
   labelsGroup = new THREE.Group();
-  mapGroup.add(makeGround(MAPS[state.map]));
+  let worldGround=makeGround(MAPS[state.map]);mapGroup.add(worldGround);
   addMarsBoundaryFence(mapGroup, MAPS[state.map]);
   addMapEntry(mapGroup, MAPS[state.map]);
   if (state.map === "sky") {
@@ -21527,6 +22984,14 @@ function rebuildMap() {
     if (source) addBuilding(mapGroup, item, source);
   });
   setUfoRampPhysics(state.ufoDoorOpen);
+  installSpaceMaterialBook();
+  installConstructionDeliveryDock();
+  worldWaterController?.install({group:mapGroup,blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider});
+  worldSoilController?.install({group:mapGroup,blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,surface:addAuthoritativeSurface,ceiling:addRotatedCeiling});
+  worldTimberController?.install({group:mapGroup,blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,physics:{floor:registerPhysicsFloor,ceiling:registerPhysicsCeiling,collider:registerPhysicsCollider}});
+  const excavationHole=worldExcavationController?.install({group:mapGroup,blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
+    reserved:(p,size)=>!!(worldWaterController?.overlapsBuild(p,size)||worldSoilController?.overlapsBuild(p,size)||worldTimberController?.overlapsBuild(p,size))});
+  if(excavationHole){mapGroup.remove(worldGround);disposeConstructionGround(worldGround);worldGround=createConstructionGround(MAPS[state.map],{holes:[excavationHole]});mapGroup.add(worldGround);}
   mapGroup.add(labelsGroup);
   MAPS[state.map].buildZones.forEach((zone, index) => {
     const plot = mapBuildZone(MAPS[state.map], index);
@@ -21554,7 +23019,8 @@ function rebuildMap() {
     // 上書きしてはいけない。
     resetPlayerToMapSpawn("sky", { fromEntry: true });
     state.pendingSafeEntry = false;
-  } else if (currentPenetration > 1.5) {
+  } else if (currentPenetration > 1.5
+    && !(state.map === "mars" && state.ufoMarsArrivalExitPending)) {
     if (currentUfoPad?.position?.length >= 3) {
       state.position.set(currentUfoPad.position[0], 0, currentUfoPad.position[2]);
       state.groundY = 0;
@@ -21578,10 +23044,8 @@ function rebuildMap() {
   // A repaired position is the new authoritative save state. Without this,
   // every reload would restore the same obsolete embedded coordinate and rely
   // on another visual snap during map construction.
-  if (recoveredPosition || faceAuthAnchorRepaired || ufoPlacementRepaired) {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-    state.saved = true;
-    els.saveState.textContent = "保存済み";
+  if ((recoveredPosition || faceAuthAnchorRepaired || ufoPlacementRepaired) && !CONSTRUCTION_EXPANSION_PREVIEW) {
+    void persistWorldSnapshot();
   }
   updateBuildList();
   updateMapReadout();
@@ -21594,7 +23058,10 @@ function updateMapReadout() {
   els.sceneTitle.textContent = inSpace
     ? `${config.source.title}・UFO航行3D`
     : `${config.source.title}・正式3D`;
-  els.mapDescription.textContent = config.source.description;
+  const route = inSpace ? ufoDoorControls[0]?.spaceForwardScroll?.route : null;
+  els.mapDescription.textContent = route && isUfoForwardScrollActive()
+    ? `${route.originName}から${route.destinationName}へ航行します。前方から近づく資源星を射撃して回収し、エネルギーを補給しながら目的地を目指してください。`
+    : config.source.description;
   document.querySelectorAll("[data-map]").forEach(button => button.classList.toggle("is-active", button.dataset.map === state.map));
   els.labelsButton.textContent = `建物名：${state.labels ? "表示" : "非表示"}`;
   els.labelsButton.disabled = inSpace;
@@ -21628,6 +23095,7 @@ function updateBuildList() {
 }
 
 function selectBuild(id) {
+  if (CONSTRUCTION_EXPANSION_PREVIEW) return;
   state.selectedBuildId = id;
   updateBuildList();
   if (previewGroup) mapGroup.remove(previewGroup);
@@ -21645,6 +23113,10 @@ function selectBuild(id) {
 }
 
 function isValidBuildPosition(position, size, sourceId = null) {
+  if(typeof worldWaterController!=='undefined'&&worldWaterController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
+  if(typeof worldSoilController!=='undefined'&&worldSoilController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
+  if(typeof worldTimberController!=='undefined'&&worldTimberController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
+  if(typeof worldExcavationController!=='undefined'&&worldExcavationController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
   const [sx, , sz] = size;
   const inside = sourceId === "ufo-pad"
     ? Math.abs(position[0]) <= MAPS[state.map].world.width / 2 - sx / 2
@@ -22052,8 +23524,258 @@ function updateSkyStationGuideDialog() {
   }
 }
 
+function renderMarsShopDialog() {
+  if (!els.marsShopDialog) return;
+  els.marsShopDialog.hidden = !marsShopDialogState.open;
+  els.marsShopDialog.dataset.phase = marsShopDialogState.phase;
+  const playerResponse = marsShopDialogState.phase === 'player-response';
+  els.marsShopDialogSpeaker.textContent = playerResponse ? '白ミチロードセイバーレン' : '宇宙人';
+  els.marsShopDialogText.textContent = playerResponse ? marsShopDialogState.selectedText : MARS_SHOP_DIALOG_GREETING;
+  els.marsShopDialogChoices.hidden = playerResponse;
+}
+
+function clearMarsShopDialogInput() {
+  keys.clear();
+  touchVector.set(0, 0);
+  touchPointerId = null;
+  lookPointerId = null;
+  state.fastWalking = false;
+  els.touchStick.style.transform = 'translate(-50%, -50%)';
+  els.viewport.classList.remove('is-looking');
+}
+
+function closeMarsShopDialog(options = {}) {
+  const wasOpen = marsShopDialogState.open;
+  marsShopDialogState.close(options);
+  renderMarsShopDialog();
+  if (wasOpen) {
+    clearMarsShopDialogInput();
+    // Do not leave keyboard focus on a now-hidden choice/close button.
+    if (els.marsShopDialog?.contains(document.activeElement)) document.activeElement.blur();
+  }
+}
+
+function selectMarsShopDialogTopic(topicId) {
+  if (!marsShopDialogState.selectTopic(topicId)) return;
+  if(topicId==='buy'&&worldShopOverlay){
+    closeMarsShopDialog();
+    void worldShopOverlay.show().catch(error=>showToast(error.message));
+    return;
+  }
+  renderMarsShopDialog();
+  playSkyStationGuideDialogTypeSfx();
+  els.marsShopDialogClose?.focus({ preventScroll: true });
+}
+
+function isTouchingMarsShopkeeper() {
+  const keeperColliders = marsShopkeeper?.userData?.dialogColliders;
+  if (state.map !== 'mars' || state.ufoBoarded || !character || !keeperColliders?.length) return false;
+  const playerObb = characterCollisionObb(state.position.x, state.position.z);
+  return keeperColliders.some(collider => {
+    if (!characterVerticallyOverlapsCollider(collider)) return false;
+    if (collider.polygon?.length >= 3) {
+      return polygonContact(playerObb, collider.polygon, SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN)?.intersects;
+    }
+    const keeperObb = structureCollisionObb(collider);
+    keeperObb.halfX += SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN;
+    keeperObb.halfZ += SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN;
+    return obbContact(playerObb, keeperObb).intersects;
+  });
+}
+
+function updateMarsShopDialog() {
+  const wasOpen = marsShopDialogState.open;
+  const changed = marsShopDialogState.updateContact({
+    eligible: state.map === 'mars' && !!marsShopkeeper && !state.ufoBoarded,
+    touching: isTouchingMarsShopkeeper(),
+    blocked: isSkyStationGuideDialogOpen() || isUfoEquipmentWorkshopMenuOpen(),
+  });
+  if (!changed) return;
+  renderMarsShopDialog();
+  if (marsShopDialogState.open && !wasOpen) {
+    clearMarsShopDialogInput();
+    playSkyStationGuideDialogTypeSfx();
+    requestAnimationFrame(() => {
+      if (marsShopDialogState.open && marsShopDialogState.phase === 'greeting')
+        els.marsShopDialogChoices?.querySelector('button')?.focus({ preventScroll: true });
+    });
+  }
+}
+
+function setupMarsShopDialog() {
+  if (!els.marsShopDialog) return;
+  for (const choice of MARS_SHOP_DIALOG_CHOICES) {
+    const button = document.createElement('button');
+    button.type = 'button'; button.dataset.marsShopTopic = choice.id;
+    button.textContent = choice.text;
+    button.addEventListener('click', () => selectMarsShopDialogTopic(choice.id));
+    els.marsShopDialogChoices.appendChild(button);
+  }
+  els.marsShopDialogClose.addEventListener('click', () => closeMarsShopDialog());
+  els.marsShopDialog.addEventListener('pointerdown', event => event.stopPropagation());
+  els.marsShopDialog.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const buttons = [...els.marsShopDialog.querySelectorAll('button')].filter(button => !button.closest('[hidden]'));
+    if (!buttons.length) return;
+    const next = buttons[(buttons.indexOf(document.activeElement) + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length];
+    event.preventDefault(); next.focus({ preventScroll: true });
+  });
+}
+
 function isUfoEquipmentWorkshopMenuOpen() {
   return ufoEquipmentWorkshopMenuState.open;
+}
+
+function getUfoEquipmentDevelopmentProfile(profileId = ufoEquipmentDevelopmentTestState.profileId) {
+  return UFO_EQUIPMENT_DEVELOPMENT_PROFILES.find(profile => profile.id === profileId)
+    || UFO_EQUIPMENT_DEVELOPMENT_PROFILES[0];
+}
+
+function isUfoEquipmentDevelopmentTestActive() {
+  return getUfoEquipmentDevelopmentProfile().id !== "saved";
+}
+
+function getUfoEffectiveEquipmentState() {
+  const profile = getUfoEquipmentDevelopmentProfile();
+  // テスト中も金貨系など保存済みの他装備は保持し、比較対象の4装備だけを
+  // 一時上書きする。ここから返す値は決して保存しない。
+  return profile.equipment
+    ? { ...state.ufoEquipment, ...profile.equipment }
+    : state.ufoEquipment;
+}
+
+function renderUfoEquipmentDevelopmentTestPanel() {
+  const profile = getUfoEquipmentDevelopmentProfile();
+  const testActive = profile.id !== "saved";
+  const equipment = getUfoEffectiveEquipmentState();
+  const effects = [
+    `エネルギー星 +${getUfoEquipmentEnergyRecoveryAmount()}`,
+    equipment.simultaneousShotEnabled ? "2発同時射撃" : "通常射撃",
+    `照準 ${Number(equipment.lockOnReticleMultiplier || 1).toFixed(1)}倍`,
+    `探知 ${Number(equipment.lockOnDetectionMultiplier || 1).toFixed(1)}倍`,
+  ];
+  els.ufoEquipmentDevelopmentProfiles?.querySelectorAll("[data-ufo-equipment-development-profile]")
+    .forEach(button => {
+      const selected = button.dataset.ufoEquipmentDevelopmentProfile === profile.id;
+      button.dataset.active = String(selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+  if (els.ufoEquipmentComparisonCameraButton) {
+    els.ufoEquipmentComparisonCameraButton.textContent = ufoEquipmentDevelopmentTestState.comparisonCamera
+      ? "外観比較カメラ：ON"
+      : "外観比較カメラ";
+    els.ufoEquipmentComparisonCameraButton.setAttribute(
+      "aria-pressed",
+      String(ufoEquipmentDevelopmentTestState.comparisonCamera),
+    );
+  }
+  if (els.ufoEquipmentDevelopmentStatus) {
+    const cameraNote = ufoEquipmentDevelopmentTestState.comparisonCamera
+      ? " 外観比較カメラで、機体後部とコックピットを観察できます。"
+      : "";
+    const runtimeNote = testActive
+      ? " 保存データ・素材・作成状況は変更されません。"
+      : "";
+    els.ufoEquipmentDevelopmentStatus.textContent = `${profile.label}：${profile.description} 実機効果：${effects.join(" ／ ")}。${runtimeNote}${cameraNote}`;
+    els.ufoEquipmentDevelopmentStatus.dataset.testActive = String(testActive);
+    els.ufoEquipmentDevelopmentStatus.dataset.cameraActive = String(
+      ufoEquipmentDevelopmentTestState.comparisonCamera,
+    );
+  }
+}
+
+function selectUfoEquipmentDevelopmentProfile(profileId) {
+  const profile = getUfoEquipmentDevelopmentProfile(profileId);
+  if(profile.id!==ufoEquipmentDevelopmentTestState.profileId)ufoFlightSurvey?.equipmentChanged();
+  ufoEquipmentDevelopmentTestState.profileId = profile.id;
+  refreshUfoEquipmentVisuals();
+  refreshUfoForwardScrollHud();
+  renderUfoEquipmentDevelopmentTestPanel();
+  showToast(`${profile.label}の装備テストへ切り替えました`);
+  return profile;
+}
+
+function toggleUfoEquipmentDevelopmentComparisonCamera() {
+  if (!ufoDoorControls[0]?.craftAssembly) {
+    showToast("比較するUFOが見つかりません");
+    return false;
+  }
+  ufoEquipmentDevelopmentTestState.comparisonCamera = !ufoEquipmentDevelopmentTestState.comparisonCamera;
+  renderUfoEquipmentDevelopmentTestPanel();
+  showToast(
+    ufoEquipmentDevelopmentTestState.comparisonCamera
+      ? "UFO装備の外観比較カメラを開始しました"
+      : "外観比較カメラを終了しました",
+  );
+  return true;
+}
+
+function startUfoEquipmentDevelopmentSpaceTest() {
+  if (CONSTRUCTION_EXPANSION_PREVIEW) return;
+  const control = ufoDoorControls[0];
+  if (!control?.craftAssembly) {
+    showToast("UFO乗り場を建造してから実機テストを開始してください");
+    return false;
+  }
+  ufoEquipmentDevelopmentTestState.comparisonCamera = false;
+  if (state.map === "space" && state.ufoInSpace) {
+    const restarted = activateUfoForwardScrollMission(control, { testMode: true, silent: true });
+    renderUfoEquipmentDevelopmentTestPanel();
+    if (restarted) showToast("現在の装備テストで宇宙航路を再開しました");
+    return restarted;
+  }
+  if (!isUfoSpaceLaunchMap()) {
+    renderUfoEquipmentDevelopmentTestPanel();
+    showToast("空マップまたは火星マップで実機テストを開始してください");
+    return false;
+  }
+
+  // 既存の開発用直接宇宙遷移と同じ初期化を使う。保存座標や素材は変更せず、
+  // その場で操縦席へ固定してから前進スクロール航路だけを実際に起動する。
+  keys.clear();
+  touchVector.set(0, 0);
+  ufoFlightPointerInput.forward = 0;
+  ufoFlightPointerInput.turn = 0;
+  ufoFlightPointerInput.lift = 0;
+  ufoFlightPointerInput.strafe = 0;
+  resetUfoFlightHoldAcceleration();
+  control.craftAssembly.updateWorldMatrix(true, true);
+  const craftWorldPosition = control.craftAssembly.getWorldPosition(new THREE.Vector3());
+  const localFlightPosition = ufoWorldToLocal(
+    control,
+    craftWorldPosition.x,
+    craftWorldPosition.z,
+  );
+  const scale = control.scale || BUILDING_SCALE;
+  state.ufoFlightX = localFlightPosition.x;
+  state.ufoFlightY = (craftWorldPosition.y - (control.originY || 0)) / scale;
+  state.ufoFlightZ = localFlightPosition.z;
+  state.ufoDoorOpen = false;
+  state.ufoHatchOpen = false;
+  state.ufoMarsArrivalExitPending = false;
+  state.ufoMarsHatchRequiresFaceAuth = false;
+  state.ufoFaceAuth = false;
+  state.ufoFaceAuthLatched = false;
+  state.ufoBoarded = true;
+  state.ufoEngineMode = "ready";
+  state.ufoEngineRunning = true;
+  state.ufoCabinLightAmount = 1;
+  control.amount = 0;
+  control.target = 0;
+  control.hatchAmount = 0;
+  control.hatchTarget = 0;
+  setUfoCabinLightAmount(control, 1);
+  applyUfoCraftWorldTransform(control);
+  enforceUfoTurbineAttachment(control);
+  state.ufoSpaceTransitioning = true;
+  enterUfoSpaceMap(control, { side: "equipment-development-test" }, ufoSpaceTransitionSequence);
+  const started = activateUfoForwardScrollMission(control, { testMode: true, silent: true });
+  renderUfoEquipmentDevelopmentTestPanel();
+  if (started) {
+    document.body.dataset.ufoEquipmentDevelopmentSpaceTest = getUfoEquipmentDevelopmentProfile().id;
+    showToast("宇宙で実機テストを開始しました。射撃・ロックON・回復効果を確認できます");
+  }
+  return started;
 }
 
 function getUfoEquipmentRecipe(recipeId) {
@@ -22073,22 +23795,25 @@ function isUfoEquipmentRecipeCrafted(recipe) {
 }
 
 function getUfoEquipmentEnergyAbsorptionMultiplier() {
-  const level = clamp(Math.round(Number(state.ufoEquipment.energyAbsorptionTankLevel) || 0), 0, 2);
+  const equipment = getUfoEffectiveEquipmentState();
+  const level = clamp(Math.round(Number(equipment.energyAbsorptionTankLevel) || 0), 0, 2);
   return level >= 2 ? 1.5 : level === 1 ? 1.2 : 1;
 }
 
+function getUfoEquipmentEnergyRecoveryAmount(baseAmount = UFO_FORWARD_SCROLL_ENERGY_STAR_TYPE.reward) {
+  return Math.max(1, Math.round(baseAmount * getUfoEquipmentEnergyAbsorptionMultiplier()));
+}
+
 function getUfoEquipmentLockOnReticleMultiplier() {
-  return state.ufoEquipment.lockOnReticleMultiplier >= 1.2 ? 1.2 : 1;
+  return getUfoEffectiveEquipmentState().lockOnReticleMultiplier >= 1.2 ? 1.2 : 1;
 }
 
 function getUfoEquipmentLockOnDetectionMultiplier() {
-  return state.ufoEquipment.lockOnDetectionMultiplier >= 1.2 ? 1.2 : 1;
+  return getUfoEffectiveEquipmentState().lockOnDetectionMultiplier >= 1.2 ? 1.2 : 1;
 }
 
-function persistUfoEquipmentWorkshopState() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(worldStateSnapshot()));
-  state.saved = true;
-  if (els.saveState) els.saveState.textContent = "保存済み";
+function isUfoEquipmentSimultaneousShotEnabled() {
+  return getUfoEffectiveEquipmentState().simultaneousShotEnabled === true;
 }
 
 function normalizeUfoWorkshopMaterialLedger(value) {
@@ -22112,17 +23837,6 @@ function normalizeUfoWorkshopMaterialLedger(value) {
 
 function readUfoWorkshopMaterialLedger() {
   return normalizeUfoWorkshopMaterialLedger(safeJson(localStorage.getItem(UFO_WORKSHOP_MATERIAL_STORE_KEY)));
-}
-
-function writeUfoWorkshopMaterialLedger(value) {
-  const ledger = normalizeUfoWorkshopMaterialLedger(value);
-  ledger.updatedAt = Date.now();
-  try {
-    localStorage.setItem(UFO_WORKSHOP_MATERIAL_STORE_KEY, JSON.stringify(ledger));
-  } catch (error) {
-    console.warn("UFO倉庫素材を保存できませんでした。", error);
-  }
-  return ledger;
 }
 
 function getUfoEquipmentRecipeCostEntries(recipe) {
@@ -22202,7 +23916,11 @@ function renderUfoEquipmentWorkshopMenu() {
       button.textContent = `素材不足（${availability.missingCosts.map(entry => `${entry.label}あと${entry.missing}`).join(" / ")}）`;
     }
     else button.textContent = "作成して装備";
-    button.addEventListener("click", () => craftUfoEquipment(recipe.id));
+    button.addEventListener("click", () => {
+      void craftUfoEquipment(recipe.id).catch(error => {
+        showToast(`装備を作成できませんでした：${error.message}`);
+      });
+    });
     button.addEventListener("pointerdown", event => event.stopPropagation());
     card.append(title, cost, effect, button);
     list.appendChild(card);
@@ -22212,10 +23930,13 @@ function renderUfoEquipmentWorkshopMenu() {
   }
 }
 
-function craftUfoEquipment(recipeId) {
+async function craftUfoEquipment(recipeId) {
+  if(worldSaveService.mode!=='live'){showToast('確認モードでは実際の装備素材を消費しません。');return false;}
+  if(worldSaveService.busy||worldSaveService.blocked){showToast('保存が完了してから作成してください。');return false;}
   const recipe = getUfoEquipmentRecipe(recipeId);
   if (!recipe) return false;
-  const materials = readUfoWorkshopMaterialLedger();
+  const beforeRaw=localStorage.getItem(UFO_WORKSHOP_MATERIAL_STORE_KEY);
+  const materials = normalizeUfoWorkshopMaterialLedger(safeJson(beforeRaw));
   const availability = getUfoEquipmentRecipeAvailability(recipe, materials);
   if (availability.crafted) {
     showToast(`${recipe.label}はすでに装備済みです`);
@@ -22233,21 +23954,33 @@ function craftUfoEquipment(recipeId) {
   getUfoEquipmentRecipeCostEntries(recipe).forEach(entry => {
     updatedMaterials[entry.id] = Math.max(0, (Number(updatedMaterials[entry.id]) || 0) - entry.amount);
   });
-  writeUfoWorkshopMaterialLedger(updatedMaterials);
+  updatedMaterials.updatedAt=Date.now();
+  const updatedEquipment={...state.ufoEquipment};
   if (recipe.id.startsWith("energy-absorption-tank")) {
-    state.ufoEquipment.energyAbsorptionTankLevel = Math.max(
+    updatedEquipment.energyAbsorptionTankLevel = Math.max(
       state.ufoEquipment.energyAbsorptionTankLevel,
       recipe.value,
     );
   } else if (recipe.id === "simultaneous-shot") {
-    state.ufoEquipment.simultaneousShotEnabled = true;
+    updatedEquipment.simultaneousShotEnabled = true;
   } else if (recipe.id === "lock-on-reticle-radar") {
-    state.ufoEquipment.lockOnReticleMultiplier = 1.2;
+    updatedEquipment.lockOnReticleMultiplier = 1.2;
   } else if (recipe.id === "lock-on-range-radar") {
-    state.ufoEquipment.lockOnDetectionMultiplier = 1.2;
+    updatedEquipment.lockOnDetectionMultiplier = 1.2;
   }
-  persistUfoEquipmentWorkshopState();
+  worldSaveErrorUI.startWork();clearMarsShopDialogInput();
+  try{
+    const saved=await worldSaveService.craftEquipment(worldStateSnapshot(),updatedEquipment,beforeRaw,JSON.stringify(updatedMaterials),crypto.randomUUID());
+    Object.assign(state.ufoEquipment,saved.ufoEquipment);worldSaveErrorUI.endWork();
+  }catch(error){worldSaveErrorUI.show(error);return false;}
+  // 実際に作成した直後は開発用の仮装備を解除し、保存済みの正規装備を
+  // そのまま見える状態に戻す。
+  ufoEquipmentDevelopmentTestState.profileId = "saved";
+  // 作成直後にも、現在表示中のUFOへ追加パーツを即時反映する。次回の
+  // マップ再構築時は buildCatalogModel 側でも同じ保存状態を読み込む。
+  refreshUfoEquipmentVisuals();
   renderUfoEquipmentWorkshopMenu();
+  renderUfoEquipmentDevelopmentTestPanel();
   showToast(`${recipe.label}を作成し、UFOへ装備しました`);
   return true;
 }
@@ -22371,6 +24104,24 @@ function updateCharacterSeatedPose(delta) {
   });
 }
 
+function reportPhysicsBlock(blocker) {
+  // 物理表示中だけ、実際に移動を止めた要素を知らせる。見えている
+  // メッシュと異なる古い近似箱が残っていないか、座標に頼らず確認する
+  // ための開発用の接触ログで、通常プレイ時の表示や判定には影響しない。
+  if (!state.physicsDebug) return;
+  const label = typeof blocker === "string"
+    ? blocker
+    : (blocker?.id || "未分類の物理面");
+  if (state.physicsLastBlockedId === label) return;
+  state.physicsLastBlockedId = label;
+  // 画面上でも接触元を確認できるよう、物理表示中の切替ボタンへ表示する。
+  // OFFへ戻した時は通常の短いラベルに復帰する。
+  if (els.physicsDebugButton) {
+    els.physicsDebugButton.textContent = `物理表示：ON / 接触：${label}`;
+  }
+  showToast(`物理接触：${label}`);
+}
+
 function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
   const config = MAPS[state.map];
   const limitX = config.world.width / 2 - PLAYER_RADIUS;
@@ -22389,7 +24140,10 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
     const availableRise = stepTransition.availableJumpRise ?? getAvailableJumpRise();
     // Every raised visible surface follows the same rule: walking cannot climb
     // it, a reachable jump can, and descending never needs another jump.
-    if (!originHasContact && (!stepTransition.airborne || availableRise + STEP_JUMP_CLEARANCE < requiredRise)) return true;
+    if (!originHasContact && (!stepTransition.airborne || availableRise + STEP_JUMP_CLEARANCE < requiredRise)) {
+      reportPhysicsBlock("段差の立ち上がり");
+      return true;
+    }
   }
   return colliders.some(c => {
     if (isColliderPassage(x, z, c)) return false;
@@ -22420,7 +24174,9 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
     if (!fromInside && !toInside
       && characterVerticallyOverlapsCollider(c)
       && segmentIntersectsCollider(fromX, fromZ, x, z, c, 0)) {
-      return canPassStepCollider(c, stepTransition) ? false : true;
+      if (canPassStepCollider(c, stepTransition)) return false;
+      reportPhysicsBlock(c);
+      return true;
     }
     // Endpoint SAT handles ordinary body overlap; the swept test above handles
     // the remaining thin-part tunnel case.
@@ -22428,13 +24184,14 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
     // すべての段差部材を、個別の「ここだけ通す」例外ではなく、
     // 段差の実高さとジャンプ状態で同じように評価する。
     if (canPassStepCollider(c, stepTransition)) return false;
+    reportPhysicsBlock(c);
     return true;
   });
 }
 
 function readMoveVector() {
   // RPG会話中は移動入力を止め、選択肢の操作に集中できるようにする。
-  if (isSkyStationGuideDialogOpen() || isUfoEquipmentWorkshopMenuOpen()) return new THREE.Vector3();
+  if (isSkyStationGuideDialogOpen() || marsShopDialogState.open || isUfoEquipmentWorkshopMenuOpen()) return new THREE.Vector3();
   const strafe = (keys.has("d") || keys.has("arrowright") ? 1 : 0) - (keys.has("a") || keys.has("arrowleft") ? 1 : 0) + touchVector.x;
   const forward = (keys.has("w") || keys.has("arrowup") ? 1 : 0) - (keys.has("s") || keys.has("arrowdown") ? 1 : 0) - touchVector.y;
   const input = new THREE.Vector2(strafe, forward);
@@ -22448,14 +24205,65 @@ function readMoveVector() {
   return viewForward.multiplyScalar(input.y).add(viewRight.multiplyScalar(input.x));
 }
 
+// Local preview only: exercise the ordinary per-frame walking/physics path.
+// No teleport after the starting point, no jump and no save-data changes.
+function setupStationWalkPreview() {
+  if (!SKY_STATION_INTERIOR_PREVIEW || !skyStationBuilding) return;
+  const panel = document.createElement('div');
+  panel.style.cssText = 'position:absolute;top:48px;left:16px;z-index:12;background:#102c42e8;padding:10px;border-radius:8px;color:white;max-width:320px';
+  const button = document.createElement('button');
+  button.id = 'stationWalkTestButton'; button.textContent = '駅を徒歩で往復テスト';
+  button.addEventListener('pointerdown', event => event.stopPropagation());
+  const status = document.createElement('div'); status.setAttribute('role','status');
+  status.style.cssText = 'font-size:12px;margin-top:6px';
+  status.textContent = '正面 → 改札 → ホーム → 正面（保存しません）';
+  panel.append(button, status); els.viewport.append(panel);
+  button.addEventListener('click', () => {
+    const previousDebug = state.physicsDebug;
+    const previousDebugLabel = els.physicsDebugButton.textContent;
+    const route = [[0,60],[0,26],[0,-10],[-60,-10],[-44,-10],[0,-10],[0,26],[0,60]]
+      .map(([x,z]) => skyStationBuilding.localToWorld(new THREE.Vector3(x,0,z)));
+    state.position.set(route[0].x,0,route[0].z); state.groundY = 0;
+    state.jumpY=0; state.jumpVelocity=0; state.falling=false; state.fastWalking=false;
+    state.physicsDebug=true; state.physicsLastBlockedId=null;
+    keys.clear(); touchVector.set(0,0);
+    stationWalkPreview = { route:route.slice(1), index:0, status, button, elapsed:0, stuck:0, last:state.position.clone(), previousDebug, previousDebugLabel };
+    button.disabled = true; updateCharacter(0);
+  });
+}
+
+function updateStationWalkPreview(delta) {
+  const test = stationWalkPreview;
+  if (!test) return;
+  test.elapsed += delta;
+  test.stuck = state.position.distanceTo(test.last) < .01 ? test.stuck + delta : 0;
+  test.last.copy(state.position);
+  let target = test.route[test.index];
+  if (target && Math.hypot(target.x-state.position.x,target.z-state.position.z) < .08) target = test.route[++test.index];
+  const stop = message => {
+    state.physicsDebug=test.previousDebug; els.physicsDebugButton.textContent=test.previousDebugLabel;
+    touchVector.set(0,0); test.button.disabled=false; test.status.textContent=message; stationWalkPreview=null;
+  };
+  if (test.stuck > 2 || state.falling || state.jumpY > .1) {
+    stop(`停止：${state.falling ? '床から落下' : state.physicsLastBlockedId || '歩行の引っかかり'} / X ${state.position.x.toFixed(1)} Z ${state.position.z.toFixed(1)}`); return;
+  }
+  if (!target) { stop('往復完了：正面・改札・ホームをジャンプなしで通過'); return; }
+  const dx=target.x-state.position.x, dz=target.z-state.position.z;
+  state.viewHeading=Math.atan2(dx,dz); state.viewPitch=-.03;
+  touchVector.set(0,-Math.min(1,Math.hypot(dx,dz)/Math.max(.001,PLAYER_SPEED*delta)));
+  test.status.textContent=`歩行テスト ${test.index+1}/${test.route.length}・床 ${state.groundY.toFixed(2)}・ジャンプ ${state.jumpY.toFixed(2)}`;
+}
+
 function isFastWalking() {
   return state.fastWalking;
 }
 
 function triggerJump() {
   if (state.jumpCount >= MAX_JUMPS) return;
+  const soilBoost=state.jumpCount===0&&state.jumpY===0&&!state.falling
+    ? worldSoilController?.jumpMultiplier({x:state.position.x,y:state.groundY,z:state.position.z,heading:state.heading})??1 : 1;
   state.falling = false;
-  state.jumpVelocity = JUMP_VELOCITY;
+  state.jumpVelocity = JUMP_VELOCITY*soilBoost;
   state.jumpCount += 1;
   showToast(`${state.jumpCount}段ジャンプ`);
 }
@@ -22516,8 +24324,8 @@ function updateBoardedCharacter(delta) {
     ? (state.map === "space" && flightInput.autoAdvanceInput
       ? (isUfoForwardScrollActive(control)
         ? (Math.abs(flightInput.strafeInput || 0) + Math.abs(flightInput.liftInput || 0) > .01
-          ? `火星航行を自動前進・回収中${accelerationLabel}`
-          : "火星航行を自動前進中")
+          ? `${control.spaceForwardScroll.route.destinationName}航行を自動前進・回収中${accelerationLabel}`
+          : `${control.spaceForwardScroll.route.destinationName}航行を自動前進中`)
         : (Math.abs(flightInput.strafeInput || 0) > .01
           ? `救助航路を自動前進・左右操縦中${accelerationLabel}`
           : "救助航路を自動前進中"))
@@ -22551,6 +24359,7 @@ function updateCharacter(delta) {
   // Resolve the rendered hemispherical canopy on the vertical axis as well,
   // so jumping in place or using a second/third jump never passes through it.
   constrainCharacterBelowUfoCapsule();
+  constrainCharacterBelowAuthoredCeilings();
   const landedThisFrame = wasAirborne && state.jumpY === 0 && state.jumpVelocity === 0;
   const move = readMoveVector();
   state.moving = move.lengthSq() > .001;
@@ -22661,6 +24470,7 @@ function updateCharacter(delta) {
   // end position in the same frame so no rendered frame can protrude through
   // the capsule before the next update corrects it.
   constrainCharacterBelowUfoCapsule();
+  constrainCharacterBelowAuthoredCeilings();
   // Do not run a post-movement depenetration pass. If a rotated body would
   // overlap a wall, the next movement input is rejected by isBlocked(); the
   // current frame must remain where it was instead of being pushed backward.
@@ -22713,6 +24523,15 @@ function updateCharacter(delta) {
   // The character is grounded only by a real floor under the feet. A nearby
   // edge with no foot overlap must not lift the whole body over empty ground.
   let targetGroundY = exactGroundY;
+  const stationSlopeY = state.map === 'sky'
+    ? skyStationRampHeightAt(skyStationBuilding, state.position.x, state.position.z) : null;
+  if (!wasAirborne && Number.isFinite(stationSlopeY)) {
+    // The sloping top supersedes the old flat foundation beneath it. Holding
+    // a nearby flat floor under one foot makes a descending walker hover,
+    // then fall when that foot finally leaves the edge.
+    targetGroundY = stationSlopeY;
+    state.supportSurfaceId = null;
+  }
   // 歩いて高所の端を離れた場合は、groundYを即座に下げて瞬間移動
   // させない。現在の足場から着地点までの差を空中距離として保持し、
   // ジャンプと同じ重力で落下させる。判定は現在の足元の実在面だけを
@@ -22723,6 +24542,8 @@ function updateCharacter(delta) {
     && state.moving
     && state.jumpY === 0
     && state.jumpVelocity === 0
+    && !isStationAccessRampTransition({ fromX: movementOrigin.x, fromZ: movementOrigin.z,
+      toX: state.position.x, toZ: state.position.z, fromHeight: state.groundY, toHeight: targetGroundY })
     && targetGroundY < state.groundY - .2;
   if (walkingOffRaisedSurface) {
     const fallDistance = Math.max(0, state.groundY - targetGroundY);
@@ -22819,7 +24640,7 @@ function updateUfoFlightCameraFov() {
 }
 
 function applyUfoForwardScrollDepartureCamera(control, mission, cameraPosition, cameraTarget) {
-  const earth = control?.spaceEarth;
+  const earth = mission?.departurePlanet || control?.spaceEarth;
   const craft = control?.craftAssembly;
   if (!earth?.visible || !craft || mission?.phase !== "launch") return false;
 
@@ -22849,7 +24670,9 @@ function applyUfoForwardScrollDepartureCamera(control, mission, cameraPosition, 
     .addScaledVector(forward, 940 - progress * 130)
     .addScaledVector(right, 620)
     .addScaledVector(up, 460 + progress * 85);
-  const departureFocus = mission.departureCloudDeck?.focus || earthCenter;
+  const departureFocus = mission.route.origin === 'mars'
+    ? earthCenter.clone().addScaledVector(mission.earthDepartureLaunchNormal, earth.userData.radius)
+    : mission.departureCloudDeck?.focus || earthCenter;
   departureTarget.copy(departureFocus)
     .lerp(craftCenter, .38 + progress * .16)
     .addScaledVector(up, 76 + progress * 34);
@@ -22860,9 +24683,75 @@ function applyUfoForwardScrollDepartureCamera(control, mission, cameraPosition, 
   return true;
 }
 
+function applyUfoForwardScrollMarsDescentCamera(control, mission, cameraPosition, cameraTarget) {
+  const entry = mission?.marsAtmosphereEntry;
+  const mars = mission?.destinationPlanet || control?.spaceMars;
+  const craft = control?.craftAssembly;
+  if (!entry?.descentStarted || mission?.phase !== "mars-descent" || !mars?.visible || !craft) {
+    return false;
+  }
+
+  const progress = clamp(
+    entry.descentElapsed / Math.max(.001, UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS),
+    0,
+    1,
+  );
+  craft.updateWorldMatrix(true, true);
+  mars.updateWorldMatrix(true, true);
+  const craftCenter = craft.getWorldPosition(new THREE.Vector3());
+  // 地球離脱とは逆に、地球側の真後ろ上空からUFOが火星へ沈み込む様子を
+  // 映す。注視点を火星中心へ寄せすぎると巨大な火星面に引っ張られ、機体が
+  // 画面端へ逃げてしまうため、機体の進行方向を中心に構図を固定する。
+  entry.descentCamera.copy(craftCenter)
+    .addScaledVector(mission.forward, -780 + progress * 130)
+    .addScaledVector(mission.right, 74)
+    .addScaledVector(mission.up, 360 - progress * 82);
+  entry.descentTarget.copy(craftCenter)
+    .addScaledVector(mission.forward, 680 + progress * 180)
+    .addScaledVector(mission.up, -128 - progress * 54);
+  cameraPosition.copy(entry.descentCamera);
+  cameraTarget.copy(entry.descentTarget);
+  document.body.dataset.ufoMarsDescentCamera = "external-earthside";
+  return true;
+}
+
+function applyUfoEquipmentDevelopmentComparisonCamera() {
+  if (!ufoEquipmentDevelopmentTestState.comparisonCamera || !camera) return false;
+  const craft = ufoDoorControls[0]?.craftAssembly;
+  if (!craft) {
+    ufoEquipmentDevelopmentTestState.comparisonCamera = false;
+    renderUfoEquipmentDevelopmentTestPanel();
+    return false;
+  }
+  craft.updateWorldMatrix(true, true);
+  const craftCenter = craft.getWorldPosition(new THREE.Vector3());
+  const craftQuaternion = craft.getWorldQuaternion(new THREE.Quaternion());
+  // 後部増槽とコックピット内部の両方が同時に読める、左後ろ上方の固定観察角。
+  // UFOは実寸を2.5倍にしているため、近すぎると外縁しか映らず装備比較に
+  // ならない。機体全体と追加パーツの位置関係を一枚で見られる距離を取る。
+  const cameraOffset = new THREE.Vector3(-282, 164, 292).applyQuaternion(craftQuaternion);
+  const focusOffset = new THREE.Vector3(-4, 18, 0).applyQuaternion(craftQuaternion);
+  camera.position.copy(craftCenter).add(cameraOffset);
+  camera.lookAt(craftCenter.clone().add(focusOffset));
+  els.viewport.classList.remove("is-first-person");
+  els.viewReadout.textContent = "UFO装備比較";
+  els.cameraModeButton.textContent = "視点：装備比較";
+  els.cameraDistanceButton.textContent = "画角：装備比較";
+  document.body.dataset.ufoEquipmentComparisonCamera = "active";
+  return true;
+}
+
 function updateCamera() {
+  if (CONSTRUCTION_EXPANSION_PREVIEW && constructionOverview && state.map === 'construction') {
+    camera.near = 10; camera.far = 14000; camera.updateProjectionMatrix();
+    camera.position.set(0, Math.max(5900, 3400 / Math.max(.3, camera.aspect)), 1900);
+    camera.lookAt(0, 0, 0); scene.fog = null;
+    return;
+  }
   updateUfoFlightCameraFov();
   const target = new THREE.Vector3(state.position.x, 38 + state.groundY + state.jumpY, state.position.z);
+  if (applyUfoEquipmentDevelopmentComparisonCamera()) return;
+  delete document.body.dataset.ufoEquipmentComparisonCamera;
   if (UFO_LIGHT_VISUAL_TEST && state.ufoEngineMode === "ready") {
     const control = ufoDoorControls[0];
     const craftWorld = control?.craftAssembly
@@ -22917,19 +24806,31 @@ function updateCamera() {
     const forwardScrollMission = state.map === "space"
       ? ufoDoorControls[0]?.spaceForwardScroll
       : null;
-    if (!applyUfoForwardScrollDepartureCamera(
+    const usingDepartureCamera = applyUfoForwardScrollDepartureCamera(
       ufoDoorControls[0],
       forwardScrollMission,
       cockpitCamera,
       cockpitTarget,
-    )) {
+    );
+    const usingMarsDescentCamera = !usingDepartureCamera
+      && applyUfoForwardScrollMarsDescentCamera(
+        ufoDoorControls[0],
+        forwardScrollMission,
+        cockpitCamera,
+        cockpitTarget,
+      );
+    if (!usingDepartureCamera) {
       delete document.body.dataset.ufoEarthDepartureCamera;
     }
+    if (!usingMarsDescentCamera) delete document.body.dataset.ufoMarsDescentCamera;
     if (state.map === "space") {
       const control = ufoDoorControls[0];
       const earthCenter = control?.spaceEarthWorldCenter;
       const entryCraftY = control?.spaceEarthEntryCraftY;
-      if (earthCenter && Number.isFinite(entryCraftY) && !control?.spaceEarth?.userData?.planetariumHidden) {
+      if (earthCenter
+        && Number.isFinite(entryCraftY)
+        && forwardScrollMission?.phase !== "mars-descent"
+        && !control?.spaceEarth?.userData?.planetariumHidden) {
         const craftY = control.craftAssembly.getWorldPosition(new THREE.Vector3()).y;
         const descended = Math.max(0, entryCraftY - craftY);
         const earthReveal = THREE.MathUtils.smoothstep(descended, 110, 720);
@@ -22960,7 +24861,9 @@ function updateCamera() {
     els.cameraDistanceButton.textContent = `画角：${activePreset.label}`;
     els.touchHint.textContent = state.ufoEngineMode === "ready"
       ? isUfoForwardScrollActive()
-        ? "高速火星航行：自動前進 / W・S 上下　A・D 左右（Gの掛かる軌道補正）"
+        ? forwardScrollMission?.phase === "mars-descent"
+          ? `${forwardScrollMission.route.destinationName}大気圏を降下中`
+          : `高速${forwardScrollMission.route.destinationName}航行：自動前進 / W・S 上下　A・D 左右（Gの掛かる軌道補正）`
         : "UFO操縦：W 上昇 / S 下降 / A 左移動 / D 右移動（前後・回転は画面レバー）"
       : "エンジン始動シーケンス中";
     return;
@@ -23010,13 +24913,122 @@ function updateCamera() {
     : "左パッド：画面基準で移動　同じ方向を素早く2回：速歩（停止で解除）　Space：最大3段ジャンプ　右側ドラッグ：カメラ回転";
 }
 
+function startMarsArrivalDevelopmentPreview() {
+  // 火星タブでの開発確認も、地表へ置いて始めるのではなく、プレイヤーが
+  // 実際に使う「操縦席 → 大気圏降下 → 停止 → 引き戸・足場を開く」経路を
+  // そのまま再生する。これで降車までを一続きで検証できる。
+  resetUfoEngineRuntime();
+  state.map = "sky";
+  state.selectedBuildId = null;
+  state.ufoDoorOpen = false;
+  state.ufoHatchOpen = false;
+  state.ufoFaceAuth = false;
+  state.ufoFaceAuthLatched = false;
+  state.pendingSafeEntry = false;
+  cancelBuild();
+  resetPlayerToMapSpawn("sky", { fromEntry: true });
+  if (scene) {
+    scene.background = color(MAPS.sky.palette.fog);
+    scene.fog = new THREE.Fog(MAPS.sky.palette.fog, 360, 780);
+  }
+  rebuildMap();
+
+  const control = ufoDoorControls[0];
+  if (!control?.craftAssembly) {
+    showToast("火星到着演出用のUFOを準備できませんでした");
+    return false;
+  }
+
+  // 演出の開始時点は、到着前の密閉された操縦席。以前の足場・扉の状態を
+  // 引き継がず、着陸後に既存の到着処理だけが開くように初期化する。
+  control.amount = 0;
+  control.target = 0;
+  control.hatchAmount = 0;
+  control.hatchTarget = 0;
+  control.craftAssembly.updateWorldMatrix(true, true);
+  const craftWorldPosition = control.craftAssembly.getWorldPosition(new THREE.Vector3());
+  const localFlightPosition = ufoWorldToLocal(
+    control,
+    craftWorldPosition.x,
+    craftWorldPosition.z,
+  );
+  const scale = control.scale || BUILDING_SCALE;
+  state.ufoFlightX = localFlightPosition.x;
+  state.ufoFlightY = (craftWorldPosition.y - (control.originY || 0)) / scale;
+  state.ufoFlightZ = localFlightPosition.z;
+  state.ufoFlightHeading = 0;
+  state.ufoFlightBasePitch = 0;
+  state.ufoFlightBaseRoll = 0;
+  state.ufoFlightPitch = 0;
+  state.ufoFlightRoll = 0;
+  state.ufoFlightDirectionalYaw = 0;
+  state.ufoFlightRockBlend = 0;
+  state.ufoFlightWarningRockBlend = 0;
+  const seatAnchor = ufoSeatWorldAnchor(control);
+  state.position.set(seatAnchor.x, 0, seatAnchor.z);
+  state.groundY = seatAnchor.y;
+  state.jumpY = 0;
+  state.jumpVelocity = 0;
+  state.jumpCount = 0;
+  state.falling = false;
+  state.moving = false;
+  state.fastWalking = false;
+  state.supportSurfaceId = null;
+  state.heading = control.seatHeadingLocal + control.rotation;
+  state.viewHeading = state.heading;
+  state.viewPitch = 0;
+  state.ufoBoarded = true;
+  state.ufoEngineMode = "ready";
+  state.ufoEngineTimer = 0;
+  state.ufoEngineRunning = true;
+  state.ufoCabinLightAmount = 1;
+  keys.clear();
+  setUfoCabinLightAmount(control, 1);
+  applyUfoCraftWorldTransform(control);
+  enforceUfoTurbineAttachment(control);
+  state.ufoSpaceTransitioning = true;
+  enterUfoSpaceMap(
+    control,
+    { side: "mars-arrival-development" },
+    ufoSpaceTransitionSequence,
+  );
+
+  const started = activateUfoForwardScrollMission(control, {
+    testMode: true,
+    silent: true,
+    marsArrivalPreview: true,
+  });
+  if (!started) {
+    showToast("火星到着演出を開始できませんでした");
+    return false;
+  }
+  control.craftAssembly.updateWorldMatrix(true, true);
+  const craftCenter = control.craftAssembly.getWorldPosition(new THREE.Vector3());
+  if (!beginUfoForwardScrollMarsDescent(control, control.spaceForwardScroll, craftCenter)) {
+    showToast("火星の降下演出を開始できませんでした");
+    return false;
+  }
+  document.body.dataset.ufoMarsArrivalDevelopment = "descending";
+  showToast("火星到着の降下演出を開始しました。着陸後は操縦席から降車できます");
+  return true;
+}
+
 function setMap(key) {
+  if(typeof worldExcavationController!=='undefined'&&worldExcavationController?.active){worldExcavationController.leave({force:true,then:()=>setMap(key)});return;}
+  if(typeof worldWaterController!=='undefined'&&worldWaterController?.active){void worldWaterController.leave({force:true,then:()=>setMap(key)});return;}
+  if(typeof worldSoilController!=='undefined'&&worldSoilController?.active){void worldSoilController.leave({force:true,then:()=>setMap(key)});return;}
+  if(typeof worldTimberController!=='undefined'&&state.map==='construction'&&(worldTimberController?.active||worldTimberController?.dirty)&&worldSaveService.mode!=='readonly'){void worldTimberController.leave({force:true,then:()=>setMap(key)});return;}
+  if(typeof worldTimberController!=='undefined'&&worldTimberController?.active){void worldTimberController.leave({force:true,then:()=>setMap(key)});return;}
+  if (CONSTRUCTION_EXPANSION_PREVIEW && key !== 'construction') return;
   if (!MAPS[key] || key === state.map) return;
+  if (key === "mars" && startMarsArrivalDevelopmentPreview()) return;
   resetUfoEngineRuntime();
   state.map = key; resetPlayerToMapSpawn(key); state.selectedBuildId = null; state.ufoBoarded = false; state.ufoDoorOpen = false; state.ufoFaceAuth = false; state.ufoFaceAuthLatched = false; cancelBuild();
   if (scene) {
     scene.background = color(MAPS[key].palette.fog);
-    scene.fog = new THREE.Fog(MAPS[key].palette.fog, 360, 780);
+    scene.fog = key === 'mars' ? null : key === 'construction'
+      ? new THREE.Fog(MAPS[key].palette.fog, 1400, 7000)
+      : new THREE.Fog(MAPS[key].palette.fog, 360, 780);
   }
   rebuildMap(); showToast(`${MAPS[key].source.title}へ移動しました`);
 }
@@ -23043,6 +25055,7 @@ function setupTouchPad() {
     }
   };
   els.touchPad.addEventListener("pointerdown", event => {
+    if (marsShopDialogState.open) { event.preventDefault(); return; }
     const now = performance.now();
     if (now - lastTouchTapAt <= 380) {
       startFastWalking();
@@ -23083,6 +25096,7 @@ function setupTouchPad() {
 
 function setupLookControls() {
   els.viewport.addEventListener("pointerdown", event => {
+    if (marsShopDialogState.open) return;
     // パッド上の距離ボタンは視点ドラッグとして扱わず、
     // タップをボタン自身のクリック処理へ渡す。
     if (event.target.closest("#touchPad, #cameraDistanceButton, #emergencyEscapeButton, #ufoFlightControls, #ufoSpaceCombat")) return;
@@ -23462,14 +25476,143 @@ function startUfoSpaceTransitionTestIfRequested() {
   window.setTimeout(() => keys.delete("d"), initialExitHoldMs);
 }
 
+function setupMarsReturnDevelopmentPreview() {
+  if (!MARS_RETURN_PREVIEW) return;
+  const button = document.createElement('button');
+  button.textContent = '火星の柵から地球へ出発（開発確認）';
+  button.id = 'marsReturnPreviewStart';
+  button.addEventListener('pointerdown', event => event.stopPropagation());
+  els.viewport.prepend(button);
+  Object.assign(button.style, { position: 'absolute', top: '12px', left: '12px', zIndex: '30', padding: '12px' });
+  els.saveState.textContent = '火星帰路の確認中（保存しません）';
+  button.addEventListener('click', () => {
+    if (state.map !== 'mars') return;
+    const control = ufoDoorControls[0];
+    if (!control?.craftAssembly) return;
+    const scale = control.scale || BUILDING_SCALE;
+    const radius = (control.flightCollision?.radiusLocal ?? UFO_FLIGHT_COLLISION_RADIUS_LOCAL) * scale + UFO_FLIGHT_COLLISION_SKIN;
+    const start = ufoWorldToLocal(control, MAPS.mars.world.width / 2 - 16 - radius - 6, 0);
+    state.ufoFlightX = start.x;
+    state.ufoFlightZ = start.z;
+    state.ufoFlightY = 160 / scale;
+    state.ufoFlightHeading = -(control.rotation || 0);
+    state.ufoBoarded = true;
+    state.ufoEngineMode = 'ready';
+    state.ufoEngineRunning = true;
+    state.ufoCabinLightAmount = 1;
+    state.ufoDoorOpen = false; state.ufoHatchOpen = false;
+    control.amount = 0; control.target = 0;
+    control.hatchAmount = 0; control.hatchTarget = 0;
+    setUfoCabinLightAmount(control, 1);
+    applyUfoCraftWorldTransform(control);
+    enforceUfoTurbineAttachment(control);
+    // Cross the fence with the actual flight update and boundary detector.
+    // No direct call to enterUfoSpaceMap, no changed production durations.
+    keys.add('d');
+    window.setTimeout(() => keys.delete('d'), 20000);
+    button.remove();
+  });
+}
+
+function setupConstructionExpansionPreview() {
+  if (!CONSTRUCTION_EXPANSION_PREVIEW) return;
+  const panel = document.createElement('section');
+  panel.style.cssText = 'padding:14px;margin-bottom:16px;background:#fff5dc;border:1px solid #d4a76b;border-radius:12px;color:#553c22';
+  const title = document.createElement('h2'); title.textContent = '工事現場・面積100倍'; title.style.fontSize = '18px';
+  const detail = document.createElement('p'); detail.textContent = '5,400 × 3,600。中央の元の土地・橋・開始位置はそのままです。確認中は保存しません。'; detail.style.cssText = 'font-size:12px;line-height:1.7';
+  const controls = document.createElement('div'); controls.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px';
+  const status = document.createElement('p'); status.id = 'constructionPreviewStatus'; status.setAttribute('role', 'status'); status.style.cssText = 'font-size:12px;line-height:1.7';
+  const addButton = (text, action) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = text;
+    b.style.cssText = 'padding:8px;font-size:12px;background:white;color:#553c22;border:1px solid #d4b78c;border-radius:7px';
+    b.addEventListener('click', action); controls.append(b); return b;
+  };
+  const walking = () => {
+    constructionOverview = false;
+    if (constructionPreviewGuides) constructionPreviewGuides.visible = false;
+    camera.near = .1; camera.far = 6000; camera.updateProjectionMatrix();
+    scene.fog = new THREE.Fog(MAPS.construction.palette.fog, 1400, 7000);
+  };
+  const stopTest = () => { constructionWalkPreview = null; keys.clear(); touchVector.set(0, 0); };
+  const movePreviewTo = (x, z, heading = 0) => {
+    stopTest(); walking();
+    if (hasGroundCollisionAt(x, z, 0)) { status.textContent = '保存済み建物と重なるため、この確認地点への移動を中止しました。'; return false; }
+    state.position.set(x, 0, z); state.groundY = 0; state.jumpY = 0; state.jumpVelocity = 0; state.falling = false; state.supportSurfaceId = null;
+    state.heading = state.viewHeading = heading; state.viewPitch = -.06; state.cameraMode = 'third'; state.fastWalking = false;
+    updateCharacter(0); updateCamera(); status.textContent = `確認地点 X ${x.toFixed(1)} / Z ${z.toFixed(1)}（開発用移動）`; return true;
+  };
+  addButton('全体を見る', () => { stopTest(); constructionOverview = true; constructionPreviewGuides.visible = true; status.textContent = '外枠が拡張後の土地。中央の小さい枠が元の540×360です。'; });
+  addButton('歩行に戻る', () => { stopTest(); walking(); status.textContent = '通常のパッドで拡張した土地を歩けます。'; });
+  addButton('元の開始位置', () => { const p = mapSpawn(MAPS.construction); movePreviewTo(p.x, p.z, p.heading); });
+  for (const [name, x, z, heading] of [['西端', -2660, 0, -Math.PI / 2], ['東端', 2660, 0, Math.PI / 2], ['北端', 0, -1760, Math.PI], ['南端', 0, 1760, 0]]) {
+    addButton(name, () => movePreviewTo(x, z, heading));
+  }
+  addButton('旧境界を徒歩で往復', () => {
+    if (!movePreviewTo(240, 0, Math.PI / 2)) return;
+    constructionWalkPreview = { targets: [340, 240], index: 0, status, elapsed: 0, lastX: 240, stuck: 0 };
+  });
+  panel.append(title, detail, controls, status); document.querySelector('.control-card').prepend(panel);
+  constructionPreviewGuides = new THREE.Group(); constructionPreviewGuides.name = 'construction-preview-outlines';
+  for (const [w, d, tint] of [[5400, 3600, 0xfff5dc], [540, 360, 0x86fff0]]) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2],[-w/2,-d/2]].map(([x,z]) => new THREE.Vector3(x, 1, z)));
+    constructionPreviewGuides.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color:tint})));
+  }
+  scene.add(constructionPreviewGuides); constructionOverview = true;
+  status.textContent = '外枠が拡張後の土地。中央の小さい枠が元の540×360です。';
+  els.saveState.textContent = '工事現場の拡張確認中（保存しません）';
+  els.saveButton.disabled = els.resetButton.disabled = els.emergencyEscapeButton.disabled = true;
+  if (els.ufoEquipmentSpaceTestButton) els.ufoEquipmentSpaceTestButton.disabled = true;
+  document.querySelectorAll('[data-map]').forEach(b => { if (b.dataset.map !== 'construction') b.disabled = true; });
+}
+
+function updateConstructionWalkPreview(delta) {
+  const test = constructionWalkPreview;
+  if (!test || state.map !== 'construction') return;
+  test.elapsed += delta;
+  test.stuck = Math.abs(state.position.x - test.lastX) < .001 ? test.stuck + delta : 0; test.lastX = state.position.x;
+  const stop = text => { touchVector.set(0, 0); test.status.textContent = text; constructionWalkPreview = null; };
+  if (test.stuck > 2 || state.falling || state.jumpY > .01 || state.groundY !== 0) { stop('歩行検査停止：地面または保存済み建物との接触を確認してください。'); return; }
+  let target = test.targets[test.index];
+  if (Math.abs(target - state.position.x) < .08) target = test.targets[++test.index];
+  if (target === undefined) { stop('往復完了：旧境界 X270 をジャンプなしで通過。床0・落下なし。'); return; }
+  const dx = target - state.position.x;
+  state.viewHeading = dx > 0 ? Math.PI / 2 : -Math.PI / 2;
+  touchVector.set(0, -Math.min(1, Math.abs(dx) / Math.max(.001, PLAYER_SPEED * delta)));
+  test.status.textContent = `徒歩で旧境界を確認中：X ${state.position.x.toFixed(1)} / 床 ${state.groundY.toFixed(1)}`;
+}
+
 function setupScene() {
+  if (MATERIAL_GUIDE_PREVIEW) {
+    resetUfoEngineRuntime();state.map=MATERIAL_GUIDE_PREVIEW;resetPlayerToMapSpawn(state.map);state.pendingSafeEntry=false;
+  }
+  if (CONSTRUCTION_EXPANSION_PREVIEW) {
+    resetUfoEngineRuntime(); state.map = 'construction'; resetPlayerToMapSpawn('construction'); state.pendingSafeEntry = false;
+  }
+  if (SKY_STATION_INTERIOR_PREVIEW) {
+    resetUfoEngineRuntime(); state.map = 'sky'; resetPlayerToMapSpawn('sky'); state.pendingSafeEntry = false;
+  }
+  if (!CONSTRUCTION_EXCAVATION_PREVIEW && !CONSTRUCTION_TIMBER_PREVIEW && !CONSTRUCTION_SOIL_PREVIEW && !CONSTRUCTION_WATER_PREVIEW && !CONSTRUCTION_DELIVERY_PREVIEW && (MARS_SHOPKEEPER_PREVIEW || MARS_RETURN_PREVIEW || WORLD_SHOP_PREVIEW)) {
+    resetUfoEngineRuntime();
+    state.map='mars';
+    resetPlayerToMapSpawn('mars');
+    state.pendingSafeEntry=false;
+    state.ufoBoarded=false;
+    state.ufoDoorOpen=false;
+    state.ufoFaceAuth=false;
+  }
+  if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_DELIVERY_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW){
+    resetUfoEngineRuntime();state.map='construction';resetPlayerToMapSpawn('construction');state.pendingSafeEntry=false;state.ufoBoarded=false;
+  }
   renderer = new THREE.WebGLRenderer({ canvas: els.canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
   const initialSpaceView = state.map === "space" ? ufoSpaceViewMetrics() : null;
   scene = new THREE.Scene(); scene.background = color(MAPS[state.map].palette.fog); scene.fog = initialSpaceView
     ? new THREE.Fog(MAPS.space.palette.fog, initialSpaceView.fogNear, initialSpaceView.fogFar)
-    : new THREE.Fog(MAPS[state.map].palette.fog, 360, 780); clock = new THREE.Clock();
+    : state.map === 'mars' ? null : state.map === 'construction'
+      ? new THREE.Fog(MAPS[state.map].palette.fog, 1400, 7000)
+      : new THREE.Fog(MAPS[state.map].palette.fog, 360, 780); clock = new THREE.Clock();
   camera = new THREE.PerspectiveCamera(UFO_CAMERA_BASE_FOV, 1, .1, initialSpaceView?.cameraFar ?? 6000); camera.position.set(0, 110, 190);
+  marsSky = createMarsSky(); scene.add(marsSky);
   worldGroup = new THREE.Group(); mapGroup = new THREE.Group(); worldGroup.add(mapGroup); scene.add(worldGroup);
   physicsMeshGroup = new THREE.Group();
   physicsMeshGroup.name = "authoritative-physics-mesh";
@@ -23483,7 +25626,86 @@ function setupScene() {
   const sun = new THREE.DirectionalLight(0xffffff, 3.4); sun.position.set(-160, 320, 220); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = -380; sun.shadow.camera.right = 380; sun.shadow.camera.top = 380; sun.shadow.camera.bottom = -380; sun.shadow.camera.far = 900; scene.add(sun);
   character = makeCharacter(); scene.add(character);
   const shadowMaterial = new THREE.MeshBasicMaterial({ color: 0x19355b, transparent: true, opacity: .24, depthWrite: false }); characterShadow = new THREE.Mesh(new THREE.CircleGeometry(12, 32), shadowMaterial); characterShadow.rotation.x = -Math.PI / 2; scene.add(characterShadow);
+  worldWaterController=createWorldWaterController({service:worldSaveService,practice:CONSTRUCTION_WATER_PRACTICE,preview:CONSTRUCTION_WATER_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
+    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},onError:error=>worldSaveErrorUI?.show(error),readout:()=>{
+      els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
+      els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
+    }});
+  worldSoilController=createWorldSoilController({service:worldSaveService,practice:CONSTRUCTION_SOIL_PRACTICE,preview:CONSTRUCTION_SOIL_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
+    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},onError:error=>worldSaveErrorUI?.show(error),readout:()=>{
+      els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
+      els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
+    }});
+  worldTimberController=createWorldTimberController({service:worldSaveService,practice:CONSTRUCTION_TIMBER_PRACTICE,preview:CONSTRUCTION_TIMBER_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
+    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},onError:error=>worldSaveErrorUI?.show(error),readout:()=>{
+      els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
+      els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
+    }});
+  if(CONSTRUCTION_EXCAVATION_PREVIEW)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,
+    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   rebuildMap();
+  setupConstructionExpansionPreview();
+  setupConstructionDeliveryPreview();
+  if(CONSTRUCTION_WATER_PREVIEW){
+    const p=worldWaterController.previewSpawn();
+    if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
+    els.saveState.textContent=CONSTRUCTION_WATER_PRACTICE?'給水ローダーの貸出練習（保存しません）':'給水ローダーの本体接続確認';
+  }
+  if(CONSTRUCTION_DELIVERY_PREVIEW&&constructionDeliveryDock){
+    state.position.set(constructionDeliveryDock.position.x,0,constructionDeliveryDock.position.z+60);
+    state.heading=Math.PI;state.viewHeading=Math.PI;state.viewPitch=.08;state.cameraMode='third';
+    state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);
+    els.saveState.textContent='建材受取所の接続確認（本体とは別保存）';
+  }
+  if(CONSTRUCTION_SOIL_PREVIEW){
+    const p=worldSoilController.previewSpawn();
+    if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
+    els.saveState.textContent=CONSTRUCTION_SOIL_PRACTICE?'火星土ローダーの貸出練習（保存しません）':'火星土ローダーの本体接続確認';
+  }
+  if(CONSTRUCTION_TIMBER_PREVIEW){
+    const p=worldTimberController.previewSpawn();
+    if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
+    els.saveState.textContent=CONSTRUCTION_TIMBER_PRACTICE?'火星木材クレーンの貸出練習（保存しません）':'火星木材クレーンの本体接続確認';
+  }
+  if(CONSTRUCTION_EXCAVATION_PREVIEW){
+    const p=worldExcavationController.previewSpawn();if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
+    els.saveState.textContent='ショベルカー本体接続の練習（保存しません）';
+  }
+  if ((MARS_SHOPKEEPER_PREVIEW || WORLD_SHOP_PREVIEW) && marsShopkeeper) {
+    const shop=marsShopkeeper.parent;
+    shop.updateMatrixWorld(true);
+    const interiorPreview = new URLSearchParams(location.search).get('shopView') === 'interior';
+    const dialogPreview = WORLD_SHOP_PREVIEW || new URLSearchParams(location.search).get('shopView') === 'dialog';
+    const approach=shop.localToWorld(dialogPreview ? new THREE.Vector3(36,0,78) : interiorPreview ? new THREE.Vector3(0,0,62) : new THREE.Vector3(10,0,105));
+    state.position.set(approach.x,0,approach.z);
+    state.heading=shop.rotation.y+Math.PI;
+    state.viewHeading=state.heading;
+    state.viewPitch=interiorPreview ? -.04 : .08;
+    state.cameraMode=interiorPreview ? 'first' : 'third';
+    state.groundY=0; state.jumpY=0; state.jumpVelocity=0; state.falling=false;
+    updateCharacter(0);
+    els.saveState.textContent=interiorPreview ? '店内の陳列確認中（保存しません）' : '店主の配置確認中（保存しません）';
+    if(WORLD_SHOP_PREVIEW)els.saveState.textContent='ショップ接続確認（本体とは別保存）';
+  }
+  runSkyTrainCollisionSelfTestIfRequested();
+  if (SKY_STATION_INTERIOR_PREVIEW && skyStationBuilding) {
+    const view = new URLSearchParams(location.search).get('stationView');
+    const p = skyStationBuilding.localToWorld(new THREE.Vector3(view === 'inside' ? 4 : 0, 0, view === 'inside' ? 14 : 60));
+    state.position.set(p.x, 0, p.z); state.groundY = view === 'inside' ? 18.25 : 0;
+    state.jumpY = 0; state.jumpVelocity = 0; state.falling = false;
+    state.heading = Math.PI; state.viewHeading = Math.PI; state.viewPitch = -.03;
+    state.cameraMode = 'first'; updateCharacter(0);
+    els.saveState.textContent = '駅内部の確認中（保存しません）';
+    setupStationWalkPreview();
+  }
+  setupMarsReturnDevelopmentPreview();
+  if(MATERIAL_GUIDE_PREVIEW && spaceMaterialBook){
+    spaceMaterialBook.updateMatrixWorld(true);
+    state.position.copy(spaceMaterialBook.localToWorld(new THREE.Vector3(0,0,46)));
+    state.heading=spaceMaterialBook.rotation.y+Math.PI;state.viewHeading=state.heading;
+    state.viewPitch=.04;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;
+    updateCharacter(0);els.saveState.textContent='図鑑の確認中（通常セーブと分離）';
+  }
   runUfoFlightCollisionSelfTestIfRequested();
   startUfoSpaceTransitionTestIfRequested();
   startUfoActualAscentTestIfRequested();
@@ -23495,12 +25717,42 @@ function setupScene() {
 
 function frame() {
   const delta = Math.min(.05, clock.getDelta());
+  if(worldShopOverlay?.open||worldSaveService?.blocked||worldSaveService?.crafting){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  updateConstructionDelivery();
+  if(constructionDeliveryMenu?.open){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  updateSpaceMaterialBook();
+  // Reading cannot move the player, advance a mission, or consume energy.
+  if(spaceMaterialGuide?.open){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  if(worldWaterController?.update(delta)){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  if(worldSoilController?.update(delta)){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  if(worldTimberController?.update(delta)){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  if(worldExcavationController?.update(delta)){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  updateConstructionWalkPreview(delta);
+  updateConstructionDeliveryWalk(delta);
+  updateStationWalkPreview(delta);
+  updateSkyStationCutaway(skyStationBuilding, character.position, state.map === 'sky' && state.cameraMode !== 'first' && !state.ufoBoarded);
   updateSkyStationClock();
-  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); updateCharacter(delta); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updatePhysicsDebugContact(); renderer.render(scene, camera);
+  if (marsShopkeeper && state.map==='mars') {
+    marsShopkeeper.userData.idleElapsed+=delta;
+    marsShopkeeper.userData.updateAnimation(marsShopkeeper.userData.idleElapsed);
+  }
+  updateMarsShopDialog();
+  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); updateCharacter(delta); updateMarsArrivalHatchExit(); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updateMarsSky(marsSky, camera, state.map); updatePhysicsDebugContact(); renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 
 function wireUI() {
+  const isolateWorldShopKeys=event=>{
+    if(!worldShopOverlay?.open&&!constructionDeliveryMenu?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting)return;
+    if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright',' '].includes(event.key.toLowerCase())){
+      if(!(event.key===' '&&event.target.closest?.('button')))event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  };
+  window.addEventListener('keydown',isolateWorldShopKeys,true);window.addEventListener('keyup',isolateWorldShopKeys,true);
+  spaceMaterialGuide=createSpaceMaterialGuide({onOpen:clearMarsShopDialogInput,onClose:clearMarsShopDialogInput});
+  document.getElementById('materialGuideButton')?.addEventListener('click',showSpaceMaterialGuide);
+  document.getElementById('constructionDeliveryButton')?.addEventListener('click',showConstructionDelivery);
   // Engine start and ground takeoff happen after earlier player actions. Prime
   // both supplied sounds on the first real gesture so delayed playback remains
   // reliable on mobile and desktop browsers.
@@ -23511,7 +25763,14 @@ function wireUI() {
     renderUfoEquipmentWorkshopMenu();
   });
   window.addEventListener("keydown", event => {
+    if(constructionDeliveryMenu?.open)return;
     const key = event.key.toLowerCase();
+    if (marsShopDialogState.open) {
+      if (key === 'escape') { event.preventDefault(); closeMarsShopDialog(); }
+      // Space may activate the focused reply button, but never jumps or fires.
+      else if (["w", "a", "s", "d", "x", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) event.preventDefault();
+      return;
+    }
     if (isUfoEquipmentWorkshopMenuOpen()) {
       if (key === "escape") closeUfoEquipmentWorkshopMenu();
       const gameInput = [" ", "w", "a", "s", "d", "x", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
@@ -23617,6 +25876,7 @@ function wireUI() {
   els.cameraDistanceButton.addEventListener("pointerdown", event => event.stopPropagation());
   els.emergencyEscapeButton.addEventListener("click", emergencyEscape);
   els.emergencyEscapeButton.addEventListener("pointerdown", event => event.stopPropagation());
+  setupMarsShopDialog();
   els.skyStationGuideDialogChoices?.querySelectorAll("[data-guide-dialog-topic]").forEach(button => {
     button.addEventListener("click", () => selectSkyStationGuideDialogTopic(button.dataset.guideDialogTopic));
     button.addEventListener("pointerdown", event => event.stopPropagation());
@@ -23626,6 +25886,21 @@ function wireUI() {
   els.ufoEquipmentWorkshopClose?.addEventListener("click", () => closeUfoEquipmentWorkshopMenu());
   els.ufoEquipmentWorkshopClose?.addEventListener("pointerdown", event => event.stopPropagation());
   els.ufoEquipmentWorkshopMenu?.addEventListener("pointerdown", event => event.stopPropagation());
+  els.ufoEquipmentDevelopmentProfiles
+    ?.querySelectorAll("[data-ufo-equipment-development-profile]")
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        selectUfoEquipmentDevelopmentProfile(button.dataset.ufoEquipmentDevelopmentProfile);
+      });
+      button.addEventListener("pointerdown", event => event.stopPropagation());
+    });
+  els.ufoEquipmentComparisonCameraButton?.addEventListener(
+    "click",
+    toggleUfoEquipmentDevelopmentComparisonCamera,
+  );
+  els.ufoEquipmentComparisonCameraButton?.addEventListener("pointerdown", event => event.stopPropagation());
+  els.ufoEquipmentSpaceTestButton?.addEventListener("click", startUfoEquipmentDevelopmentSpaceTest);
+  els.ufoEquipmentSpaceTestButton?.addEventListener("pointerdown", event => event.stopPropagation());
   els.ufoSpaceFireButton?.addEventListener("click", () => {
     if (isUfoForwardScrollActive()) {
       fireUfoForwardScrollLockOn();
@@ -23662,6 +25937,7 @@ function wireUI() {
   els.labelsButton.addEventListener("click", () => { state.labels = !state.labels; rebuildMap(); updateMapReadout(); });
   els.physicsDebugButton.addEventListener("click", () => {
     state.physicsDebug = !state.physicsDebug;
+    state.physicsLastBlockedId = null;
     if (physicsDebugGroup) physicsDebugGroup.visible = state.physicsDebug;
     if (physicsMeshGroup) physicsMeshGroup.visible = state.physicsDebug;
     els.physicsDebugButton.dataset.debugActive = String(state.physicsDebug);
@@ -23680,6 +25956,34 @@ function wireUI() {
   setupUfoFlightPad();
 }
 
-loadState();
-wireUI();
-setupScene();
+async function startSavedWorld() {
+  // This first world connection is opt-in and cannot touch an authority DB,
+  // even if another preview query parameter requests integration persistence.
+  const mode=CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
+  worldSaveErrorUI=createWorldSaveErrorUI({retry:async()=>{
+    await worldSaveService.retry();
+    if(!worldBooted)activateSavedWorld(worldSaveService.world);
+    else{Object.assign(state.ufoEquipment,worldSaveService.world.ufoEquipment);Object.assign(state.ufoResources,worldSaveService.world.ufoResources);refreshUfoEquipmentVisuals();renderUfoEquipmentWorkshopMenu();}
+  },exportRecord:()=>worldSaveService.exportRecovery()});
+  worldSaveService=new WorldSaveService({mode,readLegacy:()=>localStorage.getItem(SAVE_KEY),
+    materialsIO:mode==='live'?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
+    onError:error=>worldSaveErrorUI.show(error),
+    onChange:s=>{state.saved=!s.busy&&!s.blocked;els.saveState.textContent=s.blocked?'保存の確認が必要':s.busy?'保存中…':mode==='integration'?'保存済み（接続確認専用）':'保存済み';constructionDeliveryMenu?.refresh();},
+  });
+  const saved=await worldSaveService.initialize(worldStateSnapshot());
+  activateSavedWorld(saved);
+}
+function activateSavedWorld(saved) {
+  if(worldBooted)return;const mode=worldSaveService.mode;worldBooted=true;
+  loadState(saved);
+  worldShopOverlay=createWorldShopOverlay({service:worldSaveService,onOpen:clearMarsShopDialogInput,
+    onClose:world=>{Object.assign(state.ufoResources,world.ufoResources);clearMarsShopDialogInput();updateMapReadout();},onError:error=>worldSaveErrorUI.show(error)});
+  constructionDeliveryMenu=createConstructionDeliveryMenu({service:worldSaveService,context:constructionDeliveryContext,snapshot:worldStateSnapshot,onOpen:clearMarsShopDialogInput,onClose:clearMarsShopDialogInput});
+  wireUI();renderUfoEquipmentDevelopmentTestPanel();setupScene();
+  if(mode==='live'){
+    const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている古い開発画面は再読み込みしてから遊んでください。旧保存は保護して残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
+    window.addEventListener('storage',event=>{if(event.key===SAVE_KEY)notice.textContent='古い画面が旧保存を更新しました。現在の金貨・建築は上書きされません。古い画面を再読み込みしてください。';});
+  }
+  window.addEventListener('beforeunload',event=>{if(worldSaveService.busy||worldSaveService.blocked||(worldSaveService.mode!=='readonly'&&((worldWaterController?.active&&worldWaterController.dirty)||(worldSoilController?.active&&worldSoilController.dirty)||worldTimberController?.dirty))){event.preventDefault();event.returnValue='';}});
+}
+startSavedWorld().catch(error=>{els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});

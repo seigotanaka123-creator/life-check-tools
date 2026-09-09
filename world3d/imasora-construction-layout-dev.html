@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ja">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>働く車の大きさ・駐車場案｜イマソラウォーカーズ</title><link rel="stylesheet" href="./imasora-construction-layout-dev.css"></head>
+<body>
+  <header><div><span class="eyebrow">イマソラウォーカーズ ／ 工事現場</span><h1>働く車の大きさ・駐車場案</h1></div><span class="stage">第1段階・比較専用</span></header>
+  <main>
+    <section class="viewport" aria-label="3D比較画面"><canvas id="scene" aria-label="ドラッグで回転、ホイールで拡大縮小できる3D比較"></canvas>
+      <div class="view-switch"><button data-view="vehicle" aria-pressed="true">車体と2席</button><button data-view="parking" aria-pressed="false">駐車場・現場</button></div>
+      <div class="caption"><strong id="sceneTitle">正式キャラ2匹が収まる共通サイズ</strong><p id="sceneSubtitle">黄色の車は大きさの確認用。7車種の完成形ではありません。</p></div>
+      <div class="camera"><button data-camera="perspective">全体・斜め</button><button data-camera="front">正面</button><button data-camera="side">横</button><button data-camera="rear">後ろ</button><button data-camera="top">上から</button><button data-camera="parkingFocus" id="parkingFocus" hidden>区画拡大</button></div>
+      <div id="status" role="status">読み込み中…</div>
+    </section>
+    <aside>
+      <div class="panel-title"><span class="eyebrow">実寸を基準に比較</span><h2 id="panelTitle">キャラ1匹 × 2席</h2></div>
+      <div class="metrics" id="metrics"></div>
+      <div class="controls"><label><input type="checkbox" id="roof">屋根を表示</label><label><input type="checkbox" id="characters" checked>正式キャラの体格見本</label><label><input type="checkbox" id="guides" checked>寸法・乗降余白を表示</label><label><input type="checkbox" id="paths" checked>駐車場の出庫経路を表示</label></div>
+      <div id="explanation"></div>
+      <details><summary>測定・検査結果</summary><div id="diagnostics"></div></details>
+      <p class="safe-note">既存マップ・セーブ・所持品は変更しません。走行・搭乗・建設は次の段階で実装します。</p>
+    </aside>
+  </main>
+  <script type="module" src="./imasora-construction-layout-dev.js"></script>
+</body></html>

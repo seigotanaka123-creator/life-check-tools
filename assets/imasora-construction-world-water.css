@@ -1,0 +1,12 @@
+.world-water-controls{position:absolute;left:8px;right:8px;bottom:8px;z-index:36;padding:10px 12px;border:2px solid #bfa470;border-radius:12px;background:linear-gradient(115deg,#102d35f5,#193d45f5);color:#eff9ee;box-shadow:0 5px 20px #071c29a8;font-size:12px;max-height:45%;overflow:auto;overscroll-behavior:contain}
+.world-water-controls[hidden],.world-water-controls [hidden]{display:none!important}
+.world-water-controls header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.world-water-controls strong{font-size:16px;color:#ffdda1}.world-water-controls .ww-mode{color:#b2e7dd;flex:1}
+.world-water-controls button,.world-water-controls select{font:inherit;color:#f3f9e5;background:linear-gradient(#3b6168,#223f4a);border:1px solid #819993;border-bottom-width:3px;border-radius:7px;min-height:34px;padding:5px 10px;touch-action:none;cursor:pointer}
+.world-water-controls button:active,.world-water-controls button.held{background:#d7ae60;color:#192d35;transform:translateY(2px);border-bottom-width:1px}
+.world-water-controls button:disabled{opacity:.36;cursor:default}.world-water-controls button:focus-visible,.world-water-controls select:focus-visible{outline:3px solid #ffe9a6;outline-offset:2px}
+.world-water-controls .ww-message{margin:6px 0;color:#fff0cd;line-height:1.5;min-height:18px}.world-water-controls .ww-stats{color:#abd9e7;font-variant-numeric:tabular-nums;margin-bottom:6px}
+.world-water-controls .ww-pad,.world-water-controls .ww-work,.world-water-controls footer{display:flex;flex-wrap:wrap;gap:5px}
+.world-water-controls .ww-pad{margin:4px 0 7px}.world-water-controls .ww-pad button{flex:1;min-width:60px;background:linear-gradient(#aa8244,#72532c);border-color:#d3b887;font-weight:700;min-height:40px}
+.world-water-controls .ww-work label{display:flex;align-items:center;gap:5px;color:#bde4df}.world-water-controls footer{border-top:1px solid #587370;margin-top:7px;padding-top:7px;justify-content:flex-end}
+.world-water-operating .touch-pad,.world-water-operating .touch-hint,.world-water-operating .camera-distance-control,.world-water-operating .jump-control,.world-water-operating .touch-actions{display:none!important}
+@media(max-width:620px){.world-water-controls{left:4px;right:4px;bottom:4px;padding:7px;font-size:11px;max-height:52%}.world-water-controls button{padding:4px 7px}.world-water-controls .ww-work button{flex:1 1 27%}.world-water-controls .ww-stats{font-size:10px}}

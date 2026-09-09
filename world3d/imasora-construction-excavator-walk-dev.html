@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ショベルカー・深掘りと横穴｜イマソラウォーカーズ</title><link rel="stylesheet" href="imasora-construction-excavator-dev.css?v=466"><link rel="stylesheet" href="imasora-construction-excavator-walk-dev.css?v=466"></head><body data-excavation-walk>
+<canvas id="scene" aria-label="土の床・壁・天井と同じ判定の掘削区画"></canvas>
+<header><small>工事現場 · 9-1b1</small><h1>土の中へ</h1><p>掘った形が、そのまま歩ける空間になる。</p></header>
+<nav class="views"><button id="camera">視点：斜め後ろ</button><button id="roof">屋根を透かす</button><button id="home">安全エリアへ</button><button id="help-open">操作ガイド</button></nav>
+<section class="readout" aria-label="掘削作業の状態"><b id="mode">徒歩</b><span id="load">バケット 0 / 6</span><span id="bin">受け箱 0</span><span id="total">土の合計 —</span><span id="feet">足元 —</span></section>
+<p id="status" role="status">準備中…</p><p id="aim"></p>
+<section class="controls" aria-label="ショベルカーと徒歩の操作">
+<div class="moving"><div class="row"><button data-hold="forward">前へ</button><button data-hold="back">後ろへ</button></div><div class="row"><button data-hold="left">左へ</button><button data-hold="right">右へ</button><button data-hold="brake">停止</button></div><div class="row"><button id="jump" data-hold="jump">ジャンプ</button><button id="walk-view">徒歩視点：追従</button></div></div>
+<div class="main"><button id="interact">運転席に乗る</button><button id="work">作業モード</button><span id="operation"></span></div>
+<div class="working" hidden><div class="row"><button data-hold="boom-up">ブーム上げ</button><button data-hold="boom-down">ブーム下げ</button><button data-hold="stick-out">アーム伸ばす</button><button data-hold="stick-in">アーム寄せる</button></div><div class="row"><button data-hold="slew-left">左旋回</button><button data-hold="slew-right">右旋回</button><button id="scoop" class="gold">すくう</button><button id="dump" class="gold">こぼす</button></div></div>
+</section>
+<aside id="help" hidden><h2>深掘りと横穴</h2><button id="help-close">閉じる</button>
+<p>確認例はあらかじめ掘った貸出区画です。自分で掘る場合は「掘削から」を選んでください。切替・再読込で、この練習だけ初期状態に戻ります。</p>
+<nav class="examples"><a data-example="dig" href="?check=excavation-walk-v466&example=dig">掘削から</a><a data-example="gallery" href="?check=excavation-walk-v466&example=gallery">横穴の徒歩確認例</a><a data-example="pit" href="?check=excavation-walk-v466&example=pit">深掘りの徒歩確認例</a></nav>
+<ol><li>横穴の確認例は、入口から前へ進むと8ずつ段差を下ります。足元−16まで下り、奥の天井の下へ入ってください。</li><li>壁へ向かうと停止。中でジャンプすると頭が天井に当たって落下します。穴の外へ飛び出しません。</li><li>後ろへ戻ると段差を歩いて登り、地上へ戻れます。ジャンプの連打は不要です。</li><li>深掘りの確認例は深さ32。掘ってなくなった床には着地せず、残っている土や岩盤まで落ちます。</li><li>「掘削から」では運転席→作業→すくう→ブーム上げ→右旋回→こぼす。掘った床・壁・天井、排土の形が歩行にも反映されます。</li></ol>
+<p>画面ドラッグで視点回転。「徒歩視点」で目線へ切替。追従カメラは土の壁・天井の手前で止まり、近すぎる場所では目線になります。</p>
+<p>W/S/A/D：徒歩。Space：ジャンプ（走行中は停止）。R/F：ブーム、T/G：アーム、Q/E：旋回。スマートフォンは画面ボタンで同じ操作ができます。</p>
+<p>危険な位置からは「安全エリアへ」。レンだけ戻り、掘った土・積載・排土は残ります。本体の作品・所持品には接続していません。地形保存・本体接続は次段階です。</p>
+<details><summary>開発用の数値</summary><pre id="debug"></pre></details></aside>
+<script type="module" src="imasora-construction-excavator-walk-dev.js?v=466"></script></body></html>

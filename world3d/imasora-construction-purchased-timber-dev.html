@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>持ち帰った木材で浮遊床を作る｜イマソラウォーカーズ</title><link rel="stylesheet" href="./imasora-construction-crane-dev.css?v=437"><link rel="stylesheet" href="./imasora-construction-timber-dev.css?v=446"><link rel="stylesheet" href="./imasora-construction-floating-timber-dev.css?v=447"><link rel="stylesheet" href="./imasora-construction-purchased-timber-dev.css?v=455"></head>
+<body><canvas id="scene" aria-label="購入済み火星木材の床板を吊って浮かせる作業場"></canvas>
+<header><div><small id="scope">建設開発 8-3b2</small><h1>持ち帰った木材で浮遊床を作る</h1></div><nav><button id="stock-open" class="primary">素材置場</button><button id="save">保存</button><button id="pause">一時停止</button><button id="camera">視点：作業</button><button id="roof">屋根を透かす</button><button id="help-open">使い方</button><button id="home">緊急帰還</button></nav></header>
+<div id="notice"><span id="mode">徒歩</span><span id="message" role="status"></span></div>
+<aside id="readout"><strong id="cargo">吊り荷なし</strong><span id="count">部材 4 / 4</span><span id="height"></span><span id="hook-position" hidden></span><span id="material-summary"></span><strong id="float-load"></strong><span id="float-warning" role="status"></span><span id="return-hint" hidden></span><span id="save-status">読み込み中</span></aside>
+<div id="placement" hidden></div>
+<div id="placement-detail" hidden></div>
+<footer><div class="main-actions"><button id="interact" class="primary">運転席に乗る</button><button id="mode-toggle">クレーン作業へ</button><button id="jump" data-action="jump">ジャンプ</button><span id="position"></span></div>
+<div id="drive-controls" class="controls"><div class="group"><span id="move-label">歩く</span><div class="pad"><button data-action="forward">前へ</button><button data-action="left">左</button><button data-action="back">後ろへ</button><button data-action="right">右</button></div></div><div class="group" id="pedals" hidden><span>ペダル</span><div><button data-action="accelerate">前進</button><button data-action="brake">ブレーキ</button><button data-action="reverse">後退</button></div></div><p id="drive-hint">正式なレンが運転席に乗ります。車体・部材はドラッグで見回せます。</p></div>
+<div id="work-controls" class="controls" hidden>
+<div class="group"><span>アーム旋回</span><div><button data-action="slew-left">左へ回す</button><button data-action="slew-right">右へ回す</button></div></div>
+<div class="group"><span>アーム伸縮</span><div><button data-action="extend">伸ばす</button><button data-action="retract">縮める</button></div></div>
+<div class="group"><span>フック</span><div><button data-action="raise">巻上げ</button><button data-action="lower">巻下げ</button></div></div>
+<div class="work-actions"><button id="pick" class="primary">吊り索を掛ける</button><button id="rotate">部材を90°回す</button><button id="place" class="primary">ここに設置</button><button id="release">吊り索を外す</button><button id="return-stock">素材置場へ回収</button><button id="snap" aria-pressed="true">面合わせ ON</button><button id="precision" aria-pressed="false">微調整 OFF</button></div></div></footer>
+<dialog id="help"><h2>持ち帰った木材で、浮く床を作ろう</h2>
+<ol><li>「素材置場」で「床板を1枚出す」。青い枠に実際の床板が出ます。</li><li>「運転席に乗る」→「クレーン作業へ」→「吊り索を掛ける」。</li><li>「巻上げ」を短く1回押して「浮遊を開始」。底の高さを2以下にすると、そのまま歩いて乗れる低い浮遊床になります。</li><li>「走行へ戻る」で支持脚を格納して降車。紫の床へ歩いて乗ると、体重で少し沈みます。降りると元の高さへ戻ります。</li><li>吊り直しは上のレンや床板を降ろしてから。青い回収枠の中央へ運び、床の底を8以下に巻き下げて「素材置場へ回収」。同じ1枚分が保管へ戻ります。</li></ol>
+<p>旋回・伸縮・巻上げで好きな場所へ運べます。90°回転は約1.8秒の機械動作です。ドラッグで見回し、「視点」で側面・俯瞰にも切り替えられます。</p>
+<p>1枚＝幅80×厚さ6×奥行56、材積26.88。出庫・吊り荷・浮遊・設置・保管を同じ枚数で追跡します。購入材は最大8枚まで同時に作業できます。部材の接合と自由加工は別工程です。</p>
+<p>開発用キー：徒歩WASD／矢印、Spaceジャンプ、E乗降。作業中A/D旋回、W/S伸縮、↑↓巻上げ・巻下げ。スマホでは下部の操作部を使います。</p>
+<p>購入済み作業の保存は別領域。再読込後は一時停止から再開します。通常世界・金貨・土・水・既存の木材試験には書き込みません。</p>
+<button id="export">保存内容を確認</button><button id="help-close" class="primary">閉じる</button><pre id="export-data" hidden></pre></dialog>
+<dialog id="stock-dialog"><small>工事現場の荷物</small><h2>火星木材の置場</h2><p id="source-info"></p>
+<div id="imports"><p>既に購入した開発保存を一度だけ複製します。木材が0枚の場合は補充しません。</p><button id="import-copy">v451の購入済み素材を複製</button><button id="import-world">v452の接続確認素材を複製</button></div>
+<div class="ledger-scroll"><table><caption>床板の収支</caption><thead><tr><th>素材</th><th>保管</th><th>置場</th><th>吊り荷</th><th>浮遊</th><th>設置</th><th>合計</th></tr></thead><tbody id="material-ledger"></tbody></table></div>
+<p id="stock-count"></p><button id="issue-floor" class="primary">床板を1枚出す</button><p id="issue-hint"></p><p id="stock-message" role="status"></p>
+<button id="reload">保存を読み直す</button><p class="demo-links"><a data-example href="./imasora-construction-purchased-timber-dev.html?check=purchased-timber-v455&amp;timberPractice=1">保存しない操作体験（貸出床2枚）</a><a data-example href="./imasora-construction-purchased-timber-dev.html?check=purchased-timber-v455">購入済みの作業保存へ戻る</a></p>
+<p>貸出材は保存・購入品への移行ができません。実際の購入品はそのまま残ります。</p><button id="stock-close" class="primary">作業に戻る</button></dialog>
+<script type="module" src="./imasora-construction-purchased-timber-dev.js?v=455"></script></body></html>

@@ -4,7 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>イマソラ3Dワールド基盤 開発</title>
-  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=20260905-ufo-workshop-common-arcade-v407">
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=20260905-mars-earth-return-v416">
+  <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=450">
+  <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=456">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=457">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=459">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=460">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=471">
+  <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=464">
 </head>
 <body>
   <main class="world-shell">
@@ -28,6 +35,8 @@
         <button type="button" data-map="construction">工事現場</button>
       </div>
       <div class="toolbar-actions">
+        <button type="button" id="materialGuideButton" class="material-guide-map-button" hidden>宇宙素材図鑑</button>
+        <button type="button" id="constructionDeliveryButton" hidden>建材受取所</button>
         <button type="button" id="cameraModeButton">視点：三人称</button>
         <button type="button" id="labelsButton">建物名：表示</button>
         <button type="button" id="physicsDebugButton">物理表示：OFF</button>
@@ -72,6 +81,14 @@
             <div class="sky-station-guide-dialog-footer" id="skyStationGuideDialogFooter" hidden>
               <span class="sky-station-guide-dialog-page" id="skyStationGuideDialogPage" aria-live="off"></span>
               <button class="sky-station-guide-dialog-next" type="button" id="skyStationGuideDialogNext">つぎへ</button>
+            </div>
+          </section>
+          <section class="sky-station-guide-dialog" id="marsShopDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="火星素材ショップの宇宙人との会話" aria-describedby="marsShopDialogText">
+            <div class="sky-station-guide-dialog-name" id="marsShopDialogSpeaker">宇宙人</div>
+            <p class="sky-station-guide-dialog-text" id="marsShopDialogText"></p>
+            <div class="sky-station-guide-dialog-choices" id="marsShopDialogChoices" aria-label="白ミチロードセイバーレンの返答"></div>
+            <div class="sky-station-guide-dialog-footer">
+              <button class="sky-station-guide-dialog-next" type="button" id="marsShopDialogClose" data-last-page="true">とじる</button>
             </div>
           </section>
           <section class="ufo-equipment-workshop-menu" id="ufoEquipmentWorkshopMenu" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="UFO倉庫装備メニュー">
@@ -172,6 +189,29 @@
           <p class="build-message" id="ufoStatus">UFO乗り場を建造してください。</p>
         </section>
 
+        <section class="panel-section ufo-equipment-development-section" aria-label="UFO装備の開発テスト">
+          <p class="eyebrow">UFO EQUIPMENT DEV TEST</p>
+          <h2>UFO装備テスト</h2>
+          <p class="muted">保存データや素材を変えずに、装備の外観と宇宙航行中の効果を比較できます。</p>
+          <div class="ufo-equipment-development-profiles" id="ufoEquipmentDevelopmentProfiles" aria-label="比較する装備">
+            <button type="button" data-ufo-equipment-development-profile="saved">保存済み装備</button>
+            <button type="button" data-ufo-equipment-development-profile="none">未装備</button>
+            <button type="button" data-ufo-equipment-development-profile="energy-tank-1">タンク I</button>
+            <button type="button" data-ufo-equipment-development-profile="energy-tank-2">タンク II</button>
+            <button type="button" data-ufo-equipment-development-profile="simultaneous-shot">同時発射装置</button>
+            <button type="button" data-ufo-equipment-development-profile="reticle-radar">照準拡大レーダー</button>
+            <button type="button" data-ufo-equipment-development-profile="range-radar">探知距離レーダー</button>
+            <button type="button" data-ufo-equipment-development-profile="all">全装備</button>
+          </div>
+          <div class="ufo-equipment-development-actions">
+            <button type="button" id="ufoEquipmentComparisonCameraButton">外観比較カメラ</button>
+            <button type="button" id="ufoEquipmentSpaceTestButton" class="primary-button">宇宙で実機テスト</button>
+          </div>
+          <p class="ufo-equipment-development-status" id="ufoEquipmentDevelopmentStatus" aria-live="polite">保存済み装備を表示しています。</p>
+        </section>
+
+        <details class="panel-section ufo-flight-survey" id="ufoFlightSurvey" hidden></details>
+
         <section class="panel-section checklist">
           <p class="eyebrow">FOUNDATION CHECK</p>
           <h2>共通基盤の確認</h2>
@@ -192,6 +232,6 @@
       <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
     </footer>
   </main>
-<script type="module" src="./imasora-world-3d-dev.js?v=20260905-ufo-workshop-common-arcade-v407"></script>
+  <script type="module" src="./imasora-world-3d-dev.js?v=excavator-performance-v476"></script>
 </body>
 </html>

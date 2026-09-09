@@ -1,0 +1,11 @@
+import {IndexedConstructionStore} from './imasora-construction-storage.js';
+import {initialPurchasedTimber,packPurchasedTimber,unpackPurchasedTimber} from './imasora-construction-purchased-timber.js';
+export {purchasedSourceReader} from './imasora-construction-purchased-water-storage.js';
+export const PURCHASED_TIMBER_DB='imasora-construction-purchased-timber-copy-development-v1';
+export class PurchasedTimberStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=PURCHASED_TIMBER_DB;}}
+export class PurchasedTimberSession{
+  constructor(store=new PurchasedTimberStore()){this.store=store;this.generation=null;this.loaded=null;this.savedRevision=-1;this.busy=false;this.blocked=true;}
+  async load(){if(this.busy)throw Error('保存中です。');this.busy=true;this.blocked=true;try{const r=await this.store.read();if(r&&(!Number.isSafeInteger(r.generation)||r.generation<1||!Array.isArray(r.backups)))throw Error('保存管理情報が不正です。');this.loaded=r?unpackPurchasedTimber(r.current):null;this.generation=r?.generation??null;this.savedRevision=this.loaded?.revision??-1;this.blocked=false;return this.loaded;}finally{this.busy=false;}}
+  async importSource(reader,kind){if(this.blocked||this.busy||this.loaded||this.generation!==null)throw Error('複製済みの木材は補充しません。');this.busy=true;try{const r=await reader.read();if(!r)throw Error('購入済み保存がありません。');if(!Number.isSafeInteger(r.generation)||r.generation<1||!Array.isArray(r.backups))throw Error('購入元の管理情報が不正です。');const s=initialPurchasedTimber(r.current,kind),saved=await this.store.commit(null,packPurchasedTimber(s));this.generation=saved.generation;this.loaded=s;this.savedRevision=s.revision;return s;}catch(e){this.blocked=true;throw e;}finally{this.busy=false;}}
+  async save(s){if(this.blocked||this.busy||!this.loaded)throw Error('保存の読込を確認してください。');if(s.source.mode!=='copy'||s.source.packet!==this.loaded.source.packet||s.source.kind!==this.loaded.source.kind)throw Error('貸出木材や別の購入元へ差し替えできません。');const raw=packPurchasedTimber(s);this.busy=true;try{const r=await this.store.commit(this.generation,raw);this.generation=r.generation;this.loaded=structuredClone(s);this.savedRevision=s.revision;}catch(e){this.blocked=true;throw e;}finally{this.busy=false;}}
+}

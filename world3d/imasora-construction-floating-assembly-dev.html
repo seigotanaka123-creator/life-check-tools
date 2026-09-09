@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>つながる浮遊床｜イマソラウォーカーズ</title><link rel="stylesheet" href="./imasora-construction-crane-dev.css?v=437"><link rel="stylesheet" href="./imasora-construction-timber-dev.css?v=446"><link rel="stylesheet" href="./imasora-construction-floating-timber-dev.css?v=447"><link rel="stylesheet" href="./imasora-construction-floating-assembly-dev.css?v=448"></head>
+<body><canvas id="scene" aria-label="クレーン車と試験用部材の開発区画"></canvas>
+<header><div><small>建設開発 7-2</small><h1>つながる浮遊床</h1></div><nav><button id="stock-open" class="primary">素材置場</button><button id="save">保存</button><button id="camera">視点：作業</button><button id="roof">屋根を透かす</button><button id="help-open">使い方</button><button id="home">緊急帰還</button></nav></header>
+<div id="notice"><span id="mode">徒歩</span><span id="message" role="status"></span></div>
+<aside id="readout"><strong id="cargo">吊り荷なし</strong><span id="count">部材 6 / 6</span><span id="height"></span><span id="hook-position" hidden></span><span id="material-summary"></span><span id="joint-count"></span><strong id="float-load"></strong><span id="float-warning" role="status"></span><span id="return-hint" hidden></span><span id="save-status">読み込み中</span></aside>
+<div id="placement" hidden></div>
+<div id="placement-detail" hidden></div>
+<footer><div class="main-actions"><button id="interact" class="primary">運転席に乗る</button><button id="mode-toggle">クレーン作業へ</button><button id="jump" data-action="jump">ジャンプ</button><span id="position"></span></div>
+<div id="drive-controls" class="controls"><div class="group"><span id="move-label">歩く</span><div class="pad"><button data-action="forward">前へ</button><button data-action="left">左</button><button data-action="back">後ろへ</button><button data-action="right">右</button></div></div><div class="group" id="pedals" hidden><span>ペダル</span><div><button data-action="accelerate">前進</button><button data-action="brake">ブレーキ</button><button data-action="reverse">後退</button></div></div><p id="drive-hint">正式なレンが運転席に乗ります。車体・部材はドラッグで見回せます。</p></div>
+<div id="work-controls" class="controls" hidden>
+<div class="group"><span>アーム旋回</span><div><button data-action="slew-left">左へ回す</button><button data-action="slew-right">右へ回す</button></div></div>
+<div class="group"><span>アーム伸縮</span><div><button data-action="extend">伸ばす</button><button data-action="retract">縮める</button></div></div>
+<div class="group"><span>フック</span><div><button data-action="raise">巻上げ</button><button data-action="lower">巻下げ</button></div></div>
+<div class="work-actions"><button id="pick" class="primary">吊り索を掛ける</button><button id="rotate">部材を90°回す</button><button id="place" class="primary">ここに設置</button><button id="release">吊り索を外す</button><button id="join" class="primary">床に接合</button><button id="detach">接合を外して吊る</button><button id="return-stock">素材置場へ回収</button><button id="snap" aria-pressed="true">面合わせ ON</button><button id="precision" aria-pressed="false">微調整 OFF</button></div></div></footer>
+<dialog id="help">
+<h2>浮く床をつないで、広げよう</h2>
+<ol>
+<li>クレーンで最初の火星木材Aを吊り上げ、「浮遊を開始」。巻上げを軽く一回なら、あとで歩いて乗れる低い床になります。</li>
+<li>「素材置場」から火星木材BやCを出して吊ります。浮いている床の辺へ、横12・高さ差8以内まで近づけてください。</li>
+<li>緑の接合プレビューが出たら「床に接合」。約1.2秒かけて面を合わせます。接合中は他の作業を待ちます。</li>
+<li>1枚の支持力は4、2枚なら8、3枚なら12。つながった床は一体で動きます。レンは1、小さい鉄は1.50、重い鉄は6.37の荷重です。</li>
+<li>「走行へ戻る」→「停車して降りる」で徒歩へ。低い床に乗り、継ぎ目を歩いて渡ってみてください。</li>
+<li>外す時は、つながった床のレンや荷物を先に降ろします。外したい床の中央へフックを下ろして「接合を外して吊る」。残った床は浮いたままです。</li>
+</ol>
+<p>青い回収枠で底を高さ8以下に下ろすと「素材置場へ回収」。普通の木材と鉄は通常の置き方で、今回の接合は火星木材の水平な床だけです。90°回転・微調整も使えます。</p>
+<p>すぐ試す比較例（現在の作業を保存して切り替えます）：</p>
+<p class="demo-links">
+<a data-example href="./imasora-construction-floating-assembly-dev.html?check=floating-join-v448&amp;assemblyTest=1&amp;assemblyDemo=join">接合直前から操作を試す</a>
+<a data-example href="./imasora-construction-floating-assembly-dev.html?check=floating-walk-v448&amp;assemblyTest=1&amp;assemblyDemo=walk">三枚の継ぎ目を歩いて渡る</a>
+<a data-example href="./imasora-construction-floating-assembly-dev.html?check=floating-load-v448&amp;assemblyTest=1&amp;assemblyDemo=load">二枚で重いおもりを支える</a>
+<a data-example href="./imasora-construction-floating-assembly-dev.html?check=floating-overload-v448&amp;assemblyTest=1&amp;assemblyDemo=overload">一枚で同じおもりを支える</a>
+<a data-example href="./imasora-construction-floating-assembly-dev.html?check=floating-assembly-v448">保存した作業場に戻る</a>
+</p>
+<p>例は保存なしの開発用配置で、購入品・散歩の所持品・既存の作品とは別です。自由な立体接合、車両・水の積載、部材の傾きは後続の検証対象です。</p>
+<p>開発キー：徒歩W/S前後・A/D左右、スペースジャンプ。作業中A/D旋回、W/S伸縮、↑/↓巻上げ・巻下げ。スマホは画面下のボタンで操作します。</p>
+<button id="export">保存データを書き出す</button><button id="help-close" class="primary">閉じる</button><pre id="export-data" hidden></pre>
+</dialog>
+<dialog id="stock-dialog">
+<h2>素材置場</h2>
+<p>火星木材・普通の木材・鉄を比べる独立した建設テストです。貸出部材のみで、散歩の所持品・火星素材・通常の作品には影響しません。</p>
+<div class="ledger-scroll"><table><caption>素材の収支（材積）</caption><thead><tr><th>材質</th><th>保管</th><th>置場</th><th>吊り荷</th><th>浮遊</th><th>設置</th><th>合計</th></tr></thead><tbody id="material-ledger"></tbody></table></div>
+<p>材積は部材の体積を数える開発単位です。散歩の獲得数や加工レシピは後の段階で接続します。火星木材・普通の木材・鉄は別々に数え、回収しても増減しません。</p>
+<p id="stock-message" role="status">部材を選んで、色枠の置場へ出してください。</p>
+<div id="stock-list"></div><button id="stock-close" class="primary">作業に戻る</button>
+</dialog>
+<dialog id="drop-demo">
+<h2>床の枚数で、支えられる重さが変わる</h2>
+<p>高さ24の浮遊床に、荷重6.37の鉄を載せています。一枚は支持力4で下降し、二枚なら支持力8で支えられます。</p>
+<button id="drop-start" class="primary">荷重の比較を開始</button>
+</dialog>
+<script type="module" src="./imasora-construction-floating-assembly-dev.js?v=448"></script></body></html>

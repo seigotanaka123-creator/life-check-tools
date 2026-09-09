@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171e32"><title>火星素材ショップ｜建設開発8-1</title><link rel="stylesheet" href="./imasora-construction-shop-dev.css?v=450"><link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=450"></head>
+<body>
+<div class="shop-shell">
+  <header class="shop-heading"><div class="shop-crest" aria-hidden="true">✦</div><div><small>イマソラウォーカーズ</small><h1>火星素材ショップ</h1></div><aside class="wallet" aria-label="試験用の所持金"><small>試験用 宇宙金貨</small><strong><i aria-hidden="true">✦</i> <span id="balance">—</span><span class="coin-unit">枚</span></strong></aside></header>
+  <nav class="shop-tools" aria-label="ショップのメニュー"><span class="shop-tab">買う</span><button id="open-bag">もちもの</button><button id="open-guide">素材図鑑</button><button id="open-dev" class="dev-link">開発設定</button></nav>
+  <main class="shop-stage">
+    <section class="merchant-stage" aria-label="店主の案内"><div class="shop-arch" aria-hidden="true"></div><span class="merchant-tag">店主</span><div id="merchant" role="img" aria-label="火星素材ショップのクラゲの店主"></div><div class="merchant-plinth" aria-hidden="true"></div><div class="speech"><p class="greeting">ワレワレハ、<br>ウチュウジンダ！</p><p>どんなものを作る？<br>気になる素材を選んでね。</p></div></section>
+    <section class="shop-counter" aria-labelledby="products-title"><h2 id="products-title"><span>建設素材</span><small>商品をえらぶ</small></h2><div id="products" class="products" role="group" aria-label="販売する素材"></div>
+      <article id="item-detail" class="item-detail" aria-labelledby="detail-name"><div id="detail-art" class="detail-art" aria-hidden="true"></div><div class="detail-copy"><span class="detail-label">この素材でできること</span><h3 id="detail-name"></h3><p id="detail-description"></p><p id="detail-vehicle" class="vehicle"></p></div></article>
+      <div class="buy-row"><p id="detail-pack"></p><button id="buy-selected" class="primary">数量をえらぶ <span aria-hidden="true">›</span></button></div>
+    </section>
+  </main>
+  <section id="pending" class="pending" hidden aria-labelledby="pending-title"><h2 id="pending-title">未完了の注文があります</h2><p id="pending-text"></p><p id="pending-money">まだ金貨は引かれていません。商品も未受取です。</p><div class="actions"><button id="resume" class="primary">この注文の購入を再開</button><button id="cancel-pending">注文を取り消す</button></div></section>
+  <div class="message-window"><span aria-hidden="true">◆</span><p id="notice" role="status" aria-live="polite">保存を読み込んでいます。</p></div>
+  <footer class="shop-footer"><span>開発専用・価格は仮設定<br>本番の金貨・素材・作品は変わりません。</span><span id="save-status">読込中</span></footer>
+</div>
+<dialog id="bag" class="game-dialog" aria-labelledby="owned-title"><header><h2 id="owned-title">もちもの</h2><button data-close="bag">とじる ×</button></header><p>購入済みの建材</p><div id="inventory" class="inventory"></div><p class="scope">今回買った分は、この開発画面の保存に残ります。実際の持ち帰り・施工への接続は次の段階です。</p><details class="receipts"><summary>注文の記録</summary><ol id="receipts"></ol></details></dialog>
+<dialog id="development" class="game-dialog" aria-labelledby="development-title"><header><h2 id="development-title">開発設定</h2><button data-close="development">とじる ×</button></header><p class="scope">購入・保存の独立テストです。最初の一度だけ60枚。価格は調整前の仮設定です。</p><button id="reload">保存を読み直す</button><details class="dev-panel"><summary>開発用：中断・保存を確認する</summary><p>次の購入1回だけ、中断の起きる箇所を選べます。再読込後、同じ注文を二重に支払わないことを確認できます。</p><label for="fault">次の購入の動作</label><select id="fault"><option value="normal">通常どおり購入する</option><option value="pause">支払い直前で中断する</option><option value="abort">支払いの保存を中断する</option><option value="lost">購入完了直後の応答を中断する</option></select><div class="actions"><button id="export">保存記録を表示</button></div><p>金貨を増やすリセットや、過去の残高へ戻す操作はありません。異常時は元の保存を上書きせず停止します。</p><pre id="export-data" hidden></pre></details></dialog>
+<dialog id="confirm" class="game-dialog purchase-dialog" aria-labelledby="confirm-title"><small class="detail-label">火星素材ショップ</small><h2 id="confirm-title">いくつ買う？</h2><div class="confirm-product"><div id="confirm-art" aria-hidden="true"></div><p id="confirm-name"></p></div><label for="quantity">セット数</label><select id="quantity"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><div id="quote"></div><p class="scope">試験用金貨のみ使用します。価格は仮設定です。</p><div class="actions"><button id="confirm-buy" class="primary">この内容で購入</button><button id="confirm-close">やめる</button></div></dialog>
+<script type="module" src="./imasora-construction-shop-dev.js?v=452"></script>
+</body></html>

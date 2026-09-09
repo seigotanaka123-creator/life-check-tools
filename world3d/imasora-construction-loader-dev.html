@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ホイールローダー・乗車と走行｜イマソラウォーカーズ</title><link rel="stylesheet" href="imasora-construction-loader-dev.css?v=429"></head>
+<body>
+<canvas id="scene" aria-label="レンと2席のホイールローダーの走行確認区画"></canvas>
+<header><span>工事現場開発 · 段階3-1</span><h1>ホイールローダー</h1><p>乗る。走る。停めて、降りる。</p></header>
+<nav class="views" aria-label="表示と安全操作"><button id="camera">視点：追従</button><button id="roof" aria-pressed="false">屋根を透かす</button><button id="home">安全エリアへ</button><button id="help-open">説明</button></nav>
+<section class="telemetry" aria-label="現在の状態"><strong id="mode">徒歩</strong><span id="speed">停車中</span><span id="gear">—</span></section>
+<div id="status" role="status">表示を準備しています。</div>
+<div class="bottom">
+  <nav class="dpad" aria-label="移動とハンドル"><button data-action="forward" aria-label="歩いて前へ">▲</button><button data-action="left" aria-label="左へ・ハンドル左">◀</button><span id="pad-label">歩く</span><button data-action="right" aria-label="右へ・ハンドル右">▶</button><button data-action="back" aria-label="歩いて後ろへ">▼</button></nav>
+  <div class="boarding"><span id="action-hint">運転席側の足元から乗れます</span><button id="interact">運転席に乗る</button></div>
+  <nav class="pedals" aria-label="車両の走行" hidden><div><button data-action="reverse">後退</button><button data-action="accelerate" class="accelerator">前進</button></div><button data-action="brake" class="brake">ブレーキ</button></nav>
+</div>
+<aside id="help" hidden><div class="help-head"><h2>ローダーの確認</h2><button id="help-close">閉じる</button></div>
+<p>左のパッドで車体左側のステップに近づき、<b>「運転席に乗る」</b>を押してください。触れただけでは乗りません。</p>
+<p>乗車後は右の<b>前進・後退</b>を押しながら、左でハンドルを操作します。指を離すと減速します。<b>ブレーキで停車してから降車</b>してください。</p>
+<p>左の降車経路が塞がっている場合は右を確認します。両側が塞がっていれば車内に留まり、開いた場所への移動を案内します。</p>
+<p>「屋根を透かす」で2席と正式なレンを確認できます。助手席は空席です。「安全エリアへ」はレンだけを戻し、車両を勝手に駐車位置へ移動しません。</p>
+<p class="note">独立した走行試作です。土をすくう・運ぶ操作は次の段階。通常ゲーム・素材・これまでの建設セーブには書き込みません。再読み込みすると、この車両の走行確認だけ最初からになります。</p>
+<details><summary>開発用の操作・座標</summary><p>徒歩：WASD。乗車：W/Sで前後進、A/Dで操舵、Spaceでブレーキ。Eで乗降。画面ドラッグで視点回転、ホイールで距離調整。</p><dl><dt>車体位置</dt><dd id="vehicle-position">—</dd><dt>レンの足元</dt><dd id="actor-position">—</dd><dt>接触</dt><dd id="contact">なし</dd><dt>寸法</dt><dd>幅60・全長86・高さ43（ステップ展開時の幅80）</dd></dl></details>
+<a href="imasora-construction-terrain-dev.html?check=construction-terrain-v428">前段階：掘って歩く確認</a></aside>
+<script type="module" src="imasora-construction-loader-dev.js?v=430"></script></body></html>

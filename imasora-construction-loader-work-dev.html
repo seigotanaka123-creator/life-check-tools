@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ローダーで土を運ぶ｜イマソラウォーカーズ</title><link rel="stylesheet" href="imasora-construction-loader-dev.css?v=429"><link rel="stylesheet" href="imasora-construction-loader-work-dev.css?v=431"></head>
+<body>
+<canvas id="scene" aria-label="レンと2席のホイールローダーの走行確認区画"></canvas>
+<header><span>工事現場開発 · 段階3-2</span><h1>ローダーで土を運ぶ</h1><p>差し込む。すくう。持ち上げて、こぼす。</p></header>
+<nav class="views" aria-label="表示と安全操作"><button id="camera">視点：追従</button><button id="roof" aria-pressed="false">屋根を透かす</button><button id="home">安全エリアへ</button><button id="help-open">説明</button></nav>
+<section class="telemetry" aria-label="現在の状態"><strong id="mode">徒歩</strong><span id="speed">停車中</span><span id="gear">—</span><strong id="load-amount">積載 0 / 6</strong><progress id="load-bar" max="48" value="0" aria-label="バケットの積載量"></progress></section>
+<div id="status" role="status">表示を準備しています。</div>
+<section id="work-controls" aria-label="バケットの操作" hidden>
+  <div class="work-caption"><span id="bucket-pose">アーム 0% ／ 傾き 0°</span><button id="bucket-ready">差し込み姿勢</button></div>
+  <div class="work-buttons"><button data-action="raise">↑ 上げる</button><button data-action="lower">↓ 下げる</button><button data-action="curl">↶ すくう</button><button data-action="tip">↷ こぼす</button></div>
+</section>
+<div class="bottom">
+  <nav class="dpad" aria-label="移動とハンドル"><button data-action="forward" aria-label="歩いて前へ">▲</button><button data-action="left" aria-label="左へ・ハンドル左">◀</button><span id="pad-label">歩く</span><button data-action="right" aria-label="右へ・ハンドル右">▶</button><button data-action="back" aria-label="歩いて後ろへ">▼</button></nav>
+  <div class="boarding"><span id="action-hint">運転席側の足元から乗れます</span><button id="interact">運転席に乗る</button></div>
+  <nav class="pedals" aria-label="車両の走行" hidden><div><button data-action="reverse">後退</button><button data-action="accelerate" class="accelerator">前進</button></div><button data-action="brake" class="brake">ブレーキ</button></nav>
+</div>
+<aside id="help" hidden><div class="help-head"><h2>土を運ぶ操作</h2><button id="help-close">閉じる</button></div>
+<ol><li>「差し込み姿勢」でバケットを低く平らにし、正面の土の山へ前進します。実際に触れた土だけがバケットへ入ります。</li><li>いったん後退し、「すくう」で抱え、「上げる」で持ち上げます。そのまま好きな空き地へ運べます。</li><li>「こぼす」を1回押すと、停車し、必要な高さまで上げてから前へ傾け、荷下ろしします。長押しは不要です。途中で「止める」を押すと残りの土を保持します。戻すときは「差し込み姿勢」。落とした土も再びすくえます。</li></ol>
+<p>山の近くでは差し込みやすい低速、積載時は少し重い走行になります。満杯・地面への突き刺し・車体との衝突は止まります。「上げる・下げる・すくう」は長押し。「こぼす」は1回押す操作です。手動操作・説明表示・画面を離れる操作でも荷下ろしを中断します。</p>
+<p>左のパッドで車体左側のステップに近づき、<b>「運転席に乗る」</b>を押してください。触れただけでは乗りません。</p>
+<p>乗車後は右の<b>前進・後退</b>を押しながら、左でハンドルを操作します。指を離すと減速します。<b>ブレーキで停車してから降車</b>してください。</p>
+<p>左の降車経路が塞がっている場合は右を確認します。両側が塞がっていれば車内に留まり、開いた場所への移動を案内します。</p>
+<p>「屋根を透かす」で2席と正式なレンを確認できます。助手席は空席です。「安全エリアへ」はレンだけを戻し、車両を勝手に駐車位置へ移動しません。</p>
+<p class="note">貸出の普通の土32だけを使う独立試作です。土の山・積荷・落下中の土・車両位置を専用の保存先にまとめて保存します。停車して操作を離し、土が落ち着くと自動保存。途中でも「今の状態を保存」が使えます。通常ゲームと、これまでの地形セーブは変更しません。</p>
+<section class="save-tools"><strong id="save-status">保存を確認しています…</strong><p id="soil-total">土の総量を確認しています…</p><button id="work-save">今の状態を保存</button><button id="work-export">バックアップを表示</button><textarea id="work-backup" aria-label="土と車両のバックアップ" readonly hidden></textarea></section>
+<details><summary>開発用の操作・座標</summary><p>徒歩：WASD。乗車：W/Sで前後進、A/Dで操舵、Spaceでブレーキ。Eで乗降。画面ドラッグで視点回転、ホイールで距離調整。</p><dl><dt>車体位置</dt><dd id="vehicle-position">—</dd><dt>レンの足元</dt><dd id="actor-position">—</dd><dt>接触</dt><dd id="contact">なし</dd><dt>寸法</dt><dd>幅60・全長86・高さ43（ステップ展開時の幅80）</dd></dl></details>
+<p>作業の開発キー：R＝上げる、F＝下げる、Q＝すくう、T＝こぼす。</p><a href="imasora-construction-loader-dev.html?check=loader-steering-v430">前段階：走行だけの確認</a></aside>
+<script type="module" src="imasora-construction-loader-work-dev.js?v=432"></script></body></html>
