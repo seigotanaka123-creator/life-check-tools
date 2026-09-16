@@ -45238,7 +45238,7 @@ let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260916-pachicoin-same-day-resume-v1")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260916-pachicoin-central-production-v1")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;

@@ -1,7 +1,7 @@
 import * as THREE from "./three.module.min.js";
 import * as CANNON from "./rapier-cannon-compat.js?out-step156-20260802";
 import * as CANNON_MACHINE2 from "./cannon-es.js";
-import { PRODUCTION_JACKPOT_LAYOUT } from "./imasora-jackpot-production-layout.js";
+import { PRODUCTION_JACKPOT_LAYOUT } from "./imasora-jackpot-production-layout.js?v=20260916-central-production-v1";
 
 // 台番号ごとの役物内シーソー高さ。釘・保存レイアウトとは分離し、
 // 通常プレイと釘見の3Dモデルが同じ値を使う。
