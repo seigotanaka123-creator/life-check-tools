@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260820-live-opening-preview">
   <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260820-live-opening-preview">
   <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260804-machine3-floating-ring-position-editor-step306">
-  <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260819-opening-recorded-partner-v4">
+  <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260914-tri-link-full-restore">
   <link rel="stylesheet" href="assets/imasora-sky-map.css?v=20260821-cloud-workshop-sky-station-v15">
   <script src="assets/imasora-sky-map.js?v=20260821-cloud-workshop-sky-station-v15"></script>
   <link rel="stylesheet" href="assets/imasora-coastal-town-map.css?v=20260822-coastal-night-lift-v3">
@@ -11051,6 +11051,154 @@
       min-height: 620px;
       background: #12141d;
     }
+    .pachicoin-station-selector {
+      display: grid;
+      gap: 8px;
+      margin: 10px 12px 0;
+      padding: 10px;
+      border: 1px solid rgba(255,216,91,.6);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(18,28,42,.98), rgba(42,31,50,.98));
+      color: #fff8d0;
+      box-shadow: inset 0 0 16px rgba(255,210,74,.08);
+    }
+    .pachicoin-station-selector-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .pachicoin-station-selector-head small {
+      color: #9ff2d1;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .pachicoin-station-selector-head strong {
+      color: #fff2a9;
+      font-size: 13px;
+    }
+    .pachicoin-move-dialog { max-width: min(420px, 90vw); padding: 22px; border: 1px solid #64739a; border-radius: 14px; color: #edf4ff; background: #152038; }
+    .pachicoin-move-dialog::backdrop { background: #060b16bb; }
+    .pachicoin-move-dialog p { line-height: 1.6; }
+    .pachicoin-move-dialog > div { display: flex; justify-content: flex-end; gap: 12px; }
+    .pachicoin-move-dialog button { min-height: 44px; padding: 8px 14px; }
+    .pachicoin-station-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .pachicoin-station-card {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+    .pachicoin-station-button {
+      min-height: 42px;
+      padding: 5px 3px;
+      border: 1px solid #6c768b;
+      border-radius: 7px;
+      background: #263246;
+      color: #f7fbff;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,.22);
+    }
+    .pachicoin-station-button small,
+    .pachicoin-station-button strong {
+      display: block;
+      line-height: 1.15;
+    }
+    .pachicoin-station-button small { color: #9aa9c5; font-size: 9px; }
+    .pachicoin-station-button strong { color: #fff4a6; font-size: 16px; }
+    .pachicoin-station-height {
+      display: block;
+      margin-top: 2px;
+      color: #b9d7d2;
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .pachicoin-station-button.is-selected {
+      border-color: #ffe168;
+      background: linear-gradient(180deg, #9b5a2c, #583449);
+      box-shadow: 0 0 0 2px rgba(255,225,104,.24), inset 0 -3px 0 rgba(62,22,29,.35);
+    }
+    .pachicoin-station-button:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+    .pachicoin-pin-view-button {
+      min-height: 27px;
+      padding: 3px 2px;
+      border: 1px solid rgba(159,242,209,.72);
+      border-radius: 6px;
+      background: rgba(18,49,62,.92);
+      color: #bfffe8;
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .pachicoin-pin-view-button:hover,
+    .pachicoin-pin-view-button:focus-visible {
+      border-color: #fff0a0;
+      background: rgba(53,77,73,.98);
+      color: #fff8cf;
+    }
+    .pachicoin-pin-view-button:disabled {
+      cursor: default;
+      opacity: .66;
+    }
+    .pachicoin-station-note {
+      margin: 0;
+      color: #c8d3df;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+    .pachicoin-pin-dialog {
+      box-sizing: border-box; width: min(1100px, 98vw); max-width: 1100px;
+      height: min(900px, 96dvh); max-height: 96dvh; margin: auto; padding: 0;
+      border: 1px solid #ddc778; border-radius: 12px; background: #101725; color: #f7fbff;
+    }
+    .pachicoin-pin-dialog::backdrop { background: #050812d9; }
+    .pachicoin-pin-dialog-inner { display: flex; flex-direction: column; height: 100%; padding: 10px; box-sizing: border-box; gap: 8px; }
+    .pachicoin-pin-dialog-head { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 8px; }
+    .pachicoin-pin-dialog-head strong { color: #fff2a9; font-size: 16px; }
+    .pachicoin-pin-dialog-nav { display: flex; align-items: center; gap: 5px; justify-self: start; }
+    .pachicoin-pin-dialog-nav button,
+    .pachicoin-pin-dialog-close, .pachicoin-pin-tools button, .pachicoin-pin-regions button {
+      padding: 6px 10px; min-height: 36px; border: 1px solid #71849a; border-radius: 6px; background: #26354a; color: #fff; cursor: pointer;
+    }
+    .pachicoin-pin-dialog-nav button { border-color: #86b9ad; background: #193b46; color: #d9fff2; font-weight: 800; white-space: nowrap; }
+    .pachicoin-pin-dialog-nav button:hover,
+    .pachicoin-pin-dialog-nav button:focus-visible { border-color: #ffe18a; background: #315b5b; color: #fff5bf; }
+    .pachicoin-pin-regions { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 5px; }
+    .pachicoin-pin-regions button { font-size: 12px; padding: 5px 3px; }
+    .pachicoin-pin-regions button[aria-pressed="true"] { background: #665326; border-color: #ffe18a; color: #fff5bf; }
+    .pachicoin-pin-stage { flex: 1; min-height: 100px; width: 100%; position: relative; overflow: hidden; background: #071224; border-radius: 7px; }
+    .pachicoin-pin-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+    .pachicoin-pin-stage canvas:active { cursor: grabbing; }
+    .pachicoin-pin-status { margin: 0; min-height: 18px; font-size: 12px; color: #b8eedd; }
+    .pachicoin-pin-tools { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+    .pachicoin-pin-tools label { display: flex; align-items: center; gap: 5px; }
+    .pachicoin-pin-tools input { width: 95px; }
+    .pachicoin-pin-dialog-note { margin: 0; color: #c3cfdf; font-size: 11px; }
+    @media (max-width: 600px) {
+      .pachicoin-pin-dialog-inner { padding: 7px; gap: 5px; }
+      .pachicoin-pin-dialog-head { grid-template-columns: auto minmax(0,1fr) auto; gap: 3px; }
+      .pachicoin-pin-dialog-head strong { font-size: 13px; }
+      .pachicoin-pin-dialog-nav button, .pachicoin-pin-dialog-close { min-height: 32px; padding: 4px 5px; font-size: 11px; }
+      .pachicoin-pin-regions { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 3px; }
+      .pachicoin-pin-regions button { min-height: 32px; font-size: 11px; }
+    }
+    @media (max-width: 420px) {
+      .pachicoin-station-selector { margin-left: 8px; margin-right: 8px; }
+      .pachicoin-station-grid { gap: 4px; }
+      .pachicoin-station-button { min-height: 38px; }
+      .pachicoin-station-button strong { font-size: 14px; }
+      .pachicoin-pin-view-button { font-size: 9px; }
+    }
     .arcade-page-header {
       position: relative;
       z-index: 8;
@@ -18436,6 +18584,7 @@ let townRailwayJourneyFinishTimer = 0;
 let townRailwayJourneyActive = false;
 let townRailwayJourneyResizeHandler = null;
 let selectedArcadeMachineId = "";
+let selectedPachicoinMachineId = "001";
 let arcadeGameRunning = false;
 let townArcadeLobbyMoveTimer = 0;
 let townArcadeLobbyStepTimer = 0;
@@ -19028,6 +19177,7 @@ const mapMoveSfxFileKey = "mapMove";
 const matchEndSfxFileKey = "matchEndCandidate1";
 const drumRollSfxFileKey = "drumRollCandidate1";
 const sound = { ctx: null, enabled: true, bgmTimer: null, bgmLoopCueTimer: null, step: 0, mode: "normal", audio: null, usingAudioFile: false };
+let suspendedPachicoinBgmMode = null;
 const bgmModeNames = {
   normal: "通常時BGM",
   outsideHome: "時間外ホームBGM",
@@ -41462,6 +41612,18 @@ function stopBgm() {
   }
   sound.usingAudioFile = false;
 }
+function suspendBgmForPachicoin() {
+  if (sound.audio || sound.bgmTimer || sound.bgmLoopCueTimer) {
+    suspendedPachicoinBgmMode = sound.mode;
+  }
+  stopBgm();
+}
+function restoreBgmAfterPachicoin() {
+  const mode = suspendedPachicoinBgmMode;
+  suspendedPachicoinBgmMode = null;
+  if (!mode || !sound.enabled) return;
+  startBgm(mode);
+}
 function triggerRetirementLoopShootingStar() {
   if (sound.mode !== "retirementCeremony") return;
   const sendoff = document.getElementById("retirementSendoff");
@@ -45060,7 +45222,7 @@ let imasoraTriLinkModulePromise = null;
 function ensureImasoraTriLinkLoaded() {
   if (window.ImasoraTriLink) return Promise.resolve(window.ImasoraTriLink);
   if (!imasoraTriLinkModulePromise) {
-    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260820-direct-match-start-v2")
+    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260914-tri-link-full-restore")
       .then(() => {
         if (!window.ImasoraTriLink) throw new Error("Tri-Link module did not initialize");
         return window.ImasoraTriLink;
@@ -45076,7 +45238,7 @@ let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260905-ufo-workshop-common-arcade-v408")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260916-pachicoin-same-day-resume-v1")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;
@@ -45087,6 +45249,24 @@ function ensureImasoraJackpotRapierValidationLoaded() {
       });
   }
   return imasoraJackpotRapierValidationModulePromise;
+}
+let pachicoinModulePreloadQueued = false;
+function refreshPachicoinResumeLabels() {
+  document.querySelectorAll('[data-pachicoin-resume-label]').forEach(label => {
+    label.textContent = window.ImasoraJackpotRapierValidation?.getResumeStatus(label.dataset.pachicoinResumeLabel) || '';
+  });
+}
+function preloadPachicoinModule() {
+  if (pachicoinModulePreloadQueued || window.ImasoraJackpotRapierValidation) return;
+  pachicoinModulePreloadQueued = true;
+  // Let the selection screen paint first. This loads code only: no game,
+  // audio, saved layout or player state is created before pressing Start.
+  requestAnimationFrame(() => setTimeout(() => {
+    pachicoinModulePreloadQueued = false;
+    if (townArcadeMachineById(selectedArcadeMachineId)?.game !== "coinPusherRapierValidation"
+      || !document.querySelector('[data-screen="arcade"].active')) return;
+    ensureImasoraJackpotRapierValidationLoaded().then(refreshPachicoinResumeLabels).catch(() => {});
+  }, 0));
 }
 function imasoraArcadePlushColors(item, colorSettings = null) {
   const colorStyle = `${item?.style || ""}${colorSettings ? companionColorInlineStyle(colorSettings) : ""}`;
@@ -45388,8 +45568,75 @@ const townArcadeMachines = Object.freeze([
   { id: "arcade-machine-2", name: "イマソラ・トライリンク", number: "△", tone: 2, game: "triLink", mapX: 50, mapY: 23, heroX: 50, heroY: 47, mapLabel: "GAME 02" },
   { id: "arcade-machine-3", name: "イマソラパチコイン落としゲーム", number: "P3", tone: 3, game: "coinPusherRapierValidation", mapX: 80, mapY: 40, heroX: 69, heroY: 61, mapLabel: "GAME 03" }
 ]);
+const townArcadePachicoinStations = Object.freeze([
+  { id: "001", label: "001番台", seesawY: { left: 3.380, right: 3.380 } },
+  { id: "002", label: "002番台", seesawY: { left: 3.360, right: 3.380 } },
+  { id: "003", label: "003番台", seesawY: { left: 3.370, right: 3.370 } },
+  { id: "004", label: "004番台", seesawY: { left: 3.380, right: 3.360 } },
+  { id: "005", label: "005番台", seesawY: { left: 3.360, right: 3.360 } }
+]);
+function townArcadePachicoinStationById(id) {
+  return townArcadePachicoinStations.find(station => station.id === id) || townArcadePachicoinStations[0];
+}
+let activePachicoinPinInspection = null;
+let pachicoinPinInspectionGeneration = 0;
+function disposePachicoinPinInspection() {
+  pachicoinPinInspectionGeneration += 1;
+  activePachicoinPinInspection?.destroy();
+  activePachicoinPinInspection = null;
+}
 function townArcadeMachineById(id) {
   return townArcadeMachines.find(machine => machine.id === id) || null;
+}
+function townArcadePachicoinStationMarkup(interactive = true) {
+  const selected = townArcadePachicoinStationById(selectedPachicoinMachineId);
+  const buttons = townArcadePachicoinStations.map(station => {
+    const isSelected = station.id === selected.id;
+    return `<div class="pachicoin-station-card">
+      <button type="button" class="pachicoin-station-button${isSelected ? " is-selected" : ""}" data-pachicoin-station="${station.id}" aria-pressed="${isSelected}"${interactive ? "" : " disabled"}>
+        <small>台番号</small><strong>${station.id}</strong><span class="pachicoin-station-height">左${station.seesawY.left.toFixed(3)} / 右${station.seesawY.right.toFixed(3)}</span>
+      </button>
+      <button type="button" class="pachicoin-pin-view-button" data-pachicoin-pin-view="${station.id}"${interactive ? "" : " disabled"}>釘を見る</button>
+      <small data-pachicoin-resume-label="${station.id}"></small>
+    </div>`;
+  }).join("");
+  return `<section class="pachicoin-station-selector" aria-label="イマソラパチコイン落としゲームの台選択">
+    <div class="pachicoin-station-selector-head"><small>IMASORA PACHICOIN / 5 MACHINES</small><strong>現在：${selected.label}</strong></div>
+    <div class="pachicoin-station-grid" role="group" aria-label="パチコインの台番号">${buttons}</div>
+    <p class="pachicoin-station-note">釘と左風車は台ごとに日替わりです。同じ日の配置は固定され、プレイ中は変わりません（日本時間0時更新）。</p>
+    <p class="pachicoin-station-note">ST・大当たりの途中は自動保存されます。同じ台で再開できます（日本時間の当日限り）。</p>
+    <p class="pachicoin-station-note" data-pachicoin-move-status role="status" hidden></p>
+    <button type="button" data-pachicoin-move-cancel hidden>台移動を取り消す</button>
+    <dialog class="pachicoin-move-dialog" data-pachicoin-move-dialog aria-labelledby="pachicoinMoveTitle">
+      <strong id="pachicoinMoveTitle" data-pachicoin-move-title>台を変更しますか？</strong>
+      <p>もちコインを引き継いで移動します。ST・大当たりの続きは元の台に保存され、同じ日ならその台で再開できます。</p>
+      <p>進行中の入賞・抽選・払い出しは、完了を待ってから移動します。</p>
+      <div><button type="button" data-pachicoin-move-back>戻る</button><button type="button" data-pachicoin-move-confirm>この台へ移動</button></div>
+    </dialog>
+    <dialog class="pachicoin-pin-dialog" data-pachicoin-pin-dialog aria-labelledby="pachicoinPinDialogTitle">
+      <div class="pachicoin-pin-dialog-inner">
+        <header class="pachicoin-pin-dialog-head">
+          <div class="pachicoin-pin-dialog-nav">
+            <button type="button" data-pachicoin-pin-prev aria-label="前の台へ">前の台へ</button>
+            <button type="button" data-pachicoin-pin-next aria-label="次の台へ">次の台へ</button>
+          </div>
+          <strong id="pachicoinPinDialogTitle" data-pachicoin-pin-title>実機の釘を見る</strong>
+          <button type="button" class="pachicoin-pin-dialog-close" data-pachicoin-pin-close>閉じる</button>
+        </header>
+        <nav class="pachicoin-pin-regions" data-pachicoin-pin-regions aria-label="拡大する箇所"></nav>
+        <p class="pachicoin-pin-status" data-pachicoin-pin-status role="status"></p>
+        <div class="pachicoin-pin-stage" data-pachicoin-pin-board></div>
+        <div class="pachicoin-pin-tools">
+          <button type="button" data-pin-zoom="1.3" aria-label="釘を拡大">＋</button>
+          <button type="button" data-pin-zoom="0.76923" aria-label="釘を縮小">−</button>
+          <button type="button" data-pin-reset>視点を戻す</button>
+          <label>左右角度<input type="range" min="-30" max="30" value="0" data-pin-yaw aria-label="左右の見る角度"></label>
+          <label>上下角度<input type="range" min="-25" max="25" value="0" data-pin-pitch aria-label="上下の見る角度"></label>
+        </div>
+        <p class="pachicoin-pin-dialog-note">ドラッグで移動。ピンチ・ホイール・＋−で拡大縮小。角度を変えて釘の間隔や奥行きを確認できます。</p>
+      </div>
+    </dialog>
+  </section>`;
 }
 function getImasoraJackpotEffectPreferences() {
   const saved = state.jackpotEffects && typeof state.jackpotEffects === "object"
@@ -45517,6 +45764,10 @@ function clearTownArcadeLobbyMoveTimers() {
 function moveTownArcadeHeroToMachine(button) {
   const machine = townArcadeMachineById(button?.dataset?.arcadeMachine || "");
   if (!machine || button.disabled) return;
+  if (machine.game === "companionCatcher" || machine.game === "coinPusherRapierValidation") {
+    selectTownArcadeMachine(machine.id);
+    return;
+  }
   const lobby = button.closest("[data-arcade-rpg-lobby]");
   if (!lobby) {
     selectTownArcadeMachine(machine.id);
@@ -45559,7 +45810,23 @@ function moveTownArcadeHeroToMachine(button) {
     selectTownArcadeMachine(machine.id, { silent: true });
   }, moveDuration);
 }
+let arcadeOpeningImages = null;
+function preloadArcadeOpeningImages() {
+  if (arcadeOpeningImages) return;
+  arcadeOpeningImages = [
+    "./assets/imasora-catcher-opening-preview-20260914.webp",
+    "./assets/imasora-pachicoin-opening-preview-20260914.webp?v=star-poster-20260915"
+  ].map(src => {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = src;
+    image.decode?.().catch(() => {});
+    return image;
+  });
+}
 function renderTownArcade() {
+  disposePachicoinPinInspection();
+  preloadArcadeOpeningImages();
   const box = document.getElementById("townArcade");
   if (!box) return;
   clearTownArcadeLobbyMoveTimers();
@@ -45608,11 +45875,11 @@ function renderTownArcade() {
           <div class="arcade-game-stage companion-catcher-stage character-catcher-opening-stage">
             <div class="character-catcher-opening">
               <div class="cco-badge"><span>GAME 01</span><b>6 ACTION CHARACTER CATCH</b></div>
-              <div class="cco-opening-live-visual" aria-label="ゲーム本体と同じ3Dキャッチャーのライブ映像">
+              <div class="cco-opening-live-visual" aria-label="イマソラキャラクターキャッチャーのゲーム画面イメージ">
                 <div class="cco-opening-live-mount" id="imasoraCompanionCatcherOpeningPreviewMount" aria-hidden="true">
-                  <div class="arcade-opening-live-loading"><i></i><span>3D CATCHER CONNECTING</span></div>
+                  <img src="./assets/imasora-catcher-opening-preview-20260914.webp" alt="イマソラキャラクターキャッチャーのゲーム画面" decoding="async" fetchpriority="high" width="390" height="292" style="display:block;width:100%;height:100%;object-fit:contain">
                 </div>
-                <span class="arcade-opening-live-badge" aria-hidden="true"><i></i><b>LIVE 3D CATCHER</b></span>
+                <span class="arcade-opening-live-badge" aria-hidden="true"><i></i><b>GAME PREVIEW</b></span>
               </div>
               <div class="cco-copy">
                 <small>POSITION. FINE TUNE. DROP.</small>
@@ -45703,20 +45970,22 @@ function renderTownArcade() {
     } else if (selectedMachine.game === "coinPusherRapierValidation") {
       if (arcadeGameRunning) {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          ${townArcadePachicoinStationMarkup(true)}
           <div class="arcade-game-stage coin-pusher-stage">
-            <div class="coin-pusher-host" id="imasoraJackpotRapierValidationMount"></div>
+            <div class="coin-pusher-host" id="imasoraJackpotRapierValidationMount"><div class="icp-load-error"><div><strong role="status">ロード中</strong></div></div></div>
             <div class="coin-pusher-exit-row"><button type="button" data-arcade-stop>ゲームを終了</button></div>
           </div>`;
       } else {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
+          ${townArcadePachicoinStationMarkup(true)}
           <div class="arcade-game-stage coin-pusher-stage pachi-coin-opening-stage">
             <div class="pachi-coin-opening">
               <div class="pco-badge"><span>GAME 03</span><b>PACHINKO × COIN PUSHER</b></div>
-              <div class="pco-opening-live-visual" aria-label="ゲーム本体と同じパチンコ・コイン落とし盤のライブ映像">
+              <div class="pco-opening-live-visual" aria-label="ハンドル付きイマソラパチコイン落としゲームの画面イメージ">
                 <div class="pco-opening-live-mount" id="imasoraJackpotOpeningPreviewMount" aria-hidden="true">
-                  <div class="arcade-opening-live-loading"><i></i><span>PACHINKO CONNECTING</span></div>
+                  <img src="./assets/imasora-pachicoin-opening-preview-20260914.webp?v=star-poster-20260915" alt="ハンドル付きイマソラパチコイン落としゲームの画面" decoding="async" fetchpriority="high" width="368" height="461" style="display:block;width:100%;height:100%;object-fit:contain">
                 </div>
-                <span class="arcade-opening-live-badge is-gold" aria-hidden="true"><i></i><b>LIVE PACHINKO × PUSHER</b></span>
+                <span class="arcade-opening-live-badge is-gold" aria-hidden="true"><i></i><b>GAME PREVIEW</b></span>
               </div>
               <div class="pco-copy">
                 <small>TURN. SHOOT. PUSH.</small>
@@ -45748,6 +46017,194 @@ function renderTownArcade() {
   box.querySelectorAll("[data-arcade-machine]").forEach(button => {
     button.addEventListener("click", () => moveTownArcadeHeroToMachine(button));
   });
+  const moveDialog = box.querySelector('[data-pachicoin-move-dialog]');
+  const moveStatus = box.querySelector('[data-pachicoin-move-status]');
+  const moveCancel = box.querySelector('[data-pachicoin-move-cancel]');
+  let pendingMoveId = null;
+  let moveOpener = null;
+  moveDialog?.addEventListener('close', () => {
+    if (!moveDialog.isConnected || moveDialog.open || box.querySelector('[data-pachicoin-pin-dialog]')?.open) return;
+    window.ImasoraJackpotRapierValidation?.setNavigationPaused(false);
+    moveOpener?.focus();
+  });
+  box.querySelector('[data-pachicoin-move-back]')?.addEventListener('click', () => moveDialog.close());
+  box.querySelector('[data-pachicoin-move-confirm]')?.addEventListener('click', () => {
+    const nextId = pendingMoveId;
+    moveDialog.close();
+    window.ImasoraJackpotRapierValidation?.setNavigationPaused(false);
+    if (!nextId || !window.ImasoraJackpotRapierValidation?.requestStationChange(nextId)) return;
+    moveStatus.textContent = nextId + '番台へ移動します。発射を止めて入賞・抽選・払い出しの完了を待っています。';
+    moveStatus.hidden = false;
+    moveCancel.hidden = false;
+  });
+  moveCancel?.addEventListener('click', () => {
+    window.ImasoraJackpotRapierValidation?.cancelStationChange();
+    moveStatus.textContent = '台移動を取り消しました。この台でプレイを続けられます。';
+    moveCancel.hidden = true;
+  });
+  box.querySelectorAll("[data-pachicoin-station]").forEach(button => {
+    button.addEventListener("click", () => {
+      const station = townArcadePachicoinStationById(button.dataset.pachicoinStation);
+      if (arcadeGameRunning) {
+        if (station.id === selectedPachicoinMachineId) return;
+        const game = window.ImasoraJackpotRapierValidation;
+        if (!game?.getNavigationState()) { toast('台の準備が終わってから選んでください'); return; }
+        pendingMoveId = station.id;
+        moveOpener = button;
+        box.querySelector('[data-pachicoin-move-title]').textContent = station.label + 'へ移動しますか？';
+        game.setNavigationPaused(true);
+        moveDialog.showModal();
+        return;
+      }
+      selectedPachicoinMachineId = station.id;
+      renderTownArcade();
+      playSfx("select");
+    });
+  });
+  const pachicoinPinDialog = box.querySelector('[data-pachicoin-pin-dialog]');
+  const pinBoard = box.querySelector('[data-pachicoin-pin-board]');
+  const pinRegions = box.querySelector('[data-pachicoin-pin-regions]');
+  const pinStatus = box.querySelector('[data-pachicoin-pin-status]');
+  let pinOpener = null;
+  const pinViewStateFromViewer = () => {
+    const viewer = activePachicoinPinInspection;
+    if (!viewer) return { regionId: 'whole', zoom: 1, yaw: 0, pitch: 0, panX: 0, panY: 0 };
+    return {
+      regionId: viewer.inspectionRegion?.id || 'whole',
+      zoom: Number.isFinite(viewer.inspectionZoom) ? viewer.inspectionZoom : 1,
+      yaw: Number.isFinite(viewer.inspectionYaw) ? viewer.inspectionYaw : 0,
+      pitch: Number.isFinite(viewer.inspectionPitch) ? viewer.inspectionPitch : 0,
+      panX: Number.isFinite(viewer.inspectionPan?.x) ? viewer.inspectionPan.x : 0,
+      panY: Number.isFinite(viewer.inspectionPan?.y) ? viewer.inspectionPan.y : 0
+    };
+  };
+  const normalizePinViewState = value => ({
+    regionId: String(value?.regionId || 'whole'),
+    zoom: Math.min(5, Math.max(0.5, Number(value?.zoom) || 1)),
+    yaw: Math.min(30, Math.max(-30, Number(value?.yaw) || 0)),
+    pitch: Math.min(25, Math.max(-25, Number(value?.pitch) || 0)),
+    panX: Number(value?.panX) || 0,
+    panY: Number(value?.panY) || 0
+  });
+  const closePinView = () => {
+    activePachicoinPinInspection?.suspendInspection();
+    pachicoinPinDialog?.close();
+  };
+  pachicoinPinDialog?.addEventListener('cancel', () => activePachicoinPinInspection?.suspendInspection());
+  pachicoinPinDialog?.addEventListener('close', () => {
+    if (!pachicoinPinDialog.isConnected || pachicoinPinDialog.open) return;
+    pachicoinPinInspectionGeneration += 1;
+    activePachicoinPinInspection?.suspendInspection();
+    if (arcadeGameRunning) window.ImasoraJackpotRapierValidation?.setNavigationPaused(false);
+    pinOpener?.focus();
+  });
+  box.querySelector('[data-pachicoin-pin-close]')?.addEventListener('click', closePinView);
+  const syncPinInspectionRegion = () => {
+    const viewer = activePachicoinPinInspection;
+    if (!viewer) return;
+    const station = townArcadePachicoinStationById(viewer.stationId);
+    box.querySelector('[data-pachicoin-pin-title]').textContent = station.label + '｜実機の釘を見る';
+    pinStatus.textContent = station.label + '｜' + viewer.inspectionRegion.label + '｜調整日 ' + viewer.dailyAdjustment.dayKey + (arcadeGameRunning ? '｜プレイ一時停止中（閉じると再開）' : '');
+    pinRegions.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.pinRegion === viewer.inspectionRegion.id)));
+  };
+  const openPachicoinPinView = async (stationId, requestedViewState = null, opener = null) => {
+    const station = townArcadePachicoinStationById(stationId);
+    const stationButton = box.querySelector(`[data-pachicoin-pin-view="${station.id}"]`);
+    pinOpener = stationButton || opener || pinOpener;
+    const playState = arcadeGameRunning ? window.ImasoraJackpotRapierValidation?.getNavigationState() : null;
+    const adjustmentDate = playState?.stationId === station.id
+      ? new Date(playState.adjustmentDay + 'T12:00:00+09:00') : undefined;
+    const currentViewer = activePachicoinPinInspection;
+    if (currentViewer?.inspectionReady && !currentViewer.destroyed && currentViewer.root === pinBoard && currentViewer.isLayoutCurrent()) {
+      // A station change is synchronous and keeps the same canvas and controls.
+      // No blank loading screen, WebGL teardown or texture reload between tables.
+      try {
+        const reopening = !pachicoinPinDialog.open;
+        if (reopening) {
+          if (arcadeGameRunning) window.ImasoraJackpotRapierValidation?.setNavigationPaused(true);
+          pachicoinPinDialog.showModal();
+          currentViewer.resumeInspection();
+        }
+        currentViewer.switchStation(station.id, { adjustmentDate });
+        if (reopening) {
+          const view = normalizePinViewState(requestedViewState);
+          currentViewer.selectRegion(view.regionId);
+          currentViewer.inspectionZoom = view.zoom;
+          currentViewer.inspectionPan.set(view.panX, view.panY);
+          currentViewer.angleInspection(view.yaw, view.pitch);
+          box.querySelector('[data-pin-yaw]').value = String(view.yaw);
+          box.querySelector('[data-pin-pitch]').value = String(view.pitch);
+        }
+        syncPinInspectionRegion();
+        return;
+      } catch (error) {
+        console.error('釘見の台切替を再読み込みで復旧します。', error);
+      }
+    }
+    disposePachicoinPinInspection();
+    const generation = pachicoinPinInspectionGeneration;
+    const viewState = normalizePinViewState(requestedViewState);
+    box.querySelector('[data-pachicoin-pin-title]').textContent = station.label + '｜実機の釘を見る';
+    pinRegions.replaceChildren();
+    pinStatus.textContent = '実機の盤面を読み込んでいます…';
+    if (!pachicoinPinDialog.open) {
+      if (arcadeGameRunning) window.ImasoraJackpotRapierValidation?.setNavigationPaused(true);
+      pachicoinPinDialog.showModal();
+    }
+    try {
+      const module = await ensureImasoraJackpotRapierValidationLoaded();
+      if (generation !== pachicoinPinInspectionGeneration || !pachicoinPinDialog.open || !pinBoard.isConnected) return;
+      const viewer = module.mountPinInspection(pinBoard, {
+        stationId: station.id, adjustmentDate, wingArt: getImasoraJackpotWingArt(), roster: getImasoraArcadePlushRoster()
+      });
+      activePachicoinPinInspection = viewer;
+      const syncRegion = syncPinInspectionRegion;
+      viewer.inspectionRegions.forEach(region => {
+        const item = document.createElement('button');
+        item.type = 'button'; item.textContent = region.label; item.dataset.pinRegion = region.id;
+        item.addEventListener('click', () => { viewer.selectRegion(region.id); syncRegion(); });
+        pinRegions.append(item);
+      });
+      const regionExists = viewer.inspectionRegions.some(region => region.id === viewState.regionId);
+      viewer.selectRegion(regionExists ? viewState.regionId : 'whole');
+      viewer.inspectionZoom = viewState.zoom;
+      viewer.inspectionPan.set(viewState.panX, viewState.panY);
+      viewer.angleInspection(viewState.yaw, viewState.pitch);
+      box.querySelector('[data-pin-yaw]').value = String(viewState.yaw);
+      box.querySelector('[data-pin-pitch]').value = String(viewState.pitch);
+      syncRegion();
+    } catch (error) {
+      if (generation !== pachicoinPinInspectionGeneration) return;
+      disposePachicoinPinInspection();
+      pinStatus.textContent = '盤面を読み込めませんでした。閉じて、もう一度開いてください。';
+      console.error('実機の釘見を読み込めませんでした。', error);
+    }
+  };
+  box.querySelectorAll('[data-pachicoin-pin-view]').forEach(button => {
+    button.setAttribute('aria-label', button.dataset.pachicoinPinView + '番台の釘を見る');
+    button.addEventListener('click', () => { void openPachicoinPinView(button.dataset.pachicoinPinView, null, button); });
+  });
+  const movePachicoinPinStation = offset => {
+    const currentId = activePachicoinPinInspection?.stationId || pinOpener?.dataset.pachicoinPinView || selectedPachicoinMachineId;
+    const currentIndex = townArcadePachicoinStations.findIndex(station => station.id === currentId);
+    const nextIndex = (currentIndex + offset + townArcadePachicoinStations.length) % townArcadePachicoinStations.length;
+    const viewState = pinViewStateFromViewer();
+    void openPachicoinPinView(townArcadePachicoinStations[nextIndex].id, viewState);
+  };
+  box.querySelector('[data-pachicoin-pin-prev]')?.addEventListener('click', () => movePachicoinPinStation(-1));
+  box.querySelector('[data-pachicoin-pin-next]')?.addEventListener('click', () => movePachicoinPinStation(1));
+  box.querySelectorAll('[data-pin-zoom]').forEach(button => button.addEventListener('click', () => activePachicoinPinInspection?.zoomInspection(Number(button.dataset.pinZoom))));
+  box.querySelector('[data-pin-reset]')?.addEventListener('click', () => {
+    const viewer = activePachicoinPinInspection;
+    if (!viewer) return;
+    box.querySelector('[data-pin-yaw]').value = '0';
+    box.querySelector('[data-pin-pitch]').value = '0';
+    viewer.angleInspection(0, 0);
+    viewer.selectRegion(viewer.inspectionRegion.id);
+  });
+  box.querySelectorAll('[data-pin-yaw], [data-pin-pitch]').forEach(input => input.addEventListener('input', () => {
+    activePachicoinPinInspection?.angleInspection(box.querySelector('[data-pin-yaw]').value, box.querySelector('[data-pin-pitch]').value);
+  }));
   box.querySelector("[data-tri-link-retired]")?.addEventListener("change", event => {
     selectedTriLinkRetiredId = event.currentTarget.value || "";
     renderTownArcade();
@@ -45811,7 +46268,7 @@ function renderTownArcade() {
       mount.innerHTML = '<div class="itl-opening-live-loading"><i></i><span>3D ARENA CONNECTING</span></div>';
       ensureImasoraTriLinkLoaded()
         .then(game => {
-          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
+          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id || !document.querySelector('[data-screen="arcade"].active')) return;
           game.mount(mount, {
             participants: getImasoraTriLinkParticipants(),
             memories: [],
@@ -45827,50 +46284,8 @@ function renderTownArcade() {
         });
     });
   }
-  if (activeArcadeMachine?.game === "companionCatcher" && !arcadeGameRunning) {
-    requestAnimationFrame(() => {
-      const mount = document.getElementById("imasoraCompanionCatcherOpeningPreviewMount");
-      if (!mount) return;
-      mount.innerHTML = '<div class="arcade-opening-live-loading"><i></i><span>3D CATCHER CONNECTING</span></div>';
-      ensureImasoraCompanionCatcherLoaded()
-        .then(game => {
-          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
-          game.mount(mount, {
-            roster: getImasoraArcadePlushRoster(),
-            previewOnly: true
-          });
-          mount.dataset.liveCatcher = "ready";
-        })
-        .catch(error => {
-          console.error("イマソラキャラクターキャッチャーの3D導入映像を起動できませんでした。", error);
-          if (!mount.isConnected) return;
-          mount.innerHTML = '<div class="arcade-opening-live-loading is-error"><span>3D CATCHER RETRY</span></div>';
-        });
-    });
-  }
-  if (activeArcadeMachine?.game === "coinPusherRapierValidation" && !arcadeGameRunning) {
-    requestAnimationFrame(() => {
-      const mount = document.getElementById("imasoraJackpotOpeningPreviewMount");
-      if (!mount) return;
-      mount.innerHTML = '<div class="arcade-opening-live-loading"><i></i><span>PACHINKO CONNECTING</span></div>';
-      ensureImasoraJackpotRapierValidationLoaded()
-        .then(game => {
-          if (!mount.isConnected || arcadeGameRunning || selectedArcadeMachineId !== activeArcadeMachine.id) return;
-          game.mount(mount, {
-            roster: getImasoraArcadePlushRoster(),
-            wingArt: getImasoraJackpotWingArt(),
-            effects: getImasoraJackpotEffectPreferences(),
-            previewOnly: true
-          });
-          mount.dataset.livePachinko = "ready";
-        })
-        .catch(error => {
-          console.error("イマソラパチコイン落としゲームの3D導入映像を起動できませんでした。", error);
-          if (!mount.isConnected) return;
-          mount.innerHTML = '<div class="arcade-opening-live-loading is-error"><span>PACHINKO RETRY</span></div>';
-        });
-    });
-  }
+
+
   if (activeArcadeMachine?.game === "companionCatcher" && arcadeGameRunning) {
     requestAnimationFrame(() => {
       const mount = document.getElementById("imasoraCompanionCatcherMount");
@@ -45878,7 +46293,7 @@ function renderTownArcade() {
       mount.innerHTML = '<div class="icc-load-error"><div><strong>3Dキャッチャーを準備中</strong></div></div>';
       ensureImasoraCompanionCatcherLoaded()
         .then(game => {
-          if (!mount.isConnected) return;
+          if (!mount.isConnected || !document.querySelector('[data-screen="arcade"].active')) return;
           game.mount(mount, { roster: getImasoraArcadePlushRoster() });
           observeImasoraCompanionCatcherWorkshopRewards(mount);
         })
@@ -45896,7 +46311,7 @@ function renderTownArcade() {
       mount.innerHTML = '<div class="icc-load-error"><div><strong>三者対戦の物理盤を準備中</strong></div></div>';
       ensureImasoraTriLinkLoaded()
         .then(game => {
-          if (!mount.isConnected) return;
+          if (!mount.isConnected || !document.querySelector('[data-screen="arcade"].active')) return;
           game.mount(mount, {
             participants: getImasoraTriLinkParticipants(),
             memories: getImasoraTriLinkMemories(),
@@ -45913,27 +46328,39 @@ function renderTownArcade() {
     });
   }
   if (activeArcadeMachine?.game === "coinPusherRapierValidation" && arcadeGameRunning) {
-    requestAnimationFrame(() => {
-      const mount = document.getElementById("imasoraJackpotRapierValidationMount");
-      if (!mount) return;
-      mount.innerHTML = '<div class="icp-load-error"><div><strong>Rapier検証版を準備中</strong></div></div>';
+    const mount = box.querySelector("#imasoraJackpotRapierValidationMount");
+    // Paint the loading text before doing any synchronous 3D work. Capture
+    // this host so leaving/reopening cannot start an obsolete request here.
+    requestAnimationFrame(() => setTimeout(() => {
+      if (!mount?.isConnected || !arcadeGameRunning || !document.querySelector('[data-screen="arcade"].active')) return;
       ensureImasoraJackpotRapierValidationLoaded()
         .then(game => {
-          if (!mount.isConnected) return;
-          game.mount(mount, {
+          if (!mount.isConnected || !document.querySelector('[data-screen="arcade"].active')) return;
+          const mountedGame = game.mount(mount, {
             roster: getImasoraArcadePlushRoster(),
             wingArt: getImasoraJackpotWingArt(),
             effects: getImasoraJackpotEffectPreferences(),
+            stationId: selectedPachicoinMachineId,
+            onStationChange: stationId => {
+              if (!mount.isConnected || !arcadeGameRunning) return;
+              selectedPachicoinMachineId = stationId;
+              renderTownArcade();
+              playSfx("select");
+            },
             onWorkshopExchange: awardUfoWorkshopCoinPusherExchange
           });
+          if (box.querySelector('[data-pachicoin-pin-dialog]')?.open || box.querySelector('[data-pachicoin-move-dialog]')?.open) mountedGame?.setNavigationPaused(true);
+          const adjustmentNote = box.querySelector('.pachicoin-station-note');
+          if (adjustmentNote && mountedGame) adjustmentNote.textContent = mountedGame.stationId + '番台｜調整日 ' + mountedGame.dailyAdjustment.dayKey + '（日本時間）。このプレイ中の配置は固定です。';
         })
         .catch(error => {
           console.error("イマソラジャックポットRapier検証版の読み込みに失敗しました。", error);
           if (!mount.isConnected) return;
-          mount.innerHTML = '<div class="icp-load-error"><div><strong>Rapier検証版を起動できませんでした</strong><p>ページを更新して、もう一度ゲーム機3から開いてください。</p></div></div>';
+          mount.innerHTML = '<div class="icp-load-error"><div><strong>ゲームを読み込めませんでした</strong><p>ゲーム機を選ぶ画面に戻り、もう一度お試しください。</p></div></div>';
         });
-    });
+    }, 0));
   }
+  refreshPachicoinResumeLabels();
 }
 function openTownArcadeFromMap() {
   if (!isTownBuildingBuilt("arcade")) {
@@ -45949,16 +46376,21 @@ function openTownArcadeFromMap() {
   toast("ゲームセンターへ移動しました");
 }
 function selectTownArcadeMachine(id, options = {}) {
-  if (!townArcadeMachineById(id)) return;
+  const machine = townArcadeMachineById(id);
+  if (!machine) return;
+  if (machine.game === "coinPusherRapierValidation") suspendBgmForPachicoin();
+  else restoreBgmAfterPachicoin();
   selectedArcadeMachineId = id;
   arcadeGameRunning = false;
   renderTownArcade();
+  if (machine.game === "coinPusherRapierValidation") preloadPachicoinModule();
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (!options.silent) playSfx("select");
 }
 function startTownArcadeGame() {
   const machine = townArcadeMachineById(selectedArcadeMachineId);
   if (!machine) return;
+  if (machine.game === "coinPusherRapierValidation") suspendBgmForPachicoin();
   if (machine.game === "triLink") {
     const access = imasoraTriLinkGrowthAccess();
     if (!access.playable) {
@@ -45979,6 +46411,7 @@ function stopTownArcadeGame() {
   playSfx("select");
 }
 function returnToTownArcadeLobby() {
+  restoreBgmAfterPachicoin();
   selectedArcadeMachineId = "";
   arcadeGameRunning = false;
   renderTownArcade();
@@ -45986,6 +46419,7 @@ function returnToTownArcadeLobby() {
   playSfx("select");
 }
 function returnToTownMapFromArcade() {
+  restoreBgmAfterPachicoin();
   clearTownArcadeLobbyMoveTimers();
   selectedArcadeMachineId = "";
   arcadeGameRunning = false;
@@ -57004,6 +57438,12 @@ function showHomeCenterNotice(text) {
 }
 function switchScreen(screen) {
   blurActiveTextInput();
+  if (screen !== "arcade") {
+    clearTownArcadeLobbyMoveTimers();
+    disposePachicoinPinInspection();
+    window.ImasoraJackpotRapierValidation?.unmount();
+    window.ImasoraTriLink?.unmount();
+  }
   if (screen !== "skyMap") window.ImasoraSkyMap?.unmount();
   if (screen !== "landMap") window.ImasoraLandMap?.unmount();
   if (screen !== "coastalTown") window.ImasoraCoastalTown?.unmount();
@@ -57185,14 +57625,6 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 

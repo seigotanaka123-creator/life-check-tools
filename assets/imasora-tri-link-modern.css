@@ -201,6 +201,7 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
 .itl3-player-card::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--itl3-color), transparent); box-shadow: 0 0 9px var(--itl3-color); }
 .itl3-player-card.is-hit { animation: itl-modern-card-hit .55s ease; }
 .itl3-player-card.is-out { opacity: .3; filter: grayscale(.8); }
+.itl3-player-card.is-leader { border-color:color-mix(in srgb,var(--itl3-color) 82%,white); box-shadow:inset 0 1px rgba(255,255,255,.18),0 0 18px color-mix(in srgb,var(--itl3-color) 38%,transparent),0 8px 20px rgba(0,0,0,.34); }
 .itl3-player-index { color: color-mix(in srgb, var(--itl3-color) 72%, white); font: 900 11px/1 ui-monospace, monospace; writing-mode: vertical-rl; letter-spacing: .1em; }
 .itl3-player-mini { width: 42px; height: 42px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--itl3-color) 70%, white); border-radius: 8px; background: radial-gradient(circle at 45% 25%, rgba(255,255,255,.92), color-mix(in srgb, var(--itl3-color) 62%, #152239)); box-shadow: 0 0 14px color-mix(in srgb, var(--itl3-color) 38%, transparent); }
 .itl3-player-mini svg { width: 100%; height: 100%; }
@@ -208,16 +209,19 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
 .itl3-player-info small { display: block; color: var(--itl3-color); font: 800 7px/1.1 ui-monospace, monospace; letter-spacing: .14em; }
 .itl3-player-info strong { display: block; overflow: hidden; margin-top: 2px; color: #fff; font-size: clamp(10px, 1.3cqw, 14px); font-weight: 900; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
 .itl3-player-info span { display: block; overflow: hidden; margin-top: 2px; color: #89a9bb; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-.itl3-lives { display: flex; gap: 4px; }
-.itl3-life { position: relative; width: 9px; height: 23px; transform: skewX(-12deg); border: 1px solid rgba(127,151,171,.38); background: rgba(45,57,73,.34); }
-.itl3-life span { position: absolute; inset: 2px; background: rgba(68,79,96,.28); }
-.itl3-life.is-on { border-color: color-mix(in srgb, var(--itl3-color) 78%, white); box-shadow: 0 0 8px var(--itl3-color); }
-.itl3-life.is-on span { background: linear-gradient(180deg, white, var(--itl3-color) 34%, color-mix(in srgb, var(--itl3-color) 62%, #001)); }
+.itl3-territory { display:grid; grid-template-columns:auto auto; align-items:end; gap:2px 5px; min-width:68px; }
+.itl3-territory small { color:#8db5c7; font:800 6px/1 ui-monospace,monospace; letter-spacing:.13em; }
+.itl3-territory b { color:#fff; font:900 16px/.9 ui-monospace,monospace; text-align:right; text-shadow:0 0 8px var(--itl3-color); }
+.itl3-territory b em { color:#7d9aaa; font-size:7px; font-style:normal; }
+.itl3-territory > i { grid-column:1/-1; display:block; width:100%; height:4px; overflow:hidden; transform:skewX(-12deg); background:rgba(81,104,124,.28); }
+.itl3-territory > i span { display:block; height:100%; background:linear-gradient(90deg,color-mix(in srgb,var(--itl3-color) 55%,white),var(--itl3-color)); box-shadow:0 0 9px var(--itl3-color); transition:width .35s ease; }
 
 .itl3-characters { position: absolute; z-index: 28; inset: 0; pointer-events: none; }
 .itl3-character { --itl3-color:#63e6ff; --itl3-depth:1; position: absolute; left: 50%; top: 50%; width: max-content; transform: translate(-50%, -50%) scale(var(--itl3-depth)); transform-origin: center; transition: opacity .3s, filter .3s; }
 .itl3-character-name { display: flex; align-items: center; gap: 5px; max-width: 160px; padding: 4px 9px; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); background: rgba(1,6,15,.82); border-left: 2px solid var(--itl3-color); color: #fff; font-size: 9px; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-shadow: 0 0 12px color-mix(in srgb,var(--itl3-color) 32%,transparent); }
 .itl3-character-name i { width: 5px; height: 5px; border-radius: 50%; background: var(--itl3-color); box-shadow: 0 0 7px var(--itl3-color); }
+.itl3-character-name { transition: opacity .18s ease, transform .18s ease; transform-origin: center; }
+.itl3-characters.are-names-hidden .itl3-character-name { opacity: 0; transform: translateY(-3px) scale(.96); pointer-events: none; }
 .itl3-character-bubble { position: absolute; left: 50%; bottom: calc(100% + 7px); min-width: 74px; padding: 5px 8px; transform: translate(-50%,8px) scale(.9); clip-path: polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px); background: color-mix(in srgb,var(--itl3-color) 88%,white); color: #03101d; font: 900 8px/1.2 ui-monospace,monospace; text-align:center; letter-spacing:.06em; opacity:0; transition:opacity .14s,transform .14s; }
 .itl3-character.is-reacting .itl3-character-bubble { opacity:1; transform:translate(-50%,0) scale(1); }
 .itl3-character.is-out { opacity:.25; filter:grayscale(1); }
@@ -228,7 +232,7 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
 .itl3-message::after { right:0; transform:scaleX(-1); }
 .itl3-message.is-visible { animation:itl-modern-message 1.15s cubic-bezier(.16,.8,.2,1) both; }
 .itl3-message small { display:block; color:#8deaff; font:900 10px/1 ui-monospace,monospace; letter-spacing:.32em; text-shadow:0 0 11px #36cfff; }
-.itl3-message strong { display:block; margin-top:6px; color:#fff; font-size:clamp(42px,8cqw,96px); font-style:italic; font-weight:1000; line-height:.9; letter-spacing:-.02em; text-transform:uppercase; text-shadow:2px 0 #43eaff,-2px 0 #ff53a8,0 0 8px #fff,0 0 28px rgba(92,220,255,.72),0 10px 32px rgba(0,0,0,.55); }
+.itl3-message strong { display:block; margin-top:6px; color:#fff; font-size:clamp(42px,8cqw,96px); font-style:italic; font-weight:1000; line-height:.9; letter-spacing:-.02em; text-transform:uppercase; white-space:pre-line; text-shadow:2px 0 #43eaff,-2px 0 #ff53a8,0 0 8px #fff,0 0 28px rgba(92,220,255,.72),0 10px 32px rgba(0,0,0,.55); }
 
 .itl3-combat-hud { position:absolute; z-index:24; right:18px; bottom:18px; display:grid; justify-items:end; gap:8px; pointer-events:none; }
 .itl3-speed { width:180px; padding:8px 10px; clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); background:rgba(2,8,18,.72); border-left:2px solid var(--itl-cyan); text-align:right; }
@@ -291,10 +295,25 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
 .itl3-photo-person > div { position:relative; display:grid; place-items:end center; height:120px; }
 .itl3-photo-person svg { max-width:100%; max-height:118px; }
 .itl3-photo-person strong { display:block; overflow:hidden; color:#fff; font-size:10px; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 2px 6px #001; }
+.itl3-photo-person small { display:block; margin-top:3px; color:#9feeff; font:900 8px/1 ui-monospace,monospace; letter-spacing:.08em; text-shadow:0 0 8px currentColor; }
 .itl3-result-actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 .itl3-result-actions .itl3-primary { width:260px; }
 .itl3-secondary { min-height:45px; padding:9px 18px; border:1px solid rgba(117,220,251,.42); clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); background:rgba(12,34,57,.78); color:#e7faff; font-weight:900; cursor:pointer; }
 
+.itl3-dev-character-panel { margin-top:12px; padding:13px; border:1px solid rgba(104,225,255,.48); background:linear-gradient(135deg,rgba(5,24,45,.96),rgba(16,12,39,.94)); box-shadow:inset 0 0 28px rgba(65,200,255,.08); }
+.itl3-dev-character-heading { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:10px; }
+.itl3-dev-character-heading div { display:grid; gap:3px; }
+.itl3-dev-character-heading small { color:#67ddf8; font:850 8px/1 ui-monospace,monospace; letter-spacing:.16em; }
+.itl3-dev-character-heading strong { color:#fff; font-size:15px; }
+.itl3-dev-character-heading > span { color:#9bb7ca; font:750 9px/1.3 ui-monospace,monospace; }
+.itl3-dev-character-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.itl3-dev-character-field { display:grid; gap:5px; min-width:0; padding:8px; border:1px solid rgba(125,214,241,.22); background:rgba(2,11,24,.72); }
+.itl3-dev-character-field > span { color:#ffd879; font:900 8px/1 ui-monospace,monospace; letter-spacing:.12em; }
+.itl3-dev-character-field select { width:100%; min-width:0; min-height:35px; padding:6px 8px; border:1px solid rgba(118,225,255,.45); border-radius:3px; background:#081b30; color:#fff; font-size:11px; font-weight:800; }
+.itl3-dev-character-field small { min-height:30px; color:#9cecff; font:750 8px/1.45 ui-monospace,monospace; }
+.itl3-dev-character-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:9px; }
+.itl3-dev-character-actions p { margin:0; color:#91aebe; font-size:9px; font-weight:750; }
+.itl3-dev-character-actions button { flex:0 0 auto; min-height:34px; padding:7px 14px; border:1px solid #ffe28b; background:linear-gradient(135deg,#f04e91,#6b56ff); color:#fff; font-size:10px; font-weight:950; cursor:pointer; box-shadow:0 0 15px rgba(113,94,255,.25); }
 .itl3-testbar { display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:9px; padding:8px; border:1px dashed rgba(255,211,103,.5); background:rgba(24,15,3,.78); }
 .itl3-testbar button { padding:7px 11px; border:1px solid rgba(255,255,255,.36); background:#122c49; color:#fff; font-size:10px; cursor:pointer; }
 .itl3-debug { margin-left:auto; color:#ffe58d; font:700 9px/1.4 ui-monospace,monospace; }
@@ -318,6 +337,9 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
 @keyframes itl-modern-card-hit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-7px); filter:brightness(1.6); } 48% { transform:translateX(5px); } 72% { transform:translateX(-2px); } }
 
 @container (max-width: 740px) {
+  .itl3-dev-character-grid { grid-template-columns:1fr; }
+  .itl3-dev-character-actions { align-items:stretch; flex-direction:column; }
+  .itl3-dev-character-actions button { width:100%; }
   .itl3-gamebar { grid-template-columns:minmax(0,1fr) auto auto; min-height:62px; gap:8px; padding:8px 11px; border-radius:17px 17px 0 0; }
   .itl3-brand-mark { flex-basis:35px; width:35px; height:35px; border-radius:10px; }
   .itl3-brand-copy small { display:none; }
@@ -334,8 +356,10 @@ body:has(#imasoraTriLinkMount .itl3-shell) {
   .itl3-player-mini { width:29px; height:29px; border-radius:6px; }
   .itl3-player-info small,.itl3-player-info span { display:none; }
   .itl3-player-info strong { font-size:8px; }
-  .itl3-lives { grid-column:1/-1; justify-content:center; }
-  .itl3-life { width:7px; height:12px; }
+  .itl3-territory { grid-column:1/-1; grid-template-columns:1fr auto; min-width:0; padding:0 3px; }
+  .itl3-territory small { font-size:5px; }
+  .itl3-territory b { font-size:12px; }
+  .itl3-territory > i { height:3px; }
   .itl3-opening { align-items:flex-end; padding:66px 9px 24px; background:linear-gradient(0deg,rgba(1,4,12,.96) 0%,rgba(1,4,12,.82) 46%,rgba(1,4,12,.18) 82%,transparent); }
   .itl3-opening-card { width:100%; min-width:0; padding:17px 16px 18px; }
   .itl3-opening-card h2 { font-size:clamp(29px,9cqw,42px); }
