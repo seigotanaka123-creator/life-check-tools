@@ -518,6 +518,7 @@ export class World {
     this._listeners = new Map();
     this._contactMaterials = [];
     this._colliderRecords = new Map();
+    this._nextColliderSequence = 0;
     this.lastStepMilliseconds = 0;
     this.lastSubsteps = 0;
     this.lastContactCount = 0;
@@ -573,7 +574,10 @@ export class World {
         descriptor.setDensity(0);
       }
       const collider = this._rapierWorld.createCollider(descriptor, body._rawBody);
-      const record = { body, shape, collider, offset, orientation, material, transformDirty: false };
+      const record = {
+        body, shape, collider, offset, orientation, material, transformDirty: false,
+        sequence: this._nextColliderSequence++
+      };
       this._colliderRecords.set(collider.handle, record);
       return record;
     });
@@ -667,6 +671,12 @@ export class World {
   _prepareBody(body) {
     const rawBody = body._rawBody;
     if (!rawBody?.isValid()) return;
+    // Fixed bodies cannot move in the solver. Read them back only after an
+    // explicit edit, including Rapier's float32 normalization of the new pose.
+    body._staticReadbackNeeded = body.type === Body.STATIC && (
+      body._typeDirty || body._positionDirty || body._rotationDirty ||
+      body._velocityDirty || body._angularVelocityDirty
+    );
     if (body._typeDirty) {
       rawBody.setBodyType(rapierBodyType(body.type), true);
       body._typeDirty = false;
@@ -705,17 +715,17 @@ export class World {
 
   _syncContacts() {
     const contacts = [];
-    const visitedPairs = new Set();
     for (const record of this._colliderRecords.values()) {
       if (!record.collider.isValid()) continue;
       this._rapierWorld.contactPairsWith(record.collider, otherCollider => {
         const otherRecord = this._colliderRecords.get(otherCollider.handle);
         if (!otherRecord || otherRecord.body === record.body) return;
+        // Rapier reports each pair from both colliders. Preserve the original
+        // Map traversal order without allocating string keys for every pair.
+        // Creation order is separate from handles, which Rapier can recycle.
+        if (otherRecord.sequence < record.sequence) return;
         const firstRecord = record.collider.handle <= otherCollider.handle ? record : otherRecord;
         const secondRecord = firstRecord === record ? otherRecord : record;
-        const pairKey = `${firstRecord.collider.handle}:${secondRecord.collider.handle}`;
-        if (visitedPairs.has(pairKey)) return;
-        visitedPairs.add(pairKey);
         this._rapierWorld.contactPair(
           firstRecord.collider,
           secondRecord.collider,
@@ -767,7 +777,9 @@ export class World {
       this._dispatch("preStep");
       this.bodies.forEach(body => this._prepareBody(body));
       this._rapierWorld.step();
-      this.bodies.forEach(body => body._syncFromRapier());
+      this.bodies.forEach(body => {
+        if (body.type !== Body.STATIC || body._staticReadbackNeeded) body._syncFromRapier();
+      });
       this._syncContacts();
     }
     this.lastStepMilliseconds = performance.now() - startedAt;

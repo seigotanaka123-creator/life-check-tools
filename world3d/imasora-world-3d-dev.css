@@ -324,3 +324,7 @@ code { color: #8edfff; }
   .viewport.is-first-person .look-pad { transform: scale(.88); }
   .touch-hint { left: 12px; right: auto; bottom: 4px; }
 }
+
+/* v492: only the 3D canvas starts a look gesture. UI controls keep their own input. */
+#worldCanvas { cursor: grab; }
+#viewport.is-looking #worldCanvas { cursor: grabbing; }

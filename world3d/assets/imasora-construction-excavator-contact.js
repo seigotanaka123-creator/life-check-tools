@@ -34,6 +34,17 @@ export function prismTouchesBox(p,min,max,skin=0){
  const cx=(min[0]+max[0])/2,cy=(min[1]+max[1])/2,cz=(min[2]+max[2])/2,hx=(max[0]-min[0])/2+skin,hy=(max[1]-min[1])/2+skin,hz=(max[2]-min[2])/2+skin;
  for(let i=0;i<p.axes.length;i++){const axis=p.axes[i],middle=cx*axis[0]+cy*axis[1]+cz*axis[2],r=hx*Math.abs(axis[0])+hy*Math.abs(axis[1])+hz*Math.abs(axis[2]),range=p.ranges[i];if(range[0]>middle+r||range[1]<middle-r)return false;}return true;
 }
+// Minimum separating translation on the same SAT axes as contact detection.
+// Used only to leave already-overlapping loose spoil; not to soften solid soil.
+export function prismBoxPenetration(p,min,max){
+ let depth=Infinity;
+ for(let k=0;k<3;k++){depth=Math.min(depth,p.max[k]-min[k],max[k]-p.min[k]);if(depth<=0)return 0;}
+ const center=min.map((v,k)=>(v+max[k])/2),half=min.map((v,k)=>(max[k]-v)/2);
+ for(let i=0;i<p.axes.length;i++){
+  const axis=p.axes[i],middle=axis.reduce((sum,v,k)=>sum+v*center[k],0),r=axis.reduce((sum,v,k)=>sum+Math.abs(v)*half[k],0),range=p.ranges[i];
+  depth=Math.min(depth,range[1]-middle+r,middle+r-range[0]);if(depth<=0)return 0;
+ }return depth;
+}
 function touchedCells(s,parts,cell=8,skin=0){
  const ids=new Set();for(const p of parts)for(let x=Math.floor((p.min[0]-skin)/cell);x<=Math.floor((p.max[0]+skin)/cell);x++)for(let y=Math.max(-4,Math.floor((p.min[1]-skin)/cell));y<=Math.min(2,Math.floor((p.max[1]+skin)/cell));y++)for(let z=Math.floor((p.min[2]-skin)/cell);z<=Math.floor((p.max[2]+skin)/cell);z++){
   const id=`${x},${y},${z}`;if(!s.terrain[id]||ids.has(id))continue;if(prismTouchesBox(p,[x*cell,y*cell,z*cell],[(x+1)*cell,(y+1)*cell,(z+1)*cell],skin))ids.add(id);

@@ -2,7 +2,7 @@
 import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js';
 import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js';
 import {bucketOffset,isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
-import {toothContacts,bucketEnvironmentHits} from './imasora-construction-excavator-contact.js';
+import {toothContacts,bucketEnvironmentHits,bucketContactGeometry,prismTouchesBox,prismBoxPenetration} from './imasora-construction-excavator-contact.js';
 export const CELL=8;
 export const PLOT=Object.freeze({minX:-32,maxX:96,minZ:48,maxZ:176,bottom:-32,top:24});
 export const BIN=Object.freeze({x:-94,z:-12,width:64,depth:48,height:10});
@@ -77,13 +77,47 @@ export function armIntersections(s,padding=0){
   for(let n=0;n<2;n++){const a=pose.world[n],b=pose.world[n+1],steps=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/2);for(let i=1;i<=steps;i++)sample({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps,z:a.z+(b.z-a.z)*i/steps},2.2);}
   if(isContactDig(s)){for(const hit of bucketEnvironmentHits(s,pose))hits.add(hit);}else sample(pose.bucket,6);return hits;
 }
+function armSamples(pose){
+ const points=[];for(let n=0;n<2;n++){const a=pose.world[n],b=pose.world[n+1],steps=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/2);for(let i=1;i<=steps;i++)points.push({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps,z:a.z+(b.z-a.z)*i/steps});}return points;
+}
+export function spoilPenetrations(s){
+ const pose=armPose(s),parts=bucketContactGeometry(s,pose).all,samples=armSamples(pose),out=new Map();
+ for(const p of s.spoil){const min=[p.x-3.9,p.y-3.9,p.z-3.9],max=[p.x+3.9,p.y+3.9,p.z+3.9];let depth=0;
+  for(const part of parts)depth+=prismBoxPenetration(part,min,max);
+  for(const point of samples)depth+=Math.max(0,6.2-Math.hypot(point.x-p.x,point.y-p.y,point.z-p.z));
+  if(depth>0)out.set('排土:'+p.id,depth);
+ }return out;
+}
+export function contactBlocker(before,candidate,hits=armIntersections(candidate)){
+ if(!hits.size)return '';
+ const hard=[...hits].find(id=>!id.startsWith('排土:'));if(hard)return hard;
+ const old=armIntersections(before);if([...hits].some(id=>!old.has(id)))return [...hits][0];
+ const a=spoilPenetrations(before),b=spoilPenetrations(candidate);let improved=false;
+ for(const[id,depth]of b)if(depth>(a.get(id)||0)+1e-8)return id;
+ for(const[id,depth]of a)if((b.get(id)||0)<depth-1e-8)improved=true;
+ return improved?'':[...hits][0];
+}
+// Airborne soil can wait on the attachment, but may not harden through it.
+// No new state fields: the existing falling ledger remains valid v3 data.
+export function soilSettlementBlocked(s,p){
+ const pose=armPose(s),min=[p.x-3.9,p.y-3.9,p.z-3.9],max=[p.x+3.9,p.y+3.9,p.z+3.9];
+ const parts=bucketContactGeometry(s,pose).all;
+ // Keep loose grains dynamic through the bucket's opening/withdrawal envelope.
+ // Freezing a grain just outside this frame's shell would jam the next frame.
+ const radius=Math.max(...parts.flatMap(part=>part.vertices.map(v=>Math.hypot(v[0]-pose.wrist.x,v[1]-pose.wrist.y,v[2]-pose.wrist.z))))+Math.sqrt(3)*3.9+4;
+ if(Math.hypot(p.x-pose.wrist.x,p.y-pose.wrist.y,p.z-pose.wrist.z)<radius)return true;
+ if(parts.some(part=>prismTouchesBox(part,min,max)))return true;
+ if(armSamples(pose).some(q=>Math.hypot(q.x-p.x,q.y-p.y,q.z-p.z)<6.2))return true;
+ const v=s.loader.vehicle,q=localToWorld({x:0,z:0,heading:-v.heading},p.x-v.x,p.z-v.z);
+ return Math.abs(q.x)<38.9&&Math.abs(q.z)<46.9&&p.y-3.9<17&&p.y+3.9>0;
+}
 function contactMove(s,input,dt){
  const targets={boom:clamp(s.arm.boom+(input.boom||0)*dt*.5,EX.boomMin,EX.boomMax),stick:clamp(s.arm.stick+(input.stick||0)*dt*.65,-2.55,stickExtensionLimit(s)),slew:clamp(s.arm.slew-(input.slew||0)*dt*.62,-EX.slewLimit,EX.slewLimit),curl:clamp(s.arm.curl+(input.curl||0)*dt*.75,bucketOpenLimit(s),1.1)};
  let n={...s,arm:{...s.arm},hit:''};const groups=input.coordinated?[Object.keys(targets)]:Object.keys(targets).map(k=>[k]);
- for(const keys of groups){const from={...n.arm},steps=Math.max(1,...keys.map(k=>Math.ceil(Math.abs(targets[k]-from[k])/.003)));for(let i=1;i<=steps;i++){const arm={...from};for(const k of keys)arm[k]=from[k]+(targets[k]-from[k])*i/steps;if(keys.every(k=>arm[k]===n.arm[k]))continue;const candidate={...n,arm},hit=[...armIntersections(candidate)][0];if(hit){
+ for(const keys of groups){const from={...n.arm},steps=Math.max(1,...keys.map(k=>Math.ceil(Math.abs(targets[k]-from[k])/.003)));for(let i=1;i<=steps;i++){const arm={...from};for(const k of keys)arm[k]=from[k]+(targets[k]-from[k])*i/steps;if(keys.every(k=>arm[k]===n.arm[k]))continue;const candidate={...n,arm},hit=contactBlocker(n,candidate);if(hit){
    // Approach the actual surface, not the previous coarse sample; the contact
    // readout and the next scoop then agree with what the player can see.
-   const safe={...n.arm};let lo=0,hi=1;for(let j=0;j<4;j++){const t=(lo+hi)/2,probe={...safe};for(const k of keys)probe[k]=safe[k]+(arm[k]-safe[k])*t;if(armIntersections({...n,arm:probe}).size)hi=t;else{lo=t;n={...n,arm:probe};}}
+   const safe={...n.arm};let lo=0,hi=1;for(let j=0;j<4;j++){const t=(lo+hi)/2,probe={...safe};for(const k of keys)probe[k]=safe[k]+(arm[k]-safe[k])*t;if(contactBlocker(n,{...n,arm:probe}))hi=t;else{lo=t;n={...n,arm:probe};}}
    n.hit=hit;n.message=`${hit.startsWith('土:')?'爪・バケットが土':hit}に接触しました。逆方向へ戻すか、土なら「すくう」を使ってください。`;break;}n=candidate;}}
  return n;
 }
@@ -159,12 +193,12 @@ function stepContactAction(s,dt){
   const arm={};for(const k of Object.keys(end))arm[k]=s.arm[k]+(end[k]-s.arm[k])*i/steps;
   let candidate={...n,arm};const contacts=original.kind==='scoop'&&!original.loadedLift?scoopTargets(candidate):[];
   if(contacts.length){candidate={...candidate,terrain:{...n.terrain},spoil:[...n.spoil],action:{...n.action,collected:[...n.action.collected]}};for(const target of contacts){if(target.kind==='terrain')delete candidate.terrain[target.id];else candidate.spoil=candidate.spoil.filter(p=>p.id!==target.id);candidate.load++;candidate.action.collected.push(target);}candidate.revision++;}
-  const hit=[...armIntersections(candidate)][0];if(hit)return{...n,action:null,hit,message:`${hit.startsWith('土:')?'バケット本体が土':hit}に接触したため停止しました。爪の向きを変えてください。積載 ${n.load}/6。`};
-  n=candidate;if(n.load===6&&original.kind==='scoop'&&!original.loadedLift)break;
+  const hit=contactBlocker(n,candidate);if(hit)return{...n,action:null,hit,message:`${hit.startsWith('土:')?'バケット本体が土':hit}に接触したため停止しました。爪の向きを変えてください。積載 ${n.load}/6。`};
+  n=candidate;if(n.load===6&&original.kind==='scoop'&&!original.loadedLift&&!original.oneTouch)break;
  }
  const t=elapsed/original.duration;
  if(original.kind==='dump'&&t>.3&&n.load){const desired=Math.min(original.initialLoad,Math.ceil((t-.3)/.6*original.initialLoad)),released=original.initialLoad-n.load;if(desired>released){const p=armPose(n).bucket,id=++n.serial;n.load--;n.falling=[...n.falling,{...p,x:p.x+(id%3-1)*3,z:p.z+(Math.floor(id/3)%2-.5)*3,id,vy:0}];}}
- if(original.kind==='scoop'&&n.load===6&&!original.loadedLift){
+ if(original.kind==='scoop'&&n.load===6&&!original.loadedLift&&!original.oneTouch){
   // A full bucket does not snap to a carrying pose. Lift/curl it mechanically,
   // with the same swept collision test and without removing any more soil.
   const from={...n.arm};n.action={...n.action,loadedLift:true,elapsed:0,from,end:{...from,boom:Math.min(EX.boomMax,from.boom+.28),stick:Math.max(-2.55,from.stick-.1),curl:1.1}};n.message='6個の土を保持し、接触しない範囲でバケットを持ち上げて閉じます。';
@@ -219,7 +253,11 @@ export function stepExcavator(s,input,dt){
   if(n.falling.length){const active=[];n.spoil=[...n.spoil];
     for(const old of n.falling){const p={...old,vy:old.vy-90*dt};p.y+=p.vy*dt;
       const inBin=Math.abs(p.x-BIN.x)<BIN.width/2-5&&Math.abs(p.z-BIN.z)<BIN.depth/2-5,h=inBin?3:soilSupportBelow(n,p.x,p.z,old.y-4);
-      if(p.y<=h+4){if(inBin)n.bin++;else n.spoil.push({...p,y:h+4,vy:0});n.revision++;}else active.push(p);
+      if(p.y<=h+4){
+        const settled={...p,y:h+4,vy:0};
+        if(isContactDig(n)&&!inBin&&soilSettlementBlocked(n,settled)){active.push({...old,vy:0});continue;}
+        if(inBin)n.bin++;else n.spoil.push(settled);n.revision++;
+      }else active.push(p);
     }n.falling=active;
   }
   return n;

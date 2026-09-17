@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>保存済み記録の控え｜イマソラウォーカーズ</title>
+  <link rel="stylesheet" href="./imasora-world-recovery-dev.css?v=483">
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">イマソラウォーカーズ · 開発 v483</p><h1>保存済み記録の控え</h1>
+      <p>本体の作品・財布・素材・作業記録を、保存領域ごとにまとめて手元へ保管できます。</p>
+    </header>
+    <section aria-labelledby="scope-title">
+      <h2 id="scope-title">この画面で保管するもの</h2>
+      <p>このアドレスの通常正本と履歴、旧本体保存、UFO装備素材、工事の確認用保存5領域を読み取ります。工事の確認用保存は、通常正本と区別したまま保持します。</p>
+      <p class="scope" id="origin"></p>
+      <p><strong>開いている画面の未保存作業は含みません。</strong>ショベル作業は元の画面の「作業を書き出す」で別に控えてください。ホームなど、別のアドレスの保存や、ここに記載のない保存領域も対象外です。</p>
+      <p>保存先を2回読み、変化を検出した場合は取得を止めます。すべての画面を停止して同時保存する機能ではありません。元のゲーム画面は開いたまま、一時停止して取得できます。</p>
+      <button type="button" id="capture">保存済み記録を控える</button>
+    </section>
+    <section aria-labelledby="inspect-title">
+      <h2 id="inspect-title">控えの内容を確認</h2>
+      <p>取得した控えや手元のファイルの照合値・保存領域・装備作成途中の状態を検査します。この画面ではゲームへの復元や素材の消費は行いません。</p>
+      <label for="file">控えのJSONファイル（64 MiBまで）</label><input id="file" type="file" accept=".json,application/json">
+      <label for="record">保存済み記録のJSON文字列</label><textarea id="record" rows="6" spellcheck="false" autocomplete="off"></textarea>
+      <div class="actions"><button type="button" id="inspect">内容を検査する</button><button type="button" id="download" disabled>検査済みの控えをダウンロード</button></div>
+      <p id="status" role="status" aria-live="polite">まだ取得していません。保存内容は書き換えません。</p>
+      <div id="result" hidden></div>
+    </section>
+    <footer>9-1c2b2b1 · 保存済み記録の保全。ショベルの通常保存・復元実行・全領域の同時保存は次の工程です。</footer>
+  </main>
+  <script type="module" src="./imasora-world-recovery-dev.js?v=483"></script>
+</body>
+</html>

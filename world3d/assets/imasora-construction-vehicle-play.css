@@ -1,0 +1,54 @@
+/* Shared game layout for the water/soil loaders and timber crane, v491. */
+body.world-vehicle-playing{overflow:hidden;overscroll-behavior:none}
+.world-vehicle-playing .world-header,.world-vehicle-playing .world-toolbar,.world-vehicle-playing .control-card,.world-vehicle-playing .viewport-toolbar,.world-vehicle-playing .viewport-footer,.world-vehicle-playing .world-shell>footer{display:none!important}
+.world-vehicle-playing .world-shell{padding:0;min-height:0}
+.world-vehicle-playing .world-layout{display:block;position:static;z-index:auto}
+.world-vehicle-playing .viewport-card{border:0;border-radius:0;box-shadow:none}
+.world-vehicle-playing #viewport{position:fixed;inset:0;z-index:100;width:100%;height:100dvh;min-height:0;display:grid;grid-template-areas:"scene" "dock";grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 300px;overflow:hidden;background:#182c2c}
+.world-vehicle-playing #worldCanvas{grid-area:scene;min-width:0;min-height:0;width:100%;height:100%;align-self:stretch}
+.world-vehicle-operating> :not(#worldCanvas):not(.world-vehicle-controls-active){display:none!important}
+.world-vehicle-playing #viewport>.world-vehicle-controls-active{grid-area:dock;position:relative;inset:auto;width:auto;height:100%;min-width:0;min-height:0;max-height:none;margin:0;border:0;border-top:2px solid #ba975b;border-radius:0;padding:7px 10px max(7px,env(safe-area-inset-bottom));background:#183432;box-shadow:none;overflow:hidden;font-size:12px;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:4px}
+.world-vehicle-playing .world-vehicle-controls header{display:grid;grid-template-columns:1fr auto;gap:0 6px;min-height:30px;align-items:center}
+.world-vehicle-playing .world-vehicle-controls header strong{font-size:14px;white-space:nowrap}
+.world-vehicle-playing .world-vehicle-controls header span{grid-row:2;font-size:10px;line-height:1.2}
+.world-vehicle-controls .gv-load{grid-column:2;grid-row:1/3;color:#ffe4a0;font-size:12px;font-weight:bold;white-space:nowrap}
+.world-vehicle-playing .world-vehicle-controls .gv-message{margin:0;min-height:0;line-height:17px;max-height:34px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:11px;color:#d6e7dc}
+.world-vehicle-controls .gv-active{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;min-height:0;gap:5px}
+.world-vehicle-controls .gv-nav,.world-vehicle-controls .gv-quick{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px}
+.world-vehicle-controls .gv-nav button{min-height:30px;padding:3px;font-size:11px;background:#284b48}
+.world-vehicle-controls .gv-nav button[aria-pressed=true]{background:#d6b875;color:#213b33;border-color:#f1d59a;font-weight:bold}
+.world-vehicle-controls .gv-pages{min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:2px;scrollbar-width:thin}
+.world-vehicle-controls .gv-page,.world-vehicle-controls .gv-page>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0}
+.world-vehicle-controls .gv-page>div{grid-column:1/-1}
+.world-vehicle-controls .gv-page[hidden]{display:none!important}
+.world-vehicle-controls .gv-page button,.world-vehicle-controls .gv-quick button{min-height:44px;min-width:0;white-space:normal;padding:4px;font-size:11px;line-height:1.3;font-weight:bold}
+.world-vehicle-controls .gv-page button{background:linear-gradient(#b4985d,#8c703e);color:#fff8df;border-color:#cab783}
+.world-vehicle-controls .gv-page label{display:flex;grid-column:span 2;gap:8px;align-items:center;justify-content:center}
+.world-vehicle-controls .gv-page select{min-height:36px}
+.world-vehicle-controls .gv-hint{grid-column:1/-1;margin:0;font-size:10px;line-height:1.4;color:#b5d4c9}
+.world-vehicle-controls .wt-crane:not([hidden])+.gv-hint{display:none}
+.world-vehicle-controls .gv-quick button{background:#284b48;border-color:#72948a;color:#f2f7e7}
+.world-vehicle-controls .gv-quick .gv-pause{color:#ffe1a5}
+.world-vehicle-controls .gv-paused .gv-pause,.world-vehicle-controls.gv-paused .gv-pause{background:#806534}
+.world-vehicle-controls .gv-details{min-height:0;color:#efdb9e}
+.world-vehicle-controls .gv-details summary{cursor:pointer;min-height:20px;line-height:20px;font-size:12px}
+.world-vehicle-controls .gv-details summary:focus-visible{outline:2px solid #ffe08d}
+.world-vehicle-controls .gv-info{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid #527c70;margin-top:5px;padding:5px 0;color:#cce8dd;line-height:1.6}
+.world-vehicle-controls .gv-info>p,.world-vehicle-controls .gv-info>div{width:100%;margin:3px 0}
+.world-vehicle-controls .gv-info button{min-height:44px}
+.world-vehicle-controls .gv-active:has(.gv-details[open]){grid-template-rows:auto minmax(0,1fr)}
+.world-vehicle-controls .gv-active:has(.gv-details[open])>.gv-nav,.world-vehicle-controls .gv-active:has(.gv-details[open])>.gv-pages{display:none}
+.world-vehicle-controls .gv-details[open]{overflow:auto;overscroll-behavior:contain}
+.world-vehicle-controls .emergency-escape-control{position:static;inset:auto;transform:none;white-space:normal;box-shadow:none}
+@media(min-width:1100px),(min-width:700px) and (max-height:600px){
+ .world-vehicle-playing #viewport{grid-template-areas:"scene dock";grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:minmax(0,1fr)}
+ .world-vehicle-playing #viewport>.world-vehicle-controls-active{border-top:0;border-left:2px solid #ba975b;padding-top:12px}
+ .world-vehicle-controls .gv-page,.world-vehicle-controls .gv-page>div{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .world-vehicle-controls .gv-quick[data-count="4"]{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:700px) and (max-height:600px){
+ .world-vehicle-playing #viewport{grid-template-columns:minmax(0,1fr) 280px}
+ .world-vehicle-controls .gv-page,.world-vehicle-controls .gv-page>div{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .world-vehicle-controls .gv-quick[data-count="4"]{grid-auto-flow:column;grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:620px){.world-vehicle-playing #viewport>.world-vehicle-controls-active{padding-left:7px;padding-right:7px}.world-vehicle-controls .gv-load{font-size:11px}.world-vehicle-playing .world-vehicle-controls header strong{font-size:13px}}

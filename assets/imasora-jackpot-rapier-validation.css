@@ -1,3 +1,39 @@
+.icp-shell dialog.icp-game-over {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  padding: 18px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  backdrop-filter: none;
+}
+
+.icp-shell dialog.icp-game-over::backdrop { background: transparent; }
+
+.icp-shell dialog.icp-game-over .icp-game-over-panel {
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.icp-investment-retry {
+  width: 100%;
+  min-height: 44px;
+  border: 2px solid #ffe58b;
+  border-radius: 6px;
+  background: #c43d78;
+  color: white;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .icp-rapier-validation-badge {
   position: absolute;
   z-index: 11;
@@ -279,4 +315,80 @@
     grid-template-columns: 32px repeat(6, minmax(0, 1fr));
     gap: 2px;
   }
+}
+
+.icp-shell .icp-prize-open {
+  appearance: none; cursor: pointer; font: inherit; color: inherit;
+  border: 1px solid #60cbbd; border-radius: 8px; background: #123c48;
+  min-height: 48px; padding: 5px 8px; text-align: right;
+}
+.icp-shell .icp-prize-open.is-ready { border-color: #ffe388; background: #4a3920; }
+.icp-shell .icp-prize-open strong { font-size: clamp(11px, 2.7vw, 16px); }
+.icp-shell .icp-prize-open:focus-visible { outline: 3px solid #ffe388; outline-offset: 2px; }
+.icp-shell .icp-prize-dialog {
+  position: fixed; inset: 0; margin: auto; box-sizing: border-box;
+  width: min(440px, calc(100vw - 24px)); max-width: none;
+  max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain;
+  padding: 22px; border: 2px solid #73ddc7; border-radius: 16px;
+  background: #112e39; color: #f1faf5; box-shadow: 0 16px 60px #0009;
+  font: 15px/1.6 system-ui, sans-serif; text-align: left;
+}
+.icp-shell .icp-prize-dialog[hidden] { display: none; }
+.icp-prize-dialog::backdrop { background: #07151dbb; }
+.icp-prize-dialog h2 { margin: 0 0 8px; font-size: 23px; color: #fff1b6; }
+.icp-prize-dialog p { margin: 10px 0; }
+.icp-prize-balance { padding: 9px 12px; background: #061c25; border-radius: 8px; }
+.icp-prize-balance strong { color: #ffe589; font-size: 25px; }
+.icp-prize-card { display: flex; align-items: center; gap: 12px; padding: 16px 12px;
+  border: 2px solid #507b80; border-radius: 10px; cursor: pointer; background: #1e424d; }
+.icp-prize-card:has(input:checked) { border-color: #ffe589; background: #3c442e; }
+.icp-prize-card input { width: 20px; height: 20px; flex: none; accent-color: #ffe589; }
+.icp-prize-card > span { display: grid; gap: 4px; }
+.icp-prize-card strong { font-size: 20px; }
+.icp-prize-card span span { font-size: 13px; color: #c4ddd9; }
+.icp-prize-card b { color: #ffe589; }
+.icp-prize-message { color: #bdf5df; min-height: 1.6em; }
+.icp-prize-actions { display: grid; gap: 10px; margin: 16px 0 12px; }
+.icp-prize-actions button { min-height: 48px; border: 1px solid #79baae; border-radius: 8px;
+  background: #285763; color: white; cursor: pointer; font: 700 16px system-ui, sans-serif; padding: 10px; }
+.icp-prize-actions button[data-icp-prize-confirm] { background: #f5cf72; color: #342b17; }
+.icp-prize-actions button:disabled { opacity: .45; cursor: default; }
+.icp-prize-dialog > small { display: block; color: #b0cecc; font-size: 12px; }
+
+
+/* Keep the recovery action in the play area's corner, outside the main controls. */
+.icp-shell .icp-stage > .icp-jam-clear-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 13;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto;
+  min-width: 0;
+  min-height: 32px;
+  margin: 0;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  border: 1px solid #e7d691;
+  border-radius: 6px;
+  background: rgba(26, 48, 59, .94);
+  color: #fff0bc;
+  box-shadow: 0 2px 5px #0005;
+  font: 700 11px/1.2 system-ui, sans-serif;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.icp-jam-clear-button > span { font-size: 16px; line-height: 1; }
+.icp-jam-clear-button > strong { font-size: inherit; }
+.icp-shell .icp-stage > .icp-jam-clear-button:hover:not(:disabled) { background: #34535e; }
+.icp-shell .icp-stage > .icp-jam-clear-button:focus-visible { outline: 2px solid #fff0bc; outline-offset: 2px; }
+.icp-shell .icp-stage > .icp-jam-clear-button:active:not(:disabled) { transform: translateY(1px); }
+.icp-shell .icp-stage > .icp-jam-clear-button:disabled { opacity: .5; cursor: default; }
+@media (pointer: coarse) {
+  .icp-shell .icp-stage > .icp-jam-clear-button { min-height: 44px; }
 }

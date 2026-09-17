@@ -23,7 +23,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="assets/imasora-companion-catcher.css?v=20260820-live-opening-preview">
   <link rel="stylesheet" href="assets/imasora-jackpot-coin-pusher.css?v=20260820-live-opening-preview">
-  <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260804-machine3-floating-ring-position-editor-step306">
+  <link rel="stylesheet" href="assets/imasora-jackpot-rapier-validation.css?v=20260917-pachicoin-jam-button-v1">
   <link rel="stylesheet" href="assets/imasora-tri-link.css?v=20260914-tri-link-full-restore">
   <link rel="stylesheet" href="assets/imasora-sky-map.css?v=20260821-cloud-workshop-sky-station-v15">
   <script src="assets/imasora-sky-map.js?v=20260821-cloud-workshop-sky-station-v15"></script>
@@ -11179,6 +11179,11 @@
     .pachicoin-pin-stage { flex: 1; min-height: 100px; width: 100%; position: relative; overflow: hidden; background: #071224; border-radius: 7px; }
     .pachicoin-pin-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
     .pachicoin-pin-stage canvas:active { cursor: grabbing; }
+    .pachicoin-pin-play-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
+    .pachicoin-pin-play-row span { color: #b8eedd; font-size: 13px; }
+    .pachicoin-pin-start { min-height: 44px; padding: 8px 18px; border: 1px solid #ffe18a; border-radius: 7px; background: #e9c36a; color: #272018; font: 800 15px system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+    .pachicoin-pin-start:disabled { opacity: .45; cursor: default; }
+    .pachicoin-pin-start:focus-visible { outline: 3px solid #a6f4df; outline-offset: 2px; }
     .pachicoin-pin-status { margin: 0; min-height: 18px; font-size: 12px; color: #b8eedd; }
     .pachicoin-pin-tools { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; font-size: 12px; }
     .pachicoin-pin-tools label { display: flex; align-items: center; gap: 5px; }
@@ -18291,23 +18296,193 @@ function formatUfoWorkshopMaterialReward(reward) {
     .map(entry => `${entry.label} +${entry.amount}`)
     .join(" / ");
 }
-function awardUfoWorkshopArcadeMaterials(reward, source = "") {
-  const rewardText = formatUfoWorkshopMaterialReward(reward);
-  if (!rewardText) return readUfoWorkshopMaterialLedger();
-  const ledger = awardUfoWorkshopMaterials(reward);
-  addLog(`ゲームセンター報酬${source ? `（${source}）` : ""}: ${rewardText}`);
-  saveState();
-  toast(`UFO整備素材を獲得：${rewardText}`);
-  return ledger;
+// Daily arcade allowances are independent of spendable materials and machine numbers.
+const ufoArcadeDailyKey = "imasoraUfoArcadeDailyRewardsV1";
+const ufoArcadeRewardJournalKey = "imasoraUfoArcadeRewardPendingV1";
+const ufoArcadeDailyLimits = Object.freeze({ catcher: 3, triLink: 3, pachicoin: 5 });
+const ufoArcadeDayFormatter = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" });
+const ufoArcadeDayKey = () => ufoArcadeDayFormatter.format(new Date());
+let ufoArcadeDailyCache = null;
+function readUfoArcadeDaily() {
+  const raw = JSON.parse(localStorage.getItem(ufoArcadeDailyKey) || "null");
+  const dayKey = ufoArcadeDayKey();
+  if (raw === null || raw.dayKey !== dayKey) {
+    return { version: 1, dayKey, catcher: 0, triLink: 0, pachicoin: 0, triLinkAwards: [] };
+  }
+  if (raw.version !== 1 || Object.keys(ufoArcadeDailyLimits).some(id => !Number.isSafeInteger(raw[id]) || raw[id] < 0)
+    || !Array.isArray(raw.triLinkAwards)) throw new Error("日ごとの獲得記録を読み込めませんでした。");
+  return raw;
+}
+function getUfoArcadeDailyStatus(game, fresh = false) {
+  const now = Date.now();
+  if (fresh || !ufoArcadeDailyCache || now - ufoArcadeDailyCache.at >= 1000 || now < ufoArcadeDailyCache.at) {
+    try { ufoArcadeDailyCache = { at: now, daily: readUfoArcadeDaily() }; }
+    catch { ufoArcadeDailyCache = { at: now, daily: null }; }
+  }
+  const limit = ufoArcadeDailyLimits[game];
+  const daily = ufoArcadeDailyCache.daily;
+  const used = daily ? daily[game] : limit;
+  return { dayKey: daily?.dayKey, used, limit, remaining: Math.max(0, limit - used), reached: used >= limit, unavailable: !daily };
+}
+function ufoArcadeDailyMessage(game, status = getUfoArcadeDailyStatus(game)) {
+  if (status.unavailable) return "本日の獲得記録を確認できません。保存設定を確認してから開き直してください。";
+  if (game === "pachicoin") return status.reached
+    ? "本日の景品交換は上限5回（整備パーツ10個）に達しました。明日また交換できます。"
+    : `350枚で整備パーツ2個。本日の交換：${status.used}/5回（日本時間0時にリセット）`;
+  const condition = game === "catcher" ? "景品1体キャッチで整備パーツ1個" : "勝利で整備パーツ1個（完走のみは0個）";
+  return status.reached
+    ? "本日の整備パーツは上限3個を獲得しました。ゲームは続けて遊べます。明日また獲得できます。"
+    : `${condition}。本日の獲得：${status.used}/3個（日本時間0時にリセット）`;
+}
+function refreshUfoArcadeDailyNotices() {
+  document.querySelectorAll("[data-ufo-arcade-daily]").forEach(element => {
+    const text = ufoArcadeDailyMessage(element.dataset.ufoArcadeDaily);
+    if (element.textContent !== text) element.textContent = text;
+  });
+}
+function withUfoArcadeRewardLock(action) {
+  // A single lock covers the allowance, material credit and optional coin debit across tabs.
+  if (navigator.locks?.request) return navigator.locks.request("imasora-ufo-arcade-reward", action);
+  return Promise.reject(new Error("このブラウザーでは獲得記録を安全に保存できません。"));
+}
+function recoverUfoArcadeReward() {
+  const raw = localStorage.getItem(ufoArcadeRewardJournalKey);
+  if (!raw) return;
+  const record = JSON.parse(raw);
+  if (record.version !== 1 || !Array.isArray(record.before) || record.before.length < 2
+    || record.before.some(([key, value]) => ![ufoArcadeDailyKey, ufoWorkshopMaterialStoreKey, pachicoinHeldCoinKey].includes(key)
+      || !(value === null || typeof value === "string"))) throw new Error("Invalid arcade reward recovery record");
+  for (const [key, value] of record.before) {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  }
+  localStorage.removeItem(ufoArcadeRewardJournalKey);
+  ufoArcadeDailyCache = null;
+}
+function commitUfoArcadeReward(daily, ledger, nextHeld = null) {
+  const entries = [[ufoWorkshopMaterialStoreKey, ledger], [ufoArcadeDailyKey, daily]];
+  if (nextHeld) entries.push([pachicoinHeldCoinKey, nextHeld]);
+  const before = entries.map(([key]) => [key, localStorage.getItem(key)]);
+  let journalWritten = false;
+  try {
+    localStorage.setItem(ufoArcadeRewardJournalKey, JSON.stringify({ version: 1, before }));
+    journalWritten = true;
+    for (const [key, value] of entries) localStorage.setItem(key, JSON.stringify(value));
+    localStorage.removeItem(ufoArcadeRewardJournalKey);
+    ufoArcadeDailyCache = null;
+  } catch (error) {
+    if (journalWritten) {
+      try { recoverUfoArcadeReward(); } catch { error.exchangeRecoveryRequired = true; }
+    }
+    throw error;
+  }
+}
+async function awardUfoWorkshopArcadeMaterials(reward, source = "", game, eventId = "") {
+  const requested = Math.max(0, Math.floor(Number(reward?.arcadeParts) || 0));
+  if (!requested) return;
+  const rewardDay = ufoArcadeDayKey();
+  try {
+    const result = await withUfoArcadeRewardLock(() => {
+      recoverUfoArcadeReward();
+      if (!["catcher", "triLink"].includes(game) || rewardDay !== ufoArcadeDayKey()) return null;
+      const daily = readUfoArcadeDaily();
+      if (game === "triLink" && eventId && daily.triLinkAwards.includes(eventId)) return null;
+      const granted = Math.min(requested, Math.max(0, ufoArcadeDailyLimits[game] - daily[game]));
+      if (granted) {
+        const ledger = normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}"));
+        ledger.arcadeParts += granted;
+        ledger.updatedAt = Date.now();
+        daily[game] += granted;
+        if (game === "triLink" && eventId) daily.triLinkAwards.push(eventId);
+        commitUfoArcadeReward(daily, ledger);
+      }
+      return { granted, reached: daily[game] >= ufoArcadeDailyLimits[game] };
+    });
+    if (!result) return;
+    const rewardText = formatUfoWorkshopMaterialReward({ arcadeParts: result.granted });
+    const notice = result.reached ? ufoArcadeDailyMessage(game, getUfoArcadeDailyStatus(game, true)) : "";
+    if (result.granted) {
+      try { addLog(`ゲームセンター報酬（${source}）: ${rewardText}${notice ? `。${notice}` : ""}`); saveState(); }
+      catch (error) { console.error("報酬の履歴を保存できませんでした。", error); }
+    }
+    refreshUfoArcadeDailyNotices();
+    toast([rewardText ? `UFO整備素材を獲得：${rewardText}` : "", notice].filter(Boolean).join("。"));
+  } catch (error) {
+    console.error("ゲームセンター報酬を保存できませんでした。", error);
+    toast("整備パーツの保存に失敗しました。保存設定を確認してください。");
+  }
+}
+window.addEventListener("storage", event => {
+  if (event.key === ufoArcadeDailyKey) { ufoArcadeDailyCache = null; refreshUfoArcadeDailyNotices(); }
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) { ufoArcadeDailyCache = null; refreshUfoArcadeDailyNotices(); }
+});
+setInterval(() => {
+  if (!document.hidden && document.querySelector("[data-ufo-arcade-daily]")) refreshUfoArcadeDailyNotices();
+}, 30000);
+
+const pachicoinExchangeJournalKey = "imasoraPachicoinPrizeExchangePendingV1";
+const pachicoinHeldCoinKey = "imasoraPachicoinDailyHeldCoinsV1";
+// Recover an interrupted two-save exchange before either balance is used again.
+// The journal is removed only after both the prize and the coin debit are saved.
+function recoverPachicoinPrizeExchange() {
+  const source = localStorage.getItem(pachicoinExchangeJournalKey);
+  if (!source) return;
+  const pending = JSON.parse(source);
+  if (pending.version !== 1 || typeof pending.beforeHeld !== "string"
+    || !(pending.beforeLedger === null || typeof pending.beforeLedger === "string")) {
+    throw new Error("Invalid prize exchange recovery record");
+  }
+  localStorage.setItem(pachicoinHeldCoinKey, pending.beforeHeld);
+  if (pending.beforeLedger === null) localStorage.removeItem(ufoWorkshopMaterialStoreKey);
+  else localStorage.setItem(ufoWorkshopMaterialStoreKey, pending.beforeLedger);
+  localStorage.removeItem(pachicoinExchangeJournalKey);
+}
+try { recoverPachicoinPrizeExchange(); } catch (error) {
+  console.error("景品交換の保存を復旧できませんでした。", error);
 }
 function awardUfoWorkshopCoinPusherExchange(exchange) {
-  const arcadeParts = Math.max(0, Math.floor(Number(exchange?.arcadeParts) || 0));
-  if (!arcadeParts) return readUfoWorkshopMaterialLedger();
-  return awardUfoWorkshopArcadeMaterials(
-    { arcadeParts },
-    `コイン落とし・${Math.max(0, Math.floor(Number(exchange?.spentCredits) || 0))}枚換金`
-  );
+  // Called synchronously while the game's shared arcade-reward lock is held.
+  recoverPachicoinPrizeExchange();
+  try { recoverUfoArcadeReward(); }
+  catch (error) { error.exchangeRecoveryRequired = true; throw error; }
+  const held = JSON.parse(localStorage.getItem(pachicoinHeldCoinKey) || "null");
+  const dayKey = ufoArcadeDayKey();
+  if (exchange?.spentCredits !== 350 || exchange?.arcadeParts !== 2
+    || !Number.isInteger(exchange?.heldCreditsBefore) || exchange.heldCreditsBefore < 350
+    || exchange.heldCreditsAfter !== exchange.heldCreditsBefore - 350
+    || !held || held.version !== 1 || held.credits !== exchange.heldCreditsBefore
+    || held.dayKey !== dayKey || exchange.dayKey !== dayKey
+    || !exchange.writerId || held.writerId !== exchange.writerId) {
+    throw new Error("Prize exchange conditions changed");
+  }
+  const daily = readUfoArcadeDaily();
+  if (daily.pachicoin >= ufoArcadeDailyLimits.pachicoin) {
+    const error = new Error("Daily prize exchange limit reached");
+    error.dailyLimitReached = true;
+    throw error;
+  }
+  const ledger = normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}"));
+  ledger.arcadeParts += 2;
+  ledger.updatedAt = Date.now();
+  daily.pachicoin += 1;
+  commitUfoArcadeReward(daily, ledger, { ...held, credits: exchange.heldCreditsAfter });
+  const status = getUfoArcadeDailyStatus("pachicoin", true);
+  // A log/render failure must never turn an already committed exchange into a retry.
+  try {
+    addLog("ゲームセンター景品交換：もちコイン350枚 → 整備パーツ2個"
+      + (status.reached ? "。" + ufoArcadeDailyMessage("pachicoin", status) : ""));
+    saveState();
+    refreshUfoArcadeDailyNotices();
+  } catch (error) { console.error("景品交換の履歴を更新できませんでした。", error); }
+  return { committed: true, dailyStatus: status };
 }
+void withUfoArcadeRewardLock(() => recoverUfoArcadeReward()).catch(error => {
+  console.error("ゲームセンター報酬の保存を復旧できませんでした。", error);
+});
+
+
 const todayKey = () => new Date().toLocaleDateString("sv-SE");
 const weekKey = () => {
   const d = new Date();
@@ -19177,6 +19352,49 @@ const mapMoveSfxFileKey = "mapMove";
 const matchEndSfxFileKey = "matchEndCandidate1";
 const drumRollSfxFileKey = "drumRollCandidate1";
 const sound = { ctx: null, enabled: true, bgmTimer: null, bgmLoopCueTimer: null, step: 0, mode: "normal", audio: null, usingAudioFile: false };
+let ambientBgmScreen = "walk";
+let ambientBgmTownArea = "map";
+let ambientBgmSuspended = false;
+let explicitKaraokePlayback = false;
+function isLabyrinthBgm(mode = sound.mode) {
+  return mode === "normal" || mode === "outsideHome";
+}
+function canPlayAmbientBgm() {
+  // Maps/facilities outside the town overview never inherit its music.
+  return !document.hidden && !townRailwayJourneyActive
+    && ["walk", "town", "monster", "rules", "guildSupportSearch"].includes(ambientBgmScreen)
+    && (ambientBgmScreen !== "town" || ambientBgmTownArea === "map");
+}
+function syncAmbientBgmBoundary(resume = false) {
+  if (explicitKaraokePlayback && (ambientBgmScreen !== "town" || ambientBgmTownArea !== "karaoke")) stopBgm();
+  if (!canPlayAmbientBgm()) {
+    if (isLabyrinthBgm() && !explicitKaraokePlayback) {
+      if (sound.audio || sound.bgmTimer || sound.usingAudioFile) ambientBgmSuspended = true;
+      stopBgm();
+    }
+    return;
+  }
+  if (resume && ambientBgmSuspended && sound.enabled && !explicitKaraokePlayback
+      && !(sound.audio && !isLabyrinthBgm())) {
+    startBgm(homeBgmMode());
+  }
+}
+function setTownAmbientBgmArea(area) {
+  ambientBgmTownArea = area;
+  syncAmbientBgmBoundary(area === "map");
+}
+document.addEventListener("visibilitychange", () => syncAmbientBgmBoundary(true));
+window.addEventListener("pagehide", () => {
+  if (isLabyrinthBgm()) {
+    if (sound.audio) ambientBgmSuspended = true;
+    stopBgm();
+  }
+});
+window.addEventListener("pageshow", event => {
+  if (!event.persisted) return;
+  ambientBgmScreen = document.querySelector("[data-screen].active")?.dataset.screen || "walk";
+  syncAmbientBgmBoundary(true);
+});
 let suspendedPachicoinBgmMode = null;
 const bgmModeNames = {
   normal: "通常時BGM",
@@ -41600,6 +41818,7 @@ function bgmSong(mode = "normal") {
   return songs[mode] || songs.normal;
 }
 function stopBgm() {
+  explicitKaraokePlayback = false;
   karaokePreviewRequestId += 1;
   if (sound.bgmTimer) clearTimeout(sound.bgmTimer);
   if (sound.bgmLoopCueTimer) clearTimeout(sound.bgmLoopCueTimer);
@@ -41678,6 +41897,12 @@ function playBgmEvent(song, event) {
 }
 function startBgm(mode = "normal") {
   if (!sound.enabled) return;
+  if (isLabyrinthBgm(mode) && !canPlayAmbientBgm()) {
+    ambientBgmSuspended = true;
+    syncAmbientBgmBoundary();
+    return;
+  }
+  if (isLabyrinthBgm(mode)) ambientBgmSuspended = false;
   const song = bgmSong(mode);
   if (sound.bgmTimer && sound.mode === mode) return;
   if (sound.usingAudioFile && sound.mode === mode) return;
@@ -41708,8 +41933,11 @@ function startBgm(mode = "normal") {
       toast("MP3を読み込めません。assets/audio の配置を確認してください");
     }, { once: true });
     audio.play().then(() => {
+      if (sound.audio !== audio) return;
+      if (isLabyrinthBgm(mode) && !canPlayAmbientBgm()) { syncAmbientBgmBoundary(); return; }
       toast(`${bgmModeName(mode)} MP3再生中`);
     }).catch(() => {
+      if (sound.audio !== audio) return;
       stopBgm();
       toast("MP3再生に失敗しました。BGMは鳴らしません");
     });
@@ -41756,6 +41984,7 @@ function toggleSound() {
     return;
   }
   stopBgm();
+  stopTownRailwayJourneyAudio();
   sound.enabled = false;
   setSoundButtonLabel("BGM OFF");
   toast("BGM OFF");
@@ -41792,6 +42021,7 @@ async function previewKaraokeSongOnce(mode) {
   setSoundButtonLabel("BGM ON");
   stopBgm();
   const requestId = ++karaokePreviewRequestId;
+  explicitKaraokePlayback = true; // A chosen karaoke performance is not ambient town music.
   sound.mode = mode;
   sound.step = 0;
   const audioSource = await karaokeAudioSourceForMode(mode);
@@ -44457,10 +44687,111 @@ function openTownRailwayDestination() {
   townLandRouteOpen = false;
   townRailwayDestinationIndex = 0;
   townRailwayDestinationOpen = true;
+  void prepareTownRailwayJourneyAudio();
   renderTown();
   playSfx("select");
   requestAnimationFrame(() => syncTownRailwayCursor());
 }
+// Departure audio is scoped to one journey. It never writes player saves.
+const TOWN_RAILWAY_AUDIO_FILES = Object.freeze({
+  running: "assets/audio/railway-Shinkansen-Running01-1.mp3",
+  horn2: "assets/audio/railway-Car_Horn-Fake02-2.mp3",
+  horn5: "assets/audio/railway-Car_Horn-Fake02-5.mp3"
+});
+let townRailwayAudioBuffersPromise = null;
+let townRailwayAudioSession = null;
+function prepareTownRailwayJourneyAudio() {
+  if (!sound.enabled || volumeScale("sfx") <= 0) return Promise.resolve(null);
+  if (townRailwayAudioBuffersPromise) return townRailwayAudioBuffersPromise;
+  if (!initSound()) return Promise.resolve(null);
+  const ctx = sound.ctx;
+  townRailwayAudioBuffersPromise = Promise.all(Object.entries(TOWN_RAILWAY_AUDIO_FILES).map(async ([key, url]) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      let buffer = await ctx.decodeAudioData(await response.arrayBuffer());
+      // The supplied running recording is two minutes long. Retain only the
+      // first 14 seconds in decoded memory; the original MP3 stays untouched.
+      if (key === "running" && buffer.duration > 14) {
+        const short = ctx.createBuffer(buffer.numberOfChannels, Math.ceil(14 * buffer.sampleRate), buffer.sampleRate);
+        for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+          short.copyToChannel(buffer.getChannelData(channel).subarray(0, short.length), channel);
+        }
+        buffer = short;
+      }
+      return [key, buffer];
+    } catch (error) {
+      console.warn("Railway sound unavailable:", key, error);
+      return [key, null];
+    }
+  })).then(entries => {
+    const buffers = Object.fromEntries(entries);
+    if (entries.some(([, buffer]) => !buffer)) townRailwayAudioBuffersPromise = null;
+    return buffers;
+  });
+  return townRailwayAudioBuffersPromise;
+}
+function stopTownRailwayJourneyAudio() {
+  const session = townRailwayAudioSession;
+  townRailwayAudioSession = null;
+  if (!session) return;
+  for (const voice of session.voices) {
+    try { voice.source.stop(); } catch {}
+    voice.source.disconnect();
+    voice.gain.disconnect();
+  }
+  session.voices.clear();
+}
+function startTownRailwayJourneyAudio(journeyDuration) {
+  stopTownRailwayJourneyAudio();
+  if (!sound.enabled || volumeScale("sfx") <= 0 || !initSound()) return;
+  const ctx = sound.ctx;
+  const session = { voices: new Set(), startedAt: performance.now() };
+  townRailwayAudioSession = session;
+  const total = journeyDuration / 1000 + .5; // Include the existing closing fade.
+  const departure = journeyDuration < 5000 ? .1 : .45;
+  const scale = volumeScale("sfx");
+  const resume = ctx.state === "running" ? Promise.resolve() : ctx.resume();
+  void Promise.all([prepareTownRailwayJourneyAudio(), resume]).then(([buffers]) => {
+    if (townRailwayAudioSession !== session || !townRailwayJourneyActive || !sound.enabled || !buffers) return;
+    const elapsed = (performance.now() - session.startedAt) / 1000;
+    if (elapsed >= total) return;
+    const origin = ctx.currentTime - elapsed;
+    const schedule = (buffer, from, until, offset, volume, fade = false) => {
+      if (!buffer || until <= elapsed || until <= from) return;
+      const position = Math.max(from, elapsed);
+      const actualOffset = offset + position - from;
+      if (actualOffset >= buffer.duration) return;
+      const source = ctx.createBufferSource(), gain = ctx.createGain();
+      source.buffer = buffer;
+      source.connect(gain);gain.connect(ctx.destination);
+      const voice = { source, gain };session.voices.add(voice);
+      source.onended = () => { source.disconnect();gain.disconnect();session.voices.delete(voice); };
+      const when = origin + position, end = origin + until;
+      if (fade) {
+        const rise = from + .6, fall = Math.max(rise, until - 1.2);
+        const factor = position < rise ? (position - from) / .6 : position > fall ? (until - position) / (until - fall) : 1;
+        gain.gain.setValueAtTime(volume * Math.max(0, factor), when);
+        if (position < rise) gain.gain.linearRampToValueAtTime(volume, origin + rise);
+        if (position < fall) gain.gain.setValueAtTime(volume, origin + fall);
+        gain.gain.linearRampToValueAtTime(0, end);
+      } else gain.gain.setValueAtTime(volume, when);
+      source.start(when, actualOffset);
+      source.stop(end);
+    };
+    schedule(buffers.running, departure, total, .33, .68 * scale, true);
+    const firstEnd = departure + (buffers.horn2?.duration || 0);
+    schedule(buffers.horn2, departure, Math.min(firstEnd, total), 0, .72 * scale);
+    // Schedule against the first clip's decoded end, never an approximate timer.
+    const secondStart = firstEnd + .08;
+    schedule(buffers.horn5, secondStart, Math.min(secondStart + (buffers.horn5?.duration || 0), total), 0, .72 * scale);
+  }).catch(error => { if (townRailwayAudioSession === session) stopTownRailwayJourneyAudio();console.warn("Railway sound could not start:", error); });
+}
+window.addEventListener("pagehide", stopTownRailwayJourneyAudio);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopTownRailwayJourneyAudio();
+});
+
 function townRailwayJourneyTimeText(now = new Date()) {
   const hours = String(now.getHours()).padStart(2, "0");
   const minutes = String(now.getMinutes()).padStart(2, "0");
@@ -44568,14 +44899,24 @@ function clearTownRailwayJourneyTimers() {
     townRailwayJourneyResizeHandler = null;
   }
 }
+function townRailwaySkyWorldUrl(pageUrl = window.location.href) {
+  const page = new URL(pageUrl);
+  const destination = new URL("./imasora-world-3d-dev.html", page);
+  // Local home and 3D use separate servers. Keep the existing 3D save origin.
+  // Published pages share the same directory, so keep their relative URL.
+  if (["127.0.0.1", "localhost"].includes(page.hostname) && ["8765", "8766"].includes(page.port)) {
+    destination.port = "8877";
+  }
+  destination.searchParams.set("arrival", "town-station");
+  return destination.href;
+}
 function completeTownRailwayJourney() {
+  stopTownRailwayJourneyAudio();
   clearTownRailwayJourneyTimers();
   townRailwayJourneyActive = false;
   document.body.classList.remove("town-railway-journey-active");
   document.querySelector("[data-railway-journey]")?.remove();
   switchScreen("skyMap");
-  requestAnimationFrame(() => document.getElementById("imasoraSkyMapWorld")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  toast("空のマップへ到着しました");
 }
 function finishTownRailwayJourney({ immediate = false } = {}) {
   if (!townRailwayJourneyActive) return;
@@ -44589,6 +44930,7 @@ function finishTownRailwayJourney({ immediate = false } = {}) {
   townRailwayJourneyFinishTimer = setTimeout(completeTownRailwayJourney, 500);
 }
 function startTownRailwayJourney() {
+  stopTownRailwayJourneyAudio();
   clearTownRailwayJourneyTimers();
   document.querySelector("[data-railway-journey]")?.remove();
   townRailwayDestinationOpen = false;
@@ -44598,6 +44940,7 @@ function startTownRailwayJourney() {
   document.body.insertAdjacentHTML("beforeend", townRailwayJourneyMarkup(scene, now));
   const journey = document.querySelector("[data-railway-journey]");
   townRailwayJourneyActive = true;
+  syncAmbientBgmBoundary();
   document.body.classList.add("town-railway-journey-active");
   journey?.querySelector("[data-railway-journey-skip]")?.addEventListener("click", () => finishTownRailwayJourney({ immediate: true }));
   townRailwayJourneyResizeHandler = () => syncTownRailwayJourneyGeometry(journey);
@@ -44609,6 +44952,7 @@ function startTownRailwayJourney() {
   });
   playSfx("select");
   const journeyDuration = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? 3500 : 12150;
+  startTownRailwayJourneyAudio(journeyDuration);
   townRailwayJourneyTimer = setTimeout(finishTownRailwayJourney, journeyDuration);
 }
 function chooseTownRailwayDestination(destination) {
@@ -44882,11 +45226,13 @@ function toggleTownDevBuilding(id) {
 }
 function selectTownFacility(id) {
   if (id !== "warehouse" && !townBuildableBuildingIds.includes(id)) return;
+  setTownAmbientBgmArea("map");
   selectedTownBuildingId = id;
   renderTown();
   playSfx("select");
 }
 function openTownWorkshopFromMap() {
+  setTownAmbientBgmArea("workshop");
   document.getElementById("townWorkshop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
 }
@@ -44985,6 +45331,7 @@ function enterTownBuilding(id) {
     openTownWorkshopFromMap();
     return;
   }
+  if (["shop", "bookstore", "retirePark", "medalHall"].includes(id)) setTownAmbientBgmArea(id);
   if (id === "shop") {
     document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
     playSfx("select");
@@ -45152,6 +45499,7 @@ function renderTownBookstore() {
   box.querySelector("[data-bookstore-return-town]")?.addEventListener("click", returnToTownMapFromBookstore);
 }
 function returnToTownMapFromBookstore() {
+  setTownAmbientBgmArea("map");
   selectedBookstoreDexStage = "";
   renderTownBookstore();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -45191,8 +45539,9 @@ function observeImasoraCompanionCatcherWorkshopRewards(mount) {
     if (caught > previousCaught) {
       const newlyCaught = caught - previousCaught;
       awardUfoWorkshopArcadeMaterials(
-        { arcadeParts: newlyCaught * 6 },
-        `キャッチャー・賞品${newlyCaught}体`
+        { arcadeParts: newlyCaught },
+        `キャッチャー・賞品${newlyCaught}体`,
+        "catcher"
       );
     }
     previousCaught = caught;
@@ -45238,7 +45587,7 @@ let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260916-pachicoin-central-production-v1")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260917-arcade-daily-rewards-v1")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;
@@ -45519,10 +45868,11 @@ function saveImasoraTriLinkMemory(memory) {
   const currentParticipantId = (Array.isArray(memory.participants) ? memory.participants : [])
     .find(participant => participant?.role === "current")?.id || triLinkCurrentParticipant().id;
   const playerWon = memory.winnerId === currentParticipantId;
-  const reward = { arcadeParts: playerWon ? 3 : 2 };
+  const reward = { arcadeParts: playerWon ? 1 : 0 };
   awardUfoWorkshopArcadeMaterials(
     reward,
-    `三者対戦${playerWon ? "・勝利ボーナス込み" : "・完走"}`
+    `三者対戦${playerWon ? "・勝利" : "・完走"}`,
+    "triLink", String(memory.id)
   );
 }
 function getImasoraJackpotWingArt() {
@@ -45623,6 +45973,10 @@ function townArcadePachicoinStationMarkup(interactive = true) {
           <strong id="pachicoinPinDialogTitle" data-pachicoin-pin-title>実機の釘を見る</strong>
           <button type="button" class="pachicoin-pin-dialog-close" data-pachicoin-pin-close>閉じる</button>
         </header>
+        <div class="pachicoin-pin-play-row">
+          <span data-pachicoin-pin-play-station>盤面を確認中…</span>
+          <button type="button" class="pachicoin-pin-start" data-pachicoin-pin-start disabled>ゲームをはじめる</button>
+        </div>
         <nav class="pachicoin-pin-regions" data-pachicoin-pin-regions aria-label="拡大する箇所"></nav>
         <p class="pachicoin-pin-status" data-pachicoin-pin-status role="status"></p>
         <div class="pachicoin-pin-stage" data-pachicoin-pin-board></div>
@@ -46014,6 +46368,16 @@ function renderTownArcade() {
         </div>`;
     }
   }
+  const dailyGame = { companionCatcher: "catcher", triLink: "triLink", coinPusherRapierValidation: "pachicoin" }[activeArcadeMachine?.game];
+  if (dailyGame) {
+    const notice = document.createElement("p");
+    notice.dataset.ufoArcadeDaily = dailyGame;
+    notice.setAttribute("role", "status");
+    notice.style.cssText = "margin:8px 0;padding:8px 12px;border-radius:10px;background:#e8f3fa;color:#183346;font-size:13px;line-height:1.5";
+    const stage = box.querySelector(".arcade-game-stage");
+    if (stage) stage.before(notice); else box.appendChild(notice);
+    refreshUfoArcadeDailyNotices();
+  }
   box.querySelectorAll("[data-arcade-machine]").forEach(button => {
     button.addEventListener("click", () => moveTownArcadeHeroToMachine(button));
   });
@@ -46065,6 +46429,8 @@ function renderTownArcade() {
   const pinBoard = box.querySelector('[data-pachicoin-pin-board]');
   const pinRegions = box.querySelector('[data-pachicoin-pin-regions]');
   const pinStatus = box.querySelector('[data-pachicoin-pin-status]');
+  const pinStart = box.querySelector('[data-pachicoin-pin-start]');
+  let pinStarting = false;
   let pinOpener = null;
   const pinViewStateFromViewer = () => {
     const viewer = activePachicoinPinInspection;
@@ -46099,15 +46465,52 @@ function renderTownArcade() {
     pinOpener?.focus();
   });
   box.querySelector('[data-pachicoin-pin-close]')?.addEventListener('click', closePinView);
+  pinStart?.addEventListener('click', () => {
+    const viewer = activePachicoinPinInspection;
+    if (pinStarting || !pachicoinPinDialog.open || !viewer?.inspectionReady
+      || viewer.destroyed || viewer.root !== pinBoard || pinStart.disabled) return;
+    const stationId = viewer.stationId; // Use the displayed machine, including previous/next navigation.
+    pinStarting = true;
+    pinStart.disabled = true;
+    if (!arcadeGameRunning) {
+      selectedPachicoinMachineId = stationId;
+      closePinView();
+      startTownArcadeGame();
+      return;
+    }
+    const game = window.ImasoraJackpotRapierValidation;
+    const current = game?.getNavigationState();
+    if (!current) {
+      pinStarting = false;
+      pinStart.disabled = false;
+      pinStatus.textContent = 'ゲームの準備が終わってから、もう一度押してください。';
+      return;
+    }
+    if (current.stationId === stationId) {
+      game.cancelStationChange();
+      closePinView(); // Resume this instance, keeping its ST/round/coins intact.
+      return;
+    }
+    closePinView();
+    if (!game.setNavigationPaused(false) || !game.requestStationChange(stationId)) return;
+    moveStatus.textContent = stationId + '番台へ移動します。発射を止めて入賞・抽選・払い出しの完了を待っています。';
+    moveStatus.hidden = false;
+    moveCancel.hidden = false;
+  });
   const syncPinInspectionRegion = () => {
     const viewer = activePachicoinPinInspection;
     if (!viewer) return;
     const station = townArcadePachicoinStationById(viewer.stationId);
     box.querySelector('[data-pachicoin-pin-title]').textContent = station.label + '｜実機の釘を見る';
+    pinStart.disabled = !viewer.inspectionReady || pinStarting;
+    box.querySelector('[data-pachicoin-pin-play-station]').textContent = station.label + 'でプレイ';
     pinStatus.textContent = station.label + '｜' + viewer.inspectionRegion.label + '｜調整日 ' + viewer.dailyAdjustment.dayKey + (arcadeGameRunning ? '｜プレイ一時停止中（閉じると再開）' : '');
     pinRegions.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.pinRegion === viewer.inspectionRegion.id)));
   };
   const openPachicoinPinView = async (stationId, requestedViewState = null, opener = null) => {
+    pinStarting = false;
+    pinStart.disabled = true;
+    box.querySelector('[data-pachicoin-pin-play-station]').textContent = '盤面を確認中…';
     const station = townArcadePachicoinStationById(stationId);
     const stationButton = box.querySelector(`[data-pachicoin-pin-view="${station.id}"]`);
     pinOpener = stationButton || opener || pinOpener;
@@ -46347,7 +46750,9 @@ function renderTownArcade() {
               renderTownArcade();
               playSfx("select");
             },
-            onWorkshopExchange: awardUfoWorkshopCoinPusherExchange
+            onWorkshopExchange: awardUfoWorkshopCoinPusherExchange,
+            getWorkshopDailyStatus: fresh => getUfoArcadeDailyStatus("pachicoin", fresh),
+            withWorkshopRewardLock: withUfoArcadeRewardLock
           });
           if (box.querySelector('[data-pachicoin-pin-dialog]')?.open || box.querySelector('[data-pachicoin-move-dialog]')?.open) mountedGame?.setNavigationPaused(true);
           const adjustmentNote = box.querySelector('.pachicoin-station-note');
@@ -47837,6 +48242,7 @@ function openMusicPlazaKaraokeFromTown() {
     return;
   }
   karaokeSofaDevPreviewActive = false;
+  setTownAmbientBgmArea("karaoke");
   preloadKaraokeVisualAssets();
   musicPlazaKaraokeOpen = true;
   renderTownKaraoke();
@@ -47852,6 +48258,7 @@ function returnToTownMapFromKaraoke() {
   clearKaraokePerformanceTimer();
   clearKaraokeCinemascope();
   stopBgm();
+  setTownAmbientBgmArea("map");
   renderTownKaraoke();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
@@ -47872,6 +48279,7 @@ function openKaraokeSofaDevPreview() {
     toast("音楽プラザはまだ建設されていません");
     return;
   }
+  setTownAmbientBgmArea("karaoke");
   preloadKaraokeVisualAssets();
   musicPlazaKaraokeOpen = true;
   selectedKaraokeBgmMode = karaokeAvailableVocalSongModes()[0] || "nightPlaza";
@@ -48234,6 +48642,7 @@ function renderTownMemorialDex() {
   }));
 }
 function returnToTownMapFromMemorialDex() {
+  setTownAmbientBgmArea("map");
   memorialWallpaperView = "records";
   renderTownMemorialDex();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -48912,12 +49321,13 @@ function cancelRetireParkPracticeStrategy() {
   selectedTownBuildingId = "retirePark";
   renderTournament();
   renderTownPractice();
-  switchScreen("town");
+  switchScreen("town", "retirePark");
   document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
   toast("広場に戻りました");
 }
 function returnToTownMapFromRetireParkPractice() {
+  setTownAmbientBgmArea("map");
   pendingRetireParkPracticeRecordId = "";
   renderTownPractice();
   document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -49028,7 +49438,7 @@ function buyShopItem(itemId) {
   toast(`${item.name}を購入`);
 }
 function openTownShopFromItems() {
-  switchScreen("town");
+  switchScreen("town", "shop");
   renderTown();
   document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
@@ -53768,7 +54178,7 @@ function openPlaytestShop() {
   addLog("開発用テスト補助でアイテムショップを建築済み状態に調整。");
   saveState();
   renderAll();
-  switchScreen("town");
+  switchScreen("town", "shop");
   document.getElementById("townShop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("reward");
   toast("アイテムショップを確認できる状態にしました");
@@ -53835,7 +54245,7 @@ function openPlaytestRetireParkRecords() {
   addLog("開発用テスト補助で、広場の練習試合確認用に引退記録4件を用意。正式版の通常進行では使わない補助です。");
   saveState();
   renderAll();
-  switchScreen("town");
+  switchScreen("town", "retirePark");
   document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("reward");
   toast("広場の記録4件を用意しました");
@@ -56950,7 +57360,7 @@ function returnToRetireParkPracticeFromBattleResult() {
   selectedTownBuildingId = "retirePark";
   saveState();
   renderAll();
-  switchScreen("town");
+  switchScreen("town", "retirePark");
   document.getElementById("townPractice")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
   toast("広場に戻りました");
@@ -57436,7 +57846,14 @@ function showHomeCenterNotice(text) {
   box.classList.add("show");
   setTimeout(() => box.classList.remove("show"), 2200);
 }
-function switchScreen(screen) {
+function switchScreen(screen, townArea = "map") {
+  ambientBgmScreen = screen;
+  ambientBgmTownArea = townArea;
+  syncAmbientBgmBoundary();
+  if (screen === "skyMap") {
+    window.location.assign(townRailwaySkyWorldUrl());
+    return;
+  }
   blurActiveTextInput();
   if (screen !== "arcade") {
     clearTownArcadeLobbyMoveTimers();
@@ -57479,17 +57896,6 @@ function switchScreen(screen) {
     warmKaraokeTextCaches();
     if (!townVisualRenderedOnce) renderTown();
   }
-  if (screen === "skyMap") {
-    preloadTownVisualAssets();
-    window.ImasoraSkyMap?.mount({
-      onReturn: () => {
-        switchScreen("town");
-        renderTown();
-        requestAnimationFrame(() => document.getElementById("townView")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-        playSfx("select");
-      }
-    });
-  }
   if (screen === "landMap") {
     window.ImasoraLandMap?.mount({
       onReturn: () => {
@@ -57512,6 +57918,7 @@ function switchScreen(screen) {
   }
   if (screen === "arcade") renderTownArcade();
   if (screen === "retirement") renderRetirementCeremony();
+  syncAmbientBgmBoundary(true);
   if (screen === "walk") syncHomeBgmMode();
   scheduleCaretCleanup();
 }
@@ -57625,9 +58032,6 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
-
-
-
 
 
 

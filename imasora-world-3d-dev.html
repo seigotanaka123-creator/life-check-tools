@@ -4,14 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>イマソラ3Dワールド基盤 開発</title>
-  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=20260905-mars-earth-return-v416">
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=492">
   <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=450">
   <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=456">
   <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=457">
   <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=459">
   <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=460">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=471">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=490">
   <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=464">
+  <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=491-verified3">
 </head>
 <body>
   <main class="world-shell">
@@ -24,6 +25,7 @@
       <div class="status-stack">
         <span class="status-pill"><i></i><span id="statusText">ワールド準備中</span></span>
         <span class="save-state" id="saveState">未保存</span>
+        <a href="./imasora-world-recovery-dev.html?check=world-recovery-v483" target="_blank" rel="noopener" style="color:#b8dbc9;font-size:12px">保存済み記録の控え（別タブ）</a>
       </div>
     </header>
 
@@ -145,7 +147,7 @@
           <div class="touch-pad" id="touchPad" aria-label="タッチ移動パッド">
             <div class="touch-stick" id="touchStick"></div>
           </div>
-          <div class="touch-hint" id="touchHint">左パッド：画面基準で移動　Space：最大3段ジャンプ　右側ドラッグ：カメラ回転（上下左右）</div>
+          <div class="touch-hint" id="touchHint">左パッド：画面基準で移動　Space：最大3段ジャンプ　3D画面をスライド／左ドラッグ：カメラ回転（上下左右）</div>
         </div>
         <div class="viewport-footer">
           <span id="mapDescription">雲の床を歩き、雲づくり工房を建てます。</span>
@@ -232,6 +234,6 @@
       <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
     </footer>
   </main>
-  <script type="module" src="./imasora-world-3d-dev.js?v=excavator-performance-v476"></script>
+  <script type="module" src="./imasora-world-3d-dev.js?v=drag-look-v492"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 import * as THREE from './three.module.min.js';
-import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js';
+import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=487';
 import {FACES} from './imasora-construction-terrain.js';
 import {BIN,CELL} from './imasora-construction-excavator.js';
 const FACE_TRIANGLES=[0,1,2,0,2,3],SOIL_COLORS=[new THREE.Color(0xaa7847),new THREE.Color(0xbe9159)];

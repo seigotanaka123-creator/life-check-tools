@@ -18,7 +18,12 @@ function bucketPlate(group,points,width,x,material,name){
 function createBackhoeBucket(){
   const g=new THREE.Group();g.name='内向きバックホーバケット';
   bucketPlate(g,BUCKET_SHELL,18,0,dark,'曲面バケット外殻');
-  for(const x of[-8.35,8.35])bucketPlate(g,BUCKET_OUTLINE,1.3,x,yellow,'バケット側板');
+  // Shell and side plates used to cover the same x=+/-9 rim faces. Partition
+  // the outline at the shell's inner contour so each visible face exists once.
+  // The shell and outline share their first six points; keep the black rim,
+  // original width, outer silhouette and physical collision geometry intact.
+  const sideFill=[BUCKET_OUTLINE[0],...BUCKET_SHELL.slice(6).reverse(),...BUCKET_OUTLINE.slice(5)];
+  for(const x of[-8.35,8.35])bucketPlate(g,sideFill,1.3,x,yellow,'バケット側板');
   for(const x of[-6,-2,2,6]){
     // Short wedge teeth continue the lip's inward/upward tangent. The previous
     // long downward spike bent away from the bowl instead of following it.

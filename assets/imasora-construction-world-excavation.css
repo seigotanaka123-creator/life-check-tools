@@ -4,9 +4,56 @@
 .world-excavation-controls button{font:inherit;min-height:36px;padding:6px 10px;border:1px solid #a2a783;border-bottom:3px solid #59675b;border-radius:7px;background:linear-gradient(#fff5d9,#e6dfbd);color:#253e36;touch-action:none;cursor:pointer}
 .world-excavation-controls button:disabled{opacity:.36;cursor:default}.world-excavation-controls button:focus-visible{outline:3px solid #ffe08d}.world-excavation-controls button:active,.world-excavation-controls button.held{background:#e3bb62;transform:translateY(1px)}
 .world-excavation-controls .we-message{margin:5px 0;line-height:1.5}.world-excavation-controls .we-stats{color:#bae4d7;font-variant-numeric:tabular-nums;font-size:11px}
+.world-excavation-controls .we-forecast{display:flex;align-items:center;gap:9px;margin-top:7px;padding:6px 8px;border:1px solid #769994;border-radius:7px;background:#132b2b90;line-height:1.45}.world-excavation-controls .we-forecast button{flex:0 0 auto;min-height:32px}.world-excavation-controls .we-preview[data-kind="scoop"]{color:#85f5f2}.world-excavation-controls .we-preview[data-kind="dump"]{color:#ffca84}
 .world-excavation-controls .we-move,.world-excavation-controls .we-arm,.world-excavation-controls .we-actions,.world-excavation-controls footer{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .world-excavation-controls .we-move button,.world-excavation-controls .we-arm button{flex:1;background:linear-gradient(#d9b36e,#a78547);font-weight:bold}.world-excavation-controls footer{border-top:1px solid #748a75;padding-top:7px}
+.world-excavation-controls .we-arm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.world-excavation-controls .we-arm button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;white-space:nowrap}.world-excavation-controls kbd{font:inherit;font-size:10px;padding:1px 4px;border:1px solid #655b3f;border-radius:3px;background:#fff3c655}.world-excavation-controls .we-key-help{font-size:11px;color:#c2ded0;margin:5px 0}.world-excavation-controls .we-stop{margin-top:7px;width:100%}.world-excavation-controls .we-options{margin-top:7px}.world-excavation-controls .we-options summary{cursor:pointer;padding:5px 0;color:#ffdf8f}.world-excavation-controls .we-options summary:focus-visible{outline:2px solid #ffe08d}
 .world-excavation-operating .touch-pad,.world-excavation-operating .touch-hint,.world-excavation-operating .camera-distance-control,.world-excavation-operating .jump-control,.world-excavation-operating .touch-actions{display:none!important}
 .world-excavation-near .world-water-controls,.world-excavation-near .world-soil-controls,.world-excavation-near .world-timber-controls{display:none!important}
 .world-excavation-near:not(.world-excavation-operating) .world-excavation-controls{top:8px;bottom:auto;max-height:26%}
+.world-excavation-controls:has(.we-restore:not([hidden])){max-height:85%}
+.we-restore h3{margin:8px 0}.we-restore p{line-height:1.6}.we-restore label{display:block;margin:9px 0}
+.we-restore textarea{display:block;box-sizing:border-box;width:100%;min-height:92px;resize:vertical;font:12px/1.5 monospace;background:#122e2d;color:#fff5d6;border:1px solid #a2a783;border-radius:6px;padding:8px}
+.we-restore input{display:block;max-width:100%;margin-top:6px}.we-backup-actions{display:flex;flex-wrap:wrap;gap:6px}
+.we-restore-comparison{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.7;color:#bae4d7}.we-restore-status{font-weight:bold}
 @media(max-width:620px){.world-excavation-controls{left:4px;right:4px;bottom:4px;font-size:11px;padding:7px;max-height:49%}.world-excavation-controls button{padding:5px 7px;min-height:38px}.world-excavation-controls .we-arm button{flex:1 1 22%}.world-excavation-controls footer button{flex:1 1 26%}.world-excavation-controls .we-stats{font-size:10px}}
+.we-restore .we-backup-actions:last-child{position:sticky;bottom:-9px;background:#203f3d;padding:9px 0;border-top:1px solid #748a75}
+
+.world-excavation-controls .we-quick{display:flex;gap:6px;margin-top:7px}.world-excavation-controls .we-quick button{flex:1;min-height:44px;font-weight:bold}
+
+/* During play, the scene and the dock own different grid cells. */
+body.world-excavation-playing{overflow:hidden;overscroll-behavior:none}
+.world-excavation-playing .world-header,.world-excavation-playing .world-toolbar,.world-excavation-playing .control-card,.world-excavation-playing .viewport-toolbar,.world-excavation-playing .viewport-footer,.world-excavation-playing .world-shell>footer{display:none!important}
+.world-excavation-playing .world-shell{padding:0;min-height:0}
+.world-excavation-playing .world-layout{display:block;position:static;z-index:auto}
+.world-excavation-playing .viewport-card{border:0;border-radius:0;box-shadow:none}
+.world-excavation-playing #viewport{position:fixed;inset:0;z-index:100;width:100%;height:100dvh;min-height:0;display:grid;grid-template-areas:"scene" "dock";grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 244px;overflow:hidden;background:#182c2c}
+.world-excavation-playing #worldCanvas{grid-area:scene;min-width:0;min-height:0;width:100%;height:100%;align-self:stretch}
+.world-excavation-operating> :not(#worldCanvas):not(.world-excavation-controls){display:none!important}
+.world-excavation-playing #viewport>.world-excavation-controls{grid-area:dock;position:relative;inset:auto;align-self:stretch;width:auto;height:100%;min-width:0;min-height:0;max-height:none!important;margin:0;border:0;border-top:2px solid #ba975b;border-radius:0;padding:8px 12px max(8px,env(safe-area-inset-bottom));background:#183432;box-shadow:none;overflow:auto;font-size:13px}
+.world-excavation-playing .world-excavation-controls header{gap:8px;flex-wrap:nowrap;min-height:22px}
+.world-excavation-playing .world-excavation-controls header strong{font-size:14px;white-space:nowrap}
+.world-excavation-playing .world-excavation-controls header span{font-size:10px;line-height:1.3}
+.world-excavation-controls .we-load{margin-left:auto;white-space:nowrap;color:#ffe5a2;font-weight:bold;font-variant-numeric:tabular-nums}
+.world-excavation-controls .we-now{margin:3px 0 5px;color:#ceeade;font-size:12px;line-height:1.45}
+.world-excavation-playing .world-excavation-controls .we-arm,.world-excavation-playing .world-excavation-controls .we-move,.world-excavation-playing .world-excavation-controls .we-actions,.world-excavation-playing .world-excavation-controls .we-quick{margin-top:5px}
+.world-excavation-playing .world-excavation-controls button{min-height:44px}
+.world-excavation-playing .world-excavation-controls .we-arm button{gap:3px;padding:4px;font-size:12px}
+.world-excavation-playing .world-excavation-controls .we-quick button{font-size:12px;padding:4px 6px;background:#284b48;border-color:#72948a;color:#f2f7e7}
+.world-excavation-playing .world-excavation-controls .we-quick [data-action="pause"]{color:#ffe1a5}
+.world-excavation-playing .world-excavation-controls .we-forecast{margin-top:5px;padding:3px 6px;font-size:11px;min-height:32px}
+.world-excavation-playing .world-excavation-controls .we-forecast button{min-height:28px;padding:2px 6px;font-size:11px}
+.world-excavation-playing .world-excavation-controls .we-options{margin-top:3px}
+.world-excavation-controls .we-details{border-top:1px solid #527c70;padding-top:8px;line-height:1.6}
+.world-excavation-controls .we-preview-detail{margin:8px 0;color:#a8e9df}
+.world-excavation-playing .world-excavation-controls .emergency-escape-control{position:static;inset:auto;transform:none;white-space:normal;box-shadow:none}
+.world-excavation-playing .world-excavation-controls:has(.we-restore:not([hidden]))>.we-now{display:none}
+@media(min-width:1100px),(min-width:700px) and (max-height:600px){
+  .world-excavation-playing #viewport{grid-template-areas:"scene dock";grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:minmax(0,1fr)}
+  .world-excavation-playing #viewport>.world-excavation-controls{border-top:0;border-left:2px solid #ba975b;padding-top:14px}
+  .world-excavation-playing .world-excavation-controls .we-arm{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .world-excavation-playing .world-excavation-controls .we-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .world-excavation-playing .world-excavation-controls .we-quick [data-action="pause"]{grid-column:1/-1}
+}
+@media(min-width:700px) and (max-height:600px){.world-excavation-playing #viewport{grid-template-columns:minmax(0,1fr) 280px}}
+@media(max-width:620px){.world-excavation-playing #viewport>.world-excavation-controls{padding-left:8px;padding-right:8px}.world-excavation-playing .world-excavation-controls header strong{font-size:13px}.world-excavation-playing .world-excavation-controls header span{font-size:9px}}

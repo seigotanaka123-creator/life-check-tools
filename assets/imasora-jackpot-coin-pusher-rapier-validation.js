@@ -1,5 +1,5 @@
 import * as THREE from "./three.module.min.js";
-import * as CANNON from "./rapier-cannon-compat.js?out-step156-20260802";
+import * as CANNON from "./rapier-cannon-compat.js?v=20260916-pachicoin-many-coins-v1";
 import * as CANNON_MACHINE2 from "./cannon-es.js";
 import { PRODUCTION_JACKPOT_LAYOUT } from "./imasora-jackpot-production-layout.js?v=20260916-central-production-v1";
 
@@ -129,8 +129,8 @@ const TABLE_COIN_CLEANUP_THRESHOLD = 180;
 const TABLE_COIN_INSTANCE_INITIAL_CAPACITY = 256;
 const STARTING_CREDITS = 250;
 const UFO_WORKSHOP_EXCHANGE_MIN_CREDITS = 350;
-const UFO_WORKSHOP_EXCHANGE_COST = 150;
-const UFO_WORKSHOP_EXCHANGE_REWARD = 18;
+const UFO_WORKSHOP_EXCHANGE_COST = 350;
+const UFO_WORKSHOP_EXCHANGE_REWARD = 2;
 const DAILY_HELD_COIN_STORAGE_KEY = "imasoraPachicoinDailyHeldCoinsV1";
 const DAILY_HELD_COIN_STATE_VERSION = 1;
 const PACHICOIN_LAUNCH_SOUND_URL = "./assets/audio/padlock01-lock2.mp3";
@@ -146,6 +146,10 @@ const PACHICOIN_DIGITAL_HIT_SOUND_URL = "./assets/audio/retro-anime-gun10-3-hit.
 const PACHICOIN_JACKPOT_FANFARE_SOUND_URL = "./assets/audio/nes-general-b03-1-fanfare.mp3";
 const PACHICOIN_JACKPOT_ROUND_SOUND_URL = "./assets/audio/nes-rpg-a09-3-jackpot-round.mp3";
 const PACHICOIN_JACKPOT_ENDING_SOUND_URL = "./assets/audio/nes-shooter-c07-1-jackpot-ending.mp3";
+const PACHICOIN_ROLE_COIN_SOUND_URL = "./assets/audio/gb-rpg-b04-2-role.mp3";
+const PACHICOIN_SHARK_LARGE_SOUND_URL = "./assets/audio/onoma-rumble04-1-shark-large.mp3";
+const PACHICOIN_SHARK_SMALL_SOUND_URL = "./assets/audio/onoma-rumble04-2-shark-small.mp3";
+const PACHICOIN_ATTACKER_ENTRY_SOUND_URL = "./assets/audio/cash-register-drawer02-4-attacker.mp3";
 
 // One cancellable voice spans accepted entry to the first fully open wing pose.
 export class PachicoinCheckerWaitSound {
@@ -692,6 +696,41 @@ export class PachicoinWingOpenSound extends PachicoinCheckerWaitSound {
   }
 }
 
+// Preserve each accepted entry, including several coins during audio loading.
+export class PachicoinAttackerEntrySound extends PachicoinWingOpenSound {
+  constructor(options = {}) {
+    super(options);
+    this.url = PACHICOIN_ATTACKER_ENTRY_SOUND_URL;
+    this.startOffset = 0;
+    this.pendingPlays = 0;
+  }
+
+  play() {
+    if (!this.enabled || this.destroyed || document.hidden || this.navigationPaused) return false;
+    this.pendingPlays += 1;
+    this.active = true;
+    this.unlock();
+    this.sync();
+    return true;
+  }
+
+  sync() {
+    if (!this.active || this.destroyed || !this.buffer
+      || document.hidden || this.navigationPaused || this.context?.state !== "running") return;
+    const pending = this.pendingPlays;
+    this.pendingPlays = 0;
+    for (let index = 0; index < pending; index += 1) {
+      this.active = true;
+      super.sync();
+    }
+  }
+
+  stop() {
+    this.pendingPlays = 0;
+    super.stop();
+  }
+}
+
 export class PachicoinJackpotFanfareSound extends PachicoinWingOpenSound {
   constructor(options = {}) {
     super(options);
@@ -803,6 +842,101 @@ export class PachicoinJackpotRoundSound extends PachicoinCheckerWaitSound {
   stop() {
     super.stop();
     this.resumeOffset = 0;
+  }
+}
+
+// Follow the actual shark travel clock, including its exit below the cabinet.
+export class PachicoinSharkSound extends PachicoinJackpotRoundSound {
+  constructor({ variant = "small", ...options } = {}) {
+    super(options);
+    this.url = variant === "large" ? PACHICOIN_SHARK_LARGE_SOUND_URL : PACHICOIN_SHARK_SMALL_SOUND_URL;
+    this.volume = variant === "large" ? 0.52 : 0.38;
+    this.level = 0;
+    this.appliedLevel = null;
+  }
+
+  prepare() {
+    const loading = super.prepare();
+    if (this.gain && this.appliedLevel === null) {
+      this.gain.gain.value = 0;
+      this.appliedLevel = 0;
+    }
+    return loading;
+  }
+
+  syncTravel(travel, duration) {
+    if (!travel.active) {
+      if (this.active) this.stop();
+      return;
+    }
+    this.start();
+    const elapsed = clamp(travel.progress, 0, 1) * duration;
+    // Short attack; fade during the final 0.45 seconds instead of a hard cut.
+    this.level = this.volume * clamp(Math.min(elapsed / 0.12, (duration - elapsed) / 0.45), 0, 1);
+    this.sync();
+  }
+
+  sync() {
+    if (this.gain && this.level !== this.appliedLevel) {
+      this.gain.gain.setTargetAtTime(this.level, this.context.currentTime, 0.02);
+      this.appliedLevel = this.level;
+    }
+    super.sync();
+  }
+
+  stop() {
+    super.stop();
+    this.level = 0;
+    if (this.gain) {
+      this.gain.gain.cancelScheduledValues(this.context.currentTime);
+      this.gain.gain.setValueAtTime(0, this.context.currentTime);
+      this.appliedLevel = 0;
+    }
+  }
+}
+
+// Reuse the cancellable looping voice with an independent source and lifetime.
+export class PachicoinRoleCoinSound extends PachicoinJackpotRoundSound {
+  constructor(options = {}) {
+    super(options);
+    this.url = PACHICOIN_ROLE_COIN_SOUND_URL;
+    this.outStopTimer = 0;
+    this.suppressed = false;
+  }
+
+  setSuppressed(suppressed) {
+    this.suppressed = Boolean(suppressed);
+    // Cancel both an audible voice and any pending decode/OUT-tail playback.
+    if (this.suppressed) this.stop();
+  }
+
+  sync() {
+    if (this.suppressed) return;
+    super.sync();
+  }
+
+  start() {
+    if (this.suppressed) return;
+    clearTimeout(this.outStopTimer);
+    this.outStopTimer = 0;
+    super.start();
+  }
+
+  stop() {
+    clearTimeout(this.outStopTimer);
+    this.outStopTimer = 0;
+    super.stop();
+  }
+
+  stopAfterOut() {
+    if (!this.active || this.destroyed || this.outStopTimer) return;
+    // Wall-clock delay: repeated empty frames must not restart the 0.8 s tail.
+    this.outStopTimer = window.setTimeout(() => this.stop(), 800);
+  }
+
+  syncRolePresence(present) {
+    if (present) this.start();
+    else if (!this.outStopTimer) this.stop();
   }
 }
 
@@ -1264,7 +1398,7 @@ const SHARK_ROLE_CAPTURE_APERTURE_MIN_Y = -0.135;
 const SHARK_ROLE_CAPTURE_APERTURE_MAX_Y = 0.21;
 const SHARK_ROLE_CAPTURE_MAX_WORLD_Y = STATIC_BED_SURFACE_Y + 0.34;
 const SHARK_ROLE_CAPTURE_RANGE_SCALE_SMALL = 1.55;
-const SHARK_ROLE_CAPTURE_RANGE_SCALE_LARGE = 2.4;
+const SHARK_ROLE_CAPTURE_RANGE_SCALE_LARGE = 2.3;
 export const SHARK_ROLE_EXIT_PATH = Object.freeze({
   initialDelay: SHARK_ROLE_INITIAL_DELAY,
   lineX: SHARK_ROLE_LEFT_LINE_X,
@@ -1299,7 +1433,6 @@ const PUSHER_COIN_WAKE_SWEEP_MARGIN = 0.01;
 const INITIAL_COIN_CLEARANCE = 0.018;
 const INITIAL_COIN_REAR_Z = -0.42;
 const INITIAL_COIN_ROW_GAP = 0.46;
-const GAME_OVER_GRACE_SECONDS = 3.4;
 const PACHINKO_COIN_RADIUS = 0.084;
 const PACHINKO_COIN_THICKNESS = 0.024;
 const PACHINKO_TOKEN_COLLIDER_RADIUS = PACHINKO_COIN_RADIUS * 0.88;
@@ -2342,11 +2475,29 @@ const markup = `
     <header class="icp-hud">
       <div class="icp-hud-cell"><small>もちコイン</small><strong data-icp-credits>250</strong></div>
       <div class="icp-hud-logo"><small>IMASORA</small><strong>JACKPOT</strong></div>
-      <div class="icp-hud-cell icp-hud-cell-right" title="もちコイン350枚以上で150枚を整備パーツ18個へ換金します"><small>景品交換ライン</small><strong data-icp-exchange>350枚</strong><span data-icp-collected hidden>0</span></div>
+      <button type="button" class="icp-hud-cell icp-hud-cell-right icp-prize-open" data-icp-prize-open title="景品を選んで交換できます"><small>景品交換所</small><strong data-icp-exchange>350枚から</strong></button><span data-icp-collected hidden>0</span>
     </header>
+    <dialog class="icp-prize-dialog" data-icp-prize-dialog aria-labelledby="icpPrizeTitle" hidden>
+      <h2 id="icpPrizeTitle">景品交換所</h2>
+      <p data-icp-prize-daily role="status"></p>
+      <p>もちコイン350枚以上で、景品を選んで交換できます。</p>
+      <p class="icp-prize-balance">もちコイン <strong data-icp-prize-balance>0</strong> 枚</p>
+      <label class="icp-prize-card">
+        <input type="radio" name="icp-prize" value="arcadeParts" data-icp-prize-select>
+        <span><strong>整備パーツ2個</strong><span>UFOの整備に使えるパーツ</span><b>もちコイン350枚と交換</b></span>
+      </label>
+      <p data-icp-prize-summary>景品を選んでください。</p>
+      <p class="icp-prize-message" data-icp-prize-message role="status" aria-live="polite"></p>
+      <div class="icp-prize-actions">
+        <button type="button" data-icp-prize-confirm disabled>350枚で交換する</button>
+        <button type="button" data-icp-prize-close>ゲームに戻る</button>
+      </div>
+      <small>このメニューを開いている間、ゲームは一時停止します。</small>
+    </dialog>
     <div class="icp-stage" data-icp-stage>
       <canvas class="icp-canvas" data-icp-canvas aria-label="一発台型パチンコ盤とコインプッシャーの3Dゲーム画面。黄土色板の回転ハンドルを時計回りになぞると発射します"></canvas>
       <div class="icp-danger-room-overlay" data-icp-danger-room-overlay aria-hidden="true"></div>
+      <button type="button" class="icp-jam-clear-button" data-icp-clear-jam title="盤面上のコインをアウトにする"><span aria-hidden="true">↺</span><strong>玉詰まり解消</strong></button>
       <div class="icp-seven-panel" hidden aria-hidden="true">
         <small data-icp-spin-label>CHANCE SLOT</small>
         <div class="icp-seven-digits">
@@ -2357,7 +2508,7 @@ const markup = `
       <div class="icp-st-badge" data-icp-st hidden><strong>ST</strong><span>残り <b data-icp-st-count>5</b> 回</span><small>継続期待 92.2%</small></div>
       <div class="icp-callout" data-icp-callout hidden></div>
       <div class="icp-payout-meter" data-icp-payout hidden><span>放出中</span><strong data-icp-payout-count>0</strong></div>
-      <div class="icp-game-over" data-icp-game-over role="dialog" aria-modal="true" aria-labelledby="icpAdditionalInvestmentTitle" hidden>
+      <dialog class="icp-game-over" data-icp-game-over aria-labelledby="icpAdditionalInvestmentTitle" hidden>
         <div class="icp-game-over-panel" aria-live="polite">
           <small data-icp-investment-status>COIN OUT</small>
           <strong id="icpAdditionalInvestmentTitle" data-icp-investment-title>追加投資する？</strong>
@@ -2374,9 +2525,10 @@ const markup = `
             <p style="margin-bottom:0;">残り <b data-icp-rewarded-cm-countdown>${ADDITIONAL_INVESTMENT_CM_SECONDS}</b> 秒</p>
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
     <div class="icp-controls">
+      <button type="button" class="icp-investment-retry" data-icp-investment-retry hidden>追加投資する</button>
       <label class="icp-stroke-control">
         <span>ストローク</span>
         <input type="range" min="20" max="100" value="58" step="1" data-icp-stroke aria-label="コイン発射のストローク">
@@ -2384,7 +2536,6 @@ const markup = `
       </label>
       <div class="icp-action-row">
         <button type="button" class="icp-auto-button" data-icp-auto aria-pressed="false"><span aria-hidden="true">▶</span><strong data-icp-auto-label>オート発射 OFF</strong><small>0.6秒 / 1枚</small></button>
-        <button type="button" class="icp-jam-clear-button" data-icp-clear-jam title="盤面上のコインをアウトにする"><span aria-hidden="true">↺</span><strong>玉詰まり解消</strong></button>
         <button type="button" class="icp-dev-start-button" data-icp-dev-start title="スタートチェッカー入賞を1回発生させる"><span aria-hidden="true">S</span><strong>開発用 Sチェッカー入賞</strong></button>
       </div>
       <div class="icp-rapier-load-row" data-icp-validation-load aria-label="Rapier負荷テスト用の盤面コイン枚数">
@@ -4121,8 +4272,12 @@ class ImasoraJackpotCoinPusherGame {
     this.handleUnlockSound = new PachicoinHandleUnlockSound({ enabled: !this.previewOnly });
     this.checkerWaitSound = new PachicoinCheckerWaitSound({ enabled: !this.previewOnly });
     this.wingOpenSound = new PachicoinWingOpenSound({ enabled: !this.previewOnly });
+    this.attackerEntrySound = new PachicoinAttackerEntrySound({ enabled: !this.previewOnly });
     this.digitalHitSound = new PachicoinDigitalHitSound({ enabled: !this.previewOnly });
     this.jackpotRoundSound = new PachicoinJackpotRoundSound({ enabled: !this.previewOnly });
+    this.roleCoinSound = new PachicoinRoleCoinSound({ enabled: !this.previewOnly });
+    this.sharkSounds = ["small", "large"].map(variant =>
+      new PachicoinSharkSound({ variant, enabled: !this.previewOnly }));
     this.jackpotEndingSound = new PachicoinJackpotEndingSound({
       enabled: !this.previewOnly,
       onActivityChange: active => this.setJackpotPostRoundSoundActive(active)
@@ -4137,8 +4292,11 @@ class ImasoraJackpotCoinPusherGame {
       this.handleUnlockSound.unlock();
       this.checkerWaitSound.unlock();
       this.wingOpenSound.unlock();
+      this.attackerEntrySound.unlock();
       this.digitalHitSound.unlock();
       this.jackpotRoundSound.unlock();
+      this.roleCoinSound.unlock();
+      this.sharkSounds.forEach(sound => sound.unlock());
       this.jackpotEndingSound.unlock();
     };
     this.boundDigitalSoundPageHide = () => {
@@ -4151,8 +4309,11 @@ class ImasoraJackpotCoinPusherGame {
       this.handleUnlockSound.stop();
       this.checkerWaitSound.pause();
       this.wingOpenSound.stop();
+      this.attackerEntrySound.stop();
       this.digitalHitSound.stop();
       this.jackpotRoundSound.pause();
+      this.roleCoinSound.pause();
+      this.sharkSounds.forEach(sound => sound.pause());
       this.jackpotEndingSound.stop();
     };
     this.roster = Array.isArray(options.roster)
@@ -4166,6 +4327,8 @@ class ImasoraJackpotCoinPusherGame {
       dangerIllumination: options.effects?.dangerIllumination !== false
     };
     this.random = typeof options.random === "function" ? options.random : Math.random;
+    this.getWorkshopDailyStatus = typeof options.getWorkshopDailyStatus === "function" ? options.getWorkshopDailyStatus : null;
+    this.withWorkshopRewardLock = typeof options.withWorkshopRewardLock === "function" ? options.withWorkshopRewardLock : null;
     this.onWorkshopExchange = typeof options.onWorkshopExchange === "function"
       ? options.onWorkshopExchange
       : null;
@@ -4311,6 +4474,8 @@ class ImasoraJackpotCoinPusherGame {
     this.gameOver = false;
     this.rewardedCmActive = false;
     this.rewardedCmElapsed = 0;
+    this.rewardedCmTimer = 0;
+    this.rewardedCmLastTimestamp = null;
     this.currentLcdCode = "00";
     this.currentLcdLabel = "CHANCE SLOT";
     this.currentLcdPalette = BOARD_LCD_DEFAULT_PALETTE;
@@ -4428,12 +4593,22 @@ class ImasoraJackpotCoinPusherGame {
     this.boundLoop = this.loop.bind(this);
     this.boundResize = this.resize.bind(this);
     this.boundAuto = this.toggleAuto.bind(this);
+    this.boundPrizeOpen = this.openPrizeExchange.bind(this);
+    this.boundPrizeClose = () => this.closePrizeExchange();
+    this.boundPrizeCancel = event => { event.preventDefault(); this.closePrizeExchange(); };
+    this.boundPrizeSelect = () => { this.els.prizeMessage.textContent = ""; this.refreshPrizeExchange(); };
+    this.boundPrizeConfirm = this.confirmPrizeExchange.bind(this);
     this.boundClearJam = this.clearPachinkoJam.bind(this);
     this.boundDevStart = this.triggerDevStartChucker.bind(this);
     this.boundValidationLoad = this.onValidationLoadClick.bind(this);
     this.boundStroke = this.onStrokeInput.bind(this);
     this.boundAdditionalInvestmentYes = this.startAdditionalInvestmentCm.bind(this);
     this.boundAdditionalInvestmentNo = this.declineAdditionalInvestment.bind(this);
+    this.boundAdditionalInvestmentRetry = this.reopenAdditionalInvestmentOffer.bind(this);
+    this.boundAdditionalInvestmentCancel = event => {
+      event.preventDefault();
+      if (!this.rewardedCmActive) this.declineAdditionalInvestment();
+    };
     this.boundVisibility = this.onVisibilityChange.bind(this);
     this.boundPageHide = () => { this.flushPlayCheckpoint(); this.flushPinLayoutSave(); };
     this.boundCheckpointStorage = this.onCheckpointStorage.bind(this);
@@ -4489,6 +4664,16 @@ class ImasoraJackpotCoinPusherGame {
       rapierStats: this.root.querySelector("[data-icp-rapier-stats]"),
       dangerRoomOverlay: this.root.querySelector("[data-icp-danger-room-overlay]"),
       credits: this.root.querySelector("[data-icp-credits]"),
+      prizeOpen: this.root.querySelector("[data-icp-prize-open]"),
+      exchange: this.root.querySelector("[data-icp-exchange]"),
+      prizeDialog: this.root.querySelector("[data-icp-prize-dialog]"),
+      prizeBalance: this.root.querySelector("[data-icp-prize-balance]"),
+      prizeSelect: this.root.querySelector("[data-icp-prize-select]"),
+      prizeSummary: this.root.querySelector("[data-icp-prize-summary]"),
+      prizeMessage: this.root.querySelector("[data-icp-prize-message]"),
+      prizeConfirm: this.root.querySelector("[data-icp-prize-confirm]"),
+      prizeDaily: this.root.querySelector("[data-icp-prize-daily]"),
+      prizeClose: this.root.querySelector("[data-icp-prize-close]"),
       collected: this.root.querySelector("[data-icp-collected]"),
       sevenPanel: this.root.querySelector(".icp-seven-panel"),
       digitLeft: this.root.querySelector("[data-icp-digit-left]"),
@@ -4506,6 +4691,7 @@ class ImasoraJackpotCoinPusherGame {
       investmentActions: this.root.querySelector("[data-icp-investment-actions]"),
       investmentYes: this.root.querySelector("[data-icp-investment-yes]"),
       investmentNo: this.root.querySelector("[data-icp-investment-no]"),
+      investmentRetry: this.root.querySelector("[data-icp-investment-retry]"),
       rewardedCm: this.root.querySelector("[data-icp-rewarded-cm]"),
       rewardedCmProgress: this.root.querySelector("[data-icp-rewarded-cm-progress]"),
       rewardedCmProgressBar: this.root.querySelector("[data-icp-rewarded-cm-progress-bar]"),
@@ -4571,13 +4757,17 @@ class ImasoraJackpotCoinPusherGame {
     this.handleUnlockSound.prepare();
     this.checkerWaitSound.prepare();
     this.wingOpenSound.prepare();
+    this.attackerEntrySound.prepare();
     this.digitalHitSound.prepare();
     this.jackpotRoundSound.prepare();
+    this.roleCoinSound.prepare();
+    this.sharkSounds.forEach(sound => sound.prepare());
     this.jackpotEndingSound.prepare();
     this.root.addEventListener("pointerdown", this.boundDigitalSoundUnlock, true);
     this.root.addEventListener("keydown", this.boundDigitalSoundUnlock, true);
     window.addEventListener("pagehide", this.boundDigitalSoundPageHide);
     this.refreshHud();
+    this.updateGameOver();
     this.resize();
     if (!this.previewOnly) {
       // Submit all initial material programs together so the first frame
@@ -7514,6 +7704,9 @@ class ImasoraJackpotCoinPusherGame {
         shark.scale
       );
       this.updateSingleSharkMechanism(shark, travel, delta);
+      this.sharkSounds[shark.slotIndex].syncTravel(
+        travel, sharkRolePathForScale(shark.scale).activeSeconds
+      );
       if (travel.phase === "incoming") {
         incomingSharkActive = true;
         this.applySharkSuction(
@@ -11568,7 +11761,7 @@ class ImasoraJackpotCoinPusherGame {
       || this.bottomRotaryHandleCoinEmissionPaused
     ) return false;
     if (this.credits <= 0) {
-      this.showCallout("もちコインがありません", 1.3, "warning");
+      this.updateGameOver();
       this.autoEnabled = false;
       this.refreshHud();
       return false;
@@ -11579,6 +11772,7 @@ class ImasoraJackpotCoinPusherGame {
     this.spawnPachinkoToken();
     this.playLaunchSound();
     this.refreshHud();
+    this.updateGameOver();
     return true;
   }
 
@@ -14950,6 +15144,11 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   bindEvents() {
+    this.els.prizeOpen.addEventListener("click", this.boundPrizeOpen);
+    this.els.prizeClose.addEventListener("click", this.boundPrizeClose);
+    this.els.prizeDialog.addEventListener("cancel", this.boundPrizeCancel);
+    this.els.prizeSelect.addEventListener("change", this.boundPrizeSelect);
+    this.els.prizeConfirm.addEventListener("click", this.boundPrizeConfirm);
     this.els.auto.addEventListener("click", this.boundAuto);
     this.els.clearJam.addEventListener("click", this.boundClearJam);
     this.els.devStart.addEventListener("click", this.boundDevStart);
@@ -14963,6 +15162,8 @@ class ImasoraJackpotCoinPusherGame {
       "click",
       this.boundAdditionalInvestmentNo
     );
+    this.els.investmentRetry.addEventListener("click", this.boundAdditionalInvestmentRetry);
+    this.els.gameOver.addEventListener("cancel", this.boundAdditionalInvestmentCancel);
     this.els.layoutEditor.addEventListener("toggle", this.boundEditorToggle);
     this.els.editorBody.addEventListener("click", this.boundEditorClick);
     this.els.editorBody.addEventListener("input", this.boundEditorInput);
@@ -15342,10 +15543,18 @@ class ImasoraJackpotCoinPusherGame {
     if (this.stTongue) this.stTongue.openTimer = 0;
   }
 
+  syncRoleCoinSoundSuppression() {
+    // The ending's real audio lifetime is the boundary, not the later ST delay.
+    this.roleCoinSound.setSuppressed(Boolean(
+      this.attackerStartDelay || this.attackerRound?.active || this.jackpotPostRoundSoundActive
+    ));
+  }
+
   setJackpotPostRoundSoundActive(active) {
     // The ending holds this lock after final closure and releases it on
     // natural completion or cancellation, before the existing ST delay.
     this.jackpotPostRoundSoundActive = Boolean(active);
+    this.syncRoleCoinSoundSuppression();
     if (this.jackpotPostRoundSoundActive) {
       if (this.postJackpotStDelay) {
         this.postJackpotStDelay.remaining = POST_JACKPOT_ST_DELAY_SECONDS;
@@ -15677,6 +15886,13 @@ class ImasoraJackpotCoinPusherGame {
       1
     );
     attacker.openProgress = normalizedProgress;
+    // Coins already accepted inside stay behind the closed door, including
+    // when the next round reopens it. Keep their sensor/payout processing alive.
+    for (const token of this.pachinkoTokens) {
+      if (token.phase !== "attacker") continue;
+      if (normalizedProgress === 0) token.attackerHiddenByClosedDoor = true;
+      token.visual.visible = !token.attackerHiddenByClosedDoor;
+    }
     const angle = lerp(
       attacker.closedAngle,
       attacker.openAngle,
@@ -15800,6 +16016,8 @@ class ImasoraJackpotCoinPusherGame {
     const supportedY = Math.min(token.body.position.y, trayTopY);
     const catchY = Math.max(supportedY, projectedCatchY);
     token.phase = "attacker";
+    token.attackerHiddenByClosedDoor = false;
+    token.visual.visible = true;
     token.attackerElapsed = 0;
     token.attackerEntryZ = token.body.position.z;
     token.attackerEntryX = token.body.position.x;
@@ -16091,6 +16309,7 @@ class ImasoraJackpotCoinPusherGame {
     if (!round?.active) return false;
     round.count += 1;
     this.pendingPayout += HAKAMA_ATTACKER_PAYOUT_PER_COUNT;
+    this.attackerEntrySound.play();
     this.setSpinLabel(
       `ATTACKER ${round.roundNumber}R ${round.count}/${HAKAMA_ATTACKER_COUNT_LIMIT}C`
     );
@@ -16115,6 +16334,7 @@ class ImasoraJackpotCoinPusherGame {
       remaining: ATTACKER_START_DELAY_SECONDS,
       outcome: { ...outcome }
     };
+    this.syncRoleCoinSoundSuppression();
     this.cancelCheckerActionsForJackpot();
     this.setHakamaAttackerOpenProgress(0);
     this.setSpinLabel(`${outcome.code} JACKPOT`);
@@ -16147,6 +16367,7 @@ class ImasoraJackpotCoinPusherGame {
       closePending: false,
       nextStRemaining: outcome.nextStRemaining
     };
+    this.syncRoleCoinSoundSuppression();
     this.cancelCheckerActionsForJackpot();
     this.setHakamaAttackerOpenProgress(1);
     this.jackpotRoundSound.start();
@@ -16514,8 +16735,12 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   updateRoleSideNeon() {
-    if (!this.roleSideNeon) return;
     const roleCoinActive = this.isRoleCoinActive();
+    // Occupancy keeps one voice playing; only the OUT tail outlasts the lamp.
+    // Additional coins cancel a pending stop without restarting the track.
+    this.syncRoleCoinSoundSuppression();
+    this.roleCoinSound.syncRolePresence(roleCoinActive);
+    if (!this.roleSideNeon) return;
     const normalPhase = this.elapsed * Math.PI * 2 / ROLE_SIDE_NEON_PULSE_SECONDS;
     const normalPulse = (Math.sin(normalPhase) + 1) / 2;
     const alertPhase = this.elapsed * Math.PI * 2 / ROLE_SIDE_NEON_ALERT_BLINK_SECONDS;
@@ -18472,6 +18697,7 @@ class ImasoraJackpotCoinPusherGame {
         const reachedRearOut = token.body.position.z <= ROLE_OUT_TRIGGER_BODY_Z;
         if (reachedRearOut || token.roleOutDepthElapsed >= ROLE_OUT_MAX_SECONDS) {
           this.removePachinkoToken(index);
+          if (token.entryAuthorized && !this.isRoleCoinActive()) this.roleCoinSound.stopAfterOut();
           continue;
         }
       }
@@ -18568,8 +18794,10 @@ class ImasoraJackpotCoinPusherGame {
             centerY: ROLE_SIDE_OUT_POCKET_CENTER_Y,
             depthVisualZ: ROLE_SIDE_OUT_DEPTH_VISUAL_Z
           });
+          if (token.entryAuthorized && !this.isRoleCoinActive()) this.roleCoinSound.stopAfterOut();
         } else {
           this.removePachinkoToken(index);
+          if (!this.isRoleCoinActive()) this.roleCoinSound.stop();
         }
         continue;
       }
@@ -18956,34 +19184,111 @@ class ImasoraJackpotCoinPusherGame {
     this.collected += value;
     this.credits += value;
     this.zeroCreditTimer = 0;
-    const exchange = this.tryWorkshopCoinExchange();
     this.refreshHud();
-    if (exchange) {
-      this.showCallout(
-        `換金成立！もちコイン${exchange.spentCredits}枚 → 整備パーツ +${exchange.arcadeParts}`,
-        2.2,
-        "jackpot"
-      );
-      try {
-        this.onWorkshopExchange?.(exchange);
-      } catch (error) {
-        console.error("UFO整備素材の換金処理に失敗しました。", error);
-      }
+  }
+
+  openPrizeExchange() {
+    if (this.destroyed || this.previewOnly || this.navigationPaused || this.pendingStationChange
+      || this.layoutEditing || this.els.gameOver.open || this.prizeExchangeRecoveryBlocked) return false;
+    if (!this.setNavigationPaused(true) || this.checkpointSuperseded) return false;
+    this.prizeExchangeActive = true;
+    this.workshopDailyStatus(true);
+    this.els.prizeSelect.checked = false;
+    this.els.prizeMessage.textContent = "";
+    this.refreshPrizeExchange();
+    this.els.prizeDialog.hidden = false;
+    this.els.prizeDialog.showModal();
+    return true;
+  }
+
+  closePrizeExchange(resume = true) {
+    if (!this.prizeExchangeActive || this.prizeExchangeBusy) return;
+    this.prizeExchangeActive = false;
+    this.els.prizeDialog.close();
+    this.els.prizeDialog.hidden = true;
+    this.els.prizeSelect.checked = false;
+    if (resume && !this.destroyed && !this.prizeExchangeRecoveryBlocked) {
+      this.setNavigationPaused(false);
+      this.els.prizeOpen.focus({ preventScroll: true });
     }
   }
 
-  tryWorkshopCoinExchange() {
-    if (this.previewOnly) return null;
-    if (this.credits < UFO_WORKSHOP_EXCHANGE_MIN_CREDITS) return null;
-    const heldCreditsBefore = this.credits;
-    this.credits = Math.max(0, this.credits - UFO_WORKSHOP_EXCHANGE_COST);
-    return {
-      heldCreditsBefore,
-      heldCreditsAfter: this.credits,
-      spentCredits: UFO_WORKSHOP_EXCHANGE_COST,
-      arcadeParts: UFO_WORKSHOP_EXCHANGE_REWARD,
-      elapsed: this.elapsed
-    };
+  workshopDailyStatus(fresh = false) {
+    if (!this.getWorkshopDailyStatus) return { reached: false, unavailable: false, used: 0, limit: 5 };
+    try { return this.getWorkshopDailyStatus(fresh); }
+    catch { return { reached: true, unavailable: true, used: 5, limit: 5 }; }
+  }
+
+  refreshPrizeExchange() {
+    const daily = this.workshopDailyStatus();
+    const eligible = this.credits >= UFO_WORKSHOP_EXCHANGE_MIN_CREDITS && !daily.reached && !daily.unavailable;
+    this.els.prizeOpen.disabled = this.previewOnly || this.checkpointSuperseded || this.prizeExchangeRecoveryBlocked;
+    this.els.prizeOpen.classList.toggle("is-ready", eligible);
+    this.els.exchange.textContent = daily.unavailable ? "記録を確認" : daily.reached ? "本日交換済み" : eligible ? "交換できます" : "350枚から";
+    this.els.prizeBalance.textContent = String(this.credits);
+    this.els.prizeSelect.disabled = daily.reached || daily.unavailable || this.prizeExchangeBusy;
+    this.els.prizeClose.disabled = Boolean(this.prizeExchangeBusy);
+    this.els.prizeConfirm.disabled = !eligible || !this.els.prizeSelect.checked
+      || typeof this.onWorkshopExchange !== "function" || this.prizeExchangeBusy
+      || this.checkpointSuperseded || this.prizeExchangeRecoveryBlocked;
+    this.els.prizeDaily.textContent = daily.unavailable
+      ? "本日の獲得記録を確認できません。保存設定を確認してから開き直してください。"
+      : daily.reached
+        ? "本日の景品交換は上限5回（整備パーツ10個）に達しました。明日また交換できます。"
+        : `本日の交換：${daily.used}/5回（整備パーツは最大10個・全台共通）。日本時間0時にリセット。`;
+    this.els.prizeSummary.textContent = daily.reached || daily.unavailable
+      ? "もちコインはそのままです。ゲームは引き続き遊べます。"
+      : !eligible
+        ? "交換するには、あと" + (UFO_WORKSHOP_EXCHANGE_MIN_CREDITS - this.credits) + "枚必要です。"
+        : this.els.prizeSelect.checked
+          ? "交換後のもちコイン：" + (this.credits - UFO_WORKSHOP_EXCHANGE_COST) + "枚"
+          : "景品を選んでください。";
+  }
+
+  async confirmPrizeExchange() {
+    if (!this.prizeExchangeActive || !this.els.prizeDialog.open || this.prizeExchangeBusy
+      || this.prizeExchangeRecoveryBlocked || this.checkpointSuperseded || this.previewOnly
+      || !this.els.prizeSelect.checked || this.credits < UFO_WORKSHOP_EXCHANGE_MIN_CREDITS
+      || typeof this.onWorkshopExchange !== "function") return false;
+    this.prizeExchangeBusy = true;
+    this.els.prizeSelect.checked = false;
+    this.refreshPrizeExchange();
+    try {
+      const commit = () => {
+        if (this.destroyed || !this.prizeExchangeActive || !this.els.prizeDialog.open) return false;
+        const daily = this.workshopDailyStatus(true);
+        if (daily.unavailable) throw new Error("daily record unavailable");
+        if (daily.reached) { const error = new Error("daily limit reached"); error.dailyLimitReached = true; throw error; }
+        if (this.checkpointDay !== pachicoinAdjustmentDayKey()) throw new Error("day changed");
+        this.flushPlayCheckpoint();
+        if (this.checkpointSuperseded) throw new Error("another game resumed");
+        const result = this.onWorkshopExchange({
+          heldCreditsBefore: this.credits, heldCreditsAfter: this.credits - UFO_WORKSHOP_EXCHANGE_COST,
+          spentCredits: UFO_WORKSHOP_EXCHANGE_COST, arcadeParts: UFO_WORKSHOP_EXCHANGE_REWARD,
+          dayKey: this.checkpointDay, writerId: this.checkpointWriterId
+        });
+        if (result?.committed !== true) throw new Error("exchange was not saved");
+        // Keep the in-memory balance in the same locked task as both saved balances.
+        this.credits -= UFO_WORKSHOP_EXCHANGE_COST;
+        this.workshopDailyStatus(true);
+        this.refreshHud();
+        this.els.prizeMessage.textContent = "整備パーツ2個を受け取りました。もちコインは残り" + this.credits + "枚です。"
+          + (result.dailyStatus?.reached ? " 本日の上限5回に達しました。明日また交換できます。" : "");
+        return true;
+      };
+      return await (this.withWorkshopRewardLock ? this.withWorkshopRewardLock(commit) : commit());
+    } catch (error) {
+      this.prizeExchangeRecoveryBlocked = error?.exchangeRecoveryRequired === true;
+      this.els.prizeMessage.textContent = this.prizeExchangeRecoveryBlocked
+        ? "交換の保存を確認するため、ゲームを一時停止しました。保存設定を確認してから画面を開き直してください。"
+        : error?.dailyLimitReached
+          ? "本日の景品交換は上限5回に達しました。もちコインは使用していません。明日また交換できます。"
+          : "交換できませんでした。もちコインは使用していません。保存設定や日付、別の画面でのプレイを確認してください。";
+      return false;
+    } finally {
+      this.prizeExchangeBusy = false;
+      if (!this.destroyed) this.refreshPrizeExchange();
+    }
   }
 
   removeCoin(index) {
@@ -19118,6 +19423,7 @@ class ImasoraJackpotCoinPusherGame {
       this.stRemaining = outcome.nextStRemaining;
     }
     if (outcome.kind === "big" || outcome.kind === "small") {
+      this.roleCoinSound.setSuppressed(true);
       if (outcome.code === "77" || outcome.code === "33") this.digitalHitSound.play();
       this.recordPachinkoDataLampJackpot(outcome.code);
     }
@@ -19304,31 +19610,22 @@ class ImasoraJackpotCoinPusherGame {
     this.boardLcdTexture.needsUpdate = true;
   }
 
-  updateGameOver(delta) {
-    if (this.gameOver) return;
+  updateGameOver() {
+    if (this.previewOnly || this.destroyed) return;
     if (this.credits > 0) {
       this.zeroCreditTimer = 0;
+      // The last coin and pending awards keep running behind the offer.
+      // Return to play if they replenish the balance before CM starts.
+      if (this.gameOver && !this.rewardedCmActive) {
+        this.gameOver = false;
+        this.closeAdditionalInvestmentOffer();
+        this.refreshHud();
+      }
       return;
     }
-    if (this.autoEnabled) {
-      this.autoEnabled = false;
-      this.refreshHud();
-    }
-    const resultStillMoving = this.pachinkoTokens.length > 0
-      || this.sharkEatenCoins.length > 0
-      || this.pendingPayout > 0
-      || this.pendingSpins > 0
-      || Boolean(this.spin)
-      || Boolean(this.attackerStartDelay)
-      || Boolean(this.attackerRound)
-      || Boolean(this.postJackpotStDelay)
-      || this.spinDelay > 0;
-    if (resultStillMoving) {
-      this.zeroCreditTimer = 0;
-      return;
-    }
-    this.zeroCreditTimer += delta;
-    if (this.zeroCreditTimer >= GAME_OVER_GRACE_SECONDS) this.endGame();
+    // Show once per empty balance, including while a result is in flight.
+    // gameOver also keeps a declined offer or an active CM from reopening.
+    if (!this.gameOver) this.endGame();
   }
 
   persistLocalValue(key, value) {
@@ -19415,6 +19712,7 @@ class ImasoraJackpotCoinPusherGame {
       if (this.spin.stage === 'rolling') this.digitalSpinSound.start(this.spin);
       else if (this.spin.stage === 'blinking') this.digitalBlinkSound.start();
     }
+    this.syncRoleCoinSoundSuppression();
     if (this.attackerRound?.active) {
       this.jackpotRoundSound.start();
       this.setSpinLabel(`ATTACKER ${this.attackerRound.roundNumber}R ${this.attackerRound.count}/${HAKAMA_ATTACKER_COUNT_LIMIT}C`);
@@ -19449,7 +19747,7 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   flushPlayCheckpoint(claim = false) {
-    if (this.previewOnly || !this.checkpointReady || this.destroyed || this.checkpointSuperseded) return;
+    if (this.previewOnly || !this.checkpointReady || this.destroyed || this.checkpointSuperseded || this.prizeExchangeRecoveryBlocked) return;
     if (this.checkpointFrameActive) { this.checkpointDirty = true; return; }
     const today = pachicoinAdjustmentDayKey();
     // A game left open across midnight cannot overwrite the next day's balance.
@@ -19519,6 +19817,9 @@ class ImasoraJackpotCoinPusherGame {
 
 
   showAdditionalInvestmentOffer() {
+    clearInterval(this.rewardedCmTimer);
+    this.rewardedCmTimer = 0;
+    this.rewardedCmLastTimestamp = null;
     this.rewardedCmActive = false;
     this.rewardedCmElapsed = 0;
     this.els.investmentStatus.textContent = "COIN OUT";
@@ -19533,17 +19834,44 @@ class ImasoraJackpotCoinPusherGame {
     this.els.rewardedCmCountdown.textContent = String(
       ADDITIONAL_INVESTMENT_CM_SECONDS
     );
+    // The top layer stays visible even when the player is scrolled to the handle.
+    this.els.gameOver.hidden = false;
+    if (!this.els.gameOver.open) this.els.gameOver.showModal();
+    this.root.classList.add("is-game-over");
+    this.els.investmentRetry.hidden = true;
+  }
+
+  closeAdditionalInvestmentOffer() {
+    clearInterval(this.rewardedCmTimer);
+    this.rewardedCmTimer = 0;
+    this.rewardedCmLastTimestamp = null;
+    this.els.gameOver.close();
+    this.els.gameOver.hidden = true;
+    this.root.classList.remove("is-game-over");
+  }
+
+  reopenAdditionalInvestmentOffer() {
+    if (this.destroyed || this.previewOnly || this.navigationPaused || this.checkpointSuperseded
+      || this.credits > 0 || this.rewardedCmActive) return false;
+    this.gameOver = true;
+    this.showAdditionalInvestmentOffer();
+    return true;
   }
 
   startAdditionalInvestmentCm() {
     if (
       this.destroyed
+      || this.navigationPaused
+      || this.checkpointSuperseded
       || !this.gameOver
       || this.credits > 0
       || this.rewardedCmActive
     ) return false;
     this.rewardedCmActive = true;
     this.rewardedCmElapsed = 0;
+    this.rewardedCmLastTimestamp = performance.now();
+    // CM time must not depend on the physics frame rate or a clamped game delta.
+    this.rewardedCmTimer = window.setInterval(() => this.updateRewardedCm(), 100);
     this.els.investmentStatus.textContent = "REWARDED CM";
     this.els.investmentTitle.textContent = "CM視聴中";
     this.els.investmentMessage.textContent = (
@@ -19556,17 +19884,21 @@ class ImasoraJackpotCoinPusherGame {
 
   declineAdditionalInvestment() {
     if (this.destroyed || !this.gameOver || this.rewardedCmActive) return false;
-    this.els.gameOver.hidden = true;
-    this.root.classList.remove("is-game-over");
+    this.closeAdditionalInvestmentOffer();
+    this.refreshHud();
     this.showCallout("追加投資を見送りました", 1.4, "normal");
     return true;
   }
 
-  updateRewardedCm(delta) {
-    if (!this.rewardedCmActive || document.hidden) return;
+  updateRewardedCm() {
+    if (!this.rewardedCmActive || this.destroyed) return;
+    const now = performance.now();
+    const previous = this.rewardedCmLastTimestamp ?? now;
+    this.rewardedCmLastTimestamp = now;
+    if (document.hidden || this.navigationPaused || this.checkpointSuperseded) return;
     this.rewardedCmElapsed = Math.min(
       ADDITIONAL_INVESTMENT_CM_SECONDS,
-      this.rewardedCmElapsed + delta
+      this.rewardedCmElapsed + Math.max(0, (now - previous) / 1000)
     );
     const progress = this.rewardedCmElapsed / ADDITIONAL_INVESTMENT_CM_SECONDS;
     const percentage = Math.round(progress * 100);
@@ -19589,31 +19921,32 @@ class ImasoraJackpotCoinPusherGame {
     if (!this.rewardedCmActive || this.destroyed) return false;
     this.rewardedCmActive = false;
     this.rewardedCmElapsed = ADDITIONAL_INVESTMENT_CM_SECONDS;
-    this.credits = STARTING_CREDITS;
+    // Preserve coins awarded by the last shot while the CM was running.
+    this.credits += STARTING_CREDITS;
     this.zeroCreditTimer = 0;
     this.gameOver = false;
-    this.els.gameOver.hidden = true;
-    this.root.classList.remove("is-game-over");
+    this.closeAdditionalInvestmentOffer();
     this.showCallout("もちコイン250枚を受け取りました", 1.8, "chance");
     this.refreshHud();
     return true;
   }
 
   endGame() {
-    if (this.gameOver || this.credits > 0) return;
+    if (this.previewOnly || this.destroyed || this.gameOver || this.credits > 0) return;
     this.gameOver = true;
-    this.endBottomRotaryHandleStopLeverHold();
-    this.endBottomRotaryHandleDrag();
     this.autoEnabled = false;
     this.showAdditionalInvestmentOffer();
-    this.els.gameOver.hidden = false;
-    this.root.classList.add("is-game-over");
+    this.endBottomRotaryHandleStopLeverHold();
+    this.endBottomRotaryHandleDrag();
     this.refreshHud();
   }
 
   refreshHud() {
     this.persistDailyHeldCoinState();
     this.els.credits.textContent = String(this.credits);
+    this.refreshPrizeExchange();
+    this.els.investmentRetry.hidden = this.credits > 0 || !this.gameOver
+      || !this.els.gameOver.hidden || this.rewardedCmActive;
     this.els.collected.textContent = String(this.collected);
     this.els.st.hidden = this.stRemaining <= 0;
     this.els.stCount.textContent = String(this.stRemaining);
@@ -19671,15 +20004,24 @@ class ImasoraJackpotCoinPusherGame {
   navigationSounds() {
     return [this.digitalSpinSound, this.digitalBlinkSound, this.startCheckerSound,
       this.digitalMissSound, this.handleLockSound, this.handleUnlockSound,
-      this.checkerWaitSound, this.wingOpenSound, this.digitalHitSound,
-      this.digitalHitSound.fanfareSound, this.jackpotRoundSound, this.jackpotEndingSound];
+      this.checkerWaitSound, this.wingOpenSound, this.attackerEntrySound, this.digitalHitSound,
+      this.digitalHitSound.fanfareSound, this.jackpotRoundSound, this.roleCoinSound,
+      ...this.sharkSounds, this.jackpotEndingSound];
   }
 
   setNavigationPaused(paused) {
     if (this.destroyed || this.previewOnly) return false;
+    if (!paused && this.prizeExchangeRecoveryBlocked) return false;
+    this.rewardedCmLastTimestamp = performance.now();
     paused = Boolean(paused);
     if (!paused && (this.checkpointSuperseded || this.restartExpiredInterruption())) return false;
     if (paused) this.flushPlayCheckpoint();
+    // A paused/superseded game must never retain a modal whose CM cannot finish.
+    if (paused && this.els.gameOver.open) {
+      this.rewardedCmActive = false;
+      this.closeAdditionalInvestmentOffer();
+      this.refreshHud();
+    }
     if (paused === this.navigationPaused) return true;
     this.navigationPaused = paused;
     this.root.dataset.pachicoinPaused = String(paused);
@@ -19770,6 +20112,7 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   onVisibilityChange() {
+    this.rewardedCmLastTimestamp = performance.now();
     if (document.hidden) this.flushPlayCheckpoint();
     else if (this.restartExpiredInterruption()) return;
     if (this.navigationPaused) {
@@ -19781,8 +20124,11 @@ class ImasoraJackpotCoinPusherGame {
     if (document.hidden) {
       this.checkerWaitSound.pause();
       this.wingOpenSound.stop();
+      this.attackerEntrySound.stop();
       this.digitalHitSound.stop();
       this.jackpotRoundSound.pause();
+      this.roleCoinSound.pause();
+      this.sharkSounds.forEach(sound => sound.pause());
       this.jackpotEndingSound.stop();
       this.digitalSpinSound.pause();
       this.digitalBlinkSound.stop();
@@ -19790,6 +20136,8 @@ class ImasoraJackpotCoinPusherGame {
       this.digitalSpinSound.sync();
       this.checkerWaitSound.unlock();
       this.jackpotRoundSound.unlock();
+      this.roleCoinSound.unlock();
+      this.sharkSounds.forEach(sound => sound.unlock());
     }
     cancelAnimationFrame(this.frame);
     this.frame = 0;
@@ -19869,7 +20217,6 @@ class ImasoraJackpotCoinPusherGame {
     this.updateSharkMechanism(delta);
     this.updateSharkDangerWarning();
     this.updateUiTimers(delta);
-    this.updateRewardedCm(delta);
     this.updateBottomRotaryHandle(delta);
     this.updateAttackerStartDelay(delta);
     this.updatePostJackpotStTransition(delta);
@@ -19906,7 +20253,7 @@ class ImasoraJackpotCoinPusherGame {
     this.updatePachinkoDataLamp(delta);
     this.updateBallReturnGate(delta);
     this.updateTableCoins(delta);
-    this.updateGameOver(delta);
+    this.updateGameOver();
     this.updateCamera(delta);
     // A frame is one payout transaction: credit increments, pending payout
     // decrements and consumed tokens are all complete before saving together.
@@ -19937,8 +20284,11 @@ class ImasoraJackpotCoinPusherGame {
     this.handleUnlockSound.destroy();
     this.checkerWaitSound.destroy();
     this.wingOpenSound.destroy();
+    this.attackerEntrySound.destroy();
     this.digitalHitSound.destroy();
     this.jackpotRoundSound.destroy();
+    this.roleCoinSound.destroy();
+    this.sharkSounds.forEach(sound => sound.destroy());
     this.jackpotEndingSound.destroy();
     this.root.removeEventListener("pointerdown", this.boundDigitalSoundUnlock, true);
     this.root.removeEventListener("keydown", this.boundDigitalSoundUnlock, true);
@@ -19950,6 +20300,12 @@ class ImasoraJackpotCoinPusherGame {
     this.destroyed = true;
     cancelAnimationFrame(this.frame);
     this.resizeObserver?.disconnect();
+    this.closePrizeExchange(false);
+    this.els?.prizeOpen?.removeEventListener("click", this.boundPrizeOpen);
+    this.els?.prizeClose?.removeEventListener("click", this.boundPrizeClose);
+    this.els?.prizeDialog?.removeEventListener("cancel", this.boundPrizeCancel);
+    this.els?.prizeSelect?.removeEventListener("change", this.boundPrizeSelect);
+    this.els?.prizeConfirm?.removeEventListener("click", this.boundPrizeConfirm);
     this.els?.auto?.removeEventListener("click", this.boundAuto);
     this.els?.clearJam?.removeEventListener("click", this.boundClearJam);
     this.els?.devStart?.removeEventListener("click", this.boundDevStart);
@@ -19963,6 +20319,10 @@ class ImasoraJackpotCoinPusherGame {
       "click",
       this.boundAdditionalInvestmentNo
     );
+    this.rewardedCmActive = false;
+    if (this.els?.gameOver) this.closeAdditionalInvestmentOffer();
+    this.els?.investmentRetry?.removeEventListener("click", this.boundAdditionalInvestmentRetry);
+    this.els?.gameOver?.removeEventListener("cancel", this.boundAdditionalInvestmentCancel);
     this.els?.layoutEditor?.removeEventListener("toggle", this.boundEditorToggle);
     this.els?.editorBody?.removeEventListener("click", this.boundEditorClick);
     this.els?.editorBody?.removeEventListener("input", this.boundEditorInput);

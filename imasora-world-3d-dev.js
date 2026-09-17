@@ -1,10 +1,13 @@
+import {createLookControls} from './assets/imasora-world-look-controls.js?v=492';
 import * as THREE from "./assets/three.module.min.js";
-import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=476';
+import {observeWorldCanvasSize} from './assets/imasora-world-canvas-size.js?v=490';
+import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=492';
+import {ExcavationLedgerSession,excavationLedgerPreview} from './assets/imasora-construction-excavation-session.js';
 import {createUfoFlightSurveyView} from './assets/imasora-ufo-flight-survey.js?v=464';
 import {WorldSaveService,worldSaveMode,WORKSHOP_MATERIAL_KEY} from './assets/imasora-world-save-service.js?v=460';
-import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=463';
-import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=463';
-import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=463';
+import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=492';
+import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=492';
+import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=492';
 import {DELIVERY_SITES,DELIVERY_SIZE,deliveryAccess,chooseDeliverySite} from './assets/imasora-construction-delivery.js?v=456';
 import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=457';
 import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=452';
@@ -47,7 +50,9 @@ let worldSoilController=null;
 const CONSTRUCTION_TIMBER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionTimberPreview')==='1';
 const CONSTRUCTION_TIMBER_PRACTICE=CONSTRUCTION_TIMBER_PREVIEW&&new URLSearchParams(location.search).get('constructionTimberPractice')==='1';
 let worldTimberController=null;
-const CONSTRUCTION_EXCAVATION_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionExcavationPreview')==='1';
+const CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW=excavationLedgerPreview(location.search,location.hostname);
+const CONSTRUCTION_EXCAVATION_PREVIEW=CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW||(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionExcavationPreview')==='1');
+let excavationLedgerSession=null;
 let worldExcavationController=null;
 const CONSTRUCTION_DELIVERY_PREVIEW=WORLD_SHOP_PREVIEW && new URLSearchParams(location.search).get('constructionDeliveryPreview')==='1';
 let constructionDeliveryMenu=null,constructionDeliveryDock=null,constructionDeliveryCollider=null,constructionDeliverySite=-1;
@@ -192,14 +197,14 @@ const UFO_EQUIPMENT_RECIPES = Object.freeze([
     id: "energy-absorption-tank-1",
     label: "エネルギー吸収増タンク I",
     effect: "エネルギー星を破壊した時の回復量を 10 → 12 に増やす。",
-    costs: Object.freeze({ cloudFiber: 4, arcadeParts: 3 }),
+    costs: Object.freeze({ cloudFiber: 4, arcadeParts: 4 }),
     value: 1,
   }),
   Object.freeze({
     id: "energy-absorption-tank-2",
     label: "エネルギー吸収増タンク II",
     effect: "エネルギー星を破壊した時の回復量を 12 → 15 に増やす。",
-    costs: Object.freeze({ cloudFiber: 6, arcadeParts: 5 }),
+    costs: Object.freeze({ cloudFiber: 6, arcadeParts: 8 }),
     value: 2,
     requires: "energy-absorption-tank-1",
   }),
@@ -207,19 +212,19 @@ const UFO_EQUIPMENT_RECIPES = Object.freeze([
     id: "simultaneous-shot",
     label: "＋α同時発射弾丸装置",
     effect: "射撃時に追尾弾を1発追加し、2発を同時に発射する。",
-    costs: Object.freeze({ skySightCrystal: 4, arcadeParts: 5 }),
+    costs: Object.freeze({ skySightCrystal: 4, arcadeParts: 6 }),
   }),
   Object.freeze({
     id: "lock-on-reticle-radar",
     label: "ロックオン照準1.2倍拡大レーダー",
     effect: "照準枠とロックON判定を1.2倍に広げる。",
-    costs: Object.freeze({ skySightCrystal: 3, arcadeParts: 3 }),
+    costs: Object.freeze({ skySightCrystal: 3, arcadeParts: 5 }),
   }),
   Object.freeze({
     id: "lock-on-range-radar",
     label: "ロックオン探知距離1.2倍拡張レーダー",
     effect: "ロックONできる探知距離を1.2倍に拡張する。",
-    costs: Object.freeze({ skySightCrystal: 5, arcadeParts: 6 }),
+    costs: Object.freeze({ skySightCrystal: 6, arcadeParts: 8 }),
   }),
 ]);
 // 開発画面専用の一時装備プロファイル。保存データや素材台帳は一切変更せず、
@@ -1300,9 +1305,7 @@ let touchStartY = 0;
 let lastTouchTapAt = 0;
 let lastMovementTapAt = 0;
 let lastMovementTapKey = "";
-let lookPointerId = null;
-let lookLastX = 0;
-let lookLastY = 0;
+let lookControls = null;
 let toastTimer;
 let ufoEngineStartAudio = null;
 let ufoEngineStartAudioPrimed = false;
@@ -2059,7 +2062,7 @@ function emergencyEscape() {
   keys.clear();
   touchVector.set(0, 0);
   touchPointerId = null;
-  lookPointerId = null;
+  lookControls?.cancel();
   els.touchStick.style.transform = "translate(-50%, -50%)";
   els.viewport.classList.remove("is-looking");
 
@@ -23538,7 +23541,7 @@ function clearMarsShopDialogInput() {
   keys.clear();
   touchVector.set(0, 0);
   touchPointerId = null;
-  lookPointerId = null;
+  lookControls?.cancel();
   state.fastWalking = false;
   els.touchStick.style.transform = 'translate(-50%, -50%)';
   els.viewport.classList.remove('is-looking');
@@ -24909,8 +24912,8 @@ function updateCamera() {
   els.cameraDistanceButton.textContent = `距離：${THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label}`;
   els.viewport.classList.toggle("is-first-person", state.cameraMode === "first");
   els.touchHint.textContent = state.cameraMode === "first"
-    ? "移動：WASD / 左パッド　同じ方向を素早く2回：速歩（停止で解除）　Space：最大3段ジャンプ　視点：右側ドラッグ"
-    : "左パッド：画面基準で移動　同じ方向を素早く2回：速歩（停止で解除）　Space：最大3段ジャンプ　右側ドラッグ：カメラ回転";
+    ? "移動：WASD / 左パッド　同じ方向を素早く2回：速歩（停止で解除）　Space：最大3段ジャンプ　視点：3D画面をスライド／左ドラッグ"
+    : "左パッド：画面基準で移動　同じ方向を素早く2回：速歩（停止で解除）　Space：最大3段ジャンプ　3D画面をスライド／左ドラッグ：カメラ回転";
 }
 
 function startMarsArrivalDevelopmentPreview() {
@@ -25014,6 +25017,7 @@ function startMarsArrivalDevelopmentPreview() {
 }
 
 function setMap(key) {
+  lookControls?.cancel();
   if(typeof worldExcavationController!=='undefined'&&worldExcavationController?.active){worldExcavationController.leave({force:true,then:()=>setMap(key)});return;}
   if(typeof worldWaterController!=='undefined'&&worldWaterController?.active){void worldWaterController.leave({force:true,then:()=>setMap(key)});return;}
   if(typeof worldSoilController!=='undefined'&&worldSoilController?.active){void worldSoilController.leave({force:true,then:()=>setMap(key)});return;}
@@ -25095,38 +25099,18 @@ function setupTouchPad() {
 }
 
 function setupLookControls() {
-  els.viewport.addEventListener("pointerdown", event => {
-    if (marsShopDialogState.open) return;
-    // パッド上の距離ボタンは視点ドラッグとして扱わず、
-    // タップをボタン自身のクリック処理へ渡す。
-    if (event.target.closest("#touchPad, #cameraDistanceButton, #emergencyEscapeButton, #ufoFlightControls, #ufoSpaceCombat")) return;
-    const rect = els.viewport.getBoundingClientRect();
-    if (event.pointerType === "touch" && event.clientX < rect.left + rect.width * .42) return;
-    lookPointerId = event.pointerId;
-    lookLastX = event.clientX;
-    lookLastY = event.clientY;
-    els.viewport.setPointerCapture(lookPointerId);
-    els.viewport.classList.add("is-looking");
+  lookControls = createLookControls({element:els.canvas,indicator:els.viewport,
+    context(){
+      if(marsShopDialogState.open||document.querySelector('dialog[open]')||(state.ufoBoarded&&state.ufoEngineMode!=='idle'))return null;
+      return [worldExcavationController,worldWaterController,worldSoilController,worldTimberController].find(controller=>controller?.active)||state.map+'/'+state.cameraMode;
+    },
+    onDelta(dx,dy,type,owner){
+      const sensitivity=type==='touch'?LOOK_TOUCH_SENSITIVITY:LOOK_MOUSE_SENSITIVITY;
+      if(typeof owner==='object'){owner.look(dx,dy,sensitivity);return;}
+      state.viewHeading-=dx*sensitivity;
+      state.viewPitch=clamp(state.viewPitch-dy*sensitivity*.78,state.cameraMode==='first'?LOOK_PITCH_MIN:THIRD_PERSON_PITCH_MIN,state.cameraMode==='first'?LOOK_PITCH_MAX:THIRD_PERSON_PITCH_MAX);
+    }
   });
-  els.viewport.addEventListener("pointermove", event => {
-    if (event.pointerId !== lookPointerId) return;
-    const sensitivity = event.pointerType === "touch" ? LOOK_TOUCH_SENSITIVITY : LOOK_MOUSE_SENSITIVITY;
-    const dx = event.clientX - lookLastX;
-    const dy = event.clientY - lookLastY;
-    lookLastX = event.clientX;
-    lookLastY = event.clientY;
-    state.viewHeading -= dx * sensitivity;
-    const pitchMin = state.cameraMode === "first" ? LOOK_PITCH_MIN : THIRD_PERSON_PITCH_MIN;
-    const pitchMax = state.cameraMode === "first" ? LOOK_PITCH_MAX : THIRD_PERSON_PITCH_MAX;
-    state.viewPitch = clamp(state.viewPitch - dy * sensitivity * .78, pitchMin, pitchMax);
-  });
-  const endLook = event => {
-    if (event.pointerId !== lookPointerId) return;
-    lookPointerId = null;
-    els.viewport.classList.remove("is-looking");
-  };
-  els.viewport.addEventListener("pointerup", endLook);
-  els.viewport.addEventListener("pointercancel", endLook);
 }
 
 function setupUfoFlightControls() {
@@ -25641,7 +25625,7 @@ function setupScene() {
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
     }});
-  if(CONSTRUCTION_EXCAVATION_PREVIEW)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,
+  if(CONSTRUCTION_EXCAVATION_PREVIEW)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,persistence:excavationLedgerSession,
     onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   rebuildMap();
   setupConstructionExpansionPreview();
@@ -25669,7 +25653,7 @@ function setupScene() {
   }
   if(CONSTRUCTION_EXCAVATION_PREVIEW){
     const p=worldExcavationController.previewSpawn();if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
-    els.saveState.textContent='ショベルカー本体接続の練習（保存しません）';
+    els.saveState.textContent=CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW?'掘削の保存接続確認（通常セーブは保護）':'ショベルカー本体接続の練習（保存しません）';
   }
   if ((MARS_SHOPKEEPER_PREVIEW || WORLD_SHOP_PREVIEW) && marsShopkeeper) {
     const shop=marsShopkeeper.parent;
@@ -25710,7 +25694,7 @@ function setupScene() {
   startUfoSpaceTransitionTestIfRequested();
   startUfoActualAscentTestIfRequested();
   updateCamera();
-  const resize = () => { const rect = els.viewport.getBoundingClientRect(); renderer.setSize(rect.width, rect.height, false); camera.aspect = rect.width / Math.max(1, rect.height); camera.updateProjectionMatrix(); }; window.addEventListener("resize", resize); resize();
+  observeWorldCanvasSize({canvas:els.canvas,renderer,camera});
   els.statusText.textContent = "歩行可能";
   requestAnimationFrame(frame);
 }
@@ -25858,7 +25842,7 @@ function wireUI() {
     state.cameraMode = state.cameraMode === "third" ? "first" : "third";
     state.viewHeading = state.heading;
     state.viewPitch = 0;
-    lookPointerId = null;
+    lookControls?.cancel();
     els.viewport.classList.remove("is-looking");
     showToast(`${state.cameraMode === "third" ? "三人称" : "一人称・目線"}視点に切り替えました`);
   });
@@ -25962,6 +25946,7 @@ async function startSavedWorld() {
   const mode=CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
   worldSaveErrorUI=createWorldSaveErrorUI({retry:async()=>{
     await worldSaveService.retry();
+    if(CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW&&!worldBooted){excavationLedgerSession??=new ExcavationLedgerSession();await excavationLedgerSession.initialize(worldSaveService.world);}
     if(!worldBooted)activateSavedWorld(worldSaveService.world);
     else{Object.assign(state.ufoEquipment,worldSaveService.world.ufoEquipment);Object.assign(state.ufoResources,worldSaveService.world.ufoResources);refreshUfoEquipmentVisuals();renderUfoEquipmentWorkshopMenu();}
   },exportRecord:()=>worldSaveService.exportRecovery()});
@@ -25971,6 +25956,7 @@ async function startSavedWorld() {
     onChange:s=>{state.saved=!s.busy&&!s.blocked;els.saveState.textContent=s.blocked?'保存の確認が必要':s.busy?'保存中…':mode==='integration'?'保存済み（接続確認専用）':'保存済み';constructionDeliveryMenu?.refresh();},
   });
   const saved=await worldSaveService.initialize(worldStateSnapshot());
+  if(CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW){excavationLedgerSession=new ExcavationLedgerSession();await excavationLedgerSession.initialize(saved);}
   activateSavedWorld(saved);
 }
 function activateSavedWorld(saved) {
