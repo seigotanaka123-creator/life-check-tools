@@ -3,29 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>イマソラ3Dワールド基盤 開発</title>
-  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=492">
+  <title>イマソラーズウォーク｜冒険マップ</title>
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=119bf">
+  <link rel="stylesheet" href="./assets/imasora-hold-dash.css?v=119bf">
   <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=450">
-  <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=456">
+  <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=531">
   <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=457">
   <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=459">
   <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=460">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=490">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=498">
   <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=464">
-  <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=491-verified3">
+  <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=119be">
+  <link rel="stylesheet" href="./assets/imasora-world-map-menu.css?v=511">
+  <script src="./assets/imasora-game-touch-guard.js?v=119bg"></script>
+<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=119bm">
 </head>
-<body>
+<body class="world-player-game">
   <main class="world-shell">
     <header class="world-header">
       <div>
-        <p class="eyebrow">IMASORA WORLD FOUNDATION</p>
-        <h1>白ミチロードセイバーレンと歩く3Dマップ</h1>
-        <p class="lead">空・海岸・工事現場の正式マップ座標を共有し、歩行・物理・建築・保存を一体化した3Dワールドです。</p>
+        <p class="eyebrow">イマソラーズウォーク</p>
+        <h1>相棒と出かけよう</h1>
+        <p class="lead">空を歩き、海岸を探検し、工事現場で自由につくろう。</p>
       </div>
       <div class="status-stack">
-        <span class="status-pill"><i></i><span id="statusText">ワールド準備中</span></span>
+        <span class="status-pill"><i></i><span id="statusText">ロード中</span></span>
         <span class="save-state" id="saveState">未保存</span>
-        <a href="./imasora-world-recovery-dev.html?check=world-recovery-v483" target="_blank" rel="noopener" style="color:#b8dbc9;font-size:12px">保存済み記録の控え（別タブ）</a>
+        <a href="./imasora-world-recovery-dev.html?check=world-recovery-v496" target="_blank" rel="noopener" style="color:#b8dbc9;font-size:12px">保存済み記録の控え（別タブ）</a>
       </div>
     </header>
 
@@ -43,7 +47,7 @@
         <button type="button" id="labelsButton">建物名：表示</button>
         <button type="button" id="physicsDebugButton">物理表示：OFF</button>
         <button type="button" id="saveButton">保存</button>
-        <button type="button" id="resetButton">このマップを初期化</button>
+        <button type="button" id="resetButton" disabled>建物メニュー</button>
       </div>
     </section>
 
@@ -53,8 +57,19 @@
           <span class="scene-title" id="sceneTitle">空マップ・正式3D区画</span>
           <span class="coords" id="coords">X 0.0 / Z 0.0</span>
         </div>
-        <div class="viewport" id="viewport">
+        <div class="viewport" id="viewport" data-game-gesture-surface>
           <canvas id="worldCanvas" aria-label="白ミチロードセイバーレンが歩く3Dワールド"></canvas>
+          <button type="button" id="buildMenuButton" class="world-build-open" disabled>建物を選ぶ</button>
+          <section id="buildPlacementControls" class="world-build-placement" hidden aria-label="建物の配置">
+            <strong id="buildPlacementName"></strong>
+            <div class="build-actions">
+              <button type="button" id="placeButton" class="primary-button" disabled>ここに建てる</button>
+              <button type="button" id="cancelBuildButton" disabled>配置をやめる</button>
+              <button type="button" id="buildPlacementMenuButton">メニュー</button>
+              <button type="button" id="buildPlacementCameraButton">視点を変える</button>
+            </div>
+            <p class="build-message" id="buildMessage" role="status">建物を選択してください。</p>
+          </section>
           <div class="camera-reticle" id="cameraReticle" aria-hidden="true"></div>
           <div class="look-pad" id="lookPad" aria-hidden="true"><span>視点</span></div>
           <div class="toast" id="toast" role="status"></div>
@@ -144,6 +159,7 @@
               <button type="button" class="flight-lever space-strafe-lever" data-ufo-flight="strafe-right" aria-label="右へ移動" title="右へ移動"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>▶</b><small>右へ</small></button>
             </div>
           </div>
+          <button type="button" id="walkDashButton" class="hold-dash-button" aria-label="ダッシュ（押している間）" aria-pressed="false"><span aria-hidden="true">≫</span><b>ダッシュ</b></button>
           <div class="touch-pad" id="touchPad" aria-label="タッチ移動パッド">
             <div class="touch-stick" id="touchStick"></div>
           </div>
@@ -173,11 +189,7 @@
           <h2>建造</h2>
           <p class="muted">建築候補を選び、緑色のプレビューを確認してから配置します。</p>
           <div class="build-list" id="buildList"></div>
-          <div class="build-actions">
-            <button type="button" id="placeButton" class="primary-button" disabled>ここに建てる</button>
-            <button type="button" id="cancelBuildButton" disabled>キャンセル</button>
-          </div>
-          <p class="build-message" id="buildMessage">建物を選択してください。</p>
+          <button type="button" id="buildCatalogButton" class="primary-button">建物を選ぶメニューを開く</button>
         </section>
 
         <section class="panel-section ufo-section">
@@ -234,6 +246,6 @@
       <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
     </footer>
   </main>
-  <script type="module" src="./imasora-world-3d-dev.js?v=drag-look-v492"></script>
+  <script type="module" src="./imasora-world-3d-dev.js?v=120e"></script>
 </body>
 </html>

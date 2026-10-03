@@ -1,5 +1,5 @@
 // Runtime-only escape assistance. It never edits the soil ledger or checkpoints.
-import {armIntersections,contactBlocker,moveArm,spoilPenetrations,EX} from './imasora-construction-excavator.js';
+import {armIntersections,contactBlocker,moveArm,spoilPenetrations,EX} from './imasora-construction-excavator.js?v=520';
 
 const SPEED={boom:.5,stick:.65,curl:.75,slew:.62};
 const KEYS=Object.keys(SPEED),LIMITS={boom:[EX.boomMin,EX.boomMax],stick:[-2.55,-Math.PI/6],curl:[-1.25,1.1],slew:[-EX.slewLimit,EX.slewLimit]};
@@ -18,21 +18,21 @@ function proposed(work,direction,dt){
   arm[k]=Math.max(low,Math.min(maximum,arm[k]+direction[k]*SPEED[k]*dt));
  }return {...work,arm};
 }
-function apply(work,cursor,candidate,stepDt){
+function apply(work,cursor,candidate,stepDt,external=[]){
  const input={coordinated:true};
  for(const k of KEYS)input[k]=(candidate.arm[k]-work.arm[k])/(SPEED[k]*stepDt)*(k==='slew'?-1:1);
- const next=moveArm(work,input,stepDt);
+ const next=moveArm(work,input,stepDt,external);
  if(next.hit||KEYS.every(k=>next.arm[k]===work.arm[k]))return output(next,null,false,next.hit||'排土から離れる経路を確保できませんでした。');
- const hits=armIntersections(next);
+ const hits=armIntersections(next,0,external);
  if(!hits.size)return output(next,null,true);
  return output(next,{...cursor,anchor:anchor(next),moves:cursor.moves+1,index:0,best:null});
 }
 
 // Search work is capped at four poses per call. An accepted direction is reused
 // on later frames, while every tiny physical move still passes the core guard.
-export function stepSpoilRecovery(work,cursor,dt){
+export function stepSpoilRecovery(work,cursor,dt,external=[]){
  if(!Number.isFinite(dt)||dt<=0||dt>.05)throw Error('更新刻みが不正です');
- const hits=armIntersections(work);
+ const hits=armIntersections(work,0,external);
  if(!hits.size)return output(work,null,true);
  const hard=[...hits].find(id=>!id.startsWith('排土:'));
  if(hard)return output(work,null,false,hard);
@@ -46,11 +46,11 @@ export function stepSpoilRecovery(work,cursor,dt){
  function probe(direction){
   budget--;c.probes++;
   const candidate=proposed(work,direction,stepDt);
-  if(KEYS.every(k=>candidate.arm[k]===work.arm[k])||contactBlocker(work,candidate))return null;
+  if(KEYS.every(k=>candidate.arm[k]===work.arm[k])||contactBlocker(work,candidate,undefined,external))return null;
   const value=score(candidate);
   return value<beforeScore-1e-8?{direction,value,candidate}:null;
  }
- if(c.last){const previous=probe(c.last);if(previous)return apply(work,c,previous.candidate,stepDt);c.last=null;}
+ if(c.last){const previous=probe(c.last);if(previous)return apply(work,c,previous.candidate,stepDt,external);c.last=null;}
  while(budget>0&&c.index<DIRECTIONS.length){
   const p=probe(DIRECTIONS[c.index++]);
   if(p&&(!c.best||p.value<c.best.value))c.best={direction:p.direction,value:p.value};
@@ -58,5 +58,5 @@ export function stepSpoilRecovery(work,cursor,dt){
  if(c.index<DIRECTIONS.length)return output(work,c);
  if(!c.best)return output(work,null,false,'排土から離れる安全な経路が見つかりませんでした。');
  c.last=c.best.direction;
- return apply(work,c,proposed(work,c.last,stepDt),stepDt);
+ return apply(work,c,proposed(work,c.last,stepDt),stepDt,external);
 }

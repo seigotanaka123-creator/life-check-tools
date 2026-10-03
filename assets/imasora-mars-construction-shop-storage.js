@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {createShopState,prepareOrder,settleOrder,packShop,unpackShop} from './imasora-mars-construction-shop.js';
+import {createShopState,prepareOrder,settleOrder,packShop,unpackShop} from './imasora-mars-construction-shop.js?v=503';
 export const SHOP_DB='imasora-mars-construction-shop-development-v1';
 export class ShopStore extends IndexedConstructionStore {
   constructor(idb=globalThis.indexedDB){super(idb);this.name=SHOP_DB;}

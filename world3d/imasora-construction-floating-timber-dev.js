@@ -1,3 +1,4 @@
+import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
 import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
@@ -108,6 +109,7 @@ function refresh(){
   $('height').textContent=state.rig.mode==='foot'?`足元の高さ ${state.rig.player.y.toFixed(1)} / ${state.rig.player.grounded?'接地':'空中'}`:work?`フック高さ ${hook(state).y.toFixed(1)} / 腕 ${state.boom.reach.toFixed(1)}`:Math.abs(state.rig.vehicle.speed)<.5?'停車中':`走行 ${Math.round(Math.abs(state.rig.vehicle.speed))}`;
   $('position').textContent=state.rig.mode==='foot'?`レン X ${state.rig.player.x.toFixed(1)} / Y ${state.rig.player.y.toFixed(1)} / Z ${state.rig.player.z.toFixed(1)}`:`車体 X ${state.rig.vehicle.x.toFixed(1)} / Z ${state.rig.vehicle.z.toFixed(1)}`;
   $('interact').textContent=aboard?'停車して降りる':transition?'乗り降り中…':'運転席に乗る';$('interact').disabled=blocked||transition||(aboard&&(work||state.deployment>0))||(aboard?!craneExitOption(state):!craneBoardOption(state));
+  setBoardPrompt($('interact'),state.rig.mode,!$('interact').disabled);
   $('jump').hidden=state.rig.mode!=='foot';
   $('mode-toggle').disabled=blocked||!aboard||!!p||Math.abs(state.rig.vehicle.speed)>.8||state.deployment>0&&state.deployment<1;$('mode-toggle').textContent=work?'走行へ戻る':'クレーン作業へ';
   $('work-controls').hidden=!work||!aboard;$('drive-controls').hidden=work&&aboard;$('pedals').hidden=!aboard;$('move-label').textContent=aboard?'ハンドル':'歩く';document.querySelector('[data-action="forward"]').hidden=aboard;document.querySelector('[data-action="back"]').hidden=aboard;

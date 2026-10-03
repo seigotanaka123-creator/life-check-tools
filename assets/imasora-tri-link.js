@@ -1032,25 +1032,25 @@ class ImasoraTriLink3D {
   markup() {
     return `<section class="itl3-shell itl3-modern" aria-label="イマソラ・トライリンク 3D対戦">
       <header class="itl3-gamebar">
-        <div class="itl3-brand"><i class="itl3-brand-mark" aria-hidden="true"><span></span></i><div class="itl3-brand-copy"><small>IMASORA ARCADE // NEXT MATCH SYSTEM</small><strong>TRI-LINK <em>ARENA</em></strong></div></div>
+        <div class="itl3-brand"><i class="itl3-brand-mark" aria-hidden="true"><span></span></i><div class="itl3-brand-copy"><small>イマソラ・トライリンク</small><strong>TRI-LINK <em>ARENA</em></strong></div></div>
         <div class="itl3-season"><span>TERRITORY LEAGUE</span><b>3-WAY BATTLE</b></div>
-        <div class="itl3-clock"><span>BATTLE TIME</span><b data-itl3-clock>${MATCH_SECONDS}</b></div>
+        <div class="itl3-clock"><span>残り時間</span><b data-itl3-clock>${MATCH_SECONDS}</b></div>
         <button class="itl3-exit" type="button" data-itl3-exit aria-label="アリーナを終了してゲーム機選択へ戻る"><span>EXIT</span><b>終了</b></button>
       </header>
       <div class="itl3-stage-shell" data-itl3-stage>
         <canvas class="itl3-canvas" data-itl3-canvas aria-label="3人の相棒が戦う立体エアホッケー盤"></canvas>
         <div class="itl3-scoreboard">${this.players.map(player => this.scoreCardMarkup(player)).join("")}</div>
         <div class="itl3-characters" data-itl3-characters>${this.players.map(player => this.characterMarkup(player)).join("")}</div>
-        <div class="itl3-message" data-itl3-message><small data-itl3-message-kicker>PHYSICS LINK</small><strong data-itl3-message-main>READY</strong></div>
+        <div class="itl3-message" data-itl3-message><small data-itl3-message-kicker>3匹で陣取り対戦</small><strong data-itl3-message-main>READY</strong></div>
         <div class="itl3-combat-hud" aria-hidden="true"><div class="itl3-speed"><small>PUCK SPEED</small><b data-itl3-speed>000</b><i><span data-itl3-speed-bar></span></i></div><div class="itl3-combo" data-itl3-combo><small>IMPACT CHAIN</small><b>LINK <span>1</span></b></div></div>
         <div class="itl3-corner-bracket itl3-corner-bracket-a" aria-hidden="true"></div><div class="itl3-corner-bracket itl3-corner-bracket-b" aria-hidden="true"></div>
         ${this.openingMarkup()}
-        <div class="itl3-control-hint"><i aria-hidden="true"></i><span>DRAG TO CONTROL</span><b>育成中の相棒をなぞって操作</b></div>
+        <div class="itl3-control-hint"><i aria-hidden="true"></i><span>スライドで操作</span><b>育成中の相棒をなぞって操作</b></div>
         <div class="itl3-vignette" aria-hidden="true"></div>
       </div>
       ${this.testMode ? this.developmentControlsMarkup() : ""}
       ${this.testMode ? `<div class="itl3-testbar" aria-label="トライリンク検証操作"><button type="button" data-itl3-test-capture="0">育成中が領域獲得</button><button type="button" data-itl3-test-capture="1">引退相棒が領域獲得</button><button type="button" data-itl3-test-capture="2">白レンが領域獲得</button><button type="button" data-itl3-test-timeup>残り1秒</button><span class="itl3-debug" data-itl3-debug>READY</span></div>` : ""}
-      <section class="itl3-memory-panel"><div class="itl3-memory-heading"><div><small>AFTER MATCH ARCHIVE</small><strong>トライリンク・メモリーズ</strong></div><span>最新12試合</span></div><div class="itl3-memory-list" data-itl3-memory-list></div></section>
+      <section class="itl3-memory-panel"><div class="itl3-memory-heading"><div><small>これまでの対戦</small><strong>トライリンク・メモリーズ</strong></div><span>最新12試合</span></div><div class="itl3-memory-list" data-itl3-memory-list></div></section>
     </section>`;
   }
 
@@ -1059,11 +1059,11 @@ class ImasoraTriLink3D {
     return `<div class="itl3-opening" data-itl3-opening>
       <div class="itl3-opening-card">
         <div class="itl3-opening-eyebrow"><span>LIVE</span> THREE SOULS // ONE PUCK</div>
-        <small>3D PHYSICS BATTLE ARENA</small>
+        <small>ゴールを決めて、陣地を広げよう</small>
         <h2>ゴールを決め、<br><em>盤面を奪え。</em></h2>
         <p>盤面は12領域。ゴールするたび相手側の領域が自分の色へ変わる。3匹とも最後まで戦い、120秒後に最も広い領域を持つ相棒が勝者です。</p>
         <div class="itl3-roster-preview">${this.players.map(player => `<div class="itl3-roster-unit" style="--itl3-color:${escapeHtml(player.color)}"><div class="itl3-roster-art">${player.art}</div><strong>${escapeHtml(player.name)}</strong><span>${escapeHtml(player.roleLabel)}</span></div>`).join("")}</div>
-        <button class="itl3-primary" type="button" data-itl3-start><span>ENTER THE ARENA</span><b>マッチ開始</b><i aria-hidden="true">›</i></button>
+        <button class="itl3-primary" type="button" data-itl3-start><span>準備はいい？</span><b>対戦をはじめる</b><i aria-hidden="true">›</i></button>
       </div>
     </div>`;
   }
@@ -7526,14 +7526,38 @@ class ImasoraTriLink3D {
     this.beep(620, .16, .07);
     window.setTimeout(() => this.beep(820, .22, .065), 140);
     const record = this.createRecord(winner, reason);
+    let resultRecord = { ...record, rewardSavePending: !this.testMode && !!this.onRecord };
+    const present = () => {
+      if (!this.destroyed) this.presentResult(resultRecord);
+    };
+    const updateReward = summary => {
+      if (this.destroyed || this.matchId !== record.id) return;
+      const saved = summary?.committed === true || summary?.status === "duplicate";
+      resultRecord = { ...record, rewardSavePending: !saved, constructionRewardBoxesAwarded: saved ? Number(summary.constructionRewardBoxesAwarded) || 0 : 0 };
+      if (saved) {
+        this.memories = [resultRecord, ...this.memories.filter(m => m.id !== record.id)].slice(0, 12); this.renderMemories();
+        window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
+        this.pendingRewardListener = null;
+      }
+      const status = this.root?.querySelector("[data-itl3-reward-status]");
+      if (status) status.textContent = saved ? "対戦結果・報酬を保存しました" + (resultRecord.constructionRewardBoxesAwarded ? "（建築セット +" + resultRecord.constructionRewardBoxesAwarded + "箱）" : "") : "報酬の保存待ちです。画面上の案内から保存し直してください。";
+    };
     if (!this.testMode && this.onRecord) {
-      try { this.onRecord(this.serializableRecord(record)); } catch (error) { console.warn("Tri-Link memory save failed", error); }
-      this.memories = [record, ...this.memories].slice(0, 12);
-      this.renderMemories();
+      if (this.pendingRewardListener) window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
+      this.pendingRewardListener = event => {
+        if (event.detail?.id !== "triLink:" + record.id) return;
+        if (this.matchId !== record.id) {
+          window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
+          this.pendingRewardListener = null;
+          return;
+        }
+        updateReward(event.detail.summary);
+      };
+      window.addEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
+      // Saving can wait for another tab's transaction. Never display an uncommitted reward.
+      Promise.resolve().then(() => this.onRecord(this.serializableRecord(record))).then(updateReward).catch(() => { resultRecord = { ...record, rewardSavePending: true }; });
     }
-    window.setTimeout(() => {
-      if (!this.destroyed) this.presentResult(record);
-    }, 1050);
+    window.setTimeout(present, 1050);
   }
 
   spawnVictory(winner) {
@@ -7589,7 +7613,12 @@ class ImasoraTriLink3D {
     const panel = document.createElement("div");
     panel.className = "itl3-result";
     panel.dataset.itl3Result = "";
-    panel.innerHTML = `<div class="itl3-result-card"><div class="itl3-result-rank">TERRITORY RESULT <b>01</b></div><small>COMMEMORATIVE MATCH CARD</small><h2>${escapeHtml(record.winnerName)}<em>TERRITORY CHAMPION</em></h2><p>${escapeHtml(formatDate(record.playedAt))}　//　${escapeHtml(record.reason)}</p><div class="itl3-photo">${record.participants.map((participant, index) => `<div class="itl3-photo-person${participant.id === record.winnerId ? " is-winner" : ""}"><span>0${index + 1}</span><div>${participant.art || fallbackArt(participant.name, participant.color)}</div><strong>${escapeHtml(participant.name)}</strong><small>AREA ${Number(participant.territory) || 0}/${record.territoryTotal || TERRITORY_SECTOR_COUNT}</small></div>`).join("")}</div><div class="itl3-result-actions"><button type="button" class="itl3-primary" data-itl3-rematch><span>REPLAY</span><b>もう一度対戦</b><i>›</i></button><button type="button" class="itl3-secondary" data-itl3-close-result>アリーナを見る</button></div></div>`;
+    const constructionReward = record.rewardSavePending
+      ? `<p class="itl3-result-reward" data-itl3-reward-status>報酬の保存待ちです。画面上の案内から保存し直してください。</p>`
+      : Number(record.constructionRewardBoxesAwarded) > 0
+      ? `<p class="itl3-result-reward">建築セット +${Math.floor(Number(record.constructionRewardBoxesAwarded))}箱</p>`
+      : "";
+    panel.innerHTML = `<div class="itl3-result-card"><div class="itl3-result-rank">TERRITORY RESULT <b>01</b></div><small>COMMEMORATIVE MATCH CARD</small><h2>${escapeHtml(record.winnerName)}<em>TERRITORY CHAMPION</em></h2><p>${escapeHtml(formatDate(record.playedAt))}　//　${escapeHtml(record.reason)}</p>${constructionReward}<div class="itl3-photo">${record.participants.map((participant, index) => `<div class="itl3-photo-person${participant.id === record.winnerId ? " is-winner" : ""}"><span>0${index + 1}</span><div>${participant.art || fallbackArt(participant.name, participant.color)}</div><strong>${escapeHtml(participant.name)}</strong><small>AREA ${Number(participant.territory) || 0}/${record.territoryTotal || TERRITORY_SECTOR_COUNT}</small></div>`).join("")}</div><div class="itl3-result-actions"><button type="button" class="itl3-primary" data-itl3-rematch><span>REPLAY</span><b>もう一度対戦</b><i>›</i></button><button type="button" class="itl3-secondary" data-itl3-close-result>アリーナを見る</button></div></div>`;
     this.stage.appendChild(panel);
     panel.querySelector("[data-itl3-rematch]")?.addEventListener("click", () => this.startMatch());
     panel.querySelector("[data-itl3-close-result]")?.addEventListener("click", () => panel.remove());
@@ -7864,6 +7893,8 @@ class ImasoraTriLink3D {
 
   destroy() {
     this.destroyed = true;
+    if (this.pendingRewardListener) window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
+    this.pendingRewardListener = null;
     cancelAnimationFrame(this.frame);
     this.resizeObserver?.disconnect();
     window.removeEventListener("resize", this.boundResize);

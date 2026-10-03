@@ -1,11 +1,11 @@
-import {SHOP_OFFERS as TRIAL_OFFERS,quoteOrder as quoteTrialOrder,formatMaterial} from './assets/imasora-mars-construction-shop.js';
-import {ShopSession} from './assets/imasora-mars-construction-shop-storage.js';
+import {SHOP_OFFERS as TRIAL_OFFERS,quoteOrder as quoteTrialOrder,formatMaterial} from './assets/imasora-mars-construction-shop.js?v=503';
+import {ShopSession} from './assets/imasora-mars-construction-shop-storage.js?v=503';
 import {materialArtwork} from './assets/imasora-material-ui-art.js?v=450';
 import {createSpaceMaterialGuide} from './assets/imasora-space-material-guide.js?v=450';
 const $=id=>document.getElementById(id);
 const previewMode=new URLSearchParams(location.search).get('walletPreview');
 const walletUI=new URLSearchParams(location.search).get('worldShop')==='1'
-  ?(await import('./assets/imasora-world-shop-client.js?v=452')).createWorldShopClient()
+  ?(await import('./assets/imasora-world-shop-client.js?v=504')).createWorldShopClient()
   :previewMode?(await import('./assets/imasora-world-purchase-preview-ui.js?v=451')).makeWalletPreview(previewMode):null;
 const session=walletUI?.session||new ShopSession(),SHOP_OFFERS=walletUI?.offers||TRIAL_OFFERS,quoteOrder=walletUI?.quote||quoteTrialOrder;
 let working=false,selection=null,browsing=SHOP_OFFERS[0];

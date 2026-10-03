@@ -1,4 +1,4 @@
-import {RECOVERY_DATABASES,RECOVERY_LOCAL_KEYS,MAX_RECOVERY_PAYLOAD,checkRecoveryJSON} from './imasora-world-recovery-bundle.js?v=483';
+import {RECOVERY_DATABASES,RECOVERY_LOCAL_KEYS,MAX_RECOVERY_PAYLOAD,checkRecoveryJSON} from './imasora-world-recovery-bundle.js?v=496';
 
 // No WorldSaveService.initialize(): even opening a new save normally performs migration.
 export function createRecoveryReader({idb=globalThis.indexedDB,storage=globalThis.localStorage,events=globalThis,timeoutMs=5000}={}){

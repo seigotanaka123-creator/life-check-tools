@@ -1,17 +1,19 @@
 // v471: opt-in, memory-only connection to the actual construction scene.
 // No importing practice saves or granting soil to an inventory.
-import {initialExcavatorBuild,stepExcavatorBuild,actExcavatorBuild} from './imasora-construction-excavator-build.js';
-import {digPersonBlocked,digPlayer} from './imasora-construction-excavator-walk.js';
+import {initialExcavatorBuild,stepExcavatorBuild,actExcavatorBuild} from './imasora-construction-excavator-build.js?v=520';
+import {digPersonBlocked,digPlayer} from './imasora-construction-excavator-walk.js?v=520';
 import {SITE} from './imasora-construction-loader-physics.js';
-import {PLOT,excavatorActorPose} from './imasora-construction-excavator.js';
+import {PLOT,excavatorActorPose} from './imasora-construction-excavator.js?v=520';
 import {BACKHOE_BUCKET,CONTACT_DIG} from './imasora-construction-excavator-bucket.js';
+import {hasValidWorldFootprint} from './imasora-construction-world-yard-reservation.js?v=514';
 export const EXCAVATION_YARDS=Object.freeze([[0,1180],[0,-1180],[2100,0],[-2100,0]].map(Object.freeze));
-export const EXCAVATION_GATE=Object.freeze({x:-230,z:-226,width:84});
+export const EXCAVATION_GATE=Object.freeze({x:-230,z:-226,width:112});
+export const EXCAVATION_HANDOFF_LOCAL_Z=-218;
 export function chooseExcavationYard(blockedAt,reserved=()=>false){
   return EXCAVATION_YARDS.findIndex(([x,z])=>!blockedAt(x,z,425)&&!reserved([x,0,z],[720,0,600]));
 }
 export function excavationOpening(site){const [x,z]=EXCAVATION_YARDS[site];return {minX:x+PLOT.minX,maxX:x+PLOT.maxX,minZ:z+PLOT.minZ,maxZ:z+PLOT.maxZ};}
-export function excavationReserved(site,p,size){const [x,z]=EXCAVATION_YARDS[site];return Math.abs(p[0]-x)<360+size[0]/2&&Math.abs(p[2]-z)<300+size[2]/2;}
+export function excavationReserved(site,p,size){if(!Number.isInteger(site)||site<0||site>=EXCAVATION_YARDS.length||!hasValidWorldFootprint(p,size))return true;const [x,z]=EXCAVATION_YARDS[site];return Math.abs(p[0]-x)<360+size[0]/2&&Math.abs(p[2]-z)<300+size[2]/2;}
 export function excavationLocal(site,p){const [x,z]=EXCAVATION_YARDS[site];return {...p,x:p.x-x,z:p.z-z};}
 export function excavationEntry(site,p){const q=excavationLocal(site,p);return Math.abs(q.x-EXCAVATION_GATE.x)<32&&q.z>=-228&&q.z<=-202&&Math.abs(q.y)<.05;}
 export function excavationCanLeave(s){const p=s.loader.player;return s.loader.mode==='foot'&&!s.action&&p.grounded&&Math.abs(p.y)<.05&&Math.abs(p.x-EXCAVATION_GATE.x)<32&&p.z<-210;}
@@ -31,4 +33,6 @@ export function leaveExcavation(s,{force=false}={}){
 export const initialWorldExcavation=()=>({...initialExcavatorBuild(),bucketStyle:BACKHOE_BUCKET});
 // Explicit new mode: old checkpoint kinematics and guided tunnel remain readable.
 export function initialContactWorldExcavation(){const s=initialWorldExcavation();return{...s,digMode:CONTACT_DIG,cutMask:Object.fromEntries(Object.keys(s.terrain).map(id=>[id,true])),arm:{...s.arm,curl:-1},message:'掘りたい場所に爪を合わせて「すくう」。バケットの開閉も手動で調整できます。土は接触した分だけ掘れます。'};}
-export {stepExcavatorBuild as stepWorldExcavation,actExcavatorBuild as actWorldExcavation,SITE};
+export const stepWorldExcavation=(s,input,dt,external=[])=>stepExcavatorBuild(s,input,dt,external);
+export const actWorldExcavation=(s,action,external=[])=>actExcavatorBuild(s,action,external);
+export {SITE};

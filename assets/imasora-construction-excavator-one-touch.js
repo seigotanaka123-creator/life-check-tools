@@ -1,7 +1,7 @@
 // Command assistance only. Physical states/checkpoints remain the existing v3.
-import {stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js';
-import {armIntersections,moveArm} from './imasora-construction-excavator.js';
-import {stepSpoilRecovery} from './imasora-construction-excavator-recovery.js';
+import {stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=520';
+import {armIntersections,moveArm} from './imasora-construction-excavator.js?v=520';
+import {stepSpoilRecovery} from './imasora-construction-excavator-recovery.js?v=520';
 import {excavationCheckpoint} from './imasora-construction-excavator-save.js';
 export const DIG_READY=Object.freeze({boom:74*Math.PI/180,stick:-Math.PI/6,curl:-1.25});
 export const DIG_LOWER=33*Math.PI/180;
@@ -54,10 +54,10 @@ export function limitedDigInput(s,input,dt){
   return {...input,stick:Math.min(input.stick,Math.max(0,(DIG_READY.stick-s.arm.stick)/(.65*dt)))};
 }
 export function allowedDigGuide(guide){return !guide?.path||guide.path.every(n=>n.stick<=DIG_READY.stick+1e-8);}
-export function beginOneTouch(work,kind){
+export function beginOneTouch(work,kind,external=[]){
   if(!['scoop','haul','dump'].includes(kind))return abortSequence(work,'操作の種類を確認できない');
   if(work.loader.mode!=='working'||work.action)return {work,sequence:null};
-  if(kind==='dump')return {work:actWorldExcavation(work,'dump'),sequence:work.load?{phase:'dump'}:null};
+  if(kind==='dump')return {work:actWorldExcavation(work,'dump',external),sequence:work.load?{phase:'dump'}:null};
   if(work.load)return {work:{...work,message:'先に「こぼす」で土を降ろしてください。'},sequence:null};
   return {work:{...work,guide:null,hit:'',message:'基本姿勢から、一連のすくい動作を始めます。'},sequence:{phase:'prepare',index:0,haul:kind==='haul'}};
 }
@@ -75,15 +75,15 @@ function finishLift(work,sequence){
   if(!work.load&&/^(土:|排土:)/.test(sequence.cutHit))return result({...work,message:'土の山にバケットが当たってすくえなかったため、ブームを74°へ戻しました。車両の位置・向きを調整してください。'},null);
   return result({...work,message:work.load?`${work.load}個の土を保持し、ブームを74°まで上げました。`:'ブームを74°へ戻しました。爪が土に届きませんでした。車両の位置・向きを調整してください。'},null);
 }
-function bucketClearance(work,dt,message){
+function bucketClearance(work,dt,message,external=[]){
   if(!/^(土:|排土:)/.test(work.hit)||work.arm.stick>=DIG_READY.stick-1e-8)return null;
-  const next=moveArm(work,limitedDigInput(work,{stick:1},dt),dt);
+  const next=moveArm(work,limitedDigInput(work,{stick:1},dt),dt,external);
   return next.hit?null:{...next,message};
 }
-function stepActiveOneTouch(work,sequence,dt){
+function stepActiveOneTouch(work,sequence,dt,external){
   if(sequence.phase==='recover'){
     if(work.action||work.guide)return abortSequence(work,'退避と別の動作が重なった');
-    const recovered=stepSpoilRecovery(stepWorldExcavation(work,{},dt),sequence.cursor??null,dt);
+    const recovered=stepSpoilRecovery(stepWorldExcavation(work,{},dt,external),sequence.cursor??null,dt,external);
     if(recovered.blocked)return abortSequence(recovered.work,'排土との接触を減らす退避経路が見つからない');
     if(recovered.done){const {resumePhase,cursor,...rest}=sequence;return result(recovered.work,{...rest,phase:resumePhase});}
     return result(recovered.work,{...sequence,cursor:recovered.cursor});
@@ -91,8 +91,9 @@ function stepActiveOneTouch(work,sequence,dt){
   if(sequence.phase==='cut'||sequence.phase==='dump'){
     if(work.action?.kind!==(sequence.phase==='cut'?'scoop':'dump'))return abortSequence(work,'予定していた掘削・排土動作が見つからない');
     if(!Number.isFinite(work.action.elapsed)||!Number.isFinite(work.action.duration)||work.action.duration<=0)return abortSequence(work,'掘削・排土動作の進行を確認できない');
-    const next=stepWorldExcavation(work,{},dt);
+    const next=stepWorldExcavation(work,{},dt,external);
     if(next.action)return result(next,sequence);
+    if(external.some(volume=>volume?.name===next.hit))return abortSequence(next,'建材に接触した');
     if(sequence.phase==='dump'){
       if(next.load&&/^(土:|排土:)/.test(next.hit)&&(sequence.dumpRetries??0)<1)return result(next,{...sequence,phase:'dump-clear',index:0,dumpRetries:1});
       return result(next,!next.load?{...sequence,phase:'return',index:0}:null);
@@ -102,7 +103,7 @@ function stepActiveOneTouch(work,sequence,dt){
   }
   if(work.action||work.guide)return abortSequence(work,'別の動作と自動操作が重なった');
   if(['prepare','return'].includes(sequence.phase)&&work.spoil.length){
-    const hits=[...armIntersections(work)];
+    const hits=[...armIntersections(work,0,external)];
     if(hits.length&&hits.every(hit=>hit.startsWith('排土:'))){
       if((sequence.recoveries??0)>=3)return abortSequence(work,'排土との接触が繰り返された');
       return result(work,{...sequence,phase:'recover',resumePhase:sequence.phase,cursor:null,recoveries:(sequence.recoveries??0)+1});
@@ -116,12 +117,12 @@ function stepActiveOneTouch(work,sequence,dt){
   else if(sequence.phase==='lift')command=['boom',DIG_READY.boom,work.load?'すくった土を保持し、ブームを74°まで上げています。':'ブームを74°まで上げています。'];
   else command=['curl',DIG_CLOSE,'バケットを24°まで閉じています。'];
   const [axis,target,message]=command,delta=target-work.arm[axis];
-  const next=stepWorldExcavation(work,{[axis]:Math.sign(delta)*Math.min(1,Math.abs(delta)/(speed[axis]*dt))},dt);
+  const next=stepWorldExcavation(work,{[axis]:Math.sign(delta)*Math.min(1,Math.abs(delta)/(speed[axis]*dt))},dt,external);
   const reached=Math.abs(next.arm[axis]-target)<1e-8;
   if(next.hit){
     if(sequence.phase==='draw'||sequence.phase==='lower'){
       // Soil contact is the hand-off to the existing swept-tooth scoop.
-      if(next.hit.startsWith('土:')||next.hit.startsWith('排土:'))return startCut({...next,hit:''},sequence);
+      if(next.hit.startsWith('土:')||next.hit.startsWith('排土:'))return startCut({...next,hit:''},sequence,external);
     }
     if(sequence.phase==='close'){
       // The existing physical arm stop is about 23.7 degrees, shown as 24 in
@@ -130,18 +131,18 @@ function stepActiveOneTouch(work,sequence,dt){
       // A full bucket cannot cut more soil. Make a little room with the stick
       // while holding the boom, then retry closing on the next bounded frame.
       // moveArm applies the same swept collisions without advancing time twice.
-      const clearance=bucketClearance(next,dt,'ブームを保ち、アームで余地を作ってバケットを24°まで閉じています。');
+      const clearance=bucketClearance(next,dt,'ブームを保ち、アームで余地を作ってバケットを24°まで閉じています。',external);
       if(clearance)return result(clearance,sequence);
       return result({...next,message:`${next.hit}に接触し、バケットが24°まで閉じないため停止しました。現在の姿勢と土は保持しています。`},null);
     }
     if(sequence.phase==='return'&&sequence.index===0&&!next.load){
-      const clearance=bucketClearance(next,dt,'排土を終え、アームで余地を作ってバケットを開いています。');
+      const clearance=bucketClearance(next,dt,'排土を終え、アームで余地を作ってバケットを開いています。',external);
       if(clearance)return result(clearance,sequence);
     }
     if(sequence.phase==='return'&&sequence.index===1&&!next.load&&/^(土:|排土:)/.test(next.hit)&&next.arm.boom<DIG_READY.boom-1e-8){
       // After a stopped low dump, the open bucket can catch the far bank while
       // extending. Empty-bucket return may lift just enough to clear that bank.
-      const raised=moveArm(next,{boom:Math.min(1,(DIG_READY.boom-next.arm.boom)/(speed.boom*dt))},dt);
+      const raised=moveArm(next,{boom:Math.min(1,(DIG_READY.boom-next.arm.boom)/(speed.boom*dt))},dt,external);
       if(!raised.hit)return result({...raised,message:'空のバケットを土から離し、基本姿勢へ戻しています。'},sequence);
     }
     return result({...next,message:`${next.hit}に接触したため自動操作を停止しました。現在の姿勢と土は保持しています。`},null);
@@ -149,23 +150,23 @@ function stepActiveOneTouch(work,sequence,dt){
   if(!reached)return result({...next,message},sequence);
   if(sequence.phase==='dump-clear'){
     if(sequence.index===0)return result(next,{...sequence,index:1});
-    const dumping=actWorldExcavation(next,'dump');return result(dumping,dumping.action?{...sequence,phase:'dump'}:null);
+    const dumping=actWorldExcavation(next,'dump',external);return result(dumping,dumping.action?{...sequence,phase:'dump'}:null);
   }
   if(sequence.phase==='prepare'||sequence.phase==='return'){
     if(sequence.index<2)return result(next,{...sequence,index:sequence.index+1});
     return sequence.phase==='return'?result({...next,message:'排土を終え、基本姿勢（根元74°・アーム−30°・バケット−72°）へ戻りました。'},null):result(next,{...sequence,phase:'lower'});
   }
   if(sequence.phase==='lower')return result(next,{...sequence,phase:'draw'});
-  if(sequence.phase==='draw')return startCut(next,sequence);
+  if(sequence.phase==='draw')return startCut(next,sequence,external);
   if(sequence.phase==='lift')return finishLift(next,sequence);
   return finishCut(next,sequence);
 }
-function startCut(work,sequence){
-  const next=actWorldExcavation(work,'scoop');
+function startCut(work,sequence,external){
+  const next=actWorldExcavation(work,'scoop',external);
   if(next.action?.kind==='scoop')return result({...next,action:{...next.action,oneTouch:true}},{...sequence,phase:'cut'});
   return result({...next,message:'すくい込みを終え、バケットを24°まで閉じています。'},{...sequence,phase:'close'});
 }
-export function stepOneTouch(work,sequence,input,dt){
+export function stepOneTouch(work,sequence,input,dt,external=[]){
   if(!Number.isFinite(dt)||dt<0)return abortSequence(work,'更新時間を確認できない');
   if(sequence&&(!validSequence(sequence)||!validGuard(sequence.guard)||!finiteArm(work.arm)))return abortSequence(work,'自動操作の段階・姿勢を確認できない');
   if(sequence&&work.loader.mode!=='working')return abortSequence(work,'作業モードを離れた');
@@ -175,7 +176,7 @@ export function stepOneTouch(work,sequence,input,dt){
   dt=Math.min(dt,.05);
   if(!sequence){
     if(!allowedDigGuide(work.guide))return result({...work,guide:null,message:'アーム−30°の制限を越える運搬経路のため停止しました。土は保持しています。'},null);
-    const next=stepWorldExcavation(work,limitedDigInput(work,input,dt),dt);
+    const next=stepWorldExcavation(work,limitedDigInput(work,input,dt),dt,external);
     const dumped=(work.action?.kind==='dump'||work.guide?.phase==='dump')&&!next.action&&!next.load&&(!next.guide||next.guide.phase==='dump');
     // Released soil can rest on the bucket. Waiting for every particle to land
     // before lifting the arm creates a circular wait; let return move it first.
@@ -185,7 +186,7 @@ export function stepOneTouch(work,sequence,input,dt){
     phaseElapsed:old?.key===key?old.phaseElapsed:0,idleElapsed:old?.key===key?old.idleElapsed:0};
   if(guard.elapsed>=ONE_TOUCH_LIMITS.total||guard.phaseElapsed>=ONE_TOUCH_LIMITS.phase)return abortSequence(work,'自動操作の制限時間に達した');
   if(guard.idleElapsed>=ONE_TOUCH_LIMITS.idle)return abortSequence(work,'姿勢や動作が進まない状態が続いた');
-  const next=stepActiveOneTouch(work,sequence,dt);
+  const next=stepActiveOneTouch(work,sequence,dt,external);
   if(!next.sequence)return next;
   const nextKey=phaseKey(next.sequence),changed=key!==nextKey;
   next.sequence={...next.sequence,guard:{key:nextKey,elapsed:guard.elapsed+dt,

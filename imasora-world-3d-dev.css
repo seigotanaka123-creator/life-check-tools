@@ -328,3 +328,5 @@ code { color: #8edfff; }
 /* v492: only the 3D canvas starts a look gesture. UI controls keep their own input. */
 #worldCanvas { cursor: grab; }
 #viewport.is-looking #worldCanvas { cursor: grabbing; }
+
+@media(pointer:coarse){#viewport:has(>.hold-dash-button:not([hidden]))>.touch-hint{bottom:116px;right:14px;max-width:calc(100% - 175px);font-size:10px}}

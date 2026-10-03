@@ -1,3 +1,4 @@
+import {walkFactor} from './imasora-construction-travel-input.mjs';
 // 8-3b1: purchased Mars-soil COPY. No loan ledger, wallet mutation, or main-world hooks.
 import {readPurchasedSource} from './imasora-construction-purchased-water.js';
 import {fingerprint} from './imasora-world-purchase-ledger.js';
@@ -65,7 +66,7 @@ export function soilCopySurface(s,p=s.loader.player){
 function jump(s){const p=s.loader.player,b=s.body;if(s.paused||s.task||s.loader.mode!=='foot'||!b.grounded)return;
   const kind=soilCopySurface(s),boost=kind==='mars'?3:1;b.vy=SOIL_BODY.jump*Math.sqrt(boost);b.grounded=false;b.flight={kind,from:p.y,peak:0,hit:false};s.message=boost===3?'敷いた火星土からジャンプ！到達高は通常の3倍。':'普通の地面からジャンプ。';s.revision++;
 }
-export function purchasedSoilAction(s,action,id){validatePurchasedSoil(s);
+export function purchasedSoilAction(s,action,id,external=[]){validatePurchasedSoil(s);
   if(action==='pause'){return{...s,paused:!s.paused,revision:s.revision+1};}
   ok(!s.paused,'再開してから操作してください。');
   if(['load','store','lay','recover'].includes(action)){
@@ -81,7 +82,7 @@ export function purchasedSoilAction(s,action,id){validatePurchasedSoil(s);
   const n=clone(s);if(action==='jump')jump(n);
   else if(action==='interact'||action==='home'){
     ok(action==='home'||(s.body.grounded&&Math.abs(s.loader.player.y)<.01)||s.loader.mode==='driving','地面に着地してから乗ってください。');
-    n.loader=actLoader(s.loader,action,[...boxes,...s.patches.map(p=>({id:'敷いた土',x:p.x,z:p.z,width:32,depth:32,height:2}))]);
+    n.loader=actLoader(s.loader,action,[...boxes,...s.patches.map(p=>({id:'敷いた土',x:p.x,z:p.z,width:32,depth:32,height:2})),...external]);
     n.body={...n.body,vy:0,grounded:true,flight:null,jumpHeld:false};n.message=n.loader.message;n.revision++;
   }else throw Error('未対応の土作業です。');
   validatePurchasedSoil(n);return n;
@@ -95,20 +96,20 @@ function moveVertical(s,p,dy){let d=dy,hit='';if(dy<0&&p.y+dy<=0){d=-p.y;hit='�
 function supported(s,p){return !!moveVertical(s,{...p},-.001);}
 function stepWalker(s,input,dt){const p=s.loader.player,b=s.body;b.grounded=b.vy<=0&&supported(s,p);if(input.jump&&!b.jumpHeld)jump(s);b.jumpHeld=!!input.jump;
   const x=fin(input.x)?clamp(input.x,-1,1):0,z=fin(input.z)?clamp(input.z,-1,1):0,len=Math.max(1,Math.hypot(x,z));
-  for(const axis of['x','z']){const delta=(axis==='x'?x:z)/len*48*dt,q={...p,[axis]:p[axis]+delta};if(bodyClear(s,q))p[axis]=q[axis];
+  for(const axis of['x','z']){const delta=(axis==='x'?x:z)/len*48*walkFactor(input)*dt,q={...p,[axis]:p[axis]+delta};if(bodyClear(s,q))p[axis]=q[axis];
     else if(b.grounded){const rise=Math.max(0,...surfaces(s).filter(o=>overlap(q,o)).map(o=>o.maxY-p.y));if(rise>0&&rise<=7&&bodyClear(s,{...q,y:p.y+rise})){p[axis]=q[axis];p.y+=rise;}}}
   b.grounded=b.vy<=0&&supported(s,p);if(!b.grounded){let left=dt;while(left>1e-10){const h=b.vy>0&&b.vy/SOIL_BODY.gravity<left?b.vy/SOIL_BODY.gravity:left;
     const dy=b.vy*h-SOIL_BODY.gravity*h*h/2,hit=moveVertical(s,p,dy);b.vy-=SOIL_BODY.gravity*h;left-=h;if(Math.abs(b.vy)<1e-9)b.vy=0;if(b.flight)b.flight.peak=Math.max(b.flight.peak,p.y-b.flight.from);
     if(hit){b.vy=0;if(dy>0){s.message='頭が屋根に当たりました。';if(b.flight)b.flight.hit=true;}else{b.grounded=true;break;}}}}
   if(x||z)p.heading=Math.atan2(x,z);if(b.flight&&b.grounded){const f=b.flight;b[f.kind]={height:f.peak,hit:f.hit};b.flight=null;s.message=`着地：上昇量 ${f.peak.toFixed(2)}${f.hit?'（頭上で停止）':''}。`;}
 }
-function tick(s,input){const n={...s,loader:clone(s.loader),body:clone(s.body),time:s.time+SOIL_STEP,revision:s.revision+1};
+function tick(s,input,external=[]){const n={...s,loader:clone(s.loader),body:clone(s.body),time:s.time+SOIL_STEP,revision:s.revision+1};
   if(s.task){n.task={...s.task,elapsed:Math.min(2,s.task.elapsed+SOIL_STEP)};if(n.task.elapsed>=2-eps){if(['load','recover'].includes(s.task.kind))n.load+=4;else if(s.task.kind==='store')n.stock+=4;else n.patches=[...s.patches,s.task.patch];n.message=s.task.kind==='lay'?'敷設完了。後退して降車し、紫の土で跳んでみよう。':'移送完了。4ブロック分の量は変わりません。';n.task=null;}return n;}
   if(s.loader.mode==='foot')stepWalker(n,input,SOIL_STEP);
-  else{const previous=s.loader.mode;n.loader=stepLoader(s.loader,input,SOIL_STEP,[...boxes,...s.patches.map(p=>({id:'敷いた土',x:p.x,z:p.z,width:32,depth:32,height:2}))]);if(previous==='exiting'&&n.loader.mode==='foot')n.body.grounded=true;}
+  else{const previous=s.loader.mode;n.loader=stepLoader(s.loader,input,SOIL_STEP,[...boxes,...s.patches.map(p=>({id:'敷いた土',x:p.x,z:p.z,width:32,depth:32,height:2})),...external]);if(previous==='exiting'&&n.loader.mode==='foot')n.body.grounded=true;}
   return n;
 }
-export function advancePurchasedSoil(s,input={},dt){ok(fin(dt)&&dt>=0&&dt<=.1,'更新時間が不正です。');if(s.paused)return s;let n={...s,phase:s.phase+dt};while(n.phase>=SOIL_STEP-1e-9){n={...n,phase:Math.max(0,n.phase-SOIL_STEP)};n=tick(n,input);}if(n.phase<1e-9)n.phase=0;return n;}
+export function advancePurchasedSoil(s,input={},dt,external=[]){ok(fin(dt)&&dt>=0&&dt<=.1,'更新時間が不正です。');if(s.paused)return s;let n={...s,phase:s.phase+dt};while(n.phase>=SOIL_STEP-1e-9){n={...n,phase:Math.max(0,n.phase-SOIL_STEP)};n=tick(n,input,external);}if(n.phase<1e-9)n.phase=0;return n;}
 export function validatePurchasedSoil(s){
   exact(s,['schema','scope','source','revision','time','phase','paused','stock','load','patches','task','nextId','operations','loader','body','message']);
   ok(s.schema===1&&s.scope===SOIL_COPY_SCOPE&&int(s.revision)&&fin(s.time)&&s.time>=0&&fin(s.phase)&&s.phase>=0&&s.phase<SOIL_STEP+1e-8&&typeof s.paused==='boolean','土の保存版・時間が不正です。');
@@ -121,7 +122,7 @@ export function validatePurchasedSoil(s){
   if(s.task){const t=s.task;exact(t,['id','kind','elapsed','duration','patch']);ok(ops.has(t.id)&&s.operations.at(-1).id===t.id&&s.operations.at(-1).kind===t.kind&&t.duration===2&&fin(t.elapsed)&&t.elapsed>=0&&t.elapsed<2&&s.loader.mode==='driving'&&Math.abs(s.loader.vehicle.speed)<.01,'移送状態が不正です。');
     if(['lay','recover'].includes(t.kind)){exact(t.patch,['id','x','z']);ok(int(t.patch.id)&&t.patch.id>0&&t.patch.id<s.nextId&&!ids.has(t.patch.id)&&patchAllowed(s,t.patch),'移送中の地面が不正です。');}else ok(t.patch===null,'不要な地面が移送に含まれています。');}
   ok(soilCopyTotals(s).total===s.source.total,'保管・車載・移送中・地面の土量が一致しません。');
-  const l=s.loader,v=l.vehicle,p=l.player;ok(['foot','driving','boarding','exiting'].includes(l.mode)&&['x','z','heading','speed','steering','wheelTravel'].every(k=>fin(v[k]))&&Math.abs(v.speed)<=100.001&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,[...boxes,...s.patches.map(q=>({id:'敷いた土',x:q.x,z:q.z,width:32,depth:32,height:2}))]),'車両の位置が不正です。');
+  const l=s.loader,v=l.vehicle,p=l.player;ok(['foot','driving','boarding','exiting'].includes(l.mode)&&['x','z','heading','speed','steering','wheelTravel'].every(k=>fin(v[k]))&&Math.abs(v.speed)<=200.001&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,[...boxes,...s.patches.map(q=>({id:'敷いた土',x:q.x,z:q.z,width:32,depth:32,height:2}))]),'車両の位置が不正です。');
   ok(['x','y','z','heading'].every(k=>fin(p[k]))&&p.y<=1200,'身体の座標が不正です。');if(l.mode==='foot')ok(bodyClear(s,p),'身体が床や障害物に入っています。');
   if(l.transition){ok(['boarding','exiting'].includes(l.mode)&&Array.isArray(l.transition.path)&&l.transition.path.length>=6&&l.transition.path.every(q=>['x','y','z','heading'].every(k=>fin(q[k])))&&fin(l.transition.elapsed)&&l.transition.elapsed>=0&&l.transition.elapsed<l.transition.duration,'乗降状態が不正です。');}else ok(!['boarding','exiting'].includes(l.mode),'乗降経路がありません。');
   exact(s.body,['vy','grounded','flight','jumpHeld','normal','mars']);ok(fin(s.body.vy)&&Math.abs(s.body.vy)<1000&&typeof s.body.grounded==='boolean'&&typeof s.body.jumpHeld==='boolean','ジャンプ状態が不正です。');if(s.body.flight){const f=s.body.flight;exact(f,['kind','from','peak','hit']);ok(['normal','mars'].includes(f.kind)&&fin(f.from)&&f.from>=0&&fin(f.peak)&&f.peak>=0&&typeof f.hit==='boolean','跳躍記録が不正です。');}

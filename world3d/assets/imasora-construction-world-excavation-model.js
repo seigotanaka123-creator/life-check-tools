@@ -1,4 +1,5 @@
 import * as THREE from './three.module.min.js';
+import {createGroundMark} from './imasora-construction-ground-mark.js?v=119bp';
 import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=487';
 import {FACES} from './imasora-construction-terrain.js';
 import {BIN,CELL} from './imasora-construction-excavator.js';
@@ -6,7 +7,7 @@ const FACE_TRIANGLES=[0,1,2,0,2,3],SOIL_COLORS=[new THREE.Color(0xaa7847),new TH
 // A walk-through gateway on the south edge; all other edges are fenced.
 export const EXCAVATION_FENCES=Object.freeze([
   {x:0,z:250,w:642,d:2},{x:-320,z:0,w:2,d:500},{x:320,z:0,w:2,d:500},
-  {x:-296,z:-250,w:48,d:2},{x:66,z:-250,w:508,d:2}
+  {x:-303,z:-250,w:34,d:2},{x:73,z:-250,w:494,d:2}
 ]);
 export function createWorldExcavationModel(){
   const root=new THREE.Group();root.name='construction-excavation-yard';
@@ -18,12 +19,12 @@ export function createWorldExcavationModel(){
   for(const x of[-1,1])box(BIN.x+x*(BIN.width/2-1.5),5,BIN.z,3,10,BIN.depth,metal,'受け箱の縁');
   for(const z of[-1,1])box(BIN.x,5,BIN.z+z*(BIN.depth/2-1.5),BIN.width,10,3,metal,'受け箱の縁');
   // Entry markings lie outside the editable soil: no plane across the tunnel.
-  const entry=box(-230,.07,-232,72,.12,34,yellow,'作業区画の出入口');
+  const entry=createGroundMark(root,{name:'作業区画の出入口',x:-230,z:-232,width:72,depth:34,color:0xe7bd55,y:.13});
   const canvas=document.createElement('canvas');canvas.width=768;canvas.height=160;const ctx=canvas.getContext('2d');ctx.fillStyle='#264b44';ctx.fillRect(0,0,768,160);ctx.fillStyle='#fff2ca';ctx.font='bold 55px sans-serif';ctx.textAlign='center';ctx.fillText('ショベルカー作業区画',384,98);
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const sign=new THREE.Mesh(new THREE.PlaneGeometry(116,24),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));sign.position.set(-140,44,-248);sign.rotation.y=Math.PI;root.add(sign);
   const machine=createExcavator();root.add(machine);
-  const particles=new THREE.InstancedMesh(new THREE.BoxGeometry(7.8,7.8,7.8),soil,1792),pile=new THREE.InstancedMesh(new THREE.BoxGeometry(6.5,5,6.5),soil,200);
+  const particles=new THREE.InstancedMesh(new THREE.BoxGeometry(CELL,CELL,CELL),soil,1792),pile=new THREE.InstancedMesh(new THREE.BoxGeometry(6.5,5,6.5),soil,200);
   for(const o of[particles,pile]){o.frustumCulled=false;o.castShadow=o.receiveShadow=true;root.add(o);}
   // Keep the bucket unobstructed: the old floating ring was a debug guide,
   // not a machine part or a collider. Digging remains in the physics module.

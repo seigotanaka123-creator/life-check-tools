@@ -10,7 +10,7 @@ export const SHOP_OFFERS = Object.freeze([
     vehicle:'ローダーで運び、バケットから注ぐ',look:'water'}),
   Object.freeze({id:'mars-soil',name:'火星土',price:10,amount:8000,unit:'土量',pack:'8ブロック分',
     description:'足元に敷くと、ジャンプの到達高が通常の3倍に。重ねても倍率は増えません。',
-    vehicle:'ローダーで運び、地面に敷く（接続予定）',look:'soil'}),
+    vehicle:'土ローダーで運び、地面に敷く・回収する',look:'soil'}),
   Object.freeze({id:'mars-timber',name:'火星木材',price:18,amount:26880,unit:'材積',pack:'浮遊床1枚分',
     description:'離した高さに浮く木材。つなげれば、広い空中の床を作れます。',
     vehicle:'クレーンで吊り上げ、床同士を接合',look:'timber'}),

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="imasora-player-ui">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QKD3PTLJSQ"></script>
@@ -11,13 +11,13 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>イマソラウォーカーズ</title>
-  <meta name="description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーカーズ。歩いて、立ち止まり、イマソラ認識で町と相棒を育てるローカル試作です。">
+  <title>イマソラーズウォーク</title>
+  <meta name="description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラーズウォーク。歩いて、立ち止まり、イマソラ認識で町と相棒を育てる散歩ゲームです。">
   <link rel="canonical" href="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Life Check Tools">
-  <meta property="og:title" content="イマソラウォーカーズ">
-  <meta property="og:description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラウォーカーズ。25マスマップを進め、重要マスではイマソラ認識で進化やタネ召喚を楽しむ散歩ゲーム試作です。">
+  <meta property="og:title" content="イマソラーズウォーク">
+  <meta property="og:description" content="大人もハマる、今の空で進化する散歩ゲームアプリ、イマソラーズウォーク。25マスマップを進め、重要マスではイマソラ認識で進化やタネ召喚を楽しむ散歩ゲームです。">
   <meta property="og:url" content="https://seigotanaka123-creator.github.io/life-check-tools/life-quest-walk.html">
   <meta property="og:image" content="https://seigotanaka123-creator.github.io/life-check-tools/images/ogp-life-check-tools-home.png?v=20260517">
   <meta name="twitter:card" content="summary_large_image">
@@ -356,7 +356,7 @@
       justify-content: flex-start;
       color: #ff8abe;
       font-family: "Imasora Rounded Pop", "HGP創英角ﾎﾟｯﾌﾟ体", "HG創英角ﾎﾟｯﾌﾟ体", "Meiryo", sans-serif;
-      font-size: 82px;
+      font-size: clamp(44px, 13.5vw, 70px);
       font-weight: 400;
       line-height: .94;
       letter-spacing: 0;
@@ -388,19 +388,12 @@
     }
     .new-opening-title-part.imasora {
       color: #ff8abe;
-      transform: translateX(-22px) rotate(-2deg);
+      transform: translateX(-4px) rotate(-2deg);
     }
     .new-opening-title-part.walk {
       margin-top: -2px;
       color: #58dfc0;
-      transform: translateX(26px) rotate(2deg);
-    }
-    .new-opening-title-part.walk.walkers {
-      font-size: 1em;
-      transform: translateX(4px) rotate(2deg);
-    }
-    .new-opening-title-part.walk.walkers::before {
-      content: "ウォーカーズ";
+      transform: translateX(14px) rotate(2deg);
     }
     .new-opening-logo-char {
       display: inline-block;
@@ -413,6 +406,8 @@
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(2) { color: #f47cdf; transform: translateY(-2px) rotate(2deg); }
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(3) { color: #db82f6; transform: translateY(1px) rotate(-1deg); }
     .new-opening-title-part.imasora .new-opening-logo-char:nth-child(4) { color: #b58cf8; transform: translateY(-1px) rotate(3deg); }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(5) { color: #a98df5; transform: translateY(1px) rotate(-2deg); }
+    .new-opening-title-part.imasora .new-opening-logo-char:nth-child(6) { color: #9c99f6; transform: translateY(-1px) rotate(2deg); }
     .new-opening-title-part.walk .new-opening-logo-char:nth-child(1) { color: #63e7cb; transform: translateY(-1px) rotate(-2deg); }
     .new-opening-title-part.walk .new-opening-logo-char:nth-child(2) { color: #63e7cb; transform: translateY(2px) rotate(2deg); }
     .new-opening-title-part.walk .new-opening-logo-char:nth-child(3) { color: #63e7cb; transform: translateY(-2px) rotate(-1deg); }
@@ -495,19 +490,19 @@
     }
     @media (max-width: 380px) {
       .new-opening-title {
-        font-size: 70px;
+        font-size: clamp(42px, 13.5vw, 51px);
       }
       .new-opening-title-part.imasora {
-        transform: translateX(-14px) rotate(-2deg);
+        transform: translateX(-2px) rotate(-2deg);
       }
       .new-opening-title-part.walk {
-        transform: translateX(18px) rotate(2deg);
+        transform: translateX(10px) rotate(2deg);
       }
     }
     @media (max-height: 720px) {
       .new-opening-title {
         top: max(56px, calc(env(safe-area-inset-top) + 46px));
-        font-size: 74px;
+        font-size: clamp(42px, 13.5vw, 64px);
       }
       .new-opening-stage {
         bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
@@ -10608,6 +10603,43 @@
       margin-top: 3px;
       font-size: 11px;
     }
+    .construction-pack-panel {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #c7d8c2;
+      border-radius: 10px;
+      background: linear-gradient(140deg, #f4fff2, #fffdf4);
+    }
+    .construction-pack-panel h3 { margin: 0; color: #315b36; font-size: 14px; }
+    .construction-pack-panel p { margin: 5px 0 8px; color: #59665a; font-size: 11px; line-height: 1.45; }
+    .construction-pack-stock { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+    .construction-pack-stock div { padding: 7px; border: 1px solid #dce7d8; border-radius: 7px; background: #fff; }
+    .construction-pack-stock strong { display: block; color: #315b36; font-size: 11px; }
+    .construction-pack-stock small { display: block; margin-top: 3px; color: #46534a; font-weight: 800; }
+    .construction-pack-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: end; }
+    .construction-pack-form label { display: grid; gap: 4px; color: #425342; font-size: 11px; font-weight: 800; }
+    .construction-pack-form input, .construction-pack-form select { width: 100%; min-height: 36px; border: 1px solid #bbcbb7; border-radius: 7px; background: #fff; padding: 6px 8px; font: inherit; }
+    .construction-pack-preview { grid-column: 1 / -1; padding: 8px; border-radius: 7px; background: #edf6e9; color: #344b36; font-size: 11px; line-height: 1.45; }
+    .construction-pack-consent { grid-column: 1 / -1; display: flex !important; grid-template-columns: auto 1fr; align-items: start; gap: 7px !important; }
+    .construction-pack-consent input { width: 16px; min-height: 16px; margin: 1px 0 0; }
+    .construction-pack-form button { grid-column: 1 / -1; min-height: 38px; border: 1px solid #55774a; border-radius: 8px; background: #e8f4e1; color: #2e5031; font-weight: 900; }
+    .construction-pack-form button:disabled { opacity: .5; }
+    .construction-pack-transfer { margin-top: 10px; padding: 10px; border: 1px solid #b8cbb3; border-radius: 9px; background: #f5f8f2; }
+    .construction-pack-transfer h4 { margin: 0 0 5px; color: #315b36; font-size: 13px; }
+    .construction-pack-transfer p { margin: 5px 0 8px; color: #59665a; font-size: 11px; line-height: 1.45; }
+    .construction-pack-transfer form { display: grid; gap: 7px; }
+    .construction-pack-transfer label { display: grid; gap: 4px; color: #425342; font-size: 11px; font-weight: 800; }
+    .construction-pack-transfer input[type="text"] { width: 100%; min-height: 38px; border: 1px solid #bbcbb7; border-radius: 7px; background: #fff; padding: 6px 8px; font: inherit; letter-spacing: .08em; }
+    .construction-pack-transfer .construction-pack-consent { display: flex !important; align-items: start; gap: 7px; }
+    .construction-pack-transfer button { min-height: 38px; border: 1px solid #55774a; border-radius: 8px; background: #e8f4e1; color: #2e5031; font-weight: 900; }
+    .construction-pack-transfer button:disabled { opacity: .5; }
+    .construction-pack-transfer-status { padding: 7px; border-radius: 7px; background: #e8f0e4; }
+    .construction-pack-transfer-list { display: grid; gap: 5px; }
+    .construction-pack-transfer-item { display: grid; gap: 4px; padding: 7px; border: 1px solid #dce7d8; border-radius: 7px; background: #fff; font-size: 10px; overflow-wrap: anywhere; }
+    @media (max-width: 480px) {
+      .construction-pack-stock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .construction-pack-form { grid-template-columns: 1fr; }
+    }
     .town-shop {
       margin-top: 12px;
       padding: 12px;
@@ -17573,12 +17605,15 @@
       z-index: 13;
     }
   </style>
+  <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
+<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=119bm">
+<script>if(new URLSearchParams(location.search).get("developer")==="1")document.documentElement.classList.add("game-developer-ui");</script>
 </head>
 <body class="loading-screen-active">
 <div class="app">
-  <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラウォーカーズのオープニング画面" hidden>
+  <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラーズウォークのオープニング画面" hidden>
     <img class="new-opening-background" src="assets/imasora-new-opening-v1.png" alt="">
-    <h1 class="new-opening-title" aria-label="イマソラウォーカーズ"><span class="new-opening-title-part imasora" data-text="イマソラ" aria-hidden="true"><span class="new-opening-logo-char">イ</span><span class="new-opening-logo-char">マ</span><span class="new-opening-logo-char">ソ</span><span class="new-opening-logo-char">ラ</span></span><span class="new-opening-title-part walk walkers" data-text="ウォーカーズ" aria-hidden="true"><span class="new-opening-logo-char">ウ</span><span class="new-opening-logo-char">ォ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">カ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ズ</span></span></h1>
+    <h1 class="new-opening-title" aria-label="イマソラーズウォーク"><span class="new-opening-title-part imasora" data-text="イマソラーズ" aria-hidden="true"><span class="new-opening-logo-char">イ</span><span class="new-opening-logo-char">マ</span><span class="new-opening-logo-char">ソ</span><span class="new-opening-logo-char">ラ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ズ</span></span><span class="new-opening-title-part walk" data-text="ウォーク" aria-hidden="true"><span class="new-opening-logo-char">ウ</span><span class="new-opening-logo-char">ォ</span><span class="new-opening-logo-char">ー</span><span class="new-opening-logo-char">ク</span></span></h1>
     <div class="new-opening-stage">
       <div class="new-opening-guide" id="newOpeningGuide" role="img" aria-label="白ミチロードセイバーレン"></div>
       <button class="new-opening-start" id="newOpeningStartBtn" type="button">はじめる</button>
@@ -17587,8 +17622,8 @@
   <header>
     <section class="hero">
       <p class="eyebrow">大人もハマる、今の空で進化する散歩ゲームアプリ</p>
-      <h1>イマソラウォーカーズ</h1>
-      <div class="core-loop" aria-label="イマソラウォーカーズの基本の遊び方">
+      <h1>イマソラーズウォーク</h1>
+      <div class="core-loop" aria-label="イマソラーズウォークの基本の遊び方">
         <div class="loop-step walk">
           <span class="loop-num">1</span><div class="loop-icon walker-icon" aria-hidden="true"><span class="walker"><i class="walker-head"></i><i class="walker-body"></i><i class="walker-arm front"></i><i class="walker-arm back"></i><i class="walker-leg front"></i><i class="walker-leg back"></i></span></div>
           <b>歩く</b>
@@ -17609,7 +17644,7 @@
     </section>
   </header>
 
-  <nav class="app-nav" aria-label="イマソラウォーカーズ menu">
+  <nav class="app-nav" aria-label="イマソラーズウォークのメニュー">
     <button class="nav-tab active" type="button" data-tab="walk">歩く</button>
     <button class="nav-tab" type="button" data-tab="monster">育成・大会</button>
     <button class="nav-tab" type="button" data-tab="town">街・記録</button>
@@ -17645,7 +17680,7 @@
       <div class="proof">
         <div class="proof-row">
           <div>
-            <b>Step Session</b>
+            <b>散歩の記録</b>
             <span id="proofText">歩数計カウント中はゲーム進行しません。停止後のイマソラ認識で進行します。</span>
           </div>
           <span class="proof-chip" id="proofChip">OFF</span>
@@ -17666,7 +17701,7 @@
         <div class="sky-detector">
           <div class="sky-detector-head">
             <b>認識ステータス</b>
-            <span class="detector-chip" id="walkSkyDetectorChip">READY</span>
+            <span class="detector-chip" id="walkSkyDetectorChip">準備OK</span>
           </div>
           <div class="sky-detector-grid" id="walkSkyDetectorStatus"></div>
         </div>
@@ -17680,7 +17715,7 @@
       </div>
       <div class="imasora-definition" id="imasoraDefinition">
         <b>イマソラとは</b>
-        <span>イマソラは「今の空」のことであり、イマソラウォーカーズではその空をスマホで認識することがタネ報酬の獲得やモンスターの進化には必要不可欠な行動となります。端末内で空らしさ、明るさ、雲量、時間帯などを判定するための結果だけに使われます。</span>
+        <span>イマソラは「今の空」のことであり、イマソラーズウォークではその空をスマホで認識することがタネ報酬の獲得やモンスターの進化には必要不可欠な行動となります。端末内で空らしさ、明るさ、雲量、時間帯などを判定するための結果だけに使われます。</span>
       </div>
       <div class="safety-note">
         <b>安全ルール</b>
@@ -17692,7 +17727,7 @@
 
     <section class="panel screen" data-screen="guildSupportSearch">
       <h2>協力支援を探す</h2>
-      <p>協力支援を依頼している相棒の一覧です。正式版では、依頼中の相棒をここから確認する想定です。</p>
+      <p>協力支援を依頼している相棒の一覧です。</p>
       <div class="guild-panel" id="guildRequestList"></div>
     </section>
 
@@ -17802,9 +17837,9 @@
       <h2>散歩モンスター</h2>
       <p>イマソラ認識と日々の育成で、タネから育つ姿が変わります。</p>
       <div class="section-jump" aria-label="散歩モンスター確認ショートカット">
-        <button type="button" data-monster-view="characterGalleryPage" aria-controls="characterGalleryPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'characterGalleryPage')">キャラデザイン確認</button>
+        <button type="button" data-monster-view="characterGalleryPage" aria-controls="characterGalleryPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'characterGalleryPage')">相棒のすがた</button>
         <button type="button" data-monster-view="monsterDexPage" aria-controls="monsterDexPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'monsterDexPage')">モンスター図鑑</button>
-        <button type="button" data-monster-view="evolutionPlanPage" aria-controls="evolutionPlanPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'evolutionPlanPage')">進化系統計画</button>
+        <button type="button" data-monster-view="evolutionPlanPage" aria-controls="evolutionPlanPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'evolutionPlanPage')">進化の道しるべ</button>
         <button type="button" data-monster-view="itemBoxPage" aria-controls="itemBoxPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'itemBoxPage')">育成アイテム</button>
       </div>
       <div class="sky-summon">
@@ -17818,7 +17853,7 @@
         <div class="sky-detector">
           <div class="sky-detector-head">
             <b>イマソラ認識装置</b>
-            <span class="detector-chip" id="skyDetectorChip">READY</span>
+            <span class="detector-chip" id="skyDetectorChip">準備OK</span>
           </div>
           <div class="sky-detector-grid" id="skyDetectorStatus"></div>
         </div>
@@ -17858,9 +17893,9 @@
       <p class="micro-note">参加したい大会カードを押すと、ここに確認が出ます。</p>
       <div class="balance-room" id="balanceRoom"></div>
       <div class="section-jump" aria-label="育成確認メニュー">
-        <button type="button" class="active" data-monster-view="characterGalleryPage" aria-controls="characterGalleryPage" aria-pressed="true" onclick="openMonsterSubpage(event, 'characterGalleryPage')">キャラデザイン確認</button>
+        <button type="button" class="active" data-monster-view="characterGalleryPage" aria-controls="characterGalleryPage" aria-pressed="true" onclick="openMonsterSubpage(event, 'characterGalleryPage')">相棒のすがた</button>
         <button type="button" data-monster-view="monsterDexPage" aria-controls="monsterDexPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'monsterDexPage')">モンスター図鑑</button>
-        <button type="button" data-monster-view="evolutionPlanPage" aria-controls="evolutionPlanPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'evolutionPlanPage')">進化系統計画</button>
+        <button type="button" data-monster-view="evolutionPlanPage" aria-controls="evolutionPlanPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'evolutionPlanPage')">進化の道しるべ</button>
         <button type="button" data-monster-view="itemBoxPage" aria-controls="itemBoxPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'itemBoxPage')">育成アイテム</button>
       </div>
       <section class="monster-subpage active" id="characterGalleryPage">
@@ -17872,7 +17907,7 @@
         <div class="dex-grid" id="monsterDex"></div>
       </section>
       <section class="monster-subpage" id="evolutionPlanPage">
-        <h3 id="evolutionPlanTitle">進化系統計画</h3>
+        <h3 id="evolutionPlanTitle">進化の道しるべ</h3>
         <div class="evolution-plan" id="evolutionPlan"></div>
       </section>
       <section class="monster-subpage" id="itemBoxPage">
@@ -17883,13 +17918,13 @@
 
     <section class="panel screen" data-screen="rules">
       <h2>規約・設定</h2>
-      <p>イマソラウォーカーズは現実の散歩とつながるため、安全ルールをゲーム進行より上位に置きます。</p>
+      <p>イマソラーズウォークは現実の散歩とつながるため、安全ルールをゲーム進行より上位に置きます。</p>
       <div class="settings-panel-stack" id="homeSettingsPanel">
         <div class="policy-card" id="talkSettings"></div>
         <div class="policy-card" id="companionColorSettings"></div>
         <div class="policy-card" id="soundSettings"></div>
       </div>
-      <div class="policy-card">
+      <div class="policy-card" data-developer-only>
         <b>第1回プレイテスト準備</b>
         <span>完成度ではなく、方向性の確認をします。実際に触って、楽しいか、分かりやすいか、面倒ではないかを見ます。</span>
         <ul>
@@ -18141,7 +18176,7 @@
         <b>クレジット</b>
         <span>一部効果音: OtoLogic（https://otologic.jp/） / CC BY 4.0</span>
       </div>
-      <div class="policy-card">
+      <div class="policy-card" data-developer-only>
         <b>第1回プレイテスト実行手順</b>
         <span>ローカル試作なので、本物の散歩判定ではなく、画面操作で流れを確認します。まずは1周だけ通して、楽しいか、分かりにくいかを見ます。</span>
         <ul>
@@ -18206,7 +18241,7 @@
           <li>不正な歩数操作、改造、複数端末による不正、ボット利用をしない。</li>
         </ul>
       </div>
-      <div class="policy-card">
+      <div class="policy-card" data-developer-only>
         <b>正式アプリの画面階層案</b>
         <ul>
           <li>ホーム: 今日の歩数、25マスマップ、歩行セッション、停止確認、安全表示。</li>
@@ -18220,7 +18255,7 @@
       </div>
       <div class="policy-card">
         <b>冒険ログ</b>
-        <span>今日までの散歩の出来事です。正式アプリでは「記録」階層に置き、自宅でゆっくり見返す画面にします。</span>
+        <span>これまでの散歩や相棒との出来事を振り返れます。</span>
         <div class="log" id="log"></div>
       </div>
       <div class="actions">
@@ -18240,6 +18275,12 @@
   </div>
 </div>
 
+<script src="./assets/imasora-construction-reward-ledger.js?v=20260924-plan107"></script>
+<script src="./assets/imasora-construction-pack-transfer.js?v=20260924-plan98"></script>
+<script src="./assets/imasora-construction-pack-ledger.js?v=20260924-plan107"></script>
+<script src="./assets/imasora-construction-save-guard.js?v=20260924-plan107"></script>
+<script src="./assets/imasora-arcade-reward-transaction.js?v=20260924-plan94"></script>
+<script src="./assets/imasora-pending-rewards.js?v=20261003-reward-recovery-120b"></script>
 <script>
 const storeKey = "lifeQuestWalkV1";
 // UFO装備素材は、日々の散歩とゲームセンターの遊びを無理に一体化せず、
@@ -18266,6 +18307,11 @@ function normalizeUfoWorkshopMaterialLedger(value) {
   Object.keys(ufoWorkshopMaterialLabels).forEach(id => {
     if (id !== "arcadeParts") ledger[id] = amount(raw[id]);
   });
+  // Craft receipts belong to the 3D save journal. Reward writers preserve them
+  // exactly, including unrecognized values; only the 3D owner may interpret them.
+  if (Object.prototype.hasOwnProperty.call(raw, "worldCraftReceipts")) {
+    ledger.worldCraftReceipts = structuredClone(raw.worldCraftReceipts);
+  }
   return ledger;
 }
 function readUfoWorkshopMaterialLedger() {
@@ -18342,40 +18388,255 @@ function refreshUfoArcadeDailyNotices() {
 }
 function withUfoArcadeRewardLock(action) {
   // A single lock covers the allowance, material credit and optional coin debit across tabs.
-  if (navigator.locks?.request) return navigator.locks.request("imasora-ufo-arcade-reward", action);
+  if (navigator.locks?.request) return navigator.locks.request("imasora-ufo-arcade-reward", () => {
+    // Finish both older rollback journals before any material writer starts.
+    recoverPachicoinPrizeExchange();
+    recoverUfoArcadeReward();
+    return action();
+  });
   return Promise.reject(new Error("このブラウザーでは獲得記録を安全に保存できません。"));
 }
-function recoverUfoArcadeReward() {
-  const raw = localStorage.getItem(ufoArcadeRewardJournalKey);
-  if (!raw) return;
-  const record = JSON.parse(raw);
-  if (record.version !== 1 || !Array.isArray(record.before) || record.before.length < 2
-    || record.before.some(([key, value]) => ![ufoArcadeDailyKey, ufoWorkshopMaterialStoreKey, pachicoinHeldCoinKey].includes(key)
-      || !(value === null || typeof value === "string"))) throw new Error("Invalid arcade reward recovery record");
-  for (const [key, value] of record.before) {
-    if (value === null) localStorage.removeItem(key);
-    else localStorage.setItem(key, value);
+const constructionSaveGuard = window.ImasoraConstructionSaveGuard.createGuard();
+let constructionPackOpeningPending = false;
+let constructionPackTransferPending = false;
+function constructionPackAuxiliaryLabel(kind) {
+  return ({ formwork: "型枠", rebar: "鉄筋", tiles: "タイル", decoration: "装飾材" })[kind] || "補助資材";
+}
+function refreshConstructionPackPreview() {
+  const form = document.querySelector("#townWorkshop [data-construction-pack-open-form]");
+  if (!form) return;
+  const input = form.querySelector("[data-pack-box-count]");
+  const select = form.querySelector("[data-pack-auxiliary-kind]");
+  const consent = form.querySelector("[data-pack-trial-consent]");
+  const button = form.querySelector("[data-pack-open-submit]");
+  const previewNode = form.querySelector("[data-pack-preview]");
+  const boxes = Number(input?.value);
+  const auxiliaryKind = select?.value;
+  const plan = window.ImasoraConstructionPackLedger.preview(boxes, auxiliaryKind);
+  if (plan) {
+    previewNode.textContent = `${boxes}箱の内容：コンクリート ${plan.concreteBlockCredits}杯分 / ペンキ ${plan.paintSurfaceCredits}面分 / ${constructionPackAuxiliaryLabel(auxiliaryKind)} ${plan.auxiliaryUnits}。配布量は調整中です。工事現場への送り方は下で確認できます。`;
+  } else {
+    previewNode.textContent = "箱数と補助資材を選ぶと、開封内容を表示します。";
   }
-  localStorage.removeItem(ufoArcadeRewardJournalKey);
+  const reward = state.constructionRewardLedger;
+  const materials = state.constructionMaterialLedger;
+  const ready = plan && Number.isSafeInteger(reward?.unopenedBoxes) && boxes <= reward.unopenedBoxes
+    && !reward?.blocked && !materials?.blocked && Boolean(consent?.checked) && !constructionPackOpeningPending;
+  button.disabled = !ready;
+  button.textContent = constructionPackOpeningPending ? "開封を保存中…" : "内容を確認して建築セットを開封";
+}
+function refreshConstructionPackTransfer() {
+  const form = document.querySelector("#townWorkshop [data-construction-pack-transfer-form]");
+  if (!form) return;
+  const target = form.querySelector("[data-pack-transfer-profile]")?.value.trim().toLowerCase() || "";
+  const consent = form.querySelector("[data-pack-transfer-consent]")?.checked;
+  const button = form.querySelector("[data-pack-transfer-submit]");
+  const status = form.querySelector("[data-pack-transfer-status]");
+  const available = window.ImasoraConstructionPackLedger.transferAvailability(state.constructionMaterialLedger);
+  status.textContent = available.blocked ? `保存を照合できません：${available.reason} 移送しません。`
+    : available.ready ? `今回移送できる試作分：ブロック相当 ${available.quantities.concreteBlockCredits} / 塗装面相当 ${available.quantities.paintSurfaceCredits} / 型枠 ${available.quantities.auxiliaryUnits.formwork} / 鉄筋 ${available.quantities.auxiliaryUnits.rebar} / タイル ${available.quantities.auxiliaryUnits.tiles} / 装飾材 ${available.quantities.auxiliaryUnits.decoration}`
+    : "移送できる未移送の開封分はありません。";
+  button.disabled = constructionPackTransferPending || !available.ready || !/^[0-9a-f]{8}$/.test(target) || !consent;
+  button.textContent = constructionPackTransferPending ? "移送記録を保存中…" : "確認して移送ファイルを作成";
+}
+function downloadConstructionPackTransfer(packet) {
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `imasora-construction-trial-${packet.targetProfileId}-${packet.id}.json`;
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+async function exportConstructionPackTrial(targetProfileId) {
+  if (constructionPackTransferPending) return;
+  constructionPackTransferPending = true;
+  refreshConstructionPackTransfer();
+  try {
+    const result = await withUfoArcadeRewardLock(() => {
+      const raw = localStorage.getItem(storeKey);
+      const savedState = raw ? JSON.parse(raw) : { ...state };
+      const prepared = window.ImasoraConstructionPackLedger.prepareTransferState(savedState, targetProfileId,
+        `export-${createConstructionPackEventToken()}`, { date: todayKey() });
+      if (prepared.status === "exported") {
+        commitUfoArcadeJournaledEntries([[storeKey, JSON.stringify(prepared.state)]], "roll-forward");
+        state.constructionMaterialLedger = prepared.ledger;
+        if (Array.isArray(prepared.state.logs)) state.logs = prepared.state.logs;
+      }
+      return prepared;
+    });
+    if (result.status === "exported" || result.status === "duplicate") {
+      try { downloadConstructionPackTransfer(result.packet); }
+      catch (error) {
+        console.warn("建築セット試作ポイントの移送記録は保存済みですが、ファイル出力に失敗しました。", error);
+        toast("移送記録は保存済みです。工房の移送履歴からファイルを再保存できます。");
+        return;
+      }
+      playSfx("itemUse");
+      toast(result.status === "exported" ? "試作ポイントを移送用に記録し、ファイルを保存しました。" : "同じ移送ファイルを再保存しました。二重移送ではありません。");
+    } else if (result.status === "blocked") toast("台帳の整合を確認できません。ポイントは移送していません。");
+    else if (result.status === "conflict") toast("移送番号と受取先が一致しません。ポイントは移送していません。");
+    else toast("移送できる試作ポイントを確認できません。ポイントは移送していません。");
+  } catch (error) {
+    console.error("建築セット試作ポイントの移送を保存できませんでした。", error);
+    toast("移送記録を保存できません。ポイントは確認後に再操作してください。");
+  } finally {
+    constructionPackTransferPending = false;
+    renderTownWorkshop();
+  }
+}
+async function openConstructionPackBoxes(boxes, auxiliaryKind) {
+  if (constructionPackOpeningPending) return;
+  const current = state.constructionRewardLedger;
+  if (!Number.isSafeInteger(boxes) || boxes < 1 || boxes > Number(current?.unopenedBoxes || 0)
+    || !window.ImasoraConstructionPackLedger.preview(boxes, auxiliaryKind)) {
+    toast("開封する箱数と補助資材を確認してください。");
+    return;
+  }
+  constructionPackOpeningPending = true;
+  refreshConstructionPackPreview();
+  try {
+    const eventId = `open-${createConstructionPackEventToken()}`;
+    const result = await withUfoArcadeRewardLock(() => {
+      const raw = localStorage.getItem(storeKey);
+      const savedState = raw ? JSON.parse(raw) : { ...state };
+      if (!savedState || typeof savedState !== "object" || Array.isArray(savedState)) {
+        throw new Error("保存データを確認できません。");
+      }
+      const prepared = window.ImasoraConstructionPackLedger.prepareOpeningState(savedState, {
+        boxes, auxiliaryKind, eventId, date: todayKey()
+      }, window.ImasoraConstructionRewardLedger);
+      if (!prepared.opened) return prepared;
+      commitUfoArcadeJournaledEntries([[storeKey, JSON.stringify(prepared.state)]], "roll-forward");
+      state.constructionRewardLedger = prepared.rewardLedger;
+      state.constructionMaterialLedger = prepared.ledger;
+      if (Array.isArray(prepared.state.logs)) state.logs = prepared.state.logs;
+      return prepared;
+    });
+    if (result?.opened) {
+      playSfx("itemUse");
+      toast(`建築セットを${result.boxes}箱開封しました。試作台帳に記録しました。`);
+      renderTownWorkshop();
+    } else if (result?.status === "blocked") {
+      toast("台帳の保存情報を確認できないため、開封を保留しました。箱は消費していません。");
+      renderTownWorkshop();
+    } else if (result?.status === "duplicate") {
+      toast("この開封記録はすでに反映されています。箱は追加で消費していません。");
+      renderTownWorkshop();
+    } else {
+      toast("未開封箱の数を確認できないため、開封しませんでした。箱は消費していません。");
+      renderTownWorkshop();
+    }
+  } catch (error) {
+    console.error("建築セットを安全に開封できませんでした。", error);
+    toast("開封の保存結果を確認できません。保存済みの可能性もあるため、再操作前に工房で最新の箱数と開封履歴を確認してください。");
+  } finally {
+    constructionPackOpeningPending = false;
+    refreshConstructionPackPreview();
+  }
+}
+function createConstructionPackEventToken() {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi?.randomUUID) return cryptoApi.randomUUID().replaceAll("-", "");
+  const bytes = new Uint32Array(4);
+  cryptoApi.getRandomValues(bytes);
+  return Array.from(bytes, value => value.toString(16).padStart(8, "0")).join("");
+}
+function renderPendingArcadeRewards(entries) {
+  if (typeof document === "undefined" || !document.body) return;
+  let panel = document.getElementById("imasoraPendingArcadeRewards");
+  const failed = entries.some(entry => entry.failed);
+  if (!failed) { panel?.remove(); return; }
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = "imasoraPendingArcadeRewards";
+    panel.setAttribute("role", "status");
+    panel.style.cssText = "position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:20000;width:min(420px,calc(100% - 16px));box-sizing:border-box;padding:12px 14px;border:2px solid #b66a16;border-radius:14px;background:#fff4dc;color:#332513;box-shadow:0 4px 18px #0004;font:600 14px/1.5 system-ui;";
+    const text = document.createElement("p"); text.dataset.rewardMessage = ""; text.style.margin = "0 0 8px";
+    const button = document.createElement("button"); button.type = "button";
+    button.textContent = "報酬を保存し直す";
+    button.style.cssText = "min-height:44px;padding:8px 18px;border:0;border-radius:10px;background:#225e48;color:white;font:700 15px system-ui;touch-action:manipulation;-webkit-user-select:none;user-select:none;";
+    button.addEventListener("click", () => retryPendingArcadeRewards());
+    panel.append(text, button); document.body.append(panel);
+  }
+  panel.querySelector("[data-reward-message]").textContent = "報酬の保存待ち：" + entries.length + "件。この画面を閉じず、端末の空き容量・保存設定を確認してから保存し直してください。";
+  panel.querySelector("button").disabled = entries.some(entry => entry.busy);
+}
+const pendingArcadeRewards = window.ImasoraPendingRewards.createQueue(renderPendingArcadeRewards);
+async function retryPendingArcadeRewards() {
+  await pendingArcadeRewards.retry();
+  if (!pendingArcadeRewards.hasPending()) toast("報酬を保存しました。続けて遊べます。");
+}
+window.addEventListener("beforeunload", event => {
+  if (!pendingArcadeRewards.hasPending()) return;
+  event.preventDefault(); event.returnValue = "";
+});
+function prepareArcadeHomeState() {
+  const raw = localStorage.getItem(storeKey);
+  const saved = raw === null ? { ...state } : JSON.parse(raw);
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) throw new Error("ホームの保存を読み取れません。");
+  // Do not discard current unsaved progress or spend a stale copy of an opened box.
+  const prepared = constructionSaveGuard.prepare(state, saved);
+  const memories = [...(Array.isArray(saved.triLinkMemories) ? saved.triLinkMemories : []), ...(Array.isArray(state.triLinkMemories) ? state.triLinkMemories : [])];
+  prepared.triLinkMemories = memories.filter((memory, index) => memories.findIndex(item => item?.id === memory?.id) === index).slice(0, 20);
+  return prepared;
+}
+function prepareArcadeMaintenanceEntries(game, amount, rewardDay, eventId = "") {
+  if (!amount || rewardDay !== ufoArcadeDayKey()) return { entries: [], granted: 0 };
+  const daily = readUfoArcadeDaily();
+  if (game === "triLink" && daily.triLinkAwards.includes(eventId)) return { entries: [], granted: 0 };
+  const granted = Math.min(amount, Math.max(0, ufoArcadeDailyLimits[game] - daily[game]));
+  if (!granted) return { entries: [], granted: 0 };
+  const ledger = normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}"));
+  ledger.arcadeParts += granted; ledger.updatedAt = Date.now(); daily[game] += granted;
+  if (game === "triLink") daily.triLinkAwards.push(eventId);
+  return { granted, entries: [[ufoWorkshopMaterialStoreKey, JSON.stringify(ledger)], [ufoArcadeDailyKey, JSON.stringify(daily)]] };
+}
+function recoverUfoArcadeReward() {
+  const recovered = window.ImasoraArcadeRewardTransaction.recover(localStorage, ufoArcadeRewardJournalKey,
+    [ufoArcadeDailyKey, ufoWorkshopMaterialStoreKey, pachicoinHeldCoinKey, storeKey]);
+  if (recovered) ufoArcadeDailyCache = null;
+}
+function commitUfoArcadeJournaledEntries(entries, recoveryMode = "rollback") {
+  window.ImasoraArcadeRewardTransaction.commit(localStorage, ufoArcadeRewardJournalKey, entries,
+    [ufoArcadeDailyKey, ufoWorkshopMaterialStoreKey, pachicoinHeldCoinKey, storeKey], recoveryMode);
+  const homeEntry = entries.find(([key]) => key === storeKey);
+  if (homeEntry) {
+    const saved = JSON.parse(homeEntry[1]);
+    state.constructionRewardLedger = window.ImasoraConstructionRewardLedger.normalize(saved.constructionRewardLedger);
+    state.constructionMaterialLedger = window.ImasoraConstructionPackLedger.normalize(saved.constructionMaterialLedger);
+    constructionSaveGuard.remember(saved);
+  }
   ufoArcadeDailyCache = null;
 }
 function commitUfoArcadeReward(daily, ledger, nextHeld = null) {
-  const entries = [[ufoWorkshopMaterialStoreKey, ledger], [ufoArcadeDailyKey, daily]];
-  if (nextHeld) entries.push([pachicoinHeldCoinKey, nextHeld]);
-  const before = entries.map(([key]) => [key, localStorage.getItem(key)]);
-  let journalWritten = false;
-  try {
-    localStorage.setItem(ufoArcadeRewardJournalKey, JSON.stringify({ version: 1, before }));
-    journalWritten = true;
-    for (const [key, value] of entries) localStorage.setItem(key, JSON.stringify(value));
-    localStorage.removeItem(ufoArcadeRewardJournalKey);
-    ufoArcadeDailyCache = null;
-  } catch (error) {
-    if (journalWritten) {
-      try { recoverUfoArcadeReward(); } catch { error.exchangeRecoveryRequired = true; }
+  const entries = [[ufoWorkshopMaterialStoreKey, JSON.stringify(ledger)], [ufoArcadeDailyKey, JSON.stringify(daily)]];
+  if (nextHeld) entries.push([pachicoinHeldCoinKey, JSON.stringify(nextHeld)]);
+  commitUfoArcadeJournaledEntries(entries);
+}
+async function awardConstructionArcadeReward(event, source = "") {
+  const capture = { ...event }, rewardDay = ufoArcadeDayKey();
+  return pendingArcadeRewards.submit("construction:" + capture.game + ":" + capture.eventId, source || "建築セット", async () => {
+    const result = await withUfoArcadeRewardLock(() => {
+      const savedState = prepareArcadeHomeState();
+      const grant = window.ImasoraConstructionRewardLedger.awardArcadeEvent(savedState.constructionRewardLedger, { ...capture, official: true });
+      if (!grant.granted) {
+        if (grant.status === "duplicate") {
+          state.constructionRewardLedger = grant.ledger;
+          constructionSaveGuard.remember(savedState);
+        }
+        return grant;
+      }
+      const nextState = { ...savedState, constructionRewardLedger: grant.ledger };
+      const maintenance = prepareArcadeMaintenanceEntries(capture.game, capture.game === "catcher" ? 1 : 0, rewardDay);
+      commitUfoArcadeJournaledEntries([...maintenance.entries, [storeKey, JSON.stringify(nextState)]], "roll-forward");
+      return { ...grant, committed: true, arcadePartsAwarded: maintenance.granted };
+    });
+    if (result?.committed) {
+      try { refreshUfoArcadeDailyNotices(); toast("建築セット +" + result.boxes + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("catcher", getUfoArcadeDailyStatus("catcher", true))); } catch {}
     }
-    throw error;
-  }
+    return result;
+  });
 }
 async function awardUfoWorkshopArcadeMaterials(reward, source = "", game, eventId = "") {
   const requested = Math.max(0, Math.floor(Number(reward?.arcadeParts) || 0));
@@ -18414,6 +18675,16 @@ async function awardUfoWorkshopArcadeMaterials(reward, source = "", game, eventI
 }
 window.addEventListener("storage", event => {
   if (event.key === ufoArcadeDailyKey) { ufoArcadeDailyCache = null; refreshUfoArcadeDailyNotices(); }
+  if (event.key === storeKey && event.newValue) {
+    try {
+      const remoteState = JSON.parse(event.newValue);
+      const reconciled = constructionSaveGuard.prepare(state, remoteState);
+      state.constructionRewardLedger = reconciled.constructionRewardLedger;
+      state.constructionMaterialLedger = reconciled.constructionMaterialLedger;
+      constructionSaveGuard.remember(remoteState);
+      if (document.querySelector("#townWorkshop [data-construction-pack-open-form]")) renderTownWorkshop();
+    } catch (error) { console.warn("他のタブの建築報酬台帳を読み込めません。", error); }
+  }
 });
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) { ufoArcadeDailyCache = null; refreshUfoArcadeDailyNotices(); }
@@ -18439,9 +18710,6 @@ function recoverPachicoinPrizeExchange() {
   else localStorage.setItem(ufoWorkshopMaterialStoreKey, pending.beforeLedger);
   localStorage.removeItem(pachicoinExchangeJournalKey);
 }
-try { recoverPachicoinPrizeExchange(); } catch (error) {
-  console.error("景品交換の保存を復旧できませんでした。", error);
-}
 function awardUfoWorkshopCoinPusherExchange(exchange) {
   // Called synchronously while the game's shared arcade-reward lock is held.
   recoverPachicoinPrizeExchange();
@@ -18463,22 +18731,50 @@ function awardUfoWorkshopCoinPusherExchange(exchange) {
     error.dailyLimitReached = true;
     throw error;
   }
-  const ledger = normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}"));
-  ledger.arcadeParts += 2;
-  ledger.updatedAt = Date.now();
+  if (typeof exchange?.exchangeId !== "string") throw new Error("Prize exchange ID is unavailable");
+  const materialLedger = normalizeUfoWorkshopMaterialLedger(JSON.parse(localStorage.getItem(ufoWorkshopMaterialStoreKey) || "{}"));
+  materialLedger.arcadeParts += 2;
+  materialLedger.updatedAt = Date.now();
   daily.pachicoin += 1;
-  commitUfoArcadeReward(daily, ledger, { ...held, credits: exchange.heldCreditsAfter });
+  const rawState = localStorage.getItem(storeKey);
+  const savedState = rawState ? JSON.parse(rawState) : { ...state };
+  if (!savedState || typeof savedState !== "object" || Array.isArray(savedState)) {
+    throw new Error("Home save cannot be verified");
+  }
+  const constructionGrant = window.ImasoraConstructionRewardLedger.awardArcadeEvent(
+    savedState.constructionRewardLedger,
+    { game: "pachicoin", kind: "exchange", eventId: exchange.exchangeId, official: true }
+  );
+  if (!constructionGrant.granted || constructionGrant.boxes !== 3) {
+    const error = new Error("Construction reward could not be committed");
+    error.constructionRewardUnavailable = true;
+    throw error;
+  }
+  const nextState = { ...savedState, constructionRewardLedger: constructionGrant.ledger };
+  const entries = [
+    [ufoWorkshopMaterialStoreKey, JSON.stringify(materialLedger)],
+    [ufoArcadeDailyKey, JSON.stringify(daily)],
+    [pachicoinHeldCoinKey, JSON.stringify({ ...held, credits: exchange.heldCreditsAfter })],
+    [storeKey, JSON.stringify(nextState)]
+  ];
+  try { commitUfoArcadeJournaledEntries(entries, "roll-forward"); }
+  catch (error) {
+    if (error?.recoveryRequired) error.exchangeRecoveryRequired = true;
+    throw error;
+  }
+  state.constructionRewardLedger = constructionGrant.ledger;
   const status = getUfoArcadeDailyStatus("pachicoin", true);
   // A log/render failure must never turn an already committed exchange into a retry.
   try {
-    addLog("ゲームセンター景品交換：もちコイン350枚 → 整備パーツ2個"
+    addLog(`ゲームセンター景品交換：もちコイン350枚 → 整備パーツ2個＋建築セット3箱（未開封合計${constructionGrant.ledger.unopenedBoxes}箱）`
       + (status.reached ? "。" + ufoArcadeDailyMessage("pachicoin", status) : ""));
     saveState();
     refreshUfoArcadeDailyNotices();
   } catch (error) { console.error("景品交換の履歴を更新できませんでした。", error); }
-  return { committed: true, dailyStatus: status };
+  return { committed: true, dailyStatus: status, constructionRewardBoxes: constructionGrant.boxes,
+    constructionUnopenedBoxes: constructionGrant.ledger.unopenedBoxes };
 }
-void withUfoArcadeRewardLock(() => recoverUfoArcadeReward()).catch(error => {
+void withUfoArcadeRewardLock(() => {}).catch(error => {
   console.error("ゲームセンター報酬の保存を復旧できませんでした。", error);
 });
 
@@ -18725,8 +19021,19 @@ const stampCatalog = [
 ];
 const monsterNicknameMaxLength = 12;
 const state = loadState();
+constructionSaveGuard.remember(state);
 normalizeState();
-saveState();
+// A pending journal owns the saved snapshot until recovery finishes under its lock.
+if (localStorage.getItem(ufoArcadeRewardJournalKey)) {
+  withUfoArcadeRewardLock(() => {
+    const saved = JSON.parse(localStorage.getItem(storeKey));
+    const reconciled = constructionSaveGuard.prepare(state, saved);
+    state.constructionRewardLedger = reconciled.constructionRewardLedger;
+    state.constructionMaterialLedger = reconciled.constructionMaterialLedger;
+    constructionSaveGuard.remember(saved);
+    saveState();
+  }).catch(error => { console.error("建築保存の復旧を保留しました。", error); });
+} else saveState();
 let todayCards = [];
 let selected = [];
 let selectedSky = "blue";
@@ -18766,10 +19073,10 @@ let townArcadeLobbyStepTimer = 0;
 let selectedTriLinkRetiredId = "";
 let pendingRetireParkPracticeRecordId = "";
 const memorialWallpaperChoices = [
-  { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラウォーカーズの街" },
-  { id: "wallpaper2", name: "壁紙2", src: "assets/imasora-wallpaper-workshop-dawn-v1.png", alt: "朝焼けのイマソラウォーカーズの街" },
-  { id: "wallpaper3", name: "壁紙3", src: "assets/imasora-wallpaper-workshop-home-v1.png", alt: "イマソラウォーカーズの相棒の部屋" },
-  { id: "wallpaper4", name: "壁紙4", src: "assets/imasora-wallpaper-workshop-karaoke-v1.png", alt: "イマソラウォーカーズのカラオケラウンジ" }
+  { id: "wallpaper1", name: "壁紙1", src: "assets/imasora-wallpaper-workshop-night-v1.png", alt: "夜のイマソラーズウォークの街" },
+  { id: "wallpaper2", name: "壁紙2", src: "assets/imasora-wallpaper-workshop-dawn-v1.png", alt: "朝焼けのイマソラーズウォークの街" },
+  { id: "wallpaper3", name: "壁紙3", src: "assets/imasora-wallpaper-workshop-home-v1.png", alt: "イマソラーズウォークの相棒の部屋" },
+  { id: "wallpaper4", name: "壁紙4", src: "assets/imasora-wallpaper-workshop-karaoke-v1.png", alt: "イマソラーズウォークのカラオケラウンジ" }
 ];
 let memorialWallpaperSelectedBackgroundId = "wallpaper2";
 let memorialWallpaperSelectedRecordId = "memorial-wallpaper-test-4";
@@ -40842,6 +41149,8 @@ const dailySideQuestItems = [
 function defaultState() {
   return {
     position: 0,
+    constructionRewardLedger: window.ImasoraConstructionRewardLedger.defaultLedger(),
+    constructionMaterialLedger: window.ImasoraConstructionPackLedger.defaultLedger(),
     coin: 0,
     monster: { seedId: "seed-walk", nickname: "ミチロードフワナ", xp: 35, nature: 4, city: 3, sky: 12, wins: 0, age: 0, lifeBonus: 0, bornAt: Date.now() - 73 * 60 * 60 * 1000, evolutionStage: 3, lifeExtensionUses: 0, grandQualified: false, medals: [], skills: ["tap"] },
     walkSession: { active: false, startedAt: 0, stepChecked: false, stopped: false, skyVerified: false, stepCount: 0, blocked: false },
@@ -40904,7 +41213,25 @@ function loadState() {
   }
 }
 function saveState() {
-  localStorage.setItem(storeKey, JSON.stringify(state));
+  try {
+    if (localStorage.getItem(ufoArcadeRewardJournalKey)) {
+      const error = new Error("CONSTRUCTION_RECOVERY_PENDING");
+      error.constructionSaveConflict = true;
+      throw error;
+    }
+    const raw = localStorage.getItem(storeKey);
+    const next = constructionSaveGuard.prepare(state, raw === null ? undefined : JSON.parse(raw));
+    localStorage.setItem(storeKey, JSON.stringify(next));
+    state.constructionRewardLedger = next.constructionRewardLedger;
+    state.constructionMaterialLedger = next.constructionMaterialLedger;
+    constructionSaveGuard.remember(next);
+  } catch (error) {
+    if (error.constructionSaveConflict) {
+      console.error("建築台帳の上書きを防ぐため保存を保留しました。", error);
+      try { toast("別画面の建築保存と競合しています。この画面を閉じずに、先に進めた画面の保存を確認してください。"); } catch {}
+    }
+    throw error;
+  }
 }
 function escapeAttr(value) {
   return String(value).replace(/[&"<']/g, char => ({ "&": "&amp;", "\"": "&quot;", "<": "&lt;", "'": "&#39;" }[char]));
@@ -40926,6 +41253,8 @@ function normalizeOfficialMonsterNames(value, seen = new WeakSet()) {
 }
 function normalizeState() {
   normalizeOfficialMonsterNames(state);
+  state.constructionRewardLedger = window.ImasoraConstructionRewardLedger.normalize(state.constructionRewardLedger);
+  state.constructionMaterialLedger = window.ImasoraConstructionPackLedger.normalize(state.constructionMaterialLedger);
   state.stamps = Array.isArray(state.stamps) ? state.stamps : [];
   state.monster = state.monster && typeof state.monster === "object" ? state.monster : { xp: 0, nature: 0, city: 0, sky: 0, wins: 0, skills: ["tap"] };
   const validSeedIds = ["seed-walk", "seed-sky", "seed-leaf", "seed-city", "seed-river", "seed-night", "seed-luck", "seed-white"];
@@ -41225,17 +41554,17 @@ function renderTalkSettings() {
   const currentSet = homeTalkTemplateSets.find(set => set.id === state.homeTalk?.currentId);
   box.innerHTML = `
     <b>おしゃべりテーマ設定</b>
-    <span>通常画面で2匹が話すテーマを選びます。正式版では大量テンプレ方式で、1テーマ300〜1000セット、全体8000セット以上を目標にします。</span>
+    <span>ホームで相棒たちがおしゃべりするテーマを選べます。</span>
     <div class="mini-feature">
       <b>年齢設定</b>
-      <span>表示するテーマの範囲を変えます。子ども向けでは大人向けテーマを出さない設計です。</span>
+      <span>年齢に合わせて、選べるおしゃべりのテーマが変わります。</span>
       <div class="actions" style="gap:6px;flex-wrap:wrap;margin-top:8px">
         ${homeTalkAgeOptions.map(item => `<button class="quiet ${age === item.id ? "selected" : ""}" type="button" data-home-talk-age="${item.id}">${item.label}</button>`).join("")}
       </div>
     </div>
     <div class="mini-feature">
       <b>テーマ</b>
-      <span>勉強という言葉を前に出さず、2匹の会話として知識が少しずつ残る形にします。</span>
+      <span>好きなテーマを選んで、相棒たちとのおしゃべりを楽しみましょう。</span>
       <div class="actions" style="gap:6px;flex-wrap:wrap;margin-top:8px">
         ${allowedThemes.map(item => `<button class="quiet ${theme === item.id ? "selected" : ""}" type="button" data-home-talk-theme="${item.id}">${item.label} ${homeTalkThemeCount(item.id, age)}</button>`).join("")}
       </div>
@@ -41935,7 +42264,7 @@ function startBgm(mode = "normal") {
     audio.play().then(() => {
       if (sound.audio !== audio) return;
       if (isLabyrinthBgm(mode) && !canPlayAmbientBgm()) { syncAmbientBgmBoundary(); return; }
-      toast(`${bgmModeName(mode)} MP3再生中`);
+      toast(`${bgmModeName(mode)}を再生中`);
     }).catch(() => {
       if (sound.audio !== audio) return;
       stopBgm();
@@ -42654,7 +42983,7 @@ function shareDraftText() {
   const diary = [state.imasoraDiary?.mood, state.imasoraDiary?.note].filter(Boolean).join("。");
   const diaryText = diary ? `${diary}。` : "";
   const baseText = diaryText || "大人もハマる、今の空で進化する散歩ゲームアプリ。";
-  return `${baseText} #イマソラウォーカーズ#イマソラ`;
+  return `${baseText} #イマソラーズウォーク#イマソラ`;
 }
 function shareDraftUrl(target = "x") {
   const text = encodeURIComponent(shareDraftText());
@@ -43328,6 +43657,12 @@ function homeTalkCandidateSets() {
     homeTalkSetAllowsAge(set, age)
   );
 }
+function saveHomeConversationState() {
+  // Conversation rotation is cosmetic; keep rendering while an award owns the save journal.
+  if (pendingArcadeRewards.hasPending()) return false;
+  try { saveState(); return true; }
+  catch { return false; }
+}
 function selectHomeTalkTemplateSet() {
   const candidates = homeTalkCandidateSets();
   if (!candidates.length) return null;
@@ -43347,7 +43682,7 @@ function selectHomeTalkTemplateSet() {
   state.homeTalk.currentId = selected.id;
   state.homeTalk.lastId = selected.id;
   state.homeTalk.usedToday = unused.length ? [...used, selected.id].slice(-80) : [selected.id];
-  saveState();
+  saveHomeConversationState();
   return selected;
 }
 function homeTalkTemplateDialogue() {
@@ -43487,7 +43822,7 @@ function startCompanionHomeDialogue(pairs) {
       if (state.homeTalk?.currentId) {
         state.homeTalk.lastId = state.homeTalk.currentId;
         state.homeTalk.currentId = "";
-        saveState();
+        saveHomeConversationState();
       }
       if (companionHomeTalkTimer) clearInterval(companionHomeTalkTimer);
       companionHomeTalkTimer = null;
@@ -43785,7 +44120,7 @@ function renderDailySideQuest() {
       ${dailySideQuestItems.map(item => {
         const done = isSideQuestDone(item.id);
         const claimed = state.sideQuest.claimed.includes(item.id);
-        const buttonText = claimed ? "受け取り済み" : done ? "報酬を受け取る" : item.requiresSky ? "認識へ進む" : item.requiresAction ? "進む" : "確認する";
+        const buttonText = claimed ? "受け取り済み" : done ? "報酬を受け取る" : item.requiresSky ? "認識へ進む" : item.requiresAction ? (item.action === "items" ? "アイテムを開く" : "支援を探す") : "確認する";
         return `
           <div class="side-quest-card ${done ? "done" : ""} ${claimed ? "claimed" : ""}">
             <small>${item.mark} / ${done ? "達成" : "未達成"}</small>
@@ -45079,7 +45414,7 @@ function renderTownDevMenu() {
   if (!box) return;
   box.hidden = false;
   const constructionPreview = townConstructionPreviewOptions.find(item => item.id === townConstructionPreviewMode) || townConstructionPreviewOptions[0];
-  const constructionControls = `<div class="town-dev-card town-dev-scene-card">
+  const constructionControls = `<div class="town-dev-card town-dev-scene-card" data-developer-only>
     <div class="town-dev-card-title"><span>街マップ建設状態</span><span class="town-dev-offset">表示: ${constructionPreview.label}（進行データは変更しません）</span></div>
     <div class="town-dev-scene-buttons town-dev-construction-buttons">
       ${townConstructionPreviewOptions.map(item => `<button class="${townConstructionPreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-construction-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
@@ -45091,7 +45426,7 @@ function renderTownDevMenu() {
       ${townSceneOptions.map(item => `<button class="${townScenePreviewMode === item.id ? "town-dev-scene-active" : ""}" type="button" data-town-scene-preview="${item.id}">${item.label}<br><small>${item.text}</small></button>`).join("")}
     </div>
   </div>`;
-  box.innerHTML = constructionControls + sceneControls + townBridge2DevCardHtml();
+  box.innerHTML = constructionControls + sceneControls + `<div data-developer-only>${townBridge2DevCardHtml()}</div>`;
   box.querySelectorAll("[data-town-construction-preview]").forEach(button => {
     button.addEventListener("click", () => setTownConstructionPreview(button.dataset.townConstructionPreview));
   });
@@ -45307,7 +45642,7 @@ function renderTownBuildingDetail() {
   const kindText = kind === "special" ? "特別施設" : "通常建物";
   const action = built
     ? `<button class="primary" type="button" data-town-enter="${id}">中を見る</button>`
-    : `<button class="primary" type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "所持不足"}</button>`;
+    : `<button class="primary" type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "素材が足りません"}</button>`;
   box.innerHTML = `
     <b>${mark} ${displayName}</b>
     <span>${kindText}。${description || effect}</span>
@@ -45509,7 +45844,7 @@ let imasoraCompanionCatcherModulePromise = null;
 function ensureImasoraCompanionCatcherLoaded() {
   if (window.ImasoraCompanionCatcher) return Promise.resolve(window.ImasoraCompanionCatcher);
   if (!imasoraCompanionCatcherModulePromise) {
-    imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=20260812-character-catcher-opening")
+  imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=20261003-construction-reward-120a")
       .then(() => {
         if (!window.ImasoraCompanionCatcher) throw new Error("3D catcher module did not initialize");
         return window.ImasoraCompanionCatcher;
@@ -45571,7 +45906,7 @@ let imasoraTriLinkModulePromise = null;
 function ensureImasoraTriLinkLoaded() {
   if (window.ImasoraTriLink) return Promise.resolve(window.ImasoraTriLink);
   if (!imasoraTriLinkModulePromise) {
-    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20260914-tri-link-full-restore")
+    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=20261003-reward-recovery-120b")
       .then(() => {
         if (!window.ImasoraTriLink) throw new Error("Tri-Link module did not initialize");
         return window.ImasoraTriLink;
@@ -45587,7 +45922,7 @@ let imasoraJackpotRapierValidationModulePromise = null;
 function ensureImasoraJackpotRapierValidationLoaded() {
   if (window.ImasoraJackpotRapierValidation) return Promise.resolve(window.ImasoraJackpotRapierValidation);
   if (!imasoraJackpotRapierValidationModulePromise) {
-        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260917-arcade-daily-rewards-v1")
+        imasoraJackpotRapierValidationModulePromise = import("./assets/imasora-jackpot-coin-pusher-rapier-validation.js?v=20260924-construction-reward-plan95")
       .then(() => {
         if (!window.ImasoraJackpotRapierValidation) throw new Error("Rapier validation module did not initialize");
         return window.ImasoraJackpotRapierValidation;
@@ -45856,24 +46191,42 @@ function getImasoraTriLinkMemories() {
   }));
 }
 function saveImasoraTriLinkMemory(memory) {
-  if (!memory || typeof memory !== "object" || !memory.id) return;
-  const current = Array.isArray(state.triLinkMemories) ? state.triLinkMemories : [];
-  const alreadyRecorded = current.some(item => item?.id === memory.id);
-  state.triLinkMemories = [
-    memory,
-    ...current.filter(item => item?.id !== memory.id)
-  ].slice(0, 20);
-  saveState();
-  if (alreadyRecorded) return;
-  const currentParticipantId = (Array.isArray(memory.participants) ? memory.participants : [])
-    .find(participant => participant?.role === "current")?.id || triLinkCurrentParticipant().id;
-  const playerWon = memory.winnerId === currentParticipantId;
-  const reward = { arcadeParts: playerWon ? 1 : 0 };
-  awardUfoWorkshopArcadeMaterials(
-    reward,
-    `三者対戦${playerWon ? "・勝利" : "・完走"}`,
-    "triLink", String(memory.id)
-  );
+  if (!memory || typeof memory !== "object" || !memory.id) return Promise.resolve({ status: "unavailable" });
+  const record = structuredClone(memory), rewardDay = ufoArcadeDayKey();
+  return pendingArcadeRewards.submit("triLink:" + record.id, "トライリンクの対戦報酬", async () => {
+    const result = await withUfoArcadeRewardLock(() => {
+      const saved = prepareArcadeHomeState();
+      const current = Array.isArray(saved.triLinkMemories) ? saved.triLinkMemories : [];
+      const existing = current.find(item => item?.id === record.id);
+      const currentParticipantId = (Array.isArray(record.participants) ? record.participants : []).find(p => p?.role === "current")?.id || triLinkCurrentParticipant().id;
+      const playerWon = record.winnerId === currentParticipantId;
+      const grant = window.ImasoraConstructionRewardLedger.awardArcadeEvent(saved.constructionRewardLedger, {
+        game: "triLink", kind: "match-complete", eventId: String(record.id), official: true, playerWon
+      });
+      if (!grant.granted && grant.status !== "duplicate") return grant;
+      if (existing && grant.status === "duplicate") {
+        state.triLinkMemories = current;
+        state.constructionRewardLedger = grant.ledger;
+        constructionSaveGuard.remember(saved);
+        return { status: "duplicate", committed: true, constructionRewardBoxesAwarded: 0 };
+      }
+      const maintenance = prepareArcadeMaintenanceEntries("triLink", grant.granted && playerWon ? 1 : 0, rewardDay, String(record.id));
+      const boxes = grant.granted ? grant.boxes : 0;
+      const savedMemory = { ...existing, ...record, constructionRewardBoxesAwarded: boxes || Number(existing?.constructionRewardBoxesAwarded) || 0 };
+      const memories = [savedMemory, ...current.filter(item => item?.id !== record.id)].slice(0, 20);
+      const next = { ...saved, constructionRewardLedger: grant.ledger, triLinkMemories: memories };
+      commitUfoArcadeJournaledEntries([...maintenance.entries, [storeKey, JSON.stringify(next)]], "roll-forward");
+      state.triLinkMemories = memories;
+      return { status: grant.status, committed: true, constructionRewardBoxesAwarded: boxes, arcadePartsAwarded: maintenance.granted };
+    });
+    if (result?.committed) {
+      try { window.dispatchEvent(new CustomEvent("imasora-arcade-reward-saved", { detail: { id: "triLink:" + record.id, summary: result } })); } catch {}
+    }
+    if (result?.committed && result.constructionRewardBoxesAwarded) {
+      try { refreshUfoArcadeDailyNotices(); toast("対戦報酬：建築セット +" + result.constructionRewardBoxesAwarded + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("triLink", getUfoArcadeDailyStatus("triLink", true))); } catch {}
+    }
+    return result;
+  });
 }
 function getImasoraJackpotWingArt() {
   try {
@@ -45944,14 +46297,14 @@ function townArcadePachicoinStationMarkup(interactive = true) {
     const isSelected = station.id === selected.id;
     return `<div class="pachicoin-station-card">
       <button type="button" class="pachicoin-station-button${isSelected ? " is-selected" : ""}" data-pachicoin-station="${station.id}" aria-pressed="${isSelected}"${interactive ? "" : " disabled"}>
-        <small>台番号</small><strong>${station.id}</strong><span class="pachicoin-station-height">左${station.seesawY.left.toFixed(3)} / 右${station.seesawY.right.toFixed(3)}</span>
+        <small>台番号</small><strong>${station.id}</strong><span class="pachicoin-station-height" data-developer-only>左${station.seesawY.left.toFixed(3)} / 右${station.seesawY.right.toFixed(3)}</span>
       </button>
       <button type="button" class="pachicoin-pin-view-button" data-pachicoin-pin-view="${station.id}"${interactive ? "" : " disabled"}>釘を見る</button>
       <small data-pachicoin-resume-label="${station.id}"></small>
     </div>`;
   }).join("");
   return `<section class="pachicoin-station-selector" aria-label="イマソラパチコイン落としゲームの台選択">
-    <div class="pachicoin-station-selector-head"><small>IMASORA PACHICOIN / 5 MACHINES</small><strong>現在：${selected.label}</strong></div>
+    <div class="pachicoin-station-selector-head"><small>5つの台から選ぼう</small><strong>現在：${selected.label}</strong></div>
     <div class="pachicoin-station-grid" role="group" aria-label="パチコインの台番号">${buttons}</div>
     <p class="pachicoin-station-note">釘と左風車は台ごとに日替わりです。同じ日の配置は固定され、プレイ中は変わりません（日本時間0時更新）。</p>
     <p class="pachicoin-station-note">ST・大当たりの途中は自動保存されます。同じ台で再開できます（日本時間の当日限り）。</p>
@@ -46013,7 +46366,7 @@ function imasoraJackpotEffectCustomizationMarkup() {
   </label>`;
   return `<dialog class="arcade-effects-dialog" id="arcadeEffectsDialog" data-arcade-effects-dialog aria-labelledby="arcadeEffectsDialogTitle">
       <header class="arcade-effects-dialog-header">
-        <strong id="arcadeEffectsDialogTitle">演出カスタマイズ</strong>
+        <strong id="arcadeEffectsDialogTitle">演出の設定</strong>
         <button class="arcade-effects-close" type="button" data-arcade-effects-close aria-label="演出カスタマイズを閉じる">×</button>
       </header>
       <div class="arcade-effects-options">
@@ -46029,7 +46382,7 @@ function townArcadeHeaderMarkup(title, showMachineSelect = false) {
   return `<div class="arcade-page-header${coinPusherHeaderClass}">
     <div class="arcade-page-title"><small>街の発展</small><strong>${escapeAttr(title)}</strong></div>
     <div class="arcade-page-actions">
-      ${showEffectCustomization ? '<button class="arcade-effects-customize-button" type="button" data-arcade-effects-open aria-expanded="false" aria-controls="arcadeEffectsDialog">演出カスタマイズ</button>' : ""}
+      ${showEffectCustomization ? '<button class="arcade-effects-customize-button" type="button" data-arcade-effects-open aria-expanded="false" aria-controls="arcadeEffectsDialog">演出の設定</button>' : ""}
       ${showMachineSelect ? '<button type="button" data-arcade-return-lobby>ゲーム機を選ぶ</button>' : ""}
       <button type="button" data-arcade-return-town>街に戻る</button>
     </div>
@@ -46228,15 +46581,15 @@ function renderTownArcade() {
         box.innerHTML = `${townArcadeHeaderMarkup(selectedMachine.name, true)}
           <div class="arcade-game-stage companion-catcher-stage character-catcher-opening-stage">
             <div class="character-catcher-opening">
-              <div class="cco-badge"><span>GAME 01</span><b>6 ACTION CHARACTER CATCH</b></div>
+              <div class="cco-badge"><span>GAME 01</span><b>6つの操作でキャッチ</b></div>
               <div class="cco-opening-live-visual" aria-label="イマソラキャラクターキャッチャーのゲーム画面イメージ">
                 <div class="cco-opening-live-mount" id="imasoraCompanionCatcherOpeningPreviewMount" aria-hidden="true">
                   <img src="./assets/imasora-catcher-opening-preview-20260914.webp" alt="イマソラキャラクターキャッチャーのゲーム画面" decoding="async" fetchpriority="high" width="390" height="292" style="display:block;width:100%;height:100%;object-fit:contain">
                 </div>
-                <span class="arcade-opening-live-badge" aria-hidden="true"><i></i><b>GAME PREVIEW</b></span>
+                <span class="arcade-opening-live-badge" aria-hidden="true"><i></i><b>ゲーム画面</b></span>
               </div>
               <div class="cco-copy">
-                <small>POSITION. FINE TUNE. DROP.</small>
+                <small>ねらう・合わせる・つかむ</small>
                 <strong>イマソラキャラクターキャッチャー</strong>
                 <p>6つの操作でアームの位置と向きを決め、回転ステージのキャラクターを星形の3本爪でつかむ。最後は「下降」で勝負。</p>
               </div>
@@ -46286,14 +46639,14 @@ function renderTownArcade() {
               <div class="itl-opening-topline">
                 <div class="itl-opening-brand">
                   <span class="itl-opening-logo" aria-hidden="true"><i></i></span>
-                  <span><small>GAME 02 / IMASORA PHYSICS ARENA</small><strong>TRI-LINK</strong></span>
+                  <span><small>3匹で陣取りバトル</small><strong>TRI-LINK</strong></span>
                 </div>
-                <div class="itl-opening-time"><small>BATTLE TIME</small><b>120</b><span>SEC</span></div>
+                <div class="itl-opening-time"><small>対戦時間</small><b>120</b><span>SEC</span></div>
               </div>
               <div class="itl-opening-main">
                 <div class="itl-opening-copy">
-                  <span class="itl-opening-live"><i></i>THREE PARTNERS / ONE PUCK</span>
-                  <small>TRACE. REBOUND. TAKE THE FIELD.</small>
+                  <span class="itl-opening-live"><i></i>3匹の相棒と1つのパック</span>
+                  <small>弾いて、跳ね返して、陣地を取ろう</small>
                   <strong>ゴールを決めて、<em>光る陣を奪え。</em></strong>
                   <p>いま育てている相棒と、思い出に残る引退相棒、白ミチロードセイバーレンが同じアリーナへ。パットを弾き、ゴールで12の陣を奪い合う、120秒の三つ巴バトルです。</p>
                   <div class="itl-opening-rules" aria-label="ゲームの特徴">
@@ -46314,8 +46667,8 @@ function renderTownArcade() {
               </div>
               ${retiredRecords.length ? `<label class="itl-retired-picker"><span><small>RECORDED PARTNER</small><strong>記録した相棒を選ぶ</strong><em>これまで育てて記録に残した相棒から選べます。</em></span><select data-tri-link-retired>${retiredOptions}</select></label>` : '<div class="itl-no-record"><strong>相棒を記録すると選べます</strong><span>今回は体験参加の相棒がアリーナに入ります。</span></div>'}
               <div class="itl-opening-action">
-                <span><small>DRAG TO CONTROL</small>育成中の相棒を指で動かして勝負</span>
-                <button class="arcade-start-button itl-opening-start" type="button" data-arcade-start><small>START THE MATCH</small><strong>この3匹で試合開始</strong><i aria-hidden="true">›</i></button>
+                <span><small>指でスライドして操作</small>育成中の相棒を指で動かして勝負</span>
+                <button class="arcade-start-button itl-opening-start" type="button" data-arcade-start><small>準備はいい？</small><strong>この3匹で試合開始</strong><i aria-hidden="true">›</i></button>
               </div>
             </div>
           </div>`;
@@ -46334,22 +46687,22 @@ function renderTownArcade() {
           ${townArcadePachicoinStationMarkup(true)}
           <div class="arcade-game-stage coin-pusher-stage pachi-coin-opening-stage">
             <div class="pachi-coin-opening">
-              <div class="pco-badge"><span>GAME 03</span><b>PACHINKO × COIN PUSHER</b></div>
+              <div class="pco-badge"><span>GAME 03</span><b>ハンドルで狙うコイン落とし</b></div>
               <div class="pco-opening-live-visual" aria-label="ハンドル付きイマソラパチコイン落としゲームの画面イメージ">
                 <div class="pco-opening-live-mount" id="imasoraJackpotOpeningPreviewMount" aria-hidden="true">
                   <img src="./assets/imasora-pachicoin-opening-preview-20260914.webp?v=star-poster-20260915" alt="ハンドル付きイマソラパチコイン落としゲームの画面" decoding="async" fetchpriority="high" width="368" height="461" style="display:block;width:100%;height:100%;object-fit:contain">
                 </div>
-                <span class="arcade-opening-live-badge is-gold" aria-hidden="true"><i></i><b>GAME PREVIEW</b></span>
+                <span class="arcade-opening-live-badge is-gold" aria-hidden="true"><i></i><b>ゲーム画面</b></span>
               </div>
               <div class="pco-copy">
-                <small>TURN. SHOOT. PUSH.</small>
+                <small>ねらう・打ち出す・押し出す</small>
                 <strong>イマソラパチコイン落としゲーム</strong>
-                <p>回転ハンドルでコインを打ち出し、釘とチェッカーの物理抽選から青いコイン落とし盤へつなぐ。JACKPOTを狙うパチンコ×コイン落としゲーム。</p>
+                <p>ハンドルを回してコインを発射！釘の間を通してチェッカーを狙い、コインをたくさん押し出そう。貯めたコインは景品交換所で交換できます。</p>
               </div>
               <div class="pco-guide" aria-label="遊びの流れ">
-                <span><b>TURN</b>ハンドルでコインを発射</span>
-                <span><b>CHANCE</b>釘とチェッカーで抽選</span>
-                <span><b>PUSH</b>コインを押し出す</span>
+                <span><b>1</b>ハンドルでコインを発射</span>
+                <span><b>2</b>釘とチェッカーで抽選</span>
+                <span><b>3</b>コインを押し出す</span>
               </div>
               <button class="arcade-start-button pco-start" type="button" data-arcade-start>ゲームをはじめる</button>
             </div>
@@ -46697,8 +47050,16 @@ function renderTownArcade() {
       ensureImasoraCompanionCatcherLoaded()
         .then(game => {
           if (!mount.isConnected || !document.querySelector('[data-screen="arcade"].active')) return;
-          game.mount(mount, { roster: getImasoraArcadePlushRoster() });
-          observeImasoraCompanionCatcherWorkshopRewards(mount);
+          game.mount(mount, {
+            roster: getImasoraArcadePlushRoster(),
+            controlSoundVolume: () => sound.enabled ? volumeScale("sfx") : 0,
+            onPrizeCaptured: event => awardConstructionArcadeReward({
+              game: "catcher",
+              kind: "capture",
+              eventId: event.eventId
+            }, `キャッチャー・${event.prizeName || "景品"}`)
+          });
+          // The confirmed capture now saves boxes and maintenance parts in one transaction.
         })
         .catch(error => {
           console.error("イマソラキャラクターキャッチャー3Dの読み込みに失敗しました。", error);
@@ -48206,7 +48567,7 @@ function renderTownKaraoke() {
   }
   box.innerHTML = `
     <div class="karaoke-heading"><b>カラオケボックス</b><button type="button" data-karaoke-return-town>町に戻る</button></div>
-    <span>育成中の相棒、白ミチロードセイバーレン、引退した相棒最大2匹まで一緒に、イマソラウォーカーズの曲を歌詞表示ありで試聴できます。</span>
+    <span>育成中の相棒、白ミチロードセイバーレン、引退した相棒最大2匹まで一緒に、イマソラーズウォークの曲を歌詞表示ありで試聴できます。</span>
     <div class="karaoke-room">
       <div class="karaoke-singers">
         ${participants.map(item => `<div class="karaoke-singer"><strong>${escapeAttr(item.name)}</strong><small>${escapeAttr(item.role)}</small></div>`).join("")}
@@ -49055,7 +49416,7 @@ async function saveMemorialWallpaperImage(button, blob, url, fileName) {
   button.textContent = "保存画面を開いています...";
   try {
     const file = new File([blob], fileName, { type: "image/png" });
-    const shareData = { title: "イマソラウォーカーズ壁紙", files: [file] };
+    const shareData = { title: "イマソラーズウォーク壁紙", files: [file] };
     const canShareFile = Boolean(navigator.share)
       && (typeof navigator.canShare !== "function" || navigator.canShare(shareData));
     if (canShareFile) {
@@ -49448,6 +49809,14 @@ function renderTownWorkshop() {
   const opened = openedTownBuildings();
   const latest = opened[opened.length - 1];
   const unbuilt = townBuildableBuildings.filter(([id]) => !isTownBuildingBuilt(id));
+  const constructionPacks = state.constructionRewardLedger;
+  const constructionMaterials = state.constructionMaterialLedger;
+  const packOpenBlocked = constructionPacks.blocked || constructionMaterials.blocked;
+  const transferReceipts = constructionMaterials.transferReceipts || [];
+  const transferHistoryHtml = transferReceipts.length ? transferReceipts.map(receipt => `
+    <div class="construction-pack-transfer-item"><span>受取先 ${receipt.targetProfileId} / ${receipt.packet.quantities.concreteBlockCredits}ブロック相当 / ${receipt.packet.quantities.paintSurfaceCredits}塗装面相当</span><button type="button" data-pack-transfer-download="${receipt.id}">移送ファイルを再保存</button></div>
+  `).join("") : `<small>まだ移送記録はありません。</small>`;
+  const unopenedPackCount = constructionPacks.blocked ? "確認不可" : constructionPacks.unopenedBoxes;
   document.getElementById("townWorkshop").innerHTML = `
     <b>街づくり工房</b>
     <span>散歩で集めた素材を、街の建物に変えられる場所です。建てたいものを選んで、あなたのタイミングで街を少しずつ育てていきましょう。</span>
@@ -49460,7 +49829,41 @@ function renderTownWorkshop() {
     <div class="workshop-effects">
       <div class="workshop-effect"><strong>最近開いた建物</strong><span>${latest ? `${latest[2]}: ${latest[4]}` : "まだ建物はありません"}</span></div>
       <div class="workshop-effect"><strong>素材ストック</strong><span>草${townMaterialCount("草の素材")} / 木${townMaterialCount("木の素材")} / 灯り${townMaterialCount("灯りの素材")} / 土${townMaterialCount("土の素材")} / 雲${townMaterialCount("雲の素材")} / 鉄${townMaterialCount("鉄の素材")}</span></div>
+      <div class="workshop-effect"><strong>工事現場セット</strong><span>${state.constructionRewardLedger.blocked ? "保存情報を確認できないため受取を停止中。復旧確認が必要です。" : `建築セット（未開封）${state.constructionRewardLedger.unopenedBoxes}箱 / 基本道具一式の受取権${state.constructionRewardLedger.starterToolkitEntitled ? "あり（最初の建築セットと一緒に受け取る）" : "未取得"}`}</span></div>
     </div>
+    <section class="construction-pack-panel" aria-labelledby="constructionPackHeading">
+      <h3 id="constructionPackHeading">建築セットを開ける</h3>
+      <p>補助資材を選んで開封し、下の「工事現場へ送る」から建材受取所へ送れます。コンクリートは受取後に工房へ移して練り、ペンキと型枠はそのまま施工に使えます。鉄筋・タイル・装飾材の使用は準備中です。配布量は調整中です。</p>
+      <div class="construction-pack-stock" aria-live="polite">
+        <div><strong>未開封セット</strong><small>${unopenedPackCount}箱</small></div>
+        <div><strong>ブロック相当</strong><small>${constructionMaterials.blocked ? "確認不可" : constructionMaterials.concreteBlockCredits}</small></div>
+        <div><strong>塗装面相当</strong><small>${constructionMaterials.blocked ? "確認不可" : constructionMaterials.paintSurfaceCredits}</small></div>
+        <div><strong>型枠</strong><small>${constructionMaterials.blocked ? "確認不可" : constructionMaterials.auxiliaryUnits.formwork}</small></div>
+        <div><strong>鉄筋</strong><small>${constructionMaterials.blocked ? "確認不可" : constructionMaterials.auxiliaryUnits.rebar}</small></div>
+        <div><strong>タイル / 装飾材</strong><small>${constructionMaterials.blocked ? "確認不可" : `${constructionMaterials.auxiliaryUnits.tiles} / ${constructionMaterials.auxiliaryUnits.decoration}`}</small></div>
+      </div>
+      ${packOpenBlocked ? `<p role="status">台帳を安全に確認できないため開封を停止中です。保存内容はそのまま保持しています。</p>` : `
+      <form class="construction-pack-form" data-construction-pack-open-form>
+        <label>開ける箱数<input type="number" min="1" max="${constructionPacks.unopenedBoxes}" step="1" value="${constructionPacks.unopenedBoxes ? 1 : 0}" data-pack-box-count ${constructionPacks.unopenedBoxes ? "" : "disabled"}></label>
+        <label>選ぶ補助資材<select data-pack-auxiliary-kind ${constructionPacks.unopenedBoxes ? "" : "disabled"}>
+          <option value="formwork">型枠</option><option value="rebar">鉄筋</option><option value="tiles">タイル</option><option value="decoration">装飾材</option>
+        </select></label>
+        <div class="construction-pack-preview" data-pack-preview aria-live="polite">箱数と補助資材を選ぶと、開封内容を表示します。</div>
+        <label class="construction-pack-consent"><input type="checkbox" data-pack-trial-consent><span>箱数と受け取る内容を確認しました。開封した箱は未開封の状態には戻せません。</span></label>
+        <button type="submit" data-pack-open-submit disabled>内容を確認して建築セットを開封</button>
+      </form>`}
+    </section>
+    <section class="construction-pack-transfer" aria-labelledby="constructionPackTransferHeading">
+      <h4 id="constructionPackTransferHeading">工事現場へ送る</h4>
+      <p>3Dマップの建材受取所に表示される受取IDを入力し、確認後に移送ファイルを保存します。受取所でそのファイルを選んで受け取ってください。送った分はホームの残量から差し引かれます。ファイルを保存し直しても、同じ受取先で二重に増えることはありません。</p>
+      <form data-construction-pack-transfer-form>
+        <label>World3Dの受取ID（8文字）<input type="text" maxlength="8" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" pattern="[0-9a-f]{8}" placeholder="例：1a2b3c4d" data-pack-transfer-profile></label>
+        <p class="construction-pack-transfer-status" data-pack-transfer-status role="status" aria-live="polite"></p>
+        <label class="construction-pack-consent"><input type="checkbox" data-pack-transfer-consent><span>表示された数量を移送し、ホーム側の今回分を差し引くことを確認しました。受取先IDに誤りがあると別の保存先では受け取れません。</span></label>
+        <button type="submit" data-pack-transfer-submit disabled>確認して移送ファイルを作成</button>
+      </form>
+      <div class="construction-pack-transfer-list" aria-label="移送済みファイル">${transferHistoryHtml}</div>
+    </section>
     <div class="town-quest-list">
       ${unbuilt.length ? unbuilt.map(([id, mark, name, need, effect]) => {
         const canBuild = canBuildTownBuilding(id);
@@ -49469,7 +49872,7 @@ function renderTownWorkshop() {
           <strong>${mark} ${displayName}</strong>
           <span>${effect}</span>
           <small>${townBuildingCostText(id)}</small>
-          <button type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "所持不足"}</button>
+          <button type="button" data-town-build="${id}">${canBuild ? `${displayName}を建設する` : "素材が足りません"}</button>
         </div>`;
       }).join("") : `
         <div class="town-quest-card">
@@ -49481,6 +49884,44 @@ function renderTownWorkshop() {
     </div>
   `;
   document.querySelectorAll("#townWorkshop [data-town-build]").forEach(button => button.addEventListener("click", () => buildTownBuilding(button.dataset.townBuild)));
+  const packForm = document.querySelector("#townWorkshop [data-construction-pack-open-form]");
+  if (packForm) {
+    packForm.addEventListener("input", refreshConstructionPackPreview);
+    packForm.addEventListener("change", refreshConstructionPackPreview);
+    packForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const boxes = Number(packForm.querySelector("[data-pack-box-count]")?.value);
+      const auxiliaryKind = packForm.querySelector("[data-pack-auxiliary-kind]")?.value;
+      if (!packForm.querySelector("[data-pack-trial-consent]")?.checked) {
+        toast("開封前に試作数量の確認へチェックしてください。");
+        return;
+      }
+      void openConstructionPackBoxes(boxes, auxiliaryKind);
+    });
+    refreshConstructionPackPreview();
+  }
+  const transferForm = document.querySelector("#townWorkshop [data-construction-pack-transfer-form]");
+  if (transferForm) {
+    transferForm.addEventListener("input", refreshConstructionPackTransfer);
+    transferForm.addEventListener("change", refreshConstructionPackTransfer);
+    transferForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const targetProfileId = transferForm.querySelector("[data-pack-transfer-profile]")?.value.trim().toLowerCase() || "";
+      if (!transferForm.querySelector("[data-pack-transfer-consent]")?.checked) {
+        toast("移送前に受取先と数量を確認してください。");
+        return;
+      }
+      void exportConstructionPackTrial(targetProfileId);
+    });
+    transferForm.querySelectorAll("[data-pack-transfer-download]").forEach(button => button.addEventListener("click", () => {
+      const receipt = window.ImasoraConstructionPackLedger.normalize(state.constructionMaterialLedger).transferReceipts
+        .find(item => item.id === button.dataset.packTransferDownload);
+      if (!receipt) { toast("移送ファイルの保存記録を確認できません。"); return; }
+      downloadConstructionPackTransfer(receipt.packet);
+      toast("保存済みの移送ファイルを再保存しました。");
+    }));
+    refreshConstructionPackTransfer();
+  }
 }
 function spendTownBuildingMaterials(id) {
   if (!canBuildTownBuilding(id)) return false;
@@ -49890,8 +50331,20 @@ function applyMapTileReward(position = state.position, source = "散歩") {
     state.skyStock.materials[reward.material] = Number(state.skyStock.materials[reward.material] || 0) + 1;
     if (reward.xp) state.monster.xp += reward.xp;
     addMapStamp(reward.mark, tile.name);
-    addLog(`${source}: ${tile.name}を通過。${reward.text}を獲得。`);
-    return { title: tile.name, text: reward.text, mark: reward.mark };
+    let constructionPackText = "";
+    if (["歩数計", "イマソラ認識"].includes(source)) {
+      const grant = window.ImasoraConstructionRewardLedger.awardWalkTile(state.constructionRewardLedger, {
+        dayKey: mapActiveDayKey(),
+        position,
+        source
+      });
+      state.constructionRewardLedger = grant.ledger;
+      if (grant.granted) {
+        constructionPackText = `建築セット +1箱（未開封 ${grant.ledger.unopenedBoxes}箱）${grant.toolkitGranted ? " / 基本道具一式の受取権を獲得（建材受取所で受け取れます）" : ""}`;
+      }
+    }
+    addLog(`${source}: ${tile.name}を通過。${reward.text}を獲得。${constructionPackText ? ` ${constructionPackText}。` : ""}`);
+    return { title: tile.name, text: `${reward.text}${constructionPackText ? ` / ${constructionPackText}` : ""}`, mark: reward.mark };
   }
   return null;
 }
@@ -50727,7 +51180,7 @@ function renderRetirementSendoff() {
           <span id="retirementSendoffWish"></span>
         </div>
         <div class="retirement-sendoff-endroll" aria-hidden="true">
-          <span>主演　${escapeAttr(name)}　　白ミチロードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラウォーカーズ制作委員会の提供でお送りしました。</span>
+          <span>主演　${escapeAttr(name)}　　白ミチロードセイバーレン　出演　夕焼け空と星空　街の窓の明かり　　通常時BGM　『イマソララビリンス』　　引退式テーマソング　『また街で会おうね』　　はじまり杯テーマソング　『イマソラ回廊』　　はじまり杯 決勝テーマソング　『イマソラ冒険符』　　森の四大杯 予選テーマソング　『イマソラパスワード』　　森の四大杯 決勝テーマソング　『イマソラヒーロー』　　街の四大杯 予選テーマソング　『イマソラ夢回路』　　街の四大杯 決勝テーマソング　『封印されしイマソラ王城』　　空の四大杯 予選テーマソング　『星降るミチ』　　空の四大杯 決勝テーマソング　『鼓動』　　水辺の四大杯 予選テーマソング　『ハレミチ』　　水辺の四大杯 決勝テーマソング　『クライマックス』　　グランドチャンピオン杯 予選テーマソング　『魔王』　　グランドチャンピオン杯 決勝テーマソング　『イマソラループ』　　勝利リザルトテーマソング　『今日の空に勝った日』　　敗北リザルトテーマソング　『負けても道は続く』　　この物語はイマソラーズウォーク制作委員会の提供でお送りしました。</span>
         </div>
       </div>
     </div>
@@ -53455,7 +53908,7 @@ function renderSkyDetector(current = skyTypes.find(item => item.id === selectedS
   const stopped = session.active && session.stepChecked && session.stopped && !session.blocked;
   const verified = stopped && session.skyVerified;
   const pending = stopped && state.pendingSky;
-  const chipText = !playtime ? "CLOSE" : verified ? "SKY OK" : pending ? "CHECK" : stopped ? "STOP OK" : session.active ? "WALK" : "READY";
+  const chipText = !playtime ? "時間外" : verified ? "認識できました" : pending ? "確認中" : stopped ? "停止を確認" : session.active ? "散歩中" : "準備OK";
   const detectorHtml = [
     ["歩行", session.active ? `${session.stepCount || 0}歩 試作` : "未開始"],
     ["停止", stopped ? "安全停止OK" : "停止後に認識"],
@@ -53533,7 +53986,21 @@ function skySummon() {
   playSfx("skyScan");
   toast(`${current.name}を認識候補にしました`);
 }
-function confirmSkyRecognition() {
+let skyRecognitionCommitPending = false;
+async function confirmSkyRecognition() {
+  if (skyRecognitionCommitPending) return false;
+  skyRecognitionCommitPending = true;
+  try {
+    return await withUfoArcadeRewardLock(() => confirmSkyRecognitionLocked());
+  } catch (error) {
+    console.error("イマソラ認識の報酬を保存できませんでした。", error);
+    toast("報酬の保存を確認できませんでした。保存設定を確認してから、もう一度お試しください。");
+    return false;
+  } finally {
+    skyRecognitionCommitPending = false;
+  }
+}
+function confirmSkyRecognitionLocked() {
   if (hasGuildSupportToday()) {
     playSfx("error");
     toast("今日は協力支援を受けています");
@@ -57769,13 +58236,31 @@ function battle() {
       state.grandUnlockBonusGiven = true;
       addLog("四大杯4つ全てを制覇。グランドチャンピオン杯の出場資格を獲得。");
     }
+    let constructionRewardText = "";
+    if (!playtestBypass && !state.pendingBattle.playtest) {
+      const constructionGrant = window.ImasoraConstructionRewardLedger.awardTournamentWin(state.constructionRewardLedger, {
+        cupId: cup.id,
+        enteredAt: state.pendingBattle.enteredAt,
+        official: true
+      });
+      state.constructionRewardLedger = constructionGrant.ledger;
+      if (constructionGrant.granted) {
+        constructionRewardText = `建築セット +${constructionGrant.boxes}箱${constructionGrant.toolkitGranted ? " / 基本道具一式の受取権（建材受取所で受け取れます）" : ""}`;
+        pendingBattleLogMessages.push(`大会優勝報酬: ${constructionRewardText}`);
+        addLog(`${cup.name}優勝: ${constructionRewardText}`);
+      } else if (constructionGrant.status === "blocked" || constructionGrant.status === "unavailable") {
+        constructionRewardText = "建築セット報酬は保存情報を確認できるまで保留です。既存の優勝報酬はそのままです。";
+        pendingBattleLogMessages.push(constructionRewardText);
+        addLog(`${cup.name}優勝: ${constructionRewardText}`);
+      }
+    }
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦を勝ち抜き。${allMatches.length}試合 / 最終${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote} / Coin +${cup.reward}`);
     if (openedWhiteSeed) pendingBattleLogMessages.push("グランドチャンピオン杯優勝賞品として、白のタネを授与された。");
-    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。参加人数不足やシードなしで、公式大会を安定して運営できます。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
+    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。参加人数不足やシードなしで、公式大会を安定して運営できます。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}${constructionRewardText ? `<br>${constructionRewardText}` : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
     pendingBattleReward = {
       mark: openedWhiteSeed ? "白" : cup.medal,
       title: openedWhiteSeed ? "白のタネ獲得" : `${cup.name}メダル獲得`,
-      text: openedWhiteSeed ? "体色だけが白く育つ特別なタネが開放されました。" : `${cup.name}を制覇しました。`,
+      text: `${openedWhiteSeed ? "体色だけが白く育つ特別なタネが開放されました。" : `${cup.name}を制覇しました。`}${constructionRewardText ? ` ${constructionRewardText}` : ""}`,
       cupId: cup.id,
       cupName: cup.name,
       matches: allMatches,
@@ -57888,7 +58373,10 @@ function switchScreen(screen, townArea = "map") {
     section.classList.toggle("active", section.dataset.screen === screen);
   });
   document.querySelectorAll("[data-tab]").forEach(button => {
-    button.classList.toggle("active", button.dataset.tab === screen);
+    const parentTab = ["arcade", "skyMap", "landMap", "coastalTown"].includes(screen) ? "town" : ["retirement", "guildSupportSearch"].includes(screen) ? "walk" : screen;
+    const selected = button.dataset.tab === parentTab;
+    button.classList.toggle("active", selected);
+    if(selected) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
   });
   if (screen === "town") {
     preloadTownVisualAssets();
@@ -58004,9 +58492,10 @@ document.getElementById("stepBtn").addEventListener("click", checkStepProof);
 document.getElementById("skySummonBtn").addEventListener("click", skySummon);
 document.getElementById("walkSkySummonBtn").addEventListener("click", skySummon);
 document.getElementById("resetBtn").addEventListener("click", () => {
-  if (confirm("イマソラウォーカーズの保存データを削除しますか？")) {
+  if (confirm("イマソラーズウォークの保存データを削除しますか？")) {
     localStorage.removeItem(storeKey);
     Object.assign(state, defaultState());
+    constructionSaveGuard.remember(state);
     normalizeState();
     document.getElementById("eventBox").innerHTML = "";
     shuffleCards();
@@ -58032,25 +58521,6 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

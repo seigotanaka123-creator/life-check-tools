@@ -1,3 +1,4 @@
+import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
 import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-work-model.js?v=431';
@@ -106,6 +107,7 @@ function refresh(){
   $('status').textContent=workReady?workWorld.message:saveText;$('interact').textContent=state.mode==='foot'?'運転席に乗る':driving?'停車して降りる':state.mode==='boarding'?'乗り込んでいます…':'降りています…';
   const soilObstacles=[...OBSTACLES,...soilColumns(workWorld)];
   $('interact').disabled=!workReady||workSession.blocked||transition||(state.mode==='foot'?!boardOption(state,soilObstacles):Math.abs(state.vehicle.speed)>.8);
+  setBoardPrompt($('interact'),state.mode,!$('interact').disabled);
   $('action-hint').textContent=transition?'乗り降りの間は車両を止めています':driving?(Math.abs(state.vehicle.speed)>.8?'ブレーキを押して停車してください':exitOption(state,soilObstacles)?'降りる経路の空きを確認済み':'両側が塞がっています。開いた場所へ移動してください'):boardOption(state,soilObstacles)?'運転席側のステップから乗れます':'車体左側の黄色い目印へ近づいてください';
   const a=actorPose(state);$('vehicle-position').textContent=`X ${state.vehicle.x.toFixed(1)} / Z ${state.vehicle.z.toFixed(1)} / 向き ${(state.vehicle.heading*180/Math.PI).toFixed(1)}°`;$('actor-position').textContent=`X ${a.x.toFixed(1)} / Y ${a.y.toFixed(1)} / Z ${a.z.toFixed(1)}`;$('contact').textContent=state.hit||'なし';
   const totals=workTotals(workWorld);$('load-amount').textContent=`積載 ${(totals.bucket/1000).toFixed(2)} / 6`;$('load-bar').value=workWorld.load;$('soil-total').textContent=`地面 ${(totals.ground/1000).toFixed(2)} ＋ 落下中 ${(totals.air/1000).toFixed(2)} ＋ 積載 ${(totals.bucket/1000).toFixed(2)} ＝ ${(totals.total/1000).toFixed(2)}`;

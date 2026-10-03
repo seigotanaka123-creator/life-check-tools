@@ -1,3 +1,4 @@
+import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
 import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-model.js?v=430';
@@ -69,6 +70,7 @@ function refresh(){
   $('mode').textContent=modes[state.mode];$('speed').textContent=Math.abs(state.vehicle.speed)<.8?'停車中':`走行 ${Math.round(Math.abs(state.vehicle.speed))}`;$('gear').textContent=driving?(state.vehicle.speed<-.8?'後退':state.vehicle.speed>.8?'前進':'停止'):'';
   $('status').textContent=state.message;$('interact').textContent=state.mode==='foot'?'運転席に乗る':driving?'停車して降りる':state.mode==='boarding'?'乗り込んでいます…':'降りています…';
   $('interact').disabled=!local||transition||(state.mode==='foot'?!boardOption(state):Math.abs(state.vehicle.speed)>.8);
+  setBoardPrompt($('interact'),state.mode,!$('interact').disabled);
   $('action-hint').textContent=transition?'乗り降りの間は車両を止めています':driving?(Math.abs(state.vehicle.speed)>.8?'ブレーキを押して停車してください':exitOption(state)?'降りる経路の空きを確認済み':'両側が塞がっています。開いた場所へ移動してください'):boardOption(state)?'運転席側のステップから乗れます':'車体左側の黄色い目印へ近づいてください';
   const a=actorPose(state);$('vehicle-position').textContent=`X ${state.vehicle.x.toFixed(1)} / Z ${state.vehicle.z.toFixed(1)} / 向き ${(state.vehicle.heading*180/Math.PI).toFixed(1)}°`;$('actor-position').textContent=`X ${a.x.toFixed(1)} / Y ${a.y.toFixed(1)} / Z ${a.z.toFixed(1)}`;$('contact').textContent=state.hit||'なし';
 }

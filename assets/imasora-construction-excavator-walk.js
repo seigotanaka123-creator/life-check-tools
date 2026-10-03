@@ -1,6 +1,7 @@
+import {walkFactor} from './imasora-construction-travel-input.mjs';
 // 9-1b: solid voxel floors/walls/ceilings, not a top-height-only terrain.
 // The approved excavator remains the owner of soil quantities and arm actions.
-import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js';
+import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js?v=520';
 import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js';
 import {EX_ACCESS} from './imasora-construction-excavator-access.js';
 export const DIG_WALK=Object.freeze({...WALKER,step:8.01,gravity:90,jump:44});
@@ -39,7 +40,7 @@ export function horizontalOverlap(p,b,r=DIG_WALK.radius){
 }
 export function bodyOverlap(p,b){return p.y<b.y+b.h-EPS&&p.y+DIG_WALK.height>b.y+EPS&&horizontalOverlap(p,b);}
 const inside=p=>p.x-DIG_WALK.radius>=SITE.minX&&p.x+DIG_WALK.radius<=SITE.maxX&&p.z-DIG_WALK.radius>=SITE.minZ&&p.z+DIG_WALK.radius<=SITE.maxZ;
-export function excavationVolumes(s,p,{machine=true}={}){
+export function excavationVolumes(s,p,{machine=true,external=[]}={}){
   const out=[...DIG_FIXED],r=DIG_WALK.radius+4;
   // Local broad phase includes one full step and this frame's jump/fall sweep.
   for(let x=Math.floor((p.x-r)/CELL);x<=Math.floor((p.x+r)/CELL);x++)
@@ -48,6 +49,10 @@ export function excavationVolumes(s,p,{machine=true}={}){
         if(s.terrain[`${x},${y},${z}`])out.push(volume('普通の土',(x+.5)*CELL,y*CELL,(z+.5)*CELL,CELL,CELL,CELL));
       }
   for(const o of s.spoil)if(Math.abs(o.x-p.x)<r+4&&Math.abs(o.z-p.z)<r+4)out.push(volume('排土',o.x,o.y-4,o.z,8,8,8));
+  // Main-world authored timber is supplied in excavation-local coordinates.
+  // Keep only nearby slabs/edges so collision cost stays bounded per footstep.
+  for(const b of external)if(b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0&&
+    Math.abs(b.x-p.x)<r+b.w/2+4&&Math.abs(b.z-p.z)<r+b.d/2+4&&b.y+b.h>=p.y-16&&b.y<=p.y+DIG_WALK.height+16)out.push(b);
   if(!machine)return out;
   const v=s.loader.vehicle,heading=v.heading+s.arm.slew;
   out.push(volume('クローラー',v.x,0,v.z,68,17,86,v.heading,false));
@@ -61,7 +66,7 @@ export function excavationVolumes(s,p,{machine=true}={}){
   const q=arm.bucket;out.push(volume('バケット',q.x,q.y-8,q.z,22,18,24,heading,false));
   return out;
 }
-export function digPersonBlocked(s,p,options){return !inside(p)||excavationVolumes(s,p,options).some(b=>bodyOverlap(p,b));}
+export function digPersonBlocked(s,p,options={},external=[]){return !inside(p)||excavationVolumes(s,p,{...options,external}).some(b=>bodyOverlap(p,b));}
 function verticalTravel(p,dy,boxes){
   let distance=dy,hit='';
   for(const b of boxes){if(!horizontalOverlap(p,b))continue;
@@ -83,50 +88,50 @@ function horizontalMove(p,axis,distance,boxes){
     }
   }return blockers[0].name;
 }
-export function stepDigWalker(s,input,dt){
+export function stepDigWalker(s,input,dt,external=[]){
   if(!Number.isFinite(dt)||dt<=0||dt>.05)throw Error('歩行の更新刻みが不正です');
-  const p=digPlayer(s.loader.player);let boxes=excavationVolumes(s,p),hit='';
+  const p=digPlayer(s.loader.player);let boxes=excavationVolumes(s,p,{external}),hit='';
   p.grounded=supported(p,boxes)&&p.vy<=0;
   if(input.jump&&!p.jumpHeld&&p.grounded){p.vy=DIG_WALK.jump;p.grounded=false;}
   p.jumpHeld=!!input.jump;
-  const norm=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/norm*DIG_WALK.speed*dt,dz=(input.z||0)/norm*DIG_WALK.speed*dt;
+  const norm=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/norm*DIG_WALK.speed*walkFactor(input)*dt,dz=(input.z||0)/norm*DIG_WALK.speed*walkFactor(input)*dt;
   const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));
   for(let i=0;i<steps;i++){
-    boxes=excavationVolumes(s,p);
+    boxes=excavationVolumes(s,p,{external});
     hit=horizontalMove(p,'x',dx/steps,boxes)||hit;hit=horizontalMove(p,'z',dz/steps,boxes)||hit;
     p.grounded=supported(p,boxes)&&p.vy<=0;
   }
   p.vy-=DIG_WALK.gravity*dt;
   // Vertical sweep, not a final-position overlap, prevents ceiling tunnelling.
-  const dy=p.vy*dt,moved=verticalTravel(p,dy,excavationVolumes(s,p));p.y+=moved.distance;
+  const dy=p.vy*dt,moved=verticalTravel(p,dy,excavationVolumes(s,p,{external}));p.y+=moved.distance;
   p.grounded=dy<0&&moved.distance>dy+EPS;p.ceilingHit=dy>0&&moved.distance<dy-EPS;
   if(p.grounded||p.ceilingHit)p.vy=0;if(p.ceilingHit)hit=`${moved.hit}（頭上）`;
   if(Math.hypot(dx,dz)>EPS)p.heading=Math.atan2(dx,dz);
   return{...s.loader,player:p,hit};
 }
-export function excavationRouteClear(s,path){
+export function excavationRouteClear(s,path,external=[]){
   for(let i=0;i<path.length-1;i++){
     const a=path[i],b=path[i+1],count=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z)/.4));
-    for(let j=0;j<=count;j++){const t=j/count;if(digPersonBlocked(s,{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t},{machine:false}))return false;}
+    for(let j=0;j<=count;j++){const t=j/count;if(digPersonBlocked(s,{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t},{machine:false},external))return false;}
   }return true;
 }
-export function actExcavatorWalk(s,action){
+export function actExcavatorWalk(s,action,external=[]){
   if(action==='interact'&&s.loader.mode==='foot'){
     const p=digPlayer(s.loader.player);
-    if(Math.abs(p.y)>.05||Math.abs(p.vy)>.1||!supported(p,excavationVolumes(s,p)))return{...s,message:'地上のステップへ戻り、着地してから乗車してください。穴や空中からは乗車できません。'};
+    if(Math.abs(p.y)>.05||Math.abs(p.vy)>.1||!supported(p,excavationVolumes(s,p,{external})))return{...s,message:'地上のステップへ戻り、着地してから乗車してください。穴や空中からは乗車できません。'};
   }
-  const n=actExcavator(s,action);
+  const n=actExcavator(s,action,external);
   if(action==='home')return{...n,loader:{...n.loader,player:digPlayer(n.loader.player)}};
-  if(n.loader.transition&&!excavationRouteClear(n,n.loader.transition.path))return{...s,message:'乗降経路の土・排土・天井が身体に当たります。先に経路を空けてください。'};
+  if(n.loader.transition&&!excavationRouteClear(n,n.loader.transition.path,external))return{...s,message:'乗降経路の土・排土・天井が身体に当たります。先に経路を空けてください。'};
   return n;
 }
-export function stepExcavatorWalk(s,input,dt){
+export function stepExcavatorWalk(s,input,dt,external=[]){
   // Existing kinematic foot motion is kept idle; this module owns 3D walking.
-  const n=stepExcavator(s,s.loader.mode==='foot'?{}:input,dt);
+  const n=stepExcavator(s,s.loader.mode==='foot'?{}:input,dt,external);
   if(s.loader.mode==='foot'){
-    n.loader=stepDigWalker(n,input,dt);
+    n.loader=stepDigWalker(n,input,dt,external);
     if(n.loader.hit)n.message=`${n.loader.hit}に接触しました。`;
   }
-  if(n.loader.transition&&!excavationRouteClear(n,n.loader.transition.path))return{...s,message:'乗降中の経路が塞がっています。安全エリアへ戻って確認してください。'};
+  if(n.loader.transition&&!excavationRouteClear(n,n.loader.transition.path,external))return{...s,message:'乗降中の経路が塞がっています。安全エリアへ戻って確認してください。'};
   return n;
 }

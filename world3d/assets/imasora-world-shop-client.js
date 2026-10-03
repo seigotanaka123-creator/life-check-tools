@@ -1,4 +1,4 @@
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=503';
 export function createWorldShopClient(){
   if(parent===window)throw Error('このショップは火星の店主から開いてください。');
   const token=location.hash.slice(1);if(!/^[\w-]{36}$/.test(token))throw Error('ショップ接続情報がありません。');
@@ -16,7 +16,7 @@ export function createWorldShopClient(){
   document.querySelector('#development .dev-panel>summary').textContent='保存記録を見る';
   const fault=document.getElementById('fault');fault.value='normal';fault.hidden=true;document.querySelector('label[for=fault]').hidden=true;
   document.querySelector('#development .dev-panel>p').textContent='異常時は保存を確認してください。金貨を増やすリセットはありません。';
-  document.querySelector('#bag>.scope').textContent='購入した建材は世界の保存に残ります。工事現場での持ち帰り・施工への接続は次の段階です。';
+  document.querySelector('#bag>.scope').textContent='購入した建材は世界共通の保存に記録され、工事現場の建材受取所で素材ごとに保管できます。対応する作業車と使い方は、各素材の案内をご確認ください。';
   function refresh(){const test=mode==='integration';document.querySelector('.wallet small').textContent=test?'接続確認用 宇宙金貨':'宇宙金貨';document.querySelector('.wallet').setAttribute('aria-label',test?'接続確認用の所持金':'所持金');document.querySelector('#confirm>.scope').textContent=test?'接続確認用の金貨を使います。本体の金貨は変わりません。':'所持している宇宙金貨で購入します。';document.querySelector('.shop-footer>span').textContent=test?'本体とは別の接続確認です。価格は調整中。':'価格は調整中。購入した建材は保存されます。';if(state&&!busy&&!blocked)document.getElementById('save-status').textContent='保存済み';}
   return {session,offers:L.LINK_OFFERS,quote:L.quoteLinkedOrder,refresh,bind(){},showImport(){throw Error('本体の保存準備が完了していません。');}};
 }

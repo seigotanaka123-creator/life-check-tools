@@ -32,7 +32,7 @@ export function validateExcavation(s){
   check(totals(s).total===1792,'土の総量が一致しません。上書きせず停止します。');armValid(s.arm,s);
   const l=s.loader,v=l?.vehicle,p=l?.player;
   check(object(l)&&['foot','boarding','driving','working','exiting'].includes(l.mode)&&object(v),'乗車状態が不正です。');position(p);
-  check(finite(v.x,-320,320)&&finite(v.z,-250,250)&&finite(v.heading,-Math.PI-1e-7,Math.PI+1e-7)&&finite(v.speed,-48.001,100.001)&&finite(v.steering,-.471,.471)&&finite(v.wheelTravel,-1e10,1e10),'車体の走行状態が不正です。');
+  check(finite(v.x,-320,320)&&finite(v.z,-250,250)&&finite(v.heading,-Math.PI-1e-7,Math.PI+1e-7)&&finite(v.speed,-96.001,200.001)&&finite(v.steering,-.471,.471)&&finite(v.wheelTravel,-1e10,1e10),'車体の走行状態が不正です。');
   check(finite(p.heading,-20,20)&&finite(p.vy??0,-5000,100),'乗員の状態が不正です。');
   for(const k of ['grounded','ceilingHit','jumpHeld'])check(p[k]===undefined||typeof p[k]==='boolean','歩行状態が不正です。');
   if(l.transition){const t=l.transition;check(['boarding','exiting'].includes(l.mode)&&object(t)&&Array.isArray(t.path)&&t.path.length>=2&&t.path.length<=8&&[-1,1].includes(t.side),'乗降経路が不正です。');check(t.duration===(l.mode==='boarding'?1.9:2.1)&&finite(t.elapsed,0,t.duration)&&t.elapsed<t.duration,'乗降の時間が不正です。');for(const q of t.path){position(q);check(finite(q.heading,-20,20),'乗降の向きが不正です。');}}

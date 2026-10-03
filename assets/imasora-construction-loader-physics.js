@@ -1,4 +1,6 @@
+import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs';
 // Stage 3-1: flat-ground, kinematic vehicle/boarding prototype. No game-save access.
+import {atDriverDoor} from './imasora-construction-boarding.js';
 export const LOADER = Object.freeze({width:60,length:86,floor:9.12,seatZ:-8,seatX:-14,wheelbase:49,wheelRadius:8.9,maxSpeed:100,reverseSpeed:48,acceleration:65,coast:35,brake:190,steering:.47});
 export const WALKER = Object.freeze({radius:15.6,height:26.6,speed:48});
 export const SITE = Object.freeze({minX:-320,maxX:320,minZ:-250,maxZ:250});
@@ -26,7 +28,7 @@ export function polygonsOverlap(a,b){
     if(Math.max(...aa)<=Math.min(...bb)+EPS||Math.max(...bb)<=Math.min(...aa)+EPS)return false;
   }return true;
 }
-const rect=o=>polygon({...o,heading:0},o.width,o.depth);
+const rect=o=>polygon({...o,heading:Number.isFinite(o.angle)?o.angle:0},o.width,o.depth);
 const inside=poly=>poly.every(p=>p.x>=SITE.minX&&p.x<=SITE.maxX&&p.z>=SITE.minZ&&p.z<=SITE.maxZ);
 export function vehicleBlocker(vehicle,obstacles=OBSTACLES){
   // Extra 4 units each side cover the steered tyre corners; bucket is inside length 86.
@@ -51,8 +53,8 @@ export function stepVehicle(vehicle,input,dt,obstacles=OBSTACLES){
   // The vehicle faces local +Z with +Y up: driver's right is -X.
   // Positive input is right, but Three's positive yaw turns +Z toward +X (left).
   v.steering=approach(v.steering,-steer*LOADER.steering,dt*1.8);
-  const target=throttle*(throttle>=0?LOADER.maxSpeed:LOADER.reverseSpeed);
-  v.speed=approach(v.speed,input.brake?0:target,dt*(input.brake?LOADER.brake:throttle?LOADER.acceleration:LOADER.coast));
+  const factor=driveFactor(input),target=throttle*(throttle>=0?LOADER.maxSpeed:LOADER.reverseSpeed)*factor;
+  v.speed=approach(v.speed,input.brake?0:target,dt*(input.brake?LOADER.brake:throttle?LOADER.acceleration*factor:LOADER.coast));
   const travel=v.speed*dt,angle=travel*2*Math.tan(v.steering)/LOADER.wheelbase;
   const count=Math.max(1,Math.ceil(Math.abs(travel)/.6),Math.ceil(Math.abs(angle)/.008));let hit='';
   for(let i=0;i<count;i++){
@@ -83,10 +85,10 @@ export function routeClear(points,obstacles=OBSTACLES){
   }return true;
 }
 export function boardOption(state,obstacles=OBSTACLES){
-  if(state.mode!=='foot')return null;
+  if(state.mode!=='foot'||state.transition||Math.abs(state.vehicle.speed)>.8)return null;
   // Driver's left door only for boarding. Right door remains a safe exit alternative.
   const points=transitionPoints(state.vehicle,-1),start=points[0];
-  if(Math.hypot(state.player.x-start.x,state.player.z-start.z)>24)return null;
+  if(!atDriverDoor(state.player,start,state.vehicle.heading))return null;
   const path=[{...state.player,heading:state.vehicle.heading},...points];
   return routeClear(path,obstacles)?{side:-1,path}:null;
 }
@@ -120,7 +122,7 @@ export function stepLoader(state,input,dt,obstacles=OBSTACLES){
     return next;
   }
   if(state.mode==='driving'){const moved=stepVehicle(state.vehicle,input,dt,obstacles);Object.assign(next,moved);if(moved.hit)next.message=`${moved.hit}に接触したため止まりました。`;return next;}
-  const p={...state.player},len=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/len*WALKER.speed*dt,dz=(input.z||0)/len*WALKER.speed*dt;
+  const p={...state.player},len=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/len*WALKER.speed*walkFactor(input)*dt,dz=(input.z||0)/len*WALKER.speed*walkFactor(input)*dt;
   const count=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.6));
   for(let i=0;i<count;i++){if(walkingClear({...p,x:p.x+dx/count},state.vehicle,obstacles))p.x+=dx/count;if(walkingClear({...p,z:p.z+dz/count},state.vehicle,obstacles))p.z+=dz/count;}
   if(Math.hypot(dx,dz)>.0001)p.heading=Math.atan2(dx,dz);next.player=p;return next;

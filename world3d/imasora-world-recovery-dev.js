@@ -1,5 +1,5 @@
-import {collectRecoveryBundle,unpackRecoveryBundle,inspectRecoveryBundle,MAX_RECOVERY_FILE} from './assets/imasora-world-recovery-bundle.js?v=483';
-import {createRecoveryReader} from './assets/imasora-world-recovery-reader.js?v=483';
+import {collectRecoveryBundle,unpackRecoveryBundle,inspectRecoveryBundle,MAX_RECOVERY_FILE} from './assets/imasora-world-recovery-bundle.js?v=496';
+import {createRecoveryReader} from './assets/imasora-world-recovery-reader.js?v=496';
 const el=id=>document.getElementById(id),record=el('record'),status=el('status'),result=el('result');
 let verified=null,busy=false;
 el('origin').textContent=`保存元：${location.origin}`;
@@ -10,6 +10,12 @@ const labels={
   'imasora-construction-terrain-development-v1':'工事2-2の貸出地形',
   'imasora-construction-excavation-development-v1':'旧ショベル専用保存（v1/v2）',
   'imasora-construction-excavation-restore-test-v1':'旧ショベル復元確認用',
+  'imasora-world-excavation-integration-v1':'掘削作業の保存・復元前の控え（v484/v493）',
+  'imasora-world-excavation-authority-development-v1':'世界と掘削の同時保存確認（v494以降）',
+  'imasoraUfoArcadeDailyRewardsV1':'ゲームセンターの日次獲得数',
+  'imasoraPachicoinDailyHeldCoinsV1':'パチコインのもちコイン',
+  'imasoraUfoArcadeRewardPendingV1':'ゲーム報酬の復旧用記録',
+  'imasoraPachicoinPrizeExchangePendingV1':'旧景品交換の復旧用記録',
   'imasora-world-foundation-v3':'移行前の本体保存',
   'imasora-ufo-workshop-materials-v1':'UFO装備素材',
 };

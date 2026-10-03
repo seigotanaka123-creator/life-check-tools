@@ -1,3 +1,4 @@
+import {walkFactor} from './imasora-construction-travel-input.mjs';
 // Stage 4-2: the same oriented parts are floors, walls and ceilings.
 // Independent of the approved loader/terrain physics and their saves.
 import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js';
@@ -54,7 +55,7 @@ export function stepCraneWalker(s,rig,input,dt){
   p.grounded=grounded(p,boxes)&&p.vy<=0;
   if(input.jump&&!p.jumpHeld&&p.grounded){p.vy=CRANE_WALK.jump;p.grounded=false;}
   p.jumpHeld=!!input.jump;
-  const n=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/n*CRANE_WALK.speed*dt,dz=(input.z||0)/n*CRANE_WALK.speed*dt;
+  const n=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/n*CRANE_WALK.speed*walkFactor(input)*dt,dz=(input.z||0)/n*CRANE_WALK.speed*walkFactor(input)*dt;
   const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));let hit='';
   for(let i=0;i<steps;i++){
     hit=horizontalMove(p,'x',dx/steps,boxes)||hit;

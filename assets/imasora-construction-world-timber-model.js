@@ -1,4 +1,5 @@
 import * as THREE from './three.module.min.js';
+import {createGroundMark} from './imasora-construction-ground-mark.js?v=119bp';
 import {createCrane,updateCraneModel} from './imasora-construction-crane-model.js';
 import {createFloatingPart,animateFloatingPart} from './imasora-construction-floating-model.js';
 import {hook,pickOption} from './imasora-construction-crane.js';
@@ -16,9 +17,9 @@ export function createWorldTimberModel(){
   const box=(name,x,y,z,w,h,d,m)=>{const o=new THREE.Mesh(cube,m);o.name=name;o.position.set(x,y,z);o.scale.set(w,h,d);o.castShadow=o.receiveShadow=true;root.add(o);};
   // Paint only: preserve the unified construction ground, without a second floor.
   for(const b of TIMBER_FENCES)box('クレーン区画の柵',b.x,b.height/2,b.z,b.width,b.height,b.depth,teal);
-  for(const side of[-1,1]){box('回収枠',RETURN_PAD.x+side*RETURN_PAD.w/2,.11,RETURN_PAD.z,.8,.08,RETURN_PAD.d,blue);box('回収枠',RETURN_PAD.x,.11,RETURN_PAD.z+side*RETURN_PAD.d/2,RETURN_PAD.w,.08,.8,blue);box('駐車線',side*52,.11,-80,.6,.08,120,gold);}
+  for(const side of[-1,1]){createGroundMark(root,{name:'回収枠',x:RETURN_PAD.x+side*RETURN_PAD.w/2,z:RETURN_PAD.z,width:.8,depth:RETURN_PAD.d,color:0x5bbdc7,y:.15});createGroundMark(root,{name:'回収枠',x:RETURN_PAD.x,z:RETURN_PAD.z+side*RETURN_PAD.d/2,width:RETURN_PAD.w,depth:.8,color:0x5bbdc7,y:.15});createGroundMark(root,{name:'駐車線',x:side*52,z:-80,width:.6,depth:120,color:0xe1c57f,y:.15});}
   const c=document.createElement('canvas');c.width=768;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#23463f';ctx.fillRect(0,0,768,128);ctx.strokeStyle='#e1c57f';ctx.lineWidth=6;ctx.strokeRect(3,3,762,122);ctx.fillStyle='#fff5dc';ctx.font='bold 50px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('火星木材 ・ 出庫 / 回収枠',384,64,736);const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
-  const label=new THREE.Mesh(new THREE.PlaneGeometry(160,160/6),new THREE.MeshBasicMaterial({map:texture,transparent:false,side:THREE.DoubleSide}));label.rotation.x=-Math.PI/2;label.position.set(0,.16,104);root.add(label);
+  const label=createGroundMark(root,{name:'木材回収の床案内',x:0,z:104,width:160,depth:160/6,map:texture,y:.16});
   const crane=createCrane();root.add(crane);
   const ghost=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0x77efb6,wireframe:true,transparent:true,opacity:.75,depthWrite:false}));root.add(ghost);
   const ring=new THREE.Mesh(new THREE.RingGeometry(9,10,32),new THREE.MeshBasicMaterial({color:0xffda70,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;root.add(ring);

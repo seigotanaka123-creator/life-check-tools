@@ -2,13 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>工事現場・掘って歩く｜イマソラウォーカーズ</title>
+  <title>工事現場・掘って歩く｜イマソラーズウォーク</title>
   <link rel="stylesheet" href="imasora-construction-terrain-dev.css?v=428">
+  <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
 </head>
 <body>
   <canvas id="scene" aria-label="レンが歩ける立体の工事区画"></canvas>
   <header>
-    <div><span class="eyebrow">イマソラウォーカーズ · 工事現場 / 段階2-2</span><h1>掘って、歩いて、つくる。</h1><p>土の面をタップ →「掘る」か「置く」。ドラッグで視点を回転。</p></div>
+    <div><span class="eyebrow">イマソラーズウォーク · 工事現場 / 段階2-2</span><h1>掘って、歩いて、つくる。</h1><p>土の面をタップ →「掘る」か「置く」。ドラッグで視点を回転。</p></div>
     <div class="corner"><button id="home">入口へ戻る</button><button id="camera">見下ろす</button><button id="tools" aria-expanded="false">保存・説明</button></div>
   </header>
   <section class="inventory" aria-label="土と保存の状態"><div>手持ちの土 <strong id="stock">—</strong></div><div>地形の土 <strong id="terrain-count">—</strong></div><span id="save-state">読み込み中</span></section>

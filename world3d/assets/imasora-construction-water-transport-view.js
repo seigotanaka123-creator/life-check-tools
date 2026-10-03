@@ -1,4 +1,5 @@
 import * as THREE from './three.module.min.js';
+import {createGroundMark} from './imasora-construction-ground-mark.js?v=119bp';
 import {createLoader,updateLoaderModel} from './imasora-construction-loader-work-model.js';
 import {createWaterLab,updateWaterLab} from './imasora-construction-water-view.js';
 import {SOURCE_PORT,RETURN_PORT,TRANSPORT_OBSTACLES,CATCHER,waterNozzle,parcelPosition,transportAvailability} from './imasora-construction-water-transport.js';
@@ -10,8 +11,8 @@ export function createWaterTransportView({embedded=false}={}){
   if(!embedded){box(root,0,-4.1,0,646,8,506,sand);const ground=new THREE.Mesh(new THREE.PlaneGeometry(640,500),sand);ground.rotation.x=-Math.PI/2;root.add(ground);}
   for(const z of embedded?[251]:[-251,251])box(root,0,9,z,644,18,2,dark);for(const x of[-321,321])box(root,x,9,0,2,18,500,dark);
   if(embedded){box(root,-312,9,-251,18,18,2,dark);box(root,52,9,-251,538,18,2,dark);}
-  for(let x=-290;x<300;x+=30)box(root,x,.08,-170,12,.08,.8,cream);for(const x of[-185,-75])box(root,x,.08,-112,.8,.08,100,cream);
-  box(root,-260,.08,-190,110,.1,110,mat(0x93bdb0));
+  for(let x=-290;x<300;x+=30)createGroundMark(root,{name:'給水区画の駐車線',x,z:-170,width:12,depth:.8,color:0xe8e5c9});for(const x of[-185,-75])createGroundMark(root,{name:'給水区画の駐車線',x,z:-112,width:.8,depth:100,color:0xe8e5c9});
+  createGroundMark(root,{name:'給水区画の待機床',x:-260,z:-190,width:110,depth:110,color:0x93bdb0,y:.13});
   const tank=new THREE.Group();tank.position.set(-130,0,20);root.add(tank);
   box(tank,0,29,0,72,58,54,glass,'source-tank');for(const x of[-35,35])for(const z of[-26,26])box(tank,x,29,z,2,58,2,dark);
   box(tank,0,2,0,72,4,54,dark);box(tank,0,56,0,74,4,56,yellow);

@@ -18,9 +18,13 @@ export const bounds=p=>polygon({x:p.x,z:p.z,heading:p.angle||0},p.w,p.d);
 export function initialCrane(){const rig=initialLoaderState();rig.player=cranePlayer(rig.player);return{schemaVersion:1,revision:0,rig,work:false,deployment:0,boom:{yaw:0,reach:70,cable:54.5},held:null,snap:true,parts:PARTS.map(p=>({...p,y:0,angle:0,vx:0,vz:0,vy:0,fixed:false})),history:[],message:'「運転席に乗る」→「クレーン作業へ」。最初の床板はフックの真下にあります。'};}
 export function tip(s){const p=localToWorld(s.rig.vehicle,Math.sin(s.boom.yaw)*s.boom.reach,26+Math.cos(s.boom.yaw)*s.boom.reach);return{...p,y:42+s.boom.reach*.35};}
 export function hook(s){const p=s.parts.find(p=>p.id===s.held);return p?{x:p.x,z:p.z,y:p.y+p.h+4}:{...tip(s),y:tip(s).y-s.boom.cable};}
-function footprint(o){return polygon({...o,heading:0},o.width,o.depth);}
+function footprint(o){return polygon({x:o.x,z:o.z,heading:Number.isFinite(o.angle)?o.angle:0},o.width,o.depth);}
 function pointInside(p,poly){let sign=0;for(let i=0;i<4;i++){const a=poly[i],b=poly[(i+1)%4],cross=(b.x-a.x)*(p.z-a.z)-(b.z-a.z)*(p.x-a.x);if(Math.abs(cross)<.01)continue;const next=Math.sign(cross);if(sign&&sign!==next)return false;sign=next;}return true;}
-export function collides(s,p,{ignoreGround=false}={}){
+const validExternal=o=>o&&[o.x,o.z,o.width,o.depth,o.height,o.minY??0,o.angle??0].every(Number.isFinite)&&o.width>0&&o.depth>0&&o.height>(o.minY??0);
+function externalOverlap(p,o){return validExternal(o)&&p.y<o.height-EPS&&p.y+p.h>(o.minY??0)+EPS&&polygonsOverlap(bounds(p),footprint(o));}
+function externalPointOverlap(point,o,radius=4.2){return validExternal(o)&&point.y+5.6>(o.minY??0)+EPS&&point.y-2.7<o.height-EPS&&polygonsOverlap(polygon({x:point.x,z:point.z,heading:0},radius*2,radius*2),footprint(o));}
+function externalBeamOverlap(point,o,radius=4){return validExternal(o)&&point.y+radius>(o.minY??0)+EPS&&point.y-radius<o.height-EPS&&polygonsOverlap(polygon({x:point.x,z:point.z,heading:0},radius*2,radius*2),footprint(o));}
+export function collides(s,p,{ignoreGround=false,external=[]}={}){
   const b=bounds(p);
   if(b.some(q=>q.x<SITE.minX+2||q.x>SITE.maxX-2||q.z<SITE.minZ+2||q.z>SITE.maxZ-2))return'外周の柵';
   if(!ignoreGround&&p.y<0)return'地面';
@@ -29,24 +33,26 @@ export function collides(s,p,{ignoreGround=false}={}){
   // Match all four beams, vertical legs and outer foot plates, also mid-extension.
   if(craneOutriggerVolumes(s).some(q=>overlapsOutrigger(p,q)))return'支持脚';
   for(const q of s.parts)if(q.id!==p.id&&p.y<q.y+q.h-EPS&&p.y+p.h>q.y+EPS&&polygonsOverlap(b,bounds(q)))return q.name;
+  for(const o of external)if(externalOverlap(p,o))return o.name||o.id||'建材';
   return'';
 }
-export function supportAt(s,p){
-  const poly=bounds(p),levels=[0,...s.parts.filter(q=>q.id!==p.id&&q.fixed&&q.y+q.h<=p.y+14&&polygonsOverlap(poly,bounds(q))).map(q=>q.y+q.h)].sort((a,b)=>b-a);
+export function supportAt(s,p,external=[]){
+  const poly=bounds(p),levels=[0,...s.parts.filter(q=>q.id!==p.id&&q.fixed&&q.y+q.h<=p.y+14&&polygonsOverlap(poly,bounds(q))).map(q=>q.y+q.h),...external.filter(o=>validExternal(o)&&o.height<=p.y+14&&polygonsOverlap(poly,footprint(o))).map(o=>o.height)].sort((a,b)=>b-a);
   for(const y of levels){
     if(y===0)return{y,ids:[]};
     const supports=s.parts.filter(q=>q.id!==p.id&&q.fixed&&Math.abs(q.y+q.h-y)<.05);
+    const materialSupports=external.filter(o=>validExternal(o)&&Math.abs(o.height-y)<.05);
     // Two separated bearing points carry a beam/bridge; unsupported cantilevers are refused.
     const pose={x:p.x,z:p.z,heading:p.angle};
     const spans=[.3,.4,.45].flatMap(r=>[[localToWorld(pose,-p.w*r,0),localToWorld(pose,p.w*r,0)],[localToWorld(pose,0,-p.d*r),localToWorld(pose,0,p.d*r)]]);
-    if(spans.some(pair=>pair.every(v=>supports.some(q=>pointInside(v,bounds(q))))))return{y,ids:supports.filter(q=>polygonsOverlap(poly,bounds(q))).map(q=>q.id)};
+    if(spans.some(pair=>pair.every(v=>supports.some(q=>pointInside(v,bounds(q)))||materialSupports.some(o=>pointInside(v,footprint(o))))))return{y,ids:[...supports.filter(q=>polygonsOverlap(poly,bounds(q))).map(q=>q.id),...materialSupports.filter(o=>polygonsOverlap(poly,footprint(o))).map(o=>o.id||o.name||'建材')]};
   }return{y:0,ids:[]};
 }
-export function placement(s){
+export function placement(s,external=[]){
   const p=s.parts.find(p=>p.id===s.held);if(!p)return null;
   const candidate={...p,x:s.snap?(Math.round(p.x/CRANE.snap)*CRANE.snap||0):p.x,z:s.snap?(Math.round(p.z/CRANE.snap)*CRANE.snap||0):p.z};
-  const support=supportAt(s,candidate);candidate.y=support.y;
-  let reason=s.rotation?'部材を回転中です。止まってから設置できます。':collides(s,candidate);
+  const support=supportAt(s,candidate,external);candidate.y=support.y;
+  let reason=s.rotation?'部材を回転中です。止まってから設置できます。':collides(s,candidate,{external});
   if(!reason&&Math.abs(p.y-candidate.y)>14)reason='もう少し巻き下げてください';
   if(!reason&&Math.hypot(p.vx,p.vz)>12)reason='揺れが落ち着くまで少し待ってください';
   const t=tip(s);if(!reason&&(t.y-(candidate.y+p.h+4)<3||Math.hypot(candidate.x-t.x,candidate.z-t.z)>22))reason='フックを置き場所の上へ寄せてください';
@@ -58,31 +64,33 @@ export function pickOption(s){
   return s.parts.filter(p=>Math.hypot(p.x-h.x,p.z-h.z)<18&&h.y>=p.y+p.h-1&&h.y<=p.y+p.h+22&&Math.abs(p.vy)<.1).sort((a,b)=>Math.hypot(a.x-h.x,a.z-h.z)-Math.hypot(b.x-h.x,b.z-h.z))[0]||null;
 }
 function record(s,action,id){s.revision++;s.history.push({revision:s.revision,action,id});if(s.history.length>60)s.history.shift();}
-function obstacles(s){
+function obstacles(s,external=[]){
   const items=s.parts.filter(p=>p.y<(s.rig.mode==='foot'?26.8:44)).map(p=>({...p,id:p.name}));
   // Stowed supports belong to the moving chassis, not stationary obstacles to
   // feed back into the driver's own footprint test.
   if(s.deployment>0)items.push(...craneOutriggerVolumes(s));
-  return items.map(p=>{const b=bounds(p),xs=b.map(v=>v.x),zs=b.map(v=>v.z);return{id:p.id,x:(Math.min(...xs)+Math.max(...xs))/2,z:(Math.min(...zs)+Math.max(...zs))/2,width:Math.max(...xs)-Math.min(...xs),depth:Math.max(...zs)-Math.min(...zs),height:p.y+p.h};});
+  const local=items.map(p=>{const b=bounds(p),xs=b.map(v=>v.x),zs=b.map(v=>v.z);return{id:p.id,x:(Math.min(...xs)+Math.max(...xs))/2,z:(Math.min(...zs)+Math.max(...zs))/2,width:Math.max(...xs)-Math.min(...xs),depth:Math.max(...zs)-Math.min(...zs),height:p.y+p.h};});
+  const maxY=s.rig.mode==='foot'?26.8:44;
+  return[...local,...external.filter(o=>validExternal(o)&&(o.minY??0)<maxY&&o.height>8)];
 }
-export function craneObstacles(s){return obstacles(s);}
-export function craneBoardOption(s){
+export function craneObstacles(s,external=[]){return obstacles(s,external);}
+export function craneBoardOption(s,external=[]){
   if(Math.abs(s.rig.player.y)>.05||Math.abs(s.rig.player.vy||0)>.1)return null;
-  const option=boardOption(s.rig,obstacles(s));return option&&craneWalkingRouteClear(s,option.path)?option:null;
+  const option=boardOption(s.rig,obstacles(s,external));return option&&craneWalkingRouteClear(s,option.path)?option:null;
 }
-export function craneExitOption(s){
+export function craneExitOption(s,external=[]){
   if(s.rig.mode!=='driving'||Math.abs(s.rig.vehicle.speed)>.8)return null;
-  for(const side of[-1,1]){const path=transitionPoints(s.rig.vehicle,side,false);if(routeClear(path,obstacles(s))&&craneWalkingRouteClear(s,path))return{side,path};}
+  for(const side of[-1,1]){const path=transitionPoints(s.rig.vehicle,side,false);if(routeClear(path,obstacles(s,external))&&craneWalkingRouteClear(s,path))return{side,path};}
   return null;
 }
-export function actCrane(state,action){
+export function actCrane(state,action,external=[]){
   const s=copy(state);s.message='';
-  if(action==='home'){delete s.rotation;s.rig=actLoader(s.rig,'home',obstacles(s));s.message='レンだけ安全エリアに戻りました。車両と部材はそのままです。';record(s,action,null);return s;}
+  if(action==='home'){delete s.rotation;s.rig=actLoader(s.rig,'home',obstacles(s,external));s.message='レンだけ安全エリアに戻りました。車両と部材はそのままです。';record(s,action,null);return s;}
   if(action==='interact'){
     if(s.work&&s.rig.mode==='driving'){s.message='先に部材を置き、「走行へ戻る」でクレーンを格納してください。';return s;}
-    const boarding=s.rig.mode==='foot',option=boarding?craneBoardOption(s):craneExitOption(s);
+    const boarding=s.rig.mode==='foot',option=boarding?craneBoardOption(s,external):craneExitOption(s,external);
     if(!option){s.message='乗降経路と頭上を空け、地面のステップ前から乗り降りしてください。';return s;}
-    s.rig=actLoader(s.rig,'interact',obstacles(s));
+    s.rig=actLoader(s.rig,'interact',obstacles(s,external));
     // The shared vehicle animation remains unchanged, but use the exit whose
     // complete head corridor passed the crane's 3D test, including the right side.
     s.rig.transition={...s.rig.transition,path:option.path,side:option.side};
@@ -94,7 +102,7 @@ export function actCrane(state,action){
   if(action==='mode'){
     if(s.held){s.message='吊った部材を設置するか、下ろしてから切り替えてください。';return s;}
     if(Math.abs(s.rig.vehicle.speed)>.8){s.message='ブレーキで停車してください。';return s;}
-    const clearance=deploymentClearance(s,s.work?0:1);
+    const clearance=deploymentClearance(s,s.work?0:1,external);
     if(clearance==='部材'){s.message='支持脚の展開・格納経路が塞がっています。周囲の部材を離してください。';return s;}
     if(clearance==='フック'){
       if(s.work){s.message='格納経路でフックが支持脚に当たります。先に巻き上げてください。';return s;}
@@ -107,6 +115,7 @@ export function actCrane(state,action){
   if(!s.work||s.deployment<1){s.message='作業モードの展開完了を待ってください。';return s;}
   if(action==='pick'){
     const p=pickOption(s);if(!p){s.message='フックを部材の中央の上へ。巻き下げて近づけてください。';return s;}
+    if(collides(s,p,{external})){s.message='部材が本体の火星土へ食い込んでいるため吊れません。先に接触を解消してください。';return s;}
     // Placement searches nearby heights for snapping; removal must only consider
     // actual bottom-to-top contact, not a lower floor within that search window.
     const dependent=s.parts.find(q=>q.id!==p.id&&q.fixed&&Math.abs(q.y-(p.y+p.h))<.05&&polygonsOverlap(bounds(q),bounds(p)));
@@ -117,11 +126,11 @@ export function actCrane(state,action){
   const p=s.parts.find(p=>p.id===s.held);if(!p)return s;
   if(s.rotation&&['rotate','place','release'].includes(action)){s.message='部材を回転中です。停止までお待ちください。追加の回転は予約しません。';return s;}
   if(action==='rotate'){
-    const start=p.angle;for(let i=1;i<=36;i++){const q={...p,angle:start+Math.PI/2*i/36};if(collides(s,q)){s.message='回転する途中に部材や車体があるため回せません。先に持ち上げてください。';return s;}}
+    const start=p.angle;for(let i=1;i<=36;i++){const q={...p,angle:start+Math.PI/2*i/36};if(collides(s,q,{external})){s.message='回転する途中に部材や車体があるため回せません。先に持ち上げてください。';return s;}}
     p.angle=((start%(Math.PI*2))+Math.PI*2)%(Math.PI*2);s.rotation={partId:p.id,start:p.angle,elapsed:0};s.message=`${p.name}を機械で90°回転しています。`;record(s,action,p.id);
   }
   if(action==='place'){
-    const preview=placement(s);if(!preview.ok){s.message=preview.reason;return s;}
+    const preview=placement(s,external);if(!preview.ok){s.message=preview.reason;return s;}
     Object.assign(p,preview.candidate,{fixed:true,vx:0,vz:0,vy:0});s.held=null;s.message=`${p.name}を設置しました。同じフックでまた外せます。`;record(s,action,p.id);
   }
   if(action==='release'){s.held=null;p.fixed=false;p.vy=0;s.message=`${p.name}の吊り索を外しました。部材は消えず、下の面に落下します。`;record(s,action,p.id);}
@@ -129,14 +138,14 @@ export function actCrane(state,action){
 }
 // The motor changes the physical pose, not a separate render-only angle. Sweep
 // small arc segments so a moving load cannot clip a thin wall between frames.
-function stepCargoRotation(s,dt){
+function stepCargoRotation(s,dt,external=[]){
   const r=s.rotation;if(!r)return;
   const p=s.parts.find(p=>p.id===s.held);
   if(!p||p.id!==r.partId||s.rig.mode!=='driving'){delete s.rotation;return;}
   const elapsed=Math.min(CRANE.rotationSeconds,r.elapsed+dt),target=rotationAngle({...r,elapsed});
   const start=p.angle,n=Math.max(1,Math.ceil(Math.abs(target-start)*Math.hypot(p.w,p.d)/2/.25));
   for(let i=1;i<=n;i++){
-    const angle=start+(target-start)*i/n,hit=collides(s,{...p,angle});
+    const angle=start+(target-start)*i/n,hit=collides(s,{...p,angle},{external});
     if(hit){p.angle%=Math.PI*2;delete s.rotation;s.message=`回転中に${hit}へ接触するため停止しました。巻上げや離れる方向へ操作してください。`;return;}
     p.angle=angle;
   }
@@ -145,26 +154,27 @@ function stepCargoRotation(s,dt){
 }
 // Contact removes only obstructed motion. Never roll back an independent winch
 // command merely because pendulum sway is pushing sideways into a column.
-function cargoPathHit(s,old,p){
+function cargoPathHit(s,old,p,external=[]){
   const steps=Math.max(1,Math.ceil(Math.hypot(p.x-old.x,p.y-old.y,p.z-old.z)/.3));
   for(let i=1;i<=steps;i++){
     const t=i/steps,q={...p,x:old.x+(p.x-old.x)*t,y:old.y+(p.y-old.y)*t,z:old.z+(p.z-old.z)*t};
-    const hit=collides(s,q);if(hit)return hit;
+    const hit=collides(s,q,{external});if(hit)return hit;
     if(hookOutriggerHit(s,{x:q.x,z:q.z,y:q.y+q.h+4}))return'支持脚';
   }return'';
 }
 // Check the swept extension/retraction, including the foot's vertical movement.
 // The visible folded hook is above the front deck, not at its working endpoint.
-function deploymentClearance(s,target){
+function deploymentClearance(s,target,external=[]){
   let hookHit=false;
   const workingHook=hook(s),folded=localToWorld(s.rig.vehicle,0,34);
   for(let i=0;i<=80;i++){
     const k=s.deployment+(target-s.deployment)*i/80,q={...s,deployment:k};
     for(const b of craneOutriggerVolumes(q)){
       const poly=bounds(b);
-      if(poly.some(p=>p.x<SITE.minX||p.x>SITE.maxX||p.z<SITE.minZ||p.z>SITE.maxZ)||polygonsOverlap(poly,footprint(SAFE_ZONE))||s.parts.some(p=>overlapsOutrigger(p,b)))return'部材';
+      if(poly.some(p=>p.x<SITE.minX||p.x>SITE.maxX||p.z<SITE.minZ||p.z>SITE.maxZ)||polygonsOverlap(poly,footprint(SAFE_ZONE))||s.parts.some(p=>overlapsOutrigger(p,b))||external.some(o=>validExternal(o)&&overlapsOutrigger({x:o.x,z:o.z,y:o.minY??0,w:o.width,h:o.height-(o.minY??0),d:o.depth,angle:o.angle??0},b)))return'部材';
     }
     const h={x:folded.x+(workingHook.x-folded.x)*k,z:folded.z+(workingHook.z-folded.z)*k,y:24+(workingHook.y-24)*k};
+    if(external.some(o=>externalPointOverlap(h,o)))return'部材';
     if(hookOutriggerHit(q,h))hookHit=true;
   }
   return hookHit?'フック':'';
@@ -172,7 +182,7 @@ function deploymentClearance(s,target){
 // Empty hooks used to bypass cargo collision entirely. Sweep actual winch,
 // extension and slew motion in <= .2-unit arc steps, stopping at contact. Try
 // independent axes too, so the operator can always lift/retreat from a support.
-function solveEmptyHookContact(s,prior){
+function solveEmptyHookContact(s,prior,external=[]){
   const boxes=craneOutriggerVolumes(s),requested={...s.boom},old=prior.boom;
   const distance=Math.max(old.reach,requested.reach)*Math.abs(requested.yaw-old.yaw)+1.35*Math.abs(requested.reach-old.reach)+Math.abs(requested.cable-old.cable);
   const steps=Math.max(1,Math.ceil(distance/.2)),delta=Object.fromEntries(['yaw','reach','cable'].map(k=>[k,(requested[k]-old[k])/steps]));
@@ -180,6 +190,8 @@ function solveEmptyHookContact(s,prior){
   const blocked=(from,to)=>{
     const a=hook({...s,boom:from}),b=hook({...s,boom:to});
     if(b.y<4-1e-7&&b.y<a.y-1e-8)return true;
+    const distance=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z),count=Math.max(1,Math.ceil(distance/.2));
+    for(let i=1;i<=count;i++){const t=i/count,q={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t};if(external.some(o=>externalPointOverlap(q,o)))return true;}
     // Old saves may already contain a penetrated empty hook. Allow motion out
     // without allowing deeper penetration or snapping the hook through the foot.
     return boxes.some(box=>hookSupportDepth(b,box)>Math.max(1e-6,hookSupportDepth(a,box)+1e-8));
@@ -198,10 +210,10 @@ function solveEmptyHookContact(s,prior){
     }
   }
   s.boom=boom;
-  if(contact)s.message='フックが支持脚に接触中です。巻上げや離れる方向へ操作できます。';
-  else if(s.message.startsWith('フックが支持脚に接触中'))s.message='接触を抜けました。引き続きクレーンを操作できます。';
+  if(contact)s.message='フックが支持脚または本体火星土に接触中です。巻上げや離れる方向へ操作できます。';
+  else if(s.message.startsWith('フックが支持脚'))s.message='接触を抜けました。引き続きクレーンを操作できます。';
 }
-function solveCargoContact(s,prior,dt){
+function solveCargoContact(s,prior,dt,external=[]){
   const old=prior.parts.find(p=>p.id===s.held),requested=s.boom,previous=prior.boom;
   const choices=[requested,{...requested,yaw:previous.yaw},{...requested,reach:previous.reach},
     {...previous,cable:requested.cable},{...requested,cable:previous.cable},
@@ -219,7 +231,7 @@ function solveCargoContact(s,prior,dt){
       const [cx,cz]=candidates[i],r=Math.hypot(cx-t.x,cz-t.z);if(r>maxRadius+.000001)continue;
       const p={...old,x:cx,z:cz,y:t.y-Math.sqrt(Math.max(0,length*length-r*r))-old.h-4,
         vx:Math.abs(cx-x)<.000001?vx:0,vz:Math.abs(cz-z)<.000001?vz:0};
-      const hit=cargoPathHit(s,old,p);if(hit){contact=hit;continue;}
+      const hit=cargoPathHit(s,old,p,external);if(hit){contact=hit;continue;}
       // Do not keep pulling the boom farther past a blocked load. Retreat and
       // tangential movement remain available; the winch remains independent.
       if(i>0&&(boom.yaw!==previous.yaw||boom.reach!==previous.reach)){
@@ -232,7 +244,7 @@ function solveCargoContact(s,prior,dt){
   }
   return{part:{...old,vx:0,vz:0},boom:{...previous},contact:contact||'障害物'};
 }
-export function stepCrane(state,input,dt){
+export function stepCrane(state,input,dt,external=[]){
   if(!Number.isFinite(dt)||dt<=0||dt>.05)throw new Error('更新刻みが不正です。');
   const s=copy(state),before=JSON.stringify([s.rig,s.boom,s.parts,s.deployment,s.rotation]);
   s.deployment=clamp(s.deployment+(s.work?1:-1)*dt/1.2,0,1);
@@ -240,7 +252,7 @@ export function stepCrane(state,input,dt){
   else if(s.rig.mode==='foot'&&!s.rig.transition)s.rig=stepCraneWalker(s,s.rig,input,dt);
   else if(s.rig.transition&&!craneWalkingRouteClear(s,s.rig.transition.path)){
     s.rig={...s.rig,mode:s.rig.mode==='boarding'?'foot':'driving',transition:null,hit:'乗降経路',message:'頭上や乗降経路が塞がったため中止しました。'};
-  }else s.rig=stepLoader(s.rig,input,dt,obstacles(s));
+  }else s.rig=stepLoader(s.rig,input,dt,obstacles(s,external));
   if(s.rig.vehicle.steering===0)s.rig.vehicle.steering=0; // Canonicalize -0 for JSON round trips.
   if(s.work&&s.deployment===1&&s.rig.mode==='driving'){
     s.boom.yaw=clamp(s.boom.yaw+(input.slew||0)*CRANE.slew*dt,-Math.PI*.8,Math.PI*.8);
@@ -248,21 +260,22 @@ export function stepCrane(state,input,dt){
     s.boom.cable=clamp(s.boom.cable-(input.hoist||0)*CRANE.hoist*dt,4,tip(s).y-4);
     // The raised arm must not cut through an already-built upper wall/beam.
     const t=tip(s),base=localToWorld(s.rig.vehicle,0,26);let armHit='';
-    for(let i=1;(s.boom.yaw!==state.boom.yaw||s.boom.reach!==state.boom.reach)&&i<=60&&!armHit;i++){const q=i/60,x=base.x+(t.x-base.x)*q,z=base.z+(t.z-base.z)*q,y=42+(t.y-42)*q;
-      for(const p of s.parts)if(p.id!==s.held&&y+4>p.y&&y-4<p.y+p.h&&polygonsOverlap(polygon({x,z,heading:0},8,8),bounds(p))){armHit=p.name;break;}}
+    for(let i=1;(s.boom.yaw!==state.boom.yaw||s.boom.reach!==state.boom.reach)&&i<=60&&!armHit;i++){const q=i/60,x=base.x+(t.x-base.x)*q,z=base.z+(t.z-base.z)*q,y=42+(t.y-42)*q,point={x,z,y};
+      for(const p of s.parts)if(p.id!==s.held&&y+4>p.y&&y-4<p.y+p.h&&polygonsOverlap(polygon({x,z,heading:0},8,8),bounds(p))){armHit=p.name;break;}
+      if(!armHit)for(const o of external)if(externalBeamOverlap(point,o)){armHit=o.name||o.id||'建材';break;}}
     if(armHit){s.boom={...state.boom,cable:clamp(s.boom.cable,4,tip(state).y-4)};s.message=`アームが${armHit}に当たるため旋回・伸縮を止めました。フックは操作できます。`;}
   }
   const held=s.parts.find(p=>p.id===s.held);
   if(held){
-    const solved=solveCargoContact(s,state,dt);Object.assign(held,solved.part);s.boom=solved.boom;
+    const solved=solveCargoContact(s,state,dt,external);Object.assign(held,solved.part);s.boom=solved.boom;
     if(solved.contact)s.message=`${solved.contact}に接触中です。接触する方向だけ止めています。巻上げや離れる方向へ操作できます。`;
     else if(/に接触中|に当たるため止めました/.test(s.message))s.message='接触を抜けました。引き続きクレーンを操作できます。';
-  }else if(s.work&&s.deployment===1&&state.deployment===1)solveEmptyHookContact(s,state);
-  stepCargoRotation(s,dt);
+  }else if(s.work&&s.deployment===1&&state.deployment===1)solveEmptyHookContact(s,state,external);
+  stepCargoRotation(s,dt,external);
   for(const p of s.parts){
     if(p.fixed||p.id===s.held)continue;
     p.vy-=CRANE.gravity*dt;const target=p.y+p.vy*dt,n=Math.max(1,Math.ceil(Math.abs(target-p.y)/.35)),step=(target-p.y)/n;
-    for(let i=0;i<n;i++){const q={...p,y:p.y+step};if(collides(s,q)){p.vy=0;break;}p.y=q.y;}
+    for(let i=0;i<n;i++){const q={...p,y:p.y+step};if(collides(s,q,{external})){p.vy=0;break;}p.y=q.y;}
     if(p.y<.02&&p.vy===0)p.y=0;
   }
   if(s.deployment===1&&state.deployment<1)s.message='作業準備OK。フック下の部材を「吊り索を掛ける」でつかめます。';

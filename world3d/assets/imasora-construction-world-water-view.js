@@ -1,17 +1,24 @@
+import {bindTravelBoost} from './imasora-construction-travel-input.mjs';
+import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
-import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=491-verified';
+import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=119be';
+import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=502';
+import {createVehicleRestoreView} from './imasora-construction-vehicle-restore-view.js?v=502';
 import * as THREE from './three.module.min.js';
-import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=457';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js';
-import {transportAvailability,TRANSPORT_OBSTACLES} from './imasora-construction-water-transport.js';
-import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,validateWorldWater} from './imasora-construction-world-water.js';
+import {overlapsWorldYardBuild} from './imasora-construction-world-yard-reservation.js?v=512';
+import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=119bp';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=520';
+import {transportAvailability,TRANSPORT_OBSTACLES,transportMaterialObstacles} from './imasora-construction-water-transport.js?v=520';
+import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=520';
+import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,validateWorldWater} from './imasora-construction-world-water.js?v=520';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js';
 import {waterCheckpoint} from './imasora-construction-world-water.js';
 
 // Same scene and same Ren as the main world. Only the input/physics owner changes.
-export function createWorldWaterController({service,practice=false,preview=false,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,readout}){
-  const orbit=createOrbitLook();
-  let work=null,root=null,active=false,busy=false,blocked=false,retryPending=false,expected=null,auto=0,ui=0,yaw=Math.PI,view=0,walk=0,idleIssue='';
+export function createWorldWaterController({service,practice=false,preview=false,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,readout,onRestoreRebuild}){
+  const orbit=createOrbitLook();let menuSaveNote='',restoreSession=null,savedWorkAwaitingResume=false;
+  const restoreLocked=()=>!!restoreSession?.locked;
+  let work=null,root=null,contactGeometry=null,active=false,busy=false,blocked=false,retryPending=false,expected=null,auto=0,ui=0,yaw=Math.PI,view=0,walk=0,idleIssue='';
   const inertState=new Map();
   function ownInput(owns){orbit.reset();
     if(owns){for(const el of document.querySelectorAll('.world-toolbar,.control-card')){inertState.set(el,el.inert);el.inert=true;}}
@@ -20,7 +27,7 @@ export function createWorldWaterController({service,practice=false,preview=false
   }
   const held=new Map(),taps=new Map(),keys=new Set();
   const panel=document.createElement('section');panel.className='world-water-controls';panel.hidden=true;panel.setAttribute('aria-label','工事現場の給水ローダー');
-  panel.innerHTML=`<header><strong>給水ローダー v492</strong><span class="ww-mode"></span><button data-action="begin">作業を始める</button></header>
+  panel.innerHTML=`<header><strong>給水ローダー</strong><span class="ww-mode"></span><button data-action="begin">作業を始める</button></header>
     <p class="ww-message" role="status"></p><div class="ww-stats"></div>
     <div class="ww-active" hidden><div class="ww-pad" aria-label="給水ローダーの操作"><button data-hold="left">左へ</button><button data-hold="accelerate">前へ</button><button data-hold="right">右へ</button><button data-hold="reverse">後ろへ</button><button data-hold="brake">ブレーキ</button></div>
     <div class="ww-work"><button data-action="interact">運転席に乗る</button><button data-action="dispatch">保管庫から32 L出庫</button><button data-action="store">給水槽の32 Lを保管</button><button data-action="source">給水槽から汲む</button><button data-action="pour">受け口へ注ぐ</button><button data-action="returned">回収槽から汲む</button><button data-action="recover">水路の水を回収</button><button data-action="flow">流れを切り替える</button><label>次に注ぐ向き <select aria-label="火星水を注ぐ向き"><option value="4">上 ↑</option><option value="8">下 ↓</option><option value="1">右 →</option><option value="2">左 ←</option><option value="16">奥</option><option value="32">手前</option></select></label></div>
@@ -32,33 +39,53 @@ export function createWorldWaterController({service,practice=false,preview=false
   panel.addEventListener('pointerup',e=>e.stopPropagation());
   const button=a=>panel.querySelector(`[data-action="${a}"]`),message=panel.querySelector('.ww-message');
   const received=()=>practice?32000:service.constructionStock?.receipts.filter(e=>e.offerId==='mars-water').reduce((n,e)=>n+e.amount,0)||0;
-  function clear(){held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
-  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ww",groups:[{"id":"move","label":"移動","selectors":[".ww-pad"],"hint":"WASD／矢印で移動。停車して給水します。"},{"id":"work","label":"給水","selectors":["[data-action=\"source\"]","[data-action=\"pour\"]","[data-action=\"unload\"]","[data-action=\"returned\"]",".ww-work label"]},{"id":"stock","label":"水路・保管","selectors":["[data-action=\"dispatch\"]","[data-action=\"store\"]","[data-action=\"recover\"]","[data-action=\"flow\"]","[data-action=\"stop\"]"]}],quick:["interact","camera"]});
+  let travelBoost=null;
+  function clear(){travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
+  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ww",groups:[{"id":"move","label":"移動","selectors":[".ww-pad"],"hint":"WASD／矢印で移動。同方向を素早く2回で加速（離すと解除）。停車して給水します。"},{"id":"work","label":"給水","selectors":["[data-action=\"source\"]","[data-action=\"pour\"]","[data-action=\"unload\"]","[data-action=\"returned\"]",".ww-work label"]},{"id":"stock","label":"水路・保管","selectors":["[data-action=\"dispatch\"]","[data-action=\"store\"]","[data-action=\"recover\"]","[data-action=\"flow\"]","[data-action=\"stop\"]"]}],quick:["interact","camera"]});
+  if(!practice&&!preview&&service.mode==='live'){
+    restoreSession=new VehicleRestoreSession({service,kind:'water',origin:globalThis.location?.origin,getWork:()=>work,getExpectedRevision:()=>expected,
+      available:()=>{if(!active||state.map!=='construction')return 'この車両の作業を始めてから復元してください。';if(busy||blocked)return '先に保存の結果を確認してください。';return '';},
+      onChange:refresh,onRestored:saved=>{
+        if(typeof onRestoreRebuild!=='function')throw Error('区画の再構築が接続されていません。');
+        clear();game.pause();scene.add(character);work=structuredClone(saved);expected=saved.revision;auto=0;savedWorkAwaitingResume=true;retryPending=false;blocked=false;idleIssue='';
+        // Keep the input gate paused while rebuilding floors, edges and solids.
+        const wasActive=active;active=false;
+        try{onRestoreRebuild();if(!root)throw Error('復元した区画を安全に表示できません。');}
+        finally{active=wasActive;}
+        if(active)work={...work,work:{...work.work,paused:false}};
+        orbit.reset();render(0);menuSaveNote='作業を復元しました。一時停止中です。';
+      }});
+    game.attachRestore(createVehicleRestoreView({menu:game.menu,session:restoreSession,isMenuOpen:()=>game.menuOpen,refresh}));
+  }
   function failure(e){clear();blocked=true;retryPending=service.blocked;message.textContent=`停止しました：${e.message||e}`;if(service.blocked)onError(e);refresh();}
   function near(){if(!root||state.map!=='construction'||state.ufoBoarded||Math.abs(state.groundY+state.jumpY)>.5)return false;
     const v=work.work.loader.vehicle;return Math.hypot(state.position.x-root.position.x-v.x,state.position.z-root.position.z-v.z)<=112;}
   function fresh(){
     const saved=service.world?.constructionWater;
-    if(saved&&!practice){work=structuredClone(saved);expected=saved.revision;}
+    if(saved&&!practice){work=structuredClone(saved);expected=saved.revision;savedWorkAwaitingResume=!practice&&!preview&&service.mode==='live';}
   }
+  function externalVolumes(){return root&&contactGeometry?constructionMaterialContactVolumes([root.position.x,root.position.z],contactGeometry()):[];}
   function begin(){
-    if(!near()||busy||blocked||active)return;clear();idleIssue='';
+    if(!near()||busy||blocked||restoreLocked()||active)return;clear();idleIssue='';
     try{
-      // Resuming an interrupted operation keeps its seat/path and all in-flight water.
-      if(work.work.loader.mode!=='foot'||work.work.task){work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
+      const resumeSaved=!practice&&!preview&&service.mode==='live'&&!!service.world?.constructionWater;
+      // A saved position/path is not rewritten on entry. Time starts only after
+      // the player chooses Resume, leaving time to inspect or undo a restore.
+      if(resumeSaved||work.work.loader.mode!=='foot'||work.work.task){work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
       else work=enterWorldWater(work,{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z,heading:state.heading});
-      active=true;auto=0;ownInput(true);render(0);refresh();
+      active=true;auto=0;ownInput(true);if(resumeSaved){savedWorkAwaitingResume=true;game.pause();menuSaveNote='保存した作業を一時停止で開きました。「再開」で続けられます。';}render(0);refresh();
     }catch(e){idleIssue=e.message;message.textContent=e.message;}
   }
   async function save(){
-    if(!work||busy||blocked)return false;if(practice)return true;
+    if(!work||busy||blocked||restoreLocked())return false;if(practice)return true;
     if(service.mode==='readonly'){message.textContent='この表示確認では保存しません。';return true;}
-    busy=true;clear();refresh();
-    try{await service.flush();const saved=await service.saveConstructionWater(work,snapshot(),expected);expected=saved.revision;auto=0;return true;}
+    menuSaveNote='';busy=true;clear();refresh();
+    try{await service.flush();const saved=await service.saveConstructionWater(work,snapshot(),expected);expected=saved.revision;auto=0;menuSaveNote='作業を保存しました。';return true;}
     catch(e){failure(e);return false;}finally{busy=false;refresh();}
   }
   async function leave({force=false,then=null}={}){
-    if(!active){then?.();return true;}if(busy||blocked)return false;clear();
+    if(restoreLocked())return false;
+    if(!active){then?.();return true;}if(busy||blocked||restoreLocked())return false;clear();
     const w=work.work;
     if(!force&&(w.loader.mode!=='foot'||w.task||w.air.length||work.delivery)){message.textContent='移送を終え、停車して降車してから徒歩へ戻ってください。';return false;}
     // Checkpoint the operation, not a fabricated dismounted vehicle state.
@@ -71,51 +98,55 @@ export function createWorldWaterController({service,practice=false,preview=false
     onExit();refresh();then?.();return true;
   }
   async function action(a,value){
-    if(a==='begin'){begin();return;}if(!active||busy||blocked||!game.allows(a))return;clear();
+    if(a==='begin'){begin();return;}if(!active||busy||blocked||restoreLocked()||!game.allows(a))return;clear();
     if(a==='camera'){orbit.reset();view=(view+1)%3;button('camera').textContent=['視点：追従','視点：横から','視点：区画全体'][view];return;}
     if(a==='leave'){await leave();return;}if(a==='save'){await save();return;}
-    try{const old=work;work=worldWaterAction(work,a,value??(['dispatch','store'].includes(a)?crypto.randomUUID():undefined),received());
+    try{const old=work;work=worldWaterAction(work,a,value??(['dispatch','store'].includes(a)?crypto.randomUUID():undefined),received(),externalVolumes());
       if(['dispatch','store'].includes(a)&&old!==work)await save();
     }catch(e){message.textContent=e.message;work={...work,work:{...work.work,message:e.message}};}
     refresh();
   }
+  travelBoost=bindTravelBoost({panel,enabled:()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen,context:()=>work?.work?.loader.mode});
   panel.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>void action(b.dataset.action)));
   panel.querySelector('select').addEventListener('change',e=>void action('direction',Number(e.target.value)));
   for(const b of panel.querySelectorAll('[data-hold]')){
-    b.addEventListener('pointerdown',e=>{if(!active||busy||blocked||game.paused)return;e.preventDefault();held.set(e.pointerId,b.dataset.hold);taps.set(b.dataset.hold,work.work.time+.15);b.setPointerCapture(e.pointerId);b.classList.add('held');});
+    b.addEventListener('pointerdown',e=>{if(!active||busy||blocked||restoreLocked()||game.paused)return;e.preventDefault();held.set(e.pointerId,b.dataset.hold);taps.set(b.dataset.hold,work.work.time+.15);b.setPointerCapture(e.pointerId);b.classList.add('held');});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,e=>{held.delete(e.pointerId);b.classList.remove('held');});
-    b.addEventListener('click',e=>{if(e.detail===0&&active&&!busy&&!blocked&&!game.paused)taps.set(b.dataset.hold,work.work.time+.15);});
+    b.addEventListener('click',e=>{if(e.detail===0&&active&&!busy&&!blocked&&!restoreLocked()&&!game.paused)taps.set(b.dataset.hold,work.work.time+.15);});
   }
   const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'];
-  addEventListener('keydown',e=>{if(!active)return;if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked)taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
-  addEventListener('keyup',e=>{keys.delete(e.code);if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
+  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
+  addEventListener('keyup',e=>{keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
   // While this controller owns Ren, unrelated build/camera buttons cannot mutate the scene.
   document.addEventListener('pointerdown',e=>{if(active&&!service.blocked&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',clear);document.addEventListener('visibilitychange',clear);
-  function input(){const actions=[...held.values()],pressed=[...keys];for(const [k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
+  function input(){return travelBoost.input(rawInput());}
+  function rawInput(){const actions=[...held.values()],pressed=[...keys];for(const [k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
     if(work.work.loader.mode==='driving')return loaderDrivingInput(actions,pressed);
     const on=(a,...k)=>actions.includes(a)||k.some(x=>pressed.includes(x)),forward=Number(on('accelerate','KeyW','ArrowUp'))-Number(on('reverse','KeyS','ArrowDown')),right=Number(on('right','KeyD','ArrowRight'))-Number(on('left','KeyA','ArrowLeft'));
     const a=orbit.yaw(view===2?Math.PI+.2:work.work.loader.vehicle.heading+(view===1?Math.PI/2:yaw));return{x:right*Math.cos(a)-forward*Math.sin(a),z:-right*Math.sin(a)-forward*Math.cos(a)};
   }
-  function refresh(){
+  function refresh(){if(!root){panel.hidden=!(active&&restoreLocked());if(!panel.hidden){message.textContent=restoreSession.message;game.refresh({busy:true,blocked:true,context:'stopped',loadText:'停止中',menuHint:restoreSession.message});}return;}
     panel.hidden=!root||state.map!=='construction';if(panel.hidden)return;
-    button('begin').hidden=active;button('begin').disabled=!near()||busy||blocked;panel.querySelector('.ww-active').hidden=!active;
-    panel.querySelector('.ww-mode').textContent=practice?'貸出32 L・保存しません':service.mode==='readonly'?'表示確認・保存なし':service.mode==='integration'?'本体とは別の接続確認保存':'本体と共通保存';
+    button('begin').hidden=active;button('begin').disabled=!near()||busy||blocked||restoreLocked();panel.querySelector('.ww-active').hidden=!active;
+    panel.querySelector('.ww-mode').textContent=practice?'貸出32 L・保存しません':service.mode==='readonly'?'表示確認・保存なし':service.mode==='integration'?'本体とは別の接続確認保存':'作業を保存できます';
     const t=worldWaterTotals(work),w=work.work,l=w.loader,a=transportAvailability(w),lit=n=>(n*.25).toFixed(2);
     panel.querySelector('.ww-stats').textContent=`保管 ${lit(received()/250-work.allocated)} L ｜給水槽 ${lit(t.source)} L ｜車載 ${lit(t.bucket)} L ｜移送 ${lit(t.transit+t.moving)} L ｜水路・回収 ${lit(t.course+t.returnTank)} L`;
     if(!blocked)message.textContent=busy?'同じ本体保存へ記録中…':active?w.message:idleIssue|| (near()?'ローダーの近くです。作業を始められます。':`給水区画 X ${root.position.x} / Z ${root.position.z}。車の近くで作業できます。`);
-    const off=busy||blocked||!!work.delivery;
+    const off=busy||blocked||restoreLocked()||!!work.delivery;
     for(const b of panel.querySelectorAll('.ww-active button'))b.disabled=off;
-    button('interact').textContent=l.mode==='foot'?'乗る':l.mode==='driving'?'降りる':'乗降中…';button('interact').disabled=off||!!w.task||!!w.air.length||!!l.transition||!(l.mode==='foot'?boardOption(l,TRANSPORT_OBSTACLES):exitOption(l,TRANSPORT_OBSTACLES));
+    const obstacles=[...TRANSPORT_OBSTACLES,...transportMaterialObstacles(l,externalVolumes())];
+    button('interact').textContent=l.mode==='foot'?'乗る':l.mode==='driving'?'降りる':'乗降中…';button('interact').disabled=off||!!w.task||!!w.air.length||!!l.transition||!(l.mode==='foot'?boardOption(l,obstacles):exitOption(l,obstacles));
+  setBoardPrompt(button('interact'),l.mode,!button('interact').disabled);
     button('dispatch').disabled=off||!waterWarehouseAccess(work)||received()/250-work.allocated<128||work.allocated+128>768;
     button('store').disabled=off||!waterWarehouseAccess(work)||w.source<128;
     button('source').disabled=off||!a.source;button('returned').disabled=off||!a.returned;button('pour').disabled=off||!a.pourable;
     button('unload').disabled=off||!a.unload;
     for(const k of ['flow','recover'])button(k).disabled=off||!a.nearReturn||!a.stopped||!a.idle;
-    button('stop').disabled=busy||blocked||!w.task;button('save').disabled=busy||blocked||practice||service.mode==='readonly';button('save').textContent=practice?'貸出：保存なし':'作業を保存';
-    button('leave').disabled=busy||blocked||l.mode!=='foot'||!!work.delivery||!!w.task||!!w.air.length;
+    button('stop').disabled=busy||blocked||restoreLocked()||!w.task;button('save').disabled=busy||blocked||restoreLocked()||practice||service.mode==='readonly';button('save').textContent=practice?'貸出：保存なし':'作業を保存';
+    button('leave').disabled=busy||blocked||restoreLocked()||l.mode!=='foot'||!!work.delivery||!!w.task||!!w.air.length;
     const select=panel.querySelector('select');select.value=String(w.direction);select.disabled=off||!!w.task||!!w.air.length;
-    game.refresh({busy,blocked,context:l.mode,loadText:'車載 '+lit(t.bucket)+' L'});
+    game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:l.mode,loadText:'車載 '+lit(t.bucket)+' L',menuHint:menuSaveNote});
   }
   function render(dt){
     if(!root)return;updateWaterTransportView(root,work.work,dt);if(!active)return;
@@ -127,8 +158,9 @@ export function createWorldWaterController({service,practice=false,preview=false
     const v=l.vehicle,focus=view===2?new THREE.Vector3(root.position.x,25,root.position.z+20):new THREE.Vector3(root.position.x+v.x,24,root.position.z+v.z),angle=orbit.yaw(view===2?Math.PI+.2:v.heading+(view===1?Math.PI/2:yaw)),pitch=orbit.pitch(view===2?1.1:.48),dist=(view===2?740:245)*Math.max(1,.72/camera.aspect);
     camera.position.copy(focus).addScaledVector(new THREE.Vector3(Math.sin(angle)*Math.cos(pitch),Math.sin(pitch),Math.cos(angle)*Math.cos(pitch)),dist);camera.lookAt(focus);readout();
   }
-  function install({group,blockedAt,collider}){
+  function install({group,blockedAt,collider,contactGeometry:readContactGeometry=null}){
     if(active)throw Error('乗車中の作業区画を再構築できません。');if(root){disposeSpaceMaterialBook(root);root=null;}panel.hidden=true;
+    contactGeometry=typeof readContactGeometry==='function'?readContactGeometry:null;
     if(state.map!=='construction')return;
     if(!work){fresh();if(!work){const site=WATER_YARDS.findIndex(([x,z])=>!blockedAt(x,z,375));if(site<0)return;work=initialWorldWater(site);}}
     const [x,z]=WATER_YARDS[work.siteIndex];if(blockedAt(x,z,375)){message.textContent='保存済みの作業区画が建物と重なっています。移動・上書きせず停止しました。';return;}
@@ -137,14 +169,14 @@ export function createWorldWaterController({service,practice=false,preview=false
     for(const o of solids)collider(x+o.x,z+o.z,[o.width,o.depth],0,'construction-water-fixed',0,{minY:0,maxY:o.height,obstacleHeight:o.height});
     const v=work.work.loader.vehicle;collider(x+v.x,z+v.z,[88,90],v.heading,'construction-water-loader',0,{minY:0,maxY:44,obstacleHeight:44});render(0);refresh();
   }
-  return {look(dx,dy,sensitivity){if(active)orbit.drag(dx,dy,sensitivity);},get active(){return active;},get busy(){return busy;},get dirty(){return !!work&&work.revision!==expected;},install,save,leave,begin,
-    overlapsBuild(position,size){return !!root&&Math.abs(position[0]-root.position.x)<350+size[0]/2&&Math.abs(position[2]-root.position.z)<280+size[2]/2;},
+  return {look(dx,dy,sensitivity){if(active&&!game.menuOpen&&!restoreLocked())orbit.drag(dx,dy,sensitivity);},get active(){return active;},get busy(){return busy||restoreLocked();},get dirty(){return !!work&&work.revision!==expected;},install,save,leave,begin,
+    overlapsBuild(position,size){return !!root&&overlapsWorldYardBuild([root.position.x,root.position.z],position,size);},
     previewSpawn(){if(!preview||!root)return null;return{x:root.position.x-188,z:root.position.z-118,heading:0};},
-    update(dt){if(state.map!=='construction'||!root)return false;
-      if(blocked&&retryPending&&service.blocked===false){fresh();blocked=false;retryPending=false;if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
-      if(active&&!busy&&!blocked&&!game.paused&&!document.hidden){try{const mode=work.work.loader.mode;work=advanceWorldWater(work,input(),dt);if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
+    update(dt){if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
+      if(!restoreLocked()&&blocked&&retryPending&&service.blocked===false){fresh();blocked=false;retryPending=false;if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
+      if(active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;work=advanceWorldWater(work,input(),dt,externalVolumes());if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
       render(game.paused?0:dt);ui+=dt;if(ui>.15){ui=0;refresh();}
-      if(active&&auto>8&&!busy&&!blocked&&!practice&&service.mode!=='readonly'&&Math.abs(work.work.loader.vehicle.speed)<.01&&!held.size&&!keys.size)void save();
+      if(active&&!game.menuOpen&&auto>8&&!busy&&!blocked&&!restoreLocked()&&!practice&&service.mode!=='readonly'&&Math.abs(work.work.loader.vehicle.speed)<.01&&!held.size&&!keys.size)void save();
       return active;
     },
   };

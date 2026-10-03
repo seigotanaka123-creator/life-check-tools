@@ -1,6 +1,6 @@
 // Optional construction assistance: physical poses, finite cuts and real soil transport.
-import {initialExcavatorWalk,actExcavatorWalk,stepExcavatorWalk} from './imasora-construction-excavator-walk.js';
-import {armPose,armIntersections,EX,BIN,cellCenter,scoopTargets,solveBucketPose,scoopPoseAt,stickExtensionLimit,bucketOpenLimit} from './imasora-construction-excavator.js';
+import {initialExcavatorWalk,actExcavatorWalk,stepExcavatorWalk} from './imasora-construction-excavator-walk.js?v=520';
+import {armPose,armIntersections,EX,BIN,cellCenter,scoopTargets,solveBucketPose,scoopPoseAt,stickExtensionLimit,bucketOpenLimit} from './imasora-construction-excavator.js?v=520';
 import {isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function tunnelPlan(){const mask={};for(let x=1;x<7;x++)for(let z=6;z<16;z++)for(let y=z<8?-1:-2;y<(z<12?3:2);y++)mask[`${x},${y},${z}`]=true;return mask;}
@@ -83,12 +83,12 @@ export function nextCut(s){
   }
   return null;
 }
-export function actExcavatorBuild(s,action){
+export function actExcavatorBuild(s,action,external=[]){
   if(action==='plan-haul')return s.guide?.phase==='plan-haul'?actExcavatorBuild({...s,guide:null},'build-cycle'):s;
-  if(action==='stop-guide'||action==='home')return action==='home'?{...actExcavatorWalk(s,action),guide:null}:{...s,guide:null,message:'施工補助を停止しました。土とアームの位置は保持します。'};
+  if(action==='stop-guide'||action==='home')return action==='home'?{...actExcavatorWalk(s,action,external),guide:null}:{...s,guide:null,message:'施工補助を停止しました。土とアームの位置は保持します。'};
   if(action==='build-cycle'){
     if(s.loader.mode!=='working'||s.action||s.guide)return{...s,message:'停車して作業モードにしてください。動作中の予約はしません。'};
-    if(isContactDig(s)&&!s.load){const n=actExcavatorWalk(s,'scoop');return n.action?{...n,guide:{phase:'contact-cut'}}:n;}
+    if(isContactDig(s)&&!s.load){const n=actExcavatorWalk(s,'scoop',external);return n.action?{...n,guide:{phase:'contact-cut'}}:n;}
     if(s.load){const points=isBackhoe(s)?[{x:-82,y:42,z:4},{x:-82,y:42,z:-6},{x:-78,y:36,z:4},{x:-78,y:36,z:-8},{x:-86,y:36,z:4},{x:-86,y:36,z:0}]:[{x:-94,y:55,z:4}];let path=null;for(const p of points){const arm=inverseBucket(s,p);if(!arm||(isBackhoe(s)&&!dumpContained(s,arm)))continue;path=posePath(s,p);if(path)break;}return path?{...s,guide:{phase:'haul',path,index:0},message:'積載済みの土を受け箱へ運びます。'}:{...s,message:'排土経路が塞がっています。先端を上げて確認してください。'};}
     const remaining=Object.keys(s.cutMask).filter(id=>s.terrain[id]),row=Math.min(...remaining.map(id=>s.terrain[id][2])),targetZ=remaining.length?(row>=14?-13:row>=12?3:row>=8?-13:-37):-75;
     if(Math.abs(s.loader.vehicle.z-targetZ)>.3&&(!remaining.length||s.positionedRow!==row)){
@@ -113,39 +113,39 @@ export function actExcavatorBuild(s,action){
     return{...s,guide:{phase:'approach',...cut,index:0,row},message:'入口側から順番に、次の掘削面へバケットを運びます。'};
   }
   if(s.guide)return{...s,message:'施工補助を止めてから手動操作へ切り替えてください。'};
-  return actExcavatorWalk(s,action);
+  return actExcavatorWalk(s,action,external);
 }
-export function stepExcavatorBuild(s,input,dt){
+export function stepExcavatorBuild(s,input,dt,external=[]){
   if(!Number.isFinite(dt)||dt<=0||dt>.05)throw Error('更新刻みが不正です');
-  if(!s.guide)return stepExcavatorWalk(s,input,dt);
-  if(Object.values(input).some(Boolean))return stepExcavatorWalk({...s,guide:null},input,dt);
+  if(!s.guide)return stepExcavatorWalk(s,input,dt,external);
+  if(Object.values(input).some(Boolean))return stepExcavatorWalk({...s,guide:null},input,dt,external);
   let n=s,g={...s.guide};
   if(g.phase==='drive'){
     const dist=g.targetZ-s.loader.vehicle.z,speed=s.loader.vehicle.speed;
     if(Math.abs(dist)<.3&&Math.abs(speed)<.8)return {...s,positionedRow:g.row,loader:{...s.loader,mode:buildProgress(s).done?'driving':'working',vehicle:{...s.loader.vehicle,speed:0}},guide:null,message:buildProgress(s).done?'通路を空けました。「降りる」で降車し、入口から歩いて確かめてください。':'位置取りができました。次の1回を掘れます。'};
     const wanted=Math.sign(dist)*Math.min(12,Math.sqrt(2*130*Math.abs(dist)),Math.abs(dist)/dt),brake=Math.abs(speed)>Math.abs(wanted)+.2||speed*dist<0;
-    n=stepExcavatorWalk(s,{throttle:wanted/(wanted>=0?100:48),brake},dt);
+    n=stepExcavatorWalk(s,{throttle:wanted/(wanted>=0?100:48),brake},dt,external);
     if(n.loader.hit||n.hit)return {...n,guide:null,message:'移動経路で接触したため停止しました。周囲を確認してください。'};
     return {...n,guide:g};
   }
-  if(s.loader.mode!=='working')return stepExcavatorWalk({...s,guide:null},input,dt);
-  if(g.phase==='plan-haul')return stepExcavatorWalk(s,{},dt);
+  if(s.loader.mode!=='working')return stepExcavatorWalk({...s,guide:null},input,dt,external);
+  if(g.phase==='plan-haul')return stepExcavatorWalk(s,{},dt,external);
   if(g.phase==='contact-cut'){
-    n=stepExcavatorWalk(s,{},dt);if(n.action)return{...n,guide:g};
+    n=stepExcavatorWalk(s,{},dt,external);if(n.action)return{...n,guide:g};
     return n.load?{...n,guide:{phase:'plan-haul'},message:`${n.load}個の土を保持しました。接触しない排土経路を確認します。`}:{...n,guide:null};
   }
   if(['approach','haul','stow'].includes(g.phase)){
     const end=g.path[g.index];if(!g.segment)g.segment={from:{...s.arm},elapsed:0,duration:Math.max(.01,Math.abs(end.boom-s.arm.boom)/.5,Math.abs(end.stick-s.arm.stick)/.65,Math.abs(end.slew-s.arm.slew)/.62)};
     g.segment={...g.segment,elapsed:Math.min(g.segment.duration,g.segment.elapsed+dt)};const t=g.segment.elapsed/g.segment.duration,target={...end};for(const k of ['boom','stick','slew'])target[k]=g.segment.from[k]+(end[k]-g.segment.from[k])*t;
     const controls={coordinated:true,boom:clamp((target.boom-s.arm.boom)/(.5*dt),-1,1),stick:clamp((target.stick-s.arm.stick)/(.65*dt),-1,1),slew:clamp((s.arm.slew-target.slew)/(.62*dt),-1,1)};
-    n=stepExcavatorWalk(s,controls,dt);
+    n=stepExcavatorWalk(s,controls,dt,external);
     if(n.hit)return{...n,guide:null,message:'施工補助の経路で接触しました。停止し、手動操作へ戻しました。'};
     if(t>=1&&delta(n.arm,end)<.001){g.index++;g.segment=null;if(g.index===g.path.length){
-      if(g.phase==='stow'){n=actExcavatorWalk(n,'work');g={phase:'drive',targetZ:g.targetZ,row:g.row};}
-      else {if(g.phase==='approach')n={...n,positionedRow:g.row};n=actExcavatorWalk(n,g.phase==='approach'?'scoop':'dump');if(!n.action)return{...n,guide:null};g={phase:g.phase==='approach'?'cut':'dump'};}
+      if(g.phase==='stow'){n=actExcavatorWalk(n,'work',external);g={phase:'drive',targetZ:g.targetZ,row:g.row};}
+      else {if(g.phase==='approach')n={...n,positionedRow:g.row};n=actExcavatorWalk(n,g.phase==='approach'?'scoop':'dump',external);if(!n.action)return{...n,guide:null};g={phase:g.phase==='approach'?'cut':'dump'};}
     }}
   }else{
-    n=stepExcavatorWalk(s,{},dt);
+    n=stepExcavatorWalk(s,{},dt,external);
     if(n.hit)return {...n,guide:null};
     if(!n.action){
       if(g.phase==='cut'){g={phase:'plan-haul'};n.message='土を保持したまま、排土経路を確認しています。';}

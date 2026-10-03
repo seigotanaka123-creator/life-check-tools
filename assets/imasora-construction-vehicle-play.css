@@ -1,4 +1,20 @@
-/* Shared game layout for the water/soil loaders and timber crane, v491. */
+/* Vehicle approach information is next to the canvas, outside movement controls. */
+.world-vehicle-lobby{background:#183432;border-top:2px solid #ba975b;min-width:0}
+.world-vehicle-lobby:not(:has(>.world-vehicle-controls:not([hidden]))),
+#viewport[class*="-operating"]+.world-vehicle-lobby{display:none!important}
+#viewport:has(+.world-vehicle-lobby>.world-vehicle-controls:not([hidden]))>.touch-hint{display:none}
+.world-vehicle-lobby>.world-vehicle-controls{position:static;inset:auto;width:auto;max-height:none;margin:0;border:0;border-radius:0;padding:9px 12px;background:transparent;box-shadow:none;overflow:visible;font-size:12px}
+.world-vehicle-lobby>.world-vehicle-controls>header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;margin:0}
+.world-vehicle-lobby>.world-vehicle-controls>header strong{font-size:14px;line-height:1.3;min-width:0}
+.world-vehicle-lobby>.world-vehicle-controls>header span{grid-column:1;font-size:11px;line-height:1.3}
+.world-vehicle-lobby>.world-vehicle-controls>header [data-action=begin]{grid-column:2;grid-row:1/3;min-height:44px;padding:6px 12px;font-size:12px;touch-action:manipulation}
+.world-vehicle-lobby>.world-vehicle-controls>.gv-message{min-height:0;margin:6px 0 0;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+#viewport.world-soil-near+.world-vehicle-lobby>.world-water-controls,
+#viewport.world-timber-near+.world-vehicle-lobby>.world-water-controls,
+#viewport.world-timber-near+.world-vehicle-lobby>.world-soil-controls{display:none!important}
+@media(max-width:620px){.world-vehicle-lobby>.world-vehicle-controls{padding:8px 10px}}
+
+/* Shared game layout for the water/soil loaders and timber crane. */
 body.world-vehicle-playing{overflow:hidden;overscroll-behavior:none}
 .world-vehicle-playing .world-header,.world-vehicle-playing .world-toolbar,.world-vehicle-playing .control-card,.world-vehicle-playing .viewport-toolbar,.world-vehicle-playing .viewport-footer,.world-vehicle-playing .world-shell>footer{display:none!important}
 .world-vehicle-playing .world-shell{padding:0;min-height:0}
@@ -52,3 +68,70 @@ body.world-vehicle-playing{overflow:hidden;overscroll-behavior:none}
  .world-vehicle-controls .gv-quick[data-count="4"]{grid-auto-flow:column;grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @media(max-width:620px){.world-vehicle-playing #viewport>.world-vehicle-controls-active{padding-left:7px;padding-right:7px}.world-vehicle-controls .gv-load{font-size:11px}.world-vehicle-playing .world-vehicle-controls header strong{font-size:13px}}
+
+/* Player menus share the same bounded, paused-game layout on every vehicle. */
+.world-vehicle-controls .gv-menu-button{grid-column:3;grid-row:1/3;min-height:44px;min-width:70px;padding:6px 9px;font:inherit;font-weight:bold;touch-action:manipulation}
+.world-vehicle-playing .world-vehicle-controls>header{grid-template-columns:minmax(0,1fr) auto auto;gap:0 7px}
+.world-vehicle-playing .world-vehicle-controls>header strong{overflow:hidden;text-overflow:ellipsis}
+.world-vehicle-controls .gv-active{grid-template-rows:auto minmax(0,1fr) auto}
+.world-vehicle-controls .gv-menu{position:fixed;inset:0;z-index:160;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:100dvh;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:hidden;overscroll-behavior:contain;isolation:isolate;background:#061917c9;color:#f1f5e9;font-size:15px;line-height:1.55;text-align:left}
+.world-vehicle-controls .gv-menu[hidden],.world-vehicle-controls .gv-menu [hidden],.world-vehicle-controls .gv-menu-button[hidden]{display:none!important}
+.world-vehicle-controls .gv-menu-card{display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:min(100%,700px);max-height:100%;min-width:0;min-height:0;border:1px solid #82a799;border-radius:16px;background:#173733;box-shadow:0 16px 70px #0008;overflow:hidden}
+.world-vehicle-controls .gv-menu .gv-menu-header{display:flex;grid-template-columns:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;min-width:0;margin:0;padding:17px 22px 13px;border-bottom:1px solid #52796d;background:#1e443e}
+.world-vehicle-controls .gv-menu-vehicle{margin:0 0 2px;color:#b5d6c7;font-size:12px}
+.world-vehicle-controls .gv-menu h2{margin:0;color:#ffe29a;font-size:23px;line-height:1.35;overflow-wrap:anywhere}
+.world-vehicle-controls .gv-menu h2:focus{outline:none}
+.world-vehicle-controls .gv-menu .gv-menu-badge{display:block;flex:none;grid-row:auto;white-space:nowrap;border:1px solid #8ea294;border-radius:100px;padding:4px 10px;font-size:12px;color:#eaf1df}
+.world-vehicle-controls .gv-menu-body{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:18px 22px;touch-action:pan-y}
+.world-vehicle-controls .gv-menu p{overflow-wrap:anywhere}
+.world-vehicle-controls .gv-menu-intro{margin:0 0 14px}
+.world-vehicle-controls .gv-menu-hint{margin:0 0 14px;padding:10px 12px;border:1px solid #6e8a67;border-radius:8px;background:#2d4d38;color:#ffe7a8}
+.world-vehicle-controls .gv-menu-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.world-vehicle-controls .gv-menu button{min-height:44px;max-width:100%;padding:9px 13px;font:inherit;font-size:14px;font-weight:bold;white-space:normal;overflow-wrap:anywhere;touch-action:manipulation}
+.world-vehicle-controls .gv-menu-actions [data-action=save]{background:linear-gradient(#ffe6a1,#e3b954);border-color:#d6b66d;color:#283526}
+.world-vehicle-controls .gv-menu button:disabled{opacity:.48}
+.world-vehicle-controls .gv-menu .gv-details{margin-top:16px;padding:11px 13px;border:1px solid #527d6d;border-radius:8px;color:#d9e8d7}
+.world-vehicle-controls .gv-menu .gv-details summary{cursor:pointer;min-height:24px;font-size:14px;line-height:24px;color:#e9e6bc;touch-action:manipulation}
+.world-vehicle-controls .gv-menu .gv-details[open]{overflow:visible}
+.world-vehicle-controls .gv-menu .gv-info{font-size:13px;min-width:0;overflow-wrap:anywhere}
+.world-vehicle-controls .gv-menu input,.world-vehicle-controls .gv-menu textarea,.world-vehicle-controls .gv-menu select{max-width:100%;min-width:0;box-sizing:border-box;font:inherit;touch-action:pan-y}
+.world-vehicle-controls .gv-menu .gv-menu-emergency .emergency-escape-control{position:static;inset:auto;transform:none;max-width:100%;min-height:44px;box-shadow:none;margin:0;background:#274b43;border-color:#789685;color:#eef1dc;font-size:13px}
+.world-vehicle-controls .gv-menu-footer{display:block;min-width:0;margin:0;padding:13px 22px 15px;border-top:1px solid #52796d;background:#1c403a}
+.world-vehicle-controls .gv-menu-footer button{display:block;width:100%}
+.world-vehicle-controls .gv-menu-footer p{margin:8px 0 0;font-size:12px;line-height:1.45;color:#c5dace}
+.world-vehicle-controls .gv-restore h3{font-size:16px;margin:0 0 9px;color:#ffe4ab}
+.world-vehicle-controls .gv-restore label{display:grid;gap:8px;margin:8px 0;min-width:0}
+.world-vehicle-controls .gv-restore select,.world-vehicle-controls .gv-restore input,.world-vehicle-controls .gv-restore textarea{width:100%;min-height:44px;background:#102e2a;color:#f4f5e4;border:1px solid #7a9f8e;border-radius:6px;padding:9px}
+.world-vehicle-controls .gv-restore-choice,.world-vehicle-controls .gv-restore details{padding:13px;margin:13px 0;border:1px solid #527c70;border-radius:8px}
+.world-vehicle-controls .gv-restore details summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:#f3e7b9}
+.world-vehicle-controls .gv-restore p{margin:8px 0}
+.world-vehicle-controls .gv-restore-preserve{padding:12px;border-left:3px solid #bfa76e;background:#234b3e;font-size:13px}
+.world-vehicle-controls .gv-restore-status{padding:11px 13px;border:1px solid #aa9b62;border-radius:8px;color:#fff0b6;background:#304c38}
+.world-vehicle-controls .gv-restore-comparison{overflow:auto;max-width:100%}
+.world-vehicle-controls .gv-restore table{width:100%;border-collapse:collapse;font-size:14px}
+.world-vehicle-controls .gv-restore th,.world-vehicle-controls .gv-restore td{padding:9px 6px;border-bottom:1px solid #527c70;text-align:left;white-space:nowrap}
+.world-vehicle-controls .gv-restore caption{text-align:left;font-weight:bold;padding:8px 0}
+.world-vehicle-controls .gv-restore-footer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.world-vehicle-controls .gv-restore-footer:has(>button:not([hidden]))~[data-vehicle-menu=close]{margin-top:8px}
+.world-vehicle-controls .gv-restore-footer [data-vehicle-restore=apply]{background:#dfbc68;color:#21372e}
+.world-vehicle-controls .gv-restore-footer [data-vehicle-restore=retry]{grid-column:1/-1}
+@media(max-width:620px){
+ .world-vehicle-controls .gv-menu{padding:max(7px,env(safe-area-inset-top)) max(7px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left));font-size:14px}
+ .world-vehicle-controls .gv-menu-card{border-radius:11px}
+ .world-vehicle-controls .gv-menu .gv-menu-header{padding:12px 14px;gap:9px}
+ .world-vehicle-controls .gv-menu h2{font-size:19px}
+ .world-vehicle-controls .gv-menu .gv-menu-badge{font-size:10px;padding:4px 7px}
+ .world-vehicle-controls .gv-menu-body{padding:14px}
+ .world-vehicle-controls .gv-menu-footer{padding:10px 14px 12px}
+ .world-vehicle-controls .gv-menu-actions{gap:8px}
+ .world-vehicle-controls .gv-menu-actions button{padding:9px 7px;font-size:13px}
+}
+@media(max-height:500px){
+ .world-vehicle-controls .gv-menu{padding:max(5px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(5px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+ .world-vehicle-controls .gv-menu .gv-menu-header{padding:8px 14px}
+ .world-vehicle-controls .gv-menu h2{font-size:18px}
+ .world-vehicle-controls .gv-menu-vehicle{display:none}
+ .world-vehicle-controls .gv-menu-body{padding:12px 14px}
+ .world-vehicle-controls .gv-menu-footer{padding:8px 14px}
+ .world-vehicle-controls .gv-menu-footer p{margin-top:5px;font-size:11px}
+}

@@ -1,0 +1,59 @@
+/* Shared player vocabulary: amber action, blue choice, muted rose recovery. */
+:root{--game-panel:#172f40;--game-ink:#edf5fa;--game-line:#7896aa;--game-action:#f5c466;--game-action-ink:#172a37;--game-choice:#c5e7fa;--game-danger:#753b49}
+html.imasora-player-ui :is(.app-nav,.home-actions,.actions,.section-jump,.arcade-page-actions,.arcade-game-controls,.companion-catcher-exit-row) button{min-height:46px;font-size:14px;font-weight:700;line-height:1.45;border:1px solid #88a6b9;border-radius:11px;touch-action:manipulation}
+html.imasora-player-ui :is(.home-actions,.actions,.section-jump,.arcade-page-actions) button{background:#284b60;color:#f1f7fc;box-shadow:0 2px 0 #142c4433}
+html.imasora-player-ui :is(.primary,.arcade-start-button,.cco-start){background:#f5c466;color:#172a37;border-color:#d5a550;min-height:48px;font-size:15px;font-weight:800}
+html.imasora-player-ui .app-nav{gap:5px;padding:6px;background:#172f40;border-radius:14px}
+html.imasora-player-ui .app-nav .nav-tab{background:#294657;color:#e7f1f8;border-color:transparent;min-width:0;padding:9px 5px}
+html.imasora-player-ui .app-nav .nav-tab.active{background:#c5e7fa;color:#183748;border-color:#f0faff;box-shadow:inset 0 -3px #66b5df}
+html.imasora-player-ui :is(.home-actions,.actions,.section-jump,.arcade-page-actions) button:disabled{opacity:1;background:#e2e7eb!important;color:#596977!important;border-color:#a9b6be!important;box-shadow:none}
+html.imasora-player-ui :is([data-home-action=retirement],#resetBtn,[data-arcade-stop]){background:#753b49!important;color:#fff4f2!important;border-color:#a95a6d!important}
+html.imasora-player-ui :is(button,a,summary,select,input):focus-visible{outline:3px solid #3179a7;outline-offset:3px}
+html.imasora-player-ui :is(select,input[type=text],input[type=number],textarea){font-size:16px}
+html.imasora-player-ui :is(.arcade-page-actions,.arcade-pachicoin-stations){gap:8px}
+html.imasora-player-ui .arcade-page-actions{display:flex;flex-wrap:wrap}
+html.imasora-player-ui .arcade-start-button{border-radius:12px;padding:12px 18px;line-height:1.45}
+html.imasora-player-ui .construction-pack-trial-panel{line-height:1.7}
+html:not(.game-developer-ui) [data-developer-only],html:not(.game-developer-ui) :is(#playtestBoost,#playtestMemo,#playtestRunner,#tournamentTalkPreview,.bgm-check-room){display:none!important}
+@media(max-width:480px){html.imasora-player-ui .app-nav .nav-tab{font-size:13px}html.imasora-player-ui .section-jump{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}html.imasora-player-ui .home-actions{flex-wrap:wrap}html.imasora-player-ui .home-actions button{flex:1 1 70px;padding:9px 6px}}
+
+body.world-player-game .world-shell{width:100%;padding:8px;min-height:100dvh;background:#10283a}
+.world-player-game .world-header{display:block;margin:0 0 8px}
+.world-player-game .world-header>:not(.world-player-bar){display:none}
+.world-player-game .world-player-bar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:9px 12px;background:#172f40;border:1px solid #607d91;border-radius:14px}
+.world-player-brand>strong{display:block;font-size:17px;color:#f5ce81}.world-player-brand>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;margin-top:4px}
+.world-player-brand .save-state{padding:2px 7px;font-size:11px;color:#d2e3ef}.world-player-brand .scene-title{font-size:13px;color:#f0f7fc}
+.world-player-game .world-toolbar,.world-player-game .viewport-toolbar,.world-player-game .physics-badge,.world-player-game .world-shell>footer{display:none!important}
+.world-player-game .world-layout{display:block}.world-player-game .viewport{height:calc(100dvh - 174px);min-height:360px}.world-player-game .viewport-card{border-radius:14px}.world-player-game .viewport-footer{padding:8px 12px;font-size:12px;line-height:1.5}
+.world-player-game .world-build-open{background:#f5c466;color:#172a37;border-color:#ffe2a0;font-size:14px;min-height:46px}
+.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume) button{min-height:46px;padding:10px 12px;font-size:14px;font-weight:700;border:1px solid #7896aa;border-radius:11px;background:#294657;color:#f1f7fc;line-height:1.45;touch-action:manipulation}
+.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume) button:disabled{opacity:1;background:#283843;color:#b8c5ce;border-color:#526570;cursor:not-allowed}
+.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu) :is(button,summary,a):focus-visible{outline:3px solid #a5deff;outline-offset:3px}
+.world-player-menu{box-sizing:border-box;width:min(640px,calc(100% - 20px));max-height:calc(100dvh - 24px);padding:0;border:1px solid #9ab3c5;border-radius:18px;background:#172f40;color:#edf5fa;overflow:hidden}
+.world-player-menu::backdrop{background:#081722b8}.world-player-menu[open]{display:flex;flex-direction:column}
+.world-player-menu>header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#213d50;border-bottom:1px solid #5e7a8c;flex-shrink:0}
+.world-player-menu h2{font-size:20px;color:#fff1ce;margin:3px 0}.world-player-menu h3{font-size:15px;color:#f5ce81;margin:4px 0 12px}.world-player-menu small{font-size:12px;color:#d4e4ef}
+.world-player-menu-scroll{padding:16px;overflow:auto;overscroll-behavior:contain}.world-player-menu-scroll>section{margin-bottom:20px}.world-player-menu :is(.map-tabs,[data-player-tools]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.world-player-menu .map-tabs button.is-active{background:#c5e7fa;color:#183748;border-color:#f0faff}.world-player-menu [data-player-tools]>a{display:block;grid-column:1/-1;color:#d4edff!important;font-size:14px!important;padding:12px;border:1px solid #7896aa;border-radius:10px;text-align:center}
+.world-player-menu .control-card{display:block!important;background:transparent;box-shadow:none;border:0;overflow:visible}.world-player-menu .control-card .panel-section{padding:14px 0;border-color:#577588}.world-player-menu .control-card [data-player-debug],.world-player-menu :is(.ufo-equipment-development-section,.checklist,#ufoFlightSurvey){display:none!important}
+.world-player-menu .control-card :is(p,.muted){font-size:14px;color:#d6e5ef;line-height:1.7}.world-player-menu .control-card .eyebrow{display:none}.world-player-facilities{border:1px solid #617e91;border-radius:12px;padding:0 12px;margin-bottom:20px}.world-player-facilities summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;cursor:pointer;list-style:none}.world-player-facilities summary::after{content:'＋';color:#f5ce81}.world-player-facilities[open] summary::after{content:'−'}
+.world-player-menu .world-player-help p{font-size:14px;line-height:1.7;color:#d6e5ef}.world-player-game :is(#saveButton,[data-map-menu=save],[data-map-menu=confirm]){background:#f5c466;color:#172a37;border-color:#ffe3a7}.world-player-game :is([data-map-menu=reset],[data-map-menu=undo]){background:#753b49;color:#fff4f2;border-color:#d399a4}
+.world-player-game .world-vehicle-controls .gv-menu-card{background:#172f40;color:#edf5fa;border-color:#7896aa}.world-player-game .world-vehicle-controls .gv-menu-actions button{min-height:46px;font-size:14px;opacity:1}.world-player-game .world-vehicle-controls .gv-menu-actions button:disabled{background:#283843;color:#b8c5ce;border-color:#526570}.world-player-game .world-vehicle-lobby>.world-vehicle-controls>.gv-message{font-size:13px}.world-player-game .world-vehicle-lobby>.world-vehicle-controls>header span{font-size:12px}
+@media(max-width:520px){.world-player-game .world-player-bar{gap:6px;padding:8px}.world-player-brand>strong{font-size:14px}.world-player-game .world-player-bar button{font-size:12px;padding:8px;max-width:105px}.world-player-menu-scroll{padding:12px}.world-player-menu>header{padding:10px 12px}.world-player-menu h2{font-size:18px}.world-player-menu>header button{font-size:13px;padding:8px}.world-player-game .viewport{min-height:380px}}
+@media(max-height:500px){.world-player-game .viewport{min-height:270px}.world-player-menu{max-height:calc(100dvh - 12px)}.world-player-menu>header{padding:7px 12px}.world-player-brand>strong{font-size:14px}}
+@media(prefers-reduced-motion:reduce){html.imasora-player-ui :is(button,a),.world-player-game button{transition:none!important}}
+/* The welcome instructions belong to loading; keep the play header compact. */
+html.imasora-player-ui body:not(.loading-screen-active) .app>header .hero{padding:10px 16px;border-radius:14px;box-shadow:none}
+html.imasora-player-ui body:not(.loading-screen-active) .app>header :is(.core-loop,.loading-status,.eyebrow){display:none}
+html.imasora-player-ui body:not(.loading-screen-active) .app>header h1{font-size:22px;margin:0;line-height:1.5}
+html.imasora-player-ui body:not(.loading-screen-active) .app>header{margin-bottom:6px}
+html.imasora-player-ui .app-nav .nav-tab[aria-current=page]{background:#c5e7fa;color:#183748;border-color:#f0faff;box-shadow:inset 0 -3px #66b5df}
+
+html.imasora-player-ui .home-actions [data-home-action=walk]{background:#f5c466;color:#172a37;border-color:#d5a550}
+html.imasora-player-ui .pachicoin-station-selector-head small{letter-spacing:.03em}
+/* Coin-game tuning controls are only visible in an explicitly opened developer view. */
+html.imasora-player-ui:not(.game-developer-ui) :is([data-icp-dev-start],[data-icp-validation-load],[data-icp-layout-editor]){display:none!important}
+html.imasora-player-ui .icp-auto-button{font-size:14px!important;min-height:46px}
+html.imasora-player-ui :is(.actions,.section-jump) button:is(.selected,.active,[aria-pressed=true]){background:#c5e7fa;color:#183748;border-color:#3179a7;box-shadow:inset 0 -3px #66b5df}
+.world-player-game .world-layout>.control-card{display:none}
+.world-player-game .world-header:not(:has(.world-player-bar))::before{content:'マップをロード中…';display:block;padding:14px;color:#edf5fa;font-size:16px}

@@ -1,4 +1,5 @@
 import * as THREE from './three.module.min.js';
+import {createGroundMark} from './imasora-construction-ground-mark.js?v=119bp';
 import {createLoader,updateLoaderModel} from './imasora-construction-loader-work-model.js';
 import {soilTransferVisual,soilCopyOptions,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js';
 export const SOIL_FENCES=Object.freeze([
@@ -13,7 +14,7 @@ export function createWorldSoilModel(){
   // Use the main world's unified ground. No overlapping floor or distant terrain.
   for(const b of SOIL_SITE_SOLIDS)box(root,b.id,(b.minX+b.maxX)/2,(b.minY+b.maxY)/2,(b.minZ+b.maxZ)/2,b.maxX-b.minX,b.maxY-b.minY,b.maxZ-b.minZ,b.id==='試し跳びの屋根'?gold:b.id==='資材容器'?purple:metal);
   for(const b of SOIL_FENCES)box(root,'土作業区画の柵',b.x,b.height/2,b.z,b.width,b.height,b.depth,metal);
-  for(const x of[-52,52])box(root,'ローダー駐車線',x,.06,-80,.6,.08,120,gold);
+  for(const x of[-52,52])createGroundMark(root,{name:'ローダー駐車線',x,z:-80,width:.6,depth:120,color:0xdaba68,y:.1});
   function sign(text,x,y,z,w){const c=document.createElement('canvas');c.width=768;c.height=128;const g=c.getContext('2d');g.fillStyle='#342b3d';g.fillRect(0,0,768,128);g.strokeStyle='#ddc17c';g.lineWidth=5;g.strokeRect(3,3,762,122);g.font='bold 52px system-ui';g.fillStyle='#fff0d0';g.textAlign='center';g.textBaseline='middle';g.fillText(text,384,64,735);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const geom=new THREE.PlaneGeometry(w,w/6),m=new THREE.MeshBasicMaterial({map:t});for(const side of[-1,1]){const p=new THREE.Mesh(geom,m);p.position.set(x,y,z+side*.04);p.rotation.y=side<0?Math.PI:0;root.add(p);}}
   sign('火星土 ・ 保管口',68,30,-54,64);sign('火星土を敷いて 高くジャンプ',0,12,150,164);sign('頭上注意',-155,54,179,66);
   const loader=createLoader();loader.userData.work.soil.material.color.set(0xa66096);root.add(loader);

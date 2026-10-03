@@ -1,7 +1,13 @@
 import * as THREE from "./three.module.min.js";
 import * as CANNON from "./cannon-es.js";
+import { CatcherControlSound } from "./imasora-catcher-control-sound.js?v=20260917-control-sound-v1";
 
 const MAX_ATTEMPTS = 5;
+function createCatcherRewardSessionId() {
+  const token = globalThis.crypto?.randomUUID?.().replaceAll("-", "")
+    || `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+  return `catcher-${token}`;
+}
 const NUMBER_PLAQUE_BASE_POSITIONS = Object.freeze({
   1: Object.freeze({ x: -0.3, z: 3.23 }),
   2: Object.freeze({ x: 4.72, z: 1.27 }),
@@ -965,6 +971,12 @@ function svgToFabricTexture(svg, renderer) {
 class ImasoraCompanionCatcherGame {
   constructor(root, options = {}) {
     this.root = root;
+    this.rewardSessionId = createCatcherRewardSessionId();
+    this.onPrizeCaptured = typeof options.onPrizeCaptured === "function" ? options.onPrizeCaptured : null;
+    this.constructionRewardBoxesEarned = 0;
+    this.controlSound = new CatcherControlSound(options.controlSoundVolume);
+    this.automaticControlSound = false;
+    this.controlSoundKey = null;
     this.roster = Array.isArray(options.roster)
       ? options.roster.filter(item => item?.id && item?.frontSvg)
       : [];
@@ -1058,6 +1070,23 @@ class ImasoraCompanionCatcherGame {
     this.boundHandleKeyDown = this.handleHandleKeyDown.bind(this);
     this.boundHandleKeyUp = this.handleHandleKeyUp.bind(this);
     this.boundResize = this.resize.bind(this);
+    this.boundControlInterrupted = () => {
+      this.controlSound.stop();
+      this.controlSoundKey = null;
+      this.releaseActiveHandle(false);
+    };
+    this.boundControlResumed = () => {
+      if (!this.destroyed && !document.hidden && document.hasFocus() && this.automaticControlSound) {
+        this.controlSound.begin("automatic-cycle");
+      }
+    };
+    this.boundControlVisibility = () => {
+      if (document.hidden) this.boundControlInterrupted();
+      else this.boundControlResumed();
+    };
+    this.boundControlCaptureLost = event => {
+      if (!this.root.hasPointerCapture?.(event.pointerId) && this.controlSound.owners.has(event.pointerId)) this.handleHandleUp(event);
+    };
   }
 
   mount() {
@@ -1088,7 +1117,12 @@ class ImasoraCompanionCatcherGame {
     window.addEventListener("pointerup", this.boundHandleUp);
     window.addEventListener("pointercancel", this.boundHandleUp);
     this.root.addEventListener("keydown", this.boundHandleKeyDown);
-    this.root.addEventListener("keyup", this.boundHandleKeyUp);
+    window.addEventListener("keyup", this.boundHandleKeyUp);
+    window.addEventListener("blur", this.boundControlInterrupted);
+    window.addEventListener("focus", this.boundControlResumed);
+    window.addEventListener("pagehide", this.boundControlInterrupted);
+    document.addEventListener("visibilitychange", this.boundControlVisibility);
+    this.root.addEventListener("lostpointercapture", this.boundControlCaptureLost);
     try {
       this.setupRenderer();
       this.setupPhysics();
@@ -1111,6 +1145,7 @@ class ImasoraCompanionCatcherGame {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.automaticControlSound = false;
     cancelAnimationFrame(this.frame);
     clearTimeout(this.calloutTimer);
     this.resizeObserver?.disconnect();
@@ -1121,7 +1156,13 @@ class ImasoraCompanionCatcherGame {
     window.removeEventListener("pointerup", this.boundHandleUp);
     window.removeEventListener("pointercancel", this.boundHandleUp);
     this.root.removeEventListener("keydown", this.boundHandleKeyDown);
-    this.root.removeEventListener("keyup", this.boundHandleKeyUp);
+    window.removeEventListener("keyup", this.boundHandleKeyUp);
+    window.removeEventListener("blur", this.boundControlInterrupted);
+    window.removeEventListener("focus", this.boundControlResumed);
+    window.removeEventListener("pagehide", this.boundControlInterrupted);
+    document.removeEventListener("visibilitychange", this.boundControlVisibility);
+    this.root.removeEventListener("lostpointercapture", this.boundControlCaptureLost);
+    this.controlSound.dispose();
     this.timers.forEach(timer => clearTimeout(timer));
     this.timers.clear();
     this.textureTasks.clear();
@@ -2614,6 +2655,12 @@ class ImasoraCompanionCatcherGame {
   }
 
   resetGame() {
+    // New physical prizes need new receipts; repeated detection keeps each prize's ID.
+    this.rewardSessionId = createCatcherRewardSessionId();
+    this.constructionRewardBoxesEarned = 0;
+    this.automaticControlSound = false;
+    this.controlSound.stop();
+    this.controlSoundKey = null;
     this.clearPlushes();
     this.releaseGrip(false);
     this.releaseActiveHandle(false);
@@ -2825,6 +2872,7 @@ class ImasoraCompanionCatcherGame {
       const moundContactPoints = this.createPlushMoundContactPoints(visual);
       const plush = {
         ...item,
+        constructionRewardEventId: `${this.rewardSessionId}-p${index + 1}`,
         profileKey,
         spec,
         body,
@@ -3189,6 +3237,7 @@ class ImasoraCompanionCatcherGame {
   }
 
   handleHandleDown(event) {
+    if (event.button !== undefined && event.button !== 0) return;
     const fineButton = event.target.closest("[data-icc-fine]");
     const fineCenter = event.target.closest("[data-icc-fine-center]");
     const fineGroup = fineButton?.closest("[data-icc-fine-group]")
@@ -3209,6 +3258,7 @@ class ImasoraCompanionCatcherGame {
         this.controlCaptureElement = fineGroup;
         return;
       }
+      this.controlSound.begin(event.pointerId);
       this.pendingFineLever = {
         pointerId: event.pointerId,
         group: fineGroup,
@@ -3224,7 +3274,10 @@ class ImasoraCompanionCatcherGame {
     const axis = handle.dataset.iccHandle;
     if (axis === "stop") {
       event.preventDefault();
-      this.startAutomaticGrab();
+      if (this.startAutomaticGrab()) {
+        this.controlSound.begin(event.pointerId);
+        this.root.setPointerCapture?.(event.pointerId);
+      }
       return;
     }
     if (!this.activateHandle(axis, handle, event.pointerId)) return;
@@ -3262,6 +3315,7 @@ class ImasoraCompanionCatcherGame {
   }
 
   handleHandleUp(event) {
+    this.controlSound.end(event?.pointerId);
     if (this.pendingFineLever) {
       if (event?.pointerId !== undefined && event.pointerId !== this.pendingFineLever.pointerId) return;
       event?.preventDefault?.();
@@ -3326,23 +3380,28 @@ class ImasoraCompanionCatcherGame {
     const fineButton = event.target.closest("[data-icc-fine]");
     if (fineButton && this.root.contains(fineButton) && !fineButton.disabled) {
       event.preventDefault();
-      this.activateFineHandle(fineButton.dataset.iccFine, fineButton, "keyboard");
+      if (this.activateFineHandle(fineButton.dataset.iccFine, fineButton, "keyboard")) this.controlSoundKey = event.key;
       return;
     }
     const handle = event.target.closest("[data-icc-handle]");
     if (!handle || !this.root.contains(handle) || handle.disabled) return;
     event.preventDefault();
     if (handle.dataset.iccHandle === "stop") {
-      this.startAutomaticGrab();
+      if (this.startAutomaticGrab()) {
+        this.controlSoundKey = event.key;
+        this.controlSound.begin("keyboard");
+      }
       return;
     }
-    this.activateHandle(handle.dataset.iccHandle, handle, "keyboard");
+    if (this.activateHandle(handle.dataset.iccHandle, handle, "keyboard")) this.controlSoundKey = event.key;
   }
 
   handleHandleKeyUp(event) {
-    if ((event.key !== "Enter" && event.key !== " ") || this.controlPointerId !== "keyboard") return;
+    if (event.key !== this.controlSoundKey) return;
+    this.controlSoundKey = null;
+    this.controlSound.end("keyboard");
     event.preventDefault();
-    this.completeActiveHandle();
+    if (this.controlPointerId === "keyboard") this.completeActiveHandle();
   }
 
   activateHandle(axis, handle, pointerId) {
@@ -3359,7 +3418,7 @@ class ImasoraCompanionCatcherGame {
     this.setClawStarNeonMode(axis);
     handle.classList.add("is-held");
     handle.setAttribute("aria-pressed", "true");
-    safeSelectSound();
+    this.controlSound.begin(pointerId);
     return true;
   }
 
@@ -3373,7 +3432,7 @@ class ImasoraCompanionCatcherGame {
     this.setClawStarNeonMode(horizontal ? "horizontal" : "vertical");
     button.classList.add("is-held");
     button.setAttribute("aria-pressed", "true");
-    safeSelectSound();
+    this.controlSound.begin(pointerId);
     return true;
   }
 
@@ -3398,7 +3457,10 @@ class ImasoraCompanionCatcherGame {
     const handle = axis ? (this.els?.[axis] || fineHandles[axis]) : null;
     const captureElement = this.controlCaptureElement || handle;
     if (captureElement && typeof pointerId === "number" && captureElement.hasPointerCapture?.(pointerId)) {
-      captureElement.releasePointerCapture(pointerId);
+      // At an automatic travel limit, keep tracking the physical hold on the
+      // stable root even though the completed button becomes disabled.
+      if (this.controlSound.owners.has(pointerId)) this.root.setPointerCapture?.(pointerId);
+      else captureElement.releasePointerCapture(pointerId);
     }
     handle?.classList.remove("is-held");
     handle?.setAttribute("aria-pressed", "false");
@@ -3463,7 +3525,7 @@ class ImasoraCompanionCatcherGame {
   }
 
   startAutomaticGrab() {
-    if (this.phase !== "fineSettle" || this.attemptsRemaining <= 0) return;
+    if (this.phase !== "fineSettle" || this.attemptsRemaining <= 0) return false;
     this.descentButtonPressedUntil = this.elapsed + 0.24;
     this.attemptsRemaining -= 1;
     this.attemptCaught = 0;
@@ -3488,12 +3550,14 @@ class ImasoraCompanionCatcherGame {
     this.clawEffectivePosition.copy(this.clawBody.position);
     this.prongStopClawY = this.clawBody.position.y;
     this.phase = "descending";
+    this.automaticControlSound = true;
+    this.controlSound.begin("automatic-cycle");
     this.setClawStarNeonMode("descending");
     this.phaseTime = 0;
     this.grabCableLength = MAX_GRAB_CABLE_LENGTH;
     this.refreshHud();
     this.refreshControls();
-    safeSelectSound();
+    return true;
   }
 
   setPhase(phase) {
@@ -6314,6 +6378,7 @@ class ImasoraCompanionCatcherGame {
   }
 
   markPrizeWon(plush) {
+    if (!plush || plush.won) return;
     plush.won = true;
     plush.active = false;
     plush.clawContained = false;
@@ -6327,9 +6392,27 @@ class ImasoraCompanionCatcherGame {
     this.caughtNames.push(plush.name);
     this.refreshHud();
     safeCatchSound();
+    if (this.onPrizeCaptured && plush.constructionRewardEventId) {
+      const rewardSessionId = this.rewardSessionId;
+      try {
+        Promise.resolve(this.onPrizeCaptured({
+          eventId: plush.constructionRewardEventId,
+          prizeName: plush.name
+        })).then(result => {
+          if (result?.granted && this.rewardSessionId === rewardSessionId) {
+            this.constructionRewardBoxesEarned += result.boxes;
+          }
+        }).catch(error => console.warn("キャッチャーの建築報酬を確定できませんでした。", error));
+      } catch (error) {
+        console.warn("キャッチャーの建築報酬を確定できませんでした。", error);
+      }
+    }
   }
 
   finishAttempt() {
+    // Called only after the carriage and the original claw heading have returned.
+    this.automaticControlSound = false;
+    this.controlSound.end("automatic-cycle");
     this.releaseGrip(false);
     this.plushes.forEach(plush => {
       plush.clawContained = false;
@@ -6357,6 +6440,8 @@ class ImasoraCompanionCatcherGame {
   }
 
   showResult() {
+    this.automaticControlSound = false;
+    this.controlSound.end("automatic-cycle");
     this.phase = "result";
     this.releaseGrip(false);
     this.refreshControls();
@@ -6373,12 +6458,16 @@ class ImasoraCompanionCatcherGame {
     const prizes = this.caughtNames.length
       ? this.caughtNames.map(escapeHtml).join(" / ")
       : "今回のキャッチはありません";
+    const constructionReward = this.constructionRewardBoxesEarned
+      ? `<div class="icc-result-prizes">建築セット +${this.constructionRewardBoxesEarned}箱</div>`
+      : "";
     this.els.result.innerHTML = `<div class="icc-result-panel">
       <small>RESULT</small>
       <strong>${escapeHtml(title)}</strong>
       <p>${escapeHtml(description)}</p>
       <div class="icc-result-score">${this.score}</div>
       <div class="icc-result-prizes">${prizes}</div>
+      ${constructionReward}
       <button type="button" data-icc-action="restart">もう一度あそぶ</button>
     </div>`;
     this.els.result.hidden = false;
@@ -6489,6 +6578,8 @@ class ImasoraCompanionCatcherGame {
   }
 
   showFatalError() {
+    this.automaticControlSound = false;
+    this.controlSound.stop();
     if (!this.els?.viewport) {
       this.root.innerHTML = `<div class="icc-load-error"><div><strong>3Dキャッチャーを起動できませんでした</strong><p>ページを更新して、もう一度ゲームセンターから開いてください。</p></div></div>`;
       return;
@@ -6779,6 +6870,7 @@ class ImasoraCompanionCatcherGame {
 
   loop(timestamp) {
     if (this.destroyed) return;
+    this.controlSound.update();
     const previous = this.lastTimestamp || timestamp;
     const delta = clamp((timestamp - previous) / 1000, 0.008, 0.034);
     this.lastTimestamp = timestamp;

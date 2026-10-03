@@ -1,5 +1,5 @@
 // 9-1a: finite, session-only ordinary soil. No wallet or world-save access.
-import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js';
+import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,worldToLocal,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js';
 import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js';
 import {bucketOffset,isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
 import {toothContacts,bucketEnvironmentHits,bucketContactGeometry,prismTouchesBox,prismBoxPenetration} from './imasora-construction-excavator-contact.js';
@@ -60,8 +60,19 @@ export function scoopTargets(s){
   for(const o of s.spoil)if(near(p,o,13))out.push({kind:'spoil',id:o.id,position:o});
   return out.sort((a,b)=>Math.hypot(a.position.x-p.x,a.position.y-p.y,a.position.z-p.z)-Math.hypot(b.position.x-p.x,b.position.y-p.y,b.position.z-p.z)).slice(0,EX.capacity-s.load);
 }
-export function armIntersections(s,padding=0){
-  const pose=armPose(s),hits=new Set(),sample=(p,r)=>{
+const validExternalVolume=b=>b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0;
+function externalMachineVolumes(s,external=[]){
+  const v=s.loader.vehicle;
+  return external.filter(b=>validExternalVolume(b)&&Math.abs(b.x-v.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-v.z)<175+Math.hypot(b.w,b.d)/2);
+}
+function externalVehicleObstacles(s,external=[]){
+  const v=s.loader.vehicle;
+  return external.filter(b=>validExternalVolume(b)&&
+    Math.abs(b.x-v.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-v.z)<175+Math.hypot(b.w,b.d)/2&&
+    b.y<54&&b.y+b.h>8).map(b=>({id:b.name||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.h,y:b.y,angle:b.angle||0}));
+}
+export function armIntersections(s,padding=0,external=[]){
+  const pose=armPose(s),hits=new Set(),materials=externalMachineVolumes(s,external),sample=(p,r)=>{
     r+=padding;
     if(p.y-r<PLOT.bottom)hits.add('岩盤');
     if((p.x<PLOT.minX||p.x>PLOT.maxX||p.z<PLOT.minZ||p.z>PLOT.maxZ)&&p.y-r<0)hits.add('固定地面');
@@ -73,6 +84,12 @@ export function armIntersections(s,padding=0){
       const id=key([x,y,z]);if(s.terrain[id])hits.add(`土:${id}`);
     }
     for(const o of s.spoil)if(near(o,p,4+r))hits.add(`排土:${o.id}`);
+    for(const b of materials){
+      if(p.y+r<=b.y||p.y-r>=b.y+b.h)continue;
+      const q=worldToLocal({x:b.x,z:b.z,heading:b.angle||0},p.x,p.z);
+      const dx=Math.max(0,Math.abs(q.x)-b.w/2),dz=Math.max(0,Math.abs(q.z)-b.d/2);
+      if(dx*dx+dz*dz<=r*r)hits.add(b.name||'建材');
+    }
   };
   for(let n=0;n<2;n++){const a=pose.world[n],b=pose.world[n+1],steps=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/2);for(let i=1;i<=steps;i++)sample({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps,z:a.z+(b.z-a.z)*i/steps},2.2);}
   if(isContactDig(s)){for(const hit of bucketEnvironmentHits(s,pose))hits.add(hit);}else sample(pose.bucket,6);return hits;
@@ -88,14 +105,26 @@ export function spoilPenetrations(s){
   if(depth>0)out.set('排土:'+p.id,depth);
  }return out;
 }
-export function contactBlocker(before,candidate,hits=armIntersections(candidate)){
+export function contactBlocker(before,candidate,hits=armIntersections(candidate),external=[]){
+ if(external.length)hits=armIntersections(candidate,0,external);
  if(!hits.size)return '';
- const hard=[...hits].find(id=>!id.startsWith('排土:'));if(hard)return hard;
- const old=armIntersections(before);if([...hits].some(id=>!old.has(id)))return [...hits][0];
+ const old=armIntersections(before,0,external);
+ const materialNames=new Set(external.filter(validExternalVolume).map(b=>b.name||'建材'));
+ const newMaterial=[...hits].find(id=>materialNames.has(id)&&!old.has(id));
+ if(newMaterial)return newMaterial;
+ const solid=[...hits].filter(id=>!materialNames.has(id));if(!solid.length)return '';
+ const hard=solid.find(id=>!id.startsWith('排土:'));if(hard)return hard;
+ if(solid.some(id=>!old.has(id)))return solid[0];
  const a=spoilPenetrations(before),b=spoilPenetrations(candidate);let improved=false;
  for(const[id,depth]of b)if(depth>(a.get(id)||0)+1e-8)return id;
  for(const[id,depth]of a)if((b.get(id)||0)<depth-1e-8)improved=true;
- return improved?'':[...hits][0];
+ return improved?'':solid[0];
+}
+export function externalContactBlocker(before,candidate,external=[]){
+ if(!external.length)return '';
+ const names=new Set(external.filter(validExternalVolume).map(b=>b.name||'建材'));
+ const old=armIntersections(before,0,external),next=armIntersections(candidate,0,external);
+ return [...next].find(id=>names.has(id)&&!old.has(id))||'';
 }
 // Airborne soil can wait on the attachment, but may not harden through it.
 // No new state fields: the existing falling ledger remains valid v3 data.
@@ -111,42 +140,43 @@ export function soilSettlementBlocked(s,p){
  const v=s.loader.vehicle,q=localToWorld({x:0,z:0,heading:-v.heading},p.x-v.x,p.z-v.z);
  return Math.abs(q.x)<38.9&&Math.abs(q.z)<46.9&&p.y-3.9<17&&p.y+3.9>0;
 }
-function contactMove(s,input,dt){
+function contactMove(s,input,dt,external=[]){
  const targets={boom:clamp(s.arm.boom+(input.boom||0)*dt*.5,EX.boomMin,EX.boomMax),stick:clamp(s.arm.stick+(input.stick||0)*dt*.65,-2.55,stickExtensionLimit(s)),slew:clamp(s.arm.slew-(input.slew||0)*dt*.62,-EX.slewLimit,EX.slewLimit),curl:clamp(s.arm.curl+(input.curl||0)*dt*.75,bucketOpenLimit(s),1.1)};
  let n={...s,arm:{...s.arm},hit:''};const groups=input.coordinated?[Object.keys(targets)]:Object.keys(targets).map(k=>[k]);
- for(const keys of groups){const from={...n.arm},steps=Math.max(1,...keys.map(k=>Math.ceil(Math.abs(targets[k]-from[k])/.003)));for(let i=1;i<=steps;i++){const arm={...from};for(const k of keys)arm[k]=from[k]+(targets[k]-from[k])*i/steps;if(keys.every(k=>arm[k]===n.arm[k]))continue;const candidate={...n,arm},hit=contactBlocker(n,candidate);if(hit){
+ for(const keys of groups){const from={...n.arm},steps=Math.max(1,...keys.map(k=>Math.ceil(Math.abs(targets[k]-from[k])/.003)));for(let i=1;i<=steps;i++){const arm={...from};for(const k of keys)arm[k]=from[k]+(targets[k]-from[k])*i/steps;if(keys.every(k=>arm[k]===n.arm[k]))continue;const candidate={...n,arm},hit=contactBlocker(n,candidate,undefined,external);if(hit){
    // Approach the actual surface, not the previous coarse sample; the contact
    // readout and the next scoop then agree with what the player can see.
-   const safe={...n.arm};let lo=0,hi=1;for(let j=0;j<4;j++){const t=(lo+hi)/2,probe={...safe};for(const k of keys)probe[k]=safe[k]+(arm[k]-safe[k])*t;if(contactBlocker(n,{...n,arm:probe}))hi=t;else{lo=t;n={...n,arm:probe};}}
+   const safe={...n.arm};let lo=0,hi=1;for(let j=0;j<4;j++){const t=(lo+hi)/2,probe={...safe};for(const k of keys)probe[k]=safe[k]+(arm[k]-safe[k])*t;if(contactBlocker(n,{...n,arm:probe},undefined,external))hi=t;else{lo=t;n={...n,arm:probe};}}
    n.hit=hit;n.message=`${hit.startsWith('土:')?'爪・バケットが土':hit}に接触しました。逆方向へ戻すか、土なら「すくう」を使ってください。`;break;}n=candidate;}}
  return n;
 }
-export function moveArm(s,input,dt){
-  if(isContactDig(s))return contactMove(s,input,dt);
+export function moveArm(s,input,dt,external=[]){
+  if(isContactDig(s))return contactMove(s,input,dt,external);
   let next={...s,arm:{...s.arm},hit:''};
-  const old=armIntersections(s);
+  const old=armIntersections(s,0,external);
   const targets={boom:clamp(s.arm.boom+(input.boom||0)*dt*.5,EX.boomMin,EX.boomMax),stick:clamp(s.arm.stick+(input.stick||0)*dt*.65,s.cutMask?-2.55:EX.stickMin,stickExtensionLimit(s)),slew:clamp(s.arm.slew-(input.slew||0)*dt*.62,-EX.slewLimit,EX.slewLimit)};
   if(input.coordinated){
     // Coordinated hydraulics follow the sampled joint-space path, not three
     // independent full-speed axes which bend that path into obstacles.
     const count=Math.max(1,...Object.keys(targets).map(k=>Math.ceil(Math.abs(targets[k]-s.arm[k])/.003)));let before=old;
     for(let i=1;i<=count;i++){const arm={...s.arm};for(const k of Object.keys(targets))arm[k]=s.arm[k]+(targets[k]-s.arm[k])*i/count;
-      const hits=armIntersections({...s,arm}),blocked=[...hits].find(id=>!before.has(id));
+      const hits=armIntersections({...s,arm},0,external),blocked=[...hits].find(id=>!before.has(id));
       if(blocked)return{...s,hit:blocked,message:'同期油圧の経路で接触したため停止しました。'};before=hits;
     }return{...next,arm:{...s.arm,...targets}};
   }
   for(const k of ['boom','stick','slew']){
     if(targets[k]===s.arm[k])continue;const proposal={...next,arm:{...next.arm,[k]:targets[k]}};
-    const blocked=[...armIntersections(proposal)].find(id=>!old.has(id));
+    const blocked=[...armIntersections(proposal,0,external)].find(id=>!old.has(id));
     if(blocked){next.hit=blocked.startsWith('土:')?'普通の土':blocked.startsWith('排土:')?'排土':blocked;next.message=`${next.hit}に接触しています。持ち上げるか逆方向へ戻してください。`;}
     else next=proposal;
   }return next;
 }
-export function actExcavator(s,action){
+export function actExcavator(s,action,external=[]){
+  const obstacles=[...OBSTACLES,...externalVehicleObstacles(s,external)];
   if(action==='home')return {...s,loader:actLoader(s.loader,'home',OBSTACLES),message:'レンを安全エリアへ戻しました。掘削状態と土は残り、作業は一時停止します。'};
   if(action==='interact'){
     if(s.loader.mode==='working')return{...s,message:'先に「走行モード」に戻してください。'};
-    const loader=excavatorAccessAction(s.loader,s.arm.slew,OBSTACLES);return{...s,loader,message:loader.message};
+    const loader=excavatorAccessAction(s.loader,s.arm.slew,obstacles);return{...s,loader,message:loader.message};
   }
   if(action==='work'){
     if(s.loader.mode==='driving'&&Math.abs(s.loader.vehicle.speed)<.8)return {...s,loader:{...s.loader,mode:'working'},message:s.action?'途中の作業を再開します。':isContactDig(s)?'ブームは根元、アームは先端側の関節です。バケットを開き、爪を掘りたい土へ向けて「すくう」。':'アーム先端の枠が緑なら掘れます。「すくう」は1回押すと最後まで動きます。'};
@@ -187,13 +217,13 @@ export function excavatorActorPose(s){
   return ['driving','working'].includes(s.loader.mode)?{...pose,y:EX_ACCESS.floor}:pose;
 }
 export function contactActionArm(a,t){const e=t*t*(3-2*t),arm={};for(const k of['boom','stick','slew','curl'])arm[k]=a.from[k]+(a.end[k]-a.from[k])*e;return arm;}
-function stepContactAction(s,dt){
+function stepContactAction(s,dt,external=[]){
  const original=s.action,elapsed=Math.min(original.duration,original.elapsed+dt),end=contactActionArm(original,elapsed/original.duration),steps=Math.max(1,...Object.keys(end).map(k=>Math.ceil(Math.abs(end[k]-s.arm[k])/.003)));let n={...s,hit:'',action:{...original,elapsed,collected:[...original.collected]}};
  for(let i=1;i<=steps;i++){
   const arm={};for(const k of Object.keys(end))arm[k]=s.arm[k]+(end[k]-s.arm[k])*i/steps;
   let candidate={...n,arm};const contacts=original.kind==='scoop'&&!original.loadedLift?scoopTargets(candidate):[];
   if(contacts.length){candidate={...candidate,terrain:{...n.terrain},spoil:[...n.spoil],action:{...n.action,collected:[...n.action.collected]}};for(const target of contacts){if(target.kind==='terrain')delete candidate.terrain[target.id];else candidate.spoil=candidate.spoil.filter(p=>p.id!==target.id);candidate.load++;candidate.action.collected.push(target);}candidate.revision++;}
-  const hit=contactBlocker(n,candidate);if(hit)return{...n,action:null,hit,message:`${hit.startsWith('土:')?'バケット本体が土':hit}に接触したため停止しました。爪の向きを変えてください。積載 ${n.load}/6。`};
+  const hit=contactBlocker(n,candidate,undefined,external);if(hit)return{...n,action:null,hit,message:`${hit.startsWith('土:')?'バケット本体が土':hit}に接触したため停止しました。爪の向きを変えてください。積載 ${n.load}/6。`};
   n=candidate;if(n.load===6&&original.kind==='scoop'&&!original.loadedLift&&!original.oneTouch)break;
  }
  const t=elapsed/original.duration;
@@ -205,30 +235,34 @@ function stepContactAction(s,dt){
  }else if(elapsed>=original.duration){n.action=null;n.message=original.kind==='scoop'?(n.load?`${n.load}個の土をすくいました。`:'爪は土に触れませんでした。ブーム・アーム・バケット角度で掘りたい場所へ合わせてください。'):'その場へ排土しました。';}
  return n;
 }
-export function stepExcavator(s,input,dt){
+export function stepExcavator(s,input,dt,external=[]){
   if(!Number.isFinite(dt)||dt<=0||dt>.05)throw Error('更新刻みが不正です');
   s=upgradeExcavatorAccess(s);
-  if(s.loader.transition&&!excavatorAccessClear(s.loader.transition.path,s.loader.vehicle,OBSTACLES))return {...s,message:'乗降経路が塞がっています。先に障害物を移動してください。'};
+  const obstacles=[...OBSTACLES,...externalVehicleObstacles(s,external)];
+  if(s.loader.transition&&!excavatorAccessClear(s.loader.transition.path,s.loader.vehicle,obstacles))return {...s,message:'乗降経路が塞がっています。先に障害物を移動してください。'};
   let n={...s,hit:''};
   if(s.loader.mode==='working'){
-    if(!s.action)n=moveArm(n,input,dt);
-    else if(isContactDig(s)&&s.action.contact)n=stepContactAction(n,dt);
+    if(!s.action)n=moveArm(n,input,dt,external);
+    else if(isContactDig(s)&&s.action.contact)n=stepContactAction(n,dt,external);
     else if(s.action.kind==='center'){
-      n=moveArm(n,{slew:Math.sign(s.arm.slew)},dt);
+      n=moveArm(n,{slew:Math.sign(s.arm.slew)},dt,external);
       if(n.hit){n.action=null;n.message='正面へ戻す経路で接触しました。アームを持ち上げてから、もう一度走行モードを押してください。';}
       else if(Math.abs(n.arm.slew)<.006||Math.sign(n.arm.slew)!==Math.sign(s.arm.slew)){
         n.arm={...n.arm,slew:0};n.action=null;n.loader={...n.loader,mode:'driving',message:'正面へ戻りました。走行・降車できます。'};n.message=n.loader.message;
       }
     }else{
       const a={...s.action,elapsed:Math.min(s.action.duration,s.action.elapsed+dt)},t=a.elapsed/a.duration,e=t*t*(3-2*t);
-      n.action=a;n.arm={...s.arm,curl:a.start+((a.kind==='scoop'?1.1:-.45)-a.start)*e};
+      let arm={...s.arm,curl:a.start+((a.kind==='scoop'?1.1:-.45)-a.start)*e};
       if(a.center){
-        const arm=scoopPoseAt(s,a.center,a.start,t);
-        if(!arm)return {...s,action:null,guide:null,message:'これ以上巻き込めない姿勢です。腕を戻してすくい直してください。'};
-        const allowed=armIntersections(s),hit=[...armIntersections({...s,arm})].find(id=>!allowed.has(id));
+        const pose=scoopPoseAt(s,a.center,a.start,t);
+        if(!pose)return {...s,action:null,guide:null,message:'これ以上巻き込めない姿勢です。腕を戻してすくい直してください。'};
+        const allowed=armIntersections(s,0,external),hit=[...armIntersections({...s,arm:pose},0,external)].find(id=>!allowed.has(id));
         if(hit)return {...s,action:null,guide:null,hit,message:'巻き込み経路で接触したため停止しました。土の数量は保持しています。'};
-        n.arm=arm;
+        arm=pose;
       }
+      const materialHit=externalContactBlocker(n,{...n,arm},external);
+      if(materialHit)return{...s,action:null,hit:materialHit,message:`${materialHit}に接触したため動作を停止しました。姿勢と土は保持しています。`};
+      n.action=a;n.arm=arm;
       if(a.kind==='scoop'&&!a.transferred&&t>=.48){
         n.terrain={...s.terrain};n.spoil=[...s.spoil];let count=0;
         for(const p of a.targets){if(p.kind==='terrain'&&n.terrain[p.id]){delete n.terrain[p.id];count++;}else if(p.kind==='spoil'&&n.spoil.some(o=>o.id===p.id)){n.spoil=n.spoil.filter(o=>o.id!==p.id);count++;}}
@@ -242,11 +276,11 @@ export function stepExcavator(s,input,dt){
     }
   }else{
     if(s.loader.mode==='driving'&&Math.abs(s.arm.slew)>.04){n.loader={...s.loader,vehicle:{...s.loader.vehicle,speed:0}};n.message='キャビンが横を向いています。作業モードから走行モードへ切り替え、正面へ戻してください。';}
-    else n.loader=stepLoader(s.loader,input,dt,OBSTACLES);
+    else n.loader=stepLoader(s.loader,input,dt,obstacles);
     if(n.loader.mode!==s.loader.mode)n.message=n.loader.message;
     // The extended attachment also follows a swept collision check while driving.
     if(s.loader.mode==='driving'){
-      const before=armIntersections(s),hit=[...armIntersections(n)].find(id=>!before.has(id));
+      const before=armIntersections(s,0,external),hit=[...armIntersections(n,0,external)].find(id=>!before.has(id));
       if(hit){n.loader={...n.loader,vehicle:{...s.loader.vehicle,speed:0}};n.message='アーム先端が接触しました。作業モードで持ち上げてください。';}
     }
   }

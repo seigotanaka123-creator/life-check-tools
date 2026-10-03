@@ -1,7 +1,6 @@
 // Main-world finite water work. No copied wallet, purchase API, storage or loan grant.
-import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport} from './imasora-construction-water-transport.js';
+import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport,TRANSPORT_OBSTACLES} from './imasora-construction-water-transport.js?v=520';
 import {walkingClear} from './imasora-construction-loader-physics.js';
-import {TRANSPORT_OBSTACLES} from './imasora-construction-water-transport.js';
 export const WORLD_WATER_SCOPE='construction-world-water-v1';
 export const WATER_YARDS=Object.freeze([[-760,-480],[-760,550],[760,-480],[760,550]].map(Object.freeze));
 export const WATER_PACK=128; // 32 L, in 250 mL physics units.
@@ -27,7 +26,7 @@ export function enterWorldWater(s,worldPosition){
   ok(Math.hypot(p.x-s.work.loader.vehicle.x,p.z-s.work.loader.vehicle.z)<=112,'給水ローダーの近くへ来てください。');
   const n=copy(s);n.work.paused=false;n.work.loader={...n.work.loader,mode:'foot',player:p,transition:null,vehicle:{...n.work.loader.vehicle,speed:0}};n.revision++;return n;
 }
-export function worldWaterAction(s,action,value,receivedML){
+export function worldWaterAction(s,action,value,receivedML,external=[]){
   validateWorldWater(s,receivedML);
   if(['dispatch','store'].includes(action)){
     ok(idOK(value),'出庫番号が不正です。');const old=s.events.find(e=>e.id===value);
@@ -39,13 +38,13 @@ export function worldWaterAction(s,action,value,receivedML){
     if(action==='dispatch')n.allocated+=128;n.revision++;n.work.message=action==='dispatch'?'保管庫から給水槽へ移送中…':'給水槽から保管庫へ移送中…';return n;
   }
   ok(!s.delivery||action==='pause','保管口の移送が完了してから操作してください。');
-  const n={...s,work:transportAction(s.work,action,value),revision:s.revision+1};validateWorldWater(n,receivedML);return n;
+  const n={...s,work:transportAction(s.work,action,value,external),revision:s.revision+1};validateWorldWater(n,receivedML);return n;
 }
-export function advanceWorldWater(s,input,dt){
+export function advanceWorldWater(s,input,dt,external=[]){
   ok(Number.isFinite(dt)&&dt>=0&&dt<=.1,'更新時間が不正です。');if(s.work.paused)return s;
   let n={...s,phase:s.phase+dt};
   while(n.phase>=1/120-1e-9){
-    n={...n,phase:Math.max(0,n.phase-1/120),work:stepTransport(n.work,n.delivery?{brake:true}:input,1/120),revision:n.revision+1};
+    n={...n,phase:Math.max(0,n.phase-1/120),work:stepTransport(n.work,n.delivery?{brake:true}:input,1/120,external),revision:n.revision+1};
     if(n.delivery){
       const d={...n.delivery,clock:n.delivery.clock+64/120},q=Math.min(128-d.moved,Math.floor(d.clock+1e-9));d.clock-=q;d.moved+=q;
       n.work={...n.work,source:n.work.source+(d.kind==='dispatch'?q:-q)};n.delivery=d;

@@ -1,3 +1,5 @@
+import {excavatorAtDriverDoor} from './assets/imasora-construction-excavator-access.js';
+import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js';
 import {createConstructionGround} from './assets/imasora-construction-ground.js';
@@ -77,6 +79,8 @@ function refresh(){extension?.beforeRefresh?.();const t=totals(state),m=state.lo
   $('mode').textContent=({foot:'徒歩',boarding:'乗車中',exiting:'降車中',driving:'走行',working:'掘削作業'})[m];$('load').textContent=`バケット ${state.load} / ${EX.capacity}`;$('bin').textContent=`受け箱 ${state.bin}`;$('total').textContent=`土の合計 ${t.total} / ${state.total}`;$('status').textContent=state.message;
   document.querySelector('.working').hidden=!working;document.querySelector('.moving').hidden=working;
   $('interact').textContent=m==='foot'?'運転席に乗る':transition?'乗り降り中…':'降りる';$('interact').disabled=!local||transition||working||Math.abs(state.loader.vehicle.speed)>.8;
+  if(m==='foot'&&!excavatorAtDriverDoor(state.loader,state.arm.slew))$('interact').disabled=true;
+  setBoardPrompt($('interact'),m,!$('interact').disabled);
   $('work').textContent=working?'走行モード':'作業モード';$('work').disabled=!local||!['working','driving'].includes(m)||Math.abs(state.loader.vehicle.speed)>.8||busy;
   $('scoop').disabled=!working||busy||state.load>0;$('dump').disabled=!working||busy||!state.load;
   document.querySelectorAll('.working [data-hold]').forEach(b=>b.disabled=busy);$('operation').textContent=working?`旋回 ${(state.arm.slew*180/Math.PI).toFixed(0)}° · ${busy?'油圧作動中':'受け箱は右旋回−90°付近'}`:'停車して作業へ切替';

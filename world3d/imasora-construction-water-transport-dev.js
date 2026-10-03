@@ -1,3 +1,4 @@
+import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
 import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
@@ -34,6 +35,7 @@ function refresh(){const t=transferTotals(state),a=transportAvailability(state),
   $('mode').textContent=state.paused?'一時停止中':state.task?state.task.type==='pour'?'注水中':'汲み取り中':({foot:'徒歩',boarding:'乗車中',driving:'運転中',exiting:'降車中'})[l.mode];$('pad-name').textContent=l.mode==='driving'?'ハンドル':'歩く';
   $('message').textContent=state.message;$('pose').textContent=`X ${l.vehicle.x.toFixed(1)} / Z ${l.vehicle.z.toFixed(1)} / ${(l.vehicle.heading*180/Math.PI).toFixed(1)}° / 速さ ${Math.abs(l.vehicle.speed).toFixed(1)}`;$('save-status').textContent=testMode?'操作テスト・保存しません':saveText;
   const disabled=!ready||session.blocked||session.busy;$('interact').textContent=l.mode==='foot'?'運転席に乗る':l.mode==='driving'?'停車して降りる':'乗り降り中…';$('interact').disabled=disabled||!!state.task||!!state.air.length||!!l.transition||(l.mode==='foot'?!boardOption(l,TRANSPORT_OBSTACLES):!exitOption(l,TRANSPORT_OBSTACLES));
+  setBoardPrompt($('interact'),l.mode,!$('interact').disabled);
   $('source-fill').disabled=disabled||state.paused||!a.source;$('return-fill').disabled=disabled||state.paused||!a.returned;$('pour').disabled=disabled||state.paused||!a.pourable;$('stop').disabled=disabled||!state.task;
   for(const id of['flow','recover'])$(id).disabled=disabled||!a.nearReturn||!a.stopped||!a.idle;$('flow').textContent=state.water.running?'水路を止める':'水路を流す';$('direction').value=String(state.direction);$('direction').disabled=disabled||!!state.task||!!state.air.length;$('pause').textContent=state.paused?'再開する':'一時停止';$('save').disabled=disabled||testMode;$('home').disabled=disabled;
   $('hint').textContent=state.task?'水の移送中は車を停車しています。':l.mode!=='driving'?'ステップから運転席に乗ってください。':Math.abs(l.vehicle.speed)>.8?'作業するときはブレーキで停車。':state.load?a.pourable?'着水予告が受け口の中です。注げます。':'青い受け口へ着水予告を合わせましょう。':a.source?'汲み取りホースが届く距離です。':`給水槽へあと ${Math.max(0,a.sourceDistance-28).toFixed(0)}。`;

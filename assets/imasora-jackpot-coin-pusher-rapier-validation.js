@@ -19262,17 +19262,19 @@ class ImasoraJackpotCoinPusherGame {
         if (this.checkpointDay !== pachicoinAdjustmentDayKey()) throw new Error("day changed");
         this.flushPlayCheckpoint();
         if (this.checkpointSuperseded) throw new Error("another game resumed");
+        const exchangeId = window.crypto?.randomUUID?.()
+          || `${this.checkpointWriterId}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const result = this.onWorkshopExchange({
           heldCreditsBefore: this.credits, heldCreditsAfter: this.credits - UFO_WORKSHOP_EXCHANGE_COST,
           spentCredits: UFO_WORKSHOP_EXCHANGE_COST, arcadeParts: UFO_WORKSHOP_EXCHANGE_REWARD,
-          dayKey: this.checkpointDay, writerId: this.checkpointWriterId
+          dayKey: this.checkpointDay, writerId: this.checkpointWriterId, exchangeId
         });
         if (result?.committed !== true) throw new Error("exchange was not saved");
         // Keep the in-memory balance in the same locked task as both saved balances.
         this.credits -= UFO_WORKSHOP_EXCHANGE_COST;
         this.workshopDailyStatus(true);
         this.refreshHud();
-        this.els.prizeMessage.textContent = "整備パーツ2個を受け取りました。もちコインは残り" + this.credits + "枚です。"
+        this.els.prizeMessage.textContent = "整備パーツ2個と建築セット" + (result.constructionRewardBoxes || 0) + "箱を受け取りました（未開封" + (result.constructionUnopenedBoxes ?? "不明") + "箱）。もちコインは残り" + this.credits + "枚です。"
           + (result.dailyStatus?.reached ? " 本日の上限5回に達しました。明日また交換できます。" : "");
         return true;
       };

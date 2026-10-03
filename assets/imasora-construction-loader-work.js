@@ -137,7 +137,7 @@ export function validateWork(w){
   require(t.total===32000&&a.vehicle===t.bucket&&a.loose===t.ground+t.air&&a.storage===0&&a.held===0,'土の形と台帳の量が一致しません。');
   const v=w.loader?.vehicle,p=w.loader?.player;
   require(v&&p&&['foot','driving'].includes(w.loader.mode)&&w.loader.transition===null,'乗降中は保存できません。');
-  require(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&['x','y','z','heading'].every(k=>finite(p[k]))&&Math.abs(v.speed)<=100&&Math.abs(v.steering)<=.471,'車両・乗員の状態が不正です。');
+  require(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&['x','y','z','heading'].every(k=>finite(p[k]))&&Math.abs(v.speed)<=200&&Math.abs(v.steering)<=.471,'車両・乗員の状態が不正です。');
   require(!vehicleBlocker(v)&&!bodyHits(v,soilColumns(w)),'車体が障害物に重なっています。');
   require(w.loader.mode==='driving'||walkingClear(p,v,[...OBSTACLES,...soilColumns(w)]),'乗員の復帰地点が塞がっています。');
   require(w.bucket&&finite(w.bucket.lift)&&w.bucket.lift>=0&&w.bucket.lift<=1&&finite(w.bucket.tilt)&&w.bucket.tilt>=-.42&&w.bucket.tilt<=.95&&bucketClear(v,w.bucket),'バケット位置が不正です。');

@@ -1,5 +1,6 @@
 // Excavator-only access. The wheel loader keeps its original low floor/path.
 import {LOADER,WALKER,localToWorld,worldToLocal,routeClear,samplePath} from './imasora-construction-loader-physics.js';
+import {atDriverDoor} from './imasora-construction-boarding.js';
 export const EX_ACCESS=Object.freeze({version:2,lift:9,floor:LOADER.floor+9,trackTop:16.6,trackWidth:10.5,trackLength:76.4});
 export function trackBlocksPerson(p,vehicle){
   if(p.y>=EX_ACCESS.trackTop+.05)return false;
@@ -31,12 +32,13 @@ export function excavatorAccessAction(loader,slew,obstacles){
   if(!boarding&&(loader.mode!=='driving'||Math.abs(loader.vehicle.speed)>.8))return {...loader,message:'ブレーキで停車してから降りてください。'};
   for(const side of boarding?[-1]:[-1,1]){
     let path=excavatorAccessPath(loader.vehicle,slew,side,boarding);
-    if(boarding){if(Math.hypot(loader.player.x-path[0].x,loader.player.z-path[0].z)>24)continue;path=[{...loader.player,heading:path[0].heading},...path];}
+    if(boarding){if(loader.transition||Math.abs(loader.vehicle.speed)>.8||!atDriverDoor(loader.player,path[0],loader.vehicle.heading+slew))continue;path=[{...loader.player,heading:path[0].heading},...path];}
     if(!excavatorAccessClear(path,loader.vehicle,obstacles))continue;
     return {...loader,mode:boarding?'boarding':'exiting',vehicle:{...loader.vehicle,speed:0},transition:{path,elapsed:0,duration:boarding?1.9:2.1,side,accessVersion:EX_ACCESS.version},message:boarding?'乗降ステップを出し、キャタピラーより上へ足を上げて乗り込みます。':'ステップを使い、キャタピラーの外側へ降ります。'};
   }
   return {...loader,message:boarding?'運転席側の足元へ近づいてください。キャタピラーや障害物を横切る経路では乗車できません。':'降車経路が塞がっています。空いている場所へ移動してください。'};
 }
+export function excavatorAtDriverDoor(loader,slew){return loader.mode==='foot'&&!loader.transition&&Math.abs(loader.vehicle.speed)<=.8&&atDriverDoor(loader.player,excavatorAccessPath(loader.vehicle,slew,-1)[0],loader.vehicle.heading+slew);}
 export function upgradeExcavatorAccess(state){
   const l=state.loader,t=l.transition;
   if(t&&!t.accessVersion){

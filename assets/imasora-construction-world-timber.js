@@ -1,7 +1,7 @@
 // Authoritative received timber; reuses the approved finite crane/float solver.
 import {initialWorldTimberPhysics,validatePurchasedTimber,refreshTimberLedger,timberCopyTotals,timberPhysicsState,FLOOR_VOLUME} from './imasora-construction-purchased-timber.js';
 import {cranePlayer,cranePersonBlocked,craneWalkVolumes} from './imasora-construction-crane-walk.js';
-import {assemblyState,worldAssemblyAction,advanceWorldAssembly,validateWorldAssembly,floatingView,stepFloating} from './imasora-construction-world-timber-assembly.js';
+import {assemblyState,worldAssemblyAction,advanceWorldAssembly,validateWorldAssembly,floatingView,stepFloating} from './imasora-construction-world-timber-assembly.js?v=523';
 import {polygon} from './imasora-construction-loader-physics.js';
 export {FLOOR_VOLUME};
 export const TIMBER_YARDS=Object.freeze([[760,650],[-760,650],[760,-1000],[-760,-1000]].map(Object.freeze));
@@ -23,8 +23,15 @@ export function enterWorldTimber(s,position,received){
   if(n.work.rig.mode==='foot'){ok(!cranePersonBlocked(floatingView(timberPhysicsState(n.work)),p),'足元や車体から離れてください。');n.work.rig.player=p;}
   n.work=assemblyState(n.work);n.work.paused=false;n.revision++;return validateWorldTimber(n,received);
 }
-export function worldTimberAction(s,action,id,received){s=syncWorldTimber(s,received);const w=worldAssemblyAction(s.work,action,id);if(w===s.work)return s;const n={...s,revision:s.revision+1,work:w};return w.rig.transition?n:validateWorldTimber(n,received);}
-export function advanceWorldTimber(s,input,dt){const w=advanceWorldAssembly(s.work,input,dt);return w===s.work?s:{...s,revision:s.revision+1,work:w};}
+export function worldTimberMaterialObstacles(rig,external=[]){
+  const v=rig?.vehicle;if(!v||!Array.isArray(external))return[];
+  // Keep low slabs and elevated ground volumes available to crane loads and
+  // support placement. Crane vehicle routing filters driveable low surfaces.
+  return external.filter(b=>b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0&&b.y<180&&b.y+b.h>0&&Math.abs(b.x-v.x)<270+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-v.z)<270+Math.hypot(b.w,b.d)/2)
+    .map(b=>({id:b.name||b.id||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h,minY:b.y,angle:b.angle||0}));
+}
+export function worldTimberAction(s,action,id,received,external=[]){s=syncWorldTimber(s,received);const obstacles=worldTimberMaterialObstacles(s.work.rig,external),w=worldAssemblyAction(s.work,action,id,obstacles);if(w===s.work)return s;const n={...s,revision:s.revision+1,work:w};return w.rig.transition?n:validateWorldTimber(n,received);}
+export function advanceWorldTimber(s,input,dt,external=[]){const obstacles=worldTimberMaterialObstacles(s.work.rig,external),w=advanceWorldAssembly(s.work,input,dt,obstacles);return w===s.work?s:{...s,revision:s.revision+1,work:w};}
 export function timberCheckpoint(s){validateWorldTimber(s,s.work.source.total*FLOOR_VOLUME);const n=copy(s);n.work.paused=true;n.work.rig.vehicle.speed=0;return n;}
 export function validateTimberContinuation(old,next){if(!old)return;
   ok(old.siteIndex===next.siteIndex&&next.revision>=old.revision&&next.work.revision>=old.work.revision&&next.work.source.total>=old.work.source.total,'古い木材作業や別の区画へ戻せません。');
