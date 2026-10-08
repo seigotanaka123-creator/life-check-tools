@@ -97,7 +97,14 @@ export function walkPath(f,start,end,external=()=>false,heightAt=()=>0){
  if(blocked(start.x,start.z)||blocked(end.x,end.z))throw Error('安全な徒歩経路を確保してください。車両を離して停め直せます。');
  if(safe(start,end))return[point(start),point(end)];
  // Visibility graph uses corners around the two vehicles and the entire wet work area.
- const nodes=[start,end,...pipeWalkingCorners(f)];for(const v of [f.truck,f.pump])for(const x of [-63,63])for(const z of [-68,68])nodes.push(vehiclePoint(v,{x,z}));
+ const nodes=[start,end,...pipeWalkingCorners(f)];
+ // A tight rear stance needs side corners for both the approach and departure.
+ // The usual corners farther behind the truck may be across a yard boundary.
+ for(const v of [f.truck,f.pump])for(const p of [start,end]){const c=Math.cos(v.heading),s=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,x=c*dx-s*dz,z=s*dx+c*dz;if(Math.abs(x)<=64&&z<-44&&z>=-80)for(const side of [-63,63]){const q=vehiclePoint(v,{x:side,z});nodes.push({x:q.x,z:q.z});}}
+ // These are horizontal planning points, not saved foot poses. vehiclePoint
+ // supplies a default Y=0, which would reject a valid detour on raised ground.
+ // Derive their height from the same surface as every checked route edge.
+ for(const v of [f.truck,f.pump])for(const x of [-63,63])for(const z of [-68,68]){const p=vehiclePoint(v,{x,z});nodes.push({x:p.x,z:p.z});}
  for(const x of [-27,27])for(const z of [FRAME_RACK.z-22,FRAME_RACK.z+22])nodes.push({x,z});
  if(!['design','complete'].includes(f.stage))for(const x of [-56,56])for(const z of [-56,56])nodes.push({x,z});
  for(const w of f.completed.filter(w=>freeWorkMask(w)&&w.x-f.location.x>=Math.min(start.x,end.x)-100&&w.x-f.location.x<=Math.max(start.x,end.x)+100&&w.z-f.location.z>=Math.min(start.z,end.z)-100&&w.z-f.location.z<=Math.max(start.z,end.z)+100).slice(0,16))for(const dx of [-46,46])for(const dz of [-46,46])nodes.push({x:w.x-f.location.x+dx,z:w.z-f.location.z+dz});

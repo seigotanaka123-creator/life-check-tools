@@ -11,6 +11,10 @@ import {EARTH_LIVE_SCOPE,createAuthorityExcavation,validateAuthorityExcavation,v
 import './imasora-construction-pack-transfer.js?v=530';
 const PACK_TRANSFER=globalThis.ImasoraConstructionPackTransfer;
 import {createProfileProject,assertProfileProject,transitionProfileProject,availablePackConcreteCredits} from './imasora-construction-profile-project.js?v=119c';
+import {createWorldTransport,createWorldTransportWork,validateWorldTransport,commandWorldTransport} from './imasora-construction-transport-authority.mjs';
+import {assertWorldTransportWorkReceipt} from './imasora-construction-transport-work-flow.mjs';
+import {projectStarterToolkit} from './imasora-construction-toolkit.mjs';
+import {assertTransportShovel,transportNeedsShovel} from './imasora-construction-transport-hand.mjs';
 export function createWorldLedgerAPI({scope,kinds}) {
 const LINK_SCOPE=scope;
 const LINK_PRICES=Object.freeze({'mars-water':3,'mars-soil':2,'mars-timber':4});
@@ -50,7 +54,7 @@ function validateOrder(event,statuses){
 }
 function validateWorldPurchaseLedger(s){
   keys(s,['schemaVersion','scope','revision','worldWrites','source','world','materials','events','pending']);
-  ok([1,2].includes(s.schemaVersion)&&s.scope===LINK_SCOPE,'接続保存の版・区分が不正です。');
+  ok([1,2,3].includes(s.schemaVersion)&&s.scope===LINK_SCOPE,'接続保存の版・区分が不正です。');
   keys(s.source,['kind','fingerprint','world']);ok(kinds.includes(s.source.kind),'複製元の区分が不正です。');
   validateWorld(s.source.world);validateWorld(s.world);ok(fingerprint(s.source.world)===s.source.fingerprint,'複製元の記録が変わっています。');
   ok(s.source.world.constructionPackTrialLedger===undefined,'複製元の試作受取台帳は新しい保存へ持ち込めません。');
@@ -58,6 +62,7 @@ function validateWorldPurchaseLedger(s){
   if(s.world.constructionProfileProject!==undefined)assertProfileProject(s.world.constructionProfileProject,s.world.constructionPackTrialLedger);
   if(s.world.constructionWorkPlatform!==undefined)assertWorkPlatformRecord(s.world.constructionWorkPlatform,s.world.constructionProfileProject);
   ok(s.source.world.constructionExcavation===undefined,'複製元から掘削地形の取得権を持ち込むことはできません。');
+  ok(s.source.world.constructionTransport===undefined,'複製元から共有土の取得権を持ち込むことはできません。');
   keys(s.materials,MATERIAL_IDS);ok(Array.isArray(s.events)&&s.events.length<=LIMIT,'取引記録が不正または上限です。');
   ok(int(s.worldWrites)&&int(s.revision),'保存番号が不正です。');
   const totals=Object.fromEntries(MATERIAL_IDS.map(k=>[k,0])),received=Object.fromEntries(MATERIAL_IDS.map(k=>[k,0])),funds=resources(s.source.world),seen=new Set();let revisions=s.worldWrites;
@@ -83,8 +88,11 @@ function validateWorldPurchaseLedger(s){
   if(s.world.constructionExcavation!==undefined)validateAuthorityExcavation(s.world.constructionExcavation);
   // Live excavation makes the complete ledger unreadable to pre-v496 clients,
   // including clients that do not recognize an excavation field at all.
-  if(s.schemaVersion===2)ok(LINK_SCOPE==='imasora-world-ledger-v1'&&s.world.constructionExcavation?.version===2&&s.world.constructionExcavation?.scope===EARTH_LIVE_SCOPE,'通常の掘削取得記録が欠けた新版保存は使用できません。');
+  if(s.schemaVersion>=2)ok(LINK_SCOPE==='imasora-world-ledger-v1'&&s.world.constructionExcavation?.version===2&&s.world.constructionExcavation?.scope===EARTH_LIVE_SCOPE,'通常の掘削取得記録が欠けた新版保存は使用できません。');
   else ok(s.world.constructionExcavation?.scope!==EARTH_LIVE_SCOPE,'通常の掘削地形は新版保存で一度だけ取得してください。');
+  if(s.schemaVersion===3){ok(s.world.constructionTransport!==undefined,'共有土の記録が欠けた保存は使用できません。');validateWorldTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint);}
+  else ok(s.world.constructionTransport===undefined,'共有土は対応した新版保存へ一度だけ切り替えてください。');
+  if(transportNeedsShovel(s.world.constructionTransport))assertTransportShovel(projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint),s.source.fingerprint);
   return true;
 }
 function existing(s,id){return s.events.find(e=>e.id===id)||(s.pending?.id===id?s.pending:null);}
@@ -108,7 +116,12 @@ function awardLinkedFlightReward(s,resource,amount,id){
   n.world.ufoResources[resource]+=amount;n.events.push({kind:'reward',id,resource,amount});n.revision++;validateWorldPurchaseLedger(n);return n;
 }
 function saveLinkedWorldDraft(s,draft,{craft=false}={}){
-  validateWorldPurchaseLedger(s);validateWorld(draft);const n=clone(s);
+  validateWorldPurchaseLedger(s);const n=buildLinkedWorldDraft(s,draft,craft);validateWorldPurchaseLedger(n);return n;
+}
+// Private assembly only. Callers validate the original ledger first and the
+// finished ledger afterwards; no intermediate version is published or saved.
+function buildLinkedWorldDraft(s,draft,craft=false,transportRecord=undefined){
+  validateWorld(draft);const n=clone(s);
   // The wallet/resource authority is never taken from a stale scene snapshot.
   // Other scene data is committed under the store's generation check.
   n.world={...n.world,...clone(draft)};n.world.ufoResources=clone(s.world.ufoResources);
@@ -125,6 +138,9 @@ function saveLinkedWorldDraft(s,draft,{craft=false}={}){
   else delete n.world.constructionTimber;
   if(s.world.constructionExcavation!==undefined)n.world.constructionExcavation=clone(s.world.constructionExcavation);
   else delete n.world.constructionExcavation;
+  if(transportRecord!==undefined)n.world.constructionTransport=clone(transportRecord);
+  else if(s.world.constructionTransport!==undefined)n.world.constructionTransport=clone(s.world.constructionTransport);
+  else delete n.world.constructionTransport;
   if(s.world.constructionPackTrialLedger!==undefined)n.world.constructionPackTrialLedger=clone(s.world.constructionPackTrialLedger);
   else delete n.world.constructionPackTrialLedger;
   if(s.world.constructionProfileProject!==undefined)n.world.constructionProfileProject=clone(s.world.constructionProfileProject);
@@ -132,7 +148,7 @@ function saveLinkedWorldDraft(s,draft,{craft=false}={}){
   if(s.world.constructionWorkPlatform!==undefined)n.world.constructionWorkPlatform=clone(s.world.constructionWorkPlatform);
   else delete n.world.constructionWorkPlatform;
   if(s.world.ufoEquipment&&draft.ufoEquipment)n.world.ufoEquipment={...s.world.ufoEquipment,...clone(draft.ufoEquipment)};
-  n.worldWrites++;n.revision++;validateWorldPurchaseLedger(n);return n;
+  n.worldWrites++;n.revision++;return n;
 }
 function projectLinkedShop(s){
   if(!s)return null;return{balance:s.world.ufoResources.spaceCoins,materials:clone(s.materials),pending:s.pending?clone(s.pending):null,orders:s.events.filter(e=>e.kind==='order').map(clone)};
@@ -183,10 +199,39 @@ function allocateConstructionExcavation(s,site,origin,grantId,draft,{live=false}
 }
 function saveConstructionExcavationDraft(s,record,draft,expectedRevision){
   validateWorldPurchaseLedger(s);const old=s.world.constructionExcavation;
+  ok(s.world.constructionTransport===undefined,'土の共有保存へ切り替え済みです。旧ショベルからは変更できません。');
   ok(old!==undefined,'先に本体で掘削する地形を確保してください。');
   ok(old.revision===expectedRevision,'別の掘削状態で更新されています。上書きしません。');
   validateAuthorityExcavationContinuation(old,record);
   const n=saveLinkedWorldDraft(s,draft);n.world.constructionExcavation=clone(record);validateWorldPurchaseLedger(n);return n;
+}
+function enableConstructionTransport(s,draft,expectedEarthRevision){
+  validateWorldPurchaseLedger(s);const earth=s.world.constructionExcavation;
+  ok(LINK_SCOPE==='imasora-world-ledger-v1'&&earth?.scope===EARTH_LIVE_SCOPE,'取得済みの通常地形が必要です。');
+  ok(earth.revision===expectedEarthRevision,'切替確認後に掘削作業が変わりました。もう一度確認してください。');
+  ok(!s.pending&&!s.world.equipmentCraftPending,'購入・装備作成を完了してから切り替えてください。');
+  if(s.world.constructionTransport!==undefined)return s;
+  const record=createWorldTransport(earth,s.source.fingerprint),n=saveLinkedWorldDraft(s,draft);
+  n.schemaVersion=3;n.world.constructionTransport=record;validateWorldPurchaseLedger(n);return n;
+}
+function applyConstructionTransportCommand(s,command,draft){
+  validateWorldPurchaseLedger(s);ok(s.schemaVersion===3,'先に土の共有保存へ切り替えてください。');
+  const record=commandWorldTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint,command);
+  if(record===s.world.constructionTransport)return s;
+  const n=saveLinkedWorldDraft(s,draft);n.world.constructionTransport=record;validateWorldPurchaseLedger(n);return n;
+}
+function enableConstructionTransportWork(s,draft,expectedEarthRevision){
+  validateWorldPurchaseLedger(s);const earth=s.world.constructionExcavation;
+  ok(LINK_SCOPE==='imasora-world-ledger-v1'&&earth?.scope===EARTH_LIVE_SCOPE,'取得済みの通常地形が必要です。');
+  ok(earth.revision===expectedEarthRevision,'切替確認後に掘削作業が変わりました。もう一度確認してください。');
+  ok(!s.pending&&!s.world.equipmentCraftPending,'購入・装備作成を完了してから切り替えてください。');
+  const record=createWorldTransportWork(earth,s.source.fingerprint,s.world.constructionTransport);
+  if(record===s.world.constructionTransport)return s;
+  const n=saveLinkedWorldDraft(s,draft);n.schemaVersion=3;n.world.constructionTransport=record;validateWorldPurchaseLedger(n);return n;
+}
+function saveConstructionTransportWork(s,record,draft,expectedRevision){
+  validateWorldPurchaseLedger(s);assertWorldTransportWorkReceipt(s.world.constructionTransport,record,expectedRevision,projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint));
+  const n=buildLinkedWorldDraft(s,draft,false,record);validateWorldPurchaseLedger(n);return n;
 }
 function receiveConstructionMaterial(s,offerId,quantity,id,context){
   validateWorldPurchaseLedger(s);checkId(id);const q=quoteLinkedOrder(offerId,quantity),old=existing(s,id);
@@ -242,5 +287,5 @@ function saveConstructionWorkPlatform(s,record,draft,expectedRevision){
 }
 function packWorldPurchaseLedger(s){validateWorldPurchaseLedger(s);return JSON.stringify({format:LINK_SCOPE,checksum:fingerprint(s),state:s});}
 function unpackWorldPurchaseLedger(raw){ok(typeof raw==='string'&&raw.length<=20000000,'接続保存が不正です。');const p=JSON.parse(raw);keys(p,['format','checksum','state']);ok(p.format===LINK_SCOPE&&p.checksum===fingerprint(p.state),'接続保存の整合性を確認できません。');validateWorldPurchaseLedger(p.state);return p.state;}
-return {LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
+return {LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,enableConstructionTransport,applyConstructionTransportCommand,enableConstructionTransportWork,saveConstructionTransportWork,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
 }

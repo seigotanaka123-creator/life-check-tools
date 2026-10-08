@@ -23,9 +23,23 @@ function keys(value, expected) {
   requireValue(object(value) && Object.keys(value).sort().join('|') === [...expected].sort().join('|'), '保存データの項目が不正です。');
 }
 function id(value) { return typeof value === 'string' && /^[a-zA-Z0-9_-]{1,96}$/.test(value); }
+// Only escaped property NAMES are retained, never mutable save data or a
+// validation result. A fixed count/length cap prevents arbitrary imported
+// keys from retaining an unbounded amount of memory.
+const canonicalKeyText = new Map();
+function quotedCanonicalKey(key) {
+  let text = canonicalKeyText.get(key);
+  if (text !== undefined) return text;
+  text = JSON.stringify(key);
+  if (key.length <= 64 && canonicalKeyText.size < 256) canonicalKeyText.set(key, text);
+  return text;
+}
 export function canonical(value) {
+  // JSON's finite-number spelling is the ordinary number-to-string spelling,
+  // including -0 -> 0. Keep JSON.stringify for non-finite and other values.
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
   if (Array.isArray(value)) return '[' + value.map(canonical).join(',') + ']';
-  if (object(value)) return '{' + Object.keys(value).sort().map(k => JSON.stringify(k) + ':' + canonical(value[k])).join(',') + '}';
+  if (object(value)) return '{' + Object.keys(value).sort().map(k => quotedCanonicalKey(k) + ':' + canonical(value[k])).join(',') + '}';
   return JSON.stringify(value);
 }
 // Accidental-corruption check, NOT an authentication/signature or anti-cheat mechanism.

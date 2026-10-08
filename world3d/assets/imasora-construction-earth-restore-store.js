@@ -18,6 +18,7 @@ export function validateEarthRestoreBefore(current,before){
 }
 export function createEarthRestoreLedger(current,candidate){
   L.validateWorldPurchaseLedger(current);
+  check(current.world.constructionTransport===undefined,'共有土の地形だけを復元できません。荷台・手元・移送中の土も一緒に確認してください。');
   check(!current.pending&&!current.world.equipmentCraftPending,'保留中の購入・装備作成を先に確認してください。');
   const next=structuredClone(current);
   next.world.constructionExcavation=restoreAuthorityEarth(current.world.constructionExcavation,candidate);

@@ -11,11 +11,16 @@ import {isResettableBuilding} from './assets/imasora-world-map-reset-store.js?v=
 import {createLookControls} from './assets/imasora-world-look-controls.js?v=492';
 import * as THREE from "./assets/three.module.min.js";
 import {observeWorldCanvasSize} from './assets/imasora-world-canvas-size.js?v=490';
+import {createWorldTransportPlayController} from './assets/imasora-construction-transport-play-view.mjs';
+import {openSavedTransportWork} from './assets/imasora-construction-transport-runtime.mjs';
+import {createTransportMigrationView} from './assets/imasora-construction-transport-migration-view.mjs';
+import {createWorldTransportSceneBridge} from './assets/imasora-construction-transport-site-view.mjs';
+import {createTransportSceneReadStore} from './assets/imasora-construction-transport-site.mjs';
 import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=119bp';
 import {ExcavationAuthoritySession,excavationAuthorityPreview} from './assets/imasora-construction-earth-session.js?v=501';
 import {ExcavationLedgerSession,excavationLedgerPreview} from './assets/imasora-construction-excavation-session.js?v=493';
 import {createUfoFlightSurveyView} from './assets/imasora-ufo-flight-survey.js?v=464';
-import {WorldSaveService,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=120e';
+import {WorldSaveService,WorldAuthorityStore,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=120e';
 import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=119bp';
 import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=119bp';
 import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=119bp';
@@ -56,7 +61,7 @@ const MATERIAL_GUIDE_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostn
 const SAVE_KEY = MATERIAL_GUIDE_PREVIEW ? 'imasora-material-guide-preview-v440' : "imasora-world-foundation-v3";
 const WORLD_SHOP_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname) && new URLSearchParams(location.search).get('worldShopPreview') === '1';
 let worldSaveService=null,worldShopOverlay=null,worldSaveErrorUI=null,worldBooted=false;
-let worldPlayerUI=null;
+let worldPlayerUI=null,transportMigrationUI=null;
 let worldMapMenu=null,mapMenuLoading=false,mapMenuReadError='',mapResetPoint=null,mapResetPending=null,mapMovePreviewGroup=null;
 const CONSTRUCTION_WATER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionWaterPreview')==='1';
 const CONSTRUCTION_WATER_PRACTICE=CONSTRUCTION_WATER_PREVIEW&&new URLSearchParams(location.search).get('constructionWaterPractice')==='1';
@@ -72,7 +77,10 @@ const CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW=!CONSTRUCTION_EXCAVATION_AUTHORITY_
 const CONSTRUCTION_EXCAVATION_PREVIEW=CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW||CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW||(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionExcavationPreview')==='1');
 let excavationLedgerSession=null;
 const CONSTRUCTION_EXCAVATION_LIVE=!CONSTRUCTION_EXCAVATION_PREVIEW&&worldSaveMode(location.search,location.hostname)==='live';
-const CONSTRUCTION_EXCAVATION_SAVED=CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE;
+const CONSTRUCTION_TRANSPORT_SCENE_PREVIEW=location.hostname==='127.0.0.1'&&location.port==='9079'&&new URLSearchParams(location.search).get('constructionTransportScenePreview')==='1';
+const CONSTRUCTION_TRANSPORT_PLAY_PREVIEW=location.hostname==='127.0.0.1'&&['9081','9083','9084','9085','9087','9089','9091','9093','9095'].includes(location.port)&&new URLSearchParams(location.search).get('constructionTransportPlayPreview')==='1';
+let transportPlaySession=null;
+const CONSTRUCTION_EXCAVATION_SAVED=!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW&&(CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE);
 let worldExcavationController=null;
 const CONSTRUCTION_DELIVERY_PREVIEW=WORLD_SHOP_PREVIEW && new URLSearchParams(location.search).get('constructionDeliveryPreview')==='1';
 let constructionDeliveryMenu=null,constructionDeliveryDock=null,constructionDeliveryCollider=null,constructionDeliverySite=-1;
@@ -25791,7 +25799,9 @@ function setupScene() {
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
     }});
-  if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,persistence:excavationLedgerSession,
+  if(transportPlaySession)worldExcavationController=createWorldTransportPlayController({service:worldSaveService,session:transportPlaySession,resumeAtSavedPose:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW,verification:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&new URLSearchParams(location.search).get('transportVerification')==='1',state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
+  else if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldExcavationController=createWorldTransportSceneBridge({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
+  else if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,persistence:excavationLedgerSession,
     onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE){const createConcrete=CONSTRUCTION_CONCRETE_PREVIEW?createWorldConcreteController:createLiveConcreteController;worldConcreteController=createConcrete({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},onLayoutChange:()=>rebuildMap(),onError:error=>worldSaveErrorUI?.show(error)});}
   rebuildMap();
@@ -25819,9 +25829,9 @@ function setupScene() {
     if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
     els.saveState.textContent=CONSTRUCTION_TIMBER_PRACTICE?'火星木材クレーンの貸出練習（保存しません）':'火星木材クレーンの本体接続確認';
   }
-  if(CONSTRUCTION_EXCAVATION_PREVIEW){
-    const p=worldExcavationController.previewSpawn();if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
-    els.saveState.textContent=CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'世界と掘削の同時保存確認（試験用金貨12枚・通常保存は保護）':CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW?'掘削の保存接続確認（通常セーブは保護）':'ショベルカー本体接続の練習（保存しません）';
+  if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_TRANSPORT_PLAY_PREVIEW){
+    const p=worldExcavationController.previewSpawn();if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?p.y:0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
+    els.saveState.textContent=CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?'保存した現場':CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'世界と掘削の同時保存確認（試験用金貨12枚・通常保存は保護）':CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW?'掘削の保存接続確認（通常セーブは保護）':'ショベルカー本体接続の練習（保存しません）';
   }
   if ((MARS_SHOPKEEPER_PREVIEW || WORLD_SHOP_PREVIEW) && marsShopkeeper) {
     const shop=marsShopkeeper.parent;
@@ -25872,7 +25882,7 @@ function frame() {
   const delta = Math.min(.05, clock.getDelta());
   els.resetButton.disabled=!!mapMenuUnavailableReason();
   updateBuildPlacementControls();
-  if(worldPlayerUI?.open||worldMapMenu?.paused||mapResetPending){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
+  if(worldPlayerUI?.open||transportMigrationUI?.open||worldMapMenu?.paused||mapResetPending){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
   if(worldShopOverlay?.open||worldSaveService?.blocked||worldSaveService?.crafting){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
   if(worldConcreteController?.update(delta)){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
   updateConstructionDelivery();
@@ -26124,36 +26134,55 @@ function wireUI() {
   setupUfoFlightPad();
 }
 
+async function prepareSavedConstruction() {
+  if(!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW&&(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)){
+    transportPlaySession=await openSavedTransportWork({service:worldSaveService,snapshot:worldStateSnapshot,session:transportPlaySession});
+    if(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!transportPlaySession)throw Error('確認ページで専用データを用意してください。');
+  }
+  if(CONSTRUCTION_EXCAVATION_SAVED&&!transportPlaySession){excavationLedgerSession??=new ExcavationAuthoritySession({service:worldSaveService,origin:location.origin,snapshot:worldStateSnapshot});excavationLedgerSession.initialize();}
+}
 async function startSavedWorld() {
   // Preview modes keep their own storage boundary. Live excavation uses the
   // normal world authority only after native acquisition at the construction site.
-  const mode=CONSTRUCTION_CONCRETE_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
+  const mode=CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?'live':CONSTRUCTION_CONCRETE_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
   worldSaveErrorUI=createWorldSaveErrorUI({retry:async()=>{
-    if(CONSTRUCTION_EXCAVATION_SAVED&&excavationLedgerSession?.pending){if(!await excavationLedgerSession.retry())throw Error(excavationLedgerSession.message);}
+    if(transportPlaySession?.intent)await transportPlaySession.retry();
+    else if(CONSTRUCTION_EXCAVATION_SAVED&&excavationLedgerSession?.pending){if(!await excavationLedgerSession.retry())throw Error(excavationLedgerSession.message);}
     else await worldSaveService.retry();
     if(mapResetPending)await finishMapResetOperation();
     if(worldMapMenu?.paused)worldMapMenu.recovered();
     worldMapMenu?.update();
     if(CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW&&!worldBooted){excavationLedgerSession??=new ExcavationLedgerSession();await excavationLedgerSession.initialize(worldSaveService.world);}
-    if(CONSTRUCTION_EXCAVATION_SAVED&&!worldBooted){excavationLedgerSession??=new ExcavationAuthoritySession({service:worldSaveService,origin:location.origin,snapshot:worldStateSnapshot});excavationLedgerSession.initialize();}
+    if(!worldBooted)await prepareSavedConstruction();
     if(!worldBooted)activateSavedWorld(worldSaveService.world);
     else{Object.assign(state.ufoEquipment,worldSaveService.world.ufoEquipment);Object.assign(state.ufoResources,worldSaveService.world.ufoResources);refreshUfoEquipmentVisuals();renderUfoEquipmentWorkshopMenu();}
   },exportRecord:()=>worldSaveService.exportRecovery()});
   worldSaveService=new WorldSaveService({mode,guardedDrafts:true,
-    ...(CONSTRUCTION_CONCRETE_PREVIEW?{store:new ConstructionProfileProjectPreviewStore(),constructionProjectPreview:true}:CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?{store:new ExcavationAuthorityStore(),excavationPreview:true,excavationOrigin:location.origin}:CONSTRUCTION_EXCAVATION_LIVE?{excavationLive:true,excavationOrigin:location.origin}:{}),readLegacy:()=>CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK?null:localStorage.getItem(SAVE_KEY),
-    materialsIO:mode==='live'?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
-    onError:error=>worldSaveErrorUI.show(error),
+    ...(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?{store:new WorldAuthorityStore('live'),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{store:createTransportSceneReadStore(new WorldAuthorityStore('live')),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_CONCRETE_PREVIEW?{store:new ConstructionProfileProjectPreviewStore(),constructionProjectPreview:true}:CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?{store:new ExcavationAuthorityStore(),excavationPreview:true,excavationOrigin:location.origin}:CONSTRUCTION_EXCAVATION_LIVE?{excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:{}),readLegacy:()=>CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK?null:localStorage.getItem(SAVE_KEY),
+    materialsIO:mode==='live'&&!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
+    onError:error=>{if(!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!transportMigrationUI?.open)worldSaveErrorUI.show(error);},
     onChange:s=>{state.saved=!s.busy&&!s.blocked;els.saveState.textContent=s.blocked?'保存の確認が必要':s.busy?'保存中…':mode==='integration'?'保存済み（接続確認専用）':'保存済み';constructionDeliveryMenu?.refresh();},
   });
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK){state.map='construction';state.position.set(632,0,1570);}
   const saved=await worldSaveService.initialize(worldStateSnapshot());
+  // The dedicated scene bridge reads and validates the normal-format packet,
+  // then uses existing readonly UI guards. Its store also rejects every commit.
+  if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldSaveService.mode='readonly';
+  // Older shared-soil records cannot boot an actor-aware controller. Offer an
+  // explicit, checked migration before scene ownership; never fabricate actors
+  // for already moved version1 soil or silently replace the source.
+  if(CONSTRUCTION_EXCAVATION_LIVE&&worldSaveService.constructionTransport?.version===1){
+    transportMigrationUI=createTransportMigrationView({service:worldSaveService,startup:true,clearInput:clearMarsShopDialogInput});
+    await transportMigrationUI.show();return;
+  }
+  await prepareSavedConstruction();
   if(CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW){excavationLedgerSession=new ExcavationLedgerSession();await excavationLedgerSession.initialize(saved);}
-  if(CONSTRUCTION_EXCAVATION_SAVED){excavationLedgerSession=new ExcavationAuthoritySession({service:worldSaveService,origin:location.origin,snapshot:worldStateSnapshot});excavationLedgerSession.initialize();}
   activateSavedWorld(saved);
 }
 function activateSavedWorld(saved) {
   if(worldBooted)return;const mode=worldSaveService.mode;worldBooted=true;
   loadState(saved);
+  if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_TRANSPORT_PLAY_PREVIEW)state.map='construction';
   worldShopOverlay=createWorldShopOverlay({service:worldSaveService,onOpen:clearMarsShopDialogInput,
     onClose:world=>{Object.assign(state.ufoResources,world.ufoResources);clearMarsShopDialogInput();updateMapReadout();},onError:error=>worldSaveErrorUI.show(error)});
   constructionDeliveryMenu=createConstructionDeliveryMenu({service:worldSaveService,context:constructionDeliveryContext,snapshot:worldStateSnapshot,onOpen:clearMarsShopDialogInput,onClose:clearMarsShopDialogInput});
@@ -26162,11 +26191,18 @@ function activateSavedWorld(saved) {
     move:(context,targetId,position)=>commitMapResetOperation('move',context,targetId,position),canMove:worldMapBuildingMoveCheck,onMovePreview:updateWorldMapBuildingMovePreview,undo:context=>commitMapResetOperation('undo',context),
     onPause:clearMarsShopDialogInput,onResume:clearMarsShopDialogInput,onChange:syncWorldMapMenuPause});
   worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput});
+  if(CONSTRUCTION_EXCAVATION_LIVE&&worldSaveService.world.constructionExcavation&&!worldSaveService.constructionTransport){
+    transportMigrationUI=createTransportMigrationView({service:worldSaveService,clearInput:clearMarsShopDialogInput,beforeCompare:async()=>{
+      if([worldExcavationController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.active||c?.dirty))throw Error('いまの作業を保存して終了してから引き継いでください。');
+      await worldSaveService.saveWorld(worldStateSnapshot());
+    }});
+    const migrate=document.createElement('button');migrate.type='button';migrate.textContent='保存して新しい現場操作へ';migrate.onclick=()=>void transportMigrationUI.show();document.querySelector('[data-player-tools]').append(migrate);
+  }
   wireUI();renderUfoEquipmentDevelopmentTestPanel();setupScene();
   if(mode==='live'){
     const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている古い開発画面は再読み込みしてから遊んでください。旧保存は保護して残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
     window.addEventListener('storage',event=>{if(event.key===SAVE_KEY)notice.textContent='古い画面が旧保存を更新しました。現在の金貨・建築は上書きされません。古い画面を再読み込みしてください。';});
   }
-  window.addEventListener('beforeunload',event=>{if(mapResetPending||worldSaveService.busy||worldSaveService.blocked||(worldSaveService.mode!=='readonly'&&((worldWaterController?.active&&worldWaterController.dirty)||(worldSoilController?.active&&worldSoilController.dirty)||worldTimberController?.dirty))){event.preventDefault();event.returnValue='';}});
+  window.addEventListener('beforeunload',event=>{if(mapResetPending||worldSaveService.busy||worldSaveService.blocked||(transportPlaySession&&worldExcavationController?.active&&worldExcavationController.dirty)||(worldSaveService.mode!=='readonly'&&((worldWaterController?.active&&worldWaterController.dirty)||(worldSoilController?.active&&worldSoilController.dirty)||worldTimberController?.dirty))){event.preventDefault();event.returnValue='';}});
 }
 startSavedWorld().catch(error=>{els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});

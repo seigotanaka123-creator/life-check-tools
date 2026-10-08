@@ -9,7 +9,7 @@ import {FOUNDATION_WORK_OFFSET} from './free-foundation-work-scaffold.mjs';
 const error=()=>Error('土台の地面・通路・対象が変わりました。確認し直してください。');
 export function foundationActionFromPlan(plan){if(plan.kind!=='preparation'||plan.deckY===null)throw Error(plan.issue);return{mask:plan.mask,deckY:plan.deckY,bottoms:plan.supports.map(p=>p.bottom)};}
 export function assertFoundationEnvironment(p,a,{heightAt=()=>null,blockedAt=()=>true,foot=null}={}){
- if(!FOUNDATION_ACTIONS.has(a.type))throw error();const f=p.freeBuild,s=a.type==='FREE_FOUNDATION_BUILD'?{...foundationActionFromPlan(inspectFormGround(f,a.mask,2,heightAt,blockedAt)),x:f.location.x,z:f.location.z}:p.foundation;
+ if(!FOUNDATION_ACTIONS.has(a.type))throw error();const f=p.freeBuild,s=a.type==='FREE_FOUNDATION_BUILD'?{...foundationActionFromPlan(inspectFormGround(f,a.mask,2,heightAt,blockedAt,a.deckY)),x:f.location.x,z:f.location.z}:p.foundation;
  if(!s||s.x!==f.location.x||s.z!==f.location.z)throw error();
  assertFoundationClear(p,s);
  if(!foot||!Number.isFinite(foot.x+foot.y+foot.z)||foundationContains(s,foot.x,foot.z,14))throw Error('土台の外へ移動してから設置・回収してください。');

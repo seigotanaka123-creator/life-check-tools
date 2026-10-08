@@ -18374,7 +18374,7 @@ function ufoArcadeDailyMessage(game, status = getUfoArcadeDailyStatus(game)) {
   if (status.unavailable) return "本日の獲得記録を確認できません。保存設定を確認してから開き直してください。";
   if (game === "pachicoin") return status.reached
     ? "本日の景品交換は上限5回（整備パーツ10個）に達しました。明日また交換できます。"
-    : `350枚で整備パーツ2個。本日の交換：${status.used}/5回（日本時間0時にリセット）`;
+    : `350枚で整備パーツ2個＋建築セット3箱。本日の交換：${status.used}/5回（日本時間0時にリセット）`;
   const condition = game === "catcher" ? "景品1体キャッチで整備パーツ1個" : "勝利で整備パーツ1個（完走のみは0個）";
   return status.reached
     ? "本日の整備パーツは上限3個を獲得しました。ゲームは続けて遊べます。明日また獲得できます。"
@@ -45568,6 +45568,7 @@ function selectTownFacility(id) {
 }
 function openTownWorkshopFromMap() {
   setTownAmbientBgmArea("workshop");
+  renderTownWorkshop();
   document.getElementById("townWorkshop")?.scrollIntoView({ behavior: "smooth", block: "start" });
   playSfx("select");
 }
@@ -49913,7 +49914,7 @@ function renderTownWorkshop() {
       }
       void exportConstructionPackTrial(targetProfileId);
     });
-    transferForm.querySelectorAll("[data-pack-transfer-download]").forEach(button => button.addEventListener("click", () => {
+    document.querySelectorAll("#townWorkshop [data-pack-transfer-download]").forEach(button => button.addEventListener("click", () => {
       const receipt = window.ImasoraConstructionPackLedger.normalize(state.constructionMaterialLedger).transferReceipts
         .find(item => item.id === button.dataset.packTransferDownload);
       if (!receipt) { toast("移送ファイルの保存記録を確認できません。"); return; }
@@ -52953,8 +52954,11 @@ function renderBattleStage(profile, lifeRemain = 1) {
   const readyMatchLabel = readyMatchIndex >= readyTotal - 1 ? "決勝" : "予選";
   const readyOpponent = readyCup ? tournamentOpponentForMatch(readyCup, readyMatchIndex, readyTotal, readyPlayerName) : null;
   const readyEnemyName = readyOpponent?.name || (readyCup ? tournamentEnemyMonsterName(readyCup, readyPlayerName) : "大会相手");
-  const readyPlayerStats = state.pendingBattle.battleStats || monsterStats();
-  const readyEnemyStats = readyCup ? enemyStatsForTournamentMatch(readyCup, readyMatchIndex) : null;
+  const readyStrategy = state.pendingBattle.strategy || state.battleStrategy || "balanced";
+  const readyBaseStats = state.pendingBattle.battleStats || tournamentBattleBaseStats(monsterStats(), readyStrategy, state.itemEffects.battle);
+  const readyPlayerStats = tournamentBattleActiveStats(readyBaseStats, readyStrategy, readyMatchIndex >= readyTotal - 1);
+  const readyEnemyBaseStats = readyCup ? enemyStatsForTournamentMatch(readyCup, readyMatchIndex) : null;
+  const readyEnemyStats = readyEnemyBaseStats ? { ...readyEnemyBaseStats, hp: tournamentBattleEnemyHp(readyPlayerStats, readyEnemyBaseStats) } : null;
   const readyAffinityStats = tournamentOpeningPlayerAffinityStats(readyPlayerStats, profile);
   field.innerHTML = `
     <div class="battle-hud">
@@ -52968,6 +52972,7 @@ function renderBattleStage(profile, lifeRemain = 1) {
     <div class="fighter opening-fighter enemy" id="enemyFighter">${readyCup ? tournamentEnemyOpeningFighterHtml(readyCup, readyOpponent || readyEnemyName, readyEnemyStats) : readyEnemyName}</div>
     <div class="battle-flash"></div>
   `;
+  log.innerHTML = `<strong>${readyCup.name} ${readyMatchLabel}・試合前</strong><p>${readyEnemyName}との対戦です。「${readyMatchLabel}試合を観戦する」で試合を始めます。</p>`;
 }
 function retirementMessage(profile) {
   return `<strong>引退準備</strong>
@@ -55257,6 +55262,22 @@ function battleSoraDamaAffinityNote(player, enemy) {
     return enemy.stage === player.stage ? "相手のソラタマ特性で少し有利" : "相手のソラタマ特性で少し不利";
   }
   return "";
+}
+function tournamentBattleBaseStats(stats, strategy, itemEffects = {}) {
+  const prepared = { ...stats };
+  if (strategy === "rush") prepared.spd += 2;
+  if (strategy === "guard") { prepared.def += 2; prepared.hp += 2; }
+  if (strategy === "focus") { prepared.acc += 2; prepared.mp += 2; }
+  if (strategy === "read") { prepared.acc += 1; prepared.eva += 2; }
+  prepared.acc += Number(itemEffects.acc || 0);
+  prepared.def += Number(itemEffects.def || 0);
+  prepared.spd += Number(itemEffects.spd || 0);
+  return prepared;
+}
+function tournamentBattleActiveStats(baseStats, strategy, finalMatch) {
+  const active = { ...baseStats };
+  if (strategy === "reserve") active.mp = finalMatch ? active.mp + 3 : Math.max(0, active.mp - 1);
+  return active;
 }
 function tournamentBattleEnemyHp(stats, enemyStats) {
   return Math.max(enemyStats.hp, Math.round(stats.hp * .92 + enemyStats.hp * .35));
@@ -58160,16 +58181,8 @@ function battle() {
   let battleStats = state.pendingBattle.battleStats;
   let battleItemNote = state.pendingBattle.battleItemNote || "";
   if (!battleStats) {
-    const stats = monsterStats();
-    battleStats = { ...stats };
-    if (strategy === "rush") battleStats.spd += 2;
-    if (strategy === "guard") { battleStats.def += 2; battleStats.hp += 2; }
-    if (strategy === "focus") { battleStats.acc += 2; battleStats.mp += 2; }
-    if (strategy === "read") { battleStats.acc += 1; battleStats.eva += 2; }
     const battleItemEffects = { ...(state.itemEffects.battle || {}) };
-    battleStats.acc += Number(battleItemEffects.acc || 0);
-    battleStats.def += Number(battleItemEffects.def || 0);
-    battleStats.spd += Number(battleItemEffects.spd || 0);
+    battleStats = tournamentBattleBaseStats(monsterStats(), strategy, battleItemEffects);
     battleItemNote = battleItemEffects.acc || battleItemEffects.def || battleItemEffects.spd ? ` / アイテム補助 命中+${battleItemEffects.acc || 0} 防御+${battleItemEffects.def || 0} 速+${battleItemEffects.spd || 0}` : "";
     state.itemEffects.battle = {};
     state.pendingBattle.battleStats = battleStats;
@@ -58178,14 +58191,7 @@ function battle() {
   const total = tournamentMatchCount(cup);
   const currentMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), total - 1));
   const isFinalMatch = currentMatchIndex >= total - 1;
-  const activeBattleStats = { ...battleStats };
-  if (strategy === "reserve") {
-    if (isFinalMatch) {
-      activeBattleStats.mp += 3;
-    } else {
-      activeBattleStats.mp = Math.max(0, activeBattleStats.mp - 1);
-    }
-  }
+  const activeBattleStats = tournamentBattleActiveStats(battleStats, strategy, isFinalMatch);
   const playerDisplayName = tournamentPlayerDisplayName(profile);
   const opponent = tournamentOpponentForMatch(cup, currentMatchIndex, total, playerDisplayName);
   const match = applyTournamentOpponentToMatch(simulateTournamentMatch(activeBattleStats, cup, currentMatchIndex, total, opponent), opponent);
@@ -58256,7 +58262,7 @@ function battle() {
     }
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦を勝ち抜き。${allMatches.length}試合 / 最終${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote} / Coin +${cup.reward}`);
     if (openedWhiteSeed) pendingBattleLogMessages.push("グランドチャンピオン杯優勝賞品として、白のタネを授与された。");
-    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。参加人数不足やシードなしで、公式大会を安定して運営できます。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}${constructionRewardText ? `<br>${constructionRewardText}` : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
+    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。優勝おめでとう！ メダルと賞品を受け取りましょう。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}${constructionRewardText ? `<br>${constructionRewardText}` : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
     pendingBattleReward = {
       mark: openedWhiteSeed ? "白" : cup.medal,
       title: openedWhiteSeed ? "白のタネ獲得" : `${cup.name}メダル獲得`,
@@ -58272,7 +58278,7 @@ function battle() {
     pendingBattleResultHomeAction = true;
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦で敗退。第${currentMatchIndex + 1}試合 / ${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦`);
-    pendingBattleResultHtml = `<strong>${cup.name} 敗退 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は第${currentMatchIndex + 1}試合で敗退しました。公式大会は参加人数不足やシードなしでいつでも挑戦できます。</p>${tournamentMatchesHtml(allMatches, cup)}`;
+    pendingBattleResultHtml = `<strong>${cup.name} 敗退 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は第${currentMatchIndex + 1}試合で敗退しました。相棒を育て、作戦を変えてまた挑戦しましょう。</p>${tournamentMatchesHtml(allMatches, cup)}`;
     state.pendingBattle = null;
   }
   saveState();
@@ -58383,6 +58389,7 @@ function switchScreen(screen, townArea = "map") {
     preloadKaraokeVisualAssets();
     warmKaraokeTextCaches();
     if (!townVisualRenderedOnce) renderTown();
+    else renderTownWorkshop();
   }
   if (screen === "landMap") {
     window.ImasoraLandMap?.mount({
@@ -58521,10 +58528,6 @@ setInterval(refreshPlaytimeSensitiveViews, 60000);
 </script>
 </body>
 </html>
-
-
-
-
 
 
 

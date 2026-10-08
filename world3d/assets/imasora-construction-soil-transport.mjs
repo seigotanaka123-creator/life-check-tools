@@ -15,13 +15,14 @@ const object=v=>v!==null&&typeof v==='object'&&!Array.isArray(v)&&Object.getProt
 const keys=(v,names)=>check(object(v)&&Object.keys(v).sort().join('|')===[...names].sort().join('|'),'保存の項目が一致しません。');
 const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER-1)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,96}$/.test(v);
-function json(v,depth=0,seen=new Set()){
+function json(v,depth=0,seen=new Set(),immutability=null){
  check(depth<=32,'保存の階層が深すぎます。');if(v===null||typeof v==='string'||typeof v==='boolean')return;
  if(typeof v==='number'){check(Number.isFinite(v),'保存できない数値です。');return;}
  check(Array.isArray(v)||object(v),'保存できない型です。');check(!seen.has(v),'循環した保存です。');seen.add(v);
+ if(immutability&&(!Object.isFrozen(v)||Array.isArray(v)&&Object.getPrototypeOf(v)!==Array.prototype))immutability.frozen=false;
  const names=Object.keys(v);if(Array.isArray(v))check(names.length===v.length&&names.every((n,i)=>n===String(i)),'配列に欠けた要素があります。');
  check(Reflect.ownKeys(v).length===names.length+(Array.isArray(v)?1:0),'保存できない属性です。');
- for(const n of names){const d=Object.getOwnPropertyDescriptor(v,n);check(Object.hasOwn(d,'value'),'動的な属性です。');json(d.value,depth+1,seen);}seen.delete(v);
+ for(const n of names){const d=Object.getOwnPropertyDescriptor(v,n);check(Object.hasOwn(d,'value'),'動的な属性です。');json(d.value,depth+1,seen,immutability);}seen.delete(v);
 }
 function position(p,scale=1){check(Array.isArray(p)&&p.length===3&&integer(p[0],-640/scale,639/scale)&&integer(p[1],-80/scale,255/scale)&&integer(p[2],-640/scale,639/scale),'土の座標が範囲外です。');}
 function address(p){position(p);const cell=p.map(n=>Math.floor(n/4)),l=p.map(n=>(n%4+4)%4);return{key:cell.join(','),bit:1n<<BigInt(l[0]+4*l[1]+16*l[2])};}
@@ -60,8 +61,21 @@ function remove(s,from,m,amount,p){if(from==='terrain')for(const q of p){check(s
 function apply(s,c){
  check(s.revision<Number.MAX_SAFE_INTEGER-2&&s.journal.length<SOIL_LIMITS.history,'作業履歴が上限です。土を保持して止めます。');
  check(id(c.id)&&integer(c.expectedRevision)&&c.expectedRevision===s.revision,'別の作業で更新されています。保存を読み直してください。');
- if(c.type==='reserve'||c.type==='reserve-loose'){
-  const loose=c.type==='reserve-loose';keys(c,['type','id','expectedRevision','transferId','from','to','materialId','amount','positions',...(loose?['looseId']:[])]);check(!s.pending,'進行中の土の移送を終えてください。');check(id(c.transferId)&&!s.journal.some(q=>['reserve','reserve-loose'].includes(q.type)&&q.transferId===c.transferId),'移送番号が重複しています。');
+ if(c.type==='reserve-batch'){
+  keys(c,['type','id','expectedRevision','transferId','to','materialId','segments']);
+  check(s.schema===2&&!s.pending&&c.to==='bucket'&&id(c.transferId),'共有地形から空きのあるバケットへの予約が必要です。');
+  check(!s.journal.some(q=>['reserve','reserve-loose','reserve-batch'].includes(q.type)&&q.transferId===c.transferId),'移送番号が重複しています。');
+  material(s,c.materialId);check(Array.isArray(c.segments)&&c.segments.length>=1&&c.segments.length<=SOIL_LIMITS.transfer,'取り元の数が不正です。');
+  const seen=new Set();let requested=0;
+  for(const q of c.segments){const loose=q.from==='loose';keys(q,['from','positions',...(loose?['looseId']:[])]);check(loose||q.from==='terrain','地面か盛土だけを回収できます。');check(Array.isArray(q.positions)&&q.positions.length>0,'回収する範囲が空です。');requested+=q.positions.length;check(requested<=SOIL_LIMITS.transfer,'回収量が上限を超えています。');
+   if(loose){check(id(q.looseId),'盛土の番号が不正です。');loosePositions(q.positions,q.positions.length);}else positions(q.positions,q.positions.length);
+   for(const p of q.positions){const key=q.from+':'+(q.looseId??'')+':'+p.join(',');check(!seen.has(key),'同じ土を二重に扱えません。');seen.add(key);check((loose?soilLooseVoxel(s,q.looseId,p):soilVoxel(s,p))===c.materialId,'回収する土が一致しません。');}
+  }
+  check(integer(requested,1,SOIL_LIMITS.transfer),'回収量が上限を超えています。');const amount=Math.min(requested,room(s,c.to,c.materialId));check(amount>0,'バケットがいっぱいです。');
+  const segments=[];let rest=amount;for(const q of c.segments){if(!rest)break;const p=copy(q.positions.slice(0,rest)),part={...q,positions:p};segments.push(part);rest-=p.length;if(q.from==='loose')changeLoose(s,q.looseId,p,c.materialId,false);else remove(s,'terrain',c.materialId,p.length,p);}
+  s.pending={id:c.transferId,phase:'reserved',from:'batch',to:c.to,materialId:c.materialId,amount,positions:[],segments};
+ }else if(c.type==='reserve'||c.type==='reserve-loose'){
+  const loose=c.type==='reserve-loose';keys(c,['type','id','expectedRevision','transferId','from','to','materialId','amount','positions',...(loose?['looseId']:[])]);check(!s.pending,'進行中の土の移送を終えてください。');check(id(c.transferId)&&!s.journal.some(q=>['reserve','reserve-loose','reserve-batch'].includes(q.type)&&q.transferId===c.transferId),'移送番号が重複しています。');
   if(loose){check(s.schema===2&&c.from==='loose'&&id(c.looseId)&&owners.includes(c.to),'盛土は現行の引継ぎから容器へ回収してください。');loosePositions(c.positions,c.amount);}
   else owner(c.from);owner(c.to);material(s,c.materialId);check(c.from!==c.to&&integer(c.amount,1,SOIL_LIMITS.transfer),'移動先または量が不正です。');
   const touches=c.from==='terrain'||c.to==='terrain';if(touches)positions(c.positions,c.amount);else if(!loose)check(Array.isArray(c.positions)&&!c.positions.length,'不要な地形の編集指定です。');
@@ -77,7 +91,7 @@ function apply(s,c){
   const p=s.pending;check(p&&c.transferId===p.id,'移送途中の土が見つかりません。');
   if(c.type==='release'){check(p.phase==='reserved','すでに土を放しています。');p.phase='in-flight';}
   else if(c.type==='complete'){check(p.phase==='in-flight','放した土だけを受け取れます。');add(s,p.to,p.materialId,p.amount,p.to==='terrain'?p.positions:[]);s.pending=null;}
-  else if(c.type==='cancel'){check(p.phase==='reserved','放した土は元へ戻せません。落ちた地面へ残してください。');if(p.from==='loose')changeLoose(s,p.looseId,p.positions,p.materialId,true);else add(s,p.from,p.materialId,p.amount,p.from==='terrain'?p.positions:[]);s.pending=null;}
+  else if(c.type==='cancel'){check(p.phase==='reserved','放した土は元へ戻せません。落ちた地面へ残してください。');if(p.from==='batch'){for(const q of p.segments)if(q.from==='loose')changeLoose(s,q.looseId,q.positions,p.materialId,true);else add(s,'terrain',p.materialId,q.positions.length,q.positions);}else if(p.from==='loose')changeLoose(s,p.looseId,p.positions,p.materialId,true);else add(s,p.from,p.materialId,p.amount,p.from==='terrain'?p.positions:[]);s.pending=null;}
   else if(land){check(p.phase==='in-flight','落下途中の土だけを地面へ残せます。');positions(c.positions,p.amount);add(s,'terrain',p.materialId,p.amount,c.positions);s.pending=null;}
   else throw Error('土の移送：未対応の操作です。');
  }
@@ -91,15 +105,47 @@ export function soilTransportTotals(s){const result=Object.fromEntries(s.site.ma
  if(s.pending)result[s.pending.materialId].inFlight=s.pending.amount;
  for(const r of Object.values(result))r.total=r.terrain+(r.loose??0)+r.shovel+r.bucket+r.dump+r.storage+r.inFlight;return result;
 }
-export function validateSoilTransport(s){
- json(s);keys(s,['format','schema','scope','site','initial','revision','blocks','containers','pending','journal',...(s.schema===2?['loose']:[])]);check((s.format===SOIL_TRANSPORT_FORMAT&&s.schema===1&&s.scope===SOIL_TRANSPORT_SCOPE)||(s.format===SOIL_NATIVE_TRANSPORT_FORMAT&&s.schema===2&&s.scope===SOIL_NATIVE_TRANSPORT_SCOPE),'旧掘削や通常保存はこの形式で読めません。');
+// Retain exact, checked values, never mutable state identities or a short
+// checksum. Mutable/unproved graphs pass descriptor checks before each lookup.
+// A changed external source, owner, voxel or journal requires a fresh replay.
+// Bound retained UTF-16 key storage as well as entry count on mobile browsers.
+const validatedSoilValues=new Map(),validationMemoLimit=8*1024*1024;
+// An identity is trusted only after every descendant has passed the ordinary
+// descriptor check AND is frozen. A frozen wrapper around mutable data never
+// qualifies. Weak references keep no retired scenes alive.
+const validatedFrozenSoils=new WeakSet();
+let validationMemoBytes=0;
+function rememberValidatedSoil(value){
+ const bytes=value.length*2;if(bytes>validationMemoLimit)return;
+ if(validatedSoilValues.has(value)){validationMemoBytes-=validatedSoilValues.get(value);validatedSoilValues.delete(value);}
+ while(validatedSoilValues.size>=4||validationMemoBytes+bytes>validationMemoLimit){const oldest=validatedSoilValues.keys().next().value;validationMemoBytes-=validatedSoilValues.get(oldest);validatedSoilValues.delete(oldest);}
+ validatedSoilValues.set(value,bytes);validationMemoBytes+=bytes;
+}
+function checkedSoilValue(s,immutability=null){
+ json(s,0,new Set(),immutability);keys(s,['format','schema','scope','site','initial','revision','blocks','containers','pending','journal',...(s.schema===2?['loose']:[])]);check((s.format===SOIL_TRANSPORT_FORMAT&&s.schema===1&&s.scope===SOIL_TRANSPORT_SCOPE)||(s.format===SOIL_NATIVE_TRANSPORT_FORMAT&&s.schema===2&&s.scope===SOIL_NATIVE_TRANSPORT_SCOPE),'旧掘削や通常保存はこの形式で読めません。');
  check(integer(s.revision)&&Array.isArray(s.journal)&&s.journal.length<=SOIL_LIMITS.history&&s.revision===s.journal.length,'保存番号と履歴が一致しません。');
+ const value=canonical(s);check(new TextEncoder().encode(value).length<=SOIL_LIMITS.bytes,'保存内容が大きすぎます。');
+ return value;
+}
+export function validateSoilTransport(s){
+ if(validatedFrozenSoils.has(s))return s;
+ const immutability={frozen:true},value=checkedSoilValue(s,immutability);
+ if(validatedSoilValues.has(value)){const bytes=validatedSoilValues.get(value);validatedSoilValues.delete(value);validatedSoilValues.set(value,bytes);if(immutability.frozen)validatedFrozenSoils.add(s);return s;}
  const replay=seedFor(s),initial=soilTransportTotals(replay),seen=new Set();for(const c of s.journal){check(object(c)&&id(c.id)&&!seen.has(c.id),'操作番号が重複しています。');seen.add(c.id);apply(replay,c);}
  check(canonical(projection(replay))===canonical(projection(s)),'地形・積荷・途中の土と移送履歴が一致しません。');
  const totals=soilTransportTotals(replay);for(const m of s.site.materials)check(totals[m].total===initial[m].total,'土の体積が一致しません。');
- check(new TextEncoder().encode(canonical(s)).length<=SOIL_LIMITS.bytes,'保存内容が大きすぎます。');return s;
+ rememberValidatedSoil(value);if(immutability.frozen)validatedFrozenSoils.add(s);return s;
 }
-export function soilTransportCommand(s,c){validateSoilTransport(s);json(c);const existing=s.journal.find(q=>q.id===c.id);if(existing){check(canonical(existing)===canonical(c),'同じ操作番号の内容が変わっています。');return s;}const n=apply(copy(s),c);return validateSoilTransport(n);}
+export function soilTransportCommand(s,c){
+ validateSoilTransport(s);json(c);const existing=s.journal.find(q=>q.id===c.id);if(existing){check(canonical(existing)===canonical(c),'同じ操作番号の内容が変わっています。');return s;}
+ // The prior state was fully validated and this private transition is the
+ // SAME reducer used during replay. Replaying its entire prefix once more
+ // cannot add evidence. Check shape/limits and conservation, then remember
+ // only the exact resulting value. External/new values still replay fully.
+ const n=apply(copy(s),c),value=checkedSoilValue(n),before=soilTransportTotals(s),after=soilTransportTotals(n);
+ for(const m of s.site.materials)check(after[m].total===before[m].total,'土の体積が一致しません。');
+ rememberValidatedSoil(value);return n;
+}
 export function validateSoilTransportContinuation(old,next){validateSoilTransport(old);validateSoilTransport(next);check(old.scope===next.scope&&old.format===next.format&&old.schema===next.schema&&canonical(old.site)===canonical(next.site)&&canonical(old.initial)===canonical(next.initial),'別の現場・初期地形へ切り替えられません。');check(next.journal.length>=old.journal.length&&old.journal.every((c,i)=>canonical(c)===canonical(next.journal[i])),'古い所有状態・一部だけの復元では土を複製するため戻せません。');return next;}
 function checksum(t){let h=2166136261;for(let i=0;i<t.length;i++)h=Math.imul(h^t.charCodeAt(i),16777619);return(h>>>0).toString(16).padStart(8,'0');}
 export function packSoilTransport(s){validateSoilTransport(s);return JSON.stringify({kind:s.format,version:s.schema,checksum:checksum(canonical(s)),state:s});}

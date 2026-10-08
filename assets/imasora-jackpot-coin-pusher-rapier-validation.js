@@ -2484,7 +2484,7 @@ const markup = `
       <p class="icp-prize-balance">もちコイン <strong data-icp-prize-balance>0</strong> 枚</p>
       <label class="icp-prize-card">
         <input type="radio" name="icp-prize" value="arcadeParts" data-icp-prize-select>
-        <span><strong>整備パーツ2個</strong><span>UFOの整備に使えるパーツ</span><b>もちコイン350枚と交換</b></span>
+        <span><strong>整備パーツ2個 ＋ 建築セット3箱</strong><span>UFOの整備と、工事現場の建築に使えます</span><b>もちコイン350枚と交換</b></span>
       </label>
       <p data-icp-prize-summary>景品を選んでください。</p>
       <p class="icp-prize-message" data-icp-prize-message role="status" aria-live="polite"></p>

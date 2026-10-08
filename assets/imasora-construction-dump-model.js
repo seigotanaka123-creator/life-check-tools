@@ -35,9 +35,10 @@ export function createDumpModel(){
  const ramBase=new THREE.Vector3(0,8,-15),ramTop=new THREE.Vector3();
  root.userData={wheels,steps,measurement,pilotSocket,roof,roofMat,bed,gate,cargo,ram,ramBase,ramTop,wheel};return root;
 }
-export function updateDumpModel(root,w,{roofTransparent=false}={}){
- const d=root.userData,v=w.rig.vehicle;root.position.set(v.x,0,v.z);root.rotation.y=v.heading;
- for(const a of d.wheels){a.pivot.rotation.y=v.steering*(a.front?1:-1);a.spin.rotation.x=v.wheelTravel/8.9;}
+export function orientDumpObject(object,axes){object.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(...axes.map(a=>new THREE.Vector3(...a))));}
+export function updateDumpModel(root,w,{roofTransparent=false,supportPose=null,wheelOffsets=null}={}){
+ const d=root.userData,v=w.rig.vehicle;if(supportPose){root.position.fromArray(supportPose.position);orientDumpObject(root,supportPose.axes);}else{root.position.set(v.x,0,v.z);root.rotation.set(0,v.heading,0);}
+ for(const [i,a] of d.wheels.entries()){a.pivot.position.y=8.9+(wheelOffsets?.[i]??0);a.pivot.rotation.y=v.steering*(a.front?1:-1);a.spin.rotation.x=v.wheelTravel/8.9;}
  for(const a of d.steps)a.visible=w.rig.mode!=='driving';
  if(d.roofMat.transparent!==roofTransparent){d.roofMat.transparent=roofTransparent;d.roofMat.needsUpdate=true;}d.roofMat.opacity=roofTransparent?.13:1;d.roofMat.depthWrite=!roofTransparent;d.roof.castShadow=!roofTransparent;
  d.bed.rotation.x=-w.bed;d.gate.rotation.x=w.bed+Math.min(1.45,w.bed*2);d.cargo.visible=w.load>0;d.cargo.scale.y=w.load/DUMP.capacity;d.cargo.position.y=1+4*w.load/DUMP.capacity;d.wheel.rotation.z=-v.steering*2.8;

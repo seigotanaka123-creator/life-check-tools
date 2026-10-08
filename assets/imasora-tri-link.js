@@ -747,7 +747,9 @@ class ImasoraTriLink3D {
     this.kickoffLaunchedAt = 0;
     this.kickoffEntryHistory = [];
     this.nextCenterBlackTurntableTelemetryAt = 0;
-    this.matchId = `tri-link-3d-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    this.matchSessionId = `tri-link-3d-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    this.matchSequence = 0;
+    this.matchId = this.matchSessionId;
     this.puck = { x: 0, z: 0, vx: 0, vz: 0, visible: true, lastHitAt: -10, lastHitBy: -1, ownerIndex: -1, goalPostCapture: null, goalCornerApproach: null, goalCornerApproachBlockedUntil: 0 };
     this.players = this.participants.map((participant, index) => this.makePlayer(participant, index));
     this.territories = Array.from({ length: TERRITORY_SECTOR_COUNT }, (_, index) => {
@@ -4239,6 +4241,8 @@ class ImasoraTriLink3D {
 
   startMatch() {
     if (this.running && !this.finished) return;
+    this.matchSequence += 1;
+    this.matchId = `${this.matchSessionId}-${this.matchSequence}`;
     this.resumeAudio();
     this.finished = false;
     this.resultPresented = false;
@@ -7533,14 +7537,14 @@ class ImasoraTriLink3D {
     const updateReward = summary => {
       if (this.destroyed || this.matchId !== record.id) return;
       const saved = summary?.committed === true || summary?.status === "duplicate";
-      resultRecord = { ...record, rewardSavePending: !saved, constructionRewardBoxesAwarded: saved ? Number(summary.constructionRewardBoxesAwarded) || 0 : 0 };
+      resultRecord = { ...record, rewardSavePending: !saved, constructionRewardBoxesAwarded: saved ? Number(summary.constructionRewardBoxesAwarded) || 0 : 0, arcadePartsAwarded: saved ? Number(summary.arcadePartsAwarded) || 0 : 0 };
       if (saved) {
         this.memories = [resultRecord, ...this.memories.filter(m => m.id !== record.id)].slice(0, 12); this.renderMemories();
         window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
         this.pendingRewardListener = null;
       }
       const status = this.root?.querySelector("[data-itl3-reward-status]");
-      if (status) status.textContent = saved ? "対戦結果・報酬を保存しました" + (resultRecord.constructionRewardBoxesAwarded ? "（建築セット +" + resultRecord.constructionRewardBoxesAwarded + "箱）" : "") : "報酬の保存待ちです。画面上の案内から保存し直してください。";
+      if (status) status.textContent = saved ? "対戦結果・報酬を保存しました" + (resultRecord.constructionRewardBoxesAwarded ? "（建築セット +" + resultRecord.constructionRewardBoxesAwarded + "箱" + (resultRecord.arcadePartsAwarded ? " / 整備パーツ +" + resultRecord.arcadePartsAwarded + "個" : "") + "）" : "") : "報酬の保存待ちです。画面上の案内から保存し直してください。";
     };
     if (!this.testMode && this.onRecord) {
       if (this.pendingRewardListener) window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
@@ -7616,7 +7620,7 @@ class ImasoraTriLink3D {
     const constructionReward = record.rewardSavePending
       ? `<p class="itl3-result-reward" data-itl3-reward-status>報酬の保存待ちです。画面上の案内から保存し直してください。</p>`
       : Number(record.constructionRewardBoxesAwarded) > 0
-      ? `<p class="itl3-result-reward">建築セット +${Math.floor(Number(record.constructionRewardBoxesAwarded))}箱</p>`
+      ? `<p class="itl3-result-reward">建築セット +${Math.floor(Number(record.constructionRewardBoxesAwarded))}箱${Number(record.arcadePartsAwarded) > 0 ? ` / 整備パーツ +${Math.floor(Number(record.arcadePartsAwarded))}個` : ""}</p>`
       : "";
     panel.innerHTML = `<div class="itl3-result-card"><div class="itl3-result-rank">TERRITORY RESULT <b>01</b></div><small>COMMEMORATIVE MATCH CARD</small><h2>${escapeHtml(record.winnerName)}<em>TERRITORY CHAMPION</em></h2><p>${escapeHtml(formatDate(record.playedAt))}　//　${escapeHtml(record.reason)}</p>${constructionReward}<div class="itl3-photo">${record.participants.map((participant, index) => `<div class="itl3-photo-person${participant.id === record.winnerId ? " is-winner" : ""}"><span>0${index + 1}</span><div>${participant.art || fallbackArt(participant.name, participant.color)}</div><strong>${escapeHtml(participant.name)}</strong><small>AREA ${Number(participant.territory) || 0}/${record.territoryTotal || TERRITORY_SECTOR_COUNT}</small></div>`).join("")}</div><div class="itl3-result-actions"><button type="button" class="itl3-primary" data-itl3-rematch><span>REPLAY</span><b>もう一度対戦</b><i>›</i></button><button type="button" class="itl3-secondary" data-itl3-close-result>アリーナを見る</button></div></div>`;
     this.stage.appendChild(panel);

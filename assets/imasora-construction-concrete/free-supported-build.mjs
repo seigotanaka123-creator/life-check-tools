@@ -48,7 +48,7 @@ export function supportedWorkMatches(p,w,mask){
 }
 export function assertFoundationSupport(p,{heightAt,blockedAt}={}){
  const s=p.foundation;if(!s)throw Error('施工物を支える土台がありません。');
- const plan=inspectFormGround(p.freeBuild,s.mask,2,heightAt,blockedAt);
+ const plan=inspectFormGround(p.freeBuild,s.mask,2,heightAt,blockedAt,s.deckY);
  if(plan.kind!=='preparation'||plan.deckY!==s.deckY||plan.supports.length!==s.bottoms.length||plan.supports.some((v,i)=>Math.abs(v.bottom-s.bottoms[i])>1e-8))throw Error('土台を支える地面が変わりました。施工を止め、地面を確認してください。');
  return true;
 }

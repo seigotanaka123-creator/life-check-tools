@@ -2,6 +2,7 @@ import * as THREE from './three.module.min.js';
 import {SHOP_OFFERS} from './imasora-mars-construction-shop.js?v=503';
 import {deliveryAccess} from './imasora-construction-delivery.js';
 import {toolkitSummary,toolkitDetails} from './imasora-construction-toolkit.mjs?v=120c';
+import {deliveryConcreteSummary} from './imasora-construction-concrete/delivery-summary.mjs';
 
 export function createConstructionDeliveryDock(){
   const root=new THREE.Group();root.name='construction-delivery-dock';
@@ -36,7 +37,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
       <p>散歩・大会・ゲームで獲得した箱をホームの街づくり工房で開封し、ここに表示する受取IDを移送先に指定して作ったJSONファイルを選んでください。受取記録はこのゲームのセーブデータに保存されます。</p>
       <div class="delivery-pack-profile"><span>このセーブデータの受取ID</span><code data-pack-transfer-profile></code><button type="button" data-pack-transfer-copy>受取IDをコピー</button></div>
       <p class="delivery-pack-stock" data-pack-transfer-stock></p>
-      <details><summary>基本道具一式</summary><p data-toolkit-summary></p><p data-toolkit-detail style="white-space:pre-line"></p><p>最初の建築セットの受取記録と一緒に保管します。同じファイルを選び直しても増えません。シャベルで土を運ぶ作業と型紙の模様塗りは準備中です。</p></details>
+      <details><summary>基本道具一式</summary><p data-toolkit-summary></p><p data-toolkit-detail style="white-space:pre-line"></p><p>最初の建築セットと一緒に受け取れます。シャベルで土を運び、型紙で模様を塗れます。道具は繰り返し使えます。同じファイルを選び直しても増えません。</p></details>
       <label class="delivery-pack-file">移送ファイル<input type="file" accept=".json,application/json" data-pack-transfer-file></label>
       <p class="delivery-pack-message" role="status" aria-live="polite" data-pack-transfer-message></p>
     </section>
@@ -102,9 +103,9 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
     const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent=eligible.length?'移す受取分を選んでください':'移せる受取分はありません';projectSelect.append(placeholder);
     for(const packet of eligible){const option=document.createElement('option');option.value=packet.id;option.textContent=`${packet.id}（コンクリート ${packet.quantities.concreteBlockCredits}杯相当）`;projectSelect.append(option);}
     if(eligible.some(packet=>packet.id===priorSelection))projectSelect.value=priorSelection;
-    const site=concreteStock?.site;
+    const site=concreteStock?.site,summary=deliveryConcreteSummary(project,site);
     dialog.querySelector('[data-concrete-project-stock]').textContent=concreteStock&&site
-      ? `未移送 ${concreteStock.availablePackConcreteCredits}杯分 / 受取累計 ${concreteStock.packConcreteCredits}杯分　｜　生コン ${site.availableConcreteCells}杯・バケツ ${site.bucketCells}杯・今回の打設 ${site.pouredCells}杯・完成保存 ${(project.completedFloors??[]).reduce((sum,f)=>sum+f.cells,0)}杯${project.mixer?`・未混練 ${project.mixer.receivedCells-project.mixer.mixedCells}杯分`:''}`
+      ? `未移送 ${concreteStock.availablePackConcreteCredits}杯分 / 受取累計 ${concreteStock.packConcreteCredits}杯分　｜　生コン ${summary.concrete}杯・バケツ ${summary.bucket}杯・ホース ${summary.hose}杯・今回の打設 ${summary.poured}杯・完成保存 ${summary.completed}杯・未混練 ${summary.unmixed}杯分`
       : '保存情報を確認できません。';
     transferInput.disabled=opening||working||service.busy||service.blocked||service.mode!=='live'||!near;
     dialog.querySelector('[data-pack-transfer-copy]').disabled=!profileId||service.mode!=='live';

@@ -172,3 +172,38 @@ body.world-concrete-playing{overflow:hidden}.world-concrete-playing .world-heade
 .free-stencil-preview i[data-filled=true][data-color=green]{background:#6ac79a}
 .free-stencil-preview i[data-filled=true][data-color=black]{background:#263441;outline:1px solid #bdd6d9}
 .free-concrete .free-sheet .free-stencil-controls button[data-ui=stencil-paint]{background:#f3c366;color:#213e3f}
+
+/* Keep routine tools in reach; reserve the toolbox for detailed choices. */
+.world-free-playing .free-concrete .free-hud-top{right:auto;width:min(540px,calc(100% - 24px));box-sizing:border-box;background:#183c42f5;border-color:#9db9aa}
+.world-free-playing .free-concrete .free-deck{background:#f5f0df;color:#233e43;border:2px solid #d8c9a8;border-radius:20px;box-shadow:0 6px 0 #26434b55,0 10px 25px #142d3938}
+.world-free-playing .free-concrete .free-tools-title{margin:6px 0 0;font-size:12px;font-weight:800;letter-spacing:.08em;color:#526766}
+.world-free-playing .free-concrete .free-mode-tabs{border-bottom-color:#c8c4ae}
+.world-free-playing .free-concrete .free-mode-tabs button{background:#e3e4d7;color:#415650;min-height:44px}
+.world-free-playing .free-concrete .free-mode-tabs button[aria-selected=true]{background:#205c60;color:#fff7da;border-color:#205c60;box-shadow:inset 0 -3px #9fdacb}
+.world-free-playing .free-concrete [data-mode-note]{color:#435d5e;font-size:12px;line-height:1.5;margin:6px 0}
+.world-free-playing .free-concrete .free-progress{margin:7px 0 4px}
+.world-free-playing .free-concrete .free-progress li{color:#536566;font-size:10px}
+.world-free-playing .free-concrete .free-progress li span{display:none}
+.world-free-playing .free-concrete .free-progress li[aria-current=step]{color:#1d585c;border-bottom:3px solid #1d7774;padding-bottom:3px}
+.world-free-playing .free-concrete .free-primary-actions button{border-radius:12px;min-height:46px}
+.world-free-playing .free-concrete .free-primary-actions [data-free],.world-free-playing .free-concrete .free-primary-actions [data-ui=quick-stencil]{background:#f0bd59;color:#293e3b;border-color:#c69335;box-shadow:inset 0 -3px #cc942f55;font-weight:800}
+.world-free-playing .free-concrete .free-primary-actions [data-ui=settings]{background:#e2ece5;color:#265351;border-color:#9bb9ab;box-shadow:none;font-size:12px}
+.world-free-playing .free-concrete .free-primary-actions button:disabled{background:#e1e0d5!important;color:#66746f!important;border-color:#c1c5b9!important;box-shadow:none}
+.world-free-playing .free-concrete [data-pour-reason]{color:#765127;border-color:#bf8533;font-size:12px}
+.free-concrete .free-quick-tools{margin:7px 0}
+.free-concrete .free-quick-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.free-concrete .free-quick-row label{font-size:11px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.free-concrete .free-quick-tools select{min-width:0;width:100%;min-height:44px;font:inherit;font-size:16px;background:#fffdf4;color:#254943;border:1px solid #91aaa0;border-radius:9px;padding:4px}
+.free-concrete .free-quick-amount{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;font-size:12px}
+.free-concrete .free-target-stepper{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:4px;margin:5px 0}
+.world-free-playing .free-concrete .free-target-stepper button{background:#dae8de;color:#265351;border-color:#8bb0a3;font-size:24px;min-height:44px;padding:0}
+.free-concrete [data-quick-target-label]{text-align:center;font-size:12px;font-weight:750}
+.free-concrete [data-quick-cost]{font-size:11px;color:#49615e;line-height:1.5;margin:6px 0}
+.free-concrete .free-toolbox-tabs{display:flex;gap:5px;padding:8px 12px;background:#213d50;flex-shrink:0}
+.free-concrete .free-toolbox-tabs button{flex:1;min-height:44px;border-radius:10px;font-size:13px}
+.world-free-playing .free-concrete .free-toolbox-tabs button[aria-pressed=true]{background:#b5e4d3;color:#1b4944;border-color:#d1f7e9}
+.world-free-playing .free-concrete .free-sheet-overlay{background:#10222b75;justify-content:flex-end}
+.world-free-playing .free-concrete .free-sheet{width:min(460px,100%);border:2px solid #a2c5b5;border-radius:22px}
+.free-concrete .free-quick-tools [hidden],.free-concrete .free-toolbox-tabs[hidden]{display:none!important}
+@media(max-width:700px){.world-free-playing .free-concrete .free-deck{padding:8px;max-height:calc(100dvh - var(--free-hud-size,150px) - 122px)}.world-free-playing .free-concrete .free-primary-actions{gap:5px}.free-concrete .free-quick-row{gap:4px}.world-free-playing .free-concrete .free-hud-top{width:calc(100% - 16px)}.world-free-playing .free-concrete .free-sheet-overlay{align-items:flex-end}.world-free-playing .free-concrete .free-sheet{max-height:82%}}
+@media(max-height:500px) and (min-width:701px){.world-free-playing .free-concrete .free-hud-top{width:min(450px,calc(100% - 30px))}.world-free-playing .free-concrete .free-deck{width:320px;max-height:calc(100dvh - var(--free-hud-size,100px) - 110px)}.world-free-playing .free-concrete .free-tools-title,.world-free-playing .free-concrete .free-progress{display:none}.world-free-playing .free-concrete .free-sheet{max-height:100%}}

@@ -3,8 +3,8 @@ import {vehicleGroundPose,vehicleGroundError} from './free-vehicle-ground.mjs';
 import {constructionBase} from './free-supported-build.mjs';
 import * as T from '../three.module.min.js';
 import {freeCell} from './free-build-state.mjs';
-import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs';
-import {CAST_PORTS,castPoint,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs';
+import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked,walkingBlocked} from './free-contact.mjs';
+import {CAST_PORTS,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs';
 import {createBoomMotion,BOOM_DURATIONS} from './free-boom-motion.mjs';
 
 import {footingAt} from './free-footing.mjs';
@@ -13,6 +13,7 @@ import {finishNeedsScaffold,finishAccessPlan} from './free-finish-access.mjs';
 import {paintScaffoldSteps} from './free-paint-access.mjs';
 import {createScaffoldMotion} from './free-scaffold-motion.mjs';
 import {frameBlocked,frameSegmentBlocked,assertFrameFoundation} from './free-frames.mjs';
+import {bucketLoadAccess} from './free-bucket-access.mjs';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),mix=(a,b,t)=>a+(b-a)*t;
 const finishPoint=(f,cell,row,t)=>{const c=freeCell(cell);return{x:c.x-6+row*4,y:constructionBase(f)+f.fill[cell]/2,z:c.z-6+12*(row%2?1-t:t)};};
@@ -47,7 +48,7 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
   if(!stages.length)throw Error('仕上げる生コンがありません。');
  }else if(a.type==='FREE_BUCKET_LOAD'){
   if(f.aboard||f.bucket||f.wet<4)throw Error('車を降り、空のバケツと1杯分の生コンを用意してください。');
-  const dest=castPoint(f.truck,{x:0,y:0,z:-70});if(!footingAt(f,dest.x,dest.z,supportHeightAt))throw Error('生コンを汲む場所の足元を平らにしてください。');walk(dest);pose.heading=f.truck.heading;stages.push({kind:'load',stance:{...pose},duration:3});
+  const access=bucketLoadAccess(f,pose,external,supportHeightAt);for(let i=1;i<access.path.length;i++)stages.push({kind:'walk',from:access.path[i-1],to:access.path[i],duration:Math.max(.1,vec(access.path[i-1]).distanceTo(vec(access.path[i]))/60)});pose={...access.stance};stages.push({kind:'load',stance:{...pose},duration:3});
  }else{
   const problem=castingProblem(f,a.source,a.cell);if(problem)throw Error(problem);
   if(a.source==='bucket'){
@@ -123,7 +124,8 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
    if(s.kind==='finish'){const band=r.bands.find(b=>b.cell===s.cell&&b.row===s.row);band.samples++;band.min=Math.min(band.min,t);band.max=Math.max(band.max,t);mark(t);}Object.assign(focus,point);return;
   }
   if(s.kind==='load'){
-   const cup=bucket(t*512),source=actualPort('truck',CAST_PORTS.truck),tip={x:cup.surface.x,y:s.stance.y+11,z:cup.surface.z},out=trough(source,tip);stream(out,cup.surface);r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs((f.wet*128-t*512)+cup.volume-f.wet*128));mark(t);Object.assign(focus,{...cup.lip,y:12});return;
+   if(walkingBlocked(f,s.stance.x,s.stance.z,external))throw Error('汲む場所がふさがったため止めました。材料は変更していません。');
+   const cup=bucket(t*512),source=actualPort('truck',CAST_PORTS.truck),tip={x:cup.surface.x,y:s.stance.y+11,z:cup.surface.z};r.maxPoleLength=Math.max(r.maxPoleLength,source.distanceTo(vec(tip)));if(r.maxPoleLength>64)throw Error('バケツに注ぎ口が届きません。車の後ろに空きを作ってください。');const out=trough(source,tip);stream(out,cup.surface);r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs((f.wet*128-t*512)+cup.volume-f.wet*128));mark(t);Object.assign(focus,{...cup.lip,y:12});return;
   }
   const c=freeCell(a.cell),target={...c,y:constructionBase(f)+(f.fill[a.cell]+t)/2},tip={...c,y:constructionBase(f)+f.height+1};let out;
   if(a.source==='bucket'){
@@ -137,5 +139,5 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
   if(done)return true;verifyCars();verifyForm();if(boomMotion&&!boomPrepared){boomPrepared=boomMotion.prepare();return false;}if(model.position.distanceTo(initial.position)>1e-5||model.scale.distanceTo(initial.scale)>1e-5||model.quaternion.angleTo(initial.rotation)>1e-5)throw Error('キャラクターの位置が変わったため作業を止めました。');
   const step=Math.min(.05,Math.max(0,dt));phase+=step*10;tools.clear();const s=stages[index];if(!started){started=true;progress=0;render(s,0);return false;}
   progress=Math.min(1,progress+step/s.duration);render(s,progress);if(progress===1){index++;started=false;if(index===stages.length){assertFreeReceipt(a,p,p.revision,r);clean();return true;}}return false;
- },verifyFooting:()=>{verifyCars();verifyForm();footing?.stand();},cancel(){if(!done)clean();}};
+ },verifyFooting:()=>{verifyCars();verifyForm();footing?.stand();if(a.type==='FREE_BUCKET_LOAD'&&walkingBlocked(f,endPose.x,endPose.z,external))throw Error('汲む場所がふさがったため止めました。材料は変更していません。');},cancel(){if(!done)clean();}};
 }

@@ -16,6 +16,14 @@ import {SUPPORTED_WORK_MOVE,assertSupportedWorkMoveReceipt} from './imasora-cons
 import {FOUNDATION_ACTIONS} from './imasora-construction-concrete/free-foundation-state.mjs';
 import {assertFoundationReceipt} from './imasora-construction-concrete/free-foundation-operation.mjs';
 import {projectStarterToolkit,assertStarterTool,requiredStarterTool} from './imasora-construction-toolkit.mjs?v=120e';
+import {worldTransportTotals} from './imasora-construction-transport-authority.mjs';
+import {prepareTransportRestorePlan,snapshotTransportRestoreRecord,sameTransportRestoreValue,validateTransportRestoreJournal} from './imasora-construction-transport-restore.mjs';
+import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs';
+import {runWorldSaveTask} from './imasora-world-save-client.mjs';
+import {commitTransportRestore,readTransportRestoreState} from './imasora-construction-transport-restore-store.mjs';
+import {assertWorldTransportWorkReceipt} from './imasora-construction-transport-work-flow.mjs';
+import {createTransportMigrationPlan,validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs';
+import {commitTransportMigration,readTransportMigrationState} from './imasora-construction-transport-migration-store.mjs';
 
 export const LIVE_WORLD_DB='imasora-world-authority-v1';
 export const WORLD_SHOP_TEST_DB='imasora-world-shop-integration-development-v1';
@@ -40,6 +48,10 @@ export function worldSaveMode(search,hostname){
 }
 export class WorldAuthorityStore extends IndexedConstructionStore{
   constructor(mode,idb=globalThis.indexedDB){super(idb);if(!['live','integration'].includes(mode))throw Error('保存先が不正です。');this.name=mode==='live'?LIVE_WORLD_DB:WORLD_SHOP_TEST_DB;}
+  commitTransportRestore(journal){return commitTransportRestore(this,journal);}
+  readTransportRestoreState(){return readTransportRestoreState(this);}
+  commitTransportMigration(journal){return commitTransportMigration(this,journal);}
+  readTransportMigrationState(){return readTransportMigrationState(this);}
   commitEarthRestore(journal){return commitEarthRestore(this,journal);}
   readEarthRestore(){return readEarthRestore(this);}
   readEarthRestoreState(){return readEarthRestoreState(this);}
@@ -49,11 +61,17 @@ export class WorldAuthorityStore extends IndexedConstructionStore{
   readVehicleRestoreState(kind){return readVehicleRestoreState(this,kind);}
 }
 export class WorldSaveService{
-  constructor({mode='live',store,readLegacy=()=>null,materialsIO=null,onChange=()=>{},onError=()=>{},excavationPreview=false,excavationLive=false,constructionProjectPreview=false,excavationOrigin=null,guardedDrafts=false,workshopLock=withWorkshopWriteLock}={}){
+  constructor({mode='live',store,readLegacy=()=>null,materialsIO=null,onChange=()=>{},onError=()=>{},excavationPreview=false,excavationLive=false,constructionProjectPreview=false,excavationOrigin=null,transportAuthority=false,transportWork=false,guardedDrafts=false,workshopLock=withWorkshopWriteLock,backgroundSaveMinimumChars=2*1024*1024}={}){
     if(!['live','integration','readonly'].includes(mode))throw Error('保存区分が不正です。');
+    if(!Number.isSafeInteger(backgroundSaveMinimumChars)||backgroundSaveMinimumChars<0)throw Error('セーブの処理設定が不正です。');
+    this.backgroundSaveMinimumChars=backgroundSaveMinimumChars;
     Object.assign(this,{mode,store:store||(mode==='readonly'?null:new WorldAuthorityStore(mode)),readLegacy,materialsIO,onChange,onError});
     if(excavationPreview&&(mode!=='integration'||this.store?.name!==EXCAVATION_AUTHORITY_DB))throw Error('掘削の同時保存確認は専用の保存領域で行ってください。');
     if(excavationLive&&(excavationPreview||mode!=='live'||this.store?.name!==LIVE_WORLD_DB))throw Error('通常の地形は本体の保存領域だけで利用できます。');
+    if(transportAuthority&&(!excavationLive||mode!=='live'||this.store?.name!==LIVE_WORLD_DB))throw Error('共有土は対応した通常保存の画面だけで利用できます。');
+    this.transportAuthority=transportAuthority;
+    if(transportWork&&!transportAuthority)throw Error('人物と車両の保存には共有土への対応が必要です。');
+    this.transportWork=transportWork;
     if(constructionProjectPreview&&(mode!=='integration'||this.store?.name!==CONSTRUCTION_PROFILE_PROJECT_TEST_DB))throw Error('施工プロフィール試作は専用の隔離保存領域で行ってください。');
     if(this.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB&&!constructionProjectPreview)throw Error('施工プロフィール試作の保存先には専用確認画面が必要です。');
     this.constructionProjectPreview=constructionProjectPreview;
@@ -61,19 +79,27 @@ export class WorldSaveService{
     this.draftGuard=guardedDrafts?new WorldDraftGuard():null;this.workshopLock=workshopLock;
     this.mapResetPoints={};this.ledger=null;this.raw=null;this.generation=null;this.blocked=false;this.jobs=[];this.running=false;this.ready=false;this.imported=false;
   }
-  get busy(){return this.running||this.jobs.length>0||!!this.crafting;}
+  // A failed job stays queued for reconciliation, but is no longer running.
+  // Keep `blocked` true to prohibit new work while allowing the retry UI.
+  get busy(){return this.running||(!this.blocked&&this.jobs.length>0)||!!this.crafting||!!this.reconciling||!!this.preparingTransportRestore;}
   get world(){return this.ledger?this.issueDraft(structuredClone(this.ledger.world)):null;}
   issueDraft(draft){return this.draftGuard?.issue(draft)??draft;}
   deriveDraft(draft,overrides){return this.draftGuard?this.draftGuard.derive(draft,overrides):{...structuredClone(draft),...structuredClone(overrides)};}
-  enqueueDraft(draft,fn,{craft=false}={}){
+  enqueueDraft(draft,fn,{craft=false,prepare}={}){
+    if(this.preparingTransportRestore)return Promise.reject(Error('現場を戻す準備が終わるまでお待ちください。'));
+    if(this.migratingTransport)return Promise.reject(Error('現場の引継ぎ結果を確認してから保存してください。'));
+    if(this.restoringTransport)return Promise.reject(Error('現場の復元結果を確認してから保存してください。'));
     if(this.mode==='readonly')return Promise.resolve(null);
     if(this.restoringVehicle)return Promise.reject(Error('車両の復元結果を確認してから保存してください。'));
     if(this.restoringMapReset)return Promise.reject(Error('建造物の片付け結果を確認してから保存してください。'));
     if(this.restoringEarth)return Promise.reject(Error('地形の復元を確認してから保存してください。'));
     if(!this.ready||this.blocked||(!craft&&this.crafting))return Promise.reject(Error('保存を確認するまで操作できません。'));
     try{
-      const {snapshot,token}=this.draftGuard?.consume(draft)??{snapshot:structuredClone(draft),token:null};
-      return this.enqueue(s=>fn(s,snapshot),{draftToken:token,craft});
+      let captured;
+      if(this.draftGuard)captured=this.draftGuard.consume(draft,prepare);
+      else{const snapshot=structuredClone(draft);captured={snapshot,token:null,prepared:prepare?.(snapshot)};}
+      const {snapshot,token,prepared}=captured;
+      return this.enqueue(s=>fn(s,snapshot,prepared),{draftToken:token,craft});
     }catch(e){return Promise.reject(e);}
   }
   get shopState(){return L.projectLinkedShop(this.ledger);}
@@ -85,6 +111,8 @@ export class WorldSaveService{
     return structuredClone(this.toolkitValue);
   }
   get constructionWorkPlatform(){return structuredClone(this.ledger?.world.constructionWorkPlatform??null);}
+  get constructionTransport(){return structuredClone(this.ledger?.world.constructionTransport??null);}
+  get constructionTransportTotals(){const s=this.ledger;return s?.world.constructionTransport?worldTransportTotals(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint):null;}
   get constructionConcreteProject(){return L.projectConstructionProfileProject(this.ledger);}
   get constructionConcreteStock(){return L.projectConstructionProfileStock(this.ledger);}
   canWriteConstructionProfileProject(){return(this.mode==='live'&&this.excavationLive&&this.store?.name===LIVE_WORLD_DB)||(this.constructionProjectPreview&&this.mode==='integration'&&this.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB);}
@@ -93,6 +121,30 @@ export class WorldSaveService{
   accept(record){
     if(!record||!Number.isSafeInteger(record.generation)||record.generation<1||!Array.isArray(record.backups))throw Error('保存管理情報が不正です。');
     const next=L.unpackWorldPurchaseLedger(record.current);
+    this.#adoptCheckedRecord(record,next);
+  }
+  #backgroundSave(raw=this.raw?.current){return this.transportWork&&typeof raw==='string'&&raw.length>=this.backgroundSaveMinimumChars;}
+  async acceptStored(record){
+    // Small saves retain the original path: starting a new worker can cost
+    // more than the work saved. Large shared-earth saves use the same checks
+    // in a worker. No blocking fallback is used if that worker fails.
+    if(!this.#backgroundSave(record?.current)){this.accept(record);return;}
+    if(!record||!Number.isSafeInteger(record.generation)||record.generation<1||!Array.isArray(record.backups))throw Error('保存管理情報が不正です。');
+    const frozen=structuredClone(record),ledger=this.ledger,gen=this.generation,raw=this.raw?.current;
+    const next=await runWorldSaveTask('unpack',{raw:frozen.current});
+    if(this.ledger!==ledger||this.generation!==gen||this.raw?.current!==raw)throw Error('読込み中に保存が変わりました。古い内容で置き換えず停止しました。');
+    this.#adoptCheckedRecord(frozen,next);
+  }
+  async #acceptCommitted(record,job){
+    if(!job.checkedLedger){await this.acceptStored(record);return;}
+    // The worker fully validated the snapshot used to make this exact packet.
+    // Adopt it only after the atomic store confirms both bytes and generation.
+    if(!record||!Number.isSafeInteger(record.generation)||record.generation<1||record.generation!==job.expected+1||record.current!==job.packet||!Array.isArray(record.backups))throw Error('保存結果が準備した内容と一致しません。作業を保持して停止しました。');
+    this.#adoptCheckedRecord(structuredClone(record),job.checkedLedger);
+  }
+  #adoptCheckedRecord(record,next){
+    if(next.world.constructionTransport&&!this.transportAuthority)throw Error('共有土に対応した画面で保存を開いてください。古い地形で上書きせず停止しました。');
+    if(next.world.constructionTransport?.version===2&&!this.transportWork)throw Error('人物・車両・作業途中に対応した画面で保存を開いてください。');
     const earth=next.world.constructionExcavation;
     if(earth){
       const live=this.mode==='live',scope=live?EARTH_LIVE_SCOPE:EARTH_AUTHORITY_SCOPE;
@@ -110,7 +162,7 @@ export class WorldSaveService{
         this.ledger=L.createWorldPurchaseLedger(this.readLegacy()??JSON.stringify(defaultWorld),'new-world');this.ready=true;return this.world;
       }
       const record=await this.store.read();
-      if(record)this.accept(record);
+      if(record)await this.acceptStored(record);
       else{
         const legacy=this.mode==='live'?this.readLegacy():null;
         const seed=structuredClone(defaultWorld);
@@ -118,8 +170,8 @@ export class WorldSaveService{
         const next=L.createWorldPurchaseLedger(legacy??JSON.stringify(seed),legacy===null?'new-world':'legacy-world');
         const packet=L.packWorldPurchaseLedger(next);
         // First read/compare/write is atomic; another first importer wins, never gets overwritten.
-        try{this.accept(await this.store.commit(null,packet));this.imported=legacy!==null;}
-        catch(e){const winner=await this.store.read();if(!winner)throw e;this.accept(winner);}
+        try{await this.acceptStored(await this.store.commit(null,packet));this.imported=legacy!==null;}
+        catch(e){const winner=await this.store.read();if(!winner)throw e;await this.acceptStored(winner);}
         if(legacy!==null&&this.readLegacy()!==legacy)throw Error('移行中に旧画面が保存を変更しました。両方の保存を保護して停止します。旧画面を閉じて内容を確認してください。');
       }
       this.ready=true;
@@ -128,32 +180,49 @@ export class WorldSaveService{
       this.onChange(this);return this.world;
     }catch(e){this.blocked=true;this.onError(e);throw e;}
   }
-  enqueue(fn,{draftToken=null,craft=false,earthRestore=null,mapReset=null,vehicleRestore=null}={}){
+  enqueue(fn,{draftToken=null,craft=false,earthRestore=null,mapReset=null,vehicleRestore=null,transportRestore=null,transportMigration=null}={}){
+    if(this.preparingTransportRestore)return Promise.reject(Error('現場を戻す準備が終わるまでお待ちください。'));
     if(!this.ready||this.blocked||(!craft&&this.crafting))return Promise.reject(Error('保存を確認するまで操作できません。'));
+    if(this.migratingTransport&&!transportMigration)return Promise.reject(Error('現場の引継ぎ結果を確認してから保存してください。'));
+    if(this.restoringTransport&&!transportRestore)return Promise.reject(Error('現場の復元結果を確認してから保存してください。'));
     if(this.restoringVehicle&&!vehicleRestore)return Promise.reject(Error('車両の復元結果を確認してから保存してください。'));
     if(this.restoringMapReset&&!mapReset)return Promise.reject(Error('建造物の片付け結果を確認してから保存してください。'));
     if(this.restoringEarth&&!earthRestore)return Promise.reject(Error('地形の復元を確認してから保存してください。'));
     if(this.mode==='readonly')return Promise.resolve(null);
-    const promise=new Promise((resolve,reject)=>this.jobs.push({fn,resolve,reject,packet:null,next:null,expected:null,draftToken,earthRestore,mapReset,vehicleRestore}));
+    const promise=new Promise((resolve,reject)=>this.jobs.push({fn,resolve,reject,packet:null,next:null,expected:null,draftToken,earthRestore,mapReset,vehicleRestore,transportRestore,transportMigration}));
     this.onChange(this);void this.drain();return promise;
   }
   async commitHead(job){
-    if(!job.packet){job.next=job.fn(this.ledger);job.expected=this.generation;job.packet=L.packWorldPurchaseLedger(job.next);}
+    if(!job.packet){
+      const base=this.ledger,raw=this.raw?.current;job.next=job.fn(base);job.expected=this.generation;
+      const prepared=this.#backgroundSave()?await runWorldSaveTask('pack-checked',{ledger:job.next}):null;
+      const packet=prepared?prepared.packet:L.packWorldPurchaseLedger(job.next);
+      if(this.ledger!==base||this.generation!==job.expected||this.raw?.current!==raw)throw Error('保存の準備中に現場が変わりました。上書きせず停止しました。');
+      job.packet=packet;if(prepared)job.checkedLedger=prepared.ledger;
+    }
     if(job.next===this.ledger){if(job.draftToken)this.draftGuard.discard(job.draftToken);return;}
-    if(job.vehicleRestore){
+    if(job.transportMigration){
+      if(job.expected!==job.transportMigration.expectedGeneration||job.packet!==job.transportMigration.appliedRaw)throw Error('引継ぎ確認後に保存が変わりました。');
+      await this.#acceptCommitted(await this.store.commitTransportMigration(job.transportMigration),job);
+      this.draftGuard?.invalidate();this.migratingTransport=false;
+    }else if(job.transportRestore){
+      if(job.expected!==job.transportRestore.expectedGeneration||job.packet!==job.transportRestore.appliedRaw)throw Error('現場の復元確認後に保存が変わりました。');
+      await this.#acceptCommitted(await this.store.commitTransportRestore(job.transportRestore),job);this.transportRestorePoint=structuredClone(job.transportRestore);
+      this.draftGuard?.invalidate();this.restoringTransport=false;
+    }else if(job.vehicleRestore){
       if(job.expected!==job.vehicleRestore.expectedGeneration||job.packet!==job.vehicleRestore.appliedRaw)throw Error('車両復元の確認後に保存が変わりました。');
-      this.accept(await this.store.commitVehicleRestore(job.vehicleRestore));
+      await this.#acceptCommitted(await this.store.commitVehicleRestore(job.vehicleRestore),job);
       this.draftGuard?.invalidate();this.restoringVehicle=false;
     }else if(job.mapReset){
       if(job.expected!==job.mapReset.expectedGeneration||job.packet!==job.mapReset.appliedRaw)throw Error('片付けの確認後に保存内容が変わりました。');
-      this.accept(await this.store.commitMapReset(job.mapReset));
+      await this.#acceptCommitted(await this.store.commitMapReset(job.mapReset),job);
       this.mapResetPoints[job.mapReset.map]=structuredClone(job.mapReset);
       this.draftGuard?.invalidate();this.restoringMapReset=false;
     }else if(job.earthRestore){
       if(job.expected!==job.earthRestore.expectedGeneration||job.packet!==job.earthRestore.appliedRaw)throw Error('復元確認後に保存内容が変わりました。');
-      this.accept(await this.store.commitEarthRestore(job.earthRestore));
+      await this.#acceptCommitted(await this.store.commitEarthRestore(job.earthRestore),job);
       this.draftGuard?.invalidate();this.restoringEarth=false;
-    }else this.accept(await this.store.commit(job.expected,job.packet));
+    }else await this.#acceptCommitted(await this.store.commit(job.expected,job.packet),job);
     if(job.draftToken)this.draftGuard.committed(job.draftToken);
   }
   async drain(){
@@ -173,21 +242,32 @@ export class WorldSaveService{
     if(this.blocked)throw Error('保存が停止しています。');
   }
   async retry(){
-    if(this.running)throw Error('保存処理中です。');
+    if(this.running||this.reconciling)throw Error('保存処理中です。');
+    this.reconciling=true;this.onChange(this);
+    try{return await this.#reconcileRetry();}
+    finally{this.reconciling=false;this.onChange(this);}
+  }
+  async #reconcileRetry(){
     const job=this.jobs[0];
     if(this.blocked&&!job&&this.ledger?.world.equipmentCraftPending){this.blocked=false;await this.resumeEquipmentCraft();return this.flush();}
     if(!this.blocked||!job)return this.flush();
-    const state=job.vehicleRestore?await this.store.readVehicleRestoreState(job.vehicleRestore.vehicleKind):job.mapReset?await this.store.readMapResetState(job.mapReset.map):job.earthRestore?await this.store.readEarthRestoreState():{record:await this.store.read()},record=state.record;
+    const state=job.transportMigration?await this.store.readTransportMigrationState():job.transportRestore?await this.store.readTransportRestoreState():job.vehicleRestore?await this.store.readVehicleRestoreState(job.vehicleRestore.vehicleKind):job.mapReset?await this.store.readMapResetState(job.mapReset.map):job.earthRestore?await this.store.readEarthRestoreState():{record:await this.store.read()},record=state.record;
     if(job.packet&&record?.generation===(job.expected??0)+1&&record?.current===job.packet){
+      if(job.transportMigration){validateTransportMigrationJournal(state.journal);if(canonical(state.journal)!==canonical(job.transportMigration))throw Error('引継ぎ前の控えと保存結果が一致しません。記録を保持して停止します。');}
+      if(job.transportRestore){validateTransportRestoreJournal(state.journal);if(canonical(state.journal)!==canonical(job.transportRestore))throw Error('現場の控えと復元結果が一致しません。停止して保持します。');}
       if(job.vehicleRestore){validateVehicleRestoreJournal(state.journal);if(canonical(state.journal)!==canonical(job.vehicleRestore))throw Error('車両の直前控えと復元結果が一致しません。記録を保持して停止します。');}
       if(job.mapReset){validateMapResetJournal(state.journal);if(canonical(state.journal)!==canonical(job.mapReset))throw Error('建造物の直前控えと保存の結果が一致しません。記録を保持して停止します。');}
       if(job.earthRestore){validateEarthRestoreJournal(state.journal);if(canonical(state.journal)!==canonical(job.earthRestore))throw Error('復元前控えと保存の結果が一致しません。記録を保持して停止します。');}
-      this.accept(record);if(job.draftToken)this.draftGuard.committed(job.draftToken);
+      await this.#acceptCommitted(record,job);if(job.draftToken)this.draftGuard.committed(job.draftToken);
+      if(job.transportMigration){this.draftGuard?.invalidate();this.migratingTransport=false;}
+      if(job.transportRestore){this.draftGuard?.invalidate();this.restoringTransport=false;this.transportRestorePoint=structuredClone(job.transportRestore);}
       if(job.vehicleRestore){this.draftGuard?.invalidate();this.restoringVehicle=false;}
       if(job.mapReset){this.mapResetPoints[job.mapReset.map]=structuredClone(job.mapReset);this.draftGuard?.invalidate();this.restoringMapReset=false;}
       if(job.earthRestore){this.draftGuard?.invalidate();this.restoringEarth=false;}this.jobs.shift();job.resolve(this.shopState);
     }
     else if((record?.generation??null)!==job.expected)throw Error('別の画面で保存が更新されています。古い建築や残高で上書きはしません。記録を確認後、この画面を再読み込みしてください。');
+    else if(job.transportMigration&&record?.current!==job.transportMigration.expectedRaw)throw Error('同じ保存番号の内容が変わりました。現場を引き継がず停止します。');
+    else if(job.transportRestore&&record?.current!==job.transportRestore.expectedRaw)throw Error('同じ保存番号の内容が変わりました。現場を復元せず停止します。');
     else if(job.vehicleRestore&&record?.current!==job.vehicleRestore.expectedRaw)throw Error('同じ保存番号の内容が変更されています。車両を復元せず停止します。');
     else if(job.mapReset&&record?.current!==job.mapReset.expectedRaw)throw Error('同じ保存番号の内容が変更されています。片付けず停止します。');
     else if(job.earthRestore&&record?.current!==job.earthRestore.expectedRaw)throw Error('同じ保存番号の内容が変更されています。復元せず停止します。');
@@ -196,6 +276,7 @@ export class WorldSaveService{
   }
   async craftEquipment(draft,equipment,beforeRaw,afterRaw,id){
     if(this.mode!=='live')throw Error('接続確認モードでは実際の装備素材を消費しません。');
+    if(this.restoringTransport)throw Error('現場の復元結果を確認してから装備を作成してください。');
     if(this.restoringVehicle)throw Error('車両の復元結果を確認してから装備を作成してください。');
     if(this.restoringMapReset)throw Error('建造物の片付け結果を確認してから装備を作成してください。');
     if(this.restoringEarth)throw Error('地形の復元を確認してから装備を作成してください。');
@@ -269,7 +350,114 @@ export class WorldSaveService{
     await this.enqueueDraft(draft,(s,current)=>L.saveConstructionExcavationDraft(s,next,current,expectedRevision));
     return structuredClone(this.ledger.world.constructionExcavation);
   }
+  // This is the single quantity writer. Scene controllers must still provide
+  // physical work/actor checkpoints before enabling this mode in normal play.
+  checkTransportWrite(draft){
+    if(!this.transportAuthority||this.mode!=='live'||!this.excavationLive||this.store?.name!==LIVE_WORLD_DB)throw Error('共有土に対応した通常保存の画面で操作してください。');
+    if(!this.ready||this.blocked||this.busy)throw Error('保存処理を確認してから土を動かしてください。');
+    if(this.ledger?.world.constructionExcavation?.origin!==this.excavationOrigin)throw Error('土の保存元が一致しません。');
+    if(draft?.map!=='construction')throw Error('工事現場の作業として保存してください。');
+  }
+  async enableConstructionTransport(draft,expectedEarthRevision){
+    this.checkTransportWrite(draft);
+    const checked=L.enableConstructionTransport(this.ledger,structuredClone(draft),expectedEarthRevision);
+    if(checked!==this.ledger)await this.enqueueDraft(draft,(s,current)=>L.enableConstructionTransport(s,current,expectedEarthRevision));
+    return this.constructionTransport;
+  }
+  async applyConstructionTransportCommand(command,draft){
+    this.checkTransportWrite(draft);const frozen=structuredClone(command);
+    const checked=L.applyConstructionTransportCommand(this.ledger,frozen,structuredClone(draft));
+    if(checked!==this.ledger)await this.enqueueDraft(draft,(s,current)=>L.applyConstructionTransportCommand(s,frozen,current));
+    return this.constructionTransport;
+  }
+  async enableConstructionTransportWork(draft,expectedEarthRevision){
+    this.checkTransportWrite(draft);if(!this.transportWork)throw Error('人物と車両に対応した画面で操作してください。');
+    const checked=L.enableConstructionTransportWork(this.ledger,structuredClone(draft),expectedEarthRevision);
+    if(checked!==this.ledger)await this.enqueueDraft(draft,(s,current)=>L.enableConstructionTransportWork(s,current,expectedEarthRevision));
+    return this.constructionTransport;
+  }
+  checkTransportMigration(gen,raw){
+    if(!this.transportWork||!this.transportAuthority||this.mode!=='live'||!this.excavationLive||this.store?.name!==LIVE_WORLD_DB)throw Error('通常保存に対応した画面で引き継いでください。');
+    if(!this.ready||this.blocked||this.busy||this.migratingTransport||this.restoringTransport||this.restoringEarth||this.restoringMapReset||this.restoringVehicle)throw Error('保存処理を確認してから引き継いでください。');
+    if(this.ledger?.world.constructionExcavation?.origin!==this.excavationOrigin)throw Error('土の保存元が一致しません。');
+    if(gen!==this.generation||raw!==this.raw?.current)throw Error('確認後に保存が変わりました。内容を確認し直してください。');
+    if(typeof this.store.commitTransportMigration!=='function'||typeof this.store.readTransportMigrationState!=='function')throw Error('引継ぎ前の控えを同時保存できません。');
+  }
+  prepareConstructionTransportMigration(recoverLegacy=false,relocate=false){
+    this.checkTransportMigration(this.generation,this.raw?.current);
+    return createTransportMigrationPlan(this.raw.current,this.generation,crypto.randomUUID(),recoverLegacy,relocate);
+  }
+  async migrateConstructionTransport(point){
+    validateTransportMigrationJournal(point);this.checkTransportMigration(point.expectedGeneration,point.expectedRaw);
+    const frozen=structuredClone(point),next=L.unpackWorldPurchaseLedger(frozen.appliedRaw);this.migratingTransport=true;
+    await this.enqueue(()=>next,{transportMigration:frozen});return this.constructionTransport;
+  }
+  async readConstructionTransportMigration(){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy||this.store?.name!==LIVE_WORLD_DB||!this.transportWork)throw Error('保存を確認してから引継ぎ前の控えを読んでください。');
+    const gen=this.generation,raw=this.raw.current,state=await this.store.readTransportMigrationState();
+    if(this.generation!==gen||this.raw.current!==raw||state.record?.generation!==gen||state.record?.current!==raw)throw Error('別の画面で保存が変わりました。');
+    if(state.journal===null)return null;const point=validateTransportMigrationJournal(state.journal),before=L.unpackWorldPurchaseLedger(point.expectedRaw);
+    if(before.source.fingerprint!==this.ledger.source.fingerprint||before.world.constructionExcavation.origin!==this.excavationOrigin)throw Error('引継ぎ前の控えの保存元が違います。');
+    return structuredClone(point);
+  }
+  async saveConstructionTransportWork(record,draft,expectedRevision){
+    this.checkTransportWrite(draft);if(!this.transportWork)throw Error('人物と車両に対応した画面で操作してください。');
+    // Keep the physical receipt's object identity through the write boundary.
+    const base=this.ledger,generation=this.generation,raw=this.raw.current;
+    const unchanged=()=>this.ledger===base&&this.generation===generation&&this.raw.current===raw;
+    const changed=()=>{if(!unchanged())throw Error('保存の準備中に状態が変わりました。現在の現場から保存し直してください。');};
+    await this.enqueueDraft(draft,(s,_snapshot,next)=>{
+      // This candidate was fully checked before accepting the draft. It is
+      // private to this queued save; no cache is reused by a different save.
+      changed();if(s!==base)throw Error('保存の準備中に状態が変わりました。');return next;
+    },{prepare:snapshot=>{
+      changed();this.checkTransportWrite(snapshot);
+      const next=L.saveConstructionTransportWork(base,record,snapshot,expectedRevision);
+      changed();this.checkTransportWrite(snapshot);return next;
+    }});
+    return this.constructionTransport;
+  }
+  checkTransportRestore(gen,raw){
+    if(!this.transportWork||!this.transportAuthority||this.mode!=='live'||!this.excavationLive||this.store?.name!==LIVE_WORLD_DB)throw Error('人物と車両に対応した通常保存で確認してください。');
+    if(!this.ready||this.blocked||this.busy||this.restoringTransport||this.restoringEarth||this.restoringMapReset||this.restoringVehicle)throw Error('保存を停止してから現場を確認してください。');
+    if(this.ledger?.pending||this.ledger?.world.equipmentCraftPending)throw Error('購入・装備作成を先に確認してください。');
+    if(this.ledger?.world.constructionTransport?.version!==2||this.ledger.world.constructionExcavation?.origin!==this.excavationOrigin)throw Error('対応する現場の記録がありません。');
+    if(this.generation!==gen||this.raw?.current!==raw)throw Error('比較後に保存が変わりました。もう一度内容を確認してください。');
+    if(typeof this.store.commitTransportRestore!=='function'||typeof this.store.readTransportRestoreState!=='function')throw Error('復元前控えを同時保存できない保存先です。');
+  }
+  async readConstructionTransportRestore({signal}={}){
+    const gen=this.generation,raw=this.raw?.current;this.checkTransportRestore(gen,raw);const state=await this.store.readTransportRestoreState();this.checkTransportRestore(gen,raw);
+    if(state.record?.generation!==gen||state.record?.current!==raw)throw Error('別の画面で保存が変わりました。比較を止めました。');
+    if(signal?.aborted)throw Error('控えの確認を中止しました。');
+    if(state.journal===null)return null;
+    const point=await runTransportRecoveryTask('journal',{journal:state.journal},{signal});
+    this.checkTransportRestore(gen,raw);
+    return structuredClone(point);
+  }
+  async restoreConstructionTransport(candidate,before,gen,raw,{priorRestoreId=null}={}){
+    this.checkTransportRestore(gen,raw);
+    assertWorldTransportWorkReceipt(this.ledger.world.constructionTransport,before,this.ledger.world.constructionTransport.work.revision,this.constructionToolkit);
+    // Receipt authority stays on this thread. Capture descriptor-checked plain
+    // values before awaiting; the worker never receives mutable caller objects.
+    const base=this.ledger,args={ledger:base,candidate:snapshotTransportRestoreRecord(candidate),before:snapshotTransportRestoreRecord(before),generation:gen,raw,id:crypto.randomUUID(),priorRestoreId};
+    this.preparingTransportRestore=true;
+    try{
+      this.onChange(this);
+      const {next,point}=this.#backgroundSave()?await runWorldSaveTask('restore-plan',args):prepareTransportRestorePlan(args);
+      if(this.ledger!==base||this.generation!==gen||this.raw?.current!==raw)throw Error('現場を戻す準備中に保存が変わりました。上書きせず停止しました。');
+      // No await between releasing the preparation lock and taking the atomic
+      // restore queue lock. Ordinary saves cannot enter either interval.
+      this.preparingTransportRestore=false;this.checkTransportRestore(gen,raw);this.restoringTransport=true;
+      await this.enqueue(()=>next,{transportRestore:point});return this.constructionTransport;
+    }finally{this.preparingTransportRestore=false;this.onChange(this);}
+  }
+  async undoConstructionTransportRestore(before,gen,raw,id){
+    this.checkTransportRestore(gen,raw);const p=await this.readConstructionTransportRestore();this.checkTransportRestore(gen,raw);
+    if(!p||p.kind!=='restore'||p.id!==id||!sameTransportRestoreValue(this.ledger.world.constructionTransport,p.applied)||!sameTransportRestoreValue(before,p.applied))throw Error('復元後に作業が変わったため、復元前へ戻せません。');
+    return this.restoreConstructionTransport(p.beforeUnsaved,before,gen,raw,{priorRestoreId:p.id});
+  }
   checkEarthRestore(expectedGeneration,expectedRaw){
+    if(this.ledger?.world.constructionTransport)throw Error('共有土の作業では地形だけを復元できません。荷台・手元・移送中の土も一緒に確認してください。');
     if(this.restoringVehicle)throw Error('車両の復元結果を確認してください。');
     if(this.mode!=='live'||!this.excavationLive||this.store?.name!==LIVE_WORLD_DB)throw Error('通常保存の地形だけを復元できます。');
     if(!this.ready||this.blocked||this.busy||this.restoringEarth||this.restoringMapReset)throw Error('保存や作業を停止してから地形を復元してください。');

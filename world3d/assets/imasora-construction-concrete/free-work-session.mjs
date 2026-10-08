@@ -58,7 +58,11 @@ export function workPlatformAccess(plan,f,from,center,reach,external,heightAt,{f
  const boxes=frameWorkBoxes(f),geometry=new Map(),allowed=(x,z,m)=>{if(external(x,z,m,plan.height))return true;const key=x+','+z+','+m;if(!geometry.has(key)){const extra=Math.max(0,m-margin);geometry.set(key,!workDeckContains(plan,x-f.location.x,z-f.location.z,12.6+extra)||frameWorkspaceBlocked(boxes,{x:x-f.location.x,z:z-f.location.z},(exact?13:14.5)+extra));}return geometry.get(key);};
  const candidates=[];
  const minX=Math.min(...plan.pieces.map(p=>p.x-p.width/2)),maxX=Math.max(...plan.pieces.map(p=>p.x+p.width/2)),minZ=Math.min(...plan.pieces.map(p=>p.z-p.depth/2)),maxZ=Math.max(...plan.pieces.map(p=>p.z+p.depth/2));
- const points=exact?[exact]:Array.from({length:Math.max(0,Math.floor((maxX-minX-12)/6)+1)},(_,i)=>minX+6+i*6).flatMap(x=>Array.from({length:Math.max(0,Math.floor((maxZ-minZ-12)/6)+1)},(_,i)=>({x,z:minZ+6+i*6})));
+ // Sample the centre lines of retained floor rectangles as well as the grid.
+ // A supported 26-unit strip can fall entirely between the six-unit nodes.
+ // Every candidate still requires the full shoes, workspace and route checks.
+ const centreLines=exact?[]:plan.pieces.flatMap(p=>[{x:p.x,z:p.z},...Array.from({length:Math.max(0,Math.floor((p.depth-26)/6)+1)},(_,i)=>({x:p.x,z:p.z-p.depth/2+13+i*6})),...Array.from({length:Math.max(0,Math.floor((p.width-26)/6)+1)},(_,i)=>({x:p.x-p.width/2+13+i*6,z:p.z}))]);
+ const points=exact?[exact]:centreLines.concat(Array.from({length:Math.max(0,Math.floor((maxX-minX-12)/6)+1)},(_,i)=>minX+6+i*6).flatMap(x=>Array.from({length:Math.max(0,Math.floor((maxZ-minZ-12)/6)+1)},(_,i)=>({x,z:minZ+6+i*6}))));
  for(const{x,z}of points){
   if(face==='north'&&z>=center.z-8||face==='south'&&z<=center.z+8||face==='west'&&x>=center.x-8||face==='east'&&x<=center.x+8)continue;
   const stance={x,z,y:plan.height,heading:exact?.heading??Math.atan2(center.x-x,center.z-z)};
@@ -67,8 +71,21 @@ export function workPlatformAccess(plan,f,from,center,reach,external,heightAt,{f
  }
  candidates.sort((a,b)=>Math.hypot(a.x-center.x,a.z-center.z)-Math.hypot(b.x-center.x,b.z-center.z));
  const ground=frameGroundRoute(f,plan.panels,from,plan.entry,external,margin,heightAt);
- const landing=plan.path[0];let last;
- for(const stance of candidates.slice(0,80))try{const path=frameRoute(f,exact?[]:plan.panels,landing,stance,allowed,margin,heightAt,()=>({height:plan.height}),false,{minX:-220,maxX:220,minZ:-220,maxZ:220}).map(p=>({...p,y:plan.height}));return{stance,ground,scaffold:{...plan,stairs:plan.primaryStairs??plan.stairs,path,ground}};}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
+ const landing=plan.path[0],panels=exact?[]:plan.panels;let last;
+ function deckRoute(stance){
+  try{return frameRoute(f,panels,landing,stance,allowed,margin,heightAt,()=>({height:plan.height}),false,{minX:-220,maxX:220,minZ:-220,maxZ:220});}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
+  // Long narrow strips can exhaust the continuous-probe budget on one edge.
+  // Use short edges through actual floor centre lines, retaining all original
+  // whole-edge checks and their finite budgets. Saved geometry never changes.
+  const axes={x:[minX+13,maxX-13,...plan.pieces.map(p=>p.x)],z:[minZ+13,maxZ-13,...plan.pieces.map(p=>p.z)]};
+  for(const axis of ['x','z'])for(const value of [...new Set(axes[axis])]){
+   const other=axis==='x'?'z':'x',turns=[landing,{[axis]:value,[other]:landing[other]},{[axis]:value,[other]:stance[other]},stance],path=[landing];let safe=true;
+   for(let i=1;i<turns.length&&safe;i++){const a=turns[i-1],b=turns[i],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/24));for(let j=1;j<=n;j++){const q={x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n};if(frameSegmentBlocked(f,panels,path.at(-1),q,allowed,margin)){safe=false;break;}path.push(q);}}
+   if(safe)return path;
+  }
+  throw last;
+ }
+ for(const stance of candidates.slice(0,80))try{const path=deckRoute(stance).map(p=>({...p,y:plan.height}));return{stance,ground,scaffold:{...plan,stairs:plan.primaryStairs??plan.stairs,path,ground}};}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
  throw Error('共通作業台から施工面へ届く通路がありません。車やホースを離すか、作業台を片付けて配置を見直してください。',{cause:last});
 }
 export function createWorkPlatformSession({root,actor,feet,box,mats,heightAt,external}){
