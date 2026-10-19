@@ -1,5 +1,5 @@
-import {startExcavatorView} from './imasora-construction-excavator-dev.js?v=467';
-import {initialExcavatorBuild,actExcavatorBuild,stepExcavatorBuild,buildProgress} from './assets/imasora-construction-excavator-build.js';
+import {startExcavatorView} from './imasora-construction-excavator-dev.js?v=120fc';
+import {initialExcavatorBuild,actExcavatorBuild,stepExcavatorBuild,buildProgress} from './assets/imasora-construction-excavator-build.js?v=120fc';
 const $=id=>document.getElementById(id);
 export function startExcavatorBuildView({initial=initialExcavatorBuild,decorate=null,canEdit=()=>true}={}){
 return startExcavatorView({initial,actState:actExcavatorBuild,stepState:stepExcavatorBuild,walking:true,setup(api){
@@ -10,7 +10,7 @@ return startExcavatorView({initial,actState:actExcavatorBuild,stepState:stepExca
   }
   function cancel(){generation++;pending?.worker.terminate();pending=null;repeat=false;$('repeat-guide').checked=false;}
   function request(action){
-    if(pending||!canEdit())return;const snapshot=api.getState();api.clear();const worker=new Worker(new URL('./assets/imasora-construction-excavator-planner-worker.js',import.meta.url),{type:'module'}),id=++generation;
+    if(pending||!canEdit())return;const snapshot=api.getState();api.clear();const worker=new Worker(new URL('./assets/imasora-construction-excavator-planner-worker.js?v=120fc',import.meta.url),{type:'module'}),id=++generation;
     pending={worker,id};api.setState({...snapshot,message:'接触しない経路を確認中…（停止・カメラ操作は使えます）'});
     worker.onmessage=({data})=>{worker.terminate();if(!pending||id!==generation)return;pending=null;const current=api.getState();api.setState({...current,guide:data.guide,message:data.message});wasGuide=!!data.guide;if(!data.guide){repeat=false;$('repeat-guide').checked=false;}};
     worker.onerror=()=>{cancel();api.setState({...api.getState(),guide:null,message:'経路の計算に失敗しました。手動操作は使用できます。'});};worker.postMessage({state:snapshot,action});

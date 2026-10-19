@@ -1,6 +1,6 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {initialPurchasedSoil,packPurchasedSoil,unpackPurchasedSoil} from './imasora-construction-purchased-soil.js';
-export {purchasedSourceReader} from './imasora-construction-purchased-water-storage.js';
+import {initialPurchasedSoil,packPurchasedSoil,unpackPurchasedSoil} from './imasora-construction-purchased-soil.js?v=120fw';
+export {purchasedSourceReader} from './imasora-construction-purchased-water-storage.js?v=120fw';
 export const PURCHASED_SOIL_DB='imasora-construction-purchased-soil-copy-development-v1';
 export class PurchasedSoilStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=PURCHASED_SOIL_DB;}}
 export class PurchasedSoilSession{

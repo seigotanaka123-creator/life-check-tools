@@ -1,3 +1,4 @@
+import {openArcadeCheckpoint,bindTriLinkSave} from './imasora-arcade-autosave.mjs?v=120er';
 import * as THREE from "./three.module.min.js";
 import {
   ALL_FLOWERING_HERO_CHARACTERS,
@@ -641,6 +642,8 @@ function setVectorLength(x, z, maxLength) {
 class ImasoraTriLink3D {
   constructor(root, options = {}) {
     this.root = root;
+    this.resumeStore=openArcadeCheckpoint('trilink',options);
+    if(this.resumeStore?.value?.participants)options={...options,participants:this.resumeStore.value.participants};
     const supplied = Array.isArray(options.participants) ? options.participants.slice(0, 3) : [];
     this.participants = [0, 1, 2].map(index => cleanParticipant(supplied[index], index));
     this.memories = Array.isArray(options.memories) ? options.memories.slice(0, 12) : [];
@@ -1018,7 +1021,8 @@ class ImasoraTriLink3D {
     this.renderMemories();
     this.updateScoreboard();
     this.resize();
-    if (this.autoStart && !this.previewOnly) this.startMatch();
+    if (this.autoStart && !this.previewOnly && !this.resumeStore?.value) this.startMatch();
+    bindTriLinkSave(this);
     this.frame = requestAnimationFrame(this.boundLoop);
   }
 
@@ -1027,7 +1031,7 @@ class ImasoraTriLink3D {
     const link = document.createElement("link");
     link.id = "imasora-tri-link-modern-style";
     link.rel = "stylesheet";
-    link.href = "./assets/imasora-tri-link-modern.css?v=20260814-territory-goal-v1";
+    link.href = "./assets/imasora-tri-link-modern.css?v=120ds";
     document.head.appendChild(link);
   }
 
@@ -4241,6 +4245,7 @@ class ImasoraTriLink3D {
 
   startMatch() {
     if (this.running && !this.finished) return;
+    this.resumeResult=null;
     this.matchSequence += 1;
     this.matchId = `${this.matchSessionId}-${this.matchSequence}`;
     this.resumeAudio();
@@ -4590,6 +4595,7 @@ class ImasoraTriLink3D {
 
   loop(timestamp) {
     if (this.destroyed) return;
+    if(document.hidden||document.body.classList.contains('new-opening-active')||document.body.classList.contains('loading-screen-active')||this.autosaveBlocked){this.lastTimestamp=timestamp;this.keyState.clear();this.dragging=false;this.frame=requestAnimationFrame(this.boundLoop);return;}
     const delta = this.lastTimestamp ? Math.min(.05, Math.max(0, (timestamp - this.lastTimestamp) / 1000)) : 0;
     this.lastTimestamp = timestamp;
     this.elapsed += delta;
@@ -7530,6 +7536,7 @@ class ImasoraTriLink3D {
     this.beep(620, .16, .07);
     window.setTimeout(() => this.beep(820, .22, .065), 140);
     const record = this.createRecord(winner, reason);
+    this.resumeResult=record;void this.autoSaver?.flush('result');
     let resultRecord = { ...record, rewardSavePending: !this.testMode && !!this.onRecord };
     const present = () => {
       if (!this.destroyed) this.presentResult(resultRecord);
@@ -7538,6 +7545,7 @@ class ImasoraTriLink3D {
       if (this.destroyed || this.matchId !== record.id) return;
       const saved = summary?.committed === true || summary?.status === "duplicate";
       resultRecord = { ...record, rewardSavePending: !saved, constructionRewardBoxesAwarded: saved ? Number(summary.constructionRewardBoxesAwarded) || 0 : 0, arcadePartsAwarded: saved ? Number(summary.arcadePartsAwarded) || 0 : 0 };
+      this.resumeResult=resultRecord;void this.autoSaver?.flush('reward');
       if (saved) {
         this.memories = [resultRecord, ...this.memories.filter(m => m.id !== record.id)].slice(0, 12); this.renderMemories();
         window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
@@ -7896,6 +7904,7 @@ class ImasoraTriLink3D {
   }
 
   destroy() {
+    void this.autoSaver?.flush('exit');this.autoSaver?.dispose();
     this.destroyed = true;
     if (this.pendingRewardListener) window.removeEventListener("imasora-arcade-reward-saved", this.pendingRewardListener);
     this.pendingRewardListener = null;

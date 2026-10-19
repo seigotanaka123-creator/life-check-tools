@@ -1,15 +1,15 @@
 import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=119bf';
-import {createEmbeddedSiteView} from './site-view.mjs?v=119bf';
+import {createEmbeddedSiteView} from './site-view.mjs?v=120ds';
 import {constructionMovePadTemplate} from './move-pad.mjs?v=119bf';
 import {CONCRETE_SITE,concreteEntryAllowed,concreteSiteOverlap} from './world-contract.mjs';
-import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=113';
-import {CONSTRUCTION_PROFILE_PROJECT_TEST_DB,LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=532';
+import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120fw';
+import {CONSTRUCTION_PROFILE_PROJECT_TEST_DB,LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120fw';
 
 export function createWorldConcreteController({service,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,profileAuthorityCheck=false}){
  const fixture=service.constructionProjectPreview&&service.mode==='integration'&&service.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB;
  const liveAuthority=profileAuthorityCheck&&service.mode==='live'&&service.excavationLive&&service.store?.name===LIVE_WORLD_DB;
  if(!fixture&&!liveAuthority)throw Error('施工確認には明示された専用プロフィールが必要です。');
- const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=119bf',import.meta.url).href;document.head.append(style);
+ const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=120dz',import.meta.url).href;document.head.append(style);
  const launcher=document.createElement('section');launcher.className='concrete-launcher';launcher.innerHTML=`<h3>手作業のコンクリート施工</h3><p>${liveAuthority?'localhost:8925 専用のプロフィール保存接続確認です。ゲーム本番の保存先とは別です。':'本体マップの接続試験です。通常の保存・所持素材とは別です。'}</p><button data-action="entrance">区画の入口へ（確認用）</button><button data-action="enter">施工区画に入る</button><p class="entry-status" role="status"></p>`;
  document.querySelector('.control-card').prepend(launcher);
  const panel=document.createElement('section');panel.className='concrete-controls';panel.hidden=true;panel.setAttribute('aria-label','コンクリート手作業');

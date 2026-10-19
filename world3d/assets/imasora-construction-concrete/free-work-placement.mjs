@@ -1,6 +1,6 @@
-import {constructionBase,supportedWorkMatches} from './free-supported-build.mjs';
+import {constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120fw';
 import {freeFilledMask,freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
-import {floorPanels,boxesOverlap} from './floor-parts.mjs';
+import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120ds';
 export function freeWorkPartsProblem(p,index,mask){
  const f=p.freeBuild,w=f?.completed[index];
  if(!Number.isInteger(index)||!w)return '保管・復元する完成作品を選んでください。';

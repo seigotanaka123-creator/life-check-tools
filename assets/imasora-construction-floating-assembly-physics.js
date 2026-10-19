@@ -1,8 +1,8 @@
 // Stage 7-2: connected horizontal floors, one load/velocity per component.
-import {bounds,collides,placement} from './imasora-construction-crane.js';
-import {polygonsOverlap,worldToLocal} from './imasora-construction-loader-physics.js';
-import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js';
-export {releaseFloating} from './imasora-construction-floating-physics.js';
+import {bounds,collides,placement} from './imasora-construction-crane.js?v=120fw';
+import {polygonsOverlap,worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
+import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120fw';
+export {releaseFloating} from './imasora-construction-floating-physics.js?v=120fw';
 export const FLOATING=Object.freeze({capacity:4,sagPerLoad:.7,spring:15,damping:6,maxSpeed:24,personMass:1});
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export function component(s,id){
@@ -12,8 +12,8 @@ export function component(s,id){
 }
 export function floatingView(s){const next=structuredClone(s);for(const p of next.parts)if(p.hover&&p.id!==next.held)p.fixed=true;return next;}
 export function restoreFloatingFlags(s){for(const p of s.parts)if(p.hover)p.fixed=false;return s;}
-export function floatingPlacement(s){
-  const o=placement(floatingView(s));if(!o?.ok)return o;
+export function floatingPlacement(s,external=[],landing=null){
+  const o=placement(floatingView(s),external,landing);if(!o?.ok)return o;
   const roots=new Set(o.support.ids.map(id=>component(s,id)[0]?.id).filter(Boolean));
   if(roots.size>1)return{...o,ok:false,reason:'別々に浮いている床です。先に床同士を接合してください。'};
   if(o.candidate.materialId==='mars-timber'&&roots.size)return{...o,ok:false,reason:'火星木材の床は上に重ねず、横へ近づけて接合してください。'};

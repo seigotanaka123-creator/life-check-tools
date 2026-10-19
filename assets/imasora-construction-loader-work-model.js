@@ -1,6 +1,6 @@
 import * as THREE from './three.module.min.js';
-import {createLoader as createBase,updateLoaderModel as updateBase} from './imasora-construction-loader-model.js';
-import {CAPACITY} from './imasora-construction-loader-work.js';
+import {createLoader as createBase,updateLoaderModel as updateBase} from './imasora-construction-loader-model.js?v=120ey';
+import {CAPACITY} from './imasora-construction-loader-work.js?v=120ey';
 export function createLoader(){
   const root=createBase(),arm=new THREE.Group();arm.name='working-arm';arm.position.set(0,11,11);root.add(arm);root.updateMatrixWorld(true);
   const moving=root.children.filter(o=>['lift-arm','bucket-link','arm-pivot'].includes(o.name));for(const o of moving)arm.attach(o);

@@ -4,19 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>イマソラーズウォーク｜冒険マップ</title>
-  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=119bf">
-  <link rel="stylesheet" href="./assets/imasora-hold-dash.css?v=119bf">
-  <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=450">
-  <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=531">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=457">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=459">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=460">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=498">
-  <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=464">
-  <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=119be">
-  <link rel="stylesheet" href="./assets/imasora-world-map-menu.css?v=511">
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=120ey">
+  <link rel="stylesheet" href="./assets/imasora-hold-dash.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=120fj">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-world-map-menu.css?v=120et">
   <script src="./assets/imasora-game-touch-guard.js?v=119bg"></script>
-<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=119bm">
+<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-construction-player-menu.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-game-pastel.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-pop-menu.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-construction-high-live.css?v=120fw">
 </head>
 <body class="world-player-game">
   <main class="world-shell">
@@ -44,7 +48,7 @@
         <button type="button" id="materialGuideButton" class="material-guide-map-button" hidden>宇宙素材図鑑</button>
         <button type="button" id="constructionDeliveryButton" hidden>建材受取所</button>
         <button type="button" id="cameraModeButton">視点：三人称</button>
-        <button type="button" id="labelsButton">建物名：表示</button>
+        <button type="button" id="labelsButton">近くの名前：表示</button>
         <button type="button" id="physicsDebugButton">物理表示：OFF</button>
         <button type="button" id="saveButton">保存</button>
         <button type="button" id="resetButton" disabled>建物メニュー</button>
@@ -160,10 +164,11 @@
             </div>
           </div>
           <button type="button" id="walkDashButton" class="hold-dash-button" aria-label="ダッシュ（押している間）" aria-pressed="false"><span aria-hidden="true">≫</span><b>ダッシュ</b></button>
+          <button type="button" id="constructionJumpButton" class="construction-jump-button" aria-label="ジャンプ（3段まで）" hidden><span aria-hidden="true">↑</span><b>ジャンプ</b></button>
           <div class="touch-pad" id="touchPad" aria-label="タッチ移動パッド">
             <div class="touch-stick" id="touchStick"></div>
           </div>
-          <div class="touch-hint" id="touchHint">左パッド：画面基準で移動　Space：最大3段ジャンプ　3D画面をスライド／左ドラッグ：カメラ回転（上下左右）</div>
+          <div class="touch-hint" id="touchHint" hidden aria-hidden="true"></div>
         </div>
         <div class="viewport-footer">
           <span id="mapDescription">雲の床を歩き、雲づくり工房を建てます。</span>
@@ -246,6 +251,6 @@
       <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
     </footer>
   </main>
-  <script type="module" src="./imasora-world-3d-dev.js?v=120w"></script>
+  <script type="module" src="./imasora-world-3d-dev.js?v=120fw"></script>
 </body>
 </html>

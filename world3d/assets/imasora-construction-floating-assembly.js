@@ -1,10 +1,10 @@
 // Stage 7-2: six loan pieces, connected floating floors, isolated inventory.
-import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js';
-import {worldToLocal} from './imasora-construction-loader-physics.js';
-import {CRANE_WALK} from './imasora-construction-crane-walk.js';
-import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-assembly-physics.js';
-import {component,floatingPlacement} from './imasora-construction-floating-assembly-physics.js';
-import {joinOption,detachOption,beginJoin,stepJoining,alignCable,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js';
+import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120fw';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
+import {CRANE_WALK} from './imasora-construction-crane-walk.js?v=120fw';
+import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-assembly-physics.js?v=120fw';
+import {component,floatingPlacement} from './imasora-construction-floating-assembly-physics.js?v=120fw';
+import {joinOption,detachOption,beginJoin,stepJoining,alignCable,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120fw';
 export {joinOption,detachOption,component};
 export {floatReadout};
 export const TIMBER_PARTS=Object.freeze([

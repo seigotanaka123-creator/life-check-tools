@@ -1,19 +1,20 @@
 // Finite received floors use the approved joint solver, never its demo inventory.
-import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=523';
-import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js';
-import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js';
-import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js';
+import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=120fw';
+import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120fw';
+import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js?v=120fw';
+import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120fw';
 export {component,floatReadout,floatingView,floatingPlacement,stepFloating,joinOption,detachOption};
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);};
 // v460 saves are read without mutation. Their IDs, poses and cargo stay intact.
 export function assemblyState(s){return s.joints===undefined?{...s,joints:[],assemblyRevision:0}:s;}
 function merge(s,p){const n={...s,...p};for(const k of ['rotation','joining'])if(!p[k])delete n[k];return refreshTimberLedger(n);}
-export function worldAssemblyAction(state,action,id,external=[]){
+export function worldAssemblyAction(state,action,id,external=[],landing=null){
+  if(landing&&action!=='place')throw Error('置き先は設置する時にえらぼう。');
   const s=assemblyState(state);
   if(action==='pause')return purchasedTimberAction(s,action,id);
   ok(!s.paused,'一時停止中です。');ok(!s.rig.transition,'乗り降りの完了を待ってください。');
   if(s.joining)return{...s,message:'接合中です。次の操作は予約しません。'};
-  if(action==='issue'||action==='return-stock')return purchasedTimberAction(s,action,id);
+  if(action==='issue'||action==='return-stock')return purchasedTimberAction(s,action,id,external);
   ok(['join','detach','interact','mode','snap','home','pick','rotate','release','place'].includes(action),'不明な木材操作です。');
   if(action==='join'){
     const o=joinOption(s);ok(o.ok,o.reason);const n=copy(s);beginJoin(n,o);n.assemblyRevision++;n.joining.operation=n.assemblyRevision;return n;
@@ -22,8 +23,8 @@ export function worldAssemblyAction(state,action,id,external=[]){
   if(action==='detach'){const o=detachOption(s);ok(o.ok,o.reason);}
   if(action==='pick'&&candidate?.hover&&component(s,candidate.id).length>1)throw Error('「接合を外して吊る」を使ってください。');
   if((action==='pick'||action==='detach')&&candidate?.hover&&floatReadout(s,candidate.id).load>0)throw Error('上のレンや荷物を先に降ろしてください。');
-  if(action==='place'){const o=floatingPlacement(s);ok(o?.ok,o?.reason||'支持面へ近づけてください。');}
-  const held=s.parts.find(p=>p.id===s.held),n=merge(s,restoreFloatingFlags(actCrane(floatingView(physics),action==='detach'?'pick':action,external))),p=n.parts.find(p=>p.id===held?.id);
+  if(action==='place'){const o=floatingPlacement(s,external,landing);ok(o?.ok,o?.reason||'支持面へ近づけてください。');}
+  const held=s.parts.find(p=>p.id===s.held),n=merge(s,restoreFloatingFlags(actCrane(floatingView(physics),action==='detach'?'pick':action,external,landing))),p=n.parts.find(p=>p.id===held?.id);
   if(action==='release'&&p&&!n.held){releaseFloating(p);p.carrierId=null;n.message='この高さで浮遊を開始しました。辺にもう1枚の床を寄せると接合できます。';}
   if((action==='pick'||action==='detach')&&n.held){const q=n.parts.find(p=>p.id===n.held);q.hover=null;q.carrierId=null;n.joints=n.joints.filter(j=>j.a!==q.id&&j.b!==q.id);if(action==='detach'){n.assemblyRevision++;n.message='この1枚の接合を外して吊りました。残りの床はその場に浮いています。';}}
   if(action==='place'&&p&&!n.held)bindPlacedCargo(n,p);
@@ -37,7 +38,11 @@ export function advanceWorldAssembly(state,input,dt,external=[]){
     if(s.joining){view.parts.find(p=>p.id===s.held).fixed=true;view.held=null;}
     const next=restoreFloatingFlags(stepCrane(view,s.joining?{}:input,1/120,external));
     if(s.joining){next.held=s.held;next.parts.find(p=>p.id===s.held).fixed=false;}
-    bindLandedCargo(next,prior);stepFloating(next,1/120);stepJoining(next,1/120);
+    bindLandedCargo(next,prior);
+    const player=next.rig.player,worldWalker=next.rig.mode==='foot'&&next.rig.vehicle.field&&typeof external.groundHeightAt==='function';
+    if(worldWalker)player.y+=external.groundHeightAt(player.x,player.z)??0;
+    stepFloating(next,1/120);stepJoining(next,1/120);
+    if(worldWalker)player.y-=external.groundHeightAt(player.x,player.z)??0;
     s=merge(s,next);s.phase=Math.max(0,s.phase-1/120);
   }
   if(s.phase<1e-9)s.phase=0;return s;

@@ -1,13 +1,13 @@
-import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs';
-import {footingAt} from './free-footing.mjs';
+import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
+import {footingAt} from './free-footing.mjs?v=120fw';
 import * as T from '../three.module.min.js';
-import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs';
-import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs';
+import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs?v=120fw';
+import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs?v=120fw';
 
-import {createFootingGuard} from './free-footing-motion.mjs';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs';
-import {fixedWorkPlatform} from './free-fixed-work-platform.mjs';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
+import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120fw';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120fw';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z);
 export const frameRackPose=(rank,base=0)=>({x:FRAME_RACK.x,y:base+2+(rank+.5)*.45,z:FRAME_RACK.z,heading:0,tilt:-Math.PI/2});
@@ -65,7 +65,10 @@ export function createFreeFrameMotion({a,p,root,actor,model,hands,feet,tools,mat
  }
  function verifySeat(board,pose){root.updateMatrixWorld(true);const error=board.position.distanceTo(vec(pose)),q=1-Math.abs(board.quaternion.dot(rotation(pose)));receipt.maxPlacementError=Math.max(receipt.maxPlacementError,error,Math.abs(q));}
  function render(s,progress){
-  const record=receipt.panels.find(r=>r.id===s.panel.id),board=boards.get(s.panel.id);tools.clear();reset();assertFrameFoundation(f,supportHeightAt,[s.panel]);scaffold?.verify();
+  const record=receipt.panels.find(r=>r.id===s.panel.id),board=boards.get(s.panel.id);tools.clear();reset();assertFrameFoundation(f,supportHeightAt,[s.panel]);
+  // Scaffold steps measure all posts and both shoes below; ground-only steps
+  // still verify the retained platform. Avoid the same full check twice.
+  if(!s.scaffold)scaffold?.verify();
   if(s.kind==='climb'){scaffold.climb(s,progress);if(s.carrying){setPose(board,carryPose({...actor.position,heading:actor.rotation.y}));holdBoard(board);record.carrySamples++;}return;}
   if(s.kind==='walk'){
    const from={x:actor.position.x,z:actor.position.z};actor.position.copy(vec(s.from).lerp(vec(s.to),progress));const d=vec(s.to).sub(vec(s.from));if(d.length()>.001)actor.rotation.y=Math.atan2(d.x,d.z);if(!s.scaffold)footing.walk(phase);

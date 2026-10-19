@@ -1,7 +1,7 @@
-import {freeCell} from './free-build-state.mjs';
-import {frameBlocked} from './free-frames.mjs';
-import {FOOT_LEVEL_EPS} from './free-footing.mjs';
-import {VEHICLE_GROUND} from './free-vehicle-ground.mjs';
+import {freeCell} from './free-build-state.mjs?v=120fw';
+import {frameBlocked} from './free-frames.mjs?v=120fw';
+import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
+import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ek';
 
 const EMPTY='型枠の形を1マス以上選んでください。';
 // Read-only planning. A proposed deck never supplies a surface or owns material.

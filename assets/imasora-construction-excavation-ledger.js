@@ -1,11 +1,11 @@
 // 9-1c2b2b2: isolated integration fixture. This format cannot be a live wallet
 // save, a loan-checkpoint import, or an inventory grant.
 import {canonical,SOIL_UNIT} from './imasora-construction-state.js';
-import {createWorldLedgerAPI} from './imasora-world-ledger-engine.js';
-import {contactTerrainProjection} from './imasora-construction-excavation-compatibility.js';
-import {initialContactWorldExcavation,EXCAVATION_YARDS} from './imasora-construction-world-excavation.js';
-import {readyExcavation,oneTouchCheckpoint} from './imasora-construction-excavator-one-touch.js';
-import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js';
+import {createWorldLedgerAPI} from './imasora-world-ledger-engine.js?v=120fw';
+import {contactTerrainProjection} from './imasora-construction-excavation-compatibility.js?v=120fc';
+import {initialContactWorldExcavation,EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120fc';
+import {readyExcavation,oneTouchCheckpoint} from './imasora-construction-excavator-one-touch.js?v=120fc';
+import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js?v=120fc';
 
 export const EXCAVATION_LEDGER_KIND='imasora-excavation-validation-ledger-v1';
 const SCOPE='imasora-excavation-validation-v1',WORLD_SCOPE='imasora-excavation-validation-world-v1';

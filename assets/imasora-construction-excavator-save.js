@@ -1,8 +1,8 @@
 // 9-1c1: checkpoints for the v467 loan plot. No world wallet or legacy saves.
-import {initialExcavatorBuild,tunnelPlan} from './imasora-construction-excavator-build.js';
-import {EX,armPose,cellCenter,totals,scoopPoseAt,stickExtensionLimit,bucketOpenLimit,contactActionArm} from './imasora-construction-excavator.js';
+import {initialExcavatorBuild,tunnelPlan} from './imasora-construction-excavator-build.js?v=120fc';
+import {EX,armPose,cellCenter,totals,scoopPoseAt,stickExtensionLimit,bucketOpenLimit,contactActionArm} from './imasora-construction-excavator.js?v=120fc';
 import {canonical} from './imasora-construction-state.js';
-import {EX_ACCESS,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js';
+import {EX_ACCESS,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js?v=120ey';
 import {BACKHOE_BUCKET,CONTACT_DIG,isContactDig} from './imasora-construction-excavator-bucket.js';
 export const EXCAVATION_FORMAT='imasora-excavation-checkpoint-v1';
 export const BACKHOE_EXCAVATION_FORMAT='imasora-excavation-checkpoint-v2';

@@ -1,8 +1,8 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-model.js?v=430';
-import {initialLoaderState,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,SITE,OBSTACLES,SAFE_ZONE,approach,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=430';
+import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-model.js?v=120ey';
+import {initialLoaderState,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,SITE,OBSTACLES,SAFE_ZONE,approach,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
 const $=id=>document.getElementById(id),local=['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 let state=initialLoaderState(),roofTransparent=false,cameraMode=0,orbit=-2.55,pitch=.58,distance=185,stepAmount=1,walkPhase=0;
 const held=new Map(),keys=new Set(),scene=new THREE.Scene();scene.background=new THREE.Color(0xd6e5df);scene.fog=new THREE.Fog(0xd6e5df,800,1600);

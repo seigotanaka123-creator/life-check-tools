@@ -1,8 +1,8 @@
-import {constructionBase} from './free-supported-build.mjs';
-import {freeCell} from './free-build-state.mjs';
-import {frameBlocked,frameRoute,frameLocal} from './free-frames.mjs';
-import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs';
-import {frameDeckHeight} from './free-frame-workspace.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120fw';
+import {frameBlocked,frameRoute,frameLocal} from './free-frames.mjs?v=120fw';
+import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
+import {frameDeckHeight} from './free-frame-workspace.mjs?v=120fw';
 
 export const finishNeedsScaffold=f=>constructionBase(f)+f.height>4;
 export const newFinishAccess=f=>Array.from({length:16},(_,cell)=>cell).filter(cell=>f.fill[cell]>0&&finishNeedsScaffold(f)).map(cell=>({cell,...newScaffoldReceipt()}));

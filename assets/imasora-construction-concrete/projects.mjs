@@ -1,6 +1,6 @@
 import {freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
-import {freeGeometry} from './free-build-state.mjs';
-import {floorMask,floorPanels,floorPanelsProblem,boxesOverlap} from './floor-parts.mjs';
+import {freeGeometry} from './free-build-state.mjs?v=120fw';
+import {floorMask,floorPanels,floorPanelsProblem,boxesOverlap} from './floor-parts.mjs?v=120ds';
 export const DEFAULT_CONCRETE_LOCATION=Object.freeze({x:600,z:1450});
 export const MAX_CONCRETE_FLOORS=16;
 export const concreteLocation=project=>project.location??DEFAULT_CONCRETE_LOCATION;

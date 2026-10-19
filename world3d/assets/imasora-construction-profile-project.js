@@ -1,11 +1,13 @@
+import {highCastingBoards} from './imasora-construction-concrete/high-casting-state.mjs?v=120ft';
 import {PROJECT_HISTORY_PAGE,PROJECT_HISTORY_LIMIT,projectOperationCount,findProjectOperation,archiveProjectPage} from './imasora-construction-concrete/project-history.mjs';
-import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs';
+import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs?v=120fw';
 import './imasora-construction-pack-transfer.js?v=530';
 import {createTrialState,assertTrialState,transitionTrial} from './imasora-construction-concrete-site-state.js';
 import {createMixer,supplyIngredients,startMix,advanceMix,cancelMix,availableMixCells,CURE_DURATION_MS} from './imasora-construction-concrete/mixing.mjs';
-import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs';
-import {floorMask,floorPanelsProblem,paintCost,paintRemaining} from './imasora-construction-concrete/floor-parts.mjs';
-import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs';
+import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs?v=120fw';
+import {floorMask,floorPanelsProblem,paintCost,paintRemaining} from './imasora-construction-concrete/floor-parts.mjs?v=120ds';
+import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs?v=120fw';
+import {captureFreeStep,finishFreeStep,restoreFreeStep,enableFreeStepHistory,advanceLegacyStepHistory,FREE_STEP_ACTIONS} from './imasora-construction-concrete/free-step-undo.mjs?v=120ft';
 
 export const PROFILE_PROJECT_SCOPE='imasora-construction-profile-project-v1';
 export const PROFILE_PROJECT_SITE='construction';
@@ -69,8 +71,12 @@ function packetFor(ledger,id,profileId){
  return packet;
 }
 function apply(state,action,packLedger){
- if(action.type==='PLACE_FORMWORK'&&state.foundation&&foundationBoardCount(state.foundation)+(state.schemaVersion>=11&&!['design','complete'].includes(state.freeBuild.stage)?freeFrameBoards(state.freeBuild.mask):0)+8>(packLedger.quantities?.auxiliaryUnits?.formwork??0))fail('土台で使用中の板を回収してから型枠を組んでください。');
- if(action.type.startsWith('FREE_')){applyFreeAction(state,action,packLedger);
+ if(state.freeBuild?.highCastings?.some(c=>c.pending)&&!['FREE_HIGH_TICK','FREE_HIGH_FLOW_FINISH','FREE_HIGH_FLOW_CANCEL'].includes(action.type))fail('上の階へ送っているよ。送液を止めてから別の作業をしよう。');
+ if((action.type==='FREE_PARK_VEHICLES'||action.recordStep==='ten'||action.multiStep===true)&&!Object.hasOwn(state,'workStepUndoStack'))enableFreeStepHistory(state,legacyStepHistory(state,packLedger));
+ const step=captureFreeStep(state,action);
+ if(action.type==='PLACE_FORMWORK'&&(state.foundation||highCastingBoards(state.freeBuild))&&highCastingBoards(state.freeBuild)+(state.foundation?foundationBoardCount(state.foundation):0)+(state.schemaVersion>=11&&!['design','complete'].includes(state.freeBuild.stage)?freeFrameBoards(state.freeBuild.mask):0)+8>(packLedger.quantities?.auxiliaryUnits?.formwork??0))fail('土台で使用中の板を回収してから型枠を組んでください。');
+ if(action.type==='FREE_UNDO_STEP'){restoreFreeStep(state,action);
+ }else if(action.type.startsWith('FREE_')){applyFreeAction(state,action,packLedger);
  }else if(['IMPORT_PACK_CONCRETE','IMPORT_PACK_INGREDIENTS'].includes(action.type)){
   const packet=packetFor(packLedger,action.transferId,state.profileId),previous=state.importedTransfers.find(receipt=>receipt.transferId===packet.id);
   if(previous)return false;
@@ -120,8 +126,29 @@ function apply(state,action,packLedger){
  }else{
   const next=transitionTrial(state.site,action,state.site.revision);if(!next.changed)return false;state.site=next.state;
  }
+ if(action.type!=='FREE_UNDO_STEP')finishFreeStep(state,action,step);
  state.operations.push(clone(action));state.revision++;archiveProjectPage(state);return true;
 }
+// A one-time explicit upgrade recovers at most ten supported old work steps.
+// Replay is read-only with respect to the original saved object. Every old undo
+// and material/site boundary is honored, rather than resurrecting spent stock.
+function legacyStepHistory(state,ledger){
+ const history=[];let replay=createProfileProject(state.profileId,state.historySourceSchemaVersion??state.schemaVersion);
+ const pages=[...(state.archivedOperations??[]),state.operations];
+ for(let index=0;index<pages.length;index++){
+  for(const raw of pages[index]){
+   const a=canonical(raw);if(a.recordStep==='ten'||a.multiStep===true)fail('INVALID_UNDO_UPGRADE_HISTORY');
+   const point=FREE_STEP_ACTIONS.has(a.type)?captureFreeStep(replay,{...a,recordStep:true}):null;
+   if(point)point.revision=replay.revision;const oldPaintId=replay.freeBuild?.paintUndo?.operationId;
+   apply(replay,a,ledger);advanceLegacyStepHistory(history,a,point,oldPaintId);
+  }
+  if(index<pages.length-1&&replay.schemaVersion<14)replay=upgradeProjectHistory(replay);
+ }
+ return history;
+}
+// The controller calls this only when its already-validated project changes.
+// Return owned patches, never the project's mutable stack or full save.
+export function profileWorkUndoHistory(state,ledger){return structuredClone((Object.hasOwn(state,'workStepUndoStack')?state.workStepUndoStack:legacyStepHistory(state,ledger)).slice(-10));}
 // Only exact, already replayed archived pages may use this private bounded
 // cache. The key includes every page byte and the full validated pack ledger.
 // State fields and the active page are still checked on every call.

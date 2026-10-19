@@ -1,17 +1,26 @@
-import * as bucket from './imasora-construction-bucket-dump.mjs';
-import {createDumpWork} from './imasora-construction-dump-work.mjs';
-import {shovelMachineState,shovelDumpObstacles} from './imasora-construction-shovel-work.mjs';
-import {soilTransportCommand,validateSoilTransport,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs';
-import {beginOneTouch,stepOneTouch,DIG_READY} from './imasora-construction-excavator-one-touch.js';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js';
-import {localToWorld} from './imasora-construction-loader-physics.js';
-import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js';
-import {armPose} from './imasora-construction-excavator.js';
-import {actWorldExcavation} from './imasora-construction-world-excavation.js';
+import {retainingBasinCut} from './imasora-construction-basin-shape.mjs?v=120fb';
+import {nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120fw';
+import {excavatorWorkSupported} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
+import {unopenedGround} from './imasora-construction-field-earth.mjs?v=120fc';
+export {driveTransportExcavator} from './imasora-construction-transport-drive.mjs?v=120fw';
+import * as bucket from './imasora-construction-bucket-dump.mjs?v=120fw';
+import {createDumpWork} from './imasora-construction-dump-work.mjs?v=120fw';
+import {shovelMachineState,shovelDumpObstacles} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {soilTransportCommand,soilTransportCommands,validateSoilTransport,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {beginOneTouch,stepOneTouch,DIG_READY} from './imasora-construction-excavator-one-touch.js?v=120fc';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ey';
+import {localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
+import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js?v=120fc';
+import {armPose,EX} from './imasora-construction-excavator.js?v=120fc';
+import {actWorldExcavation} from './imasora-construction-world-excavation.js?v=120fc';
 import {canonical} from './imasora-construction-state.js';
 export const SCOOP_DUMP_FORMAT='imasora-fragment-scoop-dump-checkpoint-v1';
 export const SCOOP_DUMP_SCOPE='imasora-fragment-scoop-dump-isolated-v1';
 const STEP=1/60,cache=new WeakMap(),certificates=new WeakMap(),shadowCache=new WeakMap(),replayPlans=new Map();
+const basinCache=new WeakMap();
+// Save/readback clones lose identity. Keep a small exact-value cache of the
+// privately frozen audit projections; never cache an imported validation verdict.
+const shadowValues=new Map();let shadowBytes=0;const shadowLimit=8*1024*1024;
 const axes=['boom','stick','curl','slew'],same=(a,b)=>canonical(a)===canonical(b);
 const check=(v,t)=>{if(!v)throw Error('ショベル作業：'+t);};
 const exact=(v,keys)=>check(v&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join('|')===[...keys].sort().join('|'),'保存の項目が不正です。');
@@ -33,31 +42,36 @@ function physical(s,soil=s.frame.soil,{partialExact=false}={}){
 }
 function bucketPoint(f,x,y,z){const p=localToWorld(f.dump,x,z);return[p.x,y,p.z];}
 const lerp=(a,b,t)=>Object.fromEntries(axes.map(k=>[k,a[k]+(b[k]-a[k])*t]));
-function groups(soil){
+function groups(soil,vehicle){
  const out=[],bits=mask=>Array.from({length:64},(_,i)=>i).filter(i=>(BigInt('0x'+mask)&(1n<<BigInt(i)))!==0n);
- for(const [id,b]of Object.entries(soil.blocks)){const c=id.split(',').map(Number),indexes=bits(b.mask),full=indexes.length===64;
+ for(const [id,b]of Object.entries(soil.blocks)){const c=id.split(',').map(Number);if(vehicle&&(Math.abs(c[0]*8+4-vehicle.x)>200||Math.abs(c[2]*8+4-vehicle.z)>200))continue;const indexes=bits(b.mask),full=indexes.length===64;
   out.push({from:'terrain',id,materialId:b.materialId,amount:indexes.length,positions:()=>indexes.map(i=>[c[0]*4+i%4,c[1]*4+Math.floor(i/4)%4,c[2]*4+Math.floor(i/16)]),boxes:full?[{position:c.map(n=>n*8+4),size:8,materialId:b.materialId}]:indexes.map(i=>({position:[c[0]*8+i%4*2+1,c[1]*8+Math.floor(i/4)%4*2+1,c[2]*8+Math.floor(i/16)*2+1],size:2,materialId:b.materialId}))});
  }
- for(const [id,b]of Object.entries(soil.loose)){const indexes=bits(b.mask);if(!indexes.length)continue;out.push({from:'loose',id,materialId:b.materialId,amount:indexes.length,positions:()=>indexes.map(i=>[i%4,Math.floor(i/4)%4,Math.floor(i/16)]),boxes:indexes.length===64?[{position:[...b.position],size:8,materialId:b.materialId}]:indexes.map(i=>({position:[b.position[0]-3+i%4*2,b.position[1]-3+Math.floor(i/4)%4*2,b.position[2]-3+Math.floor(i/16)*2],size:2,materialId:b.materialId}))});}
+ for(const [id,b]of Object.entries(soil.loose)){if(vehicle&&(Math.abs(b.position[0]-vehicle.x)>200||Math.abs(b.position[2]-vehicle.z)>200))continue;const indexes=bits(b.mask);if(!indexes.length)continue;out.push({from:'loose',id,materialId:b.materialId,amount:indexes.length,positions:()=>indexes.map(i=>[i%4,Math.floor(i/4)%4,Math.floor(i/16)]),boxes:indexes.length===64?[{position:[...b.position],size:8,materialId:b.materialId}]:indexes.map(i=>({position:[b.position[0]-3+i%4*2,b.position[1]-3+Math.floor(i/4)%4*2,b.position[2]-3+Math.floor(i/16)*2],size:2,materialId:b.materialId}))});}
  return out.sort((a,b)=>(a.from+':'+a.id).localeCompare(b.from+':'+b.id));
 }
 function takeGroup(soil,g){if(g.from==='terrain'){const blocks={...soil.blocks};delete blocks[g.id];return{...soil,blocks};}return{...soil,loose:{...soil.loose,[g.id]:{...soil.loose[g.id],mask:'0000000000000000'}}};}
+function touchesCut(part,box){
+ const h=box.size/2,p=box.position;
+ for(let k=0;k<3;k++)if(part.min[k]>p[k]+h+.08||part.max[k]<p[k]-h-.08)return false;
+ return prismTouchesBox(part,[p[0]-h,p[1]-h,p[2]-h],[p[0]+h,p[1]+h,p[2]+h],.08);
+}
 function* generate(s,{partialExact=false}={}){
  if(s.mode!=='excavating'||s.scoop||s.link||s.unload||s.frame.job||s.frame.soil.pending||s.frame.soil.containers.bucket.amount)return null;
  const {work,external}=physical(s,s.frame.soil,{partialExact});let run=beginOneTouch(work,'scoop',external),time=0,remaining=s.frame.soil,amount=0;
- const candidates=groups(remaining),removed=new Set(),poses=[{time:0,arm:{...work.arm},phase:run.sequence.phase}],cuts=[];
+ const candidates=groups(remaining,work.loader.vehicle),removed=new Set(),poses=[{time:0,arm:{...work.arm},phase:run.sequence.phase}],cuts=[];
  while(run.sequence&&time<45){
   const previous=run.work,seq=run.sequence,oldTime=time;run=stepOneTouch(previous,seq,{},STEP,external);time+=STEP;
   const n=Math.max(1,...axes.map(k=>Math.ceil(Math.abs(run.work.arm[k]-previous.arm[k])/.003)));let safe={...previous.arm};
   for(let i=1;i<=n;i++){
    const arm=lerp(previous.arm,run.work.arm,i/n),probe={...run.work,arm},geometry=bucketContactGeometry(probe,armPose(probe));
    if(seq.phase==='cut')for(const group of candidates){const id=group.from+':'+group.id;if(removed.has(id)||group.materialId!=='earth-soil'||group.amount>384-amount)continue;
-    if(!group.boxes.some(b=>geometry.teeth.some(t=>prismTouchesBox(t,b.position.map(v=>v-b.size/2),b.position.map(v=>v+b.size/2),.08))))continue;
+    if(!group.boxes.some(b=>geometry.teeth.some(t=>touchesCut(t,b))))continue;
     remaining=takeGroup(remaining,group);removed.add(id);amount+=group.amount;cuts.push({from:group.from,id:group.id,positions:group.positions(),boxes:group.boxes,time:oldTime+STEP*i/n});
    }
    if(!bucket.linkedArmClear({...s.frame,machineArm:arm,soil:remaining})){
     // The legacy loose cube is 0.1 smaller. Stop at the exact surface, then cut.
-    const tooth=candidates.some(group=>!removed.has(group.from+':'+group.id)&&group.boxes.some(b=>geometry.teeth.some(t=>prismTouchesBox(t,b.position.map(v=>v-b.size/2),b.position.map(v=>v+b.size/2),.08))));
+    const tooth=candidates.some(group=>!removed.has(group.from+':'+group.id)&&group.boxes.some(b=>geometry.teeth.some(t=>touchesCut(t,b))));
     const hardClear=bucket.linkedArmClear({...s.frame,machineArm:arm,soil:{...remaining,blocks:{},loose:{}}});
     if(!['lower','draw'].includes(seq.phase)||!tooth||!hardClear)return null;
     const cutting=actWorldExcavation({...previous,arm:safe},'scoop',external);if(cutting.action?.kind!=='scoop')return null;
@@ -79,16 +93,53 @@ function* generatePlan(s){
  // soil, hard ground, body, shell and shafts are still checked at every pose.
  return yield* generate(s,{partialExact:true});
 }
-function key(s){return canonical([s.frame.machineArm,s.frame.dump,s.mode]);}
-const canPlan=s=>s.mode==='excavating'&&!s.scoop&&!s.link&&!s.unload&&!s.frame.job&&!s.frame.soil.pending&&!s.frame.soil.containers.bucket.amount;
-function replayKey(s){const soil=s.frame.soil;return canonical([soil.initial,soil.site,soil.blocks,soil.loose,soil.containers.dump,s.frame.machineArm,s.frame.dump,s.mode]);}
+function* generateBasin(s,legacy=false){
+ // Survey a few nearby upper-body directions; keep the crawler stationary.
+ // Every candidate is the existing swept-tooth excavation, not a rectangular
+ // deletion. The broad area is bounded to one bucket's actual capacity.
+ let best=null;const start=s.frame.machineArm;
+ for(const offset of[0,-.2,.2]){
+  const arm={...start,slew:start.slew+offset};if(Math.abs(arm.slew)>EX.slewLimit)continue;
+  const count=Math.ceil(Math.abs(offset)/(.62*STEP)),aim=[];let safe=true;
+  for(let i=0;i<=count;i++){const a=lerp(start,arm,count?i/count:0);if(!bucket.linkedArmClear(s.frame,a)){safe=false;break;}aim.push({time:i*STEP,arm:a,phase:'aim'});yield;}
+  if(!safe)continue;
+  const p=yield* generatePlan({...s,frame:{...s.frame,machineArm:arm}});if(!p||(legacy?p.cuts.some(c=>c.from!=='terrain'||c.positions.some(q=>q[1]<-4||q[1]>=0)):!retainingBasinCut(s.frame,p,nativeDumpHeightReader(s.frame))))continue;
+  const delay=count*STEP,plan={...p,kind:legacy?'basin':'basin-v2',duration:p.duration+delay,poses:[...aim.slice(0,-1),...p.poses.map(q=>({...q,time:q.time+delay}))],cuts:p.cuts.map(c=>({...c,time:c.time+delay}))};
+  if(plan.duration>45)continue;
+  if(!best||plan.amount>best.amount)best=plan;if(best.amount>=256)break;
+ }
+ return best?freeze(best):null;
+}
+function key(s){return canonical([s.frame.machineArm,s.frame.machineVehicle??null,s.frame.dump,s.mode]);}
+const canPlan=s=>s.mode==='excavating'&&!s.scoop&&!s.link&&!s.unload&&!s.frame.job&&!s.frame.soil.pending&&!s.frame.soil.containers.bucket.amount&&excavatorWorkSupported(s.frame);
+function replayKey(s){const soil=s.frame.soil;return canonical([soil.initial,soil.site,soil.field??null,soil.journal.filter(c=>c.type==='open-ground').map(c=>c.patches),soil.blocks,soil.loose,soil.containers.dump,s.frame.machineArm,s.frame.machineVehicle??null,s.frame.dump,s.mode]);}
 function rememberPlan(s,k,plan){cache.set(s.frame.soil,{key:k,plan});const stamp=replayKey(s);replayPlans.delete(stamp);replayPlans.set(stamp,plan);if(replayPlans.size>8)replayPlans.delete(replayPlans.keys().next().value);return plan;}
 // Atomic save/readback clones the soil. Reuse only a previously checked path
 // with the same source, occupied geometry, cargo, vehicle and starting arm.
 // Journal and revision still undergo the full ownership audit below.
-function replayPlan(s){const stamp=replayKey(s);return replayPlans.has(stamp)?replayPlans.get(stamp):scoopDumpPlan(s);}
-export function scoopDumpPlan(s){if(!canPlan(s))return null;const k=key(s),old=cache.get(s.frame.soil);if(old?.key===k)return old.plan;const it=generatePlan(s);let n;do{n=it.next();}while(!n.done);return rememberPlan(s,k,n.value);}
-export async function scoopDumpPlanAsync(s,yieldFrame=()=>new Promise(r=>setTimeout(r,0))){if(!canPlan(s))return null;const k=key(s),old=cache.get(s.frame.soil);if(old?.key===k)return old.plan;const it=generatePlan(s);let n,count=0,slice=performance.now();do{n=it.next();if(!n.done&&(++count>=32||performance.now()-slice>=6)){await yieldFrame();slice=performance.now();count=0;}}while(!n.done);return rememberPlan(s,k,n.value);}
+function replayPlan(s,kind){if(kind==='basin'){const k='legacy-basin:'+replayKey(s);if(replayPlans.has(k))return replayPlans.get(k);const it=generateBasin(s,true);let n;do{n=it.next();}while(!n.done);replayPlans.set(k,n.value);if(replayPlans.size>8)replayPlans.delete(replayPlans.keys().next().value);return n.value;}return kind==='basin-v2'?basinScoopPlan(s):replayPlans.has(replayKey(s))?replayPlans.get(replayKey(s)):scoopDumpPlan(s);}
+function rememberBasin(s,k,plan){basinCache.set(s.frame.soil,{key:k,plan});const stamp='basin:'+replayKey(s);replayPlans.delete(stamp);replayPlans.set(stamp,plan);if(replayPlans.size>8)replayPlans.delete(replayPlans.keys().next().value);return plan;}
+async function sharedScoopPlan(s,basin){
+ // Planning and the later full save check use one worker, retaining its exact
+ // geometric replay cache. This result is a preview, never a save receipt.
+ const {runWorldSaveTask}=await import('./imasora-world-save-client.mjs?v=120fw'),abort=new AbortController(),timer=setTimeout(()=>abort.abort(),30000);
+ try{return await runWorldSaveTask('scoop-plan',{work:s,basin},{signal:abort.signal});}finally{clearTimeout(timer);}
+}
+export function basinScoopPlan(s){if(!canPlan(s))return null;const k=key(s),old=basinCache.get(s.frame.soil);if(old?.key===k)return old.plan;const stamp='basin:'+replayKey(s);if(replayPlans.has(stamp))return rememberBasin(s,k,replayPlans.get(stamp));const it=generateBasin(s);let n;do{n=it.next();}while(!n.done);return rememberBasin(s,k,n.value);}
+export async function basinScoopPlanAsync(s,yieldFrame=()=>new Promise(r=>setTimeout(r,0))){
+ if(!canPlan(s))return null;const k=key(s),old=basinCache.get(s.frame.soil);if(old?.key===k)return old.plan;const stamp='basin:'+replayKey(s);if(replayPlans.has(stamp))return rememberBasin(s,k,replayPlans.get(stamp));
+ let plan;if(typeof document!=='undefined'&&typeof Worker==='function'){
+  plan=await sharedScoopPlan(s,true);
+ }else{const it=generateBasin(s);let n,count=0,time=performance.now();do{n=it.next();if(!n.done&&(++count>=32||performance.now()-time>=6)){await yieldFrame();count=0;time=performance.now();}}while(!n.done);plan=n.value;}
+ plan=plan?freeze(plan):null;return rememberBasin(s,k,plan);
+}
+export function scoopDumpPlan(s){if(!canPlan(s))return null;const k=key(s),old=cache.get(s.frame.soil);if(old?.key===k)return old.plan;const stamp=replayKey(s);if(replayPlans.has(stamp))return rememberPlan(s,k,replayPlans.get(stamp));const it=generatePlan(s);let n;do{n=it.next();}while(!n.done);return rememberPlan(s,k,n.value);}
+export async function scoopDumpPlanAsync(s,yieldFrame=()=>new Promise(r=>setTimeout(r,0))){if(!canPlan(s))return null;const k=key(s),old=cache.get(s.frame.soil);if(old?.key===k)return old.plan;const stamp=replayKey(s);if(replayPlans.has(stamp))return rememberPlan(s,k,replayPlans.get(stamp));
+ if(typeof document!=='undefined'&&typeof Worker==='function'){
+  const plan=await sharedScoopPlan(s,false);
+  return rememberPlan(s,k,freeze(plan));
+ }
+ const it=generatePlan(s);let n,count=0,slice=performance.now();do{n=it.next();if(!n.done&&(++count>=32||performance.now()-slice>=6)){await yieldFrame();slice=performance.now();count=0;}}while(!n.done);return rememberPlan(s,k,n.value);}
 function segments(plan){return plan.cuts.map(c=>({from:c.from,positions:c.positions,...(c.from==='loose'?{looseId:c.id}:{})}));}
 export function scoopPoseAt(plan,time){const poses=plan.poses;for(let i=1;i<poses.length;i++)if(time<=poses[i].time){const a=poses[i-1],b=poses[i];return lerp(a.arm,b.arm,(time-a.time)/(b.time-a.time));}return{...poses.at(-1).arm};}
 export function scoopVisual(s){const j=s.scoop;if(!j)return{bucket:s.frame.soil.containers.bucket.amount,source:[],progress:0,phase:null};const collected=j.plan.cuts.filter(c=>c.time<=j.elapsed+1e-10).reduce((n,c)=>n+c.positions.length,0),phase=j.plan.poses.find(p=>p.time>=j.elapsed)?.phase??'done';return{bucket:collected,source:j.plan.cuts.filter(c=>c.time>j.elapsed+1e-10).flatMap(c=>c.boxes),progress:j.elapsed/j.plan.duration,phase};}
@@ -97,35 +148,48 @@ export function createScoopDumpWork(source){
  const p=localToWorld(w.loader.vehicle,80,13),frame={...b.frame,dump:{x:p.x,z:p.z,heading:w.loader.vehicle.heading},machineArm:{...w.arm}},door=excavatorAccessPath(w.loader.vehicle,frame.machineArm.slew,-1)[0];frame.player={...frame.player,...door,heading:Math.atan2(Math.sin(door.heading),Math.cos(door.heading)),travel:0};
  return validateScoopDumpWork(lift({...b,frame,link:null}));
 }
-export function startScoopDump(s,operationId){
+export const startScoopDump=(s,operationId)=>startPlannedScoop(s,operationId,false);
+export const startBasinScoop=(s,operationId)=>startPlannedScoop(s,operationId,true);
+function startPlannedScoop(s,operationId,basin){
+ check(excavatorWorkSupported(s.frame),'履帯を支える地面がないよ。安全な地面へ停め直そう。');
  assertIdle(s);check(typeof operationId==='string'&&/^[a-zA-Z0-9_-]{1,55}$/.test(operationId),'操作番号が不正です。');check(s.frame.soil.journal.length<=SOIL_LIMITS.history-3,'保存の履歴が上限です。土を保持します。');
- const plan=scoopDumpPlan(s);check(plan,'爪が届く土がないか、通り道がふさがっています。位置・向きを変えてください。');
+ const plan=basin?basinScoopPlan(s):scoopDumpPlan(s);check(plan,basin?'穴を掘れる地面へ向けよう。平らな地面で、車や建物から離してね。':'爪が届く土がないか、通り道がふさがっています。位置・向きを変えてください。');
  const soil=soilTransportCommand(s.frame.soil,{type:'reserve-batch',id:operationId+'_reserve',expectedRevision:s.frame.soil.revision,transferId:operationId,to:'bucket',materialId:'earth-soil',segments:segments(plan)});
- certificates.set(plan,{soil,dump:canonical(s.frame.dump),signature:canonical(plan)});
+ certificates.set(plan,{soil,soilKey:canonical(soil),dump:canonical([s.frame.dump,s.frame.machineVehicle??null]),signature:canonical(plan)});
  return next(s,{...s.frame,soil},{scoop:{id:operationId,plan,elapsed:0,returning:false}});
 }
 export function progressScoopDump(s,dt){check(s.scoop&&finite(dt,0,.05),'進行時間が不正です。');const j=s.scoop,elapsed=j.returning?Math.max(0,j.elapsed-dt):Math.min(j.plan.duration,j.elapsed+dt),frame={...s.frame,machineArm:scoopPoseAt(j.plan,elapsed)};frame.player=bucket.linkedExcavatorSeat(frame);return next(s,frame,{scoop:{...j,elapsed}});}
 export const scoopDumpReady=s=>!!s.scoop&&(s.scoop.returning?s.scoop.elapsed===0:s.scoop.elapsed===s.scoop.plan.duration);
 export function cancelScoopDump(s){check(s.scoop&&s.scoop.elapsed<s.scoop.plan.cuts[0].time,'すくい始めた土は戻せません。メニューで一時停止し、続きから再開できます。');return next(s,s.frame,{scoop:{...s.scoop,returning:true}});}
 export function finishScoopDump(s){check(scoopDumpReady(s),'動作が終わるまでお待ちください。');const j=s.scoop;let soil=soilTransportCommand(s.frame.soil,{type:j.returning?'cancel':'release',id:j.id+(j.returning?'_cancel':'_release'),expectedRevision:s.frame.soil.revision,transferId:j.id});if(!j.returning)soil=soilTransportCommand(soil,{type:'complete',id:j.id+'_complete',expectedRevision:soil.revision,transferId:j.id});return validateScoopDumpWork(next(s,{...s.frame,soil},{scoop:null}));}
-function projections(s){let c=shadowCache.get(s.frame.soil);if(!c){const p=s.frame.soil.pending;let original=soilTransportCommand(s.frame.soil,{type:'cancel',id:p.id+'_audit_cancel',expectedRevision:s.frame.soil.revision,transferId:p.id});let landed=soilTransportCommand(s.frame.soil,{type:'release',id:p.id+'_audit_release',expectedRevision:s.frame.soil.revision,transferId:p.id});landed=soilTransportCommand(landed,{type:'complete',id:p.id+'_audit_complete',expectedRevision:landed.revision,transferId:p.id});c={original,landed};shadowCache.set(s.frame.soil,c);}return c;}
+function projections(s){
+ const soil=s.frame.soil,key=canonical(soil),identity=shadowCache.get(soil);if(identity?.key===key)return identity.value;let c;
+ // Caller has fully validated soil before reaching this function. The entire
+ // value, including history and reservation, is compared; no hash can collide.
+ const old=shadowValues.get(key);
+ if(old){shadowValues.delete(key);shadowValues.set(key,old);c=old.value;}
+ else{const p=soil.pending;const original=soilTransportCommand(soil,{type:'cancel',id:p.id+'_audit_cancel',expectedRevision:soil.revision,transferId:p.id}),landed=soilTransportCommands(soil,[{type:'release',id:p.id+'_audit_release',expectedRevision:soil.revision,transferId:p.id},{type:'complete',id:p.id+'_audit_complete',expectedRevision:soil.revision+1,transferId:p.id}]);c=freeze({original,landed});
+  const bytes=(key.length+canonical(c).length)*2;if(bytes<=shadowLimit){while(shadowValues.size>=8||shadowBytes+bytes>shadowLimit){const first=shadowValues.keys().next().value;shadowBytes-=shadowValues.get(first).bytes;shadowValues.delete(first);}shadowValues.set(key,{value:c,bytes});shadowBytes+=bytes;}
+ }
+ shadowCache.set(soil,{key,value:c});return c;
+}
 export function validateScoopDumpWork(s){
  exact(s,['format','scope','version','revision','frame','mode','vehicleTravel','wheelTravel','unload','link','scoop']);check(s.format===SCOOP_DUMP_FORMAT&&s.scope===SCOOP_DUMP_SCOPE&&s.version===1,'専用の掘削・積込み保存が必要です。');
  if(!s.scoop){bucket.validateBucketDumpWork(base(s));return s;}
- const j=s.scoop;exact(j,['id','plan','elapsed','returning']);exact(j.plan,['amount','duration','poses','cuts']);check(s.mode==='excavating'&&!s.link&&!s.unload&&!s.frame.job&&typeof j.returning==='boolean','別の作業と重なっています。');
+ const j=s.scoop;exact(j,['id','plan','elapsed','returning']);exact(j.plan,['amount','duration','poses','cuts',...(j.plan.kind===undefined?[]:['kind'])]);check(j.plan.kind===undefined||['basin','basin-v2'].includes(j.plan.kind),'掘り方が不正です。');check(s.mode==='excavating'&&!s.link&&!s.unload&&!s.frame.job&&typeof j.returning==='boolean','別の作業と重なっています。');
  check(typeof j.id==='string'&&/^[a-zA-Z0-9_-]{1,55}$/.test(j.id)&&finite(j.plan.duration,STEP,45)&&Array.isArray(j.plan.poses)&&j.plan.poses.length<=2800&&Array.isArray(j.plan.cuts)&&j.plan.cuts.length>0&&j.plan.cuts.length<=384&&j.plan.amount>=1&&j.plan.amount<=384&&j.plan.amount===j.plan.cuts.reduce((n,c)=>n+c.positions.length,0),'掘削経路が不正です。');
  validateSoilTransport(s.frame.soil);const p=s.frame.soil.pending,r=s.frame.soil.journal.at(-1);
  check(p?.id===j.id&&p.from==='batch'&&p.to==='bucket'&&p.phase==='reserved'&&p.materialId==='earth-soil'&&p.amount===j.plan.amount&&s.frame.soil.containers.bucket.amount===0&&r.id===j.id+'_reserve'&&same(p.segments,segments(j.plan)),'土の予約と掘る範囲が一致しません。');
  check(finite(j.elapsed,0,j.plan.duration)&&(!j.returning||j.elapsed<j.plan.cuts[0].time)&&same(s.frame.machineArm,scoopPoseAt(j.plan,j.elapsed)),'アームと途中時刻が一致しません。');
  const shadow=projections(s);
  bucket.validateBucketDumpWork({...base(s),frame:{...s.frame,soil:shadow.landed}});
- const stamp={soil:s.frame.soil,dump:canonical(s.frame.dump),signature:canonical(j.plan)},old=certificates.get(j.plan);
- if(!old||old.soil!==stamp.soil||old.dump!==stamp.dump||old.signature!==stamp.signature){
-  const start={...s,scoop:null,frame:{...s.frame,soil:shadow.original,machineArm:j.plan.poses[0]?.arm}};start.frame.player=bucket.linkedExcavatorSeat(start.frame);bucket.validateBucketDumpWork(base(start));const expected=replayPlan(start);check(expected&&same(expected,j.plan),'保存した経路が実際の接触掘削と一致しません。');freeze(j.plan);certificates.set(j.plan,stamp);
+ const stamp={soil:s.frame.soil,soilKey:canonical(s.frame.soil),dump:canonical([s.frame.dump,s.frame.machineVehicle??null]),signature:canonical(j.plan)},old=certificates.get(j.plan);
+ if(!old||old.soil!==stamp.soil||old.soilKey!==stamp.soilKey||old.dump!==stamp.dump||old.signature!==stamp.signature){
+  const start={...s,scoop:null,frame:{...s.frame,soil:shadow.original,machineArm:j.plan.poses[0]?.arm}};start.frame.player=bucket.linkedExcavatorSeat(start.frame);bucket.validateBucketDumpWork(base(start));const expected=replayPlan(start,j.plan.kind);check(expected&&same(expected,j.plan),'保存した経路が実際の接触掘削と一致しません。');freeze(j.plan);certificates.set(j.plan,stamp);
  }
  return s;
 }
-export function validateScoopDumpContinuation(a,b){validateScoopDumpWork(a);validateScoopDumpWork(b);check(same(a.frame.soil.site,b.frame.soil.site)&&same(a.frame.soil.initial,b.frame.soil.initial),'別の現場へ切り替えられません。');check(b.frame.soil.journal.length>=a.frame.soil.journal.length&&a.frame.soil.journal.every((c,i)=>same(c,b.frame.soil.journal[i])),'土の所有を巻き戻せません。');check(b.revision>=a.revision&&b.frame.revision>=a.frame.revision&&b.vehicleTravel>=a.vehicleTravel&&b.frame.player.travel>=a.frame.player.travel,'動作を巻き戻せません。');check(a.revision!==b.revision||same(a,b),'同じ番号の保存が変わっています。');return b;}
+export function validateScoopDumpContinuation(a,b){validateScoopDumpWork(a);validateScoopDumpWork(b);check(a.frame.version===b.frame.version&&same(a.frame.soil.field??null,b.frame.soil.field??null)&&same(a.frame.soil.site,b.frame.soil.site)&&same(a.frame.soil.initial,b.frame.soil.initial),'別の現場へ切り替えられません。');check(a.frame.soil===b.frame.soil||b.frame.soil.journal.length>=a.frame.soil.journal.length&&a.frame.soil.journal.every((c,i)=>same(c,b.frame.soil.journal[i])),'土の所有を巻き戻せません。');check(b.revision>=a.revision&&b.frame.revision>=a.frame.revision&&b.vehicleTravel>=a.vehicleTravel&&b.frame.player.travel>=a.frame.player.travel,'動作を巻き戻せません。');check(a.revision!==b.revision||same(a,b),'同じ番号の保存が変わっています。');return b;}
 const wrap=fn=>(s,...args)=>{check(!s.scoop,'すくう動作が終わるまでお待ちください。');return lift(fn(base(s),...args));};
 export const startBucketAccess=wrap(bucket.startBucketAccess),progressBucketLink=wrap(bucket.progressBucketLink),finishBucketLink=wrap(bucket.finishBucketLink),startBucketStorage=wrap(bucket.startBucketStorage),startBucketPour=wrap(bucket.startBucketPour),cancelBucketPour=wrap(bucket.cancelBucketPour),slewBucketWork=wrap(bucket.slewBucketWork),walkBucketSite=wrap(bucket.walkBucketSite),turnBucketWalker=wrap(bucket.turnBucketWalker),driveBucketSite=wrap(bucket.driveBucketSite),boardBucketSiteDump=wrap(bucket.boardBucketSiteDump),leaveBucketSiteDump=wrap(bucket.leaveBucketSiteDump),startBucketSiteStorage=wrap(bucket.startBucketSiteStorage),startBucketSiteUnload=wrap(bucket.startBucketSiteUnload),progressDumpUnload=wrap(bucket.progressDumpUnload),finishDumpUnload=wrap(bucket.finishDumpUnload),cancelDumpUnload=wrap(bucket.cancelDumpUnload);
 export const linkedAccessTarget=(s,...args)=>s.scoop?null:bucket.linkedAccessTarget(base(s),...args),dumpBoardTarget=(s,...args)=>s.scoop?null:bucket.dumpBoardTarget(base(s),...args),dumpStoragePlan=(s,...args)=>s.scoop?null:bucket.dumpStoragePlan(base(s),...args),dumpUnloadPlan=(s,...args)=>s.scoop?null:bucket.dumpUnloadPlan(base(s),...args),bucketStoragePlanAsync=(s,...args)=>s.scoop?null:bucket.bucketStoragePlanAsync(base(s),...args),bucketDumpPlanAsync=(s,...args)=>s.scoop?null:bucket.bucketDumpPlanAsync(base(s),...args);
@@ -136,3 +200,9 @@ export function packScoopDumpWork(s){validateScoopDumpWork(s);return JSON.string
 export function unpackScoopDumpWork(text){check(typeof text==='string'&&new TextEncoder().encode(text).length<=SOIL_LIMITS.bytes+1048576,'保存が大きすぎます。');const p=JSON.parse(text);exact(p,['kind','checksum','state']);check(p.kind===SCOOP_DUMP_FORMAT&&p.checksum===checksum(canonical(p.state)),'保存の検査に失敗しました。');return validateScoopDumpWork(p.state);}
 
 export const linkedStorageVisual=s=>bucket.linkedStorageVisual(base(s));
+
+export function openScoopGround(s){
+ const patches=unopenedGround(s);if(!patches.length)return s;assertIdle(s);
+ const soil=soilTransportCommand(s.frame.soil,{type:'open-ground',id:'ground_'+s.frame.soil.revision,expectedRevision:s.frame.soil.revision,patches});
+ return next(s,{...s.frame,soil});
+}

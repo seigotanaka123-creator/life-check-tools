@@ -1,5 +1,5 @@
 import {canonical} from './imasora-construction-state.js';
-import {vehicleRestoreCheckpoint,vehicleRestoreSummary,validateVehicleRestoreBefore,createVehicleRestoreLedger,inspectVehicleRestoreBundle,inspectVehicleRestoreHistory,vehicleRestoreUndoMatches,vehicleRestoreUndoCandidate} from './imasora-construction-vehicle-restore.js?v=502';
+import {vehicleRestoreCheckpoint,vehicleRestoreSummary,validateVehicleRestoreBefore,createVehicleRestoreLedger,inspectVehicleRestoreBundle,inspectVehicleRestoreHistory,vehicleRestoreUndoMatches,vehicleRestoreUndoCandidate} from './imasora-construction-vehicle-restore.js?v=120fw';
 
 const fields={water:'constructionWater',soil:'constructionSoil',timber:'constructionTimber'};
 const clone=structuredClone;
@@ -14,7 +14,7 @@ export class VehicleRestoreSession{
     this.plan=null;this.pending=null;this.epoch=0;this.localBusy=false;this.invalid=false;this.message='';
   }
   get enabled(){return this.service.mode==='live'&&this.service.store?.name==='imasora-world-authority-v1';}
-  get saved(){return this.service.world?.[fields[this.kind]]??null;}
+  get saved(){return this.service.readConstructionVehicleWork(this.kind); }
   get busy(){return this.localBusy||this.service.busy;}
   get restorePending(){return !!this.pending;}
   get locked(){return this.localBusy||this.restorePending||this.invalid;}

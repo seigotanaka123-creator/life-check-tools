@@ -1,12 +1,14 @@
-import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs';
-import {PLOT} from './imasora-construction-excavator.js';
-import {SITE} from './imasora-construction-loader-physics.js';
+import {earthBaseReader} from './imasora-construction-field-earth.mjs?v=120fc';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
+import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {PLOT} from './imasora-construction-excavator.js?v=120fc';
+import {SITE} from './imasora-construction-loader-physics.js?v=120ey';
 
 // Native terrain is a 2-unit grid. Inspect every cell touched by the tyre,
 // Include steering and the projected shift from tilt/suspension. Five isolated
 // sample points can miss a small hole.
 // This read model never replays commands or invents/imports practice soil.
-const surfaces=new WeakMap(),supports=new WeakMap(),finite=n=>typeof n==='number'&&Number.isFinite(n);
+const surfaces=new WeakMap(),supports=new WeakMap(),depressions=new WeakMap(),finite=n=>typeof n==='number'&&Number.isFinite(n);
 const rad=n=>n*Math.PI/180;
 function surface(soil){
  let top=surfaces.get(soil);if(top)return top;top=new Map();
@@ -20,12 +22,35 @@ function surface(soil){
  }
  surfaces.set(soil,top);return top;
 }
-export function nativeDumpHeightAt(frame,x,z){
- if(!finite(x)||!finite(z)||x<SITE.minX||x>=SITE.maxX||z<SITE.minZ||z>=SITE.maxZ||frame?.soil?.schema!==2)return undefined;
- const base=x>=PLOT.minX&&x<PLOT.maxX&&z>=PLOT.minZ&&z<PLOT.maxZ?PLOT.bottom:0;
- return Math.max(base,surface(frame.soil).get(Math.floor(x/2)+','+Math.floor(z/2))??base);
+const heightReaders=new WeakMap();
+export function nativeDumpHeightReader(frame){
+ const soil=frame?.soil;if(!soil||![2,3].includes(soil.schema))return()=>undefined;
+ let entry=heightReaders.get(soil);if(entry&&entry.revision===soil.revision)return entry.read;
+ const area=transportArea(frame),baseAt=earthBaseReader(soil),top=surface(soil);
+ const read=(x,z)=>{if(!finite(x)||!finite(z)||x<area.minX||x>=area.maxX||z<area.minZ||z>=area.maxZ)return undefined;const base=baseAt(x,z);return Math.max(base,top.get(Math.floor(x/2)+','+Math.floor(z/2))??base);};
+ // Every native ground column is a 2-unit cell. Reuse its depression test
+ // across successive half-unit drive steps on the same immutable soil.
+ read.isPit=(x,z,h)=>isDepression(frame,{x:Math.floor(x/2)*2+1,z:Math.floor(z/2)*2+1,h});
+ heightReaders.set(soil,{revision:soil.revision,read});return read;
 }
+export function nativeDumpHeightAt(frame,x,z){return nativeDumpHeightReader(frame)(x,z);}
 const point=(v,x,z)=>({x:v.x+Math.cos(v.heading)*x+Math.sin(v.heading)*z,z:v.z-Math.sin(v.heading)*x+Math.cos(v.heading)*z});
+function isDepression(frame,q){
+ let cache=depressions.get(frame.soil);if(!cache){cache=new Map();depressions.set(frame.soil,cache);}
+ const key=(frame.version??1)+':'+q.x+','+q.z;if(cache.has(key))return cache.get(key);
+ let hole=false;
+ for(const [dx,dz] of [[1,0],[0,1]]){
+  let lower=false,upper=false;
+  for(let distance=2;distance<=24&&!(lower&&upper);distance+=2){
+   if(!lower)lower=nativeDumpHeightAt(frame,q.x-dx*distance,q.z-dz*distance)>q.h+1.99;
+   if(!upper)upper=nativeDumpHeightAt(frame,q.x+dx*distance,q.z+dz*distance)>q.h+1.99;
+  }
+  if(lower&&upper){hole=true;break;}
+ }
+ // Terrain is immutable. A changed soil object gets a new diagnosis; moving
+ // vehicles may reuse these cell results without keeping an unbounded trail.
+ if(cache.size>=8192)cache.delete(cache.keys().next().value);cache.set(key,hole);return hole;
+}
 function overlapArea(dx,dz,c,s,hx,hz){
  let p=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,z])=>[c*(dx+x)-s*(dz+z),s*(dx+x)+c*(dz+z)]);
  for(const [axis,sign,limit]of[[0,1,hx],[0,-1,hx],[1,1,hz],[1,-1,hz]]){const next=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],aa=sign*a[axis]-limit,bb=sign*b[axis]-limit;if(aa<=0)next.push(a);if((aa<=0)!==(bb<=0)){const u=aa/(aa-bb);next.push(a.map((v,k)=>v+(b[k]-v)*u));}}p=next;}
@@ -41,9 +66,9 @@ function cells(frame,centre,heading,hx,hz){
  }
  return out;
 }
-function calculate(frame){
+function calculate(frame){const SITE=transportArea(frame);
  const v=frame?.dump,stored=frame?.soil?.containers?.dump?.amount,load=stored+(frame?.soil?.pending?.from==='dump'?frame.soil.pending.amount:0);
- if(!v||!['x','z','heading'].every(k=>finite(v[k]))||v.x<SITE.minX||v.x>SITE.maxX||v.z<SITE.minZ||v.z>SITE.maxZ||Math.abs(v.heading)>Math.PI||!finite(load)||load<0||load>SOIL_CAPACITY.dump||frame.soil.schema!==2)return{ok:false,flatReady:false,reason:'車の位置と地面を確認できません。'};
+ if(!v||!['x','z','heading'].every(k=>finite(v[k]))||v.x<SITE.minX||v.x>SITE.maxX||v.z<SITE.minZ||v.z>SITE.maxZ||Math.abs(v.heading)>Math.PI||!finite(load)||load<0||load>SOIL_CAPACITY.dump||![2,3].includes(frame.soil.schema))return{ok:false,flatReady:false,reason:'車の位置と地面を確認できません。'};
  const wheels=[],patches=[],defects=[];let issue='';
  for(const z of[-31,18])for(const x of[-25.5,25.5]){
   const p=point(v,x,z),patch=cells(frame,p,v.heading,7.5,12.65);
@@ -61,11 +86,18 @@ function calculate(frame){
  }
  const flatReady=!issue&&wheels.every(w=>Math.abs(w.min)<.05&&Math.abs(w.max)<.05);
  // Smooth stairs may slope, but a local pit is not a supporting ramp.
- // A single isolated missing cell is not a continuous step of the ramp.
+ // A depression spanning several cells is not a continuous step either.
+ // Look for opposing raised banks. Monotone ramp steps have an open low
+ // side, so this does not turn an ordinary incline into an impassable hole.
  let hole=false;
- for(const patch of patches){for(const q of patch){
-  if([[-2,0],[2,0],[0,-2],[0,2]].every(([dx,dz])=>nativeDumpHeightAt(frame,q.x+dx,q.z+dz)>q.h+1.99))hole=true;
- }}
+ for(const [i,patch] of patches.entries()){
+  if(hole)break;
+  for(const q of patch){
+   if(q.h>=wheels[i].max-1.99)continue;
+   hole=isDepression(frame,q);
+   if(hole)break;
+  }
+ }
  const driveReady=!issue&&!hole;
  // Overlap areas are needed only to let a historical unsupported stop escape.
  // Supported ramps must not clip hundreds of polygons on every input frame.

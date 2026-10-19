@@ -1,12 +1,12 @@
-import {excavatorAtDriverDoor} from './assets/imasora-construction-excavator-access.js';
+import {excavatorAtDriverDoor} from './assets/imasora-construction-excavator-access.js?v=120ey';
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js';
 import {createConstructionGround} from './assets/imasora-construction-ground.js';
 import {FACES} from './assets/imasora-construction-terrain.js';
-import {loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
-import {initialExcavator,actExcavator,stepExcavator,armPose,scoopTargets,totals,excavatorActorPose,PLOT,BIN,CELL,EX} from './assets/imasora-construction-excavator.js?v=465';
-import {createExcavator,updateExcavatorModel} from './assets/imasora-construction-excavator-model.js?v=465';
+import {loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {initialExcavator,actExcavator,stepExcavator,armPose,scoopTargets,totals,excavatorActorPose,PLOT,BIN,CELL,EX} from './assets/imasora-construction-excavator.js?v=120fc';
+import {createExcavator,updateExcavatorModel} from './assets/imasora-construction-excavator-model.js?v=120fc';
 export function startExcavatorView({initial=initialExcavator,actState=actExcavator,stepState=stepExcavator,walking=false,example='dig',setup=null}={}){
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
 let state=initial(),orbit=walking&&example!=='dig'?Math.PI:-2.4,pitch=.6,distance=275,cameraMode=0,roofTransparent=false,revision=-1,ui=0,phase=0,eyeView=false,extension=null;

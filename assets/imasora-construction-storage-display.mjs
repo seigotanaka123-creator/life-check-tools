@@ -1,5 +1,5 @@
-import {BIN} from './imasora-construction-excavator.js';
-import {SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs';
+import {BIN} from './imasora-construction-excavator.js?v=120fc';
+import {SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
 
 const check=(ok,message)=>{if(!ok)throw Error('土の保管箱：'+message);};
 const quantity=new Intl.NumberFormat('ja-JP',{maximumFractionDigits:3});

@@ -1,3 +1,4 @@
+import {openArcadeCheckpoint,bindCatcherSave} from './imasora-arcade-autosave.mjs?v=120er';
 import * as THREE from "./three.module.min.js";
 import * as CANNON from "./cannon-es.js";
 import { CatcherControlSound } from "./imasora-catcher-control-sound.js?v=20260917-control-sound-v1";
@@ -971,6 +972,8 @@ function svgToFabricTexture(svg, renderer) {
 class ImasoraCompanionCatcherGame {
   constructor(root, options = {}) {
     this.root = root;
+    this.resumeStore=openArcadeCheckpoint('catcher',options);
+    if(this.resumeStore?.value?.roster)options={...options,roster:this.resumeStore.value.roster};
     this.rewardSessionId = createCatcherRewardSessionId();
     this.onPrizeCaptured = typeof options.onPrizeCaptured === "function" ? options.onPrizeCaptured : null;
     this.constructionRewardBoxesEarned = 0;
@@ -1128,6 +1131,7 @@ class ImasoraCompanionCatcherGame {
       this.setupPhysics();
       this.setupScene();
       this.resetGame();
+      bindCatcherSave(this);
       if (window.ResizeObserver) {
         this.resizeObserver = new window.ResizeObserver(() => this.resize());
         this.resizeObserver.observe(this.els.viewport);
@@ -1144,6 +1148,7 @@ class ImasoraCompanionCatcherGame {
 
   destroy() {
     if (this.destroyed) return;
+    void this.autoSaver?.flush('exit');this.autoSaver?.dispose();
     this.destroyed = true;
     this.automaticControlSound = false;
     cancelAnimationFrame(this.frame);
@@ -6390,6 +6395,7 @@ class ImasoraCompanionCatcherGame {
     const value = Math.max(100, Number(plush.value || 160));
     this.score += value;
     this.caughtNames.push(plush.name);
+    void this.autoSaver?.flush('capture');
     this.refreshHud();
     safeCatchSound();
     if (this.onPrizeCaptured && plush.constructionRewardEventId) {
@@ -6870,6 +6876,7 @@ class ImasoraCompanionCatcherGame {
 
   loop(timestamp) {
     if (this.destroyed) return;
+    if(document.hidden||document.body.classList.contains('new-opening-active')||document.body.classList.contains('loading-screen-active')||this.autosaveBlocked){this.lastTimestamp=timestamp;this.frame=requestAnimationFrame(this.boundLoop);return;}
     this.controlSound.update();
     const previous = this.lastTimestamp || timestamp;
     const delta = clamp((timestamp - previous) / 1000, 0.008, 0.034);

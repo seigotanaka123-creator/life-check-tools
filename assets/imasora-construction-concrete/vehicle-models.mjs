@@ -1,6 +1,7 @@
+import {UPPER_PUMP_PORT} from './high-casting-state.mjs?v=120ft';
 import * as T from '../three.module.min.js';
-import {CAST_PORTS} from './free-casting.mjs';
-import {VEHICLE_WHEELS,VEHICLE_PADS} from './free-vehicle-contact.mjs';
+import {CAST_PORTS} from './free-casting.mjs?v=120fw';
+import {VEHICLE_WHEELS,VEHICLE_PADS} from './free-vehicle-contact.mjs?v=120fw';
 
 // Both vehicles retain the existing seat centres, passenger clearance and saved poses.
 // +Z is the front. The drum rotates in its own tilted cradle, not with the cabin.
@@ -9,7 +10,7 @@ export function createConcreteVehicle(kind) {
  const root = new T.Group(); root.name = `concrete-${kind}`;
  const cab = new T.Group(); cab.name = 'cab'; root.add(cab);
  const equipment = new T.Group(); equipment.name = 'rear-equipment'; root.add(equipment);
- const color = kind === 'truck' ? '#efb536' : '#27a6b7';
+ const color = kind === 'truck' ? '#feb109' : '#05b0c7';
  const mat = (c, opts = {}) => new T.MeshStandardMaterial({color:c, roughness:.62, ...opts});
  const m = {
   color:mat(color), white:mat('#f0ede0'), frame:mat('#293c47'), rubber:mat('#192932'),
@@ -148,6 +149,7 @@ export function createConcreteVehicle(kind) {
   box(equipment,0,24,-38,20,4,8,m.frame,1);
   for(const x of [-27,27])box(equipment,x,18,-16,5,3,41,m.silver,.7);
  }
+ if(kind==='pump'){const p=UPPER_PUMP_PORT;torus(equipment,p.x,p.y,p.z,1.65,.45,m.silver).name='upper-pump-outlet';strut(equipment,[p.x,p.y,p.z],[p.x,p.y,-38],1.1,m.hose);}
  const port=kind==='truck'?CAST_PORTS.truck:CAST_PORTS.supplyInlet;
  torus(equipment,port.x,port.y,port.z,1.65,.45,m.silver).name='supply-hose-coupler';
  const legs=new T.Group();legs.name='deployed-supports';root.add(legs);

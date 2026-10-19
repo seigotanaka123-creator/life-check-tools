@@ -1,8 +1,8 @@
 // N2: development-only, individually identified loan stock. No wallet or walk
 // rewards. Quantities use integer geometry volume; never infer material by color.
-import {PARTS,initialCrane,actCrane,stepCrane,validateCrane,collides} from './imasora-construction-crane.js';
-import {worldToLocal} from './imasora-construction-loader-physics.js';
-import {CRANE_WALK} from './imasora-construction-crane-walk.js';
+import {PARTS,initialCrane,actCrane,stepCrane,validateCrane,collides} from './imasora-construction-crane.js?v=120fw';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
+import {CRANE_WALK} from './imasora-construction-crane-walk.js?v=120fw';
 export const TIMBER_PARTS=Object.freeze(PARTS.map(p=>Object.freeze({...p,
   materialId:p.id.startsWith('post')?'earth-iron':'earth-timber',
   name:`${p.id.startsWith('post')?'普通の鉄':'普通の木材'}・${p.name}`,

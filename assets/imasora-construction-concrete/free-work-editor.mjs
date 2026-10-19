@@ -1,9 +1,9 @@
-import {constructionBase} from './free-supported-build.mjs';
-import {SUPPORTED_WORK_MOVE,supportedWorkSnapCandidates} from './free-supported-work-move.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {SUPPORTED_WORK_MOVE,supportedWorkSnapCandidates} from './free-supported-work-move.mjs?v=120fw';
 import {rotateFreeWork} from './free-work-rotation.mjs';
-import {FLOOR_COLORS} from './floor-parts.mjs';
+import {paintColor} from './paint-colors.mjs?v=120ds';
 import {freeFilledMask,freeWorkMask,freeWorkSummary} from './free-work-parts.mjs';
-import {freeWorkMoveTargets,freeWorkSnapCandidates,freeWorkMovePlan} from './free-work-move.mjs';
+import {freeWorkMoveTargets,freeWorkSnapCandidates,freeWorkMovePlan} from './free-work-move.mjs?v=120fw';
 export const freeWorkEditorTemplate=()=>`
  <section data-sheet-content="works">
   <label>完成作品 <select data-edit-work></select></label>
@@ -70,7 +70,7 @@ export function createFreeWorkEditor({panel,getProject,problem,moveProblem,ask,p
    targetSelect.disabled=!can||!targets.length;q('[data-work-move-review]').disabled=!can||!!error;
    q('[data-work-move-summary]').textContent=`東西 ${position.x}・南北 ${position.z}｜配置 ${s.placed}マス・保管 ${s.stored}マス／合計 ${s.totalCups}杯`;
    q('[data-work-move-problem]').textContent=moveNote||error||'配置できます。確認してから実行してください。';
-   const cells=Number.isFinite(position.x)&&Number.isFinite(position.z)?freeWorkMovePlan(p,index,position,quarterTurns):[],pk=JSON.stringify([cells,!!error]);if(pk!==planKey){planKey=pk;const svg=q('[data-work-plan]');if(cells.length){const minX=Math.min(...cells.map(c=>c.x))-16,minZ=Math.min(...cells.map(c=>c.z))-16,maxX=Math.max(...cells.map(c=>c.x))+16,maxZ=Math.max(...cells.map(c=>c.z))+16;svg.setAttribute('viewBox',`${minX} ${minZ} ${maxX-minX} ${maxZ-minZ}`);}svg.innerHTML=cells.map(c=>`<rect x="${c.x-8}" y="${c.z-8}" width="16" height="16" fill="${({source:'#f9ad68',other:'#8ec2eb',stored:'none',target:error?'#fa8b83':'#95e2bb'})[c.kind]}" fill-opacity=".55" stroke="${c.kind==='stored'?'#cad8d6':'#ffffff'}" stroke-width="1" ${c.kind==='stored'?'stroke-dasharray="2 2"':''}/>${c.kind==='target'?(c.paint??[]).map((color,i)=>FLOOR_COLORS[color]?`<rect x="${c.x-8+(i%4)*4}" y="${c.z-8+Math.floor(i/4)*4}" width="4" height="4" fill="${FLOOR_COLORS[color]}"/>`:'').join(''):''}`).join('');}
+   const cells=Number.isFinite(position.x)&&Number.isFinite(position.z)?freeWorkMovePlan(p,index,position,quarterTurns):[],pk=JSON.stringify([cells,!!error]);if(pk!==planKey){planKey=pk;const svg=q('[data-work-plan]');if(cells.length){const minX=Math.min(...cells.map(c=>c.x))-16,minZ=Math.min(...cells.map(c=>c.z))-16,maxX=Math.max(...cells.map(c=>c.x))+16,maxZ=Math.max(...cells.map(c=>c.z))+16;svg.setAttribute('viewBox',`${minX} ${minZ} ${maxX-minX} ${maxZ-minZ}`);}svg.innerHTML=cells.map(c=>`<rect x="${c.x-8}" y="${c.z-8}" width="16" height="16" fill="${({source:'#f9ad68',other:'#8ec2eb',stored:'none',target:error?'#fa8b83':'#95e2bb'})[c.kind]}" fill-opacity=".55" stroke="${c.kind==='stored'?'#cad8d6':'#ffffff'}" stroke-width="1" ${c.kind==='stored'?'stroke-dasharray="2 2"':''}/>${c.kind==='target'?(c.paint??[]).map((color,i)=>paintColor(color)?`<rect x="${c.x-8+(i%4)*4}" y="${c.z-8+Math.floor(i/4)*4}" width="4" height="4" fill="${paintColor(color)}"/>`:'').join(''):''}`).join('');}
    preview(w&&Number.isFinite(position.x)&&Number.isFinite(position.z)?{work:index,position:{...position},quarterTurns,invalid:!!error}:null);
   }else preview(visible&&w?{work:index,mask}:null);
  }

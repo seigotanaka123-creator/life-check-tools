@@ -1,7 +1,7 @@
 import {IndexedConstructionStore,CONSTRUCTION_STORE} from './imasora-construction-storage.js';
 import {canonical} from './imasora-construction-state.js';
-import {LEDGER_RESTORE_POINT,prepareLedgerReplacement,inspectLedgerRestorePoint} from './imasora-construction-excavation-ledger-recovery.js';
-import {createExcavationLedger,checkpointExcavationLedger,packExcavationLedger,unpackExcavationLedger,excavationLedgerWork,excavationLedgerSummary} from './imasora-construction-excavation-ledger.js';
+import {LEDGER_RESTORE_POINT,prepareLedgerReplacement,inspectLedgerRestorePoint} from './imasora-construction-excavation-ledger-recovery.js?v=120fw';
+import {createExcavationLedger,checkpointExcavationLedger,packExcavationLedger,unpackExcavationLedger,excavationLedgerWork,excavationLedgerSummary} from './imasora-construction-excavation-ledger.js?v=120fw';
 
 export const EXCAVATION_INTEGRATION_DB='imasora-world-excavation-integration-v1';
 export const excavationLedgerPreview=(search,host)=>['127.0.0.1','localhost'].includes(host)&&new URLSearchParams(search).get('constructionExcavationLedgerPreview')==='1';

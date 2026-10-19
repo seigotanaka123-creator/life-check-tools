@@ -53,6 +53,14 @@ export class WorldDraftGuard{
     this.#accepted=entry.sequence;this.#tokens.set(token,entry);this.#pending.set(token,entry);
     return prepare?{snapshot,token,prepared}:{snapshot,token};
   }
+  async consumeAsync(draft,prepare){
+    const entry=this.#entry(draft);this.#fresh(entry);
+    const snapshot=structuredClone(draft);this.#fresh(entry);
+    const prepared=await prepare(snapshot);this.#fresh(entry);
+    const token=Object.freeze({});entry.state='accepted';entry.token=token;
+    this.#accepted=entry.sequence;this.#tokens.set(token,entry);this.#pending.set(token,entry);
+    return {snapshot,token,prepared};
+  }
   committed(token){
     const entry=token&&typeof token==='object'?this.#tokens.get(token):null;
     if(!entry)fail('token','この保存処理の受理記録がありません。');

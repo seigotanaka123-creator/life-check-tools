@@ -30,7 +30,9 @@ export function vehicleGroundPose(f,v,heightAt=()=>0){
   if(Math.abs(offset)>VEHICLE_GROUND.maxSuspension+1e-8)throw problem();
   p=new T.Vector3(wheel.x,offset,wheel.z).applyQuaternion(rotation).add(position);
   if(Math.abs(p.y-sample(p.x,p.z))>1e-5)throw problem();
-  for(const dx of [-2.5,0,2.5])for(const dz of [-1,0,1]){const q=new T.Vector3(wheel.x+dx,offset,wheel.z+dz).applyQuaternion(rotation).add(position);maxPatchError=Math.max(maxPatchError,Math.abs(q.y-sample(q.x,q.z)));}
+  // A 2-unit soil cavity can fit between the former three lateral probes.
+  // Resolve the full contact width at 1-unit spacing, including rotated tyres.
+  for(let dx=-3;dx<=3;dx++)for(const dz of [-1,0,1]){const q=new T.Vector3(wheel.x+dx,offset,wheel.z+dz).applyQuaternion(rotation).add(position);maxPatchError=Math.max(maxPatchError,Math.abs(q.y-sample(q.x,q.z)));}
   if(maxPatchError>VEHICLE_GROUND.maxPatchError+1e-8)throw problem();
   // Check the leading/trailing tire arc as well as the bottom contact patch.
   // A curb must not already pass through the wheel before its centre reaches it.
@@ -59,5 +61,5 @@ export function placeVehicleDriver(root,actor,model){
 
 export function vehicleLevelWorkProblem(f,v,heightAt=()=>0,allowRaised=true){
  try{const g=vehicleGroundPose(f,v,heightAt);if((allowRaised||Math.abs(g.position.y)<1e-5)&&g.slope<1e-7&&g.maxSuspension<1e-5)return '';}catch{}
- return '施工・支持脚の操作は、平らな作業区画へ戻ってから行ってください。';
+ return '施工や支持脚の操作は、平らな地面で車を止めてから行ってください。';
 }

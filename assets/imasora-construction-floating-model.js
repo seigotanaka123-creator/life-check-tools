@@ -1,5 +1,5 @@
 import * as THREE from './three.module.min.js';
-import {createTimberPart} from './imasora-construction-timber-model.js';
+import {createTimberPart} from './imasora-construction-timber-model.js?v=120fw';
 export function createFloatingPart(p){
   const root=createTimberPart(p);if(p.materialId!=='mars-timber')return root;
   const ink=new THREE.MeshStandardMaterial({color:0xd6fff0,emissive:0x4ba697,emissiveIntensity:.65,roughness:.45});

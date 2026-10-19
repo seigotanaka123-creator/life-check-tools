@@ -1,5 +1,6 @@
-import {MAX_EARTH_RESTORE_INPUT} from './imasora-construction-earth-restore.js?v=497';
-import {MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=501';
+import {openConstructionGuide} from './imasora-construction-overlays.mjs?v=120ea';
+import {MAX_EARTH_RESTORE_INPUT} from './imasora-construction-earth-restore.js?v=120fw';
+import {MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=120fw';
 
 export function createExcavationAuthorityView({panel,session,snapshot,pause,replace,refresh}){
   if(session.live)return createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh});
@@ -111,15 +112,13 @@ function createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh}){
       <section data-earth-screen="home" aria-label="保存と復元">
         <p class="we-player-menu-intro">地形とショベルの作業を保存して、続きから遊べます。</p>
         <div class="we-player-save-state"><strong data-earth-save-state></strong><p data-earth-saved-counts></p></div>
-        <div class="we-player-menu-actions"><button data-earth-save type="button">作業を保存する</button><button data-earth-restore="open" type="button">地形と作業を復元</button><button data-earth-export type="button">控えをダウンロード</button></div>
+        <div class="we-player-menu-actions"><button data-earth-help type="button">ショベルカーの使い方を見る</button><button data-earth-save type="button">作業を保存する</button><button data-earth-restore="open" type="button">前の記録に戻す</button></div>
         <p class="we-player-menu-note">復元は、戻す内容を確認してから行います。財布・建物・装備・購入した素材は現在のままです。</p>
       </section>
       <section data-earth-screen="choose" aria-label="戻したい保存を選ぶ" hidden>
         <p class="we-player-menu-intro">戻したい保存を選んで、内容を確認してください。この画面ではまだ復元しません。</p>
-        <div class="we-player-choice"><h3>この端末の保存履歴から選ぶ</h3><label>戻したい保存<select data-earth-history aria-label="地形と作業の保存履歴"><option value="">履歴を選ぶ</option></select></label><p data-earth-history-empty hidden>まだ過去の保存はありません。以前ダウンロードした控えがあれば、下から選べます。</p><button data-earth-restore="history" type="button">選んだ保存の内容を確認</button></div>
-        <details class="we-player-file-choice"><summary>控えのファイルから選ぶ</summary><label>地形の控え（32 MiBまで）・一括控え（64 MiBまで）<input data-earth-file type="file" accept=".json,application/json" aria-label="地形と作業の控えファイル"></label><p class="we-earth-filename">ファイルは選択されていません。</p><button data-earth-restore="file" type="button">ファイルの内容を確認</button></details>
-        <details class="we-player-advanced"><summary>控えの文字列を貼り付ける</summary><label>控えの文字列<textarea data-earth-text aria-label="地形と作業の控え文字列" rows="4" spellcheck="false"></textarea></label><button data-earth-restore="inspect" type="button">文字列の内容を確認</button></details>
-        <div class="we-player-undo"><button data-earth-restore="undo" type="button">直前の復元を取り消す内容を確認</button><p>復元後に作業を進める前なら、復元直前の状態へ戻せます。</p></div>
+        <div class="we-player-choice"><h3>このゲームの記録から選ぶ</h3><label>戻したい保存<select data-earth-history aria-label="地形と作業の保存履歴"><option value="">履歴を選ぶ</option></select></label><p data-earth-history-empty hidden>まだ前の記録がありません。作業を保存すると、ここから選べます。</p><button data-earth-restore="history" type="button">この記録を確認する</button></div>
+        <div class="we-player-undo"><button data-earth-restore="undo" type="button">戻す前に戻る</button><p>復元後に作業を進める前なら、復元直前の状態へ戻せます。</p></div>
       </section>
       <section data-earth-screen="review" aria-label="復元する内容の確認" hidden>
         <p class="we-player-menu-intro" data-earth-review-intro>下の内容へ地形とショベルの作業を戻します。</p>
@@ -132,9 +131,9 @@ function createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh}){
     <footer class="we-player-menu-footer"><div class="we-player-menu-footer-actions"><button data-earth-menu="back" type="button" hidden>メニューに戻る</button><button data-earth-restore="apply" class="we-player-confirm" type="button" hidden>復元する</button><button data-earth-restore="retry" type="button" hidden>復元結果を再確認する</button><button data-earth-menu="close" type="button">ゲームに戻る</button></div><p id="we-player-menu-paused">画面へ戻っても一時停止のままです。「再開」で作業を続けます。</p></footer>
   </div>`;
   panel.append(box);
-  const q=selector=>box.querySelector(selector),button=name=>q(`[data-earth-restore="${name}"]`),save=q('[data-earth-save]'),exportButton=q('[data-earth-export]'),area=q('[data-earth-text]'),file=q('[data-earth-file]'),history=q('[data-earth-history]'),back=q('[data-earth-menu="back"]'),closeButton=q('[data-earth-menu="close"]'),heading=q('h2');
-  area.maxLength=MAX_EARTH_BUNDLE_RESTORE_INPUT;
-  let fileText='',notice='';
+  box.querySelector('[data-earth-help]').onclick=()=>{pause();openConstructionGuide('excavator');};
+  const q=selector=>box.querySelector(selector),button=name=>q(`[data-earth-restore="${name}"]`),save=q('[data-earth-save]'),history=q('[data-earth-history]'),back=q('[data-earth-menu="back"]'),closeButton=q('[data-earth-menu="close"]'),heading=q('h2');
+  let notice='';
   function invalidate(){token++;reviewed=false;comparison=null;session.clearRestore();}
   // Keep the read barrier until the canceled promise settles: a late undo
   // inspection must not replace or clear a newer restore plan.
@@ -147,18 +146,17 @@ function createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh}){
     const busy=session.busy||reading||applying,pending=!!session.restorePending,blocked=!!session.blocked,lockedNavigation=session.busy||applying||pending;
     menuButton.setAttribute('aria-expanded',String(opened));box.hidden=!opened;
     for(const section of box.querySelectorAll('[data-earth-screen]'))section.hidden=section.dataset.earthScreen!==screen;
-    heading.textContent=screen==='home'?'ゲームメニュー':screen==='choose'?'地形と作業を復元':'この内容で復元しますか？';
-    save.disabled=busy||pending;save.textContent=blocked?'保存の結果を再確認する':'作業を保存する';exportButton.disabled=busy||pending;
+    heading.textContent=screen==='home'?'ゲームメニュー':screen==='choose'?'前の記録に戻す':'この内容で復元しますか？';
+    save.disabled=busy||pending;save.textContent=blocked?'保存の結果を再確認する':'作業を保存する';
     button('open').disabled=busy||!session.record||blocked||pending;
-    for(const name of ['inspect','file','undo'])button(name).disabled=busy||blocked||pending;
-    button('inspect').disabled ||= !area.value.trim();button('file').disabled ||= !fileText;
+    for(const name of ['undo'])button(name).disabled=busy||blocked||pending;
     button('history').disabled=busy||blocked||pending||history.value==='';
     button('apply').hidden=screen!=='review'||pending||!reviewed;button('apply').disabled=busy||blocked||pending||!reviewed;
-    button('apply').textContent=comparison?.sourceKind==='before-restore'?'復元前に戻す':'復元する';
+    button('apply').textContent=comparison?.sourceKind==='before-restore'?'戻す前に戻る':'復元する';
     button('retry').hidden=!pending;button('retry').disabled=busy;
     back.hidden=screen==='home'||pending;back.disabled=lockedNavigation;back.textContent=screen==='review'?'選び直す':'メニューに戻る';closeButton.disabled=lockedNavigation;
-    area.disabled=file.disabled=history.disabled=busy||blocked||pending;
-    q('.we-ledger-status').textContent=reading?'控えの内容と照合値を確認しています…':applying||session.busy?friendlyMessage(session.message):notice;
+    history.disabled=busy||blocked||pending;
+    q('.we-ledger-status').textContent=reading?'記録をたしかめています…':applying||session.busy?friendlyMessage(session.message):notice;
     if(opened){
       let dirty=false;try{dirty=!!session.record&&session.dirty(snapshot());}catch{dirty=true;}
       q('[data-earth-save-state]').textContent=session.busy?'保存を確認しています…':pending?'復元結果の確認が必要です':blocked?'保存結果の確認が必要です':!session.record?'地形を準備しています':dirty?'未保存の作業があります':'作業は保存されています';
@@ -196,30 +194,14 @@ function createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh}){
     update();refresh();focusHeading();
   };
   save.onclick=async()=>{if(save.disabled)return;pause();invalidate();try{await session.save(snapshot());notice=friendlyMessage(session.message);}catch(e){notice=friendlyMessage(e.message);}update();refresh();};
-  exportButton.onclick=()=>{
-    if(exportButton.disabled)return;pause();
-    try{const text=session.export(snapshot()),url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='imasora-world-earth-v501.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);notice='控えのダウンロードを開始しました。端末の保存先を確認してください。このメニューから地形と作業を復元できます。';}
-    catch(e){notice=friendlyMessage(e.message);}update();refresh();
-  };
   button('open').onclick=()=>{if(button('open').disabled)return;invalidate();notice='戻したい保存を選んでください。内容の確認だけでは復元しません。';loadHistory();transition('choose');};
-  area.oninput=()=>{invalidate();message('文字列が変わりました。内容を確認してください。まだ復元していません。');};
-  history.onchange=()=>{invalidate();message('選んだ保存の内容を確認してください。まだ復元していません。');};
-  file.onchange=async()=>{
-    invalidate();const id=token,selected=file.files?.[0];fileText='';q('.we-earth-filename').textContent=selected?selected.name:'ファイルは選択されていません。';
-    if(!selected){message('控えのファイルを選んでください。');return;}
-    if(selected.size>MAX_EARTH_BUNDLE_RESTORE_INPUT){message('64 MiB以下の控えを選んでください。現在の作業は保持しています。');return;}
-    reading=true;readToken=id;update();
-    try{const text=await selected.text();if(id!==token||!opened||screen!=='choose')return;if(new TextEncoder().encode(text).byteLength>MAX_EARTH_BUNDLE_RESTORE_INPUT)throw Error('64 MiB以下の控えを選んでください。');fileText=text;notice='ファイルを読み取りました。「ファイルの内容を確認」を押してください。';}
-    catch(e){if(id===token)notice=friendlyMessage(e.message||'ファイルを読み取れませんでした。現在の作業は保持しています。');}
-    finally{if(readToken===id){reading=false;readToken=null;update();refresh();}}
-  };
+  history.onchange=()=>{invalidate();message('この記録を確認するしてください。まだ復元していません。');};
   async function inspect(text){
     if(reading||session.busy||applying)return;invalidate();const id=token;reading=true;readToken=id;update();
     try{const current=snapshot(),signature=session.signature(current),result=await session.inspectRestoreInput(text,current,{isCurrent:()=>id===token&&opened&&screen==='choose'&&session.signature(snapshot())===signature});if(id!==token||!opened||screen!=='choose')return;showComparison(result);}
     catch(e){if(id===token)notice=friendlyMessage(e.message);}
     finally{if(readToken===id){reading=false;readToken=null;update();refresh();}}
   }
-  button('inspect').onclick=()=>{if(!button('inspect').disabled)inspect(area.value);};button('file').onclick=()=>{if(!button('file').disabled)inspect(fileText);};
   button('history').onclick=()=>{if(button('history').disabled)return;const row=historyRows[Number(history.value)];if(row)inspect(row.packet);};
   button('undo').onclick=async()=>{
     if(button('undo').disabled)return;invalidate();const id=token;reading=true;readToken=id;update();

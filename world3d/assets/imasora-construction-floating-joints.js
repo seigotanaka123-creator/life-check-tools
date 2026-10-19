@@ -1,5 +1,5 @@
-import {tip,pickOption} from './imasora-construction-crane.js';
-import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js';
+import {tip,pickOption} from './imasora-construction-crane.js?v=120fw';
+import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js?v=120fw';
 export const JOIN_SECONDS=1.2;
 function dimensions(p){
   const turn=Math.round(p.angle/(Math.PI/2));

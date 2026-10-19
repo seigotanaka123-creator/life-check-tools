@@ -1,4 +1,4 @@
-import {FLOOR_PARTS,FLOOR_COLORS,floorMask,partCount,paintCost,paintRemaining} from './floor-parts.mjs';
+import {FLOOR_PARTS,FLOOR_COLORS,floorMask,partCount,paintCost,paintRemaining} from './floor-parts.mjs?v=120ds';
 
 // Drafts live only in the controller. Neither choosing a cell nor previewing
 // a neighbour writes to the save; the existing confirmation queue does that.

@@ -1,18 +1,19 @@
 import * as T from '../three.module.min.js';
-import {freeCell} from './free-build-state.mjs';
-import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs';
-import {vehicleGroundError} from './free-vehicle-ground.mjs';
-import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs';
+import {PAINT_REMOVE_COLOR} from './free-paint-removal.mjs?v=120dm';
+import {freeCell} from './free-build-state.mjs?v=120fw';
+import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120fw';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120fw';
+import {vehicleGroundError} from './free-vehicle-ground.mjs?v=120ek';
+import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120fw';
 
-import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs';
-import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs';
-import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs';
-import {createFootingGuard} from './free-footing-motion.mjs';
+import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs?v=120fw';
+import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs?v=120fw';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
+import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs?v=120fw';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),distance=(a,b)=>Math.hypot(a.x-b.x,(a.y??0)-(b.y??0),a.z-b.z);
-export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles,tools,colors,mats,line,drawPaint,external,supportHeightAt=()=>0,paintGroundExternal=external,sharedPlatform=null}){
+export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles,tools,colors,mats,line,drawPaint,external,supportHeightAt=()=>0,paintGroundExternal=external,sharedPlatform=null,masking=null}){
  const f=p.freeBuild,r=newFreeReceipt(a,p),stages=[];let stage=0,progress=0,started=false,phase=0,finished=false;
  const modelPosition=model.position.clone(),modelScale=model.scale.clone(),modelRotation=model.quaternion.clone();
  const focus={x:actor.position.x,y:10,z:actor.position.z};
@@ -52,7 +53,8 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
   const b=r.boarding;b.samples++;b.terrainSamples+=now.ground.contacts.length+now.support.samples;b.maxSlope=Math.max(b.maxSlope,now.ground.slope,now.support.slope);b.maxPatchError=Math.max(b.maxPatchError,now.ground.maxPatchError,now.support.error);b.maxPoseError=Math.max(b.maxPoseError,poseError);
   if(checkSoles&&actor.position.distanceTo(vec(boarding.door))<1e-5){const s=walkingGroundAt(f,actor.position.x,actor.position.z,supportHeightAt);b.maxSoleError=Math.max(b.maxSoleError,assertLandingSoles(f,root,actor,feet,s,supportHeightAt,clearance));b.landingSamples++;}
  }
- const head=new T.Mesh(a.tool==='roller'?new T.CylinderGeometry(1,1,1,16):new T.BoxGeometry(1,1,1),colors[a.color]??mats.metal);head.name='verified-paint-head';
+ const head=new T.Mesh(a.tool==='roller'?new T.CylinderGeometry(1,1,1,16):new T.BoxGeometry(1,1,1),colors[a.color]??mats.metal);head.name=a.color===PAINT_REMOVE_COLOR?'verified-paint-scraper':'verified-paint-head';
+ if(masking){head.name='verified-tape-roll';const core=new T.Mesh(new T.CylinderGeometry(.52,.52,1.02,16),mats.metal);core.name='tape-roll-core';head.add(core);}
  const completed=[],temporary=new T.Group(),unit=new T.BoxGeometry(1,1,1);temporary.name='paint-access-operation';if(access?.scaffold)root.add(temporary);
  function box(parent,x,y,z,w,h,d,mat,name){const m=new T.Mesh(unit,mat);m.position.set(x,y,z);m.scale.set(w,h,d);m.name=name;parent.add(m);return m;}
  const scaffold=access?.scaffold?createScaffoldMotion({f,root,actor,feet,record:r.access,footing:r.footing,heightAt:supportHeightAt,external,parent:temporary,box,mats,name:'paint-scaffold',fixedPlan:sharedPlatform?.visible?sharedPlatform.plan:null,sharedPlatform:sharedPlatform?.visible?sharedPlatform:null}):null;let cleaned=false;
@@ -94,7 +96,7 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
   else r.stepSamples++;
   Object.assign(focus,{x:actor.position.x,y:actor.position.y+12,z:actor.position.z});
  }
- return{focus,cameraAngle,cameraDistance:vehicle?150:110,cameraHeight:vehicle?105:85,verifyFooting(){footing?.stand();verifyBoarding();},get endPose(){return endPose;},get receipt(){return r;},get phase(){const s=stages[stage];if(vehicle)return a.type==='FREE_BOARD'?'ドアを開け、足掛けから運転席へ乗っています。':'足掛けを下りて、ドア前の地面に立っています。';if(sharedPlatform?.visible&&s?.kind==='scaffold-open')return '同じ作業台の足元を確認しています。';if(sharedPlatform?.visible&&s?.kind==='scaffold-close')return '同じ作業台を残して地上に戻りました。';return s?.kind==='climb'?(s.ascending?'塗装用足場の階段を上っています。':'塗装用足場の階段を下りています。'):({'scaffold-open':'塗装用の足場を広げています。','scaffold-close':'塗装用の足場を片付けています。',paint:scaffold?'足場に立って施工面を塗っています。':'施工面を塗っています。',walk:scaffold?'塗る面へ安全な通路を歩いています。':'塗る面へ歩いています。'}[s?.kind]??'');},
+ return{focus,cameraAngle,cameraDistance:vehicle?150:110,cameraHeight:vehicle?105:85,verifyFooting(){footing?.stand();verifyBoarding();},get endPose(){return endPose;},get receipt(){return r;},get phase(){const s=stages[stage];if(!masking&&a.color===PAINT_REMOVE_COLOR&&s?.kind==='paint')return '選んだ色を道具でこすって落としています。';if(!masking&&a.color===PAINT_REMOVE_COLOR&&s?.kind==='walk')return s.scaffold?'作業台の通路を歩いています。':'色を落とす場所へ歩いています。';if(masking&&s?.kind==='walk')return 'テープを使う場所へ歩いています。';if(masking&&s?.kind==='paint')return masking.toMask&(1<<s.pixel)?'テープを貼って守っています。':'テープをはがしています。';if(vehicle)return a.type==='FREE_BOARD'?'ドアを開け、足掛けから運転席へ乗っています。':'足掛けを下りて、ドア前の地面に立っています。';if(sharedPlatform?.visible&&s?.kind==='scaffold-open')return '同じ作業台の足元を確認しています。';if(sharedPlatform?.visible&&s?.kind==='scaffold-close')return '同じ作業台を残して地上に戻りました。';return s?.kind==='climb'?(s.ascending?'塗装用足場の階段を上っています。':'塗装用足場の階段を下りています。'):({'scaffold-open':'塗装用の足場を広げています。','scaffold-close':'塗装用の足場を片付けています。',paint:scaffold?'足場に立って施工面を塗っています。':'施工面を塗っています。',walk:scaffold?'塗る面へ安全な通路を歩いています。':'塗る面へ歩いています。'}[s?.kind]??'');},
   tick(dt){
    if(finished)return true;
    if(model.position.distanceTo(modelPosition)>1e-5||model.scale.distanceTo(modelScale)>1e-5||model.quaternion.angleTo(modelRotation)>1e-5)throw Error('キャラクターの位置が変わったため作業を止めました。');
@@ -109,10 +111,10 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
      r.endpointError=distance(actual,endPose);r.doorClosedError=Math.abs(vehicle.driverDoor.rotation.y);
     }
     else delete r.travelSamples;
-    assertFreeReceipt(a,p,p.revision,r);finished=true;head.geometry.dispose();return true;
+    assertFreeReceipt(a,p,p.revision,r);finished=true;head.geometry.dispose();head.getObjectByName('tape-roll-core')?.geometry.dispose();return true;
    }}return false;
   },
   settle(){cleanup();},
-  cancel(){cleanup();if(vehicle)vehicle.driverDoor.rotation.y=0;resetFeet();tools.clear();if(!finished)head.geometry.dispose();finished=true;}
+  cancel(){cleanup();if(vehicle)vehicle.driverDoor.rotation.y=0;resetFeet();tools.clear();if(!finished){head.geometry.dispose();head.getObjectByName('tape-roll-core')?.geometry.dispose();}finished=true;}
  };
 }

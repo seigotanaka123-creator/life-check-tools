@@ -1,11 +1,11 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-work-model.js?v=431';
-import {createWorkState,stepWork,workAction,workTotals,soilColumns,packWork} from './assets/imasora-construction-loader-work.js?v=432';
-import {startDump,stepDump} from './assets/imasora-construction-loader-dump.js?v=432';
-import {LoaderWorkSession,WORK_DB} from './assets/imasora-construction-loader-work-storage.js?v=431';
-import {initialLoaderState,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,SITE,OBSTACLES,SAFE_ZONE,approach,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=430';
+import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-work-model.js?v=120ey';
+import {createWorkState,stepWork,workAction,workTotals,soilColumns,packWork} from './assets/imasora-construction-loader-work.js?v=120ey';
+import {startDump,stepDump} from './assets/imasora-construction-loader-dump.js?v=120ey';
+import {LoaderWorkSession,WORK_DB} from './assets/imasora-construction-loader-work-storage.js?v=120ey';
+import {initialLoaderState,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,SITE,OBSTACLES,SAFE_ZONE,approach,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
 const $=id=>document.getElementById(id),local=['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 // Explicit, non-saving UI regression fixture; never loads or alters the user's work DB.
 const dumpCheck=local&&['low','raised'].includes(new URLSearchParams(location.search).get('dumpCheck'))?new URLSearchParams(location.search).get('dumpCheck'):null;

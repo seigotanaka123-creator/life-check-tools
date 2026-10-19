@@ -1,7 +1,8 @@
 import * as THREE from './three.module.min.js';
+import {createMaterialSourceClient} from './imasora-construction-material-source.mjs';
 import {SHOP_OFFERS} from './imasora-mars-construction-shop.js?v=503';
 import {deliveryAccess} from './imasora-construction-delivery.js';
-import {toolkitSummary,toolkitDetails} from './imasora-construction-toolkit.mjs?v=120c';
+import {toolkitSummary,toolkitDetails} from './imasora-construction-toolkit.mjs?v=120fs';
 import {deliveryConcreteSummary} from './imasora-construction-concrete/delivery-summary.mjs';
 
 export function createConstructionDeliveryDock(){
@@ -34,19 +35,20 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
     <p class="delivery-mode"></p><div class="delivery-stock-list"></div>
     <section class="delivery-pack-transfer" aria-labelledby="pack-transfer-title">
       <h3 id="pack-transfer-title">開封済み建築セットを受け取る</h3>
-      <p>散歩・大会・ゲームで獲得した箱をホームの街づくり工房で開封し、ここに表示する受取IDを移送先に指定して作ったJSONファイルを選んでください。受取記録はこのゲームのセーブデータに保存されます。</p>
-      <div class="delivery-pack-profile"><span>このセーブデータの受取ID</span><code data-pack-transfer-profile></code><button type="button" data-pack-transfer-copy>受取IDをコピー</button></div>
+      <p>街の工房で開けた建築セットを受け取れます。中身をたしかめて「受け取る」を押してください。送った分は街から移り、同じ建材は二重に増えません。</p>
       <p class="delivery-pack-stock" data-pack-transfer-stock></p>
-      <details><summary>基本道具一式</summary><p data-toolkit-summary></p><p data-toolkit-detail style="white-space:pre-line"></p><p>最初の建築セットと一緒に受け取れます。シャベルで土を運び、型紙で模様を塗れます。道具は繰り返し使えます。同じファイルを選び直しても増えません。</p></details>
-      <label class="delivery-pack-file">移送ファイル<input type="file" accept=".json,application/json" data-pack-transfer-file></label>
+      <details><summary>基本道具一式</summary><p data-toolkit-summary></p><p data-toolkit-detail style="white-space:pre-line"></p><p>最初の建築セットと一緒に受け取れます。シャベルや型紙は繰り返し使えます。</p></details>
+      <p data-material-source-preview role="status" aria-live="polite">街の建材をたしかめてください。</p>
+      <button type="button" data-material-source-check>街の建材をたしかめる</button>
+      <button type="button" data-material-source-receive disabled>受け取る</button>
       <p class="delivery-pack-message" role="status" aria-live="polite" data-pack-transfer-message></p>
     </section>
     <section class="delivery-project" aria-labelledby="concrete-project-title">
       <h3 id="concrete-project-title">受取済みの配合材料を工房へ移す</h3>
       <p>1箱に、生コン8杯分のセメント・砂・砂利・水が入っています。工房へ移した材料をミキサーで練り、バケツで型枠へ運びます。塗装・付属品は別に保管されます。</p>
       <p class="delivery-project-stock" data-concrete-project-stock></p>
-      <label class="delivery-project-select">施工台帳へ移す受取分
-        <select data-concrete-pack-select aria-label="施工台帳へ移す建築セット"></select>
+      <label class="delivery-project-select">工房へ運ぶ材料
+        <select data-concrete-pack-select aria-label="工房へ運ぶ建材"></select>
       </label>
       <button type="button" data-concrete-pack-import>選んだ材料を工房へ移す</button>
       <p class="delivery-project-message" role="status" aria-live="polite" data-concrete-project-message></p>
@@ -58,7 +60,11 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
   document.body.append(dialog);
   let working=false,opening=false,success='';
   const closeButton=dialog.querySelector('.delivery-close'),returnButton=dialog.querySelector('.delivery-return'),message=dialog.querySelector('.delivery-message');
-  const transferInput=dialog.querySelector('[data-pack-transfer-file]'),transferMessage=dialog.querySelector('[data-pack-transfer-message]');
+  const transferMessage=dialog.querySelector('[data-pack-transfer-message]'),sourceCheck=dialog.querySelector('[data-material-source-check]'),sourceReceive=dialog.querySelector('[data-material-source-receive]');
+  let sourceClient=null,sourcePreview=null;
+  const source=()=>sourceClient??=createMaterialSourceClient();
+  const pendingPackets=()=>{const received=new Set((service.constructionPackTrialStock?.transfers??[]).map(p=>p.id));return (sourcePreview?.packets??[]).filter(p=>!received.has(p.id));};
+  const sourceReady=()=>!!sourcePreview&&(sourcePreview.openingReceipts.length>0||pendingPackets().length>0);
   const projectSelect=dialog.querySelector('[data-concrete-pack-select]'),projectImport=dialog.querySelector('[data-concrete-pack-import]'),projectMessage=dialog.querySelector('[data-concrete-project-message]');
   let projectSuccess='';
   const rows=SHOP_OFFERS.map(o=>{
@@ -87,54 +93,53 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
       if(o.id==='mars-water'&&stock?.inUse?.['mars-water'])row.querySelector('.delivery-stored').textContent+=`（ほか作業中 ${amountText(o.id,stock.inUse['mars-water'])}）`;
       button.disabled=opening||working||service.busy||service.blocked||service.mode==='readonly'||!near||!!service.shopState?.pending||(stock?.unreceived[o.id]??0)<o.amount;
     }
-    const profileId=service.constructionTransferProfileId;
-    dialog.querySelector('[data-pack-transfer-profile]').textContent=profileId??'保存読込後に表示';
     const trial=service.constructionPackTrialStock;
     dialog.querySelector('[data-toolkit-summary]').textContent=toolkitSummary(service.constructionToolkit);
     dialog.querySelector('[data-toolkit-detail]').textContent=toolkitDetails(service.constructionToolkit);
     const q=trial?.quantities;
     dialog.querySelector('[data-pack-transfer-stock]').textContent=q
-      ? `受取記録：コンクリート ${q.concreteBlockCredits}杯相当 / 塗装面 ${q.paintSurfaceCredits}面相当 / 型枠 ${q.auxiliaryUnits.formwork} / 鉄筋 ${q.auxiliaryUnits.rebar} / タイル ${q.auxiliaryUnits.tiles} / 装飾材 ${q.auxiliaryUnits.decoration}（${trial.transfers.length}件）`
+      ? `受け取った建材：生コンの材料 ${q.concreteBlockCredits}杯分 / ペンキ ${q.paintSurfaceCredits}面分 / 型枠 ${q.auxiliaryUnits.formwork} / 鉄筋 ${q.auxiliaryUnits.rebar} / タイル ${q.auxiliaryUnits.tiles} / 装飾材 ${q.auxiliaryUnits.decoration}（${trial.transfers.length}件）`
       : '保存情報を確認できません。';
     const priorSelection=projectSelect.value, concreteStock=service.constructionConcreteStock, project=service.constructionConcreteProject;
     const imported=new Set(project?.importedTransfers?.map(entry=>entry.transferId)??[]);
     projectSelect.replaceChildren();
     const eligible=(trial?.transfers??[]).filter(packet=>packet.quantities?.concreteBlockCredits>0&&!imported.has(packet.id));
     const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent=eligible.length?'移す受取分を選んでください':'移せる受取分はありません';projectSelect.append(placeholder);
-    for(const packet of eligible){const option=document.createElement('option');option.value=packet.id;option.textContent=`${packet.id}（コンクリート ${packet.quantities.concreteBlockCredits}杯相当）`;projectSelect.append(option);}
+    for(const packet of eligible){const option=document.createElement('option');option.value=packet.id;option.textContent=`生コン ${packet.quantities.concreteBlockCredits}杯分の材料（受取 ${trial.transfers.indexOf(packet)+1}）`;projectSelect.append(option);}
     if(eligible.some(packet=>packet.id===priorSelection))projectSelect.value=priorSelection;
     const site=concreteStock?.site,summary=deliveryConcreteSummary(project,site);
     dialog.querySelector('[data-concrete-project-stock]').textContent=concreteStock&&site
       ? `未移送 ${concreteStock.availablePackConcreteCredits}杯分 / 受取累計 ${concreteStock.packConcreteCredits}杯分　｜　生コン ${summary.concrete}杯・バケツ ${summary.bucket}杯・ホース ${summary.hose}杯・今回の打設 ${summary.poured}杯・完成保存 ${summary.completed}杯・未混練 ${summary.unmixed}杯分`
       : '保存情報を確認できません。';
-    transferInput.disabled=opening||working||service.busy||service.blocked||service.mode!=='live'||!near;
-    dialog.querySelector('[data-pack-transfer-copy]').disabled=!profileId||service.mode!=='live';
+    sourceCheck.disabled=opening||working||service.busy||service.blocked||service.mode!=='live'||!near;
+    sourceReceive.disabled=sourceCheck.disabled||!sourceReady();
+    const incoming=sourcePreview?structuredClone(sourcePreview.quantities):null;
+    if(incoming)for(const packet of pendingPackets()){incoming.concreteBlockCredits+=packet.quantities.concreteBlockCredits;incoming.paintSurfaceCredits+=packet.quantities.paintSurfaceCredits;for(const k of Object.keys(incoming.auxiliaryUnits))incoming.auxiliaryUnits[k]+=packet.quantities.auxiliaryUnits[k];}
+    dialog.querySelector('[data-material-source-preview]').textContent=sourcePreview?`受け取れる：生コン ${incoming.concreteBlockCredits}杯分・ペンキ ${incoming.paintSurfaceCredits}面分・型枠 ${incoming.auxiliaryUnits.formwork}枚・鉄筋 ${incoming.auxiliaryUnits.rebar}本・タイル ${incoming.auxiliaryUnits.tiles}枚・装飾材 ${incoming.auxiliaryUnits.decoration}個。${pendingPackets().length?`受取待ち ${pendingPackets().length}件。`:''}${sourceReady()?'中身をたしかめて、受け取ってください。':'受け取れる建材はありません。街で建築セットを開けると使えます。'}`:'街の工房で開けた建材を、ここで受け取れます。';
     projectSelect.disabled=opening||working||service.busy||service.blocked||service.mode!=='live'||!near||eligible.length===0;
     projectImport.disabled=projectSelect.disabled||!projectSelect.value||!service.excavationLive;
-    transferMessage.textContent=service.mode!=='live'?'接続確認・表示用の保存では受け取れません。':!near?'建材受取所の正面へ徒歩で来てから受け取れます。':working||opening||service.busy?'保存内容を確認しています…':success||'受取IDをホームへ入力し、出力したJSONファイルを選んでください。';
-    projectMessage.textContent=service.mode!=='live'?'通常のゲーム保存でのみ移送できます。':!service.excavationLive?'工事現場の通常プレイ画面でのみ施工在庫へ移せます。':!near?'建材受取所の正面へ徒歩で来てください。':working||opening||service.busy?'保存内容を確認しています…':projectSuccess||'受取済み建築セットのコンクリート分が対象です。';
-    dialog.querySelector('.delivery-mode').textContent=service.mode==='integration'?'接続確認用の保存です。本体の素材とは別です。':service.mode==='readonly'?'表示確認中：素材の受取・保存は行いません。':'本体と共通の購入品・保管記録';
+    transferMessage.textContent=service.mode!=='live'?'接続確認・表示用の保存では受け取れません。':!near?'建材受取所の正面へ徒歩で来てから受け取れます。':working||opening||service.busy?'保存内容を確認しています…':success||'「街の建材をたしかめる」で、受け取れる中身を見られます。';
+    projectMessage.textContent=service.mode!=='live'?'いつもの冒険で材料を運べます。':!service.excavationLive?'工事現場で材料を工房へ運べます。':!near?'建材受取所の正面へ徒歩で来てください。':working||opening||service.busy?'保存内容を確認しています…':projectSuccess||'受取済み建築セットのコンクリート分が対象です。';
+    dialog.querySelector('.delivery-mode').textContent=service.mode==='integration'?'接続確認用の保存です。本体の素材とは別です。':service.mode==='readonly'?'表示確認中：素材の受取・保存は行いません。':'この冒険の保管庫';
     message.textContent=service.blocked?'保存が停止しています。保存確認画面で記録を確認してください。':working||opening?'保管記録を確認中…':success||(!near?'建材受取所の正面へ、徒歩で来てください。':service.shopState?.pending?'先に火星ショップの保留注文を確認してください。':rows.some(({o})=>(stock?.unreceived[o.id]??0)>=o.amount)?'保管したい建材を選んでください。':'未受取の購入品はありません。購入した建材はここに表示されます。');
   }
-  function close(){if(working||opening||service.busy)return false;if(dialog.open){dialog.close();onClose();}return true;}
+  function close(){if(working||opening||service.busy)return false;if(dialog.open){dialog.close();sourceClient?.dispose();sourceClient=null;sourcePreview=null;onClose();}return true;}
   closeButton.addEventListener('click',close);
   returnButton.addEventListener('click',close);
-  dialog.querySelector('[data-pack-transfer-copy]').addEventListener('click',async()=>{
-    const profileId=service.constructionTransferProfileId;if(!profileId)return;
-    try{await navigator.clipboard.writeText(profileId);success='受取IDをコピーしました。';}
-    catch{const code=dialog.querySelector('[data-pack-transfer-profile]');const range=document.createRange();range.selectNodeContents(code);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);success='受取IDを選択しました。コピーしてください。';}
-    refresh();
+  sourceCheck.addEventListener('click',async()=>{
+    if(sourceCheck.disabled)return;working=true;success='';sourcePreview=null;refresh();
+    try{sourcePreview=await source().preview(service.constructionTransferProfileId);success=sourceReady()?'中身をたしかめて「受け取る」を押してください。':'受取待ちの建材はありません。街で建築セットを開けると使えます。';}
+    catch(error){success=error.message;}finally{working=false;refresh();}
   });
-  transferInput.addEventListener('change',async()=>{
-    const file=transferInput.files?.[0];if(!file)return;
-    if(file.size>8_000_000){success='ファイルが大きすぎます。受取を保留しました。';transferInput.value='';refresh();return;}
-    working=true;success='';refresh();
+  sourceReceive.addEventListener('click',async()=>{
+    if(sourceReceive.disabled)return;working=true;success='';refresh();
     try{
-      const packet=JSON.parse(await file.text());
-      await service.receiveConstructionPackTrial(packet,context());
-      success='ゲームのセーブデータに受取記録を保存しました。施工に使うコンクリート分を下で選べます。';
-    }catch(error){success=error?.message||'移送ファイルを確認できません。';}
-    finally{working=false;transferInput.value='';refresh();}
+      const incoming=await source().take(service.constructionTransferProfileId,sourcePreview.openingReceipts);
+      const received=new Set((service.constructionPackTrialStock?.transfers??[]).map(p=>p.id));
+      for(const packet of incoming.packets){if(!received.has(packet.id))await service.receiveConstructionPackTrial(packet,context());}
+      sourcePreview=incoming;success='建材を受け取りました！生コンの材料は下のボタンで工房へ移せます。';
+    }catch(error){sourcePreview=null;success=error.message+' 送った建材は街に記録されています。「街の建材をたしかめる」で続きから受け取れます。';}
+    finally{working=false;refresh();}
   });
   projectSelect.addEventListener('change',refresh);
   projectImport.addEventListener('click',async()=>{
@@ -146,7 +151,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
       const saved=await service.saveConstructionConcreteProject({type:'IMPORT_PACK_INGREDIENTS',operationId:`c2-${crypto.randomUUID()}`,transferId},before.revision,snapshot());
       const receipt=saved.importedTransfers.find(entry=>entry.transferId===transferId);
       projectSuccess=receipt?`生コン ${receipt.cells}杯分の配合材料を工房へ移しました。工房のミキサーで練ってから使えます。`:'この受取分はすでに工房へ移されています。';
-    }catch(error){projectSuccess=error?.message||'施工台帳への保存に失敗しました。';}
+    }catch(error){projectSuccess=error?.message||'工房へ材料を運べませんでした。もう一度たしかめてください。';}
     finally{working=false;refresh();}
   });
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});

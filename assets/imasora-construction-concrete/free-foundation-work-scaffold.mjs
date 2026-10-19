@@ -1,7 +1,7 @@
-import {foundationCorners,foundationContains} from './free-foundation-state.mjs';
-import {footSurface,footingAt,FOOT_LEVEL_EPS} from './free-footing.mjs';
-import {frameBlocked,frameRoute} from './free-frames.mjs';
-import {accessPlatePieces} from './free-foundation-access.mjs';
+import {foundationCorners,foundationContains} from './free-foundation-state.mjs?v=120fw';
+import {footSurface,footingAt,FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
+import {frameBlocked,frameRoute} from './free-frames.mjs?v=120fw';
+import {accessPlatePieces} from './free-foundation-access.mjs?v=120fw';
 export const FOUNDATION_WORK_OFFSET=.7,FOUNDATION_WORK_THICKNESS=.25;
 const inside=(r,x,z)=>Math.abs(x-r.x)<=r.width/2+1e-8&&Math.abs(z-r.z)<=r.depth/2+1e-8;
 export function foundationWorkSurface(f,plan,x,z,heightAt){

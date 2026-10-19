@@ -1,6 +1,6 @@
-@import url("../imasora-hold-dash.css?v=119bf");
+@import url("../imasora-hold-dash.css?v=120ds");
 .concrete-launcher{border:2px solid #d5ad65;border-radius:12px;padding:12px;margin:8px 0;background:#203d36}.concrete-launcher p{font-size:12px;line-height:1.5}.concrete-controls[hidden],.concrete-controls [hidden],.concrete-launcher[hidden]{display:none!important}
-body.world-concrete-playing{overflow:hidden}.world-concrete-playing .world-header,.world-concrete-playing .world-toolbar,.world-concrete-playing .control-card,.world-concrete-playing .viewport-toolbar,.world-concrete-playing .viewport-footer,.world-concrete-playing .world-shell>footer{display:none!important}.world-concrete-playing .world-shell{padding:0}.world-concrete-playing .world-layout{display:block;position:static}.world-concrete-playing .viewport-card{border:0;border-radius:0}.world-concrete-playing #viewport{position:fixed;inset:0;z-index:100;width:100%;height:100dvh;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;grid-template-rows:minmax(0,1fr);grid-template-areas:'scene dock';background:#20372f;overflow:hidden}.world-concrete-playing #worldCanvas{grid-area:scene;min-height:0;min-width:0;width:100%;height:100%}.world-concrete-operating>:not(#worldCanvas):not(.concrete-controls){display:none!important}
+body.world-concrete-playing{overflow:hidden}.world-concrete-playing .world-header,.world-concrete-playing .world-toolbar,.world-concrete-playing .control-card,.world-concrete-playing .viewport-toolbar,.world-concrete-playing .viewport-footer,.world-concrete-playing .world-shell>footer{display:none!important}.world-concrete-playing .world-shell{padding:0}.world-concrete-playing .world-layout{display:block;position:static}.world-concrete-playing .viewport-card{border:0;border-radius:0}.world-concrete-playing #viewport{position:fixed;inset:0;z-index:100;width:100%;height:100dvh;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;grid-template-rows:minmax(0,1fr);grid-template-areas:'scene dock';background:#20372f;overflow:hidden}.world-concrete-playing #worldCanvas{grid-area:scene;min-height:0;min-width:0;width:100%;height:100%}.world-concrete-operating>:not(#worldCanvas):not(.concrete-controls):not(.work-target-callout){display:none!important}
 .world-concrete-playing .concrete-controls{grid-area:dock;display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;overflow:hidden;padding:12px;background:#193b35;color:#f1f6df;border-left:2px solid #d5ad65;box-sizing:border-box;font-size:12px}.concrete-controls header{display:flex;justify-content:space-between;align-items:center;gap:8px}.concrete-controls header strong{font-size:15px}.concrete-controls button{min-height:42px;min-width:0;padding:7px;font-size:12px;white-space:normal}.concrete-controls button:disabled{opacity:.4}.concrete-controls button[aria-pressed=true]{background:#e5d59a;color:#193b35}.concrete-scroll{flex:1;overflow:auto;min-height:0;padding:2px}.concrete-tools,.concrete-routes,.concrete-actions,.concrete-walk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-bottom:9px}.concrete-actions button{background:#c99f50;color:#102b28}.concrete-controls footer{display:flex;gap:8px;align-items:center;padding-top:8px}.concrete-stats{font-weight:bold;line-height:1.6}.concrete-message{min-height:32px;max-height:64px;overflow:auto;line-height:1.5}.concrete-diagnostics{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px}.concrete-controls summary{min-height:36px;cursor:pointer}.concrete-controls details p{line-height:1.5}.concrete-controls details button{margin:3px}
 @media(max-width:700px){.world-concrete-playing #viewport{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) min(46dvh,340px);grid-template-areas:'scene' 'dock'}.world-concrete-playing .concrete-controls{border-left:0;border-top:2px solid #d5ad65;padding:7px 10px max(8px,env(safe-area-inset-bottom))}.concrete-controls header strong{font-size:13px}.concrete-message{min-height:16px;max-height:32px;margin:3px 0}.concrete-stats{margin:3px 0}.concrete-tools,.concrete-routes,.concrete-actions,.concrete-walk{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-bottom:5px}.concrete-controls button{font-size:11px}.concrete-actions button{grid-column:span 2}}
 .concrete-controls button{min-height:44px}.concrete-controls header{flex-wrap:wrap}.concrete-mix{border:1px solid #799388;border-radius:9px;padding:8px;margin-bottom:9px}.concrete-mix p{margin:4px 0;line-height:1.5}.concrete-mix label{display:flex;align-items:center;gap:8px}.concrete-mix select{min-height:44px;flex:1;min-width:0}.concrete-mix button{width:100%;margin-top:6px}.concrete-confirm{border:2px solid #e5d59a;border-radius:9px;padding:10px;margin:8px 0;background:#294a40}.concrete-confirm button{width:100%;margin-top:5px}.concrete-controls [data-move]{touch-action:none}
@@ -207,3 +207,173 @@ body.world-concrete-playing{overflow:hidden}.world-concrete-playing .world-heade
 .free-concrete .free-quick-tools [hidden],.free-concrete .free-toolbox-tabs[hidden]{display:none!important}
 @media(max-width:700px){.world-free-playing .free-concrete .free-deck{padding:8px;max-height:calc(100dvh - var(--free-hud-size,150px) - 122px)}.world-free-playing .free-concrete .free-primary-actions{gap:5px}.free-concrete .free-quick-row{gap:4px}.world-free-playing .free-concrete .free-hud-top{width:calc(100% - 16px)}.world-free-playing .free-concrete .free-sheet-overlay{align-items:flex-end}.world-free-playing .free-concrete .free-sheet{max-height:82%}}
 @media(max-height:500px) and (min-width:701px){.world-free-playing .free-concrete .free-hud-top{width:min(450px,calc(100% - 30px))}.world-free-playing .free-concrete .free-deck{width:320px;max-height:calc(100dvh - var(--free-hud-size,100px) - 110px)}.world-free-playing .free-concrete .free-tools-title,.world-free-playing .free-concrete .free-progress{display:none}.world-free-playing .free-concrete .free-sheet{max-height:100%}}
+
+/* Compact, dismissible tools. Movement controls keep their own clear area. */
+.world-free-playing .free-concrete .free-deck{width:min(390px,calc(100% - 180px));max-height:min(280px,42dvh);padding:8px;border-radius:20px;overflow:auto;overscroll-behavior:contain}
+.free-concrete .free-deck-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 5px}
+.free-concrete .free-deck-heading strong{font-size:12px}.free-concrete .free-deck-heading button{font-size:12px;min-height:44px;padding:6px 10px}
+.world-free-playing .free-concrete .free-mode-tabs{padding-bottom:0;margin-bottom:6px;border:0;gap:4px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.world-free-playing .free-concrete .free-mode-tabs button{font-size:13px;padding:6px 3px}
+.world-free-playing .free-concrete :is(.free-progress,[data-mode-note]){display:none}
+.world-free-playing .free-concrete .free-quick-tools{padding:0;margin:0 0 6px;border:0;background:transparent}
+.free-concrete .free-quick-tools>summary{font-size:12px;min-height:44px;margin:0;cursor:pointer;list-style:none;justify-content:space-between;padding:0 10px;border:1px solid #c2dce1;border-radius:12px;background:#f0f8fc;color:#354b60}
+.free-concrete .free-quick-tools>summary::after{content:'＋';font-size:18px}.free-concrete .free-quick-tools[open]>summary::after{content:'−'}
+.world-free-playing .free-concrete .free-primary-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0}
+.world-free-playing .free-concrete .free-primary-actions button{min-height:46px;font-size:12px;padding:6px}
+.world-free-playing .free-concrete [data-pour-reason]{margin:5px 0 0;font-size:11px;line-height:1.45;max-height:32px;overflow:auto}
+.world-free-playing .free-concrete .free-hud-top{padding:8px 10px;width:min(450px,calc(100% - 24px));border-radius:18px}
+.world-free-playing .free-concrete .free-hud-info strong{font-size:15px}.world-free-playing .free-concrete .free-hud-info p{font-size:11px;margin:2px 0}
+.free-concrete .free-hud-notice:empty{display:none}
+.free-concrete .free-step-undo{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-width:0;border-top:1px solid #cce5dd;padding-top:5px}
+.world-free-playing .free-concrete .free-step-undo button{flex-shrink:0;min-height:44px;padding:6px 12px!important;border-radius:15px;background:#fff0c7!important;color:#664625!important;border-color:#e4c486!important;font-size:13px!important}
+.free-concrete .free-step-undo>span{font-size:11px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#526a76}
+.free-concrete .free-deck-open{pointer-events:auto;position:absolute;right:12px;bottom:12px;min-height:48px;padding:10px 18px;z-index:2}
+.world-free-playing .free-concrete[data-watching=true] .free-deck-open{display:none!important}
+.free-concrete .free-deck[hidden],.free-concrete .free-deck-open[hidden]{display:none!important}
+.world-free-playing .free-concrete .free-sheet header{flex-wrap:nowrap;flex-shrink:0}.world-free-playing .free-concrete .free-sheet header button{flex-shrink:0;font-size:13px}
+@media(pointer:coarse) and (min-width:701px){.world-free-playing .free-concrete .free-deck,.world-free-playing .free-concrete .free-deck-open{right:calc(112px + env(safe-area-inset-right));width:min(380px,calc(100% - 300px))}}
+@media(max-width:700px){.world-free-playing .free-concrete .free-deck{width:calc(100% - 24px);left:12px;right:12px;bottom:calc(136px + env(safe-area-inset-bottom));max-height:30dvh;padding:7px}.world-free-playing .free-concrete .free-deck-heading{margin:0 0 3px}.world-free-playing .free-concrete .free-deck-heading strong{font-size:11px}.world-free-playing .free-concrete .free-deck-heading button{min-height:44px}.world-free-playing .free-concrete .free-primary-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.world-free-playing .free-concrete .free-deck-open{bottom:calc(143px + env(safe-area-inset-bottom));right:12px}.world-free-playing .free-concrete .free-hud-top{width:calc(100% - 16px);padding:6px 8px}.world-free-playing .free-concrete .free-sheet{max-height:78dvh}.world-free-playing .free-concrete .free-sheet-overlay{padding:8px}}
+@media(max-height:500px) and (min-width:701px){.world-free-playing .free-concrete .free-deck{max-height:calc(100dvh - 105px);width:min(330px,calc(100% - 285px));right:120px;bottom:8px}.world-free-playing .free-concrete .free-deck-heading strong{display:none}.world-free-playing .free-concrete .free-deck-heading{justify-content:flex-end}.world-free-playing .free-concrete .free-hud-top{width:min(350px,calc(100% - 24px))}.world-free-playing .free-concrete .free-sheet{max-height:calc(100dvh - 16px)}}
+
+.free-concrete .free-deck-heading{position:sticky;top:-8px;z-index:3;background:#fffaf3;padding:5px 0;border-bottom:1px solid #dceae1}
+
+.free-concrete :is(.free-mode-tabs button,.free-primary-actions button,.free-deck-heading button){font-size:14px!important}
+
+/* Face-local masking aid: readable text and stripes convey protection together. */
+.world-free-playing .free-concrete .free-mask-grid{max-width:300px;margin:12px auto;touch-action:manipulation}
+.world-free-playing .free-concrete .free-mask-grid button{min-width:44px;min-height:48px;color:#36584a;background:#ddf1e8;border:2px solid #9ccdbc;font-size:14px}
+body.world-player-game .free-concrete .free-mask-grid button[aria-pressed="true"]{background:repeating-linear-gradient(135deg,#ffe5a6 0 9px,#fff5dd 9px 16px)!important;border-color:#bd9445!important;color:#664c26!important;box-shadow:inset 0 0 0 1px #fff9ea!important}
+.free-concrete .free-mask-hint{font-size:13px;color:#536b69}
+/* Keep paint choices on the field, with real swatches and pattern pictures. */
+.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{display:flex;flex-direction:column;height:min(425px,59dvh);max-height:min(425px,59dvh);overflow:hidden}
+.free-concrete[data-play-mode=paint] :is(.free-deck-heading,.free-mode-tabs){flex-shrink:0}
+.free-concrete[data-play-mode=paint] #free-mode-controls{display:flex;flex-direction:column;min-height:0;flex:1}
+.free-concrete[data-play-mode=paint] .free-paint-tray{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain;padding-right:3px}
+.world-free-playing .free-concrete[data-play-mode=paint] .free-primary-actions{flex-shrink:0;grid-template-columns:repeat(4,minmax(0,1fr));padding-top:7px;border-top:1px solid #dceae1}
+.world-free-playing .free-concrete[data-play-mode=paint] .free-primary-actions :is([data-free=roller],[data-ui=quick-stencil]){grid-column:span 2}
+.world-free-playing .free-concrete[data-play-mode=paint] .free-primary-actions button{font-size:12px!important;padding:4px;min-height:44px}
+.free-concrete .free-paint-tray[hidden]{display:none!important}
+.free-concrete .free-paint-tray{padding:4px 0 9px;--pattern-color:#618db7}
+.free-concrete .paint-tray-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:6px 0;color:#365873;font-size:12px}
+.free-concrete .paint-tray-heading strong{font-size:13px}.free-concrete .paint-tray-heading span{color:#537787}
+.free-concrete .free-paint-tray .free-paint-palette{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:0}
+body.world-player-game .free-concrete .free-paint-tray [data-paint-color]{min-height:48px;min-width:0;padding:4px 0;background:#fffaf4!important;color:#365873!important;border:2px solid #d5e5ea!important;border-radius:13px;box-shadow:0 2px #c0d6df;font-size:12px;position:relative}
+.free-concrete .free-paint-tray [data-paint-color] i{display:block;width:20px;height:18px;border:1px solid #52666a50;border-radius:7px;background:var(--paint-color);margin:0 auto 2px}
+body.world-player-game .free-concrete .free-paint-tray [data-paint-color][aria-pressed=true]{border-color:#638b9d!important;box-shadow:0 0 0 2px #f5d67b!important}
+body.world-player-game .free-concrete .free-paint-tray [data-paint-color][aria-pressed=true]::after{content:'✓';position:absolute;top:-4px;right:0;font-size:13px;color:#25485e;background:#fff2b0;border-radius:50%}
+.free-concrete .paint-patterns{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+body.world-player-game .free-concrete [data-paint-position]{min-height:44px;min-width:116px;padding:5px 10px;border-radius:14px;background:#e1f1fa!important;color:#35536b!important;border:2px solid white!important;font-size:12px;box-shadow:0 2px #bed6e1}
+.free-concrete .stencil-position-board{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:min(244px,100%);margin:14px auto;padding:7px;background:#c8e7e9;border:3px solid #fff;border-radius:17px;touch-action:none;user-select:none;-webkit-user-select:none}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-board button{min-width:44px;min-height:44px;aspect-ratio:1;padding:0;background:var(--stencil-position-color)!important;border:2px solid #fff!important;border-radius:8px;box-shadow:none!important;touch-action:none}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-board [data-filled=true]{border-color:#647b78!important;box-shadow:inset 0 0 0 2px #ffffff77!important}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-board [data-masked=true]{background:repeating-linear-gradient(135deg,#ffe5a6 0 7px,#fff5dd 7px 12px)!important;border-color:#bd9445!important}
+.free-concrete .stencil-position-arrows{display:grid;grid-template-columns:repeat(3,minmax(44px,1fr));gap:7px;width:min(244px,100%);margin:10px auto}
+.free-concrete .stencil-position-arrows [data-stencil-shift="0,-1"]{grid-column:2}.free-concrete .stencil-position-arrows [data-stencil-shift="-1,0"]{grid-column:1}.free-concrete .stencil-position-arrows [data-stencil-shift="0,1"]{grid-column:2}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-arrows button{min-height:44px;font-size:21px;background:#e2f3e8!important;color:#355d51!important;border:2px solid #fff!important;border-radius:14px}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-arrows [data-ui=stencil-center]{font-size:13px;background:#fff0bf!important}
+.free-concrete .stencil-position-arrows{grid-template-columns:repeat(5,minmax(44px,1fr));width:min(280px,100%);gap:5px}
+.free-concrete .stencil-position-arrows [data-stencil-shift]{grid-column:auto}
+body.world-player-game.imasora-pop-menus .free-concrete .free-sheet .stencil-position-arrows button{height:50px;padding:4px;line-height:1.2}
+body.world-player-game.imasora-pop-menus .free-concrete .stencil-position-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+body.world-player-game.imasora-pop-menus .free-concrete .stencil-position-actions button{min-height:48px;padding:5px;font-size:13px;line-height:1.4}
+body.world-player-game.imasora-pop-menus .free-concrete .stencil-position-actions{position:sticky;bottom:0;z-index:2;padding:6px 0;background:#fff6df;border-radius:15px;box-shadow:0 -5px 9px #fff6df;margin-bottom:0}
+body.world-player-game .free-concrete .paint-patterns button{min-width:0;min-height:60px;padding:4px 1px;border:2px solid white!important;border-radius:14px;background:#e1f1fa!important;color:#35536b!important;box-shadow:0 2px #bed6e1;font-size:11px}
+.free-concrete .paint-patterns svg{display:block;width:32px;height:32px;margin:0 auto 3px}.free-concrete .paint-patterns span{display:block;white-space:nowrap}.free-concrete [data-paint-turn] b{display:block;font-size:28px;line-height:32px}
+body.world-player-game .free-concrete .free-paint-tray [data-paint-color]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+body.world-player-game .free-concrete .paint-patterns [aria-pressed=true]{background:#fff0b9!important;border-color:#d1ad52!important;box-shadow:0 2px #d1ad52!important}
+body.world-player-game .free-concrete [data-paint-turn]{min-height:44px;padding:4px 10px;border-radius:13px;background:#e4f5e9!important;color:#315c51!important;font-size:12px;border:2px solid white!important}
+.free-concrete .paint-target-hint{font-size:12px!important;margin:7px 0 0!important;color:#557284}
+@media(max-width:700px){.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{height:min(400px,45dvh);max-height:min(400px,45dvh)}}
+@media(max-height:500px) and (min-width:701px){.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{height:calc(100dvh - 105px);max-height:calc(100dvh - 105px)}}
+body.world-player-game .free-concrete .free-brush button[data-masked="true"],.free-concrete [data-stencil-pixel][data-masked="true"]{background:repeating-linear-gradient(135deg,#ffe5a6 0 7px,#fff5dd 7px 12px)!important;border-color:#bd9445!important;opacity:1!important}
+
+/* 120dq: a small task path and only the selected painting tool stay on the field. */
+.free-concrete .free-mode-tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px}
+.free-concrete .free-mode-tabs button>span{font-size:20px;line-height:1}
+.free-concrete .free-mode-tabs button strong{font-size:14px}
+.free-concrete .free-mode-tabs button small{font-size:10px;line-height:1.2;font-weight:600}
+.free-concrete .workshop-task{padding:12px;margin:9px 0;border:2px solid #fff;border-radius:20px;background:linear-gradient(110deg,#e5f8ff,#fff8d9);color:#345669}
+.free-concrete .task-heading{display:flex;align-items:center;gap:9px;font-size:16px}
+.free-concrete [data-task-symbol]{display:grid;place-items:center;width:32px;height:32px;border-radius:12px;background:#fff1ab;color:#537fa6}
+.free-concrete .workshop-task p{font-size:12px;line-height:1.55;margin:6px 0}
+.free-concrete [data-task-steps]{display:flex;gap:4px;list-style:none;margin:8px 0 0;padding:0;flex-wrap:wrap}
+.free-concrete [data-task-steps] li{font-size:10px;color:#617383;background:#eef1f4;border-radius:9px;padding:4px 6px}
+.free-concrete [data-task-steps] li[data-done=true]{background:#cff1de;color:#37664d}
+.free-concrete [data-task-steps] li[data-current=true]{background:#ffe9a1;color:#755222;outline:2px solid white;font-weight:800}
+.free-concrete [data-task-link]{width:100%;min-height:46px;margin-top:9px}
+.free-concrete [data-next-action]{box-shadow:0 3px #e1ba59,0 0 0 3px #ffe499!important;background:linear-gradient(#fff4c8,#ffdf91)!important;color:#644825!important}
+.free-concrete .task-more{width:100%;min-height:44px;font-size:12px;margin-top:8px}
+.free-concrete .vehicle-job-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.free-concrete .vehicle-job-choices button{display:flex;flex-direction:column;align-items:center;min-height:82px;gap:3px}
+.free-concrete .vehicle-job-choices b{font-size:26px;color:#548898}
+.free-concrete .vehicle-job-choices small{font-size:12px}
+.free-concrete .vehicle-job-choices [aria-pressed=true]{outline:3px solid #f3ca64}
+.free-concrete .paint-target-card{display:flex;align-items:center;gap:8px;width:100%;min-height:57px;text-align:left;margin-bottom:10px}
+.free-concrete .paint-target-card>b{background:#b4e6f4;border-radius:50%;padding:4px 10px}
+.free-concrete .paint-target-card span{flex:1;display:flex;flex-direction:column;gap:3px}
+.free-concrete .paint-target-card small{font-size:11px;font-weight:500}
+.free-concrete .paint-target-card em{font-size:11px;font-style:normal}
+.free-concrete .free-paint-palette{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.free-concrete .paint-tool-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:5px 0 9px}
+.free-concrete .paint-tool-choices button{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:82px;padding:6px 3px}
+.free-concrete .paint-tool-choices b{font-size:25px;color:#7298ab}
+.free-concrete .paint-tool-choices svg{width:46px;height:40px}
+.free-concrete .vehicle-job-choices svg{width:82px;height:54px}
+.free-concrete .free-mode-tabs button svg{width:35px;height:28px;display:block}
+.free-concrete[data-play-mode=paint][data-color-editing=true] :is([data-task-card],.free-primary-actions,[data-task-more],[data-pour-reason]){display:none!important}
+.free-concrete[data-play-mode=paint][data-color-editing=true] .free-paint-tray>:not(.paint-studio){display:none!important}
+.free-concrete[data-play-mode=paint][data-color-editing=true] .free-paint-tray :is([data-color-expand],.paint-recent,.paint-studio-hint){display:none!important}
+.free-concrete[data-play-mode=paint][data-color-editing=true] .paint-studio-body{margin:0;padding:5px}
+.free-concrete[data-play-mode=paint][data-color-editing=true] .paint-tone{height:110px}
+.free-concrete[data-play-mode=paint][data-color-editing=true] .paint-studio{margin:0}
+.world-free-playing .free-concrete[data-play-mode=move] [data-mode-note]:not([hidden]){display:block}
+.free-concrete .paint-tool-choices strong{font-size:13px}
+.free-concrete .paint-tool-choices small{font-size:10px}
+.free-concrete .paint-tool-choices [aria-pressed=true]{outline:3px solid #e8bd5c;background:#fff2be!important}
+.free-concrete .paint-studio{margin:9px 0}
+.free-concrete [data-color-expand]{display:flex;align-items:center;gap:8px;width:100%;min-height:49px;text-align:left}
+.free-concrete [data-color-expand]>i,.free-concrete [data-color-result]{display:block;flex:none;width:29px;height:29px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 1px #abc5d0}
+.free-concrete [data-color-expand]>span{font-size:10px;margin-left:auto}
+.free-concrete .paint-studio-body{padding:9px;border-radius:15px;background:#fff9eb;margin-top:8px}
+.free-concrete .paint-studio-body p{font-size:11px;line-height:1.5}
+.free-concrete .paint-hue{height:44px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);border:4px solid white;border-radius:15px;position:relative;margin:9px 0;touch-action:none;cursor:crosshair}
+.free-concrete .paint-hue i{position:absolute;top:-4px;bottom:-4px;width:10px;border:3px solid white;border-radius:8px;box-shadow:0 0 0 1px #536a7d;transform:translateX(-50%);pointer-events:none}
+.free-concrete .paint-tone{height:135px;position:relative;border:4px solid white;border-radius:15px;background:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent),var(--hue-color);touch-action:none;cursor:crosshair}
+.free-concrete .paint-tone>i{position:absolute;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 1px #536a7d;transform:translate(-50%,-50%);pointer-events:none}
+.free-concrete .paint-tone span{position:absolute;font-size:10px;pointer-events:none;color:#34445b;text-shadow:0 1px white}
+.free-concrete .tone-white{top:4px;left:6px}.free-concrete .tone-color{top:4px;right:6px}.free-concrete .tone-dark{bottom:4px;left:6px;color:white!important;text-shadow:none!important}
+.free-concrete .paint-color-result{display:flex;gap:8px;align-items:center;padding-top:10px;font-size:12px}
+.free-concrete .paint-color-result button{margin-left:auto;min-height:44px;padding:5px 8px;font-size:12px}
+.free-concrete .paint-recent{display:flex;align-items:center;gap:5px;margin-top:7px}
+.free-concrete .paint-recent>span{font-size:10px}
+body.world-player-game.imasora-pop-menus .free-concrete .paint-recent button{min-width:44px;width:44px;height:44px;min-height:44px;padding:0;background:var(--paint-color)!important;border:3px solid white;border-radius:13px}
+.free-concrete .free-paint-tray{max-height:min(52vh,480px)}
+.free-concrete [data-task-card][hidden],.free-concrete [data-vehicle-jobs][hidden],.free-concrete [data-color-body][hidden],.free-concrete [data-paint-pattern-options][hidden]{display:none!important}
+.world-free-playing .free-concrete .free-deck{max-height:min(610px,76dvh);overflow:auto}
+.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{height:min(610px,76dvh);max-height:min(610px,76dvh)}
+.free-concrete[data-play-mode=paint] #free-mode-controls{overflow:auto;display:block;overscroll-behavior:contain}
+.free-concrete[data-play-mode=paint] .free-paint-tray{max-height:none;overflow:visible}
+.free-concrete[data-play-mode=paint] .free-primary-actions{position:sticky;bottom:0;background:#fffaf3;padding:8px 0 4px;z-index:2}
+.free-concrete[data-play-mode=paint] .workshop-task{padding:7px 10px;margin:4px 0}
+.free-concrete[data-play-mode=paint] .workshop-task p,.free-concrete[data-play-mode=paint] [data-task-steps]{display:none}
+.free-concrete .free-paint-tray .free-paint-palette{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:700px){.world-free-playing .free-concrete .free-deck{max-height:min(430px,47dvh)}.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{height:min(430px,47dvh);max-height:min(430px,47dvh)}}
+@media(max-height:500px) and (min-width:701px){.world-free-playing .free-concrete .free-deck,.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{height:calc(100dvh - 105px);max-height:calc(100dvh - 105px)}}
+@media(max-width:600px){.free-concrete .workshop-task{padding:8px;margin:5px 0}.free-concrete [data-task-steps]{gap:3px}.free-concrete .workshop-task p{font-size:11px}.free-concrete .task-heading{font-size:14px}.free-concrete .free-mode-tabs button small{font-size:9px}.free-concrete .free-paint-tray{max-height:36vh}.free-concrete .free-deck .paint-tool-choices button{min-height:68px}.free-concrete .free-deck .paint-tool-choices b{font-size:21px}}
+@media(max-width:700px){
+ .world-free-playing .free-concrete .free-deck,.world-free-playing .free-concrete .free-deck-open{bottom:calc(max(136px,var(--free-basics-size,112px) + 24px) + env(safe-area-inset-bottom))}
+ .world-free-playing .free-concrete .free-deck,.world-free-playing .free-concrete[data-play-mode=paint] .free-deck{max-height:min(47dvh,calc(100dvh - var(--free-hud-size,150px) - max(136px,var(--free-basics-size,112px) + 24px) - 36px))}
+ .free-concrete .free-mode-tabs button svg{height:23px}
+}
+
+/* 120dr: visual callout belongs to the scene, not to a modal or input surface. */
+.work-target-callout{position:absolute;z-index:1;pointer-events:none;background:#fff6b9;color:#34445d;border:3px solid white;border-radius:18px;padding:8px 13px;max-width:230px;text-align:center;box-shadow:0 3px 0 #ee729c,0 6px 16px #799bbe35}
+.world-free-playing .free-concrete{z-index:2}
+.work-target-callout{width:max-content;box-sizing:border-box}
+.work-target-callout[data-side=below] i{top:-24px;bottom:auto;transform:rotate(180deg)}
+.work-target-callout[hidden]{display:none!important}.work-target-callout strong{display:block;font-size:19px;line-height:1.3}.work-target-callout span{display:block;font-size:12px;margin-top:3px}.work-target-callout i{position:absolute;left:calc(50% - 9px);bottom:-24px;font-size:24px;color:#ee729c;font-style:normal}
+.free-concrete .free-show-target{background:#fff0ac!important;border:2px solid #efb9d3!important;color:#354b60!important;border-radius:16px;padding:9px 16px;min-height:44px;width:100%;font-weight:800}
+@media(max-width:600px){.work-target-callout{padding:6px 10px;max-width:185px}.work-target-callout strong{font-size:16px}}
+
+/* Native vehicle-door routes stay inside the game HUD. */
+.free-door-routes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.free-door-routes[hidden],[data-door-run][hidden]{display:none!important}.free-door-routes button{min-height:48px;white-space:normal;font-size:14px}.free-door-routes small{grid-column:1/-1;font-size:12px;color:#43505c}.free-concrete [data-door-run]{display:flex;align-items:center;justify-content:space-between;gap:8px;grid-column:1/-1;background:#fff5d8;border-radius:12px;padding:6px 10px;color:#493d32;font-size:13px}.free-concrete [data-door-run] button{min-height:44px;min-width:64px}

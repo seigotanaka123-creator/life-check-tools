@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {packWork,unpackWork} from './imasora-construction-loader-work.js';
+import {packWork,unpackWork} from './imasora-construction-loader-work.js?v=120ey';
 export const WORK_DB='imasora-construction-loader-work-development-v1';
 // Reuse the already-tested atomic CAS store. Override the name before any open/read.
 export class LoaderWorkStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=WORK_DB;}}

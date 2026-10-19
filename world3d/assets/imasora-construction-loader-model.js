@@ -1,6 +1,6 @@
 import * as THREE from './three.module.min.js';
-import { measureCharacter } from './imasora-construction-layout.js';
-import { LOADER } from './imasora-construction-loader-physics.js';
+import { measureCharacter } from './imasora-construction-layout.js?v=120ds';
+import { LOADER } from './imasora-construction-loader-physics.js?v=120ey';
 
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.62,...extra});
 function mesh(parent,geometry,material,name,x=0,y=0,z=0){const o=new THREE.Mesh(geometry,material);o.name=name;o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o;}
@@ -15,7 +15,7 @@ function beam(parent,a,b,w,d,material,name){const va=new THREE.Vector3(...a),vb=
 
 export function createLoader(){
   const root=new THREE.Group();root.name='wheel-loader-01';
-  const yellow=mat(0xf1b22e,{metalness:.18}),trim=mat(0x233638),rubber=mat(0x202b2c),treadMat=mat(0x303b3a),steel=mat(0xb8c7bd,{metalness:.76,roughness:.3}),seatMat=mat(0x263734),hubMat=mat(0xe8a323,{metalness:.3});
+  const yellow=mat(0xfead03,{metalness:.18}),trim=mat(0x233638),rubber=mat(0x202b2c),treadMat=mat(0x303b3a),steel=mat(0xb8c7bd,{metalness:.76,roughness:.3}),seatMat=mat(0x263734),hubMat=mat(0xeb9901,{metalness:.3});
   const glass=mat(0x9edbdb,{transparent:true,opacity:.18,depthWrite:false,roughness:.18,side:THREE.DoubleSide});
   rounded(root,48,75,4.8,0,6.4,-4,trim,'chassis');
   rounded(root,55,35,1,0,8.5,-8,yellow,'cabin-floor',2);
@@ -40,7 +40,7 @@ export function createLoader(){
     wheels.push({pivot,spin,front:z>0});
     rounded(root,10,21,1.2,side*24.5,19.1,z,yellow,'wheel-guard',2);
   }
-  const roofMat=mat(0xf0ba42,{metalness:.2}),roof=rounded(root,58,36,3,0,41.5,-8,roofMat,'cab-roof',5);
+  const roofMat=mat(0xfeb616,{metalness:.2}),roof=rounded(root,58,36,3,0,41.5,-8,roofMat,'cab-roof',5);
   for(const x of[-27.5,27.5])for(const z of[-24,8])box(root,1.6,31,1.6,x,24.5,z,trim,'cab-pillar');
   box(root,53,22,.25,0,28,8.8,glass,'front-windscreen');
   box(root,53,19,.25,0,29,-24.8,glass,'rear-windscreen');
@@ -80,7 +80,7 @@ export function createLoader(){
   const sideGeometry=new THREE.ExtrudeGeometry(shape,{depth:1.5,bevelEnabled:false});
   const pos=sideGeometry.attributes.position;for(let i=0;i<pos.count;i++){const a=pos.getX(i),b=pos.getY(i),c=pos.getZ(i);pos.setXYZ(i,c,b,a);}sideGeometry.computeVertexNormals();
   // Reflecting the coordinate axes changes winding: render both sides of the cheeks.
-  const cheekMat=mat(0xe9a62d,{side:THREE.DoubleSide,metalness:.2});
+  const cheekMat=mat(0xf69f01,{side:THREE.DoubleSide,metalness:.2});
   mesh(bucket,sideGeometry,cheekMat,'bucket-cheek',-28.5,0,0);mesh(bucket,sideGeometry.clone(),cheekMat,'bucket-cheek',27,0,0);
   const steps=[];
   for(const side of[-1,1]){
@@ -93,12 +93,16 @@ export function createLoader(){
   const pilotSocket=new THREE.Group();pilotSocket.name='driver-socket';pilotSocket.position.set(-14,LOADER.floor-m.footBottom,-8);root.add(pilotSocket);
   root.userData={wheels,roof,roofMat,steering,steps,pilotSocket,measurement:m,bucket};return root;
 }
-export function updateLoaderModel(root,vehicle,{steps=1,roofTransparent=false}={}){
-  root.position.set(vehicle.x,0,vehicle.z);root.rotation.y=vehicle.heading;
+export function applyLoaderGround(root,g){
+ if(!g)return;root.position.fromArray(g.position);root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(...g.axes.map(a=>new THREE.Vector3(...a))));
+ root.userData.groundFrame=g;root.userData.wheels.forEach((w,i)=>w.pivot.position.y=LOADER.wheelRadius+(g.suspension[i]??0));
+}
+export function updateLoaderModel(root,vehicle,{steps=1,ground=null}={}){
+  root.position.set(vehicle.x,0,vehicle.z);root.rotation.set(0,vehicle.heading,0);
+  root.userData.wheels.forEach(w=>w.pivot.position.y=LOADER.wheelRadius);applyLoaderGround(root,ground);
   for(const wheel of root.userData.wheels){wheel.pivot.rotation.y=vehicle.steering*(wheel.front?1:-1);wheel.spin.rotation.x=vehicle.wheelTravel/LOADER.wheelRadius;}
   for(const group of root.userData.steps){group.scale.x=Math.max(.01,steps);group.visible=steps>.02;}
-  if(root.userData.roofMat.transparent!==roofTransparent){root.userData.roofMat.transparent=roofTransparent;root.userData.roofMat.needsUpdate=true;}
-  root.userData.roofMat.opacity=roofTransparent?.14:1;root.userData.roofMat.depthWrite=!roofTransparent;root.userData.roof.castShadow=!roofTransparent;
+  // The metal roof stays opaque in every view, including while riding.
   root.userData.steering.rotation.z=-vehicle.steering*2.8;
 }
 export function disposeLoader(root){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}

@@ -1,6 +1,6 @@
-import {validateAuthorityExcavation} from './imasora-construction-earth-authority.js';
-import {unpackDumpWorld} from './imasora-construction-dump-truck.js';
-import {SOIL_Q,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs';
+import {validateAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120fc';
+import {unpackDumpWorld} from './imasora-construction-dump-truck.js?v=120ey';
+import {SOIL_Q,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
 const check=(ok,msg)=>{if(!ok)throw Error(`土の体積照合：${msg}`);};
 export function excavationUnitsToQ(units){check(Number.isSafeInteger(units)&&units>=0&&units%1000===0,'旧掘削の単位は1000の倍数で照合してください。');const q=units/1000*64;check(Number.isSafeInteger(q),'体積が大きすぎます。');return q;}
 export function dumpUnitsToQ(units){check(Number.isSafeInteger(units)&&units>=0,'ダンプの個数が不正です。');const q=units*29;check(Number.isSafeInteger(q),'体積が大きすぎます。');return q;}

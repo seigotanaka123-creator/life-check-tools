@@ -1,0 +1,48 @@
+/* Shared play surfaces: cream, sky, mint and peach; keep swatches and game art intact. */
+:root{--game-panel:#fffaf4;--game-ink:#354b60;--game-line:#b8d8db;--game-action:#ffe3a6;--game-action-ink:#51422b;--game-choice:#dceffc;--game-danger:#f9d6df}
+body.world-player-game .world-shell{background:linear-gradient(145deg,#fff1f5,#edf9f4)}
+body.world-player-game :is(.world-player-bar,.world-player-menu,.wmm-card,.world-map-menu-resume,.gv-menu-card,.we-player-menu-card,.construction-delivery-menu,.transport-sheet,.transport-migration,.concrete-controls:not(.free-concrete),.free-hud-top,.free-deck,.free-sheet,.free-confirm-card,.free-work-watch){background:#fffaf4!important;color:#354b60!important;border-color:#b8d8db!important;box-shadow:0 5px 0 #b6d7d42b,0 8px 24px #729baf24!important}
+body.world-player-game :is(.world-player-menu,.construction-delivery-menu,.transport-sheet,.transport-migration)::backdrop{background:#54728555}
+body.world-player-game :is(.world-map-menu,.we-player-menu,.gv-menu,.free-sheet-overlay,.free-confirm-overlay){background:#68869855!important}
+body.world-player-game :is(.world-player-menu>header,.wmm-header,.wmm-footer,.gv-menu-header,.gv-menu-footer,.we-player-menu-header,.we-player-menu-footer,.free-sheet>header,.transport-menu-head,.construction-delivery-menu>header,.construction-delivery-menu>footer){background:#e5f5ee!important;border-color:#b8d8db!important}
+body.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume,.world-vehicle-controls,.world-excavation-controls,.construction-delivery-menu,.transport-play,.transport-migration,.concrete-controls) :is(h1,h2,h3,h4,p,small,label,summary,strong,span,output,caption,td,th){color:#354b60!important}
+body.world-player-game :is(.world-player-brand>strong,.free-hud-info>strong){color:#4e7181!important}
+body.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume,.world-vehicle-controls,.world-excavation-controls,.construction-delivery-menu,.transport-play,.transport-migration,.concrete-controls) button{background:#deeffb!important;color:#354b60!important;border-color:#b4d4e5!important;box-shadow:0 2px 0 #adced633!important;border-radius:14px;opacity:1;min-height:44px;line-height:1.4}
+body.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-vehicle-controls,.world-excavation-controls,.construction-delivery-menu,.transport-play,.concrete-controls) button:is(.primary,[aria-pressed=true],[aria-selected=true],.is-active,.held){background:#cceede!important;border-color:#73ae98!important;color:#244d47!important;box-shadow:inset 0 -3px #9cd0bb88!important}
+body.world-player-game :is([data-player-build],[data-player-start]>button,.free-primary-actions>[data-free],.free-primary-actions>[data-ui=quick-stencil],#saveButton,[data-map-menu=save],[data-map-menu=confirm],[data-free=confirm]){background:#ffe3aa!important;color:#51442d!important;border-color:#dabc7e!important}
+body.world-player-game :is([data-tone=caution],[data-map-menu=reset],[data-map-menu=undo],[data-free=stop],[data-free=unframe],[data-id=recovery]){background:#f9dce5!important;color:#724459!important;border-color:#d9aabb!important}
+body.world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-vehicle-controls,.world-excavation-controls,.construction-delivery-menu,.transport-play,.concrete-controls) button:disabled{background:#eef0f2!important;color:#73808c!important;border-color:#d1dbe0!important;box-shadow:none!important;opacity:1}
+body.world-player-game :is(.world-player-menu,.world-map-menu,.world-vehicle-controls,.world-excavation-controls,.construction-delivery-menu,.transport-play,.concrete-controls) :is(select,input,textarea){background:#fffefa!important;color:#354b60!important;border-color:#b4cdd9!important;font-size:16px}
+body.world-player-game :is(.world-vehicle-lobby,.world-vehicle-controls-active,.world-excavation-controls,.viewport-footer,.free-menu-group,.free-toolbox-tabs,.free-hud-notice,.free-boarding-help,.concrete-launcher,.concrete-mix,.concrete-confirm,.wmm-preserve,.wmm-comparison th,.we-player-choice,.we-player-preserve,.gv-menu-vehicle,.delivery-help,.delivery-stock,.delivery-pack-transfer,.delivery-project,.delivery-return,.construction-delivery-preview,.transport-note,.storage-section){background:#edf7f3!important;color:#354b60!important;border-color:#b8d8db!important}
+body.world-player-game .free-concrete::before{background:none!important}
+body.world-player-game :is(.free-progress li,.free-menu-group summary)::after{color:#557789!important}
+body.world-player-game .free-concrete .free-progress li[aria-current=step]{color:#326657!important;border-color:#73ad98}
+body.world-player-game .free-concrete .free-paint-palette button[aria-pressed=true]::after{color:#326657}
+body.world-player-game .free-concrete .free-stencil-preview{background:#d5e6e9}
+body.world-player-game .free-concrete .free-stencil-preview i:not([data-filled=true]){background:#b7cbd0}
+body.world-player-game .free-hose-meter progress,body.world-player-game .free-hose-meter progress::-webkit-progress-bar{background:#dbe9ed}
+body.world-player-game .free-hose-meter progress::-webkit-progress-value{background:#76bca8}
+body.world-player-game .free-hose-meter progress::-moz-progress-bar{background:#76bca8}
+body.world-player-game :is(.free-seat-actions,.transport-pad,.concrete-travel)>span{color:#354b60!important;background:#dceffc!important}
+body.world-player-game :is(button,summary):focus-visible{outline:3px solid #5f8ba4!important;outline-offset:2px}
+
+/* Keep movement hints legible on the same light palette. */
+body.world-player-game .construction-keyboard-hint,body.world-player-game .construction-move-pad,body.world-player-game .construction-hold-dash{background:#e0f2fa!important;color:#294959!important;border-color:#aecdda!important;box-shadow:0 3px 0 #c0d9d7!important}
+body.world-player-game .construction-move-stick{background:#b7e5d1!important;border-color:#75b7a8!important}
+
+body.world-player-game .hold-dash-button{border-radius:50%!important;background:#ffe5ad!important;color:#57472c!important;border-color:#d5b575!important;box-shadow:0 3px 0 #c9b27955!important}
+body.world-player-game .hold-dash-button[aria-pressed=true]{background:#bce6d1!important;border-color:#73ae98!important;color:#244d47!important}
+body.world-player-game .hold-dash-button:disabled{background:#eef0f2!important;color:#73808c!important}
+
+/* Other 3D dialogs using the former dark panel family. */
+body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu){background:#fffaf4!important;color:#354b60!important;border-color:#b8d8db!important;box-shadow:0 8px 24px #729baf33!important}
+body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) :is(h2,h3,p,span,strong,small){color:#354b60!important;text-shadow:none!important}
+body.world-player-game .sky-station-guide-dialog-name{background:#d2eddf!important;color:#294c43!important;box-shadow:none!important;border-color:#a6ccc1!important}
+body.world-player-game .ufo-equipment-workshop-card{background:#eef5ff!important;border-color:#bfd6e3!important;box-shadow:none!important}
+body.world-player-game .ufo-equipment-workshop-card[data-status=crafted]{background:#def3e8!important;border-color:#90c5ae!important}
+body.world-player-game .ufo-equipment-workshop-resources span{background:#fff0ce!important;border-color:#dfc791!important}
+body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button{background:#deeffb!important;color:#354b60!important;border-color:#b4d4e5!important;border-radius:14px;min-height:44px;box-shadow:none!important}
+body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button:disabled{background:#edf0f2!important;color:#63717d!important;border-color:#cad5dc!important}
+body.world-player-game .sky-station-guide-dialog button::before,body.world-player-game .sky-station-guide-dialog button::after{color:#527788!important;text-shadow:none!important}
+
+body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button:disabled{opacity:1!important}

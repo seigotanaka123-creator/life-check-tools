@@ -1,8 +1,8 @@
 // 9-1a: finite, session-only ordinary soil. No wallet or world-save access.
-import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,worldToLocal,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js';
-import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js';
+import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,worldToLocal,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js?v=120ey';
+import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js?v=120ey';
 import {bucketOffset,isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
-import {toothContacts,bucketEnvironmentHits,bucketContactGeometry,prismTouchesBox,prismBoxPenetration} from './imasora-construction-excavator-contact.js';
+import {toothContacts,bucketEnvironmentHits,bucketContactGeometry,prismTouchesBox,prismBoxPenetration} from './imasora-construction-excavator-contact.js?v=120fc';
 export const CELL=8;
 export const PLOT=Object.freeze({minX:-32,maxX:96,minZ:48,maxZ:176,bottom:-32,top:24});
 export const BIN=Object.freeze({x:-94,z:-12,width:64,depth:48,height:10});
@@ -24,15 +24,16 @@ export function armPose(s){
   const positions=[{...b},{x:b.x,y:b.y+EX.boomLength*Math.sin(a.boom),z:b.z+EX.boomLength*Math.cos(a.boom)}];
   positions.push({x:b.x,y:positions[1].y+EX.stickLength*Math.sin(a.boom+a.stick),z:positions[1].z+EX.stickLength*Math.cos(a.boom+a.stick)});
   const wrist=positions[2],offset=bucketOffset(s),center={x:wrist.x,y:wrist.y+offset.y,z:wrist.z+offset.z};
-  const transform=p=>({...localToWorld({...v,heading},p.x,p.z),y:p.y});
-  return {local:positions,world:positions.map(transform),bucket:transform(center),wrist:transform(wrist),heading};
+  const ground=s.groundPose,cs=Math.cos(a.slew),sn=Math.sin(a.slew),axes=ground?[ground.axes[0].map((n,i)=>n*cs-ground.axes[2][i]*sn),ground.axes[1],ground.axes[0].map((n,i)=>n*sn+ground.axes[2][i]*cs)]:null;
+  const transform=p=>{if(!ground)return {...localToWorld({...v,heading},p.x,p.z),y:p.y};const q=ground.position.map((n,i)=>n+axes[0][i]*p.x+axes[1][i]*p.y+axes[2][i]*p.z);return{x:q[0],y:q[1],z:q[2]};};
+  return {local:positions,world:positions.map(transform),bucket:transform(center),wrist:transform(wrist),heading,...(axes?{axes}:{})};
 }
 const near=(a,b,r)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)<=r;
 export function solveBucketPose(s,p,curl=s.arm.curl){
-  const v=s.loader.vehicle,dx=p.x-v.x,dz=p.z-v.z,r2=dx*dx+dz*dz-EX.shoulder.x**2;if(r2<0)return null;
-  const localZ=Math.sqrt(r2),yaw=Math.atan2(dx,dz)-Math.atan2(EX.shoulder.x,localZ),slew=Math.atan2(Math.sin(yaw-v.heading),Math.cos(yaw-v.heading));
+  const v=s.loader.vehicle,g=s.groundPose,q=g?g.axes.map(a=>a.reduce((n,x,i)=>n+x*([p.x,p.y,p.z][i]-g.position[i]),0)):null,dx=q?q[0]:p.x-v.x,dz=q?q[2]:p.z-v.z,r2=dx*dx+dz*dz-EX.shoulder.x**2;if(r2<0)return null;
+  const localZ=Math.sqrt(r2),yaw=Math.atan2(dx,dz)-Math.atan2(EX.shoulder.x,localZ),relative=yaw-(g?0:v.heading),slew=Math.atan2(Math.sin(relative),Math.cos(relative));
   const contact=isContactDig(s),offset=bucketOffset(contact?{...s,arm:{...s.arm,boom:0,stick:0}}:s,curl),length=contact?Math.hypot(offset.y,EX.stickLength+offset.z):EX.stickLength,beta=contact?Math.atan2(offset.y,EX.stickLength+offset.z):0;
-  const y=p.y-(contact?0:offset.y)-EX.shoulder.y,z=localZ-(contact?0:offset.z)-EX.shoulder.z;
+  const y=(q?q[1]:p.y)-(contact?0:offset.y)-EX.shoulder.y,z=localZ-(contact?0:offset.z)-EX.shoulder.z;
   const c=(y*y+z*z-EX.boomLength**2-length**2)/(2*EX.boomLength*length);if(c<-1||c>1)return null;
   const effective=-Math.acos(c),stick=effective-beta,boom=Math.atan2(y,z)-Math.atan2(length*Math.sin(effective),EX.boomLength+length*Math.cos(effective));
   if(boom<EX.boomMin||boom>EX.boomMax||stick<(s.cutMask?-2.55:EX.stickMin)||stick>stickExtensionLimit(s)||Math.abs(slew)>EX.slewLimit)return null;
@@ -45,8 +46,8 @@ export function scoopPoseAt(s,center,start,t){
   // A backhoe draws the stick toward the machine while curling. Keeping its
   // bowl fixed in space would force the wrist farther into a low tunnel roof.
   const begin=solveBucketPose(s,center,start);if(!begin)return null;
-  const heading=s.loader.vehicle.heading+begin.slew,draw=16*e;
-  return solveBucketPose(s,{x:center.x-Math.sin(heading)*draw,y:center.y,z:center.z-Math.cos(heading)*draw},curl);
+  const heading=s.loader.vehicle.heading+begin.slew,draw=16*e,axis=armPose({...s,arm:begin}).axes?.[2]??[Math.sin(heading),0,Math.cos(heading)];
+  return solveBucketPose(s,{x:center.x-axis[0]*draw,y:center.y-axis[1]*draw,z:center.z-axis[2]*draw},curl);
 }
 export function scoopTargets(s){
   if(isContactDig(s))return toothContacts(s,armPose(s));
@@ -75,13 +76,13 @@ export function armIntersections(s,padding=0,external=[]){
   const pose=armPose(s),hits=new Set(),materials=externalMachineVolumes(s,external),sample=(p,r)=>{
     r+=padding;
     if(p.y-r<PLOT.bottom)hits.add('岩盤');
-    if((p.x<PLOT.minX||p.x>PLOT.maxX||p.z<PLOT.minZ||p.z>PLOT.maxZ)&&p.y-r<0)hits.add('固定地面');
-    const local={...localToWorld({x:0,z:0,heading:-s.loader.vehicle.heading},p.x-s.loader.vehicle.x,p.z-s.loader.vehicle.z),y:p.y};
-    if(Math.abs(local.x)<35+r&&Math.abs(local.z)<43+r&&p.y-r<17)hits.add('クローラー');
+    if((p.x<PLOT.minX||p.x>PLOT.maxX||p.z<PLOT.minZ||p.z>PLOT.maxZ)&&p.y-r<0&&!s.groundPatches?.has([Math.floor(p.x/32),Math.floor(p.z/32)].join(',')))hits.add('固定地面');
+    const q=s.groundPose?s.groundPose.axes.map(a=>a.reduce((n,v,i)=>n+v*([p.x,p.y,p.z][i]-s.groundPose.position[i]),0)):null,local=q?{x:q[0],y:q[1],z:q[2]}:{...localToWorld({x:0,z:0,heading:-s.loader.vehicle.heading},p.x-s.loader.vehicle.x,p.z-s.loader.vehicle.z),y:p.y};
+    if(Math.abs(local.x)<35+r&&Math.abs(local.z)<43+r&&local.y-r<17)hits.add('クローラー');
     const dx=Math.abs(p.x-BIN.x),dz=Math.abs(p.z-BIN.z);
     if(p.y-r<BIN.height&&p.y+r>0&&dx<BIN.width/2+r&&dz<BIN.depth/2+r&&(dx>BIN.width/2-3-r||dz>BIN.depth/2-3-r))hits.add('受け箱の縁');
     for(let x=Math.floor((p.x-r)/CELL);x<=Math.floor((p.x+r)/CELL);x++)for(let y=Math.floor((p.y-r)/CELL);y<=Math.floor((p.y+r)/CELL);y++)for(let z=Math.floor((p.z-r)/CELL);z<=Math.floor((p.z+r)/CELL);z++){
-      const id=key([x,y,z]);if(s.terrain[id])hits.add(`土:${id}`);
+      const id=x+','+y+','+z;if(s.terrain[id])hits.add(`土:${id}`);
     }
     for(const o of s.spoil)if(near(o,p,4+r))hits.add(`排土:${o.id}`);
     for(const b of materials){
@@ -105,16 +106,18 @@ export function spoilPenetrations(s){
   if(depth>0)out.set('排土:'+p.id,depth);
  }return out;
 }
-export function contactBlocker(before,candidate,hits=armIntersections(candidate),external=[]){
- if(external.length)hits=armIntersections(candidate,0,external);
+export function contactBlocker(before,candidate,hits,external=[]){
+ // Compute the candidate once, including its live external volumes. Only an
+ // existing loose/material overlap needs the preceding pose's contact set.
+ if(external.length||hits===undefined)hits=armIntersections(candidate,0,external);
  if(!hits.size)return '';
- const old=armIntersections(before,0,external);
+ let previous;const old=()=>previous??=(armIntersections(before,0,external));
  const materialNames=new Set(external.filter(validExternalVolume).map(b=>b.name||'建材'));
- const newMaterial=[...hits].find(id=>materialNames.has(id)&&!old.has(id));
+ const newMaterial=[...hits].find(id=>materialNames.has(id)&&!old().has(id));
  if(newMaterial)return newMaterial;
  const solid=[...hits].filter(id=>!materialNames.has(id));if(!solid.length)return '';
  const hard=solid.find(id=>!id.startsWith('排土:'));if(hard)return hard;
- if(solid.some(id=>!old.has(id)))return solid[0];
+ if(solid.some(id=>!old().has(id)))return solid[0];
  const a=spoilPenetrations(before),b=spoilPenetrations(candidate);let improved=false;
  for(const[id,depth]of b)if(depth>(a.get(id)||0)+1e-8)return id;
  for(const[id,depth]of a)if((b.get(id)||0)<depth-1e-8)improved=true;

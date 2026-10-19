@@ -1,15 +1,15 @@
 // Explicit rollback of one closed vehicle work scope, never its material ledger.
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=496';
-import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=496';
-import * as W from './imasora-construction-world-water.js';
-import * as S from './imasora-construction-world-soil.js';
-import * as T from './imasora-construction-world-timber.js';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
+import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120fw';
+import * as W from './imasora-construction-world-water.js?v=120fb';
+import * as S from './imasora-construction-world-soil.js?v=120fw';
+import * as T from './imasora-construction-world-timber.js?v=120fw';
 export const MAX_VEHICLE_RESTORE_INPUT=MAX_RECOVERY_FILE;
 export const VEHICLE_RESTORE_KINDS=Object.freeze(['water','soil','timber']);
 const clone=structuredClone,equal=(a,b)=>canonical(a)===canonical(b);
 const check=(v,m)=>{if(!v)throw Error(`車両作業の復元：${m}`);};
-const specs={water:{key:'constructionWater',label:'給水ローダー',unit:'L',scale:1000,validate:W.validateWorldWater,checkpoint:W.waterCheckpoint,continuation:W.validateWaterContinuation},soil:{key:'constructionSoil',label:'火星土ローダー',unit:'ブロック',scale:1000,validate:S.validateWorldSoil,checkpoint:S.soilCheckpoint,continuation:S.validateSoilContinuation},timber:{key:'constructionTimber',label:'木材クレーン',unit:'枚',scale:T.FLOOR_VOLUME,validate:T.validateWorldTimber,checkpoint:T.timberCheckpoint,continuation:T.validateTimberContinuation}};
+const specs={water:{key:'constructionWater',label:'給水車',unit:'L',scale:1000,validate:W.validateWorldWater,checkpoint:W.waterCheckpoint,continuation:W.validateWaterContinuation},soil:{key:'constructionSoil',label:'火星土ローダー',unit:'ブロック',scale:1000,validate:S.validateWorldSoil,checkpoint:S.soilCheckpoint,continuation:S.validateSoilContinuation},timber:{key:'constructionTimber',label:'木材クレーン',unit:'枚',scale:T.FLOOR_VOLUME,validate:T.validateWorldTimber,checkpoint:T.timberCheckpoint,continuation:T.validateTimberContinuation}};
 export function vehicleRestoreSpec(kind){check(VEHICLE_RESTORE_KINDS.includes(kind),'車両の種類が不正です。');return specs[kind];}
 function exact(value,names){check(value&&Object.getPrototypeOf(value)===Object.prototype&&Object.keys(value).sort().join('|')===[...names].sort().join('|'),'確認情報の項目が不正です。');}
 function validLedger(ledger){L.validateWorldPurchaseLedger(ledger);check(ledger.scope==='imasora-world-ledger-v1'&&!ledger.pending&&!ledger.world.equipmentCraftPending,'通常保存の購入・装備作成を完了してから確認してください。');return ledger;}
@@ -42,6 +42,8 @@ export function vehicleRestoreCandidate(ledger,kind){const boundary=vehicleResto
 export function vehicleRestoreUndoCandidate(journal){const candidate=vehicleRestoreCandidate(L.unpackWorldPurchaseLedger(journal.expectedRaw),journal.vehicleKind);candidate.work=clone(journal.beforeUnsaved);return candidate;}
 function validateCandidate(current,kind,candidate){
   exact(candidate,['work','boundary']);const boundary=vehicleRestoreBoundary(current,kind);
+  const old=current.world[vehicleRestoreSpec(kind).key],field=w=>(w?.work?.loader??w?.work?.rig)?.vehicle?.field??null;
+  check(old.schema===candidate.work?.schema&&equal(field(old),field(candidate.work)),'この記録は駐車場へ移す前のものです。車だけを前の場所へ戻すことはできません。');
   check(equal(boundary,candidate.boundary),'購入・受取・保管量または区画が現在と違います。この控えでは復元できません。');
   safeWork(kind,candidate.work,boundary.received);
   check(candidate.work.siteIndex===boundary.siteIndex&&inUse(kind,candidate.work)===boundary.inUse,'復元する作業の区画・使用量が一致しません。');

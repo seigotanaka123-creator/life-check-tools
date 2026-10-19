@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {packTimber,unpackTimber} from './imasora-construction-timber.js';
+import {packTimber,unpackTimber} from './imasora-construction-timber.js?v=120fw';
 export const TIMBER_DB='imasora-construction-timber-development-v1';
 export class TimberStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=TIMBER_DB;}}
 export class TimberSession{

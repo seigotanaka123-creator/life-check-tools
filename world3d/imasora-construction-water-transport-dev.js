@@ -1,12 +1,12 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
-import {initialTransport,advanceTransport,transportAction,transportAvailability,transferTotals,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js?v=443';
-import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js?v=443';
-import {TransportSession} from './assets/imasora-construction-water-transport-storage.js?v=443';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {upgradeWaterTruck,initialTransport,advanceTransport,transportAction,transportAvailability,transferTotals,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js?v=120fb';
+import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js?v=120fb';
+import {TransportSession} from './assets/imasora-construction-water-transport-storage.js?v=120fb';
 const $=id=>document.getElementById(id),local=['127.0.0.1','localhost','[::1]'].includes(location.hostname),testMode=new URLSearchParams(location.search).get('waterTransportTest')==='1';
-let state=initialTransport(),ready=false,last=0,ui=0,autosave=0,saveText='読み込み中',view=0,yawOffset=Math.PI,pitch=.55,distance=225,drag=null;
+let state=upgradeWaterTruck(initialTransport()),ready=false,last=0,ui=0,autosave=0,saveText='読み込み中',view=0,yawOffset=Math.PI,pitch=.55,distance=225,drag=null;
 const session=new TransportSession(),keys=new Set(),held=new Map(),taps=new Map(),scene=new THREE.Scene();scene.background=new THREE.Color(0xd8e4d7);scene.fog=new THREE.Fog(0xd8e4d7,1000,2400);
 const renderer=new THREE.WebGLRenderer({canvas:$('scene'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
 const camera=new THREE.PerspectiveCamera(46,1,.5,2600);scene.add(new THREE.HemisphereLight(0xf6fff0,0x819881,2.4));const sun=new THREE.DirectionalLight(0xffeeca,3);sun.position.set(-210,380,190);scene.add(sun);const fill=new THREE.DirectionalLight(0xc8f1ff,1);fill.position.set(180,100,-230);scene.add(fill);
@@ -52,5 +52,5 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   ui+=dt;if(ui>.12){ui=0;refresh();}if(autosave>8&&!testMode&&Math.abs(l.vehicle.speed)<.01&&!held.size&&!keys.size)save();
 }
 function fail(message){clear();session.blocked=true;state.message=message;saveText=message;refresh();}window.addEventListener('error',e=>fail('表示エラー：'+e.message));window.addEventListener('unhandledrejection',e=>fail('処理エラー：'+(e.reason?.message||e.reason)));
-if(local){try{if(!testMode){const loaded=await session.load();if(loaded){state=loaded;state.message='水量・車両位置・移送を復元しました。「再開する」で続けられます。';}}ready=true;saveText='水運搬専用・通常セーブは変更しません';}catch(e){fail('保存を保護して停止：'+e.message);}}else state.message='ローカル開発専用です。';refresh();requestAnimationFrame(frame);
+if(local){try{if(!testMode){const loaded=await session.load();if(loaded){state=upgradeWaterTruck(loaded);state.message='水量・車両位置・移送を復元しました。「再開する」で続けられます。';}}ready=true;saveText='水運搬専用・通常セーブは変更しません';}catch(e){fail('保存を保護して停止：'+e.message);}}else state.message='ローカル開発専用です。';refresh();requestAnimationFrame(frame);
 window.addEventListener('beforeunload',e=>{if(!testMode&&ready&&session.savedRevision!==state.revision){e.preventDefault();e.returnValue='';}});

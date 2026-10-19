@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {validateBucketDumpWork,validateBucketDumpContinuation,packBucketDumpWork,unpackBucketDumpWork} from './imasora-construction-bucket-dump.mjs';
+import {validateBucketDumpWork,validateBucketDumpContinuation,packBucketDumpWork,unpackBucketDumpWork} from './imasora-construction-bucket-dump.mjs?v=120fw';
 import {canonical} from './imasora-construction-state.js';
 export const BUCKET_DUMP_DB='imasora-shared-bucket-dump-isolated-v1';
 export class BucketDumpWorkStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=BUCKET_DUMP_DB;}}

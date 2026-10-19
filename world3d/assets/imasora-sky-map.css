@@ -1,0 +1,407 @@
+#imasoraSkyMapScreen {
+  overflow: hidden;
+  border-color: rgba(81, 137, 177, .28);
+  background:
+    radial-gradient(circle at 92% 6%, rgba(255,255,255,.94) 0 6%, transparent 19%),
+    linear-gradient(180deg, #f8fcff 0%, #edf7fd 100%);
+  box-shadow: 0 18px 44px rgba(45, 91, 126, .14);
+}
+
+#imasoraSkyMapScreen .skyMapHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#imasoraSkyMapScreen .skyMapHeadingCopy { min-width: 0; }
+
+#imasoraSkyMapScreen .skyMapKicker {
+  display: block;
+  margin-bottom: 2px;
+  color: #397cab;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+#imasoraSkyMapScreen .skyMapHeading h2 { margin: 0; }
+
+#imasoraSkyMapScreen .skyMapReturn {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(64, 121, 159, .32);
+  border-radius: 999px;
+  color: #285d7d;
+  font: inherit;
+  font-weight: 900;
+  background: rgba(255,255,255,.84);
+  box-shadow: 0 6px 14px rgba(49, 94, 126, .12);
+  cursor: pointer;
+}
+
+#imasoraSkyMapScreen .skyMapIntro {
+  margin: 7px 0 10px;
+  color: #4d7189;
+}
+
+#imasoraSkyMapScreen .skyMapWorldShell {
+  position: relative;
+}
+
+#imasoraSkyMapScreen .skyMapWorld {
+  --sky-top: #338fe4;
+  --sky-mid: #8dd1f7;
+  --sky-horizon: #e8f8ff;
+  --sky-glow: rgba(255,248,191,.7);
+  --sky-star-opacity: 0;
+  --cloud-rim: #ffffff;
+  --cloud-high: #f9fdff;
+  --cloud-mid: #e9f5fc;
+  --cloud-low: #cbddeb;
+  --cloud-accent: rgba(159,204,231,.55);
+  --cloud-shadow: rgba(70,108,141,.26);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border: 1px solid rgba(84, 145, 184, .34);
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 84% 4%, var(--sky-glow) 0 4.5%, transparent 16%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 13%, var(--sky-horizon) 26%, var(--sky-horizon) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.72),
+    0 8px 0 rgba(63,117,151,.11),
+    0 20px 34px rgba(42,85,116,.19);
+  transform: translateZ(0);
+}
+
+#imasoraSkyMapScreen .skyMapWorld[data-sky-scene="morning"] {
+  --sky-top: #79b9e6;
+  --sky-mid: #d5eafa;
+  --sky-horizon: #ffe9cb;
+  --sky-glow: rgba(255,197,132,.76);
+  --cloud-rim: #fffdf7;
+  --cloud-high: #fffaf3;
+  --cloud-mid: #f2eef1;
+  --cloud-low: #ccdbea;
+  --cloud-accent: rgba(220,183,190,.38);
+  --cloud-shadow: rgba(84,101,132,.28);
+}
+
+#imasoraSkyMapScreen .skyMapWorld[data-sky-scene="day"] {
+  --sky-top: #338fe4;
+  --sky-mid: #8dd1f7;
+  --sky-horizon: #e8f8ff;
+}
+
+#imasoraSkyMapScreen .skyMapWorld[data-sky-scene="evening"] {
+  --sky-top: #496eae;
+  --sky-mid: #d29dbe;
+  --sky-horizon: #ffd4a4;
+  --sky-glow: rgba(255,143,102,.72);
+  --cloud-rim: #fff7ef;
+  --cloud-high: #fbf3f5;
+  --cloud-mid: #e5dce9;
+  --cloud-low: #aeb5d1;
+  --cloud-accent: rgba(214,151,185,.42);
+  --cloud-shadow: rgba(73,61,105,.34);
+}
+
+#imasoraSkyMapScreen .skyMapWorld[data-sky-scene="night"] {
+  --sky-top: #0b1e46;
+  --sky-mid: #244e82;
+  --sky-horizon: #718bb4;
+  --sky-glow: rgba(194,220,255,.32);
+  --sky-star-opacity: 1;
+  --cloud-rim: #f4f8ff;
+  --cloud-high: #e6edf8;
+  --cloud-mid: #c1d0e2;
+  --cloud-low: #7890b1;
+  --cloud-accent: rgba(113,150,198,.5);
+  --cloud-shadow: rgba(5,17,42,.5);
+}
+
+#imasoraSkyMapScreen .skyMapStars {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: var(--sky-star-opacity);
+  pointer-events: none;
+}
+
+#imasoraSkyMapScreen .skyMapStars i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px #fff, 0 0 7px rgba(188,225,255,.9);
+}
+
+#imasoraSkyMapScreen .skyMapStars i::before,
+#imasoraSkyMapScreen .skyMapStars i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.92), transparent);
+  transform: translate(-50%, -50%);
+}
+
+#imasoraSkyMapScreen .skyMapStars i::before { width: 7px; height: 1px; }
+#imasoraSkyMapScreen .skyMapStars i::after { width: 1px; height: 7px; }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(1) { left: 5%; top: 3%; transform: scale(.7); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(2) { left: 13%; top: 8%; transform: scale(.48); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(3) { left: 24%; top: 2%; transform: scale(.58); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(4) { left: 35%; top: 6%; transform: scale(.42); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(5) { right: 35%; top: 4%; transform: scale(.5); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(6) { right: 23%; top: 2%; transform: scale(.62); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(7) { right: 12%; top: 7%; transform: scale(.45); }
+#imasoraSkyMapScreen .skyMapStars i:nth-child(8) { right: 4%; top: 3%; transform: scale(.68); }
+
+#imasoraSkyMapScreen .skyMapUpperGlow {
+  position: absolute;
+  inset: 0 0 71% 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, transparent 0 26%, rgba(255,255,255,.17) 40%, transparent 59%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.16) 78%, transparent);
+}
+
+#imasoraSkyMapScreen .skyMapFarCloud {
+  position: absolute;
+  z-index: 2;
+  width: 20%;
+  height: 4.8%;
+  border-radius: 999px;
+  pointer-events: none;
+  background: rgba(255,255,255,.54);
+  filter: blur(.5px) drop-shadow(0 4px 7px rgba(39,87,124,.13));
+}
+
+#imasoraSkyMapScreen .skyMapFarCloud::before,
+#imasoraSkyMapScreen .skyMapFarCloud::after {
+  content: "";
+  position: absolute;
+  bottom: 16%;
+  border-radius: 50%;
+  background: inherit;
+}
+
+#imasoraSkyMapScreen .skyMapFarCloud::before { left: 15%; width: 39%; aspect-ratio: 1; }
+#imasoraSkyMapScreen .skyMapFarCloud::after { right: 13%; width: 46%; aspect-ratio: 1; }
+#imasoraSkyMapScreen .skyMapFarCloudA { left: 4%; top: 8%; transform: scale(.72); }
+#imasoraSkyMapScreen .skyMapFarCloudB { right: 4%; top: 13%; transform: scale(.58); opacity: .42; }
+
+#imasoraSkyMapScreen .skyMapCloudExpanse {
+  position: absolute;
+  left: -9%;
+  right: -9%;
+  top: -1%;
+  bottom: -28%;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  filter: drop-shadow(0 -8px 13px rgba(255,255,255,.22));
+}
+
+#imasoraSkyMapScreen .skyMapCloudSurface {
+  position: absolute;
+  inset: 10% 0 0;
+  background:
+    radial-gradient(ellipse at 15% 7%, rgba(255,255,255,.9) 0 5%, transparent 19%),
+    radial-gradient(ellipse at 50% 2%, rgba(255,255,255,.7) 0 8%, transparent 24%),
+    radial-gradient(ellipse at 83% 11%, rgba(255,255,255,.68) 0 7%, transparent 23%),
+    linear-gradient(165deg, var(--cloud-high) 0 21%, var(--cloud-mid) 58%, var(--cloud-low) 100%);
+  box-shadow:
+    inset 0 15px 18px rgba(255,255,255,.5),
+    inset 0 -34px 58px var(--cloud-shadow);
+}
+
+#imasoraSkyMapScreen .skyMapCloudHorizon {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  height: 16%;
+  background:
+    radial-gradient(ellipse at 51% 20%, rgba(255,255,255,.5) 0 15%, transparent 42%),
+    linear-gradient(170deg, var(--cloud-rim) 0 35%, var(--cloud-high) 68%, var(--cloud-mid) 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0 200V128C35 104 74 105 110 125C122 85 168 68 211 86C225 44 274 20 322 49C354 22 407 27 432 68C465 30 527 24 560 66C587 12 659 2 703 55C740 25 803 33 831 76C865 43 927 52 951 92C985 66 1041 73 1060 111C1100 92 1155 102 1200 130V200Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0 200V128C35 104 74 105 110 125C122 85 168 68 211 86C225 44 274 20 322 49C354 22 407 27 432 68C465 30 527 24 560 66C587 12 659 2 703 55C740 25 803 33 831 76C865 43 927 52 951 92C985 66 1041 73 1060 111C1100 92 1155 102 1200 130V200Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+
+#imasoraSkyMapScreen .skyMapCloudTexture {
+  position: absolute;
+  z-index: 3;
+  border-radius: 49% 51% 46% 54% / 52% 43% 57% 48%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 38% 31%, rgba(255,255,255,.62), transparent 58%),
+    radial-gradient(ellipse at 67% 65%, var(--cloud-accent), transparent 61%);
+  filter: blur(3px);
+}
+
+#imasoraSkyMapScreen .skyMapCloudTextureA { left: 2%; top: 20%; width: 42%; height: 36%; transform: rotate(-7deg); }
+#imasoraSkyMapScreen .skyMapCloudTextureB { right: 0; top: 14%; width: 51%; height: 43%; transform: rotate(5deg); }
+#imasoraSkyMapScreen .skyMapCloudTextureC { left: 23%; bottom: 2%; width: 59%; height: 45%; transform: rotate(-2deg); opacity: .75; }
+
+#imasoraSkyMapScreen .skyMapCloudFlow {
+  position: absolute;
+  z-index: 4;
+  height: 10%;
+  border: 2px solid rgba(255,255,255,.38);
+  border-color: rgba(255,255,255,.38) transparent transparent;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 1px rgba(104,147,180,.12));
+}
+
+#imasoraSkyMapScreen .skyMapCloudFlowA { left: 7%; top: 37%; width: 37%; transform: rotate(-5deg); }
+#imasoraSkyMapScreen .skyMapCloudFlowB { right: 4%; top: 48%; width: 46%; transform: rotate(4deg); }
+#imasoraSkyMapScreen .skyMapCloudFlowC { left: 29%; top: 70%; width: 43%; transform: rotate(-2deg); opacity: .72; }
+
+#imasoraSkyMapScreen .skyMapTownRailwayLayers {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+#imasoraSkyMapScreen .skyMapSharedTownTrack {
+  position: absolute;
+  inset: 0;
+  background: url("town-layered-prebuild-v1.png") center / 100% 100% no-repeat;
+  clip-path: polygon(0 24%, 43% 0, 58% 0, 0 39%);
+  filter: brightness(1.06) saturate(1.02) drop-shadow(0 4px 5px rgba(61,83,103,.2));
+}
+
+#imasoraSkyMapScreen .town-scene-morning .skyMapSharedTownTrack { filter: brightness(1.1) saturate(1.03) sepia(.03); }
+#imasoraSkyMapScreen .town-scene-day .skyMapSharedTownTrack { filter: brightness(1.08) saturate(1.08); }
+#imasoraSkyMapScreen .town-scene-evening .skyMapSharedTownTrack { filter: brightness(.96) saturate(1.13) sepia(.08); }
+#imasoraSkyMapScreen .town-scene-night .skyMapSharedTownTrack { filter: brightness(.71) saturate(.94) contrast(1.05) hue-rotate(5deg); }
+
+#imasoraSkyMapScreen .skyMapTownRailwayLayers .town-layer-sprite { pointer-events: none; }
+
+#imasoraSkyMapScreen .skyMapRailCloudVeil {
+  position: absolute;
+  z-index: 13;
+  width: 24%;
+  height: 4.5%;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), var(--cloud-high) 86%);
+  filter: blur(3px);
+  opacity: .5;
+  transform: rotate(-26deg);
+}
+
+#imasoraSkyMapScreen .skyMapRailCloudVeilA { left: 1%; top: 36%; }
+#imasoraSkyMapScreen .skyMapRailCloudVeilB { left: 20%; top: 24%; width: 27%; opacity: .32; }
+
+#imasoraSkyMapScreen .skyMapAerialMark {
+  position: absolute;
+  left: 59%;
+  top: 52%;
+  z-index: 8;
+  width: 19%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: .32;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 1px solid rgba(92,153,190,.45);
+  border-radius: 22%;
+  box-shadow: inset 0 0 0 7px rgba(255,255,255,.1);
+}
+
+#imasoraSkyMapScreen .skyMapAerialMark::before,
+#imasoraSkyMapScreen .skyMapAerialMark::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px dashed rgba(255,255,255,.62);
+  border-radius: 20%;
+}
+
+#imasoraSkyMapScreen .skyMapAerialMark::after {
+  inset: 38%;
+  border-style: solid;
+  background: rgba(111,179,215,.18);
+}
+
+#imasoraSkyMapScreen .skyMapBuildingName {
+  z-index: 24;
+}
+
+#imasoraSkyMapScreen .skyMapBuildingToggle {
+  left: 14px;
+  bottom: 14px;
+}
+
+#imasoraSkyMapScreen .skyMapSceneControl {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid rgba(77,129,165,.23);
+  border-radius: 12px;
+  background: rgba(246,251,254,.84);
+}
+
+#imasoraSkyMapScreen .skyMapSceneTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #53738a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+#imasoraSkyMapScreen .skyMapSceneButtons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  margin-top: 7px;
+}
+
+#imasoraSkyMapScreen .skyMapSceneButton {
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 2px;
+  border: 1px solid rgba(75,121,155,.25);
+  border-radius: 9px;
+  color: #47708d;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  background: linear-gradient(180deg, #fff, #eef6fb);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92);
+  cursor: pointer;
+}
+
+#imasoraSkyMapScreen .skyMapSceneButton.isActive {
+  border-color: #91bfda;
+  color: #245e82;
+  background: linear-gradient(180deg, #e9f9ff, #c8eaf7);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 0 12px rgba(101,190,229,.28);
+}
+
+#imasoraSkyMapScreen .skyMapSceneButton:focus-visible,
+#imasoraSkyMapScreen .skyMapReturn:focus-visible {
+  outline: 3px solid rgba(69,161,212,.34);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  #imasoraSkyMapScreen .skyMapIntro { font-size: 12px; }
+  #imasoraSkyMapScreen .skyMapSceneButton { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #imasoraSkyMapScreen *,
+  #imasoraSkyMapScreen *::before,
+  #imasoraSkyMapScreen *::after { animation: none !important; }
+}

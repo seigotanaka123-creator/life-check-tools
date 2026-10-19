@@ -1,5 +1,5 @@
-import {safeReturnPlan,assertSafeReturn} from './free-safe-return.mjs';
-import {canonicalFreeAction} from './free-build-state.mjs';
+import {safeReturnPlan,assertSafeReturn} from './free-safe-return.mjs?v=120fw';
+import {canonicalFreeAction} from './free-build-state.mjs?v=120fw';
 const context=p=>JSON.stringify({profileId:p.profileId,revision:p.revision,freeBuild:p.freeBuild,foundation:p.foundation??null});
 const onFoot=p=>({...p,freeBuild:{...p.freeBuild,aboard:null}});
 const keys=(o,s)=>!!o&&typeof o==='object'&&Object.keys(o).sort().join(',')===s.split(',').sort().join(',');

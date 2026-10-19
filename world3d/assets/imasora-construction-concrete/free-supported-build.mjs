@@ -1,5 +1,5 @@
-import {inspectFormGround} from './free-foundation-check.mjs';
-import {foundationContains} from './free-foundation-state.mjs';
+import {inspectFormGround} from './free-foundation-check.mjs?v=120fw';
+import {foundationContains} from './free-foundation-state.mjs?v=120fw';
 import {ROUTE_EPS} from './free-route-clearance.mjs';
 
 export const constructionBase=f=>f?.baseY??0;

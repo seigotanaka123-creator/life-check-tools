@@ -1,0 +1,23 @@
+
+.cv-picker,.construction-help-view{box-sizing:border-box;width:min(1060px,calc(100% - 16px));height:min(800px,calc(100dvh - 16px));padding:0;border:3px solid #8ebecb;border-radius:24px;background:#fff8e8;color:#234354;overflow:hidden;font-family:system-ui;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.cv-picker[open],.construction-help-view[open]{display:flex;flex-direction:column}
+.cv-picker::backdrop,.construction-help-view::backdrop{background:#203f5966}
+.cv-picker [hidden]{display:none!important}
+.cv-picker button,.construction-help-view button{font:700 14px system-ui;min-height:44px;border:2px solid #a4c9d5;background:#e0f2fc;color:#234354;border-radius:13px;padding:8px 14px;cursor:pointer;touch-action:manipulation}
+.cv-picker button:focus-visible,.construction-help-view button:focus-visible{outline:3px solid #227aaf;outline-offset:2px}
+.cv-picker>header,.construction-help-view>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;background:#def2fa;flex-shrink:0}
+.cv-picker h2{font-size:24px;margin:0}.cv-picker small{color:#426776;font-weight:700}
+.cv-body{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 18px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(240px,1fr);gap:12px}
+.cv-stage-wrap{min-width:0;position:relative;border:2px solid #b1d5d7;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse at 50% 78%,#fff3bb 0%,#e7f8f9 65%);min-height:225px}
+.cv-stage{position:absolute;inset:0}.cv-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.cv-spin{position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:6px;pointer-events:none}.cv-spin button{pointer-events:auto;padding:5px 13px;background:#ffffffd9}.cv-spin span{background:#ffffffd9;padding:5px 8px;border-radius:9px;font-size:12px}
+.cv-detail{align-self:center;min-width:0}.cv-detail h3{font-size:28px;margin:6px 0;line-height:1.3}.cv-detail p{font-size:15px;line-height:1.7}.cv-number{display:inline-block;border-radius:8px;background:#ffdc7a;padding:4px 9px;font-size:12px;font-weight:800}.cv-detail .cv-guide{display:block;width:100%;margin:10px 0;background:#e0f4cf;border-color:#aac889}.cv-detail .cv-go{display:block;width:100%;background:#ffd777;border-color:#caa34f;font-size:16px}.cv-note{font-size:12px!important;color:#587180;margin-bottom:0}
+.cv-roster{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:stretch;align-self:end}
+.cv-picker .cv-card{padding:4px 4px 7px;background:#f1fafc;border-color:#c1d9df;box-shadow:0 3px 0 #d2e1e2;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;line-height:1.35}
+.cv-card img{width:100%;aspect-ratio:1.3;object-fit:contain}.cv-card[aria-pressed=true]{border-color:#cf9a21;background:#fff0be;box-shadow:0 3px 0 #dbb457;transform:translateY(-2px)}.cv-card span{padding:2px;min-height:2.5em;display:grid;place-items:center}
+.cv-loading{position:absolute;inset:0;display:grid;place-items:center;background:#f0fbf7e6;font-weight:700}
+.cv-picker button:disabled{opacity:.6;cursor:default}.cv-footer{padding:8px 18px 12px;text-align:center;font-size:12px;color:#587180;margin:0}
+.construction-help-view [data-help-content]{flex:1;min-height:0}.construction-help-view iframe{width:100%;height:100%;border:0;display:block}.construction-help-view button{background:#ffdc7a;border-color:#caa34f}
+@media(max-width:600px){.cv-picker>header{padding:8px 12px}.cv-picker h2{font-size:20px}.cv-body{display:flex;flex-direction:column;gap:9px;padding:10px}.cv-stage-wrap{min-height:215px;flex-shrink:0}.cv-detail h3{font-size:23px;margin:3px 0}.cv-detail p{margin:5px 0;font-size:13px}.cv-detail .cv-guide{margin:7px 0}.cv-roster{order:2;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;flex-shrink:0}.cv-detail{order:1;width:100%}.cv-footer{padding:5px 10px;font-size:11px}.cv-picker .cv-card{font-size:11px}.cv-card img{max-height:67px}}
+@media(max-height:500px) and (min-width:601px){.cv-body{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);padding:8px 12px}.cv-stage-wrap{min-height:180px}.cv-detail h3{font-size:22px}.cv-detail p{margin:4px 0;font-size:12px}.cv-roster{gap:6px}.cv-card img{max-height:55px}.cv-detail .cv-guide{margin:6px 0}.cv-footer{display:none}}
+

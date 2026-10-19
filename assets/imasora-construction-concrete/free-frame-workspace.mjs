@@ -1,5 +1,5 @@
-import {constructionBase} from './free-supported-build.mjs';
-import {freeCell} from './free-build-state.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120fw';
 import {freePlacedFill} from './free-work-parts.mjs';
 import {pointBoxDistance} from './free-route-clearance.mjs';
 

@@ -1,11 +1,12 @@
+import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120ea';
 // UI pause is local to this controller. It never rewrites a saved work record.
 export function createVehiclePlayGate(clearInput){
   let active=false,paused=false;
   return {
-    get active(){return active;},get paused(){return paused;},
+    get active(){return active;},get paused(){return paused||constructionOverlayOpen();},
     setActive(value){active=!!value;paused=false;clearInput();},
     setPaused(value){if(!active)return;paused=!!value;clearInput();},
-    allows(action){return active&&(!paused||['camera','save','leave','stop'].includes(action));},
+    allows(action){return !constructionOverlayOpen()&&active&&(!paused||['camera','save','leave','stop'].includes(action));},
   };
 }
 
@@ -52,6 +53,7 @@ export function createVehiclePlayView({panel,canvas,prefix,groups,quick,clearInp
   menu.innerHTML='<div class="gv-menu-card"><header class="gv-menu-header"><div><p class="gv-menu-vehicle"></p><h2 id="'+prefix+'-game-menu-title" tabindex="-1">ゲームメニュー</h2></div><span class="gv-menu-badge">一時停止中</span></header><div class="gv-menu-body"><p class="gv-menu-intro">作業を保存したり、車両の作業を終えたりできます。</p><p class="gv-menu-hint" role="status"></p><div class="gv-menu-actions"></div><div class="gv-menu-emergency"></div></div><footer class="gv-menu-footer"><button data-vehicle-menu="close" type="button">ゲームに戻る</button><p id="'+prefix+'-game-menu-paused">画面へ戻っても一時停止のままです。「再開」で作業を続けます。</p></footer></div>';
   const menuActions=menu.querySelector('.gv-menu-actions'),menuHint=menu.querySelector('.gv-menu-hint'),closeButton=menu.querySelector('[data-vehicle-menu="close"]'),heading=menu.querySelector('h2');
   for(const el of [...footer.children])menuActions.append(el);
+  const helpButton=document.createElement('button');helpButton.type='button';helpButton.textContent='動きで使い方を見る';helpButton.onclick=()=>{clearInput();openConstructionGuide({ww:'water',ws:'soil',wt:'crane'}[prefix]||'controls');};menuActions.prepend(helpButton);
   menu.querySelector('.gv-menu-body').append(details);
   // An unclassified control must remain accessible rather than silently disappear.
   for(const el of active.querySelectorAll('button,select'))info.append(el.closest('label')||el);

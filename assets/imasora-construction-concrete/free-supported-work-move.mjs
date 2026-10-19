@@ -1,10 +1,10 @@
-import {constructionBase,supportedWorkMatches,assertFoundationSupport} from './free-supported-build.mjs';
+import {constructionBase,supportedWorkMatches,assertFoundationSupport} from './free-supported-build.mjs?v=120fw';
 import {freeWorkMask,freeFilledMask,freeWorkCells} from './free-work-parts.mjs';
-import {freeWorkMoveProblem,freeWorkMoveEnvironmentProblem} from './free-work-move.mjs';
+import {freeWorkMoveProblem,freeWorkMoveEnvironmentProblem} from './free-work-move.mjs?v=120fw';
 import {rotateFreeWork} from './free-work-rotation.mjs';
-import {walkingGroundAt} from './free-walking-ground.mjs';
-import {foundationContains} from './free-foundation-state.mjs';
-import {canonicalFreeAction} from './free-build-state.mjs';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
+import {foundationContains} from './free-foundation-state.mjs?v=120fw';
+import {canonicalFreeAction} from './free-build-state.mjs?v=120fw';
 
 export const SUPPORTED_WORK_MOVE='FREE_TRANSFORM_SUPPORTED_WORK';
 // Old MOVE_WORK/TRANSFORM_WORK retain their historical ground-only meaning.

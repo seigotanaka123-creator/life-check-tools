@@ -1,17 +1,22 @@
-import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs';
-import {pipeContactPath} from './free-boom-contact.mjs';
+import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
+import {pipeContactPath} from './free-boom-contact.mjs?v=120fw';
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
-import {makeFrameScaffold} from './free-frame-scaffold.mjs';
-import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs';
-import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs';
-import {walkingGroundAt} from './free-walking-ground.mjs';
+import {makeFrameScaffold} from './free-frame-scaffold.mjs?v=120fw';
+import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs?v=120fw';
+import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs?v=120fw';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {freeFramePanels,freeCell} from './free-build-state.mjs';
+import {freeFramePanels,freeCell} from './free-build-state.mjs?v=120fw';
 
 export const FREE_FRAME_ACTIONS=new Set(['FREE_FRAME','FREE_FRAME_RAISED','FREE_DEMOLD','FREE_UNFRAME']);
 export const FRAME_HAND_REACH=24,FRAME_TOOL_REACH=64,FRAME_GRIP_SPAN=4,FRAME_RACK={x:0,z:140},FRAME_RACK_STANCE={x:0,z:116,heading:0};
 export const FRAME_WORK_TEMPO=Object.freeze({walkSpeed:210,pickup:.22,place:.3,fasten:.18,climb:.22,open:.16,close:.12});
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+// This memo belongs to one synchronous plan. Callback identity includes its
+// deck height; live motion and later jobs always check their current world.
+const ROUTE_WORLD_SEGMENT=Symbol('fixed-plan-world-segment');
+function shareWorldSegments(external,location){const segments=new Map();external[ROUTE_WORLD_SEGMENT]=(from,to,radius)=>{const key=[from.x,from.z,to.x,to.z,radius].join(',');if(segments.has(key))return segments.get(key);const hit=externalSegmentBlocked(location,from,to,radius,external);if(segments.size<40000)segments.set(key,hit);return hit;};return external;}
+const routeWorldBlocked=(external,location,from,to,radius)=>external[ROUTE_WORLD_SEGMENT]?.(from,to,radius)??externalSegmentBlocked(location,from,to,radius,external);
 export function frameOrder(mask){return freeFramePanels(mask).sort((a,b)=>a.z-b.z||a.x-b.x||a.id.localeCompare(b.id));}
 // The default datum is Y=0; an explicit saved foundation supplies a raised datum.
 // Missing ground never supplies an invisible support or scaffold.
@@ -39,13 +44,27 @@ export function frameSegmentBlocked(f,panels,from,to,external=()=>false,vehicleM
  for(const {box,radius}of frameObstacles(f,panels,vehicleMargin))if(clearanceBlocked(segmentBoxDistance(from,to,box),radius))return true;return false;
 }
 export function frameRoute(f,panels,start,end,external=()=>false,vehicleMargin=20,heightAt=()=>0,supportAt=(x,z)=>walkingGroundAt(f,x,z,heightAt,true),strictFooting=true,bounds=null){
- let samples=0;const edges=new Map();
- const blocked=p=>frameBlocked(f,panels,p,external,vehicleMargin)||(strictFooting&&!supportAt(p.x,p.z)),checkEdge=(a,b)=>{
-  if(frameSegmentBlocked(f,panels,a,b,external,vehicleMargin))return false;const n=Math.max(1,Math.ceil(distance(a,b)/2));let last=null;
+ let samples=0;const edges=new Map(),points=new Map(),obstacles=[...frameObstacles(f,panels,vehicleMargin)],hose=pipeContactPath(f);let pointCount=0;
+ // All geometry is fixed inside one synchronous route search. Cache a point's
+ // clearance once; motion still uses the uncached exported live checks.
+ // A segment outside a box's expanded world bounds cannot touch that box.
+ // Keep the exact rotated-box distance at the boundary; this is only a
+ // conservative broad phase for geometry fixed during this route search.
+ const prepared=obstacles.map(o=>{const {box,radius}=o,c=Math.abs(Math.cos(box.heading??0)),s=Math.abs(Math.sin(box.heading??0));return{...o,canCull:Number.isFinite(radius)&&radius>=0&&[box.x,box.z,box.hx,box.hz,c,s].every(Number.isFinite)&&box.hx>=0&&box.hz>=0,minX:box.x-c*box.hx-s*box.hz-radius-ROUTE_EPS,maxX:box.x+c*box.hx+s*box.hz+radius+ROUTE_EPS,minZ:box.z-s*box.hx-c*box.hz-radius-ROUTE_EPS,maxZ:box.z+s*box.hx+c*box.hz+radius+ROUTE_EPS};});
+ // Broad-phase rejection also avoids repeated point distance work. Invalid
+ // bounds or radii stay on the original fail-closed distance checks.
+ const pointBoxesBlocked=p=>{for(const o of prepared){if(o.canCull&&(p.x<o.minX||p.x>o.maxX||p.z<o.minZ||p.z>o.maxZ))continue;if(clearanceBlocked(pointBoxDistance(p,o.box),o.radius))return true;}return false;};
+ const boxesBlocked=(a,b)=>{const minX=Math.min(a.x,b.x),maxX=Math.max(a.x,b.x),minZ=Math.min(a.z,b.z),maxZ=Math.max(a.z,b.z);for(const o of prepared){if(o.canCull&&(maxX<o.minX||minX>o.maxX||maxZ<o.minZ||minZ>o.maxZ))continue;if(clearanceBlocked(segmentBoxDistance(a,b,o.box),o.radius))return true;}return false;};
+ const segmentBlocked=(from,to)=>outside(f,from)||outside(f,to)||routeWorldBlocked(external,f.location,from,to,vehicleMargin)||hoseSegmentBlocked(hose,from,to,vehicleMargin)||boxesBlocked(from,to);
+ const blocked=p=>{let row=points.get(p.x);if(row?.has(p.z))return row.get(p.z);const occupied=outside(f,p)||external(f.location.x+p.x,f.location.z+p.z,vehicleMargin-ROUTE_EPS)||hoseSegmentBlocked(hose,p,p,vehicleMargin)||pointBoxesBlocked(p)||(strictFooting&&!supportAt(p.x,p.z));if(pointCount<40000){if(!row)points.set(p.x,row=new Map());row.set(p.z,occupied);pointCount++;}return occupied;},checkEdge=(a,b)=>{
+  if(segmentBlocked(a,b))return false;const n=Math.max(1,Math.ceil(distance(a,b)/2));let last=null;
   for(let i=0;i<=n;i++){if(++samples>20000){const e=Error('型枠作業の経路が複雑です。車両を離し、近くの平らな通路を空けてください。');e.code='FRAME_ROUTE_BUDGET';throw e;}const t=i/n,p={x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t};if(blocked(p))return false;if(!strictFooting)continue;const h=supportAt(p.x,p.z).height;if(i===0&&Number.isFinite(a.y)&&Math.abs(h-a.y)>FOOT_LEVEL_EPS||last!==null&&Math.abs(h-last)>Math.tan(8*Math.PI/180)*distance(a,b)/n+FOOT_LEVEL_EPS)return false;last=h;}return true;};
  // Repeated A* edges are identical within this synchronous planning call.
  // Keep direction and datum in the key, and revalidate live terrain in motion.
- const safe=(a,b)=>{const k=[a.x,a.z,a.y,b.x,b.z,b.y].join(',');if(edges.has(k))return edges.get(k);const ok=checkEdge(a,b);if(edges.size<40000)edges.set(k,ok);return ok;};
+ // Exact grid nodes without a datum fit into 48 safe integer bits. Fractional
+ // endpoints and links with a height keep the original coordinate key.
+ const gridEdgeKey=(a,b)=>{if(a.y!==undefined||b.y!==undefined||a.x%6||a.z%6||b.x%6||b.z%6)return null;const ax=a.x/6,az=a.z/6,bx=b.x/6,bz=b.z/6;if(Math.max(Math.abs(ax),Math.abs(az),Math.abs(bx),Math.abs(bz))>=2048)return null;return(((ax+2048)*4096+az+2048)*4096+bx+2048)*4096+bz+2048;};
+ const safe=(a,b)=>{const k=gridEdgeKey(a,b)??[a.x,a.z,a.y,b.x,b.z,b.y].join(',');if(edges.has(k))return edges.get(k);const ok=checkEdge(a,b);if(edges.size<40000)edges.set(k,ok);return ok;};
  const point=p=>({...p,y:strictFooting?supportAt(p.x,p.z).height:frameSurface(f,p.x,p.z)});
  if(strictFooting){const origin=supportAt(start.x,start.z);if(!origin||Number.isFinite(start.y)&&Math.abs(origin.height-start.y)>FOOT_LEVEL_EPS)throw Error(FOOTING_MESSAGE);}
  if(blocked(start)||blocked(end))throw Error('型枠作業の通路を空けてください。車両を型枠と資材置き場から離せます。');
@@ -79,11 +98,35 @@ export function framePlan(f,type,start,handBases,external=()=>false,heightAt=()=
  if(f.aboard)throw Error('型枠の作業は車を降りて行ってください。');
  if(frameAssembly(type)&&f.stage!=='design'||type==='FREE_DEMOLD'&&f.stage!=='cured'||type==='FREE_UNFRAME'&&(f.stage!=='framed'||f.fill.some(Boolean)))throw Error('型枠を作業できる工程ではありません。');
  const raised=type===RAISED_FRAME_ACTION,highScaffold=raised||constructionBase(f)>4,strictFooting=type==='FREE_FRAME';
- if(highScaffold){let queries=0;const cache=fn=>{const values=new Map();return(...args)=>{const key=args.join(',');if(values.has(key))return values.get(key);if(++queries>250000){const e=Error('高所の施工経路が複雑です。型枠の周りに平らな通路を空けてください。');e.code='FRAME_HIGH_BUDGET';throw e;}const value=fn(...args);values.set(key,value);return value;};};heightAt=cache(heightAt);external=cache(external);}
+ // The world is unchanged during this synchronous plan. Low forms also try
+ // several scaffold approaches when a truck is nearby; share identical world
+ // queries across those attempts. Motion still checks the live environment.
+ {
+  // These callbacks only receive XY, or XY/radius/optional datum. Keep missing
+  // datum distinct from an explicit undefined and preserve zero/false values.
+  // Maps live for this synchronous plan only; live motion never reads them.
+  let queries=0;const count=()=>{if(++queries>250000){const e=Error('施工経路が複雑です。型枠の周りに平らな通路を空けてください。');e.code=highScaffold?'FRAME_HIGH_BUDGET':'FRAME_ROUTE_BUDGET';throw e;}};
+  const terrain=heightAt,world=external,groundRows=new Map(),worldRows=new Map(),absent=Symbol();
+  let lastX=absent,lastGroundRow,lastHeight=absent,lastRadius=absent,lastWorldRoot,lastWorldX=absent,lastWorldRow;
+  heightAt=(x,z)=>{
+   let row;if(x===lastX)row=lastGroundRow;else{row=groundRows.get(x);if(!row)groundRows.set(x,row=new Map());lastX=x;lastGroundRow=row;}
+   if(row.has(z))return row.get(z);count();const value=terrain(x,z);row.set(z,value);return value;
+  };
+  external=function(x,z,radius,y){
+   const h=arguments.length>3?y:absent;let root;
+   if(h===lastHeight&&radius===lastRadius)root=lastWorldRoot;
+   else{let radii=worldRows.get(h);if(!radii)worldRows.set(h,radii=new Map());root=radii.get(radius);if(!root)radii.set(radius,root=new Map());lastHeight=h;lastRadius=radius;lastWorldRoot=root;lastWorldX=absent;}
+   let row;if(x===lastWorldX)row=lastWorldRow;else{row=root.get(x);if(!row)root.set(x,row=new Map());lastWorldX=x;lastWorldRow=row;}
+   if(row.has(z))return row.get(z);count();const value=h===absent?world(x,z,radius):world(x,z,radius,y);row.set(z,value);return value;
+  };
+ }
+ shareWorldSegments(external,f.location);
  assertFrameFoundation(f,heightAt);
  const deckHeight=frameDeckHeight(f),workBoxes=frameWorkBoxes(f),exterior=frameExterior(f);
  const supportCache=new Map(),supportAt=(x,z)=>{const k=x+','+z;if(supportCache.has(k))return supportCache.get(k);if(supportCache.size>=30000){const e=Error('型枠作業の経路が複雑です。車両を離し、近くの平らな通路を空けてください。');e.code='FRAME_ROUTE_BUDGET';throw e;}const s=strictFooting?walkingGroundAt(f,x,z,heightAt,true):{height:deckHeight};supportCache.set(k,s);return s;};
- const deckExternal=(x,z,margin)=>external(x,z,margin,deckHeight)||frameWorkspaceBlocked(workBoxes,{x:x-f.location.x,z:z-f.location.z});
+ const workspacePoints=new Map();let workspacePointCount=0;
+ const deckExternal=(x,z,margin)=>{if(external(x,z,margin,deckHeight))return true;let row=workspacePoints.get(x);if(row?.has(z))return row.get(z);const blocked=frameWorkspaceBlocked(workBoxes,{x:x-f.location.x,z:z-f.location.z});if(workspacePointCount<40000){if(!row)workspacePoints.set(x,row=new Map());row.set(z,blocked);workspacePointCount++;}return blocked;};
+ shareWorldSegments(deckExternal,f.location);
  const order=frameOrder(f.mask);if(!order.length)throw Error('型枠の形を選んでください。');
  if(frameAssembly(type))for(const board of order)for(let i=0;i<=8;i++){const offset=-8+i*2,point={x:board.x+(board.width>board.depth?offset:0),z:board.z+(board.depth>board.width?offset:0)};if(frameBlocked(f,[],point,external,.5))throw Error('型枠を置く場所に車両や建物があります。先に移動してください。');}
  const remove=!frameAssembly(type),scaffoldWork=remove||raised,sequence=remove?[...order].reverse():order,remaining=remove?[...order]:[],steps=[];let from={...start},preferredEntry=null;

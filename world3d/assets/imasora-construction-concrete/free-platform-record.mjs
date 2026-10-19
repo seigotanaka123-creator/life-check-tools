@@ -1,6 +1,6 @@
-import {freeFramePanels} from './free-build-state.mjs';
-import {frameWorkBoxes} from './free-frame-workspace.mjs';
-import {RAISED_BASE_MAX} from './free-supported-build.mjs';
+import {freeFramePanels} from './free-build-state.mjs?v=120fw';
+import {frameWorkBoxes} from './free-frame-workspace.mjs?v=120fw';
+import {RAISED_BASE_MAX} from './free-supported-build.mjs?v=120fw';
 
 // A bounded blueprint is separate from material-consuming project history.
 // It never supplies stock, rewards, a vehicle pose or a character pose.

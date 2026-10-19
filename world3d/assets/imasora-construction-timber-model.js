@@ -1,5 +1,5 @@
 import * as THREE from './three.module.min.js';
-import {createPart} from './imasora-construction-crane-model.js';
+import {createPart} from './imasora-construction-crane-model.js?v=120fw';
 let grain;
 function woodTexture(){
   if(grain)return grain;

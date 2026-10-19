@@ -1,0 +1,9 @@
+import * as T from'./three.module.min.js';
+import{roomLayoutParts,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
+export const ROOM_PART_COLORS=Object.freeze({screen:'#ffe2b5',foot:'#bd8b58',frame:'#b98d62',track:'#d5b857',leaf:'#80cdb1',top:'#a7dcd3',leg:'#bd8b58',landing:'#e2be84'});
+export function createRoomLayoutView(parent,{preview=false}={}){
+ const root=new T.Group();root.name=preview?'room-layout-preview':'room-layout-actual';parent.add(root);const geometry=new T.BoxGeometry(1,1,1),colors=preview?{preview:'#ffd13d'}:ROOM_PART_COLORS,meshes={},materials={},transform=new T.Object3D();
+ for(const[k,color]of Object.entries(colors)){const mat=preview?new T.MeshBasicMaterial({color,wireframe:true,depthTest:true}):new T.MeshStandardMaterial({color,roughness:.8});materials[k]=mat;const mesh=new T.InstancedMesh(geometry,mat,96);mesh.count=0;mesh.name='room-'+k;root.add(mesh);meshes[k]=mesh;}let key='';
+ function sync(w,floor=null,item=null,valid=true){const parts=preview?(item?roomItemParts({...item,id:'preview',open:false}):[]):roomLayoutParts(w),visible=parts.filter(p=>floor===null||p.y-p.h/2<(floor+1)*40&&p.y+p.h/2>floor*40),next=JSON.stringify([visible,valid]);if(next===key)return;key=next;for(const m of Object.values(meshes))m.count=0;for(const p of visible){const m=meshes[preview?'preview':p.kind];transform.position.set(p.x,p.y,p.z);transform.scale.set(p.w,p.h,p.d);transform.updateMatrix();m.setMatrixAt(m.count++,transform.matrix);}for(const m of Object.values(meshes)){m.instanceMatrix.needsUpdate=true;m.computeBoundingSphere();}if(preview)materials.preview.color.set(valid?'#e5ab16':'#e56a67');}
+ return{root,sync,dispose(){for(const m of Object.values(meshes))m.dispose();geometry.dispose();for(const m of Object.values(materials))m.dispose();root.removeFromParent();}};
+}

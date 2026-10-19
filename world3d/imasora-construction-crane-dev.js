@@ -1,10 +1,10 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
-import {initialCrane,actCrane,stepCrane,hook,placement,pickOption,craneBoardOption,craneExitOption,packCrane,validateCrane} from './assets/imasora-construction-crane.js?v=438';
-import {createCrane,updateCraneModel,createPart} from './assets/imasora-construction-crane-model.js?v=436';
-import {CraneSession} from './assets/imasora-construction-crane-storage.js?v=436';
+import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {initialCrane,actCrane,stepCrane,hook,placement,pickOption,craneBoardOption,craneExitOption,packCrane,validateCrane} from './assets/imasora-construction-crane.js?v=120fp';
+import {createCrane,updateCraneModel,createPart} from './assets/imasora-construction-crane-model.js?v=120fp';
+import {CraneSession} from './assets/imasora-construction-crane-storage.js?v=120fp';
 import {createCraneFloor} from './assets/imasora-construction-crane-floor.js?v=435';
 import {craneWorkInput,cranePlacementReadout} from './assets/imasora-construction-crane-controls.js?v=437';
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname),testMode=new URLSearchParams(location.search).get('craneTest')==='1';
@@ -97,7 +97,7 @@ async function boot(){
   }
   const example=new URLSearchParams(location.search).get('craneAssemblyTest');
   if(testMode&&example){
-    try{const {craneAssemblyExample}=await import('./assets/imasora-construction-crane-examples.js?v=436');state=craneAssemblyExample(example,{finishWithCrane:new URLSearchParams(location.search).get('craneFinishTest')==='1'});orbit=example==='bridge'?-Math.PI/2:Math.PI;pitch=.3;distance=200;}
+    try{const {craneAssemblyExample}=await import('./assets/imasora-construction-crane-examples.js?v=120fp');state=craneAssemblyExample(example,{finishWithCrane:new URLSearchParams(location.search).get('craneFinishTest')==='1'});orbit=example==='bridge'?-Math.PI/2:Math.PI;pitch=.3;distance=200;}
     catch(e){state.message=e.message;refresh();return;}
   }
   try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しいクレーン開発データ':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();

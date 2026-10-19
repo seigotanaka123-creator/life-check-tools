@@ -18,14 +18,14 @@ const body=[...plates(BUCKET_SHELL,18),...plates(BUCKET_OUTLINE,1.3,-8.35),...pl
 const geometryCache=[];
 export function bucketContactGeometry(s,pose){
  const a=bucketRotation(s),c=Math.cos(a),sn=Math.sin(a),h=pose.heading,ch=Math.cos(h),sh=Math.sin(h),w=pose.wrist;
- const key=[a,h,w.x,w.y,w.z],cached=geometryCache.find(e=>key.every((v,i)=>v===e.key[i]));if(cached)return cached.value;
- const rotate=p=>{const y=p[1]*c-p[2]*sn,z=p[1]*sn+p[2]*c;return[p[0]*ch+z*sh,y,-p[0]*sh+z*ch];};
- const make=p=>{const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity],vertices=p.vertices.map(v=>{const q=rotate(v);q[0]+=w.x;q[1]+=w.y;q[2]+=w.z;for(let k=0;k<3;k++){min[k]=Math.min(min[k],q[k]);max[k]=Math.max(max[k],q[k]);}return q;}),axes=[];
-  for(const normal of p.normals)uniqueAxis(axes,rotate(normal));for(const direction of p.directions){const e=rotate(direction);uniqueAxis(axes,[0,e[2],-e[1]]);uniqueAxis(axes,[-e[2],0,e[0]]);uniqueAxis(axes,[e[1],-e[0],0]);}
-  // A prism's vertex projections do not change between testing its nearby
-  // soil cells, bin walls and spoil. Calculate them once per pose, not per box.
-  const ranges=axes.map(axis=>{let low=Infinity,high=-Infinity;for(const v of vertices){const d=v[0]*axis[0]+v[1]*axis[1]+v[2]*axis[2];low=Math.min(low,d);high=Math.max(high,d);}return[low,high];});
-  return{...p,vertices,axes,ranges,min,max};
+ const key=[a,h,w.x,w.y,w.z,...(pose.axes?.flat()??[])],cached=geometryCache.find(e=>key.length===e.key.length&&key.every((v,i)=>v===e.key[i]));if(cached)return cached.value;
+ const rotate=p=>{const y=p[1]*c-p[2]*sn,z=p[1]*sn+p[2]*c;if(pose.axes)return pose.axes[0].map((_,i)=>pose.axes[0][i]*p[0]+pose.axes[1][i]*y+pose.axes[2][i]*z);return[p[0]*ch+z*sh,y,-p[0]*sh+z*ch];};
+ const make=p=>{const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity],vertices=p.vertices.map(v=>{const q=rotate(v);q[0]+=w.x;q[1]+=w.y;q[2]+=w.z;for(let k=0;k<3;k++){min[k]=Math.min(min[k],q[k]);max[k]=Math.max(max[k],q[k]);}return q;});let axes,ranges;
+  // Most pieces never pass the bounding-box test. Defer their exact SAT
+  // projections until needed, preserving every axis, skin and comparison.
+  const getAxes=()=>{if(axes)return axes;axes=[];
+   for(const normal of p.normals)uniqueAxis(axes,rotate(normal));for(const direction of p.directions){const e=rotate(direction);uniqueAxis(axes,[0,e[2],-e[1]]);uniqueAxis(axes,[-e[2],0,e[0]]);uniqueAxis(axes,[e[1],-e[0],0]);}return axes;};
+  return{...p,vertices,min,max,get axes(){return getAxes();},get ranges(){return ranges??=getAxes().map(axis=>{let low=Infinity,high=-Infinity;for(const v of vertices){const d=v[0]*axis[0]+v[1]*axis[1]+v[2]*axis[2];low=Math.min(low,d);high=Math.max(high,d);}return[low,high];});}};
  };
  const value={teeth:teeth.map(make),body:body.map(make)};value.all=[...value.body,...value.teeth];geometryCache.unshift({key,value});if(geometryCache.length>8)geometryCache.pop();return value;
 }
@@ -75,9 +75,9 @@ const walls=[[-126,0,-36,-123,10,12],[-65,0,-36,-62,10,12],[-126,0,-36,-62,10,-3
 export function bucketEnvironmentHits(s,pose,{includeTeeth=true}={}){
  const g=bucketContactGeometry(s,pose),parts=includeTeeth?g.all:g.body,hits=new Set([...touchedCells(s,parts)].map(id=>'土:'+id));
  // Test the same geometry in the vehicle frame against the crawler chassis.
- const vehicle=s.loader.vehicle,localPose={heading:s.arm.slew,wrist:{x:(pose.wrist.x-vehicle.x)*Math.cos(vehicle.heading)-(pose.wrist.z-vehicle.z)*Math.sin(vehicle.heading),y:pose.wrist.y,z:(pose.wrist.x-vehicle.x)*Math.sin(vehicle.heading)+(pose.wrist.z-vehicle.z)*Math.cos(vehicle.heading)}};
- if(parts.some(p=>p.min[1]<17)){const local=bucketContactGeometry(s,localPose);if(local.all.some(p=>prismTouchesBox(p,[-35,0,-43],[35,17,43])))hits.add('クローラー');}
- for(const p of parts){if(p.min[1]<-32)hits.add('岩盤');if(p.vertices.some(([x,y,z])=>y<0&&(x<-32||x>96||z<48||z>176)))hits.add('固定地面');
+ const vehicle=s.loader.vehicle,local=s.groundPose?s.groundPose.axes.map(a=>a.reduce((n,v,i)=>n+v*([pose.wrist.x,pose.wrist.y,pose.wrist.z][i]-s.groundPose.position[i]),0)):null,localPose={heading:s.arm.slew,wrist:local?{x:local[0],y:local[1],z:local[2]}:{x:(pose.wrist.x-vehicle.x)*Math.cos(vehicle.heading)-(pose.wrist.z-vehicle.z)*Math.sin(vehicle.heading),y:pose.wrist.y,z:(pose.wrist.x-vehicle.x)*Math.sin(vehicle.heading)+(pose.wrist.z-vehicle.z)*Math.cos(vehicle.heading)}};
+ if(s.groundPose||parts.some(p=>p.min[1]<17)){const local=bucketContactGeometry(s,localPose);if(local.all.some(p=>prismTouchesBox(p,[-35,0,-43],[35,17,43])))hits.add('クローラー');}
+ for(const p of parts){if(p.min[1]<-32)hits.add('岩盤');if(p.vertices.some(([x,y,z])=>y<0&&(x<-32||x>96||z<48||z>176)&&!s.groundPatches?.has([Math.floor(x/32),Math.floor(z/32)].join(','))))hits.add('固定地面');
   if(walls.some(b=>prismTouchesBox(p,b.min,b.max)))hits.add('受け箱の縁');for(const o of s.spoil)if(prismTouchesBox(p,[o.x-3.9,o.y-3.9,o.z-3.9],[o.x+3.9,o.y+3.9,o.z+3.9]))hits.add('排土:'+o.id);
  }
  const self=bucketSelfContact(s,pose);if(self)hits.add(self);return hits;

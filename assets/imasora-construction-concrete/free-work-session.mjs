@@ -1,13 +1,13 @@
-import {createWorkPlatformRecord,assertWorkPlatformRecord} from './free-platform-record.mjs';
-import {fixedWorkPlatform} from './free-fixed-work-platform.mjs';
-import {frameBlocked,frameRoute,frameGroundRoute,frameSegmentBlocked,FRAME_RACK_STANCE} from './free-frames.mjs';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs';
-import {scaffoldSupport} from './free-frame-scaffold.mjs';
-import {footSurface} from './free-footing.mjs';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs';
-import {vehicleFootprints} from './free-vehicle-contact.mjs';
+import {createWorkPlatformRecord,assertWorkPlatformRecord} from './free-platform-record.mjs?v=120fw';
+import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120fw';
+import {frameBlocked,frameRoute,frameGroundRoute,frameSegmentBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120fw';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120fw';
+import {scaffoldSupport} from './free-frame-scaffold.mjs?v=120fw';
+import {footSurface} from './free-footing.mjs?v=120fw';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
+import {vehicleFootprints} from './free-vehicle-contact.mjs?v=120fw';
 import {pointBoxDistance} from './free-route-clearance.mjs';
-import {boardingAccess} from './free-boarding.mjs';
+import {boardingAccess} from './free-boarding.mjs?v=120fw';
 
 const inside=(plan,x,z)=>plan.pieces.some(p=>Math.abs(x-p.x)<=p.width/2+1e-8&&Math.abs(z-p.z)<=p.depth/2+1e-8);
 const pointSegment=(p,a,b)=>{const dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/(dx*dx+dz*dz||1)));return Math.hypot(p.x-a.x-dx*t,p.z-a.z-dz*t);};

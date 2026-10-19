@@ -22,6 +22,14 @@ body[data-world-building-paused=true]{overflow:hidden;overscroll-behavior:none}
 .world-build-open{position:absolute;right:12px;top:12px;z-index:5;min-height:44px;border:1px solid #9dcab6;border-radius:10px;background:#173b35ed;padding:9px 14px;color:#fff1be;font-weight:700}
 .world-build-placement[hidden],.world-build-open[hidden]{display:none!important}
 .world-build-placement{padding:10px 14px;background:#173b35;color:#eef4e8}.world-build-placement strong{display:block;margin-bottom:6px}.world-build-placement .build-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.world-build-placement button{min-height:44px;min-width:0;white-space:normal;border:1px solid #abc6ab;border-radius:8px;padding:7px;background:#284c40}.world-build-placement .primary-button{background:#e6ca82;color:#183c30}.world-build-placement .build-message{margin:7px 0 0;font-size:12px;line-height:1.5}
+/* Keep the construction action bar readable and the jump clear of its buttons. */
+body[data-world-build-placement=true] .world-build-placement{background:#eef9f4;color:#285166;border-top:2px solid #badfcf}
+body[data-world-build-placement=true] .world-build-placement button{background:#d9edf9;color:#285166;border-color:#aacddf;border-radius:14px;font-weight:700}
+body[data-world-build-placement=true] .world-build-placement .primary-button{background:#ffe5a1;color:#5a4829;border-color:#e8c976}
+body[data-world-build-placement=true] .world-build-placement .build-message{color:#285166;font-weight:600}
+body[data-world-build-placement=true] #constructionJumpButton{bottom:164px}
+@media(max-width:620px){body[data-world-build-placement=true] #constructionJumpButton{bottom:213px}}
+@media(max-height:500px){body[data-world-build-placement=true] #constructionJumpButton{bottom:124px}}
 body[data-world-build-placement=true]{overflow:hidden;overscroll-behavior:none}
 body[data-world-build-placement=true] .world-header,body[data-world-build-placement=true] .world-toolbar,body[data-world-build-placement=true] .control-card,body[data-world-build-placement=true] .viewport-toolbar,body[data-world-build-placement=true] .viewport-footer,body[data-world-build-placement=true] .world-shell>footer{display:none!important}
 body[data-world-build-placement=true] .world-shell{padding:0;min-height:0}

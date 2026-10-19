@@ -1,12 +1,12 @@
 import * as T from '../three.module.min.js';
-import {foundationParts,foundationContains} from './free-foundation-state.mjs';
-import {assertFoundationEnvironment} from './free-foundation-operation.mjs';
-import {frameRoute,frameBlocked,FRAME_RACK_STANCE} from './free-frames.mjs';
-import {walkingGroundAt,walkingGroundRotation} from './free-walking-ground.mjs';
+import {foundationParts,foundationContains} from './free-foundation-state.mjs?v=120fw';
+import {assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120fw';
+import {frameRoute,frameBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120fw';
+import {walkingGroundAt,walkingGroundRotation} from './free-walking-ground.mjs?v=120fw';
 import {ROUTE_EPS} from './free-route-clearance.mjs';
-import {footingAt} from './free-footing.mjs';
-import {foundationScaffoldBase,foundationScaffoldFor,foundationWorkSurface} from './free-foundation-work-scaffold.mjs';
-import {paintScaffoldSteps} from './free-paint-access.mjs';
+import {footingAt} from './free-footing.mjs?v=120fw';
+import {foundationScaffoldBase,foundationScaffoldFor,foundationWorkSurface} from './free-foundation-work-scaffold.mjs?v=120fw';
+import {paintScaffoldSteps} from './free-paint-access.mjs?v=120fw';
 export const FOUNDATION_HAND_REACH=24;
 export const foundationGrip=(part,i)=>part.id.startsWith('post-')?{x:i?.2:-.2,y:part.height/2-.1,z:-.3}:{x:i?6:-6,y:0,z:-1};
 export function* foundationHandPlanSteps(p,a,start,bases,env){

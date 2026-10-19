@@ -1,7 +1,11 @@
+import {cranePoint,craneChassisFrame,cranePartGround,craneGroundHeight,cranePartFlatGround,craneGroundCeiling} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {groundPoint} from './imasora-construction-vehicle-ground-frame.mjs';
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
 // Stage 4-1: inert, uniquely identified loan parts. No game inventory/economy access.
-import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js';
-import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js';
-import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js';
+import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120ey';
+import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120fw';
+import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js?v=120fw';
 export const CRANE={minReach:42,maxReach:152,slew:.48,extend:26,hoist:23,gravity:65,snap:6,rotationSeconds:1.8};
 export const PARTS=[
   {id:'panel-1',name:'床板 A',w:52,h:6,d:30,x:0,z:16,color:0xdab573},
@@ -16,7 +20,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),copy=s=>structuredClone(s),EPS=.0
 const rotationAngle=r=>{const t=clamp(r.elapsed/CRANE.rotationSeconds,0,1);return r.start+Math.PI/2*t*t*(3-2*t);};
 export const bounds=p=>polygon({x:p.x,z:p.z,heading:p.angle||0},p.w,p.d);
 export function initialCrane(){const rig=initialLoaderState();rig.player=cranePlayer(rig.player);return{schemaVersion:1,revision:0,rig,work:false,deployment:0,boom:{yaw:0,reach:70,cable:54.5},held:null,snap:true,parts:PARTS.map(p=>({...p,y:0,angle:0,vx:0,vz:0,vy:0,fixed:false})),history:[],message:'「運転席に乗る」→「クレーン作業へ」。最初の床板はフックの真下にあります。'};}
-export function tip(s){const p=localToWorld(s.rig.vehicle,Math.sin(s.boom.yaw)*s.boom.reach,26+Math.cos(s.boom.yaw)*s.boom.reach);return{...p,y:42+s.boom.reach*.35};}
+export function tip(s){return cranePoint(s,Math.sin(s.boom.yaw)*s.boom.reach,42+s.boom.reach*.35,26+Math.cos(s.boom.yaw)*s.boom.reach);}
 export function hook(s){const p=s.parts.find(p=>p.id===s.held);return p?{x:p.x,z:p.z,y:p.y+p.h+4}:{...tip(s),y:tip(s).y-s.boom.cable};}
 function footprint(o){return polygon({x:o.x,z:o.z,heading:Number.isFinite(o.angle)?o.angle:0},o.width,o.depth);}
 function pointInside(p,poly){let sign=0;for(let i=0;i<4;i++){const a=poly[i],b=poly[(i+1)%4],cross=(b.x-a.x)*(p.z-a.z)-(b.z-a.z)*(p.x-a.x);if(Math.abs(cross)<.01)continue;const next=Math.sign(cross);if(sign&&sign!==next)return false;sign=next;}return true;}
@@ -26,10 +30,10 @@ function externalPointOverlap(point,o,radius=4.2){return validExternal(o)&&point
 function externalBeamOverlap(point,o,radius=4){return validExternal(o)&&point.y+radius>(o.minY??0)+EPS&&point.y-radius<o.height-EPS&&polygonsOverlap(polygon({x:point.x,z:point.z,heading:0},radius*2,radius*2),footprint(o));}
 export function collides(s,p,{ignoreGround=false,external=[]}={}){
   const b=bounds(p);
-  if(b.some(q=>q.x<SITE.minX+2||q.x>SITE.maxX-2||q.z<SITE.minZ+2||q.z>SITE.maxZ-2))return'外周の柵';
-  if(!ignoreGround&&p.y<0)return'地面';
-  if(polygonsOverlap(b,footprint(SAFE_ZONE)))return'歩行者退避エリア';
-  if(p.y<44&&polygonsOverlap(b,polygon(s.rig.vehicle,68,86)))return'車体';
+  if(b.some(q=>!inWorkArea(q,s.rig.vehicle,2)))return'外周の柵';
+  if(!ignoreGround){const floor=cranePartGround(p,external,{collision:true});if(floor===null||p.y<floor-.0001)return'地面';}
+  if(!s.rig.vehicle.field&&polygonsOverlap(b,footprint(SAFE_ZONE)))return'歩行者退避エリア';
+  const g=craneChassisFrame(s);if(g?boxesOverlap3D({position:[p.x,p.y+p.h/2,p.z],half:[p.w/2,p.h/2,p.d/2],heading:p.angle||0},{position:groundPoint(g,0,22,0),half:[34,22,43],axes:g.axes}):p.y<44&&polygonsOverlap(b,polygon(s.rig.vehicle,68,86)))return'車体';
   // Match all four beams, vertical legs and outer foot plates, also mid-extension.
   if(craneOutriggerVolumes(s).some(q=>overlapsOutrigger(p,q)))return'支持脚';
   for(const q of s.parts)if(q.id!==p.id&&p.y<q.y+q.h-EPS&&p.y+p.h>q.y+EPS&&polygonsOverlap(b,bounds(q)))return q.name;
@@ -37,24 +41,26 @@ export function collides(s,p,{ignoreGround=false,external=[]}={}){
   return'';
 }
 export function supportAt(s,p,external=[]){
-  const poly=bounds(p),levels=[0,...s.parts.filter(q=>q.id!==p.id&&q.fixed&&q.y+q.h<=p.y+14&&polygonsOverlap(poly,bounds(q))).map(q=>q.y+q.h),...external.filter(o=>validExternal(o)&&o.height<=p.y+14&&polygonsOverlap(poly,footprint(o))).map(o=>o.height)].sort((a,b)=>b-a);
+  const upper=craneGroundCeiling(p,external),far=Number.isFinite(upper)&&p.y-upper>14,ground=far?upper:cranePartGround(p,external),poly=bounds(p),levels=[...(far||ground===null||!cranePartFlatGround(p,external)?[]:[ground]),...s.parts.filter(q=>q.id!==p.id&&q.fixed&&q.y+q.h<=p.y+14&&polygonsOverlap(poly,bounds(q))).map(q=>q.y+q.h),...external.filter(o=>validExternal(o)&&o.height<=p.y+14&&polygonsOverlap(poly,footprint(o))).map(o=>o.height)].sort((a,b)=>b-a);
   for(const y of levels){
-    if(y===0)return{y,ids:[]};
+    if(y===ground)return{y,ids:[]};
     const supports=s.parts.filter(q=>q.id!==p.id&&q.fixed&&Math.abs(q.y+q.h-y)<.05);
     const materialSupports=external.filter(o=>validExternal(o)&&Math.abs(o.height-y)<.05);
     // Two separated bearing points carry a beam/bridge; unsupported cantilevers are refused.
     const pose={x:p.x,z:p.z,heading:p.angle};
     const spans=[.3,.4,.45].flatMap(r=>[[localToWorld(pose,-p.w*r,0),localToWorld(pose,p.w*r,0)],[localToWorld(pose,0,-p.d*r),localToWorld(pose,0,p.d*r)]]);
     if(spans.some(pair=>pair.every(v=>supports.some(q=>pointInside(v,bounds(q)))||materialSupports.some(o=>pointInside(v,footprint(o))))))return{y,ids:[...supports.filter(q=>polygonsOverlap(poly,bounds(q))).map(q=>q.id),...materialSupports.filter(o=>polygonsOverlap(poly,footprint(o))).map(o=>o.id||o.name||'建材')]};
-  }return{y:0,ids:[]};
+  }return{y:ground??0,ids:[],unsupported:true};
 }
-export function placement(s,external=[]){
+export function placement(s,external=[],landing=null){
   const p=s.parts.find(p=>p.id===s.held);if(!p)return null;
-  const candidate={...p,x:s.snap?(Math.round(p.x/CRANE.snap)*CRANE.snap||0):p.x,z:s.snap?(Math.round(p.z/CRANE.snap)*CRANE.snap||0):p.z};
+  if(landing&&(Object.keys(landing).sort().join('|')!=='x|z'||![landing.x,landing.z].every(Number.isFinite)||Math.hypot(landing.x-p.x,landing.z-p.z)>1.2))throw Error('フックを置き先のすぐ上へ運ぼう。');
+  const candidate={...p,x:landing?landing.x:s.snap?(Math.round(p.x/CRANE.snap)*CRANE.snap||0):p.x,z:landing?landing.z:s.snap?(Math.round(p.z/CRANE.snap)*CRANE.snap||0):p.z};
   const support=supportAt(s,candidate,external);candidate.y=support.y;
-  let reason=s.rotation?'部材を回転中です。止まってから設置できます。':collides(s,candidate,{external});
+  let reason=candidate.y<0?'ここは低すぎるよ。高さ0より上の支えに置こう。':support.unsupported?'地面を平らにするか、支えの上へ置こう。':s.rotation?'部材を回転中です。止まってから設置できます。':collides(s,candidate,{external});
   if(!reason&&Math.abs(p.y-candidate.y)>14)reason='もう少し巻き下げてください';
   if(!reason&&Math.hypot(p.vx,p.vz)>12)reason='揺れが落ち着くまで少し待ってください';
+  if(!reason&&landing)reason=cargoPathHit(s,p,candidate,external);
   const t=tip(s);if(!reason&&(t.y-(candidate.y+p.h+4)<3||Math.hypot(candidate.x-t.x,candidate.z-t.z)>22))reason='フックを置き場所の上へ寄せてください';
   return{candidate,support,ok:!reason,reason:reason||'ここに設置できます'};
 }
@@ -71,7 +77,7 @@ function obstacles(s,external=[]){
   if(s.deployment>0)items.push(...craneOutriggerVolumes(s));
   const local=items.map(p=>{const b=bounds(p),xs=b.map(v=>v.x),zs=b.map(v=>v.z);return{id:p.id,x:(Math.min(...xs)+Math.max(...xs))/2,z:(Math.min(...zs)+Math.max(...zs))/2,width:Math.max(...xs)-Math.min(...xs),depth:Math.max(...zs)-Math.min(...zs),height:p.y+p.h};});
   const maxY=s.rig.mode==='foot'?26.8:44;
-  return[...local,...external.filter(o=>validExternal(o)&&(o.minY??0)<maxY&&o.height>8)];
+  const base=craneChassisFrame(s)?.position[1]??0;return[...local,...external.filter(o=>validExternal(o)&&(o.minY??0)<base+maxY&&o.height>base+8&&o.height>(craneGroundHeight(external,o.x,o.z)??-Infinity)+.05)];
 }
 export function craneObstacles(s,external=[]){return obstacles(s,external);}
 export function craneBoardOption(s,external=[]){
@@ -80,10 +86,10 @@ export function craneBoardOption(s,external=[]){
 }
 export function craneExitOption(s,external=[]){
   if(s.rig.mode!=='driving'||Math.abs(s.rig.vehicle.speed)>.8)return null;
-  for(const side of[-1,1]){const path=transitionPoints(s.rig.vehicle,side,false);if(routeClear(path,obstacles(s,external))&&craneWalkingRouteClear(s,path))return{side,path};}
+  for(const side of[-1,1]){const path=transitionPoints(s.rig.vehicle,side,false);if(routeClear(path,obstacles(s,external),s.rig.vehicle)&&craneWalkingRouteClear(s,path))return{side,path};}
   return null;
 }
-export function actCrane(state,action,external=[]){
+export function actCrane(state,action,external=[],landing=null){
   const s=copy(state);s.message='';
   if(action==='home'){delete s.rotation;s.rig=actLoader(s.rig,'home',obstacles(s,external));s.message='レンだけ安全エリアに戻りました。車両と部材はそのままです。';record(s,action,null);return s;}
   if(action==='interact'){
@@ -130,7 +136,7 @@ export function actCrane(state,action,external=[]){
     p.angle=((start%(Math.PI*2))+Math.PI*2)%(Math.PI*2);s.rotation={partId:p.id,start:p.angle,elapsed:0};s.message=`${p.name}を機械で90°回転しています。`;record(s,action,p.id);
   }
   if(action==='place'){
-    const preview=placement(s,external);if(!preview.ok){s.message=preview.reason;return s;}
+    const preview=placement(s,external,landing);if(!preview.ok){s.message=preview.reason;return s;}
     Object.assign(p,preview.candidate,{fixed:true,vx:0,vz:0,vy:0});s.held=null;s.message=`${p.name}を設置しました。同じフックでまた外せます。`;record(s,action,p.id);
   }
   if(action==='release'){s.held=null;p.fixed=false;p.vy=0;s.message=`${p.name}の吊り索を外しました。部材は消えず、下の面に落下します。`;record(s,action,p.id);}
@@ -166,14 +172,14 @@ function cargoPathHit(s,old,p,external=[]){
 // The visible folded hook is above the front deck, not at its working endpoint.
 function deploymentClearance(s,target,external=[]){
   let hookHit=false;
-  const workingHook=hook(s),folded=localToWorld(s.rig.vehicle,0,34);
+  const workingHook=hook({...s,deployment:1}),folded=cranePoint({...s,deployment:0},0,24,34);
   for(let i=0;i<=80;i++){
     const k=s.deployment+(target-s.deployment)*i/80,q={...s,deployment:k};
     for(const b of craneOutriggerVolumes(q)){
       const poly=bounds(b);
-      if(poly.some(p=>p.x<SITE.minX||p.x>SITE.maxX||p.z<SITE.minZ||p.z>SITE.maxZ)||polygonsOverlap(poly,footprint(SAFE_ZONE))||s.parts.some(p=>overlapsOutrigger(p,b))||external.some(o=>validExternal(o)&&overlapsOutrigger({x:o.x,z:o.z,y:o.minY??0,w:o.width,h:o.height-(o.minY??0),d:o.depth,angle:o.angle??0},b)))return'部材';
+      if(poly.some(p=>!inWorkArea(p,s.rig.vehicle))||(!s.rig.vehicle.field&&polygonsOverlap(poly,footprint(SAFE_ZONE)))||s.parts.some(p=>overlapsOutrigger(p,b))||external.some(o=>validExternal(o)&&overlapsOutrigger({x:o.x,z:o.z,y:o.minY??0,w:o.width,h:o.height-(o.minY??0),d:o.depth,angle:o.angle??0},b)))return'部材';
     }
-    const h={x:folded.x+(workingHook.x-folded.x)*k,z:folded.z+(workingHook.z-folded.z)*k,y:24+(workingHook.y-24)*k};
+    const h={x:folded.x+(workingHook.x-folded.x)*k,z:folded.z+(workingHook.z-folded.z)*k,y:folded.y+(workingHook.y-folded.y)*k};
     if(external.some(o=>externalPointOverlap(h,o)))return'部材';
     if(hookOutriggerHit(q,h))hookHit=true;
   }
@@ -189,7 +195,7 @@ function solveEmptyHookContact(s,prior,external=[]){
   let boom={...old},contact=false;
   const blocked=(from,to)=>{
     const a=hook({...s,boom:from}),b=hook({...s,boom:to});
-    if(b.y<4-1e-7&&b.y<a.y-1e-8)return true;
+    const ground=craneGroundHeight(external,b.x,b.z);if(!Number.isFinite(ground)||b.y<ground+4-1e-7&&b.y<a.y-1e-8)return true;
     const distance=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z),count=Math.max(1,Math.ceil(distance/.2));
     for(let i=1;i<=count;i++){const t=i/count,q={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t};if(external.some(o=>externalPointOverlap(q,o)))return true;}
     // Old saves may already contain a penetrated empty hook. Allow motion out
@@ -249,7 +255,7 @@ export function stepCrane(state,input,dt,external=[]){
   const s=copy(state),before=JSON.stringify([s.rig,s.boom,s.parts,s.deployment,s.rotation]);
   s.deployment=clamp(s.deployment+(s.work?1:-1)*dt/1.2,0,1);
   if((s.work||s.deployment>0)&&s.rig.mode==='driving')s.rig.vehicle.speed=0;
-  else if(s.rig.mode==='foot'&&!s.rig.transition)s.rig=stepCraneWalker(s,s.rig,input,dt);
+  else if(s.rig.mode==='foot'&&!s.rig.transition)s.rig=stepCraneWalker(s,s.rig,input,dt,external);
   else if(s.rig.transition&&!craneWalkingRouteClear(s,s.rig.transition.path)){
     s.rig={...s.rig,mode:s.rig.mode==='boarding'?'foot':'driving',transition:null,hit:'乗降経路',message:'頭上や乗降経路が塞がったため中止しました。'};
   }else s.rig=stepLoader(s.rig,input,dt,obstacles(s,external));
@@ -257,13 +263,13 @@ export function stepCrane(state,input,dt,external=[]){
   if(s.work&&s.deployment===1&&s.rig.mode==='driving'){
     s.boom.yaw=clamp(s.boom.yaw+(input.slew||0)*CRANE.slew*dt,-Math.PI*.8,Math.PI*.8);
     s.boom.reach=clamp(s.boom.reach+(input.extend||0)*CRANE.extend*dt,CRANE.minReach,CRANE.maxReach);
-    s.boom.cable=clamp(s.boom.cable-(input.hoist||0)*CRANE.hoist*dt,4,tip(s).y-4);
+    s.boom.cable=clamp(s.boom.cable-(input.hoist||0)*CRANE.hoist*dt,4,Math.min(100,tip(s).y-(craneGroundHeight(external,tip(s).x,tip(s).z)??0)-4));
     // The raised arm must not cut through an already-built upper wall/beam.
-    const t=tip(s),base=localToWorld(s.rig.vehicle,0,26);let armHit='';
-    for(let i=1;(s.boom.yaw!==state.boom.yaw||s.boom.reach!==state.boom.reach)&&i<=60&&!armHit;i++){const q=i/60,x=base.x+(t.x-base.x)*q,z=base.z+(t.z-base.z)*q,y=42+(t.y-42)*q,point={x,z,y};
+    const t=tip(s),base=cranePoint(s,0,42,26);let armHit='';
+    for(let i=1;(s.boom.yaw!==state.boom.yaw||s.boom.reach!==state.boom.reach)&&i<=60&&!armHit;i++){const q=i/60,x=base.x+(t.x-base.x)*q,z=base.z+(t.z-base.z)*q,y=base.y+(t.y-base.y)*q,point={x,z,y};
       for(const p of s.parts)if(p.id!==s.held&&y+4>p.y&&y-4<p.y+p.h&&polygonsOverlap(polygon({x,z,heading:0},8,8),bounds(p))){armHit=p.name;break;}
       if(!armHit)for(const o of external)if(externalBeamOverlap(point,o)){armHit=o.name||o.id||'建材';break;}}
-    if(armHit){s.boom={...state.boom,cable:clamp(s.boom.cable,4,tip(state).y-4)};s.message=`アームが${armHit}に当たるため旋回・伸縮を止めました。フックは操作できます。`;}
+    if(armHit){s.boom={...state.boom,cable:clamp(s.boom.cable,4,Math.min(100,tip(state).y-4))};s.message=`アームが${armHit}に当たるため旋回・伸縮を止めました。フックは操作できます。`;}
   }
   const held=s.parts.find(p=>p.id===s.held);
   if(held){
@@ -285,10 +291,10 @@ export function stepCrane(state,input,dt,external=[]){
 }
 function checksum(text){let n=2166136261;for(let i=0;i<text.length;i++)n=Math.imul(n^text.charCodeAt(i),16777619);return(n>>>0).toString(16);}
 export function validateCrane(s,templates=PARTS){
-  if(s?.schemaVersion!==1||!Number.isSafeInteger(s.revision)||s.revision<0||!Array.isArray(s.parts)||s.parts.length!==templates.length||!Array.isArray(s.history)||s.history.length>60)throw new Error('クレーンの保存形式が不正です。');
+  if(s?.schemaVersion!==(s?.rig?.vehicle?.field?2:1)||!Number.isSafeInteger(s.revision)||s.revision<0||!Array.isArray(s.parts)||s.parts.length!==templates.length||!Array.isArray(s.history)||s.history.length>60)throw new Error('クレーンの保存形式が不正です。');
   if(typeof s.work!=='boolean'||typeof s.snap!=='boolean'||!Number.isFinite(s.deployment)||s.deployment<0||s.deployment>1)throw new Error('作業状態が不正です。');
   if(!s.boom||!Number.isFinite(s.boom.yaw)||Math.abs(s.boom.yaw)>Math.PI*.8+.001||!Number.isFinite(s.boom.reach)||s.boom.reach<42||s.boom.reach>152||!Number.isFinite(s.boom.cable)||s.boom.cable<3||s.boom.cable>100)throw new Error('アームの状態が不正です。');
-  for(const template of templates){const list=s.parts.filter(p=>p.id===template.id);if(list.length!==1)throw new Error('部材IDの重複・欠落があります。');const p=list[0];for(const k of['w','h','d','name','color'])if(p[k]!==template[k])throw new Error('部材の内容が一致しません。');for(const k of['x','y','z','angle','vx','vz','vy'])if(!Number.isFinite(p[k]))throw new Error('部材座標が不正です。');if(typeof p.fixed!=='boolean'||p.y<-.05||p.y>180||bounds(p).some(q=>q.x<-320||q.x>320||q.z<-250||q.z>250))throw new Error('部材が保存範囲外です。');}
+  for(const template of templates){const list=s.parts.filter(p=>p.id===template.id);if(list.length!==1)throw new Error('部材IDの重複・欠落があります。');const p=list[0];for(const k of['w','h','d','name','color'])if(p[k]!==template[k])throw new Error('部材の内容が一致しません。');for(const k of['x','y','z','angle','vx','vz','vy'])if(!Number.isFinite(p[k]))throw new Error('部材座標が不正です。');if(typeof p.fixed!=='boolean'||p.y<-.05||p.y>180||bounds(p).some(q=>!inWorkArea(q,s.rig.vehicle)))throw new Error('部材が保存範囲外です。');}
   if(s.held!==null&&(!s.work||!s.parts.some(p=>p.id===s.held&&!p.fixed)))throw new Error('吊り荷の台帳が不正です。');
   if(s.rotation!==undefined){
     const r=s.rotation,p=s.parts.find(p=>p.id===s.held);
@@ -297,7 +303,7 @@ export function validateCrane(s,templates=PARTS){
   if(!['foot','driving'].includes(s.rig?.mode)||s.rig.transition)throw new Error('乗り降りの完了後に保存してください。');
   for(const obj of[s.rig.vehicle,s.rig.player])for(const k of['x','z','heading'])if(!Number.isFinite(obj?.[k]))throw new Error('車両・乗員の位置が不正です。');
   for(const k of['speed','steering','wheelTravel'])if(!Number.isFinite(s.rig.vehicle[k]))throw new Error('走行状態が不正です。');
-  if(Math.abs(s.rig.vehicle.x)>320||Math.abs(s.rig.vehicle.z)>250||Math.abs(s.rig.player.x)>320||Math.abs(s.rig.player.z)>250||!Number.isFinite(s.rig.player.y))throw new Error('保存範囲外です。');
+  if(!inWorkArea(s.rig.vehicle,s.rig.vehicle)||!inWorkArea(s.rig.player,s.rig.vehicle)||!Number.isFinite(s.rig.player.y))throw new Error('保存範囲外です。');
   if(s.rig.player.vy!==undefined&&(!Number.isFinite(s.rig.player.vy)||Math.abs(s.rig.player.vy)>2000))throw new Error('歩行速度が不正です。');
   for(const key of['grounded','ceilingHit','jumpHeld'])if(s.rig.player[key]!==undefined&&typeof s.rig.player[key]!=='boolean')throw new Error('歩行状態が不正です。');
   return s;

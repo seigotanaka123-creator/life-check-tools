@@ -1,10 +1,10 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-work-model.js';
-import {actorPose,localToWorld,loaderDrivingInput,boardOption,exitOption} from './assets/imasora-construction-loader-physics.js';
-import {initialSoilPractice,purchasedSoilAction,advancePurchasedSoil,soilCopyOptions,soilCopyTotals,soilCopySurface,soilTransferVisual,SOIL_SITE_SOLIDS} from './assets/imasora-construction-purchased-soil.js?v=454';
-import {PurchasedSoilSession,purchasedSourceReader} from './assets/imasora-construction-purchased-soil-storage.js?v=454';
+import {createLoader,updateLoaderModel} from './assets/imasora-construction-loader-work-model.js?v=120ey';
+import {actorPose,localToWorld,loaderDrivingInput,boardOption,exitOption} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {initialSoilPractice,purchasedSoilAction,advancePurchasedSoil,soilCopyOptions,soilCopyTotals,soilCopySurface,soilTransferVisual,SOIL_SITE_SOLIDS} from './assets/imasora-construction-purchased-soil.js?v=120fp';
+import {PurchasedSoilSession,purchasedSourceReader} from './assets/imasora-construction-purchased-soil-storage.js?v=120fp';
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname),practice=local&&new URLSearchParams(location.search).get('soilPractice')==='1';
 // Practice creates no storage adapter and cannot import, export, save or claim a receipt.
 const session=practice?null:new PurchasedSoilSession(),held=new Map(),keys=new Set(),taps=new Map();

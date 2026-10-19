@@ -1,20 +1,20 @@
 import * as THREE from './three.module.min.js';
-import {createGroundMark} from './imasora-construction-ground-mark.js?v=119bp';
-import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=487';
+import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
+import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120fc';
 import {FACES} from './imasora-construction-terrain.js';
-import {BIN,CELL} from './imasora-construction-excavator.js';
+import {BIN,CELL} from './imasora-construction-excavator.js?v=120fc';
 const FACE_TRIANGLES=[0,1,2,0,2,3],SOIL_COLORS=[new THREE.Color(0xaa7847),new THREE.Color(0xbe9159)];
 // A walk-through gateway on the south edge; all other edges are fenced.
 export const EXCAVATION_FENCES=Object.freeze([
   {x:0,z:250,w:642,d:2},{x:-320,z:0,w:2,d:500},{x:320,z:0,w:2,d:500},
   {x:-303,z:-250,w:34,d:2},{x:73,z:-250,w:494,d:2}
 ]);
-export function createWorldExcavationModel(){
+export function createWorldExcavationModel({shared=false}={}){
   const root=new THREE.Group();root.name='construction-excavation-yard';
   const soil=new THREE.MeshStandardMaterial({color:0xbe9159,roughness:1}),metal=new THREE.MeshStandardMaterial({color:0x478b92,roughness:.7}),dark=new THREE.MeshStandardMaterial({color:0x465c51,roughness:1}),yellow=new THREE.MeshStandardMaterial({color:0xe7bd55});
   const cube=new THREE.BoxGeometry(1,1,1),box=(x,y,z,w,h,d,m,name)=>{const o=new THREE.Mesh(cube,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.name=name;o.castShadow=o.receiveShadow=true;root.add(o);return o;};
   box(32,-36,112,128,8,128,dark,'岩盤');
-  for(const f of EXCAVATION_FENCES){box(f.x,20,f.z,f.w,40,f.d,dark,'掘削外柵');box(f.x,40,f.z,f.w,2,f.d+1,yellow,'柵の上端');}
+  for(const f of shared?[]:EXCAVATION_FENCES){box(f.x,20,f.z,f.w,40,f.d,dark,'掘削外柵');box(f.x,40,f.z,f.w,2,f.d+1,yellow,'柵の上端');}
   box(BIN.x,1.5,BIN.z,BIN.width,3,BIN.depth,metal,'受け箱底');
   for(const x of[-1,1])box(BIN.x+x*(BIN.width/2-1.5),5,BIN.z,3,10,BIN.depth,metal,'受け箱の縁');
   for(const z of[-1,1])box(BIN.x,5,BIN.z+z*(BIN.depth/2-1.5),BIN.width,10,3,metal,'受け箱の縁');
@@ -22,7 +22,7 @@ export function createWorldExcavationModel(){
   const entry=createGroundMark(root,{name:'作業区画の出入口',x:-230,z:-232,width:72,depth:34,color:0xe7bd55,y:.13});
   const canvas=document.createElement('canvas');canvas.width=768;canvas.height=160;const ctx=canvas.getContext('2d');ctx.fillStyle='#264b44';ctx.fillRect(0,0,768,160);ctx.fillStyle='#fff2ca';ctx.font='bold 55px sans-serif';ctx.textAlign='center';ctx.fillText('ショベルカー作業区画',384,98);
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
-  const sign=new THREE.Mesh(new THREE.PlaneGeometry(116,24),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));sign.position.set(-140,44,-248);sign.rotation.y=Math.PI;root.add(sign);
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(116,24),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));sign.position.set(-140,44,-248);sign.rotation.y=Math.PI;root.add(sign);entry.visible=sign.visible=!shared;
   const machine=createExcavator();root.add(machine);
   const particles=new THREE.InstancedMesh(new THREE.BoxGeometry(CELL,CELL,CELL),soil,1792),pile=new THREE.InstancedMesh(new THREE.BoxGeometry(6.5,5,6.5),soil,200);
   for(const o of[particles,pile]){o.frustumCulled=false;o.castShadow=o.receiveShadow=true;root.add(o);}

@@ -1,5 +1,5 @@
-import {WorldPurchaseStore,WorldPurchaseSession} from './imasora-world-purchase-storage.js';
-import {LINK_OFFERS,quoteLinkedOrder,readWorldSource,fingerprint} from './imasora-world-purchase-ledger.js';
+import {WorldPurchaseStore,WorldPurchaseSession} from './imasora-world-purchase-storage.js?v=120fw';
+import {LINK_OFFERS,quoteLinkedOrder,readWorldSource,fingerprint} from './imasora-world-purchase-ledger.js?v=120fw';
 // Reading is explicitly user-triggered and one-way. There is no legacy save writer.
 const SOURCE_KEY='imasora-world-foundation-v3';
 const $=id=>document.getElementById(id);

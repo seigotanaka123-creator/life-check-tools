@@ -1,3 +1,4 @@
+import {isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
 // Stage 2-1: development-loan data only. No legacy wallet/save access.
 export const CONSTRUCTION_SCHEMA = 1;
 export const SOIL_UNIT = 1000; // fixed-point volume: one displayed block
@@ -34,7 +35,14 @@ function quotedCanonicalKey(key) {
   if (key.length <= 64 && canonicalKeyText.size < 256) canonicalKeyText.set(key, text);
   return text;
 }
+const immutableSoilText=new WeakMap();
 export function canonical(value) {
+  // Only completely captured immutable soil trees qualify. Other objects,
+  // frozen wrappers and mutable input retain the original traversal.
+  if(value&&typeof value==='object'&&isCapturedConstructionJson(value)&&typeof value.format==='string'&&value.journal&&value.containers){
+    let text=immutableSoilText.get(value);if(text!==undefined)return text;
+    text='{'+Object.keys(value).sort().map(k=>quotedCanonicalKey(k)+':'+canonical(value[k])).join(',')+'}';immutableSoilText.set(value,text);return text;
+  }
   // JSON's finite-number spelling is the ordinary number-to-string spelling,
   // including -0 -> 0. Keep JSON.stringify for non-finite and other values.
   if (typeof value === 'number' && Number.isFinite(value)) return String(value);

@@ -1,6 +1,6 @@
-import {constructionBase} from './free-supported-build.mjs';
-import {pipeWalkingBlocked} from './free-boom-contact.mjs';
-import {footSurface,FOOT_LEVEL_EPS} from './free-footing.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {pipeWalkingBlocked} from './free-boom-contact.mjs?v=120fw';
+import {footSurface,FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
 import {accessDeckContains} from './free-access-deck.mjs';
 
 // The 26-unit deck fits the measured shoes beside, rather than above, the work.
@@ -47,7 +47,16 @@ export function makeFrameScaffold(f,stance,panels,heightAt,external,groundRoute,
   }
   const landing={x:origin.x,z:origin.z+origin.dz*(20+count*12),y:height};
   const entry={x:origin.x,z:origin.z,y:entryBase,heading:0},ground=groundRoute(entry);
-  const blocked=(x,z,margin)=>{const point={x:x-f.location.x,z:z-f.location.z};return deckExternal(x,z,margin)||dist(point,entry)<26||ground.slice(1).some((p,i)=>segmentDistance(point,ground[i],p)<26)||stairs.some(s=>s.y<height&&stairDistance(point,s)<SCAFFOLD_RADIUS-1e-6);};
+  // The route and staircase are fixed within this one synchronous candidate.
+  // Keep exact distance checks near their boundaries; skip only disjoint bounds.
+  const groundSegments=ground.slice(1).map((b,i)=>{const a=ground[i];return{a,b,minX:Math.min(a.x,b.x)-26,maxX:Math.max(a.x,b.x)+26,minZ:Math.min(a.z,b.z)-26,maxZ:Math.max(a.z,b.z)+26};});
+  const insideApproach=point=>{
+   if(Math.abs(point.x-entry.x)<26&&Math.abs(point.z-entry.z)<26&&dist(point,entry)<26)return true;
+   for(const {a,b,minX,maxX,minZ,maxZ}of groundSegments)if(point.x>=minX&&point.x<=maxX&&point.z>=minZ&&point.z<=maxZ&&segmentDistance(point,a,b)<26)return true;
+   for(const s of stairs)if(s.y<height&&Math.abs(point.x-s.x)<=s.halfX+SCAFFOLD_RADIUS&&Math.abs(point.z-s.z)<=s.halfZ+SCAFFOLD_RADIUS&&stairDistance(point,s)<SCAFFOLD_RADIUS-1e-6)return true;
+   return false;
+  };
+  const blocked=(x,z,margin)=>deckExternal(x,z,margin)||insideApproach({x:x-f.location.x,z:z-f.location.z});
   const path=raisedRoute(landing,stance,blocked).map(p=>({...p,y:height}));
   const legs=[],seen=new Set();
   function leg(x,z,y){const key=x.toFixed(4)+','+z.toFixed(4)+','+y;if(seen.has(key))return;seen.add(key);

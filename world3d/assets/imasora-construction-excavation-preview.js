@@ -1,7 +1,7 @@
 // Disposable prediction only: the authoritative state, saves and soil ledger
 // are never modified. Use this module in a worker; the controller owns timeout.
-import {beginOneTouch,stepOneTouch} from './imasora-construction-excavator-one-touch.js?v=519';
-import {BIN,cellCenter,totals} from './imasora-construction-excavator.js';
+import {beginOneTouch,stepOneTouch} from './imasora-construction-excavator-one-touch.js?v=120fc';
+import {BIN,cellCenter,totals} from './imasora-construction-excavator.js?v=120fc';
 export const EXCAVATION_PREVIEW_MAX_STEPS=7200;
 const DT=1/120,POSITION_KEYS=['x','y','z'],BIN_VISIBLE_LIMIT=200;
 const position=p=>Object.fromEntries(POSITION_KEYS.map(k=>[k,p[k]]));

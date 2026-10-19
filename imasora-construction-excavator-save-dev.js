@@ -1,8 +1,8 @@
-import {startExcavatorBuildView} from './imasora-construction-excavator-build-dev.js?v=468';
-import {initialExcavatorBuild} from './assets/imasora-construction-excavator-build.js';
-import {packExcavation,unpackExcavation,resumeExcavation} from './assets/imasora-construction-excavator-save.js';
-import {ExcavationSession,ExcavationStore} from './assets/imasora-construction-excavator-storage.js';
-import {readExcavationImport,excavationImportSummary,EXCAVATION_IMPORT_LIMIT} from './assets/imasora-construction-excavator-import.js';
+import {startExcavatorBuildView} from './imasora-construction-excavator-build-dev.js?v=120fc';
+import {initialExcavatorBuild} from './assets/imasora-construction-excavator-build.js?v=120fc';
+import {packExcavation,unpackExcavation,resumeExcavation} from './assets/imasora-construction-excavator-save.js?v=120fc';
+import {ExcavationSession,ExcavationStore} from './assets/imasora-construction-excavator-storage.js?v=120fc';
+import {readExcavationImport,excavationImportSummary,EXCAVATION_IMPORT_LIMIT} from './assets/imasora-construction-excavator-import.js?v=120fc';
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
 const restoreTest=new URLSearchParams(location.search).has('excavationRestoreTest');
 const session=new ExcavationSession(new ExcavationStore(undefined,{restoreTest}));let initial=initialExcavatorBuild(),paused=false,writing=false,ready=false,saveText='未保存・保存ボタンで開始',api,guide;

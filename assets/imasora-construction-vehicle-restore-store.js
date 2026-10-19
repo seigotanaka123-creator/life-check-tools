@@ -1,8 +1,8 @@
 // Vehicle-only restore and its previous unsaved work are committed atomically.
 import {CONSTRUCTION_STORE} from './imasora-construction-storage.js';
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=496';
-import {vehicleRestoreSpec,vehicleRestoreCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=502';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
+import {vehicleRestoreSpec,vehicleRestoreCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=120fw';
 const check=(v,m)=>{if(!v)throw Error(`車両作業の復元：${m}`);},equal=(a,b)=>canonical(a)===canonical(b);
 const id=v=>typeof v==='string'&&/^[\w-]{8,96}$/.test(v);
 export function vehicleRestoreKey(kind){vehicleRestoreSpec(kind);return `construction-vehicle-restore:${kind}`;}

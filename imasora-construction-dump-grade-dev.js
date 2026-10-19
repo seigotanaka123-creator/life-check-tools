@@ -1,6 +1,6 @@
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js';
+import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js?v=120ey';
 import {createDumpGait} from './assets/imasora-construction-dump-gait.js';
 import {createConstructionMovePad} from './assets/imasora-construction-concrete/move-pad.mjs';
 import {bindTravelBoost} from './assets/imasora-construction-travel-input.mjs';

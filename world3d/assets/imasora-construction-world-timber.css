@@ -17,3 +17,8 @@
 .world-timber-controls .wt-crane button{background:linear-gradient(#416e61,#284d48);border-color:#7da893}
 .world-timber-controls .wt-work button{min-height:34px}
 
+
+/* Upper-floor delivery stays inside the existing load page. */
+.world-timber-controls .wt-upper{display:grid;gap:6px;flex-basis:100%;background:#fff8e8;color:#395754;border:2px solid #e4c875;border-radius:16px;padding:10px;max-height:24vh;overflow:auto;overscroll-behavior:contain}
+.world-timber-controls .wt-upper strong{color:#395754}.world-timber-controls .wt-upper small{display:block;line-height:1.45}.world-timber-controls .wt-upper-choices{display:grid;gap:8px}.world-timber-controls .wt-upper-choices>div{display:grid;gap:3px}.world-timber-controls .wt-upper button{background:#d6f2de;color:#2d5543;border-color:#7ab797;min-height:44px}.world-timber-controls [data-action="upper-stop"]{background:#ffe2ce;color:#754329;border-color:#d9996d}
+.world-timber-controls .gv-page>.wt-upper{grid-template-columns:1fr!important}.world-timber-controls .wt-upper>*{grid-column:1/-1}.world-timber-controls .wt-upper-choices>div{grid-template-columns:1fr!important}.world-timber-controls .wt-upper-choices button{width:100%;min-height:44px}

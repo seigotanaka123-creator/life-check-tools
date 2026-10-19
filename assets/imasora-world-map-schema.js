@@ -24,7 +24,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
       layout: "正式マップと同一の1536×1024座標、駅・線路・鉄道・UFO装備倉庫レイヤー",
       pixelSize: [1536, 1024],
       composite: "official-sky-layer-composite-v1",
-      references: ["assets/imasora-sky-map.js", "assets/imasora-sky-map.css"],
+      references: ["assets/imasora-sky-map.js", "assets/imasora-sky-map.css?v=120ds"],
     },
     palette: { ground: 0xb7d9ee, edge: 0x6ab7e5, fog: 0x90c9f1, accent: 0x8de9ff },
     // 空駅の正面通路から開始。正式レイヤー上の駅を最初から確認できる位置。

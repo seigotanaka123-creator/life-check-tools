@@ -4,9 +4,10 @@ import {soilSize} from './assets/imasora-construction-dump-soil.js?v=526';
 import {createDumpGait} from './assets/imasora-construction-dump-gait.js?v=526';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js?v=526';
-import {createDumpWorld,dumpAction,stepDumpWorld,dumpTotals,dumpActorPose,dumpBoardOption,dumpGroundObstacles,loadingReady,planDump,DUMP,packDumpWorld,unpackDumpWorld,DUMP_WALLS,LOAD_BAY} from './assets/imasora-construction-dump-truck.js?v=526';
-import {localToWorld} from './assets/imasora-construction-loader-physics.js';
+import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js?v=120ey';
+import {createDumpWorld,dumpAction,stepDumpWorld,dumpTotals,dumpActorPose,dumpBoardOption,dumpGroundObstacles,loadingReady,planDump,DUMP,packDumpWorld,unpackDumpWorld,DUMP_WALLS,LOAD_BAY} from './assets/imasora-construction-dump-truck.js?v=120ey';
+import {localToWorld} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {DUMP_CAB,dumpCabActorPose} from './assets/imasora-construction-dump-cab.mjs?v=120ey';
 const $=id=>document.getElementById(id),scene=new THREE.Scene(),canvas=$('scene');
 scene.background=new THREE.Color(0xcbded8);scene.fog=new THREE.Fog(0xcbded8,750,1500);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -23,7 +24,7 @@ function label(text,x,z,width){const c=document.createElement('canvas');c.width=
 label('積込所',0,-174,90);
 const sourcePile=box(70,9,-110,28,18,48,0xa16e46);box(70,2,-110,34,4,56,0x697c68);
 let world=createDumpWorld(),cameraMode=0,orbit=2.7,pitch=.65,distance=205,roofTransparent=false,paused=false,pendingRestore=null,undo=null,fatal=false;
-const truck=createDumpModel(),ren=officialCharacter();scene.add(truck,ren);const updateGait=createDumpGait(ren);
+const truck=createDumpModel(),ren=officialCharacter();scene.add(truck,ren);const updateGait=createDumpGait(ren),driverHandBases=ren.userData.hands.map(h=>h.position.clone());
 const soil=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),mat(0xa16e46),48);soil.castShadow=soil.receiveShadow=true;soil.frustumCulled=false;scene.add(soil);const matrix=new THREE.Matrix4();
 const ghostMaterial=new THREE.MeshBasicMaterial({color:0x43c890,transparent:true,opacity:.35,depthWrite:false});
 const ghosts=new THREE.InstancedMesh(new THREE.BoxGeometry(DUMP.grain,DUMP.grain,DUMP.grain),ghostMaterial,48);ghosts.frustumCulled=false;scene.add(ghosts);
@@ -90,10 +91,12 @@ function refresh(){
 }
 
 function render(travel=0,sampled=true){
+ ren.userData.hands.forEach((h,i)=>h.position.copy(driverHandBases[i]));
  updateGait(travel,{seated:world.rig.mode==='driving',paused:paused||fatal,sampled});
- updateDumpModel(truck,world,{roofTransparent});const pose=dumpActorPose(world.rig);
+ updateDumpModel(truck,world,{roofTransparent});const pose=dumpCabActorPose(world.rig);
  if(world.rig.mode==='driving'){if(ren.parent!==truck.userData.pilotSocket)truck.userData.pilotSocket.add(ren);ren.position.set(0,0,0);ren.rotation.set(0,0,0);}
  else{if(ren.parent!==scene)scene.add(ren);ren.position.set(pose.x,pose.y-truck.userData.measurement.footBottom,pose.z);ren.rotation.set(0,pose.heading,0);}
+ if(world.rig.mode==='driving'){truck.updateMatrixWorld(true);ren.updateMatrixWorld(true);ren.userData.hands.forEach((hand,i)=>{const point=truck.localToWorld(new THREE.Vector3(DUMP_CAB.driverX+(i?3.8:-3.8),DUMP_CAB.gripY,DUMP_CAB.gripZ));hand.position.copy(hand.parent.worldToLocal(point));});}
  let n=0;const put=(p,g)=>soil.setMatrixAt(n++,matrix.makeScale(g,g,g).setPosition(p.x,p.y,p.z));for(const cell of world.ground)for(let j=0;j<cell.n;j++){const g=soilSize(cell);put({x:cell.x,y:(j+.5)*g,z:cell.z},g);}for(const p of world.air)put(p,soilSize(p));soil.count=n;soil.instanceMatrix.needsUpdate=true;
  sourcePile.scale.y=Math.max(.01,18*world.source/48);sourcePile.position.y=2+9*world.source/48;sourcePile.visible=world.source>0;
  const marker=localToWorld(world.rig.vehicle,-58,18);entry.position.set(marker.x,.2,marker.z);entry.visible=world.rig.mode==='foot';

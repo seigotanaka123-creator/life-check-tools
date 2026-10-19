@@ -1,5 +1,5 @@
 import {IndexedConstructionStore,CONSTRUCTION_STORE} from './imasora-construction-storage.js';
-import {EXCAVATION_FORMAT,packExcavation,unpackExcavation} from './imasora-construction-excavator-save.js';
+import {EXCAVATION_FORMAT,packExcavation,unpackExcavation} from './imasora-construction-excavator-save.js?v=120fc';
 export const EXCAVATION_DB='imasora-construction-excavation-development-v1';
 export const EXCAVATION_RESTORE_TEST_DB='imasora-construction-excavation-restore-test-v1';
 export const EXCAVATION_RESTORE_POINT='imasora-excavation-before-restore-v1';

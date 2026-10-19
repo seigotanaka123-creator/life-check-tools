@@ -2,7 +2,7 @@
 // Terrain, vehicles, inventory and every other map remain in the current ledger.
 import {CONSTRUCTION_STORE} from './imasora-construction-storage.js';
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=496';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
 
 export const MAP_RESET_MAPS=Object.freeze(['sky','mars','coast','construction']);
 export const MAP_RESET_PREFIX='world-map-reset:';

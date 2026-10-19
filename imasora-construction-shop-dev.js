@@ -5,8 +5,8 @@ import {createSpaceMaterialGuide} from './assets/imasora-space-material-guide.js
 const $=id=>document.getElementById(id);
 const previewMode=new URLSearchParams(location.search).get('walletPreview');
 const walletUI=new URLSearchParams(location.search).get('worldShop')==='1'
-  ?(await import('./assets/imasora-world-shop-client.js?v=504')).createWorldShopClient()
-  :previewMode?(await import('./assets/imasora-world-purchase-preview-ui.js?v=451')).makeWalletPreview(previewMode):null;
+  ?(await import('./assets/imasora-world-shop-client.js?v=120fp')).createWorldShopClient()
+  :previewMode?(await import('./assets/imasora-world-purchase-preview-ui.js?v=120fp')).makeWalletPreview(previewMode):null;
 const session=walletUI?.session||new ShopSession(),SHOP_OFFERS=walletUI?.offers||TRIAL_OFFERS,quoteOrder=walletUI?.quote||quoteTrialOrder;
 let working=false,selection=null,browsing=SHOP_OFFERS[0];
 const buttons=new Map();

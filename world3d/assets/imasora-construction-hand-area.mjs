@@ -1,13 +1,14 @@
-import {shovelDropTarget,shovelStanding,shovelGroundHeight,walkShovelWork,turnShovelWork} from './imasora-construction-shovel-work.mjs';
-import {SITE,WALKER} from './imasora-construction-loader-physics.js';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
+import {shovelDropTarget,shovelDropSurface,shovelStanding,shovelGroundHeight,walkShovelWork,turnShovelWork} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120ey';
 
 // Selection covers the yard. The actual placement remains a short, checked
 // shovel stroke: plan real walking to a safe stance, never relocate the actor.
 export const HAND_AREA_SEARCH_LIMIT=8192;
-export const handAreaEnvironment=s=>JSON.stringify([s.soil.revision,s.dump,s.machineArm??null]);
+export const handAreaEnvironment=s=>JSON.stringify([s.soil.revision,s.dump,s.machineArm??null,s.machineVehicle??null,s.soil.field??null]);
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const facing=(p,t)=>Math.atan2(t[0]-p.x,t[2]-p.z);
-const inside=p=>p.x>=SITE.minX+WALKER.radius&&p.x<=SITE.maxX-WALKER.radius&&p.z>=SITE.minZ+WALKER.radius&&p.z<=SITE.maxZ-WALKER.radius;
+const inside=(p,s)=>{const SITE=transportArea(s);return p.x>=SITE.minX+WALKER.radius&&p.x<=SITE.maxX-WALKER.radius&&p.z>=SITE.minZ+WALKER.radius&&p.z<=SITE.maxZ-WALKER.radius;};
 
 function line(s,to){
  const length=distance(s.player,to);let next=s;
@@ -29,16 +30,16 @@ class Queue{
 }
 
 export async function planHandArea(s,point,{yieldNow=()=>Promise.resolve(),cancelled=()=>false}={}){
- const issue=t=>({point:Array.isArray(point)?[...point]:null,target:null,points:null,issue:t,visited:0});
+ const SITE=transportArea(s);const issue=t=>({point:Array.isArray(point)?[...point]:null,target:null,points:null,issue:t,visited:0});
  if(s.job||s.soil.pending||!s.soil.containers.shovel.amount)return issue('土を持ってから置き先を選んでください。');
  if(!Array.isArray(point)||point.length!==2||!point.every(Number.isFinite))return issue('地面や土の上面を選んでください。');
  const x=Math.floor(point[0]/4)*4,z=Math.floor(point[1]/4)*4;
- if(x<SITE.minX||x+4>SITE.maxX||z<SITE.minZ||z+4>SITE.maxZ)return issue('工事区画の中を選んでください。');
+ if(x<SITE.minX||x+4>SITE.maxX||z<SITE.minZ||z+4>SITE.maxZ)return issue('工事現場の中を選んでください。');
  if(!shovelStanding(s,s.player))return issue('足元が変わりました。移動できる場所を確認してください。');
- const heights=[0,1].flatMap(dx=>[0,1].map(dz=>shovelGroundHeight(s,x+dx*2+1,z+dz*2+1,256))),y=Math.max(...heights);
- if(heights.some(h=>Math.abs(h-y)>.05)||Math.abs(Math.round(y/2)*2-y)>.05)return issue('土全体が載る平らな上面を選んでください。');
- const target=[x+2,y+2,z+2],selected=[x,z],environment=handAreaEnvironment(s);
- const result=(p,points,visited=0)=>({point:selected,target,points,heading:facing(p,target),environment,issue:'',visited});
+ const selected=[x,z],surface=shovelDropSurface(s,selected);
+ if(!surface)return issue('土を受け止められる地面や盛土を選んでください。');
+ const target=surface.target,environment=handAreaEnvironment(s);
+ const result=(p,points,visited=0)=>({...shovelDropTarget({...s,player:{...p,heading:facing(p,target)}},selected),point:selected,points,heading:facing(p,target),environment,issue:'',visited});
  const directly=turnShovelWork(s,facing(s.player,target));
  if(shovelDropTarget(directly,selected))return result(s.player,[]);
  const goals=[],angle=Math.atan2(s.player.x-target[0],s.player.z-target[2]);
@@ -47,7 +48,7 @@ export async function planHandArea(s,point,{yieldNow=()=>Promise.resolve(),cance
   const offset=i===0?0:(i%2?1:-1)*Math.ceil(i/2)*Math.PI/8,a=angle+offset;
   const p={...s.player,x:target[0]+Math.sin(a)*radius,z:target[2]+Math.cos(a)*radius};
   p.y=shovelGroundHeight(s,p.x,p.z,256);p.heading=facing(p,target);
-  if(inside(p)&&shovelStanding(s,p)&&shovelDropTarget({...s,player:p},selected))goals.push(p);
+  if(inside(p,s)&&shovelStanding(s,p)&&shovelDropTarget({...s,player:p},selected))goals.push(p);
   if(i%4===3)await yieldNow();
  }
  if(!goals.length)return issue('ここには土を置けません。車・土の重なりや置き先の高さを確認してください。');
@@ -68,7 +69,7 @@ export async function planHandArea(s,point,{yieldNow=()=>Promise.resolve(),cance
    const points=[[goal.x,goal.z]];for(let p=n;p.parent;p=p.parent)points.push([p.x,p.z]);points.reverse();return result(goal,points,visited);
   }
   for(const [dx,dz]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
-   const ix=n.ix+dx,iz=n.iz+dz,key=ix+','+iz,p={x:root.x+ix*8,z:root.z+iz*8};if(closed.has(key)||!inside(p))continue;
+   const ix=n.ix+dx,iz=n.iz+dz,key=ix+','+iz,p={x:root.x+ix*8,z:root.z+iz*8};if(closed.has(key)||!inside(p,s))continue;
    const g=n.g+Math.hypot(dx,dz)*8;if(g>=(best.get(key)??Infinity))continue;
    p.y=shovelGroundHeight(s,p.x,p.z,n.y);const next=line(frame,p);if(!next)continue;
    const node={...p,y:next.player.y,g,score:g+heuristic(p),key,ix,iz,parent:n};best.set(key,g);queue.push(node);

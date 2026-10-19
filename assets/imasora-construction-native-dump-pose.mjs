@@ -1,4 +1,5 @@
-import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs';
+import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
+import {dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120ey';
 
 const dot=(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=a=>{const n=Math.hypot(...a);return a.map(v=>v/n);};
 const poseCache=new WeakMap();
@@ -8,9 +9,17 @@ export function nativeDumpPose(frame){
  const support=nativeDumpSupport(frame),v=frame.dump;let cache=poseCache.get(support);if(cache)return cache;
  const enabled=!!support.driveReady,sx=enabled?Math.tan(support.roll):0,sz=enabled?Math.tan(support.pitch):0;
  const xx=unit([1,sx,0]),yy=unit([-sx,1,-sz]),zz=unit(cross(xx,yy)),c=Math.cos(v.heading),s=Math.sin(v.heading),turn=a=>[c*a[0]+s*a[2],a[1],-s*a[0]+c*a[2]];
- const axes=[xx,yy,zz].map(turn);cache=Object.freeze({position:Object.freeze([v.x,enabled?support.y:0,v.z]),axes:Object.freeze(axes.map(a=>Object.freeze(a))),pitch:enabled?support.pitch:0,roll:enabled?support.roll:0,enabled});poseCache.set(support,cache);return cache;
+ const axes=[xx,yy,zz].map(turn),groundPosition=[v.x,enabled?support.y:0,v.z];
+ const radius=8.65*Math.sqrt(Math.max(0,1-axes[0][1]**2))+4.5*Math.abs(axes[0][1])+.25;
+ const bodyLift=enabled?dumpSuspensionLift(support.wheels.map(w=>(w.max+radius-groundPosition[1]-axes[0][1]*w.x-axes[1][1]*8.9-axes[2][1]*w.z)/axes[1][1])):0;
+ // Rebalance the sprung body, not the ground-contacting wheels. The wheel
+ // offsets below counter this exact displacement along the same up axis.
+ cache=Object.freeze({position:Object.freeze(groundPosition.map((n,i)=>n+axes[1][i]*bodyLift)),groundPosition:Object.freeze(groundPosition),bodyLift,axes:Object.freeze(axes.map(a=>Object.freeze(a))),pitch:enabled?support.pitch:0,roll:enabled?support.roll:0,enabled});poseCache.set(support,cache);return cache;
 }
 export function nativeDumpPoint(frame,x,y,z){const p=nativeDumpPose(frame);return p.position.map((v,i)=>v+p.axes[0][i]*x+p.axes[1][i]*y+p.axes[2][i]*z);}
+// Keep the historical saved seat anchor independent of the sprung body's
+// visual ride height. The actual driver/camera use nativeDumpPoint instead.
+export function nativeDumpAnchorPoint(frame,x,y,z){const p=nativeDumpPose(frame);return p.groundPosition.map((v,i)=>v+p.axes[0][i]*x+p.axes[1][i]*y+p.axes[2][i]*z);}
 export function nativeDumpLocal(frame,point){const p=nativeDumpPose(frame),d=point.map((v,i)=>v-p.position[i]);return p.axes.map(a=>dot(a,d));}
 export function nativeDumpBox(frame,centre,half,extra={}){const p=nativeDumpPose(frame);return{position:nativeDumpPoint(frame,...centre),half:[...half],heading:frame.dump.heading,...(Math.abs(p.pitch)+Math.abs(p.roll)>1e-12?{axes:p.axes}:{}),...extra};}
 export function boxAxes(b){if(b.axes)return b.axes;const c=Math.cos(b.heading??0),s=Math.sin(b.heading??0);return[[c,0,-s],[0,1,0],[s,0,c]];}
@@ -55,4 +64,4 @@ export function boxesOverlap3D(a,b,margin=.01){
 // A vertical suspension offset lets each round tyre meet the highest step
 // within its contact patch without lowering any part through native soil.
 export function nativeDumpWheelOffsets(frame){const p=nativeDumpPose(frame),support=nativeDumpSupport(frame);if(!p.enabled)return[0,0,0,0];const radius=8.65*Math.sqrt(Math.max(0,1-p.axes[0][1]**2))+4.5*Math.abs(p.axes[0][1])+.25;return support.wheels.map(w=>{const centre=nativeDumpPoint(frame,w.x,8.9,w.z);return(w.max+radius-centre[1])/p.axes[1][1];});}
-export function nativeDumpDoorPoint(frame,side){const p=nativeDumpPoint(frame,side*52,0,18),h=nativeDumpHeightAt(frame,p[0],p[2]);return Number.isFinite(h)&&Math.abs(h-p[1])<=2.01?[p[0],h,p[2]]:null;}
+export function nativeDumpDoorPoint(frame,side){const p=nativeDumpAnchorPoint(frame,side*52,0,18),h=nativeDumpHeightAt(frame,p[0],p[2]);return Number.isFinite(h)&&Math.abs(h-p[1])<=2.01?[p[0],h,p[2]]:null;}

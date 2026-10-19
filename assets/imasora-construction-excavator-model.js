@@ -1,10 +1,10 @@
 import * as THREE from './three.module.min.js';
-import {createLoader} from './imasora-construction-loader-model.js';
-import {armPose,EX} from './imasora-construction-excavator.js';
-import {EX_ACCESS,accessOuter} from './imasora-construction-excavator-access.js';
+import {createLoader} from './imasora-construction-loader-model.js?v=120ey';
+import {armPose,EX} from './imasora-construction-excavator.js?v=120fc';
+import {EX_ACCESS,accessOuter} from './imasora-construction-excavator-access.js?v=120ey';
 import {isBackhoe,bucketRotation,bucketPoint,BUCKET_OUTLINE,BUCKET_SHELL,BUCKET_TOOTH,toothHalfWidth} from './imasora-construction-excavator-bucket.js';
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.65,...extra});
-const yellow=mat(0xf5b935,{metalness:.18}),dark=mat(0x28393c),rubber=mat(0x202b2c),steel=mat(0xb9c8c3,{metalness:.8,roughness:.28});
+const yellow=mat(0xfeb30e,{metalness:.18}),dark=mat(0x28393c),rubber=mat(0x202b2c),steel=mat(0xb9c8c3,{metalness:.8,roughness:.28});
 function box(g,w,h,d,x,y,z,m,name){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.name=name;o.castShadow=o.receiveShadow=true;g.add(o);return o;}
 function cylinder(g,r,length,x,y,z,m){const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,length,20),m);o.rotation.z=Math.PI/2;o.position.set(x,y,z);o.castShadow=true;g.add(o);return o;}
 function link(g,m,width){const o=box(g,width,1,width,0,0,0,m,'油圧アーム');return o;}
@@ -84,8 +84,8 @@ export function createExcavator(){
   const bucketHydraulics=[link(upper,dark,2.4),link(upper,steel,1.3)];bucketHydraulics.forEach(o=>o.visible=false);
   root.userData={upper,steps,stepsPivot,wheels,boom,stick,hydraulics,joints,bucket,soil:legacySoil,legacySoil,legacyBucket,backhoe,bucketHydraulics,pilotSocket:upper.userData.pilotSocket,measurement:upper.userData.measurement};return root;
 }
-export function updateExcavatorModel(root,s,{roofTransparent=false}={}){
-  const d=root.userData,a=s.arm,p=armPose(s),v=s.loader.vehicle;root.position.set(v.x,0,v.z);root.rotation.y=v.heading;d.upper.rotation.y=a.slew;
+export function updateExcavatorModel(root,s){
+  const d=root.userData,a=s.arm,p=armPose(s),v=s.loader.vehicle;root.position.set(v.x,0,v.z);root.rotation.set(0,v.heading,0);if(s.groundPose){root.position.fromArray(s.groundPose.position);root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(...s.groundPose.axes.map(a=>new THREE.Vector3(...a))));}d.upper.rotation.y=a.slew;
   align(d.boom,p.local[0],p.local[1]);align(d.stick,p.local[1],p.local[2]);
   const interpolate=(a,b,t)=>({x:a.x,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t});
   const c0={...EX.shoulder,x:39,y:17,z:2},c1={...interpolate(p.local[0],p.local[1],.6),x:39},c2={...interpolate(p.local[0],p.local[1],.75),x:39},c3={...interpolate(p.local[1],p.local[2],.55),x:39};
@@ -103,5 +103,5 @@ export function updateExcavatorModel(root,s,{roofTransparent=false}={}){
       if(o.name==='乗降渡り板'){const end=outer+2;o.position.x=side*(end+27.5)/2;o.scale.x=end-27.5;}
     }
   });d.wheels.forEach(o=>o.rotation.x=v.wheelTravel/8);
-  const rm=d.upper.userData.roofMat;if(rm.transparent!==roofTransparent){rm.transparent=roofTransparent;rm.needsUpdate=true;}rm.opacity=roofTransparent?.15:1;rm.depthWrite=!roofTransparent;d.upper.userData.roof.castShadow=!roofTransparent;
+  // Keep the two-seat cabin roof opaque while the upper body turns.
 }

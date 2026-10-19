@@ -19,10 +19,10 @@ export function projectStarterToolkit(ledger,profileId){
 export function requiredStarterTool(action){
  const type=action?.type;
  if(type==='STENCIL_PAINT')return 'stencil';
- if(['LOAD_BUCKET','POUR','RETURN_BUCKET','FREE_BUCKET_LOAD','FREE_BUCKET_RETURN'].includes(type)||type==='FREE_POUR'&&action.source==='bucket')return 'bucket';
- if(['FINISH_SURFACE','FREE_FINISH'].includes(type))return 'trowel';
+ if(['LOAD_BUCKET','POUR','RETURN_BUCKET','FREE_BUCKET_LOAD','FREE_BUCKET_RETURN','FREE_HIGH_RECOVER'].includes(type)||type==='FREE_POUR'&&action.source==='bucket')return 'bucket';
+ if(['FINISH_SURFACE','FREE_FINISH','FREE_HIGH_FINISH'].includes(type))return 'trowel';
  if(type==='PAINT_FLOOR_PANELS')return 'roller';
- if(type==='FREE_PAINT'&&['brush','roller'].includes(action.tool))return action.tool;
+ if(['FREE_PAINT','FREE_HIGH_PAINT','FREE_BUILDING_PAINT','FREE_DECOR_PAINT'].includes(type)&&['brush','roller'].includes(action.tool))return action.tool;
  return null;
 }
 export function assertStarterTool(toolkit,action){
@@ -31,4 +31,4 @@ export function assertStarterTool(toolkit,action){
  if(!tool?.owned||tool.count!==1)throw Error(`${STARTER_TOOLS.find(t=>t.id===id).name}を持っていません。ホームで建築セットを開封し、建材受取所で受け取ってください。`);
 }
 export function toolkitSummary(toolkit){return toolkit?.received?'基本道具一式：所持。何度使っても減りません。':'基本道具一式：未受取。最初の建築セットを受け取ると使えます。';}
-export function toolkitDetails(toolkit){return (toolkit?.tools??STARTER_TOOLS).map(t=>`${t.name} ${t.owned?'×1':'未受取'} — ${t.use}${t.usable?'':'（この作業は準備中）'}`).join('\n');}
+export function toolkitDetails(toolkit){return (toolkit?.tools??STARTER_TOOLS).map(t=>`${t.name} ${t.owned?'×1':'未受取'} — ${t.use}${t.usable?'':t.id==='shovel'?'（土あそびの現場で使う）':'（ここでは使いません）'}`).join('\n');}

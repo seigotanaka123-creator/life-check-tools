@@ -195,7 +195,7 @@ body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere 
 .touch-pad::before { inset: 13px 50%; width: 1px; background: linear-gradient(transparent, rgba(181,239,255,.72) 18%, transparent 41% 59%, rgba(181,239,255,.72) 82%, transparent); }
 .touch-pad::after { inset: 50% 13px; height: 1px; background: linear-gradient(90deg, transparent, rgba(181,239,255,.72) 18%, transparent 41% 59%, rgba(181,239,255,.72) 82%, transparent); }
 .touch-stick { position: absolute; z-index: 1; left: 50%; top: 50%; width: 48px; height: 48px; transform: translate(-50%, -50%); border: 1px solid rgba(225,251,255,.68); border-radius: 50%; background: radial-gradient(circle at 36% 30%, rgba(238,253,255,.9), rgba(126,228,255,.74) 38%, rgba(55,169,223,.78)); box-shadow: 0 3px 10px rgba(1,14,33,.38), 0 0 24px rgba(71,215,255,.5), inset 0 0 10px rgba(255,255,255,.28); }
-.touch-hint { position: absolute; right: 14px; bottom: 12px; max-width: 70%; color: rgba(255,255,255,.64); font-size: 11px; line-height: 1.4; text-align: right; pointer-events: none; }
+.touch-hint { display: none !important; }
 .viewport-footer { color: var(--muted); font-size: 12px; }
 .physics-badge { color: var(--good); font-size: 11px; padding: 5px 9px; }
 
@@ -330,3 +330,15 @@ code { color: #8edfff; }
 #viewport.is-looking #worldCanvas { cursor: grabbing; }
 
 @media(pointer:coarse){#viewport:has(>.hold-dash-button:not([hidden]))>.touch-hint{bottom:116px;right:14px;max-width:calc(100% - 175px);font-size:10px}}
+
+/* Separate jump and dash targets for three-finger play. */
+.construction-jump-button{position:absolute;right:max(108px,calc(env(safe-area-inset-right) + 88px));bottom:max(28px,env(safe-area-inset-bottom));width:76px;height:76px;min-height:64px;border:2px solid #acd5ef;border-radius:50%;background:#d9f0ff;color:#27546d;padding:6px;z-index:5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;pointer-events:auto}.construction-jump-button span,.construction-jump-button b{display:block;pointer-events:none}.construction-jump-button span{font-size:25px;line-height:25px}.construction-jump-button b{font-size:12px}.construction-jump-button:disabled{opacity:.45}.construction-jump-button[hidden]{display:none!important}.free-concrete>.construction-jump-button{bottom:max(12px,env(safe-area-inset-bottom));right:max(108px,calc(env(safe-area-inset-right) + 88px))}@media(max-height:500px){.construction-jump-button{width:64px;height:64px;right:max(96px,calc(env(safe-area-inset-right) + 76px))}}
+
+.free-concrete[data-watching=true]>.construction-jump-button{display:none!important}
+
+.ww-water-shape{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}.ww-water-shape small{display:block;font-size:11px;font-weight:500}.ww-water-shape button[aria-pressed="true"]{background:#d8f3ff!important;border:2px solid #1789aa!important;color:#20425a!important}.ww-water-plan,.ww-water-progress{grid-column:1/-1;width:100%;font-size:12px}.ww-water-progress{height:12px;accent-color:#21afd1}
+.world-vehicle-controls .gv-page>.ww-water-shape{grid-template-columns:repeat(2,minmax(0,1fr))}
+.world-vehicle-playing .world-water-controls>header{grid-template-columns:minmax(0,1fr) auto}
+.world-vehicle-playing .world-water-controls>header .gv-load{grid-column:1;grid-row:2;font-size:11px;white-space:normal}
+.world-vehicle-playing .world-water-controls>header .ww-mode{display:none}
+.world-vehicle-playing .world-water-controls>header .gv-menu-button{grid-column:2;grid-row:1/3}

@@ -1,4 +1,4 @@
-import {actExcavatorBuild} from './imasora-construction-excavator-build.js';
+import {actExcavatorBuild} from './imasora-construction-excavator-build.js?v=120fc';
 // The worker receives a disposable snapshot, never the world save or inventory.
 self.onmessage=({data:{state,action}})=>{
   try{const result=actExcavatorBuild(state,action);self.postMessage({guide:result.guide,message:result.message});}

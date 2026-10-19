@@ -121,15 +121,10 @@
 
   window.ImasoraLandMap = { mount, unmount, open, setScene };
 
+  // Build the destination on entry, without loading its image on the home screen.
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      bind();
-      ensureWorld();
-      updateScene();
-    }, { once: true });
+    document.addEventListener("DOMContentLoaded", bind, { once: true });
   } else {
     bind();
-    ensureWorld();
-    updateScene();
   }
 })();

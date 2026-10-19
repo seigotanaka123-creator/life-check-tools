@@ -1,12 +1,12 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
-import {hook,placement,pickOption,craneBoardOption,craneExitOption} from './assets/imasora-construction-crane.js';
-import {initialTimber as initialCrane,actTimber as actCrane,stepTimber as stepCrane,packTimber as packCrane,TIMBER_PARTS,TIMBER_MATERIALS,RETURN_PAD,returnOption,issueOption} from './assets/imasora-construction-timber.js?v=446';
-import {createCrane,updateCraneModel} from './assets/imasora-construction-crane-model.js';
-import {createTimberPart as createPart} from './assets/imasora-construction-timber-model.js?v=446';
-import {TimberSession as CraneSession} from './assets/imasora-construction-timber-storage.js?v=446';
+import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {hook,placement,pickOption,craneBoardOption,craneExitOption} from './assets/imasora-construction-crane.js?v=120fp';
+import {initialTimber as initialCrane,actTimber as actCrane,stepTimber as stepCrane,packTimber as packCrane,TIMBER_PARTS,TIMBER_MATERIALS,RETURN_PAD,returnOption,issueOption} from './assets/imasora-construction-timber.js?v=120fp';
+import {createCrane,updateCraneModel} from './assets/imasora-construction-crane-model.js?v=120fp';
+import {createTimberPart as createPart} from './assets/imasora-construction-timber-model.js?v=120fp';
+import {TimberSession as CraneSession} from './assets/imasora-construction-timber-storage.js?v=120fp';
 import {createCraneFloor} from './assets/imasora-construction-crane-floor.js?v=435';
 import {craneWorkInput,cranePlacementReadout} from './assets/imasora-construction-crane-controls.js?v=437';
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname),testMode=new URLSearchParams(location.search).get('timberTest')==='1';

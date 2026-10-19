@@ -1,8 +1,8 @@
 import {freePlacedFill} from './free-work-parts.mjs';
-import {canonicalFreeAction,freeCell,freeVehicleProblem} from './free-build-state.mjs';
-import {FRAME_RACK} from './free-frames.mjs';
-import {VEHICLE_WHEELS,VEHICLE_GROUND,vehicleGroundPose,vehicleLevelWorkProblem} from './free-vehicle-ground.mjs';
-export {VEHICLE_WHEELS} from './free-vehicle-ground.mjs';
+import {canonicalFreeAction,freeCell,freeVehicleProblem} from './free-build-state.mjs?v=120fw';
+import {FRAME_RACK} from './free-frames.mjs?v=120fw';
+import {VEHICLE_WHEELS,VEHICLE_GROUND,vehicleGroundPose,vehicleLevelWorkProblem} from './free-vehicle-ground.mjs?v=120ek';
+export {VEHICLE_WHEELS} from './free-vehicle-ground.mjs?v=120ek';
 
 export const FREE_VEHICLE_ACTIONS=new Set(['FREE_MOVE','FREE_LEGS']);
 import {VEHICLE_CONTACT,VEHICLE_PADS,headingDelta,vehicleTravelHeading,vehicleContactPoint,vehiclePoseAt,vehicleSweepSteps,vehicleFootprints,overlaps} from './free-vehicle-shape.mjs';

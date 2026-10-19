@@ -1,10 +1,16 @@
 import {sameConstructionRecordValue as same} from './imasora-construction-record-equality.mjs';
-import {transportSiteGate,transportWorldPose} from './imasora-construction-transport-site.mjs';
-import {excavationEntry} from './imasora-construction-world-excavation.js';
-import {worldTransportSoil} from './imasora-construction-transport-authority.mjs';
+import {transportSiteGate,transportWorldPose,transportSiteOrigin} from './imasora-construction-transport-site.mjs?v=120fw';
+import {transportDoorApproach} from './imasora-construction-transport-door.mjs?v=120fw';
+import {shovelStanding} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {excavationEntry} from './imasora-construction-world-excavation.js?v=120fc';
+import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
 const require=(ok,text)=>{if(!ok)throw Error(text);};
 export const transportWorkMoving=w=>!!(w?.scoop||w?.link||w?.unload||w?.frame.job);
-export function transportWorkCanExit(record){const w=record.work,p=w.frame.player;return w.mode==='foot'&&!transportWorkMoving(w)&&!w.frame.soil.pending&&Math.abs(p.y)<.05&&Math.abs(p.x+230)<32&&p.z<-210;}
+// A short scoop has a durable reservation before it moves and a durable result
+// on completion. Avoid repeatedly stopping its animation for timer saves.
+// Pause/hide/manual-save still capture its exact current arm and progress.
+export const deferShortScoopAutosave=(work,{paused=false,hidden=false}={})=>!paused&&!hidden&&!!work?.scoop&&Number.isFinite(work.scoop.plan?.duration)&&work.scoop.plan.duration<=10;
+export function transportWorkCanExit(record){const w=record.work;return w.mode==='foot'&&!transportWorkMoving(w)&&!w.frame.soil.pending&&shovelStanding(w.frame,w.frame.player);}
 // Scene ownership is transient; physical work is saved only by the existing
 // normal-world session. Opening a menu or completing a retry never resumes it.
 export class TransportPlaySession{
@@ -23,12 +29,24 @@ export class TransportPlaySession{
   return excavationEntry(site,p);
  }
  begin(p){require(this.canBegin(p),'入口へ戻ってから、保存した現場を再開してください。');this.clearInput();this.#active=true;this.#paused=true;this.#entered=true;return this.session.state;}
+ doorTarget(id){
+  if(this.#active||this.busy||this.session.blocked||this.session.intent)return null;
+  const p=transportDoorApproach(this.session.state,id);if(!p)return null;
+  const o=transportSiteOrigin(this.record);return{...p,x:p.x+o[0],z:p.z+o[2]};
+ }
+ beginAtDoor(id,p){
+  const goal=this.doorTarget(id);
+  require(goal&&p&&['x','y','z'].every(k=>Number.isFinite(p[k]))&&Math.hypot(p.x-goal.x,p.z-goal.z)<=.6&&Math.abs(p.y-goal.y)<=.05,'運転席のドアへ歩いてから乗ろう。');
+  const o=transportSiteOrigin(this.record);
+  this.session.move('arriveTransportDoor',id,{x:p.x-o[0],y:p.y,z:p.z-o[2]});
+  this.clearInput();this.#active=true;this.#paused=true;this.#entered=true;return this.session.state;
+ }
  pause(){this.clearInput();this.#paused=true;}
  resume(){require(this.#active&&!this.busy&&!this.session.blocked&&!this.session.intent,'保存を確認してから再開してください。');this.clearInput();this.#paused=false;}
  move(name,...args){require(this.canAdvance,'メニューを閉じ、保存を確認してから操作してください。');return this.session.move(name,...args);}
- async save(){require(this.#active&&!this.busy&&!this.session.blocked&&!this.session.intent,'保存中、または保存の確認が必要です。');this.pause();this.#saving=true;try{return await this.session.save();}finally{this.#saving=false;}}
+ async save({automatic=false}={}){require(this.#active&&!this.busy&&!this.session.blocked&&!this.session.intent,'保存中、または保存の確認が必要です。');if(!automatic)this.pause();this.#saving=true;try{return await this.session.save();}finally{this.#saving=false;}}
  async retry(){require(this.#active&&!this.busy,'保存中は再保存できません。');this.pause();this.#saving=true;try{return await this.session.retry();}finally{this.#saving=false;}}
- async exit({force=false}={}){require(this.#active&&!this.busy&&!this.session.blocked&&!this.session.intent,'保存を確認してから退出してください。');require(force||transportWorkCanExit(this.record),'車を降り、土を放す動作を終えて入口まで歩いて戻ってください。');
+ async exit({force=false}={}){require(this.#active&&!this.busy&&!this.session.blocked&&!this.session.intent,'保存を確認してから退出してください。');require(force||transportWorkCanExit(this.record),'車を降り、土を動かす作業を終えてから戻ろう。');
   await this.save();const pose=force?{...transportSiteGate(this.record),z:transportSiteGate(this.record).z-12,heading:Math.PI}:transportWorldPose(this.record);
   this.#active=false;this.#paused=true;this.clearInput();return pose;
  }

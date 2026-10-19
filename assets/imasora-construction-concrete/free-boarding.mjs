@@ -1,8 +1,8 @@
 import {atDriverDoor} from '../imasora-construction-boarding.js';
-import {vehiclePoint,walkingBlocked} from './free-contact.mjs';
+import {vehiclePoint,walkingBlocked} from './free-contact.mjs?v=120fw';
 import * as T from '../three.module.min.js';
-import {vehicleGroundPose} from './free-vehicle-ground.mjs';
-import {walkingGroundAt,walkingGroundSegment,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs';
+import {vehicleGroundPose} from './free-vehicle-ground.mjs?v=120ek';
+import {walkingGroundAt,walkingGroundSegment,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120fw';
 export const concreteDoor=(v,f=null,heightAt=()=>0)=>f?boardingAccess(f,v,heightAt).door:vehiclePoint(v,{x:v.legs?-56:-50,y:0,z:21});
 export function boardingAccess(f,v,heightAt=()=>0){
  const ground=vehicleGroundPose(f,v,heightAt),point=p=>{if(ground.slope<1e-12){const q=vehiclePoint(v,p);return{...q,y:(p.y??0)+ground.position.y};}const q=new T.Vector3(p.x,p.y??0,p.z).applyQuaternion(ground.rotation).add(ground.position);return{x:q.x,y:q.y,z:q.z};};

@@ -1,7 +1,7 @@
-import {constructionBase} from './free-supported-build.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
 import {freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
-import {freeWorkPartsProblem} from './free-work-placement.mjs';
-import {vehicleFootprints,overlaps} from './free-vehicle-contact.mjs';
+import {freeWorkPartsProblem} from './free-work-placement.mjs?v=120fw';
+import {vehicleFootprints,overlaps} from './free-vehicle-contact.mjs?v=120fw';
 export function freeWorkEnvironmentProblem(p,index,mask,{foot,blockedAt=()=>false,supportHeightAt=()=>0}={}){
  const problem=freeWorkPartsProblem(p,index,mask);if(problem)return problem;
  const f=p.freeBuild,w=f.completed[index],changed=freeWorkMask(w)^mask;

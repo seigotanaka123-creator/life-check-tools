@@ -250,6 +250,112 @@
   color: #34270a;
 }
 
+.pco-opening-live-visual {
+  position: relative;
+  isolation: isolate;
+  width: min(92vw, 370px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid rgba(255, 226, 105, .9);
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 42%, #254f66, #09141e 78%);
+  box-shadow:
+    0 0 0 4px rgba(13, 34, 49, .94),
+    0 20px 34px rgba(0, 0, 0, .44),
+    0 0 30px rgba(70, 222, 231, .2),
+    inset 0 0 0 1px rgba(255, 255, 255, .12);
+}
+
+.pco-opening-live-visual::before {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 42px rgba(0,0,0,.29), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.pco-opening-live-visual::after {
+  content: "";
+  position: absolute;
+  z-index: 9;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #61e7ec 24%, #ffe36e 54%, #ff709d 82%, transparent);
+  box-shadow: 0 0 13px #62e5e7;
+  pointer-events: none;
+}
+
+.pco-opening-live-mount {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.pco-opening-live-mount .icp-shell {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #101d28 !important;
+}
+
+.pco-opening-live-mount .icp-shell > :not(.icp-stage) {
+  display: none !important;
+}
+
+.pco-opening-live-mount .icp-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.pco-opening-live-mount .icp-stage > :not(.icp-canvas):not([data-icp-danger-room-overlay]) {
+  display: none !important;
+}
+
+.pco-opening-live-mount .icp-canvas {
+  cursor: default !important;
+  filter: saturate(1.08) contrast(1.04) brightness(1.04);
+}
+
+.pco-opening-live-visual .arcade-opening-live-loading {
+  color: #bffbff;
+}
+
+.pco-opening-live-visual .arcade-opening-live-loading i {
+  border-top-color: #63edf0;
+}
+
+.arcade-opening-live-badge.is-gold {
+  border-color: rgba(255, 225, 98, .72);
+  color: #fff6c1;
+  background: rgba(5, 22, 32, .8);
+  box-shadow: 0 0 18px rgba(69, 225, 231, .2), inset 0 0 11px rgba(255, 227, 105, .08);
+}
+
+.arcade-opening-live-badge.is-gold i {
+  background: #65eff0;
+  box-shadow: 0 0 10px #65eff0;
+}
+
 .pco-cabinet {
   position: relative;
   width: min(92vw, 354px);

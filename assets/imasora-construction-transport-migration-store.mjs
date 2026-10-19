@@ -1,5 +1,5 @@
 import {CONSTRUCTION_STORE} from './imasora-construction-storage.js';
-import {validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs';
+import {validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs?v=120fw';
 export const TRANSPORT_MIGRATION_KEY='construction-transport-migration';
 const check=(v,t)=>{if(!v)throw Error('現場の引継ぎ：'+t);};
 function native(store){check(store?.name==='imasora-world-authority-v1','通常保存で操作してください。');}

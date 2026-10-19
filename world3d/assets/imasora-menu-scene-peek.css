@@ -1,0 +1,16 @@
+/* Work controls disappear without being folded, rebuilt or losing scroll. */
+[data-menu-scene-peek="true"]{opacity:0!important;transition:none!important}
+dialog[data-menu-scene-peek="true"]::backdrop{background:transparent!important;opacity:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:none!important}
+.menu-scene-peeking .free-concrete::before{opacity:0!important;transition:none!important}
+.free-concrete[data-work-peek="true"] .free-sheet-overlay{touch-action:none!important}
+.free-concrete[data-work-peek="true"] .free-sheet{touch-action:pan-y}
+.free-concrete[data-work-peek="true"] .pop-subpage::backdrop{touch-action:none}
+.free-concrete[data-work-peek="true"] .free-sheet-overlay::after{content:'現場を押している間、道具がかくれるよ';position:absolute;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:calc(100% - 20px);padding:6px 12px;border-radius:18px;background:#fff9e9;color:#486478;font:700 11px/1.4 system-ui;white-space:nowrap;pointer-events:none}
+.free-concrete[data-work-peek="true"] .pop-subpage[open]::after{content:'現場を押している間、道具がかくれるよ';display:block;flex-shrink:0;text-align:center;padding:8px 12px;background:#fff9e9;color:#486478;font:700 11px/1.4 system-ui;pointer-events:none}
+/* These limits apply to toolboxes, never to the actual game menu. */
+.free-concrete[data-work-peek="true"] .pop-subpage{max-height:calc(100dvh - 104px)!important}
+@media(max-width:700px){
+ .world-free-playing .free-concrete[data-work-peek="true"] .free-sheet{max-height:66dvh!important}
+ body.world-player-game.imasora-pop-menus .free-concrete[data-work-peek="true"] .pop-subpage{inset:auto 12px max(8px,env(safe-area-inset-bottom))!important;margin:0 auto!important;max-height:66dvh!important}
+}
+@media(max-height:340px){.free-concrete[data-work-peek="true"] .pop-subpage{max-height:calc(100dvh - 80px)!important}}

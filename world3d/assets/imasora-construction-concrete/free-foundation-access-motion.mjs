@@ -1,12 +1,12 @@
 import * as T from '../three.module.min.js';
-import {planFoundationAccess,foundationWalkHeight} from './free-foundation-access.mjs';
-import {assertFoundationSupport,foundationSurfaceAt} from './free-supported-build.mjs';
-import {walkPath,walkingBlocked} from './free-contact.mjs';
-import {newFootingReceipt} from './free-footing.mjs';
-import {createFootingGuard} from './free-footing-motion.mjs';
-import {newScaffoldReceipt} from './free-frame-scaffold.mjs';
-import {paintScaffoldSteps} from './free-paint-access.mjs';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs';
+import {planFoundationAccess,foundationWalkHeight} from './free-foundation-access.mjs?v=120fw';
+import {assertFoundationSupport,foundationSurfaceAt} from './free-supported-build.mjs?v=120fw';
+import {walkPath,walkingBlocked} from './free-contact.mjs?v=120fw';
+import {newFootingReceipt} from './free-footing.mjs?v=120fw';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
+import {newScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
+import {paintScaffoldSteps} from './free-paint-access.mjs?v=120fw';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
 const vec=p=>new T.Vector3(p.x,p.y,p.z),distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 export function createFoundationAccessMotion({up,p,prior,root,actor,feet,heightAt,external,box,mats,target=null}){
  const f=p.freeBuild,from={x:actor.position.x,y:actor.position.y,z:actor.position.z};

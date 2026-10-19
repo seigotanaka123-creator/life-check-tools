@@ -1,5 +1,5 @@
 // Excavator-only access. The wheel loader keeps its original low floor/path.
-import {LOADER,WALKER,localToWorld,worldToLocal,routeClear,samplePath} from './imasora-construction-loader-physics.js';
+import {LOADER,WALKER,localToWorld,worldToLocal,routeClear,samplePath} from './imasora-construction-loader-physics.js?v=120ey';
 import {atDriverDoor} from './imasora-construction-boarding.js';
 export const EX_ACCESS=Object.freeze({version:2,lift:9,floor:LOADER.floor+9,trackTop:16.6,trackWidth:10.5,trackLength:76.4});
 export function trackBlocksPerson(p,vehicle){
@@ -21,7 +21,7 @@ export function excavatorAccessPath(vehicle,slew,side,boarding=true){
   return boarding?points:points.reverse();
 }
 export function excavatorAccessClear(path,vehicle,obstacles){
-  if(!routeClear(path,obstacles))return false;
+  if(!routeClear(path,obstacles,vehicle))return false;
   for(let i=1;i<path.length;i++){
     const a=path[i-1],b=path[i],count=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z)/.3));
     for(let j=0;j<=count;j++){const t=j/count;if(trackBlocksPerson({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t},vehicle))return false;}

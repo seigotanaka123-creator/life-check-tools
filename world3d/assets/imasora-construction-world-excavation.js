@@ -1,9 +1,9 @@
 // v471: opt-in, memory-only connection to the actual construction scene.
 // No importing practice saves or granting soil to an inventory.
-import {initialExcavatorBuild,stepExcavatorBuild,actExcavatorBuild} from './imasora-construction-excavator-build.js?v=520';
-import {digPersonBlocked,digPlayer} from './imasora-construction-excavator-walk.js?v=520';
-import {SITE} from './imasora-construction-loader-physics.js';
-import {PLOT,excavatorActorPose} from './imasora-construction-excavator.js?v=520';
+import {initialExcavatorBuild,stepExcavatorBuild,actExcavatorBuild} from './imasora-construction-excavator-build.js?v=120fc';
+import {digPersonBlocked,digPlayer} from './imasora-construction-excavator-walk.js?v=120fc';
+import {SITE} from './imasora-construction-loader-physics.js?v=120ey';
+import {PLOT,excavatorActorPose} from './imasora-construction-excavator.js?v=120fc';
 import {BACKHOE_BUCKET,CONTACT_DIG} from './imasora-construction-excavator-bucket.js';
 import {hasValidWorldFootprint} from './imasora-construction-world-yard-reservation.js?v=514';
 export const EXCAVATION_YARDS=Object.freeze([[0,1180],[0,-1180],[2100,0],[-2100,0]].map(Object.freeze));

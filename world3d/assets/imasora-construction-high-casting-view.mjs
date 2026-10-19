@@ -1,0 +1,38 @@
+import * as T from './three.module.min.js';
+import {createUpperPaintView} from './imasora-construction-high-paint-view.mjs?v=120fn';
+import {highProjects,highWorldPoint} from './imasora-construction-high-world.mjs?v=120fw';
+import {upperRigPath,upperFeedPath,upperRigBrackets,upperCastingLocal} from './imasora-construction-high-casting.mjs?v=120fw';
+import {highCastings,HIGH_CAST_MS} from './imasora-construction-concrete/high-casting-state.mjs?v=120ft';
+import {upperShapeTiles,upperShapeBoundary,upperCastingHeight,upperCastingCapacity,upperPourTile} from './imasora-construction-concrete/high-casting-shape.mjs?v=120fl';
+export function createUpperCastingView(parent){
+ const root=new T.Group();root.name='upper-concrete-pipe-and-forms';parent.add(root);
+ const paint=createUpperPaintView(root);
+ const box=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(1,1,1,10),mats={pipe:new T.MeshStandardMaterial({color:'#4d6473'}),wood:new T.MeshStandardMaterial({color:'#dba15d'}),concrete:new T.MeshStandardMaterial({color:'#bbc9cb',roughness:.55}),metal:new T.MeshStandardMaterial({color:'#a8c2ce'}),flow:new T.MeshBasicMaterial({color:'#ffcd55'}),target:new T.MeshBasicMaterial({color:'#ffc942',transparent:true,opacity:.32,depthWrite:false})};
+ let key='',entries=[],flowPath=[],lineBatches=new Map(),instances=[],previewKey='';const outline=new T.EdgesGeometry(box),outlineMat=new T.LineBasicMaterial({color:'#b57519'});const previewMat=new T.MeshBasicMaterial({color:'#ffc942',transparent:true,opacity:.42,depthWrite:false});const preview=new T.Group();preview.name='upper-casting-shape-preview';root.add(preview);
+ function cube(p,size,mat,turn=0){const m=new T.Mesh(box,mat);m.position.set(p.x,p.y,p.z);m.scale.set(...size);m.rotation.y=turn;root.add(m);return m;}
+ function line(a,b,r,mat){const d=new T.Vector3(b.x-a.x,b.y-a.y,b.z-a.z),m=new T.Object3D();m.position.set((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);m.scale.set(r,d.length(),r);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());m.updateMatrix();if(!lineBatches.has(mat))lineBatches.set(mat,[]);lineBatches.get(mat).push(m.matrix.clone());}
+ const stream=new T.Mesh(cylinder,mats.concrete),pulse=new T.Mesh(cylinder,mats.flow),bucket=new T.Group(),cup=new T.Mesh(new T.CylinderGeometry(3.5,3,6,12,1,true),new T.MeshStandardMaterial({color:'#e9bd58',side:T.DoubleSide})),liquid=new T.Mesh(new T.CylinderGeometry(3.1,2.8,1,12),mats.concrete);bucket.add(cup,liquid);bucket.visible=false;parent.add(bucket);root.add(stream,pulse);stream.visible=pulse.visible=false;
+ function sync(world,heightAt=()=>0,inspection=null){
+  const visible=c=>!inspection||c.anchor.buildingId!==inspection.buildingId||c.anchor.floor<=inspection.floor;paint.sync(highCastings(world.constructionProfileProject?.freeBuild).filter(visible));
+  const f=world.constructionProfileProject?.freeBuild,list=highCastings(f).filter(visible),next=JSON.stringify([inspection,list.map(c=>[c.id,c.anchor,c.shape,c.fill,c.stage,c.stored]),f?.highPipe,f?.location,f?.pump]);if(key===next)return;key=next;
+  for(const m of instances)m.dispose();instances=[];lineBatches=new Map();root.clear();root.add(stream,pulse,preview,paint.root);entries=[];flowPath=[];stream.visible=pulse.visible=false;
+  for(const c of list)if(!c.stored){const a=c.anchor,record=highProjects(world.constructionHighBuild).find(p=>p.id===a.buildingId)?.record;if(!record)continue;const local=upperCastingLocal(world.constructionHighBuild,a),point=(x,y,z)=>highWorldPoint(record.site,{x:local.x+x,y:a.floor*40+y,z:local.z+z}),angle=a.turn*Math.PI/2;
+   if(c.stage!=='complete'){
+    if(c.shape)for(const wall of upperShapeBoundary(c.shape))cube(point(wall.x,4.1,wall.z),[wall.w,8.2,wall.d],mats.wood,angle);else for(const [x,z,w,d]of [[0,-8.2,16.8,.4],[0,8.2,16.8,.4],[-8.2,0,.4,16],[8.2,0,.4,16]])cube(point(x,1.1,z),[w,2.2,d],mats.wood,angle);
+    const route=upperRigPath(world.constructionHighBuild,a,c);for(let i=1;i<route.length;i++)line(route[i-1],route[i],1.1,mats.pipe);
+    // Pipe clamps attach to the existing stair tower post, rather than a floating mast.
+    for(const b of upperRigBrackets(world.constructionHighBuild,a))line(b.a,b.b,b.radius,mats.metal);
+    for(const tile of upperShapeTiles(c.shape))cube(point(tile.x,.045,tile.z),[tile.w,.06,tile.d],mats.target,angle);
+   }
+   const slabs=upperShapeTiles(c.shape).map(tile=>{const slab=cube(point(tile.x,.01,tile.z),[tile.w,.02,tile.d],mats.concrete,angle);slab.visible=c.fill>0;return{slab,tile};});entries.push({id:c.id,slabs,point});
+  }
+  if(f?.highPipe){const c=list.find(c=>c.id===f.highPipe.castingId);try{flowPath=upperFeedPath(world.constructionHighBuild,f,c,heightAt);for(let i=1;i<4;i++)line(flowPath[i-1],flowPath[i],1.1,mats.pipe);}catch{flowPath=[];}}
+  for(const [material,matrices] of lineBatches){const mesh=new T.InstancedMesh(cylinder,material,matrices.length);matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));root.add(mesh);instances.push(mesh);}
+ }
+ function tick(f,elapsed=null){stream.visible=pulse.visible=false;for(const e of entries){const c=highCastings(f).find(c=>c.id===e.id);if(!c)continue;const progress=c.pending?Math.min(1,(elapsed??c.pending.elapsedMs)/HIGH_CAST_MS):0,amount=c.fill+(c.pending?Math.max(0,(progress-.55)/.45):0),h=Math.max(.02,amount*upperCastingHeight(c)/upperCastingCapacity(c));for(const {slab,tile}of e.slabs){slab.visible=amount>0;slab.scale.y=h;const p=e.point(tile.x,h/2+.015,tile.z);slab.position.set(p.x,p.y,p.z);}
+   if(c.pending){if(flowPath.length){const lengths=flowPath.slice(1).map((p,i)=>Math.hypot(p.x-flowPath[i].x,p.y-flowPath[i].y,p.z-flowPath[i].z)),total=lengths.reduce((a,b)=>a+b,0);let d=total*Math.min(1,progress/.7);for(let i=0;i<lengths.length;i++){if(d>lengths[i]){d-=lengths[i];continue;}const a=flowPath[i],b=flowPath[i+1],v=new T.Vector3(b.x-a.x,b.y-a.y,b.z-a.z).normalize();pulse.position.set(a.x+v.x*d,a.y+v.y*d,a.z+v.z*d);pulse.scale.set(1.2,Math.min(6,lengths[i]),1.2);pulse.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v);pulse.visible=true;break;}}
+    if(progress>.55){const tile=upperPourTile(c),a=e.point(tile.x,upperCastingHeight(c)+3,tile.z),b=e.point(tile.x,h,tile.z);stream.position.set(a.x,(a.y+b.y)/2,a.z);stream.scale.set(.8,a.y-b.y,.8);stream.visible=true;}
+   }
+  }}
+ return{root,paint,sync,tick,preview(collection,anchor,shape,valid=true){const next=JSON.stringify([anchor,shape,valid]);if(next===previewKey)return;previewKey=next;preview.clear();previewMat.color.set(valid?0xffc942:0xe95f68);if(!anchor)return;const r=highProjects(collection).find(p=>p.id===anchor.buildingId)?.record;if(!r)return;const local=upperCastingLocal(collection,anchor);for(const tile of upperShapeTiles(shape)){const p=highWorldPoint(r.site,{x:local.x+tile.x,y:anchor.floor*40+.1,z:local.z+tile.z}),m=new T.Mesh(box,previewMat);m.position.set(p.x,p.y,p.z);m.scale.set(tile.w-.15,.12,tile.d-.15);m.rotation.y=anchor.turn*Math.PI/2;preview.add(m);const edge=new T.LineSegments(outline,outlineMat);edge.position.copy(m.position);edge.scale.copy(m.scale);edge.rotation.copy(m.rotation);preview.add(edge);}},carry(character,amount){bucket.visible=root.visible&&amount>0;if(!bucket.visible)return;character.updateMatrixWorld(true);const hand=character.userData.hands?.[0]?.getWorldPosition(new T.Vector3());if(!hand){bucket.visible=false;return;}bucket.position.copy(hand).y-=4;const h=amount*1.2;liquid.scale.y=h;liquid.position.y=-2.5+h/2;},dispose(){paint.dispose();for(const m of instances)m.dispose();root.removeFromParent();bucket.removeFromParent();cup.geometry.dispose();cup.material.dispose();liquid.geometry.dispose();outline.dispose();outlineMat.dispose();previewMat.dispose();box.dispose();cylinder.dispose();Object.values(mats).forEach(m=>m.dispose());}};
+}

@@ -2,8 +2,8 @@ import {walkFactor} from './imasora-construction-travel-input.mjs';
 import {DUMP_SOIL,soilSize,soilSnap,soilOnGrid,soilLevel} from './imasora-construction-dump-soil.js?v=526';
 const G=DUMP_SOIL.grain;
 // Stage 9-2a: finite practice soil. No normal-game inventory or storage access.
-import {initialLoaderState,stepVehicle,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE,WALKER,approach} from './imasora-construction-loader-physics.js';
-import {soilPlan,tailgateBlocker,targetBlocker,flightBlocker,insideSite,startGrain,cellKey} from './imasora-construction-dump-placement.js?v=526';
+import {initialLoaderState,stepVehicle,stepLoader,actLoader,actorPose,boardOption,exitOption,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE,WALKER,approach} from './imasora-construction-loader-physics.js?v=120ey';
+import {soilPlan,tailgateBlocker,targetBlocker,flightBlocker,insideSite,startGrain,cellKey} from './imasora-construction-dump-placement.js?v=120ey';
 export const DUMP=Object.freeze({capacity:48,total:48,seatShift:26,bedMax:Math.PI/3,bedRate:.55,spreadAngle:Math.PI/5,spreadSpeed:8,grain:G});
 export const LOAD_BAY=Object.freeze({x:0,z:-110,width:100,depth:106});
 export const DUMP_WALLS=Object.freeze([{id:'積込所の壁',x:108,z:-110,width:12,depth:110,height:28},{id:'積込用の土置場',x:70,z:-110,width:34,depth:56,height:20},{id:'資材ブロック',x:-135,z:60,width:60,depth:65,height:32}]);

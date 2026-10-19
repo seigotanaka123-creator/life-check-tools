@@ -1,9 +1,12 @@
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump} from './imasora-construction-locomotion.mjs?v=120eg';
+import {LEGACY_WORK_AREA,workArea,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs';
 // Stage 3-1: flat-ground, kinematic vehicle/boarding prototype. No game-save access.
 import {atDriverDoor} from './imasora-construction-boarding.js';
 export const LOADER = Object.freeze({width:60,length:86,floor:9.12,seatZ:-8,seatX:-14,wheelbase:49,wheelRadius:8.9,maxSpeed:100,reverseSpeed:48,acceleration:65,coast:35,brake:190,steering:.47});
-export const WALKER = Object.freeze({radius:15.6,height:26.6,speed:48});
-export const SITE = Object.freeze({minX:-320,maxX:320,minZ:-250,maxZ:250});
+export const loaderCab=v=>v?.waterTruck?{floor:20,seatZ:20,seatX:-14}:LOADER;
+export const WALKER = Object.freeze({radius:15.6,height:26.6,speed:SKY_WALK_SPEED});
+export const SITE = LEGACY_WORK_AREA;
 export const OBSTACLES = Object.freeze([
   {id:'横長のコンクリート壁',x:135,z:49,width:80,depth:18,height:20},
   {id:'積みブロック',x:-130,z:98,width:70,depth:54,height:25},
@@ -29,22 +32,22 @@ export function polygonsOverlap(a,b){
   }return true;
 }
 const rect=o=>polygon({...o,heading:Number.isFinite(o.angle)?o.angle:0},o.width,o.depth);
-const inside=poly=>poly.every(p=>p.x>=SITE.minX&&p.x<=SITE.maxX&&p.z>=SITE.minZ&&p.z<=SITE.maxZ);
+const inside=(poly,vehicle)=>poly.every(p=>inWorkArea(p,vehicle));
 export function vehicleBlocker(vehicle,obstacles=OBSTACLES){
   // Extra 4 units each side cover the steered tyre corners; bucket is inside length 86.
-  const p=polygon(vehicle,68,86);
-  if(!inside(p))return'外周の柵';
-  for(const o of [...obstacles,SAFE_ZONE])if(polygonsOverlap(p,rect(o)))return o.id;
+  const p=polygon(vehicle,68,vehicle.waterTruck?94:86);
+  if(!inside(p,vehicle))return'外周の柵';
+  for(const o of [...obstacles,...(vehicle.field?[]:[SAFE_ZONE])])if(polygonsOverlap(p,rect(o)))return o.id;
   return'';
 }
-function personClear(p,obstacles){const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);return inside(poly)&&!obstacles.some(o=>polygonsOverlap(poly,rect(o)));}
+function personClear(p,obstacles,vehicle){const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);return inside(poly,vehicle)&&!obstacles.some(o=>polygonsOverlap(poly,rect(o)));}
 export function walkingClear(p,vehicle,obstacles=OBSTACLES){
-  if(!personClear(p,obstacles))return false;
+  if(!personClear(p,obstacles,vehicle))return false;
   const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);
   // Use the same envelope when walking: parked tyres may still be steered.
-  if(polygonsOverlap(poly,polygon(vehicle,68,86)))return false;
+  if(polygonsOverlap(poly,polygon(vehicle,68,vehicle.waterTruck?94:86)))return false;
   // Parked boarding steps extend beyond the travel envelope, only beside the cab.
-  return ![-1,1].some(side=>polygonsOverlap(poly,polygon({...localToWorld(vehicle,side*35,-8),heading:vehicle.heading},10,28)));
+  return ![-1,1].some(side=>polygonsOverlap(poly,polygon({...localToWorld(vehicle,side*35,loaderCab(vehicle).seatZ),heading:vehicle.heading},10,28)));
 }
 export function initialLoaderState(){return{mode:'foot',vehicle:{x:0,z:-80,heading:0,speed:0,steering:0,wheelTravel:0},player:{x:-58,z:-88,y:0,heading:0},transition:null,hit:'',message:'車体左側の足元へ近づき、「運転席に乗る」を押してください。'};}
 export function stepVehicle(vehicle,input,dt,obstacles=OBSTACLES){
@@ -64,37 +67,39 @@ export function stepVehicle(vehicle,input,dt,obstacles=OBSTACLES){
   }
   v.heading=Math.atan2(Math.sin(v.heading),Math.cos(v.heading));return{vehicle:v,hit};
 }
-function boardingPath(side){
+function boardingPath(side,vehicle){
+  if(vehicle?.waterTruck){const x=side*58,z=20;return[{x,y:0,z},{x:side*55,y:5,z},{x:side*48,y:10,z},{x:side*41,y:15,z},{x:side*34,y:20,z},{x:side*27,y:20,z},{x:-14,y:20,z}];}
   const x=side*58,seat=LOADER.seatX;
   // Rise outside the sill, then cross the open doorway at floor height.
   // The short, visible step-up matches the three deployed 3-unit treads.
   return[{x,y:0,z:-8},{x:side*55,y:3,z:-8},{x:side*48,y:6,z:-8},{x:side*41,y:LOADER.floor,z:-8},{x:side*27,y:LOADER.floor,z:-8},{x:seat,y:LOADER.floor,z:-8}];
 }
-export function transitionPoints(vehicle,side,boarding=true){const p=boardingPath(side).map(v=>({...localToWorld(vehicle,v.x,v.z),y:v.y,heading:vehicle.heading}));return boarding?p:p.reverse();}
+export function transitionPoints(vehicle,side,boarding=true){const p=boardingPath(side,vehicle).map(v=>({...localToWorld(vehicle,v.x,v.z),y:v.y,heading:vehicle.heading}));return boarding?p:p.reverse();}
 export function samplePath(points,t){
   const lengths=points.slice(1).map((p,i)=>Math.hypot(p.x-points[i].x,p.y-points[i].y,p.z-points[i].z));
   let distance=lengths.reduce((a,b)=>a+b,0)*clamp(t,0,1);
   for(let i=0;i<lengths.length;i++){if(distance<=lengths[i]||i===lengths.length-1){const q=clamp(distance/(lengths[i]||1),0,1),a=points[i],b=points[i+1];return{x:a.x+(b.x-a.x)*q,y:a.y+(b.y-a.y)*q,z:a.z+(b.z-a.z)*q,heading:b.heading};}distance-=lengths[i];}
   return{...points.at(-1)};
 }
-export function routeClear(points,obstacles=OBSTACLES){
+export function routeClear(points,obstacles=OBSTACLES,vehicle=null){
   // Check the entire corridor, not merely the final dismount point.
   for(let i=0;i<points.length-1;i++){
     const a=points[i],b=points[i+1],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/.5));
-    for(let j=0;j<=n;j++)if(!personClear({x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n},obstacles))return false;
+    for(let j=0;j<=n;j++)if(!personClear({x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n},obstacles,vehicle))return false;
   }return true;
 }
 export function boardOption(state,obstacles=OBSTACLES){
+  if(Math.abs(state.player.y??0)>.05||Math.abs(state.player.vy??0)>.1)return null;
   if(state.mode!=='foot'||state.transition||Math.abs(state.vehicle.speed)>.8)return null;
   // Driver's left door only for boarding. Right door remains a safe exit alternative.
   const points=transitionPoints(state.vehicle,-1),start=points[0];
   if(!atDriverDoor(state.player,start,state.vehicle.heading))return null;
   const path=[{...state.player,heading:state.vehicle.heading},...points];
-  return routeClear(path,obstacles)?{side:-1,path}:null;
+  return routeClear(path,obstacles,state.vehicle)?{side:-1,path}:null;
 }
 export function exitOption(state,obstacles=OBSTACLES){
   if(state.mode!=='driving'||Math.abs(state.vehicle.speed)>.8)return null;
-  for(const side of[-1,1]){const path=transitionPoints(state.vehicle,side,false);if(routeClear(path,obstacles))return{side,path};}
+  for(const side of[-1,1]){const path=transitionPoints(state.vehicle,side,false);if(routeClear(path,obstacles,state.vehicle))return{side,path};}
   return null;
 }
 export function actLoader(state,action,obstacles=OBSTACLES){
@@ -105,7 +110,7 @@ export function actLoader(state,action,obstacles=OBSTACLES){
   return{...state,mode:boarding?'boarding':'exiting',vehicle:{...state.vehicle,speed:0},transition:{path:option.path,elapsed:0,duration:boarding?1.9:2.1,side:option.side},message:boarding?'ステップから運転席へ乗り込みます。':`${option.side<0?'左':'右'}の開いた経路から降ります。`};
 }
 export function actorPose(state){
-  if(state.mode==='driving')return{...localToWorld(state.vehicle,LOADER.seatX,LOADER.seatZ),y:LOADER.floor,heading:state.vehicle.heading};
+  if(state.mode==='driving')return{...localToWorld(state.vehicle,loaderCab(state.vehicle).seatX,loaderCab(state.vehicle).seatZ),y:loaderCab(state.vehicle).floor,heading:state.vehicle.heading};
   if(state.transition)return samplePath(state.transition.path,state.transition.elapsed/state.transition.duration);
   return state.player;
 }
@@ -114,7 +119,7 @@ export function stepLoader(state,input,dt,obstacles=OBSTACLES){
   const next={...state,hit:''};
   if(state.transition){
     next.transition={...state.transition,elapsed:Math.min(state.transition.duration,state.transition.elapsed+dt)};
-    if(!routeClear(next.transition.path,obstacles)){
+    if(!routeClear(next.transition.path,obstacles,state.vehicle)){
       next.mode=state.mode==='boarding'?'foot':'driving';next.transition=null;next.message='経路が塞がったため乗り降りを中止しました。';return next;
     }
     next.player=actorPose(next);
@@ -125,5 +130,8 @@ export function stepLoader(state,input,dt,obstacles=OBSTACLES){
   const p={...state.player},len=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/len*WALKER.speed*walkFactor(input)*dt,dz=(input.z||0)/len*WALKER.speed*walkFactor(input)*dt;
   const count=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.6));
   for(let i=0;i<count;i++){if(walkingClear({...p,x:p.x+dx/count},state.vehicle,obstacles))p.x+=dx/count;if(walkingClear({...p,z:p.z+dz/count},state.vehicle,obstacles))p.z+=dz/count;}
-  if(Math.hypot(dx,dz)>.0001)p.heading=Math.atan2(dx,dz);next.player=p;return next;
+  if(Math.hypot(dx,dz)>.0001)p.heading=Math.atan2(dx,dz);
+  // Special 3D walkers call the flat loader with {} and retain vertical ownership.
+  if(Object.hasOwn(input,'jump')){p.grounded=(p.y??0)<=0&&(p.vy??0)<=0;landThreeJump(p);if(input.jump&&!p.jumpHeld)beginThreeJump(p);p.jumpHeld=!!input.jump;if(!p.grounded){p.vy=(p.vy??0)-SKY_JUMP_GRAVITY*dt;p.y=Math.max(0,p.y+p.vy*dt);if(!p.y){p.grounded=true;landThreeJump(p);}}}
+  next.player=p;return next;
 }

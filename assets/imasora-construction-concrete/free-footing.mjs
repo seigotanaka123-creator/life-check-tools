@@ -1,18 +1,29 @@
-import {constructionBase} from './free-supported-build.mjs';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {freeCell} from './free-build-state.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {freeFilledMask,freeWorkMask} from './free-work-parts.mjs';
+import {freeCell} from './free-build-state.mjs?v=120fw';
 
 // This stage supports level ground and continuous, cured surfaces. It deliberately
 // does not invent a ladder, bridge, or automatic climb at a raised floor edge.
 export const FOOT_LEVEL_EPS=.15;
 export const FOOTING_MESSAGE='足元に穴や段差があります。平らな通路と作業場所を確保してください。';
 export const needsFooting=a=>['FREE_PAINT','FREE_FINISH','FREE_BUCKET_LOAD','FREE_FRAME','FREE_FRAME_RAISED','FREE_DEMOLD','FREE_UNFRAME'].includes(a.type)||(a.type==='FREE_POUR'&&a.source==='bucket');
+let soleCells;
+// Read current placement once per work, rather than rebuilding its mask for
+// every cell. No cached terrain or mutable work survives this surface query.
+function placedSurface(height,fill,mask,base,x,z,offsetX,offsetZ){
+ if(Math.abs(x-offsetX)>32||Math.abs(z-offsetZ)>32)return height;
+ soleCells??=Array.from({length:16},(_,i)=>freeCell(i));
+ for(let i=0;i<16;i++)if((mask&(1<<i))&&fill[i]){const c=soleCells[i];if(Math.abs(x-(offsetX+c.x))<=8&&Math.abs(z-(offsetZ+c.z))<=8)height=Math.max(height,base+fill[i]/2);}
+ return height;
+}
 export function footSurface(f,x,z,heightAt=()=>0,includeCured=false){
  const ground=heightAt(f.location.x+x,f.location.z+z);
  if(!Number.isFinite(ground))return null;
  let height=ground;
- const works=includeCured&&f.stage==='cured'?[...f.completed,{...f.location,fill:f.fill,baseY:constructionBase(f)}]:f.completed;
- for(const w of works){if(Math.abs(x-(w.x-f.location.x))>32||Math.abs(z-(w.z-f.location.z))>32)continue;for(let i=0;i<16;i++)if(freePlacedFill(w,i)){const c=freeCell(i);if(Math.abs(x-(w.x-f.location.x+c.x))<=8&&Math.abs(z-(w.z-f.location.z+c.z))<=8)height=Math.max(height,constructionBase(w)+w.fill[i]/2);}}
+ for(const w of f.completed)height=placedSurface(height,w.fill,freeWorkMask(w),constructionBase(w),x,z,w.x-f.location.x,w.z-f.location.z);
+ // The current cured pour has not become a placed/stored work yet. The old
+ // temporary work included every filled cell and the current base datum.
+ if(includeCured&&f.stage==='cured')height=placedSurface(height,f.fill,freeFilledMask(f),constructionBase(f),x,z,0,0);
  return height;
 }
 export function footingAt(f,x,z,heightAt=()=>0,includeCured=false){

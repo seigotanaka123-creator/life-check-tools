@@ -1,5 +1,5 @@
 // Runtime-only escape assistance. It never edits the soil ledger or checkpoints.
-import {armIntersections,contactBlocker,moveArm,spoilPenetrations,EX} from './imasora-construction-excavator.js?v=520';
+import {armIntersections,contactBlocker,moveArm,spoilPenetrations,EX} from './imasora-construction-excavator.js?v=120fc';
 
 const SPEED={boom:.5,stick:.65,curl:.75,slew:.62};
 const KEYS=Object.keys(SPEED),LIMITS={boom:[EX.boomMin,EX.boomMax],stick:[-2.55,-Math.PI/6],curl:[-1.25,1.1],slew:[-EX.slewLimit,EX.slewLimit]};

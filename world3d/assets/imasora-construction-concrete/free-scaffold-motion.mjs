@@ -1,8 +1,8 @@
-import {accessPlatePieces} from './free-foundation-access.mjs';
+import {accessPlatePieces} from './free-foundation-access.mjs?v=120fw';
 import {accessDeckPlates} from './free-access-deck.mjs';
 import * as T from '../three.module.min.js';
-import {scaffoldSurface,scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs';
-import {FOOT_LEVEL_EPS} from './free-footing.mjs';
+import {scaffoldSurface,scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs?v=120fw';
+import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
 
 // Work decks use measured shoes rather than the conservative square used for
 // unassisted ground travel. Stairs plant one foot before moving the other.

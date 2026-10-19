@@ -1,6 +1,6 @@
 import * as THREE from './three.module.min.js';
 import { buildMatureStarCharacter360, WHITE_MICHI_ROAD_SABER_REN_ID, disposeMatureCharacterModel } from './imasora-character-360.js';
-import { IMASORA_WORLD_MAPS, normalizedPoint } from './imasora-world-map-schema.js';
+import { IMASORA_WORLD_MAPS, normalizedPoint } from './imasora-world-map-schema.js?v=120ds';
 
 // Stage 1 only: measured volumes and a read-only layout proposal. Not gameplay physics.
 export const VEHICLE_NAMES = Object.freeze(['ショベルカー', 'ダンプカー', 'ブルドーザー', 'ホイールローダー', 'クレーン車', 'フォークリフト', 'アスファルトフィニッシャー']);

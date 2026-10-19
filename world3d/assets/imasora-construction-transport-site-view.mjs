@@ -1,12 +1,13 @@
+import {DUMP_CAB,dumpDriverLocal} from './imasora-construction-dump-cab.mjs?v=120ey';
 import * as THREE from './three.module.min.js';
-import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js';
-import {updateExcavatorModel} from './imasora-construction-excavator-model.js';
-import {nativeDumpPose,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs';
-import {createDumpModel,updateDumpModel} from './imasora-construction-dump-model.js';
-import {shovelSoilBoxes,shovelMachineState} from './imasora-construction-shovel-work.mjs';
-import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportVehicleBlockedAt,visibleTransportSources,requireTransportSceneCheckpoint} from './imasora-construction-transport-site.mjs';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs';
-import {soilTransportTotals} from './imasora-construction-soil-transport.mjs';
+import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
+import {updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120fc';
+import {nativeDumpPose,nativeDumpPoint,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {createDumpModel,updateDumpModel,orientDumpObject} from './imasora-construction-dump-model.js?v=120ey';
+import {shovelSoilBoxes,shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportVehicleBlockedAt,visibleTransportSources,requireTransportSceneCheckpoint} from './imasora-construction-transport-site.mjs?v=120fw';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
+import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120fw';
 // First scene connection only. It displays the shared source and closes the old
 // excavation writer. Gameplay entry/exit will be connected after this boundary.
 export function createWorldTransportSceneBridge({service,state,scene,camera,character,shadow,canvas,clearInput,readout}){
@@ -35,7 +36,8 @@ export function createWorldTransportSceneBridge({service,state,scene,camera,char
  update(){if(!root||blocked||state.map!=='construction')return false;clearInput();state.position.set(pose.x,0,pose.z);state.groundY=pose.y;state.heading=pose.heading;state.jumpY=state.jumpVelocity=0;state.falling=state.moving=false;scene.add(character);character.visible=true;shadow.visible=false;
   character.rotation.set(0,pose.heading,0);for(const f of character.userData.walkRig?.feet??[])f.part.position.copy(f.basePosition);
   if(characterOffset===null){character.position.set(0,0,0);character.updateMatrixWorld(true);characterOffset=.12-new THREE.Box3().setFromObject(character).min.y;}
-  character.position.set(pose.x,pose.y+characterOffset,pose.z);
+  if(record.work.mode==='driving'){const o=transportSiteOrigin(record),p=nativeDumpPoint(record.work.frame,...dumpDriverLocal(-characterOffset));character.position.set(p[0]+o[0],p[1]+o[1],p[2]+o[2]);orientDumpObject(character,nativeDumpPose(record.work.frame).axes);character.updateMatrixWorld(true);for(const [i,h]of (character.userData.hands??[]).entries()){const p=nativeDumpPoint(record.work.frame,DUMP_CAB.driverX+(i?3.8:-3.8),DUMP_CAB.gripY,DUMP_CAB.gripZ),point=new THREE.Vector3(p[0]+o[0],p[1]+o[1],p[2]+o[2]);h.position.copy(h.parent.worldToLocal(point));}}
+  else{for(const h of character.userData.walkRig?.hands??[])h.part.position.copy(h.basePosition);character.position.set(pose.x,pose.y+characterOffset,pose.z);}
   const o=transportSiteOrigin(record),target=new THREE.Vector3(o[0]+32,10,o[2]+44);camera.position.copy(target).add(new THREE.Vector3(view?380:300,view?390:290,view?-380:-300));camera.lookAt(target);readout();return true;
  },dispose};
 }

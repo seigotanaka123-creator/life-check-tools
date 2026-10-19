@@ -1,12 +1,13 @@
-import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs';
+import {transportArea,transportPoseKey} from './imasora-construction-transport-field.mjs?v=120fc';
+import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,nativeDumpAnchorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
 import {canonical} from './imasora-construction-state.js';
-import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs';
-import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs';
-import {LOADER,SITE} from './imasora-construction-loader-physics.js';
-import {BIN} from './imasora-construction-excavator.js';
-import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs';
-import {nativeDumpSupport,nativeDumpRecoveryStep} from './imasora-construction-native-dump-support.mjs';
+import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {LOADER,SITE} from './imasora-construction-loader-physics.js?v=120ey';
+import {BIN} from './imasora-construction-excavator.js?v=120fc';
+import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {nativeDumpSupport,nativeDumpRecoveryStep} from './imasora-construction-native-dump-support.mjs?v=120fw';
 
 export const DUMP_WORK_SCOPE='imasora-shared-soil-dump-work-isolated-v1';
 export const DUMP_WORK_FORMAT='imasora-shared-soil-dump-work-checkpoint-v1';
@@ -20,21 +21,21 @@ const cachedObstacles=new WeakMap(),identity=new WeakMap();
 const local=(s,p)=>nativeDumpLocal(s,p);
 const horizontalLocal=(s,p)=>{const dx=p[0]-s.dump.x,dz=p[2]-s.dump.z,c=Math.cos(s.dump.heading),sn=Math.sin(s.dump.heading);return[c*dx-sn*dz,p[1],sn*dx+c*dz];};
 export function dumpBoxesOverlap(a,b){return boxesOverlap3D(a,b);}
-function obstacles(frame){const key=frame.machineArm??frame.soil;let entry=cachedObstacles.get(key),boxes=entry?.soil===frame.soil?entry.boxes:null;if(!boxes){boxes=[...shovelMachines(frame),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)];cachedObstacles.set(key,{soil:frame.soil,boxes});}return boxes;}
+function obstacles(frame){const key=frame.machineArm??frame.soil;let entry=cachedObstacles.get(key),boxes=entry?.soil===frame.soil&&entry.pose===transportPoseKey(frame)?entry.boxes:null;if(!boxes){boxes=[...shovelMachines(frame),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)];cachedObstacles.set(key,{soil:frame.soil,pose:transportPoseKey(frame),boxes});}return boxes;}
 export function dumpRaisedBoxes(frame,angle){
  check(finite(angle,0,.8),'荷台の角度が不正です。');const c=Math.cos(angle),sn=Math.sin(angle),gate=Math.min(1.45,angle*2),gc=Math.cos(gate),gs=Math.sin(gate);
  return[nativeDumpBox(frame,[0,16+6*c+18*sn,-40-6*sn+18*c],[27,7*c+20*sn,7*sn+20*c]),nativeDumpBox(frame,[0,16+12*c-6*gc,-40-12*sn-6*gs],[26,6*gc+.7*gs,6*gs+.7*gc])];
 }
 export function dumpRaiseClear(frame,extra=[]){
- const path=[];for(let k=0;k<=16;k++)path.push(...dumpRaisedBoxes(frame,.8*k/16));
+ const SITE=transportArea(frame),path=[];for(let k=0;k<=16;k++)path.push(...dumpRaisedBoxes(frame,.8*k/16));
  const extents=path.map(boxExtent),min=[0,1,2].map(i=>Math.min(...path.map((b,j)=>b.position[i]-extents[j][i]))),max=[0,1,2].map(i=>Math.max(...path.map((b,j)=>b.position[i]+extents[j][i])));
  const blocks=[...obstacles(frame),...extra].filter(b=>{const e=boxExtent(b);return e.every((r,i)=>b.position[i]+r>min[i]&&b.position[i]-r<max[i]);});
- return path.every((box,i)=>Math.abs(box.position[0])+extents[i][0]<=SITE.maxX-1&&Math.abs(box.position[2])+extents[i][2]<=SITE.maxZ-1&&!blocks.some(b=>dumpBoxesOverlap(box,b)));
+ return path.every((box,i)=>box.position[0]-extents[i][0]>=SITE.minX+1&&box.position[0]+extents[i][0]<=SITE.maxX-1&&box.position[2]-extents[i][2]>=SITE.minZ+1&&box.position[2]+extents[i][2]<=SITE.maxZ-1&&!blocks.some(b=>dumpBoxesOverlap(box,b)));
 }
 export function dumpPositionSafe(frame,{preciseArm=false,legacySupport=false}={}){
- const body=shovelDumpBody(frame),extent=boxExtent(body),c=Math.abs(Math.cos(frame.dump.heading)),sn=Math.abs(Math.sin(frame.dump.heading));
- if(Math.abs(body.position[0])+extent[0]>SITE.maxX-1||Math.abs(body.position[2])+extent[2]>SITE.maxZ-1)return false;
- if(Math.abs(frame.dump.x)+34*c+43*sn>SITE.maxX-1||Math.abs(frame.dump.z)+34*sn+43*c>SITE.maxZ-1)return false;
+ const SITE=transportArea(frame),body=shovelDumpBody(frame),extent=boxExtent(body),c=Math.abs(Math.cos(frame.dump.heading)),sn=Math.abs(Math.sin(frame.dump.heading));
+ if(body.position[0]-extent[0]<SITE.minX+1||body.position[0]+extent[0]>SITE.maxX-1||body.position[2]-extent[2]<SITE.minZ+1||body.position[2]+extent[2]>SITE.maxZ-1)return false;
+ if(frame.dump.x-(34*c+43*sn)<SITE.minX+1||frame.dump.x+34*c+43*sn>SITE.maxX-1||frame.dump.z-(34*sn+43*c)<SITE.minZ+1||frame.dump.z+34*sn+43*c>SITE.maxZ-1)return false;
  if(legacySupport){
   // Keep existing v1 checkpoints readable. New moves/plans use every tyre
   // cell; a historical stop can leave only without adding unsupported area.
@@ -46,7 +47,7 @@ export function dumpPositionSafe(frame,{preciseArm=false,legacySupport=false}={}
  const blocks=preciseArm?[...shovelMachines(frame).slice(0,2),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)]:obstacles(frame);
  return !blocks.some(b=>Math.abs(b.position[0]-body.position[0])<100+(b.size??90)&&Math.abs(b.position[2]-body.position[2])<100+(b.size??90)&&dumpBoxesOverlap(body,b));
 }
-const seat=frame=>{const p=shovelDumpPoint(frame,-14,LOADER.floor,18);return{...frame.player,x:p[0],y:p[1],z:p[2],heading:frame.dump.heading};};
+const seat=frame=>{const p=nativeDumpAnchorPoint(frame,-14,LOADER.floor,18);return{...frame.player,x:p[0],y:p[1],z:p[2],heading:frame.dump.heading};};
 export function createDumpWork(source){return validateDumpWork({format:DUMP_WORK_FORMAT,scope:DUMP_WORK_SCOPE,version:1,revision:0,frame:createShovelWork(source),mode:'foot',vehicleTravel:0,wheelTravel:0,unload:null});}
 const next=(s,frame,extra={})=>({...s,revision:s.revision+1,frame,...extra});
 const idle=s=>check(!s.frame.job&&!s.unload&&!s.frame.soil.pending,'土を動かしている間は、移動や乗り降りを待ってください。');
@@ -66,7 +67,7 @@ export function driveDumpWork(s,throttle,steer,dt,{fast=false}={}){
  const slope=nativeDumpSupport(s.frame),up=throttle*Math.tan(slope.pitch??0),load=s.frame.soil.containers.dump.amount/SOIL_CAPACITY.dump,grade=up>0?Math.max(.45,1-up*(1.2+load)):up<0?Math.max(.55,1+up*(1.2+load)):1,speed=(throttle>0?48:30)*(1-load*.3)*(fast?2.5:1)*grade,length=throttle*speed*dt,n=Math.max(1,Math.ceil(Math.abs(length)/.5));let frame=s.frame,moved=0;
  for(let i=0;i<n;i++){
   const h=heading(frame.dump.heading-steer*length/n/65),dump={x:frame.dump.x+Math.sin(h)*length/n,z:frame.dump.z+Math.cos(h)*length/n,heading:h},candidate={...frame,dump};
-  if(Math.abs(nativeDumpPose(candidate).position[1]-nativeDumpPose(frame).position[1])>2.01)break;if(!dumpPositionSafe(candidate)&&!(dumpPositionSafe(frame,{legacySupport:true})&&dumpPositionSafe(candidate,{legacySupport:true})&&nativeDumpRecoveryStep(frame,candidate)))break;moved+=Math.abs(length/n);frame={...candidate,player:seat(candidate)};
+  if(Math.abs(nativeDumpPose(candidate).groundPosition[1]-nativeDumpPose(frame).groundPosition[1])>2.01)break;if(!dumpPositionSafe(candidate)&&!(dumpPositionSafe(frame,{legacySupport:true})&&dumpPositionSafe(candidate,{legacySupport:true})&&nativeDumpRecoveryStep(frame,candidate)))break;moved+=Math.abs(length/n);frame={...candidate,player:seat(candidate)};
  }
  return moved?next(s,{...frame,revision:s.frame.revision+1},{vehicleTravel:s.vehicleTravel+moved,wheelTravel:s.wheelTravel+Math.sign(throttle)*moved}):s;
 }
@@ -81,9 +82,9 @@ export function dumpUnloadPlan(s){
  if(s.mode!=='driving'||s.frame.job||s.unload||s.frame.soil.pending||!s.frame.soil.containers.dump.amount)return null;
  if(!dumpPositionSafe(s.frame))return null;const support=nativeDumpSupport(s.frame);if(Math.abs(support.pitch)>8*Math.PI/180||Math.abs(support.roll)>6*Math.PI/180)return null;
  if(!dumpRaiseClear(s.frame))return null;
- const frame=s.frame,centre=shovelDumpPoint(frame,0,0,-62),columns=[];
+ const frame=s.frame,area=transportArea(frame),centre=shovelDumpPoint(frame,0,0,-62),columns=[];
  for(let x=Math.floor((centre[0]-40)/2);x<=Math.ceil((centre[0]+40)/2);x++)for(let z=Math.floor((centre[2]-40)/2);z<=Math.ceil((centre[2]+40)/2);z++){
-  const p=[x*2+1,0,z*2+1],l=horizontalLocal(frame,p);if(Math.abs(l[0])>23||l[2]<-76||l[2]>-48||Math.abs(p[0])>296||Math.abs(p[2])>216)continue;
+  const p=[x*2+1,0,z*2+1],l=horizontalLocal(frame,p);if(Math.abs(l[0])>23||l[2]<-76||l[2]>-48||(frame.version===2?(p[0]<area.minX+24||p[0]>area.maxX-24||p[2]<area.minZ+34||p[2]>area.maxZ-34):(Math.abs(p[0])>296||Math.abs(p[2])>216)))continue;
   const h=nativeDumpHeightAt(frame,p[0],p[2]);if(!Number.isFinite(h)||Math.abs(h/2-Math.round(h/2))>1e-8)continue;columns.push({x,z,l,y:Math.round(h/2)});
  }
  columns.sort((a,b)=>Math.abs(a.l[2]+62)-Math.abs(b.l[2]+62)||Math.abs(a.l[0])-Math.abs(b.l[0])||a.x-b.x||a.z-b.z);
@@ -109,7 +110,7 @@ export function dumpStorageFlowPoint(frame,target,index,u){
 }
 const storageContacts=new WeakMap();
 export function dumpStorageContact(frame){
- const key=canonical([frame.dump,frame.machineArm]),cached=storageContacts.get(frame.soil);if(cached?.key===key)return cached.target;
+ const key=canonical([frame.dump,frame.machineArm,frame.machineVehicle??null]),cached=storageContacts.get(frame.soil);if(cached?.key===key)return cached.target;
  let target=null;const landing=shovelDumpPoint(frame,0,0,-70);landing[1]=5.2;
  if(Math.abs(landing[0]-BIN.x)<=BIN.width/2-13&&Math.abs(landing[2]-BIN.z)<=BIN.depth/2-8&&dumpPositionSafe(frame)&&dumpRaiseClear(frame)){
   const start=shovelDumpPoint(frame,0,17,-42),min=[Math.min(start[0],landing[0]-10)-1,landing[1]-1,Math.min(start[2],landing[2]-4.5)-1],max=[Math.max(start[0],landing[0]+10)+1,Math.max(start[1],landing[1])+4,Math.max(start[2],landing[2]+4.5)+1];

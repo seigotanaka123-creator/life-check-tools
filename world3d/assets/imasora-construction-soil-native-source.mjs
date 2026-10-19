@@ -1,5 +1,5 @@
-import {validateAuthorityExcavation,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js';
-import {unpackExcavation} from './imasora-construction-excavator-save.js';
+import {validateAuthorityExcavation,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js?v=120fc';
+import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120fc';
 
 export const SOIL_NATIVE_TRANSPORT_SCOPE='imasora-shared-soil-native-copy-isolated-v2';
 export const SOIL_NATIVE_TRANSPORT_FORMAT='imasora-shared-soil-native-copy-checkpoint-v2';

@@ -1,11 +1,12 @@
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
 // 8-3b2: finite purchased floors. Source receipts are immutable READ-ONLY copies.
 // This adapter reuses the approved crane + spring/load/contact solvers unchanged.
-import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js';
-import {worldToLocal} from './imasora-construction-loader-physics.js';
-import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js';
-import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js';
-import {readPurchasedSource} from './imasora-construction-purchased-water.js';
-import {fingerprint} from './imasora-world-purchase-ledger.js';
+import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120fw';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
+import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120fw';
+import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120fw';
+import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120fw';
+import {fingerprint} from './imasora-world-purchase-ledger.js?v=120fw';
 export {floatReadout};
 export const OWNED_TIMBER_SCOPE='construction-purchased-timber-copy-v1';
 export const FLOOR_VOLUME=26880,MAX_ACTIVE_FLOORS=8;
@@ -30,16 +31,17 @@ export const initialWorldTimberPhysics=total=>{const s=initial({mode:'world',tot
 export const refreshTimberLedger=s=>reconcile(s);
 export function initialPurchasedTimber(packet,kind){const src=readPurchasedSource(packet,kind),volume=src.inventory['mars-timber'];ok(integer(volume)&&volume%FLOOR_VOLUME===0,'購入木材を床1枚分へ変換できません。');return validatePurchasedTimber(initial({mode:'copy',kind,packet,...src,total:volume/FLOOR_VOLUME}));}
 function touches(s,p){if(s.rig.mode!=='foot')return false;const a=s.rig.player,q=worldToLocal({x:p.x,z:p.z,heading:0},a.x,a.z);return a.y<p.y+p.h&&a.y+CRANE_WALK.height>p.y&&Math.hypot(Math.max(0,Math.abs(q.x)-p.w/2),Math.max(0,Math.abs(q.z)-p.d/2))<CRANE_WALK.radius+1;}
-export function issueOption(s){const p=fresh(`owned-deck-${s.nextId}`);let reason=s.paused?'一時停止を解除してください。':s.stock<1?'保管している火星木材は0枚です。':s.parts.length>=MAX_ACTIVE_FLOORS?'この確認区画は同時に8枚までです。回収して空きを作ってください。':s.rig.transition||Math.abs(s.rig.vehicle.speed)>.1||s.held||s.rotation?'停車し、吊り荷と乗降を終えてください。':collides(s,p)||(touches(s,p)?'レンが出庫位置にいます。':'');if(!reason&&s.rig.transition&&!craneWalkingRouteClear({...s,parts:[...s.parts,p]},s.rig.transition.path))reason='乗降経路が塞がっています。';return{ok:!reason,reason:reason||'受付前の枠へ床板を1枚出します。',part:p};}
-export function returnOption(s){const p=s.parts.find(p=>p.id===s.held);let reason=s.paused?'一時停止を解除してください。':!p?'戻す床板に吊り索を掛けてください。':s.rig.mode!=='driving'||!s.work||s.deployment<1?'作業モードで回収してください。':s.rotation?'回転が止まるまで待ってください。':Math.abs(p.x-RETURN_PAD.x)>8||Math.abs(p.z-RETURN_PAD.z)>8?'青い回収枠の中央へ運んでください。':p.y>8?'床板の底を高さ8以下へ巻き下げてください。':Math.hypot(p.vx,p.vz)>12?'揺れが落ち着くまで待ってください。':'';return{ok:!reason,reason:reason||'同じ床板1枚分を保管へ戻せます。',part:p};}
-export function purchasedTimberAction(state,action,id){
+export function timberReturnPad(s){const p=sharedSupply(s.rig.vehicle,'material-store');return p?{...RETURN_PAD,x:p.x,z:p.z+116}:RETURN_PAD;}
+export function issueOption(s,external=[]){const p={...fresh(`owned-deck-${s.nextId}`),x:timberReturnPad(s).x,z:timberReturnPad(s).z};let reason=s.paused?'一時停止を解除してください。':s.stock<1?'保管している火星木材は0枚です。':s.parts.length>=MAX_ACTIVE_FLOORS?'床板は同時に8枚まで出せるよ。使わない板を回収しよう。':s.rig.transition||Math.abs(s.rig.vehicle.speed)>.1||s.held||s.rotation?'停車し、吊り荷と乗降を終えてください。':collides(s,p,{external})||(touches(s,p)?'レンが出庫位置にいます。':'');if(!reason&&s.rig.transition&&!craneWalkingRouteClear({...s,parts:[...s.parts,p]},s.rig.transition.path))reason='乗降経路が塞がっています。';return{ok:!reason,reason:reason||'受付前の枠へ床板を1枚出します。',part:p};}
+export function returnOption(s){const p=s.parts.find(p=>p.id===s.held);let reason=s.paused?'一時停止を解除してください。':!p?'戻す床板に吊り索を掛けてください。':s.rig.mode!=='driving'||!s.work||s.deployment<1?'作業モードで回収してください。':s.rotation?'回転が止まるまで待ってください。':Math.abs(p.x-timberReturnPad(s).x)>8||Math.abs(p.z-timberReturnPad(s).z)>8?'青い回収枠の中央へ運んでください。':p.y>8?'床板の底を高さ8以下へ巻き下げてください。':Math.hypot(p.vx,p.vz)>12?'揺れが落ち着くまで待ってください。':'';return{ok:!reason,reason:reason||'同じ床板1枚分を保管へ戻せます。',part:p};}
+export function purchasedTimberAction(state,action,id,external=[]){
   if(action==='pause'){const s=copy(state);s.paused=!s.paused;s.message=s.paused?'一時停止中です。':'作業を再開しました。';s.revision++;return s;}
   if(action==='issue'||action==='return-stock'){
     ok(validId(id),'操作番号が不正です。');const prior=state.events.find(e=>e.id===id);if(prior){ok(prior.kind===action,'同じ番号で別の作業はできません。');return state;}
   }
   ok(!state.paused,'一時停止中です。');ok(!state.rig.transition,'乗り降りの完了を待ってください。');validatePurchasedTimber(state);
   if(action==='issue'||action==='return-stock'){
-    ok(state.events.length<2000,'操作記録が上限です。保存を保護して停止しました。');const option=action==='issue'?issueOption(state):returnOption(state);ok(option.ok,option.reason);
+    ok(state.events.length<2000,'操作記録が上限です。保存を保護して停止しました。');const option=action==='issue'?issueOption(state,external):returnOption(state);ok(option.ok,option.reason);
     const s=copy(state),p=option.part;
     if(action==='issue'){s.stock--;s.parts.push(p);s.nextId++;s.message='床板1枚を出しました。運転席に乗り「クレーン作業へ」進んでください。';}
     else{s.stock++;s.parts=s.parts.filter(q=>q.id!==p.id);s.held=null;s.message='床板1枚分を保管へ回収しました。購入量は増えません。';}
@@ -47,7 +49,7 @@ export function purchasedTimberAction(state,action,id){
   }
   ok(['interact','mode','snap','home','pick','rotate','release','place'].includes(action),'不明な木材操作です。');
   const physics=timberPhysicsState(state),candidate=pickOption(floatingView(physics));if(action==='pick'&&candidate?.hover&&floatReadout(state,candidate.id).load>0)return{...copy(state),message:'上に乗っているレンや床板を先に降ろしてください。'};
-  const wasHeld=state.parts.find(p=>p.id===state.held),s=mergePhysics(state,restoreFloatingFlags(actCrane(floatingView(physics),action))),p=s.parts.find(p=>p.id===wasHeld?.id);
+  const wasHeld=state.parts.find(p=>p.id===state.held),s=mergePhysics(state,restoreFloatingFlags(actCrane(floatingView(physics),action,external))),p=s.parts.find(p=>p.id===wasHeld?.id);
   if(action==='release'&&p&&s.held===null){releaseFloating(p);p.carrierId=null;s.message='この高さで浮遊を開始しました。低く浮かせた床は歩いて乗れます。';}
   if(action==='pick'&&s.held){const q=s.parts.find(p=>p.id===s.held);q.hover=null;q.carrierId=null;}
   if(action==='place'&&p&&s.held===null)bindPlacedCargo(s,p);

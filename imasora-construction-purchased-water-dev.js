@@ -1,11 +1,11 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js';
-import {transportAvailability,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js';
-import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js';
-import {emptyPurchasedTransport,advancePurchasedWater,purchasedWaterAction,purchasedWaterTotals,receivingAvailable} from './assets/imasora-construction-purchased-water.js?v=453';
-import {PurchasedWaterSession,purchasedSourceReader} from './assets/imasora-construction-purchased-water-storage.js?v=453';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
+import {transportAvailability,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js?v=120fb';
+import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js?v=120fb';
+import {emptyPurchasedTransport,advancePurchasedWater,purchasedWaterAction,purchasedWaterTotals,receivingAvailable} from './assets/imasora-construction-purchased-water.js?v=120fp';
+import {PurchasedWaterSession,purchasedSourceReader} from './assets/imasora-construction-purchased-water-storage.js?v=120fp';
 const $=id=>document.getElementById(id),local=['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 const session=new PurchasedWaterSession(),keys=new Set(),held=new Map(),taps=new Map(),empty=emptyPurchasedTransport();
 let state=null,ready=false,last=0,ui=0,autosave=0,saveText='読み込み中',view=0,yawOffset=Math.PI,pitch=.55,distance=225,drag=null,walk=0;

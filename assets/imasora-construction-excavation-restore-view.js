@@ -1,5 +1,5 @@
-import {packExcavation} from './imasora-construction-excavator-save.js';
-import {ContactPreviewRestore,PREVIEW_IMPORT_LIMIT} from './imasora-construction-excavation-compatibility.js';
+import {packExcavation} from './imasora-construction-excavator-save.js?v=120fc';
+import {ContactPreviewRestore,PREVIEW_IMPORT_LIMIT} from './imasora-construction-excavation-compatibility.js?v=120fc';
 
 // Lives inside the existing preview controls. Opening or inspecting never
 // replaces work; only the explicit apply button does. No persistent storage.

@@ -1,5 +1,5 @@
-import {scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs';
+import {scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs?v=120fw';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120fw';
 const key=p=>[p.x,p.z,p.y,p.base,p.halfX,p.halfZ].join(',');
 const unique=items=>[...new Map(items.map(p=>[key(p),p])).values()];
 function segmentDistance(p,a,b){const dx=b.x-a.x,dz=b.z-a.z,l=dx*dx+dz*dz,t=l?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/l)):0;return Math.hypot(p.x-a.x-dx*t,p.z-a.z-dz*t);}

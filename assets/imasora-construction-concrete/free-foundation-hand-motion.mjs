@@ -1,12 +1,12 @@
 import * as T from '../three.module.min.js';
-import {foundationGrip,foundationHandPlan,foundationHandPlanSteps,FOUNDATION_HAND_REACH} from './free-foundation-hand-plan.mjs';
-import {assertFoundationEnvironment,newFoundationReceipt,assertFoundationReceipt} from './free-foundation-operation.mjs';
-import {newFootingReceipt,newToolWalkingReceipt} from './free-footing.mjs';
-import {createFootingGuard} from './free-footing-motion.mjs';
-import {frameBlocked,frameSegmentBlocked,frameLocal} from './free-frames.mjs';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs';
-import {newScaffoldReceipt} from './free-frame-scaffold.mjs';
-import {foundationWorkSurface,foundationWorkSupport} from './free-foundation-work-scaffold.mjs';
+import {foundationGrip,foundationHandPlan,foundationHandPlanSteps,FOUNDATION_HAND_REACH} from './free-foundation-hand-plan.mjs?v=120fw';
+import {assertFoundationEnvironment,newFoundationReceipt,assertFoundationReceipt} from './free-foundation-operation.mjs?v=120fw';
+import {newFootingReceipt,newToolWalkingReceipt} from './free-footing.mjs?v=120fw';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
+import {frameBlocked,frameSegmentBlocked,frameLocal} from './free-frames.mjs?v=120fw';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
+import {newScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
+import {foundationWorkSurface,foundationWorkSupport} from './free-foundation-work-scaffold.mjs?v=120fw';
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z);
 export function createFoundationHandMotion({p,a,root,actor,model,hands,feet,tools,mats,line,environment,installedFoundation,preparedPlan=null}){
  const env={heightAt:(...q)=>environment().heightAt(...q),blockedAt:(...q)=>environment().blockedAt(...q)},start={...actor.position,heading:actor.rotation.y};root.updateMatrixWorld(true);

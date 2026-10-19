@@ -1,19 +1,19 @@
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
 import {workVehicleState} from './work-vehicle-height.mjs';
-import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs';
-import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs';
-import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs';
-import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs';
-import {frameDeckHeight} from './free-frame-workspace.mjs';
+import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
+import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs?v=120fw';
+import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs?v=120fw';
+import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
+import {frameDeckHeight} from './free-frame-workspace.mjs?v=120fw';
 import {freeWorkMask,freePlacedFill} from './free-work-parts.mjs';
-import {canonicalFreeAction,freeCell} from './free-build-state.mjs';
-import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs';
-import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs';
-import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs';
+import {canonicalFreeAction,freeCell} from './free-build-state.mjs?v=120fw';
+import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs?v=120fw';
+import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs?v=120fw';
+import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs?v=120fw';
 
-import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs';
-import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs';
-import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs';
+import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs?v=120fw';
+import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs?v=120fw';
+import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120fw';
 
 export const FREE_CONTACT_ACTIONS=new Set(['FREE_PAINT','FREE_BOARD','FREE_LEAVE',...FREE_CAST_ACTIONS,...FREE_FRAME_ACTIONS]);
 export const CONTACT_EPS=1e-5;
@@ -81,10 +81,11 @@ function* walkingObstacles(f,ignoreVehicle){
  if(!['design','complete'].includes(f.stage))for(let i=0;i<16;i++)if(f.mask&(1<<i))yield{...freeCell(i),hx:8.3,hz:8.3};
 }
 const outside=(f,p)=>![p.x,p.z].every(Number.isFinite)||Math.abs(p.x+f.location.x)>2600||Math.abs(p.z+f.location.z)>1700;
-export function walkingBlocked(f,x,z,external=()=>false,ignoreVehicle=null,heightAt=null){
- const p={x,z};if(outside(f,p)||external(x+f.location.x,z+f.location.z,14-ROUTE_EPS)||hoseSegmentBlocked(pipeContactPath(f,heightAt),p,p,14))return true;
+export function walkingObjectsBlocked(f,x,z,external=()=>false,ignoreVehicle=null,heightAt=null){
+ const p={x,z};if(![x,z].every(Number.isFinite)||external(x+f.location.x,z+f.location.z,14-ROUTE_EPS)||hoseSegmentBlocked(pipeContactPath(f,heightAt),p,p,14))return true;
  for(const box of walkingObstacles(f,ignoreVehicle))if(clearanceBlocked(pointBoxDistance(p,box),14))return true;return false;
 }
+export function walkingBlocked(f,x,z,external=()=>false,ignoreVehicle=null,heightAt=null){return outside(f,{x,z})||walkingObjectsBlocked(f,x,z,external,ignoreVehicle,heightAt);}
 export function walkingSegmentBlocked(f,from,to,external=()=>false,ignoreVehicle=null,heightAt=null){
  if(outside(f,from)||outside(f,to)||externalSegmentBlocked(f.location,from,to,14,external)||hoseSegmentBlocked(pipeContactPath(f,heightAt),from,to,14))return true;
  for(const box of walkingObstacles(f,ignoreVehicle))if(clearanceBlocked(segmentBoxDistance(from,to,box),14))return true;return false;

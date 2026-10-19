@@ -1,8 +1,10 @@
+import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {groundLocal} from './imasora-construction-vehicle-ground-frame.mjs';
 import * as THREE from './three.module.min.js';
-import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js';
-import {tip,hook} from './imasora-construction-crane.js';
-import {worldToLocal} from './imasora-construction-loader-physics.js';
-import {outriggerLocalVolumes} from './imasora-construction-crane-outriggers.js';
+import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js?v=120ey';
+import {tip,hook} from './imasora-construction-crane.js?v=120fw';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
+import {outriggerLocalVolumes,craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120fw';
 const material=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.55,metalness:.18,...extra});
 function box(parent,w,h,d,x,y,z,mat,name){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.name=name;m.castShadow=m.receiveShadow=true;parent.add(m);return m;}
 function segment(mesh,a,b){const d=b.clone().sub(a);mesh.position.copy(a).add(b).multiplyScalar(.5);mesh.scale.y=d.length();mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());}
@@ -12,7 +14,7 @@ export function createCrane(){
   const remove=new Set(['lift-arm','bucket-link','hydraulic-cylinder','hydraulic-piston','arm-pivot','loader-bucket']);
   for(const o of [...root.children])if(remove.has(o.name)){root.remove(o);o.traverse(m=>m.geometry?.dispose());}
   delete root.userData.bucket;
-  const teal=material(0x268c82),yellow=material(0xefb742),steel=material(0xc0d0ce,{metalness:.8}),dark=material(0x263c42),black=material(0x1b2a30);
+  const teal=material(0x04ae9d),yellow=material(0xfeb215),steel=material(0xc0d0ce,{metalness:.8}),dark=material(0x263c42),black=material(0x1b2a30);
   box(root,47,5,32,0,9.5,25,teal,'crane-front-deck');box(root,50,3,3,0,7,41,dark,'front-bumper');
   const mast=box(root,12,1,12,0,21,26,teal,'telescopic-mast');
   const base=new THREE.Mesh(new THREE.CylinderGeometry(11,12,5,32),dark);base.position.set(0,15,26);base.name='slewing-ring';root.add(base);
@@ -32,23 +34,23 @@ export function createCrane(){
   root.userData.crane={mast,base,swivel,boom,ram,cable,hookGroup,supports,sling,straps,tipSocket};return root;
 }
 export function updateCraneModel(root,s,options={}){
-  updateLoaderModel(root,s.rig.vehicle,options);
+  const chassis=craneChassisFrame(s);updateLoaderModel(root,s.rig.vehicle,{...options,ground:chassis??options.ground});
   const d=root.userData.crane,k=s.deployment;
-  const worldTip=tip(s),worldHook=hook(s),t=worldToLocal(s.rig.vehicle,worldTip.x,worldTip.z),h=worldToLocal(s.rig.vehicle,worldHook.x,worldHook.z);
-  const start=new THREE.Vector3(0,22+20*k,26),end=new THREE.Vector3(t.x*k,30+(worldTip.y-30)*k,34+(t.z-34)*k),bottom=new THREE.Vector3(h.x*k,24+(worldHook.y-24)*k,34+(h.z-34)*k);
+  const local=p=>{if(chassis){const q=groundLocal(chassis,[p.x,p.y,p.z]);return{x:q[0],y:q[1],z:q[2]};}return{...worldToLocal(s.rig.vehicle,p.x,p.z),y:p.y};},worldTip=tip(s),worldHook=hook(s),t=local(worldTip),h=local(worldHook);
+  const start=new THREE.Vector3(0,22+20*k,26),end=new THREE.Vector3(t.x*k,30+(t.y-30)*k,34+(t.z-34)*k),bottom=new THREE.Vector3(h.x*k,24+(h.y-24)*k,34+(h.z-34)*k);
   d.mast.position.y=(13+start.y)/2;d.mast.scale.y=start.y-13;
   d.base.rotation.y=s.boom.yaw;d.tipSocket.position.copy(end);
   for(let i=0;i<3;i++){const a=start.clone().lerp(end,i*.29),b=start.clone().lerp(end,Math.min(1,.42+i*.29));segment(d.boom[i],a,b);}
   segment(d.ram,new THREE.Vector3(0,start.y-11,24),start.clone().lerp(end,.34));
   segment(d.cable,end,bottom);d.hookGroup.position.copy(bottom);d.hookGroup.rotation.y=s.rig.vehicle.heading+s.boom.yaw;
-  const supportVolumes=outriggerLocalVolumes(k);
+  const supportVolumes=chassis?craneOutriggerVolumes(s):outriggerLocalVolumes(k);
   for(const o of d.supports)for(const b of supportVolumes){
     if(b.side!==o.side||b.station!==o.g.position.z)continue;
-    const mesh=o[b.kind];mesh.position.set(b.x-o.g.position.x,b.y+b.h/2,0);
+    const mesh=o[b.kind];if(chassis){const q=groundLocal(chassis,b.position);mesh.position.set(q[0]-o.g.position.x,q[1],q[2]-o.g.position.z);const m=new THREE.Matrix4().makeBasis(...b.axes.map(a=>new THREE.Vector3(...a))),world=new THREE.Quaternion().setFromRotationMatrix(m);mesh.quaternion.copy(root.quaternion).invert().multiply(world);}else{mesh.quaternion.identity();mesh.position.set(b.x-o.g.position.x,b.y+b.h/2,0);}
     mesh.scale.set(b.kind==='beam'?b.w:1,b.kind==='leg'?b.h:1,1);
   }
   const p=s.parts.find(p=>p.id===s.held);d.sling.visible=!!p;
-  if(p){const corners=[[-.35,-.3],[.35,-.3],[-.35,.3],[.35,.3]];for(let i=0;i<4;i++){const [x,z]=corners[i],co=Math.cos(p.angle),si=Math.sin(p.angle);const a=worldToLocal(s.rig.vehicle,p.x+x*p.w*co+z*p.d*si,p.z-x*p.w*si+z*p.d*co);segment(d.straps[i],bottom.clone().add(new THREE.Vector3(0,-1,0)),new THREE.Vector3(a.x,p.y+p.h,a.z));}}
+  if(p){const corners=[[-.35,-.3],[.35,-.3],[-.35,.3],[.35,.3]];for(let i=0;i<4;i++){const [x,z]=corners[i],co=Math.cos(p.angle),si=Math.sin(p.angle);const a=local({x:p.x+x*p.w*co+z*p.d*si,y:p.y+p.h,z:p.z-x*p.w*si+z*p.d*co});segment(d.straps[i],bottom.clone().add(new THREE.Vector3(0,-1,0)),new THREE.Vector3(a.x,a.y,a.z));}}
 }
 export function createPart(p){
   const g=new THREE.Group();g.name=p.id;const mat=material(p.color,{roughness:.85});box(g,p.w,p.h,p.d,0,p.h/2,0,mat,'inert-building-part');

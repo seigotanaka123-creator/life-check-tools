@@ -1,8 +1,8 @@
-import {constructionBase} from './free-supported-build.mjs';
+import {constructionBase} from './free-supported-build.mjs?v=120fw';
 import {freeWorkCells,freeWorkMask,freeFilledMask} from './free-work-parts.mjs';
-import {floorPanels,boxesOverlap} from './floor-parts.mjs';
-import {vehicleFootprints,overlaps} from './free-vehicle-contact.mjs';
-import {FRAME_RACK} from './free-frames.mjs';
+import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120ds';
+import {vehicleFootprints,overlaps} from './free-vehicle-contact.mjs?v=120fw';
+import {FRAME_RACK} from './free-frames.mjs?v=120fw';
 import {rotateFreeWork} from './free-work-rotation.mjs';
 
 // Translation changes only the work's anchor. Stored parts keep their offsets,

@@ -1,13 +1,16 @@
-import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent} from './imasora-construction-native-dump-pose.mjs';
+import {excavatorGroundFrame,excavatorGroundHeight,excavatorWorkSupported,groundPoint,groundLocal} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
+import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {transportExcavatorPositionSafe} from './imasora-construction-transport-drive.mjs?v=120fw';
+import {transportPoseKey} from './imasora-construction-transport-field.mjs?v=120fc';
 import {canonical} from './imasora-construction-state.js';
-import {createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs';
-import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs';
-import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js';
-import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js';
+import {dumpPositionSafe,createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs?v=120fw';
+import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js?v=120fc';
+import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js?v=120fc';
 import {bucketPoint,isContactDig,isBackhoe} from './imasora-construction-excavator-bucket.js';
-import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js';
-import {LOADER,localToWorld} from './imasora-construction-loader-physics.js';
-import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs';
+import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js?v=120ey';
+import {LOADER,WALKER,localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
+import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
 
 export const BUCKET_DUMP_FORMAT='imasora-shared-bucket-dump-checkpoint-v1';
 export const BUCKET_DUMP_SCOPE='imasora-shared-bucket-dump-isolated-v1';
@@ -21,12 +24,12 @@ const same=(a,b)=>canonical(a)===canonical(b);
 function freezePlan(value){if(value&&typeof value==='object'){for(const v of Object.values(value))freezePlan(v);Object.freeze(value);}return value;}
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,60}$/.test(v);
 const heading=n=>Math.atan2(Math.sin(n),Math.cos(n));
-const cabPath=(f,side,board=true)=>excavatorAccessPath(poseWork(f).loader.vehicle,f.machineArm.slew,side,board).map(p=>({...p,heading:heading(p.heading)}));
+const cabPath=(f,side,board=true)=>{const w=poseWork(f),v=w.loader.vehicle,g=w.groundPose;return excavatorAccessPath(v,f.machineArm.slew,side,board).map(p=>{if(!g)return{...p,heading:heading(p.heading)};const c=Math.cos(v.heading),s=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,q=groundPoint(g,c*dx-s*dz,p.y,s*dx+c*dz);return{...p,x:q[0],y:p.y===0?excavatorGroundHeight(f,q[0],q[2])??q[1]:q[1],z:q[2],heading:heading(p.heading)};});};
 const legacy=s=>({format:DUMP_WORK_FORMAT,scope:DUMP_WORK_SCOPE,version:1,revision:s.revision,frame:s.frame,mode:s.mode==='excavating'?'foot':s.mode,vehicleTravel:s.vehicleTravel,wheelTravel:s.wheelTravel,unload:s.unload});
 const idle=s=>check(!s.link&&!s.unload&&!s.frame.job&&!s.frame.soil.pending,'今の作業を終えるか、メニューで一時停止してください。');
 const next=(s,frame,extra={})=>({...s,revision:s.revision+1,frame:{...frame,revision:s.frame.revision+1},...extra});
 const poseWork=(frame,arm=frame.machineArm)=>({...shovelMachineState(frame),arm,terrain:{},spoil:[],falling:[],load:frame.soil.containers.bucket.amount/64});
-export function linkedExcavatorSeat(frame){const w=poseWork(frame),v={...w.loader.vehicle,heading:w.loader.vehicle.heading+frame.machineArm.slew},p=localToWorld(v,LOADER.seatX,LOADER.seatZ);return{...frame.player,x:p.x,y:EX_ACCESS.floor,z:p.z,heading:Math.atan2(Math.sin(v.heading),Math.cos(v.heading))};}
+export function linkedExcavatorSeat(frame){const w=poseWork(frame),v={...w.loader.vehicle,heading:w.loader.vehicle.heading+frame.machineArm.slew},p=localToWorld(v,LOADER.seatX,LOADER.seatZ);const g=w.groundPose;if(g){const c=Math.cos(w.loader.vehicle.heading),sn=Math.sin(w.loader.vehicle.heading),dx=p.x-w.loader.vehicle.x,dz=p.z-w.loader.vehicle.z,q=groundPoint(g,c*dx-sn*dz,EX_ACCESS.floor,sn*dx+c*dz);return{...frame.player,x:q[0],y:q[1],z:q[2],heading:heading(v.heading)};}return{...frame.player,x:p.x,y:EX_ACCESS.floor,z:p.z,heading:Math.atan2(Math.sin(v.heading),Math.cos(v.heading))};}
 function armValid(a){exact(a,axes);check(finite(a.boom,EX.boomMin,EX.boomMax)&&finite(a.stick,-2.55,-Math.PI/6+1e-8)&&finite(a.curl,-1.25,1.1)&&finite(a.slew,-EX.slewLimit,EX.slewLimit),'アームの範囲が不正です。');}
 function boxContact(prism,box){
  const half=box.half??Array(3).fill(box.size/2),h=box.heading??0;
@@ -38,10 +41,11 @@ function boxContact(prism,box){
 }
 function cargoBox(f){const amount=f.soil.containers.dump.amount;if(!amount)return null;const vol=amount*8,w=Math.min(48,Math.max(4,Math.sqrt(vol/4))),d=Math.min(29,Math.max(4,vol/(w*4))),height=vol/(w*d);return nativeDumpBox(f,[-24+w/2,17+height/2,-22],[w/2,height/2,d/2]);}
 export function linkedArmClear(frame,arm=frame.machineArm){
- const w=poseWork(frame,arm),p=armPose(w);if(armIntersections(w).size)return false;
- const parts=bucketContactGeometry(w,p).all,key=canonical(frame.dump);let entry=obstacleCache.get(frame.soil);if(!entry||entry.key!==key){const cargo=cargoBox(frame);entry={key,boxes:[...shovelDumpObstacles(frame),...shovelSoilBoxes(frame.soil),...(cargo?[cargo]:[])]};obstacleCache.set(frame.soil,entry);}
+ let w,p;try{w=poseWork(frame,arm);p=armPose(w);}catch{return false;}if(armIntersections(w).size)return false;
+ const parts=bucketContactGeometry(w,p).all,key=canonical(frame.dump);let entry=obstacleCache.get(frame.soil);if(!entry||entry.key!==key){const cargo=cargoBox(frame);entry={key,grid:new Map()};for(const b of [...shovelDumpObstacles(frame),...shovelSoilBoxes(frame.soil),...(cargo?[cargo]:[])]){const extent=boxExtent(b),item={b,extent};for(let x=Math.floor((b.position[0]-extent[0])/32);x<=Math.floor((b.position[0]+extent[0])/32);x++)for(let z=Math.floor((b.position[2]-extent[2])/32);z<=Math.floor((b.position[2]+extent[2])/32);z++){const cell=x+','+z,list=entry.grid.get(cell)??[];list.push(item);entry.grid.set(cell,list);}}obstacleCache.set(frame.soil,entry);}
  const min=[0,1,2].map(i=>Math.min(...p.world.map(v=>[v.x,v.y,v.z][i]-2.8),...parts.map(p=>p.min[i]))),max=[0,1,2].map(i=>Math.max(...p.world.map(v=>[v.x,v.y,v.z][i]+2.8),...parts.map(p=>p.max[i])));
- for(const b of entry.boxes){const extent=boxExtent(b);if(extent.some((v,i)=>min[i]>b.position[i]+v||max[i]<b.position[i]-v))continue;
+ const nearby=new Set();for(let x=Math.floor(min[0]/32);x<=Math.floor(max[0]/32);x++)for(let z=Math.floor(min[2]/32);z<=Math.floor(max[2]/32);z++)for(const item of entry.grid.get(x+','+z)??[])nearby.add(item);
+ for(const {b,extent} of nearby){if(extent.some((v,i)=>min[i]>b.position[i]+v||max[i]<b.position[i]-v))continue;
   for(let n=0;n<2;n++)if(shovelSegmentHits([p.world[n].x,p.world[n].y,p.world[n].z],[p.world[n+1].x,p.world[n+1].y,p.world[n+1].z],b,2.8))return false;
   if(parts.some(part=>boxContact(part,b)))return false;
  }
@@ -50,14 +54,16 @@ export function linkedArmClear(frame,arm=frame.machineArm){
 const interpolate=(a,b,u)=>Object.fromEntries(axes.map(k=>[k,a[k]+(b[k]-a[k])*u]));
 function segmentClear(f,a,b){const n=Math.max(1,...axes.map(k=>Math.ceil(Math.abs(b[k]-a[k])/.006)));check(n<=1100,'予定の移動が長すぎます。');for(let i=0;i<=n;i++)if(!linkedArmClear(f,interpolate(a,b,i/n)))return false;return true;}
 function localDump(f,p){return nativeDumpLocal(f,p);}
-export function bucketPourMouth(frame,arm=frame.machineArm,x=0){const w=poseWork(frame,arm),p=armPose(w),v=bucketPoint(w,{x,y:-10,z:-17}),c=Math.cos(p.heading),s=Math.sin(p.heading);return[p.wrist.x+c*v.x+s*v.z,p.wrist.y+v.y,p.wrist.z-s*v.x+c*v.z];}
+export function bucketPourMouth(frame,arm=frame.machineArm,x=0){const w=poseWork(frame,arm),p=armPose(w),v=bucketPoint(w,{x,y:-10,z:-17}),c=Math.cos(p.heading),s=Math.sin(p.heading);if(p.axes)return[p.wrist.x,p.wrist.y,p.wrist.z].map((n,i)=>n+p.axes[0][i]*v.x+p.axes[1][i]*v.y+p.axes[2][i]*v.z);return[p.wrist.x+c*v.x+s*v.z,p.wrist.y+v.y,p.wrist.z-s*v.x+c*v.z];}
 function mouthFits(frame,arm){return[-8,0,8].every(x=>{const p=bucketPourMouth(frame,arm,x),l=localDump(frame,p);return l[1]>29&&Math.abs(l[0])<=24&&l[2]>=-37&&l[2]<=-7;});}
 const stage=(kind,from,to,duration)=>({kind,from:{...from},to:{...to},duration:duration??Math.max(.15,...axes.map(k=>Math.abs(to[k]-from[k])/speed[k]))});
-function planKey(s){return canonical([s.frame.dump,s.frame.machineArm,s.mode]);}
+function planKey(s){return canonical([s.frame.dump,s.frame.machineArm,s.frame.machineVehicle??null,s.mode]);}
 function* segmentSteps(f,a,b){const n=Math.max(1,...axes.map(k=>Math.ceil(Math.abs(b[k]-a[k])/.006)));check(n<=1100,'予定の移動が長すぎます。');for(let i=0;i<=n;i++){if(!linkedArmClear(f,interpolate(a,b,i/n)))return false;yield;}return true;}
 function* planSteps(s){
+ if(!excavatorWorkSupported(s.frame)||!dumpPositionSafe(s.frame))return null;
  if(s.mode!=='excavating'||s.link||s.unload||s.frame.job||s.frame.soil.pending||!s.frame.soil.containers.bucket.amount||s.frame.soil.containers.dump.amount>=SOIL_CAPACITY.dump)return null;
  const f=s.frame,w=poseWork(f),closed=f.machineArm.curl,amount=Math.min(f.soil.containers.bucket.amount,SOIL_CAPACITY.dump-f.soil.containers.dump.amount);
+ if(!dumpPositionSafe({...f,soil:{...f.soil,containers:{...f.soil.containers,dump:{...f.soil.containers.dump,amount:f.soil.containers.dump.amount+amount}}}}))return null;
  // Bounded candidates. The bowl remains over the same receiving mouth while opening.
  for(const y of[60,56,52,48,64])for(const z of[-22,-27,-17]){
   const target=shovelDumpPoint(f,0,y,z),at=solveBucketPose(w,{x:target[0],y:target[1],z:target[2]},closed),open=solveBucketPose(w,{x:target[0],y:target[1],z:target[2]},-1.25);
@@ -79,7 +85,7 @@ export async function bucketDumpPlanAsync(s,yieldFrame=()=>new Promise(resolve=>
 const storagePlans=new WeakMap(),storageChecks=new WeakMap(),storageProofs=new Map();
 // Save packing clones the same immutable journal several times. Certify/replay
 // still runs first; this bounded cache only avoids repeating identical sweeps.
-const storageProof=s=>canonical([s.frame.soil.initial,s.frame.soil.site,s.frame.soil.journal,s.frame.dump,s.link.plan]);
+const storageProof=s=>canonical([s.frame.soil.initial,s.frame.soil.site,s.frame.soil.journal,s.frame.dump,s.frame.machineVehicle??null,s.link.plan]);
 function rememberStorage(s){const proof=storageProof(s);storageProofs.delete(proof);storageProofs.set(proof,true);if(storageProofs.size>8)storageProofs.delete(storageProofs.keys().next().value);}
 const STORAGE_KINDS=['raise','clear','swing','above','lower','cut','clearBin','lift','ready','close'];
 export function bucketStorageClear(frame,arm){
@@ -89,6 +95,7 @@ export function bucketStorageClear(frame,arm){
 }
 function* storageSegmentSteps(f,a,b){const n=Math.max(1,...axes.map(k=>Math.ceil(Math.abs(b[k]-a[k])/.006)));check(n<=1100,'箱への移動が長すぎます。');for(let i=0;i<=n;i++){if(!bucketStorageClear(f,interpolate(a,b,i/n)))return false;yield;}return true;}
 function* storagePlanSteps(s){
+ if(!excavatorWorkSupported(s.frame))return null;
  if(s.mode!=='excavating'||s.link||s.unload||s.frame.job||s.frame.soil.pending||s.frame.soil.containers.bucket.amount||!s.frame.soil.containers.storage.amount)return null;
  const f=s.frame,w=poseWork(f),amount=Math.min(f.soil.containers.storage.amount,SOIL_CAPACITY.bucket);
  for(const x of[-94,-92,-88])for(const z of[-22,-18,-12]){
@@ -109,7 +116,7 @@ export async function bucketStoragePlanAsync(s,yieldFrame=()=>new Promise(r=>set
 export function startBucketStorage(s,operationId){
  idle(s);check(id(operationId),'操作番号が不正です。');const plan=bucketStoragePlan(s);check(plan,'箱の土がないか、バケットの通り道がふさがっています。');check(s.frame.soil.journal.length<=SOIL_LIMITS.history-3,'保存の作業数が上限です。');
  const soil=soilTransportCommand(s.frame.soil,{type:'reserve',id:operationId+'_reserve',expectedRevision:s.frame.soil.revision,transferId:operationId,from:'storage',to:'bucket',materialId:s.frame.soil.containers.storage.materialId,amount:plan.amount,positions:[]});
- storageChecks.set(plan,{soil,dump:canonical(s.frame.dump),signature:canonical(plan)});const result=next(s,{...s.frame,soil},{link:{kind:'storage',id:operationId,plan,elapsed:0,returning:false}});rememberStorage(result);return result;
+ storageChecks.set(plan,{soil,dump:canonical([s.frame.dump,s.frame.machineVehicle??null]),signature:canonical(plan)});const result=next(s,{...s.frame,soil},{link:{kind:'storage',id:operationId,plan,elapsed:0,returning:false}});rememberStorage(result);return result;
 }
 export function linkedStorageVisual(s){const j=s.link;if(j?.kind!=='storage')return{portion:0,bucket:s.frame.soil.containers.bucket.amount,sourceVisible:false};const portion=Math.max(0,Math.min(1,(j.elapsed-j.plan.flowStart)/(j.plan.flowEnd-j.plan.flowStart)));return{portion,bucket:s.frame.soil.pending.amount*portion,sourceVisible:portion<1};}
 function validateStorageLink(s,j){
@@ -119,7 +126,7 @@ function validateStorageLink(s,j){
  for(const seg of j.plan.path){exact(seg,['kind','from','to','duration']);armValid(seg.from);armValid(seg.to);check(finite(seg.duration,.15,12),'動作時間が不正です。');}
  const r=s.frame.soil.journal.at(-1);check(r.type==='reserve'&&r.id===j.id+'_reserve'&&r.transferId===j.id&&r.from==='storage'&&r.to==='bucket'&&r.amount===j.plan.amount,'箱の履歴が一致しません。');
  check(same(s.frame.machineArm,bucketPlanPose(j.plan,j.elapsed)),'箱から取り出す途中の姿勢が一致しません。');
- const key=canonical(s.frame.dump),signature=canonical(j.plan),cached=storageChecks.get(j.plan);
+ const key=canonical([s.frame.dump,s.frame.machineVehicle??null]),signature=canonical(j.plan),cached=storageChecks.get(j.plan);
  if(!cached||cached.soil!==s.frame.soil||cached.dump!==key||cached.signature!==signature){
   if(storageProofs.has(storageProof(s))){storageChecks.set(j.plan,{soil:s.frame.soil,dump:key,signature});return;}
   // Reconstruct the pre-reservation count through the same checked journal.
@@ -131,11 +138,17 @@ function validateStorageLink(s,j){
 }
 
 export function bucketPlanPose(plan,time){let t=time;for(const p of plan.path){if(t<=p.duration)return interpolate(p.from,p.to,Math.max(0,Math.min(1,t/p.duration)));t-=p.duration;}return{...plan.path.at(-1).to};}
+export function bucketAccessPathClear(path,boxes){
+ const r=WALKER.radius,h=WALKER.height,min=[Math.min(...path.map(p=>p.x))-r,Math.min(...path.map(p=>p.y)),Math.min(...path.map(p=>p.z))-r],max=[Math.max(...path.map(p=>p.x))+r,Math.max(...path.map(p=>p.y))+h,Math.max(...path.map(p=>p.z))+r];
+ const nearby=boxes.filter(b=>{const e=boxExtent(b);return e.every((n,i)=>b.position[i]+n>min[i]+.05&&b.position[i]-n<max[i]-.05);});
+ for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z)/.3));for(let j=0;j<=steps;j++){const t=j/steps,body={position:[a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t+h/2,a.z+(b.z-a.z)*t],half:[r,h/2,r]};if(nearby.some(b=>boxesOverlap3D(body,b,.05)))return false;}}
+ return true;
+}
 export function linkedAccessTarget(s,boarding=true){
  if(s.link||s.unload||s.frame.job||s.frame.soil.pending||s.mode!==(boarding?'foot':'excavating'))return null;const f=s.frame,w=poseWork(f),v=w.loader.vehicle;
  const boxes=[...shovelDumpObstacles(f),...shovelSoilBoxes(f.soil)],obstacles=boxes.map(b=>{const h=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);return{x:b.position[0],z:b.position[2],width:h[0]*2,depth:h[2]*2,y:b.position[1]-h[1],height:h[1]*2,angle:b.axes?0:b.heading??0};});
- for(const side of[-1,1]){let path=cabPath(f,side,boarding);const first=path[0],p=f.player;if(boarding&&(Math.hypot(first.x-p.x,first.z-p.z)>10||Math.abs(p.y)>.05||!shovelStanding(f,p)))continue;
-  path=[{...p},...path];if(!excavatorAccessClear(path,v,obstacles))continue;return{side,path};
+ for(const side of[-1,1]){let path=cabPath(f,side,boarding);const first=path[0],p=f.player;if(boarding&&(Math.hypot(first.x-p.x,first.z-p.z)>10||Math.abs(p.y-first.y)>2.1||!shovelStanding(f,p)))continue;
+  path=[{...p},...path];if(!path.every(q=>[q.x,q.y,q.z].every(Number.isFinite))||!boarding&&!shovelStanding(f,path.at(-1)))continue;const g=w.groundPose,localPath=g?path.map(p=>{const q=groundLocal(g,[p.x,p.y,p.z]),c=Math.cos(v.heading),s=Math.sin(v.heading);return{...p,x:v.x+c*q[0]+s*q[2],y:q[1],z:v.z-s*q[0]+c*q[2]};}):path;if(!excavatorAccessClear(localPath,v,g?[]:obstacles))continue;if(g&&!bucketAccessPathClear(path,boxes))continue;return{side,path};
  }return null;
 }
 function pathAt(path,u){if(!u)return{...path[0]};const distances=path.slice(1).map((p,i)=>Math.hypot(p.x-path[i].x,p.y-path[i].y,p.z-path[i].z)),total=distances.reduce((a,b)=>a+b,0),face=heading(path[0].heading+heading(path.at(-1).heading-path[0].heading)*Math.min(1,u/.18));let d=total*u;for(let i=0;i<distances.length;i++){if(d<=distances[i]||i===distances.length-1){const t=distances[i]?Math.min(1,d/distances[i]):1,a=path[i],b=path[i+1];return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t,heading:face,travel:path[0].travel+total*u};}d-=distances[i];}}
@@ -149,7 +162,7 @@ export function startBucketAccess(s,boarding){idle(s);const target=linkedAccessT
 export function startBucketPour(s,operationId){
  idle(s);check(id(operationId),'操作番号が不正です。');const plan=bucketDumpPlan(s);check(plan,'荷台の位置か通り道を確認してください。届く場所へダンプを停め、荷台を空けてください。');check(s.frame.soil.journal.length<=SOIL_LIMITS.history-3,'保存の作業数が上限です。');
  const soil=soilTransportCommand(s.frame.soil,{type:'reserve',id:operationId+'_reserve',expectedRevision:s.frame.soil.revision,transferId:operationId,from:'bucket',to:'dump',materialId:s.frame.soil.containers.bucket.materialId,amount:plan.amount,positions:[]});
- planChecks.set(plan,{soil,dump:canonical(s.frame.dump),signature:canonical(plan)});return next(s,{...s.frame,soil},{link:{kind:'pour',id:operationId,plan,elapsed:0,returning:false}});
+ planChecks.set(plan,{soil,dump:canonical([s.frame.dump,s.frame.machineVehicle??null]),signature:canonical(plan)});return next(s,{...s.frame,soil},{link:{kind:'pour',id:operationId,plan,elapsed:0,returning:false}});
 }
 export function linkedPourVisual(s){const j=s.link;if(j?.kind!=='pour')return{portion:0,bucket:s.frame.soil.containers.bucket.amount,cargo:s.frame.soil.containers.dump.amount,mouth:null,progress:0};const p=Math.max(0,Math.min(1,(j.elapsed-j.plan.flowStart)/LINK_POUR_SECONDS)),amt=s.frame.soil.pending.amount;return{portion:p,bucket:s.frame.soil.containers.bucket.amount+amt*(1-p),cargo:s.frame.soil.containers.dump.amount+amt*p,mouth:bucketPourMouth(s.frame),progress:j.elapsed/j.plan.duration};}
 export function progressBucketLink(s,dt){check(s.link&&finite(dt,0,.05),'進行時間が不正です。');const j=s.link,duration=['pour','storage'].includes(j.kind)?j.plan.duration:j.duration,elapsed=j.returning?Math.max(0,j.elapsed-dt):Math.min(duration,j.elapsed+dt),link={...j,elapsed};let f=s.frame;
@@ -165,7 +178,7 @@ export function finishBucketLink(s){check(bucketLinkReady(s),'動作の終了を
 export function slewBucketWork(s,axis,dt){idle(s);check(s.mode==='excavating'&&finite(axis,-1,1)&&finite(dt,Number.EPSILON,.05),'旋回の入力が不正です。');if(!axis)return s;const a=s.frame.machineArm,h=Math.max(-EX.slewLimit,Math.min(EX.slewLimit,a.slew-axis*.62*dt)),arm={...a,slew:h};if(!segmentClear(s.frame,a,arm))return s;let f={...s.frame,machineArm:arm};f.player=linkedExcavatorSeat(f);return next(s,f);}
 export function validateBucketDumpWork(s){
  exact(s,['format','scope','version','revision','frame','mode','vehicleTravel','wheelTravel','unload','link']);check(s.format===BUCKET_DUMP_FORMAT&&s.scope===BUCKET_DUMP_SCOPE&&s.version===1&&['foot','driving','excavating'].includes(s.mode),'専用のショベル積込保存が必要です。');armValid(s.frame.machineArm);
- validateDumpWork(legacy(s),{liveArm:true,aboardExcavator:s.mode==='excavating',bucketTransfer:s.link?.kind==='pour',storageTransfer:s.link?.kind==='storage'});check(linkedArmClear(s.frame),'アーム・バケットの通り道がふさがっています。');
+ validateDumpWork(legacy(s),{liveArm:true,aboardExcavator:s.mode==='excavating',bucketTransfer:s.link?.kind==='pour',storageTransfer:s.link?.kind==='storage'});check(linkedArmClear(s.frame),'アーム・バケットの通り道がふさがっています。');if(s.frame.version===2)check(transportExcavatorPositionSafe(s.frame),'ショベルの車体や足元がふさがっています。');
  if(s.mode==='excavating'){check(!s.unload&&!s.frame.job,'乗車中の手作業はできません。');if(!s.link||['pour','storage'].includes(s.link.kind)){const p=linkedExcavatorSeat(s.frame);check(['x','y','z','heading'].every(k=>Math.abs(p[k]-s.frame.player[k])<1e-8),'人物がショベルの運転席にいません。');}}
  if(s.link){const j=s.link;check(s.mode==='excavating'&&!s.unload&&!s.frame.job&&typeof j.returning==='boolean','別の動作と重なっています。');if(j.kind==='storage'){validateStorageLink(s,j);}else if(j.kind==='pour'){
    exact(j,['kind','id','plan','elapsed','returning']);exact(j.plan,['amount','path','duration','flowStart','flowEnd']);const p=s.frame.soil.pending;
@@ -176,7 +189,7 @@ export function validateBucketDumpWork(s){
    const path=j.plan.path,near=(a,b)=>Math.abs(a-b)<1e-8,hold=(n,ks)=>ks.every(k=>near(path[n].from[k],path[n].to[k]));
    check(hold(0,['stick','curl','slew'])&&near(path[0].to.boom,READY.boom)&&hold(1,['boom','curl','slew'])&&near(path[1].to.stick,READY.stick)&&hold(2,['boom','stick','curl'])&&hold(3,['slew','curl'])&&hold(4,['slew'])&&near(path[4].to.curl,READY.curl)&&hold(6,['stick','slew'])&&hold(7,['boom','curl','slew'])&&near(path[7].to.boom,READY.boom)&&near(path[7].to.stick,READY.stick)&&near(path[7].to.curl,s.frame.soil.containers.bucket.amount?path[0].from.curl:READY.curl),'一連の積込みの姿勢が不正です。');
    check(Math.abs(t-j.plan.duration)<1e-8&&Math.abs(j.plan.flowStart-j.plan.path.slice(0,5).reduce((n,p)=>n+p.duration,0))<1e-8&&j.plan.flowEnd===j.plan.flowStart+LINK_POUR_SECONDS,'動作の時刻が不正です。');check(same(s.frame.machineArm,bucketPlanPose(j.plan,j.elapsed)),'現在のアームと保存した途中が一致しません。');
-   const key=canonical(s.frame.dump),signature=canonical(j.plan),cached=planChecks.get(j.plan);if(!cached||cached.soil!==s.frame.soil||cached.dump!==key||cached.signature!==signature){check(j.plan.path.every(seg=>segmentClear(s.frame,seg.from,seg.to)),'保存した積込経路がふさがっています。');planChecks.set(j.plan,{soil:s.frame.soil,dump:key,signature});}
+   const key=canonical([s.frame.dump,s.frame.machineVehicle??null]),signature=canonical(j.plan),cached=planChecks.get(j.plan);if(!cached||cached.soil!==s.frame.soil||cached.dump!==key||cached.signature!==signature){check(j.plan.path.every(seg=>segmentClear(s.frame,seg.from,seg.to)),'保存した積込経路がふさがっています。');planChecks.set(j.plan,{soil:s.frame.soil,dump:key,signature});}
   }else{
    exact(j,['kind','side','fromPlayer','elapsed','duration','returning']);check(['board','leave'].includes(j.kind)&&[-1,1].includes(j.side)&&j.duration===(j.kind==='board'?1.9:2.1)&&j.returning===false&&finite(j.elapsed,0,j.duration),'乗降の保存が不正です。');exact(j.fromPlayer,['x','y','z','heading','travel']);const path=accessPath(s,j),p=pathAt(path,j.elapsed/j.duration);check(['x','y','z','heading','travel'].every(k=>Math.abs(p[k]-s.frame.player[k])<1e-8),'乗降経路と人物が一致しません。');
    check(Object.values(j.fromPlayer).every(Number.isFinite)&&j.fromPlayer.travel>=0,'乗降前の人物が不正です。');if(j.kind==='leave'){const seat=linkedExcavatorSeat(s.frame);check(['x','y','z','heading'].every(k=>Math.abs(seat[k]-j.fromPlayer[k])<1e-8),'降車前に運転席にいません。');}
@@ -184,7 +197,7 @@ export function validateBucketDumpWork(s){
   }
  }else check(!s.frame.soil.pending||!!s.unload||!!s.frame.job,'途中の土に作業がありません。');return s;
 }
-export function validateBucketDumpContinuation(a,b){validateBucketDumpWork(a);validateBucketDumpWork(b);check(same(a.frame.soil.site,b.frame.soil.site)&&same(a.frame.soil.initial,b.frame.soil.initial),'別の現場へ切り替えられません。');check(b.frame.soil.journal.length>=a.frame.soil.journal.length&&a.frame.soil.journal.every((c,i)=>same(c,b.frame.soil.journal[i])),'古い土へ巻き戻せません。');check(b.revision>=a.revision&&b.frame.revision>=a.frame.revision&&b.vehicleTravel>=a.vehicleTravel&&b.frame.player.travel>=a.frame.player.travel,'古い動きへ巻き戻せません。');check(b.revision!==a.revision||same(a,b),'同じ保存番号の内容が不正です。');return b;}
+export function validateBucketDumpContinuation(a,b){validateBucketDumpWork(a);validateBucketDumpWork(b);check(a.frame.version===b.frame.version&&same(a.frame.soil.field??null,b.frame.soil.field??null)&&same(a.frame.soil.site,b.frame.soil.site)&&same(a.frame.soil.initial,b.frame.soil.initial),'別の現場へ切り替えられません。');check(b.frame.soil.journal.length>=a.frame.soil.journal.length&&a.frame.soil.journal.every((c,i)=>same(c,b.frame.soil.journal[i])),'古い土へ巻き戻せません。');check(b.revision>=a.revision&&b.frame.revision>=a.frame.revision&&b.vehicleTravel>=a.vehicleTravel&&b.frame.player.travel>=a.frame.player.travel,'古い動きへ巻き戻せません。');check(b.revision!==a.revision||same(a,b),'同じ保存番号の内容が不正です。');return b;}
 const wrap=fn=>(s,...args)=>{idle(s);return fn(s,...args);};
 export const walkBucketSite=wrap(walkDumpWork),turnBucketWalker=wrap(turnDumpWalker),driveBucketSite=wrap(driveDumpWork),boardBucketSiteDump=wrap(boardDumpWork),leaveBucketSiteDump=wrap(leaveDumpWork),startBucketSiteHand=wrap(startDumpHandWork),startBucketSiteUnload=wrap(startDumpUnload),startBucketSiteStorage=wrap(startDumpStorage);
 export {dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,progressDumpUnload,finishDumpUnload,cancelDumpUnload,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork};

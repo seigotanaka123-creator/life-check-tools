@@ -1,6 +1,6 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
 import {canonical} from './imasora-construction-state.js';
-import {SOIL_TRANSPORT_SCOPE,SOIL_NATIVE_TRANSPORT_SCOPE,validateSoilTransport,soilTransportCommand,validateSoilTransportContinuation,packSoilTransport,unpackSoilTransport} from './imasora-construction-soil-transport.mjs';
+import {SOIL_TRANSPORT_SCOPE,SOIL_NATIVE_TRANSPORT_SCOPE,validateSoilTransport,soilTransportCommand,validateSoilTransportContinuation,packSoilTransport,unpackSoilTransport} from './imasora-construction-soil-transport.mjs?v=120fw';
 export const SOIL_TRANSPORT_DB='imasora-shared-soil-transport-isolated-v1';
 export class SoilTransportStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=SOIL_TRANSPORT_DB;}}
 export const SOIL_NATIVE_TRANSPORT_DB='imasora-shared-soil-native-copy-isolated-v2';

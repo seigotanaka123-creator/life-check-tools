@@ -1,7 +1,7 @@
-import {EXCAVATION_FORMAT,packExcavation,unpackExcavation} from './imasora-construction-excavator-save.js';
-import {totals} from './imasora-construction-excavator.js';
-import {buildProgress} from './imasora-construction-excavator-build.js';
-import {EXCAVATION_DB,EXCAVATION_RESTORE_TEST_DB,EXCAVATION_RESTORE_POINT} from './imasora-construction-excavator-storage.js';
+import {EXCAVATION_FORMAT,packExcavation,unpackExcavation} from './imasora-construction-excavator-save.js?v=120fc';
+import {totals} from './imasora-construction-excavator.js?v=120fc';
+import {buildProgress} from './imasora-construction-excavator-build.js?v=120fc';
+import {EXCAVATION_DB,EXCAVATION_RESTORE_TEST_DB,EXCAVATION_RESTORE_POINT} from './imasora-construction-excavator-storage.js?v=120fc';
 export const EXCAVATION_IMPORT_LIMIT=8*1024*1024;
 const fail=message=>{throw Error(message);};
 export function excavationImportSummary(state){

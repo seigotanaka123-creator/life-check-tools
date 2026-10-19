@@ -1,7 +1,8 @@
+import {LEGACY_PAINT_COLORS,validPaintColor} from './paint-colors.mjs?v=120ds';
 import {freeWorkCells} from './free-work-parts.mjs';
 // A cured 32 x 32 floor contains four reusable 16 x 16 x 2 panels.
 // Storing a panel never returns it as wet concrete or erases its paint.
-export const FLOOR_COLORS=Object.freeze({white:'#eee9da',red:'#c66558',yellow:'#d7b64c',green:'#64917b',blue:'#618db7',black:'#42494f'});
+export const FLOOR_COLORS=LEGACY_PAINT_COLORS;
 export const FLOOR_PARTS=Object.freeze([{x:-8,z:-8,label:'北西'},{x:8,z:-8,label:'北東'},{x:-8,z:8,label:'南西'},{x:8,z:8,label:'南東'}]);
 export const floorMask=f=>f.panelMask??15;
 export const partCount=mask=>FLOOR_PARTS.reduce((n,_,i)=>n+((mask>>i)&1),0);
@@ -23,7 +24,7 @@ export function floorPanelsProblem(project,floorIndex,position,mask){
  return '';
 }
 export function paintCost(floor,mask,color){
- if(!Object.hasOwn(FLOOR_COLORS,color))throw Error('INVALID_FLOOR_COLOR');
+ if(!validPaintColor(color))throw Error('INVALID_FLOOR_COLOR');
  if(!Number.isInteger(mask)||mask<1||mask>15||(mask&floorMask(floor))!==mask)throw Error('PAINT_REQUIRES_PLACED_PANELS');
  return FLOOR_PARTS.reduce((n,_,i)=>n+((mask&(1<<i))&&floor.paint?.[i]!==color?4:0),0);
 }

@@ -4256,6 +4256,18 @@ function createBeveledLauncherRailGeometry(length, width, depth) {
   return geometry;
 }
 
+// Shared pin, cabinet and coin resources belong to this scene. Dispose each
+// resource once, even when hundreds of meshes refer to the same instance.
+function disposePachicoinSceneResources(scene, textures = []) {
+  const resources = new Set(textures);
+  scene?.traverse(node => {
+    if (node.geometry) resources.add(node.geometry);
+    if (Array.isArray(node.material)) for (const material of node.material) resources.add(material);
+    else if (node.material) resources.add(node.material);
+  });
+  for (const resource of resources) resource?.dispose?.();
+}
+
 class ImasoraJackpotCoinPusherGame {
   constructor(root, options = {}) {
     this.root = root;
@@ -19637,8 +19649,8 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   hasSameDayRecovery() {
-    return this.stRemaining > 0 || Boolean(this.attackerStartDelay || this.attackerRound || this.postJackpotStDelay)
-      || Boolean(this.spin && (this.recoveryCycle || ['big', 'small'].includes(this.spin.outcome?.kind)));
+    // Every normal-play board is recoverable too, not only ST/jackpot.
+    return this.checkpointReady===true;
   }
 
   checkpointTransitionKey() {
@@ -19731,7 +19743,7 @@ class ImasoraJackpotCoinPusherGame {
     this.els.strokeValue.textContent = String(strokeDisplay);
     this.autoEnabled = false;
     this.root.dataset.pachicoinResumed = 'true';
-    this.recoveryCycle = true;
+    this.recoveryCycle = true;this.root.dataset.autoResumed='pachicoin';
     this.showCallout(`${this.stationId}番台の続きから再開`, 2.5, 'chance');
     return true;
   }
@@ -20195,6 +20207,11 @@ class ImasoraJackpotCoinPusherGame {
     if (!this.renderer || !this.els?.stage) return;
     const width = Math.max(1, this.els.stage.clientWidth);
     const height = Math.max(1, this.els.stage.clientHeight);
+    // ResizeObserver and window resize can report the same dimensions.
+    // Keep the drawing buffer and camera stable until the size really changes.
+    if (this.renderWidth === width && this.renderHeight === height) return;
+    this.renderWidth = width;
+    this.renderHeight = height;
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.applyCameraFraming();
@@ -20205,6 +20222,7 @@ class ImasoraJackpotCoinPusherGame {
 
   loop(timestamp) {
     if (this.destroyed) return;
+    if(document.body?.classList.contains('new-opening-active')||document.body?.classList.contains('loading-screen-active')){this.lastTimestamp=timestamp;this.frame=requestAnimationFrame(this.boundLoop);return;}
     if (document.hidden || this.navigationPaused) {
       this.frame = 0;
       return;
@@ -20262,7 +20280,7 @@ class ImasoraJackpotCoinPusherGame {
     this.checkpointFrameActive = false;
     if (this.checkpointDirty || ((this.hasSameDayRecovery() || this.recoveryCycle)
       && (this.checkpointTransitionKey() !== this.lastCheckpointTransition
-        || this.elapsed - (this.lastCheckpointElapsed || 0) >= 0.5))) this.flushPlayCheckpoint();
+        || this.elapsed - (this.lastCheckpointElapsed || 0) >= (this.stRemaining>0||this.attackerRound||this.attackerStartDelay?0.5:2)))) this.flushPlayCheckpoint();
     this.syncPinDrawBatches();
     // Visual shadows refresh at 30 Hz; gameplay and input retain every frame.
     if (timestamp - this.lastShadowRenderTimestamp >= 1000 / 30 - 1) {
@@ -20275,6 +20293,7 @@ class ImasoraJackpotCoinPusherGame {
   }
 
   destroy() {
+    if (this.destroyed) return;
     this.flushPlayCheckpoint();
     this.navigationAudio.clear();
     this.pendingStationChange = null;
@@ -20345,12 +20364,7 @@ class ImasoraJackpotCoinPusherGame {
     window.removeEventListener("storage", this.boundCheckpointStorage);
     document.removeEventListener("visibilitychange", this.boundVisibility);
     this.clearPinDrawBatches();
-    this.textures.forEach(texture => texture.dispose());
-    this.scene?.traverse(node => {
-      node.geometry?.dispose?.();
-      if (Array.isArray(node.material)) node.material.forEach(material => material.dispose?.());
-      else node.material?.dispose?.();
-    });
+    disposePachicoinSceneResources(this.scene, this.textures);
     this.launchSoundInstances?.forEach(audio => {
       audio.pause();
       audio.removeAttribute("src");

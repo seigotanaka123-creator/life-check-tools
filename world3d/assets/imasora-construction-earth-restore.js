@@ -1,8 +1,8 @@
 // Explicit restoration of one finite live-earth grant only. No wallet, work,
 // equipment, purchase, or localStorage data is returned for replacement.
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=497';
-import {EARTH_LIVE_SCOPE,validateAuthorityExcavation,validateAuthorityExcavationContinuation,authorityExcavationSummary} from './imasora-construction-earth-authority.js?v=497';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
+import {EARTH_LIVE_SCOPE,validateAuthorityExcavation,validateAuthorityExcavationContinuation,authorityExcavationSummary} from './imasora-construction-earth-authority.js?v=120fc';
 
 export const LIVE_EARTH_RECOVERY_KIND='imasora-excavation-live-recovery-v1';
 export const MAX_EARTH_RESTORE_INPUT=32*1024*1024;

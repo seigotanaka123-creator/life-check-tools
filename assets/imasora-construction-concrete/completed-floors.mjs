@@ -1,10 +1,11 @@
+import {createPaintMaterials} from './paint-colors.mjs?v=120ds';
 import * as T from '../three.module.min.js';
-import {completedConcreteGeometry} from './projects.mjs';
-import {FLOOR_COLORS,floorPanels} from './floor-parts.mjs';
+import {completedConcreteGeometry} from './projects.mjs?v=120fw';
+import {FLOOR_COLORS,floorPanels} from './floor-parts.mjs?v=120ds';
 export function createCompletedFloors(scene){
  const root=new T.Group();root.name='completed-concrete-works';scene.add(root);
  const unit=new T.BoxGeometry(1,1,1),concrete=new T.MeshStandardMaterial({color:'#b8beba',roughness:.85}),scaffold=new T.MeshStandardMaterial({color:'#a99169',roughness:1});let key='';
- const paints=Object.fromEntries(Object.entries(FLOOR_COLORS).map(([name,color])=>[name,new T.MeshStandardMaterial({color,roughness:.85})]));
+ const paints=createPaintMaterials(color=>new T.MeshStandardMaterial({color,roughness:.85}));
  const preview=new T.Group();preview.name='concrete-panel-preview';scene.add(preview);
  const ghost=new T.MeshBasicMaterial({color:'#84efc0',wireframe:true});
  function showPreview(floor){

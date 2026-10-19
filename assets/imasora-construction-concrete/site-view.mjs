@@ -8,8 +8,8 @@ import {WORKSHOP_FENCE_PARTS} from './workshop-fence.mjs';
 
 import {SITE,BUCKET,createSiteCollider,stepCharacter,onFinishedSurface,contactAtFinishedEdge} from './c2-3d-physics.mjs';
 import {TOOL,toolPlan,pourPose,trowelPose,worldToLocal,assertToolReceipt,hammerPose,fillPose} from './c2-tool-contact.mjs';
-import {createHandTools} from './c2-hand-tools.mjs';
-import {createAssemblyFixtures} from './c2-assembly-fixtures.mjs';
+import {createHandTools} from './c2-hand-tools.mjs?v=120ds';
+import {createAssemblyFixtures} from './c2-assembly-fixtures.mjs?v=120ds';
 
 export function createEmbeddedSiteView({hostScene,hostCamera,model,offset,onMove,onNotice,canMove,controls}){
  const scene=new T.Group();scene.name='profile-concrete-worksite';scene.position.set(offset.x,0,offset.z);hostScene.add(scene);let active=false;
@@ -95,7 +95,7 @@ export function createEmbeddedSiteView({hostScene,hostCamera,model,offset,onMove
    let step=Math.min(held?Infinity:Math.hypot(dx,dz),18*dt*(held?walkFactor({fast:travelBoost.fast})*Math.min(1,Math.hypot(input.x,input.z)):1));if(!canMove()||work)step=0;const len=Math.hypot(dx,dz)||1;
    const result=stepCharacter(collider,actor,{x:dx/len*step,z:dz/len*step},dt);actor=result.actor;distanceMoved=result.distance;
    if(route.length&&result.blocked.length){cancel();onNotice('障害物の手前で止まりました。外周か坂道から回り込んでください。');}
-   if(distanceMoved>.001)actorGroup.rotation.y=Math.atan2(dx,dz);actorGroup.position.set(actor.x,actor.y,actor.z);
+   if(step>0&&Math.hypot(dx,dz)>1e-7)actorGroup.rotation.y=Math.atan2(dx,dz);actorGroup.position.set(actor.x,actor.y,actor.z);
    hands.forEach(({o,base})=>o.position.copy(base));
    if(tool==='bucket')grip(TOOL.carry);else if(tool==='hammer')grip({x:12,y:15,z:4});else grip({x:hands[1].base.x*.36,y:hands[1].base.y*.36+model.position.y,z:hands[1].base.z*.36});
    if(work){try{distanceMoved=updateWork(dt);}catch(error){failAction(error);}}
