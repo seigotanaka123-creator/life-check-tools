@@ -1,6 +1,6 @@
 import {createPaintMaterials} from './paint-colors.mjs?v=120ds';
 import * as T from '../three.module.min.js';
-import {completedConcreteGeometry} from './projects.mjs?v=120fw';
+import {completedConcreteGeometry} from './projects.mjs?v=120gn';
 import {FLOOR_COLORS,floorPanels} from './floor-parts.mjs?v=120ds';
 export function createCompletedFloors(scene){
  const root=new T.Group();root.name='completed-concrete-works';scene.add(root);

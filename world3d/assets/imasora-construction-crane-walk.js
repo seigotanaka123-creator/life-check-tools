@@ -1,11 +1,11 @@
-import {cranePoint,craneChassisFrame,craneGroundHeight} from './imasora-construction-crane-ground.mjs?v=120ey';
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump} from './imasora-construction-locomotion.mjs?v=120eg';
+import {cranePoint,craneChassisFrame,craneGroundHeight} from './imasora-construction-crane-ground.mjs?v=120gf';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
 import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
 import {walkFactor} from './imasora-construction-travel-input.mjs';
 // Stage 4-2: the same oriented parts are floors, walls and ceilings.
 // Independent of the approved loader/terrain physics and their saves.
-import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
-import {craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120fw';
+import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120gn';
 export const CRANE_WALK=Object.freeze({...WALKER,step:8.01,gravity:SKY_JUMP_GRAVITY,jump:SKY_JUMP_VELOCITY});
 const EPS=1e-6;
 export function cranePlayer(p){return{vy:0,grounded:p.y===0,ceilingHit:false,jumpHeld:false,...p};}
@@ -57,15 +57,15 @@ export function stepCraneWalker(s,rig,input,dt,external=[]){
   const p=cranePlayer(rig.player),reader=rig.vehicle.field&&typeof external.groundHeightAt==='function'?external.groundHeightAt:()=>0,base=reader(p.x,p.z);if(!Number.isFinite(base))return{...rig,hit:'地面'};p.y+=base;const boxes=[...craneWalkVolumes(s),...external.map(o=>({id:o.id,name:o.id||'建物',x:o.x,z:o.z,y:o.minY??0,w:o.width,d:o.depth,h:o.height-(o.minY??0),angle:o.angle??0,step:false}))];
   p.grounded=grounded(p,boxes,reader(p.x,p.z))&&p.vy<=0;
   landThreeJump(p);if(input.jump&&!p.jumpHeld)beginThreeJump(p,CRANE_WALK.jump);
-  p.jumpHeld=!!input.jump;
+  updateJumpHold(p,input.jump);
   const n=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/n*CRANE_WALK.speed*walkFactor(input)*dt,dz=(input.z||0)/n*CRANE_WALK.speed*walkFactor(input)*dt;
   const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));let hit='';
   for(let i=0;i<steps;i++){
     for(const [axis,d]of[['x',dx/steps],['z',dz/steps]]){const h=reader(p.x,p.z),q={...p,[axis]:p[axis]+d},next=reader(q.x,q.z),oldY=p.y;if(!Number.isFinite(next)||Math.abs(next-h)>3.1){hit='地面の段差';continue;}if(p.grounded&&Math.abs(p.y-h)<.05)p.y+=next-h;const blocked=horizontalMove(p,axis,d,boxes,rig.vehicle);if(blocked){p.y=oldY;hit=blocked;}}
     p.grounded=grounded(p,boxes,reader(p.x,p.z))&&p.vy<=0;
   }
-  p.vy-=CRANE_WALK.gravity*dt;
-  const wanted=p.vy*dt,moved=verticalTravel(p,wanted,boxes,reader(p.x,p.z));p.y+=moved.distance;
+  const verticalDistance=p.vy*dt-CRANE_WALK.gravity*dt*dt/2;p.vy-=CRANE_WALK.gravity*dt;
+  const wanted=verticalDistance,moved=verticalTravel(p,wanted,boxes,reader(p.x,p.z));p.y+=moved.distance;
   p.grounded=wanted<0&&moved.distance>wanted+EPS;
   p.ceilingHit=wanted>0&&moved.distance<wanted-EPS;
   if(p.grounded||p.ceilingHit)p.vy=0;landThreeJump(p);

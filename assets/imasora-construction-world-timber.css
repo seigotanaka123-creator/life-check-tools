@@ -22,3 +22,51 @@
 .world-timber-controls .wt-upper{display:grid;gap:6px;flex-basis:100%;background:#fff8e8;color:#395754;border:2px solid #e4c875;border-radius:16px;padding:10px;max-height:24vh;overflow:auto;overscroll-behavior:contain}
 .world-timber-controls .wt-upper strong{color:#395754}.world-timber-controls .wt-upper small{display:block;line-height:1.45}.world-timber-controls .wt-upper-choices{display:grid;gap:8px}.world-timber-controls .wt-upper-choices>div{display:grid;gap:3px}.world-timber-controls .wt-upper button{background:#d6f2de;color:#2d5543;border-color:#7ab797;min-height:44px}.world-timber-controls [data-action="upper-stop"]{background:#ffe2ce;color:#754329;border-color:#d9996d}
 .world-timber-controls .gv-page>.wt-upper{grid-template-columns:1fr!important}.world-timber-controls .wt-upper>*{grid-column:1/-1}.world-timber-controls .wt-upper-choices>div{grid-template-columns:1fr!important}.world-timber-controls .wt-upper-choices button{width:100%;min-height:44px}
+
+.world-timber-controls .wt-bay{display:grid;gap:6px;flex-basis:100%;background:#fff8e8;color:#395754;border:2px solid #e4c875;border-radius:16px;padding:10px;max-height:24vh;overflow:auto;overscroll-behavior:contain}
+.world-timber-controls .wt-bay strong{color:#395754}.world-timber-controls .wt-bay small{display:block;line-height:1.45}.world-timber-controls .wt-bay-choices{display:grid;gap:8px}.world-timber-controls .wt-bay-choices>div{display:grid;gap:3px}.world-timber-controls .wt-bay button{background:#d6f2de;color:#2d5543;border-color:#7ab797;min-height:44px}.world-timber-controls [data-action="upper-stop"]{background:#ffe2ce;color:#754329;border-color:#d9996d}
+.world-timber-controls .gv-page>.wt-bay{grid-template-columns:1fr!important}.world-timber-controls .wt-bay>*{grid-column:1/-1}.world-timber-controls .wt-bay-choices>div{grid-template-columns:1fr!important}.world-timber-controls .wt-bay-choices button{width:100%;min-height:44px}
+.world-timber-controls .wt-bay{max-height:none;overflow:visible}
+.world-timber-controls[data-bay-choosing=true] .gv-page>button{display:none!important}
+.world-timber-controls[data-bay-choosing=true] .gv-quick{display:none!important}
+.world-timber-controls[data-bay-moving=true] .gv-pages,.world-timber-controls[data-bay-moving=true] .gv-nav{display:none!important}
+.world-timber-controls[data-bay-moving=true] .gv-quick>[data-action="interact"],.world-timber-controls[data-bay-moving=true] .gv-quick>[data-action="mode"]{display:none!important}
+.world-timber-controls[data-bay-moving=true] .gv-quick{grid-template-columns:1fr 1.6fr 1fr!important}
+.world-timber-controls[data-bay-paused=true] .gv-quick{grid-auto-flow:row!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(max-width:620px){.world-timber-controls .wt-bay-choices:has(>button:nth-child(2)){grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.world-timber-controls .wt-lift-meter{display:block;width:100%;height:14px;accent-color:#58af98;margin:5px 0 9px}.world-timber-controls .wt-lift-meter[hidden]{display:none!important}
+
+.world-timber-controls .wt-lift-meter::-webkit-progress-bar{background:#dcedf1;border-radius:7px}.world-timber-controls .wt-lift-meter::-webkit-progress-value{background:#58af98;border-radius:7px}
+
+.world-timber-controls .wt-lift-meter{appearance:none;-webkit-appearance:none;border:0;border-radius:7px;background:#dcedf1;overflow:hidden}
+
+/* The point picker occupies the load page, leaving the scene above available. */
+.world-timber-controls[data-upper-choosing=true] .gv-page>button{display:none!important}
+.world-timber-controls .wt-upper{max-height:none;overflow:visible}
+.world-timber-controls .wt-point{display:grid;gap:6px}
+.world-timber-controls .wt-point-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.world-timber-controls .wt-point-steps button{min-width:0;padding:6px 3px;font-size:12px}
+.world-timber-controls .wt-point-note{margin:0;padding:7px 9px;background:#ffe3e3;border-radius:12px;color:#844242;line-height:1.4}
+.world-timber-controls .wt-point[data-valid=true] .wt-point-note{background:#fff2ba;color:#67531f}
+.world-timber-controls .wt-point [data-action=upper-go]{background:#ffdf91;color:#624617;border-color:#cfaa50;font-weight:800}
+.world-timber-controls .wt-point [data-action=upper-go]:disabled{opacity:.5}
+.world-timber-controls .wt-point [data-action=upper-back]{background:#e5edff;color:#3c527b;border-color:#adc1e3}
+.world-timber-controls[data-upper-choosing=true] .gv-quick{display:none!important}
+.world-timber-controls[data-point-selecting=true] .gv-nav,
+.world-timber-controls[data-point-selecting=true]>.gv-message,
+.world-timber-controls[data-point-selecting=true] .wt-mode,
+.world-timber-controls[data-point-selecting=true] .wt-upper>strong,
+.world-timber-controls[data-point-selecting=true] .wt-upper>small,
+.world-timber-controls[data-point-selecting=true] .wt-point>small{display:none!important}
+.world-timber-controls[data-point-selecting=true] .gv-active{grid-template-rows:minmax(0,1fr)!important}
+.world-timber-controls[data-point-selecting=true]{grid-template-rows:auto minmax(0,1fr)!important}
+.world-timber-controls[data-point-selecting=true] .gv-pages{overflow:hidden}
+.world-timber-controls[data-point-selecting=true] .wt-upper{padding:7px;gap:5px}
+.world-timber-controls[data-point-selecting=true] .wt-point{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.world-timber-controls[data-point-selecting=true] .wt-point>*{grid-column:1/-1}
+.world-timber-controls[data-point-selecting=true] .wt-point>[data-action=upper-go]{grid-column:1}
+.world-timber-controls[data-point-selecting=true] .wt-point>[data-action=upper-back]{grid-column:2}
+.world-timber-controls[data-point-selecting=true] .wt-point-note{font-size:11px;padding:5px 7px}
+.world-timber-controls .wt-stock-help{grid-column:1/-1;padding:7px 9px;line-height:1.55;color:#385363;background:#fff5d8;border-radius:10px}
+.world-timber-controls .wt-kit{grid-column:1/-1;display:grid;gap:8px;padding:10px;border:2px solid #e4c875;border-radius:16px;background:#fff8e8;color:#395754}.world-timber-controls .wt-kit strong{color:#395754}.world-timber-controls .wt-kit small{display:block;line-height:1.5}.world-timber-controls .wt-kit-choices{display:grid;gap:8px}.world-timber-controls .wt-kit-choices>div{display:grid;gap:3px}.world-timber-controls .wt-kit button{min-height:44px;background:#d6f2de;color:#2d5543;border-color:#7ab797}

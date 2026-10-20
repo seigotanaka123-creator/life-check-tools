@@ -1,7 +1,7 @@
 import * as THREE from './three.module.min.js';
-import {createLoader} from './imasora-construction-loader-model.js?v=120ey';
-import {armPose,EX} from './imasora-construction-excavator.js?v=120fc';
-import {EX_ACCESS,accessOuter} from './imasora-construction-excavator-access.js?v=120ey';
+import {createLoader} from './imasora-construction-loader-model.js?v=120gf';
+import {armPose,EX} from './imasora-construction-excavator.js?v=120gf';
+import {EX_ACCESS,accessOuter} from './imasora-construction-excavator-access.js?v=120gf';
 import {isBackhoe,bucketRotation,bucketPoint,BUCKET_OUTLINE,BUCKET_SHELL,BUCKET_TOOTH,toothHalfWidth} from './imasora-construction-excavator-bucket.js';
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.65,...extra});
 const yellow=mat(0xfeb30e,{metalness:.18}),dark=mat(0x28393c),rubber=mat(0x202b2c),steel=mat(0xb9c8c3,{metalness:.8,roughness:.28});

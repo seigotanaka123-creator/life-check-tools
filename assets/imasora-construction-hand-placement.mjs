@@ -1,6 +1,6 @@
-import {shovelSoilBoxes,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {PLOT} from './imasora-construction-excavator.js?v=120fc';
-import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
+import {shovelSoilBoxes,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {PLOT} from './imasora-construction-excavator.js?v=120gf';
+import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
 
 // One tap casts one bounded ray. The closest solid surface decides the hit;
 // a vehicle, fence or side face cannot select hidden ground behind it.

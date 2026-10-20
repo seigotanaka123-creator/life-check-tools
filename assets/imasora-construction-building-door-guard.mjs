@@ -1,5 +1,5 @@
-import {highSelected,highLocalPoint} from './imasora-construction-high-world.mjs?v=120fw';
-import {TIMBER_YARDS} from './imasora-construction-yard-origins.mjs';
+import {highSelected,highLocalPoint} from './imasora-construction-high-world.mjs?v=120gn';
+import {TIMBER_YARDS} from './imasora-construction-yard-origins.mjs?v=120gb';
 import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
 export function assertEntranceDoorClear(world,action,draft){
  const r=highSelected(world.constructionHighBuild);if(!r)return;

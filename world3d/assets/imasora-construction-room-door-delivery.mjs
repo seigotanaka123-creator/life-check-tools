@@ -1,9 +1,10 @@
-import {ROOM_KINDS,roomItemParts} from './imasora-construction-room-layout-shape.mjs';
-import {highFloorPieces} from './imasora-construction-high-shape.mjs';
-import {highWorkSolids,highWorkBodyHits} from './imasora-construction-high-work-position.mjs';
+import{stairPlacement}from'./imasora-construction-stair-placement.mjs?v=120gn';
+import {ROOM_KINDS,roomItemParts} from './imasora-construction-room-layout-shape.mjs?v=120gn';
+import {highFloorPieces} from './imasora-construction-high-shape.mjs?v=120gn';
+import {highWorkSolids,highWorkBodyHits} from './imasora-construction-high-work-position.mjs?v=120gn';
 import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
-import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120fw';
-import {assertRoomKitRoute,roomKitPhase,roomKitBox,ROOM_KIT_PICKUP_SECONDS} from './imasora-construction-room-kit.mjs?v=120fw';
+import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120gn';
+import {assertRoomKitRoute,roomKitPhase,roomKitBox,ROOM_KIT_PICKUP_SECONDS} from './imasora-construction-room-kit.mjs?v=120gn';
 
 const fail=message=>{throw Error(message);},p=(x,y,z,heading=0)=>({x,y,z,heading});
 export const ROOM_DOOR_UNLOAD_SECONDS=.8;
@@ -56,7 +57,7 @@ export function assertRoomDeliveryRoute(plan,boxes,{walkBoxes=boxes}={}){
   return true;
 }
 export function makeRoomDoorDelivery(w,item,stance,{fetch,loaded,toolPath}){
-  const count=ROOM_KINDS[item.kind].wood/840,own=highWorkSolids(w),future=roomItemParts(item,{sweep:true}),floor=item.floor?highFloorPieces(w,item.floor):[{x:32,z:0,w:64,d:128}];
+  const count=ROOM_KINDS[item.kind].wood/840,own=highWorkSolids(w),future=roomItemParts(item,{sweep:true}),floor=item.floor?highFloorPieces(w,item.floor):[stairPlacement(w)?{x:0,z:0,w:128,d:128}:{x:32,z:0,w:64,d:128}];
   let lastError;for(const heading of[0,Math.PI/2,Math.PI,-Math.PI/2])try{
     const depot={x:stance.x+Math.sin(heading)*30.5,y:stance.y,z:stance.z+Math.cos(heading)*30.5,angle:heading},flat={...depot,w:heading%(Math.PI)===0?21:20,d:heading%(Math.PI)===0?20:21};
     const area=floor.reduce((n,b)=>n+Math.max(0,Math.min(flat.x+flat.w/2,b.x+b.w/2)-Math.max(flat.x-flat.w/2,b.x-b.w/2))*Math.max(0,Math.min(flat.z+flat.d/2,b.z+b.d/2)-Math.max(flat.z-flat.d/2,b.z-b.d/2)),0);

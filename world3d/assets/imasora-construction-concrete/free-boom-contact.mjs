@@ -1,5 +1,5 @@
 import {workVehicleState} from './work-vehicle-height.mjs';
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
 import {curveSupplyHose,hangingHose,hoseLength,hoseBlocks,hoseCorners,hoseGeometry,SUPPLY_HOSE_RADIUS,HOSE_CLEARANCE} from './free-hose-shape.mjs';
 import {drapeSupplyHose,hoseTerrainClear,HOSE_TERRAIN_QUERY_LIMIT} from './free-hose-terrain.mjs';
 import {findSupplyHoseRoute} from './free-hose-route.mjs';
@@ -8,8 +8,8 @@ import {hoseSelfClear,hoseSegmentDistance} from './free-hose-self-contact.mjs';
 import {createHoseDynamics,HOSE_MOTION_LIMITS,hangingHoseResponse} from './free-hose-dynamics.mjs';
 import {freePlacedFill} from './free-work-parts.mjs';
 import * as T from '../three.module.min.js';
-import {freeCell,freeFramePanels,canonicalFreeAction} from './free-build-state.mjs?v=120fw';
-import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120fw';
+import {freeCell,freeFramePanels,canonicalFreeAction} from './free-build-state.mjs?v=120gn';
+import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120gn';
 const v=p=>new T.Vector3(p.x,p.y??0,p.z),mix=(a,b,t)=>a+(b-a)*t;
 export const BOOM_SIZES=[[8,8,43],[8,7,40],[7,6,34]];
 export const BOOM_PHASES=['lift','raise','swing','reach','hose','pour','hose-up','fold','swing-back','lower','stow'];

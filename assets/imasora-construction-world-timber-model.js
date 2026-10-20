@@ -1,12 +1,12 @@
-import {craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120gf';
 import * as THREE from './three.module.min.js';
 import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
-import {createCrane,updateCraneModel} from './imasora-construction-crane-model.js?v=120fw';
-import {createFloatingPart,animateFloatingPart} from './imasora-construction-floating-model.js?v=120fw';
-import {hook,pickOption} from './imasora-construction-crane.js?v=120fw';
-import {assemblyState,floatingPlacement,joinOption} from './imasora-construction-world-timber-assembly.js?v=120fw';
-import {jointPose} from './imasora-construction-floating-joints.js?v=120fw';
-import {timberPhysicsState,RETURN_PAD,timberReturnPad} from './imasora-construction-purchased-timber.js?v=120fw';
+import {createCrane,updateCraneModel} from './imasora-construction-crane-model.js?v=120gn';
+import {createFloatingPart,animateFloatingPart} from './imasora-construction-floating-model.js?v=120gn';
+import {hook,pickOption} from './imasora-construction-crane.js?v=120gn';
+import {assemblyState,floatingPlacement,joinOption} from './imasora-construction-world-timber-assembly.js?v=120gn';
+import {jointPose} from './imasora-construction-floating-joints.js?v=120gn';
+import {timberPhysicsState,RETURN_PAD,timberReturnPad} from './imasora-construction-purchased-timber.js?v=120gn';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js?v=120ds';
 export const TIMBER_FENCES=Object.freeze([
   {x:0,z:251,width:644,depth:2,height:18},{x:-321,z:0,width:2,depth:500,height:18},{x:321,z:0,width:2,depth:500,height:18},

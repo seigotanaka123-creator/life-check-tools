@@ -1,13 +1,13 @@
-import {DUMP_CAB,dumpDriverLocal} from './imasora-construction-dump-cab.mjs?v=120ey';
+import {DUMP_CAB,dumpDriverLocal} from './imasora-construction-dump-cab.mjs?v=120gf';
 import * as THREE from './three.module.min.js';
-import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
-import {updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120fc';
-import {nativeDumpPose,nativeDumpPoint,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {createDumpModel,updateDumpModel,orientDumpObject} from './imasora-construction-dump-model.js?v=120ey';
-import {shovelSoilBoxes,shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportVehicleBlockedAt,visibleTransportSources,requireTransportSceneCheckpoint} from './imasora-construction-transport-site.mjs?v=120fw';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
-import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
+import {updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120gf';
+import {nativeDumpPose,nativeDumpPoint,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {createDumpModel,updateDumpModel,orientDumpObject} from './imasora-construction-dump-model.js?v=120gf';
+import {shovelSoilBoxes,shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportVehicleBlockedAt,visibleTransportSources,requireTransportSceneCheckpoint} from './imasora-construction-transport-site.mjs?v=120gn';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120gn';
 // First scene connection only. It displays the shared source and closes the old
 // excavation writer. Gameplay entry/exit will be connected after this boundary.
 export function createWorldTransportSceneBridge({service,state,scene,camera,character,shadow,canvas,clearInput,readout}){

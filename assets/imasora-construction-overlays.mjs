@@ -9,7 +9,7 @@ export function openConstructionGuide(id='',{returnLabel='もとの画面へ戻�
  if(!guide){guide=document.createElement('dialog');guide.className='construction-help-view';guide.setAttribute('aria-label','動きでわかる遊び方');guide.innerHTML='<header><strong>動きでわかる遊び方</strong><button type="button" data-help-close></button></header><div data-help-content></div>';document.body.append(guide);guide.querySelector('button').onclick=closeConstructionGuide;guide.addEventListener('cancel',e=>{e.preventDefault();closeConstructionGuide();});guide.addEventListener('close',()=>{trackConstructionOverlay(guide,false);guide.querySelector('[data-help-content]').replaceChildren();if(focusBack?.isConnected&&focusBack.getClientRects().length)focusBack.focus({preventScroll:true});});addEventListener('message',e=>{if(e.origin===location.origin&&e.source===guide.querySelector('iframe')?.contentWindow&&e.data?.type==='imasora-guide-close')closeConstructionGuide();});}
  if(guide.open)return;
  focusBack=document.activeElement;document.dispatchEvent(new Event('imasora-menu-peek-start'));
- const frame=document.createElement('iframe');frame.title='動きでわかる工事の遊び方';frame.src=new URL('./imasora-construction-guide.html?lesson='+encodeURIComponent(id)+'&v=120ea',import.meta.url).href;
+ const frame=document.createElement('iframe');frame.title='動きでわかる工事の遊び方';frame.src=new URL('./imasora-construction-guide.html?lesson='+encodeURIComponent(id)+'&v=120gm',import.meta.url).href;
  guide.querySelector('[data-help-content]').replaceChildren(frame);guide.querySelector('button').textContent=returnLabel;trackConstructionOverlay(guide,true);guide.showModal();guide.querySelector('button').focus();
 }
 export function closeConstructionGuide(){if(guide?.open)guide.close();}

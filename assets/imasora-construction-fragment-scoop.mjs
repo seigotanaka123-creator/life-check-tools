@@ -1,18 +1,18 @@
 import {retainingBasinCut} from './imasora-construction-basin-shape.mjs?v=120fb';
-import {nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {excavatorWorkSupported} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {unopenedGround} from './imasora-construction-field-earth.mjs?v=120fc';
-export {driveTransportExcavator} from './imasora-construction-transport-drive.mjs?v=120fw';
-import * as bucket from './imasora-construction-bucket-dump.mjs?v=120fw';
-import {createDumpWork} from './imasora-construction-dump-work.mjs?v=120fw';
-import {shovelMachineState,shovelDumpObstacles} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {soilTransportCommand,soilTransportCommands,validateSoilTransport,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {beginOneTouch,stepOneTouch,DIG_READY} from './imasora-construction-excavator-one-touch.js?v=120fc';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ey';
-import {localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
+import {nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {excavatorWorkSupported} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {unopenedGround} from './imasora-construction-field-earth.mjs?v=120gf';
+export {driveTransportExcavator} from './imasora-construction-transport-drive.mjs?v=120gn';
+import * as bucket from './imasora-construction-bucket-dump.mjs?v=120gn';
+import {createDumpWork} from './imasora-construction-dump-work.mjs?v=120gn';
+import {shovelMachineState,shovelDumpObstacles} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {soilTransportCommand,soilTransportCommands,validateSoilTransport,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {beginOneTouch,stepOneTouch,DIG_READY} from './imasora-construction-excavator-one-touch.js?v=120gf';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120gf';
+import {localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
 import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js?v=120fc';
-import {armPose,EX} from './imasora-construction-excavator.js?v=120fc';
-import {actWorldExcavation} from './imasora-construction-world-excavation.js?v=120fc';
+import {armPose,EX} from './imasora-construction-excavator.js?v=120gf';
+import {actWorldExcavation} from './imasora-construction-world-excavation.js?v=120gf';
 import {canonical} from './imasora-construction-state.js';
 export const SCOOP_DUMP_FORMAT='imasora-fragment-scoop-dump-checkpoint-v1';
 export const SCOOP_DUMP_SCOPE='imasora-fragment-scoop-dump-isolated-v1';
@@ -122,7 +122,7 @@ function rememberBasin(s,k,plan){basinCache.set(s.frame.soil,{key:k,plan});const
 async function sharedScoopPlan(s,basin){
  // Planning and the later full save check use one worker, retaining its exact
  // geometric replay cache. This result is a preview, never a save receipt.
- const {runWorldSaveTask}=await import('./imasora-world-save-client.mjs?v=120fw'),abort=new AbortController(),timer=setTimeout(()=>abort.abort(),30000);
+ const {runWorldSaveTask}=await import('./imasora-world-save-client.mjs?v=120gn'),abort=new AbortController(),timer=setTimeout(()=>abort.abort(),30000);
  try{return await runWorldSaveTask('scoop-plan',{work:s,basin},{signal:abort.signal});}finally{clearTimeout(timer);}
 }
 export function basinScoopPlan(s){if(!canPlan(s))return null;const k=key(s),old=basinCache.get(s.frame.soil);if(old?.key===k)return old.plan;const stamp='basin:'+replayKey(s);if(replayPlans.has(stamp))return rememberBasin(s,k,replayPlans.get(stamp));const it=generateBasin(s);let n;do{n=it.next();}while(!n.done);return rememberBasin(s,k,n.value);}

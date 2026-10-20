@@ -1,6 +1,6 @@
 // Read the simulator's immutable terrain/spoil objects; never create or move soil.
-import {CELL,PLOT,BIN,armPose} from './imasora-construction-excavator.js?v=120fc';
-import {EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120fc';
+import {CELL,PLOT,BIN,armPose} from './imasora-construction-excavator.js?v=120gf';
+import {EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120gf';
 
 export function createEarthSurface(readWork,readSite){
  let terrain=null,spoil=null,columns=new Map(),loose=new Map();

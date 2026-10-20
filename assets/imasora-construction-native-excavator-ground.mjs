@@ -1,4 +1,4 @@
-import {nativeDumpHeightAt,nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120fw';
+import {nativeDumpHeightAt,nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120gn';
 export {nativeDumpHeightAt as excavatorGroundHeight};
 import {vehicleGroundFrame,groundPoint,groundLocal} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
 export {groundPoint,groundLocal};

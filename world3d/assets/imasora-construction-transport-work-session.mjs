@@ -1,8 +1,8 @@
-import {WorldTransportWorkFlow} from './imasora-construction-transport-work-flow.mjs?v=120fw';
+import {WorldTransportWorkFlow} from './imasora-construction-transport-work-flow.mjs?v=120gn';
 import {sameConstructionRecordValue as same,sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
-import {LIVE_WORLD_DB} from './imasora-world-save-service.js?v=120fw';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
-import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120fw';
+import {LIVE_WORLD_DB} from './imasora-world-save-service.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120gn';
 // Normal world transactions, not the isolated work database. The service keeps
 // the exact failed packet; this session retains the matching physical intent.
 export class WorldTransportWorkSession{

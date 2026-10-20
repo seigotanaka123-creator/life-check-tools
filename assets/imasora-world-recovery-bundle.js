@@ -1,6 +1,6 @@
 // 9-1c2b2b1: preserve saved records, without migrating or replaying them.
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
 import {validateEquipmentCraft,equipmentCraftWasPaid} from './imasora-workshop-write-guard.js?v=495';
 
 export const RECOVERY_DATABASES_V1=Object.freeze([

@@ -1,7 +1,7 @@
 // 8-3a: immutable purchased-stock COPY + finite water work, never a loan grant.
-import {unpackWorldPurchaseLedger as unpackCopy,fingerprint} from './imasora-world-purchase-ledger.js?v=120fw';
-import {WORLD_LEDGER} from './imasora-world-live-ledger.js?v=120fw';
-import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport} from './imasora-construction-water-transport.js?v=120fb';
+import {unpackWorldPurchaseLedger as unpackCopy,fingerprint} from './imasora-world-purchase-ledger.js?v=120gn';
+import {WORLD_LEDGER} from './imasora-world-live-ledger.js?v=120gn';
+import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport} from './imasora-construction-water-transport.js?v=120gf';
 export const OWNED_WATER_SCOPE='construction-purchased-water-copy-v1';
 export const WATER_PACKAGE=128; // 32,000 mL / 250 mL per physics unit.
 export const RECEIVING_BAY=Object.freeze({x:-225,z:-102});

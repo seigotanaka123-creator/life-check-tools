@@ -1,5 +1,5 @@
 import {vehicleGroundFrame,groundPoint,groundVector} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120ey';
+import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120gf';
 import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 
 // Ground poses are derived from the current terrain, never copied into saves.

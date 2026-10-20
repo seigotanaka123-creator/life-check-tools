@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {validateScoopDumpWork,validateScoopDumpContinuation,packScoopDumpWork,unpackScoopDumpWork} from './imasora-construction-fragment-scoop.mjs?v=120fw';
+import {validateScoopDumpWork,validateScoopDumpContinuation,packScoopDumpWork,unpackScoopDumpWork} from './imasora-construction-fragment-scoop.mjs?v=120gn';
 import {canonical} from './imasora-construction-state.js';
 export const SCOOP_DUMP_DB='imasora-fragment-scoop-dump-isolated-v1';
 export class ScoopDumpWorkStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=SCOOP_DUMP_DB;}}

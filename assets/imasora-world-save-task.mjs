@@ -1,14 +1,18 @@
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
-import {prepareTransportRestorePlan,prepareTransportRestoreCommit,compactCheckedRestorePoints,validateTransportRestoreJournal,validateAndCompactTransportRestoreJournal,snapshotTransportRestoreJournal,sameTransportRestoreValue} from './imasora-construction-transport-restore.mjs?v=120fw';
-import {validateSoilTransport} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
-import {validateScoopDumpContinuation,basinScoopPlan,scoopDumpPlan} from './imasora-construction-fragment-scoop.mjs?v=120fw';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {prepareTransportRestorePlan,prepareTransportRestoreCommit,compactCheckedRestorePoints,validateTransportRestoreJournal,validateAndCompactTransportRestoreJournal,snapshotTransportRestoreJournal,sameTransportRestoreValue} from './imasora-construction-transport-restore.mjs?v=120gn';
+import {validateSoilTransport} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {validateScoopDumpContinuation,basinScoopPlan,scoopDumpPlan} from './imasora-construction-fragment-scoop.mjs?v=120gn';
 import {sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
 
 const exactValues=(a,b)=>{if(Object.is(a,b))return true;if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;if(Array.isArray(a)&&a.length===3&&b.length===3&&Object.keys(a).length===3&&Object.keys(b).length===3&&typeof a[0]==='number'&&typeof a[1]==='number'&&typeof a[2]==='number'&&typeof b[0]==='number'&&typeof b[1]==='number'&&typeof b[2]==='number')return Object.is(a[0],b[0])&&Object.is(a[1],b[1])&&Object.is(a[2],b[2]);const keys=Object.keys(a);return keys.length===Object.keys(b).length&&(!Array.isArray(a)||a.length===b.length)&&keys.every(k=>Object.hasOwn(b,k)&&exactValues(a[k],b[k]));};
 // Only encoding and full validation. Storage, receipts and write ordering
 // remain owned by the save service on the caller's side.
 export function executeWorldSaveTask(kind,args){
+ if(kind==='prepare-kit-transfer'){
+  const next=L.transferConstructionKit(args.ledger,args.action,args.draft,args.expectedRevision),checked=executeWorldSaveTask('pack-checked',{ledger:next});
+  const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,exactSoil:before&&after?exactValues(before,after):false};
+ }
  if(kind==='prepare-high'){
   const next=L.applyConstructionHighBuild(args.ledger,args.action,args.draft,args.expectedRevision),checked=executeWorldSaveTask('pack-checked',{ledger:next});
   const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;

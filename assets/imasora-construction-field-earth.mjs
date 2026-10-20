@@ -1,4 +1,4 @@
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
 // Natural ground is finite, 32 deep, and revealed in 32 x 32 patches. Survey
 // commands only open previously untouched patches; replay never refills a cut.
 // Legacy terrain's original allocation is excluded even when emptied.

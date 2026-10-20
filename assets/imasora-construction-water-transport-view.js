@@ -1,10 +1,10 @@
 import * as THREE from './three.module.min.js';
 import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
-import {createWaterTruck,updateWaterTruck} from './imasora-construction-water-truck-model.mjs?v=120ey';
+import {createWaterTruck,updateWaterTruck} from './imasora-construction-water-truck-model.mjs?v=120gf';
 import {createWaterBuildView,updateWaterBuildView} from './imasora-construction-water-build-view.mjs?v=120fb';
 import {waterBuildLevel} from './imasora-construction-water-build.mjs?v=120fb';
 import {createWaterLab,updateWaterLab} from './imasora-construction-water-view.js?v=120ds';
-import {SOURCE_PORT,RETURN_PORT,TRANSPORT_OBSTACLES,CATCHER,waterSourcePort,parcelPosition,transportAvailability,waterBuildHoseTarget} from './imasora-construction-water-transport.js?v=120fb';
+import {SOURCE_PORT,RETURN_PORT,TRANSPORT_OBSTACLES,CATCHER,waterSourcePort,parcelPosition,transportAvailability,waterBuildHoseTarget} from './imasora-construction-water-transport.js?v=120gf';
 import {createFieldWaterView,updateFieldWaterView} from './imasora-construction-field-water-view.mjs?v=120ex';
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.65,...extra});
 function box(root,x,y,z,w,h,d,m,name=''){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.name=name;root.add(o);return o;}

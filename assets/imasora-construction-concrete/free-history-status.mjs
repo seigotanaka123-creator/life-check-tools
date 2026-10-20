@@ -1,5 +1,5 @@
 import {projectOperationCount} from './project-history.mjs';
-import {PROFILE_PROJECT_OPERATION_LIMIT} from '../imasora-construction-profile-project.js?v=120fw';
+import {PROFILE_PROJECT_OPERATION_LIMIT} from '../imasora-construction-profile-project.js?v=120gn';
 export const HISTORY_READ_ACTIONS=new Set(['access','pause','leave','save','export','camera','stop','dismiss','retry','evacuate']);
 export function historyActionAllowed(name,confirmation){return HISTORY_READ_ACTIONS.has(name)||name==='confirm'&&confirmation?.type==='SAFE_RETURN'&&!confirmation.extra?.vehicle;}
 // The existing replayable log remains intact. Never discard entries or reset

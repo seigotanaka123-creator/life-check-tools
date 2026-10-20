@@ -1,5 +1,5 @@
 import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120ey';
+import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120gf';
 
 // The vehicle can stand on a supported grade. The separate soil-bed module
 // owns the material profile; this module never saves a chassis pose.

@@ -1,31 +1,32 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
-import {EARTH_AUTHORITY_SCOPE,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js?v=120fc';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {EARTH_AUTHORITY_SCOPE,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js?v=120gf';
 import {canonical} from './imasora-construction-state.js';
-import {commitEarthRestore,readEarthRestore,readEarthRestoreState,validateEarthRestoreBefore,validateEarthRestoreJournal,createEarthRestoreLedger} from './imasora-construction-earth-restore-store.js?v=120fw';
-import {commitMapReset,readMapResetState,validateMapResetJournal,createMapResetLedger,validateMapResetBefore,mapBuildings,keptMapBuildings,removeOneMapBuilding,moveOneMapBuilding,mapResetKey} from './imasora-world-map-reset-store.js?v=120fw';
+import {commitEarthRestore,readEarthRestore,readEarthRestoreState,validateEarthRestoreBefore,validateEarthRestoreJournal,createEarthRestoreLedger} from './imasora-construction-earth-restore-store.js?v=120gn';
+import {commitMapReset,readMapResetState,validateMapResetJournal,createMapResetLedger,validateMapResetBefore,mapBuildings,keptMapBuildings,removeOneMapBuilding,moveOneMapBuilding,mapResetKey} from './imasora-world-map-reset-store.js?v=120gn';
 import {WorldDraftGuard} from './imasora-world-draft-guard.js';
-import {commitVehicleRestore,readVehicleRestoreState,validateVehicleRestoreJournal} from './imasora-construction-vehicle-restore-store.js?v=120fw';
-import {vehicleRestoreSpec,vehicleRestoreUndoCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=120fw';
+import {commitVehicleRestore,readVehicleRestoreState,validateVehicleRestoreJournal} from './imasora-construction-vehicle-restore-store.js?v=120gn';
+import {vehicleRestoreSpec,vehicleRestoreUndoCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=120gn';
 import {withWorkshopWriteLock,createEquipmentCraft,validateEquipmentCraft,equipmentCraftWasPaid} from './imasora-workshop-write-guard.js';
-import {assertConstructionToolReceipt} from './imasora-construction-profile-site-controller.js?v=120fw';
-import {FREE_CONTACT_ACTIONS,assertFreeReceipt} from './imasora-construction-concrete/free-contact.mjs?v=120fw';
-import {FREE_VEHICLE_ACTIONS,assertVehicleReceipt} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120fw';
-import {PIPE_ACTIONS,assertPipeReceipt} from './imasora-construction-concrete/free-boom-contact.mjs?v=120fw';
-import {SUPPORTED_WORK_MOVE,assertSupportedWorkMoveReceipt} from './imasora-construction-concrete/free-supported-work-move.mjs?v=120fw';
-import {FOUNDATION_ACTIONS} from './imasora-construction-concrete/free-foundation-state.mjs?v=120fw';
-import {assertFoundationReceipt} from './imasora-construction-concrete/free-foundation-operation.mjs?v=120fw';
+import {assertConstructionToolReceipt} from './imasora-construction-profile-site-controller.js?v=120gn';
+import {FREE_CONTACT_ACTIONS,assertFreeReceipt} from './imasora-construction-concrete/free-contact.mjs?v=120gn';
+import {FREE_VEHICLE_ACTIONS,assertVehicleReceipt} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120gn';
+import {PIPE_ACTIONS,assertPipeReceipt} from './imasora-construction-concrete/free-boom-contact.mjs?v=120gn';
+import {SUPPORTED_WORK_MOVE,assertSupportedWorkMoveReceipt} from './imasora-construction-concrete/free-supported-work-move.mjs?v=120gn';
+import {FOUNDATION_ACTIONS} from './imasora-construction-concrete/free-foundation-state.mjs?v=120gn';
+import {assertFoundationReceipt} from './imasora-construction-concrete/free-foundation-operation.mjs?v=120gn';
 import {projectStarterToolkit,assertStarterTool,requiredStarterTool} from './imasora-construction-toolkit.mjs?v=120fs';
-import {worldTransportTotals} from './imasora-construction-transport-authority.mjs?v=120fw';
-import {prepareTransportRestorePlan,snapshotTransportRestoreRecord,sameTransportRestoreValue,validateTransportRestoreJournal} from './imasora-construction-transport-restore.mjs?v=120fw';
-import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120fw';
-import {runWorldSaveTask,worldSaveCandidateNeedsWorker,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120fw';
-import {commitTransportRestore,readTransportRestoreState,rememberCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120fw';
-import {assertWorldTransportWorkReceipt,assertWorldTransportWorkReceiptIdentity,isWorldTransportWorkSnapshot} from './imasora-construction-transport-work-flow.mjs?v=120fw';
+import {worldTransportTotals} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {prepareTransportRestorePlan,snapshotTransportRestoreRecord,sameTransportRestoreValue,validateTransportRestoreJournal} from './imasora-construction-transport-restore.mjs?v=120gn';
+import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120gn';
+import {runWorldSaveTask,worldSaveCandidateNeedsWorker,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120gn';
+import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120gn';
+import {commitTransportRestore,readTransportRestoreState,rememberCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120gn';
+import {assertWorldTransportWorkReceipt,assertWorldTransportWorkReceiptIdentity,isWorldTransportWorkSnapshot} from './imasora-construction-transport-work-flow.mjs?v=120gn';
 const preparedTransportSaves=new WeakMap();
 import {captureConstructionJson,captureOwnedConstructionJson,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {createTransportMigrationPlan,validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs?v=120fw';
-import {commitTransportMigration,readTransportMigrationState} from './imasora-construction-transport-migration-store.mjs?v=120fw';
+import {createTransportMigrationPlan,validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs?v=120gn';
+import {commitTransportMigration,readTransportMigrationState} from './imasora-construction-transport-migration-store.mjs?v=120gn';
 
 export const LIVE_WORLD_DB='imasora-world-authority-v1';
 export const WORLD_SHOP_TEST_DB='imasora-world-shop-integration-development-v1';
@@ -33,6 +34,16 @@ export const LEGACY_WORLD_KEY='imasora-world-foundation-v3';
 export const WORKSHOP_MATERIAL_KEY='imasora-ufo-workshop-materials-v1';
 export const EXCAVATION_AUTHORITY_DB='imasora-world-excavation-authority-development-v1';
 export const CONSTRUCTION_PROFILE_PROJECT_TEST_DB='imasora-construction-profile-project-development-v1';
+// A worker reply is a fresh native clone. Capture its small string-only head
+// before exposing it; no caller can mutate it during the commit acknowledgement.
+// Other stores retain the original defensive deep-copy path.
+const ownedWorldStoreRecords=new WeakSet();
+function ownWorldStoreRecord(record){
+  if(record&&Object.getPrototypeOf(record)===Object.prototype&&Reflect.ownKeys(record).length===3&&typeof record.current==='string'&&Number.isSafeInteger(record.generation)&&Array.isArray(record.backups)&&record.backups.length<=5&&record.backups.every(v=>typeof v==='string')){
+    Object.freeze(record.backups);Object.freeze(record);ownedWorldStoreRecords.add(record);
+  }
+  return record;
+}
 export class ExcavationAuthorityStore extends IndexedConstructionStore{
   constructor(idb=globalThis.indexedDB){super(idb);this.name=EXCAVATION_AUTHORITY_DB;}
 }
@@ -50,6 +61,14 @@ export function worldSaveMode(search,hostname){
 }
 export class WorldAuthorityStore extends IndexedConstructionStore{
   constructor(mode,idb=globalThis.indexedDB){super(idb);if(!['live','integration'].includes(mode))throw Error('保存先が不正です。');this.name=mode==='live'?LIVE_WORLD_DB:WORLD_SHOP_TEST_DB;}
+  commit(expectedGeneration,packet){
+    // The native get/put also clones five protected backups. Keep that exact
+    // strict atomic transaction, but run large live writes on the existing
+    // worker connection so serializing the backups cannot stop walking.
+    if(this.name===LIVE_WORLD_DB&&typeof document!=='undefined'&&typeof Worker==='function'&&this.indexedDB===globalThis.indexedDB&&!this.failNext&&typeof packet==='string'&&packet.length>=256*1024)
+      return runSharedSaveTask('storage:world-commit',{name:this.name,expectedGeneration,packet}).then(ownWorldStoreRecord);
+    return super.commit(expectedGeneration,packet);
+  }
   commitTransportRestore(journal,options){return commitTransportRestore(this,journal,options);}
   readTransportRestoreState(options){return readTransportRestoreState(this,options);}
   commitTransportMigration(journal){return commitTransportMigration(this,journal);}
@@ -172,7 +191,7 @@ export class WorldSaveService{
     const physical=job.confirmedPhysicalRecord,checked=job.checkedLedger;
     const soil=physical?.work.frame.soil??job.confirmedRestoreSoil;
     if(soil){const transport=checked.world.constructionTransport;checked.world={...checked.world,constructionTransport:{...transport,work:{...transport.work,frame:{...transport.work.frame,soil}}}};}
-    this.#adoptCheckedRecord(structuredClone(record),checked);
+    this.#adoptCheckedRecord(ownedWorldStoreRecords.has(record)?record:structuredClone(record),checked);
   }
   #adoptCheckedRecord(record,next){
     if(next.world.constructionTransport&&!this.transportAuthority)throw Error('共有土に対応した画面で保存を開いてください。古い地形で上書きせず停止しました。');
@@ -372,7 +391,12 @@ export class WorldSaveService{
     }catch(e){this.blocked=true;this.onError(e);throw e;}
   }
   #sceneSaveCandidate(s,snapshot,event=null,craft=false){
-    if(this.#backgroundSave()&&this.raw.current.length>=2*1024*1024){
+    // Packet bytes alone miss dense soil/operation histories below 2 MiB.
+    // Route before saveLinkedWorldDraft replays that history, rather than
+    // moving only the later encoding off the animation thread. This bounded
+    // estimate schedules work; the worker still runs every original check.
+    if((this.#backgroundSave()&&this.raw.current.length>=2*1024*1024)||
+       (this.transportWork&&worldSaveCandidateNeedsWorker(s,2*1024*1024))){
       const generation=this.generation,raw=this.raw.current;
       return runWorldSaveTask('prepare-world',{ledger:s,draft:snapshot,event,craft}).then(result=>{
         const soil=s.world.constructionTransport?.work?.frame.soil;
@@ -734,10 +758,12 @@ export class WorldSaveService{
     if(this.mode!=='live'||this.store?.name!==LIVE_WORLD_DB||!this.ready||this.blocked||this.busy)throw Error('セーブをたしかめてから、もう一度進もう。');
     const frozen=structuredClone(action);
     if(this.ledger.revision!==expectedRevision)throw Error('別のセーブが進んだよ。もう一度ひらいてね。');
-    const {transitionHighWorld,highMaterialCost,highWorldTimber}=await import('./imasora-construction-high-world.mjs?v=120fw');
-    const {assertEntranceDoorClear}=await import('./imasora-construction-building-door-guard.mjs?v=120fw');assertEntranceDoorClear(this.ledger.world,frozen,draft);
-    const {assertRoomLayoutWorld}=await import('./imasora-construction-room-layout-guard.mjs?v=120fw');assertRoomLayoutWorld(this.ledger.world,frozen);
-    const candidateHigh=transitionHighWorld(this.ledger.world.constructionHighBuild??null,frozen);if(['VISIT_PAINT','VISIT_ROOM_PAINT'].includes(frozen.type)||frozen.type==='START'&&frozen.jobType==='DOOR_VISIT'){const {assertHighWorkAccess}=await import('./imasora-construction-high-casting.mjs?v=120fw');assertHighWorkAccess({...this.ledger.world,constructionHighBuild:candidateHigh});}
+    const {transitionHighWorld,highMaterialCost,highWorldTimber}=await import('./imasora-construction-high-world.mjs?v=120gn');
+    const {assertEntranceDoorClear}=await import('./imasora-construction-building-door-guard.mjs?v=120gn');assertEntranceDoorClear(this.ledger.world,frozen,draft);
+    const {assertRoomLayoutWorld}=await import('./imasora-construction-room-layout-guard.mjs?v=120gn');assertRoomLayoutWorld(this.ledger.world,frozen);
+    const {assertRoomWalkWorld}=await import('./imasora-construction-room-walk-guard.mjs?v=120gn');const roomContext=assertRoomWalkWorld(this.ledger.world,frozen);
+    const candidateHigh=transitionHighWorld(this.ledger.world.constructionHighBuild??null,frozen,roomContext);if(['VISIT_PAINT','VISIT_ROOM_PAINT'].includes(frozen.type)||frozen.type==='START'&&frozen.jobType==='DOOR_VISIT'){const {assertHighWorkAccess}=await import('./imasora-construction-high-casting.mjs?v=120gn');assertHighWorkAccess({...this.ledger.world,constructionHighBuild:candidateHigh});}
+    const {assertBoardBayRetrofitWorld}=await import('./imasora-construction-board-bay-retrofit-guard.mjs?v=120gn');assertBoardBayRetrofitWorld(this.ledger.world,frozen,candidateHigh);
     const extraTimber=highWorldTimber(candidateHigh)-highWorldTimber(this.ledger.world.constructionHighBuild);if(extraTimber>this.constructionStock.stored['mars-timber'])throw Error('木材が足りないよ。建材受取所で受け取ろう。');
     if(frozen.type==='PLACE'&&this.constructionStock.stored['mars-timber']<highMaterialCost(frozen.blueprint))throw Error('この形をつくる木材が足りないよ。受取所で受け取ろう。');
     await this.enqueueDraft(draft,async(s,current)=>{
@@ -748,6 +774,15 @@ export class WorldSaveService{
       return result.ledger;
     });
     return this.constructionHighBuild;
+  }
+  async transferConstructionKit(action,draft,expectedRevision){
+    if(this.mode!=='live'||this.store?.name!==LIVE_WORLD_DB||!this.ready||this.blocked||this.busy)throw Error('セーブをたしかめてから、もう一度進もう。');
+    const frozen=structuredClone(action);L.transferConstructionKit(this.ledger,frozen,structuredClone(draft),expectedRevision);
+    await this.enqueueDraft(draft,async(s,current)=>{
+      const generation=this.generation,raw=this.raw.current,result=await runWorldSaveTask('prepare-kit-transfer',{ledger:s,action:frozen,draft:current,expectedRevision}),soil=s.world.constructionTransport?.work?.frame.soil;
+      preparedTransportSaves.set(result.ledger,{...result,base:s,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;
+    });
+    return this.readConstructionVehicleWork('timber');
   }
   async saveConstructionTimber(work,draft,expectedRevision){
     if(this.mode==='readonly')throw Error('貸出・表示確認の木材を本体へ保存できません。');

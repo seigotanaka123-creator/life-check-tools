@@ -1,6 +1,6 @@
 import * as THREE from './three.module.min.js';
 import {measureCharacter} from './imasora-construction-layout.js?v=120ds';
-import {applyLoaderGround} from './imasora-construction-loader-model.js?v=120ey';
+import {applyLoaderGround} from './imasora-construction-loader-model.js?v=120gf';
 export const WATER_CAB={floor:20,seatZ:20,seatX:-14,roof:52};
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.55,...extra});
 export function createWaterTruck(){

@@ -1,6 +1,6 @@
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
-import {pipeWalkingBlocked} from './free-boom-contact.mjs?v=120fw';
-import {footSurface,FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
+import {pipeWalkingBlocked} from './free-boom-contact.mjs?v=120gn';
+import {footSurface,FOOT_LEVEL_EPS} from './free-footing.mjs?v=120gn';
 import {accessDeckContains} from './free-access-deck.mjs';
 
 // The 26-unit deck fits the measured shoes beside, rather than above, the work.

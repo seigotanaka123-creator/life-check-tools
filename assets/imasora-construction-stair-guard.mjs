@@ -1,0 +1,14 @@
+import{ROOM_WALK_BODY}from'./imasora-construction-room-walk-body.mjs';
+import{stairPlacement,stairPoint,stairEntry}from'./imasora-construction-stair-placement.mjs?v=120gn';
+import{highInnerRoute}from'./imasora-construction-high-interior.mjs?v=120gn';
+import{highBlueprintFloors}from'./imasora-construction-high-shape.mjs?v=120gn';
+import{roomWalkGeometry,roomBodyClear,roomSupport}from'./imasora-construction-room-contact.mjs?v=120gn';
+import{highRoomRoute}from'./imasora-construction-high-work-position.mjs?v=120gn';
+const known=new Map(),boundsByHeading=new Map();
+function clearBody(w,p,g){let bounds=boundsByHeading.get(p.heading);if(!bounds){const c=Math.cos(p.heading),s=Math.sin(p.heading);let l=Infinity,r=-Infinity,b=Infinity,t=-Infinity,low=Infinity,high=-Infinity;for(const[y0,y1,points]of ROOM_WALK_BODY){low=Math.min(low,y0);high=Math.max(high,y1);for(const[x,z]of points){const a=x*c+z*s,q=-x*s+z*c;l=Math.min(l,a);r=Math.max(r,a);b=Math.min(b,q);t=Math.max(t,q);}}bounds={l,r,b,t,low,high};boundsByHeading.set(p.heading,bounds);}const v=bounds,solids=g.solids.filter(b=>!(['floor','stair'].includes(b.kind)&&b.y+b.h/2<=p.y+2.5001)&&b.x+b.w/2>p.x+v.l&&b.x-b.w/2<p.x+v.r&&b.z+b.d/2>p.z+v.b&&b.z-b.d/2<p.z+v.t&&b.y+b.h/2>p.y+v.low&&b.y-b.h/2<p.y+v.high);return !solids.length||roomBodyClear(w,p,[],{...g,solids},2.5);}
+export function assertStairConstruction(blueprint){if(!stairPlacement(blueprint))return true;const key=JSON.stringify(blueprint);if(known.has(key)){const result=known.get(key);if(result!==true)throw Error(result);return true;}
+ let issue=null;try{const w={version:5,blueprint,levels:highBlueprintFloors(blueprint)},g=roomWalkGeometry(w),route=highInnerRoute(w.levels,w),check=(p,h)=>{const pose={...p,heading:h},y=roomSupport(g,pose,p.y);if(y===undefined||Math.abs(y-p.y)>2.5001||!clearBody(w,{...pose,y},g))throw Error('階段の入口と踊り場をあけよう。柱や壁に重ならない場所をえらんでね。');};
+ for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],d=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z),h=Math.atan2(b.x-a.x,b.z-a.z),n=Math.max(1,Math.ceil(d/2));for(let k=0;k<=n;k++){const p={x:a.x+(b.x-a.x)*k/n,y:a.y+(b.y-a.y)*k/n,z:a.z+(b.z-a.z)*k/n};check(p,h);check(p,h+Math.PI);}}
+ for(let f=0;f<w.levels;f++){const path=[[-42,56],[-14,56],[-14,48]].map(([x,z])=>stairPoint(w,{x,y:f*40,z})).concat(stairEntry(w,f*40));for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],h=Math.atan2(b.x-a.x,b.z-a.z),n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/2));for(let k=0;k<=n;k++){const p={x:a.x+(b.x-a.x)*k/n,y:f*40,z:a.z+(b.z-a.z)*k/n};check(p,h);check(p,h+Math.PI);}}}
+ for(let f=1;f<=w.levels;f++){const e=stairEntry(w,f*40),from=stairPoint(w,{x:-14,y:f*40,z:48,heading:0});if(!highRoomRoute(w,from,e))throw Error('階段の上で部屋へ出られるように、床と通り道をあけよう。');}
+ }catch(e){issue=e.message;}if(known.size>=128)known.clear();known.set(key,issue??true);if(issue)throw Error(issue);return true;}

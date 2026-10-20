@@ -1,16 +1,16 @@
-import {excavatorGroundFrame,excavatorGroundHeight,excavatorWorkSupported,groundPoint,groundLocal} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {transportExcavatorPositionSafe} from './imasora-construction-transport-drive.mjs?v=120fw';
-import {transportPoseKey} from './imasora-construction-transport-field.mjs?v=120fc';
+import {excavatorGroundFrame,excavatorGroundHeight,excavatorWorkSupported,groundPoint,groundLocal} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {transportExcavatorPositionSafe} from './imasora-construction-transport-drive.mjs?v=120gn';
+import {transportPoseKey} from './imasora-construction-transport-field.mjs?v=120gf';
 import {canonical} from './imasora-construction-state.js';
-import {dumpPositionSafe,createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs?v=120fw';
-import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js?v=120fc';
+import {dumpPositionSafe,createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs?v=120gn';
+import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js?v=120gf';
 import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js?v=120fc';
 import {bucketPoint,isContactDig,isBackhoe} from './imasora-construction-excavator-bucket.js';
-import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js?v=120ey';
-import {LOADER,WALKER,localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
-import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js?v=120gf';
+import {LOADER,WALKER,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120gn';
 
 export const BUCKET_DUMP_FORMAT='imasora-shared-bucket-dump-checkpoint-v1';
 export const BUCKET_DUMP_SCOPE='imasora-shared-bucket-dump-isolated-v1';

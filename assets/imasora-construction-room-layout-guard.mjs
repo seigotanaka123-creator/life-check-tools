@@ -1,10 +1,10 @@
-import{assertRoomDeliveryRoute as assertRoomKitRoute}from'./imasora-construction-room-door-delivery.mjs?v=120fw';
-import{roomLayoutPlan,assertRoomUndoSafe}from'./imasora-construction-room-layout.mjs?v=120fw';
-import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
-import{highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120fr';
-import{highSelected,highLocalPoint,highProjects}from'./imasora-construction-high-world.mjs?v=120fw';
-import{upperCastingGeometry,upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120fw';
-import{TIMBER_YARDS}from'./imasora-construction-yard-origins.mjs';
+import{assertRoomDeliveryRoute as assertRoomKitRoute}from'./imasora-construction-room-door-delivery.mjs?v=120gn';
+import{roomLayoutPlan,assertRoomUndoSafe}from'./imasora-construction-room-layout.mjs?v=120gn';
+import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120gn';
+import{highSelected,highLocalPoint,highProjects}from'./imasora-construction-high-world.mjs?v=120gn';
+import{upperCastingGeometry,upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120gn';
+import{TIMBER_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
 const hit=(a,b)=>Math.abs(a.x-b.x)<(a.w+b.w)/2+.1&&Math.abs(a.y-b.y)<(a.h+b.h)/2+.1&&Math.abs(a.z-b.z)<(a.d+b.d)/2+.1;
 export function assertRoomLayoutWorld(world,a,recordOverride=null){
  const r=recordOverride??highSelected(world.constructionHighBuild);if(!r)return;const w=r.work,undo=a.type==='UNDO'&&Object.hasOwn(w.history.at(-1)??{},'layout'),checking=a.type==='CHECK';if(a.type!=='ROOM_LAYOUT'&&!undo&&!checking)return;if(checking&&!w.roomLayout?.items.length&&!w.job?.edit?.deliveryVersion)return;

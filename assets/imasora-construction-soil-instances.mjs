@@ -1,5 +1,5 @@
 import * as THREE from './three.module.min.js';
-import {shovelNearbySoil,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {shovelNearbySoil,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120gn';
 
 // Every camera ray lies inside this horizontal rectangle, even while its
 // height is raised to avoid obstruction. This is a conservative broad phase;

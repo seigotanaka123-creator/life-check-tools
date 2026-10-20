@@ -1,29 +1,31 @@
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120gf';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs?v=120fb';
 import {constructionWorkAutoSaveKey} from './imasora-construction-autosave-key.mjs?v=120es';
 import {waterEditInfo} from './imasora-construction-water-undo.mjs?v=120fb';
-import {fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120fw';
+import {fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120gn';
 import {createFrameHeightSampler} from './imasora-construction-frame-height.mjs?v=120ey';
 import {createContactReadCache} from './imasora-construction-contact-cache.mjs?v=120ex';
-import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120fw';
-import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120ea';
+import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120gm';
+import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
 import {bindTravelBoost} from './imasora-construction-travel-input.mjs';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
-import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120ea';
-import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120fw';
+import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120gm';
+import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120gn';
 import {createVehicleRestoreView} from './imasora-construction-vehicle-restore-view.js?v=502';
 import * as THREE from './three.module.min.js';
 import {overlapsWorldYardBuild} from './imasora-construction-world-yard-reservation.js?v=512';
-import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=120fb';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120ey';
-import {upgradeWaterTruck,transportAvailability,TRANSPORT_OBSTACLES,waterTransportObstacles,transportMaterialObstacles} from './imasora-construction-water-transport.js?v=120fb';
+import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=120gf';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120gf';
+import {upgradeWaterTruck,transportAvailability,TRANSPORT_OBSTACLES,waterTransportObstacles,transportMaterialObstacles} from './imasora-construction-water-transport.js?v=120gf';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=520';
-import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,flowWorldFieldWater,validateWorldWater} from './imasora-construction-world-water.js?v=120fb';
+import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,flowWorldFieldWater,validateWorldWater} from './imasora-construction-world-water.js?v=120gf';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js?v=120ds';
-import {waterCheckpoint} from './imasora-construction-world-water.js?v=120fb';
+import {waterCheckpoint} from './imasora-construction-world-water.js?v=120gf';
 
 // Same scene and same Ren as the main world. Only the input/physics owner changes.
 export function createWorldWaterController({service,practice=false,preview=false,canResume=()=>true,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,readout,onRestoreRebuild}){
+  let jumpControl;const jumpInput=createJumpIntent();
   const gait=createConstructionWalkGait();
   const orbit=createOrbitLook();let menuSaveNote='',restoreSession=null,savedWorkAwaitingResume=false,undoConfirm=false;
   const restoreLocked=()=>!!restoreSession?.locked;
@@ -50,7 +52,7 @@ export function createWorldWaterController({service,practice=false,preview=false
   const button=a=>panel.querySelector(`[data-action="${a}"]`),message=panel.querySelector('.ww-message');
   const received=()=>practice?32000:service.constructionStock?.receipts.filter(e=>e.offerId==='mars-water').reduce((n,e)=>n+e.amount,0)||0;
   let travelBoost=null;
-  function clear(){travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
+  function clear(){jumpControl?.cancel();jumpInput.reset();travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
   const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ww",groups:[{"id":"move","label":"移動","selectors":[".ww-pad"],"hint":"WASD／矢印で移動。同方向を素早く2回で加速（離すと解除）。停車して給水します。"},{"id":"work","label":"給水","selectors":[".ww-water-shape","[data-action=\"source\"]","[data-action=\"pour\"]","[data-action=\"unload\"]","[data-action=\"returned\"]",".ww-work label"]},{"id":"stock","label":"水路・保管","selectors":["[data-action=\"dispatch\"]","[data-action=\"store\"]","[data-action=\"recover\"]","[data-action=\"flow\"]","[data-action=\"stop\"]"]}],quick:["interact","camera","undo-review"]});
   const undoCard=document.createElement('div');undoCard.className='ww-undo-confirm';undoCard.hidden=true;undoCard.setAttribute('role','group');undoCard.setAttribute('aria-label','水の作業をもどす');undoCard.innerHTML='<p></p><button data-action="undo-water">1つ前にもどす</button><button data-action="undo-cancel">やめる</button>';panel.querySelector('.gv-active').append(undoCard);
   const undoStyle=document.createElement('style');undoStyle.textContent='.ww-undo-confirm{grid-row:2;align-self:start;padding:12px;background:#fff5da;color:#304452;border:2px solid #e6c46e;border-radius:16px;pointer-events:auto}.ww-undo-confirm[hidden]{display:none!important}.ww-undo-confirm p{margin:0 0 8px}.ww-undo-confirm button{min-height:44px;margin:3px}.world-water-controls:has(.ww-undo-confirm:not([hidden])) :is(.gv-pages,.gv-quick){display:none}';panel.append(undoStyle);
@@ -134,29 +136,34 @@ export function createWorldWaterController({service,practice=false,preview=false
     refresh();
   }
   travelBoost=bindTravelBoost({panel,enabled:()=>active&&!busy&&!blocked&&!undoConfirm&&!restoreLocked()&&!game.paused&&!game.menuOpen,context:()=>work?.work?.loader.mode});
-  panel.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>void action(b.dataset.action,b.dataset.mode)));
+  panel.querySelectorAll('[data-action]:not([data-action=jump])').forEach(b=>b.addEventListener('click',()=>void action(b.dataset.action,b.dataset.mode)));
   panel.querySelector('select').addEventListener('change',e=>void action('direction',Number(e.target.value)));
-  for(const b of panel.querySelectorAll('[data-hold]')){
+  for(const b of panel.querySelectorAll('[data-hold]:not([data-hold=jump])')){
     b.addEventListener('pointerdown',e=>{if(!active||busy||blocked||restoreLocked()||game.paused)return;e.preventDefault();held.set(e.pointerId,b.dataset.hold);taps.set(b.dataset.hold,work.work.time+.15);b.setPointerCapture(e.pointerId);b.classList.add('held');});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,e=>{held.delete(e.pointerId);b.classList.remove('held');});
     b.addEventListener('click',e=>{if(e.detail===0&&active&&!busy&&!blocked&&!restoreLocked()&&!game.paused)taps.set(b.dataset.hold,work.work.time+.15);});
   }
+  const jumpReady=()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen&&work.work.loader.mode==='foot';
+  jumpControl=bindJumpButton({element:panel.querySelector('[data-hold=jump]'),enabled:()=>jumpReady()&&(work.work.loader.player.grounded||(work.work.loader.player.jumpCount??0)<3),canHold:jumpReady,activate:()=>jumpInput.press(),release:()=>jumpInput.release()});
   const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'];
-  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
-  addEventListener('keyup',e=>{keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
+  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
+  addEventListener('keyup',e=>{if(e.code==='Space')jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
   // While this controller owns Ren, unrelated build/camera buttons cannot mutate the scene.
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!service.blocked&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',clear);document.addEventListener('visibilitychange',clear);
-  function input(){return travelBoost.input(rawInput());}
-  function rawInput(){const actions=[...held.values()],pressed=[...keys];for(const [k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
+  function input(consumeJump=true){return travelBoost.input(rawInput(consumeJump));}
+  function rawInput(consumeJump=true){const actions=[...held.values()],pressed=[...keys];for(const [k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
     if(work.work.loader.mode==='driving')return loaderDrivingInput(actions,pressed);
     const on=(a,...k)=>actions.includes(a)||k.some(x=>pressed.includes(x)),forward=Number(on('accelerate','KeyW','ArrowUp'))-Number(on('reverse','KeyS','ArrowDown')),right=Number(on('right','KeyD','ArrowRight'))-Number(on('left','KeyA','ArrowLeft'));
-    const a=orbit.yaw(view===2?Math.PI+.2:work.work.loader.vehicle.heading+(view===1?Math.PI/2:yaw));return{x:right*Math.cos(a)-forward*Math.sin(a),z:-right*Math.sin(a)-forward*Math.cos(a),jump:on('jump','Space')};
+    const a=orbit.yaw(view===2?Math.PI+.2:work.work.loader.vehicle.heading+(view===1?Math.PI/2:yaw));return{x:right*Math.cos(a)-forward*Math.sin(a),z:-right*Math.sin(a)-forward*Math.cos(a),jump:jumpInput.read(consumeJump)};
   }
   function refresh(){if(!root){panel.hidden=!(active&&restoreLocked());if(!panel.hidden){message.textContent=restoreSession.message;game.refresh({busy:true,blocked:true,context:'stopped',loadText:'停止中',menuHint:restoreSession.message});}return;}
     panel.hidden=!root||state.map!=='construction'||work.schema===2&&!active&&!near()&&!resumeAvailable();if(panel.hidden)return;
     button('begin').hidden=active;button('begin').disabled=(!near()&&!resumeAvailable())||busy||blocked||restoreLocked();button('begin').textContent=resumeAvailable()?'保存した給水を再開':'作業を始める';panel.querySelector('.ww-active').hidden=!active;
     panel.querySelector('.ww-mode').textContent=practice?'貸出32 L・保存しません':service.mode==='readonly'?'表示確認・保存なし':service.mode==='integration'?'本体とは別の接続確認保存':'作業を保存できます';
+    // The inactive card only offers resume. Its hidden work pages must not
+    // recompute full placement/support plans while the player walks or jumps.
+    if(!active){const nextMessage=blocked?message.textContent:busy?'セーブしています…':resumeAvailable()?'保存した水と車の位置から続けられるよ。':idleIssue||'給水車が近くにいるよ。ドアから乗ってみよう。';if(message.textContent!==nextMessage)message.textContent=nextMessage;game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:work.work.loader.mode,loadText:'',menuHint:menuSaveNote});return;}
     button('camera').textContent=['視点：追従','視点：横から','視点：上から'][view];
     const t=worldWaterTotals(work),w=work.work,l=w.loader,a=transportAvailability(w,externalVolumes(),waterGround),lit=n=>(n*.25).toFixed(2);
     panel.querySelector('.ww-stats').textContent=`保管 ${lit(received()/250-work.allocated)} L ｜給水槽 ${lit(t.source)} L ｜車載 ${lit(t.bucket)} L ｜移送 ${lit(t.transit+t.moving)} L ｜現場 ${lit(t.field??0)} L ｜水路・回収 ${lit(t.course+t.returnTank)} L`;
@@ -222,9 +229,9 @@ export function createWorldWaterController({service,practice=false,preview=false
       }catch(e){idleIssue=e.message;refresh();return false;}
     },
     previewSpawn(){if(!preview||!root)return null;return{x:root.position.x-188,z:root.position.z-118,heading:0};},
-    update(dt){terrainSamples.reset(readGroundRevision?.());contactEpoch++;if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
+    update(dt){jumpControl.sync();terrainSamples.reset(readGroundRevision?.());contactEpoch++;if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
       if(!restoreLocked()&&blocked&&retryPending&&service.blocked===false){fresh();blocked=false;retryPending=false;if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
-      if(active&&!busy&&!blocked&&!undoConfirm&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldWater(work,input(),dt,externalVolumes(),waterGround);if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,{x:0,z:0},waterGround,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work=next;}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
+      if(active&&!busy&&!blocked&&!undoConfirm&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldWater(work,input(work.phase+dt>=1/120-1e-9),dt,externalVolumes(),waterGround);if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,{x:0,z:0},waterGround,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work=next;}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
       if(!active&&!busy&&!blocked&&!restoreLocked()&&!document.hidden&&work.schema===2&&Object.keys(work.work.pools??{}).length){
         runoffClock+=dt;auto+=dt;if(runoffClock>=.1){runoffClock%=.1;try{work=flowWorldFieldWater(work,externalVolumes(),waterGround);}catch(e){failure(e);}}
         if(auto>8&&!saving&&constructionWorkAutoSaveKey(work,view)!==lastAutomaticKey&&!practice&&service.mode!=='readonly')void save({automatic:true});

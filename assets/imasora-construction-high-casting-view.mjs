@@ -1,7 +1,7 @@
 import * as T from './three.module.min.js';
 import {createUpperPaintView} from './imasora-construction-high-paint-view.mjs?v=120fn';
-import {highProjects,highWorldPoint} from './imasora-construction-high-world.mjs?v=120fw';
-import {upperRigPath,upperFeedPath,upperRigBrackets,upperCastingLocal} from './imasora-construction-high-casting.mjs?v=120fw';
+import {highProjects,highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
+import {upperRigPath,upperFeedPath,upperRigBrackets,upperCastingLocal} from './imasora-construction-high-casting.mjs?v=120gn';
 import {highCastings,HIGH_CAST_MS} from './imasora-construction-concrete/high-casting-state.mjs?v=120ft';
 import {upperShapeTiles,upperShapeBoundary,upperCastingHeight,upperCastingCapacity,upperPourTile} from './imasora-construction-concrete/high-casting-shape.mjs?v=120fl';
 export function createUpperCastingView(parent){

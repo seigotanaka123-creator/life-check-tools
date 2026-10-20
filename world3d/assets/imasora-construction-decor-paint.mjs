@@ -1,5 +1,5 @@
-import{validateHighShape,shapedHighParts}from'./imasora-construction-high-shape.mjs';
-import{validateRoomItem,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
+import{validateHighShape,shapedHighParts}from'./imasora-construction-high-shape.mjs?v=120gn';
+import{validateRoomItem,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
 import{validPaintColor}from'./imasora-construction-concrete/paint-colors.mjs';
 const ok=(v,m)=>{if(!v)throw Error(m);},same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),keys=(o,k)=>o&&Object.keys(o).sort().join('|')===k;
 export const DECOR_FACES=['top','bottom','north','south','east','west'];
@@ -14,7 +14,7 @@ export function validateDecorTarget(t,plan){
 export function validateDecorAction(a){
  ok(/^building-[1-9][0-9]*$/.test(a.buildingId)&&a.buildingId.length<=24,'ぬる建物をえらぼう。');if(a.plan!==null){validateHighShape(a.plan);ok(a.plan.interiorStairs===true,'内階段のある建物をえらぼう。');validateDecorTarget(a.target,a.plan);}
  ok(['roller','brush'].includes(a.tool)&&(validPaintColor(a.color)||a.color==='bare'&&a.tool==='brush')&&Array.isArray(a.pixels)&&a.pixels.length>0&&a.pixels.length<=16&&new Set(a.pixels).size===a.pixels.length&&a.pixels.every(n=>Number.isInteger(n)&&n>=0&&n<16)&&(a.tool!=='roller'||a.pixels.length===16),'色と道具、ぬる模様をえらぼう。');
- if(a.target?.kind==='fixture'){validateRoomItem(a.item);ok(a.item.id===a.target.itemId&&a.item.floor===a.target.floor&&same(a.item,decorItem(a.item)),'家具の形が変わったよ。えらび直そう。');}else ok(a.item===null,'床・天井の場所をえらび直そう。');a.pixels=[...a.pixels].sort((a,b)=>a-b);return a;
+ if(a.target?.kind==='fixture'){validateRoomItem(a.item,a.plan?.storeys?.length??6,a.plan);ok(a.item.id===a.target.itemId&&a.item.floor===a.target.floor&&same(a.item,decorItem(a.item)),'家具の形が変わったよ。えらび直そう。');}else ok(a.item===null,'床・天井の場所をえらび直そう。');a.pixels=[...a.pixels].sort((a,b)=>a-b);return a;
 }
 const faceAxes=face=>face==='top'||face==='bottom'?{axis:'y',u:'x',v:'z',sign:face==='top'?1:-1}:face==='north'||face==='south'?{axis:'z',u:'x',v:'y',sign:face==='south'?1:-1}:{axis:'x',u:'z',v:'y',sign:face==='east'?1:-1};
 const dim={x:'w',y:'h',z:'d'};

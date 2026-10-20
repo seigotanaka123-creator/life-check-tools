@@ -1,11 +1,11 @@
 import {encodeSaveWire,decodeSaveWire} from './imasora-save-wire.mjs';
-import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120fw';
+import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120gn';
 // A dedicated worker runs proofs locally instead of spawning nested workers.
 const proofOptions=typeof WorkerGlobalScope!=='undefined'&&globalThis instanceof WorkerGlobalScope?{createWorker:()=>null}:undefined;
 const backgroundStorage=store=>typeof document!=='undefined'&&typeof Worker==='function'&&store.indexedDB===globalThis.indexedDB&&!store.failNext;
 import {CONSTRUCTION_STORE} from './imasora-construction-storage.js';
-import {snapshotTransportRestoreJournal,prepareTransportRestoreCommit,sameTransportRestoreValue,linkCheckedTransportRestorePoints} from './imasora-construction-transport-restore.mjs?v=120fw';
-import {runWorldSaveTask,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120fw';
+import {snapshotTransportRestoreJournal,prepareTransportRestoreCommit,sameTransportRestoreValue,linkCheckedTransportRestorePoints} from './imasora-construction-transport-restore.mjs?v=120gn';
+import {runWorldSaveTask,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120gn';
 import {captureConstructionJson,captureOwnedConstructionJson,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
 // IndexedDB has already produced ordinary data properties. Keep exact types,
 // prototypes, array order and field presence, without repeating millions of

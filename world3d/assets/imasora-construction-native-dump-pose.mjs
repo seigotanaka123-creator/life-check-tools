@@ -1,5 +1,5 @@
-import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120ey';
+import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120gf';
 
 const dot=(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=a=>{const n=Math.hypot(...a);return a.map(v=>v/n);};
 const poseCache=new WeakMap();

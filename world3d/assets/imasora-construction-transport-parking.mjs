@@ -1,9 +1,9 @@
-import {validateScoopDumpWork} from './imasora-construction-fragment-scoop.mjs?v=120fw';
-import {widenSoilTransport} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {transportBay} from './imasora-construction-transport-field.mjs?v=120fc';
-import {shovelStanding,shovelMachines,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {linkedArmClear} from './imasora-construction-bucket-dump.mjs?v=120fw';
-import {dumpPositionSafe,dumpBoxesOverlap} from './imasora-construction-dump-work.mjs?v=120fw';
+import {validateScoopDumpWork} from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {widenSoilTransport} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {transportBay} from './imasora-construction-transport-field.mjs?v=120gf';
+import {shovelStanding,shovelMachines,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {linkedArmClear} from './imasora-construction-bucket-dump.mjs?v=120gn';
+import {dumpPositionSafe,dumpBoxesOverlap} from './imasora-construction-dump-work.mjs?v=120gn';
 
 export function transportParkingProblem(s){
  if(s.frame.version!==1||s.frame.soil.schema!==2)return 'この車はすでに共通駐車場へ移しています。';

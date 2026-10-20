@@ -1,12 +1,13 @@
 import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 // Main-world finite water work. No copied wallet, purchase API, storage or loan grant.
-import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport,TRANSPORT_OBSTACLES,waterTransportObstacles,waterSourcePort} from './imasora-construction-water-transport.js?v=120fb';
+import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport,TRANSPORT_OBSTACLES,waterTransportObstacles,waterSourcePort} from './imasora-construction-water-transport.js?v=120gf';
 import {flowFieldWater} from './imasora-construction-field-water-flow.mjs?v=120fb';
-import {walkingClear} from './imasora-construction-loader-physics.js?v=120ey';
+import {walkingClear} from './imasora-construction-loader-physics.js?v=120gf';
 import {beginWaterEdit,finishWaterEdit,breakWaterEdits,undoWaterEdit,validateWaterEdits} from './imasora-construction-water-undo.mjs?v=120fb';
 import {waterBuildTerrainFits,waterBuildCellSize} from './imasora-construction-water-build.mjs?v=120fb';
 export const WORLD_WATER_SCOPE='construction-world-water-v1';
-export const WATER_YARDS=Object.freeze([[-760,-480],[-760,550],[760,-480],[760,550]].map(Object.freeze));
+import{WATER_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
+export{WATER_YARDS};
 export const WATER_PACK=128; // 32 L, in 250 mL physics units.
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);},int=v=>Number.isSafeInteger(v)&&v>=0;
 const exact=(o,fields)=>ok(o&&Object.getPrototypeOf(o)===Object.prototype&&Object.keys(o).sort().join('|')===[...fields].sort().join('|'),'給水作業の項目が不正です。');

@@ -1,5 +1,5 @@
 import {transitionTrial} from './imasora-construction-concrete-site-state.js';
-import {transitionProfileProject} from './imasora-construction-profile-project.js?v=120fw';
+import {transitionProfileProject} from './imasora-construction-profile-project.js?v=120gn';
 const fail=code=>{throw new Error(code);};
 const EPSILON=1e-5;
 const RECEIPT_KEYS=['type','maxGripError','maxLipError','maxBladeError','maxPoleLength','streamSamples','contactSamples','completedBands','completedPanels','hammerHits','maxHitError','fillSamples','maxFillError','maxVolumeError'];

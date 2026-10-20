@@ -1,8 +1,8 @@
 // Command assistance only. Physical states/checkpoints remain the existing v3.
-import {stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=120fc';
-import {armIntersections,moveArm} from './imasora-construction-excavator.js?v=120fc';
-import {stepSpoilRecovery} from './imasora-construction-excavator-recovery.js?v=120fc';
-import {excavationCheckpoint} from './imasora-construction-excavator-save.js?v=120fc';
+import {stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=120gf';
+import {armIntersections,moveArm} from './imasora-construction-excavator.js?v=120gf';
+import {stepSpoilRecovery} from './imasora-construction-excavator-recovery.js?v=120gf';
+import {excavationCheckpoint} from './imasora-construction-excavator-save.js?v=120gf';
 export const DIG_READY=Object.freeze({boom:74*Math.PI/180,stick:-Math.PI/6,curl:-1.25});
 export const DIG_LOWER=33*Math.PI/180;
 export const DIG_CLOSE=24*Math.PI/180;

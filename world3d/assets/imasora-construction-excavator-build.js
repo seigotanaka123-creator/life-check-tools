@@ -1,6 +1,6 @@
 // Optional construction assistance: physical poses, finite cuts and real soil transport.
-import {initialExcavatorWalk,actExcavatorWalk,stepExcavatorWalk} from './imasora-construction-excavator-walk.js?v=120fc';
-import {armPose,armIntersections,EX,BIN,cellCenter,scoopTargets,solveBucketPose,scoopPoseAt,stickExtensionLimit,bucketOpenLimit} from './imasora-construction-excavator.js?v=120fc';
+import {initialExcavatorWalk,actExcavatorWalk,stepExcavatorWalk} from './imasora-construction-excavator-walk.js?v=120gf';
+import {armPose,armIntersections,EX,BIN,cellCenter,scoopTargets,solveBucketPose,scoopPoseAt,stickExtensionLimit,bucketOpenLimit} from './imasora-construction-excavator.js?v=120gf';
 import {isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function tunnelPlan(){const mask={};for(let x=1;x<7;x++)for(let z=6;z<16;z++)for(let y=z<8?-1:-2;y<(z<12?3:2);y++)mask[`${x},${y},${z}`]=true;return mask;}

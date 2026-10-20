@@ -1,7 +1,7 @@
 import {workVehicleState} from './work-vehicle-height.mjs';
 import * as T from '../three.module.min.js';
-import {BOOM_PHASES,createBoomPlan,pipeRoute,newPipeReceipt,assertPipeReceipt} from './free-boom-contact.mjs?v=120fw';
-import {CAST_PORTS,castPoint} from './free-casting.mjs?v=120fw';
+import {BOOM_PHASES,createBoomPlan,pipeRoute,newPipeReceipt,assertPipeReceipt} from './free-boom-contact.mjs?v=120gn';
+import {CAST_PORTS,castPoint} from './free-casting.mjs?v=120gn';
 const vec=p=>new T.Vector3(p.x,p.y,p.z);
 export const BOOM_DURATIONS=[.65,1.2,.65,1.1,1,4.5,1,1.1,.65,1.2,.65];
 export function createBoomMotion({f,cell,vehicle,root,tools,line,mats,external,receipt}){

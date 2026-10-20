@@ -1,7 +1,7 @@
 // An explicitly selected, unsaved rehearsal. Never called for received inventory.
-import {initialWorldTimber,enterWorldTimber,worldTimberAction,validateWorldTimber,TIMBER_YARDS,FLOOR_VOLUME} from './imasora-construction-world-timber.js?v=120fw';
-import {refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120fw';
-import {alignCable} from './imasora-construction-floating-joints.js?v=120fw';
+import {initialWorldTimber,enterWorldTimber,worldTimberAction,validateWorldTimber,TIMBER_YARDS,FLOOR_VOLUME} from './imasora-construction-world-timber.js?v=120gn';
+import {refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120gn';
+import {alignCable} from './imasora-construction-floating-joints.js?v=120gn';
 export function worldTimberJoinPractice(siteIndex,{practice,saveMode}){
   if(!practice||saveMode!=='readonly')throw Error('接合練習は保存しない貸出画面だけで使えます。');
   const[x,z]=TIMBER_YARDS[siteIndex],total=2*FLOOR_VOLUME;

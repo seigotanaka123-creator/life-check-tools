@@ -1,11 +1,12 @@
-import {shapedHighParts} from './imasora-construction-high-shape.mjs';
+import{stairPlacement,stairPoint,stairEntry,stairExit,stairGround,stairDoor,stairApproach}from'./imasora-construction-stair-placement.mjs?v=120gn';
+import {shapedHighParts} from './imasora-construction-high-shape.mjs?v=120gn';
 const point=(x,y,z)=>({x,y,z});
 function hit(a,b,box,r=1.11){let lo=0,hi=1;for(const [k,dim]of[['x','w'],['y','h'],['z','d']]){const start=a[k]-box[k],d=b[k]-a[k],half=box[dim]/2+r;if(Math.abs(d)<1e-9){if(Math.abs(start)>=half)return false;continue;}const l=(-half-start)/d,h=(half-start)/d;lo=Math.max(lo,Math.min(l,h));hi=Math.min(hi,Math.max(l,h));if(hi<lo)return false;}return true;}
 // The delivery arm stays below the ceiling and above the full-size worker.
 // A fixed post on the reusable deck supports it; columns are routed around.
 function workPipe(s,q,tile={x:0,z:0},height=8){
  const y=q.floor*40,sg=q.floor%2?-1:1,target=point(q.x+tile.x,y+32,q.z+tile.z),solids=Array.from({length:s.levels},(_,i)=>shapedHighParts(i+1,s)).flat(),nodes=[];
- for(let z=-56;z<=56;z+=4)for(let x=8;x<=56;x+=4)nodes.push(point(x,y+32,z));
+ for(let z=-56;z<=56;z+=4)for(let x=stairPlacement(s)?-56:8;x<=56;x+=4)nodes.push(point(x,y+32,z));
  const start=point(48,y+32,16),key=p=>p.x+','+p.z,by=new Map(nodes.map(p=>[key(p),p])),prev=new Map([[key(start),null]]),queue=[start];let found=null;
  for(const a of queue){if(Math.hypot(a.x-target.x,a.z-target.z)<=6&&!solids.some(b=>hit(a,target,b))){found=key(a);break;}for(const [dx,dz]of[[4,0],[-4,0],[0,4],[0,-4]]){const b=by.get((a.x+dx)+','+(a.z+dz));if(!b||prev.has(key(b))||solids.some(v=>hit(a,b,v)))continue;prev.set(key(b),key(a));queue.push(b);}}
  if(!found)throw Error('柱から少し離れた場所をえらぼう。ホースを通せないよ。');

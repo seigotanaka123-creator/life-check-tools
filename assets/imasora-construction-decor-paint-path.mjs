@@ -1,10 +1,11 @@
+import{stairEntry,stairExit}from'./imasora-construction-stair-placement.mjs?v=120gn';
 import{overlaps}from'./imasora-construction-concrete/free-vehicle-shape.mjs';
-import{decorToolDetour}from'./imasora-construction-decor-tool-route.mjs?v=120fw';
-import{decorItem,decorParts,decorPatches,decorPoint,validateDecorTarget}from'./imasora-construction-decor-paint.mjs?v=120fs';
-import{roomGraphRoute,roomPaintRoute,roomPaintVisiblePart}from'./imasora-construction-building-room.mjs?v=120fw';
-import{highWorkSolids,highWorkBody,highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120fr';
-import{highWorldPoint,highLocalPoint}from'./imasora-construction-high-world.mjs?v=120fw';
-import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120fw';
+import{decorToolDetour}from'./imasora-construction-decor-tool-route.mjs?v=120gn';
+import{decorItem,decorParts,decorPatches,decorPoint,validateDecorTarget}from'./imasora-construction-decor-paint.mjs?v=120gn';
+import{roomGraphRoute,roomPaintRoute,roomPaintVisiblePart}from'./imasora-construction-building-room.mjs?v=120gn';
+import{highRoomNodes,highWorkSolids,highWorkBody,highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120gn';
+import{highWorldPoint,highLocalPoint}from'./imasora-construction-high-world.mjs?v=120gn';
+import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120gn';
 const ok=(v,m)=>{if(!v)throw Error(m);},point=(x,y,z,heading=0)=>({x,y,z,heading}),all=Array.from({length:16},(_,i)=>i),sameBox=(a,b)=>['x','y','z','w','h','d'].every(k=>a[k]===b[k]);
 export function decorInstalledItem(w,t){if(t.kind!=='fixture')return null;const i=w.roomLayout?.items.find(i=>i.id===t.itemId);ok(i&&i.floor===t.floor,'家具をえらび直そう。');return decorItem(i);}
 export function decorSurface(t){return{interior:true,decor:true,level:t.floor+1,target:structuredClone(t)};}
@@ -17,9 +18,9 @@ export function decorPaintToolPaths(record,a,patches,worldHand=null,extra=[],sta
 }
 const cache=new Map();
 export function decorPaintTarget(w,t){
- validateDecorTarget(t,w.blueprint);const item=decorInstalledItem(w,t),key=JSON.stringify([w.blueprint,w.levels,w.roomLayout,t]);if(cache.has(key))return cache.get(key);const patches=decorPatches(w.blueprint,t,item),visible=patches.filter(p=>p.area>0),parts=decorParts(w.blueprint,t,item);ok(visible.length,'見える面をえらぼう。');const center=parts[0],y=t.floor*40,entry=point(16,y,48),solids=highWorkSolids(w),horizontal=['floor','ceiling','fixture'].includes(t.kind)||t.face==='top'||t.face==='bottom',face=visible[0];
- const candidates=[-48,-16,16,48].flatMap(z=>[16,48].map(x=>point(x,y,z,Math.atan2(center.x-x,center.z-z)))).filter(n=>Math.hypot(n.x-center.x,n.z-center.z)<=140&&Array.from({length:24},(_,k)=>k*Math.PI/12).every(h=>!highWorkBodyHits(n,h,solids))&&(horizontal||(n[face.axis]-face.plane)*face.sign>12)&&!(t.kind==='floor'&&overlaps(highWorkBody(n,n.heading),{x:center.x,z:center.z,hx:center.w/2,hz:center.d/2,heading:0}))).sort((a,b)=>Math.hypot(a.x-center.x,a.z-center.z)-Math.hypot(b.x-center.x,b.z-center.z));
- for(const n of candidates){const route=roomGraphRoute(w,entry,n);if(!route)continue;try{decorPaintToolPaths({site:{x:0,y:0,z:0,turn:0},work:w},{target:t,pixels:all},patches,null,[],n);}catch{continue;}const result={stance:n,entry:[point(-14,y,48),...route]};result.entry.forEach(Object.freeze);Object.freeze(result.entry);Object.freeze(n);Object.freeze(result);if(cache.size>=256)cache.clear();cache.set(key,result);return result;}
+ validateDecorTarget(t,w.blueprint);const item=decorInstalledItem(w,t),key=JSON.stringify([w.blueprint,w.levels,w.roomLayout,t]);if(cache.has(key))return cache.get(key);const patches=decorPatches(w.blueprint,t,item),visible=patches.filter(p=>p.area>0),parts=decorParts(w.blueprint,t,item);ok(visible.length,'見える面をえらぼう。');const center=parts[0],y=t.floor*40,entry=stairEntry(w,y),solids=highWorkSolids(w),horizontal=['floor','ceiling','fixture'].includes(t.kind)||t.face==='top'||t.face==='bottom',face=visible[0];
+ const candidates=highRoomNodes(w,y).map(q=>({...q,heading:Math.atan2(center.x-q.x,center.z-q.z)})).filter(n=>Math.hypot(n.x-center.x,n.z-center.z)<=140&&Array.from({length:24},(_,k)=>k*Math.PI/12).every(h=>!highWorkBodyHits(n,h,solids))&&(horizontal||(n[face.axis]-face.plane)*face.sign>12)&&!(t.kind==='floor'&&overlaps(highWorkBody(n,n.heading),{x:center.x,z:center.z,hx:center.w/2,hz:center.d/2,heading:0}))).sort((a,b)=>Math.hypot(a.x-center.x,a.z-center.z)-Math.hypot(b.x-center.x,b.z-center.z));
+ for(const n of candidates){const route=roomGraphRoute(w,entry,n);if(!route)continue;try{decorPaintToolPaths({site:{x:0,y:0,z:0,turn:0},work:w},{target:t,pixels:all},patches,null,[],n);}catch{continue;}const result={stance:n,entry:[stairExit(w,y),...route]};result.entry.forEach(Object.freeze);Object.freeze(result.entry);Object.freeze(n);Object.freeze(result);if(cache.size>=256)cache.clear();cache.set(key,result);return result;}
  throw Error(t.kind==='floor'?'床をぬる場所の横に、立つ場所をあけよう。':'そばまで歩けて、道具が届く場所をえらぼう。');
 }
 export function decorPainterReady(w,t){try{const q=w.interiorPaintStation,p=decorPaintTarget(w,t).stance;return!w.job&&q?.decor===true&&JSON.stringify(q.target)===JSON.stringify(t)&&Math.hypot(w.actor.x-p.x,w.actor.y-p.y,w.actor.z-p.z)<.01&&Math.cos(w.actor.heading-p.heading)>.999;}catch{return false;}}

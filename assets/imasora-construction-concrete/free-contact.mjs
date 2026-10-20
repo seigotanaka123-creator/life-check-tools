@@ -1,19 +1,19 @@
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
 import {workVehicleState} from './work-vehicle-height.mjs';
-import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
-import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs?v=120fw';
-import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs?v=120fw';
-import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
-import {frameDeckHeight} from './free-frame-workspace.mjs?v=120fw';
+import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
+import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs?v=120gn';
+import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs?v=120gn';
+import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
+import {frameDeckHeight} from './free-frame-workspace.mjs?v=120gn';
 import {freeWorkMask,freePlacedFill} from './free-work-parts.mjs';
-import {canonicalFreeAction,freeCell} from './free-build-state.mjs?v=120fw';
-import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs?v=120fw';
-import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs?v=120fw';
-import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs?v=120fw';
+import {canonicalFreeAction,freeCell} from './free-build-state.mjs?v=120gn';
+import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs?v=120gn';
+import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs?v=120gn';
+import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs?v=120gn';
 
-import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs?v=120fw';
-import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs?v=120fw';
-import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120fw';
+import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs?v=120gn';
+import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs?v=120gn';
+import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120gn';
 
 export const FREE_CONTACT_ACTIONS=new Set(['FREE_PAINT','FREE_BOARD','FREE_LEAVE',...FREE_CAST_ACTIONS,...FREE_FRAME_ACTIONS]);
 export const CONTACT_EPS=1e-5;

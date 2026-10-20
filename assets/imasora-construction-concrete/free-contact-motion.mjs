@@ -1,16 +1,16 @@
 import * as T from '../three.module.min.js';
 import {PAINT_REMOVE_COLOR} from './free-paint-removal.mjs?v=120dm';
-import {freeCell} from './free-build-state.mjs?v=120fw';
-import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120fw';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
+import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120gn';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120gn';
 import {vehicleGroundError} from './free-vehicle-ground.mjs?v=120ek';
-import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120fw';
+import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120gn';
 
-import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs?v=120fw';
-import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs?v=120fw';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
-import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs?v=120fw';
-import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
+import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs?v=120gn';
+import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs?v=120gn';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
+import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs?v=120gn';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),distance=(a,b)=>Math.hypot(a.x-b.x,(a.y??0)-(b.y??0),a.z-b.z);
 export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles,tools,colors,mats,line,drawPaint,external,supportHeightAt=()=>0,paintGroundExternal=external,sharedPlatform=null,masking=null}){

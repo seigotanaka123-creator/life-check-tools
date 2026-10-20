@@ -1,13 +1,13 @@
-import {transportArea,transportPoseKey} from './imasora-construction-transport-field.mjs?v=120fc';
-import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,nativeDumpAnchorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
+import {transportArea,transportPoseKey} from './imasora-construction-transport-field.mjs?v=120gf';
+import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,nativeDumpAnchorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
 import {canonical} from './imasora-construction-state.js';
-import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {LOADER,SITE} from './imasora-construction-loader-physics.js?v=120ey';
-import {BIN} from './imasora-construction-excavator.js?v=120fc';
-import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {nativeDumpSupport,nativeDumpRecoveryStep} from './imasora-construction-native-dump-support.mjs?v=120fw';
+import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelNearbySoil,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {LOADER,SITE} from './imasora-construction-loader-physics.js?v=120gf';
+import {BIN} from './imasora-construction-excavator.js?v=120gf';
+import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {nativeDumpSupport,nativeDumpRecoveryStep} from './imasora-construction-native-dump-support.mjs?v=120gn';
 
 export const DUMP_WORK_SCOPE='imasora-shared-soil-dump-work-isolated-v1';
 export const DUMP_WORK_FORMAT='imasora-shared-soil-dump-work-checkpoint-v1';
@@ -44,7 +44,11 @@ export function dumpPositionSafe(frame,{preciseArm=false,legacySupport=false}={}
  // The live-arm bridge validates the real shell and swept shafts separately.
  // Its bucket can be above the open bed; the legacy broad body box cannot
  // describe that opening. Ordinary dump driving keeps the conservative guard.
- const blocks=preciseArm?[...shovelMachines(frame).slice(0,2),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)]:obstacles(frame);
+ // Use the existing immutable-soil column index only as a broad phase. The
+ // tilted body's full projected envelope includes the cab and both corners;
+ // intersecting cubes (including loose fragments) keep the same exact SAT.
+ const nearby=shovelNearbySoil(frame.soil,body.position[0],body.position[2],Math.max(extent[0],extent[2])+.01).filter(b=>b.position[1]+b.size/2>.01);
+ const blocks=[...(preciseArm?shovelMachines(frame).slice(0,2):shovelMachines(frame)),...nearby];
  return !blocks.some(b=>Math.abs(b.position[0]-body.position[0])<100+(b.size??90)&&Math.abs(b.position[2]-body.position[2])<100+(b.size??90)&&dumpBoxesOverlap(body,b));
 }
 const seat=frame=>{const p=nativeDumpAnchorPoint(frame,-14,LOADER.floor,18);return{...frame.player,x:p[0],y:p[1],z:p[2],heading:frame.dump.heading};};

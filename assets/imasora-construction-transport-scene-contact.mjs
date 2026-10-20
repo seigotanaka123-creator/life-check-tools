@@ -1,9 +1,9 @@
-import {shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {dumpRaisedBoxes} from './imasora-construction-dump-work.mjs?v=120fw';
-import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {armPose} from './imasora-construction-excavator.js?v=120fc';
+import {shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {dumpRaisedBoxes} from './imasora-construction-dump-work.mjs?v=120gn';
+import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {armPose} from './imasora-construction-excavator.js?v=120gf';
 import {bucketContactGeometry} from './imasora-construction-excavator-contact.js?v=120fc';
 // Transient scene checks supplement the saved soil model. They never mint a
 // save receipt, move an obstacle, or flatten a surface to let a vehicle through.

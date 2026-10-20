@@ -3,8 +3,8 @@ import {fieldWaterTotal,fieldWaterTarget,nearbyFieldPool,poolKey,validateFieldPo
 import {flowFieldWater,FIELD_WATER_TICK} from './imasora-construction-field-water-flow.mjs?v=120fb';
 import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
 // 5-2b: closed water bucket, positional docking, finite transfers. No game wallet.
-import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints} from './imasora-construction-loader-physics.js?v=120ey';
-import {waterWorkFrame,waterBucketPoint,waterFallTime,waterFallPrediction,waterParcelPoint,fieldWaterPathClear,waterTransferPathClear} from './imasora-construction-water-ground.mjs?v=120ey';
+import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints} from './imasora-construction-loader-physics.js?v=120gf';
+import {waterWorkFrame,waterBucketPoint,waterFallTime,waterFallPrediction,waterParcelPoint,fieldWaterPathClear,waterTransferPathClear} from './imasora-construction-water-ground.mjs?v=120gf';
 import {initialWater,advanceWater,waterAction,waterTotal,validateWater} from './imasora-construction-water.js';
 export const TRANSPORT={scope:'mars-water-transport-development-v1',total:768,capacity:128,dt:1/120,rate:80}; // .25 L units; 20 L/s
 export const SOURCE_PORT=Object.freeze({x:-130,y:9,z:-12});

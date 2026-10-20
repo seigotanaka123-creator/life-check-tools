@@ -1,19 +1,19 @@
 import {workVehicleState} from './work-vehicle-height.mjs';
 import {vehicleGroundPose,vehicleGroundError} from './free-vehicle-ground.mjs?v=120ek';
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
 import * as T from '../three.module.min.js';
-import {freeCell} from './free-build-state.mjs?v=120fw';
-import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked,walkingBlocked} from './free-contact.mjs?v=120fw';
-import {CAST_PORTS,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs?v=120fw';
-import {createBoomMotion,BOOM_DURATIONS} from './free-boom-motion.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
+import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked,walkingBlocked} from './free-contact.mjs?v=120gn';
+import {CAST_PORTS,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs?v=120gn';
+import {createBoomMotion,BOOM_DURATIONS} from './free-boom-motion.mjs?v=120gn';
 
-import {footingAt} from './free-footing.mjs?v=120fw';
-import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
-import {finishNeedsScaffold,finishAccessPlan} from './free-finish-access.mjs?v=120fw';
-import {paintScaffoldSteps} from './free-paint-access.mjs?v=120fw';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
-import {frameBlocked,frameSegmentBlocked,assertFrameFoundation} from './free-frames.mjs?v=120fw';
-import {bucketLoadAccess} from './free-bucket-access.mjs?v=120fw';
+import {footingAt} from './free-footing.mjs?v=120gn';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
+import {finishNeedsScaffold,finishAccessPlan} from './free-finish-access.mjs?v=120gn';
+import {paintScaffoldSteps} from './free-paint-access.mjs?v=120gn';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
+import {frameBlocked,frameSegmentBlocked,assertFrameFoundation} from './free-frames.mjs?v=120gn';
+import {bucketLoadAccess} from './free-bucket-access.mjs?v=120gn';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),mix=(a,b,t)=>a+(b-a)*t;
 const finishPoint=(f,cell,row,t)=>{const c=freeCell(cell);return{x:c.x-6+row*4,y:constructionBase(f)+f.fill[cell]/2,z:c.z-6+12*(row%2?1-t:t)};};

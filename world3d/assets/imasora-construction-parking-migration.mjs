@@ -1,4 +1,4 @@
-import {assertTransportField} from './imasora-construction-transport-field.mjs?v=120fc';
+import {assertTransportField} from './imasora-construction-transport-field.mjs?v=120gf';
 import {sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
 import {assertWorkField} from './imasora-construction-field-area.mjs?v=120ey';
 export const PARKING_ADAPTERS=Object.freeze([

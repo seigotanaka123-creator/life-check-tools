@@ -1,9 +1,9 @@
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
-import {SUPPORTED_WORK_MOVE,supportedWorkSnapCandidates} from './free-supported-work-move.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
+import {SUPPORTED_WORK_MOVE,supportedWorkSnapCandidates} from './free-supported-work-move.mjs?v=120gn';
 import {rotateFreeWork} from './free-work-rotation.mjs';
 import {paintColor} from './paint-colors.mjs?v=120ds';
 import {freeFilledMask,freeWorkMask,freeWorkSummary} from './free-work-parts.mjs';
-import {freeWorkMoveTargets,freeWorkSnapCandidates,freeWorkMovePlan} from './free-work-move.mjs?v=120fw';
+import {freeWorkMoveTargets,freeWorkSnapCandidates,freeWorkMovePlan} from './free-work-move.mjs?v=120gn';
 export const freeWorkEditorTemplate=()=>`
  <section data-sheet-content="works">
   <label>完成作品 <select data-edit-work></select></label>

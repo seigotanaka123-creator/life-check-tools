@@ -1,4 +1,4 @@
-import {LEDGER_RESTORE_LIMIT} from './imasora-construction-excavation-ledger-recovery.js?v=120fw';
+import {LEDGER_RESTORE_LIMIT} from './imasora-construction-excavation-ledger-recovery.js?v=120gn';
 // Same isolated record as v484; never copies a loan or touches ordinary saves.
 export function createExcavationLedgerView({panel,session,snapshot,pause,replace,refresh}){
   let open=false,reading=false,token=0,reviewed=false;

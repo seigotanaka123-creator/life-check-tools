@@ -2,8 +2,8 @@ import {soilBedRects} from './imasora-construction-soil-bed.mjs?v=120eo';
 import {sharedSupply} from './imasora-construction-field-area.mjs?v=120ey';
 import * as THREE from './three.module.min.js';
 import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
-import {createLoader,updateLoaderModel} from './imasora-construction-loader-work-model.js?v=120ey';
-import {soilTransferVisual,soilCopyOptions,SOIL_SITE_SOLIDS,soilSiteSolids} from './imasora-construction-purchased-soil.js?v=120fw';
+import {createLoader,updateLoaderModel} from './imasora-construction-loader-work-model.js?v=120gf';
+import {soilTransferVisual,soilCopyOptions,SOIL_SITE_SOLIDS,soilSiteSolids} from './imasora-construction-purchased-soil.js?v=120gn';
 export const SOIL_FENCES=Object.freeze([
   {x:0,z:251,width:644,depth:2,height:18},{x:-321,z:0,width:2,depth:500,height:18},{x:321,z:0,width:2,depth:500,height:18},
   {x:-312,z:-251,width:18,depth:2,height:18},{x:52,z:-251,width:538,depth:2,height:18},

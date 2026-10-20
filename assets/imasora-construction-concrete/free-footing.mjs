@@ -1,6 +1,6 @@
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
 import {freeFilledMask,freeWorkMask} from './free-work-parts.mjs';
-import {freeCell} from './free-build-state.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
 
 // This stage supports level ground and continuous, cured surfaces. It deliberately
 // does not invent a ladder, bridge, or automatic climb at a raised floor edge.

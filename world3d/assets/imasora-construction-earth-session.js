@@ -1,8 +1,8 @@
 import {canonical} from './imasora-construction-state.js';
-import {createAuthorityExcavation,checkpointAuthorityExcavation,authorityExcavationWork,authorityExcavationSummary,validateAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120fc';
-import {createExcavationAuthorityView} from './imasora-construction-earth-view.js?v=120fw';
-import {inspectEarthRestore,restoreAuthorityEarth} from './imasora-construction-earth-restore.js?v=120fw';
-import {inspectEarthBundleRestore,MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=120fw';
+import {createAuthorityExcavation,checkpointAuthorityExcavation,authorityExcavationWork,authorityExcavationSummary,validateAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120gf';
+import {createExcavationAuthorityView} from './imasora-construction-earth-view.js?v=120gn';
+import {inspectEarthRestore,restoreAuthorityEarth} from './imasora-construction-earth-restore.js?v=120gn';
+import {inspectEarthBundleRestore,MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=120gn';
 
 export const excavationAuthorityPreview=(search,host)=>['127.0.0.1','localhost'].includes(host)&&new URLSearchParams(search).get('constructionExcavationAuthorityPreview')==='1';
 // Adapter for the controller: every checkpoint commits through WorldSaveService,

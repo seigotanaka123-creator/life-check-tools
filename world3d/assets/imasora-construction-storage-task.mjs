@@ -1,13 +1,17 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {commitTransportRestore,readTransportRestoreState,reuseCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120fw';
+import {commitTransportRestore,readTransportRestoreState,reuseCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120gn';
 import {captureOwnedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {runWorldSaveTask} from './imasora-world-save-client.mjs?v=120fw';
+import {runWorldSaveTask} from './imasora-world-save-client.mjs?v=120gn';
 let ownedStore;
 // One worker-owned connection retains private certificates. Every transaction
 // still re-reads and compares the current head and prior point atomically.
 export async function executeTransportStorageTask(kind,args){
  if(typeof document!=='undefined'||args?.name!=='imasora-world-authority-v1')throw Error('通常保存の処理先が一致しません。');
  if(!ownedStore){ownedStore=new IndexedConstructionStore();ownedStore.name=args.name;}
+ if(kind==='world-commit'){
+  if((args.expectedGeneration!==null&&(!Number.isSafeInteger(args.expectedGeneration)||args.expectedGeneration<1))||typeof args.packet!=='string')throw Error('保存管理情報が不正なため、上書きせず停止しました。');
+  return ownedStore.commit(args.expectedGeneration,args.packet);
+ }
  if(kind==='transport-read'){
   const result=await readTransportRestoreState(ownedStore,{soil:args.soil});
   if(result.journal)result.journal=await captureOwnedConstructionJson(result.journal);

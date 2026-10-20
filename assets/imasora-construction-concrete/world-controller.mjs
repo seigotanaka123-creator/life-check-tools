@@ -2,8 +2,8 @@ import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=119bf';
 import {createEmbeddedSiteView} from './site-view.mjs?v=120ds';
 import {constructionMovePadTemplate} from './move-pad.mjs?v=119bf';
 import {CONCRETE_SITE,concreteEntryAllowed,concreteSiteOverlap} from './world-contract.mjs';
-import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120fw';
-import {CONSTRUCTION_PROFILE_PROJECT_TEST_DB,LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120fw';
+import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120gn';
+import {CONSTRUCTION_PROFILE_PROJECT_TEST_DB,LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120gn';
 
 export function createWorldConcreteController({service,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,profileAuthorityCheck=false}){
  const fixture=service.constructionProjectPreview&&service.mode==='integration'&&service.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB;

@@ -1,8 +1,8 @@
-import {earthPatches,patchColumns,earthAllocated} from './imasora-construction-field-earth.mjs?v=120fc';
-import {assertTransportField,transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
+import {earthPatches,patchColumns,earthAllocated} from './imasora-construction-field-earth.mjs?v=120gf';
+import {assertTransportField,transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
 import {canonical} from './imasora-construction-state.js';
 import {captureConstructionJson,isCapturedConstructionJson,capturedJsonInfo} from './imasora-construction-json-capture.mjs';
-import {nativeSoilOpening,SOIL_NATIVE_TRANSPORT_SCOPE,SOIL_NATIVE_TRANSPORT_FORMAT} from './imasora-construction-soil-native-source.mjs?v=120fc';
+import {nativeSoilOpening,SOIL_NATIVE_TRANSPORT_SCOPE,SOIL_NATIVE_TRANSPORT_FORMAT} from './imasora-construction-soil-native-source.mjs?v=120gf';
 export {SOIL_NATIVE_TRANSPORT_SCOPE,SOIL_NATIVE_TRANSPORT_FORMAT};
 
 // Quantity/ownership core for 9-2c1. This namespace cannot be a normal world,
@@ -192,7 +192,7 @@ export async function validateSoilTransportAsync(s,{record=null,checkedPoint=nul
  const owned=isCapturedConstructionJson(s)?s:await captureConstructionJson(s);
  if(record||!validatedFrozenSoils.has(owned)){
   if(record&&(!isCapturedConstructionJson(record)||record.work?.frame?.soil!==owned))throw Error('人物と土の読込みが一致しません。');
-  const {runWorldSaveTask,isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120fw');
+  const {runWorldSaveTask,isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120gn');
   if(checkedPoint!==null){if(!record||!isCheckedTransportRestorePoint(checkedPoint)||checkedPoint.applied!==record)throw Error('検査済みの現場と土が一致しません。');}
   else if(await runWorldSaveTask(record?'transport-check':'soil-check',record?{record}:{soil:owned})!==true)throw Error('土の保存を確認できませんでした。');
   validatedFrozenSoils.add(owned);

@@ -1,15 +1,15 @@
 import {bucketContactGeometry} from './imasora-construction-excavator-contact.js?v=120fc';
-import {excavatorGroundFrame,groundPoint} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {earthBase,earthPatches} from './imasora-construction-field-earth.mjs?v=120fc';
-import {transportArea,transportFences,transportPoseKey,assertTransportField} from './imasora-construction-transport-field.mjs?v=120fc';
-import {dumpCabLift} from './imasora-construction-dump-cab.mjs?v=120ey';
-import {nativeDumpPoint,nativeDumpLocal,nativeDumpBox,nativeDumpPose,boxLocal,boxExtent,boxesOverlap3D,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
+import {excavatorGroundFrame,groundPoint} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {earthBase,earthPatches} from './imasora-construction-field-earth.mjs?v=120gf';
+import {transportArea,transportFences,transportPoseKey,assertTransportField} from './imasora-construction-transport-field.mjs?v=120gf';
+import {dumpCabLift} from './imasora-construction-dump-cab.mjs?v=120gf';
+import {nativeDumpPoint,nativeDumpLocal,nativeDumpBox,nativeDumpPose,boxLocal,boxExtent,boxesOverlap3D,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
 import {canonical} from './imasora-construction-state.js';
-import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilVoxel,soilLooseVoxel,soilTransportGeometry,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120fc';
-import {armPose,PLOT,BIN} from './imasora-construction-excavator.js?v=120fc';
-import {WALKER,SITE} from './imasora-construction-loader-physics.js?v=120ey';
+import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilVoxel,soilLooseVoxel,soilTransportGeometry,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120gf';
+import {armPose,PLOT,BIN} from './imasora-construction-excavator.js?v=120gf';
+import {WALKER,SITE} from './imasora-construction-loader-physics.js?v=120gf';
 
 export const SHOVEL_WORK_SCOPE='imasora-shared-soil-hand-work-isolated-v1';
 export const SHOVEL_WORK_FORMAT='imasora-shared-soil-hand-work-checkpoint-v1';

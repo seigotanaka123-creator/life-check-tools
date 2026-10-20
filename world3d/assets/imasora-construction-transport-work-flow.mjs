@@ -1,10 +1,10 @@
-import * as m from './imasora-construction-fragment-scoop.mjs?v=120fw';
-import {arriveTransportDoor} from './imasora-construction-transport-door.mjs?v=120fw';
+import * as m from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {arriveTransportDoor} from './imasora-construction-transport-door.mjs?v=120gn';
 import {sameConstructionRecordValue as same,sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
 import {assertTransportShovel,transportNeedsShovel} from './imasora-construction-transport-hand.mjs';
 import {captureConstructionJson,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {validateSoilTransportAsync} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {validateSoilTransportAsync} from './imasora-construction-soil-transport.mjs?v=120gn';
 const flowCapture=Object.freeze({});
 const receipts=new WeakMap();
 const ownedSnapshots=new WeakSet();
@@ -24,7 +24,7 @@ export class WorldTransportWorkFlow{
  constructor(record,{toolkit=()=>null}={},capture=null){check(record?.version===2,'人物と車両に対応した保存が必要です。');check(typeof toolkit==='function','道具の取得記録を確認してください。');if(capture!==flowCapture||!isCapturedConstructionJson(record))validateWorldTransport(record,worldTransportSoil(record).initial.source,record.profileId);this.#base=this.#record=freeze(capture===flowCapture&&isCapturedConstructionJson(record)?record:structuredClone(record));ownedSnapshots.add(this.#record);this.#toolkit=toolkit;}
  static async open(record,{checkedRestorePoint=null,...options}={}){
   const captured=await captureConstructionJson(record);check(captured?.version===2,'人物と車両に対応した保存が必要です。');
-  if(checkedRestorePoint!==null){const {isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120fw');
+  if(checkedRestorePoint!==null){const {isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120gn');
    if(isCheckedTransportRestorePoint(checkedRestorePoint)&&same(captured,checkedRestorePoint.applied)&&sameExact(captured,checkedRestorePoint.applied)){const applied=checkedRestorePoint.applied;await validateSoilTransportAsync(worldTransportSoil(applied),{record:applied,checkedPoint:checkedRestorePoint});return new WorldTransportWorkFlow(applied,options,flowCapture);}
   }
   await validateSoilTransportAsync(worldTransportSoil(captured),{record:captured});return new WorldTransportWorkFlow(captured,options,flowCapture);

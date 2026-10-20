@@ -37,6 +37,6 @@ export function createSaveTaskQueue({createWorker,idleMs=60000,keepAlive=()=>tru
 }
 let shared;
 export function runSharedSaveTask(kind,args,options={}){
- if(!shared){shared=createSaveTaskQueue({idleMs:600000,createWorker:()=>new Worker(new URL('./imasora-world-save-worker.mjs?v=120fw',import.meta.url),{type:'module',name:'imasora-save'})});}
+ if(!shared){shared=createSaveTaskQueue({idleMs:600000,createWorker:()=>new Worker(new URL('./imasora-world-save-worker.mjs?v=120gn',import.meta.url),{type:'module',name:'imasora-save'})});}
  return shared.run(kind,args,options);
 }

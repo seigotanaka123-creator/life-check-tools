@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {validateShovelWork,validateShovelContinuation,packShovelWork,unpackShovelWork} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {validateShovelWork,validateShovelContinuation,packShovelWork,unpackShovelWork} from './imasora-construction-shovel-work.mjs?v=120gn';
 import {canonical} from './imasora-construction-state.js';
 export const SHOVEL_WORK_DB='imasora-shared-soil-hand-work-isolated-v1';
 export class ShovelWorkStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=SHOVEL_WORK_DB;}}

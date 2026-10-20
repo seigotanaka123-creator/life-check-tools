@@ -1,8 +1,8 @@
-import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120fw';
+import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120gn';
 const kinds=new Set(['export','inspect','inspect-saved','summaries','journal']);
 function workerFactory(){
  if(typeof Worker==='function'){
-  try{return new Worker(new URL('./imasora-construction-recovery-worker.mjs?v=120fw',import.meta.url),{type:'module',name:'imasora-recovery-check'});}
+  try{return new Worker(new URL('./imasora-construction-recovery-worker.mjs?v=120gn',import.meta.url),{type:'module',name:'imasora-recovery-check'});}
   catch{throw Error('控えの確認を開始できません。現場はそのままです。画面を開き直してお試しください。');}
  }
  // Headless unit tests keep the same domain implementation. In a browser,
@@ -16,7 +16,7 @@ export async function runTransportRecoveryTask(kind,args,{signal,createWorker=wo
  if(signal?.aborted)throw aborted();
  if(createWorker===workerFactory&&typeof document!=='undefined')return runSharedSaveTask('recovery:'+kind,args,{signal});
  const worker=createWorker();
- if(!worker){const {executeTransportRecoveryTask}=await import('./imasora-construction-recovery-task.mjs?v=120fw');if(signal?.aborted)throw aborted();const result=await executeTransportRecoveryTask(kind,args);if(signal?.aborted)throw aborted();return result;}
+ if(!worker){const {executeTransportRecoveryTask}=await import('./imasora-construction-recovery-task.mjs?v=120gn');if(signal?.aborted)throw aborted();const result=await executeTransportRecoveryTask(kind,args);if(signal?.aborted)throw aborted();return result;}
  return new Promise((resolve,reject)=>{
   let settled=false;
   const done=(error,result)=>{if(settled)return;settled=true;signal?.removeEventListener('abort',cancel);worker.onmessage=worker.onerror=worker.onmessageerror=null;worker.terminate();error?reject(error):resolve(result);};

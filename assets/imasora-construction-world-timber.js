@@ -1,19 +1,21 @@
-import {TIMBER_YARDS} from './imasora-construction-yard-origins.mjs?v=120fk';
+import{ownedTimberParts}from'./imasora-construction-kit-cargo.mjs?v=120gm';
+import{releaseLiftCargo}from'./imasora-construction-board-lift-state.mjs?v=120gd';
+import {TIMBER_YARDS} from './imasora-construction-yard-origins.mjs?v=120gb';
 export {TIMBER_YARDS};
-import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {craneGroundContext,craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {craneGroundContext,craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120gf';
 import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 // Authoritative received timber; reuses the approved finite crane/float solver.
-import {initialWorldTimberPhysics,validatePurchasedTimber,refreshTimberLedger,timberCopyTotals,timberPhysicsState,FLOOR_VOLUME} from './imasora-construction-purchased-timber.js?v=120fw';
-import {cranePlayer,cranePersonBlocked,craneWalkVolumes} from './imasora-construction-crane-walk.js?v=120fw';
-import {assemblyState,worldAssemblyAction,advanceWorldAssembly,validateWorldAssembly,floatingView,stepFloating} from './imasora-construction-world-timber-assembly.js?v=120fw';
-import {polygon} from './imasora-construction-loader-physics.js?v=120ey';
+import {initialWorldTimberPhysics,validatePurchasedTimber,refreshTimberLedger,timberCopyTotals,timberPhysicsState,FLOOR_VOLUME} from './imasora-construction-purchased-timber.js?v=120gn';
+import {cranePlayer,cranePersonBlocked,craneWalkVolumes} from './imasora-construction-crane-walk.js?v=120gn';
+import {assemblyState,worldAssemblyAction,advanceWorldAssembly,validateWorldAssembly,floatingView,stepFloating} from './imasora-construction-world-timber-assembly.js?v=120gn';
+import {polygon} from './imasora-construction-loader-physics.js?v=120gf';
 export {FLOOR_VOLUME};
 
 export const WORLD_TIMBER_SCOPE='construction-world-timber-v1';
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);},int=v=>Number.isSafeInteger(v)&&v>=0;
 export function initialWorldTimber(siteIndex=0,received=0){return validateWorldTimber({schema:1,scope:WORLD_TIMBER_SCOPE,siteIndex,revision:0,work:assemblyState(initialWorldTimberPhysics(received/FLOOR_VOLUME))},received);}
-export function worldTimberTotals(s){const t=timberCopyTotals(s.work);return{...t,inUse:s.work.parts.length*FLOOR_VOLUME};}
+export function worldTimberTotals(s){const t=timberCopyTotals(s.work);return{...t,inUse:ownedTimberParts(s.work).length*FLOOR_VOLUME};}
 export function validateWorldTimber(s,received){
   ok(s&&Object.keys(s).sort().join('|')==='revision|schema|scope|siteIndex|work','木材作業の項目が不正です。');
   ok([1,2].includes(s.schema)&&s.scope===WORLD_TIMBER_SCOPE&&int(s.siteIndex)&&!!TIMBER_YARDS[s.siteIndex]&&int(s.revision),'木材作業の区画・版が不正です。');
@@ -36,10 +38,11 @@ export function worldTimberMaterialObstacles(rig,external=[]){
   return external.filter(b=>b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0&&b.y<180&&b.y+b.h>0&&[v,...(v.field?[rig.player]:[])].some(p=>Math.abs(b.x-p.x)<270+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-p.z)<270+Math.hypot(b.w,b.d)/2))
     .map(b=>({id:b.name||b.id||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h,minY:b.y,angle:b.angle||0}));
 }
-export function worldTimberAction(s,action,id,received,external=[],heightAt=null,landing=null){s=syncWorldTimber(s,received);const context=craneGroundContext(s.work,heightAt,{deploy:s.work.work||s.work.deployment>0||action==='mode'}),obstacles=craneGroundObstacles(s.work,worldTimberMaterialObstacles(s.work.rig,external),heightAt),raw=worldAssemblyAction(context?{...s.work,groundPose:context}:s.work,action,id,obstacles,landing),{groundPose,...w}=raw;if(raw===s.work)return s;const n={...s,revision:s.revision+1,work:w};return w.rig.transition?n:validateWorldTimber(n,received);}
+export function worldTimberAction(s,action,id,received,external=[],heightAt=null,landing=null){s=syncWorldTimber(s,received);const context=craneGroundContext(s.work,heightAt,{deploy:s.work.work||s.work.deployment>0||action==='mode'}),obstacles=craneGroundObstacles(s.work,worldTimberMaterialObstacles(s.work.rig,external),heightAt),raw=worldAssemblyAction(context?{...s.work,groundPose:context}:s.work,action,id,obstacles,landing),{groundPose,...w}=raw;if(raw===s.work)return s;const n={...s,revision:s.revision+1,work:w};if(w.held&&w.boardLifts)n.work=releaseLiftCargo(w);return w.rig.transition?n:validateWorldTimber(n,received);}
 export function advanceWorldTimber(s,input,dt,external=[],heightAt=null){if(s.work.paused)return s;const context=craneGroundContext(s.work,heightAt),obstacles=craneGroundObstacles(s.work,worldTimberMaterialObstacles(s.work.rig,external),heightAt),raw=advanceWorldAssembly(context?{...s.work,groundPose:context}:s.work,input,dt,obstacles),{groundPose,...w}=raw;return raw===s.work?s:{...s,revision:s.revision+1,work:w};}
 export function timberCheckpoint(s){validateWorldTimber(s,s.work.source.total*FLOOR_VOLUME);const n=copy(s);n.work.paused=true;n.work.rig.vehicle.speed=0;return n;}
 export function validateTimberContinuation(old,next){if(old&&(old.schema!==next.schema||JSON.stringify((old.work.loader??old.work.rig).vehicle.field)!==JSON.stringify((next.work.loader??next.work.rig).vehicle.field)))throw Error('駐車場の移設は専用の保存で行ってください。');if(!old)return;
+  ok(JSON.stringify(old.work.buildingKits??[])===JSON.stringify(next.work.buildingKits??[]),'建築キットの受け渡しは専用ボタンで行おう。');
   ok(old.siteIndex===next.siteIndex&&next.revision>=old.revision&&next.work.revision>=old.work.revision&&next.work.source.total>=old.work.source.total,'古い木材作業や別の区画へ戻せません。');
   ok(next.work.events.length>=old.work.events.length,'木材の履歴を消せません。');
   old.work.events.forEach((e,i)=>ok(JSON.stringify(e)===JSON.stringify(next.work.events[i]),'木材の履歴を変更できません。'));

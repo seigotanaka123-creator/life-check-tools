@@ -1,12 +1,12 @@
 import {highCastingBoards} from './imasora-construction-concrete/high-casting-state.mjs?v=120ft';
 import {PROJECT_HISTORY_PAGE,PROJECT_HISTORY_LIMIT,projectOperationCount,findProjectOperation,archiveProjectPage} from './imasora-construction-concrete/project-history.mjs';
-import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs?v=120fw';
+import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs?v=120gn';
 import './imasora-construction-pack-transfer.js?v=530';
 import {createTrialState,assertTrialState,transitionTrial} from './imasora-construction-concrete-site-state.js';
 import {createMixer,supplyIngredients,startMix,advanceMix,cancelMix,availableMixCells,CURE_DURATION_MS} from './imasora-construction-concrete/mixing.mjs';
-import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs?v=120fw';
+import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs?v=120gn';
 import {floorMask,floorPanelsProblem,paintCost,paintRemaining} from './imasora-construction-concrete/floor-parts.mjs?v=120ds';
-import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs?v=120fw';
+import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs?v=120gn';
 import {captureFreeStep,finishFreeStep,restoreFreeStep,enableFreeStepHistory,advanceLegacyStepHistory,FREE_STEP_ACTIONS} from './imasora-construction-concrete/free-step-undo.mjs?v=120ft';
 
 export const PROFILE_PROJECT_SCOPE='imasora-construction-profile-project-v1';

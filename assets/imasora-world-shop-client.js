@@ -1,4 +1,4 @@
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
 export function createWorldShopClient(){
   if(parent===window)throw Error('このショップは火星の店主から開いてください。');
   const token=location.hash.slice(1);if(!/^[\w-]{36}$/.test(token))throw Error('ショップ接続情報がありません。');

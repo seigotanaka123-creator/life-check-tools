@@ -1,8 +1,8 @@
 import * as THREE from './three.module.min.js';
 import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
-import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120fc';
+import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120gf';
 import {FACES} from './imasora-construction-terrain.js';
-import {BIN,CELL} from './imasora-construction-excavator.js?v=120fc';
+import {BIN,CELL} from './imasora-construction-excavator.js?v=120gf';
 const FACE_TRIANGLES=[0,1,2,0,2,3],SOIL_COLORS=[new THREE.Color(0xaa7847),new THREE.Color(0xbe9159)];
 // A walk-through gateway on the south edge; all other edges are fenced.
 export const EXCAVATION_FENCES=Object.freeze([

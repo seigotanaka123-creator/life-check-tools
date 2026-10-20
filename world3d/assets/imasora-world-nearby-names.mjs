@@ -17,5 +17,5 @@ export function createNearbyNames({duration=3000,enter=48,leave=96}={}) {
   if(!enabled)return null;
   if(!active){const next=candidates.filter(t=>t.displayable!==false&&t.distance<=t.enterDistance&&!shown.has(t.id)).sort((a,b)=>a.distance-b.distance||String(a.id).localeCompare(String(b.id)))[0];if(next){shown.add(next.id);active={id:next.id,until:now+duration};}}
   return active?{...candidates.find(t=>t.id===active.id),until:active.until}:null;
- },get shown(){return [...shown];}};
+ },get activeId(){return active?.id??null;},get activeUntil(){return active?.until??0;},get shown(){return [...shown];}};
 }

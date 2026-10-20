@@ -1,10 +1,10 @@
-import {constructionBase,RAISED_BASE_MAX} from './free-supported-build.mjs?v=120fw';
-import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120fw';
+import {constructionBase,RAISED_BASE_MAX} from './free-supported-build.mjs?v=120gn';
+import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {paintPatch,assertPaintAccess,walkPath} from './free-contact.mjs?v=120fw';
-import {footingAt} from './free-footing.mjs?v=120fw';
-import {frameBlocked,frameRoute} from './free-frames.mjs?v=120fw';
-import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
+import {paintPatch,assertPaintAccess,walkPath} from './free-contact.mjs?v=120gn';
+import {footingAt} from './free-footing.mjs?v=120gn';
+import {frameBlocked,frameRoute} from './free-frames.mjs?v=120gn';
+import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
 const distance=(a,b)=>Math.hypot(a.x-b.x,(a.y??0)-(b.y??0),a.z-b.z);
 export const newPaintAccessReceipt=()=>({height:0,...newScaffoldReceipt()});
 export const paintDeckHeight=f=>2+Math.max(f.stage==='complete'?0:constructionBase(f)+f.height,...f.completed.flatMap(w=>w.fill.map((_,i)=>constructionBase(w)+freePlacedFill(w,i)/2)));

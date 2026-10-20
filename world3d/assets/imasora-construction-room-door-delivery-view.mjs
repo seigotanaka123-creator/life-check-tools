@@ -1,5 +1,5 @@
 import * as T from './three.module.min.js';
-import {roomDoorDelivery,roomDeliveryPhase,roomDoorVisualBoxes,roomDoorGrip} from './imasora-construction-room-door-delivery.mjs?v=120fw';
+import {roomDoorDelivery,roomDeliveryPhase,roomDoorVisualBoxes,roomDoorGrip} from './imasora-construction-room-door-delivery.mjs?v=120gn';
 
 export function createRoomDoorDeliveryView(parent,{unit,cylinder,mats,handPoint}){
   const root=new T.Group();root.name='room-door-material-delivery';parent.add(root);

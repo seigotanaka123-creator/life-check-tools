@@ -1,8 +1,8 @@
-import {freeCell} from './free-build-state.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
 import {freeWorkCells} from './free-work-parts.mjs';
-import {constructionBase,assertFoundationSupport} from './free-supported-build.mjs?v=120fw';
-import {assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120fw';
-import {requireFormGround} from './free-foundation-check.mjs?v=120fw';
+import {constructionBase,assertFoundationSupport} from './free-supported-build.mjs?v=120gn';
+import {assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120gn';
+import {requireFormGround} from './free-foundation-check.mjs?v=120gn';
 import {vehicleFootprints,overlaps} from './free-vehicle-shape.mjs';
 
 // Walking never clears an undo. Re-check the present foot, vehicles and world

@@ -1,4 +1,4 @@
-import {ROOM_KINDS} from './imasora-construction-room-layout-shape.mjs';
+import {ROOM_KINDS} from './imasora-construction-room-layout-shape.mjs?v=120gn';
 import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
 
 // One compact stack contains exactly the wood reserved by the room edit.

@@ -1,8 +1,8 @@
 // Read one live-earth candidate from a verified whole-save backup. This module
 // never opens storage and never returns any other world or account data to apply.
-import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120fw';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
-import {inspectEarthRestore} from './imasora-construction-earth-restore.js?v=120fw';
+import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {inspectEarthRestore} from './imasora-construction-earth-restore.js?v=120gn';
 
 export const MAX_EARTH_BUNDLE_RESTORE_INPUT=MAX_RECOVERY_FILE;
 const LIVE_DB='imasora-world-authority-v1',STORE='snapshots',HEAD='construction';

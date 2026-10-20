@@ -1,12 +1,12 @@
-import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
-import {pipeContactPath} from './free-boom-contact.mjs?v=120fw';
+import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
+import {pipeContactPath} from './free-boom-contact.mjs?v=120gn';
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
-import {makeFrameScaffold} from './free-frame-scaffold.mjs?v=120fw';
-import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs?v=120fw';
-import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
+import {makeFrameScaffold} from './free-frame-scaffold.mjs?v=120gn';
+import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs?v=120gn';
+import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {freeFramePanels,freeCell} from './free-build-state.mjs?v=120fw';
+import {freeFramePanels,freeCell} from './free-build-state.mjs?v=120gn';
 
 export const FREE_FRAME_ACTIONS=new Set(['FREE_FRAME','FREE_FRAME_RAISED','FREE_DEMOLD','FREE_UNFRAME']);
 export const FRAME_HAND_REACH=24,FRAME_TOOL_REACH=64,FRAME_GRIP_SPAN=4,FRAME_RACK={x:0,z:140},FRAME_RACK_STANCE={x:0,z:116,heading:0};

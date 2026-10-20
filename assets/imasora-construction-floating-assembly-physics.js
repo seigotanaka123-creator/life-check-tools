@@ -1,8 +1,8 @@
 // Stage 7-2: connected horizontal floors, one load/velocity per component.
-import {bounds,collides,placement} from './imasora-construction-crane.js?v=120fw';
-import {polygonsOverlap,worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
-import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120fw';
-export {releaseFloating} from './imasora-construction-floating-physics.js?v=120fw';
+import {bounds,collides,placement} from './imasora-construction-crane.js?v=120gn';
+import {polygonsOverlap,worldToLocal} from './imasora-construction-loader-physics.js?v=120gf';
+import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120gn';
+export {releaseFloating} from './imasora-construction-floating-physics.js?v=120gn';
 export const FLOATING=Object.freeze({capacity:4,sagPerLoad:.7,spring:15,damping:6,maxSpeed:24,personMass:1});
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export function component(s,id){

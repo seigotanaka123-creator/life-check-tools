@@ -1,8 +1,8 @@
-import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120gf';
 import {groundPoint} from './imasora-construction-vehicle-ground-frame.mjs';
-import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
 // One geometry definition for the visible telescoping supports and every collider.
-import {localToWorld,worldToLocal,polygon,polygonsOverlap} from './imasora-construction-loader-physics.js?v=120ey';
+import {localToWorld,worldToLocal,polygon,polygonsOverlap} from './imasora-construction-loader-physics.js?v=120gf';
 export function outriggerLocalVolumes(deployment){
   const k=Math.max(0,Math.min(1,deployment)),span=5+27*k,legHeight=4+7*k,out=[];
   for(const z of[-32,24])for(const side of[-1,1]){

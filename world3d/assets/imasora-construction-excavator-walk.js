@@ -1,10 +1,10 @@
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump} from './imasora-construction-locomotion.mjs?v=120eg';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
 import {walkFactor} from './imasora-construction-travel-input.mjs';
 // 9-1b: solid voxel floors/walls/ceilings, not a top-height-only terrain.
 // The approved excavator remains the owner of soil quantities and arm actions.
-import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js?v=120fc';
-import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
-import {EX_ACCESS} from './imasora-construction-excavator-access.js?v=120ey';
+import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js?v=120gf';
+import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {EX_ACCESS} from './imasora-construction-excavator-access.js?v=120gf';
 export const DIG_WALK=Object.freeze({...WALKER,step:8.01,gravity:SKY_JUMP_GRAVITY,jump:SKY_JUMP_VELOCITY});
 const EPS=1e-6;
 const volume=(name,x,y,z,w,h,d,angle=0,step=true)=>({name,x,y,z,w,h,d,angle,step});
@@ -94,7 +94,7 @@ export function stepDigWalker(s,input,dt,external=[]){
   const p=digPlayer(s.loader.player);let boxes=excavationVolumes(s,p,{external}),hit='';
   p.grounded=supported(p,boxes)&&p.vy<=0;
   landThreeJump(p);if(input.jump&&!p.jumpHeld)beginThreeJump(p,DIG_WALK.jump);
-  p.jumpHeld=!!input.jump;
+  updateJumpHold(p,input.jump);
   const norm=Math.max(1,Math.hypot(input.x||0,input.z||0)),dx=(input.x||0)/norm*DIG_WALK.speed*walkFactor(input)*dt,dz=(input.z||0)/norm*DIG_WALK.speed*walkFactor(input)*dt;
   const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));
   for(let i=0;i<steps;i++){
@@ -102,9 +102,9 @@ export function stepDigWalker(s,input,dt,external=[]){
     hit=horizontalMove(p,'x',dx/steps,boxes)||hit;hit=horizontalMove(p,'z',dz/steps,boxes)||hit;
     p.grounded=supported(p,boxes)&&p.vy<=0;
   }
-  p.vy-=DIG_WALK.gravity*dt;
+  const verticalDistance=p.vy*dt-DIG_WALK.gravity*dt*dt/2;p.vy-=DIG_WALK.gravity*dt;
   // Vertical sweep, not a final-position overlap, prevents ceiling tunnelling.
-  const dy=p.vy*dt,moved=verticalTravel(p,dy,excavationVolumes(s,p,{external}));p.y+=moved.distance;
+  const dy=verticalDistance,moved=verticalTravel(p,dy,excavationVolumes(s,p,{external}));p.y+=moved.distance;
   p.grounded=dy<0&&moved.distance>dy+EPS;p.ceilingHit=dy>0&&moved.distance<dy-EPS;
   if(p.grounded||p.ceilingHit)p.vy=0;landThreeJump(p);if(p.ceilingHit)hit=`${moved.hit}（頭上）`;
   if(Math.hypot(dx,dz)>EPS)p.heading=Math.atan2(dx,dz);

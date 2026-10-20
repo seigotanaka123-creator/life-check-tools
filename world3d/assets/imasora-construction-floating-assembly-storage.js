@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {packTimber,unpackTimber} from './imasora-construction-floating-assembly.js?v=120fw';
+import {packTimber,unpackTimber} from './imasora-construction-floating-assembly.js?v=120gn';
 export const TIMBER_DB='imasora-construction-floating-assembly-development-v1';
 export class TimberStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=TIMBER_DB;}}
 export class TimberSession{

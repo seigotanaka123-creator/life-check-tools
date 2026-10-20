@@ -1,28 +1,28 @@
-import {unopenedGround} from './imasora-construction-field-earth.mjs?v=120fc';
-import {transportSiteHoles} from './imasora-construction-transport-site.mjs?v=120fw';
-import {transportSceneActionAllowed} from './imasora-construction-transport-scene-contact.mjs?v=120fw';
-import {transportFences} from './imasora-construction-transport-field.mjs?v=120fc';
-import {shovelMachines,shovelDumpObstacles,shovelSegmentHits,shovelNearbySoil} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {createThreeJump,bindJumpButton,SKY_RUN_SPEED,jumpClearance} from './imasora-construction-locomotion.mjs?v=120eg';
-import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120ea';
-import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
-import {createShovelWorkView} from './imasora-construction-shovel-work-view.mjs?v=120fw';
-import {WorldTransportWorkSession} from './imasora-construction-transport-work-session.mjs?v=120fw';
-import {TransportPlaySession,transportWorkMoving,deferShortScoopAutosave} from './imasora-construction-transport-play-session.mjs?v=120fw';
-import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportGroundUpperBound,transportVehicleBlockedAt} from './imasora-construction-transport-site.mjs?v=120fw';
-import * as m from './imasora-construction-fragment-scoop.mjs?v=120fw';
-import {dumpUnloadReady,dumpUnloadVisual,dumpStorageContact} from './imasora-construction-dump-work.mjs?v=120fw';
-import {shovelJobReady,shovelDigTargets,shovelLoadTarget,shovelDropTarget,shovelStorageTarget,shovelStorageContact,shovelVisibleSource,shovelToolPose,shovelDumpPoint} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {transportWorkProgress} from './imasora-construction-transport-play-progress.mjs?v=120fw';
-import {storageDisplay,storageAmountText} from './imasora-construction-storage-display.mjs?v=120fw';
-import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120fw';
+import {unopenedGround} from './imasora-construction-field-earth.mjs?v=120gf';
+import {transportSiteHoles} from './imasora-construction-transport-site.mjs?v=120gn';
+import {transportSceneActionAllowed} from './imasora-construction-transport-scene-contact.mjs?v=120gn';
+import {transportFences} from './imasora-construction-transport-field.mjs?v=120gf';
+import {shovelMachines,shovelDumpObstacles,shovelSegmentHits,shovelNearbySoil} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {createThreeJump,bindJumpButton,SKY_RUN_SPEED,jumpClearance} from './imasora-construction-locomotion.mjs?v=120gf';
+import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120gm';
+import {createWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
+import {createShovelWorkView} from './imasora-construction-shovel-work-view.mjs?v=120gn';
+import {WorldTransportWorkSession} from './imasora-construction-transport-work-session.mjs?v=120gn';
+import {TransportPlaySession,transportWorkMoving,deferShortScoopAutosave} from './imasora-construction-transport-play-session.mjs?v=120gn';
+import {transportSiteOrigin,transportWorldPose,transportSiteOpening,transportSiteReserved,transportGroundHeightAt,transportGroundUpperBound,transportVehicleBlockedAt} from './imasora-construction-transport-site.mjs?v=120gn';
+import * as m from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {dumpUnloadReady,dumpUnloadVisual,dumpStorageContact} from './imasora-construction-dump-work.mjs?v=120gn';
+import {shovelJobReady,shovelDigTargets,shovelLoadTarget,shovelDropTarget,shovelStorageTarget,shovelStorageContact,shovelVisibleSource,shovelToolPose,shovelDumpPoint} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {transportWorkProgress} from './imasora-construction-transport-play-progress.mjs?v=120gn';
+import {storageDisplay,storageAmountText} from './imasora-construction-storage-display.mjs?v=120gn';
+import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120gn';
 import {createMonsterTravelInput,viewRelativeTravel} from './imasora-construction-concrete/monster-travel-input.mjs';
 import {constructionMovePadTemplate,createConstructionMovePad} from './imasora-construction-concrete/move-pad.mjs';
 import {holdDashButtonTemplate,createHeldDashButton} from './imasora-hold-dash.mjs';
-import {dumpDriveNotice,nativeDumpSupport} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {createTransportRestoreView} from './imasora-construction-transport-restore-view.mjs?v=120fw';
-import {placementTap,travelHeading} from './imasora-construction-hand-placement.mjs?v=120fw';
-import {planHandArea,handAreaEnvironment} from './imasora-construction-hand-area.mjs?v=120fw';
+import {dumpDriveNotice,nativeDumpSupport} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {createTransportRestoreView} from './imasora-construction-transport-restore-view.mjs?v=120gn';
+import {placementTap,travelHeading} from './imasora-construction-hand-placement.mjs?v=120gn';
+import {planHandArea,handAreaEnvironment} from './imasora-construction-hand-area.mjs?v=120gn';
 
 export function createWorldTransportPlayController({service,session,state,scene,camera,character,shadow,canvas,snapshot,clearInput,readout,onExit=()=>{},verification=false,resumeAtSavedPose=true}){
  session??=new WorldTransportWorkSession({service,snapshot});
@@ -77,7 +77,7 @@ export function createWorldTransportPlayController({service,session,state,scene,
  host.append(panel);const el=id=>panel.querySelector(`[data-id="${id}"]`),status=t=>{if(disposed)return;el('status').textContent=t;el('menuStatus').textContent=t;};
  el("diagnostics").hidden=!verification;
  let driveBlockedNotice=false;
- function reset(){driveBlockedNotice=false;tapStart=null;verifyRoute=null;dropApproach=null;dropPlanning=false;dropToken++;clearInput();input?.reset();pad?.cancel();dash?.cancel();held.clear();acc=0;}
+ function reset(){jumpControl?.cancel();jump.release();driveBlockedNotice=false;tapStart=null;verifyRoute=null;dropApproach=null;dropPlanning=false;dropToken++;clearInput();input?.reset();pad?.cancel();dash?.cancel();held.clear();acc=0;}
  function owns(on){reset();document.body.classList.toggle('world-excavation-playing',on);document.body.classList.toggle('world-transport-playing',on);host.classList.toggle('world-excavation-viewport-operating',on);for(const e of document.querySelectorAll('.toolbar,.control-card'))e.inert=on;el('begin').hidden=on;el('menu').hidden=el('view').hidden=el('face').hidden=!on;el('actions').hidden=el('movement').hidden=el('dash').hidden=!on;if(!on){view?.releaseActor();character.visible=true;shadow.visible=true;}}
  function setHostPose(p){state.position.set(p.x,0,p.z);state.groundY=p.y;state.heading=p.heading;state.jumpY=state.jumpVelocity=0;state.falling=state.moving=false;}
  function syncEntry(){const can=play.canBegin({x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z});el('begin').disabled=!can;el('begin').hidden=play.active||(!resumeAtSavedPose&&!can);el('amount').parentElement.hidden=!play.active&&!resumeAtSavedPose&&!can;}
@@ -85,7 +85,7 @@ export function createWorldTransportPlayController({service,session,state,scene,
  let groundPreviewKey='',groundPreviewSoil=null;function preparedGround(s){const patches=unopenedGround(s);if(!patches.length)return s;const key=JSON.stringify([s.frame.soil.revision,patches]);if(key!==groundPreviewKey){try{groundPreviewSoil=m.openScoopGround(s).frame.soil;groundPreviewKey=key;}catch{return s;}}return {...s,frame:{...s.frame,soil:groundPreviewSoil}};}
  function scan(){if(disposed)return;const s=session.state,f=s.frame;if(!f.soil.containers.shovel.amount&&f.soil.pending?.from!=='shovel')dropSelection=null;const k=[s.mode,JSON.stringify(f.machineVehicle),f.soil.revision,f.dump.x,f.dump.z,f.dump.heading,f.player.x.toFixed(1),f.player.z.toFixed(1),f.player.heading.toFixed(2),JSON.stringify(dropSelection?.point??dropSelection),!!s.link,!!s.unload].join(',');if(k===scanKey)return;scanKey=k;targets=s.mode==='foot'?{exc:m.linkedAccessTarget(s),dump:m.dumpBoardTarget(s),dig:shovelDigTargets(preparedGround(s).frame)[0]??null,load:shovelLoadTarget(f),drop:dropSelection?(dropSelection.plan?.points&&dropSelection.plan.environment===handAreaEnvironment(f)?dropSelection.plan:dropSelection.point?shovelDropTarget(f,dropSelection.point):null):shovelDropTarget(f),storage:shovelStorageContact(f),store:shovelStorageTarget(f,'store'),take:shovelStorageTarget(f,'take')}:s.mode==='driving'?{unload:m.dumpUnloadPlan(s),storeDump:m.dumpStoragePlan(s),storageCamera:dumpStorageContact(f)}:{};}
  function tryJump(){if(!enabled()||session.state.mode!=='foot'||jump.count>=3)return false;if(!jump.start())return false;status(jump.count+'段ジャンプ！');buttons();return true;}
- const jumpControl=bindJumpButton({element:jumpButton,enabled:()=>enabled()&&session.state.mode==='foot'&&jump.count<3,activate:tryJump});
+ const jumpControl=bindJumpButton({element:jumpButton,enabled:()=>enabled()&&session.state.mode==='foot'&&jump.count<3,canHold:()=>enabled()&&session.state.mode==='foot',activate:tryJump,release:()=>jump.release()});
  const enabled=()=>!disposed&&play.canOperate&&!planning&&!ending&&!failed&&!verifyRoute&&!dropPlanning&&!dropApproach;
  function buttons(){if(disposed)return;const s=session.state,ok=enabled()&&!jump.airborne;el('jump').hidden=!play.active||s.mode!=='foot'||play.paused;el('jump').disabled=!enabled()||jump.count>=3;const aboard=s.mode==='excavating',exc=aboard&&!excavatorDriving,dr=s.mode==='driving'||aboard&&excavatorDriving;el('excMode').hidden=!aboard||s.frame.version!==2;el('excMode').disabled=!ok;el('excMode').textContent=excavatorDriving?'作業に切りかえる':'走行に切りかえる';el('driveExcLeave').hidden=!aboard||!excavatorDriving;el('driveExcLeave').disabled=!ok;if(hintMode!==s.mode+excavatorDriving){hintMode=s.mode+excavatorDriving;panel.querySelector('.construction-keyboard-hint').textContent=exc?'W：すくう　A：左旋回\nS：こぼす　D：右旋回':dr?'W：前進　A：左へ曲がる\nS：後退　D：右へ曲がる':'W：前　A：左\nS：後ろ　D：右';}el('footActions').hidden=s.mode!=='foot';el('excActions').hidden=!exc;el('driveActions').hidden=s.mode!=='driving';
   for(const id of ['dig','load','drop'])el(id).disabled=!ok||!targets[id]||!service.constructionToolkit?.tools.find(t=>t.id==='shovel')?.owned;
@@ -156,7 +156,7 @@ export function createWorldTransportPlayController({service,session,state,scene,
  el('digKind').onclick=()=>{if(!enabled()||previewBusy)return;reset();basinDig=!basinDig;previewKey='';previewBoxes=previewPlan=null;buttons();status(basinDig?'水をためる穴を掘るよ。枠の土はすべてバケットに入り、ダンプへ運べるよ。':'爪が触れる土をすくうよ。');};el('excMode').onclick=()=>{if(!enabled())return;reset();excavatorDriving=!excavatorDriving;previewKey='';previewBoxes=previewPlan=null;buttons();status(excavatorDriving?'前進・後退しながらハンドルで曲がるよ。':'すくう・こぼすで土を動かそう。');};el('driveExcLeave').onclick=()=>work('leaveExc');el('exit').onclick=()=>leave();for(const id of ['dig','load','drop','scoop','pour','bucketStorage','boardExc','leaveExc','board','leave','unload','storeDump'])el(id).onclick=()=>work(id);
  for(const [id,axis] of [['left',-1],['right',1]]){const b=el(id);b.addEventListener('pointerdown',e=>{if(!enabled())return;e.preventDefault();held.set(e.pointerId,axis);b.setPointerCapture(e.pointerId);});for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,e=>held.delete(e.pointerId));}
  dash=createHeldDashButton({element:el('dash').firstElementChild,enabled,context:()=>session.state.mode});input=createMonsterTravelInput({enabled,context:()=>session.state.mode,fastHeld:()=>dash.active,clearFast:()=>dash.cancel()});pad=createConstructionMovePad({element:panel.querySelector('[data-construction-pad]'),input,enabled});
- const keyEvent=e=>{if(!play.active)return;if(recovery.open){e.stopImmediatePropagation();return;}keyCount++;lastKey={type:e.type,code:e.code};if(!['KeyW','KeyA','KeyS','KeyD','Escape','KeyE','Space','KeyX','KeyF','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))return;e.stopImmediatePropagation();e.preventDefault();if(e.code==='Escape'){if(e.type==='keydown'&&!e.repeat)menu();return;}if(session.state.mode==='excavating'&&!excavatorDriving&&['KeyW','KeyS'].includes(e.code)){if(e.type==='keydown'&&!e.repeat)work(e.code==='KeyW'?'scoop':'pour');return;}if(e.code==='Space'&&session.state.mode==='foot'){if(e.type==='keydown'&&!e.repeat)tryJump();return;}if(e.code==='KeyE'){if(e.type==='keydown'&&!e.repeat)work(session.state.mode==='driving'?(targets.storeDump?'storeDump':'unload'):session.state.mode==='excavating'?'leaveExc':targets.exc?'boardExc':'board');return;}input.key(e);};window.addEventListener('keydown',keyEvent,true);window.addEventListener('keyup',keyEvent,true);
+ const keyEvent=e=>{if(!play.active)return;if(recovery.open){e.stopImmediatePropagation();return;}keyCount++;lastKey={type:e.type,code:e.code};if(!['KeyW','KeyA','KeyS','KeyD','Escape','KeyE','Space','KeyX','KeyF','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))return;e.stopImmediatePropagation();e.preventDefault();if(e.code==='Escape'){if(e.type==='keydown'&&!e.repeat)menu();return;}if(session.state.mode==='excavating'&&!excavatorDriving&&['KeyW','KeyS'].includes(e.code)){if(e.type==='keydown'&&!e.repeat)work(e.code==='KeyW'?'scoop':'pour');return;}if(e.code==='Space'&&session.state.mode==='foot'){jumpControl.key(e);return;}if(e.code==='KeyE'){if(e.type==='keydown'&&!e.repeat)work(session.state.mode==='driving'?(targets.storeDump?'storeDump':'unload'):session.state.mode==='excavating'?'leaveExc':targets.exc?'boardExc':'board');return;}input.key(e);};window.addEventListener('keydown',keyEvent,true);window.addEventListener('keyup',keyEvent,true);
  const onBlur=()=>{if(!disposed&&play.active)menu();};
  const onVisibility=()=>{if(!disposed&&document.hidden&&play.active&&!recovery.open){menu();if(!ending&&!play.busy&&!session.blocked&&!session.intent&&!planning&&play.dirty)void write('セーブできたよ！');}};
  window.addEventListener('blur',onBlur);document.addEventListener('visibilitychange',onVisibility);

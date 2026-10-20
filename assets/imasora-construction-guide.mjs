@@ -1,6 +1,6 @@
 import * as T from './three.module.min.js';
-import {LESSONS,lessonById,stepAt,STEP_SECONDS,SHOVEL_ICON} from './imasora-construction-guide-data.mjs?v=120ey';
-import {createLessonScene} from './imasora-construction-guide-scenes.mjs?v=120fw';
+import {LESSONS,lessonById,stepAt,STEP_SECONDS,SHOVEL_ICON} from './imasora-construction-guide-data.mjs?v=120gm';
+import {createLessonScene} from './imasora-construction-guide-scenes.mjs?v=120gn';
 const q=s=>document.querySelector(s),gallery=q('#gallery'),lesson=q('#lesson'),stage=q('#stage');
 let renderer=null,camera=null,scene=null,model=null,timer=0,paused=true,raf=0,last=0,lastDraw=0,token=0,selected=null,side=false,step=-1,only=null,speed=1;
 const motion=matchMedia('(prefers-reduced-motion: reduce)');

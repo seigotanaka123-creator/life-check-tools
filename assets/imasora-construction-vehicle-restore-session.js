@@ -1,5 +1,5 @@
 import {canonical} from './imasora-construction-state.js';
-import {vehicleRestoreCheckpoint,vehicleRestoreSummary,validateVehicleRestoreBefore,createVehicleRestoreLedger,inspectVehicleRestoreBundle,inspectVehicleRestoreHistory,vehicleRestoreUndoMatches,vehicleRestoreUndoCandidate} from './imasora-construction-vehicle-restore.js?v=120fw';
+import {vehicleRestoreCheckpoint,vehicleRestoreSummary,validateVehicleRestoreBefore,createVehicleRestoreLedger,inspectVehicleRestoreBundle,inspectVehicleRestoreHistory,vehicleRestoreUndoMatches,vehicleRestoreUndoCandidate} from './imasora-construction-vehicle-restore.js?v=120gn';
 
 const fields={water:'constructionWater',soil:'constructionSoil',timber:'constructionTimber'};
 const clone=structuredClone;

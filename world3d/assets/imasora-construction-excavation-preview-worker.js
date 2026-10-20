@@ -1,4 +1,4 @@
-import {predictExcavation} from './imasora-construction-excavation-preview.js?v=120fc';
+import {predictExcavation} from './imasora-construction-excavation-preview.js?v=120gf';
 // Each request owns a structured-cloned snapshot. The parent terminates stale
 // or slow workers; the predictor also has a finite simulation-step budget.
 self.onmessage=({data})=>{

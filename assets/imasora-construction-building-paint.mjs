@@ -1,5 +1,6 @@
-import {validateHighShape,highFloors,shapedHighParts} from './imasora-construction-high-shape.mjs';
-import {highBuildingParts,highAssembly,highAssemblyAt,highDisassemblyAt,highJobPlan,highRouteSeconds} from './imasora-construction-high-build.mjs?v=120fw';
+import{boardBayRetiredPart}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
+import {validateHighShape,highFloors,shapedHighParts} from './imasora-construction-high-shape.mjs?v=120gn';
+import {highBuildingParts,highAssembly,highAssemblyAt,highDisassemblyAt,highJobPlan,highRouteSeconds} from './imasora-construction-high-build.mjs?v=120gn';
 import {validateUpperPaintAction} from './imasora-construction-concrete/high-paint.mjs';
 import {paintResultColor} from './imasora-construction-concrete/free-paint-removal.mjs';
 const ok=(v,m)=>{if(!v)throw Error(m);};
@@ -35,7 +36,7 @@ export function buildingPaintPlan(f,a){
  ok(a.pixels.some(pixel=>patches[pixel].area>0),'この面は壁や梁のうしろだよ。見える場所をえらぼう。');return{group,plan,key,patches,changes,cost};
 }
 export function applyBuildingPaint(p,a,ledger){const f=p.freeBuild,q=buildingPaintPlan(f,a);ok(q.cost<=(ledger.quantities.paintSurfaceCredits-(p.paintUsed??0))+1e-9,'ペンキが足りないよ。建材受取所で受け取ろう。');if(!q.changes.length)return;if(f.buildingPaint&&a.retire?.length)f.buildingPaint.groups=f.buildingPaint.groups.filter(g=>!a.retire.includes(g.buildingId));f.buildingPaint??={version:1,groups:[]};let g=f.buildingPaint.groups.find(g=>g.buildingId===a.buildingId);if(!g){ok(f.buildingPaint.groups.length<128,'先に古い建物の塗装を片付けよう。');g={buildingId:a.buildingId,plan:structuredClone(q.plan),faces:{}};f.buildingPaint.groups.push(g);}g.faces[q.key]??=Array(16).fill(null);for(const x of q.changes)g.faces[q.key][x.pixel]=x.color;if(g.faces[q.key].every(v=>v===null))delete g.faces[q.key];p.paintUsed=(p.paintUsed??0)+q.cost;}
-export function buildingPaintCandidates(work,level,kind,face,interior=false){if(work.version!==5||level>work.levels)return[];return highBuildingParts(level,work).map((p,part)=>({p,part})).filter(({p,part})=>p.kind===kind&&buildingPaintPatches(work.blueprint,level,part,face,interior).some(p=>p.area>0));}
+export function buildingPaintCandidates(work,level,kind,face,interior=false){if(work.version!==5||level>work.levels)return[];return highBuildingParts(level,work).map((p,part)=>({p,part})).filter(({p,part})=>p.kind===kind&&!boardBayRetiredPart(work,p)&&buildingPaintPatches(work.blueprint,level,part,face,interior).some(p=>p.area>0));}
 export function buildingPaintFixedParts(work){let count=Array.from({length:work.levels},(_,i)=>highAssembly(i+1,work).length).reduce((a,b)=>a+b,0);if(work.job?.type==='DISMANTLE'){const q=highJobPlan(work,'DISMANTLE'),t=work.job.elapsed-highRouteSeconds(q.route);if(t>=0){const a=highDisassemblyAt(work.levels,Math.min(t,q.take),work);count-=Math.min(highAssembly(work.levels,work).length,a.completed+(a.moving?0:1));}}else if(work.job?.type==='BUILD'){const q=highJobPlan(work,'BUILD'),t=work.job.elapsed-highRouteSeconds(q.route);if(t>=0)count+=highAssemblyAt(work.levels+1,t,work).completed;}return count;}
-export function buildingPaintPartVisible(work,level,index){const target=highBuildingParts(level,work)[index];let count=highAssembly(level,work).findIndex(s=>JSON.stringify(s.part)===JSON.stringify(target));for(let i=1;i<level;i++)count+=highAssembly(i,work).length;return count<buildingPaintFixedParts(work);}
+export function buildingPaintPartVisible(work,level,index){const target=highBuildingParts(level,work)[index];let count=highAssembly(level,work).findIndex(s=>JSON.stringify(s.part)===JSON.stringify(target));for(let i=1;i<level;i++)count+=highAssembly(i,work).length;return !boardBayRetiredPart(work,target)&&count<buildingPaintFixedParts(work);}
 

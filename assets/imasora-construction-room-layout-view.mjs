@@ -1,5 +1,5 @@
 import * as T from'./three.module.min.js';
-import{roomLayoutParts,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
+import{roomLayoutParts,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
 export const ROOM_PART_COLORS=Object.freeze({screen:'#ffe2b5',foot:'#bd8b58',frame:'#b98d62',track:'#d5b857',leaf:'#80cdb1',top:'#a7dcd3',leg:'#bd8b58',landing:'#e2be84'});
 export function createRoomLayoutView(parent,{preview=false}={}){
  const root=new T.Group();root.name=preview?'room-layout-preview':'room-layout-actual';parent.add(root);const geometry=new T.BoxGeometry(1,1,1),colors=preview?{preview:'#ffd13d'}:ROOM_PART_COLORS,meshes={},materials={},transform=new T.Object3D();

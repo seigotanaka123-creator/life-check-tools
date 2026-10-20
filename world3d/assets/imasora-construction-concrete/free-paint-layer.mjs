@@ -2,10 +2,10 @@ import {createPaintMaterials} from './paint-colors.mjs?v=120ds';
 import * as T from '../three.module.min.js';
 import {paintResultColor} from './free-paint-removal.mjs?v=120dm';
 import {FLOOR_COLORS} from './floor-parts.mjs?v=120ds';
-import {freeCell} from './free-build-state.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
-import {maskingProgress} from './free-masking-operation.mjs?v=120fw';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
+import {maskingProgress} from './free-masking-operation.mjs?v=120gn';
 
 // Paint and boarding cues are surface graphics, not solid boxes. Keep depth
 // testing so nearby characters and vehicles still occlude them, but do not

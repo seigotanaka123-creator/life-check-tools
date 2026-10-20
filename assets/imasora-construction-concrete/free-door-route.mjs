@@ -1,7 +1,7 @@
 import {planFieldRoute} from '../imasora-construction-shared-field.mjs?v=120ey';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120fw';
-import {walkingBlocked} from './free-contact.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120gn';
+import {walkingBlocked} from './free-contact.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
 import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ek';
 
 // This plans against the actual saved vehicles, hose, forms, works and terrain.

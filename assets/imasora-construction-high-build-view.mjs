@@ -1,7 +1,7 @@
 import * as T from './three.module.min.js';
 import {officialCharacter} from './imasora-construction-layout.js?v=120ds';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs';
-import {HIGH,newHighBuild,highBuildingParts,highPlatform,highNextAction,beginHighJob,advanceHighJob,finishHighJob,highJobReady,highJobPlan,highRouteSeconds,highActorAt,highAssemblyAt,undoHighBuild,packHighBuild,unpackHighBuild} from './imasora-construction-high-build.mjs?v=120fw';
+import {HIGH,newHighBuild,highBuildingParts,highPlatform,highNextAction,beginHighJob,advanceHighJob,finishHighJob,highJobReady,highJobPlan,highRouteSeconds,highActorAt,highAssemblyAt,undoHighBuild,packHighBuild,unpackHighBuild} from './imasora-construction-high-build.mjs?v=120gn';
 const q=id=>document.getElementById(id),key='imasora-high-build-prototype-120fc';
 let state,paused=false,failed='',saveClock=0,lastWrite='',notice='';
 try{const raw=localStorage.getItem(key);state=raw===null?newHighBuild():unpackHighBuild(raw);lastWrite=raw??'';}catch(e){failed=e.message;state=null;}

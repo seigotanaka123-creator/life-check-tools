@@ -1,4 +1,4 @@
-import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120ea';
+import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120gm';
 // UI pause is local to this controller. It never rewrites a saved work record.
 export function createVehiclePlayGate(clearInput){
   let active=false,paused=false;

@@ -1,7 +1,7 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {WorldPurchaseStore} from './imasora-world-purchase-storage.js?v=120fw';
-import {WorldAuthorityStore} from './imasora-world-save-service.js?v=120fw';
-import {initialPurchasedWater,packPurchasedWater,unpackPurchasedWater} from './imasora-construction-purchased-water.js?v=120fw';
+import {WorldPurchaseStore} from './imasora-world-purchase-storage.js?v=120gn';
+import {WorldAuthorityStore} from './imasora-world-save-service.js?v=120gn';
+import {initialPurchasedWater,packPurchasedWater,unpackPurchasedWater} from './imasora-construction-purchased-water.js?v=120gn';
 export const PURCHASED_WATER_DB='imasora-construction-purchased-water-copy-development-v1';
 export class PurchasedWaterStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=PURCHASED_WATER_DB;}}
 // Sources expose READ only. There is no purchase, award, debit, or source writer here.

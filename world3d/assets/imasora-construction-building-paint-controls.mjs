@@ -1,10 +1,10 @@
-import {roomPaintTarget} from './imasora-construction-building-room.mjs?v=120fw';
+import {roomPaintTarget} from './imasora-construction-building-room.mjs?v=120gn';
 import * as T from './three.module.min.js';
 import {BRIGHT_PAINTS} from './imasora-construction-concrete/paint-colors.mjs';
 import {colorStudioTemplate,installColorStudios} from './imasora-construction-concrete/color-studio.mjs';
-import {buildingPaintCandidates,buildingPaintPlan,buildingPaintPart} from './imasora-construction-building-paint.mjs?v=120fw';
-import {buildingPainterReady} from './imasora-construction-building-paint-path.mjs?v=120fw';
-import {highWorldPoint} from './imasora-construction-high-world.mjs?v=120fw';
+import {buildingPaintCandidates,buildingPaintPlan,buildingPaintPart} from './imasora-construction-building-paint.mjs?v=120gn';
+import {buildingPainterReady} from './imasora-construction-building-paint-path.mjs?v=120gn';
+import {highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
 import {freeStepUndoTarget} from './imasora-construction-concrete/free-step-undo.mjs?v=120ft';
 const all=()=>Array.from({length:16},(_,i)=>i);
 export function createBuildingPaintControls({host,record,buildingId,project,credits,show,ready,perform,navigate,preview,inspect,generation,look,activeBuildings=()=>[],closeLook=()=>{}}){

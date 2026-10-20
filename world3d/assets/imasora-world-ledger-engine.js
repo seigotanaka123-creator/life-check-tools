@@ -1,33 +1,38 @@
-import{assertRoomLayoutWorld,assertAllRoomLayoutsWorld}from'./imasora-construction-room-layout-guard.mjs?v=120fw';
-import {assertEntranceDoorClear} from './imasora-construction-building-door-guard.mjs?v=120fw';
-import {assertUpperCastWorld,assertUpperAction,assertHighWorkAccess} from './imasora-construction-high-casting.mjs?v=120fw';
-import {transportGroundHeightAt} from './imasora-construction-transport-site.mjs?v=120fw';
-import {highMaterialCost,highWorldTimber,validateHighWorld,transitionHighWorld,assertHighFoundation} from './imasora-construction-high-world.mjs?v=120fw';
-import {prepareTransportParking} from './imasora-construction-transport-parking.mjs?v=120fw';
+import{assertBoardLiftWorld,assertBoardLiftContinuation}from'./imasora-construction-board-lift-guard.mjs?v=120gn';
+import{assertBoardBayRetrofitWorld}from'./imasora-construction-board-bay-retrofit-guard.mjs?v=120gn';
+import{assertBoardBaySupportChange}from'./imasora-construction-board-bay-guard.mjs?v=120gn';
+import{assertRoomWalkWorld,assertAllRoomWalkingWorld}from'./imasora-construction-room-walk-guard.mjs?v=120gn';
+import{assertRoomLayoutWorld,assertAllRoomLayoutsWorld}from'./imasora-construction-room-layout-guard.mjs?v=120gn';
+import {assertEntranceDoorClear} from './imasora-construction-building-door-guard.mjs?v=120gn';
+import {assertUpperCastWorld,assertUpperAction,assertHighWorkAccess} from './imasora-construction-high-casting.mjs?v=120gn';
+import {transportGroundHeightAt} from './imasora-construction-transport-site.mjs?v=120gn';
+import {highMaterialCost,highWorldTimber,validateHighWorld,transitionHighWorld,assertHighFoundation} from './imasora-construction-high-world.mjs?v=120gn';
+import {prepareTransportParking} from './imasora-construction-transport-parking.mjs?v=120gn';
 import {serializedSaveSnapshot} from './imasora-save-wire.mjs';
 import {parseCapturedConstructionJson,capturedJsonInfo,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {assertWorkPlatformRecord,platformMatchesProject} from './imasora-construction-concrete/free-platform-record.mjs?v=120fw';
+import {assertWorkPlatformRecord,platformMatchesProject} from './imasora-construction-concrete/free-platform-record.mjs?v=120gn';
 // Shared transaction rules. Live and preview ledgers have incompatible formats.
 import {canonical} from './imasora-construction-state.js';
 import {IMASORA_WORLD_SCHEMA_VERSION} from './imasora-world-map-schema.js?v=120ds';
 import {SHOP_OFFERS} from './imasora-mars-construction-shop.js?v=503';
+import{assertBuildingKitWorld,transferBuildingKit,assertKitSupportChange}from'./imasora-construction-kit-transfer.mjs?v=120gn';
 import {deliveryAccess} from './imasora-construction-delivery.js';
-import {initialWorldWater,WATER_YARDS,validateWorldWater,validateWaterContinuation,waterCheckpoint} from './imasora-construction-world-water.js?v=120fb';
-import {initialWorldSoil,SOIL_YARDS,validateWorldSoil,validateSoilContinuation,soilCheckpoint,worldSoilTotals} from './imasora-construction-world-soil.js?v=120fw';
-import {initialWorldTimber,TIMBER_YARDS,validateWorldTimber,validateTimberContinuation,timberCheckpoint,worldTimberTotals} from './imasora-construction-world-timber.js?v=120fw';
-import {EARTH_LIVE_SCOPE,createAuthorityExcavation,validateAuthorityExcavation,validateAuthorityExcavationContinuation,authorityExcavationWork,checkpointAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120fc';
-import {stepWorldExcavation} from './imasora-construction-world-excavation.js?v=120fc';
+import {initialWorldWater,WATER_YARDS,validateWorldWater,validateWaterContinuation,waterCheckpoint} from './imasora-construction-world-water.js?v=120gf';
+import {initialWorldSoil,SOIL_YARDS,validateWorldSoil,validateSoilContinuation,soilCheckpoint,worldSoilTotals} from './imasora-construction-world-soil.js?v=120gn';
+import {initialWorldTimber,TIMBER_YARDS,validateWorldTimber,validateTimberContinuation,timberCheckpoint,worldTimberTotals} from './imasora-construction-world-timber.js?v=120gn';
+import {EARTH_LIVE_SCOPE,createAuthorityExcavation,validateAuthorityExcavation,validateAuthorityExcavationContinuation,authorityExcavationWork,checkpointAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120gf';
+import {stepWorldExcavation} from './imasora-construction-world-excavation.js?v=120gf';
 import './imasora-construction-pack-transfer.js?v=530';
 const PACK_TRANSFER=globalThis.ImasoraConstructionPackTransfer;
-import {createProfileProject,assertProfileProject,transitionProfileProject,availablePackConcreteCredits} from './imasora-construction-profile-project.js?v=120fw';
-import {createWorldTransport,createWorldTransportWork,validateWorldTransport,commandWorldTransport} from './imasora-construction-transport-authority.mjs?v=120fw';
-import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120fw';
-import {assertWorldTransportWorkReceipt,snapshotWorldTransportWork} from './imasora-construction-transport-work-flow.mjs?v=120fw';
+import {createProfileProject,assertProfileProject,transitionProfileProject,availablePackConcreteCredits} from './imasora-construction-profile-project.js?v=120gn';
+import {createWorldTransport,createWorldTransportWork,validateWorldTransport,commandWorldTransport} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {assertWorldTransportWorkReceipt,snapshotWorldTransportWork} from './imasora-construction-transport-work-flow.mjs?v=120gn';
 import {projectStarterToolkit} from './imasora-construction-toolkit.mjs?v=120fs';
 import {assertTransportShovel,transportNeedsShovel} from './imasora-construction-transport-hand.mjs';
 import {concreteParkingProblem} from './imasora-construction-concrete/free-parking.mjs?v=120ey';
-import {vehiclePoseProblem} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120fw';
-import {PARKING_ADAPTERS,prepareParkingMigration,validateParkingRecord} from './imasora-construction-parking-migration.mjs?v=120fc';
+import {vehiclePoseProblem} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120gn';
+import {PARKING_ADAPTERS,prepareParkingMigration,validateParkingRecord} from './imasora-construction-parking-migration.mjs?v=120gf';
 export function createWorldLedgerAPI({scope,kinds,verifiedPacketCacheBytes=0,immutablePackets=false}) {
 // Cache only exact immutable packet strings that completed every check.
 // Every read still parses a fresh object; mutable caller objects are never trusted.
@@ -122,6 +127,7 @@ function validateWorldPurchaseLedger(s){
     if(s.world.constructionHighBuild!==null)validateHighWorld(s.world.constructionHighBuild);
   }else ok(s.world.constructionHighBuild===undefined,'高い建物は新版の保存で記録してください。');
   ok((s.world.constructionTimber?worldTimberTotals(s.world.constructionTimber).inUse:0)+highWorldTimber(s.world.constructionHighBuild)<=received['mars-timber'],'木材を同時に使いすぎています。元の材料を残して止めました。');
+  assertBoardLiftWorld(s.world);assertBuildingKitWorld(s.world);
   if(s.world.constructionExcavation!==undefined)validateAuthorityExcavation(s.world.constructionExcavation);
   // Live excavation makes the complete ledger unreadable to pre-v496 clients,
   // including clients that do not recognize an excavation field at all.
@@ -129,7 +135,7 @@ function validateWorldPurchaseLedger(s){
   else ok(s.world.constructionExcavation?.scope!==EARTH_LIVE_SCOPE,'通常の掘削地形は新版保存で一度だけ取得してください。');
   if(s.schemaVersion>=3){ok(s.world.constructionTransport!==undefined,'共有土の記録が欠けた保存は使用できません。');validateWorldTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint);}
   else ok(s.world.constructionTransport===undefined,'共有土は対応した新版保存へ一度だけ切り替えてください。');
-  assertAllRoomLayoutsWorld(s.world);assertHighWorkAccess(s.world);assertUpperCastWorld(s.world,{heightAt:(x,z)=>transportGroundHeightAt(s.world.constructionTransport,x,z)??0});
+  assertAllRoomWalkingWorld(s.world);assertAllRoomLayoutsWorld(s.world);assertHighWorkAccess(s.world);assertUpperCastWorld(s.world,{heightAt:(x,z)=>transportGroundHeightAt(s.world.constructionTransport,x,z)??0});
   if(s.world.constructionHighBuild)assertHighFoundation(s.world.constructionHighBuild,s.world.constructionTransport);
   if(transportNeedsShovel(s.world.constructionTransport))assertTransportShovel(projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint),s.source.fingerprint);
   return true;
@@ -292,14 +298,19 @@ function applyConstructionHighBuild(s,action,draft,expectedRevision){
  validateWorldPurchaseLedger(s);ok(s.revision===expectedRevision,'別のセーブが進んだよ。古い内容では上書きしません。');
  ok(LINK_SCOPE==='imasora-world-ledger-v1'&&s.schemaVersion>=3&&s.world.constructionParking?.version===3&&draft.map==='construction','みんなの駐車場を準備してから、高い建物をつくろう。');
  if(action.type==='PLACE')ok(projectConstructionStock(s).stored['mars-timber']>=highMaterialCost(action.blueprint),'この形をつくる木材が足りないよ。受取所で受け取ろう。');
- assertRoomLayoutWorld(s.world,action);assertEntranceDoorClear(s.world,action,draft);const project=transitionHighWorld(s.world.constructionHighBuild??null,action),n=saveLinkedWorldDraft(s,draft);
+ const roomContext=assertRoomWalkWorld(s.world,action);assertRoomLayoutWorld(s.world,action);assertEntranceDoorClear(s.world,action,draft);const project=transitionHighWorld(s.world.constructionHighBuild??null,action,roomContext),n=saveLinkedWorldDraft(s,draft);
+ assertKitSupportChange(s.world,project);assertBoardBayRetrofitWorld(s.world,action,project);const timber=s.world.constructionTimber,yard=TIMBER_YARDS[timber?.siteIndex];assertBoardBaySupportChange(s.world.constructionHighBuild,project,timber,yard?{x:yard[0],z:yard[1]}:null);
  n.schemaVersion=4;n.world.constructionHighBuild=project;validateWorldPurchaseLedger(n);return n;
+}
+function transferConstructionKit(s,action,draft,expectedRevision){
+ validateWorldPurchaseLedger(s);ok(s.revision===expectedRevision,'別のセーブが進んだよ。もう一度えらぼう。');ok(s.schemaVersion===4&&s.world.constructionParking?.version===3&&draft.map==='construction','みんなの駐車場でキットを運ぼう。');
+ const result=transferBuildingKit(s.world,action),n=saveLinkedWorldDraft(s,draft);n.world.constructionHighBuild=result.high;n.world.constructionTimber=timberCheckpoint(result.timber);validateWorldPurchaseLedger(n);return n;
 }
 function saveConstructionTimberDraft(s,work,draft,expectedRevision){
   validateWorldPurchaseLedger(s);const old=s.world.constructionTimber;
   ok((old?.revision??null)===expectedRevision,'別の木材作業状態で更新されています。上書きしません。');
   const received=s.events.filter(e=>e.kind==='delivery'&&e.offerId==='mars-timber').reduce((n,e)=>n+e.amount,0);
-  validateWorldTimber(work,received);validateTimberContinuation(old,work);
+  validateWorldTimber(work,received);validateTimberContinuation(old,work);assertBoardLiftContinuation(s.world,work);
   const n=saveLinkedWorldDraft(s,draft);n.world.constructionTimber=timberCheckpoint(work);validateWorldPurchaseLedger(n);return n;
 }
 function allocateConstructionExcavation(s,site,origin,grantId,draft,{live=false}={}){
@@ -416,5 +427,5 @@ function saveConstructionWorkPlatform(s,record,draft,expectedRevision){
 }
 function packWorldPurchaseLedger(s){validateWorldPurchaseLedger(s);const raw=JSON.stringify({format:LINK_SCOPE,checksum:fingerprint(s),state:s});if(immutablePackets)rememberPacket(raw,serializedSaveSnapshot(s));return raw;}
 function unpackWorldPurchaseLedger(raw){ok(typeof raw==='string'&&raw.length<=20000000,'接続保存が不正です。');if(immutablePackets&&verifiedPackets.has(raw)){const state=verifiedPackets.get(raw);rememberPacket(raw,state);return state;}const p=immutablePackets?parseCapturedConstructionJson(raw):JSON.parse(raw);if(verifiedPackets.has(raw)){rememberPacket(raw);return p.state;}keys(p,['format','checksum','state']);ok(p.format===LINK_SCOPE&&p.checksum===fingerprint(p.state),'接続保存の整合性を確認できません。');validateWorldPurchaseLedger(p.state);rememberPacket(raw,immutablePackets?p.state:true);return p.state;}
-return {applyConstructionHighBuild,prepareSharedConstruction,migrateTransportParking,migrateConcreteParking,migrateConstructionParking,LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,enableConstructionTransport,applyConstructionTransportCommand,enableConstructionTransportWork,saveConstructionTransportWork,prepareConstructionTransportWork,prepareConstructionTransportCandidate,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
+return {transferConstructionKit,applyConstructionHighBuild,prepareSharedConstruction,migrateTransportParking,migrateConcreteParking,migrateConstructionParking,LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,enableConstructionTransport,applyConstructionTransportCommand,enableConstructionTransportWork,saveConstructionTransportWork,prepareConstructionTransportWork,prepareConstructionTransportCandidate,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
 }

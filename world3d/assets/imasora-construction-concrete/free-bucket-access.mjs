@@ -1,7 +1,7 @@
-import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120fw';
-import {walkPath,walkingBlocked} from './free-contact.mjs?v=120fw';
-import {footingAt} from './free-footing.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
+import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120gn';
+import {walkPath,walkingBlocked} from './free-contact.mjs?v=120gn';
+import {footingAt} from './free-footing.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
 
 // Keep the usual rear stance when it is usable. A nearby boundary need not
 // prevent filling a bucket: the rear chute can turn toward another clear spot.

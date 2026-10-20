@@ -1,6 +1,6 @@
 // Stage 3-2: a closed 32-unit loan, separate from every existing terrain save.
 import {createConstructionState,reduceConstruction,validateConstructionState,canonical,SOIL_UNIT} from './imasora-construction-state.js';
-import {initialLoaderState,stepLoader,actLoader,actorPose,localToWorld,worldToLocal,polygon,polygonsOverlap,vehicleBlocker,walkingClear,SITE,OBSTACLES,SAFE_ZONE,approach} from './imasora-construction-loader-physics.js?v=120ey';
+import {initialLoaderState,stepLoader,actLoader,actorPose,localToWorld,worldToLocal,polygon,polygonsOverlap,vehicleBlocker,walkingClear,SITE,OBSTACLES,SAFE_ZONE,approach} from './imasora-construction-loader-physics.js?v=120gf';
 export const GRAIN=4, VOLUME=SOIL_UNIT/8, CAPACITY=48, WORK_SCOPE='development-loader-work-v1';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),key=(x,z)=>`${x},${z}`,sum=g=>Object.values(g).reduce((a,b)=>a+b,0),finite=n=>Number.isFinite(n);
 export function soilColumns(w){return Object.entries(w.ground).map(([k,n])=>{const [x,z]=k.split(',').map(Number);return{x:(x+.5)*GRAIN,z:(z+.5)*GRAIN,width:GRAIN,depth:GRAIN,height:n*GRAIN,id:'普通の土の山',gx:x,gz:z,n};});}

@@ -1,13 +1,13 @@
-import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120fw';
-import {footingAt} from './free-footing.mjs?v=120fw';
+import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
+import {footingAt} from './free-footing.mjs?v=120gn';
 import * as T from '../three.module.min.js';
-import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs?v=120fw';
-import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs?v=120fw';
+import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs?v=120gn';
+import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs?v=120gn';
 
-import {createFootingGuard} from './free-footing-motion.mjs?v=120fw';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120fw';
-import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120fw';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120fw';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
+import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120gn';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120gn';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z);
 export const frameRackPose=(rank,base=0)=>({x:FRAME_RACK.x,y:base+2+(rank+.5)*.45,z:FRAME_RACK.z,heading:0,tilt:-Math.PI/2});

@@ -1,6 +1,6 @@
 import * as T from './three.module.min.js';
 import {createActiveWorkClock} from './imasora-construction-concrete/active-work-clock.mjs';
-import {upperPaintToolPaths} from './imasora-construction-high-paint-path.mjs?v=120fw';
+import {upperPaintToolPaths} from './imasora-construction-high-paint-path.mjs?v=120gn';
 import {upperPaintPatch,upperPaintPlan} from './imasora-construction-concrete/high-paint.mjs?v=120fn';
 import {upperPaintWorld} from './imasora-construction-high-paint-view.mjs?v=120fn';
 import {paintColor} from './imasora-construction-concrete/paint-colors.mjs';

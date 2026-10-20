@@ -1,6 +1,6 @@
 import {DUMP_SOIL,soilSize,soilSnap,soilLevel} from './imasora-construction-dump-soil.js?v=526';
 const G=DUMP_SOIL.grain;
-import {localToWorld,worldToLocal,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120ey';
+import {localToWorld,worldToLocal,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120gf';
 const rectangle=o=>polygon({...o,heading:o.angle||0},o.width,o.depth);
 export const cellKey=(x,z)=>`${x},${z}`;
 export function insideSite(p,margin=2){return p.x>=SITE.minX+margin&&p.x<=SITE.maxX-margin&&p.z>=SITE.minZ+margin&&p.z<=SITE.maxZ-margin;}

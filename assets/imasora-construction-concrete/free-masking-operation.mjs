@@ -1,4 +1,4 @@
-import {assertPaintAccess} from './free-contact.mjs?v=120fw';
+import {assertPaintAccess} from './free-contact.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
 const validMask=n=>Number.isInteger(n)&&n>=0&&n<=65535;
 export function maskingPlan(f,target,fromMask,toMask){

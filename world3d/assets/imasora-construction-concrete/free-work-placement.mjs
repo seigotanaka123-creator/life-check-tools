@@ -1,4 +1,4 @@
-import {constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120fw';
+import {constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120gn';
 import {freeFilledMask,freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
 import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120ds';
 export function freeWorkPartsProblem(p,index,mask){

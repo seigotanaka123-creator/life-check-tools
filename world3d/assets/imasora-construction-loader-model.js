@@ -1,6 +1,6 @@
 import * as THREE from './three.module.min.js';
 import { measureCharacter } from './imasora-construction-layout.js?v=120ds';
-import { LOADER } from './imasora-construction-loader-physics.js?v=120ey';
+import { LOADER } from './imasora-construction-loader-physics.js?v=120gf';
 
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.62,...extra});
 function mesh(parent,geometry,material,name,x=0,y=0,z=0){const o=new THREE.Mesh(geometry,material);o.name=name;o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o;}

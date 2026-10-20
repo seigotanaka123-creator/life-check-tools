@@ -1,11 +1,11 @@
-import {cranePoint,craneChassisFrame,cranePartGround,craneGroundHeight,cranePartFlatGround,craneGroundCeiling} from './imasora-construction-crane-ground.mjs?v=120ey';
-import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {cranePoint,craneChassisFrame,cranePartGround,craneGroundHeight,cranePartFlatGround,craneGroundCeiling} from './imasora-construction-crane-ground.mjs?v=120gf';
+import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
 import {groundPoint} from './imasora-construction-vehicle-ground-frame.mjs';
 import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
 // Stage 4-1: inert, uniquely identified loan parts. No game inventory/economy access.
-import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120ey';
-import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120fw';
-import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js?v=120fw';
+import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120gf';
+import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120gn';
+import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js?v=120gn';
 export const CRANE={minReach:42,maxReach:152,slew:.48,extend:26,hoist:23,gravity:65,snap:6,rotationSeconds:1.8};
 export const PARTS=[
   {id:'panel-1',name:'床板 A',w:52,h:6,d:30,x:0,z:16,color:0xdab573},
@@ -290,11 +290,11 @@ export function stepCrane(state,input,dt,external=[]){
   return s;
 }
 function checksum(text){let n=2166136261;for(let i=0;i<text.length;i++)n=Math.imul(n^text.charCodeAt(i),16777619);return(n>>>0).toString(16);}
-export function validateCrane(s,templates=PARTS){
+export function validateCrane(s,templates=PARTS,maxCargoHeight=s.highCargoVersion===1?260:180){
   if(s?.schemaVersion!==(s?.rig?.vehicle?.field?2:1)||!Number.isSafeInteger(s.revision)||s.revision<0||!Array.isArray(s.parts)||s.parts.length!==templates.length||!Array.isArray(s.history)||s.history.length>60)throw new Error('クレーンの保存形式が不正です。');
   if(typeof s.work!=='boolean'||typeof s.snap!=='boolean'||!Number.isFinite(s.deployment)||s.deployment<0||s.deployment>1)throw new Error('作業状態が不正です。');
   if(!s.boom||!Number.isFinite(s.boom.yaw)||Math.abs(s.boom.yaw)>Math.PI*.8+.001||!Number.isFinite(s.boom.reach)||s.boom.reach<42||s.boom.reach>152||!Number.isFinite(s.boom.cable)||s.boom.cable<3||s.boom.cable>100)throw new Error('アームの状態が不正です。');
-  for(const template of templates){const list=s.parts.filter(p=>p.id===template.id);if(list.length!==1)throw new Error('部材IDの重複・欠落があります。');const p=list[0];for(const k of['w','h','d','name','color'])if(p[k]!==template[k])throw new Error('部材の内容が一致しません。');for(const k of['x','y','z','angle','vx','vz','vy'])if(!Number.isFinite(p[k]))throw new Error('部材座標が不正です。');if(typeof p.fixed!=='boolean'||p.y<-.05||p.y>180||bounds(p).some(q=>!inWorkArea(q,s.rig.vehicle)))throw new Error('部材が保存範囲外です。');}
+  for(const template of templates){const list=s.parts.filter(p=>p.id===template.id);if(list.length!==1)throw new Error('部材IDの重複・欠落があります。');const p=list[0];for(const k of['w','h','d','name','color'])if(p[k]!==template[k])throw new Error('部材の内容が一致しません。');for(const k of['x','y','z','angle','vx','vz','vy'])if(!Number.isFinite(p[k]))throw new Error('部材座標が不正です。');if(typeof p.fixed!=='boolean'||p.y<-.05||p.y>maxCargoHeight||bounds(p).some(q=>!inWorkArea(q,s.rig.vehicle)))throw new Error('部材が保存範囲外です。');}
   if(s.held!==null&&(!s.work||!s.parts.some(p=>p.id===s.held&&!p.fixed)))throw new Error('吊り荷の台帳が不正です。');
   if(s.rotation!==undefined){
     const r=s.rotation,p=s.parts.find(p=>p.id===s.held);

@@ -1,6 +1,6 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {initialPurchasedTimber,packPurchasedTimber,unpackPurchasedTimber} from './imasora-construction-purchased-timber.js?v=120fw';
-export {purchasedSourceReader} from './imasora-construction-purchased-water-storage.js?v=120fw';
+import {initialPurchasedTimber,packPurchasedTimber,unpackPurchasedTimber} from './imasora-construction-purchased-timber.js?v=120gn';
+export {purchasedSourceReader} from './imasora-construction-purchased-water-storage.js?v=120gn';
 export const PURCHASED_TIMBER_DB='imasora-construction-purchased-timber-copy-development-v1';
 export class PurchasedTimberStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=PURCHASED_TIMBER_DB;}}
 export class PurchasedTimberSession{

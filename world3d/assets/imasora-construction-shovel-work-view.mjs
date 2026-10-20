@@ -1,23 +1,23 @@
-import {excavatorGroundFrame,groundPoint} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {transportArea,transportFences} from './imasora-construction-transport-field.mjs?v=120fc';
+import {excavatorGroundFrame,groundPoint} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {transportArea,transportFences} from './imasora-construction-transport-field.mjs?v=120gf';
 import * as THREE from './three.module.min.js';
-import {createSoilRenderLayers,soilCameraCandidates} from './imasora-construction-soil-instances.mjs?v=120fw';
+import {createSoilRenderLayers,soilCameraCandidates} from './imasora-construction-soil-instances.mjs?v=120gn';
 import {officialCharacter,measureCharacter} from './imasora-construction-layout.js?v=120ds';
-import {createDumpModel,updateDumpModel,orientDumpObject} from './imasora-construction-dump-model.js?v=120ey';
-import {DUMP_CAB,dumpDriverLocal} from './imasora-construction-dump-cab.mjs?v=120ey';
-import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120fc';
-import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120fc';
-import {shovelSoilBoxes,shovelDropFlight,shovelToolPose,shovelVisibleSource,shovelMachines,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelMachineState,SHOVEL_STROKE} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {nativeDumpPose,nativeDumpPoint,nativeDumpWheelOffsets,nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {LOADER,localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
-import {visibleTransportSources} from './imasora-construction-transport-site.mjs?v=120fw';
-import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120fc';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ey';
-import {BIN} from './imasora-construction-excavator.js?v=120fc';
-import {dumpStorageFlowPoint} from './imasora-construction-dump-work.mjs?v=120fw';
-import {storageDisplay,storageAmountText} from './imasora-construction-storage-display.mjs?v=120fw';
-import {pickShovelSurface} from './imasora-construction-hand-placement.mjs?v=120fw';
+import {createDumpModel,updateDumpModel,orientDumpObject} from './imasora-construction-dump-model.js?v=120gf';
+import {DUMP_CAB,dumpDriverLocal} from './imasora-construction-dump-cab.mjs?v=120gf';
+import {createExcavator,updateExcavatorModel} from './imasora-construction-excavator-model.js?v=120gf';
+import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120gf';
+import {shovelSoilBoxes,shovelDropFlight,shovelToolPose,shovelVisibleSource,shovelMachines,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelMachineState,SHOVEL_STROKE} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {nativeDumpPose,nativeDumpPoint,nativeDumpWheelOffsets,nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {LOADER,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {visibleTransportSources} from './imasora-construction-transport-site.mjs?v=120gn';
+import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120gf';
+import {BIN} from './imasora-construction-excavator.js?v=120gf';
+import {dumpStorageFlowPoint} from './imasora-construction-dump-work.mjs?v=120gn';
+import {storageDisplay,storageAmountText} from './imasora-construction-storage-display.mjs?v=120gn';
+import {pickShovelSurface} from './imasora-construction-hand-placement.mjs?v=120gn';
 
 export function createShovelWorkView(canvas,initial,host=null){
  const renderer=host?null:new THREE.WebGLRenderer({canvas,antialias:true});if(renderer){renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;}

@@ -1,0 +1,26 @@
+.coast-hud{position:absolute;top:86px;left:22px;z-index:12;display:flex;flex-direction:column;align-items:flex-start;gap:10px;pointer-events:none;color:#285161;text-shadow:0 1px 8px #ffffffa0}
+.coast-hud[hidden],.coast-hud [hidden]{display:none!important}
+.coast-weather{display:grid;gap:3px;padding:9px 13px;border-left:3px solid #ffffffb8;background:linear-gradient(90deg,#ffffffb0,#ffffff00);border-radius:2px 18px 18px 2px}
+.coast-weather small{font-size:10px;letter-spacing:3px}.coast-weather strong{font-size:22px;letter-spacing:2px}.coast-weather span{font-size:12px}
+.coast-hud[data-phase="night"] .coast-weather{color:#f6f5e8;text-shadow:0 1px 4px #1a2848;background:linear-gradient(90deg,#293c6177,#293c6100)}
+.coast-hud button,.coast-atlas button{pointer-events:auto;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-height:44px;border:2px solid #fff;border-radius:24px;background:#edf8ed;color:#284b5b;padding:10px 18px;font-weight:800;box-shadow:0 4px 14px #28526915;cursor:pointer}
+.coast-hud [data-coast-town]{background:#ffe9bb}.coast-hud p{font-size:13px;background:#ffffffe0;border-radius:14px;padding:8px 12px;margin:0}
+.coast-atlas{box-sizing:border-box;width:min(700px,94vw);max-height:88dvh;overflow:auto;background:#fffaf0;color:#345868;border:4px solid white;border-radius:28px;padding:24px;box-shadow:0 20px 80px #123d4d45}
+.coast-atlas::backdrop{background:#21455750}.coast-atlas header{display:flex;justify-content:space-between;align-items:center;gap:12px}.coast-atlas h2{margin:4px 0}.coast-atlas header small{color:#648a8a;letter-spacing:2px}.coast-atlas>p{font-size:14px;line-height:1.7}
+.coast-atlas svg{display:block;width:100%;max-height:47dvh;border-radius:20px}.coast-map-places circle{fill:#fff7dc;stroke:#4e8b8e;stroke-width:3}.coast-atlas svg text{font:600 12px sans-serif;fill:#2c535e;paint-order:stroke;stroke:#ffffffd0;stroke-width:3px}
+.coast-atlas-places{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.coast-atlas article{background:#eff4e9;border-radius:16px;padding:12px}.coast-atlas article b{font-size:14px}.coast-atlas article p{font-size:12px;margin:6px 0 0;line-height:1.6}
+body[data-ufo-world-map="coast"] .world-player-brand #sceneTitle{display:none}
+body[data-ufo-world-map="coast"] .world-player-brand #saveState{font-size:10px}
+body.world-player-game[data-ufo-world-map="coast"] .world-shell{padding:0;background:transparent;min-height:100dvh}
+body.world-player-game[data-ufo-world-map="coast"] .world-header{position:absolute;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;z-index:20;margin:0}
+body.world-player-game[data-ufo-world-map="coast"] .world-player-bar{background:#ffffffe3;box-shadow:0 5px 25px #28495a0d;border-color:#fff}
+body.world-player-game[data-ufo-world-map="coast"] .viewport{height:100dvh;min-height:0}
+body.world-player-game[data-ufo-world-map="coast"] .viewport-card{border:0;border-radius:0;box-shadow:none}
+body.world-player-game[data-ufo-world-map="coast"] .viewport-footer{display:none}
+body.world-player-game[data-ufo-world-map="coast"] .world-build-open{top:96px;right:14px;background:#fff4d4;border:2px solid white;border-radius:22px;color:#496273}
+.coast-hud{top:108px}
+body[data-ufo-world-map="coast"] .camera-distance-control,body[data-ufo-world-map="coast"] .emergency-escape-control{min-height:44px;transform:none;border:2px solid #fff;border-radius:22px;background:#ffffffe6;color:#345868;box-shadow:0 4px 12px #28495a16}
+body[data-ufo-world-map="coast"] .emergency-escape-control{bottom:206px}
+body[data-ufo-world-map="coast"] .camera-distance-control{bottom:156px}
+@media(max-width:600px){.coast-hud{top:95px;left:12px;gap:7px}.coast-weather{padding:6px 10px}.coast-weather strong{font-size:18px}.coast-weather small{font-size:8px}.coast-hud button{font-size:12px;padding:8px 13px}.coast-atlas{padding:16px}.coast-atlas h2{font-size:20px}.coast-atlas-places{grid-template-columns:1fr}.coast-atlas article{padding:9px}}
+@media(max-height:500px){.coast-hud{top:82px;left:12px;flex-direction:row;align-items:center}.coast-weather small{display:none}.coast-weather strong{font-size:17px}.coast-weather span{font-size:10px}.coast-atlas{max-height:94dvh}.coast-atlas svg{max-height:65dvh}}

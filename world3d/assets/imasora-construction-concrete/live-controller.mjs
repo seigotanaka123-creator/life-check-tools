@@ -1,16 +1,16 @@
 import {toolkitSummary,toolkitDetails} from '../imasora-construction-toolkit.mjs?v=120fs';
 import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=119bf';
-import {createFreeBuildController} from './free-build-controller.mjs?v=120fw';
+import {createFreeBuildController} from './free-build-controller.mjs?v=120gn';
 import {createEmbeddedSiteView} from './site-view.mjs?v=120ds';
 import {installWorkshopFence} from './workshop-fence.mjs';
 import {constructionMovePadTemplate} from './move-pad.mjs?v=119bf';
 import {onFinishedSurface} from './c2-3d-physics.mjs';
-import {concreteLocation,nextFloorProblem,moveConcreteFloorProblem,concreteBuildOverlap,completedConcreteGeometry,MAX_CONCRETE_FLOORS} from './projects.mjs?v=120fw';
+import {concreteLocation,nextFloorProblem,moveConcreteFloorProblem,concreteBuildOverlap,completedConcreteGeometry,MAX_CONCRETE_FLOORS} from './projects.mjs?v=120gn';
 import {floorMask,floorPanels,floorPanelsProblem,partCount} from './floor-parts.mjs?v=120ds';
 import {createFloorEditor} from './floor-editor.mjs';
-import {createCompletedFloors} from './completed-floors.mjs?v=120fw';
-import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120fw';
-import {LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120fw';
+import {createCompletedFloors} from './completed-floors.mjs?v=120gn';
+import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120gn';
+import {LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120gn';
 import {availableMixCells,MIX_DURATION_MS,CURE_DURATION_MS} from './mixing.mjs';
 
 // This controller uses only received materials in the world's existing save.
@@ -43,7 +43,7 @@ export function createLiveConcreteController({service,state,scene,camera,charact
  const inert=new Map(),button=id=>panel.querySelector(`[data-action="${id}"]`);
  panel.querySelector('footer').append(button('placefloor'),button('cancelplace'));
  const project=()=>{if(cachedLedger!==service.ledger){cachedProject=service.constructionConcreteProject;cachedLedger=service.ledger;}return cachedProject;};
- const origin={...concreteLocation(project())},completed=createCompletedFloors(scene);let planning=null,checkBlocked=()=>true,layoutKey=JSON.stringify([origin,project().completedFloors??[]]),completedMenuKey='';
+ const origin={...concreteLocation(project())},completed=createCompletedFloors(scene);let planning=null,checkBlocked=()=>true,layoutKey=JSON.stringify([origin,project().completedFloors??[]]),completedMenuKey='',lastLayoutProject=null;
  const entry=()=>state.map==='construction'&&!state.ufoBoarded&&Math.abs(state.groundY+state.jumpY)<.5&&Math.hypot(state.position.x-origin.x-32,state.position.z-origin.z-125)<45;
  const canMove=()=>active&&!paused&&!busy&&!clockSaving&&!service.blocked&&!controller.pending&&!confirmation&&!planning;
  const view=createEmbeddedSiteView({hostScene:scene,hostCamera:camera,model:character,offset:origin,controls:panel,canMove,onNotice:text=>{note=text;},onMove:info=>{moving=info.moving;work=info.work;panel.querySelector('.concrete-walk-record').textContent=onFinishedSurface(info.collider,info.actor)?'完成した床に乗っています':'';}});
@@ -59,7 +59,8 @@ export function createLiveConcreteController({service,state,scene,camera,charact
  }
  function sync(){const p=project();alignClocks(p);view.sync(p.site);refresh();}
  function alignLayout(p){
-  completed.sync(p);const location=concreteLocation(p),key=JSON.stringify([location,p.completedFloors??[]]);if(key===layoutKey)return;layoutKey=key;
+  if(p===lastLayoutProject)return;
+  completed.sync(p);const location=concreteLocation(p),key=JSON.stringify([location,p.completedFloors??[]]);lastLayoutProject=p;if(key===layoutKey)return;layoutKey=key;
   if(active){view.exit();active=false;ownInput(false);}planning=null;completed.showPreview(null);view.setPlacementPreview(null);view.setOrigin(location);placeAtEntrance();moving=false;
   onLayoutChange();onExit();
  }
@@ -92,7 +93,6 @@ export function createLiveConcreteController({service,state,scene,camera,charact
  }
  function refresh(){
   if(panel.querySelector('[data-toolkit]').open){const toolkit=service.constructionToolkit;panel.querySelector('[data-toolkit-summary]').textContent=toolkitSummary(toolkit);panel.querySelector('[data-toolkit-detail]').textContent=toolkitDetails(toolkit);}
-  view.syncTravelControls();
   const p=project(),s=p.site;alignClocks(p);alignLayout(p);
   launcher.hidden=state.map!=='construction';launcher.querySelector('[data-action="enter"]').disabled=active||busy||!installed||!entry()||service.blocked;
   launcher.querySelector('[data-action="entrance"]').disabled=active||busy||!installed||state.ufoBoarded||service.blocked;
@@ -101,6 +101,10 @@ export function createLiveConcreteController({service,state,scene,camera,charact
   if(completedMenuKey!==menuKey){completedMenuKey=menuKey;const select=menu.querySelector('select'),selected=select.value;select.replaceChildren(...savedFloors.map((f,i)=>new Option(`${i+1}枚目の床（配置${partCount(floorMask(f))}／保管${4-partCount(floorMask(f))}）`,String(i))));if(selected!==''&&savedFloors[Number(selected)])select.value=selected;}
   for(const c of menu.querySelectorAll('select,button'))c.disabled=active||busy||state.ufoBoarded||service.blocked;
   if(controller.pending&&!service.blocked&&!service.jobs.length&&p.operations.some(op=>op.operationId===controller.pending.action.operationId))controller.clearPendingAfterReload();
+  // Keep the launcher and saved-world drawing current, but do not refresh an
+  // entire hidden legacy workshop menu during a pedestrian's jump.
+  if(!active)return;
+  view.syncTravelControls();
   const actor=view.getActor(),atWork=actor.grounded&&Math.hypot(actor.x-27.5,actor.z)<1,atEither=actor.grounded&&Math.hypot(Math.abs(actor.x)-27.5,actor.z)<1,atStock=actor.grounded&&Math.hypot(actor.x-54,actor.z-31)<.8;
   const idle=active&&!busy&&!clockSaving&&!moving&&!service.blocked&&!controller.pending&&!confirmation&&!planning,can=idle&&!paused;
   const show=(id,visible,enabled=true)=>{button(id).hidden=!visible;button(id).disabled=!(can&&enabled);};
@@ -167,8 +171,8 @@ export function createLiveConcreteController({service,state,scene,camera,charact
   const index=Number(launcher.querySelector('[data-completed-menu] select').value),f=project().completedFloors?.[index];if(!f)return;
   clearInput();if(!await save())return;const surface=completedConcreteGeometry(project()).find(g=>g.id.startsWith(`construction-concrete-${index+1}-`)&&g.id.endsWith('-floor'));state.position.set(surface?.x??f.x,0,surface?.z??f.z);state.groundY=surface?.height??0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;state.supportSurfaceId=surface?.id??null;state.cameraMode='third';state.viewPitch=.1;onExit();await save();refresh();
  }
- function install({blockedAt,travelBlockedAt,upperPipeBlockedAt,collider,surface,supportHeightAt,placementHeightAt,jumpCeilingAt}){
-  free.install({blockedAt,travelBlockedAt,upperPipeBlockedAt,collider,surface,supportHeightAt,placementHeightAt,jumpCeilingAt});checkBlocked=blockedAt;view.root.visible=completed.root.visible=state.map==='construction';if(!view.root.visible){installed=false;planning=null;completed.showPreview(null);view.setPlacementPreview(null);refresh();return;}
+ function install({presentationRevision=null,blockedAt,travelBlockedAt,upperPipeBlockedAt,collider,surface,supportHeightAt,placementHeightAt,jumpCeilingAt}){
+  free.install({presentationRevision,blockedAt,travelBlockedAt,upperPipeBlockedAt,collider,surface,supportHeightAt,placementHeightAt,jumpCeilingAt});checkBlocked=blockedAt;view.root.visible=completed.root.visible=state.map==='construction';if(!view.root.visible){installed=false;planning=null;completed.showPreview(null);view.setPlacementPreview(null);refresh();return;}
   completed.install(project(),surface);
   if(blockedAt(origin.x,origin.z,165)){installed=false;view.root.visible=false;issue='既存の建物と工房が重なるため、入口を保留しています。';refresh();return;}
   issue='';installed=true;collider(origin.x,origin.z,[212,212],0,'concrete-worksite-reserved',0,{buildingId:'concrete-worksite-reserved'});installWorkshopFence(origin,collider);sync();

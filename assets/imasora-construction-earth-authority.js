@@ -1,10 +1,10 @@
 // 9-1c2b2b3: native earth allocation, separate from v484/v3 import formats.
 // The enclosing world ledger is the sole authority for allocation and commits.
 import {canonical,SOIL_UNIT} from './imasora-construction-state.js';
-import {contactTerrainProjection} from './imasora-construction-excavation-compatibility.js?v=120fc';
-import {initialContactWorldExcavation,EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120fc';
-import {readyExcavation,oneTouchCheckpoint} from './imasora-construction-excavator-one-touch.js?v=120fc';
-import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js?v=120fc';
+import {contactTerrainProjection} from './imasora-construction-excavation-compatibility.js?v=120gf';
+import {initialContactWorldExcavation,EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120gf';
+import {readyExcavation,oneTouchCheckpoint} from './imasora-construction-excavator-one-touch.js?v=120gf';
+import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js?v=120gf';
 
 export const EARTH_AUTHORITY_SCOPE='imasora-earth-excavation-authority-v1';
 export const EARTH_LIVE_SCOPE='imasora-earth-excavation-live-v1';

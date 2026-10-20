@@ -1,5 +1,5 @@
-import {footingAt,footSurface,FOOT_LEVEL_EPS,FOOTING_MESSAGE,newToolWalkingReceipt} from './free-footing.mjs?v=120fw';
-import {walkingGroundAt,walkingGroundSegment,walkingGroundRotation,renderedSoles,soleClearance} from './free-walking-ground.mjs?v=120fw';
+import {footingAt,footSurface,FOOT_LEVEL_EPS,FOOTING_MESSAGE,newToolWalkingReceipt} from './free-footing.mjs?v=120gn';
+import {walkingGroundAt,walkingGroundSegment,walkingGroundRotation,renderedSoles,soleClearance} from './free-walking-ground.mjs?v=120gn';
 
 export function createFootingGuard({f,root,actor,feet,record,heightAt=()=>0,includeCured=false}){
  const clearance=soleClearance(root,actor,feet),rest=feet.map(e=>e.position?.clone()??e.o.position.clone());

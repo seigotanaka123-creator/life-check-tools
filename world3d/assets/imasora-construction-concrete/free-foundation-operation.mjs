@@ -1,11 +1,11 @@
-import {inspectFormGround} from './free-foundation-check.mjs?v=120fw';
-import {FOUNDATION_ACTIONS,foundationBoardCount,foundationContains,foundationCorners,foundationParts,assertFoundationClear} from './free-foundation-state.mjs?v=120fw';
-import {canonicalFreeAction} from './free-build-state.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
-import {frameBlocked} from './free-frames.mjs?v=120fw';
-import {newToolWalkingReceipt} from './free-footing.mjs?v=120fw';
-import {newScaffoldReceipt} from './free-frame-scaffold.mjs?v=120fw';
-import {FOUNDATION_WORK_OFFSET} from './free-foundation-work-scaffold.mjs?v=120fw';
+import {inspectFormGround} from './free-foundation-check.mjs?v=120gn';
+import {FOUNDATION_ACTIONS,foundationBoardCount,foundationContains,foundationCorners,foundationParts,assertFoundationClear} from './free-foundation-state.mjs?v=120gn';
+import {canonicalFreeAction} from './free-build-state.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
+import {frameBlocked} from './free-frames.mjs?v=120gn';
+import {newToolWalkingReceipt} from './free-footing.mjs?v=120gn';
+import {newScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
+import {FOUNDATION_WORK_OFFSET} from './free-foundation-work-scaffold.mjs?v=120gn';
 const error=()=>Error('土台の地面・通路・対象が変わりました。確認し直してください。');
 export function foundationActionFromPlan(plan){if(plan.kind!=='preparation'||plan.deckY===null)throw Error(plan.issue);return{mask:plan.mask,deckY:plan.deckY,bottoms:plan.supports.map(p=>p.bottom)};}
 export function assertFoundationEnvironment(p,a,{heightAt=()=>null,blockedAt=()=>true,foot=null}={}){

@@ -1,4 +1,4 @@
-import {executeTransportRecoveryTask} from './imasora-construction-recovery-task.mjs?v=120fw';
+import {executeTransportRecoveryTask} from './imasora-construction-recovery-task.mjs?v=120gn';
 // One immutable request per dedicated worker. The caller terminates it on
 // completion, cancellation or disposal, so large histories are not retained.
 self.onmessage=async({data})=>{

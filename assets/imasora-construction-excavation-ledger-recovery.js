@@ -1,5 +1,5 @@
 import {canonical} from './imasora-construction-state.js';
-import {unpackExcavationLedger,packExcavationLedger,excavationLedgerSummary} from './imasora-construction-excavation-ledger.js?v=120fw';
+import {unpackExcavationLedger,packExcavationLedger,excavationLedgerSummary} from './imasora-construction-excavation-ledger.js?v=120gn';
 
 export const LEDGER_RESTORE_POINT='imasora-excavation-ledger-before-restore-v1';
 export const LEDGER_RESTORE_LIMIT=64*1024*1024;

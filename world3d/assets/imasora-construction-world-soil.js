@@ -1,9 +1,10 @@
 import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 // Received soil in the authoritative world. No purchase-copy import or storage API.
-import {initialWorldSoilPhysics,purchasedSoilAction,advancePurchasedSoil,validatePurchasedSoil,soilCopyTotals,soilCopySurface,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js?v=120fw';
-import {polygon} from './imasora-construction-loader-physics.js?v=120ey';
+import {initialWorldSoilPhysics,purchasedSoilAction,advancePurchasedSoil,validatePurchasedSoil,soilCopyTotals,soilCopySurface,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js?v=120gn';
+import {polygon} from './imasora-construction-loader-physics.js?v=120gf';
 import {soilBedRects,soilBedShape} from './imasora-construction-soil-bed.mjs?v=120eo';
-export const SOIL_YARDS=Object.freeze([[1520,-750],[1520,750],[-1520,-750],[-1520,750]].map(Object.freeze));
+import{SOIL_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
+export{SOIL_YARDS};
 export const WORLD_SOIL_SCOPE='construction-world-soil-v1';
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);},int=v=>Number.isSafeInteger(v)&&v>=0;
 export function initialWorldSoil(siteIndex=0,received=0){const s={schema:1,scope:WORLD_SOIL_SCOPE,siteIndex,revision:0,work:initialWorldSoilPhysics(received/1000)};return validateWorldSoil(s,received);}

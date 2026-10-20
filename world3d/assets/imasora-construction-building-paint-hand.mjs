@@ -1,6 +1,6 @@
-import{decorPaintToolPaths}from'./imasora-construction-decor-paint-path.mjs?v=120fw';
+import{decorPaintToolPaths}from'./imasora-construction-decor-paint-path.mjs?v=120gn';
 import * as T from './three.module.min.js';
-import {buildingPaintToolPaths} from './imasora-construction-building-paint-path.mjs?v=120fw';
+import {buildingPaintToolPaths} from './imasora-construction-building-paint-path.mjs?v=120gn';
 import {paintColor} from './imasora-construction-concrete/paint-colors.mjs';
 import {createActiveWorkClock} from './imasora-construction-concrete/active-work-clock.mjs';
 export function createBuildingPaintMotion(scene,character,record,a,plan,view,{now}={}){

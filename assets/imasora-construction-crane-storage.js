@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {packCrane,unpackCrane} from './imasora-construction-crane.js?v=120fw';
+import {packCrane,unpackCrane} from './imasora-construction-crane.js?v=120gn';
 export const CRANE_DB='imasora-construction-crane-development-v1';
 export class CraneStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=CRANE_DB;}}
 export class CraneSession{

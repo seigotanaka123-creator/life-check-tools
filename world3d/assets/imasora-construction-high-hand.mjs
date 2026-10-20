@@ -2,7 +2,7 @@ import * as T from './three.module.min.js';
 import {createActiveWorkClock} from './imasora-construction-concrete/active-work-clock.mjs?v=120fk';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs';
 import {upperShapeTiles,upperCastingHeight} from './imasora-construction-concrete/high-casting-shape.mjs?v=120fl';
-import {highWorldPoint,highLocalPoint} from './imasora-construction-high-world.mjs?v=120fw';
+import {highWorldPoint,highLocalPoint} from './imasora-construction-high-world.mjs?v=120gn';
 export function createUpperHandMotion(scene,character,record,type,{now,casting}={}){
  const group=new T.Group();group.name='roof-worker-hand-tool';scene.add(group);const box=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(.45,.45,1,8),metal=new T.MeshStandardMaterial({color:'#b8cbd3'}),handleMat=new T.MeshStandardMaterial({color:'#e4aa63'}),blade=new T.Mesh(box,metal),handle=new T.Mesh(cylinder,handleMat);group.add(blade,handle);blade.scale.set(type==='FREE_HIGH_FINISH'?7:3,.7,3);
  const hands=(character.userData.hands??[]).map(o=>({o,p:o.position.clone()})),clock=createActiveWorkClock(now),gait=createConstructionWalkGait(),feet=character.userData.walkRig?.feet??[];const tiles=upperShapeTiles(casting?.shape),duration=casting?.shape?3.6+tiles.length*.12:3.6,approach=casting?.shape||casting?.anchor?.version===2?3:8;const anchor=casting?.anchor,local=anchor?.version===2?highLocalPoint(record.site,anchor):{x:32,z:-32},start=anchor?.version===2?record.work.actor:{x:32,z:0,heading:Math.PI},floor=anchor?.floor??record.work.levels,dir={x:Math.sin(start.heading),z:Math.cos(start.heading)};let elapsed=0;

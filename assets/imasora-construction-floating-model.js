@@ -1,7 +1,9 @@
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
 import * as THREE from './three.module.min.js';
-import {createTimberPart} from './imasora-construction-timber-model.js?v=120fw';
+import {createTimberPart} from './imasora-construction-timber-model.js?v=120gn';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
 export function createFloatingPart(p){
-  const root=createTimberPart(p);if(p.materialId!=='mars-timber')return root;
+  const root=createTimberPart(p);if(p.materialId!=='mars-timber'||isBeamBundle(p)||isKitCargo(p))return root;
   const ink=new THREE.MeshStandardMaterial({color:0xd6fff0,emissive:0x4ba697,emissiveIntensity:.65,roughness:.45});
   // Small upward inlays on both long sides; real wood outline remains unchanged.
   for(const z of[-1,1])for(const x of[-24,0,24]){

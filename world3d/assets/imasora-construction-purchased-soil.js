@@ -1,12 +1,12 @@
-import {soilWorkFrame,soilBucketPoint} from './imasora-construction-soil-ground.mjs?v=120ey';
+import {soilWorkFrame,soilBucketPoint} from './imasora-construction-soil-ground.mjs?v=120gf';
 import {soilBedProfile,soilBedBaseAt,validSoilBed} from './imasora-construction-soil-bed.mjs?v=120eo';
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump} from './imasora-construction-locomotion.mjs?v=120eg';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
 import {workArea,inWorkArea,sharedSupply,assertVehicleField} from './imasora-construction-field-area.mjs?v=120ey';
 import {walkFactor} from './imasora-construction-travel-input.mjs';
 // 8-3b1: purchased Mars-soil COPY. No loan ledger, wallet mutation, or main-world hooks.
-import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120fw';
-import {fingerprint} from './imasora-world-purchase-ledger.js?v=120fw';
-import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER} from './imasora-construction-loader-physics.js?v=120ey';
+import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120gn';
+import {fingerprint} from './imasora-world-purchase-ledger.js?v=120gn';
+import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER} from './imasora-construction-loader-physics.js?v=120gf';
 import {SOIL_BODY} from './imasora-construction-mars-soil.js';
 export const SOIL_COPY_SCOPE='construction-purchased-soil-copy-v1';
 export const SOIL_RECEIVER=Object.freeze({x:0,z:-80});
@@ -129,7 +129,7 @@ function moveVertical(s,p,dy,external=[]){let d=dy,hit='';if(dy<0&&p.y+dy<=0){d=
   p.y+=d;return hit;
 }
 function supported(s,p,external=[]){return !!moveVertical(s,{...p},-.001,external);}
-function stepWalker(s,input,dt,external=[]){const p=s.loader.player,b=s.body;b.grounded=b.vy<=0&&supported(s,p,external);landThreeJump(b);if(input.jump&&!b.jumpHeld)jump(s);b.jumpHeld=!!input.jump;
+function stepWalker(s,input,dt,external=[]){const p=s.loader.player,b=s.body;b.grounded=b.vy<=0&&supported(s,p,external);landThreeJump(b);if(input.jump&&!b.jumpHeld)jump(s);updateJumpHold(b,input.jump);
   const x=fin(input.x)?clamp(input.x,-1,1):0,z=fin(input.z)?clamp(input.z,-1,1):0,len=Math.max(1,Math.hypot(x,z));
   for(const axis of['x','z']){const delta=(axis==='x'?x:z)/len*SKY_WALK_SPEED*walkFactor(input)*dt,q={...p,[axis]:p[axis]+delta};if(bodyClear(s,q,external))p[axis]=q[axis];
     else if(b.grounded){const rise=Math.max(0,...surfaces(s).filter(o=>overlap(q,o)).map(o=>o.maxY-p.y));if(rise>0&&rise<=7&&bodyClear(s,{...q,y:p.y+rise},external)){p[axis]=q[axis];p.y+=rise;}}}

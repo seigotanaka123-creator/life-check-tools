@@ -1,6 +1,6 @@
 import {highCastingBoards} from './high-casting-state.mjs?v=120ft';
 // Temporary formwork boards are reserved, never converted into concrete or soil.
-import {freeFrameBoards} from './free-build-state.mjs?v=120fw';
+import {freeFrameBoards} from './free-build-state.mjs?v=120gn';
 import {freeWorkCells} from './free-work-parts.mjs';
 import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120ds';
 export const FOUNDATION_ACTIONS=new Set(['FREE_FOUNDATION_BUILD','FREE_FOUNDATION_REMOVE']);

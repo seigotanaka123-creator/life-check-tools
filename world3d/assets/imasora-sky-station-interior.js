@@ -51,7 +51,7 @@ export function addSkyStationInterior(station, materials, { addBox, addWalkableB
     if (decorative) mesh.userData.nonCollidable = true;
     return mesh;
   };
-  const sign = (name, text, pos, size, rotationY = 0, bg = '#10354c') => {
+  const labelTexture = (text, bg) => {
     let texture = makeLabelTexture?.(text, bg);
     if (!texture && typeof document !== 'undefined') {
       const canvas = document.createElement('canvas'); canvas.width = 768; canvas.height = 192;
@@ -64,11 +64,19 @@ export function addSkyStationInterior(station, materials, { addBox, addWalkableB
       lines.forEach((line, i) => c.fillText(line, 384, 96 + (i - (lines.length - 1) / 2) * 65, 720));
       texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
     }
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(...size), new THREE.MeshBasicMaterial({ map: texture || null, color: texture ? 0xffffff : 0xffedbd, side: THREE.FrontSide }));
+    return texture;
+  };
+  const sign = (name, text, pos, size, rotationY = 0, bg = '#10354c', backText = null) => {
+    const texture = labelTexture(text, bg);
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(...size), new THREE.MeshBasicMaterial({ map: texture || null, color: texture ? 0xffffff : 0xffedbd, side: THREE.FrontSide, toneMapped: false }));
     mesh.name = `sky-station-sign-${name}`; mesh.position.set(...pos); mesh.rotation.y = rotationY;
     mesh.userData.nonCollidable = true; mesh.userData.text = text; group.add(mesh);
-    const back = new THREE.Mesh(mesh.geometry, new THREE.MeshBasicMaterial({ color: bg, side: THREE.BackSide }));
+    const rearTexture = backText ? labelTexture(backText, bg) : null;
+    const back = new THREE.Mesh(mesh.geometry, new THREE.MeshBasicMaterial({ map: rearTexture || null, color: rearTexture ? 0xffffff : bg, side: backText ? THREE.FrontSide : THREE.BackSide, toneMapped: false }));
     back.name = `sky-station-sign-${name}-back`; back.position.copy(mesh.position); back.rotation.copy(mesh.rotation);
+    // Separate faces have real depth; rear text is upright rather than mirrored.
+    back.position.add(new THREE.Vector3(0, 0, -.08).applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationY));
+    if (backText) { back.rotation.y += Math.PI; back.userData.text = backText; }
     back.userData.nonCollidable = true; group.add(back);
     return mesh;
   };
@@ -105,7 +113,10 @@ export function addSkyStationInterior(station, materials, { addBox, addWalkableB
     box(`ticket-reader-${i}`, [2.4, .35, 2.5], [-16.8, 15.45, z], green, true);
     box(`ticket-slot-${i}`, [.25, .6, 1.7], [-14.9, 12.2, z], screen, true);
   });
-  sign('gates', '改札口　← ホーム', [-21, 26.5, 5], [34, 6]);
+  // Hang beyond the entrance jambs so the whole board is visible from the hall.
+  // The opposite face reverses the arrow to keep pointing towards the same platform.
+  sign('gates', '改札口　← ホーム', [-21, 26.5, -3], [34, 6], 0, '#10354c', '改札口　ホーム →');
+  [-34, -8].forEach((x, i) => box(`gate-sign-hanger-${i}`, [.4, 2.2, .4], [x, 30.65, -3], gold, true));
   sign('exit', '出口　駅前広場', [0, 26, 22.8], [21, 4], Math.PI);
   sign('welcome', '空 駅\nようこそ、空の旅へ', [-4, 24, -26.8], [30, 8]);
 
@@ -116,18 +127,21 @@ export function addSkyStationInterior(station, materials, { addBox, addWalkableB
     for (let row = 0; row < 2; row++) for (let col = 0; col < 3; col++) box(`ticket-button-${i}-${row}-${col}`, [.3, .8, .9], [31.7, 14 - row * 1.25, z - 1.7 + col * 1.7], white, true);
     box(`ticket-tray-${i}`, [1.5, .6, 4.5], [31.5, 10.6, z], metal);
   });
-  sign('tickets', 'きっぷ・運賃案内', [32, 25, 1.5], [25, 5], -Math.PI / 2);
+  sign('tickets', 'きっぷ・運賃案内', [31.4, 25, 1.5], [25, 5], -Math.PI / 2);
   // Staff counter and timetable, positioned away from both walk-through lanes.
   box('information-counter', [20, 8, 7], [25, 11.3, 18], wood);
   box('information-counter-top', [21, .6, 8], [25, 15.6, 18], stoneLight);
   sign('information', 'ご案内', [25, 12.4, 13.9], [13, 3.3], Math.PI);
-  sign('timetable', '発車案内\n1番線　空行き鉄道', [26, 24, 22.8], [22, 6.5], Math.PI);
+  // Stand clear of the front columns and the vestibule; do not draw through walls.
+  sign('timetable', '発車案内\n1番線　空行き鉄道', [-28, 25, 20.7], [20, 6], Math.PI);
+  [-33, -23].forEach((x, i) => box(`timetable-sign-mount-${i}`, [.4, .4, 3.1], [x, 27.5, 22.35], gold, true));
   [12, 27].forEach((x, i) => {
     box(`waiting-seat-${i}`, [12, 1.2, 5], [x, 11.4, -19], wood);
     box(`waiting-back-${i}`, [12, 5, 1], [x, 14, -21.5], wood);
     [-4, 4].forEach(dx => box(`waiting-leg-${i}-${dx}`, [1, 3.6, 3], [x + dx, 9.1, -19], metal));
   });
-  sign('route-map', '空駅 ━ 雲海 ━ 空の街', [25, 23, -26.6], [22, 4]);
+  sign('route-map', '空駅 ━ 雲海 ━ 空の街', [25, 23, -23.3], [22, 4]);
+  [18, 32].forEach((x, i) => box(`route-sign-mount-${i}`, [.4, .4, 3.7], [x, 24.3, -25.25], gold, true));
   [-31, 24].forEach((x, i) => {
     box(`ceiling-lamp-${i}`, [14, .8, 3], [x, 30, -7], white, true);
     const light = new THREE.PointLight(0xffe4b8, 1.6, 145, 1.4);

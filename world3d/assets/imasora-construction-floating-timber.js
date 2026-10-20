@@ -1,9 +1,9 @@
 // N2: development-only, individually identified loan stock. No wallet or walk
 // rewards. Quantities use integer geometry volume; never infer material by color.
-import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120fw';
-import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
-import {CRANE_WALK} from './imasora-construction-crane-walk.js?v=120fw';
-import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120fw';
+import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120gn';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120gf';
+import {CRANE_WALK} from './imasora-construction-crane-walk.js?v=120gn';
+import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120gn';
 export {floatReadout};
 export const TIMBER_PARTS=Object.freeze([
   {id:'mars-deck',materialId:'mars-timber',name:'火星木材・浮遊床',w:80,h:6,d:56,x:0,z:16,color:0xaa80bd},

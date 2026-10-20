@@ -1,14 +1,14 @@
 import {createBuildingGroundProbe} from './imasora-construction-building-ground.mjs?v=120et';
-import {earthBase,earthHoles,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120fc';
-import {soilVoxel,soilTransportGeometry} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {fieldWorkOverlaps} from './imasora-construction-field-contact.mjs?v=120fw';
-import {transportFences} from './imasora-construction-transport-field.mjs?v=120fc';
-import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120ey';
-import {PLOT} from './imasora-construction-excavator.js?v=120fc';
-import {EXCAVATION_YARDS,EXCAVATION_GATE,excavationReserved} from './imasora-construction-world-excavation.js?v=120fc';
-import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120fw';
-import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120fw';
+import {earthBase,earthHoles,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120gf';
+import {soilVoxel,soilTransportGeometry} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {fieldWorkOverlaps} from './imasora-construction-field-contact.mjs?v=120gn';
+import {transportFences} from './imasora-construction-transport-field.mjs?v=120gf';
+import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120gf';
+import {PLOT} from './imasora-construction-excavator.js?v=120gf';
+import {EXCAVATION_YARDS,EXCAVATION_GATE,excavationReserved} from './imasora-construction-world-excavation.js?v=120gf';
+import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
 export {SITE as TRANSPORT_SITE};
 const check=(ok,text)=>{if(!ok)throw Error('土運搬の現場：'+text);};
 export function createTransportSceneReadStore(store){
@@ -67,9 +67,11 @@ export function transportGroundHeightAt(record,x,z){
  return h;
 }
 export function transportVehicleBlockedAt(record,x,z,r=0){
- const o=transportSiteOrigin(record);if(![x,z,r].every(Number.isFinite)||r<0)return true;const f=record.work.frame,px=x-o[0],pz=z-o[2];
- return [...shovelMachines(f),shovelDumpBody(f)].some(b=>{const h=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);if(b.position[1]-h[1]>=80)return false;const c=b.axes?1:Math.cos(b.heading??0),sn=b.axes?0:Math.sin(b.heading??0),dx=px-b.position[0],dz=pz-b.position[2];return Math.hypot(Math.max(0,Math.abs(c*dx-sn*dz)-h[0]),Math.max(0,Math.abs(sn*dx+c*dz)-h[2]))<=r;});
+ return createTransportVehicleProbe(record)(x,z,r);
 }
+// A path check can inspect thousands of positions against one unchanged frame.
+// Prepare its actual chassis once, then discard the probe after that check.
+export function createTransportVehicleProbe(record){const o=transportSiteOrigin(record),f=record.work.frame,boxes=[...shovelMachines(f),shovelDumpBody(f)].flatMap(b=>{const h=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);return b.position[1]-h[1]>=80?[]:[{x:b.position[0],z:b.position[2],hx:h[0],hz:h[2],c:b.axes?1:Math.cos(b.heading??0),s:b.axes?0:Math.sin(b.heading??0)}];});return(x,z,r=0)=>{if(![x,z,r].every(Number.isFinite)||r<0)return true;const px=x-o[0],pz=z-o[2];return boxes.some(b=>{const dx=px-b.x,dz=pz-b.z;return Math.hypot(Math.max(0,Math.abs(b.c*dx-b.s*dz)-b.hx),Math.max(0,Math.abs(b.s*dx+b.c*dz)-b.hz))<=r;});};}
 
 const siteHolesCache=new WeakMap();export function transportSiteHoles(record){const o=transportSiteOrigin(record),holes=earthHoles(record.work.frame.soil);let result=siteHolesCache.get(holes);if(!result){result=[transportSiteOpening(record),...holes.map(p=>({minX:p.minX+o[0],maxX:p.maxX+o[0],minZ:p.minZ+o[2],maxZ:p.maxZ+o[2]}))];siteHolesCache.set(holes,result);}return result;}
 

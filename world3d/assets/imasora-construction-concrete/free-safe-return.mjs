@@ -1,6 +1,6 @@
-import {freeEntryPose} from './free-boarding.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
-import {walkingBlocked} from './free-contact.mjs?v=120fw';
+import {freeEntryPose} from './free-boarding.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
+import {walkingBlocked} from './free-contact.mjs?v=120gn';
 const context=p=>JSON.stringify({revision:p.revision,freeBuild:p.freeBuild,foundation:p.foundation??null});
 // This is an explicit rescue, after confirmation. It does not pretend that a
 // missing route can be walked, and never moves a vehicle or alters saved materials.

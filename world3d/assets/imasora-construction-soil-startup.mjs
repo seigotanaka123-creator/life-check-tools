@@ -1,6 +1,6 @@
-import {nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120fw';
-import {actorPose} from './imasora-construction-loader-physics.js?v=120ey';
-import {SOIL_YARDS} from './imasora-construction-world-soil.js?v=120fw';
+import {nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120gm';
+import {actorPose} from './imasora-construction-loader-physics.js?v=120gf';
+import {SOIL_YARDS} from './imasora-construction-world-soil.js?v=120gn';
 
 // This is a scene bookmark, never an alternative copy of materials or work.
 // An explicit null means the player finished the session or saved another map.

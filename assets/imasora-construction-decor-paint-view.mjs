@@ -1,8 +1,8 @@
 import * as T from'./three.module.min.js';
-import{decorItem,decorKey,decorParts,decorPatches,decorTargetFromKey}from'./imasora-construction-decor-paint.mjs?v=120fs';
-import{roomLayoutParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
-import{buildingPaintPartVisible}from'./imasora-construction-building-paint.mjs?v=120fw';
-import{highProjects,highWorldPoint}from'./imasora-construction-high-world.mjs?v=120fw';
+import{decorItem,decorKey,decorParts,decorPatches,decorTargetFromKey}from'./imasora-construction-decor-paint.mjs?v=120gn';
+import{roomLayoutParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{buildingPaintPartVisible}from'./imasora-construction-building-paint.mjs?v=120gn';
+import{highProjects,highWorldPoint}from'./imasora-construction-high-world.mjs?v=120gn';
 import{paintColor}from'./imasora-construction-concrete/paint-colors.mjs';
 const quad=(p,r)=>[[-1,-1],[1,-1],[1,1],[-1,-1],[1,1],[-1,1]].map(([x,y])=>({[p.axis]:p.plane,[p.u]:x<0?r.x0:r.x1,[p.v]:y<0?r.y0:r.y1}));
 export function createDecorPaintView(parent){

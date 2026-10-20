@@ -1,5 +1,5 @@
 import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {localToWorld} from './imasora-construction-loader-physics.js?v=120ey';
+import {localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
 const unit=a=>{const n=Math.hypot(...a);return a.map(x=>x/n);};
 export function craneGroundContext(s,heightAt,{deploy=s.work||s.deployment>0}={}){
  if(!s.rig.vehicle.field||typeof heightAt!=='function')return null;

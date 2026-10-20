@@ -1,10 +1,10 @@
 import {materialSourceUrl} from './imasora-construction-material-source.mjs';
 
-export function townReturnUrl(pageUrl, moduleUrl=import.meta.url) {
+export function townReturnUrl(pageUrl, moduleUrl=import.meta.url, arrival='construction-return') {
  const page=new URL(pageUrl);
  const source=materialSourceUrl(moduleUrl,page.searchParams.get('materialHome'));
  const town=new URL('./life-quest-walk.html',source);
- town.searchParams.set('arrival','construction-return');
+ town.searchParams.set('arrival',arrival);
  return town.href;
 }
 

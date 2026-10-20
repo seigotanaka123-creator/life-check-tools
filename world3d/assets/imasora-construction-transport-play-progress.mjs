@@ -1,5 +1,5 @@
-import {SHOVEL_STROKE} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {dumpUnloadVisual} from './imasora-construction-dump-work.mjs?v=120fw';
+import {SHOVEL_STROKE} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {dumpUnloadVisual} from './imasora-construction-dump-work.mjs?v=120gn';
 // Pour links store their duration inside the checked physical plan. Boarding
 // links store it on the link itself. Keep both shapes finite for the DOM meter.
 export function transportWorkProgress(work){

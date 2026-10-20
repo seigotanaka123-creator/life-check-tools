@@ -1,4 +1,4 @@
-import {WorldTransportWorkSession} from './imasora-construction-transport-work-session.mjs?v=120fw';
+import {WorldTransportWorkSession} from './imasora-construction-transport-work-session.mjs?v=120gn';
 
 // Reading a saved work record must never allocate soil, upgrade old quantities,
 // resume motion, or move the host character. Those are separate player actions.

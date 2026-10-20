@@ -2,7 +2,7 @@ import {vehiclePicture} from './workshop-pictures.mjs?v=120dq';
 import {paintDeckTemplate,paintPalette} from './paint-deck.mjs?v=120ds';
 import {shapePicture,toolPicture,heightPicture} from '../imasora-pop-menu.mjs?v=120dg';
 import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=119bf';
-import {freeWorkEditorTemplate} from './free-work-editor.mjs?v=120fw';
+import {freeWorkEditorTemplate} from './free-work-editor.mjs?v=120gn';
 import {CONCRETE_CAMERA_MODES} from './monster-camera.mjs';
 import {constructionMovePadTemplate} from './move-pad.mjs?v=119bf';
 import {STENCIL_TEMPLATES} from './free-stencil.mjs?v=120e';

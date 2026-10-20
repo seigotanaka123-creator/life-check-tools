@@ -1,7 +1,7 @@
 import {fleetDoor,fieldPoint,FLEET} from './imasora-construction-shared-field.mjs?v=120ey';
-import {transitionPoints,LOADER} from './imasora-construction-loader-physics.js?v=120ey';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ey';
-import {DUMP_CAB} from './imasora-construction-dump-cab.mjs?v=120ey';
+import {transitionPoints,LOADER} from './imasora-construction-loader-physics.js?v=120gf';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120gf';
+import {DUMP_CAB} from './imasora-construction-dump-cab.mjs?v=120gf';
 
 // Current native access paths, translated to a shared-world vehicle pose.
 // Scene owner validates surrounding works and the current ground separately.

@@ -1,8 +1,8 @@
 import {DUMP_SOIL} from './imasora-construction-dump-soil.js?v=526';
 import * as THREE from './three.module.min.js';
 import {measureCharacter} from './imasora-construction-layout.js?v=120ds';
-import {DUMP} from './imasora-construction-dump-truck.js?v=120ey';
-import {DUMP_CAB,dumpCabLift,dumpDriverLocal,dumpPassengerLocal,dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120ey';
+import {DUMP} from './imasora-construction-dump-truck.js?v=120gf';
+import {DUMP_CAB,dumpCabLift,dumpDriverLocal,dumpPassengerLocal,dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120gf';
 const material=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.65,...extra});
 function box(parent,name,w,h,d,x,y,z,mat){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.name=name;o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o;}
 export function createDumpModel(){

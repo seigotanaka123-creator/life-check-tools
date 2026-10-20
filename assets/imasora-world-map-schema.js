@@ -1,3 +1,4 @@
+import {COAST_WORLD} from './imasora-coast-layout.mjs?v=120go';
 export const IMASORA_WORLD_SCHEMA_VERSION = 4;
 
 const map = ({ world = {}, source, palette, spawn, entry, fixedStructures = [], buildZones, decoration, buildCatalog }) => ({
@@ -156,16 +157,18 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     buildCatalog: [],
   }),
   coast: map({
+    world: COAST_WORLD,
     source: {
       title: "海岸マップ",
-      description: "正式な海岸マップの道路・海岸・6区画を、そのまま歩ける3Dワールドです。",
-      layout: "海岸の街ベース画像に描かれた橋2・道路・海岸・6区画を同一比率で投影",
+      description: "街から橋を渡って、ひかりの浜へ。桟橋・灯台・潮だまりを自由に巡る小さな海辺です。",
+      layout: "街は北、海は南。既存の建物と橋2の座標を保つ立体海岸",
       pixelSize: [1536, 1024],
-      texture: "./assets/imasora-coastal-town-base-v1.png",
+
       references: ["assets/imasora-coastal-town-base-v1.png", "assets/imasora-coastal-town-map.js"],
     },
     palette: { ground: 0xdabf87, edge: 0x6dbbd0, fog: 0xb2d9e4, accent: 0xffd37c },
-    spawn: { point: [.27, .28], heading: Math.PI * .35 },
+    // New visits arrive from town at the north end; saved coast positions are retained.
+    spawn: { point: [.145, -.5833333333333333], heading: 0 },
     entry: {
       id: "coast-bridge",
       name: "橋2",
@@ -186,7 +189,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
       { id: "coast-plot-south", name: "海岸南区画", point: [.4004, .6006], size: [126, 66] },
     ],
     decoration: {
-      waterPlanes: [{ point: [.76, .82], size: [366, 174], color: 0x218bbb }],
+      coastOpenWorld: true,
     },
     buildCatalog: [
       { id: "coast-house", name: "海岸の家", note: "白レンが暮らせる実寸の家", color: 0xffd8b1, size: [76, 58, 66] },

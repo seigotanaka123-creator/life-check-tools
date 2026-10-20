@@ -1,8 +1,8 @@
 import * as T from '../three.module.min.js';
-import {freeCell} from './free-build-state.mjs?v=120fw';
-import {constructionBase} from './free-supported-build.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
+import {constructionBase} from './free-supported-build.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {placePaintPatch,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120fw';
+import {placePaintPatch,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120gn';
 import {placeWorkTargetLabel} from './work-target-layout.mjs?v=120dt';
 
 // A visual-only description derived from the same selected cells as the action.

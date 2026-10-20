@@ -1,10 +1,10 @@
 import {canonical} from './imasora-construction-state.js';
-import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {createScoopDumpWork,validateScoopDumpWork,SCOOP_DUMP_FORMAT,SCOOP_DUMP_SCOPE} from './imasora-construction-fragment-scoop.mjs?v=120fw';
-import {createBucketDumpWork,linkedExcavatorSeat,linkedArmClear} from './imasora-construction-bucket-dump.mjs?v=120fw';
-import {shovelMachineState,shovelStanding,shovelDumpPoint,shovelMachines,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {dumpPositionSafe,dumpBoxesOverlap} from './imasora-construction-dump-work.mjs?v=120fw';
-import {SITE} from './imasora-construction-loader-physics.js?v=120ey';
+import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {createScoopDumpWork,validateScoopDumpWork,SCOOP_DUMP_FORMAT,SCOOP_DUMP_SCOPE} from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {createBucketDumpWork,linkedExcavatorSeat,linkedArmClear} from './imasora-construction-bucket-dump.mjs?v=120gn';
+import {shovelMachineState,shovelStanding,shovelDumpPoint,shovelMachines,shovelSoilBoxes} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {dumpPositionSafe,dumpBoxesOverlap} from './imasora-construction-dump-work.mjs?v=120gn';
+import {SITE} from './imasora-construction-loader-physics.js?v=120gf';
 
 export const WORLD_TRANSPORT_SCOPE='imasora-world-soil-transport-v1';
 const check=(v,t)=>{if(!v)throw Error('土の保存：'+t);};

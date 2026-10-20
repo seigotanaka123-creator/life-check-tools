@@ -1,6 +1,6 @@
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
-import {shovelDropTarget,shovelDropSurface,shovelStanding,shovelGroundHeight,walkShovelWork,turnShovelWork} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120ey';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
+import {shovelDropTarget,shovelDropSurface,shovelStanding,shovelGroundHeight,walkShovelWork,turnShovelWork} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120gf';
 
 // Selection covers the yard. The actual placement remains a short, checked
 // shovel stroke: plan real walking to a safe stance, never relocate the actor.

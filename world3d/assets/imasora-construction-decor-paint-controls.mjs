@@ -1,9 +1,9 @@
 import * as T from'./three.module.min.js';
-import{shapedHighParts}from'./imasora-construction-high-shape.mjs';
-import{ROOM_KINDS}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
-import{decorItem,decorKey,decorPaintPlan,DECOR_FACES}from'./imasora-construction-decor-paint.mjs?v=120fs';
-import{decorPainterReady,decorPaintTarget,decorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120fw';
-import{highWorldPoint}from'./imasora-construction-high-world.mjs?v=120fw';
+import{shapedHighParts}from'./imasora-construction-high-shape.mjs?v=120gn';
+import{ROOM_KINDS}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{decorItem,decorKey,decorPaintPlan,DECOR_FACES}from'./imasora-construction-decor-paint.mjs?v=120gn';
+import{decorPainterReady,decorPaintTarget,decorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120gn';
+import{highWorldPoint}from'./imasora-construction-high-world.mjs?v=120gn';
 import{BRIGHT_PAINTS}from'./imasora-construction-concrete/paint-colors.mjs';
 import{colorStudioTemplate,installColorStudios}from'./imasora-construction-concrete/color-studio.mjs';
 import{freeStepUndoTarget}from'./imasora-construction-concrete/free-step-undo.mjs?v=120ft';
@@ -30,5 +30,5 @@ export function createDecorPaintControls({host,record,buildingId,project,credits
  }
  return{root,refresh,close,get opened(){return opened;},get target(){return target;},get floor(){return floor;},get ceiling(){return kind==='ceiling';},get selecting(){return opened&&picking&&ready();},get viewTarget(){if(!target)return null;return highWorldPoint(record().site,{x:32,y:floor*40+18,z:0});},pickRay(ray){const r=record(),matrix=new T.Matrix4().makeRotationY(r.site.turn*Math.PI/2);matrix.setPosition(r.site.x,r.site.y,r.site.z);const local=ray.ray.clone().applyMatrix4(matrix.invert()),choices=list();let nearest=null;for(let n=0;n<choices.length;n++){const t=choices[n],item=t.kind==='fixture'?wItem(r.work,t.itemId):null,parts=t.kind==='fixture'?null:shapedHighParts(t.kind==='floor'?t.floor:t.floor+1,r.work),boxes=item?item.boxes:[parts[t.part]];for(const p of boxes){const hit=local.intersectBox(new T.Box3(new T.Vector3(p.x-p.w/2,p.y-p.h/2,p.z-p.d/2),new T.Vector3(p.x+p.w/2,p.y+p.h/2,p.z+p.d/2)),new T.Vector3());if(hit){const d=hit.distanceTo(local.origin);if(!nearest||d<nearest.d)nearest={n,d};}}}if(nearest){index=nearest.n;choose();}}};
 }
-import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120fr';
+import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
 function wItem(w,id){const i=w.roomLayout.items.find(i=>i.id===id);return{boxes:roomItemParts(i)};}

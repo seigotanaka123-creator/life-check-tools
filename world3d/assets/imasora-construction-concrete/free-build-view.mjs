@@ -1,49 +1,49 @@
-import {createThreeJump} from '../imasora-construction-locomotion.mjs?v=120eg';
-import {walkingObjectsBlocked} from './free-contact.mjs?v=120fw';
-import {concreteWorldDoor,concreteDoorArrival} from './native-door.mjs?v=120fw';
-import {planConcreteDoorRoute} from './free-door-route.mjs?v=120fw';
+import {createThreeJump} from '../imasora-construction-locomotion.mjs?v=120gf';
+import {walkingObjectsBlocked} from './free-contact.mjs?v=120gn';
+import {concreteWorldDoor,concreteDoorArrival} from './native-door.mjs?v=120gn';
+import {planConcreteDoorRoute} from './free-door-route.mjs?v=120gn';
 import {FIELD_RUN_SPEED} from '../imasora-construction-shared-field.mjs?v=120ey';
 import {rebaseFieldPose,retainsFieldPositions} from './free-shared-origin.mjs?v=120eh';
-import {createWorkTarget,workTargetCamera} from './work-target.mjs?v=120fw';
+import {createWorkTarget,workTargetCamera} from './work-target.mjs?v=120gn';
 import {createPaintMaterials} from './paint-colors.mjs?v=120ds';
-import {foundationWalkHeight,foundationAccessProblem,assertRaisedPaintSupport} from './free-foundation-access.mjs?v=120fw';
-import {createFoundationAccessMotion} from './free-foundation-access-motion.mjs?v=120fw';
-import {foundationContains} from './free-foundation-state.mjs?v=120fw';
-import {footingAt,footingSegment} from './free-footing.mjs?v=120fw';
+import {foundationWalkHeight,foundationAccessProblem,assertRaisedPaintSupport} from './free-foundation-access.mjs?v=120gn';
+import {createFoundationAccessMotion} from './free-foundation-access-motion.mjs?v=120gn';
+import {foundationContains} from './free-foundation-state.mjs?v=120gn';
+import {footingAt,footingSegment} from './free-footing.mjs?v=120gn';
 import {walkFactor} from '../imasora-construction-travel-input.mjs';
 import {rotateFreeWork} from './free-work-rotation.mjs';
 import {freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
-import {SUPPORTED_WORK_MOVE,newSupportedWorkMoveReceipt,supportedWorkMoveEnvironmentProblem} from './free-supported-work-move.mjs?v=120fw';
-import {constructionBase,assertFoundationSupport} from './free-supported-build.mjs?v=120fw';
+import {SUPPORTED_WORK_MOVE,newSupportedWorkMoveReceipt,supportedWorkMoveEnvironmentProblem} from './free-supported-work-move.mjs?v=120gn';
+import {constructionBase,assertFoundationSupport} from './free-supported-build.mjs?v=120gn';
 import * as T from '../three.module.min.js';
 import {createMonsterCamera} from './monster-camera.mjs';
 import {viewRelativeTravel} from './monster-travel-input.mjs';
-import {createFreePaintLayer,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120fw';
-import {assertMaskingPlan,maskingContactAction} from './free-masking-operation.mjs?v=120fw';
-import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120fw';
+import {createFreePaintLayer,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120gn';
+import {assertMaskingPlan,maskingContactAction} from './free-masking-operation.mjs?v=120gn';
+import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120gn';
 import {FLOOR_COLORS} from './floor-parts.mjs?v=120ds';
-import {createConcreteVehicle} from './vehicle-models.mjs?v=120fw';
-import {FREE_CONTACT_ACTIONS,walkingBlocked,walkingSurface} from './free-contact.mjs?v=120fw';
-import {concreteDoor,freeBoardProblem,freeBoardStatus,freeEntryPose,freeLeaveProblem} from './free-boarding.mjs?v=120fw';
-import {walkingGroundAt,walkingGroundSegment,walkingGroundRotation,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120fw';
-import {createFreeContactMotion} from './free-contact-motion.mjs?v=120fw';
-import {FREE_CAST_ACTIONS,CAST_PORTS,castPoint} from './free-casting.mjs?v=120fw';
-import {createFreeCastingMotion} from './free-casting-motion.mjs?v=120fw';
-import {FREE_FRAME_ACTIONS,FRAME_RACK} from './free-frames.mjs?v=120fw';
-import {createFreeFrameMotion,frameRackPose} from './free-frame-motion.mjs?v=120fw';
-import {FREE_VEHICLE_ACTIONS,vehicleActionProblem,vehiclePoseProblem} from './free-vehicle-contact.mjs?v=120fw';
-import {createFreeVehicleMotion} from './free-vehicle-motion.mjs?v=120fw';
+import {createConcreteVehicle} from './vehicle-models.mjs?v=120gn';
+import {FREE_CONTACT_ACTIONS,walkingBlocked,walkingSurface} from './free-contact.mjs?v=120gn';
+import {concreteDoor,freeBoardProblem,freeBoardStatus,freeEntryPose,freeLeaveProblem} from './free-boarding.mjs?v=120gn';
+import {walkingGroundAt,walkingGroundSegment,walkingGroundRotation,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120gn';
+import {createFreeContactMotion} from './free-contact-motion.mjs?v=120gn';
+import {FREE_CAST_ACTIONS,CAST_PORTS,castPoint} from './free-casting.mjs?v=120gn';
+import {createFreeCastingMotion} from './free-casting-motion.mjs?v=120gn';
+import {FREE_FRAME_ACTIONS,FRAME_RACK} from './free-frames.mjs?v=120gn';
+import {createFreeFrameMotion,frameRackPose} from './free-frame-motion.mjs?v=120gn';
+import {FREE_VEHICLE_ACTIONS,vehicleActionProblem,vehiclePoseProblem} from './free-vehicle-contact.mjs?v=120gn';
+import {createFreeVehicleMotion} from './free-vehicle-motion.mjs?v=120gn';
 import {vehicleGroundPose,applyVehicleGround,placeVehicleDriver} from './free-vehicle-ground.mjs?v=120ek';
-import {PIPE_ACTIONS,pipeRoute,pipeProblem,pipeContactPath,pipeWalkingBlocked,retainInstalledPipe,supplyHoseMotion,advanceSupplyHose} from './free-boom-contact.mjs?v=120fw';
+import {PIPE_ACTIONS,pipeRoute,pipeProblem,pipeContactPath,pipeWalkingBlocked,retainInstalledPipe,supplyHoseMotion,advanceSupplyHose} from './free-boom-contact.mjs?v=120gn';
 import {hoseBlocks} from './free-hose-shape.mjs';
-import {FOUNDATION_ACTIONS,foundationParts} from './free-foundation-state.mjs?v=120fw';
-import {createFoundationHandMotion,createDeferredFoundationHandMotion} from './free-foundation-hand-motion.mjs?v=120fw';
-import {safeReturnPlan,assertSafeReturn} from './free-safe-return.mjs?v=120fw';
-import {vehicleRescuePlan,assertVehicleRescue,newVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120fw';
-import {soleClearance,assertLandingSoles} from './free-walking-ground.mjs?v=120fw';
-import {createPipeMotion} from './free-boom-motion.mjs?v=120fw';
+import {FOUNDATION_ACTIONS,foundationParts} from './free-foundation-state.mjs?v=120gn';
+import {createFoundationHandMotion,createDeferredFoundationHandMotion} from './free-foundation-hand-motion.mjs?v=120gn';
+import {safeReturnPlan,assertSafeReturn} from './free-safe-return.mjs?v=120gn';
+import {vehicleRescuePlan,assertVehicleRescue,newVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120gn';
+import {soleClearance,assertLandingSoles} from './free-walking-ground.mjs?v=120gn';
+import {createPipeMotion} from './free-boom-motion.mjs?v=120gn';
 import {HOSE_TRANSFER_ACTIONS,createHoseTransferMotion} from './free-hose-meter.mjs?v=120d';
-import {createWorkPlatformSession} from './free-work-session.mjs?v=120fw';
+import {createWorkPlatformSession} from './free-work-session.mjs?v=120gn';
 
 
 export const FREE_WALK_SPEED=84;
@@ -246,7 +246,7 @@ export function createFreeBuildView({scene,camera,model,host}){
   if(work?.motion){const w=work;try{if(project.foundation&&(['FREE_FRAME','FREE_FRAME_RAISED'].includes(w.a.type)||constructionBase(current)&&[...FREE_FRAME_ACTIONS,...FREE_CAST_ACTIONS].includes(w.a.type)))assertFoundationSupport(project,foundationEnvironment());if(!FREE_VEHICLE_ACTIONS.has(w.a.type)&&!HOSE_TRANSFER_ACTIONS.has(w.a.type)){const problem=vehicleActionProblem(current,w.a,environment)||pipeProblem(current,w.a,pipeExternal,supportHeightAt);if(problem)throw Error(problem);}if(w.masking)assertMaskingPlan(current,w.masking);if(w.a.type==='FREE_PAINT')assertRaisedPaintSupport(project,w.a,foundationEnvironment().heightAt,foundationEnvironment().blockedAt);if(w.motion.tick(dt)){settling={action:w.a,pose:w.motion.endPose,motion:w.motion,masking:w.masking};work=null;resetTool();w.resolve(w.motion.receipt);}}catch(e){cancel(e);}cameraTick(dt);targetCue?.setVisible(false);return;}
   cameraTick(dt);targetCue?.tick();
  }
- return{root,vehicles,focusUpper(anchor,detail=null,startAngle=null){const changed=JSON.stringify(anchor)!==JSON.stringify(upperFocus);upperFocus=anchor;if(detail!==null)upperDetail=detail;cameraHold=null;if(anchor&&changed)angle=startAngle??(.84+anchor.turn*Math.PI/2);if(active)cameraTick();},stepUndoProblem,jump(){if(!active||work||settling||current.aboard)return false;const supported=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(!supported||Math.abs(supported.height-footPose.y)>.15)return false;cameraHold=null;stopWalking();return jump.start();},get airborne(){return jump.airborne;},get jumpCount(){return jump.count;},setJumpCeilingAt:fn=>{jumpCeilingAt=fn;},
+ return{root,vehicles,focusUpper(anchor,detail=null,startAngle=null){const changed=JSON.stringify(anchor)!==JSON.stringify(upperFocus);upperFocus=anchor;if(detail!==null)upperDetail=detail;cameraHold=null;if(anchor&&changed)angle=startAngle??(.84+anchor.turn*Math.PI/2);if(active)cameraTick();},stepUndoProblem,jump(){if(!active||work||settling||current.aboard)return false;const supported=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(!supported||Math.abs(supported.height-footPose.y)>.15)return false;cameraHold=null;stopWalking();return jump.start();},releaseJump(){jump.release();},get airborne(){return jump.airborne;},get jumpCount(){return jump.count;},setJumpCeilingAt:fn=>{jumpCeilingAt=fn;},
   nativeDoor(name){return concreteWorldDoor(current,name,{blockedAt:groundExternal,heightAt:supportHeightAt});},
   nativeArrival(name,pose){return concreteDoorArrival(current,name,pose,{blockedAt:groundExternal,heightAt:supportHeightAt});},
   pedestrianBlockedAt(x,z){if(!current?.location)return false;return walkingObjectsBlocked(current,x-current.location.x,z-current.location.z,(a,b,m)=>workPlatform.blocked(a,b,m)||!!project?.foundation&&foundationContains(project.foundation,a-project.foundation.x,b-project.foundation.z,m),null,supportHeightAt);},

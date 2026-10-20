@@ -1,6 +1,6 @@
 // 9-1a: finite, session-only ordinary soil. No wallet or world-save access.
-import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,worldToLocal,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js?v=120ey';
-import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js?v=120ey';
+import {initialLoaderState,actLoader,stepLoader,actorPose,localToWorld,worldToLocal,polygonsOverlap,polygon,approach} from './imasora-construction-loader-physics.js?v=120gf';
+import {EX_ACCESS,excavatorAccessAction,excavatorAccessClear,upgradeExcavatorAccess} from './imasora-construction-excavator-access.js?v=120gf';
 import {bucketOffset,isBackhoe,isContactDig} from './imasora-construction-excavator-bucket.js';
 import {toothContacts,bucketEnvironmentHits,bucketContactGeometry,prismTouchesBox,prismBoxPenetration} from './imasora-construction-excavator-contact.js?v=120fc';
 export const CELL=8;

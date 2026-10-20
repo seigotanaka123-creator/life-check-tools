@@ -1,5 +1,5 @@
 // Excavator-only access. The wheel loader keeps its original low floor/path.
-import {LOADER,WALKER,localToWorld,worldToLocal,routeClear,samplePath} from './imasora-construction-loader-physics.js?v=120ey';
+import {LOADER,WALKER,localToWorld,worldToLocal,routeClear,samplePath} from './imasora-construction-loader-physics.js?v=120gf';
 import {atDriverDoor} from './imasora-construction-boarding.js';
 export const EX_ACCESS=Object.freeze({version:2,lift:9,floor:LOADER.floor+9,trackTop:16.6,trackWidth:10.5,trackLength:76.4});
 export function trackBlocksPerson(p,vehicle){

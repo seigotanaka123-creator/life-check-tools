@@ -1,7 +1,7 @@
 import * as T from './three.module.min.js';
 import {FLEET} from './imasora-construction-shared-field.mjs?v=120ey';
-import {createFleetModel,fleetLesson,disposeFleetTree} from './imasora-construction-fleet-model.mjs?v=120fw';
-import {overlayStyle,trackConstructionOverlay,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120ea';
+import {createFleetModel,fleetLesson,disposeFleetTree} from './imasora-construction-fleet-model.mjs?v=120gn';
+import {overlayStyle,trackConstructionOverlay,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
 
 // One WebGL context serves the large preview and all seven actual-model cards.
 // It exists only while this picker is open. There are no game-state mutations.

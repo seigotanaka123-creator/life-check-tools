@@ -1,8 +1,10 @@
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
 // Finite received floors use the approved joint solver, never its demo inventory.
-import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=120fw';
-import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120fw';
-import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js?v=120fw';
-import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120fw';
+import{BEAM_ISSUE,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
+import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=120gn';
+import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120gn';
+import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js?v=120gn';
+import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120gn';
 export {component,floatReadout,floatingView,floatingPlacement,stepFloating,joinOption,detachOption};
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);};
 // v460 saves are read without mutation. Their IDs, poses and cargo stay intact.
@@ -14,8 +16,9 @@ export function worldAssemblyAction(state,action,id,external=[],landing=null){
   if(action==='pause')return purchasedTimberAction(s,action,id);
   ok(!s.paused,'一時停止中です。');ok(!s.rig.transition,'乗り降りの完了を待ってください。');
   if(s.joining)return{...s,message:'接合中です。次の操作は予約しません。'};
-  if(action==='issue'||action==='return-stock')return purchasedTimberAction(s,action,id,external);
+  if(action==='issue'||action===BEAM_ISSUE||action==='return-stock')return purchasedTimberAction(s,action,id,external);
   ok(['join','detach','interact','mode','snap','home','pick','rotate','release','place'].includes(action),'不明な木材操作です。');
+  ok(action!=='release'||!isBeamBundle(s.parts.find(p=>p.id===s.held))&&!isKitCargo(s.parts.find(p=>p.id===s.held)),'角材の束は浮かせず、地面や床の上に置こう。');
   if(action==='join'){
     const o=joinOption(s);ok(o.ok,o.reason);const n=copy(s);beginJoin(n,o);n.assemblyRevision++;n.joining.operation=n.assemblyRevision;return n;
   }

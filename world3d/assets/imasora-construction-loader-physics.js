@@ -1,4 +1,4 @@
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump} from './imasora-construction-locomotion.mjs?v=120eg';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
 import {LEGACY_WORK_AREA,workArea,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
 import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs';
 // Stage 3-1: flat-ground, kinematic vehicle/boarding prototype. No game-save access.
@@ -132,6 +132,6 @@ export function stepLoader(state,input,dt,obstacles=OBSTACLES){
   for(let i=0;i<count;i++){if(walkingClear({...p,x:p.x+dx/count},state.vehicle,obstacles))p.x+=dx/count;if(walkingClear({...p,z:p.z+dz/count},state.vehicle,obstacles))p.z+=dz/count;}
   if(Math.hypot(dx,dz)>.0001)p.heading=Math.atan2(dx,dz);
   // Special 3D walkers call the flat loader with {} and retain vertical ownership.
-  if(Object.hasOwn(input,'jump')){p.grounded=(p.y??0)<=0&&(p.vy??0)<=0;landThreeJump(p);if(input.jump&&!p.jumpHeld)beginThreeJump(p);p.jumpHeld=!!input.jump;if(!p.grounded){p.vy=(p.vy??0)-SKY_JUMP_GRAVITY*dt;p.y=Math.max(0,p.y+p.vy*dt);if(!p.y){p.grounded=true;landThreeJump(p);}}}
+  if(Object.hasOwn(input,'jump')){p.grounded=(p.y??0)<=0&&(p.vy??0)<=0;landThreeJump(p);if(input.jump&&!p.jumpHeld)beginThreeJump(p);updateJumpHold(p,input.jump);if(!p.grounded){const dy=(p.vy??0)*dt-SKY_JUMP_GRAVITY*dt*dt/2;p.vy=(p.vy??0)-SKY_JUMP_GRAVITY*dt;p.y=Math.max(0,p.y+dy);if(!p.y){p.grounded=true;landThreeJump(p);}}}
   next.player=p;return next;
 }

@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {packTransport,unpackTransport} from './imasora-construction-water-transport.js?v=120fb';
+import {packTransport,unpackTransport} from './imasora-construction-water-transport.js?v=120gf';
 export const TRANSPORT_DB='imasora-construction-water-transport-development-v1';
 export class TransportStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=TRANSPORT_DB;}}
 export class TransportSession{

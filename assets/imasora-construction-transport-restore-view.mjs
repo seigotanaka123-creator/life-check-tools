@@ -1,6 +1,6 @@
 import {sameConstructionRecordValue as same} from './imasora-construction-record-equality.mjs';
 import {isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120fw';
+import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120gn';
 const amount=q=>(q/8).toLocaleString('ja-JP',{maximumFractionDigits:3})+'すくい';
 const mode=s=>({foot:'歩いている',driving:'ダンプに乗っている',excavating:'ショベルに乗っている'}[s]??'作業中');
 const places=[['terrain','地面の土'],['loose','置いた土'],['shovel','手元の土'],['bucket','ショベルの土'],['dump','荷台の土'],['storage','保管箱の土']];

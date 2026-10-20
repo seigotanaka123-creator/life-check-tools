@@ -1,10 +1,10 @@
-import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120ey';
+import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120gf';
 import {groundLocal} from './imasora-construction-vehicle-ground-frame.mjs';
 import * as THREE from './three.module.min.js';
-import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js?v=120ey';
-import {tip,hook} from './imasora-construction-crane.js?v=120fw';
-import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
-import {outriggerLocalVolumes,craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120fw';
+import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js?v=120gf';
+import {tip,hook} from './imasora-construction-crane.js?v=120gn';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120gf';
+import {outriggerLocalVolumes,craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120gn';
 const material=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.55,metalness:.18,...extra});
 function box(parent,w,h,d,x,y,z,mat,name){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.name=name;m.castShadow=m.receiveShadow=true;parent.add(m);return m;}
 function segment(mesh,a,b){const d=b.clone().sub(a);mesh.position.copy(a).add(b).multiplyScalar(.5);mesh.scale.y=d.length();mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());}

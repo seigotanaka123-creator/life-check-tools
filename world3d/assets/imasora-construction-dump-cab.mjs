@@ -1,4 +1,4 @@
-import {LOADER,localToWorld,worldToLocal,samplePath} from './imasora-construction-loader-physics.js?v=120ey';
+import {LOADER,localToWorld,worldToLocal,samplePath} from './imasora-construction-loader-physics.js?v=120gf';
 
 // The saved driving anchor is historical. Move the visible cab and driver
 // together without rewriting that anchor, terrain, inventory or checkpoints.

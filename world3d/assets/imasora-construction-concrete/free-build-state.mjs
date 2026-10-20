@@ -1,20 +1,20 @@
-import{validateDecorAction,applyDecorPaint}from'../imasora-construction-decor-paint.mjs?v=120fs';
-import {validateBuildingPaintAction,applyBuildingPaint} from '../imasora-construction-building-paint.mjs?v=120fw';
+import{validateDecorAction,applyDecorPaint}from'../imasora-construction-decor-paint.mjs?v=120gn';
+import {validateBuildingPaintAction,applyBuildingPaint} from '../imasora-construction-building-paint.mjs?v=120gn';
 import {HIGH_CAST_SPECS,validateHighCastingAction,applyHighCasting,highCastingStock,highCastingBoards} from './high-casting-state.mjs?v=120ft';
 import {parkedConcreteVehicles} from './free-parking.mjs?v=120ey';
 import {retainFieldVehicles} from './free-shared-origin.mjs?v=120eh';
 import {foundationVehicleSweepBlocked} from './free-vehicle-shape.mjs';
 import {lastProjectOperation} from './project-history.mjs';
-import {constructionBase,preparedFrameBuild,supportedWorkMatches} from './free-supported-build.mjs?v=120fw';
-import {foundationBoardCount} from './free-foundation-state.mjs?v=120fw';
+import {constructionBase,preparedFrameBuild,supportedWorkMatches} from './free-supported-build.mjs?v=120gn';
+import {foundationBoardCount} from './free-foundation-state.mjs?v=120gn';
 import {createMixer,availableMixCells,ingredientAmount,startMix,advanceMix,cancelMix} from './mixing.mjs';
 import {freeWorkMask,freePlacedFill,freeWorkCells} from './free-work-parts.mjs';
 import {rotateFreeWork} from './free-work-rotation.mjs';
-import {supportedWorkMoveProblem} from './free-supported-work-move.mjs?v=120fw';
-import {freeWorkMoveProblem} from './free-work-move.mjs?v=120fw';
-import {freeWorkPartsProblem} from './free-work-placement.mjs?v=120fw';
+import {supportedWorkMoveProblem} from './free-supported-work-move.mjs?v=120gn';
+import {freeWorkMoveProblem} from './free-work-move.mjs?v=120gn';
+import {freeWorkPartsProblem} from './free-work-placement.mjs?v=120gn';
 import {validPaintColor} from './paint-colors.mjs?v=120ds';
-import {FOUNDATION_ACTIONS,validateFoundationDesign,applyFoundation} from './free-foundation-state.mjs?v=120fw';
+import {FOUNDATION_ACTIONS,validateFoundationDesign,applyFoundation} from './free-foundation-state.mjs?v=120gn';
 import {FREE_STEP_ACTIONS} from './free-step-undo.mjs?v=120ft';
 import {PAINT_REMOVE_COLOR,paintResultColor} from './free-paint-removal.mjs?v=120dm';
 

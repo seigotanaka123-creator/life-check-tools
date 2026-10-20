@@ -44248,7 +44248,7 @@ function renderNewOpeningScreen() {
 }
 function scheduleNewOpeningScreenReveal() {
   const opening = document.getElementById("newOpeningScreen");
-  if (new URLSearchParams(location.search).get("arrival") === "construction-return") {
+  if (["construction-return", "coast-return"].includes(new URLSearchParams(location.search).get("arrival"))) {
     document.body.classList.remove("loading-screen-active", "new-opening-active");
     if (opening) opening.hidden = true;
     switchScreen("town");
@@ -45219,6 +45219,11 @@ function townRailwaySkyWorldUrl(pageUrl = window.location.href) {
     destination.port = "8877";
   }
   destination.searchParams.set("arrival", "town-station");
+  return destination.href;
+}
+function townCoastWorldUrl(pageUrl = window.location.href) {
+  const destination = new URL(townConstructionWorldUrl(pageUrl));
+  destination.searchParams.set("arrival", "town-bridge2");
   return destination.href;
 }
 function townConstructionWorldUrl(pageUrl = window.location.href) {
@@ -58325,6 +58330,10 @@ function switchScreen(screen, townArea = "map") {
   syncAmbientBgmBoundary();
   if (screen === "skyMap") {
     window.location.assign(townRailwaySkyWorldUrl());
+    return;
+  }
+  if (screen === "coastalTown") {
+    window.location.assign(townCoastWorldUrl());
     return;
   }
   blurActiveTextInput();

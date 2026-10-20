@@ -1,8 +1,8 @@
-import {earthBaseReader} from './imasora-construction-field-earth.mjs?v=120fc';
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
-import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120fw';
-import {PLOT} from './imasora-construction-excavator.js?v=120fc';
-import {SITE} from './imasora-construction-loader-physics.js?v=120ey';
+import {earthBaseReader} from './imasora-construction-field-earth.mjs?v=120gf';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
+import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {PLOT} from './imasora-construction-excavator.js?v=120gf';
+import {SITE} from './imasora-construction-loader-physics.js?v=120gf';
 
 // Native terrain is a 2-unit grid. Inspect every cell touched by the tyre,
 // Include steering and the projected shift from tilt/suspension. Five isolated

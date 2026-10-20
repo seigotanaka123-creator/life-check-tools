@@ -1,4 +1,4 @@
-import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120fw';
+import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120gn';
 // A bounded horizontal route for the articulated extension, under the ceiling.
 // Never route the actor through these points or bypass a physical collision.
 const caches=new Map();

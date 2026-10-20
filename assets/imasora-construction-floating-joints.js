@@ -1,5 +1,7 @@
-import {tip,pickOption} from './imasora-construction-crane.js?v=120fw';
-import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js?v=120fw';
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
+import {tip,pickOption} from './imasora-construction-crane.js?v=120gn';
+import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js?v=120gn';
 export const JOIN_SECONDS=1.2;
 function dimensions(p){
   const turn=Math.round(p.angle/(Math.PI/2));
@@ -22,6 +24,8 @@ function pathHit(s,start,end){
 }
 export function joinOption(s){
   const p=s.parts.find(p=>p.id===s.held);
+  if(isKitCargo(p))return{ok:false,reason:'建築キットは受取台へ渡そう。'};
+  if(isBeamBundle(p))return{ok:false,reason:'角材の束は床に接合せず、そのまま置こう。'};
   let reason=s.joining?'接合中です。次の操作は予約しません。':!p?'接合したい火星木材を吊ってください。':p.materialId!=='mars-timber'?'接合できるのは火星木材の床同士です。':s.rotation?'90°回転が終わるまで待ってください。':s.rig.mode!=='driving'||!s.work||s.deployment<1?'クレーン作業の準備を終えてください。':!dimensions(p)?'床を90°単位の向きへ揃えてください。':'';
   if(reason)return{ok:false,reason};
   const pd=dimensions(p),options=[];

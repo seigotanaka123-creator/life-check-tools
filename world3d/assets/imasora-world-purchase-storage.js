@@ -1,5 +1,5 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {createWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,projectLinkedShop,packWorldPurchaseLedger,unpackWorldPurchaseLedger} from './imasora-world-purchase-ledger.js?v=120fw';
+import {createWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,projectLinkedShop,packWorldPurchaseLedger,unpackWorldPurchaseLedger} from './imasora-world-purchase-ledger.js?v=120gn';
 export const WORLD_LINK_DBS=Object.freeze({copy:'imasora-world-purchase-copy-development-v1',fixture:'imasora-world-purchase-fixture-development-v1'});
 export class WorldPurchaseStore extends IndexedConstructionStore{
   constructor(mode='copy',idb=globalThis.indexedDB){super(idb);if(!Object.hasOwn(WORLD_LINK_DBS,mode))throw Error('不明な接続テストです。');this.name=WORLD_LINK_DBS[mode];this.mode=mode;}

@@ -1,6 +1,6 @@
 // No-save inspection fixtures only. Never used by a normal saved session.
-import {initialCrane,tip} from './imasora-construction-crane.js?v=120fw';
-import {cranePlayer} from './imasora-construction-crane-walk.js?v=120fw';
+import {initialCrane,tip} from './imasora-construction-crane.js?v=120gn';
+import {cranePlayer} from './imasora-construction-crane-walk.js?v=120gn';
 export function craneAssemblyExample(kind,{finishWithCrane=false}={}){
   if(!['bridge','house'].includes(kind))throw new Error('確認する組立例が不正です。');
   const s=initialCrane(),part=id=>s.parts.find(p=>p.id===id),set=(id,data)=>Object.assign(part(id),data,{fixed:true});

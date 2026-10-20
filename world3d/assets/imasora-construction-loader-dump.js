@@ -1,5 +1,5 @@
 // One deliberate press, not a held-input timing puzzle. Transient intent is never saved.
-import {stepWork} from './imasora-construction-loader-work.js?v=120ey';
+import {stepWork} from './imasora-construction-loader-work.js?v=120gf';
 export function startDump(w){
   if(w.loader.mode!=='driving'||w.loader.transition||!w.load)return null;
   return{elapsed:0,stalled:0};

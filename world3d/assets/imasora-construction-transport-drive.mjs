@@ -1,9 +1,9 @@
-import {excavatorGroundFrame} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {shovelMachines,shovelMachineState,shovelSoilBoxes,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120fc';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120fw';
-import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {linkedArmClear,linkedExcavatorSeat} from './imasora-construction-bucket-dump.mjs?v=120fw';
+import {excavatorGroundFrame} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {shovelMachines,shovelMachineState,shovelNearbySoil,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {linkedArmClear,linkedExcavatorSeat} from './imasora-construction-bucket-dump.mjs?v=120gn';
 
 const finite=(n,a,b)=>Number.isFinite(n)&&n>=a&&n<=b;
 // Ground support, hulls, arm, rider and display share the same derived frame.
@@ -12,7 +12,9 @@ export function transportExcavatorPositionSafe(frame){
  if(!['x','z','heading'].every(k=>Number.isFinite(v[k])))return false;
  const parts=shovelMachines(frame),body=parts[0],e=boxExtent(body);
  if(v.x-e[0]<a.minX+1||v.x+e[0]>a.maxX-1||v.z-e[2]<a.minZ+1||v.z+e[2]>a.maxZ-1)return false;
- if([parts[1],shovelDumpBody(frame),...shovelSoilBoxes(frame.soil)].some(b=>boxesOverlap3D(body,b)))return false;
+ // Query the entire tilted hull, never just its centre or wheel contacts.
+ const nearby=shovelNearbySoil(frame.soil,body.position[0],body.position[2],Math.max(e[0],e[2])+.01);
+ if([parts[1],shovelDumpBody(frame),...nearby].some(b=>boxesOverlap3D(body,b)))return false;
  return linkedArmClear(frame);
 }
 // Steering changes heading only through actual forward/backward travel.

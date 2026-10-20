@@ -1,8 +1,8 @@
-import {excavatorGroundFrame,groundPoint,excavatorGroundHeight} from './imasora-construction-native-excavator-ground.mjs?v=120fw';
-import {shovelMachineState,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120fw';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ey';
-import {nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120fw';
-import {linkedAccessTarget,dumpBoardTarget} from './imasora-construction-bucket-dump.mjs?v=120fw';
+import {excavatorGroundFrame,groundPoint,excavatorGroundHeight} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
+import {shovelMachineState,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120gf';
+import {nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120gn';
+import {linkedAccessTarget,dumpBoardTarget} from './imasora-construction-bucket-dump.mjs?v=120gn';
 
 // Only the walking actor is handed over. The soil, vehicles and operation
 // clocks stay owned by the same work record, at their original world origin.

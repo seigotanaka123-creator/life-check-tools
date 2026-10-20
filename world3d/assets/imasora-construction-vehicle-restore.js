@@ -1,10 +1,10 @@
 // Explicit rollback of one closed vehicle work scope, never its material ledger.
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120fw';
-import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120fw';
-import * as W from './imasora-construction-world-water.js?v=120fb';
-import * as S from './imasora-construction-world-soil.js?v=120fw';
-import * as T from './imasora-construction-world-timber.js?v=120fw';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120gn';
+import * as W from './imasora-construction-world-water.js?v=120gf';
+import * as S from './imasora-construction-world-soil.js?v=120gn';
+import * as T from './imasora-construction-world-timber.js?v=120gn';
 export const MAX_VEHICLE_RESTORE_INPUT=MAX_RECOVERY_FILE;
 export const VEHICLE_RESTORE_KINDS=Object.freeze(['water','soil','timber']);
 const clone=structuredClone,equal=(a,b)=>canonical(a)===canonical(b);

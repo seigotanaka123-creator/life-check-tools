@@ -1,11 +1,11 @@
-import {foundationContains} from './free-foundation-state.mjs?v=120fw';
-import {foundationSurfaceAt,assertFoundationSupport,constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120fw';
-import {freeCell} from './free-build-state.mjs?v=120fw';
+import {foundationContains} from './free-foundation-state.mjs?v=120gn';
+import {foundationSurfaceAt,assertFoundationSupport,constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120gn';
+import {freeCell} from './free-build-state.mjs?v=120gn';
 import {freePlacedFill} from './free-work-parts.mjs';
-import {footSurface,footingAt} from './free-footing.mjs?v=120fw';
-import {walkPath,walkingBlocked} from './free-contact.mjs?v=120fw';
-import {scaffoldSupport,scaffoldSurface} from './free-frame-scaffold.mjs?v=120fw';
-import {frameRoute} from './free-frames.mjs?v=120fw';
+import {footSurface,footingAt} from './free-footing.mjs?v=120gn';
+import {walkPath,walkingBlocked} from './free-contact.mjs?v=120gn';
+import {scaffoldSupport,scaffoldSurface} from './free-frame-scaffold.mjs?v=120gn';
+import {frameRoute} from './free-frames.mjs?v=120gn';
 
 export const ACCESS_MAX_RISER=2.5,ACCESS_MAX_TREADS=16;
 // Bound the search, measure the actual stair entry, and retain the first legal

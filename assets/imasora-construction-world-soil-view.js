@@ -1,29 +1,33 @@
+import{createPresentationCache}from'./imasora-construction-presentation-cache.mjs?v=120gi';
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120gf';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs?v=120fb';
 import {constructionWorkAutoSaveKey} from './imasora-construction-autosave-key.mjs?v=120es';
 import {soilBedBaseAt} from './imasora-construction-soil-bed.mjs?v=120eo';
-import {soilStartupPositionMatches} from './imasora-construction-soil-startup.mjs?v=120fw';
+import {soilStartupPositionMatches} from './imasora-construction-soil-startup.mjs?v=120gn';
 import {createFrameHeightSampler} from './imasora-construction-frame-height.mjs?v=120ey';
-import {fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldWorkGroundProblem,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120fw';
-import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120fw';
-import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120ea';
+import {fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldWorkGroundProblem,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120gn';
+import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120gm';
+import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
 import {bindTravelBoost} from './imasora-construction-travel-input.mjs';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
-import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120ea';
-import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120fw';
+import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120gm';
+import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120gn';
 import {createVehicleRestoreView} from './imasora-construction-vehicle-restore-view.js?v=502';
 import * as THREE from './three.module.min.js';
 import {overlapsWorldYardBuild} from './imasora-construction-world-yard-reservation.js?v=512';
-import {actorPose,loaderDrivingInput,boardOption,exitOption} from './imasora-construction-loader-physics.js?v=120ey';
-import {soilCopyOptions,soilCopySurface} from './imasora-construction-purchased-soil.js?v=120fw';
-import {initialWorldSoil,SOIL_YARDS,SOIL_SITE_SOLIDS,enterWorldSoil,syncWorldSoil,worldSoilAction,advanceWorldSoil,worldSoilTotals,worldSoilSurface,worldSoilFloors,worldSoilContactGeometry,worldSoilMaterialObstacles} from './imasora-construction-world-soil.js?v=120fw';
+import {actorPose,loaderDrivingInput,boardOption,exitOption} from './imasora-construction-loader-physics.js?v=120gf';
+import {soilCopyOptions,soilCopySurface} from './imasora-construction-purchased-soil.js?v=120gn';
+import {initialWorldSoil,SOIL_YARDS,SOIL_SITE_SOLIDS,enterWorldSoil,syncWorldSoil,worldSoilAction,advanceWorldSoil,worldSoilTotals,worldSoilSurface,worldSoilFloors,worldSoilContactGeometry,worldSoilMaterialObstacles} from './imasora-construction-world-soil.js?v=120gn';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=521';
-import {createWorldSoilModel,updateWorldSoilModel,SOIL_FENCES} from './imasora-construction-world-soil-model.js?v=120fw';
+import {createWorldSoilModel,updateWorldSoilModel,SOIL_FENCES} from './imasora-construction-world-soil-model.js?v=120gn';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js?v=120ds';
-import {soilSiteSolids,soilSiteBoxes} from './imasora-construction-purchased-soil.js?v=120fw';
-import {soilCheckpoint} from './imasora-construction-world-soil.js?v=120fw';
+import {soilSiteSolids,soilSiteBoxes} from './imasora-construction-purchased-soil.js?v=120gn';
+import {soilCheckpoint} from './imasora-construction-world-soil.js?v=120gn';
 
 export function createWorldSoilController({service,practice=false,preview=false,canResume=()=>true,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,readout,onRestoreRebuild}){
+  const presentation=createPresentationCache();let readPresentationRevision=null;
+  let jumpControl;const jumpInput=createJumpIntent();
   const gait=createConstructionWalkGait();
   const orbit=createOrbitLook();let menuSaveNote='',restoreSession=null,savedWorkAwaitingResume=false,ending=false;
   const restoreLocked=()=>!!restoreSession?.locked;
@@ -43,7 +47,7 @@ export function createWorldSoilController({service,practice=false,preview=false,
   const button=a=>panel.querySelector(`[data-action="${a}"]`),message=panel.querySelector('.ws-message');
   const received=()=>practice?8000:service.constructionStock?.receipts.filter(e=>e.offerId==='mars-soil').reduce((n,e)=>n+e.amount,0)||0;
   let travelBoost=null;
-  function clear(){travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
+  function clear(){jumpControl?.cancel();jumpInput.reset();travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
   const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ws",groups:[{"id":"move","label":"移動","selectors":[".ws-pad button","[data-action=\"jump\"]"],"hint":"WASD／矢印で移動。同方向を素早く2回で加速（離すと解除）。停車して土を扱います。"},{"id":"work","label":"土の作業","selectors":["[data-action=\"load\"]","[data-action=\"lay\"]","[data-action=\"recover\"]","[data-action=\"store\"]"]}],quick:["interact","camera"]});
   if(!practice&&!preview&&service.mode==='live'){
     restoreSession=new VehicleRestoreSession({service,kind:'soil',origin:globalThis.location?.origin,getWork:()=>work,getExpectedRevision:()=>expected,
@@ -95,28 +99,33 @@ export function createWorldSoilController({service,practice=false,preview=false,
     try{work=worldSoilAction(work,a,crypto.randomUUID(),received(),externalVolumes(),baseHeight);if(['load','lay','recover','store'].includes(a))await save();}catch(e){issue=e.message;}refresh();
   }
   travelBoost=bindTravelBoost({panel,enabled:()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen,context:()=>work?.work?.loader.mode});
-  panel.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>void action(b.dataset.action)));
-  for(const b of panel.querySelectorAll('[data-hold]')){
+  panel.querySelectorAll('[data-action]:not([data-action=jump])').forEach(b=>b.addEventListener('click',()=>void action(b.dataset.action)));
+  for(const b of panel.querySelectorAll('[data-hold]:not([data-hold=jump])')){
     b.addEventListener('pointerdown',e=>{if(!active||busy||blocked||restoreLocked()||game.paused)return;e.preventDefault();held.set(e.pointerId,b.dataset.hold);taps.set(b.dataset.hold,work.work.time+.15);b.setPointerCapture(e.pointerId);b.classList.add('held');});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,e=>{held.delete(e.pointerId);b.classList.remove('held');});
     b.addEventListener('click',e=>{if(e.detail===0&&active&&!busy&&!blocked&&!restoreLocked()&&!game.paused)taps.set(b.dataset.hold,work.work.time+.15);});
   }
+  const jumpReady=()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen&&work.work.loader.mode==='foot'&&!work.work.task;
+  jumpControl=bindJumpButton({element:button('jump'),enabled:()=>jumpReady()&&(work.work.body.grounded||(work.work.body.jumpCount??0)<3),canHold:jumpReady,activate:()=>jumpInput.press(),release:()=>jumpInput.release()});
   const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'];
-  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(codes.includes(e.code)){e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
-  addEventListener('keyup',e=>{keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
+  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
+  addEventListener('keyup',e=>{if(e.code==='Space')jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!service.blocked&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',clear);document.addEventListener('visibilitychange',clear);
-  function input(){return travelBoost.input(rawInput());}
-  function rawInput(){const actions=[...held.values()],pressed=[...keys];for(const[k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
+  function input(consumeJump=true){return travelBoost.input(rawInput(consumeJump));}
+  function rawInput(consumeJump=true){const actions=[...held.values()],pressed=[...keys];for(const[k,t]of taps)if(t>work.work.time)(codes.includes(k)?pressed:actions).push(k);
     if(work.work.loader.mode==='driving')return loaderDrivingInput(actions,pressed);
     const on=(a,...k)=>actions.includes(a)||k.some(x=>pressed.includes(x)),f=Number(on('accelerate','KeyW','ArrowUp'))-Number(on('reverse','KeyS','ArrowDown')),r=Number(on('right','KeyD','ArrowRight'))-Number(on('left','KeyA','ArrowLeft'));
-    const angle=orbit.yaw(view===2?Math.PI+.15:work.work.loader.vehicle.heading+(view===1?Math.PI/2:Math.PI));return{x:r*Math.cos(angle)-f*Math.sin(angle),z:-r*Math.sin(angle)-f*Math.cos(angle),jump:pressed.includes('Space')};
+    const angle=orbit.yaw(view===2?Math.PI+.15:work.work.loader.vehicle.heading+(view===1?Math.PI/2:Math.PI));return{x:r*Math.cos(angle)-f*Math.sin(angle),z:-r*Math.sin(angle)-f*Math.cos(angle),jump:jumpInput.read(consumeJump)};
   }
   function refresh(){if(!root){panel.hidden=!(active&&restoreLocked());if(!panel.hidden){message.textContent=restoreSession.message;game.refresh({busy:true,blocked:true,context:'stopped',loadText:'停止中',menuHint:restoreSession.message});}return;}
     const close=!!root&&state.map==='construction'&&(work.schema===2?near():Math.abs(state.position.x-root.position.x)<400&&Math.abs(state.position.z-root.position.z)<340);
     panel.hidden=!close&&!active&&!resumeAvailable();canvas.parentElement.classList.toggle('world-soil-near',!panel.hidden);if(panel.hidden)return;
     button('begin').hidden=active;button('begin').disabled=(!near()&&!resumeAvailable())||busy||blocked||restoreLocked();button('begin').textContent=resumeAvailable()?'保存した土の作業を再開':'作業を始める';panel.querySelector('.ws-active').hidden=!active;
     panel.querySelector('.ws-mode').textContent=practice?'貸出8ブロック・保存しません':service.mode==='readonly'?'表示確認・保存なし':service.mode==='integration'?'本体とは別の接続確認保存':'作業を保存できます';
+    // The inactive card only offers resume. Its hidden work pages must not
+    // recompute full placement/support plans while the player walks or jumps.
+    if(!active){const nextMessage=blocked?issue:busy?'セーブしているよ…':issue||(resumeAvailable()?'保存した作業の続きから再開できるよ。':near()?'ローダーに近づきました。土の作業を始められます。':'');if(message.textContent!==nextMessage)message.textContent=nextMessage;game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:work.work.loader.mode,loadText:'',menuHint:menuSaveNote});return;}
     const w=work.work,l=w.loader,t=worldSoilTotals(work),a=soilCopyOptions(w,worldSoilMaterialObstacles(l,externalVolumes(),localHeight),baseHeight);
     previewOptions=a;
     panel.querySelector('.ws-stats').textContent=`保管 ${received()/1000-t.inUse/1000} ｜車載 ${t.bucket} ｜移送中 ${t.moving} ｜敷いた土 ${t.ground} ブロック`;
@@ -133,7 +142,7 @@ export function createWorldSoilController({service,practice=false,preview=false,
     game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:l.mode,loadText:'車載 '+t.bucket+' 個',menuHint:menuSaveNote});
   }
   function groundPose(){if(work?.schema!==2||!root)return null;try{return fieldGroundPose(work.work,root.position,fieldHeightAt);}catch{return null;}}
-  function render(dt){if(!root)return;updateWorldSoilModel(root,work.work,active,active?worldSoilMaterialObstacles(work.work.loader,externalVolumes(),localHeight):[],groundPose(),baseHeight,previewOptions);if(!active)return;
+  function render(dt){if(!root)return;presentation.draw(work.work,readPresentationRevision?.(),()=>updateWorldSoilModel(root,work.work,active,active?worldSoilMaterialObstacles(work.work.loader,externalVolumes(),localHeight):[],groundPose(),baseHeight,previewOptions),{live:active});if(!active)return;
     const w=work.work,l=w.loader,p=work.schema===2?fieldActorPose(l,root.position,fieldHeightAt):actorPose(l),d=root.userData;
     if(l.mode==='driving'){d.loader.userData.pilotSocket.add(character);character.position.set(0,0,0);character.rotation.set(0,0,0);}
     else{scene.add(character);character.position.set(root.position.x+p.x,p.y-d.loader.userData.measurement.footBottom,root.position.z+p.z);character.rotation.set(0,p.heading,0);}
@@ -143,7 +152,7 @@ export function createWorldSoilController({service,practice=false,preview=false,
     const a=orbit.yaw(view===2?Math.PI+.15:l.vehicle.heading+(view===1?Math.PI/2:Math.PI)),pitch=orbit.pitch(view===2?1.1:.65),dist=(view===2?720:250)*Math.max(1,.72/camera.aspect);
     target.y=l.mode==='foot'?p.y+18:target.y+(groundPose()?.position[1]??0);camera.position.copy(target).addScaledVector(new THREE.Vector3(Math.sin(a)*Math.cos(pitch),Math.sin(pitch),Math.cos(a)*Math.cos(pitch)),dist);camera.lookAt(target);readout();
   }
-  function install({group,blockedAt,collider,surface,ceiling,contactGeometry:readContactGeometry=null,fieldSolids=null,groundHeightAt=null,groundUpperBound=null}){
+  function install({group,presentationRevision=null,blockedAt,collider,surface,ceiling,contactGeometry:readContactGeometry=null,fieldSolids=null,groundHeightAt=null,groundUpperBound=null}){readPresentationRevision=presentationRevision;presentation.reset();
     if(active)throw Error('土作業中は区画を再構築できません。');previewOptions=null;if(root){root.traverse(o=>{if(o.isInstancedMesh)o.dispose();});disposeSpaceMaterialBook(root);root=null;}panel.hidden=true;canvas.parentElement.classList.remove('world-soil-near');if(state.map!=='construction')return;
     contactGeometry=typeof readContactGeometry==='function'?readContactGeometry:null;readFieldSolids=fieldSolids;sourceHeightAt=groundHeightAt;fieldUpperBound=groundUpperBound;heightCache.reset();fieldHeightAt=(x,z)=>{let y=heightCache.heightAt(x,z);if(root&&work?.schema===2)for(const p of work.work.patches){const base=soilBedBaseAt(p,x-root.position.x,z-root.position.z);if(base!==null)y=Number.isFinite(y)?Math.max(y,base+2):base+2;}return y;};
     if(!work){fresh();if(!work){const site=SOIL_YARDS.findIndex(([x,z])=>!blockedAt(x,z,390));if(site<0)return;work=initialWorldSoil(site,received());}}
@@ -173,9 +182,9 @@ export function createWorldSoilController({service,practice=false,preview=false,
       }catch(e){issue=e.message;refresh();return false;}
     },
     previewSpawn(){return preview&&root?{x:root.position.x-58,z:root.position.z-88,heading:0}:null;},
-    update(dt){heightCache.reset();if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
+    update(dt){jumpControl.sync();heightCache.reset();if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
       if(!restoreLocked()&&blocked&&retryPending&&service.blocked===false){fresh();blocked=false;retryPending=false;issue='';if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
-      if(active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldSoil(work,input(),dt,externalVolumes(),localHeight);if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,root.position,fieldHeightAt,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work=next;}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){fail(e);}}
+      if(active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldSoil(work,input(work.work.phase+dt>=1/120-1e-9),dt,externalVolumes(),localHeight);if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,root.position,fieldHeightAt,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work=next;}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){fail(e);}}
       render(game.paused?0:dt);ui+=dt;if(ui>.15){ui=0;refresh();}
       if(active&&!game.menuOpen&&auto>8&&!saving&&constructionWorkAutoSaveKey(work,view)!==lastAutomaticKey&&!busy&&!blocked&&!restoreLocked()&&!practice&&service.mode!=='readonly'&&Math.abs(work.work.loader.vehicle.speed)<.01&&!held.size&&!keys.size)void save({automatic:true});return active;
     },

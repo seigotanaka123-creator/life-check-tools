@@ -1,8 +1,8 @@
-import {polygon,polygonsOverlap} from './imasora-construction-loader-physics.js?v=120ey';
+import {polygon,polygonsOverlap} from './imasora-construction-loader-physics.js?v=120gf';
 import {hasValidWorldFootprint} from './imasora-construction-world-yard-reservation.js?v=512';
 import {vehicleGroundFrame,groundPoint,flatGroundWork} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {actorPose,worldToLocal} from './imasora-construction-loader-physics.js?v=120ey';
-import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120fw';
+import {actorPose,worldToLocal} from './imasora-construction-loader-physics.js?v=120gf';
+import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
 export function fieldGroundPose(work,origin,heightAt){const v=(work.loader??work.rig).vehicle;return vehicleGroundFrame(v,typeof heightAt==='function'?(x,z)=>heightAt(origin.x+x,origin.z+z):()=>0);}
 export function fieldActorPose(rig,origin,heightAt,frame=null){
  const p=actorPose(rig);if(typeof heightAt!=='function')return p;

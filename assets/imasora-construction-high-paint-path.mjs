@@ -1,6 +1,6 @@
-import {highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120fr';
-import {highLocalPoint,highWorldPoint} from './imasora-construction-high-world.mjs?v=120fw';
-import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120fw';
+import {highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {highLocalPoint,highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
+import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120gn';
 import {upperPaintPatch,upperPaintPlan} from './imasora-construction-concrete/high-paint.mjs?v=120fn';
 // A jointed extension pole travels above the worker, below the next ceiling,
 // then lowers OUTSIDE the selected face. It never shortcuts through concrete.

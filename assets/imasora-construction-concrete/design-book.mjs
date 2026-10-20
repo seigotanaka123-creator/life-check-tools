@@ -1,5 +1,5 @@
 import {freeWorkMask,freeFilledMask,freePartCount} from './free-work-parts.mjs';
-import {freeFrameBoards} from './free-build-state.mjs?v=120fw';
+import {freeFrameBoards} from './free-build-state.mjs?v=120gn';
 
 export const DESIGN_HEIGHT_NAMES=Object.freeze({2:'低めの床',4:'段差・縁どり',8:'花壇・低い壁'});
 // A design contains geometry instructions only. It never carries stock or paint.

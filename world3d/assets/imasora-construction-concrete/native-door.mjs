@@ -1,5 +1,5 @@
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120fw';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120fw';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120gn';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
 
 const valid=(f,name)=>f?.location&&!f.aboard&&['truck','pump'].includes(name);
 export function concreteWorldDoor(f,name,{blockedAt=()=>false,heightAt=()=>0}={}){

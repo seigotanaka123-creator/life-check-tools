@@ -1,6 +1,6 @@
 import {freePlacedFill} from './free-work-parts.mjs';
-import {canonicalFreeAction,freeCell,freeVehicleProblem} from './free-build-state.mjs?v=120fw';
-import {FRAME_RACK} from './free-frames.mjs?v=120fw';
+import {canonicalFreeAction,freeCell,freeVehicleProblem} from './free-build-state.mjs?v=120gn';
+import {FRAME_RACK} from './free-frames.mjs?v=120gn';
 import {VEHICLE_WHEELS,VEHICLE_GROUND,vehicleGroundPose,vehicleLevelWorkProblem} from './free-vehicle-ground.mjs?v=120ek';
 export {VEHICLE_WHEELS} from './free-vehicle-ground.mjs?v=120ek';
 

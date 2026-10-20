@@ -1,6 +1,6 @@
-import {freeCell} from './free-build-state.mjs?v=120fw';
-import {frameBlocked} from './free-frames.mjs?v=120fw';
-import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120fw';
+import {freeCell} from './free-build-state.mjs?v=120gn';
+import {frameBlocked} from './free-frames.mjs?v=120gn';
+import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120gn';
 import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ek';
 
 const EMPTY='型枠の形を1マス以上選んでください。';
