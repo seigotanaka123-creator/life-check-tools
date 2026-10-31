@@ -1,5 +1,5 @@
-import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
-import {poolKey} from './imasora-construction-field-water.mjs?v=120fb';
+import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
+import {poolKey} from './imasora-construction-field-water.mjs?v=120ov';
 
 export const FIELD_WATER_TICK=.1,FIELD_WATER_CELL=8;
 const directions=[[0,-8],[-8,0],[8,0],[0,8]];

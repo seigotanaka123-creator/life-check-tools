@@ -35,16 +35,4 @@ export function createWorldShopOverlay({service,onOpen,onClose,onError}){
   };
 }
 
-export function createWorldSaveErrorUI({retry,exportRecord}){
-  const d=document.createElement('dialog');d.className='world-save-error';d.setAttribute('aria-labelledby','world-save-error-title');
-  d.innerHTML='<h2 id="world-save-error-title">保存を確認しています</h2><p role="alert"></p><p>元の金貨・建築・装備は削除しません。安全のため操作を止めています。</p><button data-retry>保存を再試行</button> <button data-record>保護した保存記録を表示</button><pre hidden></pre>';
-  Object.assign(d.style,{maxWidth:'min(680px,94vw)',maxHeight:'85dvh',background:'#182b38',color:'#fff',border:'2px solid #dfc68d',borderRadius:'14px'});
-  document.body.append(d);d.addEventListener('cancel',e=>e.preventDefault());const message=d.querySelector('[role=alert]'),button=d.querySelector('[data-retry]');
-  button.onclick=async()=>{button.disabled=true;try{await retry();d.close();}catch(e){message.textContent=e.message;}finally{button.disabled=false;}};
-  d.querySelector('[data-record]').onclick=()=>{const pre=d.querySelector('pre');pre.textContent=exportRecord();pre.hidden=false;pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';};
-  return {
-    startWork(){message.textContent='装備の作成と素材の保存を確認しています…';for(const b of d.querySelectorAll('button'))b.disabled=true;if(!d.open)d.showModal();},
-    endWork(){d.close();for(const b of d.querySelectorAll('button'))b.disabled=false;},
-    show(e){for(const b of d.querySelectorAll('button'))b.disabled=false;message.textContent=e.message;if(!d.open)d.showModal();},
-  };
-}
+export{createWorldSaveErrorUI}from'./imasora-world-save-notice.mjs?v=120pw';

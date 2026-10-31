@@ -1,5 +1,7 @@
-import {inspectFormGround} from './free-foundation-check.mjs?v=120gn';
-import {foundationContains} from './free-foundation-state.mjs?v=120gn';
+import {groundTile,groundLayout,groundCovered,assignGroundLayout} from './ground-grid.mjs?v=120hb';
+import {levelDesign,assignDesignLevels} from './design-levels.mjs?v=120hb';
+import {inspectFormGround} from './free-foundation-check.mjs?v=120pv';
+import {foundationContains,assertFoundationClear} from './free-foundation-state.mjs?v=120pv';
 import {ROUTE_EPS} from './free-route-clearance.mjs';
 
 export const constructionBase=f=>f?.baseY??0;
@@ -16,8 +18,8 @@ export const supportedToolBlocked=(p,external)=>(x,z,margin,soleY)=>external(x,z
 export function foundationSurfaceAt(s,x,z){
  if(!s)return null;
  for(let i=0;i<16;i++)if(s.mask&(1<<i)){
-  const cx=s.x+(i%4-1.5)*16,cz=s.z+(Math.floor(i/4)-1.5)*16;
-  if(Math.abs(x-cx)<=8+1e-8&&Math.abs(z-cz)<=8+1e-8)return s.deckY;
+  const t=groundTile(i,s),cx=s.x+t.x,cz=s.z+t.z;
+  if(Math.abs(x-cx)<=t.w/2+1e-8&&Math.abs(z-cz)<=t.d/2+1e-8)return s.deckY;
  }
  return null;
 }
@@ -27,14 +29,19 @@ export function preparedFrameBuild(p,a){
   // Explicit heights work on low decks too; the legacy FREE_FRAME branch
   // below keeps its old meaning for existing saved operations.
   if(!s||s.x!==f.location.x||s.z!==f.location.z||s.deckY<=0||s.deckY>RAISED_BASE_MAX||![2,4,8].includes(a.height))throw Error('土台の高さは0超〜16、型枠の高さは2・4・8を選んでください。');
+  if(!Object.hasOwn(a,'levels')&&(s.layout||f.layout))throw Error('細かい大きさと高さをえらんでから組み立てよう。');
+  if(!Object.hasOwn(a,'levels')&&f.pourTargets&&a.height!==f.height)throw Error('マスごとの高さをえらんでから、型枠を組もう。');
+  if(Object.hasOwn(a,'levels')){const d=levelDesign(a.levels);if((a.partial===true?!groundCovered({...f.location,...(a.layout?{layout:a.layout}:{})},d.mask,s):d.mask!==s.mask)||d.height!==a.height)throw Error(a.partial===true?'土台の上に全部のマスがおさまる形をえらぼう。':'土台と同じ形の設計をえらぼう。');if(!['design','complete'].includes(f.stage)||f.fill.some(Boolean)||f.aboard||f.connected||f.hose||f.highPipe)throw Error('車を降り、ホースと今の作業を片付けてから、次の型枠を組もう。');const next={...f,baseY:s.deckY,stage:'design'};if(a.partial===true){delete next.layout;assertFoundationClear(p,{...s,mask:d.mask,layout:a.layout});if(a.layout)return assignGroundLayout(next,d.levels,a.layout);}else{if(s.layout||f.layout)throw Error('細かい大きさの形をえらんでから組み立てよう。');assertFoundationClear(p,s);}return assignDesignLevels(next,d.levels);}
   return {...f,mask:s.mask,baseY:s.deckY,height:a.height};
  }
  if(a.type!=='FREE_FRAME'||!s)return f;
+ if(s.layout||f.layout)throw Error('土台の細かい大きさをえらんでから組み立てよう。');
  if(s.x!==f.location.x||s.z!==f.location.z||s.deckY>4||f.height>4)throw Error('この土台ではまだ型枠を組めません。高さ4以下の土台と型枠を選んでください。');
  return {...f,mask:s.mask,baseY:s.deckY};
 }
 export function supportedWorkMatches(p,w,mask){
  const s=p.foundation;if(!s||Math.abs(s.deckY-constructionBase(w))>=1e-8)return false;
+ if(w.layout||s.layout)return groundCovered(w,mask,s);
  if(p.schemaVersion<13)return s.x===w.x&&s.z===w.z&&(mask&s.mask)===mask;
  // Matching full 16x16 tiles keeps both corners and interiors supported and
  // retains the grid used by walking stairs/scaffold openings. No point-only
@@ -48,7 +55,7 @@ export function supportedWorkMatches(p,w,mask){
 }
 export function assertFoundationSupport(p,{heightAt,blockedAt}={}){
  const s=p.foundation;if(!s)throw Error('施工物を支える土台がありません。');
- const plan=inspectFormGround(p.freeBuild,s.mask,2,heightAt,blockedAt,s.deckY);
+ const plan=inspectFormGround({...p.freeBuild,layout:s.layout},s.mask,2,heightAt,blockedAt,s.deckY);
  if(plan.kind!=='preparation'||plan.deckY!==s.deckY||plan.supports.length!==s.bottoms.length||plan.supports.some((v,i)=>Math.abs(v.bottom-s.bottoms[i])>1e-8))throw Error('土台を支える地面が変わりました。施工を止め、地面を確認してください。');
  return true;
 }

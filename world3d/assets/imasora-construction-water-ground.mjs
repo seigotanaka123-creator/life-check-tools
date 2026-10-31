@@ -1,13 +1,14 @@
-import {vehicleGroundFrame,groundPoint,groundVector} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120gf';
-import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {vehicleGroundFrame,groundPoint,groundVector} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
+import {bucketWorldPoint} from './imasora-construction-loader-work.js?v=120ov';
+import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 
 // Ground poses are derived from the current terrain, never copied into saves.
 export function waterWorkFrame(s,heightAt){
  if(!s.loader.vehicle.field||typeof heightAt!=='function')return null;
  const g=typeof heightAt.groundFrame==='function'?heightAt.groundFrame(s.loader.vehicle):vehicleGroundFrame(s.loader.vehicle,heightAt);
- if(g.position[1]<-32||g.position[1]>48)throw Error('水を使うときは、低い地面へ車を移そう。');
- for(const bucket of [s.bucket,{lift:0,tilt:0},{lift:.8,tilt:.7}]){const p=waterBucketPoint(s,bucket,g);if(!inWorkArea(p,s.loader.vehicle)||p.y< -32||p.y>=70)throw Error('注ぎ口を現場の中へ向けてね。');}
+ const elevated=Number.isFinite(s.loader.vehicle.groundY);
+ if(g.position[1]<-32||g.position[1]>(elevated?516:48))throw Error('車を支える床の高さをたしかめよう。');
+ for(const bucket of [s.bucket,{lift:0,tilt:0},{lift:.8,tilt:.7}]){const p=waterBucketPoint(s,bucket,g);if(!inWorkArea(p,s.loader.vehicle)||p.y< -32||p.y>=(elevated?560:70))throw Error('注ぎ口を現場の中へ向けてね。');}
  return g;
 }
 export function waterBucketPoint(s,bucket,g){

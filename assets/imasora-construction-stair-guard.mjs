@@ -2,8 +2,8 @@ import{ROOM_WALK_BODY}from'./imasora-construction-room-walk-body.mjs';
 import{stairPlacement,stairPoint,stairEntry}from'./imasora-construction-stair-placement.mjs?v=120gn';
 import{highInnerRoute}from'./imasora-construction-high-interior.mjs?v=120gn';
 import{highBlueprintFloors}from'./imasora-construction-high-shape.mjs?v=120gn';
-import{roomWalkGeometry,roomBodyClear,roomSupport}from'./imasora-construction-room-contact.mjs?v=120gn';
-import{highRoomRoute}from'./imasora-construction-high-work-position.mjs?v=120gn';
+import{roomWalkGeometry,roomBodyClear,roomSupport}from'./imasora-construction-room-contact.mjs?v=120pv';
+import{highRoomRoute}from'./imasora-construction-high-work-position.mjs?v=120ov';
 const known=new Map(),boundsByHeading=new Map();
 function clearBody(w,p,g){let bounds=boundsByHeading.get(p.heading);if(!bounds){const c=Math.cos(p.heading),s=Math.sin(p.heading);let l=Infinity,r=-Infinity,b=Infinity,t=-Infinity,low=Infinity,high=-Infinity;for(const[y0,y1,points]of ROOM_WALK_BODY){low=Math.min(low,y0);high=Math.max(high,y1);for(const[x,z]of points){const a=x*c+z*s,q=-x*s+z*c;l=Math.min(l,a);r=Math.max(r,a);b=Math.min(b,q);t=Math.max(t,q);}}bounds={l,r,b,t,low,high};boundsByHeading.set(p.heading,bounds);}const v=bounds,solids=g.solids.filter(b=>!(['floor','stair'].includes(b.kind)&&b.y+b.h/2<=p.y+2.5001)&&b.x+b.w/2>p.x+v.l&&b.x-b.w/2<p.x+v.r&&b.z+b.d/2>p.z+v.b&&b.z-b.d/2<p.z+v.t&&b.y+b.h/2>p.y+v.low&&b.y-b.h/2<p.y+v.high);return !solids.length||roomBodyClear(w,p,[],{...g,solids},2.5);}
 export function assertStairConstruction(blueprint){if(!stairPlacement(blueprint))return true;const key=JSON.stringify(blueprint);if(known.has(key)){const result=known.get(key);if(result!==true)throw Error(result);return true;}

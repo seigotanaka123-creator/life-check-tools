@@ -1,18 +1,18 @@
-import{assertStairConstruction}from'./imasora-construction-stair-guard.mjs?v=120gn';
+import{assertStairConstruction}from'./imasora-construction-stair-guard.mjs?v=120pv';
 import{stairPlacement,stairPoint,stairBox,stairEntry,stairExit,stairGround,stairDoor,stairApproach}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import{ROOM_JUMP_RISE}from'./imasora-construction-room-motion.mjs?v=120gn';
-import{assertRoomWalking}from'./imasora-construction-room-walk.mjs?v=120gn';
+import{ROOM_JUMP_RISE}from'./imasora-construction-room-motion.mjs?v=120pv';
+import{assertRoomWalking}from'./imasora-construction-room-walk.mjs?v=120pv';
 import{boardBayLevels,boardBaySupports,boardBayUndoReady,boardBayRetrofitAfter,boardBayRetrofitStep,boardBayRetrofitJobs,boardBayRetrofitPlan,validateBoardBayRetrofit,boardBayDecks,boardLiftBridges}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{roomDeliveryMotion}from'./imasora-construction-room-door-delivery.mjs?v=120gn';
-import{ROOM_KIT_PICKUP_SECONDS}from'./imasora-construction-room-kit.mjs?v=120gn';
+import{roomDeliveryMotion}from'./imasora-construction-room-door-delivery.mjs?v=120pv';
+import{ROOM_KIT_PICKUP_SECONDS}from'./imasora-construction-room-kit.mjs?v=120ov';
 import{wallDoorHost}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import{roomLayoutPlan,beginRoomLayoutEdit,assertRoomLayout,assertRoomUndoSafe}from'./imasora-construction-room-layout.mjs?v=120gn';
-import{roomLayoutParts,validateRoomLayout}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
-import {roomPaintRoute,roomGraphRoute} from './imasora-construction-building-room.mjs?v=120gn';
+import{roomLayoutPlan,beginRoomLayoutEdit,assertRoomLayout,assertRoomUndoSafe}from'./imasora-construction-room-layout.mjs?v=120pv';
+import{roomLayoutParts,validateRoomLayout}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
+import {roomPaintRoute,roomGraphRoute} from './imasora-construction-building-room.mjs?v=120pv';
 import {doorJob,doorStepAllowed,validateEntranceDoor,entranceDoorWaits} from './imasora-construction-building-door.mjs?v=120gn';
-import {validatePaintSurface,buildingPaintStance} from './imasora-construction-building-paint-path.mjs?v=120gn';
+import {validatePaintSurface,buildingPaintStance} from './imasora-construction-building-paint-path.mjs?v=120pv';
 import{highPlanScale,highInnerStairs,highInnerRoute,highStairSpine,highInsideActor}from'./imasora-construction-high-interior.mjs?v=120gn';
-import {highAccessLandings,validateHighStation,highWorkTarget,highWorkVisitPlan,highWorkReturnPlan} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {highAccessLandings,validateHighStation,highWorkTarget,highWorkVisitPlan,highWorkReturnPlan} from './imasora-construction-high-work-position.mjs?v=120ov';
 import {highBlueprintFloors,highRemainingStock,validateHighShape,highFloors,highRecipe,shapedHighParts,highShapeKey,highFloorPieces,highRoofPoint,highRoofBridge} from './imasora-construction-high-shape.mjs?v=120gn';
 // Shared building core; historical identifiers remain for existing saves.
 // Normal play stores it through the world material/terrain authority.

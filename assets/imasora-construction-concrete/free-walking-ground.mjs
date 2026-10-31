@@ -1,6 +1,6 @@
 import * as T from '../three.module.min.js';
-import {footSurface} from './free-footing.mjs?v=120gn';
-import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ek';
+import {footSurface} from './free-footing.mjs?v=120pv';
+import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ov';
 
 export const WALK_GROUND_MESSAGE='足元の両足を支える地面に穴・段差・強い傾きがあります。安全な地面へ停め直してください。';
 // Travel may follow gentle ground. Stationary tool work separately requires a level stance.

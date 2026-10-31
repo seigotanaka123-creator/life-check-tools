@@ -1,11 +1,11 @@
-import {cranePoint,craneChassisFrame,cranePartGround,craneGroundHeight,cranePartFlatGround,craneGroundCeiling} from './imasora-construction-crane-ground.mjs?v=120gf';
-import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {groundPoint} from './imasora-construction-vehicle-ground-frame.mjs';
-import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {cranePoint,craneChassisFrame,cranePartGround,craneGroundHeight,cranePartFlatGround,craneGroundCeiling} from './imasora-construction-crane-ground.mjs?v=120ov';
+import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ov';
 // Stage 4-1: inert, uniquely identified loan parts. No game inventory/economy access.
-import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120gf';
-import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120gn';
-import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js?v=120gn';
+import {initialLoaderState,stepLoader,actLoader,boardOption,transitionPoints,routeClear,localToWorld,polygon,polygonsOverlap,SITE,SAFE_ZONE} from './imasora-construction-loader-physics.js?v=120ov';
+import {cranePlayer,stepCraneWalker,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120pv';
+import {craneOutriggerVolumes,overlapsOutrigger,hookSupportDepth,hookOutriggerHit} from './imasora-construction-crane-outriggers.js?v=120pv';
 export const CRANE={minReach:42,maxReach:152,slew:.48,extend:26,hoist:23,gravity:65,snap:6,rotationSeconds:1.8};
 export const PARTS=[
   {id:'panel-1',name:'床板 A',w:52,h:6,d:30,x:0,z:16,color:0xdab573},
@@ -261,9 +261,10 @@ export function stepCrane(state,input,dt,external=[]){
   }else s.rig=stepLoader(s.rig,input,dt,obstacles(s,external));
   if(s.rig.vehicle.steering===0)s.rig.vehicle.steering=0; // Canonicalize -0 for JSON round trips.
   if(s.work&&s.deployment===1&&s.rig.mode==='driving'){
+    const cargo=s.parts.find(p=>p.id===s.held),hoistScale=cargo?.id.startsWith('structural-kit-')&&cargo.materialId==='earth-iron' ? .8 : 1;
     s.boom.yaw=clamp(s.boom.yaw+(input.slew||0)*CRANE.slew*dt,-Math.PI*.8,Math.PI*.8);
     s.boom.reach=clamp(s.boom.reach+(input.extend||0)*CRANE.extend*dt,CRANE.minReach,CRANE.maxReach);
-    s.boom.cable=clamp(s.boom.cable-(input.hoist||0)*CRANE.hoist*dt,4,Math.min(100,tip(s).y-(craneGroundHeight(external,tip(s).x,tip(s).z)??0)-4));
+    s.boom.cable=clamp(s.boom.cable-(input.hoist||0)*CRANE.hoist*hoistScale*dt,4,Math.min(100,tip(s).y-(craneGroundHeight(external,tip(s).x,tip(s).z)??0)-4));
     // The raised arm must not cut through an already-built upper wall/beam.
     const t=tip(s),base=cranePoint(s,0,42,26);let armHit='';
     for(let i=1;(s.boom.yaw!==state.boom.yaw||s.boom.reach!==state.boom.reach)&&i<=60&&!armHit;i++){const q=i/60,x=base.x+(t.x-base.x)*q,z=base.z+(t.z-base.z)*q,y=base.y+(t.y-base.y)*q,point={x,z,y};

@@ -1,10 +1,10 @@
 // Explicit rollback of one closed vehicle work scope, never its material ledger.
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120gn';
-import * as W from './imasora-construction-world-water.js?v=120gf';
-import * as S from './imasora-construction-world-soil.js?v=120gn';
-import * as T from './imasora-construction-world-timber.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {unpackRecoveryBundle,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120pv';
+import * as W from './imasora-construction-world-water.js?v=120ov';
+import * as S from './imasora-construction-world-soil.js?v=120pv';
+import * as T from './imasora-construction-world-timber.js?v=120pv';
 export const MAX_VEHICLE_RESTORE_INPUT=MAX_RECOVERY_FILE;
 export const VEHICLE_RESTORE_KINDS=Object.freeze(['water','soil','timber']);
 const clone=structuredClone,equal=(a,b)=>canonical(a)===canonical(b);
@@ -13,7 +13,7 @@ const specs={water:{key:'constructionWater',label:'給水車',unit:'L',scale:100
 export function vehicleRestoreSpec(kind){check(VEHICLE_RESTORE_KINDS.includes(kind),'車両の種類が不正です。');return specs[kind];}
 function exact(value,names){check(value&&Object.getPrototypeOf(value)===Object.prototype&&Object.keys(value).sort().join('|')===[...names].sort().join('|'),'確認情報の項目が不正です。');}
 function validLedger(ledger){L.validateWorldPurchaseLedger(ledger);check(ledger.scope==='imasora-world-ledger-v1'&&!ledger.pending&&!ledger.world.equipmentCraftPending,'通常保存の購入・装備作成を完了してから確認してください。');return ledger;}
-function received(ledger,kind){return ledger.events.filter(e=>e.kind==='delivery'&&e.offerId===`mars-${kind}`).reduce((n,e)=>n+e.amount,0);}
+function received(ledger,kind){return L.projectConstructionStock(ledger).receipts.filter(e=>e.offerId===`mars-${kind}`).reduce((n,e)=>n+e.amount,0);}
 function safeWork(kind,work,total){
   const s=vehicleRestoreSpec(kind);s.validate(work,total);
   check(kind!=='water'||!work.delivery,'保管口の水の移送を終えて保存してから確認してください。');
@@ -24,7 +24,7 @@ function safeWork(kind,work,total){
 function inUse(kind,work){return kind==='water'?work.allocated*250:kind==='soil'?S.worldSoilTotals(work).inUse:T.worldTimberTotals(work).inUse;}
 export function vehicleRestoreBoundary(ledger,kind){
   validLedger(ledger);const s=vehicleRestoreSpec(kind),work=ledger.world[s.key],total=received(ledger,kind);safeWork(kind,work,total);
-  const allocated=inUse(kind,work);return {source:clone(ledger.source),material:`mars-${kind}`,events:clone(ledger.events.filter(e=>e.offerId===`mars-${kind}`)),purchased:ledger.materials[`mars-${kind}`],received:total,warehouse:total-allocated,inUse:allocated,siteIndex:work.siteIndex,workTotal:kind==='water'?work.allocated:work.work.source.total};
+  const allocated=inUse(kind,work);return {source:clone(ledger.source),material:`mars-${kind}`,events:clone(L.projectConstructionStock(ledger).receipts.filter(e=>e.offerId===`mars-${kind}`)),purchased:ledger.materials[`mars-${kind}`],received:total,warehouse:total-allocated,inUse:allocated,siteIndex:work.siteIndex,workTotal:kind==='water'?work.allocated:work.work.source.total};
 }
 export function vehicleRestoreCheckpoint(kind,work){return vehicleRestoreSpec(kind).checkpoint(work);}
 export function vehicleRestoreUndoMatches(kind,current,applied){
@@ -67,7 +67,7 @@ export function vehicleRestoreSummary(kind,work,ledger){
   if(kind==='water'){const t=W.worldWaterTotals(work);counts=Object.fromEntries(['source','bucket','transit','course','returnTank','moving'].map(k=>[k,(t[k]??0)/4]));counts.total=t.totalWithTransit/4;}
   else if(kind==='soil'){const t=S.worldSoilTotals(work);counts=Object.fromEntries(['stock','bucket','ground','moving','total'].map(k=>[k,t[k]]));}
   else{const t=T.worldTimberTotals(work);counts=Object.fromEntries(['stored','loose','held','floating','fixed','total'].map(k=>[k,t[k]]));}
-  return {kind,label:s.label,unit:s.unit,siteIndex:work.siteIndex,revision:work.revision,purchased:b?b.purchased/s.scale:null,received:b?b.received/s.scale:null,warehouse:b?b.warehouse/s.scale:null,inUse:inUse(kind,work)/s.scale,counts:clone(counts)};
+  return {kind,label:s.label,unit:s.unit,siteIndex:work.siteIndex,revision:work.revision,purchased:b?b.purchased/s.scale:null,received:b?b.received/s.scale:null,warehouse:b?(kind==='water'?L.projectConstructionStock(ledger).stored['mars-water']/s.scale:b.warehouse/s.scale):null,inUse:inUse(kind,work)/s.scale,counts:clone(counts)};
 }
 function inspected(ledger,{kind,currentLedger,beforeUnsaved},source){
   const candidate=vehicleRestoreCandidate(ledger,kind);createVehicleRestoreLedger(currentLedger,kind,candidate,beforeUnsaved);

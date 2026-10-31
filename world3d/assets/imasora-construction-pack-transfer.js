@@ -89,7 +89,30 @@
     packet.checksum = hash(stable(packetBody(packet)));
     return validateTransferPacket(packet);
   }
+  function createCoastTransferPacket({targetProfileId,eventId,auxiliaryKind}) {
+    if (!validProfileId(targetProfileId) || typeof eventId!=="string" || !/^[A-Za-z0-9_-]{8,96}$/.test(eventId) || !Object.hasOwn(BUNDLE_UNITS,auxiliaryKind)) fail("海辺の建材の受取先をたしかめよう。");
+    const quantities={concreteBlockCredits:8,paintSurfaceCredits:64,auxiliaryUnits:{formwork:0,rebar:0,tiles:0,decoration:0}};
+    quantities.auxiliaryUnits[auxiliaryKind]=BUNDLE_UNITS[auxiliaryKind];
+    const packet={version:2,scope:"imasora-coast-kit-transfer-v1",id:"pack-transfer-coast-"+eventId,recipeVersion:"coast-kit-v1",targetProfileId,openingReceipts:[],source:{eventId,auxiliaryKind},quantities,checksum:""};
+    // Only the native coast receipt is used; no home opening receipt is fabricated.
+    const {checksum,...body}=packet;packet.checksum=hash(stable(body));return packet;
+  }
+  function createFlowerTransferPacket({targetProfileId,eventId,recipe}) {
+    if(!validProfileId(targetProfileId)||typeof eventId!=="string"||!/^[A-Za-z0-9_-]{8,96}$/.test(eventId)||!["paint","decoration"].includes(recipe))fail("花の加工の受取先をたしかめよう。");
+    const quantities={concreteBlockCredits:0,paintSurfaceCredits:recipe==="paint"?32:0,auxiliaryUnits:{formwork:0,rebar:0,tiles:0,decoration:recipe==="decoration"?4:0}};
+    const packet={version:3,scope:"imasora-flower-craft-transfer-v1",id:"pack-transfer-flower-"+eventId,recipeVersion:"flower-craft-v1",targetProfileId,openingReceipts:[],source:{eventId,recipe},quantities,checksum:""};
+    const {checksum,...body}=packet;packet.checksum=hash(stable(body));return packet;
+  }
   function validateTransferPacket(packet) {
+    if(packet?.version===3){
+      if(!exactKeys(packet,["version","scope","id","recipeVersion","targetProfileId","openingReceipts","source","quantities","checksum"])||!exactKeys(packet.source,["eventId","recipe"])||!Array.isArray(packet.openingReceipts)||packet.openingReceipts.length)fail("花の加工記録をたしかめよう。");
+      const expected=createFlowerTransferPacket({targetProfileId:packet.targetProfileId,...packet.source});if(stable(packet)!==stable(expected))fail("花の材料と完成品が一致しません。");return packet;
+    }
+    if(packet?.version===2){
+      if(!exactKeys(packet,["version","scope","id","recipeVersion","targetProfileId","openingReceipts","source","quantities","checksum"])||!exactKeys(packet.source,["eventId","auxiliaryKind"])||!Array.isArray(packet.openingReceipts)||packet.openingReceipts.length)fail("海辺の建材記録をたしかめよう。");
+      const expected=createCoastTransferPacket({targetProfileId:packet.targetProfileId,...packet.source});
+      if(stable(packet)!==stable(expected))fail("海辺の建材と受取記録が一致しません。");return packet;
+    }
     if (!exactKeys(packet, ["version", "scope", "id", "recipeVersion", "targetProfileId", "openingReceipts", "quantities", "checksum"])
       || packet.version !== 1 || packet.scope !== TRANSFER_SCOPE || !validTransferId(packet.id)
       || packet.recipeVersion !== RECIPE_VERSION || !validProfileId(packet.targetProfileId)
@@ -163,7 +186,7 @@
 
   return Object.freeze({
     TRANSFER_SCOPE, LEDGER_SCOPE, RECIPE_VERSION, BUNDLE_UNITS,
-    deriveQuantities, createTransferPacket, validateTransferPacket,
+    deriveQuantities, createTransferPacket, createCoastTransferPacket, createFlowerTransferPacket, validateTransferPacket,
     emptyTrialLedger, validateTrialLedger, receiveTransfer, stable
   });
 });

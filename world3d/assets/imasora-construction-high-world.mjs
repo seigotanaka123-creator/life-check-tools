@@ -1,17 +1,23 @@
-import{kitHandlingGeometry}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{beginRoomMotion,replayRoomMotion}from'./imasora-construction-room-motion.mjs?v=120gn';
+import{validateTankWaterLinks,pruneTankWaterLinks}from'./imasora-construction-tank-water-history.mjs?v=120ph';
+import{tankGardenTransition,undoTankGarden}from'./imasora-construction-tank-garden.mjs?v=120ps';
+import{reelWorld,reelTimber,reelGeometry,validateWorldReel,editWorldReel}from'./imasora-construction-reel-world.mjs?v=120ps';
+import{lightItems,lightParts,lightCost,validateLights,editLights}from'./imasora-construction-lights.mjs?v=120pl';
+import{gardenItems,gardenParts,gardenCost,validateGarden,editGarden}from'./imasora-construction-garden.mjs?v=120ps';
+import{outdoorSignItems,outdoorSignParts,outdoorSignWood,validateOutdoorSigns,editOutdoorSigns}from'./imasora-construction-outdoor-signs.mjs?v=120hh';
+import{kitHandlingGeometry}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{beginRoomMotion,replayRoomMotion}from'./imasora-construction-room-motion.mjs?v=120pv';
 import{boardBayBraceParts,boardBayRetrofitWood,boardBaySupports,boardLiftStructure,boardLiftInstalled,boardBayRetrofitAfter}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{beginRoomWalk,endRoomWalk,walkRoomPath,roomWalkPose}from'./imasora-construction-room-walk.mjs?v=120gn';
-import{roomDoorVisualBoxes,roomDoorDelivery}from'./imasora-construction-room-door-delivery.mjs?v=120gn';
+import{beginRoomWalk,endRoomWalk,walkRoomPath,roomWalkPose}from'./imasora-construction-room-walk.mjs?v=120pv';
+import{roomDoorVisualBoxes,roomDoorDelivery}from'./imasora-construction-room-door-delivery.mjs?v=120pv';
 import{wallDoorCutPart}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import{roomLayoutParts,roomLayoutWood}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{roomLayoutParts,roomLayoutWood}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
 import {entranceDoorParts,ENTRANCE_DOOR_TIMBER} from './imasora-construction-building-door.mjs?v=120gn';
 import{highPlanScale,highInnerStairs}from'./imasora-construction-high-interior.mjs?v=120gn';
-import {highAccessLandings} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {highAccessLandings} from './imasora-construction-high-work-position.mjs?v=120ov';
 import {highFloors,highFloorPieces,highRoofBridge,highMaterialCost,validateHighShape} from './imasora-construction-high-shape.mjs?v=120gn';
 export {highMaterialCost} from './imasora-construction-high-shape.mjs?v=120gn';
-import {newHighBuild,beginBoardBayRetrofit,beginTallBoardBayRetrofit,validateHighBuild,beginHighJob,beginHighRoomLayout,beginHighWorkVisit,beginHighPaintVisit,beginRoomPaintVisit,finishHighJob,undoHighBuild,highJobPlan,highRouteSeconds,highPlatform,highBuildingParts,highActorAt} from './imasora-construction-high-build.mjs?v=120gn';
-import {transportGroundHeightAt} from './imasora-construction-transport-site.mjs?v=120gn';
+import {newHighBuild,beginBoardBayRetrofit,beginTallBoardBayRetrofit,validateHighBuild,beginHighJob,beginHighRoomLayout,beginHighWorkVisit,beginHighPaintVisit,beginRoomPaintVisit,finishHighJob,undoHighBuild,highJobPlan,highRouteSeconds,highPlatform,highBuildingParts,highActorAt} from './imasora-construction-high-build.mjs?v=120pv';
+import {transportGroundHeightAt,transportGroundHeightReader} from './imasora-construction-transport-site.mjs?v=120pv';
 import {isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
 import {inspectBuildingGround} from './imasora-construction-building-ground.mjs';
 export const HIGH_WORLD_SCOPE='imasora-world-high-build-v1';
@@ -33,7 +39,7 @@ export function inspectHighSite(site,{heightAt,bounds,blocked,actor,work}={}){
  return{valid:true,site:{...site,y:g.y},issue:'ここに建物・作業台・階段を置けるよ。',samples:g.samples};
 }
 export function validateHighWorld(r){
- if(r?.version===2)return validateCollection(r);
+ if(r?.version>=2)return validateCollection(r);
  ok(r&&Object.keys(r).sort().join('|')==='revision|scope|site|version|work'&&r.scope===HIGH_WORLD_SCOPE&&r.version===1&&Number.isSafeInteger(r.revision)&&r.revision>=0,'高い建物の記録を保護したよ。');
  validateHighSite(r.site);validateHighBuild(r.work);return r;
 }
@@ -58,7 +64,7 @@ function transitionSingle(old,a,{roomObstacles=[]}={}){
  return validateHighWorld({...old,revision:old.revision+1,work:w});
 }
 export function highWorldGeometry(record){
- if(record?.version===2){const all=record.projects.map(p=>{const g=highWorldGeometry(p.record);return{surfaces:g.surfaces.map(b=>({...b,id:p.id+'-'+b.id,angle:g.angle})),boxes:g.boxes.map(b=>({...b,id:p.id+'-'+b.id,angle:g.angle}))};});return{surfaces:all.flatMap(g=>g.surfaces),boxes:all.flatMap(g=>g.boxes),angle:0};}
+ if(record?.version>=2){const all=record.projects.map(p=>{const g=highWorldGeometry(p.record);return{surfaces:g.surfaces.map(b=>({...b,id:p.id+'-'+b.id,angle:g.angle})),boxes:g.boxes.map(b=>({...b,id:p.id+'-'+b.id,angle:g.angle}))};});return{surfaces:all.flatMap(g=>g.surfaces).concat(gardenItems(record).flatMap(gardenParts).map(b=>({...b,y:b.y+b.h/2})),lightItems(record).flatMap(lightParts).filter(b=>b.kind==='solar'||b.kind==='wood'&&b.h===2).map(b=>({...b,underside:b.y-b.h/2,y:b.y+b.h/2}))),boxes:all.flatMap(g=>g.boxes).concat(outdoorSignItems(record).flatMap(outdoorSignParts),gardenItems(record).flatMap(gardenParts),lightItems(record).flatMap(lightParts)),angle:0};}
  validateHighWorld(record);const {site,work}=record,p=highPlatform(work);
  const surfaces=[...(work.craneKit?[{x:-91*highPlanScale(work),z:56*highPlanScale(work),y:work.levels*40,w:38*highPlanScale(work),d:36*highPlanScale(work)}]:[]),...roomLayoutParts(work).filter(b=>b.kind==='landing').map(b=>({...b,y:b.y+b.h/2})),...p.decks.filter(b=>b.y),...p.stairs,...highAccessLandings(work),...(highPlanScale(work)===2?Array.from({length:work.levels},(_,i)=>highInnerStairs(i+1,work).map(b=>({...b,y:b.y+b.h/2}))).flat():[]),...Array.from({length:work.levels},(_,i)=>highFloorPieces(work,i+1)).flat()];
  const bridge=work.levels===highFloors(work)?highRoofBridge(work):null;if(bridge)surfaces.push(bridge);
@@ -69,13 +75,13 @@ export function highWorldGeometry(record){
 
 const foundations=new WeakMap();
 export function assertHighFoundation(record,transport){
- if(!record)return true;validateHighWorld(record);if(record.version===2){for(const p of record.projects)assertHighFoundation(p.record,transport);return true;}
+ if(!record)return true;validateHighWorld(record);if(record.version>=2){for(const p of record.projects)assertHighFoundation(p.record,transport);return true;}
  const soil=transport?.work?.frame?.soil;ok(soil,'建物を支える地面の記録が見つからないよ。');
  const key=JSON.stringify([record.site,highSiteBounds(record.site,record.work)]),trusted=isCapturedConstructionJson(soil),cache=trusted?foundations.get(soil):null;
  if(cache?.has(key))return true;
  // Mutable inputs never share the terrain reader's WeakMap measurements.
  const checked=trusted?transport:structuredClone(transport),terrain={...checked,work:{...checked.work,frame:{...checked.work.frame,job:null}}},b=highSiteBounds(record.site,record.work);
- const g=inspectBuildingGround([b.x,record.site.y,b.z],[b.w,b.h,b.d],{heightAt:(x,z)=>transportGroundHeightAt(terrain,x,z)??0});
+ const read=transportGroundHeightReader(terrain),g=inspectBuildingGround([b.x,record.site.y,b.z],[b.w,b.h,b.d],{heightAt:(x,z)=>read(x,z)??0});
  ok(g.valid&&Math.abs(g.y-record.site.y)<.001,'建物の下の地面が変わるため、その作業はできないよ。建物と材料を残して止めたよ。');
  if(trusted){const set=cache??new Set();if(set.size>=32)set.clear();set.add(key);foundations.set(soil,set);}return true;
 }
@@ -83,29 +89,54 @@ export function assertHighFoundation(record,transport){
 // Keep animation that advanced while an identical checkpoint was being written.
 // Only the in-memory elapsed time is merged; committed materials/site remain authoritative.
 export function acceptHighProgress(saved,local){
- if(saved?.version===2||local?.version===2){if(saved?.version!==2||local?.version!==2||saved.selected!==local.selected||saved.revision!==local.revision+1)return saved;const a=highSelected(saved),b=highSelected(local);if(!a||!b)return saved;const merged=acceptHighProgress(a,b);return {...saved,projects:saved.projects.map(p=>p.id===saved.selected?{...p,record:merged}:p)};}
+ if(saved?.version>=2||local?.version>=2){if(saved?.version!==local?.version||!saved?.projects||saved.selected!==local.selected||saved.revision!==local.revision+1)return saved;const a=highSelected(saved),b=highSelected(local);if(!a||!b)return saved;const merged=acceptHighProgress(a,b);return {...saved,projects:saved.projects.map(p=>p.id===saved.selected?{...p,record:merged}:p)};}
  if(!saved?.work.job||!local?.work.job||saved.revision!==local.revision+1||JSON.stringify(saved.site)!==JSON.stringify(local.site)||saved.work.revision!==local.work.revision||saved.work.job.type!==local.work.job.type||JSON.stringify(saved.work.job.station)!==JSON.stringify(local.work.job.station))return saved;
  return validateHighWorld({...saved,work:{...saved.work,job:{...saved.work.job,elapsed:Math.max(saved.work.job.elapsed,local.work.job.elapsed)}}});
 }
 
 export const HIGH_PROJECT_LIMIT=8;
-export function highProjects(r){return !r?[]:r.version===2?r.projects:[{id:'building-1',record:r}];}
-export function highSelected(r){return r?.version===2?r.projects.find(p=>p.id===r.selected)?.record??null:r??null;}
-export function highSelectedId(r){return r?.version===2?r.selected:r?'building-1':null;}
-export function highWorldTimber(r){return highProjects(r).reduce((n,p)=>n+boardBayRetrofitWood(p.record.work)+highMaterialCost(p.record.work.version>=2?p.record.work.blueprint:null)+roomLayoutWood(p.record.work)+((p.record.work.entranceDoor||p.record.work.job?.type==='DOOR_INSTALL')?ENTRANCE_DOOR_TIMBER:0),0);}
-export function withHighWork(r,work){if(r.version!==2)return{...r,work};return{...r,projects:r.projects.map(p=>p.id===r.selected?{...p,record:{...p.record,work}}:p)};}
+export function highProjects(r){return !r?[]:r.version>=2?r.projects:[{id:'building-1',record:r}];}
+export function highSelected(r){return r?.version>=2?r.projects.find(p=>p.id===r.selected)?.record??null:r??null;}
+export function highSelectedId(r){return r?.version>=2?r.selected:r?'building-1':null;}
+export function highWorldTimber(r){return reelTimber(r)+lightCost(r).wood+gardenCost(r).wood+outdoorSignWood(r)+highProjects(r).reduce((n,p)=>n+boardBayRetrofitWood(p.record.work)+highMaterialCost(p.record.work.version>=2?p.record.work.blueprint:null)+roomLayoutWood(p.record.work)+((p.record.work.entranceDoor||p.record.work.job?.type==='DOOR_INSTALL')?ENTRANCE_DOOR_TIMBER:0),0);}
+export function withHighWork(r,work){if(r.version<2)return{...r,work};return{...r,projects:r.projects.map(p=>p.id===r.selected?{...p,record:{...p.record,work}}:p)};}
 const overlaps=(a,b)=>Math.abs(a.x-b.x)<(a.w+b.w)/2+8&&Math.abs(a.z-b.z)<(a.d+b.d)/2+8;
 function validateCollection(r){
- ok(Object.keys(r).sort().join('|')==='nextId|projects|revision|scope|selected|version'&&r.scope===HIGH_WORLD_SCOPE&&Number.isSafeInteger(r.revision)&&r.revision>=0&&Number.isSafeInteger(r.nextId)&&r.nextId>=1,'建物の一覧を保護したよ。');
- ok(Array.isArray(r.projects)&&r.projects.length<=HIGH_PROJECT_LIMIT,'建物の数をたしかめよう。');const ids=new Set();let jobs=0;
+ ok([2,3,4,5,6].includes(r.version)&&Object.keys(r).sort().join('|')===(r.version===6?'garden|lights|nextId|outdoorSigns|projects|reel|revision|scope|selected|version':r.version===5?'garden|lights|nextId|outdoorSigns|projects|revision|scope|selected|version':r.version===4?'garden|nextId|outdoorSigns|projects|revision|scope|selected|version':r.version===3?'nextId|outdoorSigns|projects|revision|scope|selected|version':'nextId|projects|revision|scope|selected|version')&&r.scope===HIGH_WORLD_SCOPE&&Number.isSafeInteger(r.revision)&&r.revision>=0&&Number.isSafeInteger(r.nextId)&&r.nextId>=1,'建物の一覧を保護したよ。');
+ ok(Array.isArray(r.projects)&&r.projects.length<=HIGH_PROJECT_LIMIT,'建物の数をたしかめよう。');if(r.version>=3)validateOutdoorSigns(r.outdoorSigns);if(r.version>=4)validateGarden(r.garden);if(r.version>=5)validateLights(r.lights);if(r.version===6){validateWorldReel(r.reel);validateTankWaterLinks(r);}const ids=new Set();let jobs=0;
  for(const p of r.projects){ok(p&&Object.keys(p).sort().join('|')==='id|record'&&/^building-[1-9][0-9]*$/.test(p.id)&&Number(p.id.slice(9))<r.nextId&&!ids.has(p.id),'建物の番号が重なっているよ。');ids.add(p.id);ok(p.record?.version===1,'建物の形が読めないよ。');validateHighWorld(p.record);if(p.record.work.job||p.record.work.roomWalkVersion){jobs++;ok(r.selected===p.id,'途中の建物を残してから切り替えよう。');}}
  ok(jobs<=1&&(r.projects.length?ids.has(r.selected):r.selected===null),'選んだ建物をたしかめよう。');
  for(let i=0;i<r.projects.length;i++)for(let j=0;j<i;j++)ok(!overlaps(highSiteBounds(r.projects[i].record.site,r.projects[i].record.work),highSiteBounds(r.projects[j].record.site,r.projects[j].record.work)),'作業台や階段が重なるよ。少し離して置こう。');return r;
 }
 export function transitionHighWorld(old,a,context){
- if(old?.version!==2&&!(a.type==='PLACE'&&a.blueprint))return transitionSingle(old,a,context);
+ if(a.type==='TANK_GARDEN_WATER'){validateHighWorld(old);ok(!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えてから水をあげよう。');const r=tankGardenTransition(old,a);pruneTankWaterLinks(r);return validateHighWorld(r);}
+ if((a.type==='REEL_UNDO'&&old?.reel?.past.at(-1)?.tankWater)||(a.type==='GARDEN_UNDO'&&old?.garden?.history.at(-1)?.tankWater)){validateHighWorld(old);ok(Object.keys(a).every(k=>['type','operationId'].includes(k))&&!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えてからもどそう。');return validateHighWorld(undoTankGarden(old,a));}
+ if(a.type==='REEL_EDIT'||a.type==='REEL_UNDO'){
+  if(old)validateHighWorld(old);ok(!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えてから建築リールを使おう。');
+  const r=old?.version>=2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
+  ok(Object.keys(a).every(k=>['type','edit','operationId'].includes(k)),'道具をえらび直そう。');r.reel=editWorldReel(reelWorld(old),a.type==='REEL_UNDO'?{type:a.type}:{type:a.type,edit:a.edit});r.lights??={version:1,nextId:1,items:[],history:[]};r.garden??={version:1,nextId:1,items:[],history:[]};r.outdoorSigns??={version:1,nextId:1,items:[],history:[]};r.version=6;r.revision++;pruneTankWaterLinks(r);return validateHighWorld(r);
+ }
+ if(a.type==='LIGHT_EDIT'||a.type==='LIGHT_UNDO'){
+  if(old)validateHighWorld(old);ok(!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えて、外へ出てから灯りをつくろう。');
+  const r=old?.version>=2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
+  r.lights=editLights(old?.version>=5?old.lights:null,a);r.garden??={version:1,nextId:1,items:[],history:[]};r.outdoorSigns??={version:1,nextId:1,items:[],history:[]};r.version=Math.max(5,r.version);r.revision++;return validateHighWorld(r);
+ }
+ if(a.type==='GARDEN_EDIT'||a.type==='GARDEN_UNDO'){
+
+  if(old)validateHighWorld(old);ok(!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えて、外へ出てから庭をつくろう。');
+  const r=old?.version>=2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
+  r.garden=editGarden(old?.version>=4?old.garden:null,a);r.outdoorSigns??={version:1,nextId:1,items:[],history:[]};r.version=Math.max(4,r.version);r.revision++;pruneTankWaterLinks(r);return validateHighWorld(r);
+ }
+ if(a.type==='SIGN_EDIT'||a.type==='SIGN_UNDO'){
+
+  if(old)validateHighWorld(old);ok(!highProjects(old).some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えて、外へ出てから看板をつくろう。');
+  const r=old?.version>=2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
+  r.outdoorSigns=editOutdoorSigns(old?.version>=3?old.outdoorSigns:null,a);r.version=Math.max(3,r.version);r.revision++;return validateHighWorld(r);
+ }
+
+ if((!old||old.version<2)&&!(a.type==='PLACE'&&a.blueprint))return transitionSingle(old,a,context);
  if(old)validateHighWorld(old);
- let r=old?.version===2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
+ let r=old?.version>=2?structuredClone(old):{scope:HIGH_WORLD_SCOPE,version:2,revision:old?.revision??0,nextId:old?2:1,selected:old?'building-1':null,projects:highProjects(old).map(p=>structuredClone(p))};
  if(a.type==='PLACE'){
   validateHighShape(a.blueprint);ok(!r.projects.some(p=>p.record.work.job||p.record.work.roomWalkVersion),'いまの作業を終えてから建てよう。');ok(r.projects.length<HIGH_PROJECT_LIMIT,'高い建物は8棟まで置けるよ。');
   const id='building-'+r.nextId++,record=transitionSingle(null,a);r.projects.push({id,record});r.selected=id;

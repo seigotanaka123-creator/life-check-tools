@@ -1,9 +1,10 @@
+import{SIGN_PAINT_TEXT}from'./imasora-construction-sign-text.mjs?v=120hd';
 import{validateHighShape,shapedHighParts}from'./imasora-construction-high-shape.mjs?v=120gn';
-import{validateRoomItem,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{validateRoomItem,roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
 import{validPaintColor}from'./imasora-construction-concrete/paint-colors.mjs';
 const ok=(v,m)=>{if(!v)throw Error(m);},same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),keys=(o,k)=>o&&Object.keys(o).sort().join('|')===k;
 export const DECOR_FACES=['top','bottom','north','south','east','west'];
-export const decorItem=i=>({...structuredClone(i),...('open'in i?{open:false}:{})});
+export const decorItem=i=>({...structuredClone(i),...('open'in i?{open:false}:{}),...(i.kind==='sign'?{text:SIGN_PAINT_TEXT}:{})});
 export const decorKey=t=>t.kind==='fixture'?'item:'+t.itemId+':'+t.face:t.kind+':'+t.floor+':'+t.part+':'+t.face;
 export function validateDecorTarget(t,plan){
  ok(t&&['floor','ceiling','fixture'].includes(t.kind)&&Number.isInteger(t.floor)&&t.floor>=0&&t.floor<=plan.storeys.length,'ぬる階と場所をえらぼう。');

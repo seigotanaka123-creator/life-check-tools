@@ -1,13 +1,15 @@
-import {freeCell,freePourProblem} from './free-build-state.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
+import {freeCell,freePourProblem} from './free-build-state.mjs?v=120pv';
 
 export const FREE_CAST_ACTIONS=new Set(['FREE_BUCKET_LOAD','FREE_POUR','FREE_FINISH']);
 export const CAST_PORTS={truck:{x:0,y:24,z:-43},pump:{x:0,y:35,z:-5},inlet:{x:0,y:23,z:-39},supplyInlet:{x:0,y:24,z:-43.5}};
 export function castPoint(v,p){const c=Math.cos(v.heading),s=Math.sin(v.heading);return{x:v.x+c*p.x+s*p.z,y:p.y+(v.workY??0),z:v.z-s*p.x+c*p.z};}
-export function castingProblem(f,source,cell){
- if(source==='bucket'&&f.height>4&&['framed','wet'].includes(f.stage))return 'この高さはポンプ車から注ぎます。車に乗り、支持脚を出してホースをつないでください。';
+export function castingProblem(f,source,cell,{standY=null}={}){
+ if(source==='bucket'&&(f.height>4||Number.isFinite(standY)&&constructionBase(f)+f.height-standY>4)&&['framed','wet'].includes(f.stage))return 'この高さはポンプ車から注ぎます。車に乗り、支持脚を出してホースをつないでください。';
  const problem=freePourProblem(f,source,cell);if(problem)return problem;
  if(source==='truck'){
-  const port=castPoint(f.truck,CAST_PORTS.truck),c=freeCell(cell),dx=c.x-port.x,dz=c.z-port.z;
+  const port=castPoint(f.truck,CAST_PORTS.truck),c=freeCell(cell,f),dx=c.x-port.x,dz=c.z-port.z;
   if(-Math.sin(f.truck.heading)*dx-Math.cos(f.truck.heading)*dz<2)return '後部の注ぎ口を型枠に向けて停めてください。';
   if(Math.hypot(dx,dz)>72)return '後部の注ぎ口を型枠に近づけてください。';
  }

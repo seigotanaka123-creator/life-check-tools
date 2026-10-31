@@ -1,14 +1,15 @@
+import {nativeSoilLayers} from './imasora-construction-native-soil-layers.mjs?v=120pv';
 import {createBuildingGroundProbe} from './imasora-construction-building-ground.mjs?v=120et';
-import {earthBase,earthHoles,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120gf';
-import {soilVoxel,soilTransportGeometry} from './imasora-construction-soil-transport.mjs?v=120gn';
-import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {fieldWorkOverlaps} from './imasora-construction-field-contact.mjs?v=120gn';
-import {transportFences} from './imasora-construction-transport-field.mjs?v=120gf';
-import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120gf';
-import {PLOT} from './imasora-construction-excavator.js?v=120gf';
-import {EXCAVATION_YARDS,EXCAVATION_GATE,excavationReserved} from './imasora-construction-world-excavation.js?v=120gf';
-import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
-import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
+import {earthBase,earthHoles,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120ov';
+import {soilVoxel,soilTransportGeometry} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {fieldWorkOverlaps} from './imasora-construction-field-contact.mjs?v=120pv';
+import {transportFences} from './imasora-construction-transport-field.mjs?v=120ov';
+import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120ov';
+import {PLOT} from './imasora-construction-excavator.js?v=120ov';
+import {EXCAVATION_YARDS,EXCAVATION_GATE,excavationReserved} from './imasora-construction-world-excavation.js?v=120ov';
+import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
+import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120pv';
 export {SITE as TRANSPORT_SITE};
 const check=(ok,text)=>{if(!ok)throw Error('土運搬の現場：'+text);};
 export function createTransportSceneReadStore(store){
@@ -46,7 +47,7 @@ export function transportSiteReserved(record,position,size,{terrainSupport=false
  // Catalog placement measures the whole foundation again. Other callers still
  // reserve earth and holes, including concrete approach planning.
  let supported=false;
- if(terrainSupport){if(f.job||f.soil.pending||record.work.scoop||record.work.link||record.work.unload)return true;let probe=buildingGroundProbes.get(f.soil);if(!probe){probe=createBuildingGroundProbe({heightAt:(x,z)=>transportGroundHeightAt(record,x,z)??0});buildingGroundProbes.set(f.soil,probe);}const g=probe.inspect(position,size);supported=g.valid&&Number.isFinite(position[1])&&Math.abs(g.y-position[1])<.001;if(!supported)return true;}
+ if(terrainSupport){if(f.job||f.soil.pending||record.work.scoop||record.work.link||record.work.unload)return true;let probe=buildingGroundProbes.get(f.soil);if(!probe){const read=transportGroundHeightReader(record);probe=createBuildingGroundProbe({heightAt:(x,z)=>read(x,z)??0});buildingGroundProbes.set(f.soil,probe);}const g=probe.inspect(position,size);supported=g.valid&&Number.isFinite(position[1])&&Math.abs(g.y-position[1])<.001;if(!supported)return true;}
  const earth=supported?soilTransportGeometry({blocks:{},loose:f.soil.loose??{}}):[...shovelSoilBoxes(f.soil).filter(b=>b.position[1]+b.size/2>.001),{position:[(PLOT.minX+PLOT.maxX)/2,0,(PLOT.minZ+PLOT.maxZ)/2],half:[(PLOT.maxX-PLOT.minX)/2,1,(PLOT.maxZ-PLOT.minZ)/2]}];
  const boxes=[...shovelMachines(f),shovelDumpBody(f),...earth].map(b=>{const h=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);return{x:b.position[0],z:b.position[2],w:h[0]*2,d:h[2]*2,angle:b.axes?0:b.heading??0};});
  return fieldWorkOverlaps({x:o[0],z:o[2]},position,size,[...boxes,...(supported?[]:openedGroundReservations(f.soil))]);
@@ -60,12 +61,22 @@ export function requireTransportSceneCheckpoint(record){
 }
 const columnsCache=new WeakMap();
 function columns(soil){let index=columnsCache.get(soil);if(!index){index=new Map();for(const box of shovelSoilBoxes(soil)){const r=box.size/2;for(let x=Math.floor((box.position[0]-r)/8);x<=Math.floor((box.position[0]+r)/8);x++)for(let z=Math.floor((box.position[2]-r)/8);z<=Math.floor((box.position[2]+r)/8);z++){const key=x+','+z,list=index.get(key)??[];list.push(box);index.set(key,list);}}columnsCache.set(soil,index);}return index;}
-export function transportGroundHeightAt(record,x,z){
- if(!Number.isFinite(x)||!Number.isFinite(z))return undefined;const o=transportSiteOrigin(record),f=record.work.frame,p={x:x-o[0],z:z-o[2]},inside=p.x>=PLOT.minX&&p.x<PLOT.maxX&&p.z>=PLOT.minZ&&p.z<PLOT.maxZ;
- let h=inside||earthBase(f.soil,p.x,p.z)<0?-32:undefined;
- for(const box of [...(columns(f.soil).get(Math.floor(p.x/8)+','+Math.floor(p.z/8))??[]),...visibleTransportSources(f)]){const r=box.size/2;if(p.x>=box.position[0]-r&&p.x<box.position[0]+r&&p.z>=box.position[2]-r&&p.z<box.position[2]+r)h=Math.max(h??0,box.position[1]+r);}
- return h;
+// An inspection owns one read model for its duration. Mutable callers get a
+// fresh model on the next inspection, not an identity-only persistent cache.
+export function transportGroundHeightReader(record){
+ let read=null;return(x,z,reference=null)=>{read??=buildTransportGroundHeightReader(record);return read(x,z,reference);};
 }
+function buildTransportGroundHeightReader(record){
+ const o=transportSiteOrigin(record),f=record.work.frame,layers=f.decks?nativeSoilLayers(f.soil):null,visible=visibleTransportSources(f);
+ return(x,z,reference=null)=>{
+ if(!Number.isFinite(x)||!Number.isFinite(z))return undefined;const p={x:x-o[0],z:z-o[2]},inside=p.x>=PLOT.minX&&p.x<PLOT.maxX&&p.z>=PLOT.minZ&&p.z<PLOT.maxZ;
+ if(layers){let h=layers.read(p.x,p.z,reference,2.01);for(const b of visible){const r=b.size/2,top=b.position[1]+r;if(p.x>=b.position[0]-r&&p.x<b.position[0]+r&&p.z>=b.position[2]-r&&p.z<b.position[2]+r&&(!Number.isFinite(reference)||top<=reference+2.01))h=Math.max(h,top);}return h;}
+ let h=inside||earthBase(f.soil,p.x,p.z)<0?-32:undefined;
+ for(const box of [...(columns(f.soil).get(Math.floor(p.x/8)+','+Math.floor(p.z/8))??[]),...visible]){const r=box.size/2;if(p.x>=box.position[0]-r&&p.x<box.position[0]+r&&p.z>=box.position[2]-r&&p.z<box.position[2]+r)h=Math.max(h??0,box.position[1]+r);}
+ return h;
+ };
+}
+export function transportGroundHeightAt(record,x,z,reference=null){return transportGroundHeightReader(record)(x,z,reference);}
 export function transportVehicleBlockedAt(record,x,z,r=0){
  return createTransportVehicleProbe(record)(x,z,r);
 }

@@ -2,9 +2,9 @@
 // the exact applied record before exposing a new world head. No localStorage.
 import {CONSTRUCTION_STORE} from './imasora-construction-storage.js';
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {validateAuthorityExcavationContinuation} from './imasora-construction-earth-authority.js?v=120gf';
-import {sameEarthRestoreSource,restoreAuthorityEarth} from './imasora-construction-earth-restore.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {validateAuthorityExcavationContinuation} from './imasora-construction-earth-authority.js?v=120ov';
+import {sameEarthRestoreSource,restoreAuthorityEarth} from './imasora-construction-earth-restore.js?v=120pv';
 
 export const EARTH_RESTORE_KEY='construction-earth-restore';
 const HEAD_KEY='construction',LIVE_DB='imasora-world-authority-v1';

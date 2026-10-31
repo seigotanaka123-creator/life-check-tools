@@ -1,0 +1,11 @@
+TensorFlow.js 4.22.0 and TensorFlow.js WASM backend 4.22.0
+Copyright Google LLC and contributors. Apache License, Version 2.0 (LICENSE.txt).
+Official model: TensorFlow DeepLab ADE20K quantized 1 byte, version 1 (Apache 2.0).
+https://www.kaggle.com/models/tensorflow/deeplab
+https://github.com/tensorflow/tfjs-models/tree/master/deeplab
+
+Modified by Imasora development, 2026-10-31:
+Model input/padding, decoder resize, context resize and global average pooling geometry changed from 513 to 193. Learned weight shard bytes are unmodified. Classification remains an experimental candidate, never verified recognition.
+No evaluation photos are included in this directory.
+
+2026-10-31: model-129.json adds a 129 geometry experiment with matching decoder/context/global pooling sizes. The original 193 model.json is retained for comparison. Learned weight shard bytes remain identical.

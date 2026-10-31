@@ -6,3 +6,19 @@
 .hold-dash-button:disabled{opacity:.4}
 .hold-dash-button[hidden]{display:none!important}
 @media(pointer:coarse){.hold-dash-button{display:block}}
+
+/* Dash is upper-left; jump is lower-right, inside the device safe area. */
+@media(pointer:coarse),(max-width:700px),(max-height:500px){
+ body.world-player-game #viewport{--thumb-edge:max(8px,env(safe-area-inset-right));--thumb-bottom:max(8px,env(safe-area-inset-bottom));--thumb-size:56px;--thumb-step:54px;--thumb-rise:14px}
+ body.world-player-game #viewport>#walkDashButton,body.world-player-game .free-concrete>[data-hold-dash]{display:block;right:calc(var(--thumb-edge) + var(--thumb-step))!important;bottom:calc(var(--thumb-bottom) + var(--thumb-rise))!important;width:var(--thumb-size)!important;height:var(--thumb-size)!important;min-width:var(--thumb-size)!important;min-height:var(--thumb-size)!important;padding:3px;box-sizing:border-box}
+ body.world-player-game #viewport>#constructionJumpButton,body.world-player-game .free-concrete>[data-free-jump]{right:var(--thumb-edge)!important;bottom:var(--thumb-bottom)!important;width:var(--thumb-size)!important;height:var(--thumb-size)!important;min-width:var(--thumb-size)!important;min-height:var(--thumb-size)!important;padding:3px;box-sizing:border-box}
+ body.world-player-game #viewport>:is(#walkDashButton,#constructionJumpButton) span,body.world-player-game .free-concrete>:is([data-hold-dash],[data-free-jump]) span{font-size:21px;line-height:22px}
+ body.world-player-game #viewport>:is(#walkDashButton,#constructionJumpButton) b,body.world-player-game .free-concrete>:is([data-hold-dash],[data-free-jump]) b{font-size:11px;line-height:15px}
+ body.world-player-game #viewport.sea-adventure-reserved{--thumb-edge:calc(var(--sea-shelf-width) + max(8px,env(safe-area-inset-right)))}
+}
+@media(max-width:650px) and (min-height:501px){
+ body.world-player-game #viewport.sea-adventure-reserved{--thumb-edge:max(8px,env(safe-area-inset-right));--thumb-bottom:calc(var(--sea-shelf-height) + max(8px,env(safe-area-inset-bottom)))}
+}
+@media(max-height:500px) and (min-width:701px){
+ body.world-player-game .free-concrete .free-deck{right:148px}
+}

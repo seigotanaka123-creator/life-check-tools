@@ -1,4 +1,4 @@
-import './imasora-construction-pack-transfer.js';
+import './imasora-construction-pack-transfer.js?v=120ho';
 
 // Ownership follows the durable, validated box receipts. No extra inventory,
 // currencies, or migration writes are created just to display these tools.

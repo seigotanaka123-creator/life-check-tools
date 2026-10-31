@@ -1,10 +1,10 @@
-import {planWaterBuild,waterBuildNearest,waterBuildLevel,waterBuildTerrainFits} from './imasora-construction-water-build.mjs?v=120fb';
-import {fieldWaterTotal,fieldWaterTarget,nearbyFieldPool,poolKey,validateFieldPools} from './imasora-construction-field-water.mjs?v=120fb';
-import {flowFieldWater,FIELD_WATER_TICK} from './imasora-construction-field-water-flow.mjs?v=120fb';
-import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {planWaterBuild,waterBuildNearest,waterBuildLevel,waterBuildTerrainFits} from './imasora-construction-water-build.mjs?v=120ov';
+import {fieldWaterTotal,fieldWaterTarget,nearbyFieldPool,poolKey,validateFieldPools} from './imasora-construction-field-water.mjs?v=120ov';
+import {flowFieldWater,FIELD_WATER_TICK} from './imasora-construction-field-water-flow.mjs?v=120ov';
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ov';
 // 5-2b: closed water bucket, positional docking, finite transfers. No game wallet.
-import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints} from './imasora-construction-loader-physics.js?v=120gf';
-import {waterWorkFrame,waterBucketPoint,waterFallTime,waterFallPrediction,waterParcelPoint,fieldWaterPathClear,waterTransferPathClear} from './imasora-construction-water-ground.mjs?v=120gf';
+import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints} from './imasora-construction-loader-physics.js?v=120ov';
+import {waterWorkFrame,waterBucketPoint,waterFallTime,waterFallPrediction,waterParcelPoint,fieldWaterPathClear,waterTransferPathClear} from './imasora-construction-water-ground.mjs?v=120ov';
 import {initialWater,advanceWater,waterAction,waterTotal,validateWater} from './imasora-construction-water.js';
 export const TRANSPORT={scope:'mars-water-transport-development-v1',total:768,capacity:128,dt:1/120,rate:80}; // .25 L units; 20 L/s
 export const SOURCE_PORT=Object.freeze({x:-130,y:9,z:-12});
@@ -17,10 +17,10 @@ export const TRANSPORT_OBSTACLES=Object.freeze([
 export function waterSourcePort(s){const p=sharedSupply(s.loader.vehicle,'water-supply');return p?{x:p.x,y:9,z:p.z-32}:SOURCE_PORT;}
 export function waterTransportObstacles(s){const p=sharedSupply(s.loader.vehicle,'water-supply');return p?[{...TRANSPORT_OBSTACLES[0],x:p.x,z:p.z},TRANSPORT_OBSTACLES[1]]:TRANSPORT_OBSTACLES;}
 const validExternalVolume=b=>b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0;
-export function transportMaterialObstacles(loader,external=[]){
-  const v=loader.vehicle;
-  return external.filter(b=>validExternalVolume(b)&&[v,...(v.field?[loader.player]:[])].some(p=>Math.abs(b.x-p.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-p.z)<175+Math.hypot(b.w,b.d)/2)&&b.y<54&&b.y+b.h>8)
-    .map(b=>({id:b.name||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h,minY:b.y,angle:b.angle||0}));
+export function transportMaterialObstacles(loader,external=[],heightAt=null){
+  const v=loader.vehicle,base=v.field?(loader.mode==='foot'&&heightAt?heightAt(loader.player.x,loader.player.z)??v.groundY??0:v.groundY??0):0;
+  return external.filter(b=>validExternalVolume(b)&&[v,...(v.field?[loader.player]:[])].some(p=>Math.abs(b.x-p.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-p.z)<175+Math.hypot(b.w,b.d)/2)&&b.y<base+54&&b.y+b.h>base+8)
+    .map(b=>({id:b.name||'建材',supportSurface:!!b.supportSurface,actorGround:base,x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h,minY:b.y,angle:b.angle||0}));
 }
 export function initialTransport(){const loader=initialLoaderState();loader.vehicle.x=-130;loader.vehicle.z=-110;loader.player={x:-188,y:0,z:-118,heading:0};const water=initialWater();water.reservoir=0;return{schema:1,scope:TRANSPORT.scope,revision:0,time:0,phase:0,paused:false,loader,bucket:{lift:0,tilt:0},source:768,load:0,water,air:[],sequence:0,task:null,direction:4,delivered:0,message:'運転席に乗り、正面の給水槽へ少し前進。停車したら「汲み取る」です。'};}
 export function upgradeWaterTruck(s){if(s.loader.vehicle.waterTruck)return s;const loader={...s.loader,vehicle:{...s.loader.vehicle,waterTruck:true}};if(loader.transition){const t=loader.transition;loader.transition={...t,path:transitionPoints(loader.vehicle,t.side??-1,loader.mode==='boarding')};}return{...s,loader};}
@@ -70,7 +70,7 @@ export function transportAction(state,action,value,external=[],heightAt=()=>0){
   let s=structuredClone(state),a=transportAvailability(s,external,heightAt);
   if(action==='pause'){s.paused=!s.paused;s.message=s.paused?'実験を一時停止しました。':'実験を再開しました。';}
   else if(action==='home'){s.task=null;s.loader=actLoader(s.loader,'home',waterTransportObstacles(s));s.message='レンを安全エリアへ戻しました。車と水はその場所に残ります。';}
-  else if(action==='interact'){if(s.task||s.air.length){s.message='水の移送が終わってから乗り降りしてください。';}else{s.loader=actLoader(s.loader,'interact',[...waterTransportObstacles(s),...transportMaterialObstacles(s.loader,external)]);s.message=s.loader.message;}}
+  else if(action==='interact'){if(s.task||s.air.length){s.message='水の移送が終わってから乗り降りしてください。';}else{s.loader=actLoader(s.loader,'interact',[...waterTransportObstacles(s),...transportMaterialObstacles(s.loader,external,heightAt)]);s.message=s.loader.message;}}
   else if(action==='stop'){s.task=null;s.message='新しい移送を止めました。ホース内・落下中の水は行き先へ届いてから走行できます。';}
   else if(action==='water-mode'){if(!['block','basin'].includes(value))throw Error('水の置き方を選ぼう。');if(s.task||s.air.length)s.message='注水が終わってから選ぼう。';else{s.waterMode=value;s.message=value==='block'?'土と同じ大きさの水ブロック。隣につなぐと間の枠が消えるよ。':'穴の縁まで水をためるよ。必要な量は注ぐ前にわかるよ。';}}
   else if(action==='direction'){if(![1,2,4,8,16,32].includes(value))throw Error('6方向から選んでください。');if(s.task||s.air.length){s.message='注水が終わってから、次に注ぐ水の向きを選んでください。';}else{s.direction=value;s.message='次に注ぐ水の向きを選びました。離れた水路の水は変更しません。';}}
@@ -98,7 +98,7 @@ export function stepTransport(state,input={},dt=TRANSPORT.dt,external=[],heightA
     try{const pool=nearbyFieldPool(s,waterNozzle(s,heightAt));if(pool)s.task={...s.task,pool:pool[0]};}
     catch(e){s.task=null;s.message=e.message;}
   }
-  const busy=!!(s.task||s.air.length),obstacles=[...waterTransportObstacles(s),...transportMaterialObstacles(s.loader,external)];s.loader=stepLoader(s.loader,busy?{brake:true}:input,dt,obstacles);
+  const busy=!!(s.task||s.air.length),obstacles=[...waterTransportObstacles(s),...transportMaterialObstacles(s.loader,external,heightAt)];s.loader=stepLoader(s.loader,busy?{brake:true}:input,dt,obstacles);
   if(s.loader.mode!==state.loader.mode||s.loader.hit)s.message=s.loader.message;
   const type=s.task?.type,target=['pour','field'].includes(type)?{lift:.8,tilt:.7}:{lift:0,tilt:0};
   s.bucket.lift=approach(s.bucket.lift,target.lift,dt*.42);s.bucket.tilt=approach(s.bucket.tilt,target.tilt,dt*.7);

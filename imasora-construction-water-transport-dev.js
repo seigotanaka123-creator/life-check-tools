@@ -1,10 +1,10 @@
 import {setBoardPrompt} from './assets/imasora-construction-boarding.js';
 import * as THREE from './assets/three.module.min.js';
-import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ey';
-import {upgradeWaterTruck,initialTransport,advanceTransport,transportAction,transportAvailability,transferTotals,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js?v=120fb';
-import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js?v=120fb';
-import {TransportSession} from './assets/imasora-construction-water-transport-storage.js?v=120fb';
+import {officialCharacter} from './assets/imasora-construction-layout.js?v=120ob';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ov';
+import {upgradeWaterTruck,initialTransport,advanceTransport,transportAction,transportAvailability,transferTotals,TRANSPORT_OBSTACLES} from './assets/imasora-construction-water-transport.js?v=120ov';
+import {createWaterTransportView,updateWaterTransportView} from './assets/imasora-construction-water-transport-view.js?v=120ov';
+import {TransportSession} from './assets/imasora-construction-water-transport-storage.js?v=120ov';
 const $=id=>document.getElementById(id),local=['127.0.0.1','localhost','[::1]'].includes(location.hostname),testMode=new URLSearchParams(location.search).get('waterTransportTest')==='1';
 let state=upgradeWaterTruck(initialTransport()),ready=false,last=0,ui=0,autosave=0,saveText='読み込み中',view=0,yawOffset=Math.PI,pitch=.55,distance=225,drag=null;
 const session=new TransportSession(),keys=new Set(),held=new Map(),taps=new Map(),scene=new THREE.Scene();scene.background=new THREE.Color(0xd8e4d7);scene.fog=new THREE.Fog(0xd8e4d7,1000,2400);

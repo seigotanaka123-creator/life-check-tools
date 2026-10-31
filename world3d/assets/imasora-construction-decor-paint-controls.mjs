@@ -1,12 +1,12 @@
 import * as T from'./three.module.min.js';
 import{shapedHighParts}from'./imasora-construction-high-shape.mjs?v=120gn';
-import{ROOM_KINDS}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
-import{decorItem,decorKey,decorPaintPlan,DECOR_FACES}from'./imasora-construction-decor-paint.mjs?v=120gn';
-import{decorPainterReady,decorPaintTarget,decorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120gn';
-import{highWorldPoint}from'./imasora-construction-high-world.mjs?v=120gn';
+import{ROOM_KINDS}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
+import{decorItem,decorKey,decorPaintPlan,DECOR_FACES}from'./imasora-construction-decor-paint.mjs?v=120hd';
+import{decorPainterReady,decorPaintTarget,decorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120pv';
+import{highWorldPoint}from'./imasora-construction-high-world.mjs?v=120pv';
 import{BRIGHT_PAINTS}from'./imasora-construction-concrete/paint-colors.mjs';
-import{colorStudioTemplate,installColorStudios}from'./imasora-construction-concrete/color-studio.mjs';
-import{freeStepUndoTarget}from'./imasora-construction-concrete/free-step-undo.mjs?v=120ft';
+import{colorStudioTemplate,installColorStudios}from'./imasora-construction-concrete/color-studio.mjs?v=120hg';
+import{freeStepUndoTarget}from'./imasora-construction-concrete/free-step-undo.mjs?v=120hb';
 const all=Array.from({length:16},(_,i)=>i);
 export function createDecorPaintControls({host,record,buildingId,project,credits,show,ready,generation,perform,undo,inspect,look,onOpen,onClose,preview,lastIssue}){
  const root=document.createElement('section');root.className='decor-paint-controls';root.innerHTML='<button data-dp="open">🎨 床・天井・家具をぬる</button><div data-dp-body hidden><div class="upper-paint-heading"><strong>🎨 おへやをカラフルに！</strong><button data-dp="close">とじる</button></div><div data-dp-kinds></div><div data-dp-floors></div><div class="decor-location"><button data-dp="prev" aria-label="ひとつ前の場所">◀</button><strong data-dp-target></strong><button data-dp="next" aria-label="つぎの場所">▶</button></div><button data-dp="pick">👆 現場をタップしてえらぶ</button><div data-dp-faces></div><div class="decor-swatches" aria-label="おへやのペンキの色"></div>'+colorStudioTemplate()+'<div data-dp-tools></div><div data-dp-patterns></div><p data-dp-note role="status"></p><div class="decor-actions"><button data-dp="apply">ここをぬる</button><button data-dp="undo">↶ 1つ前にもどす</button></div></div>';host.append(root);
@@ -30,5 +30,5 @@ export function createDecorPaintControls({host,record,buildingId,project,credits
  }
  return{root,refresh,close,get opened(){return opened;},get target(){return target;},get floor(){return floor;},get ceiling(){return kind==='ceiling';},get selecting(){return opened&&picking&&ready();},get viewTarget(){if(!target)return null;return highWorldPoint(record().site,{x:32,y:floor*40+18,z:0});},pickRay(ray){const r=record(),matrix=new T.Matrix4().makeRotationY(r.site.turn*Math.PI/2);matrix.setPosition(r.site.x,r.site.y,r.site.z);const local=ray.ray.clone().applyMatrix4(matrix.invert()),choices=list();let nearest=null;for(let n=0;n<choices.length;n++){const t=choices[n],item=t.kind==='fixture'?wItem(r.work,t.itemId):null,parts=t.kind==='fixture'?null:shapedHighParts(t.kind==='floor'?t.floor:t.floor+1,r.work),boxes=item?item.boxes:[parts[t.part]];for(const p of boxes){const hit=local.intersectBox(new T.Box3(new T.Vector3(p.x-p.w/2,p.y-p.h/2,p.z-p.d/2),new T.Vector3(p.x+p.w/2,p.y+p.h/2,p.z+p.d/2)),new T.Vector3());if(hit){const d=hit.distanceTo(local.origin);if(!nearest||d<nearest.d)nearest={n,d};}}}if(nearest){index=nearest.n;choose();}}};
 }
-import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
 function wItem(w,id){const i=w.roomLayout.items.find(i=>i.id===id);return{boxes:roomItemParts(i)};}

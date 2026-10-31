@@ -10,8 +10,8 @@ import {
   buildFloweringHeroCharacter360,
   disposeMatureCharacterModel,
   setMatureCharacterModelWireframe,
-} from "./imasora-character-360.js";
-import { MARS_SHOPKEEPER_ID, MARS_SHOPKEEPER_DESCRIPTOR, buildMarsShopkeeper360 } from './imasora-mars-shopkeeper-360.js?v=20260905-back-apron-v415';
+} from "./imasora-character-360.js?v=120ob";
+import { MARS_SHOPKEEPER_ID, MARS_SHOPKEEPER_DESCRIPTOR, buildMarsShopkeeper360 } from './imasora-mars-shopkeeper-360.js?v=120ob';
 
 const canvas = document.getElementById("characterCanvas");
 const stage = document.getElementById("stage");

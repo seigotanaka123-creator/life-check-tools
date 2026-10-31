@@ -1,23 +1,23 @@
-import {toolkitSummary,toolkitDetails} from '../imasora-construction-toolkit.mjs?v=120fs';
-import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=119bf';
-import {createFreeBuildController} from './free-build-controller.mjs?v=120gn';
-import {createEmbeddedSiteView} from './site-view.mjs?v=120ds';
-import {installWorkshopFence} from './workshop-fence.mjs';
+import {toolkitSummary,toolkitDetails} from '../imasora-construction-toolkit.mjs?v=120ho';
+import {holdDashButtonTemplate} from '../imasora-hold-dash.mjs?v=120od';
+import {createFreeBuildController} from './free-build-controller.mjs?v=120pv';
+import {createEmbeddedSiteView} from './site-view.mjs?v=120ov';
+import {installWorkshopFence} from './workshop-fence.mjs?v=120ov';
 import {constructionMovePadTemplate} from './move-pad.mjs?v=119bf';
 import {onFinishedSurface} from './c2-3d-physics.mjs';
-import {concreteLocation,nextFloorProblem,moveConcreteFloorProblem,concreteBuildOverlap,completedConcreteGeometry,MAX_CONCRETE_FLOORS} from './projects.mjs?v=120gn';
-import {floorMask,floorPanels,floorPanelsProblem,partCount} from './floor-parts.mjs?v=120ds';
-import {createFloorEditor} from './floor-editor.mjs';
-import {createCompletedFloors} from './completed-floors.mjs?v=120gn';
-import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120gn';
-import {LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120gn';
+import {concreteLocation,nextFloorProblem,moveConcreteFloorProblem,concreteBuildOverlap,completedConcreteGeometry,MAX_CONCRETE_FLOORS} from './projects.mjs?v=120pv';
+import {floorMask,floorPanels,floorPanelsProblem,partCount} from './floor-parts.mjs?v=120hb';
+import {createFloorEditor} from './floor-editor.mjs?v=120hb';
+import {createCompletedFloors} from './completed-floors.mjs?v=120pv';
+import {createProfileSiteController} from '../imasora-construction-profile-site-controller.js?v=120pv';
+import {LIVE_WORLD_DB} from '../imasora-world-save-service.js?v=120pv';
 import {availableMixCells,MIX_DURATION_MS,CURE_DURATION_MS} from './mixing.mjs';
 
 // This controller uses only received materials in the world's existing save.
 // Loan stock, test seeding and legacy C1/C2 databases have no entry here.
 export function createLiveConcreteController({service,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onLayoutChange=()=>{},onError}){
  if(service.mode!=='live'||!service.excavationLive||service.store?.name!==LIVE_WORLD_DB)throw Error('通常の工事現場保存が必要です。');
- const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=120dz',import.meta.url).href;document.head.append(style);
+ const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=120nx',import.meta.url).href;document.head.append(style);
  const launcher=document.createElement('section');launcher.className='concrete-launcher';
  launcher.innerHTML='<h3>コンクリート工房</h3><p>建材受取所で受け取った材料を練り、型枠に流して床を作ります。</p><button data-action="entrance">工房の入口へ移動</button><button data-action="enter">工房に入る</button><p class="entry-status" role="status"></p>';
  launcher.insertAdjacentHTML('beforeend','<div data-completed-menu hidden><label>保存した作品 <select aria-label="保存したコンクリート床"></select></label><button data-action="visitfloor">完成した床へ移動</button></div>');
@@ -212,7 +212,7 @@ export function createLiveConcreteController({service,state,scene,camera,charact
  window.addEventListener('blur',suspend);document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});window.addEventListener('pagehide',suspend);
  sync();
  const free=createFreeBuildController({service,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onLayoutChange,onError,launcher,canEnter:()=>!active&&!busy&&!clockSaving&&!service.blocked});
- return{get resumePoint(){return free.resumePoint;},resumeSaved:point=>free.resumeSaved(point),autosave:()=>free.active?free.autosave():save(),get active(){return active||free.active;},get busy(){return busy||clockSaving||free.busy;},doorTarget:name=>!active&&!busy&&!clockSaving?free.doorTarget(name):null,enterAtDoor:name=>!active&&!busy&&!clockSaving?free.enterAtDoor(name):false,pedestrianBlockedAt:(x,z)=>free.pedestrianBlockedAt(x,z),leave:(...args)=>free.active?free.leave(...args):leave(...args),save:()=>free.active?free.save():save(),toEntrance,install,contactGeometry:()=>({floors:completedConcreteGeometry(project()),walls:free.contactGeometry().walls}),overlapsVehicle:(p,size)=>state.map==='construction'&&free.overlapsVehicle(p,size),overlapsBuild:(p,size)=>state.map==='construction'&&concreteBuildOverlap(project(),p,size),handleKey:e=>free.active?free.handleKey(e):view.handleKey(e),look:(...args)=>free.active?free.look(...args):view.look(...args),update(delta){
+ return{get resumePoint(){return free.resumePoint;},resumeSaved:point=>free.resumeSaved(point),autosave:()=>free.active?free.autosave():save(),get jumpMotion(){return free.active?free.jumpMotion:view.jumpMotion??null;},get active(){return active||free.active;},get busy(){return busy||clockSaving||free.busy;},doorTarget:name=>!active&&!busy&&!clockSaving?free.doorTarget(name):null,enterAtDoor:name=>!active&&!busy&&!clockSaving?free.enterAtDoor(name):false,pedestrianBlockedAt:(x,z)=>free.pedestrianBlockedAt(x,z),leave:(...args)=>free.active?free.leave(...args):leave(...args),save:()=>free.active?free.save():save(),toEntrance,install,contactGeometry:()=>({floors:completedConcreteGeometry(project()),walls:free.contactGeometry().walls}),overlapsVehicle:(p,size)=>state.map==='construction'&&free.overlapsVehicle(p,size),overlapsBuild:(p,size)=>state.map==='construction'&&concreteBuildOverlap(project(),p,size),handleKey:e=>free.active?free.handleKey(e):view.handleKey(e),look:(...args)=>free.active?free.look(...args):view.look(...args),update(delta){
   if(free.update(delta))return true;
   if(active&&!paused&&!document.hidden){view.tick(delta);if(!busy&&!clockSaving&&!service.blocked&&!controller.pending&&!confirmation){const p=project(),dt=Math.max(0,Math.min(.05,delta))*1000;if(p.mixer?.pending)mixMs=Math.min(MIX_DURATION_MS-p.mixer.pending.elapsedMs,mixMs+dt);if(p.site.stage==='curing'&&p.cureElapsedMs!=null)cureMs=Math.min(CURE_DURATION_MS-p.cureElapsedMs,cureMs+dt);void flushClocks();}}
   uiElapsed+=delta;if(uiElapsed>.12){uiElapsed=0;refresh();}return active;

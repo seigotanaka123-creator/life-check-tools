@@ -1,11 +1,11 @@
 import{stairEntry,stairExit}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import{overlaps}from'./imasora-construction-concrete/free-vehicle-shape.mjs';
-import{decorToolDetour}from'./imasora-construction-decor-tool-route.mjs?v=120gn';
-import{decorItem,decorParts,decorPatches,decorPoint,validateDecorTarget}from'./imasora-construction-decor-paint.mjs?v=120gn';
-import{roomGraphRoute,roomPaintRoute,roomPaintVisiblePart}from'./imasora-construction-building-room.mjs?v=120gn';
-import{highRoomNodes,highWorkSolids,highWorkBody,highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120gn';
-import{highWorldPoint,highLocalPoint}from'./imasora-construction-high-world.mjs?v=120gn';
-import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120gn';
+import{overlaps}from'./imasora-construction-concrete/free-vehicle-shape.mjs?v=120ov';
+import{decorToolDetour}from'./imasora-construction-decor-tool-route.mjs?v=120pv';
+import{decorItem,decorParts,decorPatches,decorPoint,validateDecorTarget}from'./imasora-construction-decor-paint.mjs?v=120hd';
+import{roomGraphRoute,roomPaintRoute,roomPaintVisiblePart}from'./imasora-construction-building-room.mjs?v=120pv';
+import{highRoomNodes,highWorkSolids,highWorkBody,highWorkBodyHits}from'./imasora-construction-high-work-position.mjs?v=120ov';
+import{highWorldPoint,highLocalPoint}from'./imasora-construction-high-world.mjs?v=120pv';
+import{upperSegmentHitsBox}from'./imasora-construction-high-casting.mjs?v=120pv';
 const ok=(v,m)=>{if(!v)throw Error(m);},point=(x,y,z,heading=0)=>({x,y,z,heading}),all=Array.from({length:16},(_,i)=>i),sameBox=(a,b)=>['x','y','z','w','h','d'].every(k=>a[k]===b[k]);
 export function decorInstalledItem(w,t){if(t.kind!=='fixture')return null;const i=w.roomLayout?.items.find(i=>i.id===t.itemId);ok(i&&i.floor===t.floor,'家具をえらび直そう。');return decorItem(i);}
 export function decorSurface(t){return{interior:true,decor:true,level:t.floor+1,target:structuredClone(t)};}

@@ -1,10 +1,10 @@
-import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 // Main-world finite water work. No copied wallet, purchase API, storage or loan grant.
-import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport,TRANSPORT_OBSTACLES,waterTransportObstacles,waterSourcePort} from './imasora-construction-water-transport.js?v=120gf';
-import {flowFieldWater} from './imasora-construction-field-water-flow.mjs?v=120fb';
-import {walkingClear} from './imasora-construction-loader-physics.js?v=120gf';
+import {initialTransport,stepTransport,transportAction,transferTotals,validateTransport,TRANSPORT_OBSTACLES,waterTransportObstacles,waterSourcePort} from './imasora-construction-water-transport.js?v=120ov';
+import {flowFieldWater} from './imasora-construction-field-water-flow.mjs?v=120ov';
+import {walkingClear} from './imasora-construction-loader-physics.js?v=120ov';
 import {beginWaterEdit,finishWaterEdit,breakWaterEdits,undoWaterEdit,validateWaterEdits} from './imasora-construction-water-undo.mjs?v=120fb';
-import {waterBuildTerrainFits,waterBuildCellSize} from './imasora-construction-water-build.mjs?v=120fb';
+import {waterBuildTerrainFits,waterBuildCellSize} from './imasora-construction-water-build.mjs?v=120ov';
 export const WORLD_WATER_SCOPE='construction-world-water-v1';
 import{WATER_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
 export{WATER_YARDS};

@@ -1,10 +1,10 @@
-import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120pl';
 // Finite received floors use the approved joint solver, never its demo inventory.
-import{BEAM_ISSUE,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
-import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=120gn';
-import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120gn';
-import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js?v=120gn';
-import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120gn';
+import{BEAM_ISSUE,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
+import {actCrane,stepCrane,pickOption} from './imasora-construction-crane.js?v=120pv';
+import {purchasedTimberAction,timberPhysicsState,refreshTimberLedger} from './imasora-construction-purchased-timber.js?v=120pv';
+import {component,floatReadout,floatingView,restoreFloatingFlags,floatingPlacement,releaseFloating,bindPlacedCargo,bindLandedCargo,stepFloating} from './imasora-construction-floating-assembly-physics.js?v=120pv';
+import {joinOption,detachOption,beginJoin,stepJoining,touchingFaces,JOIN_SECONDS} from './imasora-construction-floating-joints.js?v=120pv';
 export {component,floatReadout,floatingView,floatingPlacement,stepFloating,joinOption,detachOption};
 const copy=structuredClone,ok=(v,m)=>{if(!v)throw Error(m);};
 // v460 saves are read without mutation. Their IDs, poses and cargo stay intact.

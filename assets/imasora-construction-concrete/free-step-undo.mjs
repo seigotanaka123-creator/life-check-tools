@@ -2,19 +2,31 @@ import {PAINT_REMOVE_COLOR} from './free-paint-removal.mjs?v=120dm';
 // Bounded work steps, without copying save history, wallets or walking.
 // Capture is derived by the project replay, never accepted from an action.
 const names={HIGH_SHAPED_FRAME:'形をえらんで上の階の型枠を組んだ',HIGH_REPLACE:'上の階に作品を置いた',HIGH_RECOVER:'上の階の生コンを回収した',HIGH_FRAME:'上の階の型枠を組んだ',HIGH_UNFRAME:'上の階の型枠を回収した',HIGH_CONNECT:'上階ホースをつないだ',HIGH_DISCONNECT:'上階ホースを外した',HIGH_BEGIN:'上階へ生コンを注いだ',HIGH_FINISH:'上の階をコテでならした',HIGH_CURE:'上の階の生コンを固めた',HIGH_DEMOLD:'上の階の型枠を外した',HIGH_STORE:'上の階の作品をしまった',DESIGN:'形をえらんだ',FRAME:'型枠を組んだ',FRAME_RAISED:'型枠を組んだ',UNFRAME:'空の型枠を回収した',FOUNDATION_BUILD:'土台をつくった',FOUNDATION_REMOVE:'土台を片付けた',SUPPLY:'原料を積んだ',MIX_START:'生コンを練った',MIX_CANCEL:'練るのをやめた',BUCKET_LOAD:'バケツにくんだ',BUCKET_RETURN:'バケツの生コンを戻した',POUR:'生コンを注いだ',RECOVER:'生コンを回収した',FINISH:'コテでならした',CURE:'生コンを固めた',DEMOLD:'型枠を外した',LEGS:'支持脚を動かした',CONNECT:'ホースの接続を変えた',PRIME:'ホースに送った',DRAIN:'ホースから回収した',PAINT:'ペンキをぬった',SET_WORK_PARTS:'作品の部分を変えた',MOVE_WORK:'作品を動かした',TRANSFORM_WORK:'作品を回した',TRANSFORM_SUPPORTED_WORK:'土台の作品を動かした'};
+names.HIGH_LEVEL_FRAME='高さをえらんで上階の型枠を組んだ';names.HIGH_ADD_LEVEL_FRAME='高さをえらんで上階の次の型枠を組んだ';
+names.HIGH_SIZED_FRAME='大きさをえらんで上階の型枠を組んだ';names.HIGH_ADD_SIZED_FRAME='大きさをえらんで上階の次の型枠を組んだ';
+names.DESIGN_SIZED='細かい大きさの形をえらんだ';
+names.DESIGN_LEVELS='マスごとに高さをえらんだ';
 names.HIGH_ADD_FRAME='上の階に次の型枠を組んだ';names.HIGH_ADD_SHAPED_FRAME='上の階に次の型枠を組んだ';names.HIGH_ADD_REPLACE='上の階に別の作品を置いた';
 names.DECOR_PAINT='床・天井・家具に色をぬった';
 names.BUILDING_PAINT='建物の壁・柱に色をぬった';
 names.HIGH_PAINT='上の階の作品に色をぬった';
 export const FREE_STEP_ACTIONS=new Set(Object.keys(names).map(n=>'FREE_'+n));
 export const FREE_STEP_UNDO_LIMIT=10;
-const keep=new Set(['FREE_HIGH_TICK','FREE_HIGH_FLOW_FINISH','FREE_HIGH_FLOW_CANCEL','FREE_HIGH_CURE_TICK','FREE_PARK_VEHICLES','FREE_BOARD','FREE_LEAVE','FREE_MIX_TICK','FREE_CURE_TICK']);
-const fields={HIGH_ADD_FRAME:['upperLayoutVersion'],HIGH_ADD_SHAPED_FRAME:['upperLayoutVersion'],HIGH_ADD_REPLACE:['upperLayoutVersion'],DECOR_PAINT:['decorPaint'],BUILDING_PAINT:['buildingPaint'],DESIGN:['mask','height'],FRAME:['stage','mask','height','baseY'],FRAME_RAISED:['stage','mask','height','baseY'],UNFRAME:['stage','baseY'],SUPPLY:['mixer'],MIX_START:['mixer','wet'],MIX_CANCEL:['mixer','wet'],BUCKET_LOAD:['wet','bucket'],BUCKET_RETURN:['wet','bucket'],POUR:['bucket','wet','hose','fill','stage'],RECOVER:['wet','fill','stage'],FINISH:['stage'],CURE:['stage','elapsedMs'],DEMOLD:['fill','stage','baseY'],CONNECT:['connected'],PRIME:['wet','hose'],DRAIN:['wet','hose'],PAINT:['paintUndo'],SET_WORK_PARTS:['stage']};
+const keep=new Set(['IMPORT_UPPER_DESIGN','SAVE_UPPER_DESIGN','RENAME_UPPER_DESIGN','FORGET_UPPER_DESIGN','IMPORT_WORK_DESIGN','SAVE_WORK_DESIGN','RENAME_WORK_DESIGN','FORGET_WORK_DESIGN','FREE_HIGH_TICK','FREE_HIGH_FLOW_FINISH','FREE_HIGH_FLOW_CANCEL','FREE_HIGH_CURE_TICK','FREE_PARK_VEHICLES','FREE_BOARD','FREE_LEAVE','FREE_MIX_TICK','FREE_CURE_TICK']);
+const fields={HIGH_ADD_SIZED_FRAME:['upperLayoutVersion'],HIGH_ADD_LEVEL_FRAME:['upperLayoutVersion'],HIGH_ADD_FRAME:['upperLayoutVersion'],HIGH_ADD_SHAPED_FRAME:['upperLayoutVersion'],HIGH_ADD_REPLACE:['upperLayoutVersion'],DECOR_PAINT:['decorPaint'],BUILDING_PAINT:['buildingPaint'],DESIGN_SIZED:['mask','height','pourTargets','layout'],DESIGN:['mask','height'],DESIGN_LEVELS:['mask','height','pourTargets'],FRAME:['stage','mask','height','baseY'],FRAME_RAISED:['stage','mask','height','baseY'],UNFRAME:['stage','baseY'],SUPPLY:['mixer'],MIX_START:['mixer','wet'],MIX_CANCEL:['mixer','wet'],BUCKET_LOAD:['wet','bucket'],BUCKET_RETURN:['wet','bucket'],POUR:['bucket','wet','hose','fill','stage'],RECOVER:['wet','fill','stage'],FINISH:['stage'],CURE:['stage','elapsedMs'],DEMOLD:['fill','stage','baseY'],CONNECT:['connected'],PRIME:['wet','hose'],DRAIN:['wet','hose'],PAINT:['paintUndo'],SET_WORK_PARTS:['stage']};
 export function captureFreeStep(p,a){
  if(!FREE_STEP_ACTIONS.has(a.type)||![true,'ten'].includes(a.recordStep))return null;
  const name=a.type.slice(5),f=p.freeBuild,before={freeBuild:{},absent:[]};
  if(name.startsWith('HIGH_'))for(const key of ['highCastings','highPipe','hose','bucket'])if(Object.hasOwn(f,key))before.freeBuild[key]=f[key];else before.absent.push(key);
+ if(name.startsWith('HIGH_')&&Object.hasOwn(f,'upperRemainder'))before.freeBuild.upperRemainder=f.upperRemainder;else if(['HIGH_LEVEL_FRAME','HIGH_ADD_LEVEL_FRAME','HIGH_SIZED_FRAME','HIGH_ADD_SIZED_FRAME'].includes(name))before.absent.push('upperRemainder');
  for(const key of fields[name]??[])if(Object.hasOwn(f,key))before.freeBuild[key]=f[key];else before.absent.push(key);
+ // Old uniform DESIGN steps must keep their exact historical snapshot fields.
+ if(['DESIGN','DESIGN_LEVELS'].includes(name)&&Object.hasOwn(f,'layout'))before.freeBuild.layout=f.layout;
+ if(['FOUNDATION_BUILD','FRAME_RAISED'].includes(name)&&Object.hasOwn(a,'layout')){if(Object.hasOwn(f,'layout'))before.freeBuild.layout=f.layout;else before.absent.push('layout');}
+ if(name==='FRAME_RAISED'&&a.partial===true&&!a.layout&&Object.hasOwn(f,'layout'))before.freeBuild.layout=f.layout;
+ if(name==='DESIGN'&&Object.hasOwn(f,'pourTargets'))before.freeBuild.pourTargets=f.pourTargets;
+ // Optional new instructions own their patch; old operations retain exact snapshots.
+ if(['FOUNDATION_BUILD','FRAME_RAISED'].includes(name)&&Object.hasOwn(a,'levels'))for(const key of ['mask','height','pourTargets'])if(!Object.hasOwn(before.freeBuild,key)&&!before.absent.includes(key)){if(Object.hasOwn(f,key))before.freeBuild[key]=f[key];else before.absent.push(key);}
  if(name==='SUPPLY')before.mixer=p.mixer;
  if(name.startsWith('FOUNDATION_'))before.foundation=p.foundation;
  if(name==='DEMOLD')before.completedLength=f.completed.length;

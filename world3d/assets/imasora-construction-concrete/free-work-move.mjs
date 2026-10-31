@@ -1,9 +1,10 @@
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
-import {freeWorkCells,freeWorkMask,freeFilledMask} from './free-work-parts.mjs';
-import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120ds';
-import {vehicleFootprints,overlaps} from './free-vehicle-contact.mjs?v=120gn';
-import {FRAME_RACK} from './free-frames.mjs?v=120gn';
-import {rotateFreeWork} from './free-work-rotation.mjs';
+import {groundQueries} from './ground-grid.mjs?v=120hb';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
+import {freeWorkCells,freeWorkMask,freeFilledMask} from './free-work-parts.mjs?v=120hb';
+import {floorPanels,boxesOverlap} from './floor-parts.mjs?v=120hb';
+import {liveVehicleFootprints,overlaps} from './free-vehicle-contact.mjs?v=120pv';
+import {FRAME_RACK} from './free-frames.mjs?v=120pv';
+import {rotateFreeWork} from './free-work-rotation.mjs?v=120hb';
 
 // Translation changes only the work's anchor. Stored parts keep their offsets,
 // concrete volume and face colours; moving never restores a stored part.
@@ -18,10 +19,10 @@ export function freeWorkMoveProblem(p,index,position,quarterTurns=0){
  if(!quarterTurns&&w.x===position.x&&w.z===position.z)return '移動先は現在の場所と同じです。';
  const others=[...(p.completedFloors??[]).flatMap(floorPanels),...f.completed.flatMap((v,i)=>i===index?[]:freeWorkCells(v))];
  for(const c of freeWorkCells({...rotateFreeWork(w,quarterTurns),x:position.x,z:position.z})){
-  const box={...c,w:16,d:16};
+  const box={...c,w:c.w??16,d:c.d??16};
   if(p.location&&boxesOverlap(box,{...p.location,w:296,d:296}))return '工房・通路と重なります。';
   if(f.stage!=='complete'&&boxesOverlap(box,{...f.location,w:296,d:296}))return '施工中の区画と重なります。';
-  if(others.some(v=>boxesOverlap(box,{...v,w:16,d:16})))return 'ほかの完成床・作品と重なります。辺を合わせてください。';
+  if(others.some(v=>boxesOverlap(box,{...v,w:v.w??16,d:v.d??16})))return 'ほかの完成床・作品と重なります。辺を合わせてください。';
  }
  return '';
 }
@@ -29,13 +30,13 @@ export function freeWorkMoveProblem(p,index,position,quarterTurns=0){
 export function freeWorkMoveEnvironmentProblem(p,index,position,{foot,blockedAt=()=>false,supportHeightAt=()=>0}={},quarterTurns=0){
  const problem=freeWorkMoveProblem(p,index,position,quarterTurns);if(problem)return problem;
  const f=p.freeBuild,w=f.completed[index],next={...rotateFreeWork(w,quarterTurns),x:position.x,z:position.z};
- for(const c of [...freeWorkCells(w),...freeWorkCells(next)])if(foot&&Math.abs(c.x-f.location.x-foot.x)<20&&Math.abs(c.z-f.location.z-foot.z)<20)return '足元の作品は移動できません。元の場所・移動先から離れてください。';
+ for(const c of [...freeWorkCells(w),...freeWorkCells(next)])if(foot&&Math.abs(c.x-f.location.x-foot.x)<(c.w??16)/2+12&&Math.abs(c.z-f.location.z-foot.z)<(c.d??16)/2+12)return '足元の作品は移動できません。元の場所・移動先から離れてください。';
  for(const c of freeWorkCells(next)){
-  for(const dx of [-4,4])for(const dz of [-4,4])if(blockedAt(c.x+dx,c.z+dz,4))return '建物・土・水などがある場所へは移動できません。';
-  for(const dx of [-7.9,0,7.9])for(const dz of [-7.9,0,7.9]){const y=supportHeightAt(c.x+dx,c.z+dz);if(!Number.isFinite(y)||Math.abs(y)>.12)return '平らな地面へ配置してください。';}
-  const tile={x:c.x-f.location.x,z:c.z-f.location.z,hx:8,hz:8,heading:0};
-  for(const name of ['truck','pump'])if(vehicleFootprints(f[name],name).some(body=>overlaps(body,tile)))return '車両を移動してから配置してください。';
-  if(boxesOverlap({...tile,w:16,d:16},{...FRAME_RACK,w:22,d:12}))return '型枠の置き場と重なります。';
+  for(const q of groundQueries(c))if(blockedAt(c.x+q.x,c.z+q.z,q.r))return '建物・土・水などがある場所へは移動できません。';
+  for(const dx of [-(c.w??16)/2+.1,0,(c.w??16)/2-.1])for(const dz of [-(c.d??16)/2+.1,0,(c.d??16)/2-.1]){const y=supportHeightAt(c.x+dx,c.z+dz);if(!Number.isFinite(y)||Math.abs(y)>.12)return '平らな地面へ配置してください。';}
+  const tile={x:c.x-f.location.x,z:c.z-f.location.z,hx:(c.w??16)/2,hz:(c.d??16)/2,heading:0};
+  for(const name of ['truck','pump'])if(liveVehicleFootprints(f[name],name).some(body=>overlaps(body,tile)))return '車両を移動してから配置してください。';
+  if(boxesOverlap({...tile,w:c.w??16,d:c.d??16},{...FRAME_RACK,w:22,d:12}))return '型枠の置き場と重なります。';
  }
  return '';
 }
@@ -49,7 +50,7 @@ export function freeWorkSnapCandidates(w,target,side,from=w){
  const direction={west:[-16,0],east:[16,0],north:[0,-16],south:[0,16]}[side];
  if(!direction||!target?.cells?.length||!freeWorkMask(w))return [];
  const found=new Map();
- for(const a of freeWorkCells(w))for(const b of target.cells){const x=w.x+b.x+direction[0]-a.x,z=w.z+b.z+direction[1]-a.z;found.set(x+':'+z,{x,z});}
+ for(const a of freeWorkCells(w))for(const b of target.cells){const x=w.x+b.x+(direction[0]?Math.sign(direction[0])*((a.w??16)+(b.w??16))/2:0)-a.x,z=w.z+b.z+(direction[1]?Math.sign(direction[1])*((a.d??16)+(b.d??16))/2:0)-a.z;found.set(x+':'+z,{x,z});}
  return [...found.values()].sort((a,b)=>Math.hypot(a.x-from.x,a.z-from.z)-Math.hypot(b.x-from.x,b.z-from.z)||a.x-b.x||a.z-b.z);
 }
 

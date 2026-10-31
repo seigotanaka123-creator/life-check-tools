@@ -1,32 +1,33 @@
+import{createIndustrialMaterial}from'./imasora-construction-industrial-materials.mjs?v=120pn';
 import{stairPlacement,stairPoint,stairBox,stairEntry,stairExit,stairGround,stairDoor,stairApproach}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import{kitPieceBoxes}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{createRoomDoorDeliveryView}from'./imasora-construction-room-door-delivery-view.mjs?v=120gn';
+import{kitPieceBoxes}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{createRoomDoorDeliveryView}from'./imasora-construction-room-door-delivery-view.mjs?v=120pv';
 import{boardBayRetrofitJobs,boardBayBraceParts,hasBoardBay,boardBayLevels,boardBaySupports,boardLiftStructure,boardLiftBridges}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{roomDoorDelivery,roomDeliveryPhase as roomKitPhase}from'./imasora-construction-room-door-delivery.mjs?v=120gn';
-import{roomKitBox,roomKitPickupBox,ROOM_KIT_PICKUP_SECONDS}from'./imasora-construction-room-kit.mjs?v=120gn';
-import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{roomDoorDelivery,roomDeliveryPhase as roomKitPhase}from'./imasora-construction-room-door-delivery.mjs?v=120pv';
+import{roomKitBox,roomKitPickupBox,ROOM_KIT_PICKUP_SECONDS}from'./imasora-construction-room-kit.mjs?v=120ov';
+import{roomItemParts}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
 import{wallDoorCutPart}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import{createRoomLayoutView,ROOM_PART_COLORS}from'./imasora-construction-room-layout-view.mjs?v=120gn';
-import{roomLayoutPlan}from'./imasora-construction-room-layout.mjs?v=120gn';
-import {roomPaintVisiblePart} from './imasora-construction-building-room.mjs?v=120gn';
+import{createRoomLayoutView,ROOM_PART_COLORS}from'./imasora-construction-room-layout-view.mjs?v=120hh';
+import{roomLayoutPlan}from'./imasora-construction-room-layout.mjs?v=120pv';
+import {roomPaintVisiblePart} from './imasora-construction-building-room.mjs?v=120pv';
 import {entranceDoorParts} from './imasora-construction-building-door.mjs?v=120gn';
-import {highAccessLandings} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {highAccessLandings} from './imasora-construction-high-work-position.mjs?v=120ov';
 import{highPlanScale}from'./imasora-construction-high-interior.mjs?v=120gn';
 import {highShapeKey,highFloors,highFloorPieces,highRoofBridge} from './imasora-construction-high-shape.mjs?v=120gn';
 import * as T from './three.module.min.js';
-import {highIsRecovering,highDisassemblyAt,highPlatform,highBuildingParts,highActorAt,highJobPlan,highRouteSeconds,highAssemblyAt,highAssembly} from './imasora-construction-high-build.mjs?v=120gn';
+import {highIsRecovering,highDisassemblyAt,highPlatform,highBuildingParts,highActorAt,highJobPlan,highRouteSeconds,highAssemblyAt,highAssembly} from './imasora-construction-high-build.mjs?v=120pv';
 export function createHighModel(scene,initial,handPoint=null){
 const roomView=createRoomLayoutView(scene);
 const layoutKey=highShapeKey(initial),scale=highPlanScale(initial);
-const unit=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(1,1,1,8);
+const unit=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(1,1,1,8),scaffoldTube=new T.CylinderGeometry(.5,.5,1,10);
 const material=color=>new T.MeshStandardMaterial({color,roughness:.8});
-const mats={wood:material('#c99a61'),beam:material('#b77b45'),floor:material('#e2be84'),wall:material('#f4d7a6'),stair:material('#d4ae77'),steel:material('#839ca8'),deck:material('#c6d8de'),lift:material('#efbd44'),green:material('#6cba97'),tool:material('#eeaf3f'),assembly:material('#ffffff')};
+const mats={wood:material('#c99a61'),beam:material('#b77b45'),floor:material('#e2be84'),wall:material('#f4d7a6'),stair:material('#d4ae77'),steel:createIndustrialMaterial('steel'),deck:createIndustrialMaterial('deck'),lift:createIndustrialMaterial('deck',{color:0xefbd44,glow:0xffd997}),clamp:new T.MeshStandardMaterial({color:0xc5d8dc,metalness:.65,roughness:.38}),green:material('#6cba97'),tool:material('#eeaf3f'),assembly:material('#ffffff')};
 const ghostMat=new T.MeshBasicMaterial({color:'#e6b933',wireframe:true,transparent:true,opacity:.48,depthWrite:false});
 function box(parent,p,mat,actual=false){if(!actual)p={...p,x:p.x*scale,z:p.z*scale,w:p.w*scale,d:p.d*scale};const m=new T.Mesh(unit,mat);m.position.set(p.x,p.y,p.z);m.scale.set(p.w,p.h,p.d);parent.add(m);return m;}
 function line(parent,a,b,r,mat){const m=new T.Mesh(cylinder,mat),d=new T.Vector3(b.x-a.x,b.y-a.y,b.z-a.z);m.position.set((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);m.scale.set(r,d.length(),r);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());parent.add(m);return m;}
 const site=new T.Group();site.name='high-build-persistent-platform';scene.add(site);
 const platform=highPlatform(initial),towerHeight=highFloors(initial)*40;
-function instances(items,mat,name){const m=new T.InstancedMesh(unit,mat,items.length),o=new T.Object3D();items.forEach((p,i)=>{o.position.set(p.x,p.y,p.z);o.scale.set(p.w,p.h,p.d);o.updateMatrix();m.setMatrixAt(i,o.matrix);});m.name=name;m.userData.roomParts=items;site.add(m);return m;}
+function instances(items,mat,name,geometry=unit){const m=new T.InstancedMesh(geometry,mat,items.length),o=new T.Object3D();items.forEach((p,i)=>{o.position.set(p.x,p.y,p.z);o.scale.set(p.w,p.h,p.d);o.updateMatrix();m.setMatrixAt(i,o.matrix);});m.name=name;m.userData.roomParts=items;site.add(m);return m;}
 instances(platform.decks.filter(p=>p.y).map(p=>({...p,y:p.y-1,h:2})),mats.deck,'same-working-decks');
 instances(boardBayBraceParts(initial),mats.beam,'retrofit-continuous-load-bearing-beams');
 instances(boardBaySupports(initial),mats.steel,'board-bay-load-bearing-supports');
@@ -41,7 +42,9 @@ if(hasBoardBay(initial)){
 }
 }
 instances(platform.stairs.map(p=>({...p,y:p.y-1.25,h:2.5})),mats.deck,'same-stairs');
-instances(platform.posts.map(p=>({...p,y:towerHeight/2,w:2*scale,h:towerHeight+6,d:2*scale})),mats.steel,'same-support-posts');
+instances(platform.posts.map(p=>({...p,y:towerHeight/2,w:1.4*scale,h:towerHeight+6,d:1.4*scale})),mats.steel,'same-support-posts',scaffoldTube);
+// Clamps stay inside the existing 2-unit support envelopes, not in walkways.
+instances(platform.posts.flatMap(p=>Array.from({length:highFloors(initial)+1},(_,i)=>({...p,y:i*40,w:2*scale,h:1.6,d:2*scale}))),mats.clamp,'scaffold-deck-couplings',scaffoldTube);
 const access=instances(highAccessLandings(initial).map(p=>({...p,y:p.y-1,h:2})),mats.deck,'room-and-pipe-landings');
 const rails=[];for(const y of Array.from({length:highFloors(initial)},(_,i)=>(i+1)*40))for(const x of[-70,70])rails.push({x,y:y+10,z:0,w:1.2,h:1.2,d:140});
 instances(rails.map(p=>({...p,x:p.x*scale,z:p.z*scale,w:p.w*scale,d:p.d*scale})),mats.steel,'outer-guardrails');
@@ -72,7 +75,7 @@ function copyPart(mesh,i,p){transform.position.set(p.x,p.y,p.z);transform.scale.
 
 const tool=new T.Group();scene.add(tool);const rod=line(tool,{x:0,y:0,z:0},{x:0,y:1,z:0},.55,mats.tool);
 const roomRods=Array.from({length:4},()=>line(tool,{x:0,y:0,z:0},{x:0,y:1,z:0},.3,mats.tool));
-const jaw=box(tool,{x:0,y:0,z:0,w:7,h:2,d:4},mats.steel);
+const jaw=box(tool,{x:0,y:0,z:0,w:7,h:2,d:4},mats.steel);jaw.name='construction-tool-tip';
 function targetLabel(text){const c=document.createElement('canvas');c.width=384;c.height=96;const ctx=c.getContext('2d');ctx.fillStyle='#fff5c9';ctx.beginPath();ctx.roundRect(2,2,380,92,32);ctx.fill();ctx.fillStyle='#5b4c22';ctx.font='bold 29px sans-serif';ctx.textAlign='center';ctx.fillText(text,192,59);const tex=new T.CanvasTexture(c),m=new T.Sprite(new T.SpriteMaterial({map:tex,depthTest:true,transparent:true}));m.scale.set(69,17,1);scene.add(m);return m;}
 const target=targetLabel('ここにつないでいくよ'),recoverTarget=targetLabel('ここを片付けるよ');
 
@@ -107,9 +110,10 @@ function update(state,paused=false,previewLevel=null,wallCell=null,focusFloor=nu
  if(kitPhase.kind==='carry'||kitPhase.kind==='assemble'&&remaining>0)kitGrips.forEach((m,i)=>{const x=i?7:-7,h=pos.heading,z=10.5;m.visible=true;m.position.set(pos.x+Math.cos(h)*x+Math.sin(h)*z,pos.y+10.51,pos.z-Math.sin(h)*x+Math.cos(h)*z);m.rotation.y=h;});
  }
  if(kitPhase?.kind==='assemble'){const parts=roomItemParts(roomPlan.item),n=kitPhase.progress*parts.length;for(let i=0;i<parts.length;i++){const f=Math.min(1,Math.max(0,n-i));if(!f)continue;const p=parts[i];assembling.setColorAt(assembling.count,new T.Color(ROOM_PART_COLORS[p.kind]));copyPart(assembling,assembling.count++,{...p,y:p.y-p.h*(1-f)/2,h:p.h*f});}assembling.instanceMatrix.needsUpdate=true;if(assembling.instanceColor)assembling.instanceColor.needsUpdate=true;assembling.computeBoundingSphere();}
+ const signWorking=!!roomWorking&&roomPlan.item.kind==='sign';if(!roomWorking)jaw.rotation.y=0;jaw.scale.set(signWorking?.6:7,signWorking?.6:2,signWorking?.6:4);jaw.rotation.x=signWorking?Math.sin(state.job.elapsed*12)*.02:0;
  tool.visible=(!!pending||making||!!roomWorking||boardBayRetrofitJobs.has(state.job?.type)&&state.job.elapsed>=highRouteSeconds(highJobPlan(state,state.job.type).route))&&!paused;
  roomRods.forEach(m=>m.visible=!!roomWorking);rod.visible=!roomWorking;
- if(tool.visible&&roomWorking){const ps=roomPlan.toolPath.map(p=>new T.Vector3(p.x,p.y,p.z)),hand=handPoint?.();if(hand)ps[0]=scene.worldToLocal(hand);roomRods.forEach((m,i)=>{const a=ps[i],b=ps[i+1],delta=b.clone().sub(a);m.position.copy(a).add(b).multiplyScalar(.5);m.scale.set(.3,delta.length(),.3);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());});jaw.position.copy(ps.at(-1));jaw.rotation.y=Math.sin(state.job.elapsed*22)*.18;}
+ if(tool.visible&&roomWorking){const ps=roomPlan.toolPath.map(p=>new T.Vector3(p.x,p.y,p.z)),hand=handPoint?.();if(hand)ps[0]=scene.worldToLocal(hand);roomRods.forEach((m,i)=>{const a=ps[i],b=ps[i+1],delta=b.clone().sub(a);m.position.copy(a).add(b).multiplyScalar(.5);m.scale.set(.3,delta.length(),.3);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());});jaw.position.copy(ps.at(-1));jaw.rotation.y=signWorking?roomPlan.item.turn*Math.PI/2:Math.sin(state.job.elapsed*22)*.18;}
  else if(tool.visible){const retrofit=boardBayRetrofitJobs.has(state.job?.type)?highJobPlan(state,state.job.type).target:null;const p=retrofit?new T.Vector3(retrofit.x,retrofit.y,retrofit.z):pending?orderedLevels[pending.index].mesh.position:new T.Vector3(-94*scale,10+Math.abs(Math.sin(state.job.elapsed*12))*5,85*scale),a=new T.Vector3(pos.x,pos.y+18,pos.z),b=p.clone(),delta=b.clone().sub(a);
   rod.position.copy(a).add(b).multiplyScalar(.5);rod.scale.set(.55,delta.length(),.55);rod.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());jaw.position.copy(b);}
  const base=state.levels*40;
@@ -129,6 +133,6 @@ function update(state,paused=false,previewLevel=null,wallCell=null,focusFloor=nu
  target.visible=state.levels<total&&!recovering;const nextFloor=previewLevel??Math.min(total,state.levels+1),aim=current?.part??highFloorPieces(state,nextFloor)[0];target.position.set(aim.x,nextFloor*40+18,aim.z);
 }
 
-return{update,dispose(){doorDeliveryView.dispose();roomView.dispose();scene.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.geometry&&o.geometry!==unit&&o.geometry!==cylinder)o.geometry.dispose();if(o.material?.map)o.material.map.dispose();});unit.dispose();cylinder.dispose();Object.values(mats).forEach(m=>m.dispose());doorGlass.dispose();ghostMat.dispose();focusMat.dispose();selectedCellMat.dispose();target.material.dispose();recoverTarget.material.dispose();}};
+return{update,dispose(){doorDeliveryView.dispose();roomView.dispose();const released=new Set([unit,cylinder]);scene.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.geometry&&!released.has(o.geometry)){released.add(o.geometry);o.geometry.dispose();}if(o.material?.map)o.material.map.dispose();});unit.dispose();cylinder.dispose();Object.values(mats).forEach(m=>m.dispose());doorGlass.dispose();ghostMat.dispose();focusMat.dispose();selectedCellMat.dispose();target.material.dispose();recoverTarget.material.dispose();}};
 }
 

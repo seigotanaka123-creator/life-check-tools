@@ -1,0 +1,28 @@
+import{paintColor}from'./imasora-construction-concrete/paint-colors.mjs';
+// Areas exclude the two joined 2x2 faces and the foot's 26x4 ground contact.
+export const OUTDOOR_PAINT_AREA=Object.freeze({board:716,stand:332});
+export const outdoorSignPaintUsed=c=>c?.version>=3&&c.outdoorSigns.version===2?c.outdoorSigns.paintUsed:0;
+export function outdoorPaintPlan(i,part,color){if(!i||!Object.hasOwn(OUTDOOR_PAINT_AREA,part)||!/^#[0-9a-f]{6}$/.test(color))throw Error('看板と、ぬる場所・色をえらぼう。');const same=i.paint?.[part]===color;return{part,color,cost:same?0:OUTDOOR_PAINT_AREA[part]/64,changed:!same};}
+export function outdoorPaintBudget(world){return(world.constructionPackTrialLedger?.quantities.paintSurfaceCredits??0)-(world.constructionProfileProject?.paintUsed??0)-outdoorSignPaintUsed(world.constructionHighBuild);}
+export function assertOutdoorPaintBudget(world){const left=outdoorPaintBudget(world);if(!Number.isFinite(left)||left< -1e-8)throw Error('ペンキが足りないよ。建材受取所で受け取ろう。');return left;}
+export function outdoorTextInk(color){const c=paintColor(color);if(!c)return{ink:'#344f64',outline:'#fffaf0'};const a=[1,3,5].map(k=>parseInt(c.slice(k,k+2),16)/255).map(n=>n<=.04045?n/12.92:((n+.055)/1.055)**2.4),light=.2126*a[0]+.7152*a[1]+.0722*a[2]>.35;return light?{ink:'#24384a',outline:'#ffffff'}:{ink:'#ffffff',outline:'#172b40'};}
+
+const dims={x:'w',y:'h',z:'d'};
+function cut(r,b){const x0=Math.max(r.x0,b.x0),x1=Math.min(r.x1,b.x1),y0=Math.max(r.y0,b.y0),y1=Math.min(r.y1,b.y1);if(x1<=x0||y1<=y0)return[r];return[{x0:r.x0,x1:x0,y0:r.y0,y1:r.y1},{x0:x1,x1:r.x1,y0:r.y0,y1:r.y1},{x0,x1,y0:r.y0,y1:y0},{x0,x1,y0:y1,y1:r.y1}].filter(r=>r.x1-r.x0>1e-6&&r.y1-r.y0>1e-6);}
+// Actual exposed rectangles, including the cut-outs at the two wood joints.
+export function outdoorPaintSurfaces(parts,part,groundY){const result=[];for(const b of parts.filter(b=>part==='board'?b.kind==='screen':b.kind!=='screen'))for(const axis of['x','y','z'])for(const sign of[-1,1]){const[u,v]=['x','y','z'].filter(a=>a!==axis),plane=b[axis]+sign*b[dims[axis]]/2;if(axis==='y'&&sign===-1&&plane<=groundY+.001)continue;let rects=[{x0:b[u]-b[dims[u]]/2,x1:b[u]+b[dims[u]]/2,y0:b[v]-b[dims[v]]/2,y1:b[v]+b[dims[v]]/2}];for(const other of parts)if(other!==b&&other[axis]-other[dims[axis]]/2<=plane+.001&&other[axis]+other[dims[axis]]/2>=plane-.001&&(other[axis]+sign*other[dims[axis]]/2-plane)*sign>.001)rects=rects.flatMap(r=>cut(r,{x0:other[u]-other[dims[u]]/2,x1:other[u]+other[dims[u]]/2,y0:other[v]-other[dims[v]]/2,y1:other[v]+other[dims[v]]/2}));for(const r of rects)result.push({axis,u,v,plane,rect:r,sign,part:b.kind,area:(r.x1-r.x0)*(r.y1-r.y0),point:{[axis]:plane+sign*.6,[u]:(r.x0+r.x1)/2,[v]:(r.y0+r.y1)/2}});}return result;}
+// A small visibility graph around the three wood parts. Every edge is checked
+// against actual current solids. A blocked route refuses the paint operation.
+const paintRouteCaches=new WeakMap();
+export function routeOutdoorPaint(parts,surfaces,hand,solids,hits){
+ // Every graph vertex lies inside this measured envelope. Rotated external
+ // boxes are conservatively projected, then the original exact segment test runs.
+ const points=[hand,...surfaces.map(s=>s.point),...parts.flatMap(b=>[-1,1].flatMap(x=>[-1,1].flatMap(y=>[-1,1].map(z=>({x:b.x+x*(b.w/2+.8),y:b.y+y*(b.h/2+.8),z:b.z+z*(b.d/2+.8)})))))],min=Object.fromEntries(['x','y','z'].map(k=>[k,Math.min(...points.map(p=>p[k]))-.36])),max=Object.fromEntries(['x','y','z'].map(k=>[k,Math.max(...points.map(p=>p[k]))+.36]));
+ solids=solids.filter(b=>{const a=b.angle??0,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a)),x=c*b.w/2+s*b.d/2,z=s*b.w/2+c*b.d/2;return b.x+x>=min.x&&b.x-x<=max.x&&b.y+b.h/2>=min.y&&b.y-b.h/2<=max.y&&b.z+z>=min.z&&b.z-z<=max.z;});
+ let paintRoutes=paintRouteCaches.get(hits);if(!paintRoutes){paintRoutes=new Map();paintRouteCaches.set(hits,paintRoutes);}const signature=JSON.stringify([hand,surfaces.map(s=>s.point),parts.map(b=>[b.x,b.y,b.z,b.w,b.h,b.d]),solids.map(b=>[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0])]);if(paintRoutes.has(signature))return paintRoutes.get(signature);
+ const safe=p=>p.y>=parts.at(-1).y-parts.at(-1).h/2+.5&&!solids.some(b=>hits(p,p,b,.35)),nodes=[hand];
+ for(const b of parts)for(const x of[-1,1])for(const y of[-1,1])for(const z of[-1,1]){const p={x:b.x+x*(b.w/2+.8),y:b.y+y*(b.h/2+.8),z:b.z+z*(b.d/2+.8)};if(safe(p))nodes.push(p);}
+ const goals=[...surfaces].sort((a,b)=>Math.hypot(a.point.x-hand.x,a.point.y-hand.y,a.point.z-hand.z)-Math.hypot(b.point.x-hand.x,b.point.y-hand.y,b.point.z-hand.z)).map(s=>nodes.push(s.point)-1),edges=nodes.map(()=>[]);for(let i=0;i<nodes.length;i++)for(let j=0;j<i;j++)if(!solids.some(b=>hits(nodes[i],nodes[j],b,.35))){const d=Math.hypot(nodes[i].x-nodes[j].x,nodes[i].y-nodes[j].y,nodes[i].z-nodes[j].z);edges[i].push([j,d]);edges[j].push([i,d]);}
+ let start=0,path=[hand];for(const goal of goals){const d=Array(nodes.length).fill(Infinity),prev=Array(nodes.length).fill(-1),seen=new Set();d[start]=0;for(let n=0;n<nodes.length;n++){let at=-1,best=Infinity;for(let k=0;k<d.length;k++)if(!seen.has(k)&&d[k]<best){best=d[k];at=k;}if(at<0||at===goal)break;seen.add(at);for(const[to,cost]of edges[at])if(d[at]+cost<d[to]){d[to]=d[at]+cost;prev[to]=at;}}if(!Number.isFinite(d[goal]))throw Error('刷毛が届くよう、看板のまわりをあけよう。');const steps=[];for(let at=goal;at!==start;at=prev[at]){if(at<0)throw Error('刷毛の通り道をあけよう。');steps.push(nodes[at]);}path.push(...steps.reverse());start=goal;}
+ const stable=path.map(p=>Object.freeze({...p}));Object.freeze(stable);if(paintRoutes.size>=64)paintRoutes.delete(paintRoutes.keys().next().value);paintRoutes.set(signature,stable);return stable;
+}

@@ -1,0 +1,62 @@
+.coast-forage-hud[hidden],.coast-forage-hud [hidden]{display:none!important}
+.coast-forage-hud{position:absolute;inset:0;z-index:13;pointer-events:none;color:#345868;font-family:inherit}
+.coast-forage-hud button,.coast-pouch button{pointer-events:auto;min-height:44px;border:2px solid white;border-radius:20px;background:#edf8ed;color:#294f60;padding:10px 15px;font:800 14px system-ui;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.coast-forage-hud .coast-pouch-open{position:absolute;top:108px;right:14px;background:#ffecc8;box-shadow:0 4px 16px #23425419}
+.coast-forage-hud .coast-find-action{position:absolute;bottom:max(126px,calc(env(safe-area-inset-bottom) + 116px));left:50%;transform:translateX(-50%);background:#fff2bb;border-color:#fffaf0;box-shadow:0 4px 18px #514b2427;max-width:90%;white-space:nowrap}
+.coast-find-message{position:absolute;left:50%;top:28%;transform:translateX(-50%);width:min(340px,85%);box-sizing:border-box;border:2px solid white;border-radius:20px;background:#fffff2ee;box-shadow:0 3px 20px #34586819;text-align:center;padding:12px;font-size:14px;line-height:1.6}
+.coast-pouch{box-sizing:border-box;width:min(620px,94vw);max-height:88dvh;overflow:auto;background:#fffaf0;color:#345868;border:4px solid white;border-radius:28px;padding:20px;box-shadow:0 20px 80px #123d4d45;font:15px system-ui}
+.coast-pouch::backdrop{background:#21455745}.coast-pouch header{display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:-20px;background:#fffaf0;z-index:1;padding:6px 0}.coast-pouch h2{font-size:23px;margin:4px 0}.coast-pouch small{font-size:12px}.coast-pouch-items{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.coast-pouch-items article{display:grid;place-items:center;gap:5px;padding:10px 4px;border:2px solid #d2e8df;background:#eff8ee;border-radius:18px;text-align:center}.coast-pouch-items article>span{font-size:29px}.coast-pouch-items strong{font-size:12px}.coast-pouch-items b{font-size:22px}.coast-pouch-help{font-size:12px;line-height:1.7;color:#597687}.coast-workshop-card{padding:14px;border:2px solid #efdca4;border-radius:22px;background:#fff5d9}.coast-workshop-card h3{margin:0 0 8px}.coast-workshop-card p{font-size:13px;line-height:1.6}.coast-kit-extras{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.coast-kit-extras button{display:grid;gap:4px;border-color:#d3dfce;padding:10px 5px;background:#edf7ed}.coast-kit-extras button[aria-pressed=true]{border-color:#d2a442;background:#ffdf8d;box-shadow:0 0 0 2px #fff8dc inset}.coast-pouch [data-coast-open-kit]{display:block;width:100%;background:#bfeadc;border-color:#83baa9;font-size:17px}.coast-pouch [data-coast-find-map]{display:block;width:100%;background:transparent;margin-top:6px;font-size:13px}.coast-pouch button:disabled,.coast-forage-hud button:disabled{opacity:.55;cursor:default}.coast-pouch [data-coast-kit-result]{color:#356451;font-weight:750}
+@media(max-width:600px){.coast-forage-hud .coast-pouch-open{top:96px;right:12px;font-size:12px;padding:8px 12px}.coast-pouch{padding:14px}.coast-pouch header{top:-14px}.coast-pouch h2{font-size:19px}.coast-pouch-items{grid-template-columns:repeat(2,1fr)}.coast-kit-extras{grid-template-columns:repeat(2,1fr)}.coast-pouch-items article{grid-template-columns:35px 1fr 25px;padding:8px}.coast-pouch-items article>span{font-size:25px}.coast-workshop-card{padding:11px}}
+@media(max-height:500px){.coast-forage-hud .coast-pouch-open{top:80px}.coast-forage-hud .coast-find-action{bottom:108px;font-size:12px;padding:9px 14px}.coast-pouch{max-height:94dvh}}
+
+.coast-hud .coast-pouch-open{position:static;background:#ffecc8;color:#294f60}.coast-hud .coast-pouch-open span{display:inline-block;min-width:0}.coast-pouch header button{flex-shrink:0}
+
+.coast-pouch{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y}
+.coast-island-receipt>strong,.coast-island-receipt>small{display:block}.coast-island-receipt>strong{font-size:16px;line-height:1.5}.coast-island-receipt h4{font-size:13px;margin:12px 0 6px}.coast-island-receipt p{font-size:12px;line-height:1.6}.coast-island-receipt progress{display:block;width:100%;height:12px;accent-color:#e3b456;margin:10px 0 5px}
+.coast-island-gift-row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:6px;padding:7px 9px;margin:4px 0;background:#fffdf4;border:2px solid #fff;border-radius:13px;font-size:13px}.coast-island-gift-row>span:first-child{font-size:22px}.coast-island-gift-row>b{font-size:16px;color:#447a78}.coast-island-receipt[hidden]{display:none}
+
+.coast-find-message{top:auto;bottom:250px}
+@media(max-width:600px) and (min-height:501px){.coast-forage-hud .coast-find-action{left:auto;right:14px;transform:none;bottom:max(184px,calc(env(safe-area-inset-bottom) + 174px));max-width:calc(100% - 130px);white-space:normal}}
+@media(max-height:500px){.coast-find-message{bottom:166px}}
+
+.coast-forage-hud .coast-find-action{left:auto;right:24px;transform:none}
+@media(max-width:600px) and (min-height:501px){.coast-forage-hud .coast-find-action{right:14px}}
+
+.coast-flower-crafts{background:#fff0f5;border:2px solid #f4cfde;border-radius:24px;padding:16px;margin:18px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.coast-flower-crafts>h3,.coast-flower-crafts>p{grid-column:1/-1;margin:0}.coast-flower-crafts button{display:flex;flex-direction:column;gap:8px;align-items:center;background:#fffaf1;border:2px solid #dfb9ce;border-radius:18px;padding:14px 10px;color:#345568;min-height:150px}.coast-flower-crafts button>span{font-size:30px}.coast-flower-crafts button:disabled{opacity:.6}.coast-flower-crafts button>b{color:#315d67}.coast-flower-crafts button>small{line-height:1.5}.coast-pouch-items{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:600px){.coast-flower-crafts{grid-template-columns:1fr}.coast-flower-crafts button{min-height:115px;gap:4px}.coast-pouch-items{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* One game task per page; the reward stays outside the pages that may hide. */
+.coast-pouch [hidden]{display:none!important}
+.coast-pouch-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0 14px}
+.coast-pouch-tabs button{padding:11px 5px;border-color:#d3e5e2;background:#f0f8f4;font-size:13px}
+.coast-pouch-tabs button[aria-pressed="true"]{background:#ffe4a3;border-color:#d3ab51;box-shadow:0 0 0 2px #fff8e0 inset}
+.coast-pouch-result{padding:14px;border:2px solid #98cbbb;background:#e7f6ed;border-radius:22px;margin:12px 0}
+.coast-pouch-result h3{margin:0 0 10px;font-size:18px}.coast-pouch-result p{font-size:13px;line-height:1.6;margin:9px 0 0}
+.coast-pouch-result [data-pouch-rewards]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.coast-pouch-result [data-pouch-rewards]>div{display:grid;place-items:center;gap:4px;background:#fffef5;border-radius:14px;padding:9px 5px;text-align:center}
+.coast-pouch-result span{font-size:26px}.coast-pouch-result strong{font-size:11px}.coast-pouch-result b{font-size:16px}
+.coast-pouch .coast-pouch-travel{display:block;width:100%;position:sticky;bottom:0;margin-top:14px;background:#cce7fb;border:2px solid #96bfdc;box-shadow:0 -7px 16px #fffaf0;font-size:16px}
+@media(max-width:600px){.coast-pouch-tabs{gap:4px}.coast-pouch-tabs button{font-size:12px;padding:11px 3px}.coast-pouch-result [data-pouch-rewards]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.coast-pouch [data-pouch-rewards] svg{width:32px;height:32px;display:block;margin:auto}.coast-kit-extras svg{width:25px;height:25px;vertical-align:middle}
+.coast-island-gift-row>span:first-child svg{display:block;width:26px;height:26px;margin:auto}
+
+/* A pocketful of items first; receipts and explanations are opt-in. */
+.coast-pouch-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.coast-pouch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.coast-pouch-grid>button{display:grid;grid-template-columns:38px minmax(0,1fr);gap:5px 8px;align-items:center;text-align:left;padding:12px;background:#eff8f4;border:2px solid #d0e6dd;border-radius:18px}
+.coast-pouch-grid>button>span{grid-row:1/3;font-size:30px;text-align:center}
+.coast-pouch-grid>button>strong{font-size:14px;line-height:1.4}
+.coast-pouch-grid>button>b{font-size:18px;color:#386b70}
+.coast-pouch-grid>button[aria-expanded=true]{background:#fff0c9;border-color:#d6b66c}
+.coast-pouch-detail{padding:14px;border:2px solid #e6c985;border-radius:18px;background:#fff4d9;margin:12px 0}
+.coast-pouch-grid>.coast-pouch-detail{grid-column:1/-1;margin:0}
+.coast-pouch-detail p{font-size:14px;line-height:1.6;margin:8px 0}
+.coast-pouch-detail button{font-size:13px;min-height:44px}
+.coast-pouch-detail [data-item-action]{display:block;width:100%;text-align:center;margin:10px 0;background:#cce7fb;border-color:#96bfdc}
+.coast-pouch-empty{padding:25px 10px;text-align:center;line-height:1.8}
+.coast-pouch.sea-adventure-dialog .coast-pouch-grid{grid-template-columns:1fr}
+.coast-pouch.sea-adventure-dialog .coast-pouch-grid>button{grid-template-columns:32px minmax(0,1fr) auto;gap:8px;min-height:56px}
+.coast-pouch.sea-adventure-dialog .coast-pouch-grid>button>span{grid-row:auto}
+.coast-pouch.sea-adventure-dialog .coast-pouch-grid>button>strong{font-size:13px}
+.coast-pouch.sea-adventure-dialog .coast-pouch-grid>button>b{font-size:16px}
+@media(max-width:420px){.coast-pouch-grid{gap:7px}.coast-pouch-grid>button{grid-template-columns:28px minmax(0,1fr);gap:4px 6px;padding:9px 7px}.coast-pouch-grid>button>span{font-size:25px}.coast-pouch-grid>button>strong{font-size:12px}.coast-pouch header button{padding:8px 10px;font-size:12px}}

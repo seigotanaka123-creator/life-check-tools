@@ -1,8 +1,8 @@
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
 import {canonical} from './imasora-construction-state.js';
-import {worldTransportTotals,recoverLegacyWorldTransportWork} from './imasora-construction-transport-authority.mjs?v=120gn';
-import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {worldTransportTotals,recoverLegacyWorldTransportWork} from './imasora-construction-transport-authority.mjs?v=120pv';
+import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {localToWorld} from './imasora-construction-loader-physics.js?v=120ov';
 const check=(v,t)=>{if(!v)throw Error('現場の引継ぎ：'+t);};
 export const TRANSPORT_MIGRATION_SCOPE='imasora-transport-migration-point-v1';
 export const TRANSPORT_RECOVERY_SCOPE='imasora-transport-migration-recovery-v2';

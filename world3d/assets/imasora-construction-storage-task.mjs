@@ -1,7 +1,7 @@
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {commitTransportRestore,readTransportRestoreState,reuseCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120gn';
+import {commitTransportRestore,readTransportRestoreState,reuseCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120pv';
 import {captureOwnedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {runWorldSaveTask} from './imasora-world-save-client.mjs?v=120gn';
+import {runWorldSaveTask} from './imasora-world-save-client.mjs?v=120pv';
 let ownedStore;
 // One worker-owned connection retains private certificates. Every transaction
 // still re-reads and compares the current head and prior point atomically.

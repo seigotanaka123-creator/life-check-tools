@@ -1,6 +1,6 @@
 import{boardBayLevels,boardLiftInstalled,boardLiftHeight,boardBayRetrofitAfter,boardBayRetrofitJobs}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{boardBayLevel}from'./imasora-construction-board-bay.mjs?v=120gn';
-import{highProjects}from'./imasora-construction-high-world.mjs?v=120gn';
+import{boardBayLevel}from'./imasora-construction-board-bay.mjs?v=120pv';
+import{highProjects}from'./imasora-construction-high-world.mjs?v=120pv';
 // A board on the raised receiver must retain its real support. Moving the
 // board first is an ordinary crane/roller operation, not an inventory deletion.
 export function assertBoardBaySupportChange(before,after,timber,origin){

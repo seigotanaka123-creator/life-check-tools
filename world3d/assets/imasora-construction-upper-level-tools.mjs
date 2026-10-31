@@ -1,0 +1,5 @@
+import {highWorldPoint,highLocalPoint} from './imasora-construction-high-world.mjs?v=120pv';
+import {upperTileHeight,upperCastingHeight} from './imasora-construction-concrete/high-casting-shape.mjs?v=120hb';
+// A short forward section leaves the hand, then the jointed pole rises above all cells.
+// The last vertical section ends on the chosen actual surface without crossing its neighbours.
+export function upperLevelHandPath(record,c,tile,{worldHand=null,finish=true}={}){const f=c.anchor.floor*40,a=record.work.actor,h=a.heading??0,q=highLocalPoint(record.site,c.anchor),hand=worldHand?highLocalPoint(record.site,worldHand):{x:a.x+Math.cos(h)*7.02+Math.sin(h)*10.7,y:f+10.51,z:a.z-Math.sin(h)*7.02+Math.cos(h)*10.7},out={x:hand.x+Math.sin(h)*8,y:hand.y,z:hand.z+Math.cos(h)*8},lift={...out,y:f+30},target={x:q.x+tile.x,y:f+(finish?upperTileHeight(c,tile):upperCastingHeight(c))+.4,z:q.z+tile.z};return[hand,out,lift,{x:target.x,y:lift.y,z:target.z},target].map(p=>highWorldPoint(record.site,p));}

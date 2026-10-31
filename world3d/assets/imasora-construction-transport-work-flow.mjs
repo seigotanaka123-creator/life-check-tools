@@ -1,10 +1,11 @@
-import * as m from './imasora-construction-fragment-scoop.mjs?v=120gn';
-import {arriveTransportDoor} from './imasora-construction-transport-door.mjs?v=120gn';
+import {withNativeDecks} from './imasora-construction-native-decks.mjs?v=120ps';
+import * as m from './imasora-construction-fragment-scoop.mjs?v=120pv';
+import {arriveTransportDoor} from './imasora-construction-transport-door.mjs?v=120pv';
 import {sameConstructionRecordValue as same,sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
 import {assertTransportShovel,transportNeedsShovel} from './imasora-construction-transport-hand.mjs';
 import {captureConstructionJson,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {validateSoilTransportAsync} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {validateSoilTransportAsync} from './imasora-construction-soil-transport.mjs?v=120pv';
 const flowCapture=Object.freeze({});
 const receipts=new WeakMap();
 const ownedSnapshots=new WeakSet();
@@ -20,11 +21,11 @@ const arity=(args,n)=>check(args.length===n,'操作の項目が不正です。')
 // and imported isolated saves cannot mint it. This is a write-boundary guard,
 // not a remote anti-cheat credential. No arbitrary quantity command is exposed.
 export class WorldTransportWorkFlow{
- #base;#record;#toolkit;#movementGuard=()=>true;#usedShovel=false;
+ #base;#record;#toolkit;#movementGuard=()=>true;#deckContext=()=>null;#soilGuard=()=>true;#usedShovel=false;
  constructor(record,{toolkit=()=>null}={},capture=null){check(record?.version===2,'人物と車両に対応した保存が必要です。');check(typeof toolkit==='function','道具の取得記録を確認してください。');if(capture!==flowCapture||!isCapturedConstructionJson(record))validateWorldTransport(record,worldTransportSoil(record).initial.source,record.profileId);this.#base=this.#record=freeze(capture===flowCapture&&isCapturedConstructionJson(record)?record:structuredClone(record));ownedSnapshots.add(this.#record);this.#toolkit=toolkit;}
  static async open(record,{checkedRestorePoint=null,...options}={}){
   const captured=await captureConstructionJson(record);check(captured?.version===2,'人物と車両に対応した保存が必要です。');
-  if(checkedRestorePoint!==null){const {isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120gn');
+  if(checkedRestorePoint!==null){const {isCheckedTransportRestorePoint}=await import('./imasora-world-save-client.mjs?v=120pv');
    if(isCheckedTransportRestorePoint(checkedRestorePoint)&&same(captured,checkedRestorePoint.applied)&&sameExact(captured,checkedRestorePoint.applied)){const applied=checkedRestorePoint.applied;await validateSoilTransportAsync(worldTransportSoil(applied),{record:applied,checkedPoint:checkedRestorePoint});return new WorldTransportWorkFlow(applied,options,flowCapture);}
   }
   await validateSoilTransportAsync(worldTransportSoil(captured),{record:captured});return new WorldTransportWorkFlow(captured,options,flowCapture);
@@ -34,8 +35,10 @@ export class WorldTransportWorkFlow{
  acceptConfirmed(record){if(!same(record,this.#record)||!sameExact(record,this.#record))return false;this.#base=this.#record;this.#usedShovel=false;receipts.delete(this.#record);return true;}
  get record(){return this.#record;}get state(){return this.#record.work;}get base(){return this.#base;}
  setMovementGuard(guard){check(typeof guard==='function','移動先の確認が不正です。');this.#movementGuard=guard;}
+ setSoilGuard(guard){check(typeof guard==='function','土の支持の確認方法が不正です。');this.#soilGuard=guard;}
+ setDeckContext(read){check(typeof read==='function','床の確認方法が不正です。');this.#deckContext=read;}
  move(name,...args){
-  let next,s=this.state;
+  let next,s=this.state;const frame=withNativeDecks(s.frame,this.#deckContext());if(frame!==s.frame)s={...s,frame};
   const hand=['startBucketSiteHand','progressDumpHandWork','finishDumpHandWork','returnDumpHandWork'].includes(name);
   if(hand)assertTransportShovel(this.#toolkit(),this.#record.profileId);
   if(name==='openScoopGround'){arity(args,0);next=m.openScoopGround(s);}
@@ -53,8 +56,9 @@ export class WorldTransportWorkFlow{
   else throw Error('現場の保存：その操作は使えません。');
   // The isolated adapters wrap even an unchanged reducer result. Preserve
   // identity when nothing advanced so blocked walking/steering can stop.
-  if(next===s||next.revision===s.revision&&next.frame.revision===s.frame.revision)return s;
-  if(!this.#movementGuard(s,next,name)){if(['walkBucketSite','driveBucketSite','driveTransportExcavator'].includes(name))return s;throw Error('車や作品に重なるため、作業場所を変えよう。');}
+  if(next===s||next.revision===s.revision&&next.frame.revision===s.frame.revision)return this.state;
+  this.#soilGuard(s,next,name);
+  if(!this.#movementGuard(s,next,name)){if(['walkBucketSite','driveBucketSite','driveTransportExcavator'].includes(name))return this.state;throw Error('車や作品に重なるため、作業場所を変えよう。');}
   if(hand)this.#usedShovel=true;
   this.#record=freeze({...this.#record,work:next});ownedSnapshots.add(this.#record);receipts.set(this.#record,{base:this.#base,usedShovel:this.#usedShovel});return this.state;
  }

@@ -1,9 +1,10 @@
+import{GIRDER_MATERIALS,girderSections}from'./imasora-construction-girder-shape.mjs?v=120pl';
 // Building kits already belong to the building's reserved materials. They are
 // crane cargo, never another purchase receipt or a source of warehouse timber.
 const ok=(v,m)=>{if(!v)throw Error(m);};
-export const isKitCargo=p=>!!p&&typeof p.id==='string'&&p.id.startsWith('building-kit-');
-export function validateKitBinding(b){ok(b&&Object.keys(b).sort().join('|')==='level|partId|projectId|scale|version'&&b.version===1&&/^building-kit-[\w-]{8,96}$/.test(b.partId)&&/^building-[1-9][0-9]*$/.test(b.projectId)&&Number.isInteger(b.level)&&b.level>=1&&b.level<=6&&[1,2].includes(b.scale),'建築キットの行き先をたしかめよう。');return b;}
-export function kitTemplate(b){validateKitBinding(b);return{id:b.partId,materialId:'mars-timber',name:'建物 '+b.projectId.slice(9)+'・'+b.level+'階の建築キット',w:28*b.scale,h:6,d:20*b.scale,color:0xc99a61};}
+export const isKitCargo=p=>!!p&&typeof p.id==='string'&&(p.id.startsWith('building-kit-')||p.id.startsWith('structural-kit-'));
+export function validateKitBinding(b){if(b?.version===2){ok(Object.keys(b).sort().join('|')==='detailId|length|material|partId|roomId|version'&&/^structural-kit-[\w-]{8,90}$/.test(b.partId)&&Number.isInteger(b.roomId)&&b.roomId>0&&Number.isInteger(b.detailId)&&b.detailId>0&&Object.hasOwn(GIRDER_MATERIALS,b.material)&&Number.isInteger(b.length)&&b.length>=40&&b.length<=240,'大型梁の行き先をたしかめよう。');return b;}ok(b&&Object.keys(b).sort().join('|')==='level|partId|projectId|scale|version'&&b.version===1&&/^building-kit-[\w-]{8,96}$/.test(b.partId)&&/^building-[1-9][0-9]*$/.test(b.projectId)&&Number.isInteger(b.level)&&b.level>=1&&b.level<=6&&[1,2].includes(b.scale),'建築キットの行き先をたしかめよう。');return b;}
+export function kitTemplate(b){validateKitBinding(b);if(b.version===2)return{id:b.partId,materialId:b.material==='steel'?'earth-iron':'mars-timber',name:GIRDER_MATERIALS[b.material].name,w:b.length,h:16,d:12,color:GIRDER_MATERIALS[b.material].color};return{id:b.partId,materialId:'mars-timber',name:'建物 '+b.projectId.slice(9)+'・'+b.level+'階の建築キット',w:28*b.scale,h:6,d:20*b.scale,color:0xc99a61};}
 // Repack the existing four 28*scale x 3 x 10*scale components without
 // shrinking a piece or overlapping their volumes to pass the lifting guides.
 export function kitPieceBoxes(scale){return[1.5,4.5].flatMap(y=>[-5,5].map(z=>({x:0,y,z:z*scale,w:28*scale,h:3,d:10*scale})));}

@@ -1,8 +1,10 @@
-import {earthBaseReader} from './imasora-construction-field-earth.mjs?v=120gf';
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
-import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120gn';
-import {PLOT} from './imasora-construction-excavator.js?v=120gf';
-import {SITE} from './imasora-construction-loader-physics.js?v=120gf';
+import {nativeSoilLayers} from './imasora-construction-native-soil-layers.mjs?v=120pv';
+import {nativeDeckHeight} from './imasora-construction-native-decks.mjs?v=120ps';
+import {earthBaseReader} from './imasora-construction-field-earth.mjs?v=120ov';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120ov';
+import {soilTransportGeometry,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {PLOT} from './imasora-construction-excavator.js?v=120ov';
+import {SITE} from './imasora-construction-loader-physics.js?v=120ov';
 
 // Native terrain is a 2-unit grid. Inspect every cell touched by the tyre,
 // Include steering and the projected shift from tilt/suspension. Five isolated
@@ -23,27 +25,29 @@ function surface(soil){
  surfaces.set(soil,top);return top;
 }
 const heightReaders=new WeakMap();
-export function nativeDumpHeightReader(frame){
+export function nativeEarthHeightReader(frame){
  const soil=frame?.soil;if(!soil||![2,3].includes(soil.schema))return()=>undefined;
- let entry=heightReaders.get(soil);if(entry&&entry.revision===soil.revision)return entry.read;
- const area=transportArea(frame),baseAt=earthBaseReader(soil),top=surface(soil);
- const read=(x,z)=>{if(!finite(x)||!finite(z)||x<area.minX||x>=area.maxX||z<area.minZ||z>=area.maxZ)return undefined;const base=baseAt(x,z);return Math.max(base,top.get(Math.floor(x/2)+','+Math.floor(z/2))??base);};
+ let entry=heightReaders.get(soil);if(entry&&entry.revision===soil.revision&&entry.decks===frame.decks)return entry.read;
+ const area=transportArea(frame),baseAt=earthBaseReader(soil),top=frame.decks?null:surface(soil),layers=frame.decks?nativeSoilLayers(soil):null;
+ const read=(x,z,reference=null)=>{if(!finite(x)||!finite(z)||x<area.minX||x>=area.maxX||z<area.minZ||z>=area.maxZ)return undefined;const base=baseAt(x,z);return frame.decks?layers.read(x,z,reference):Math.max(base,top.get(Math.floor(x/2)+','+Math.floor(z/2))??base);};
  // Every native ground column is a 2-unit cell. Reuse its depression test
  // across successive half-unit drive steps on the same immutable soil.
  read.isPit=(x,z,h)=>isDepression(frame,{x:Math.floor(x/2)*2+1,z:Math.floor(z/2)*2+1,h});
- heightReaders.set(soil,{revision:soil.revision,read});return read;
+ heightReaders.set(soil,{revision:soil.revision,decks:frame.decks,read});return read;
 }
-export function nativeDumpHeightAt(frame,x,z){return nativeDumpHeightReader(frame)(x,z);}
+const deckReaders=new WeakMap();
+export function nativeDumpHeightReader(frame){const earth=nativeEarthHeightReader(frame);if(!frame.decks)return earth;let e=deckReaders.get(frame.decks);if(e?.soil===frame.soil)return e.read;const read=(x,z,reference=0)=>nativeDeckHeight(frame,x,z,earth(x,z,reference),reference);read.isPit=(x,z,h)=>Math.abs(earth(x,z)-h)<.15&&earth.isPit?.(x,z,h);deckReaders.set(frame.decks,{soil:frame.soil,read});return read;}
+export function nativeDumpHeightAt(frame,x,z,reference=0){return nativeDumpHeightReader(frame)(x,z,reference);}
 const point=(v,x,z)=>({x:v.x+Math.cos(v.heading)*x+Math.sin(v.heading)*z,z:v.z-Math.sin(v.heading)*x+Math.cos(v.heading)*z});
 function isDepression(frame,q){
- let cache=depressions.get(frame.soil);if(!cache){cache=new Map();depressions.set(frame.soil,cache);}
- const key=(frame.version??1)+':'+q.x+','+q.z;if(cache.has(key))return cache.get(key);
+ const owner=frame.decks??frame.soil;let entry=depressions.get(owner);if(!entry||entry.soil!==frame.soil){entry={soil:frame.soil,cache:new Map()};depressions.set(owner,entry);}const cache=entry.cache;
+ const key=(frame.version??1)+':'+q.x+','+q.z+','+q.h;if(cache.has(key))return cache.get(key);
  let hole=false;
  for(const [dx,dz] of [[1,0],[0,1]]){
   let lower=false,upper=false;
   for(let distance=2;distance<=24&&!(lower&&upper);distance+=2){
-   if(!lower)lower=nativeDumpHeightAt(frame,q.x-dx*distance,q.z-dz*distance)>q.h+1.99;
-   if(!upper)upper=nativeDumpHeightAt(frame,q.x+dx*distance,q.z+dz*distance)>q.h+1.99;
+   if(!lower)lower=nativeDumpHeightAt(frame,q.x-dx*distance,q.z-dz*distance,q.h)>q.h+1.99;
+   if(!upper)upper=nativeDumpHeightAt(frame,q.x+dx*distance,q.z+dz*distance,q.h)>q.h+1.99;
   }
   if(lower&&upper){hole=true;break;}
  }
@@ -62,7 +66,7 @@ function cells(frame,centre,heading,hx,hz){
   const dx=x*2+1-centre.x,dz=z*2+1-centre.z;
   // Four separating axes for an axis-aligned cell and a rotated tyre/bed.
   if(Math.abs(dx)>=ex+1-1e-9||Math.abs(dz)>=ez+1-1e-9||Math.abs(c*dx-s*dz)>=hx+ac+as-1e-9||Math.abs(s*dx+c*dz)>=hz+ac+as-1e-9)continue;
-  const h=nativeDumpHeightAt(frame,x*2+1,z*2+1);out.push({x:x*2+1,z:z*2+1,h,area:0});
+  const h=nativeDumpHeightAt(frame,x*2+1,z*2+1,frame.dump.groundY??0);out.push({x:x*2+1,z:z*2+1,h,area:0});
  }
  return out;
 }
@@ -75,7 +79,7 @@ function calculate(frame){const SITE=transportArea(frame);
   if(!patch.length||patch.some(q=>q.h===undefined))return{ok:false,flatReady:false,reason:'道の端です。後退して戻ってください。'};
   patches.push(patch);const min=Math.min(...patch.map(q=>q.h)),max=Math.max(...patch.map(q=>q.h));
   if(max-min>4.5)issue='タイヤの下に大きな段差があります。後退して戻ってください。';
-  wheels.push({x,z,height:nativeDumpHeightAt(frame,p.x,p.z),min,max,cells:patch.length});
+  wheels.push({x,z,height:nativeDumpHeightAt(frame,p.x,p.z,v.groundY??0),min,max,cells:patch.length});
  }
  const rear=(wheels[0].height+wheels[1].height)/2,front=(wheels[2].height+wheels[3].height)/2,left=(wheels[0].height+wheels[2].height)/2,right=(wheels[1].height+wheels[3].height)/2;
  const y=rear+(front-rear)*31/49,pitch=Math.atan2(front-rear,49),roll=Math.atan2(right-left,51);
@@ -84,7 +88,7 @@ function calculate(frame){const SITE=transportArea(frame);
  for(const q of chassis){const dx=q.x-v.x,dz=q.z-v.z,lx=c*dx-s*dz,lz=s*dx+c*dz,plane=y+Math.tan(pitch)*lz+Math.tan(roll)*lx;
   if(q.h===undefined||q.h>plane+3.75||plane-q.h>5)issue='車の下に穴や段差があります。後退して戻ってください。';
  }
- const flatReady=!issue&&wheels.every(w=>Math.abs(w.min)<.05&&Math.abs(w.max)<.05);
+ const flatReady=!issue&&wheels.every(w=>Math.abs(w.min-(frame.decks?y:0))<.05&&Math.abs(w.max-(frame.decks?y:0))<.05);
  // Smooth stairs may slope, but a local pit is not a supporting ramp.
  // A depression spanning several cells is not a continuous step either.
  // Look for opposing raised banks. Monotone ramp steps have an open low
@@ -106,8 +110,8 @@ function calculate(frame){const SITE=transportArea(frame);
 }
 export function nativeDumpSupport(frame){
  if(!frame?.soil||typeof frame.soil!=='object')return calculate(frame);
- let cache=supports.get(frame.soil);if(!cache){cache=new Map();supports.set(frame.soil,cache);}
- const key=JSON.stringify([frame.dump?.x,frame.dump?.z,frame.dump?.heading,frame.soil.containers?.dump?.amount]);
+ let entry=supports.get(frame.decks??frame.soil);if(!entry||entry.soil!==frame.soil){entry={soil:frame.soil,cache:new Map()};supports.set(frame.decks??frame.soil,entry);}const cache=entry.cache;
+ const key=JSON.stringify([frame.dump?.x,frame.dump?.z,frame.dump?.heading,frame.dump?.groundY,frame.soil.containers?.dump?.amount]);
  if(cache.has(key))return cache.get(key);const result=calculate(frame);
  for(const key of['wheels','defects'])if(result[key]){for(const value of result[key])Object.freeze(value);Object.freeze(result[key]);}Object.freeze(result);
  if(cache.size>=192)cache.delete(cache.keys().next().value);cache.set(key,result);return result;
@@ -118,6 +122,9 @@ export function nativeDumpRecoveryStep(before,after){
  const keys=new Set(a.defects.map(q=>q.key));
  return b.defects.every(q=>keys.has(q.key)&&finite(q.area))&&b.defects.reduce((n,q)=>n+q.area,0)<=a.defects.reduce((n,q)=>n+q.area,0)+1e-7;
 }
+// Actual receiving cells and their supporting floor are checked by the plan
+// and the normal soil-load guard before reserving anything.
+export function nativeDumpTerrainUnloadReady(frame){return nativeDumpSupport(frame).driveReady;}
 // Transient feedback only: a stopped input never changes saved soil or pose.
 export function dumpDriveNotice(throttle,before,after,wasBlocked=false){
  if(!throttle)return{blocked:wasBlocked,message:null};

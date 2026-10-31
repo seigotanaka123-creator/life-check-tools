@@ -1,30 +1,33 @@
-import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120gf';
+import{createVehicleLoadGuard}from'./imasora-construction-structure-performance.mjs?v=120pv';
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120od';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs?v=120fb';
 import {constructionWorkAutoSaveKey} from './imasora-construction-autosave-key.mjs?v=120es';
 import {waterEditInfo} from './imasora-construction-water-undo.mjs?v=120fb';
-import {fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120gn';
-import {createFrameHeightSampler} from './imasora-construction-frame-height.mjs?v=120ey';
+import {fieldExitSafe,fieldRememberGround,fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120pv';
+import {createFrameHeightSampler} from './imasora-construction-frame-height.mjs?v=120ou';
 import {createContactReadCache} from './imasora-construction-contact-cache.mjs?v=120ex';
-import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120gm';
+import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120ov';
 import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
-import {bindTravelBoost} from './imasora-construction-travel-input.mjs';
+import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=120lb';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
 import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120gm';
-import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120gn';
+import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120pv';
 import {createVehicleRestoreView} from './imasora-construction-vehicle-restore-view.js?v=502';
 import * as THREE from './three.module.min.js';
 import {overlapsWorldYardBuild} from './imasora-construction-world-yard-reservation.js?v=512';
-import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=120gf';
-import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120gf';
-import {upgradeWaterTruck,transportAvailability,TRANSPORT_OBSTACLES,waterTransportObstacles,transportMaterialObstacles} from './imasora-construction-water-transport.js?v=120gf';
+import {createWaterTransportView,updateWaterTransportView} from './imasora-construction-water-transport-view.js?v=120ov';
+import {actorPose,boardOption,exitOption,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120ov';
+import {upgradeWaterTruck,transportAvailability,TRANSPORT_OBSTACLES,waterTransportObstacles,transportMaterialObstacles} from './imasora-construction-water-transport.js?v=120ov';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=520';
-import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,flowWorldFieldWater,validateWorldWater} from './imasora-construction-world-water.js?v=120gf';
+import {initialWorldWater,WATER_YARDS,worldWaterTotals,waterWarehouseAccess,enterWorldWater,worldWaterAction,advanceWorldWater,flowWorldFieldWater,validateWorldWater} from './imasora-construction-world-water.js?v=120ov';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js?v=120ds';
-import {waterCheckpoint} from './imasora-construction-world-water.js?v=120gf';
+import {waterCheckpoint} from './imasora-construction-world-water.js?v=120ov';
 
 // Same scene and same Ren as the main world. Only the input/physics owner changes.
 export function createWorldWaterController({service,practice=false,preview=false,canResume=()=>true,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onError,readout,onRestoreRebuild}){
+  const loadGuard=createVehicleLoadGuard(()=>practice?null:service.ledger?.world);
+  function acceptLoad(next){if(next.work.loader.mode==='exiting'&&work.schema===2&&!fieldExitSafe(work.work,{x:0,z:0},waterGround,next.work.loader.transition?.side))throw Error('広い床に停めてから降りよう。');const problem=loadGuard('constructionWater',work,next,{heightAt:fieldHeightAt});if(problem)throw Error(problem);return next;}
   let jumpControl;const jumpInput=createJumpIntent();
   const gait=createConstructionWalkGait();
   const orbit=createOrbitLook();let menuSaveNote='',restoreSession=null,savedWorkAwaitingResume=false,undoConfirm=false;
@@ -51,9 +54,10 @@ export function createWorldWaterController({service,practice=false,preview=false
   panel.addEventListener('pointerup',e=>e.stopPropagation());
   const button=a=>panel.querySelector(`[data-action="${a}"]`),message=panel.querySelector('.ww-message');
   const received=()=>practice?32000:service.constructionStock?.receipts.filter(e=>e.offerId==='mars-water').reduce((n,e)=>n+e.amount,0)||0;
+  const warehouse=()=>received()/250-(practice?0:(service.constructionStock?.gardenWaterUsedML??0)/250)-(work?.allocated??0);
   let travelBoost=null;
   function clear(){jumpControl?.cancel();jumpInput.reset();travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
-  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ww",groups:[{"id":"move","label":"移動","selectors":[".ww-pad"],"hint":"WASD／矢印で移動。同方向を素早く2回で加速（離すと解除）。停車して給水します。"},{"id":"work","label":"給水","selectors":[".ww-water-shape","[data-action=\"source\"]","[data-action=\"pour\"]","[data-action=\"unload\"]","[data-action=\"returned\"]",".ww-work label"]},{"id":"stock","label":"水路・保管","selectors":["[data-action=\"dispatch\"]","[data-action=\"store\"]","[data-action=\"recover\"]","[data-action=\"flow\"]","[data-action=\"stop\"]"]}],quick:["interact","camera","undo-review"]});
+  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"ww",groups:[{"id":"move","label":"移動","selectors":[".ww-pad"],"hint":"WASD／矢印で移動。徒歩はKかスペース＋WASDでダッシュ、E／B／Jでジャンプ。同方向を素早く2回でも加速。停車して給水します。"},{"id":"work","label":"給水","selectors":[".ww-water-shape","[data-action=\"source\"]","[data-action=\"pour\"]","[data-action=\"unload\"]","[data-action=\"returned\"]",".ww-work label"]},{"id":"stock","label":"水路・保管","selectors":["[data-action=\"dispatch\"]","[data-action=\"store\"]","[data-action=\"recover\"]","[data-action=\"flow\"]","[data-action=\"stop\"]"]}],quick:["interact","camera","undo-review"]});
   const undoCard=document.createElement('div');undoCard.className='ww-undo-confirm';undoCard.hidden=true;undoCard.setAttribute('role','group');undoCard.setAttribute('aria-label','水の作業をもどす');undoCard.innerHTML='<p></p><button data-action="undo-water">1つ前にもどす</button><button data-action="undo-cancel">やめる</button>';panel.querySelector('.gv-active').append(undoCard);
   const undoStyle=document.createElement('style');undoStyle.textContent='.ww-undo-confirm{grid-row:2;align-self:start;padding:12px;background:#fff5da;color:#304452;border:2px solid #e6c46e;border-radius:16px;pointer-events:auto}.ww-undo-confirm[hidden]{display:none!important}.ww-undo-confirm p{margin:0 0 8px}.ww-undo-confirm button{min-height:44px;margin:3px}.world-water-controls:has(.ww-undo-confirm:not([hidden])) :is(.gv-pages,.gv-quick){display:none}';panel.append(undoStyle);
   if(!practice&&!preview&&service.mode==='live'){
@@ -79,7 +83,7 @@ export function createWorldWaterController({service,practice=false,preview=false
     const saved=service.readConstructionVehicleWork('water');
     if(saved&&!practice){work=structuredClone(saved);expected=saved.revision;lastAutomaticKey=constructionWorkAutoSaveKey(work,view);savedWorkAwaitingResume=!practice&&!preview&&service.mode==='live';}
   }
-  const terrainSamples=createFrameHeightSampler((x,z)=>root&&fieldHeightAt?fieldHeightAt(root.position.x+x,root.position.z+z):0),waterGround=terrainSamples.heightAt;
+  const terrainSamples=createFrameHeightSampler((x,z,reference)=>root&&fieldHeightAt?fieldHeightAt(root.position.x+x,root.position.z+z,reference??(work?.work.loader.mode==='driving'?work.work.loader.vehicle.groundY??0:undefined)):0),waterGround=terrainSamples.heightAt;
   const contacts=createContactReadCache();
   function externalVolumes(){return contacts.read(readContactRevision?.()??contactEpoch,()=>root?[...(contactGeometry?constructionMaterialContactVolumes([root.position.x,root.position.z],contactGeometry()):[]),...(work.schema===2&&readFieldSolids?readFieldSolids(root.position):[])]:[]);}
   function begin({automatic=false}={}){terrainSamples.reset();contactEpoch++;
@@ -129,7 +133,7 @@ export function createWorldWaterController({service,practice=false,preview=false
     if(undoConfirm&&a!=='undo-water')return;
     if(a==='camera'){orbit.reset();view=(view+1)%3;button('camera').textContent=['視点：追従','視点：横から','視点：上から'][view];return;}
     if(a==='leave'){await leave();return;}if(a==='save'){await save();return;}
-    try{const old=work;work=worldWaterAction(work,a,value??(['dispatch','store'].includes(a)?crypto.randomUUID():undefined),received(),externalVolumes(),waterGround);
+    try{if(a==='dispatch'&&warehouse()<128)throw Error('保管庫の水が足りないよ。花壇に使った水は出庫できないよ。');const old=work;work=acceptLoad(worldWaterAction(work,a,value??(['dispatch','store'].includes(a)?crypto.randomUUID():undefined),received(),externalVolumes(),waterGround));
       if(a==='undo-water'){undoConfirm=false;render(0);await save();}
       if(['dispatch','store'].includes(a)&&old!==work)await save();
     }catch(e){message.textContent=e.message;work={...work,work:{...work.work,message:e.message}};}
@@ -145,9 +149,9 @@ export function createWorldWaterController({service,practice=false,preview=false
   }
   const jumpReady=()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen&&work.work.loader.mode==='foot';
   jumpControl=bindJumpButton({element:panel.querySelector('[data-hold=jump]'),enabled:()=>jumpReady()&&(work.work.loader.player.grounded||(work.work.loader.player.jumpCount??0)<3),canHold:jumpReady,activate:()=>jumpInput.press(),release:()=>jumpInput.release()});
-  const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'];
-  addEventListener('keydown',e=>{if(!active||e.target.closest?.('dialog[open]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}else if(e.code==='KeyE'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)void action('interact');}},true);
-  addEventListener('keyup',e=>{if(e.code==='Space')jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
+  const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','KeyJ','KeyB','KeyK'];
+  addEventListener('keydown',e=>{if(!active||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest?.('dialog[open],input,select,textarea,[contenteditable=true],[role=textbox]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){if(e.target.tagName==='SELECT')return;e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,work.work.time+.15);keys.add(e.code);}},true);
+  addEventListener('keyup',e=>{if(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB')jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
   // While this controller owns Ren, unrelated build/camera buttons cannot mutate the scene.
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!service.blocked&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',clear);document.addEventListener('visibilitychange',clear);
@@ -166,7 +170,7 @@ export function createWorldWaterController({service,practice=false,preview=false
     if(!active){const nextMessage=blocked?message.textContent:busy?'セーブしています…':resumeAvailable()?'保存した水と車の位置から続けられるよ。':idleIssue||'給水車が近くにいるよ。ドアから乗ってみよう。';if(message.textContent!==nextMessage)message.textContent=nextMessage;game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:work.work.loader.mode,loadText:'',menuHint:menuSaveNote});return;}
     button('camera').textContent=['視点：追従','視点：横から','視点：上から'][view];
     const t=worldWaterTotals(work),w=work.work,l=w.loader,a=transportAvailability(w,externalVolumes(),waterGround),lit=n=>(n*.25).toFixed(2);
-    panel.querySelector('.ww-stats').textContent=`保管 ${lit(received()/250-work.allocated)} L ｜給水槽 ${lit(t.source)} L ｜車載 ${lit(t.bucket)} L ｜移送 ${lit(t.transit+t.moving)} L ｜現場 ${lit(t.field??0)} L ｜水路・回収 ${lit(t.course+t.returnTank)} L`;
+    panel.querySelector('.ww-stats').textContent=`保管 ${lit(warehouse())} L ｜給水槽 ${lit(t.source)} L ｜車載 ${lit(t.bucket)} L ｜移送 ${lit(t.transit+t.moving)} L ｜現場 ${lit(t.field??0)} L ｜水路・回収 ${lit(t.course+t.returnTank)} L`;
     if(!blocked)message.textContent=busy?'セーブしています…':active?(a.workIssue||w.message):resumeAvailable()?'保存した水と車の位置から続けられるよ。':idleIssue|| (near()?'給水車が近くにいるよ。ドアから乗ってみよう。':work.schema===2?'給水車は駐車場にいるよ。「どの車に乗る？」でドアへ行こう。':'給水車の近くへ行ってみよう。');
     const plan=a.plan,b=w.task?.build?w.waterBuilds?.find(b=>b.id===w.task.build):plan?.build;
     panel.querySelector('.ww-water-plan').textContent=b?(w.task?.type==='build-return'?'回収中':w.task?.type==='build'?'注水中':b.q===b.capacity?'満水！':'できあがりの目安')+' ｜ '+lit(b.q)+' / '+lit(b.capacity)+' L'+(!w.task&&b.q<b.capacity?'（あと '+lit(b.capacity-b.q)+' L）':''):plan?.message||'水の置き方を選んで、注ぐ場所へ向けよう。';
@@ -174,10 +178,11 @@ export function createWorldWaterController({service,practice=false,preview=false
     for(const el of panel.querySelectorAll('[data-mode]')){el.setAttribute('aria-pressed',String(el.dataset.mode===(w.waterMode??'block')));}
     const off=busy||blocked||restoreLocked()||!!work.delivery;const jumpButton=panel.querySelector('[data-hold=jump]');jumpButton.hidden=l.mode!=='foot';jumpButton.disabled=off||(!l.player.grounded&&(l.player.jumpCount??0)>=3);
     for(const b of panel.querySelectorAll('.ww-active button'))b.disabled=off;
-    const obstacles=[...waterTransportObstacles(w),...transportMaterialObstacles(l,externalVolumes())];
+    const obstacles=[...waterTransportObstacles(w),...transportMaterialObstacles(l,externalVolumes(),waterGround)];
     button('interact').textContent=l.mode==='foot'?'乗る':l.mode==='driving'?'降りる':'乗降中…';button('interact').disabled=off||!!w.task||!!w.air.length||!!l.transition||!(l.mode==='foot'?boardOption(l,obstacles):exitOption(l,obstacles));
+  if(l.mode==='driving'&&work.schema===2&&!fieldExitSafe(w,{x:0,z:0},waterGround,exitOption(l,obstacles)?.side)){button('interact').disabled=true;button('interact').title='広い床に停めてから降りよう。';}else button('interact').title='';
   setBoardPrompt(button('interact'),l.mode,!button('interact').disabled);
-    button('dispatch').disabled=off||!waterWarehouseAccess(work)||received()/250-work.allocated<128||work.allocated+128>768;
+    button('dispatch').disabled=off||!waterWarehouseAccess(work)||warehouse()<128||work.allocated+128>768;
     button('store').disabled=off||!waterWarehouseAccess(work)||w.source<128;
     button('source').disabled=off||!a.source;button('returned').disabled=off||!a.returned;button('pour').disabled=off||!a.pourable;
     button('unload').disabled=off||!a.unload;button('pour').textContent=a.plan?(w.waterMode==='basin'?'この穴に注ぐ':'水ブロックを作る'):(a.fieldTarget?'ここへ水を注ぐ':'受け口へ注ぐ');for(const el of panel.querySelectorAll('[data-mode]'))el.disabled=off||!!w.task||!!w.air.length;panel.querySelector('.ww-water-shape').hidden=work.schema!==2;button('returned').textContent=(a.pool||a.buildPool||work.schema===2&&!a.nearReturn)?'近くの水を回収':'回収槽から汲む';
@@ -214,7 +219,7 @@ export function createWorldWaterController({service,practice=false,preview=false
     for(const o of work.schema===2?waterTransportObstacles(work.work):solids)collider(x+o.x,z+o.z,[o.width,o.depth],0,'construction-water-fixed',0,{minY:0,maxY:o.height,obstacleHeight:o.height});
     const v=work.work.loader.vehicle,g=groundPose(),b=g?fieldGroundBounds(g,work.work.loader.vehicle.waterTruck?[44,28,46]:undefined):null;if(b)collider(x+b.x,z+b.z,[b.width,b.depth],0,'construction-water-loader',0,{minY:b.minY,maxY:b.maxY,obstacleHeight:b.maxY});else collider(x+v.x,z+v.z,[88,90],v.heading,'construction-water-loader',0,{minY:0,maxY:44,obstacleHeight:44});render(0);refresh();
   }
-  return {look(dx,dy,sensitivity){if(active&&!game.menuOpen&&!restoreLocked())orbit.drag(dx,dy,sensitivity);},get active(){return active;},get autoSaveKey(){return active?constructionWorkAutoSaveKey(work,view):null;},get resumePoint(){return active?{kind:'water',revision:work.revision,view}:null;},resumeSaved(point){if(!point||point.kind!=='water'||point.revision!==expected||!Number.isInteger(point.view)||point.view<0||point.view>2||active||!root||busy||blocked||restoreLocked()||practice||preview||service.mode!=='live'||state.map!=='construction'||!canResume())return false;view=point.view;begin({automatic:true});return active;},get busy(){return busy||saving||restoreLocked();},get dirty(){return !!work&&work.revision!==expected;},install,save,autosave:()=>work&&!restoreLocked()?save({automatic:true}):false,leave,begin,get parkingSite(){return work?.siteIndex??null;},reloadSaved(){if(active||busy||saving)throw Error('作業を終えてから移設してください。');work=null;fresh();},
+  return {look(dx,dy,sensitivity){if(active&&!game.menuOpen&&!restoreLocked())orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.work.loader.player;return active&&work?.work.loader.mode==='foot'&&b?{owner:'water',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get autoSaveKey(){return active?constructionWorkAutoSaveKey(work,view):null;},get resumePoint(){return active?{kind:'water',revision:work.revision,view}:null;},resumeSaved(point){if(!point||point.kind!=='water'||point.revision!==expected||!Number.isInteger(point.view)||point.view<0||point.view>2||active||!root||busy||blocked||restoreLocked()||practice||preview||service.mode!=='live'||state.map!=='construction'||!canResume())return false;view=point.view;begin({automatic:true});return active;},get busy(){return busy||saving||restoreLocked();},get dirty(){return !!work&&work.revision!==expected;},install,save,autosave:()=>work&&!restoreLocked()?save({automatic:true}):false,leave,begin,get parkingSite(){return work?.siteIndex??null;},reloadSaved(){if(active||busy||saving)throw Error('作業を終えてから移設してください。');work=null;fresh();},
     overlapsBuild(position,size){return !!root&&(work.schema===2?fieldWorkOverlaps(root.position,position,size,[...waterTransportObstacles(work.work),{...work.work.loader.vehicle,width:88,depth:90},...Object.values(work.work.pools??{}).filter(p=>p.q>0).map(p=>({x:p.x,z:p.z,width:12,depth:12})),...(work.work.waterBuilds??[]).filter(b=>b.q>0).flatMap(b=>b.cells.map(c=>({x:c.x,z:c.z,width:b.kind==='block'?8:4,depth:b.kind==='block'?8:4})))]):overlapsWorldYardBuild([root.position.x,root.position.z],position,size));},
     waterVolumes(origin){return root?(work.work.waterBuilds??[]).filter(b=>b.q>0).flatMap(b=>b.cells.map(c=>({name:'水を回収してから変更しよう',x:root.position.x+c.x-origin.x,z:root.position.z+c.z-origin.z,y:c.y,w:b.kind==='block'?8:4,d:b.kind==='block'?8:4,h:b.top-c.y+.15}))):[];},
     doorTarget(){return state.map==='construction'?nativeDoorTarget(work,root?.position,{busy:busy||blocked||restoreLocked(),active,groundHeightAt:fieldHeightAt}):null;},
@@ -231,7 +236,7 @@ export function createWorldWaterController({service,practice=false,preview=false
     previewSpawn(){if(!preview||!root)return null;return{x:root.position.x-188,z:root.position.z-118,heading:0};},
     update(dt){jumpControl.sync();terrainSamples.reset(readGroundRevision?.());contactEpoch++;if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;
       if(!restoreLocked()&&blocked&&retryPending&&service.blocked===false){fresh();blocked=false;retryPending=false;if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
-      if(active&&!busy&&!blocked&&!undoConfirm&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldWater(work,input(work.phase+dt>=1/120-1e-9),dt,externalVolumes(),waterGround);if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,{x:0,z:0},waterGround,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work=next;}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
+      if(active&&!busy&&!blocked&&!undoConfirm&&!restoreLocked()&&!game.paused&&!document.hidden){savedWorkAwaitingResume=false;menuSaveNote='';try{const mode=work.work.loader.mode;{const next=advanceWorldWater(work,input(work.phase+dt>=1/120-1e-9),dt,externalVolumes(),waterGround);const loadProblem=loadGuard('constructionWater',work,next,{heightAt:fieldHeightAt});if(loadProblem){const rig=work.work.loader??work.work.rig,key=work.work.loader?'loader':'rig';work={...work,work:{...work.work,message:loadProblem,[key]:{...rig,vehicle:{...rig.vehicle,speed:0}}}};}else if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,{x:0,z:0},waterGround,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work={...next,work:fieldRememberGround(next.work,{x:0,z:0},waterGround,work.work)};}if(work.work.loader.mode!==mode)clear();auto+=dt;}catch(e){failure(e);}}
       if(!active&&!busy&&!blocked&&!restoreLocked()&&!document.hidden&&work.schema===2&&Object.keys(work.work.pools??{}).length){
         runoffClock+=dt;auto+=dt;if(runoffClock>=.1){runoffClock%=.1;try{work=flowWorldFieldWater(work,externalVolumes(),waterGround);}catch(e){failure(e);}}
         if(auto>8&&!saving&&constructionWorkAutoSaveKey(work,view)!==lastAutomaticKey&&!practice&&service.mode!=='readonly')void save({automatic:true});

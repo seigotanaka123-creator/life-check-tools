@@ -1,5 +1,5 @@
 import {LEGACY_PAINT_COLORS,validPaintColor} from './paint-colors.mjs?v=120ds';
-import {freeWorkCells} from './free-work-parts.mjs';
+import {freeWorkCells} from './free-work-parts.mjs?v=120hb';
 // A cured 32 x 32 floor contains four reusable 16 x 16 x 2 panels.
 // Storing a panel never returns it as wet concrete or erases its paint.
 export const FLOOR_COLORS=LEGACY_PAINT_COLORS;
@@ -20,7 +20,7 @@ export function floorPanelsProblem(project,floorIndex,position,mask){
  const free=project.freeBuild;if(free?.location&&Math.abs(position.x-free.location.x)<164&&Math.abs(position.z-free.location.z)<164)return '自由施工の作業区画と重なります。';
  const panels=floorPanels({...position,panelMask:mask});
  const others=[...floors.flatMap((f,i)=>i===floorIndex?[]:floorPanels(f)),...(free?.completed??[]).flatMap(w=>freeWorkCells(w))];
- if(panels.some(a=>others.some(b=>boxesOverlap({...a,w:16,d:16},{...b,w:16,d:16}))))return 'ほかの完成床と重なります。辺同士を合わせてください。';
+ if(panels.some(a=>others.some(b=>boxesOverlap({...a,w:16,d:16},{...b,w:b.w??16,d:b.d??16}))))return 'ほかの完成床と重なります。辺同士を合わせてください。';
  return '';
 }
 export function paintCost(floor,mask,color){

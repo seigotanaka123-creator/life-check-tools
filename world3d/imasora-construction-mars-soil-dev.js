@@ -1,5 +1,5 @@
 import * as THREE from './assets/three.module.min.js';
-import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js';
+import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js?v=120ob';
 import {initialMarsSoil,marsSoilAction,advanceMarsSoil,supportSoil,SOIL_MODES,validateMarsSoil} from './assets/imasora-construction-mars-soil.js?v=444';
 import {createMarsSoilLab,updateMarsSoilLab} from './assets/imasora-construction-mars-soil-view.js?v=444';
 const $=id=>document.getElementById(id),scene=new THREE.Scene();scene.background=new THREE.Color(0xd4e4dc);scene.fog=new THREE.Fog(0xd4e4dc,850,2300);

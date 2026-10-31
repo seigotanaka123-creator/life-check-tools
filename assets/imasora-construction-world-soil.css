@@ -10,6 +10,6 @@
 .world-soil-controls .ws-work label{display:flex;align-items:center;gap:5px;color:#bde4df}.world-soil-controls footer{border-top:1px solid #587370;margin-top:7px;padding-top:7px;justify-content:flex-end}
 .world-soil-operating .touch-pad,.world-soil-operating .touch-hint,.world-soil-operating .camera-distance-control,.world-soil-operating .jump-control,.world-soil-operating .touch-actions{display:none!important}
 @media(max-width:620px){.world-soil-controls{left:4px;right:4px;bottom:4px;padding:7px;font-size:11px;max-height:52%}.world-soil-controls button{padding:4px 7px}.world-soil-controls .ws-work button{flex:1 1 27%}.world-soil-controls .ws-stats{font-size:10px}}
-.world-soil-near .world-water-controls{display:none!important}
+.world-soil-near .world-water-controls:not(.world-vehicle-controls-active){display:none!important}
 .world-soil-near:not(.world-soil-operating) .world-soil-controls{top:8px;bottom:auto;max-height:24%}
 .world-soil-controls .ws-surface{margin-top:6px;color:#f1c8e7;font-size:11px}

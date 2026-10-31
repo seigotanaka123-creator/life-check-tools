@@ -1,5 +1,18 @@
 // Reuse the actual light-space depth map while all visible casters are unchanged.
 // This is presentation only: no ground, collision, simulation or save state.
+// Only apply to optional debug graphics. Gameplay/collision objects may need
+// world transforms even when invisible, and must retain the usual update path.
+export function suspendHiddenDebugMatrices(group){
+ const update=group.updateMatrixWorld;let skipped=false;
+ group.updateMatrixWorld=function(force){
+  if(!this.visible){skipped=true;return;}
+  const refresh=force||skipped;skipped=false;
+  // A parent or manual-matrix child could have changed while hidden. Refresh
+  // the complete overlay on its first visible frame, without one stale frame.
+  return update.call(this,refresh);
+ };
+ return group;
+}
 export function createWorldShadowCache({renderer}={}) {
  let previous=[],length=0,index=0,changed=true,valid=false;
  const lights=[],materialKeys=['version','visible','side','shadowSide','alphaTest','opacity','transparent','wireframe','displacementScale','displacementBias'],textureKeys=['map','alphaMap','displacementMap'],cameraKeys=['left','right','top','bottom','near','far','zoom','fov','aspect'];

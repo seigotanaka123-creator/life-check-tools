@@ -1,13 +1,14 @@
-import {constructionBase,RAISED_BASE_MAX} from './free-supported-build.mjs?v=120gn';
-import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {paintPatch,assertPaintAccess,walkPath} from './free-contact.mjs?v=120gn';
-import {footingAt} from './free-footing.mjs?v=120gn';
-import {frameBlocked,frameRoute} from './free-frames.mjs?v=120gn';
-import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {constructionBase,RAISED_BASE_MAX} from './free-supported-build.mjs?v=120pv';
+import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {paintPatch,assertPaintAccess,walkPath} from './free-contact.mjs?v=120pv';
+import {footingAt} from './free-footing.mjs?v=120pv';
+import {frameBlocked,frameRoute} from './free-frames.mjs?v=120pv';
+import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120pv';
 const distance=(a,b)=>Math.hypot(a.x-b.x,(a.y??0)-(b.y??0),a.z-b.z);
 export const newPaintAccessReceipt=()=>({height:0,...newScaffoldReceipt()});
-export const paintDeckHeight=f=>2+Math.max(f.stage==='complete'?0:constructionBase(f)+f.height,...f.completed.flatMap(w=>w.fill.map((_,i)=>constructionBase(w)+freePlacedFill(w,i)/2)));
+export const paintDeckHeight=f=>2+Math.max(f.stage==='complete'?0:constructionBase(f)+f.height,...f.completed.flatMap(w=>w.fill.map((_,i)=>constructionBase(w)+groundHeight(w,i,freePlacedFill(w,i)))));
 export const sharedPaintHeight=(f,a)=>constructionBase(f.completed[a.work])+.8;
 export function assertPaintAccessReceipt(r,f,a=null){
  if(!r||JSON.stringify(Object.keys(r).sort())!==JSON.stringify(Object.keys(newPaintAccessReceipt()).sort()))throw Error('塗装用足場の確認記録がありません。');
@@ -23,16 +24,16 @@ export function paintReach(f,a,stance,hand){
  return max;
 }
 export function paintAccessPlan(f,a,from,hand,external=()=>false,heightAt=()=>0,checkRoute=null,groundExternal=external,sharedPlatform=null){
- const w=f.completed[a.work],c=freeCell(a.cell);assertPaintAccess(f,a);const shared=sharedPlatform?.access(f,from,{x:w.x-f.location.x+c.x,z:w.z-f.location.z+c.z},stance=>paintReach(f,a,stance,hand)<=64,external,heightAt,{face:a.face});if(shared)return shared;
+ const w=f.completed[a.work],c=groundTile(a.cell,w);assertPaintAccess(f,a);const shared=sharedPlatform?.access(f,from,{x:w.x-f.location.x+c.x,z:w.z-f.location.z+c.z},stance=>paintReach(f,a,stance,hand)<=64,external,heightAt,{face:a.face});if(shared)return shared;
  let checks=0;const spend=()=>{if(++checks>250000){const e=Error('塗装の通路が複雑です。近くへ歩き、作品の周りを空けてから試してください。');e.code='PAINT_ACCESS_BUDGET';throw e;}};const oldExternal=external,oldHeight=heightAt,heights=new Map(),blocked=new Map();external=(...args)=>{const key=args.join(',');if(blocked.has(key))return blocked.get(key);spend();const value=oldExternal(...args);blocked.set(key,value);return value;};heightAt=(...args)=>{const key=args.join(',');if(heights.has(key))return heights.get(key);spend();const value=oldHeight(...args);heights.set(key,value);return value;};
  const rawGroundExternal=groundExternal,groundChecks=new Map();groundExternal=rawGroundExternal===oldExternal?external:(...args)=>{const key=args.join(',');if(groundChecks.has(key))return groundChecks.get(key);spend();const value=rawGroundExternal(...args);groundChecks.set(key,value);return value;};
- assertPaintAccess(f,a);const work=f.completed[a.work],cell=freeCell(a.cell),center={x:work.x-f.location.x+cell.x,z:work.z-f.location.z+cell.z};
+ assertPaintAccess(f,a);const work=f.completed[a.work],cell=groundTile(a.cell,work),center={x:work.x-f.location.x+cell.x,z:work.z-f.location.z+cell.z};
  const offsets=a.face==='top'?[[24,0],[-24,0],[0,24],[0,-24],...(checkRoute?[[24,24],[24,-24],[-24,24],[-24,-24],[26,26],[26,-26],[-26,26],[-26,-26]]:[])]:{north:[[0,-24]],south:[[0,24]],west:[[-24,0]],east:[[24,0]]}[a.face];
  const candidates=offsets.map(([dx,dz])=>({x:center.x+dx,z:center.z+dz,heading:Math.atan2(-dx,-dz)})).sort((a,b)=>Math.hypot(a.x-from.x,a.z-from.z)-Math.hypot(b.x-from.x,b.z-from.z));let chosen=null;
  for(const dest of candidates)try{const support=footingAt(f,dest.x,dest.z,heightAt);if(!support)continue;const stance={...dest,y:support.height};if(paintReach(f,a,stance,hand)>42)continue;const ground=walkPath(f,from,stance,groundExternal,heightAt),length=ground.slice(1).reduce((n,b,i)=>n+distance(ground[i],b),0);if(checkRoute&&!checkRoute(ground,stance))continue;if(!chosen||length<chosen.length)chosen={stance,ground,length,scaffold:null};break;}catch(e){if(e.code==='PAINT_ACCESS_BUDGET')throw e;}
  if(chosen)return chosen;
  // Cured surfaces are crossed on an explicit deck, never by hovering over an edge.
- const panels=[...(['design','complete'].includes(f.stage)?[]:freeFramePanels(f.mask)),{...center,width:16,depth:16}],height=paintDeckHeight(f,a);
+ const panels=[...(['design','complete'].includes(f.stage)?[]:freeFramePanels(f.mask,f)),{...center,width:cell.w,depth:cell.d}],height=paintDeckHeight(f,a);
  const origin={x:work.x-f.location.x,z:work.z-f.location.z},origins=[0,-64,64].flatMap(dx=>[{x:origin.x+dx,z:origin.z+116,dz:-1},{x:origin.x+dx,z:origin.z-116,dz:1}]);
  let last;
  for(const dest of candidates){const stance={...dest,y:height};if(paintReach(f,a,stance,hand)>42||frameBlocked(f,panels,stance,external,14))continue;

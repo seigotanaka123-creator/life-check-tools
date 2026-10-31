@@ -1,11 +1,12 @@
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 import {createPaintMaterials} from './paint-colors.mjs?v=120ds';
 import * as T from '../three.module.min.js';
 import {paintResultColor} from './free-paint-removal.mjs?v=120dm';
-import {FLOOR_COLORS} from './floor-parts.mjs?v=120ds';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
-import {maskingProgress} from './free-masking-operation.mjs?v=120gn';
+import {FLOOR_COLORS} from './floor-parts.mjs?v=120hb';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
+import {maskingProgress} from './free-masking-operation.mjs?v=120pv';
 
 // Paint and boarding cues are surface graphics, not solid boxes. Keep depth
 // testing so nearby characters and vehicles still occlude them, but do not
@@ -20,11 +21,11 @@ export function surfaceMesh(geometry,material){
 }
 
 export function placePaintPatch(mesh,w,origin,cell,face,pixel,bias=.026){
- const c=freeCell(cell),h=w.fill[cell]/2,base=constructionBase(w),x=w.x-origin.x+c.x,z=w.z-origin.z+c.z,col=pixel%4,row=Math.floor(pixel/4);
+ const c=groundTile(cell,w),h=groundHeight(w,cell),base=constructionBase(w),x=w.x-origin.x+c.x,z=w.z-origin.z+c.z,col=pixel%4,row=Math.floor(pixel/4);
  mesh.rotation.set(0,0,0);
- if(face==='top'){mesh.rotation.x=-Math.PI/2;mesh.position.set(x-6+col*4,base+h+bias,z-6+row*4);mesh.scale.set(3.99,3.99,1);}
- else if(face==='north'||face==='south'){mesh.rotation.y=face==='north'?Math.PI:0;mesh.position.set(x-6+col*4,base+h*(row+.5)/4,z+(face==='north'?-8-bias:8+bias));mesh.scale.set(3.99,h/4,1);}
- else{mesh.rotation.y=face==='west'?-Math.PI/2:Math.PI/2;mesh.position.set(x+(face==='west'?-8-bias:8+bias),base+h*(row+.5)/4,z-6+col*4);mesh.scale.set(3.99,h/4,1);}
+ if(face==='top'){mesh.rotation.x=-Math.PI/2;mesh.position.set(x-c.w*3/8+col*c.w/4,base+h+bias,z-c.d*3/8+row*c.d/4);mesh.scale.set(c.w/4-.01,c.d/4-.01,1);}
+ else if(face==='north'||face==='south'){mesh.rotation.y=face==='north'?Math.PI:0;mesh.position.set(x-c.w*3/8+col*c.w/4,base+h*(row+.5)/4,z+(face==='north'?-c.d/2-bias:c.d/2+bias));mesh.scale.set((face==='north'||face==='south'?c.w:c.d)/4-.01,h/4,1);}
+ else{mesh.rotation.y=face==='west'?-Math.PI/2:Math.PI/2;mesh.position.set(x+(face==='west'?-c.w/2-bias:c.w/2+bias),base+h*(row+.5)/4,z-c.d*3/8+col*c.d/4);mesh.scale.set((face==='north'||face==='south'?c.w:c.d)/4-.01,h/4,1);}
  return mesh;
 }
 
@@ -39,11 +40,11 @@ export function createFreePaintLayer(parent){
   const same=(a,b)=>a&&b&&a.work===b.work&&a.cell===b.cell&&a.face===b.face;
   const selected=maskWork?{...maskWork.plan,mask:maskWork.mask,draft:maskWork.mask}:mask;
   const targets=(mask?.appliedFaces??[]).filter(t=>!same(t,selected));if(selected)targets.push(selected);
-  const next=JSON.stringify([current?.location,targets,current?.completed?.map(w=>[w.x,w.z,w.baseY,w.fill,w.placedMask])]);if(next===maskKey)return;maskKey=next;tape.clear();
+  const next=JSON.stringify([current?.location,targets,current?.completed?.map(w=>[w.x,w.z,w.baseY,w.layout,w.fill,w.placedMask])]);if(next===maskKey)return;maskKey=next;tape.clear();
   for(const target of targets){const w=current?.completed[target.work];if(!w||!freePlacedFill(w,target.cell)||!['top','north','south','west','east'].includes(target.face))continue;
    for(let i=0;i<16;i++)if(target.mask&(1<<i)){
     const m=placePaintPatch(surfaceMesh(plane,tapeMaterial),w,current.location,target.cell,target.face,i,.11);m.renderOrder=21;m.name='tape-patch:'+i;m.userData.maskTarget={work:target.work,cell:target.cell,face:target.face};tape.add(m);
-    for(const sign of [-1,1]){const stripe=placePaintPatch(surfaceMesh(plane,stripeMaterial),w,current.location,target.cell,target.face,i,.115);stripe.translateX(sign*1.08);stripe.scale.x=.34;stripe.renderOrder=22;stripe.name='tape-stripe:'+i;tape.add(stripe);}
+    for(const sign of [-1,1]){const stripe=placePaintPatch(surfaceMesh(plane,stripeMaterial),w,current.location,target.cell,target.face,i,.115);stripe.translateX(sign*Math.min(1.08,m.scale.x/3));stripe.scale.x=.34;stripe.renderOrder=22;stripe.name='tape-stripe:'+i;tape.add(stripe);}
    }else if((target.draft??0)&(1<<i)){const m=placePaintPatch(surfaceMesh(plane,draftMaterial),w,current.location,target.cell,target.face,i,.12);m.renderOrder=21;m.name='tape-draft:'+i;tape.add(m);}
   }
  }

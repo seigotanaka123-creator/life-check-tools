@@ -1,0 +1,21 @@
+body.world-player-game dialog.world-player-menu.keyboard-settings-open{inset:12px!important;margin:auto!important;width:min(760px,calc(100% - 24px))!important;max-width:none!important;height:min(820px,calc(100dvh - 24px))!important;max-height:calc(100dvh - 24px)!important}
+.world-player-menu .keyboard-settings{color:#33596a;line-height:1.5;container-type:inline-size}
+.keyboard-settings-intro{display:flex;align-items:center;gap:14px;padding:14px;background:linear-gradient(120deg,#e0f6ee,#e8efff);border-radius:18px}
+.keyboard-settings-intro>span{font-size:40px;line-height:1}.world-player-menu .keyboard-settings-intro h3{font-size:20px;color:#33596a;margin:0 0 3px}
+.keyboard-settings-intro p,.keyboard-settings-note{margin:0;font-size:14px}.keyboard-settings-note{padding:10px 2px}
+.keyboard-settings-status{position:sticky;top:0;z-index:1;margin:0 0 16px;padding:10px 14px;background:#fff3ca;border:1px solid #ecd590;border-radius:12px;font-size:14px;min-height:22px}
+.keyboard-settings-status[data-error=true]{background:#ffe4e8;border-color:#dc9ba9;color:#85394b}
+.keyboard-settings-group{margin:0 0 16px;padding:14px;border:2px solid #d2e6ed;border-radius:18px;background:#fbfeff;box-shadow:0 4px 0 #cde3e73b}
+.world-player-menu .keyboard-settings-group h4{margin:0 0 6px;color:#497888;font-size:15px}
+.keyboard-settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px dashed #d5e7ee}
+.keyboard-settings-action{display:flex;align-items:center;gap:8px;min-width:150px}.keyboard-settings-action>span{display:grid;place-items:center;flex:0 0 28px;height:28px;background:#e6f3fa;border-radius:9px;font-size:20px;color:#4d829c}.keyboard-settings-action strong{font-size:14px}
+.keyboard-settings-keys{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.keyboard-settings-slot{display:flex;align-items:center;gap:2px}
+.world-player-game .keyboard-settings button[data-key-action]{min-width:54px;min-height:46px;padding:8px 10px;background:#e5f0ff;color:#335b80;border:2px solid #b9cfe6;border-radius:11px;box-shadow:0 3px 0 #a9c3dc;font-size:14px;font-weight:800;white-space:nowrap}
+.world-player-game .keyboard-settings button[data-waiting=true]{background:#ffe5ac;border-color:#d5a852;color:#775620;outline:3px solid #ffe5ac88;outline-offset:2px;white-space:normal;max-width:120px}
+.world-player-game .keyboard-settings .keyboard-key-remove{min-width:24px;min-height:38px;padding:2px;background:transparent;border:0;color:#8397a5;box-shadow:none;font-size:18px}
+.keyboard-settings [hidden]{display:none!important}.keyboard-settings footer{border-top:1px solid #d3e5eb;padding:12px 0 2px}.world-player-game .keyboard-settings [data-keyboard-reset]{background:#fce5ed;color:#795165;border-color:#e4bcca}.keyboard-settings footer p{font-size:12px;margin:10px 0 0;color:#69828e}
+.world-menu-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}.world-menu-tabs [data-player-nav=settings]{flex:1}
+body.world-player-game.imasora-pop-menus .keyboard-settings .keyboard-key-remove{min-width:24px!important;min-height:38px!important;padding:2px!important;border:0!important;background:transparent!important;box-shadow:none!important;color:#8397a5!important}
+body.world-player-game.imasora-pop-menus .keyboard-settings button[data-waiting=true]{background:linear-gradient(155deg,#fff8ce,#ffe294)!important}
+@container(max-width:420px){.keyboard-settings-row{align-items:flex-start;flex-direction:column;gap:9px}.keyboard-settings-keys{justify-content:flex-start}}
+@media(max-width:500px){.keyboard-settings-row{align-items:flex-start;flex-direction:column;gap:9px}.keyboard-settings-keys{justify-content:flex-start}.keyboard-settings-intro{padding:12px}.keyboard-settings-group{padding:12px}.keyboard-settings-status{font-size:13px}}

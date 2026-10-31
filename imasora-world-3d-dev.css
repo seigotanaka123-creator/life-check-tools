@@ -190,6 +190,7 @@ body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere 
 .ufo-space-reticle[data-lock="true"] i { animation: ufo-space-reticle-lock .72s ease-in-out infinite; }
 .ufo-space-reticle[data-firing="true"] { filter: drop-shadow(0 0 13px currentColor) drop-shadow(0 0 22px currentColor); }
 @keyframes ufo-space-reticle-lock { 0%, 100% { transform: scale(1); opacity: .88; } 50% { transform: scale(1.1); opacity: 1; } }
+@media(max-width:600px){.coast-fruit-action,.coast-pebble-action{bottom:calc(144px + env(safe-area-inset-bottom,0px))!important}.coast-fruit-notice{bottom:calc(206px + env(safe-area-inset-bottom,0px))!important}}
 .touch-pad { position: absolute; left: 20px; bottom: 28px; width: 118px; height: 118px; overflow: hidden; border: 1px solid rgba(177,239,255,.42); border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(125,226,255,.1) 0 28%, transparent 29%), radial-gradient(circle, rgba(8,28,55,.28) 0 57%, rgba(5,19,38,.5) 58% 100%); box-shadow: 0 0 22px rgba(47,190,255,.14), inset 0 0 30px rgba(111,219,255,.12); touch-action: none; }
 .touch-pad::before, .touch-pad::after { content: ""; position: absolute; pointer-events: none; opacity: .48; }
 .touch-pad::before { inset: 13px 50%; width: 1px; background: linear-gradient(transparent, rgba(181,239,255,.72) 18%, transparent 41% 59%, rgba(181,239,255,.72) 82%, transparent); }
@@ -342,3 +343,75 @@ code { color: #8edfff; }
 .world-vehicle-playing .world-water-controls>header .gv-load{grid-column:1;grid-row:2;font-size:11px;white-space:normal}
 .world-vehicle-playing .world-water-controls>header .ww-mode{display:none}
 .world-vehicle-playing .world-water-controls>header .gv-menu-button{grid-column:2;grid-row:1/3}
+
+/* Native upper mixed heights and the player's local design notebook. */
+.upper-level-brush{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.upper-level-brush button{min-height:48px;padding:7px 3px;border-radius:16px;background:#f2faff;color:#284958}.upper-level-brush button[aria-pressed="true"]{background:#ffe4a2;outline:3px solid #d2ae59}.upper-shape-grid button{font-weight:850}.upper-design-book{margin-top:10px;border:2px solid #d6e9ef;border-radius:20px;padding:9px;background:#f5fcfa;color:#284958}.upper-design-book input{display:block;width:100%;box-sizing:border-box;padding:12px;border:2px solid #c7e2eb;border-radius:14px;color:#284958;background:#fff}.upper-design-book [data-upper-book-cards]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.upper-design-book [data-upper-book-cards]>div{min-width:0;padding:6px;background:#fff8df;border-radius:16px}.upper-design-card{display:flex!important;flex-direction:column;align-items:center;width:100%;gap:5px}.upper-design-card span{width:88px;max-width:100%}.upper-design-card strong,.upper-design-card small{max-width:100%;overflow-wrap:anywhere}.upper-design-book [data-upper-book-confirm]{padding:12px;background:#ffeddf;border-radius:16px}@media(max-width:560px){.upper-design-book [data-upper-book-cards]{grid-template-columns:1fr}}
+
+.upper-roof-controls [data-roof-editor]>[data-upper-level-mode],.upper-roof-controls [data-roof-editor]>[data-upper-level-brush]{grid-column:1 / -1;min-width:0;width:100%;box-sizing:border-box}.upper-roof-controls .upper-level-brush{width:100%;min-width:0}.upper-roof-controls .upper-level-brush button{min-width:0;margin:0;overflow-wrap:anywhere}.upper-roof-controls [data-upper-level-mode]{min-height:44px}
+
+.upper-roof-controls [data-roof-editor],.upper-design-book [data-upper-book-body]{scroll-margin-top:68px}.high-live-panel[data-upper-level-editing=true] .building-paint-controls,.high-live-panel[data-upper-level-editing=true] .room-layout-controls,.high-live-panel[data-upper-level-editing=true] .decor-paint-controls,.high-live-panel[data-upper-level-editing=true] .building-door-controls{display:none!important}@media(max-width:600px) and (min-height:550px){.high-live-panel[data-upper-level-editing=true]{max-height:53%}}
+
+/* Upper design sharing and measured size controls. */
+.high-live-panel [data-upper-size]{grid-column:1/-1;padding:10px;border-radius:16px;background:#fff2cd;border:2px solid #e9c681;display:grid;gap:8px}
+.high-live-panel [data-upper-size] small{line-height:1.5}
+.high-live-panel [data-upper-size]>div{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:5px}
+.high-live-panel [data-upper-size] button{min-height:44px;padding:6px;font-size:12px}
+.high-live-panel [data-upper-size] output{min-width:52px;text-align:center;font-weight:800}
+.upper-design-book textarea{box-sizing:border-box;width:100%;max-width:100%;min-height:90px;border:2px solid #9fc7cf;border-radius:14px;padding:10px;background:white;color:#284958;font:inherit;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.upper-exchange-preview{padding:10px;border-radius:16px;background:linear-gradient(135deg,#dff6ff,#fff1cb);margin:10px 0}
+.upper-exchange-preview svg{display:block;width:150px;height:130px;max-width:100%;margin:auto}
+.high-live-panel [data-upper-book-exchange]>button{display:block;width:100%;margin:8px 0}
+
+/* Ground drawings: the selected cells themselves carry the dimensions. */
+.ground-design-size{margin-top:12px;padding:12px;border:2px solid #b6d6e3;border-radius:18px;background:#f3fbff;color:#284958;overflow-wrap:anywhere}.ground-design-size h3{margin-top:0}.ground-size-row{display:grid;grid-template-columns:52px minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;margin:8px 0}.ground-size-row button,.ground-design-shift button{min-height:44px;min-width:0;padding:7px;font:inherit}.ground-design-shift{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.free-grid[data-shape] button[data-supported=false]{background:#e8edf0!important;box-shadow:none;opacity:.5}.ground-design-size [data-footprint-size]{font-weight:800;font-size:1.05em}
+.viewport.is-conversing :is(.touch-pad,.world-move-pad,.look-pad,.camera-reticle,.world-hold-dash,.world-jump-button,.emergency-escape-control,#constructionJumpButton,#buildMenuButton){visibility:hidden;pointer-events:none}
+.viewport.is-conversing .camera-distance-control{top:12px;left:12px;bottom:auto;min-height:44px;z-index:17;transform:none}
+/* The close button stays outside the scrolling conversation in every phase. */
+body .sky-station-guide-dialog{left:auto;right:12px;bottom:12px;transform:none;width:min(360px,42vw);height:min(360px,calc(100% - 24px));max-height:calc(100% - 24px);box-sizing:border-box;padding:12px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+body .sky-station-guide-dialog[hidden]{display:none}
+.conversation-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+body .conversation-heading .sky-station-guide-dialog-name{margin:0;padding:6px 9px;min-width:0;font-size:14px}
+.conversation-heading>button{flex-shrink:0;min-width:82px;min-height:44px}
+.conversation-body{overflow:auto;overscroll-behavior:contain;min-height:0;padding:2px}
+body .sky-station-guide-dialog-choices{grid-template-columns:1fr}
+body .sky-station-guide-dialog-text{font-size:16px;line-height:1.6;min-height:0;margin:4px 0 12px}
+#skyStationGuideDialog[data-typing="true"] .sky-station-guide-dialog-text{cursor:pointer}
+#skyStationGuideDialog[data-typing="true"] .sky-station-guide-dialog-text:after{content:'　タップで全文';font-size:12px;opacity:.8;animation:none;border:0;width:auto;height:auto}
+@media(orientation:portrait){
+ body .sky-station-guide-dialog{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));width:auto;height:min(320px,45dvh);max-height:45dvh}
+ body .sky-station-guide-dialog-choices{grid-template-columns:1fr 1fr}
+}
+
+/* 120li: keep the shallow-water controls clear of the stick and dash. */
+.coast-snorkel-mode .coast-hud,.coast-snorkel-mode #buildMenuButton{visibility:hidden!important;pointer-events:none!important}
+.coast-snorkel-actions button{position:absolute;z-index:44;border:2px solid #fff;border-radius:23px;padding:12px 20px;background:#d4f4ef;color:#28505b;font:700 16px system-ui;box-shadow:0 3px 10px #16434a33;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.coast-snorkel-start,.coast-snorkel-net{left:50%;transform:translateX(-50%);bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.coast-snorkel-dive{right:108px;bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.coast-snorkel-net.can-catch{background:#ffe99a;border-color:#fff7d4}
+.coast-snorkel-info{position:absolute;z-index:40;left:14px;top:120px;max-width:230px;border-radius:16px;padding:9px 13px;background:#effff5e6;color:#31545d;font:600 13px/1.5 system-ui;white-space:pre-line;pointer-events:none}
+.coast-snorkel-note{position:absolute;z-index:44;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));padding:8px 14px;border-radius:18px;background:#fff6ddea;color:#465562;font:600 14px system-ui;max-width:min(340px,75%);text-align:center;pointer-events:none}
+@media(max-width:600px){.coast-snorkel-start,.coast-snorkel-net{bottom:calc(144px + env(safe-area-inset-bottom,0px))}.coast-snorkel-dive{right:105px;bottom:calc(29px + env(safe-area-inset-bottom,0px));padding:14px}.coast-snorkel-note{bottom:calc(201px + env(safe-area-inset-bottom,0px))}.coast-snorkel-info{top:110px;font-size:11px;max-width:180px}}
+@media(max-height:500px){.coast-snorkel-info{top:88px;font-size:11px;padding:5px 9px}.coast-snorkel-note{bottom:100px}.coast-snorkel-dive{right:96px}}
+
+.coast-snorkel-note{white-space:pre-line;line-height:1.5}
+.coast-snorkel-net:disabled{opacity:.78}
+.coast-snorkel-dive:disabled{opacity:.5;box-shadow:none}
+.coast-snorkel-rise:disabled{opacity:.5;box-shadow:none}
+.coast-snorkel-actions .coast-snorkel-dive,.coast-snorkel-actions .coast-snorkel-rise{right:16px;min-width:98px;bottom:calc(128px + env(safe-area-inset-bottom,0px))}
+.coast-snorkel-actions .coast-snorkel-rise{bottom:calc(188px + env(safe-area-inset-bottom,0px))}
+.coast-snorkel-actions .coast-snorkel-net{left:auto;right:16px;transform:none;bottom:calc(248px + env(safe-area-inset-bottom,0px))}
+.coast-snorkel-actions button[aria-pressed="true"]{background:#8be4da;transform:scale(.96)}
+@media(max-height:500px){.coast-snorkel-actions .coast-snorkel-net{right:140px;bottom:calc(25px + env(safe-area-inset-bottom,0px))}.coast-snorkel-actions .coast-snorkel-dive{bottom:calc(104px + env(safe-area-inset-bottom,0px))}.coast-snorkel-actions .coast-snorkel-rise{bottom:calc(164px + env(safe-area-inset-bottom,0px))}}
+.coast-snorkel-actions.is-equipped .coast-snorkel-start{left:14px;top:164px;bottom:auto;transform:none;padding:8px 13px;font-size:13px}
+@media(max-width:600px){.coast-snorkel-actions.is-equipped .coast-snorkel-start{top:151px}}
+@media(max-height:500px){.coast-snorkel-actions.is-equipped .coast-snorkel-start{top:124px}}
+
+/* Snorkelling uses a swimming action, with the ordinary walking dash hidden. */
+.coast-snorkel-mode #walkDashButton{display:none!important;pointer-events:none!important}
+.coast-snorkel-actions .coast-snorkel-kick{left:auto;right:calc(72px + env(safe-area-inset-right,0px));bottom:max(10px,env(safe-area-inset-bottom));width:68px;height:68px;min-width:68px;min-height:68px;padding:5px;border-radius:50%;box-sizing:border-box;background:#ffebb0;font-size:13px;line-height:1.3}
+.coast-snorkel-kick:disabled{opacity:.5;box-shadow:none}
+
+/* During snorkeling the chart buttons are hidden; use their free corner for breath. */
+body.world-player-game.coast-snorkel-mode .coast-snorkel-info{left:auto;right:max(12px,env(safe-area-inset-right));top:calc(max(12px,env(safe-area-inset-top)) + 52px);max-width:160px;border:2px solid white;padding:7px 10px;box-shadow:0 2px 8px #244d6422}
+
+@media(max-height:400px){body.world-player-game.coast-snorkel-mode .coast-snorkel-info{top:max(12px,env(safe-area-inset-top));left:50%;right:auto;transform:translateX(-50%);padding:4px 8px;max-width:180px;font-size:11px}}

@@ -1,5 +1,5 @@
-import {ROOM_KINDS} from './imasora-construction-room-layout-shape.mjs?v=120gn';
-import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
+import {ROOM_KINDS} from './imasora-construction-room-layout-shape.mjs?v=120hd';
+import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs?v=120ov';
 
 // One compact stack contains exactly the wood reserved by the room edit.
 // These are furniture components, never a resized ordinary crane floorboard.

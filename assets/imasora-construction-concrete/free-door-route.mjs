@@ -1,8 +1,8 @@
 import {planFieldRoute} from '../imasora-construction-shared-field.mjs?v=120ey';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120gn';
-import {walkingBlocked} from './free-contact.mjs?v=120gn';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
-import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ek';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120pv';
+import {walkingBlocked} from './free-contact.mjs?v=120pv';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120pv';
+import {VEHICLE_GROUND} from './free-vehicle-ground.mjs?v=120ov';
 
 // This plans against the actual saved vehicles, hose, forms, works and terrain.
 // The live view still validates every movement step; this is never a teleport.

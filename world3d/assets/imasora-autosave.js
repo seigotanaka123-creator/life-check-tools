@@ -2,23 +2,64 @@
  'use strict';
  // Run while the game is alive as well as on backgrounding. Unload alone is
  // not a reliable opportunity to finish an asynchronous database transaction.
- function create({save,ready=()=>true,dirty=()=>true,onError=()=>{},onSaved=()=>{},window:win=globalThis.window,document:doc=globalThis.document,interval=2000}){
-  let stopped=false,running=null,again=false,lastError=null,retryTimer=null,retries=0;
+ function create({save,urgent,ready=()=>true,dirty=()=>true,onError=()=>{},onSaved=()=>{},window:win=globalThis.window,document:doc=globalThis.document,interval=2000}){
+  let stopped=false,urgentBusy=false,running=null,queued=null,lastError=null,callbackError=null,retryTimer=null,retries=0;
+  function notify(callback,value){if(stopped)return;try{callback(value);}catch(error){callbackError=error;}}
+  function report(error){const previous=lastError;lastError=error;if(previous?.message!==error?.message)notify(onError,error);}
+  function retry(reason){if(stopped||reason==='interval'||retries++>=40)return;clearTimeout(retryTimer);retryTimer=setTimeout(()=>void flush('retry'),100);}
+  function inspect(reason){try{if(!ready()){retry(reason);return'blocked';}return dirty()?'write':'clean';}catch(error){report(error);return'blocked';}}
+  function begin(reason,waiters){
+   let acknowledge;
+   const own=new Promise(resolve=>{acknowledge=resolve;});
+   // Own the in-flight slot before capture, including synchronous reentrant events.
+   running=own;
+   let task;try{task=save(reason);}catch(error){task=Promise.reject(error);}
+   function finish(ok){
+    running=null;
+    acknowledge(ok);waiters?.resolve(ok);
+    if(!queued)return;
+    const next=queued;queued=null;
+    if(stopped){next.resolve(false);return;}
+    const state=inspect('followup');
+    if(state==='write')begin('followup',next);
+    else next.resolve(state==='clean'&&ok);
+   }
+   Promise.resolve(task).then(ok=>{
+    const confirmed=ok!==false;
+    if(confirmed){lastError=null;retries=0;notify(onSaved,reason);}else retry(reason);
+    finish(confirmed);
+   },error=>{report(error);finish(false);});
+   return own;
+  }
+  // A lifecycle checkpoint must not wait behind a pending asynchronous lock.
+  // Adapters opt in with a synchronous commit; ordinary writers remain queued.
+  function flushUrgent(reason){
+   if(inspect(reason)!=='write')return Promise.resolve(false);
+   urgentBusy=true;
+   try{
+    const result=urgent(reason);
+    if(result&&typeof result.then==='function'){Promise.resolve(result).catch(()=>{});throw TypeError('Lifecycle saves must complete synchronously');}
+    const confirmed=result!==false;
+    if(confirmed){lastError=null;retries=0;notify(onSaved,reason);}else retry(reason);
+    return Promise.resolve(confirmed);
+   }catch(error){report(error);return Promise.resolve(false);}
+   finally{urgentBusy=false;}
+  }
   function flush(reason='interval'){
-   if(stopped)return Promise.resolve(false);
+   if(stopped||urgentBusy)return Promise.resolve(false);
    if(reason!=='retry'&&reason!=='interval')retries=0;
-   const retry=()=>{if(reason!=='interval'&&retries++<40){clearTimeout(retryTimer);retryTimer=setTimeout(()=>void flush('retry'),100);}};
-   try{if(!ready()){retry();return Promise.resolve(false);}if(!dirty())return Promise.resolve(false);}catch(error){if(lastError?.message!==error?.message)onError(error);lastError=error;return Promise.resolve(false);}
-   if(running){again=true;return running;}
-   // Invoke synchronously so pagehide captures the current state before return.
-   let task;try{task=save(reason);}catch(e){task=Promise.reject(e);}
-   running=Promise.resolve(task).then(ok=>{if(ok!==false){lastError=null;retries=0;onSaved(reason);}else retry();return ok!==false;},error=>{const previous=lastError;lastError=error;if(previous?.message!==error?.message)onError(error);return false;}).finally(()=>{running=null;if(again){again=false;if(!stopped)void flush('followup');}});
-   return running;
+   if(urgent&&(reason==='pagehide'||reason==='hidden'))return flushUrgent(reason);
+   // Each queued caller awaits the snapshot requested by that batch. The first
+   // caller still completes when its own write is confirmed, without starvation.
+   if(running){if(!queued){let resolve;const promise=new Promise(done=>{resolve=done;});queued={promise,resolve};}return queued.promise;}
+   if(inspect(reason)!=='write')return Promise.resolve(false);
+   // Start capture synchronously: pagehide must not wait for a microtask first.
+   return begin(reason,null);
   }
   const hidden=()=>{if(doc.hidden)void flush('hidden');},depart=()=>void flush('pagehide'),release=()=>{clearTimeout(releaseTimer);releaseTimer=setTimeout(()=>void flush('release'),180);};
   let releaseTimer=null;const timer=setInterval(()=>{if(!doc.hidden)void flush();},interval);
   doc.addEventListener('visibilitychange',hidden);doc.addEventListener('freeze',depart);win.addEventListener('pagehide',depart);win.addEventListener('beforeunload',depart);win.addEventListener('pointerup',release);win.addEventListener('keyup',release);
-  return{flush,get busy(){return!!running;},get error(){return lastError;},dispose(){stopped=true;clearInterval(timer);clearTimeout(releaseTimer);clearTimeout(retryTimer);doc.removeEventListener('visibilitychange',hidden);doc.removeEventListener('freeze',depart);win.removeEventListener('pagehide',depart);win.removeEventListener('beforeunload',depart);win.removeEventListener('pointerup',release);win.removeEventListener('keyup',release);}};
+  return{flush,get busy(){return!!running;},get error(){return lastError;},get callbackError(){return callbackError;},dispose(){stopped=true;queued?.resolve(false);queued=null;clearInterval(timer);clearTimeout(releaseTimer);clearTimeout(retryTimer);doc.removeEventListener('visibilitychange',hidden);doc.removeEventListener('freeze',depart);win.removeEventListener('pagehide',depart);win.removeEventListener('beforeunload',depart);win.removeEventListener('pointerup',release);win.removeEventListener('keyup',release);}};
  }
  const json=value=>JSON.stringify(value);
  function checksum(text){let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return(h>>>0).toString(16);}
@@ -44,5 +85,8 @@
   function write(value){if(!claimed)throw Error('CHECKPOINT_NOT_CLAIMED');const current=storage.getItem(key);if(current!==raw)throw Error('CHECKPOINT_SUPERSEDED');if(value!==null&&!validate(value))throw Error('CHECKPOINT_INVALID');const checked=plain(value),next={version:1,kind,writer,sequence:(packet?.sequence??0)+1,value:checked,checksum:checksum(json(checked))},source=json(next);if(source.length>4*1024*1024)throw Error('CHECKPOINT_TOO_LARGE');storage.setItem(key,source);raw=source;packet=next;return checked;}
   return{get value(){return packet?.value??null;},get current(){return storage.getItem(key)===raw;},claim,write};
  }
- return Object.freeze({create,createCheckpoint,plain,fields,checksum});
+ // A draft rejected before entering the save queue has not changed storage.
+ // Capture the current scene again; do not send an ordinary wait to a modal.
+ function deferred(error){return error?.name==='WorldDraftGuardError'&&['stale','superseded'].includes(error.code)||/^(保存処理中です。|先の保存が終わるまでお待ちください。|現場の保存を準備しています。|現場を戻す準備が終わるまでお待ちください。|保存処理を確認してから[^。]+。)$/.test(error?.message??'');}
+ return Object.freeze({create,createCheckpoint,plain,fields,checksum,deferred});
 });

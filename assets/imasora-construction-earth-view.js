@@ -1,6 +1,6 @@
 import {openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
-import {MAX_EARTH_RESTORE_INPUT} from './imasora-construction-earth-restore.js?v=120gn';
-import {MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=120gn';
+import {MAX_EARTH_RESTORE_INPUT} from './imasora-construction-earth-restore.js?v=120pv';
+import {MAX_EARTH_BUNDLE_RESTORE_INPUT} from './imasora-construction-earth-bundle-restore.js?v=120pv';
 
 export function createExcavationAuthorityView({panel,session,snapshot,pause,replace,refresh}){
   if(session.live)return createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh});

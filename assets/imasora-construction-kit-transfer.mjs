@@ -1,19 +1,21 @@
-import{isKitCargo,kitTemplate,validateKitBinding,kitPad,kitOnPad,kitHandlingGeometry}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{highProjects,highWorldPoint,highWorldGeometry,validateHighWorld}from'./imasora-construction-high-world.mjs?v=120gn';
+import{assertGirderBindings}from'./imasora-construction-girder-transfer.mjs?v=120pv';
+import{reelWorldParts}from'./imasora-construction-reel-world.mjs?v=120ps';
+import{isKitCargo,kitTemplate,validateKitBinding,kitPad,kitOnPad,kitHandlingGeometry}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{highProjects,highWorldPoint,highWorldGeometry,validateHighWorld}from'./imasora-construction-high-world.mjs?v=120pv';
 import{highPlanScale}from'./imasora-construction-high-interior.mjs?v=120gn';
-import{validateHighBuild,beginHighJob,advanceHighJob,finishHighJob,highJobPlan,highRouteSeconds}from'./imasora-construction-high-build.mjs?v=120gn';
-import{TIMBER_YARDS,validateWorldTimber,worldTimberMaterialObstacles}from'./imasora-construction-world-timber.js?v=120gn';
-import{timberPhysicsState,refreshTimberLedger}from'./imasora-construction-purchased-timber.js?v=120gn';
-import{craneGroundContext,craneGroundObstacles}from'./imasora-construction-crane-ground.mjs?v=120gf';
-import{actCrane,pickOption,collides,tip,CRANE}from'./imasora-construction-crane.js?v=120gn';
-import{polygon,polygonsOverlap}from'./imasora-construction-loader-physics.js?v=120gf';
-import{transportGroundHeightAt}from'./imasora-construction-transport-site.mjs?v=120gn';
-import{boardLiftWorldObstacles}from'./imasora-construction-board-lift-guard.mjs?v=120gn';
+import{validateHighBuild,beginHighJob,advanceHighJob,finishHighJob,highJobPlan,highRouteSeconds}from'./imasora-construction-high-build.mjs?v=120pv';
+import{TIMBER_YARDS,validateWorldTimber,worldTimberMaterialObstacles}from'./imasora-construction-world-timber.js?v=120pv';
+import{timberPhysicsState,refreshTimberLedger}from'./imasora-construction-purchased-timber.js?v=120pv';
+import{craneGroundContext,craneGroundObstacles}from'./imasora-construction-crane-ground.mjs?v=120ov';
+import{actCrane,pickOption,collides,tip,CRANE}from'./imasora-construction-crane.js?v=120pv';
+import{polygon,polygonsOverlap}from'./imasora-construction-loader-physics.js?v=120ov';
+import{transportGroundHeightAt}from'./imasora-construction-transport-site.mjs?v=120pv';
+import{boardLiftWorldObstacles}from'./imasora-construction-board-lift-guard.mjs?v=120pv';
 const ok=(v,m)=>{if(!v)throw Error(m);},eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const origin=t=>({x:TIMBER_YARDS[t.siteIndex][0],z:TIMBER_YARDS[t.siteIndex][1]});
 export function assertBuildingKitWorld(world){
  const t=world.constructionTimber,kits=t?.work.buildingKits??[],projects=highProjects(world.constructionHighBuild);
- for(const b of kits){validateKitBinding(b);const r=projects.find(p=>p.id===b.projectId)?.record;
+ assertGirderBindings(world);for(const b of kits){validateKitBinding(b);if(b.version===2)continue;const r=projects.find(p=>p.id===b.projectId)?.record;
   ok(r&&r.work.kit==='made'&&!r.work.job&&r.work.kitModelVersion===1&&r.work.craneKit?.partId===b.partId&&r.work.craneKit.version===1&&b.level===r.work.levels+1&&b.scale===highPlanScale(r.work),'建物とクレーンのキットが一致しないため、記録を保護したよ。');
   const p=t.work.parts.find(p=>p.id===b.partId);ok(p&&isKitCargo(p)&&!p.hover&&!p.carrierId,'運んでいる建築キットを残そう。');
   const height=(x,z)=>transportGroundHeightAt(world.constructionTransport,x+origin(t).x,z+origin(t).z)??0,context=craneGroundContext(t.work,height),posed={...timberPhysicsState(t.work),...(context?{groundPose:context}:{})};ok(!collides(posed,p,{external:craneGroundObstacles(posed,kitObstacles(world,world.constructionHighBuild,t),height)}),'建築キットの周りの柱や車体を残そう。');
@@ -22,8 +24,8 @@ export function assertBuildingKitWorld(world){
 }
 export function kitHandlingObstacles(collection,o){const all=[];for(const p of highProjects(collection)){const g=kitHandlingGeometry(p.record.work),a=p.record.site.turn*Math.PI/2;for(const b of g.boxes){const q=highWorldPoint(p.record.site,b);all.push({...b,x:q.x-o.x,y:q.y-b.h/2,z:q.z-o.z,angle:a});}for(const b of g.surfaces){const q=highWorldPoint(p.record.site,b);all.push({...b,x:q.x-o.x,y:q.y-2,z:q.z-o.z,h:2,angle:a});}}return all;}
 export function assertKitSupportChange(world,nextHigh){const t=world.constructionTimber;if(!t?.work.parts.length)return true;const o=origin(t);for(const old of highProjects(world.constructionHighBuild)){const b=kitHandlingGeometry(old.record.work).boxes.find(b=>b.kind==='kit-repacked-material');if(!b)continue;const next=highProjects(nextHigh).find(p=>p.id===old.id),after=next&&kitHandlingGeometry(next.record.work).boxes.find(b=>b.kind==='kit-repacked-material');if(eq(b,after))continue;const q=highWorldPoint(old.record.site,b),foot=polygon({x:q.x,z:q.z,heading:old.record.site.turn*Math.PI/2},b.w,b.d);for(const p of t.work.parts)if(p.fixed&&Math.abs(p.y-q.y-b.h/2)<.05&&polygonsOverlap(foot,polygon({x:p.x+o.x,z:p.z+o.z,heading:p.angle},p.w,p.d)))throw Error('キットの上の荷物を先に降ろそう。');}return true;}
-function replaceProject(collection,id,record){if(collection.version!==2)return record;return{...collection,revision:collection.revision+1,projects:collection.projects.map(p=>p.id===id?{...p,record}:p)};}
-function kitObstacles(world,high,t){const o=origin(t),g=highWorldGeometry(high),record=highProjects(high)[0]?.record,raw=[...g.boxes.map(b=>({...b,x:b.x-o.x,y:b.y-b.h/2,z:b.z-o.z,angle:b.angle??g.angle})),...g.surfaces.map(b=>({...b,x:b.x-o.x,y:b.y-2.5,z:b.z-o.z,h:2.5,angle:b.angle??g.angle})),...(record?boardLiftWorldObstacles(world,record,o):[])];return worldTimberMaterialObstacles(t.work.rig,raw);}
+function replaceProject(collection,id,record){if(collection.version<2)return record;return{...collection,revision:collection.revision+1,projects:collection.projects.map(p=>p.id===id?{...p,record}:p)};}
+export function kitObstacles(world,high,t){const o=origin(t),g=highWorldGeometry(high),record=highProjects(high)[0]?.record,raw=[...reelWorldParts(high).map(b=>({...b,x:b.x-o.x,y:b.y-b.h/2,z:b.z-o.z,angle:0})),...g.boxes.map(b=>({...b,x:b.x-o.x,y:b.y-b.h/2,z:b.z-o.z,angle:b.angle??g.angle})),...g.surfaces.map(b=>({...b,x:b.x-o.x,y:b.y-2.5,z:b.z-o.z,h:2.5,angle:b.angle??g.angle})),...(record?boardLiftWorldObstacles(world,record,o):[])];return worldTimberMaterialObstacles(t.work.rig,raw);}
 export function kitPickupOption(world,projectId){try{
  const t=world.constructionTimber,r=highProjects(world.constructionHighBuild).find(p=>p.id===projectId)?.record,w=r?.work;
  ok(t&&w&&w.kit==='made'&&!w.job&&!w.craneKit&&w.actor.y===0,'地上で部材をつくってから、キットを吊ろう。');

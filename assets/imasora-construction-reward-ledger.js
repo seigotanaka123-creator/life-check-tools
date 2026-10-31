@@ -69,8 +69,10 @@
       || new Set(arcadeAwards).size !== arcadeAwards.length) {
       return invalidLedger(value);
     }
+    if (value.sailingAwards !== undefined && (!Array.isArray(value.sailingAwards) || value.sailingAwards.length>10000 || new Set(value.sailingAwards.map(a=>a?.id)).size!==value.sailingAwards.length || value.sailingAwards.some(a=>!a || Object.keys(a).sort().join('|')!=='amount|id|route' || typeof a.id!=='string' || a.id.length>220 || a.amount!==({walk:3,tournament:4,catcher:1,triLink:2,pachicoin:2}[a.route])))) return invalidLedger(value);
     return {
       ...value,
+      sailingAwards: (value.sailingAwards||[]).map(a=>({...a})),
       version: 3,
       unopenedBoxes: value.unopenedBoxes,
       starterToolkitEntitled: value.starterToolkitEntitled,
@@ -81,6 +83,19 @@
     };
   }
 
+  const sailingAmounts = { walk:3, tournament:4, catcher:1, triLink:2, pachicoin:2 };
+  function addSailing(ledger, route, id) {
+    ledger.sailingAwards ||= [];
+    if (ledger.sailingAwards.some(a => a.id === id)) return 0;
+    if (ledger.sailingAwards.length >= 10000) throw Error('航海パーツの記録がいっぱいです。');
+    const amount=sailingAmounts[route];ledger.sailingAwards.push({id,route,amount});return amount;
+  }
+  function awardWalkCheckpoint(current,event={}) {
+    const ledger=normalize(current),{position,dayKey,source}=event;
+    if(ledger.blocked||!allowedWalkSources.has(source)||!Number.isSafeInteger(position)||position<=0||position%25!==0||typeof dayKey!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(dayKey))return{ledger,granted:false,sailingParts:0};
+    const id='walk:'+dayKey+':'+Math.floor(position/25);if((ledger.sailingAwards||[]).some(a=>a.id===id))return{ledger,granted:false,sailingParts:0};
+    const sailingParts=addSailing(ledger,'walk',id);return{ledger,granted:true,sailingParts};
+  }
   function awardWalkTile(current, event = {}) {
     const ledger = normalize(current);
     if (ledger.blocked) return { ledger, status: "blocked", granted: false, toolkitGranted: false };
@@ -102,11 +117,15 @@
       return { ledger, status: "duplicate", granted: false, toolkitGranted: false };
     }
 
+    if (Math.floor(position/25)-Math.floor(cursor.lastPosition/25)>10000-(ledger.sailingAwards||[]).length) return {ledger,status:"unavailable",granted:false,toolkitGranted:false};
+    let sailingParts=0;
+    // Checkpoints are recorded by day and lap; retries cannot grant them twice.
+    for(let lap=Math.floor(cursor.lastPosition/25)+1;lap<=Math.floor(position/25);lap++)sailingParts+=addSailing(ledger,'walk','walk:'+dayKey+':'+lap);
     const toolkitGranted = !ledger.starterToolkitEntitled;
     ledger.unopenedBoxes += 1;
     ledger.starterToolkitEntitled = true;
     ledger.walkCursor = { dayKey, lastPosition: position };
-    return { ledger, status: "granted", granted: true, toolkitGranted };
+    return { ledger, status: "granted", granted: true, toolkitGranted, sailingParts };
   }
 
   function awardTournamentWin(current, event = {}) {
@@ -132,7 +151,8 @@
     ledger.unopenedBoxes += 8;
     ledger.starterToolkitEntitled = true;
     ledger.tournamentAwards.push(id);
-    return { ledger, status: "granted", granted: true, toolkitGranted, boxes: 8, id };
+    const sailingParts=addSailing(ledger,"tournament",id);
+    return { ledger, status: "granted", granted: true, toolkitGranted, boxes: 8, id, sailingParts };
   }
 
   function awardArcadeEvent(current, event = {}) {
@@ -165,8 +185,9 @@
     ledger.unopenedBoxes += boxes;
     ledger.starterToolkitEntitled = true;
     ledger.arcadeAwards.push(id);
-    return { ledger, status: "granted", granted: true, toolkitGranted, boxes, id };
+    const sailingParts=game!=="triLink"||playerWon===true?addSailing(ledger,game,id):0;
+    return { ledger, status: "granted", granted: true, toolkitGranted, boxes, id, sailingParts };
   }
 
-  return Object.freeze({ defaultLedger, normalize, awardWalkTile, awardTournamentWin, awardArcadeEvent });
+  return Object.freeze({ defaultLedger, normalize, awardWalkCheckpoint, awardWalkTile, awardTournamentWin, awardArcadeEvent });
 });

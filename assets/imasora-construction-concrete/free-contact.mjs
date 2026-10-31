@@ -1,43 +1,44 @@
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
-import {workVehicleState} from './work-vehicle-height.mjs';
-import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
-import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs?v=120gn';
-import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs?v=120gn';
-import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
-import {frameDeckHeight} from './free-frame-workspace.mjs?v=120gn';
-import {freeWorkMask,freePlacedFill} from './free-work-parts.mjs';
-import {canonicalFreeAction,freeCell} from './free-build-state.mjs?v=120gn';
-import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs?v=120gn';
-import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs?v=120gn';
-import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs?v=120gn';
+import {workVehicleState} from './work-vehicle-height.mjs?v=120ov';
+import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120pv';
+import {newPaintAccessReceipt,assertPaintAccessReceipt,sharedPaintHeight} from './free-paint-access.mjs?v=120pv';
+import {newFinishAccess,assertFinishAccess} from './free-finish-access.mjs?v=120pv';
+import {newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120pv';
+import {frameDeckHeight} from './free-frame-workspace.mjs?v=120pv';
+import {freeWorkMask,freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {canonicalFreeAction,freeCell} from './free-build-state.mjs?v=120pv';
+import {FREE_CAST_ACTIONS,finishBands} from './free-casting.mjs?v=120pv';
+import {FREE_FRAME_ACTIONS,FRAME_HAND_REACH,FRAME_TOOL_REACH,frameOrder,FRAME_RACK} from './free-frames.mjs?v=120pv';
+import {newBoomReceipt,assertBoomReceipt,pipeContactPath,pipeWalkingCorners} from './free-boom-contact.mjs?v=120pv';
 
-import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs?v=120gn';
-import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs?v=120gn';
-import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120gn';
+import {footSurface,footingAt,footingSegment,needsFooting,newFootingReceipt,assertFootingReceipt} from './free-footing.mjs?v=120pv';
+import {walkingGroundAt,walkingGroundSegment} from './free-walking-ground.mjs?v=120pv';
+import {assertVehicleRescueReceipt} from './free-vehicle-rescue.mjs?v=120pv';
 
 export const FREE_CONTACT_ACTIONS=new Set(['FREE_PAINT','FREE_BOARD','FREE_LEAVE',...FREE_CAST_ACTIONS,...FREE_FRAME_ACTIONS]);
 export const CONTACT_EPS=1e-5;
 export function vehiclePoint(v,p){const c=Math.cos(v.heading),s=Math.sin(v.heading);return{x:v.x+c*p.x+s*p.z,y:p.y??0,z:v.z-s*p.x+c*p.z};}
 export function paintPatch(f,a,pixel,progress=.5){
- const w=f.completed[a.work],c=freeCell(a.cell),h=freePlacedFill(w,a.cell)/2;
+ const w=f.completed[a.work],c=groundTile(a.cell,w),h=groundHeight(w,a.cell,freePlacedFill(w,a.cell));
  if(!h)throw Error('塗るコンクリートがありません。');
  const col=pixel%4,row=Math.floor(pixel/4),x=w.x-f.location.x+c.x,z=w.z-f.location.z+c.z;
- const span=a.face==='top'?4:h/4,offset=(progress-.5)*span*.96;
+ const span=a.face==='top'?c.d/4:h/4,offset=(progress-.5)*span*.96;
  let point,normal,u,v;
- if(a.face==='top'){point={x:x-6+col*4,y:h,z:z-6+row*4+offset};normal=[0,1,0];u=[1,0,0];v=[0,0,1];}
- else if(['north','south'].includes(a.face)){point={x:x-6+col*4,y:h*(row+.5)/4+offset,z:z+(a.face==='north'?-8:8)};normal=[0,0,a.face==='north'?-1:1];u=[1,0,0];v=[0,1,0];}
- else{point={x:x+(a.face==='west'?-8:8),y:h*(row+.5)/4+offset,z:z-6+col*4};normal=[a.face==='west'?-1:1,0,0];u=[0,0,1];v=[0,1,0];}
- point.y+=constructionBase(w);return{point,normal,u,v,span};
+ if(a.face==='top'){point={x:x-c.w*3/8+col*c.w/4,y:h,z:z-c.d*3/8+row*c.d/4+offset};normal=[0,1,0];u=[1,0,0];v=[0,0,1];}
+ else if(['north','south'].includes(a.face)){point={x:x-c.w*3/8+col*c.w/4,y:h*(row+.5)/4+offset,z:z+(a.face==='north'?-c.d/2:c.d/2)};normal=[0,0,a.face==='north'?-1:1];u=[1,0,0];v=[0,1,0];}
+ else{point={x:x+(a.face==='west'?-c.w/2:c.w/2),y:h*(row+.5)/4+offset,z:z-c.d*3/8+col*c.d/4};normal=[a.face==='west'?-1:1,0,0];u=[0,0,1];v=[0,1,0];}
+ point.y+=constructionBase(w);return{point,normal,u,v,span,...(w.layout?{width:(a.face==='east'||a.face==='west'?c.d:c.w)/4}:{} )};
 }
 export function assertPaintAccess(f,a){
  const w=f.completed[a.work];if(!freePlacedFill(w,a.cell))throw Error('塗るコンクリートがありません。');
  const i=a.cell,n={north:i>=4?i-4:-1,south:i<12?i+4:-1,west:i%4?i-1:-1,east:i%4<3?i+1:-1}[a.face];
- if(n>=0&&a.pixels.some(pixel=>Math.floor(pixel/4)*w.fill[i]/8<freePlacedFill(w,n)/2))throw Error('隣のコンクリートに隠れている部分を除いてください。');
+ if(n>=0&&a.pixels.some(pixel=>Math.floor(pixel/4)*groundHeight(w,i)/4<groundHeight(w,n,freePlacedFill(w,n))))throw Error('隣のコンクリートに隠れている部分を除いてください。');
 }
 function context(a,p){return JSON.stringify({profileId:p.profileId,action:canonicalFreeAction(a),freeBuild:p.freeBuild,...(p.schemaVersion>=10?{foundation:p.foundation}:{} )});}
 export function newFreeReceipt(a,p){
  const base={type:a.type,operationId:a.operationId,revision:p.revision,context:context(a,p),...(needsFooting(a)?{footing:newFootingReceipt()}:{} )};
- if(FREE_FRAME_ACTIONS.has(a.type))return{...base,...([RAISED_FRAME_ACTION,'FREE_DEMOLD','FREE_UNFRAME'].includes(a.type)?{scaffold:newScaffoldReceipt()}:{}),maxGripError:0,maxHandReach:0,maxPlacementError:0,maxHitError:0,tool:{samples:0,maxLength:0,maxContactError:0},panels:frameOrder(preparedFrameBuild(p,a).mask).map(panel=>({id:panel.id,graspSamples:0,carrySamples:0,seatSamples:0,returnedSamples:0,min:1,max:0,hits:[false,false]}))};
+ if(FREE_FRAME_ACTIONS.has(a.type))return{...base,...([RAISED_FRAME_ACTION,'FREE_DEMOLD','FREE_UNFRAME'].includes(a.type)?{scaffold:newScaffoldReceipt()}:{}),maxGripError:0,maxHandReach:0,maxPlacementError:0,maxHitError:0,tool:{samples:0,maxLength:0,maxContactError:0},panels:frameOrder(preparedFrameBuild(p,a).mask,preparedFrameBuild(p,a)).map(panel=>({id:panel.id,graspSamples:0,carrySamples:0,seatSamples:0,returnedSamples:0,min:1,max:0,hits:[false,false]}))};
  if(FREE_CAST_ACTIONS.has(a.type))return{...base,...(a.type==='FREE_FINISH'?{access:newFinishAccess(p.freeBuild)}:{}),maxGripError:0,maxContactError:0,maxPoleLength:0,maxVolumeError:0,min:1,max:0,samples:0,bands:a.type==='FREE_FINISH'?finishBands(p.freeBuild).map(b=>({...b,samples:0,min:1,max:0})):[],...(a.type==='FREE_POUR'&&a.source==='pump'?{boom:newBoomReceipt()}:{} )};
  return a.type==='FREE_PAINT'?{...base,access:newPaintAccessReceipt(),maxGripError:0,maxContactError:0,maxPoleLength:0,patches:a.pixels.map(pixel=>({pixel,samples:0,min:1,max:0}))}:{...base,travelSamples:0,stepSamples:0,endpointError:0,doorClosedError:0,doorOpened:false,boarding:{samples:0,terrainSamples:0,landingSamples:0,maxSlope:0,maxPatchError:0,maxPoseError:0,maxSoleError:0}};
 }
@@ -78,7 +79,7 @@ export function walkingSurface(f,x,z,heightAt=()=>0){return footSurface(f,x,z,he
 function* walkingObstacles(f,ignoreVehicle){
  yield{x:FRAME_RACK.x,z:FRAME_RACK.z,hx:11,hz:6};
  for(const name of ['truck','pump'])if(name!==ignoreVehicle){const v=f[name];yield{...v,hx:v.legs?40:33,hz:44};}
- if(!['design','complete'].includes(f.stage))for(let i=0;i<16;i++)if(f.mask&(1<<i))yield{...freeCell(i),hx:8.3,hz:8.3};
+ if(!['design','complete'].includes(f.stage))for(let i=0;i<16;i++)if(f.mask&(1<<i)){const t=groundTile(i,f);yield{...t,hx:t.w/2+.3,hz:t.d/2+.3};};
 }
 const outside=(f,p)=>![p.x,p.z].every(Number.isFinite)||Math.abs(p.x+f.location.x)>2600||Math.abs(p.z+f.location.z)>1700;
 export function walkingObjectsBlocked(f,x,z,external=()=>false,ignoreVehicle=null,heightAt=null){

@@ -5,8 +5,8 @@ import {createSpaceMaterialGuide} from './assets/imasora-space-material-guide.js
 const $=id=>document.getElementById(id);
 const previewMode=new URLSearchParams(location.search).get('walletPreview');
 const walletUI=new URLSearchParams(location.search).get('worldShop')==='1'
-  ?(await import('./assets/imasora-world-shop-client.js?v=120fp')).createWorldShopClient()
-  :previewMode?(await import('./assets/imasora-world-purchase-preview-ui.js?v=120fp')).makeWalletPreview(previewMode):null;
+  ?(await import('./assets/imasora-world-shop-client.js?v=120pv')).createWorldShopClient()
+  :previewMode?(await import('./assets/imasora-world-purchase-preview-ui.js?v=120pv')).makeWalletPreview(previewMode):null;
 const session=walletUI?.session||new ShopSession(),SHOP_OFFERS=walletUI?.offers||TRIAL_OFFERS,quoteOrder=walletUI?.quote||quoteTrialOrder;
 let working=false,selection=null,browsing=SHOP_OFFERS[0];
 const buttons=new Map();
@@ -90,7 +90,7 @@ await perform(read);
 // Use the approved 360-degree shopkeeper, not a replacement character.
 // This small preview is decorative; loss of WebGL must not disable purchasing.
 try{
-  const [THREE,{buildMarsShopkeeper360}]=await Promise.all([import('./assets/three.module.min.js'),import('./assets/imasora-mars-shopkeeper-360.js')]);
+  const [THREE,{buildMarsShopkeeper360}]=await Promise.all([import('./assets/three.module.min.js'),import('./assets/imasora-mars-shopkeeper-360.js?v=120ob')]);
   const host=$('merchant'),renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));host.append(renderer.domElement);
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(36,1,.1,5000),model=buildMarsShopkeeper360(undefined,{castShadow:false});scene.add(model);
   scene.add(new THREE.HemisphereLight(0xfff4e5,0x6b527c,2.2));const light=new THREE.DirectionalLight(0xffffff,2.2);light.position.set(70,160,100);scene.add(light);

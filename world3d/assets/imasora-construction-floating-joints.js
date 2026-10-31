@@ -1,7 +1,7 @@
-import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
-import {tip,pickOption} from './imasora-construction-crane.js?v=120gn';
-import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js?v=120gn';
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
+import {tip,pickOption} from './imasora-construction-crane.js?v=120pv';
+import {component,floatReadout,floatingView,movingHit} from './imasora-construction-floating-assembly-physics.js?v=120pv';
 export const JOIN_SECONDS=1.2;
 function dimensions(p){
   const turn=Math.round(p.angle/(Math.PI/2));

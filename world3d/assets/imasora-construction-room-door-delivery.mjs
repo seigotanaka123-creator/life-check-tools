@@ -1,10 +1,10 @@
 import{stairPlacement}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import {ROOM_KINDS,roomItemParts} from './imasora-construction-room-layout-shape.mjs?v=120gn';
+import {ROOM_KINDS,roomItemParts} from './imasora-construction-room-layout-shape.mjs?v=120hd';
 import {highFloorPieces} from './imasora-construction-high-shape.mjs?v=120gn';
-import {highWorkSolids,highWorkBodyHits} from './imasora-construction-high-work-position.mjs?v=120gn';
-import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
-import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120gn';
-import {assertRoomKitRoute,roomKitPhase,roomKitBox,ROOM_KIT_PICKUP_SECONDS} from './imasora-construction-room-kit.mjs?v=120gn';
+import {highWorkSolids,highWorkBodyHits} from './imasora-construction-high-work-position.mjs?v=120ov';
+import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs?v=120ov';
+import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120pv';
+import {assertRoomKitRoute,roomKitPhase,roomKitBox,ROOM_KIT_PICKUP_SECONDS} from './imasora-construction-room-kit.mjs?v=120ov';
 
 const fail=message=>{throw Error(message);},p=(x,y,z,heading=0)=>({x,y,z,heading});
 export const ROOM_DOOR_UNLOAD_SECONDS=.8;
@@ -93,6 +93,7 @@ export function roomDeliveryPhase(work,plan){
   return{kind:'assemble',trip:d.count,total:d.count,progress:Math.min(1,Math.max(0,(work.job.elapsed-d.walkSeconds-d.waitSeconds)/ROOM_DOOR_ASSEMBLY_SECONDS))};
 }
 export function roomDeliveryLabel(work,plan){
+  if(work.job?.edit?.op==='write')return work.job.elapsed<work.job.walkSeconds?'看板のそばまで歩くよ':'看板の文字を彫り直しているよ';
   const phase=roomDeliveryPhase(work,plan);if(!phase)return 'そばまで歩いて作業中…';
   const prefix=roomDoorDelivery(plan)?'材料 '+(phase.kind==='assemble'?phase.total:phase.trip+1)+' / '+phase.total+'：':'';
   return prefix+({fetch:phase.trip?'つぎの材料を取りにいくよ':'材料を取りにいくよ',pickup:'材料を持ち上げるよ',carry:'材料を運んでいるよ',unload:'材料をそっと置くよ',assemble:'組み立てているよ'}[phase.kind]);

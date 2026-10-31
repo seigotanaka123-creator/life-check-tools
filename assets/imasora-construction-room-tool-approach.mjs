@@ -1,5 +1,5 @@
-import{highRoomNodes}from'./imasora-construction-high-work-position.mjs?v=120gn';
-import {assertRoomWalking,roomWalkPose,roomWalkStep,roomWalkEndAllowed} from './imasora-construction-room-walk.mjs?v=120gn';
+import{highRoomNodes}from'./imasora-construction-high-work-position.mjs?v=120ov';
+import {assertRoomWalking,roomWalkPose,roomWalkStep,roomWalkEndAllowed} from './imasora-construction-room-walk.mjs?v=120pv';
 
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const roomToolFloor=w=>!!w&&w.roomWalkVersion===1&&!w.job&&(!w.roomMotion||w.roomMotion.grounded)&&Number.isInteger(w.actor.y/40);

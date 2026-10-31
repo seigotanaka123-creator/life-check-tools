@@ -1,8 +1,9 @@
-import {accessPlatePieces} from './free-foundation-access.mjs?v=120gn';
+import{createIndustrialMaterial}from'../imasora-construction-industrial-materials.mjs?v=120pn';
+import {accessPlatePieces} from './free-foundation-access.mjs?v=120pv';
 import {accessDeckPlates} from './free-access-deck.mjs';
 import * as T from '../three.module.min.js';
-import {scaffoldSurface,scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs?v=120gn';
-import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120gn';
+import {scaffoldSurface,scaffoldSupport,SCAFFOLD_RADIUS} from './free-frame-scaffold.mjs?v=120pv';
+import {FOOT_LEVEL_EPS} from './free-footing.mjs?v=120pv';
 
 // Work decks use measured shoes rather than the conservative square used for
 // unassisted ground travel. Stairs plant one foot before moving the other.
@@ -11,7 +12,7 @@ export function createScaffoldMotion({f,root,actor,feet,record,footing,heightAt,
  const disk=new T.CylinderGeometry(SCAFFOLD_RADIUS,SCAFFOLD_RADIUS,.6,20);
  root.updateMatrixWorld(true);const origin=root.getWorldPosition(new T.Vector3());
  const clearance=Math.min(...feet.map(e=>new T.Box3().setFromObject(e.o).min.y))-origin.y-actor.position.y;
- let current=null,fixedGeometry=null;const platformMaterial=fixedPlan?new T.MeshStandardMaterial({color:'#637785',roughness:.95,metalness:.1}):null;
+ let current=null,fixedGeometry=null;const platformMaterial=createIndustrialMaterial('deck'),postMaterial=createIndustrialMaterial('steel'),fixedDeckMaterial=fixedPlan?createIndustrialMaterial('deck',{localY:[fixedPlan.height-(fixedPlan.thickness??.6),fixedPlan.height]}):null;
  const reset=()=>feet.forEach(e=>e.o.position.copy(e.position));
  function shoe(e){root.updateMatrixWorld(true);return new T.Box3().setFromObject(e.o).translate(origin.clone().negate());}
  function centre(b){return new T.Vector3((b.min.x+b.max.x)/2,b.min.y,(b.min.z+b.max.z)/2);}
@@ -21,7 +22,7 @@ export function createScaffoldMotion({f,root,actor,feet,record,footing,heightAt,
   if(sharedPlatform){sharedPlatform.show();current=plan;return;}
   if(current===plan)return;group.clear();current=plan;
   const thickness=plan.thickness??.6;
-  for(const s of plan.stairs)if(plan.kind!=='fixed-frame-work'||Math.abs(s.y-plan.height)>1e-8)box(group,s.x,s.y-thickness/2,s.z,s.halfX*2,thickness,s.halfZ*2,platformMaterial??mats.metal,'scaffold-tread');
+  for(const s of plan.stairs)if(plan.kind!=='fixed-frame-work'||Math.abs(s.y-plan.height)>1e-8)box(group,s.x,s.y-thickness/2,s.z,s.halfX*2,thickness,s.halfZ*2,platformMaterial,'scaffold-tread');
   if(plan.kind==='fixed-frame-work'){
    // One merged opaque mesh. Adjacent pieces do not overlap or z-fight.
    const positions=[],normals=[],indices=[],top=plan.height,bottom=top-thickness;
@@ -34,20 +35,20 @@ export function createScaffoldMotion({f,root,actor,feet,record,footing,heightAt,
     for(const[a,b]of exposed(x0,x1,bounds.filter(q=>q!==p&&q.z0===z1).map(q=>[q.x0,q.x1])))quad([[a,bottom,z1],[b,bottom,z1],[b,top,z1],[a,top,z1]],[0,0,1]);
     for(const[a,b]of exposed(x0,x1,bounds.filter(q=>q!==p&&q.z1===z0).map(q=>[q.x0,q.x1])))quad([[b,bottom,z0],[a,bottom,z0],[a,top,z0],[b,top,z0]],[0,0,-1]);
    }
-   fixedGeometry=new T.BufferGeometry();fixedGeometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));fixedGeometry.setAttribute('normal',new T.Float32BufferAttribute(normals,3));fixedGeometry.setIndex(indices);const mesh=new T.Mesh(fixedGeometry,platformMaterial);mesh.name='fixed-work-platform';group.add(mesh);
+   fixedGeometry=new T.BufferGeometry();fixedGeometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));fixedGeometry.setAttribute('normal',new T.Float32BufferAttribute(normals,3));fixedGeometry.setIndex(indices);const mesh=new T.Mesh(fixedGeometry,fixedDeckMaterial);mesh.name='fixed-work-platform';group.add(mesh);
    // Shared box geometry is owned by the calling motion. Two draw calls keep
    // every measured post without hundreds of separate mobile draw calls.
    const sample=box(group,0,0,0,1,1,1,mats.metal,'post-template'),geometry=sample.geometry;group.remove(sample);
-   const posts=new T.InstancedMesh(geometry,mats.metal,plan.legs.length),pads=new T.InstancedMesh(geometry,mats.dark,plan.legs.length),matrix=new T.Matrix4(),q=new T.Quaternion(),scale=new T.Vector3(),pos=new T.Vector3();
+   const posts=new T.InstancedMesh(geometry,postMaterial,plan.legs.length),pads=new T.InstancedMesh(geometry,mats.dark,plan.legs.length),matrix=new T.Matrix4(),q=new T.Quaternion(),scale=new T.Vector3(),pos=new T.Vector3();
    posts.name='scaffold-post';pads.name='scaffold-foot';
    for(let i=0;i<plan.legs.length;i++){const p=plan.legs[i],h=p.y-thickness-p.base;posts.setMatrixAt(i,matrix.compose(pos.set(p.x,p.base+h/2,p.z),q,scale.set(.6,h,.6)));pads.setMatrixAt(i,matrix.compose(pos.set(p.x,p.base+.025,p.z),q,scale.set(1.2,.05,1.2)));}
    posts.instanceMatrix.needsUpdate=pads.instanceMatrix.needsUpdate=true;group.add(posts,pads);return;
   }
-  if(plan.kind==='foundation-work'){for(const q of plan.pieces)box(group,q.x,plan.height-thickness/2,q.z,q.width,thickness,q.depth,mats.metal,'foundation-work-deck');for(const p of plan.legs){const h=p.y-thickness-p.base;box(group,p.x,p.base+h/2,p.z,.6,h,.6,mats.metal,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}return;}
-  if(plan.kind==='foundation-access'){for(const r of accessDeckPlates(plan.path))for(const q of accessPlatePieces(r,plan.cutouts))box(group,q.x,plan.height-thickness/2,q.z,q.width,thickness,q.depth,mats.metal,'foundation-access-deck');for(const p of plan.legs){const h=Math.max(0,p.y-thickness-p.base);if(h)box(group,p.x,p.base+h/2,p.z,.6,h,.6,mats.metal,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}return;}
-  for(let i=1;i<plan.path.length;i++){const a=plan.path[i-1],b=plan.path[i],length=Math.hypot(b.x-a.x,b.z-a.z),deck=box(group,(a.x+b.x)/2,plan.height-thickness/2,(a.z+b.z)/2,SCAFFOLD_RADIUS*2,thickness,length,mats.metal,'scaffold-deck');deck.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);}
-  for(const p of plan.path){const cap=new T.Mesh(disk,mats.metal);cap.scale.y=thickness/.6;cap.position.set(p.x,plan.height-thickness/2,p.z);cap.name='scaffold-landing';group.add(cap);}
-  for(const p of plan.legs){box(group,p.x,(p.y-thickness+p.base)/2,p.z,.6,p.y-thickness-p.base,.6,mats.metal,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}
+  if(plan.kind==='foundation-work'){for(const q of plan.pieces)box(group,q.x,plan.height-thickness/2,q.z,q.width,thickness,q.depth,platformMaterial,'foundation-work-deck');for(const p of plan.legs){const h=p.y-thickness-p.base;box(group,p.x,p.base+h/2,p.z,.6,h,.6,postMaterial,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}return;}
+  if(plan.kind==='foundation-access'){for(const r of accessDeckPlates(plan.path))for(const q of accessPlatePieces(r,plan.cutouts))box(group,q.x,plan.height-thickness/2,q.z,q.width,thickness,q.depth,platformMaterial,'foundation-access-deck');for(const p of plan.legs){const h=Math.max(0,p.y-thickness-p.base);if(h)box(group,p.x,p.base+h/2,p.z,.6,h,.6,postMaterial,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}return;}
+  for(let i=1;i<plan.path.length;i++){const a=plan.path[i-1],b=plan.path[i],length=Math.hypot(b.x-a.x,b.z-a.z),deck=box(group,(a.x+b.x)/2,plan.height-thickness/2,(a.z+b.z)/2,SCAFFOLD_RADIUS*2,thickness,length,platformMaterial,'scaffold-deck');deck.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);}
+  for(const p of plan.path){const cap=new T.Mesh(disk,platformMaterial);cap.scale.y=thickness/.6;cap.position.set(p.x,plan.height-thickness/2,p.z);cap.name='scaffold-landing';group.add(cap);}
+  for(const p of plan.legs){box(group,p.x,(p.y-thickness+p.base)/2,p.z,.6,p.y-thickness-p.base,.6,postMaterial,'scaffold-post');box(group,p.x,p.base+.025,p.z,1.2,.05,1.2,mats.dark,'scaffold-foot');}
  }
  function support(plan){record.maxSupportError=Math.max(record.maxSupportError,supportAt(f,fixedPlan??plan,heightAt,external));}
  function measure(plan,planted=[true,true]){
@@ -70,6 +71,6 @@ export function createScaffoldMotion({f,root,actor,feet,record,footing,heightAt,
    try{measure(s.scaffold,planted);}catch(e){e.cause={...e.cause,from,to,t,a:a.map(p=>p.toArray()),b:b.map(p=>p.toArray()),actor:actor.position.toArray()};throw e;}if(t===1)record[s.ascending?'ascents':'descents']++;
   },
   verify(){if(fixedPlan)support(fixedPlan);},
-  dispose(){group.children.forEach(o=>{if(o.isInstancedMesh)o.dispose();});group.clear();fixedGeometry?.dispose();platformMaterial?.dispose();disk.dispose();}
+  dispose(){group.children.forEach(o=>{if(o.isInstancedMesh)o.dispose();});group.clear();fixedGeometry?.dispose();platformMaterial.dispose();postMaterial.dispose();fixedDeckMaterial?.dispose();disk.dispose();}
  };
 }

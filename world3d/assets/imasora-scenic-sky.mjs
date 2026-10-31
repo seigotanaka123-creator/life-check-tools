@@ -34,10 +34,12 @@ function textureFromCanvas(c){
  tex.generateMipmaps=false;tex.minFilter=T.LinearFilter;return tex;
 }
 /** A single background draw, with shared baked cloud pixels and owned GPU resources. */
-export function createScenicSky({uniforms,radius=4500,cloudSea=false}){
+export function createScenicSky({uniforms,radius=4500,cloudSea=false,infinite=false}){
  uniforms.clouds={value:cloudTexture()};uniforms.cloudSea={value:cloudSea?1:0};
- const skyMat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms,vertexShader:vertex,fragmentShader:`
- precision highp float;varying vec3 vWorld;uniform vec3 top,horizon,sun,sunDir;uniform float time,night,cloudSea;uniform sampler2D clouds;
+ uniforms.dusk??={value:0};
+ const skyVertex=infinite?vertex.replace('gl_Position=projectionMatrix*viewMatrix*w;','gl_Position=projectionMatrix*viewMatrix*w;gl_Position.z=gl_Position.w;'):vertex;
+ const skyMat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms,vertexShader:skyVertex,fragmentShader:`
+ precision highp float;varying vec3 vWorld;uniform vec3 top,horizon,sun,sunDir;uniform float time,night,cloudSea,dusk;uniform sampler2D clouds;
  ${hash}
  void main(){
   vec3 d=normalize(vWorld-cameraPosition);
@@ -47,6 +49,9 @@ export function createScenicSky({uniforms,radius=4500,cloudSea=false}){
   vec4 sampleCloud=texture2D(clouds,uv);
   float cloud=sampleCloud.a*smoothstep(.025,.08,h)*(1.-smoothstep(.55,.86,h));
   vec3 cc=mix(mix(sampleCloud.rgb*.86,horizon,.17),sampleCloud.rgb*.17+vec3(.025,.04,.075),night);
+  // Sun-facing cloud rims catch honey/peach light while the upper sky stays blue.
+  float rim=pow(sd,7.)*dusk;cc=mix(cc,vec3(1.,.70,.40),rim*.48);
+  col+=vec3(.45,.16,.035)*pow(sd,18.)*dusk*(1.-cloud*.6);
   col=mix(col,cc,cloud*(.96-night*.26));
   vec2 st=vec2(atan(d.x,d.z)*550.,asin(d.y)*550.);vec2 cell=floor(st);
   float star=step(.994,hash(cell))*pow(max(0.,1.-length(fract(st)-.5)*2.),3.);

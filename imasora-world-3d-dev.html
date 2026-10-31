@@ -4,24 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>イマソラーズウォーク｜冒険マップ</title>
-  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=120ey">
-  <link rel="stylesheet" href="./assets/imasora-hold-dash.css?v=120ds">
+  <link rel="stylesheet" href="./imasora-world-3d-dev.css?v=120nj">
+  <link rel="stylesheet" href="./assets/imasora-hold-dash.css?v=120nx">
   <link rel="stylesheet" href="./assets/imasora-space-material-guide.css?v=120ds">
   <link rel="stylesheet" href="./assets/imasora-construction-delivery.css?v=120ds">
   <link rel="stylesheet" href="./assets/imasora-construction-world-water.css?v=120ds">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=120ds">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=120gm">
-  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=120ds">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-soil.css?v=120ot">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-timber.css?v=120pa">
+  <link rel="stylesheet" href="./assets/imasora-construction-world-excavation.css?v=120ot">
   <link rel="stylesheet" href="./assets/imasora-ufo-flight-survey.css?v=120ds">
   <link rel="stylesheet" href="./assets/imasora-construction-vehicle-play.css?v=120ds">
-  <link rel="stylesheet" href="./assets/imasora-world-map-menu.css?v=120et">
+  <link rel="stylesheet" href="./assets/imasora-world-map-menu.css?v=120ni">
+  <script src="./assets/imasora-keyboard-settings.js?v=120od"></script>
   <script src="./assets/imasora-game-touch-guard.js?v=119bg"></script>
-<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=120ds">
-<link rel="stylesheet" href="./assets/imasora-construction-player-menu.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-player-ui.css?v=120mz">
+<link rel="stylesheet" href="./assets/imasora-construction-player-menu.css?v=120mz">
 <link rel="stylesheet" href="./assets/imasora-game-pastel.css?v=120ds">
 <link rel="stylesheet" href="./assets/imasora-pop-menu.css?v=120ds">
-<link rel="stylesheet" href="./assets/imasora-construction-high-live.css?v=120gn">
-  <link rel="stylesheet" href="./assets/imasora-coast.css?v=120go">
+<link rel="stylesheet" href="./assets/imasora-construction-high-live.css?v=120pb">
+  <link rel="stylesheet" href="./assets/imasora-coast.css?v=120ni">
+<link rel="stylesheet" href="./assets/imasora-coast-forage.css?v=120nw">
+<link rel="stylesheet" href="./assets/imasora-world-save-notice.css?v=120pw">
+<link rel="stylesheet" href="./assets/imasora-coast-physics.css?v=120mz">
+<link rel="stylesheet" href="./assets/imasora-coast-landmark.css?v=120mz">
+<link rel="stylesheet" href="./assets/imasora-coast-adventure.css?v=120oc">
+<link rel="stylesheet" href="./assets/imasora-keyboard-settings.css?v=120od">
+<link rel="stylesheet" href="./assets/imasora-touch-layout.css?v=120og">
 </head>
 <body class="world-player-game">
   <main class="world-shell">
@@ -92,8 +100,8 @@
             <i aria-hidden="true"></i>
           </div>
           <section class="sky-station-guide-dialog" id="skyStationGuideDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="ミチメバンブレイブルとの会話">
-            <div class="sky-station-guide-dialog-name" id="skyStationGuideDialogSpeaker">ミチメバンブレイブル</div>
-            <p class="sky-station-guide-dialog-text" id="skyStationGuideDialogText"></p>
+            <header class="conversation-heading"><div class="sky-station-guide-dialog-name" id="skyStationGuideDialogSpeaker">ミチメバンブレイブル</div><button type="button" id="skyStationGuideDialogClose" aria-label="会話を閉じる">とじる ×</button></header><div class="conversation-body">
+            <p class="sky-station-guide-dialog-text" id="skyStationGuideDialogText" title="タップで全文を読む"></p>
             <div class="sky-station-guide-dialog-choices" id="skyStationGuideDialogChoices" aria-label="会話の選択肢">
               <button type="button" data-guide-dialog-topic="sky-map">空マップについて</button>
               <button type="button" data-guide-dialog-topic="ufo">UFOについて</button>
@@ -104,13 +112,13 @@
               <span class="sky-station-guide-dialog-page" id="skyStationGuideDialogPage" aria-live="off"></span>
               <button class="sky-station-guide-dialog-next" type="button" id="skyStationGuideDialogNext">つぎへ</button>
             </div>
+            </div>
           </section>
           <section class="sky-station-guide-dialog" id="marsShopDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="火星素材ショップの宇宙人との会話" aria-describedby="marsShopDialogText">
-            <div class="sky-station-guide-dialog-name" id="marsShopDialogSpeaker">宇宙人</div>
+            <header class="conversation-heading"><div class="sky-station-guide-dialog-name" id="marsShopDialogSpeaker">宇宙人</div><button type="button" id="marsShopDialogClose" aria-label="会話を閉じる">とじる ×</button></header><div class="conversation-body">
             <p class="sky-station-guide-dialog-text" id="marsShopDialogText"></p>
             <div class="sky-station-guide-dialog-choices" id="marsShopDialogChoices" aria-label="白ミチロードセイバーレンの返答"></div>
-            <div class="sky-station-guide-dialog-footer">
-              <button class="sky-station-guide-dialog-next" type="button" id="marsShopDialogClose" data-last-page="true">とじる</button>
+
             </div>
           </section>
           <section class="ufo-equipment-workshop-menu" id="ufoEquipmentWorkshopMenu" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="UFO倉庫装備メニュー">
@@ -164,8 +172,8 @@
               <button type="button" class="flight-lever space-strafe-lever" data-ufo-flight="strafe-right" aria-label="右へ移動" title="右へ移動"><span class="flight-lever-shaft" aria-hidden="true"><i></i></span><b>▶</b><small>右へ</small></button>
             </div>
           </div>
-          <button type="button" id="walkDashButton" class="hold-dash-button" aria-label="ダッシュ（押している間）" aria-pressed="false"><span aria-hidden="true">≫</span><b>ダッシュ</b></button>
-          <button type="button" id="constructionJumpButton" class="construction-jump-button" aria-label="ジャンプ（3段まで）" hidden><span aria-hidden="true">↑</span><b>ジャンプ</b></button>
+          <button type="button" id="walkDashButton" title="Kまたはスペースを押しながらWASDでダッシュ" aria-keyshortcuts="Space K" class="hold-dash-button" aria-label="ダッシュ（押している間）" aria-pressed="false"><span aria-hidden="true">≫</span><b>ダッシュ</b></button>
+          <button type="button" id="constructionJumpButton" title="E／B／J：ジャンプ（長押しで高く、押し直して3段まで）" aria-keyshortcuts="E B J" class="construction-jump-button" aria-label="ジャンプ（3段まで）" hidden><span aria-hidden="true">↑</span><b>ジャンプ</b></button>
           <div class="touch-pad" id="touchPad" aria-label="タッチ移動パッド">
             <div class="touch-stick" id="touchStick"></div>
           </div>
@@ -252,6 +260,6 @@
       <code>world-schema v4 / source-locked 3:2 layout / character: white-michi-road-saber-ren</code>
     </footer>
   </main>
-  <script type="module" src="./imasora-world-3d-dev.js?v=120gs"></script>
+  <script type="module" src="./imasora-world-3d-dev.js?v=120qq"></script>
 </body>
 </html>

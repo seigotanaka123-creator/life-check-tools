@@ -1,0 +1,7 @@
+// One read on entering/returning to the home. Never poll or copy a large world
+// in a frame loop; the existing worker validates it before any home award.
+export function startIslandHomeRewards({receive,lock,notify,refresh,store,task,doc=document,win=window}){
+ let running=false,again=false,lastRaw=null,disposed=false;
+ async function sync(){if(disposed||doc.hidden)return;if(running){again=true;return;}running=true;try{if(!store){const {IndexedConstructionStore}=await import('../world3d/assets/imasora-construction-storage.js');store=new IndexedConstructionStore();store.name='imasora-world-authority-v1';}const raw=await store.read();if(!raw?.current||raw.current===lastRaw)return;if(!raw.current.includes('"coast-visit"')&&!raw.current.includes('"coast-fruit"')){lastRaw=raw.current;return;}task??=(await import('../world3d/assets/imasora-world-save-client.mjs?v=120lh')).runWorldSaveTask;const ledger=await task('unpack',{raw:raw.current});if(disposed)return;const result=await lock(()=>receive(ledger));lastRaw=raw.current;if(result?.granted){refresh();notify('🏝️ 島で見つけたアイテムを、もちものへ届けたよ！ ＋'+result.granted+'こ');}}catch(error){console.warn('島のごほうびは記録を残して、次に開く時に届けます。',error);}finally{running=false;if(again){again=false;void sync();}}}
+ const visible=()=>{if(!doc.hidden)void sync();};doc.addEventListener('visibilitychange',visible);win.addEventListener('pageshow',visible);void sync();return{sync,dispose(){disposed=true;doc.removeEventListener('visibilitychange',visible);win.removeEventListener('pageshow',visible);}};
+}

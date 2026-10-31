@@ -1,5 +1,5 @@
 import * as THREE from './assets/three.module.min.js';
-import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js';
+import {officialCharacter,measureCharacter} from './assets/imasora-construction-layout.js?v=120ob';
 import {initialWaterBody,waterBodyAction,advanceWaterBody,waterBodyReadout} from './assets/imasora-construction-water-body.js?v=442';
 import {createWaterBodyLab,updateWaterBodyLab} from './assets/imasora-construction-water-body-view.js?v=442';
 const $=id=>document.getElementById(id);

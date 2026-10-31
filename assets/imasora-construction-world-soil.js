@@ -1,7 +1,7 @@
-import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 // Received soil in the authoritative world. No purchase-copy import or storage API.
-import {initialWorldSoilPhysics,purchasedSoilAction,advancePurchasedSoil,validatePurchasedSoil,soilCopyTotals,soilCopySurface,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js?v=120gn';
-import {polygon} from './imasora-construction-loader-physics.js?v=120gf';
+import {initialWorldSoilPhysics,purchasedSoilAction,advancePurchasedSoil,validatePurchasedSoil,soilCopyTotals,soilCopySurface,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js?v=120pv';
+import {polygon} from './imasora-construction-loader-physics.js?v=120ov';
 import {soilBedRects,soilBedShape} from './imasora-construction-soil-bed.mjs?v=120eo';
 import{SOIL_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
 export{SOIL_YARDS};
@@ -32,7 +32,7 @@ export function worldSoilMaterialObstacles(loader,external=[],heightAt=null){
   const v=loader?.vehicle;if(!v||!Array.isArray(external))return[];
   const base=v.field&&loader.mode==='foot'&&typeof heightAt==='function'?(heightAt(loader.player.x,loader.player.z)??0):0;
   return external.filter(b=>b&&!(v.field&&typeof heightAt==='function'&&b.y+b.h<=(heightAt(b.x,b.z)??-Infinity)+.05)&&b&&[b.x,b.y,b.z,b.w,b.h,b.d,b.angle??0].every(Number.isFinite)&&b.w>0&&b.h>0&&b.d>0&&(v.field?b.y+b.h>0:b.y<44&&b.y+b.h>8)&&[v,...(v.field?[loader.player]:[])].some(p=>Math.abs(b.x-p.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-p.z)<175+Math.hypot(b.w,b.d)/2))
-    .map(b=>({id:b.name||b.id||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h-base,minY:b.y-base,angle:b.angle||0}));
+    .map(b=>({id:b.name||b.id||'建材',supportSurface:!!b.supportSurface,heightOffset:base,actorGround:loader.mode==='foot'?base:v.groundY??0,x:b.x,z:b.z,width:b.w,depth:b.d,height:b.y+b.h-base,minY:b.y-base,angle:b.angle||0}));
 }
 export function worldSoilAction(s,action,id,received,external=[],heightAt=null){s=syncWorldSoil(s,received);const obstacles=worldSoilMaterialObstacles(s.work.loader,external,heightAt),w=purchasedSoilAction(s.work,action,id,obstacles,heightAt);if(w===s.work)return s;return validateWorldSoil({...s,revision:s.revision+1,work:w},received);}
 export function advanceWorldSoil(s,input,dt,external=[],heightAt=null){const obstacles=worldSoilMaterialObstacles(s.work.loader,external,heightAt),w=advancePurchasedSoil(s.work,input,dt,obstacles);return w===s.work?s:{...s,revision:s.revision+1,work:w};}

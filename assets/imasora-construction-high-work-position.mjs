@@ -1,10 +1,10 @@
 import{stairPlacement,stairPoint,stairEntry,stairExit,stairGround,stairDoor,stairApproach}from'./imasora-construction-stair-placement.mjs?v=120gn';
 import{boardBayBraceParts}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
 import{wallDoorCutPart}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import{roomLayoutParts}from'./imasora-construction-room-layout-shape.mjs?v=120gn';
+import{roomLayoutParts}from'./imasora-construction-room-layout-shape.mjs?v=120hd';
 import {highFloors,highFloorPieces,shapedHighParts} from './imasora-construction-high-shape.mjs?v=120gn';
 import {highInnerRoute,highStairSpine,highInnerStairs} from './imasora-construction-high-interior.mjs?v=120gn';
-import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs';
+import {overlaps} from './imasora-construction-concrete/free-vehicle-shape.mjs?v=120ov';
 const ok=(v,m)=>{if(!v)throw Error(m);},p=(x,y,z,heading=0)=>({x,y,z,heading});
 export function validateHighStation(s,q){ok(s.version===5&&q&&Object.keys(q).sort().join('|')==='floor|version|x|z'&&q.version===1&&Number.isInteger(q.floor)&&q.floor>=1&&q.floor<=highFloors(s)&&Number.isInteger(q.x/8)&&Number.isInteger(q.z/8)&&q.x>=(stairPlacement(s)?-56:8)&&q.x<=56&&q.z>=-56&&q.z<=56,'床の内側をタップして、つくる場所をえらぼう。');return q;}
 export function highAccessLandings(s){if(s.accessVersion!==1&&!stairPlacement(s))return[];const out=[];for(let f=1;f<=s.levels;f++){out.push({...stairPoint(s,{x:-1,y:f*40,z:42}),w:stairPlacement(s)?.turn%2?12:2,d:stairPlacement(s)?.turn%2?2:12});if(f<highFloors(s))out.push({x:74,y:f*40,z:16,w:20,d:32});}return out;}

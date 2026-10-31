@@ -14,7 +14,7 @@ const problem=(reason='step')=>Error(({
 // irregularities; it is never a fallback over missing ground or a cliff.
 export function vehicleGroundPose(f,v,heightAt=()=>0){
  if(!f?.location||![v.x,v.z,v.heading].every(Number.isFinite))throw problem();
- const sample=(x,z)=>{const h=heightAt(f.location.x+x,f.location.z+z);if(!Number.isFinite(h))throw problem('missing');return h;};
+ const sample=(x,z)=>{const h=heightAt(f.location.x+x,f.location.z+z,v.groundY??0);if(!Number.isFinite(h))throw problem('missing');return h;};
  const yaw=new T.Quaternion().setFromAxisAngle(UP,v.heading),points=VEHICLE_WHEELS.map(p=>new T.Vector3(p.x,0,p.z).applyQuaternion(yaw).add(new T.Vector3(v.x,0,v.z)));
  const heights=points.map(p=>sample(p.x,p.z)),meanZ=VEHICLE_WHEELS.reduce((s,p)=>s+p.z,0)/6,meanH=heights.reduce((a,b)=>a+b,0)/6;
  const a=VEHICLE_WHEELS.reduce((s,p,i)=>s+p.x*(heights[i]-meanH),0)/VEHICLE_WHEELS.reduce((s,p)=>s+p.x*p.x,0);
@@ -63,3 +63,6 @@ export function vehicleLevelWorkProblem(f,v,heightAt=()=>0,allowRaised=true){
  try{const g=vehicleGroundPose(f,v,heightAt);if((allowRaised||Math.abs(g.position.y)<1e-5)&&g.slope<1e-7&&g.maxSuspension<1e-5)return '';}catch{}
  return '施工や支持脚の操作は、平らな地面で車を止めてから行ってください。';
 }
+
+// Persist only the measured chassis support, never the seated actor's feet.
+export function measuredVehicleMove(f,a,heightAt){if(a.type!=='FREE_MOVE')return a;const from=f[a.vehicle],v={...from,x:a.x,z:a.z,heading:a.heading},g=vehicleGroundPose(f,v,heightAt);return{...a,groundY:g.position.y};}

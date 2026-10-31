@@ -1,8 +1,8 @@
-import {excavatorGroundFrame,groundPoint,excavatorGroundHeight} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
-import {shovelMachineState,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120gf';
-import {nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {linkedAccessTarget,dumpBoardTarget} from './imasora-construction-bucket-dump.mjs?v=120gn';
+import {excavatorGroundFrame,groundPoint,excavatorGroundHeight} from './imasora-construction-native-excavator-ground.mjs?v=120pv';
+import {shovelMachineState,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {excavatorAccessPath} from './imasora-construction-excavator-access.js?v=120ov';
+import {nativeDumpDoorPoint} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {linkedAccessTarget,dumpBoardTarget} from './imasora-construction-bucket-dump.mjs?v=120pv';
 
 // Only the walking actor is handed over. The soil, vehicles and operation
 // clocks stay owned by the same work record, at their original world origin.
@@ -12,7 +12,7 @@ export function transportDoorApproach(work,id){
  const candidates=[];
  if(id==='excavator'){
   const v=shovelMachineState(f).loader.vehicle;
-  for(const side of [-1,1]){let p=excavatorAccessPath(v,f.machineArm.slew,side)[0];const g=excavatorGroundFrame(f);if(g){const c=Math.cos(v.heading),sn=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,q=groundPoint(g,c*dx-sn*dz,0,sn*dx+c*dz),y=excavatorGroundHeight(f,q[0],q[2]);if(!Number.isFinite(y)||Math.abs(y-q[1])>2.1)continue;p={...p,x:q[0],y,z:q[2]};}candidates.push(p);}
+  for(const side of [-1,1]){let p=excavatorAccessPath(v,f.machineArm.slew,side)[0];const g=excavatorGroundFrame(f);if(g){const c=Math.cos(v.heading),sn=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,q=groundPoint(g,c*dx-sn*dz,0,sn*dx+c*dz),y=excavatorGroundHeight(f,q[0],q[2],q[1]);if(!Number.isFinite(y)||Math.abs(y-q[1])>2.1)continue;p={...p,x:q[0],y,z:q[2]};}candidates.push(p);}
  }else if(id==='dump'){
   for(const side of [-1,1]){const point=nativeDumpDoorPoint(f,side);
    if(point)candidates.push({x:point[0],y:point[1],z:point[2],heading:f.dump.heading});}

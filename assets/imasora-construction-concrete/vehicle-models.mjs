@@ -1,7 +1,7 @@
-import {UPPER_PUMP_PORT} from './high-casting-state.mjs?v=120ft';
+import {UPPER_PUMP_PORT,UPPER_PUMP_COUPLER} from './vehicle-ports.mjs?v=120hc';
 import * as T from '../three.module.min.js';
-import {CAST_PORTS} from './free-casting.mjs?v=120gn';
-import {VEHICLE_WHEELS,VEHICLE_PADS} from './free-vehicle-contact.mjs?v=120gn';
+import {CAST_PORTS} from './free-casting.mjs?v=120pv';
+import {VEHICLE_WHEELS,VEHICLE_PADS} from './free-vehicle-contact.mjs?v=120pv';
 
 // Both vehicles retain the existing seat centres, passenger clearance and saved poses.
 // +Z is the front. The drum rotates in its own tilted cradle, not with the cabin.
@@ -149,7 +149,7 @@ export function createConcreteVehicle(kind) {
   box(equipment,0,24,-38,20,4,8,m.frame,1);
   for(const x of [-27,27])box(equipment,x,18,-16,5,3,41,m.silver,.7);
  }
- if(kind==='pump'){const p=UPPER_PUMP_PORT;torus(equipment,p.x,p.y,p.z,1.65,.45,m.silver).name='upper-pump-outlet';strut(equipment,[p.x,p.y,p.z],[p.x,p.y,-38],1.1,m.hose);}
+ if(kind==='pump'){const p=UPPER_PUMP_PORT,c=UPPER_PUMP_COUPLER;torus(equipment,p.x,p.y,p.z,c.ringRadius,c.tubeRadius,m.silver).name='upper-pump-outlet';strut(equipment,[p.x,p.y,p.z],[p.x,p.y,c.stemZ],c.stemRadius,m.hose).name='upper-pump-outlet-stem';}
  const port=kind==='truck'?CAST_PORTS.truck:CAST_PORTS.supplyInlet;
  torus(equipment,port.x,port.y,port.z,1.65,.45,m.silver).name='supply-hose-coupler';
  const legs=new T.Group();legs.name='deployed-supports';root.add(legs);

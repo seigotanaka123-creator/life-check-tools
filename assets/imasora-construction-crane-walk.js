@@ -1,11 +1,11 @@
-import {cranePoint,craneChassisFrame,craneGroundHeight} from './imasora-construction-crane-ground.mjs?v=120gf';
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
-import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
-import {walkFactor} from './imasora-construction-travel-input.mjs';
+import {cranePoint,craneChassisFrame,craneGroundHeight} from './imasora-construction-crane-ground.mjs?v=120ov';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ov';
+import {walkFactor} from './imasora-construction-travel-input.mjs?v=120lb';
 // Stage 4-2: the same oriented parts are floors, walls and ceilings.
 // Independent of the approved loader/terrain physics and their saves.
-import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
-import {craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120gn';
+import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120ov';
+import {craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120pv';
 export const CRANE_WALK=Object.freeze({...WALKER,step:8.01,gravity:SKY_JUMP_GRAVITY,jump:SKY_JUMP_VELOCITY});
 const EPS=1e-6;
 export function cranePlayer(p){return{vy:0,grounded:p.y===0,ceilingHit:false,jumpHeld:false,...p};}

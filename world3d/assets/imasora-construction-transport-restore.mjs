@@ -1,10 +1,10 @@
 import {capturedJsonInfo,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
 import {canonical} from './imasora-construction-state.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
-import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120gn';
-import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120gn';
-import {unpackRecoveryBundle,RECOVERY_KIND,RECOVERY_LEGACY_KIND,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120gn';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
+import {soilTransportTotals} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120pv';
+import {unpackRecoveryBundle,RECOVERY_KIND,RECOVERY_LEGACY_KIND,MAX_RECOVERY_FILE} from './imasora-world-recovery-bundle.js?v=120pv';
 
 const checkedJournalSoils=new WeakMap();
 export const TRANSPORT_RECOVERY_KIND='imasora-world-transport-recovery-v1';

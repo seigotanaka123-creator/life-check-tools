@@ -1,5 +1,5 @@
-import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
-import {dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120gf';
+import {nativeDumpSupport,nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120pv';
+import {dumpSuspensionLift} from './imasora-construction-dump-cab.mjs?v=120ov';
 
 const dot=(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=a=>{const n=Math.hypot(...a);return a.map(v=>v/n);};
 const poseCache=new WeakMap();
@@ -64,4 +64,4 @@ export function boxesOverlap3D(a,b,margin=.01){
 // A vertical suspension offset lets each round tyre meet the highest step
 // within its contact patch without lowering any part through native soil.
 export function nativeDumpWheelOffsets(frame){const p=nativeDumpPose(frame),support=nativeDumpSupport(frame);if(!p.enabled)return[0,0,0,0];const radius=8.65*Math.sqrt(Math.max(0,1-p.axes[0][1]**2))+4.5*Math.abs(p.axes[0][1])+.25;return support.wheels.map(w=>{const centre=nativeDumpPoint(frame,w.x,8.9,w.z);return(w.max+radius-centre[1])/p.axes[1][1];});}
-export function nativeDumpDoorPoint(frame,side){const p=nativeDumpAnchorPoint(frame,side*52,0,18),h=nativeDumpHeightAt(frame,p[0],p[2]);return Number.isFinite(h)&&Math.abs(h-p[1])<=2.01?[p[0],h,p[2]]:null;}
+export function nativeDumpDoorPoint(frame,side){const p=nativeDumpAnchorPoint(frame,side*52,0,18),h=nativeDumpHeightAt(frame,p[0],p[2],p[1]);return Number.isFinite(h)&&Math.abs(h-p[1])<=2.01?[p[0],h,p[2]]:null;}

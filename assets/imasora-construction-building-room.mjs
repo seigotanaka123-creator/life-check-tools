@@ -1,11 +1,11 @@
 import{stairPlacement,stairPoint,stairEntry,stairExit,stairGround,stairDoor,stairApproach}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import{decorPaintTarget,decorPaintCamera}from'./imasora-construction-decor-paint-path.mjs?v=120gn';
+import{decorPaintTarget,decorPaintCamera}from'./imasora-construction-decor-paint-path.mjs?v=120pv';
 import{wallDoorForPart,wallDoorPaintPatches}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import {buildingPaintPart,buildingPaintPatches} from './imasora-construction-building-paint.mjs?v=120gn';
-import {highRoomRoute,highRoomNodes,highWorkSolids,highWorkBodyHits,highWorkSegmentClear} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {buildingPaintPart,buildingPaintPatches} from './imasora-construction-building-paint.mjs?v=120pv';
+import {highRoomRoute,highRoomNodes,highWorkSolids,highWorkBodyHits,highWorkSegmentClear} from './imasora-construction-high-work-position.mjs?v=120ov';
 import {highInnerRoute,highStairSpine} from './imasora-construction-high-interior.mjs?v=120gn';
-import {highLocalPoint,highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
-import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120gn';
+import {highLocalPoint,highWorldPoint} from './imasora-construction-high-world.mjs?v=120pv';
+import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120pv';
 const ok=(v,m)=>{if(!v)throw Error(m);},point=(x,y,z,heading=0)=>({x,y,z,heading});
 const nodes=y=>[-48,-16,16,48].flatMap(z=>[16,48].map(x=>point(x,y,z)));
 function turnClear(p,boxes){return Array.from({length:24},(_,i)=>i*Math.PI/12).every(a=>!highWorkBodyHits(p,a,boxes));}

@@ -1,9 +1,10 @@
-import {excavatorGroundFrame} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
-import {shovelMachines,shovelMachineState,shovelNearbySoil,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {transportArea} from './imasora-construction-transport-field.mjs?v=120gf';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
-import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {linkedArmClear,linkedExcavatorSeat} from './imasora-construction-bucket-dump.mjs?v=120gn';
+import {nativeDeckBoxes} from './imasora-construction-native-decks.mjs?v=120ps';
+import {excavatorGroundFrame} from './imasora-construction-native-excavator-ground.mjs?v=120pv';
+import {shovelMachines,shovelMachineState,shovelNearbySoil,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {transportArea} from './imasora-construction-transport-field.mjs?v=120ov';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120pv';
+import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {linkedArmClear,linkedExcavatorSeat} from './imasora-construction-bucket-dump.mjs?v=120pv';
 
 const finite=(n,a,b)=>Number.isFinite(n)&&n>=a&&n<=b;
 // Ground support, hulls, arm, rider and display share the same derived frame.
@@ -14,7 +15,7 @@ export function transportExcavatorPositionSafe(frame){
  if(v.x-e[0]<a.minX+1||v.x+e[0]>a.maxX-1||v.z-e[2]<a.minZ+1||v.z+e[2]>a.maxZ-1)return false;
  // Query the entire tilted hull, never just its centre or wheel contacts.
  const nearby=shovelNearbySoil(frame.soil,body.position[0],body.position[2],Math.max(e[0],e[2])+.01);
- if([parts[1],shovelDumpBody(frame),...nearby].some(b=>boxesOverlap3D(body,b)))return false;
+ if([parts[1],shovelDumpBody(frame),...nativeDeckBoxes(frame,{vehicleY:excavatorGroundFrame(frame).position[1],x:v.x,z:v.z,r:80}),...nearby].some(b=>boxesOverlap3D(body,b)))return false;
  return linkedArmClear(frame);
 }
 // Steering changes heading only through actual forward/backward travel.
@@ -27,7 +28,7 @@ export function driveTransportExcavator(work,throttle,steer,dt,{fast=false}={}){
  for(let i=0;i<n;i++){
   const v=frame.machineVehicle,angle=v.heading-steer*length/n/65,h=Math.atan2(Math.sin(angle),Math.cos(angle));
   const machineVehicle={...v,x:v.x+Math.sin(h)*length/n,z:v.z+Math.cos(h)*length/n,heading:h,wheelTravel:v.wheelTravel+length/n};
-  const candidate={...frame,machineVehicle};if(!transportExcavatorPositionSafe(candidate))break;
+  let candidate={...frame,machineVehicle};if(frame.decks){try{const groundY=excavatorGroundFrame(candidate).position[1];candidate={...candidate,machineVehicle:{...machineVehicle,groundY}};}catch{break;}}if(!transportExcavatorPositionSafe(candidate))break;
   moved+=Math.abs(length/n);frame={...candidate,player:linkedExcavatorSeat(candidate)};
  }
  return moved?{...work,revision:work.revision+1,frame:{...frame,revision:work.frame.revision+1}}:work;

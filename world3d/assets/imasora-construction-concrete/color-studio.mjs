@@ -34,6 +34,6 @@ export function installColorStudios(panel,{getColor,choose,enabled,changed}){
    target.addEventListener('keydown',e=>{if(!enabled()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();if(target.hasAttribute('data-color-hue'))hsv.h=(hsv.h+(e.key==='ArrowLeft'||e.key==='ArrowDown'?-3:3)+360)%360;else if(e.key==='ArrowLeft'||e.key==='ArrowRight')hsv.s=Math.max(0,Math.min(1,hsv.s+(e.key==='ArrowLeft'?-.04:.04)));else hsv.v=Math.max(0,Math.min(1,hsv.v+(e.key==='ArrowDown'?-.04:.04)));set();remember();});
   }
  }
- return {refresh:render,cancel:()=>end(true)};
+ return {refresh:render,cancel:()=>end(true),get busy(){return !!pointer;}};
 }
 

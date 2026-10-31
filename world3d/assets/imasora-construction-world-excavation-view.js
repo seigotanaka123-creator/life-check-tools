@@ -1,23 +1,23 @@
-import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120gf';
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120od';
 import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
-import {bindTravelBoost} from './imasora-construction-travel-input.mjs';
-import {createEarthSurface} from './imasora-construction-earth-surface.mjs?v=120gf';
-import {excavatorAtDriverDoor} from './imasora-construction-excavator-access.js?v=120gf';
+import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=120lb';
+import {createEarthSurface} from './imasora-construction-earth-surface.mjs?v=120ov';
+import {excavatorAtDriverDoor} from './imasora-construction-excavator-access.js?v=120ov';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
-import {readyExcavation,beginOneTouch,stepOneTouch,stopOneTouch,allowedDigGuide} from './imasora-construction-excavator-one-touch.js?v=120gf';
-import {createExcavationKeyboard,EXCAVATION_KEYS} from './imasora-construction-excavation-keyboard.js?v=488';
-import {createExcavationLedgerView} from './imasora-construction-excavation-ledger-view.js?v=120gn';
+import {readyExcavation,beginOneTouch,stepOneTouch,stopOneTouch,allowedDigGuide} from './imasora-construction-excavator-one-touch.js?v=120ov';
+import {createExcavationKeyboard,EXCAVATION_KEYS} from './imasora-construction-excavation-keyboard.js?v=120lb';
+import {createExcavationLedgerView} from './imasora-construction-excavation-ledger-view.js?v=120pv';
 import {excavationFrameBudget} from './imasora-construction-excavation-frame.js';
 import {createExcavationPreviewController} from './imasora-construction-excavation-preview-controller.js?v=482';
 import {createExcavationPreviewModel,updateExcavationPreviewModel,disposeExcavationPreviewModel} from './imasora-construction-excavation-preview-model.js?v=120ds';
 import * as THREE from './three.module.min.js';
-import {loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120gf';
-import {totals,excavatorActorPose,armPose,scoopTargets} from './imasora-construction-excavator.js?v=120gf';
-import {buildProgress} from './imasora-construction-excavator-build.js?v=120gf';
-import {createContactRestoreView} from './imasora-construction-excavation-restore-view.js?v=120gf';
-import {EXCAVATION_YARDS,EXCAVATION_GATE,EXCAVATION_HANDOFF_LOCAL_Z,chooseExcavationYard,excavationOpening,excavationReserved,excavationEntry,excavationCanLeave,enterExcavation,leaveExcavation,initialContactWorldExcavation,stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=120gf';
-import {createWorldExcavationModel,updateWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120gf';
+import {loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120ov';
+import {totals,excavatorActorPose,armPose,scoopTargets} from './imasora-construction-excavator.js?v=120ov';
+import {buildProgress} from './imasora-construction-excavator-build.js?v=120ov';
+import {createContactRestoreView} from './imasora-construction-excavation-restore-view.js?v=120ov';
+import {EXCAVATION_YARDS,EXCAVATION_GATE,EXCAVATION_HANDOFF_LOCAL_Z,chooseExcavationYard,excavationOpening,excavationReserved,excavationEntry,excavationCanLeave,enterExcavation,leaveExcavation,initialContactWorldExcavation,stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=120ov';
+import {createWorldExcavationModel,updateWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120ov';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=518';
 
 export function createWorldExcavationController({state,scene,camera,character,shadow,canvas,clearInput,onExit,readout,persistence=null}){
@@ -46,7 +46,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     </div>`;
   canvas.parentElement.append(panel);const b=a=>panel.querySelector(`[data-action="${a}"]`),q=s=>panel.querySelector(s);
   const forecast=createExcavationPreviewController({
-    createWorker:()=>new Worker(new URL('./imasora-construction-excavation-preview-worker.js?v=120gf',import.meta.url),{type:'module'}),
+    createWorker:()=>new Worker(new URL('./imasora-construction-excavation-preview-worker.js?v=120ov',import.meta.url),{type:'module'}),
     onChange(s){if(forecastModel)updateExcavationPreviewModel(forecastModel,s.result);refresh();}
   });
   const restoreUI=createContactRestoreView({panel,current:()=>work,site:()=>site,
@@ -84,7 +84,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     }catch(e){issue=e.message;refresh();return false;}
   }
   function requestPlan(action='build-cycle'){
-    if(planning||sequence||!active||paused||work.action||work.loader.mode!=='working')return;clear();const worker=new Worker(new URL('./imasora-construction-excavator-planner-worker.js?v=120gf',import.meta.url),{type:'module'}),id=++token;planning=worker;
+    if(planning||sequence||!active||paused||work.action||work.loader.mode!=='working')return;clear();const worker=new Worker(new URL('./imasora-construction-excavator-planner-worker.js?v=120ov',import.meta.url),{type:'module'}),id=++token;planning=worker;
     worker.onmessage=({data})=>{worker.terminate();if(id!==token||!active)return;clearTimeout(planTimer);planTimer=null;planning=null;work=allowedDigGuide(data.guide)?{...work,guide:data.guide,message:data.message}:{...work,guide:null,message:'アーム−30°の制限を越える運搬経路のため停止しました。土は保持しています。位置や姿勢を調整してください。'};refresh();};
     worker.onerror=()=>{if(id!==token||planning!==worker)return;cancelPlan();issue='経路計算を中止しました。手動操作は使えます。';refresh();};
     planTimer=setTimeout(()=>{if(id!==token)return;cancelPlan();issue='安全な経路の計算を時間内に終えられませんでした。土は保持しています。旋回や走行モードで位置・向きを変えて再度お試しください。';refresh();},8000);
@@ -118,12 +118,12 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     const modified=e.ctrlKey||e.altKey||e.metaKey||e.isComposing;
     if(!modified&&!(e.code==='Space'&&e.target.closest?.('button,summary')))e.preventDefault();
     else return;
-    if(e.code==='Space'&&work.loader.mode==='foot'){jumpControl.key(e);return;}
+    if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB')&&work.loader.mode==='foot'){jumpControl.key(e);return;}
     const command=keyboard.press(e.code,{mode:work.loader.mode,repeat:e.repeat,blocked:paused||locked()||!!sequence||!!planning||!!work.action||!!work.loader.transition});
     if(command==='hold'){forecast.invalidate();cancelPlan();}
     else if(command)action(command);
   },true);
-  addEventListener('keyup',e=>{if(e.code==='Space')jumpControl.key(e);keyboard.release(e.code);if(active&&EXCAVATION_KEYS.includes(e.code))e.stopImmediatePropagation();},true);
+  addEventListener('keyup',e=>{if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'))jumpControl.key(e);keyboard.release(e.code);if(active&&EXCAVATION_KEYS.includes(e.code))e.stopImmediatePropagation();},true);
   addEventListener('focusin',e=>{if(active&&textEntry(e))clear();},true);
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',()=>{clear();keyboard.reset();if(active){cancelPlan();paused=true;pauseReason='画面からフォーカスが外れたため、安全のため一時停止しています。';refresh();}});
@@ -184,7 +184,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     if(onFoot&&allowed<20){camera.position.copy(focus);camera.lookAt(focus.clone().add(new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw))));character.visible=false;}
     else{camera.position.copy(focus).addScaledVector(offset,allowed);camera.lookAt(focus);}readout();
   }
-  return{look(dx,dy,sensitivity){if(active&&!ledgerUI?.open)orbit.drag(dx,dy,sensitivity);},get active(){return active;},get dirty(){return persistence?(persistence.record&&persistence.dirty(snapshot())):work.revision>0;},begin,leave,save,
+  return{look(dx,dy,sensitivity){if(active&&!ledgerUI?.open)orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.loader.player;return active&&work?.loader.mode==='foot'&&b?{owner:'excavation',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get dirty(){return persistence?(persistence.record&&persistence.dirty(snapshot())):work.revision>0;},begin,leave,save,
     install({group,blockedAt,reserved,collider,contactGeometry:readContactGeometry=null}){
       contactGeometry=typeof readContactGeometry==='function'?readContactGeometry:null;
       if(active)throw Error('掘削作業を中断してから再構築してください。');forecast.release();disposeExcavationPreviewModel(forecastModel);forecastModel=null;disposeWorldExcavationModel(root);root=null;panel.hidden=true;canvas.parentElement.classList.remove('world-excavation-near');if(state.map!=='construction')return null;

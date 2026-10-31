@@ -1,4 +1,4 @@
-import {vehicleTravelHeading} from './free-vehicle-shape.mjs';
+import {vehicleTravelHeading} from './free-vehicle-shape.mjs?v=120ov';
 // A keyboard's full step must not strand a safely parked car in a narrow aisle.
 // Every candidate uses the same complete chassis sweep and terrain validation.
 export function vehicleTravelCandidates(v,name,dx,dz,strength=1){

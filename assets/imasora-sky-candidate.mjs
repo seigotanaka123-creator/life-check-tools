@@ -1,0 +1,14 @@
+// Lightweight, uncalibrated colour/texture candidates. This is deliberately
+// not a verified sky recognition authority and never determines evolution.
+export const CANDIDATE_PROVIDER='local-colour-candidate',CANDIDATE_VERSION='candidate-v1';
+export function skyCandidate(frame,{mask}={}){
+ const {width:w,height:h,data}=frame??{};if(!Number.isSafeInteger(w)||!Number.isSafeInteger(h)||w<16||h<16||w*h>19200||!(data instanceof Uint8ClampedArray)||data.length!==w*h*4)throw Error('FRAME_UNREADABLE');
+ const size=w*h;if(mask&&(!(mask instanceof Uint8Array)||mask.length!==size||mask.some(v=>v!==0&&v!==1)))throw Error('MASK_UNREADABLE');const selected=mask?mask.reduce((a,b)=>a+b,0):size;if(selected<size*.65)return{verified:false,providerId:CANDIDATE_PROVIDER,providerVersion:CANDIDATE_VERSION,reason:'not-sky'};
+ let blue=0,cloud=0,warm=0,green=0,bright=0,total=0,sum=0,squares=0,edges=0,pairs=0;const luminance=new Float32Array(w*h),tiles=Array.from({length:16},()=>({hits:0,total:0}));
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(mask&&!mask[i])continue;const k=i*4,r=data[k]/255,g=data[k+1]/255,b=data[k+2]/255;if(data[k+3]<250)continue;const max=Math.max(r,g,b),min=Math.min(r,g,b),sat=max?(max-min)/max:0,l=.2126*r+.7152*g+.0722*b,isBlue=b>r*1.12&&b>g*.98&&b-r>.06&&b>.3&&l>.16,isCloud=l>.38&&sat<.22,isWarm=r>b*1.18&&r>g*1.03&&g>b*.98&&l>.18;blue+=+isBlue;cloud+=+isCloud;warm+=+isWarm;green+=+(g>r*1.12&&g>b*1.08);bright+=+(l>.96);sum+=l;squares+=l*l;total++;luminance[i]=l;const tile=tiles[Math.min(3,Math.floor(y/h*4))*4+Math.min(3,Math.floor(x/w*4))];tile.total++;tile.hits+=+(isBlue||isCloud||isWarm);}
+ for(let y=1;y<h;y++)for(let x=1;x<w;x++){const i=y*w+x;if((mask&&(!mask[i]||!mask[i-1]||!mask[i-w]))||data[i*4+3]<250||data[(i-1)*4+3]<250||data[(i-w)*4+3]<250)continue;edges+=+(Math.abs(luminance[i]-luminance[i-1])>.13)+ +(Math.abs(luminance[i]-luminance[i-w])>.13);pairs+=2;}
+ const base={verified:false,providerId:CANDIDATE_PROVIDER,providerVersion:CANDIDATE_VERSION};if(total<selected*.95)return{...base,reason:'incomplete'};const mean=sum/total,variance=Math.max(0,squares/total-mean*mean),edgeRate=edges/(pairs||1),coverage=tiles.filter(t=>t.total&&t.hits/t.total>.55).length/Math.max(1,tiles.filter(t=>t.total).length);
+ if(mean<.16)return{...base,reason:'dark'};if(bright/total>.9)return{...base,reason:'glare'};if(variance<.00015)return{...base,reason:'flat'};if(green/total>.16||edgeRate>.23||coverage<.69)return{...base,reason:'mixed'};
+ let skyId,label,ratio;if(warm/total>.32&&(warm+cloud+blue)/total>.7){skyId='sunset';label='夕焼け';ratio=warm/total;}else if(blue/total>.32&&(blue+cloud)/total>.7){skyId='blue';label='青空';ratio=blue/total;}else if(cloud/total>.72){skyId='cloud';label='曇り空';ratio=cloud/total;}else return{...base,reason:'uncertain'};
+ return{...base,candidate:{skyId,label,score:Math.round(Math.min(1,ratio)*100)/100},reason:'candidate'};
+}

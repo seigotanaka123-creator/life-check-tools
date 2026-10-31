@@ -1,14 +1,18 @@
-import{isKitCargo,kitPad,kitOnPad}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
+import{receivingCargo,receivingCargoAligned,receivingCargoName}from'./imasora-construction-timber-cargo.mjs?v=120pv';
+import{girderTarget,girderSupply,girders,GIRDER_MATERIALS}from'./imasora-construction-girder-shape.mjs?v=120pl';
+import{isCapturedConstructionJson}from'./imasora-construction-json-capture.mjs';
+import{reelDeck,deckFits,structuralPlacement}from'./imasora-construction-structure-performance.mjs?v=120pv';
+import{isKitCargo,kitPad,kitOnPad}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
 import{boardLiftInstalled,boardBayLevels as liftLevels,BOARD_LIFT as H}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{liftState}from'./imasora-construction-board-lift-state.mjs?v=120gd';
-import {highProjects,highWorldPoint,highLocalPoint} from './imasora-construction-high-world.mjs?v=120gn';
+import{liftState}from'./imasora-construction-board-lift-state.mjs?v=120pv';
+import {highProjects,highWorldPoint,highLocalPoint} from './imasora-construction-high-world.mjs?v=120pv';
 import {highFloorPieces} from './imasora-construction-high-shape.mjs?v=120gn';
-import {highPlatform} from './imasora-construction-high-build.mjs?v=120gn';
-import {CRANE,hook,collides} from './imasora-construction-crane.js?v=120gn';
-import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120gf';
+import {highPlatform} from './imasora-construction-high-build.mjs?v=120pv';
+import {CRANE,hook,collides} from './imasora-construction-crane.js?v=120pv';
+import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120ov';
 import{BOARD_BAY as B,hasBoardBay,boardBayLevels}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{boardBayFits,boardBayLevel}from'./imasora-construction-board-bay.mjs?v=120gn';
+import{boardBayFits,boardBayLevel}from'./imasora-construction-board-bay.mjs?v=120pv';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const key=p=>JSON.stringify([p.id,p.record.revision,p.record.site,p.record.work]);
 const cargo=s=>s.parts.find(p=>p.id===s.held);
@@ -34,8 +38,17 @@ function craneAim(s,p){
  const level=craneChassisFrame(s)?.position[1]??0,cable=level+42+reach*.35-(p.y+p.h+4);
  return{yaw,reach,cable};
 }
+const reelKeys=new WeakMap();function reelCraneKey(collection){const trusted=isCapturedConstructionJson(collection);if(trusted&&reelKeys.has(collection))return reelKeys.get(collection);const key=JSON.stringify(collection?.reel?.rooms??null);if(trusted)reelKeys.set(collection,key);return key;}
+function performanceChoices(collection,s,origin,choices){const p=cargo(s);return choices.map(c=>{if(!p||!c.ok||!c.target||!['floor',undefined,'reel'].includes(c.surface))return c;const check=structuralPlacement(collection,s,{...p,...c.target},origin);return check.known?{...c,ok:check.ok,reason:check.reason}:c;});}
+export function reelCraneTargets(collection,s,origin={x:0,z:0}){
+ const part=cargo(s),rooms=collection?.version===6?collection.reel?.rooms??[]:[];return rooms.filter(r=>r.y>0).map(r=>{const deck=reelDeck(r,rooms),entry={id:'reel-'+r.id,roomId:r.id,key:reelCraneKey(collection),level:0,surface:'reel',label:'リールの床 '+r.id+'・'+deck.report.label,target:null,ok:false,reason:''};
+ const reason=!part?'先に木材を吊ろう。':s.rig.mode!=='driving'||!s.work||s.deployment!==1?'停車して支持脚を開こう。':s.rotation||s.joining||s.rig.transition?'車と木材が止まるまで待とう。':!quarter(part.angle)?'木材を90°ずつ回して向きを合わせよう。':'';if(reason)return{...entry,reason};let best=null,fit=false;
+ for(let x=r.x0+8;x<r.x1;x+=8)for(let z=r.z0+8;z<r.z1;z+=8){const target={x:Math.round((x-origin.x)/6)*6,y:deck.top,z:Math.round((z-origin.z)/6)*6};if(!deckFits(deck,{...part,...target},origin))continue;fit=true;const aim=craneAim(s,{...part,...target});if(aim.reach<CRANE.minReach+.5||aim.reach>CRANE.maxReach-.5||Math.abs(aim.yaw)>Math.PI*.8-.01||aim.cable<4||aim.cable>100)continue;const score=Math.abs(aim.yaw-s.boom.yaw)*100+Math.abs(aim.reach-s.boom.reach);if(!best||score<best.score)best={target,aim,score,route:{kind:'dock'}};}
+ return best?{...entry,...best,ok:true,reason:'黄色い枠へ木材を運ぼう。'}:{...entry,reason:fit?'この床には届かないよ。車を床の近くへ移そう。':'木材がはみ出すよ。床や階段の穴をたしかめよう。'};});
+}
 export function craneUpperTargets(collection,s,{origin={x:0,z:0},includePlatforms=false}={}){
  const part=cargo(s),base=craneChassisFrame(s)?.position[1]??0;
+ if(part?.id.startsWith('structural-kit-')){const b=s.buildingKits?.find(b=>b.partId===part.id),g=girders(collection?.reel?.rooms??[]).find(g=>g.room.id===b?.roomId&&g.item.id===b.detailId);if(!g)return[];return[false,true].map(source=>{const q=source?girderSupply(g.item.corner,g.room):girderTarget(g.room,g.item),target={x:q.x-origin.x,y:q.y,z:q.z-origin.z},aim=craneAim(s,{...part,...target}),angle=source||q.axis==='x'?0:Math.PI/2,reason=s.rig.mode!=='driving'||!s.work||s.deployment!==1?'停車して支持脚を開こう。':s.rotation||s.joining||s.rig.transition?'回転が止まるまで待とう。':Math.abs(Math.sin(part.angle-angle))>.001?'梁を90°回し、柱の向きに合わせよう。':aim.reach<42.5||aim.reach>151.5||Math.abs(aim.yaw)>Math.PI*.8-.01||aim.cable<4||aim.cable>100?'車を柱の近くへ移そう。この高さには今の位置から届かないよ。':'';return{id:'girder-'+b.roomId+'-'+b.detailId+(source?'-return':''),girderReturn:source,roomId:b.roomId,detailId:b.detailId,key:reelCraneKey(collection),surface:'girder',level:0,label:source?'梁を床の脇へ戻す':GIRDER_MATERIALS[b.material].name+'をつなぐ場所',target,aim,route:{kind:'dock'},ok:!reason,reason:reason||(source?'床の脇へ運んでから「梁を用意した場所へ戻す」を押そう。':'柱へ運んだあと「梁を据え付ける」を押そう。')};});}
  if(isKitCargo(part)){
   const b=s.buildingKits?.find(b=>b.partId===part.id),project=highProjects(collection).find(p=>p.id===b?.projectId);if(!project)return[];
   const r=project.record;return[false,true].map(source=>{const pad=kitPad(r.work,source),q=highWorldPoint(r.site,pad),target={x:q.x-origin.x,y:q.y,z:q.z-origin.z},aim=craneAim(s,{...part,...target});
@@ -58,7 +71,7 @@ export function craneUpperTargets(collection,s,{origin={x:0,z:0},includePlatform
   }
   return best?{...entry,ok:true,reason:'黄色い枠へ、吊った木材を運ぶよ。',...best}:{...entry,reason:fit?'車を床の近くへ移動し、アームが向く側へ停めよう。':'木材を90°回すか、もっと広い床をつくろう。'};
  });
- if(!includePlatforms)return roofs;
+ if(!includePlatforms)return performanceChoices(collection,s,origin,roofs.concat(reelCraneTargets(collection,s,origin)));
  const choices=roofs.flatMap(roof=>{
   const project=highProjects(collection).find(p=>p.id===roof.id),{record}=project,choices=[];
   for(let level=1;level<record.work.levels;level++){
@@ -88,18 +101,18 @@ export function craneUpperTargets(collection,s,{origin={x:0,z:0},includePlatform
   return [...choices,roof];
  });
  for(const project of highProjects(collection).filter(p=>hasBoardBay(p.record.work))){
-  const r=project.record;for(const level of boardBayLevels(r.work)){const entry={id:project.id+':bay'+(level?':'+level:''),projectId:project.id,key:key(project),level,surface:'bay',label:'建物 '+project.id.slice(9)+'・'+(level?'上の部屋の':'')+'大きな板の受取台',ok:false,reason:'',target:null};
+  const r=project.record;for(const level of boardBayLevels(r.work)){const entry={id:project.id+':bay'+(level?':'+level:''),projectId:project.id,key:key(project),level,surface:'bay',label:'建物 '+project.id.slice(9)+'・'+(level?'上の部屋の':'')+receivingCargoName(part)+'の受取台',ok:false,reason:'',target:null};
   const reason=!part?'先に木材を吊ろう。':s.rig.mode!=='driving'||!s.work||s.deployment!==1?'停車して支持脚を開こう。':s.rotation||s.joining?'回転が終わるまで待とう。':r.work.job||r.work.roomWalkVersion||r.work.levels!==r.work.blueprint.storeys.length?'建物の作業を終えてから運ぼう。':'';
   if(reason){choices.push({...entry,reason});continue;}
   const p=highWorldPoint(r.site,{x:B.x,y:level*40,z:B.outside}),target={...part,x:p.x-origin.x,y:p.y,z:p.z-origin.z};
-  if(isBeamBundle(part)){choices.push({...entry,reason:'大きな床板専用の受取台だよ。角材の束は床か作業台へ運ぼう。'});continue;}
-  if(!boardBayFits(r,target,origin)){choices.push({...entry,reason:'床板を90°回して入口の向きに合わせよう。'});continue;}
+  
+  if(!boardBayFits(r,target,origin)){choices.push({...entry,reason:'建材の長い辺を入口の奥行きに合わせよう。'});continue;}
   const aim=craneAim(s,target);if(aim.reach<CRANE.minReach+.5||aim.reach>CRANE.maxReach-.5||Math.abs(aim.yaw)>Math.PI*.8-.01||aim.cable<4||aim.cable>100){choices.push({...entry,reason:'車を受取台の外側へ移動し、入口へ向けて停めよう。'});continue;}
   choices.push({...entry,ok:true,reason:'外の受取台へ下ろそう。そのあとローラーで部屋へ運べるよ。',target:{x:target.x,y:target.y,z:target.z},aim,route:{kind:'dock'}});
  }}
  for(const project of highProjects(collection)){const r=project.record;if(!boardLiftInstalled(r.work)||!liftLevels(r.work).some(l=>l>=2))continue;const car=liftState(s,project.id),entry={id:project.id+':lift',projectId:project.id,key:key(project),level:0,surface:'lift',label:'建物 '+project.id.slice(9)+'・荷物リフトの台',ok:false,reason:'',target:null},p=highWorldPoint(r.site,{x:H.x,y:0,z:H.z}),target=part?{...part,x:p.x-origin.x,y:p.y,z:p.z-origin.z}:null;
-  const reason=!part?'先に木材を吊ろう。':s.rig.mode!=='driving'||!s.work||s.deployment!==1?'停車して支持脚を開こう。':r.work.job||r.work.roomWalkVersion?'建物の作業を終えよう。':isBeamBundle(part)?'大きな床板専用のリフトだよ。角材の束はクレーンで床へ運ぼう。':car.height!==0||car.partId?'荷物から空のリフトを地上へ下ろそう。':part.w!==80||part.d!==56||part.h!==6||Math.abs(Math.cos(part.angle-r.site.turn*Math.PI/2))>1e-7?'床板を90°回してリフトの向きに合わせよう。':'';if(reason){choices.push({...entry,reason});continue;}const aim=craneAim(s,target);choices.push(aim.reach>=CRANE.minReach+.5&&aim.reach<=CRANE.maxReach-.5&&Math.abs(aim.yaw)<=Math.PI*.8-.01&&aim.cable>=4&&aim.cable<=100?{...entry,ok:true,reason:'リフトに下ろし、荷物から目的の階をえらぼう。',target:{x:target.x,y:target.y,z:target.z},aim,route:{kind:'dock'}}:{...entry,reason:'車をリフトの外側に寄せ、アームを向けよう。'});
- }return choices;
+  const reason=!part?'先に木材を吊ろう。':s.rig.mode!=='driving'||!s.work||s.deployment!==1?'停車して支持脚を開こう。':r.work.job||r.work.roomWalkVersion?'建物の作業を終えよう。':car.height!==0||car.partId?'荷物から空のリフトを地上へ下ろそう。':!receivingCargoAligned(part,r.site.turn)?'建材の長い辺をリフトの奥行きに合わせよう。':'';if(reason){choices.push({...entry,reason});continue;}const aim=craneAim(s,target);choices.push(aim.reach>=CRANE.minReach+.5&&aim.reach<=CRANE.maxReach-.5&&Math.abs(aim.yaw)<=Math.PI*.8-.01&&aim.cable>=4&&aim.cable<=100?{...entry,ok:true,reason:'リフトに下ろし、荷物から目的の階をえらぼう。',target:{x:target.x,y:target.y,z:target.z},aim,route:{kind:'dock'}}:{...entry,reason:'車をリフトの外側に寄せ、アームを向けよう。'});
+ }return performanceChoices(collection,s,origin,choices.concat(reelCraneTargets(collection,s,origin)));
 }
 // A chosen point is an ephemeral motor destination, never a new inventory or
 // save job. Keep the actual board dimensions and inspect the whole bearing area.
@@ -119,7 +132,7 @@ export function cranePointTarget(collection,s,request,{origin={x:0,z:0},external
  }else if(base+42+CRANE.maxReach*.35-4-part.h-4<target.y+12)reason=isBeamBundle(part)?'この階はクレーンが届かないよ。届く階をえらぼう。':'この階は高すぎるよ。荷物リフトを使おう。';
  if(!reason&&(aim.reach<CRANE.minReach+.5||aim.reach>CRANE.maxReach-.5||Math.abs(aim.yaw)>Math.PI*.8-.01||aim.cable<4||aim.cable>100))reason='アームが届かないよ。車を床の近くへ移そう。';
  if(!reason){const hit=collides(s,{...part,...target},{external});if(hit)reason='車・柱・材料と重なるよ。少しずらそう。';}
- return{...entry,aim,ok:!reason,reason:reason||'床をタップでえらぼう。黄色い枠なら運べるよ。'};
+ if(!reason&&request.surface==='floor'){const check=structuralPlacement(collection,s,{...part,...target},origin);if(!check.ok)reason=check.reason;}return{...entry,aim,ok:!reason,reason:reason||'床をタップでえらぼう。黄色い枠なら運べるよ。'};
 }
 export function cranePointRequest(collection,choice,origin={x:0,z:0}){
  if(!choice?.target||!['floor','platform',undefined].includes(choice.surface))return null;
@@ -127,8 +140,8 @@ export function cranePointRequest(collection,choice,origin={x:0,z:0}){
  const p=highLocalPoint(project.record.site,{x:origin.x+choice.target.x,y:choice.target.y,z:origin.z+choice.target.z});
  return{projectId:project.id,level:choice.level,surface:choice.surface??'floor',x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};
 }
-export function upperDeliveryProjectKey(collection,target){const p=highProjects(collection).find(p=>p.id===(target.projectId??target.id));return p?key(p):null;}
-export function upperLandingFits(collection,target,candidate,origin){const p=highProjects(collection).find(p=>p.id===(target.projectId??target.id));return !!p&&key(p)===target.key&&(!target.point||Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001)&&(target.surface==='kit'?!!p.record.work.craneKit&&kitOnPad(candidate,p.record.site,p.record.work,origin,target.kitSource===true)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:target.surface==='lift'?boardLiftInstalled(p.record.work)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:target.surface==='bay'?boardBayLevel(p.record,candidate,origin)===target.level&&boardBayFits(p.record,candidate,origin)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:highCargoFits(p.record,candidate,origin,target.surface?target:{}));}
+export function upperDeliveryProjectKey(collection,target){if(['reel','girder'].includes(target?.surface))return reelCraneKey(collection);const p=highProjects(collection).find(p=>p.id===(target.projectId??target.id));return p?key(p):null;}
+export function upperLandingFits(collection,target,candidate,origin){if(target?.surface==='girder')return reelCraneKey(collection)===target.key&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<1.2&&Math.abs(candidate.y-target.target.y)<.2; if(target?.surface==='reel'){const rooms=collection?.reel?.rooms??[],r=rooms.find(r=>r.id===target.roomId);return !!r&&reelCraneKey(collection)===target.key&&deckFits(reelDeck(r,rooms),candidate,origin);}const p=highProjects(collection).find(p=>p.id===(target.projectId??target.id));return !!p&&key(p)===target.key&&(!target.point||Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001)&&(target.surface==='kit'?!!p.record.work.craneKit&&kitOnPad(candidate,p.record.site,p.record.work,origin,target.kitSource===true)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:target.surface==='lift'?boardLiftInstalled(p.record.work)&&receivingCargoAligned(candidate,p.record.site.turn)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:target.surface==='bay'?boardBayLevel(p.record,candidate,origin)===target.level&&boardBayFits(p.record,candidate,origin)&&Math.abs(candidate.y-target.target.y)<.001&&Math.hypot(candidate.x-target.target.x,candidate.z-target.target.z)<.001:highCargoFits(p.record,candidate,origin,target.surface?target:{}));}
 // Reopening a saved crane beside its last delivery should still show that load
 // beneath the ceiling. This is a view hint, never a job added to the save.
 export function recoverUpperLanding(collection,s,origin={x:0,z:0}){
@@ -151,7 +164,9 @@ export function stepUpperDelivery(job,s,dt,currentKey){
  const j={...job},p=cargo(s),stop=reason=>({job:null,input:{brake:true},reason});
  if(!p||p.id!==j.partId||s.rig.mode!=='driving'||!s.work||s.deployment!==1||s.rotation||s.joining||s.paused||s.rig.transition||JSON.stringify(s.rig.vehicle)!==j.vehicle||currentKey!==j.target.key)return stop('現場が変わったので止めたよ。置き先をもう一度えらぼう。');
  j.elapsed+=dt;if(j.elapsed>45)return stop('ここでは運べなかったよ。荷は吊ったまま。車の位置を変えて試そう。');
- const aim=j.target.aim,side=j.target.route?.kind==='side',reach=j.target.surface==='lift'?60:side?j.target.route.stageReach:j.target.route?.kind==='dock'?aim.reach:CRANE.maxReach;
+ // The thicker bundle needs a short extra retreat radius to clear the chassis,
+ // while staying inside the lift uprights. Motors still sweep the entire path.
+ const aim=j.target.aim,side=j.target.route?.kind==='side',reach=j.target.surface==='lift'?Math.min(CRANE.maxReach,60+Math.max(0,p.h-6)/2):side?j.target.route.stageReach:j.target.route?.kind==='dock'?aim.reach:CRANE.maxReach;
  const desired=j.phase===0?{cable:4}:j.phase===1?{cable:4,reach}:j.phase===2?{cable:4,reach,yaw:aim.yaw}:j.phase===3?{cable:side?4+(s.boom.reach-reach)*.35:4,reach:aim.reach,yaw:aim.yaw}:{cable:aim.cable,reach:aim.reach,yaw:aim.yaw};
  const rates={cable:CRANE.hoist,reach:CRANE.extend,yaw:CRANE.slew},names={cable:'hoist',reach:'extend',yaw:'slew'},input={brake:true};let error=0;
  for(const[k,want]of Object.entries(desired)){const delta=want-s.boom[k];error+=Math.abs(delta)* (k==='yaw'?100:1);input[names[k]]=clamp(delta/(rates[k]*Math.max(.04,dt)),-1,1)*(k==='cable'?-1:1);}

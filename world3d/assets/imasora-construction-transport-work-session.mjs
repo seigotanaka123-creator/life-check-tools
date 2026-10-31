@@ -1,8 +1,10 @@
-import {WorldTransportWorkFlow} from './imasora-construction-transport-work-flow.mjs?v=120gn';
+import {createTransportSoilGuard} from './imasora-construction-structure-performance.mjs?v=120pv';
+import {nativeDeckSnapshot} from './imasora-construction-native-decks.mjs?v=120ps';
+import {WorldTransportWorkFlow} from './imasora-construction-transport-work-flow.mjs?v=120pv';
 import {sameConstructionRecordValue as same,sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
-import {LIVE_WORLD_DB} from './imasora-world-save-service.js?v=120gn';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import {LIVE_WORLD_DB} from './imasora-world-save-service.js?v=120pv';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {validateScoopDumpContinuation} from './imasora-construction-fragment-scoop.mjs?v=120pv';
 // Normal world transactions, not the isolated work database. The service keeps
 // the exact failed packet; this session retains the matching physical intent.
 export class WorldTransportWorkSession{
@@ -14,13 +16,13 @@ export class WorldTransportWorkSession{
  // and identity; a blocked/no-op move retains both. Only confirmed readback
  // replaces the flow and makes state and saved identical again.
  get dirty(){return !!this.#flow&&this.state!==this.saved;}
- #accept(){const flow=new WorldTransportWorkFlow(this.service.ledger.world.constructionTransport,{toolkit:()=>this.service.constructionToolkit});if(this.#intent&&!sameChecked(flow.record,this.#intent))throw Error('保存待ちの作業と読み取った作業が違います。');flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;}
+ #accept(){const flow=new WorldTransportWorkFlow(this.service.ledger.world.constructionTransport,{toolkit:()=>this.service.constructionToolkit});if(this.#intent&&!sameChecked(flow.record,this.#intent))throw Error('保存待ちの作業と読み取った作業が違います。');flow.setDeckContext(()=>nativeDeckSnapshot(this.service.ledger.world));flow.setSoilGuard(createTransportSoilGuard(()=>this.service.ledger.world));flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;}
  async #acceptAsync(){
   const base=this.service.ledger,generation=this.generation,raw=this.service.raw.current,record=base.world.constructionTransport;
   if(this.#intent&&!sameChecked(record,this.#intent))throw Error('保存待ちの作業と読み取った作業が違います。');
   const point=this.service.transportRestorePoint,checkedRestorePoint=point?.appliedRaw===raw&&point?.appliedGeneration===generation?point:null;
   const flow=this.#flow?.acceptConfirmed(record)?this.#flow:await WorldTransportWorkFlow.open(record,{toolkit:()=>this.service.constructionToolkit,checkedRestorePoint});
-  this.service.adoptConstructionTransportSnapshot(flow.record,base,generation,raw);flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;
+  this.service.adoptConstructionTransportSnapshot(flow.record,base,generation,raw);flow.setDeckContext(()=>nativeDeckSnapshot(this.service.ledger.world));flow.setSoilGuard(createTransportSoilGuard(()=>this.service.ledger.world));flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;
  }
  async open(){if(this.busy||this.#flow||this.#opening)throw Error('現場は既に開いているか保存中です。');this.#busy=true;try{if(this.service.ledger.world.constructionTransport?.version!==2){this.#opening=true;await this.service.enableConstructionTransportWork(this.snapshot(),this.service.world.constructionExcavation.revision);}return await this.#acceptAsync();}catch(e){if(!this.service.blocked)this.#opening=false;throw e;}finally{this.#busy=false;}}
  setMovementGuard(guard){if(typeof guard!=='function')throw Error('移動先の確認が不正です。');this.#movementGuard=guard;this.#flow?.setMovementGuard(guard);}
@@ -42,5 +44,6 @@ export class WorldTransportWorkSession{
   if(!p||this.service.raw?.current!==p.appliedRaw||this.generation!==p.appliedGeneration||!same(this.#flow.base,p.beforeSaved)||!same(this.record,p.beforeUnsaved))throw Error('現場と復元前控えが一致しません。停止して保持します。');
   return this.#accept();
  }
+ async synchronizeCommitted(){const next=this.service.ledger.world.constructionTransport;if(next.work.revision===this.saved.revision)return this.state;if(this.busy||this.blocked||this.intent||this.dirty)throw Error('先に土の作業を保存しよう。');validateScoopDumpContinuation(this.saved,next.work);this.#busy=true;try{return await this.#acceptAsync();}finally{this.#busy=false;}}
  async readLatest(){if(this.busy||this.blocked||this.intent)throw Error('保存待ちの作業を先に確認してください。');if(this.dirty)throw Error('歩行や作業途中を先に保存してください。');this.#busy=true;try{await this.service.readLatestConstructionTransportWork(this.saved);return await this.#acceptAsync();}finally{this.#busy=false;}}
 }

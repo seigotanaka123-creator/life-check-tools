@@ -1,0 +1,14 @@
+import{soilTransportCommand,soilTransportCommands}from'./imasora-construction-soil-transport.mjs?v=120pv';
+import{validateScoopDumpWork}from'./imasora-construction-fragment-scoop.mjs?v=120pv';
+import{assertTransportShovel}from'./imasora-construction-transport-hand.mjs';
+import{projectStarterToolkit}from'./imasora-construction-toolkit.mjs?v=120ho';
+import{gardenItems,gardenEarthReserved,assertGardenEarthStock}from'./imasora-construction-garden.mjs?v=120ps';
+import{transportSiteOrigin}from'./imasora-construction-transport-site.mjs?v=120pv';
+const ok=(v,m)=>{if(!v)throw Error(m);};
+// The existing storage owner is the conserved soil inventory. Garden quantities
+// reserve part of it; every pickup exposes only its unreserved balance.
+export function gardenEarthTransition(world,a,draft,high){const candidate={...world,constructionHighBuild:high},before=world.constructionHighBuild;const fill=a.type==='GARDEN_EDIT'&&a.edit.op==='fill',undo=a.type==='GARDEN_UNDO'?before?.garden?.history.at(-1)?.earthTransfer:null;if(!fill&&!undo){assertGardenEarthStock(candidate);return candidate;}
+ const r=world.constructionTransport,w=r?.work;ok(r?.version===2&&w.mode==='foot'&&!w.scoop&&!w.link&&!w.unload&&!w.frame.job&&!w.frame.soil.pending,'車を降りて、土を動かす作業を終えよう。');assertTransportShovel(projectStarterToolkit(world.constructionPackTrialLedger,r.profileId),r.profileId);const source=w.frame.soil,shovel=source.containers.shovel,storage=source.containers.storage;let amount,id;
+ if(fill){id=a.edit.id;amount=gardenItems(high).find(i=>i.id===id).earth-gardenItems(before).find(i=>i.id===id).earth;ok(shovel.materialId==='earth-soil'&&shovel.amount>=amount,'シャベルで土をすくってから、この花壇へ入れよう。');}else{id=undo.id;amount=undo.amount;ok(shovel.amount+amount<=8&&(!shovel.amount||shovel.materialId==='earth-soil'),'手元の土を先に置こう。シャベルへ土をもどす空きをあけてね。');ok(storage.amount-gardenEarthReserved(before)>=0&&storage.amount>=amount,'もどす土をたしかめよう。');}
+ const transferId='garden-'+(fill?'fill':'undo')+'-'+before.revision+'-'+source.revision,commands=[{type:'reserve',id:transferId+'_reserve',expectedRevision:source.revision,transferId,from:fill?'shovel':'storage',to:fill?'storage':'shovel',materialId:'earth-soil',amount,positions:[]},{type:'release',id:transferId+'_release',expectedRevision:source.revision+1,transferId},{type:'complete',id:transferId+'_complete',expectedRevision:source.revision+2,transferId}],soil=soilTransportCommands(soilTransportCommand(source,commands[0]),commands.slice(1)),o=transportSiteOrigin(r),player={...w.frame.player,x:draft.position.x-o[0],y:draft.position.y??draft.groundY,z:draft.position.z-o[2],heading:draft.heading??0},work={...w,revision:w.revision+1,frame:{...w.frame,revision:w.frame.revision+1,soil,player}};validateScoopDumpWork(work);candidate.constructionTransport={...r,work};assertGardenEarthStock(candidate);return candidate;
+}

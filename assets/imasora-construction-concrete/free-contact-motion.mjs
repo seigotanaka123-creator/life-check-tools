@@ -1,16 +1,16 @@
 import * as T from '../three.module.min.js';
 import {PAINT_REMOVE_COLOR} from './free-paint-removal.mjs?v=120dm';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120gn';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120gn';
-import {vehicleGroundError} from './free-vehicle-ground.mjs?v=120ek';
-import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120gn';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120pv';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120pv';
+import {vehicleGroundError} from './free-vehicle-ground.mjs?v=120ov';
+import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120pv';
 
-import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs?v=120gn';
-import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs?v=120gn';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
-import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs?v=120gn';
-import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
+import {footingAt,FOOTING_MESSAGE} from './free-footing.mjs?v=120pv';
+import {paintAccessPlan,paintScaffoldSteps} from './free-paint-access.mjs?v=120pv';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120pv';
+import {frameBlocked,frameSegmentBlocked} from './free-frames.mjs?v=120pv';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120pv';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),distance=(a,b)=>Math.hypot(a.x-b.x,(a.y??0)-(b.y??0),a.z-b.z);
 export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles,tools,colors,mats,line,drawPaint,external,supportHeightAt=()=>0,paintGroundExternal=external,sharedPlatform=null,masking=null}){
@@ -67,10 +67,10 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
   let anchor;
   if(a.tool==='roller'){
    const radius=a.face==='top'?.65:Math.min(.65,patch.span*.018);
-   head.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),u);head.scale.set(radius,3.99,radius);head.position.copy(point).addScaledVector(n,radius);
+   head.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),u);head.scale.set(radius,(patch.width??4)-.01,radius);head.position.copy(point).addScaledVector(n,radius);
    anchor=n.clone().applyQuaternion(head.quaternion.clone().invert()).negate();
   }else{
-   head.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(u,n,u.clone().cross(n)));head.scale.set(3.99,.36,patch.span*.03);head.position.copy(point).addScaledVector(n,.18);anchor=new T.Vector3(0,-.5,0);
+   head.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(u,n,u.clone().cross(n)));head.scale.set((patch.width??4)-.01,.36,patch.span*.03);head.position.copy(point).addScaledVector(n,.18);anchor=new T.Vector3(0,-.5,0);
   }
   tools.add(head);const handleEnd=head.position.clone().addScaledVector(n,.6),pole=line(tools,grip,handleEnd,.32,mats.wood);pole.name='verified-paint-handle';
   root.updateMatrixWorld(true);

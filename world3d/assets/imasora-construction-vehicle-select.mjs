@@ -1,6 +1,6 @@
 import * as T from './three.module.min.js';
 import {FLEET} from './imasora-construction-shared-field.mjs?v=120ey';
-import {createFleetModel,fleetLesson,disposeFleetTree} from './imasora-construction-fleet-model.mjs?v=120gn';
+import {createFleetModel,fleetLesson,disposeFleetTree} from './imasora-construction-fleet-model.mjs?v=120pv';
 import {overlayStyle,trackConstructionOverlay,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
 
 // One WebGL context serves the large preview and all seven actual-model cards.

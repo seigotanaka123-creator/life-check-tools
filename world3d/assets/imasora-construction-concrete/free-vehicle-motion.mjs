@@ -1,11 +1,11 @@
-import {driveFactor} from '../imasora-construction-travel-input.mjs';
+import {driveFactor} from '../imasora-construction-travel-input.mjs?v=120lb';
 import * as T from '../three.module.min.js';
-import {FREE_VEHICLE_ACTIONS,VEHICLE_WHEELS,VEHICLE_PADS,vehicleContactPoint,vehiclePoseAt,headingDelta,vehicleActionProblem,vehiclePoseProblem,vehicleSweepProblem,newVehicleReceipt,assertVehicleReceipt} from './free-vehicle-contact.mjs?v=120gn';
-import {vehicleGroundPose,applyVehicleGround,vehicleGroundError,placeVehicleDriver} from './free-vehicle-ground.mjs?v=120ek';
+import {FREE_VEHICLE_ACTIONS,VEHICLE_WHEELS,VEHICLE_PADS,vehicleContactPoint,vehiclePoseAt,headingDelta,vehicleActionProblem,vehiclePoseProblem,vehicleSweepProblem,newVehicleReceipt,assertVehicleReceipt} from './free-vehicle-contact.mjs?v=120pv';
+import {vehicleGroundPose,applyVehicleGround,vehicleGroundError,placeVehicleDriver} from './free-vehicle-ground.mjs?v=120ov';
 
 export function createFreeVehicleMotion({a,p,root,actor,vehicles,environment,fast=false}){
  if(!FREE_VEHICLE_ACTIONS.has(a.type))throw Error('車両操作を確認してください。');
- const f=p.freeBuild,name=a.type==='FREE_MOVE'?a.vehicle:'pump',v=vehicles[name],from={...f[name]},to={...from,...(a.type==='FREE_MOVE'?{x:a.x,z:a.z,heading:a.heading}:{legs:a.deployed})};
+ const f=p.freeBuild,name=a.type==='FREE_MOVE'?a.vehicle:'pump',v=vehicles[name],from={...f[name]},to={...from,...(a.type==='FREE_MOVE'?{x:a.x,z:a.z,heading:a.heading,...(a.groundY===undefined?{}:{groundY:a.groundY})}:{legs:a.deployed})};
  const moving=a.type==='FREE_MOVE',travelEnvironment={...environment,terrainTravel:moving};
  const problem=vehicleActionProblem(f,a,environment);if(problem)throw Error(problem);
  const receipt=newVehicleReceipt(a,p);const preflight=vehicleSweepProblem(f,name,from,to,travelEnvironment,()=>receipt.checkedPoses++);if(preflight)throw Error(preflight);
@@ -38,7 +38,7 @@ export function createFreeVehicleMotion({a,p,root,actor,vehicles,environment,fas
    receipt.supports=[];
    for(let i=0;i<VEHICLE_WHEELS.length;i++)receipt.supports.push('wheel-'+i);
    if(to.legs)for(let i=0;i<4;i++){receipt.maxGroundError=Math.max(receipt.maxGroundError,supportError(v.root.getObjectByName('support-pad-'+i),[0,-.8,0],{...vehicleContactPoint(to,VEHICLE_PADS[i]),y:ground.position.y}));receipt.supports.push('pad-'+i);}
-   assertVehicleReceipt(a,p,p.revision,receipt);done=true;
+   if(a.groundY!==undefined)receipt.groundY=ground.position.y;assertVehicleReceipt(a,p,p.revision,receipt);done=true;
   }
  }
  return{focus:{x:from.x,y:20,z:from.z},verifyFooting:verify,get phase(){return a.type==='FREE_MOVE'?'周囲と車輪の接地を確認して走行しています。':a.deployed?'4本の支持脚を下ろしています。':'支持脚を収納しています。';},get receipt(){return receipt;},tick(dt){if(done)return true;if(!started){started=true;render(0);return false;}elapsed+=Math.min(.05,Math.max(0,dt));render(Math.min(1,elapsed/duration));return done;},

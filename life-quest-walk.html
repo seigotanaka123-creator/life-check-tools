@@ -17596,7 +17596,14 @@
   <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
 <link rel="stylesheet" href="./assets/imasora-player-ui.css?v=120ds">
 <script>if(new URLSearchParams(location.search).get("developer")==="1")document.documentElement.classList.add("game-developer-ui");</script>
-</head>
+<style>
+.item-art:is(.item-art-courage-fruit,.item-art-sprout-fruit,.item-art-trail-fruit,.item-art-golden-fruit) i{position:absolute;left:23%;top:30%;width:54%;height:55%;border-radius:46% 44% 47% 45%;background:radial-gradient(circle at 30% 25%,#ffffffad 0 9%,transparent 11%),var(--item-color);box-shadow:inset -5px -6px 0 #00000017,0 3px 3px #0000001c;transform:rotate(-8deg)}
+.item-art:is(.item-art-courage-fruit,.item-art-sprout-fruit,.item-art-trail-fruit,.item-art-golden-fruit) em{position:absolute;left:49%;top:18%;height:21%;width:5%;border-radius:3px;background:#765b37;transform:rotate(14deg)}
+.item-art:is(.item-art-courage-fruit,.item-art-sprout-fruit,.item-art-trail-fruit,.item-art-golden-fruit) span{position:absolute;left:52%;top:20%;width:24%;height:16%;border-radius:0 90% 0 90%;background:#7ba44b;transform:rotate(-20deg)}
+.item-art-golden-fruit{filter:drop-shadow(0 0 5px #ffc84899)}
+.tag-home-entry{display:flex;align-items:center;gap:16px;margin:14px 0;padding:14px 18px;border:3px solid white;border-radius:22px;color:#284f69;text-decoration:none;background:linear-gradient(120deg,#d3f2ff,#f0faff 55%,#ffefd3);box-shadow:0 4px 0 #8dc8d655}.tag-home-entry b{display:block;font-size:20px}.tag-home-entry small{display:block;margin:4px 0 8px;line-height:1.5}.tag-home-entry strong{display:inline-block;padding:9px 16px;border:2px solid white;border-radius:14px;background:#c9ecdf;color:#285d55}.tag-home-entry:focus-visible{outline:3px solid #c58535;outline-offset:3px}.tag-home-ice{position:relative;display:grid;place-items:center;flex:0 0 65px;height:65px;border:3px solid white;border-radius:50%;font-size:43px;background:#a8dcf2;color:white}.tag-home-ice i{position:absolute;font-style:normal;font-size:27px;bottom:-12px;right:-5px;color:#db9b3b}
+.sky-camera-entry{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}.sky-camera-entry a{display:inline-block;text-decoration:none;color:#315a72;font-weight:800;padding:12px 17px;min-height:48px;border:2px solid white;border-radius:16px;background:#def3ff;box-shadow:0 3px #89b6cb55}.sky-camera-entry small{font-size:12px;color:#537386}
+</style></head>
 <body class="loading-screen-active">
 <div class="app">
   <section class="new-opening-screen" id="newOpeningScreen" aria-label="イマソラーズウォークのオープニング画面" hidden>
@@ -17824,6 +17831,8 @@
     <section class="panel screen" data-screen="monster">
       <h2>散歩モンスター</h2>
       <p>イマソラ認識と日々の育成で、タネから育つ姿が変わります。</p>
+      <a class="tag-home-entry" href="./imasora-sliding-tag-preview.html?from=home" onclick="startSlidingTag(event)"><span class="tag-home-ice" aria-hidden="true">❄<i>↝</i></span><span><b>すべる鬼ごっこ</b><small>氷の上で、相棒と追いかけっこ！</small><strong>相棒とあそぶ　▶</strong></span></a>
+      <p class="sky-camera-entry"><a href="./imasora-sky-camera-preview.html">☁ 今の空を撮る</a><small>写真を保存・送信せず、空の候補をたしかめます。</small></p>
       <div class="section-jump" aria-label="散歩モンスター確認ショートカット">
         <button type="button" data-monster-view="characterGalleryPage" aria-controls="characterGalleryPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'characterGalleryPage')">相棒のすがた</button>
         <button type="button" data-monster-view="monsterDexPage" aria-controls="monsterDexPage" aria-pressed="false" onclick="openMonsterSubpage(event, 'monsterDexPage')">モンスター図鑑</button>
@@ -18263,14 +18272,16 @@
   </div>
 </div>
 
-<script src="./assets/imasora-construction-reward-ledger.js?v=20260924-plan107"></script>
+<script src="./assets/imasora-construction-reward-ledger.js?v=120jj"></script>
 <script src="./assets/imasora-construction-pack-transfer.js?v=20260924-plan98"></script>
 <script src="./assets/imasora-construction-pack-ledger.js?v=20260924-plan107"></script>
-<script src="./assets/imasora-construction-save-guard.js?v=20260924-plan107"></script>
+<script src="./assets/imasora-island-fruits.js?v=120ne"></script>
+<script src="./assets/imasora-island-items.js?v=120lh"></script>
+<script src="./assets/imasora-construction-save-guard.js?v=120qf"></script>
 <script src="./assets/imasora-arcade-reward-transaction.js?v=20260924-plan94"></script>
-<script src="./assets/imasora-home-storage-lock.js?v=20261012-plan120dc"></script>
+<script src="./assets/imasora-home-storage-lock.js?v=120qn"></script>
 <script src="./assets/imasora-pending-rewards.js?v=20261003-reward-recovery-120b"></script>
-<script src="./assets/imasora-autosave.js?v=120er"></script>
+<script src="./assets/imasora-autosave.js?v=120qq"></script>
 <script id="imasoraHomeApplication" type="text/plain">
 const storeKey = "lifeQuestWalkV1";
 // UFO装備素材は、日々の散歩とゲームセンターの遊びを無理に一体化せず、
@@ -18377,16 +18388,17 @@ function refreshUfoArcadeDailyNotices() {
   });
 }
 const homeRewardStorageLock = window.ImasoraHomeStorageLock.create({ indexedDB: window.indexedDB, nativeLocks: navigator.locks });
-function withUfoArcadeRewardLock(action) {
+function withUfoArcadeRewardLock(action, canStart = () => true) {
   // A single lock covers the allowance, material credit and optional coin debit across tabs.
   return homeRewardStorageLock.request("imasora-ufo-arcade-reward", () => {
+    if (!canStart()) return false;
     // Finish both older rollback journals before any material writer starts.
     recoverPachicoinPrizeExchange();
     recoverUfoArcadeReward();
     return action();
   });
 }
-const constructionSaveGuard = window.ImasoraConstructionSaveGuard.createGuard();
+const constructionSaveGuard = window.ImasoraConstructionSaveGuard.createGuard({protectProgression:true});
 let constructionPackOpeningPending = false;
 let constructionPackTransferPending = false;
 function constructionPackAuxiliaryLabel(kind) {
@@ -18559,6 +18571,7 @@ async function retryPendingArcadeRewards() {
 }
 window.addEventListener("beforeunload", event => {
   if (!pendingArcadeRewards.hasPending()) return;
+  resetHomeNavigationPending();
   event.preventDefault(); event.returnValue = "";
 });
 function prepareArcadeHomeState() {
@@ -18593,8 +18606,7 @@ function commitUfoArcadeJournaledEntries(entries, recoveryMode = "rollback") {
   const homeEntry = entries.find(([key]) => key === storeKey);
   if (homeEntry) {
     const saved = JSON.parse(homeEntry[1]);homeAutoSavedRaw=homeEntry[1];
-    state.constructionRewardLedger = window.ImasoraConstructionRewardLedger.normalize(saved.constructionRewardLedger);
-    state.constructionMaterialLedger = window.ImasoraConstructionPackLedger.normalize(saved.constructionMaterialLedger);
+    constructionSaveGuard.adopt(state, {...saved, constructionRewardLedger:window.ImasoraConstructionRewardLedger.normalize(saved.constructionRewardLedger), constructionMaterialLedger:window.ImasoraConstructionPackLedger.normalize(saved.constructionMaterialLedger)});
     constructionSaveGuard.remember(saved);
   }
   ufoArcadeDailyCache = null;
@@ -18612,7 +18624,7 @@ async function awardConstructionArcadeReward(event, source = "") {
       const grant = window.ImasoraConstructionRewardLedger.awardArcadeEvent(savedState.constructionRewardLedger, { ...capture, official: true });
       if (!grant.granted) {
         if (grant.status === "duplicate") {
-          state.constructionRewardLedger = grant.ledger;
+          constructionSaveGuard.adopt(state, {...savedState, constructionRewardLedger:grant.ledger});
           constructionSaveGuard.remember(savedState);
         }
         return grant;
@@ -18623,7 +18635,7 @@ async function awardConstructionArcadeReward(event, source = "") {
       return { ...grant, committed: true, arcadePartsAwarded: maintenance.granted };
     });
     if (result?.committed) {
-      try { refreshUfoArcadeDailyNotices(); toast("建築セット +" + result.boxes + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("catcher", getUfoArcadeDailyStatus("catcher", true))); } catch {}
+      try { refreshUfoArcadeDailyNotices(); toast("航海パーツ +1こ / 建築セット +" + result.boxes + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("catcher", getUfoArcadeDailyStatus("catcher", true))); } catch {}
     }
     return result;
   });
@@ -18669,9 +18681,10 @@ window.addEventListener("storage", event => {
     try {
       const remoteState = JSON.parse(event.newValue);
       const reconciled = constructionSaveGuard.prepare(state, remoteState);
-      state.constructionRewardLedger = reconciled.constructionRewardLedger;
-      state.constructionMaterialLedger = reconciled.constructionMaterialLedger;
+      constructionSaveGuard.adopt(state, reconciled);
       constructionSaveGuard.remember(remoteState);
+      homeAutoSavedRaw=event.newValue;
+      if(homeAutoReady) { renderItemGuide(); renderHud(); }
       if (document.querySelector("#townWorkshop [data-construction-pack-open-form]")) renderTownWorkshop();
     } catch (error) { console.warn("他のタブの建築報酬台帳を読み込めません。", error); }
   }
@@ -18756,7 +18769,7 @@ function awardUfoWorkshopCoinPusherExchange(exchange) {
   const status = getUfoArcadeDailyStatus("pachicoin", true);
   // A log/render failure must never turn an already committed exchange into a retry.
   try {
-    addLog(`ゲームセンター景品交換：もちコイン350枚 → 整備パーツ2個＋建築セット3箱（未開封合計${constructionGrant.ledger.unopenedBoxes}箱）`
+    addLog(`ゲームセンター景品交換：航海パーツ +2こ / もちコイン350枚 → 整備パーツ2個＋建築セット3箱（未開封合計${constructionGrant.ledger.unopenedBoxes}箱）`
       + (status.reached ? "。" + ufoArcadeDailyMessage("pachicoin", status) : ""));
     saveState();
     refreshUfoArcadeDailyNotices();
@@ -19013,15 +19026,15 @@ const monsterNicknameMaxLength = 12;
 var homeAutoSave=null,homeAutoSavedRaw=null,homeAutoSavedView='',homeAutoReady=false;
 const state = loadState();
 const savedHomeResume=state.autoResume;
-constructionSaveGuard.remember(state);
+constructionSaveGuard.remember(loadState.lastRead ?? state, {persisted:loadState.lastRead !== undefined});
+delete loadState.lastRead;
 normalizeState();
 // A pending journal owns the saved snapshot until recovery finishes under its lock.
 if (localStorage.getItem(ufoArcadeRewardJournalKey)) {
   withUfoArcadeRewardLock(() => {
     const saved = JSON.parse(localStorage.getItem(storeKey));
     const reconciled = constructionSaveGuard.prepare(state, saved);
-    state.constructionRewardLedger = reconciled.constructionRewardLedger;
-    state.constructionMaterialLedger = reconciled.constructionMaterialLedger;
+    constructionSaveGuard.adopt(state, reconciled);
     constructionSaveGuard.remember(saved);
     saveState();
   }).catch(error => { console.error("建築保存の復旧を保留しました。", error); });
@@ -19820,7 +19833,8 @@ const supportItems = [
   { id: "river-shell", name: "水辺の小貝", type: "進化", mark: "水", color: "#62c9d7", sub: "自然 +2 / 空 +2", text: "水辺系の安定感を育てる小貝。偏りすぎを整える。", use: "river" },
   { id: "focus-ramune", name: "集中ラムネ", type: "大会", mark: "集", color: "#8ab6ff", sub: "次の大会だけ命中 +10", text: "試合前に気持ちを整えるラムネ。試合にしっかり効く大会用。", use: "battleAcc" },
   { id: "guard-tape", name: "まもりテープ", type: "大会", mark: "守", color: "#9fc7a0", sub: "次の大会だけ防御 +10", text: "装備を整えるテープ。受けるダメージを抑える大会用。", use: "battleDef" },
-  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。先手の流れを作る大会用。", use: "battleSpd" }
+  { id: "wind-pin", name: "追い風ピン", type: "大会", mark: "風", color: "#78d5e8", sub: "次の大会だけすばやさ +10", text: "胸につける小さなピン。先手の流れを作る大会用。", use: "battleSpd" },
+  ...window.ImasoraIslandFruits.items
 ];
 const evolutionPlan = [
   { stage: "タネ期", count: 7, branch: "7つのタネから始まる", tone: "小さく不思議。どれを育てるか選ぶ入口。" },
@@ -41159,6 +41173,7 @@ function defaultState() {
     comboDex: [],
     cups: [],
     inventory: [],
+    inventoryPending: [],
     itemEffects: { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} },
     dailyItemUses: { date: "", used: [] },
     tournamentEntries: [],
@@ -41198,7 +41213,8 @@ function defaultState() {
   };
 }
 function loadState() {
-  return { ...defaultState(), ...window.ImasoraHomeSaveAccess.readState(localStorage, storeKey) };
+  loadState.lastRead = window.ImasoraHomeSaveAccess.readState(localStorage, storeKey);
+  return { ...defaultState(), ...loadState.lastRead };
 }
 function saveState() {
   try {
@@ -41211,14 +41227,13 @@ function saveState() {
     const next = constructionSaveGuard.prepare(state, saved);
     const encoded=JSON.stringify(next);
     localStorage.setItem(storeKey, encoded);homeAutoSavedRaw=encoded;
-    state.constructionRewardLedger = next.constructionRewardLedger;
-    state.constructionMaterialLedger = next.constructionMaterialLedger;
+    constructionSaveGuard.adopt(state, next);
     constructionSaveGuard.remember(next);homeAutoSavedView=JSON.stringify(state);
   } catch (error) {
     if (error.homeSaveBlocked) window.ImasoraHomeSaveAccess.protect(error);
     if (error.constructionSaveConflict) {
-      console.error("建築台帳の上書きを防ぐため保存を保留しました。", error);
-      try { toast("別画面の建築保存と競合しています。この画面を閉じずに、先に進めた画面の保存を確認してください。"); } catch {}
+      console.error("別画面の冒険を守るため保存を保留しました。", error);
+      try { toast("別の画面でも冒険が進んでいます。両方の画面を残して、進めた内容を確認してください。"); } catch {}
     }
     throw error;
   }
@@ -41311,7 +41326,7 @@ function normalizeState() {
   resetDailyMapProgressIfNeeded();
   state.comboDex = Array.isArray(state.comboDex) ? state.comboDex : [];
   state.cups = Array.isArray(state.cups) ? state.cups : [];
-  state.inventory = Array.isArray(state.inventory) ? state.inventory : [];
+  window.ImasoraHomeInventory.normalize(state);
   if ("town" in state) delete state.town;
   state.itemEffects = state.itemEffects && typeof state.itemEffects === "object" ? state.itemEffects : { walkXp: 0, walkCoin: 0, battle: {} };
   state.itemEffects.walkXp = Math.max(0, Number(state.itemEffects.walkXp || 0));
@@ -44075,7 +44090,7 @@ function markSideQuestDone(id) {
   if (!state.sideQuest.done.includes(id)) state.sideQuest.done.push(id);
 }
 function sideQuestRewardItem(itemId) {
-  if (itemId === "random") return supportItems[Math.floor(Math.random() * supportItems.length)] || supportItems[0];
+  if (itemId === "random") { const common = supportItems.filter(item => !item.islandOnly); return common[Math.floor(Math.random() * common.length)] || common[0]; }
   return supportItems.find(item => item.id === itemId) || supportItems[0];
 }
 function sideQuestRewardLabel(itemId) {
@@ -44084,8 +44099,7 @@ function sideQuestRewardLabel(itemId) {
 }
 function addSideQuestItem(itemId) {
   const reward = sideQuestRewardItem(itemId);
-  state.inventory.unshift({ id: reward.id, at: Date.now(), reason: "今日のお仕事" });
-  state.inventory = state.inventory.slice(0, 40);
+  window.ImasoraHomeInventory.receive(state, [{ id: reward.id, at: Date.now(), reason: "今日のお仕事" }]);
   return reward;
 }
 function renderUserMenu() {
@@ -44248,6 +44262,13 @@ function renderNewOpeningScreen() {
 }
 function scheduleNewOpeningScreenReveal() {
   const opening = document.getElementById("newOpeningScreen");
+  if(['sliding-tag','sky-camera'].includes(new URLSearchParams(location.search).get('from'))) {
+    document.body.classList.remove('loading-screen-active','new-opening-active');
+    if(opening)opening.hidden=true;
+    switchScreen('monster');
+    requestAnimationFrame(()=>document.querySelector('[data-screen="monster"]')?.scrollIntoView({block:'start'}));
+    return;
+  }
   if (["construction-return", "coast-return"].includes(new URLSearchParams(location.search).get("arrival"))) {
     document.body.classList.remove("loading-screen-active", "new-opening-active");
     if (opening) opening.hidden = true;
@@ -44902,8 +44923,7 @@ function moveTownLandRouteCursor(direction) {
 function chooseTownLandRoute(destination) {
   townLandRouteOpen = false;
   if (destination === "land") {
-    saveState();
-    window.location.assign(townConstructionWorldUrl());
+    void leaveHomeFor(townConstructionWorldUrl);
     return;
   }
   renderTown();
@@ -45737,6 +45757,7 @@ function renderTownShop() {
         const boughtCount = purchases.filter(entry => entry.id === item.id).length;
         const soldOut = boughtCount >= buyLimit;
         const canBuy = state.coin >= cost && !soldOut;
+        const pending = typeof isHomeItemActionPending === "function" && isHomeItemActionPending("buy:"+item.id);
         return `<div class="shop-card ${soldOut ? "locked" : ""}" style="--item-color:${item.color}">
           ${itemArt(item)}
           <div>
@@ -45744,7 +45765,7 @@ function renderTownShop() {
             <span>${item.text}</span>
             <small>${item.sub} / ${cost} Coin / 本日 ${boughtCount}/${buyLimit}</small>
           </div>
-          <button type="button" data-shop-buy="${item.id}" ${canBuy ? "" : "disabled"}>${soldOut ? "売り切れ" : state.coin < cost ? "Coin不足" : "買う"}</button>
+          <button type="button" data-shop-buy="${item.id}" data-home-action-ready="${canBuy}" aria-busy="${pending}" ${canBuy && !pending ? "" : "disabled"}>${soldOut ? "売り切れ" : state.coin < cost ? "Coin不足" : "買う"}</button>
         </div>`;
       }).join("")}
     </div>`;
@@ -45835,7 +45856,7 @@ let imasoraCompanionCatcherModulePromise = null;
 function ensureImasoraCompanionCatcherLoaded() {
   if (window.ImasoraCompanionCatcher) return Promise.resolve(window.ImasoraCompanionCatcher);
   if (!imasoraCompanionCatcherModulePromise) {
-  imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=120er")
+  imasoraCompanionCatcherModulePromise = import("./assets/imasora-companion-catcher.js?v=120qq")
       .then(() => {
         if (!window.ImasoraCompanionCatcher) throw new Error("3D catcher module did not initialize");
         return window.ImasoraCompanionCatcher;
@@ -45897,7 +45918,7 @@ let imasoraTriLinkModulePromise = null;
 function ensureImasoraTriLinkLoaded() {
   if (window.ImasoraTriLink) return Promise.resolve(window.ImasoraTriLink);
   if (!imasoraTriLinkModulePromise) {
-    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=120er")
+    imasoraTriLinkModulePromise = import("./assets/imasora-tri-link.js?v=120qq")
       .then(() => {
         if (!window.ImasoraTriLink) throw new Error("Tri-Link module did not initialize");
         return window.ImasoraTriLink;
@@ -46199,8 +46220,7 @@ function saveImasoraTriLinkMemory(memory) {
       });
       if (!grant.granted && grant.status !== "duplicate") return grant;
       if (existing && grant.status === "duplicate") {
-        state.triLinkMemories = current;
-        state.constructionRewardLedger = grant.ledger;
+        constructionSaveGuard.adopt(state, {...saved, triLinkMemories:current, constructionRewardLedger:grant.ledger});
         constructionSaveGuard.remember(saved);
         return { status: "duplicate", committed: true, constructionRewardBoxesAwarded: 0 };
       }
@@ -46211,13 +46231,13 @@ function saveImasoraTriLinkMemory(memory) {
       const next = { ...saved, constructionRewardLedger: grant.ledger, triLinkMemories: memories };
       commitUfoArcadeJournaledEntries([...maintenance.entries, [storeKey, JSON.stringify(next)]], "roll-forward");
       state.triLinkMemories = memories;
-      return { status: grant.status, committed: true, constructionRewardBoxesAwarded: boxes, arcadePartsAwarded: maintenance.granted };
+      return { status: grant.status, committed: true, constructionRewardBoxesAwarded: boxes, nauticalPartsAwarded: grant.sailingParts||0, arcadePartsAwarded: maintenance.granted };
     });
     if (result?.committed) {
       try { window.dispatchEvent(new CustomEvent("imasora-arcade-reward-saved", { detail: { id: "triLink:" + record.id, summary: result } })); } catch {}
     }
     if (result?.committed && result.constructionRewardBoxesAwarded) {
-      try { refreshUfoArcadeDailyNotices(); toast("対戦報酬：建築セット +" + result.constructionRewardBoxesAwarded + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("triLink", getUfoArcadeDailyStatus("triLink", true))); } catch {}
+      try { refreshUfoArcadeDailyNotices(); toast("対戦報酬："+(result.nauticalPartsAwarded ? "航海パーツ +"+result.nauticalPartsAwarded+"こ / " : "")+"建築セット +" + result.constructionRewardBoxesAwarded + "箱" + (result.arcadePartsAwarded ? " / 整備パーツ +" + result.arcadePartsAwarded + "個" : "") + "。" + ufoArcadeDailyMessage("triLink", getUfoArcadeDailyStatus("triLink", true))); } catch {}
     }
     return result;
   });
@@ -49769,30 +49789,28 @@ function startRetireParkPracticeBattleFromReady(skipResult = false) {
 }
 function buyShopItem(itemId) {
   const item = dailyShopItems().find(entry => entry.id === itemId);
-  if (!item) return;
+  if (!item) return Promise.resolve(false);
+  const offer = { date: todayKey(), cost: itemCost(item) };
+  return runHomeItemAction('buy:'+itemId, () => buyShopItemLocked(itemId, offer));
+}
+function buyShopItemLocked(itemId, offer) {
+  const item = dailyShopItems().find(entry => entry.id === itemId);
+  if (!item || todayKey() !== offer.date || itemCost(item) !== offer.cost) return {changed:false,message:"お店の品ぞろえが変わったよ。もう一度えらんでね。"};
   const purchases = todayShopPurchases();
   const cost = itemCost(item);
   const boughtCount = purchases.filter(entry => entry.id === item.id).length;
   if (boughtCount >= 3) {
-    playSfx("error");
-    toast(`${item.name}は売り切れです`);
-    return;
+    return {changed:false,message:`${item.name}は売り切れです`};
   }
   if (state.coin < cost) {
-    playSfx("error");
-    toast("Coinが足りません");
-    return;
+    return {changed:false,message:"Coinが足りません"};
   }
+  window.ImasoraHomeInventory.receive(state, [{ id: item.id, at: Date.now(), reason: "アイテムショップ" }]);
   state.coin -= cost;
-  state.inventory.unshift({ id: item.id, at: Date.now(), reason: "アイテムショップ" });
-  state.inventory = state.inventory.slice(0, 40);
   state.shopPurchases.unshift({ date: todayKey(), id: item.id, cost });
   state.shopPurchases = state.shopPurchases.slice(0, 20);
   addLog(`アイテムショップ: ${item.name}を${cost} Coinで購入。`);
-  saveState();
-  renderAll();
-  if (!playAudioSfx(shopPurchaseSfxFileKey, 0, .95)) playSfx("itemGet");
-  toast(`${item.name}を購入`);
+  return {changed:true,purchase:true,sound:"itemGet",message:`${item.name}を購入`};
 }
 function openTownShopFromItems() {
   switchScreen("town", "shop");
@@ -49892,8 +49910,7 @@ function renderTownWorkshop() {
     refreshConstructionPackPreview();
   }
   document.querySelector("#townWorkshop [data-pack-delivery-go]")?.addEventListener("click", () => {
-    try { saveState(); window.location.assign(townConstructionWorldUrl()); }
-    catch { toast("街のセーブが終わってから、もう一度お試しください。"); }
+    void leaveHomeFor(townConstructionWorldUrl);
   });
 }
 function spendTownBuildingMaterials(id) {
@@ -49930,6 +49947,14 @@ function renderStamps() {
       <span>${name}</span>
     </div>
   `).join("");
+}
+function startSlidingTag(event) {
+  event?.preventDefault();
+  return leaveHomeFor(() => {
+    const profile=monsterProfile(),growth=growthForecast(),art=currentCompanionArtItem(profile,growth),colors=companionColorSettings();
+    window.ImasoraSlidingTagEntry.open({state,session:sessionStorage,now:Date.now(),id:'tag-entry-'+Array.from(crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16)).join('-'),descriptor:{name:companionDisplayName(profile),artId:art.id,stage:currentCompanionStageKey(profile),handColor:colors.handColor,footColor:colors.footColor,homePath:new URL('./life-quest-walk.html',location.href).pathname}});
+    return new URL('./imasora-sliding-tag-preview.html?from=home',location.href).href;
+  }, { resumeScreen: 'monster' });
 }
 function monsterProfile() {
   const m = state.monster;
@@ -50115,6 +50140,7 @@ const evolutionStageRules = [
   { stage: "開花期", minXp: 35 },
   { stage: "満開期", minXp: 65 }
 ];
+const monsterGrowthRules=window.ImasoraMonsterGrowth.createRules({stages:evolutionStageRules,minimumExtensions:3});
 function retirementBaseHours() {
   return 72;
 }
@@ -50162,7 +50188,7 @@ function extendRetirementByItem() {
   return true;
 }
 function canEvolveToStar() {
-  return Number(state.monster.lifeExtensionUses || 0) >= 3;
+  return window.ImasoraMonsterGrowth.canMature(state.monster,3);
 }
 function forceEvolutionStage(stageIndex) {
   const next = Math.max(0, Math.min(4, Number(stageIndex || 0)));
@@ -50210,6 +50236,7 @@ function mapStepsPerTile() {
   return 50;
 }
 function evolveOnMapTile(reason = "進化マス") {
+  const plan=monsterGrowthRules.plan(state.monster);
   const current = Number(state.monster.evolutionStage || 0);
   if (current >= 4) {
     state.monster.xp += 2;
@@ -50217,14 +50244,14 @@ function evolveOnMapTile(reason = "進化マス") {
     addLog(`${reason}: 満開期のためこれ以上の進化はなく、相棒経験値 +2 / Coin +2を獲得。`);
     return { ok: true, text: "満開期ボーナス 相棒経験値 +2 / Coin +2", stageName: "満開期" };
   }
-  if (current === 3 && !canEvolveToStar()) {
+  if (plan.status === "needs-rest") {
     return { ok: false, text: "満開期へ進むには、引退時期を延ばすアイテムを最低3回使う必要があります。" };
   }
   const beforeGrowth = growthForecast();
   const beforeProfile = monsterProfile();
   const beforeName = companionSpeciesName(beforeProfile, beforeGrowth);
   const beforeArt = companionArtHtml(beforeProfile, beforeGrowth);
-  forceEvolutionStage(current + 1);
+  monsterGrowthRules.apply(state.monster,plan);
   const afterGrowth = growthForecast();
   const afterProfile = monsterProfile();
   const afterName = companionSpeciesName(afterProfile, afterGrowth);
@@ -50245,10 +50272,9 @@ function mapTileForPosition(position = state.position) {
   return { ...terrain, type: "walk" };
 }
 function giveMapTreasureItem() {
-  const pool = supportItems;
+  const pool = supportItems.filter(item => !item.islandOnly);
   const item = pool[Math.floor(Math.random() * pool.length)] || supportItems[0];
-  state.inventory.unshift({ id: item.id, at: Date.now(), reason: "宝箱マス" });
-  state.inventory = state.inventory.slice(0, 40);
+  window.ImasoraHomeInventory.receive(state, [{ id: item.id, at: Date.now(), reason: "宝箱マス" }]);
   return item;
 }
 function addMapStamp(mark, name) {
@@ -50270,6 +50296,11 @@ function grantSummonSeedReward(reason = "召喚マス", context = {}) {
 }
 function applyMapTileReward(position = state.position, source = "散歩") {
   const tile = mapTileForPosition(position);
+  if(position>0 && position%25===0 && ["歩数計","イマソラ認識"].includes(source)) {
+    const grant=window.ImasoraConstructionRewardLedger.awardWalkCheckpoint(state.constructionRewardLedger,{dayKey:mapActiveDayKey(),position,source});
+    state.constructionRewardLedger=grant.ledger;
+    if(grant.granted){addLog("25マス到達！ 航海パーツ +"+grant.sailingParts+"こ。海岸のいかだ増強工房で使えます。");return{title:"25マス到達！",text:"航海パーツ +"+grant.sailingParts+"こ",mark:"舟"};}
+  }
   if (tile.type === "treasure") {
     const item = giveMapTreasureItem();
     addMapStamp("宝", "宝箱");
@@ -50313,7 +50344,7 @@ function applyMapTileReward(position = state.position, source = "散歩") {
       });
       state.constructionRewardLedger = grant.ledger;
       if (grant.granted) {
-        constructionPackText = `建築セット +1箱（未開封 ${grant.ledger.unopenedBoxes}箱）${grant.toolkitGranted ? " / 基本道具一式の受取権を獲得（建材受取所で受け取れます）" : ""}`;
+        constructionPackText = `${grant.sailingParts ? "航海パーツ +"+grant.sailingParts+"こ / " : ""}建築セット +1箱（未開封 ${grant.ledger.unopenedBoxes}箱）${grant.toolkitGranted ? " / 基本道具一式の受取権を獲得（建材受取所で受け取れます）" : ""}`;
       }
     }
     addLog(`${source}: ${tile.name}を通過。${reward.text}を獲得。${constructionPackText ? ` ${constructionPackText}。` : ""}`);
@@ -50367,7 +50398,7 @@ function advanceMap(count = 1, source = "散歩") {
   return { latestReward, moved, stoppedForSky };
 }
 function supportItemPool(reason = "", bias = "") {
-  const allowed = supportItems;
+  const allowed = supportItems.filter(item => !item.islandOnly);
   const typeWeights = {
     "散歩発見": { "散歩": 4, "育成": 2, "進化": 2, "大会": 1, "引退": 1 }
   };
@@ -50386,8 +50417,7 @@ function supportItemPool(reason = "", bias = "") {
 function giveSupportItem(reason = "", bias = "") {
   const pool = supportItemPool(reason, bias);
   const item = pool[Math.floor(Math.random() * pool.length)] || supportItems[0];
-  state.inventory.unshift({ id: item.id, at: Date.now(), reason });
-  state.inventory = state.inventory.slice(0, 40);
+  window.ImasoraHomeInventory.receive(state, [{ id: item.id, at: Date.now(), reason }]);
   return item;
 }
 function autoEnterGrandChampion() {
@@ -52897,6 +52927,9 @@ function saveNickname() {
   toast(name ? "名前を保存" : "名前を空にしました");
 }
 function renderBattleStage(profile, lifeRemain = 1) {
+  const savedResult = currentTournamentResult();
+  if (savedResult && document.getElementById('battleField')?.dataset?.tournamentResultKey === JSON.stringify([savedResult.cupId,savedResult.enteredAt,savedResult.index])) return;
+  if (savedResult) { presentTournamentBattle(savedResult); return; }
   const field = document.getElementById("battleField");
   const log = document.getElementById("battleLog");
   field.classList.remove("attack", "lose");
@@ -52924,7 +52957,7 @@ function renderBattleStage(profile, lifeRemain = 1) {
   const readyTotal = readyCup ? tournamentMatchCount(readyCup) : 2;
   const readyMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), readyTotal - 1));
   const readyMatchLabel = readyMatchIndex >= readyTotal - 1 ? "決勝" : "予選";
-  const readyOpponent = readyCup ? tournamentOpponentForMatch(readyCup, readyMatchIndex, readyTotal, readyPlayerName) : null;
+  const readyOpponent = readyCup ? tournamentOpponentForMatch(readyCup, readyMatchIndex, readyTotal, readyPlayerName, false) : null;
   const readyEnemyName = readyOpponent?.name || (readyCup ? tournamentEnemyMonsterName(readyCup, readyPlayerName) : "大会相手");
   const readyStrategy = state.pendingBattle.strategy || state.battleStrategy || "balanced";
   const readyBaseStats = state.pendingBattle.battleStats || tournamentBattleBaseStats(monsterStats(), readyStrategy, state.itemEffects.battle);
@@ -52935,8 +52968,8 @@ function renderBattleStage(profile, lifeRemain = 1) {
   field.innerHTML = `
     <div class="battle-hud">
       <div class="battle-action-stack">
-        <button class="battle-watch-btn" type="button" onclick="startTournamentBattleFromReady(false)">${readyMatchLabel}試合を観戦する</button>
-        <button class="battle-skip-btn" type="button" onclick="startTournamentBattleFromReady(true)">すぐに結果を見る</button>
+        <button class="battle-watch-btn" type="button" ${tournamentBattleButtonAttributes()} onclick="startTournamentBattleFromReady(false)">${readyMatchLabel}試合を観戦する</button>
+        <button class="battle-skip-btn" type="button" ${tournamentBattleButtonAttributes()} onclick="startTournamentBattleFromReady(true)">すぐに結果を見る</button>
       </div>
     </div>
     <div class="fighter opening-fighter player" id="myFighter">${tournamentPlayerOpeningFighterHtml(profile, readyPlayerStats)}</div>
@@ -53123,7 +53156,7 @@ function tournamentOpponentName(name, playerName = "") {
 }
 function tournamentOpponentSeed(cup, index, playerName = "") {
   const pending = state.pendingBattle || {};
-  return `${cup?.id || "cup"}-${pending.enteredAt || Date.now()}-${entryPeriod(cup)}-${index}-${playerName}`;
+  return `${cup?.id || "cup"}-${pending.enteredAt || Date.now()}-${pending.period || entryPeriod(cup)}-${index}-${playerName}`;
 }
 function pickTournamentOpponentItem(stage, seedText, usedIds = new Set()) {
   const pool = tournamentOpponentItems(stage);
@@ -53142,7 +53175,7 @@ function createTournamentOpponent(cup, index, total, playerName = "", usedIds = 
   const name = tournamentOpponentName(item?.name || cup?.enemy || "大会相手", playerName);
   return { id: item?.id || "", name, baseName: item?.name || name, stage };
 }
-function ensureTournamentOpponents(cup, playerName = "", total = tournamentMatchCount(cup)) {
+function ensureTournamentOpponents(cup, playerName = "", total = tournamentMatchCount(cup), persist = true) {
   if (!state.pendingBattle) return [];
   const existing = Array.isArray(state.pendingBattle.opponents) ? state.pendingBattle.opponents : [];
   const usedIds = new Set(existing.map(item => item?.id).filter(Boolean));
@@ -53158,11 +53191,11 @@ function ensureTournamentOpponents(cup, playerName = "", total = tournamentMatch
     }
     opponents.push(createTournamentOpponent(cup, index, total, playerName, usedIds));
   }
-  state.pendingBattle.opponents = opponents;
+  if (persist) state.pendingBattle.opponents = opponents;
   return opponents;
 }
-function tournamentOpponentForMatch(cup, index = 0, total = tournamentMatchCount(cup), playerName = "") {
-  const opponents = ensureTournamentOpponents(cup, playerName, total);
+function tournamentOpponentForMatch(cup, index = 0, total = tournamentMatchCount(cup), playerName = "", persist = true) {
+  const opponents = ensureTournamentOpponents(cup, playerName, total, persist);
   return opponents[index] || createTournamentOpponent(cup, index, total, playerName, new Set());
 }
 function normalizeTournamentOpponent(opponentOrName, cup) {
@@ -53296,7 +53329,7 @@ function renderEntryStatus() {
     <b>${selected.name}に参加しますか？</b>
     <p>${unavailableText || `最大${selected.matchCount || 2}試合の大会です。参加確認後、大会前の作戦を決めてからオープニングへ進みます。`}</p>
     <div class="actions tournament-confirm-actions">
-      <button class="primary" id="confirmTournamentBtn" type="button" data-cup="${selected.id}" onclick="confirmTournamentParticipation(this.dataset.cup)" ${retirementReady ? "disabled" : ""}>${retirementReady ? "大会×" : "はい"}</button>
+      <button class="primary" id="confirmTournamentBtn" type="button" data-cup="${selected.id}" onclick="confirmTournamentParticipation(this.dataset.cup)" data-home-action-key="tournament-entry" data-home-action-ready="${!retirementReady}" aria-busy="${isHomeItemActionPending('tournament-entry')}" ${retirementReady || isHomeItemActionPending('tournament-entry') ? "disabled" : ""}>${retirementReady ? "大会×" : "はい"}</button>
       <button class="quiet" id="cancelTournamentBtn" type="button" onclick="cancelTournamentParticipation()">いいえ</button>
     </div>`;
   const balanceRoom = document.getElementById("balanceRoom");
@@ -53386,52 +53419,7 @@ function runBalanceSimulation(cup) {
   playSfx("select");
 }
 function enterTournament() {
-  const cup = tournaments.find(item => item.id === selectedCup) || tournaments[0];
-  const clearedFour = hasGrandQualification();
-  const isMajor = fourMajorCupIds().includes(cup.id);
-  const playtestBypass = isTournamentPlaytestBypass();
-  if (isRetirementReady()) {
-    playSfx("error");
-    toast("引退準備中は大会に出場できません");
-    return;
-  }
-  if (!canEnterTournament()) {
-    playSfx("error");
-    toast("タネ期・新芽期・青葉期は戦闘なし");
-    return;
-  }
-  if (!playtestBypass && cup.id === "grand" && !clearedFour) {
-    playSfx("error");
-    toast("四大杯4つ制覇で解放");
-    return;
-  }
-  if (!playtestBypass && cup.id === "grand" && state.grandEntryUsed) {
-    playSfx("error");
-    toast("GC杯は1回限り");
-    return;
-  }
-  if (!playtestBypass && isMajor && fourMajorTicketCount() <= 0) {
-    playSfx("error");
-    toast("四大大会参加券が必要");
-    return;
-  }
-  if (!playtestBypass && isMajor) state.mapTickets.major4 = Math.max(0, fourMajorTicketCount() - 1);
-  if (!playtestBypass && cup.id === "grand") state.grandEntryUsed = true;
-  state.pendingBattle = {
-    cupId: cup.id,
-    enteredAt: Date.now(),
-    period: entryPeriod(cup),
-    strategy: state.battleStrategy || "balanced",
-    currentMatch: 0,
-    completedMatches: [],
-    playtest: playtestBypass
-  };
-  state.tournamentEntries.push({ cupId: cup.id, period: entryPeriod(cup), at: Date.now(), strategy: state.battleStrategy || "balanced", playtest: playtestBypass });
-  addLog(`${cup.name}に${strategyName(state.battleStrategy)}作戦で参加準備した。${playtestBypass ? "開発確認モードのため出場条件と参加券消費は無視。" : isMajor ? "四大大会参加券を1枚使用。" : cup.id === "grand" ? "グランドチャンピオン杯の1回出場を使用。" : ""}結果はあとから確認できます。`);
-  playSfx("entry");
-  saveState();
-  renderTournament();
-  toast("参加準備完了");
+  return requestTournamentEntry(selectedCup, false);
 }
 function directionDesignItem(profile, useProfileName = true) {
   const allItems = monsterDexGroups.flatMap(group => group.list || []);
@@ -53635,18 +53623,19 @@ function dexCharacterArt(entry, open) {
   }
   return `<div class="item-art item-art-${item.id}" style="--item-color:${item.color}" aria-label="${item.name}"><i></i><em></em><span></span></div>`;
 }function itemCounts() {
-  return state.inventory.reduce((map, item) => {
-    map[item.id] = (map[item.id] || 0) + 1;
-    return map;
-  }, {});
+  const islandItems = window.ImasoraIslandItems?.normalize(state.constructionRewardLedger?.islandVoyageItems ?? state.islandVoyageItems).items || {};
+  const counts = Object.assign(Object.create(null), islandItems);
+  for (const [id,n] of Object.entries(window.ImasoraHomeInventory.counts(state))) counts[id] = (counts[id] || 0) + n;
+  return counts;
 }
 function removeInventoryItem(itemId) {
-  const index = state.inventory.findIndex(item => item.id === itemId);
-  if (index < 0) return false;
-  state.inventory.splice(index, 1);
-  return true;
+  if (window.ImasoraIslandItems) {
+    const result = window.ImasoraIslandItems.take(state.constructionRewardLedger?.islandVoyageItems ?? state.islandVoyageItems, itemId);
+    if (result.used) { state.constructionRewardLedger = { ...state.constructionRewardLedger, islandVoyageItems:result.stock }; return true; }
+  }
+  return window.ImasoraHomeInventory.take(state, itemId);
 }
-const dailyLimitedItemIds = ["walk-shoes", "map-snack", "growth-seed", "leaf-compass", "sky-feather", "river-shell", "focus-ramune"];
+const dailyLimitedItemIds = ["walk-shoes", "map-snack", "growth-seed", "leaf-compass", "sky-feather", "river-shell", "focus-ramune", ...window.ImasoraIslandFruits.items.map(item => item.id)];
 function ensureDailyItemState() {
   state.dailyItemUses = state.dailyItemUses && typeof state.dailyItemUses === "object" ? state.dailyItemUses : { date: "", used: [] };
   if (state.dailyItemUses.date !== todayKey()) state.dailyItemUses = { date: todayKey(), used: [] };
@@ -53682,21 +53671,19 @@ function pendingItemEffectText() {
   return notes;
 }
 function useSupportItem(itemId) {
+  return runHomeItemAction('use:'+itemId, () => useSupportItemLocked(itemId));
+}
+function useSupportItemLocked(itemId) {
   const item = supportItems.find(entry => entry.id === itemId);
+  if (!item) return {changed:false,message:"アイテムがありません"};
   if (isRetirementReady() && !isRetirementExtensionItem(item)) {
-    playSfx("error");
-    toast("引退準備中は引退延期アイテムだけ使えます");
-    return;
+    return {changed:false,message:"引退準備中は引退延期アイテムだけ使えます"};
   }
   if (isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id)) {
-    playSfx("error");
-    toast(`${item.name}は今日は使用済みです`);
-    return;
+    return {changed:false,message:`${item.name}は今日は使用済みです`};
   }
   if (!item || !removeInventoryItem(itemId)) {
-    playSfx("error");
-    toast("アイテムがありません");
-    return;
+    return {changed:false,message:"アイテムがありません"};
   }
   state.itemEffects = state.itemEffects || { walkXp: 0, walkCoin: 0, daily: { date: "", walkXp: 0, walkCoin: 0 }, battle: {} };
   ensureDailyItemState();
@@ -53711,6 +53698,9 @@ function useSupportItem(itemId) {
     state.monster.xp += 2;
     immediateResult = `${item.name}: 相棒経験値 +2`;
   }
+  if (item.use === "fruitXp") { state.monster.xp += 3; immediateResult = `${item.name}: 相棒経験値 +3`; }
+  if (item.use === "fruitWalk") state.itemEffects.walkCoin = (state.itemEffects.walkCoin || 0) + 8;
+  if (item.use === "goldenFruit") { state.monster.xp += 10; state.itemEffects.walkCoin = (state.itemEffects.walkCoin || 0) + 20; state.itemEffects.battle.def = (state.itemEffects.battle.def || 0) + 10; immediateResult = `${item.name}: 相棒経験値 +10`; }
   if (item.use === "rest") {
     state.monster.xp += 1;
     if (extendRetirementByItem()) {
@@ -53760,10 +53750,7 @@ function useSupportItem(itemId) {
   if (isDailyLimitedItem(item)) markDailyItemUsed(item.id);
   markSideQuestDone("item-use");
   addLog(`アイテム使用: ${item.name}。${message}`);
-  saveState();
-  renderAll();
-  playSfx("itemUse");
-  toast(`${item.name}を使った`);
+  return {changed:true,sound:"itemUse",message:`${item.name}を使った`};
 }
 function renderItemGuide() {
   const box = document.getElementById("itemBox");
@@ -53778,7 +53765,7 @@ function renderItemGuide() {
     "引退": "引退までの時間を少し整える。能力値の大幅上乗せには使いません。"
   };
   const categories = ["散歩", "育成", "進化", "大会", "引退"];
-  const totalOwned = state.inventory.length;
+  const totalOwned = Object.values(counts).reduce((total, n) => total + n, 0);
   const pendingNotes = pendingItemEffectText();
   const immediateResultText = state.lastImmediateItemResult?.date === todayKey() ? String(state.lastImmediateItemResult.text || "") : "";
   const tab = selectedItemGuideTab === "dex" ? "dex" : "inventory";
@@ -53805,7 +53792,8 @@ function renderItemGuide() {
     const blockedByRetirement = retirementReady && !isRetirementExtensionItem(item);
     const usedToday = isDailyLimitedItem(item) && hasUsedDailyItemToday(item.id);
     const canUse = mode === "inventory" && owned && !blockedByRetirement && !usedToday;
-    const status = blockedByRetirement && owned ? "引退準備中は使用×" : usedToday && owned ? `今日は使用済み / x${count}` : owned ? `x${count}` : "未所持";
+    const pending = typeof isHomeItemActionPending === "function" && isHomeItemActionPending("use:"+item.id);
+    const status = blockedByRetirement && owned ? `引退準備中は使用× / x${count}` : usedToday && owned ? `今日は使用済み / x${count}` : owned ? `x${count}` : "未所持";
     const itemText = item.id === "nap-blanket"
       ? `ゆっくり休める毛布。引退延期アイテムであるひだまりの毛布の使用は、モンスターごとに最大5回まで(${state.monster.lifeExtensionUses || 0}/5)。`
       : item.text;
@@ -53818,7 +53806,7 @@ function renderItemGuide() {
         <div class="item-entry-actions">
           <i class="item-count-label">所持数</i>
           <small>${status}</small>
-          ${mode === "inventory" ? `<button class="item-use-btn" type="button" data-item-use="${item.id}" ${canUse ? "" : "disabled"}>${blockedByRetirement && owned ? "×" : usedToday && owned ? "済" : "使う"}</button>` : `<button class="item-use-btn" type="button" disabled>${owned ? "所持中" : "未所持"}</button>`}
+          ${mode === "inventory" ? `<button class="item-use-btn" type="button" data-item-use="${item.id}" data-home-action-ready="${Boolean(canUse)}" aria-busy="${pending}" ${canUse && !pending ? "" : "disabled"}>${blockedByRetirement && owned ? "×" : usedToday && owned ? "済" : "使う"}</button>` : `<button class="item-use-btn" type="button" disabled>${owned ? "所持中" : "未所持"}</button>`}
         </div>
       </div>
     </div>`;
@@ -53841,7 +53829,7 @@ function renderItemGuide() {
   box.className = "item-guide";
   box.innerHTML = `
     <div class="item-guide-head">
-      ${tab === "inventory" ? `もちものには、今持っている道具だけを表示します。持ち物 ${totalOwned}個。` : `道具図鑑では、未所持を含めて道具の種類と効果を確認できます。使う操作はもちものから行います。`}
+      ${tab === "inventory" ? `もちものには、今持っている道具だけを表示します。持ち物 ${totalOwned}個。${window.ImasoraHomeInventory.pendingCount(state) ? ` おあずかり ${window.ImasoraHomeInventory.pendingCount(state)}個も、そのまま使えます。` : ""}` : `道具図鑑では、未所持を含めて道具の種類と効果を確認できます。使う操作はもちものから行います。`}
     </div>
     <div class="item-guide-tabs">
       <button class="item-guide-tab ${tab === "inventory" ? "active" : ""}" type="button" data-item-tab="inventory">もちもの</button>
@@ -53996,6 +53984,8 @@ function confirmSkyRecognitionLocked() {
   const current = skyTypes.find(item => item.id === state.pendingSky.skyId) || skyTypes.find(item => item.id === selectedSky) || skyTypes[0];
   const imasoraTraits = imasoraTraitIds(current);
   const skyBonus = skyBonusFor(current);
+  const preparedSkyGrowth=window.ImasoraMonsterGrowth.prepareSky(state.monster,current.type,skyBonus.bias);
+  monsterGrowthRules.plan(state.monster);
   selected = imasoraTraits;
   const sessionBonus = Number(state.pendingSky.sessionBonus || 0);
   const stepBonus = walkStepBonus(state.walkSession.stepCount);
@@ -54010,12 +54000,7 @@ function confirmSkyRecognitionLocked() {
   state.coin += current.coin + skyBonus.coin + stepBonus.coin + itemWalkCoin;
   state.itemEffects.walkXp = 0;
   state.itemEffects.walkCoin = 0;
-  if (current.type === "nature") state.monster.nature += 2;
-  if (current.type === "city") state.monster.city += 2;
-  if (current.type === "sky") state.monster.sky += 2;
-  if (skyBonus.bias === "nature") state.monster.nature += 1;
-  if (skyBonus.bias === "city") state.monster.city += 1;
-  if (skyBonus.bias === "sky") state.monster.sky += 1;
+  Object.assign(state.monster,preparedSkyGrowth);
   if (current.type === "nature") learnSkill("flower");
   if (current.type === "city") learnSkill("sign");
   if (current.type === "sky") learnSkill("sky");
@@ -54302,7 +54287,7 @@ function renderPlaytestBoost() {
   const canBattle = canEnterTournament();
   const shopOpen = isTownBuildingBuilt("shop");
   const builtTownCount = openedTownBuildings().length;
-  const itemTotal = state.inventory.length;
+  const itemTotal = Object.values(itemCounts()).reduce((total, n) => total + n, 0);
   const pendingCup = state.pendingBattle ? tournaments.find(item => item.id === state.pendingBattle.cupId) : null;
   const tournamentBypass = isTournamentPlaytestBypass();
   const selectedTestCup = tournaments.find(item => item.id === selectedCup) || tournaments[0];
@@ -54350,7 +54335,7 @@ function renderPlaytestBoost() {
     <div class="playtest-status">${tournamentBypass ? "大会確認モード中です。正式版条件は残したまま、ローカル試作では全大会の試合を確認できます。" : canBattle ? "開花期以降です。大会参加、アイテム使用、店の購入導線を確認できます。" : "大会確認は、確認モードをONにするか、開花期相当まで育てると触れます。アイテムと店は単独でも確認できます。"}</div>
   `;
   document.getElementById("openCharacter360DevBtn")?.addEventListener("click", () => {
-    window.location.href = "./imasora-character-360-dev.html?check=character360-dev-entry-20260814";
+    void leaveHomeFor(() => "./imasora-character-360-dev.html?check=character360-dev-entry-20260814");
   });
   document.getElementById("playtestGrowingMonsterBtn")?.addEventListener("click", setPlaytestGrowingMonster);
   document.getElementById("playtestInsideHoursHomeBtn")?.addEventListener("click", setPlaytestInsideHoursHome);
@@ -54606,7 +54591,7 @@ function grantPlaytestItemSet() {
     .map(id => supportItems.find(item => item.id === id))
     .filter(Boolean)
     .map(item => ({ id: item.id, at: Date.now(), reason: "開発用テスト補助" }));
-  state.inventory = [...added, ...state.inventory].slice(0, 40);
+  window.ImasoraHomeInventory.receive(state, added);
   addLog("開発用テスト補助でアイテム確認セットを追加。");
   saveState();
   renderAll();
@@ -54753,9 +54738,7 @@ function startPlaytestTournamentBattle(cupId = selectedCup) {
   const cup = tournaments.find(item => item.id === cupId) || tournaments[0];
   state.playtestTournamentBypass = true;
   preparePlaytestTournamentEntry(cup.id);
-  battle();
-  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
-  toast(`${cup.name}の試合確認を開始しました`);
+  return battle();
 }
 function walkStepBonus(steps = 0) {
   return { label: "歩数ボーナスなし", xp: 0, coin: 0 };
@@ -57826,19 +57809,7 @@ function returnToRetireParkPracticeFromBattleResult() {
   toast("広場に戻りました");
 }
 function returnHomeFromTournamentDefeatDecision() {
-  blurActiveTextInput();
-  clearBattleAnimationTimer();
-  clearBattleAdTimer();
-  pendingBattleAnimation = null;
-  pendingBattleResultHtml = "";
-  pendingBattleResultSfx = "";
-  pendingBattleLogMessages.forEach(message => addLog(message));
-  pendingBattleLogMessages = [];
-  saveState();
-  renderLog();
-  switchScreen("walk");
-  document.getElementById("companionHome")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  playSfx("select");
+  return requestTournamentResultAction('defeat');
 }
 function proceedToFinalFromDecision() {
   revealBattleResult();
@@ -57929,19 +57900,7 @@ function playTournamentMedalCeremony() {
   }, 1550);
 }
 function returnFromTournamentAwardCeremony() {
-  blurActiveTextInput();
-  pendingBattleAnimation = null;
-  pendingBattleReward = null;
-  pendingBattleResultHtml = "";
-  pendingBattleResultSfx = "";
-  clearBattleAnimationTimer();
-  clearBattleAdTimer();
-  stopBattleResultBgm();
-  renderMonster();
-  renderTournament();
-  switchScreen("monster");
-  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
-  playSfx("select");
+  return requestTournamentResultAction('finish');
 }
 function showTournamentParticipationPrompt(cupId = selectedCup) {
   selectedCup = cupId;
@@ -58004,11 +57963,11 @@ function renderTournamentStrategyDecision(cup) {
     <b>${cup.name} 大会通しての作戦選択</b>
     <p>作戦を選んでから「作戦決定」を押すと、大会オープニングへ進みます。</p>
     <div class="mini-grid">
-      ${strategyBook.map(s => `<button class="strategy-card ${selectedStrategy === s.id ? "selected" : ""}" type="button" data-entry-strategy="${s.id}" data-cup="${cup.id}"><strong>${s.name}</strong><small>${s.text}</small></button>`).join("")}
+      ${strategyBook.map(s => `<button class="strategy-card ${selectedStrategy === s.id ? "selected" : ""}" type="button" data-entry-strategy="${s.id}" data-cup="${cup.id}" data-home-action-key="tournament-entry" data-home-action-ready="true" aria-busy="${isHomeItemActionPending('tournament-entry')}" ${isHomeItemActionPending('tournament-entry') ? "disabled" : ""}><strong>${s.name}</strong><small>${s.text}</small></button>`).join("")}
     </div>
     <div class="balance-note">選択中: ${strategyName(selectedStrategy)}作戦</div>
     <div class="actions">
-      <button class="primary" type="button" data-cup="${cup.id}" onclick="decideTournamentStrategy(this.dataset.cup)">作戦決定</button>
+      <button class="primary" type="button" data-cup="${cup.id}" data-home-action-key="tournament-entry" data-home-action-ready="true" aria-busy="${isHomeItemActionPending('tournament-entry')}" ${isHomeItemActionPending('tournament-entry') ? "disabled" : ""} onclick="decideTournamentStrategy(this.dataset.cup)">作戦決定</button>
       <button class="quiet" type="button" onclick="cancelTournamentParticipation()">戻る</button>
     </div>
     <div class="balance-note" id="entryResponse" aria-live="polite"></div>`;
@@ -58035,119 +57994,136 @@ function confirmTournamentParticipation(cupId = selectedCup) {
   toast("大会前の作戦を選んでください");
 }
 function decideTournamentStrategy(cupId = pendingTournamentStrategyCupId || selectedCup) {
+  return requestTournamentEntry(cupId, true);
+}
+function requestTournamentEntry(cupId, openBattle) {
   const cup = tournaments.find(item => item.id === cupId) || tournaments[0];
-  const playtestBypass = isTournamentPlaytestBypass();
-  const block = tournamentEntryBlockMessage(cup, playtestBypass);
-  if (block) {
-    playSfx("error");
-    setTournamentEntryStatusNote(block.message);
-    toast(block.toast);
-    return;
+  const intent = {cupId:cup.id, period:entryPeriod(cup), strategy:state.battleStrategy || 'balanced', playtest:isTournamentPlaytestBypass()};
+  const screen = document.querySelector('[data-screen].active')?.dataset.screen;
+  return runHomeItemAction('tournament-entry', () => enterTournamentLocked(intent), result => {
+    const battle = state.pendingBattle;
+    if (!battle || battle.cupId !== result.cupId || battle.enteredAt !== result.enteredAt) return;
+    if (document.querySelector('[data-screen].active')?.dataset.screen !== screen) return;
+    selectedCup = result.cupId;
+    pendingTournamentStrategyCupId = '';
+    renderTournament();
+    if (openBattle) {
+      renderBattleStage(monsterProfile());
+      document.getElementById('battleField')?.scrollIntoView({behavior:'smooth',block:'center'});
+    } else toast(result.resume ? '参加中の大会から続けられるよ。' : '参加準備完了');
+  });
+}
+function enterTournamentLocked(intent) {
+  const cup = tournaments.find(item => item.id === intent.cupId);
+  if (!cup) return {changed:false,message:'大会をもう一度えらんでね。'};
+  // An existing entry belongs to its original ticket, strategy and match progress.
+  if (state.pendingBattle) {
+    if (state.pendingBattle.cupId === cup.id) return {changed:false,resume:true,cupId:cup.id,enteredAt:state.pendingBattle.enteredAt};
+    return {changed:false,message:'参加中の大会があるよ。先に続きをあそぼう。'};
   }
-  const isMajor = fourMajorCupIds().includes(cup.id);
-  selectedCup = cup.id;
-  pendingTournamentStrategyCupId = "";
-  if (!playtestBypass && isMajor) state.mapTickets.major4 = Math.max(0, fourMajorTicketCount() - 1);
-  if (!playtestBypass && cup.id === "grand") state.grandEntryUsed = true;
+  if (entryPeriod(cup) !== intent.period || isTournamentPlaytestBypass() !== intent.playtest) {
+    return {changed:false,message:'大会の条件が変わったよ。もう一度たしかめてね。'};
+  }
+  const block = tournamentEntryBlockMessage(cup, intent.playtest);
+  if (block) return {changed:false,message:block.toast};
+  const isMajor = fourMajorCupIds().includes(cup.id), enteredAt = Date.now();
+  if (!intent.playtest && isMajor) state.mapTickets.major4 = Math.max(0, fourMajorTicketCount() - 1);
+  if (!intent.playtest && cup.id === 'grand') state.grandEntryUsed = true;
   state.pendingBattle = {
-    cupId: cup.id,
-    enteredAt: Date.now(),
-    period: entryPeriod(cup),
-    strategy: state.battleStrategy || "balanced",
-    currentMatch: 0,
-    completedMatches: [],
-    playtest: playtestBypass
+    cupId:cup.id, enteredAt, period:intent.period, strategy:intent.strategy,
+    currentMatch:0, completedMatches:[], playtest:intent.playtest
   };
-  state.tournamentEntries.push({ cupId: cup.id, period: entryPeriod(cup), at: Date.now(), strategy: state.battleStrategy || "balanced", playtest: playtestBypass });
-  addLog(`${cup.name}に${strategyName(state.battleStrategy)}作戦で参加決定。${playtestBypass ? "開発確認モードのため出場条件と参加券消費は無視。" : isMajor ? "四大大会参加券を1枚使用。" : cup.id === "grand" ? "グランドチャンピオン杯の1回出場を使用。" : ""}大会オープニングへ進んだ。`);
-  playSfx("entry");
-  saveState();
-  renderTournament();
-  renderBattleStage(monsterProfile());
-  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  state.tournamentEntries.push({cupId:cup.id,period:intent.period,at:enteredAt,strategy:intent.strategy,playtest:intent.playtest});
+  addLog(`${cup.name}に${strategyName(intent.strategy)}作戦で参加決定。${intent.playtest ? '開発確認モードのため出場条件と参加券消費は無視。' : isMajor ? '四大大会参加券を1枚使用。' : cup.id === 'grand' ? 'グランドチャンピオン杯の1回出場を使用。' : ''}`);
+  return {changed:true,sound:'entry',cupId:cup.id,enteredAt};
 }
 function advanceTournamentMatch(skipResult = false) {
-  if (!state.pendingBattle) {
-    playSfx("error");
-    toast("進行中の大会がありません");
-    return;
-  }
-  pendingBattleAnimation = null;
-  pendingBattleResultHtml = "";
-  pendingBattleResultSfx = "";
-  clearBattleAnimationTimer();
-  clearBattleAdTimer();
-  renderBattleStage(monsterProfile());
-  document.getElementById("battleField")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  return requestTournamentResultAction('advance');
 }
 function cancelTournamentParticipation() {
+  const pending = homeItemActions?.get('tournament-entry');
+  if (pending) { pending.cancelled = true; homeItemActions.delete('tournament-entry'); }
   pendingTournamentStrategyCupId = "";
   renderEntryStatus();
   playSfx("select");
-  toast("大会参加を見送りました");
+  toast(state.pendingBattle ? "参加は保存済みだよ。大会はあとで続けられるよ。" : "大会参加を見送りました");
 }
 function startTournamentBattleFromReady(skipResult = false) {
-  if (!state.pendingBattle) {
+  if (!state.pendingBattle && !currentTournamentResult()) {
     confirmTournamentParticipation(selectedCup);
     return;
   }
-  startPreparedTournamentBattle(skipResult);
+  return startPreparedTournamentBattle(skipResult);
 }
 function startPreparedTournamentBattle(skipResult = false) {
-  battle();
-  if (skipResult) {
-    const field = document.getElementById("battleField");
-    if (field) {
-      const cup = tournaments.find(item => item.id === state.pendingBattle?.cupId) || tournaments[0];
-      field.className = `battle-field tournament-opening ${arenaClassFor(cup)}`;
-      field.innerHTML = `<div class="battle-flash"></div>`;
-    }
-    requestBattleResultWithAd();
-  } else {
-    startBattleAnimation();
-  }
+  return battle(skipResult ? 'skip' : 'watch');
 }
 function watchTournamentFromReady() {
   startTournamentBattleFromReady(false);
 }
-function battle() {
-  blurActiveTextInput();
-  stopBattleResultBgm();
-  if (!state.pendingBattle) {
-    playSfx("error");
-    toast("先に大会を選択");
-    return;
+function battle(playMode) {
+  const pending = state.pendingBattle, prior = currentTournamentResult();
+  if (!pending && !prior) { playSfx('error'); toast('先に大会を選択'); return Promise.resolve(false); }
+  const intent = pending ? {cupId:pending.cupId,enteredAt:pending.enteredAt,index:Number(pending.currentMatch || 0)} : {cupId:prior.cupId,enteredAt:prior.enteredAt,index:prior.index};
+  const screen = document.querySelector('[data-screen].active')?.dataset.screen;
+  return runHomeItemAction('tournament-battle', () => resolveTournamentMatchLocked(intent), result => {
+    if (document.querySelector('[data-screen].active')?.dataset.screen !== screen) return;
+    if (result.battleResult) {
+      presentTournamentBattle(result.battleResult, true);
+      if (playMode === 'skip') requestBattleResultWithAd();
+      else if (playMode === 'watch') startBattleAnimation();
+    }
+  });
+}
+function tournamentBattleButtonAttributes() {
+  const pending = isHomeItemActionPending('tournament-battle');
+  return 'data-home-action-key="tournament-battle" data-home-action-ready="true" aria-busy="'+pending+'"'+(pending ? ' disabled' : '');
+}
+function tournamentResultEntry(cupId, enteredAt) {
+  return Array.isArray(state.tournamentEntries) ? state.tournamentEntries.find(entry => entry.cupId === cupId && entry.at === enteredAt) : undefined;
+}
+function validTournamentResult(result) {
+  return result?.version === 1 && result.subject === homeItemSubject() && tournaments.some(cup => cup.id === result.cupId)
+    && Number.isFinite(result.enteredAt) && result.enteredAt > 0 && Number.isInteger(result.index) && result.index >= 0
+    && Number.isInteger(result.total) && result.total > result.index && ['advance','win','lose'].includes(result.kind)
+    && typeof result.acknowledged === 'boolean' && (result.acknowledged || (result.match && typeof result.match.win === 'boolean' && Array.isArray(result.matches)));
+}
+function currentTournamentResult() {
+  let result;
+  if (state.pendingBattle) result = tournamentResultEntry(state.pendingBattle.cupId, state.pendingBattle.enteredAt)?.battleResult;
+  else result = Array.isArray(state.tournamentEntries) ? state.tournamentEntries.at(-1)?.battleResult : null;
+  return result && !result.acknowledged && validTournamentResult(result) ? result : null;
+}
+function resolveTournamentMatchLocked(intent) {
+  if (!Number.isFinite(intent.enteredAt) || intent.enteredAt <= 0 || !Number.isInteger(intent.index) || intent.index < 0 || !Array.isArray(state.tournamentEntries)) return {changed:false,message:'大会の記録を確認できないよ。'};
+  let entry = tournamentResultEntry(intent.cupId, intent.enteredAt);
+  if (state.pendingBattle && (state.pendingBattle.cupId !== intent.cupId || state.pendingBattle.enteredAt !== intent.enteredAt)) return {changed:false,message:'大会が進んだよ。今の試合をたしかめてね。'};
+  if (entry?.battleResult) {
+    if (!validTournamentResult(entry.battleResult)) return {changed:false,message:'大会の記録を確認できないよ。'};
+    if (!entry.battleResult.acknowledged) {
+      if (currentTournamentResult() !== entry.battleResult) return {changed:false,message:'今の大会をたしかめてね。'};
+      return {changed:false,resume:true,battleResult:entry.battleResult};
+    }
+    if (entry.battleResult.index === intent.index) return {changed:false,message:'この試合の結果は保存済みだよ。'};
   }
-  pendingBattleResultHtml = "";
-  pendingBattleReward = null;
-  pendingBattleResultSfx = "";
-  pendingBattleResultHomeAction = false;
-  pendingBattleLogMessages = [];
-  pendingBattleAnimation = null;
-  clearBattleAnimationTimer();
+  const pending = state.pendingBattle;
+  if (!pending || pending.cupId !== intent.cupId || pending.enteredAt !== intent.enteredAt || Number(pending.currentMatch || 0) !== intent.index) return {changed:false,message:'大会が進んだよ。今の試合をたしかめてね。'};
+  let pendingBattleResultSfx = '', pendingBattleResultHomeAction = false, pendingBattleLogMessages = [], openedWhiteSeed = false, constructionRewardText = '';
   const profile = monsterProfile();
   const cup = tournaments.find(item => item.id === state.pendingBattle.cupId) || tournaments[0];
   const clearedFour = hasGrandQualification();
   const playtestBypass = canBypassTournamentEntry();
   if (isRetirementReady()) {
-    playSfx("error");
-    toast("引退準備中は大会に出場できません");
-    return;
+    return {changed:false,message:"引退準備中は大会に出場できません"};
   }
   if (!canEnterTournament()) {
-    playSfx("error");
-    toast("タネ期・新芽期・青葉期は戦闘なし");
-    return;
+    return {changed:false,message:"タネ期・新芽期・青葉期は戦闘なし"};
   }
   if (!playtestBypass && cup.id === "grand" && !clearedFour) {
-    playSfx("error");
-    toast("四大杯4つ制覇で解放");
-    return;
+    return {changed:false,message:"四大杯4つ制覇で解放"};
   }
   if (!playtestBypass && hasCurrentCompanionWonCup(cup.id)) {
-    playSfx("error");
-    toast("この相棒は優勝済みです");
-    return;
+    return {changed:false,message:"この相棒は優勝済みです"};
   }
   const strategy = state.pendingBattle.strategy || state.battleStrategy || "balanced";
   let battleStats = state.pendingBattle.battleStats;
@@ -58161,6 +58137,7 @@ function battle() {
     state.pendingBattle.battleItemNote = battleItemNote;
   }
   const total = tournamentMatchCount(cup);
+  if (intent.index >= total) return {changed:false,message:'大会の記録を確認できないよ。'};
   const currentMatchIndex = Math.max(0, Math.min(Number(state.pendingBattle.currentMatch || 0), total - 1));
   const isFinalMatch = currentMatchIndex >= total - 1;
   const activeBattleStats = tournamentBattleActiveStats(battleStats, strategy, isFinalMatch);
@@ -58172,34 +58149,13 @@ function battle() {
   const result = { ...match, win: match.win };
   const enemy = { id: match.enemyId, name: match.enemy || cup.enemy, baseName: match.enemyBaseName, stage: match.enemyStage };
   const enemyName = enemy.name;
-  const field = document.getElementById("battleField");
-  playSfx("battle");
-  field.classList.remove("attack", "lose");
-  field.className = `battle-field tournament-opening ${arenaClassFor(cup)}`;
-  field.innerHTML = `
-    <div class="battle-hud">
-      <span class="battle-title">${cup.name} / ${matchLabel} / ${strategyName(strategy)}作戦${battleItemNote ? " / アイテム準備" : ""}</span>
-      <div class="battle-action-stack">
-        <button class="battle-watch-btn" type="button" onclick="startBattleAnimation()">${watchLabel}</button>
-        <button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>
-      </div>
-    </div>
-    <div class="fighter" id="myFighter">${tournamentPlayerFighter(profile, 100, "front", null, "", activeBattleStats.hp, null, activeBattleStats.hp)}</div>
-    <div class="versus-chip">VS</div>
-    <div class="fighter" id="enemyFighter">${tournamentEnemyFighter(cup, enemy, 100, "front", null, "", match.enemyMaxHp || match.enemyStats?.hp, null, match.enemyMaxHp || match.enemyStats?.hp)}</div>
-    <div class="battle-flash"></div>
-  `;
-  void field.offsetWidth;
-  field.classList.add("attack");
-  pendingBattleAnimation = { cup, profile, playerStats: activeBattleStats, matchLabel, watchLabel, bgmMode: tournamentBgmMode(cup, currentMatchIndex, total), queue: buildBattleAnimationQueue([match], cup, profile, activeBattleStats) };
-  const roundsHtml = tournamentMatchesHtml([match], cup);
-  document.getElementById("battleLog").innerHTML = `<strong>${cup.name} ${matchLabel}観戦中</strong><p>${enemyName}との${matchLabel}試合です。BGMと効果音を楽しみながら観戦できます。すぐ確認したい場合は、戦闘画面右上の「すぐに結果を見る」を押してください。</p>`;
+
+  const allMatches = [...(state.pendingBattle.completedMatches || []), match];
   if (result.win && !isFinalMatch) {
     pendingBattleResultSfx = "victory";
     state.pendingBattle.completedMatches = [...(state.pendingBattle.completedMatches || []), match];
     state.pendingBattle.currentMatch = currentMatchIndex + 1;
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が${matchLabel}を突破。${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote}`);
-    pendingBattleResultHtml = `<strong>${cup.name} ${matchLabel}勝利 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${enemyName}を破り、決勝へ進みました。次に決勝相手との対戦票を確認します。</p>${roundsHtml}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="advanceTournamentMatch()">決勝へと進む</button></div>`;
   } else if (result.win) {
     pendingBattleResultSfx = "victory";
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
@@ -58208,13 +58164,13 @@ function battle() {
     if (!state.cups.includes(cup.id)) state.cups.push(cup.id);
     state.monster.medals = Array.isArray(state.monster.medals) ? state.monster.medals : [];
     if (!state.monster.medals.includes(cup.id)) state.monster.medals.push(cup.id);
-    const openedWhiteSeed = cup.id === "grand" ? unlockWhiteSeedReward() : false;
+    openedWhiteSeed = cup.id === "grand" ? unlockWhiteSeedReward() : false;
     if (fourMajorCupIds().includes(cup.id) && hasGrandQualification() && !state.grandUnlockBonusGiven) {
       state.monster.grandQualified = true;
       state.grandUnlockBonusGiven = true;
       addLog("四大杯4つ全てを制覇。グランドチャンピオン杯の出場資格を獲得。");
     }
-    let constructionRewardText = "";
+
     if (!playtestBypass && !state.pendingBattle.playtest) {
       const constructionGrant = window.ImasoraConstructionRewardLedger.awardTournamentWin(state.constructionRewardLedger, {
         cupId: cup.id,
@@ -58223,7 +58179,7 @@ function battle() {
       });
       state.constructionRewardLedger = constructionGrant.ledger;
       if (constructionGrant.granted) {
-        constructionRewardText = `建築セット +${constructionGrant.boxes}箱${constructionGrant.toolkitGranted ? " / 基本道具一式の受取権（建材受取所で受け取れます）" : ""}`;
+        constructionRewardText = `航海パーツ +${constructionGrant.sailingParts||0}こ / 建築セット +${constructionGrant.boxes}箱${constructionGrant.toolkitGranted ? " / 基本道具一式の受取権（建材受取所で受け取れます）" : ""}`;
         pendingBattleLogMessages.push(`大会優勝報酬: ${constructionRewardText}`);
         addLog(`${cup.name}優勝: ${constructionRewardText}`);
       } else if (constructionGrant.status === "blocked" || constructionGrant.status === "unavailable") {
@@ -58234,30 +58190,84 @@ function battle() {
     }
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦を勝ち抜き。${allMatches.length}試合 / 最終${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦${battleItemNote} / Coin +${cup.reward}`);
     if (openedWhiteSeed) pendingBattleLogMessages.push("グランドチャンピオン杯優勝賞品として、白のタネを授与された。");
-    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${allMatches.length}試合を勝ち抜きました。優勝おめでとう！ メダルと賞品を受け取りましょう。${openedWhiteSeed ? "白のタネが賞品として授与されました。" : ""}${constructionRewardText ? `<br>${constructionRewardText}` : ""}</p>${tournamentMatchesHtml(allMatches, cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" onclick="switchScreen('monster')">通常画面に戻る</button></div>`;
-    pendingBattleReward = {
-      mark: openedWhiteSeed ? "白" : cup.medal,
-      title: openedWhiteSeed ? "白のタネ獲得" : `${cup.name}メダル獲得`,
-      text: `${openedWhiteSeed ? "体色だけが白く育つ特別なタネが開放されました。" : `${cup.name}を制覇しました。`}${constructionRewardText ? ` ${constructionRewardText}` : ""}`,
-      cupId: cup.id,
-      cupName: cup.name,
-      matches: allMatches,
-      defer: true
-    };
+
     if (state.pendingBattle && state.pendingBattle.cupId === cup.id) state.pendingBattle = null;
   } else {
     pendingBattleResultSfx = "defeat";
     pendingBattleResultHomeAction = true;
     const allMatches = [...(state.pendingBattle.completedMatches || []), match];
     pendingBattleLogMessages.push(`${cup.name}: ${playerDisplayName}が大会戦で敗退。第${currentMatchIndex + 1}試合 / ${battleDecisionLabel(match)} / ${strategyName(strategy)}作戦`);
-    pendingBattleResultHtml = `<strong>${cup.name} 敗退 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は第${currentMatchIndex + 1}試合で敗退しました。相棒を育て、作戦を変えてまた挑戦しましょう。</p>${tournamentMatchesHtml(allMatches, cup)}`;
     state.pendingBattle = null;
   }
-  saveState();
-  renderHud();
-  renderTown();
-  renderStamps();
-  renderTournament();
+
+  pendingBattleLogMessages.forEach(message => addLog(message));
+  const receipt = {version:1,subject:homeItemSubject(),cupId:cup.id,enteredAt:intent.enteredAt,index:currentMatchIndex,total,
+    kind:result.win ? (isFinalMatch ? 'win' : 'advance') : 'lose',match,matches:allMatches,strategy,battleItemNote,
+    playerDisplayName,profile,playerStats:activeBattleStats,openedWhiteSeed,constructionRewardText,acknowledged:false};
+  if (!entry) { entry = {cupId:cup.id,at:intent.enteredAt,period:pending.period || entryPeriod(cup),strategy,playtest:Boolean(pending.playtest)}; state.tournamentEntries.push(entry); }
+  for (const older of state.tournamentEntries) if (older !== entry) compactTournamentResult(older.battleResult);
+  entry.battleResult = receipt;
+  return {changed:true,sound:'battle',battleResult:receipt};
+}
+function presentTournamentBattle(receipt, animate = false) {
+  if (!validTournamentResult(receipt)) return;
+  blurActiveTextInput(); stopBattleResultBgm(); clearBattleAnimationTimer(); clearBattleAdTimer();
+  const cup = tournaments.find(item => item.id === receipt.cupId), profile = receipt.profile, match = receipt.match;
+  const matchLabel = receipt.index >= receipt.total - 1 ? '決勝' : '予選', playerDisplayName = receipt.playerDisplayName;
+  const enemy = {id:match.enemyId,name:match.enemy || cup.enemy,baseName:match.enemyBaseName,stage:match.enemyStage};
+  const activeBattleStats = receipt.playerStats, constructionRewardText = receipt.constructionRewardText, openedWhiteSeed = receipt.openedWhiteSeed;
+  pendingBattleResultSfx = receipt.kind === 'lose' ? 'defeat' : 'victory';
+  pendingBattleResultHomeAction = receipt.kind === 'lose'; pendingBattleLogMessages = []; pendingBattleReward = null;
+  if (receipt.kind === 'advance') {
+    pendingBattleResultHtml = `<strong>${cup.name} ${matchLabel}勝利 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${enemy.name}を破り、決勝へ進みました。次に決勝相手との対戦票を確認します。</p>${tournamentMatchesHtml([match],cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" ${tournamentBattleButtonAttributes()} onclick="advanceTournamentMatch()">決勝へと進む</button></div>`;
+  } else if (receipt.kind === 'win') {
+    pendingBattleResultHtml = `<strong>${cup.name} 優勝 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は${receipt.matches.length}試合を勝ち抜きました。優勝おめでとう！ メダルと賞品を受け取りましょう。${openedWhiteSeed ? '白のタネが賞品として授与されました。' : ''}${constructionRewardText ? '<br>'+constructionRewardText : ''}</p>${tournamentMatchesHtml(receipt.matches,cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" onclick="showTournamentAwardCeremony()">表彰式</button><button class="battle-skip-btn" type="button" ${tournamentBattleButtonAttributes()} onclick="returnFromTournamentAwardCeremony()">通常画面に戻る</button></div>`;
+    pendingBattleReward = {mark:openedWhiteSeed ? '白' : cup.medal,title:openedWhiteSeed ? '白のタネ獲得' : cup.name+'メダル獲得',text:(openedWhiteSeed ? '体色だけが白く育つ特別なタネが開放されました。' : cup.name+'を制覇しました。')+(constructionRewardText ? ' '+constructionRewardText : ''),cupId:cup.id,cupName:cup.name,matches:receipt.matches,defer:true};
+  } else {
+    pendingBattleResultHtml = `<strong>${cup.name} 敗退 / ${battleDecisionLabel(match)}</strong><p>${playerDisplayName}は第${receipt.index + 1}試合で敗退しました。相棒を育て、作戦を変えてまた挑戦しましょう。</p>${tournamentMatchesHtml(receipt.matches,cup)}<div class="battle-action-stack"><button class="battle-watch-btn" type="button" ${tournamentBattleButtonAttributes()} onclick="returnHomeFromTournamentDefeatDecision()">ホームへ戻る</button></div>`;
+  }
+  const field = document.getElementById('battleField'), log = document.getElementById('battleLog');
+  if (!field || !log) return;
+  field.dataset.tournamentResultKey = JSON.stringify([receipt.cupId,receipt.enteredAt,receipt.index]);
+  field.classList.remove('attack','lose'); field.className = 'battle-field tournament-opening '+arenaClassFor(cup);
+  const watchLabel = matchLabel+'試合を観戦する';
+  field.innerHTML = `<div class="battle-hud"><span class="battle-title">${cup.name} / ${matchLabel} / ${strategyName(receipt.strategy)}作戦</span><div class="battle-action-stack">${animate ? '<button class="battle-watch-btn" type="button" onclick="startBattleAnimation()">'+watchLabel+'</button><button class="battle-skip-btn" type="button" onclick="requestBattleResultWithAd()">すぐに結果を見る</button>' : '<button class="battle-watch-btn" type="button" onclick="replaySavedTournamentMatch()">試合をふりかえる</button>'}</div></div><div class="fighter" id="myFighter">${tournamentPlayerFighter(profile,100,'front',null,'',activeBattleStats.hp,null,activeBattleStats.hp)}</div><div class="versus-chip">VS</div><div class="fighter" id="enemyFighter">${tournamentEnemyFighter(cup,enemy,100,'front',null,'',match.enemyMaxHp || match.enemyStats?.hp,null,match.enemyMaxHp || match.enemyStats?.hp)}</div><div class="battle-flash"></div>`;
+  pendingBattleAnimation = animate ? {receiptKey:JSON.stringify([receipt.cupId,receipt.enteredAt,receipt.index]),cup,profile,playerStats:activeBattleStats,matchLabel,watchLabel,bgmMode:tournamentBgmMode(cup,receipt.index,receipt.total),queue:buildBattleAnimationQueue([match],cup,profile,activeBattleStats)} : null;
+  log.innerHTML = animate ? `<strong>${cup.name} ${matchLabel}観戦中</strong><p>${enemy.name}との${matchLabel}試合です。</p>` : pendingBattleResultHtml;
+}
+function replaySavedTournamentMatch() {
+  const receipt = currentTournamentResult();
+  if (!receipt) return;
+  presentTournamentBattle(receipt, true); startBattleAnimation();
+}
+function compactTournamentResult(receipt) {
+  if (receipt?.version !== 1) return;
+  receipt.acknowledged = true;
+  for (const key of ['match','matches','profile','playerStats']) delete receipt[key];
+}
+function acknowledgeTournamentResultLocked(intent, kind) {
+  const entry = tournamentResultEntry(intent.cupId,intent.enteredAt), receipt = entry?.battleResult;
+  if (!receipt || !validTournamentResult(receipt) || receipt.index !== intent.index) return {changed:false,message:'大会が進んだよ。今の結果をたしかめてね。'};
+  if (currentTournamentResult() !== receipt) return {changed:false,message:'今の結果をたしかめてね。'};
+  const pending = state.pendingBattle;
+  if (kind === 'advance') {
+    if (receipt.kind !== 'advance' || !pending || pending.cupId !== receipt.cupId || pending.enteredAt !== receipt.enteredAt || Number(pending.currentMatch) !== receipt.index + 1) return {changed:false,message:'決勝の記録をたしかめてね。'};
+  } else if (receipt.kind === 'advance' || pending) return {changed:false,message:'進行中の大会をたしかめてね。'};
+  if (receipt.acknowledged) return {changed:false,resume:true};
+  compactTournamentResult(receipt);
+  return {changed:true,sound:'select'};
+}
+function requestTournamentResultAction(kind) {
+  const receipt = currentTournamentResult();
+  if (!receipt) return Promise.resolve(false);
+  const intent = {cupId:receipt.cupId,enteredAt:receipt.enteredAt,index:receipt.index}, screen = document.querySelector('[data-screen].active')?.dataset.screen;
+  return runHomeItemAction('tournament-battle', () => acknowledgeTournamentResultLocked(intent,kind), () => {
+    if (document.querySelector('[data-screen].active')?.dataset.screen !== screen) return;
+    pendingBattleAnimation = null; pendingBattleResultHtml = ''; pendingBattleResultSfx = ''; pendingBattleReward = null; pendingBattleLogMessages = []; pendingBattleResultHomeAction = false;
+    clearBattleAnimationTimer(); clearBattleAdTimer(); stopBattleResultBgm();
+    if (kind === 'advance') renderBattleStage(monsterProfile());
+    else { switchScreen(kind === 'defeat' ? 'walk' : 'monster'); document.getElementById(kind === 'defeat' ? 'companionHome' : 'battleField')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
 }function rewardLootHtml(kind) {
   if (kind !== "sky") return "";
   const loot = [
@@ -58309,33 +58319,105 @@ function showHomeCenterNotice(text) {
   box.classList.add("show");
   setTimeout(() => box.classList.remove("show"), 2200);
 }
+var homeNavigationPending = false;
+window.addEventListener("pageshow", resetHomeNavigationPending);
+function resetHomeNavigationPending() { homeNavigationPending = false; }
+function leaveHomeFor(prepareDestination, { resumeScreen } = {}) {
+  if (homeNavigationPending) return Promise.resolve(false);
+  homeNavigationPending = true;
+  let leaving = false;
+  return (async () => {
+    try {
+      // Keep playing while ownership is pending. Read and save current state
+      // inside the same lock used by rewards, then wait for its completion.
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (pendingArcadeRewards.hasPending()) {
+          await pendingArcadeRewards.retry();
+          if (pendingArcadeRewards.hasPending()) throw new Error("HOME_REWARD_PENDING");
+        }
+        const confirmed = await withUfoArcadeRewardLock(() => {
+          if (pendingArcadeRewards.hasPending()) return false;
+          if (document.body.classList.contains("home-save-protected")) throw new Error("HOME_SAVE_PROTECTED");
+          state.autoResume = { ...homeResumePoint(), ...(resumeScreen ? { screen: resumeScreen } : {}) };
+          saveState();
+          return true;
+        });
+        if (!confirmed || pendingArcadeRewards.hasPending()) continue;
+        // An action or another tab may have advanced during IDB completion.
+        // Reconfirm it rather than departing with an older acknowledged save.
+        if (JSON.stringify(state) !== homeAutoSavedView || localStorage.getItem(storeKey) !== homeAutoSavedRaw) continue;
+        const destination = new URL(prepareDestination(), location.href);
+        const page = new URL(location.href);
+        const localBridge = ["127.0.0.1", "localhost"].includes(page.hostname)
+          && ["8765", "8766"].includes(page.port) && destination.port === "8877"
+          && destination.hostname === page.hostname && destination.protocol === page.protocol;
+        if (destination.origin !== page.origin && !localBridge) throw new Error("HOME_DESTINATION_INVALID");
+        location.assign(destination.href);
+        leaving = true;
+        return true;
+      }
+      throw new Error("HOME_CHANGED_DURING_DEPARTURE");
+    } catch (error) {
+      console.warn("移動前のセーブを確認できません。", error);
+      try { toast("セーブを確認できなかったよ。ここで、もう一度ためしてね。"); } catch {}
+      return false;
+    } finally {
+      if (!leaving) homeNavigationPending = false;
+    }
+  })();
+}
 function homeResumePoint(){return{version:1,screen:document.querySelector('[data-screen].active')?.dataset.screen||'walk',townArea:ambientBgmTownArea,machine:selectedArcadeMachineId,station:selectedPachicoinMachineId,running:arcadeGameRunning};}
-function startHomeAutoSave(){
+window.addEventListener("pagehide", stopHomeAutoSave);
+window.addEventListener("pageshow", resumeHomeAutoSave);
+function stopHomeAutoSave(){
+ if(!homeAutoSave)return;
+ void homeAutoSave.flush('pagehide');
+ homeAutoSave.dispose();
+}
+function resumeHomeAutoSave(event){if(event.persisted)startHomeAutoSave({restore:false});}
+function homeAutoSaveAllowed(){return homeAutoReady&&!document.body.classList.contains('home-save-protected');}
+function homeAutoSaveReady(){return homeAutoSaveAllowed()&&!localStorage.getItem(ufoArcadeRewardJournalKey);}
+function homeAutoSaveDirty(){return JSON.stringify(state)!==homeAutoSavedView||JSON.stringify(homeResumePoint())!==JSON.stringify(state.autoResume);}
+function saveHomeAutoSnapshot(){state.autoResume=homeResumePoint();saveState();return true;}
+function startHomeAutoSave({restore=true}={}){
+ homeAutoSave?.dispose();
  homeAutoReady=true;
- homeAutoSave=window.ImasoraAutoSave.create({interval:1500,
-  ready:()=>homeAutoReady&&!document.body.classList.contains('home-save-protected')&&!localStorage.getItem(ufoArcadeRewardJournalKey),
-  dirty:()=>JSON.stringify(state)!==homeAutoSavedView||JSON.stringify(homeResumePoint())!==JSON.stringify(state.autoResume),
-  save:()=>{if(localStorage.getItem(storeKey)!==homeAutoSavedRaw)throw Error('HOME_AUTO_SAVE_CHANGED');state.autoResume=homeResumePoint();saveState();document.body.dataset.autoSave='saved';return true;},
+ let live=true;
+ const current=window.ImasoraAutoSave.create({interval:1500,
+  ready:()=>live&&homeAutoSaveReady(),
+  dirty:homeAutoSaveDirty,
+  save:()=>withUfoArcadeRewardLock(()=>{
+   if(!homeAutoSaveReady())return false;
+   if(!homeAutoSaveDirty()&&localStorage.getItem(storeKey)===homeAutoSavedRaw)return true;
+   return saveHomeAutoSnapshot();
+  },()=>live&&homeAutoSaveAllowed()),
+  // Keep the existing synchronous last checkpoint on hide/freeze/pagehide,
+  // even when a regular save is still waiting for another writer's lock.
+  urgent:saveHomeAutoSnapshot,
+  onSaved:()=>{document.body.dataset.autoSave='saved';},
   onError:()=>{document.body.dataset.autoSave='pending';toast('セーブを確認してね。この画面を閉じずに、先に進めた画面を確認してね。');}
  });
+ const stop=current.dispose;
+ current.dispose=()=>{live=false;stop();};
+ homeAutoSave=current;
  const r=savedHomeResume,arrival=new URLSearchParams(location.search).get('arrival');
- if(r?.version===1&&!arrival&&!activeRetirementRecovery()&&['walk','town','arcade','monster','landMap','coastalTown','rules'].includes(r.screen)){
+ if(restore&&r?.version===1&&!arrival&&!activeRetirementRecovery()&&['walk','town','arcade','monster','landMap','coastalTown','rules'].includes(r.screen)){
   selectedArcadeMachineId=typeof r.machine==='string'?r.machine:'';selectedPachicoinMachineId=['001','002','003','004','005'].includes(r.station)?r.station:'001';arcadeGameRunning=r.running===true;
   switchScreen(r.screen,r.townArea||'map');
  }
 }
 function switchScreen(screen, townArea = "map") {
-  ambientBgmScreen = screen;
-  ambientBgmTownArea = townArea;
-  syncAmbientBgmBoundary();
   if (screen === "skyMap") {
-    window.location.assign(townRailwaySkyWorldUrl());
+    void leaveHomeFor(townRailwaySkyWorldUrl);
     return;
   }
   if (screen === "coastalTown") {
-    window.location.assign(townCoastWorldUrl());
+    void leaveHomeFor(townCoastWorldUrl);
     return;
   }
+  ambientBgmScreen = screen;
+  ambientBgmTownArea = townArea;
+  syncAmbientBgmBoundary();
   blurActiveTextInput();
   if (screen !== "arcade") {
     clearTownArcadeLobbyMoveTimers();
@@ -58491,8 +58573,8 @@ document.getElementById("walkSkySummonBtn").addEventListener("click", skySummon)
 document.getElementById("resetBtn").addEventListener("click", () => {
   if (confirm("イマソラーズウォークの保存データを削除しますか？")) {
     localStorage.removeItem(storeKey);
-    Object.assign(state, defaultState());
-    constructionSaveGuard.remember(state);
+    constructionSaveGuard.adopt(state, defaultState());
+    constructionSaveGuard.remember(state, {persisted:false});
     normalizeState();
     document.getElementById("eventBox").innerHTML = "";
     shuffleCards();
@@ -58508,6 +58590,123 @@ updateHomeWindowClock();
 startHomeAutoSave();
 setInterval(updateHomeWindowClock, 60000);
 setInterval(refreshPlaytimeSensitiveViews, 60000);
+function receiveIslandHomeRewards(ledger) {
+  const saved = window.ImasoraHomeSaveAccess.readState(localStorage, storeKey) || {};
+  const prepared = constructionSaveGuard.prepare(state, saved);
+  const result = window.ImasoraIslandItems.receive(prepared.constructionRewardLedger?.islandVoyageItems ?? prepared.islandVoyageItems, ledger.source.fingerprint, ledger.events);
+  if (!result.granted && (prepared.constructionRewardLedger?.islandVoyageItems || !prepared.islandVoyageItems)) return result;
+  const previous = structuredClone(prepared);
+  constructionSaveGuard.adopt(state, {...prepared, constructionRewardLedger:{...prepared.constructionRewardLedger, islandVoyageItems:result.stock}});
+  delete state.islandVoyageItems;
+  constructionSaveGuard.remember(saved);
+  try { saveState(); return result; }
+  catch (error) { constructionSaveGuard.adopt(state, previous); throw error; }
+}
+import('./assets/imasora-island-home-rewards.mjs?v=120lh').then(({startIslandHomeRewards}) => startIslandHomeRewards({receive:receiveIslandHomeRewards,lock:withUfoArcadeRewardLock,notify:toast,refresh:renderAll})).catch(error => console.warn('島のごほうびの受取を次回に続けます。',error));
+var homeItemActions = new Map(), homeItemActionEpoch = 0, homeItemActionsLive = true;
+window.addEventListener('pagehide', suspendHomeItemActions);
+window.addEventListener('pageshow', resumeHomeItemActions);
+function homeItemSubject() {
+  const monster = state.monster;
+  if (!Number.isFinite(monster?.bornAt) || monster.bornAt <= 0 || typeof monster.seedId !== 'string') throw new Error('HOME_SUBJECT_UNAVAILABLE');
+  return JSON.stringify([monster.bornAt, monster.seedId]);
+}
+function isHomeItemActionPending(key) { return Boolean(homeItemActions?.has(key)); }
+function refreshHomeItemActionButtons() {
+  for (const button of document.querySelectorAll('[data-item-use], [data-shop-buy], [data-home-action-key]')) {
+    const key = button.dataset.homeActionKey || (button.dataset.itemUse ? 'use:'+button.dataset.itemUse : 'buy:'+button.dataset.shopBuy);
+    if (button.dataset.homeActionReady === undefined) button.dataset.homeActionReady = String(!button.disabled);
+    const pending = isHomeItemActionPending(key);
+    button.disabled = pending || button.dataset.homeActionReady !== 'true';
+    button.setAttribute('aria-busy', String(pending));
+  }
+}
+function suspendHomeItemActions() {
+  homeItemActionsLive = false;
+  homeItemActionEpoch++;
+  homeItemActions?.clear();
+}
+function resumeHomeItemActions(event) { if (event.persisted) { homeItemActionsLive = true; try { renderAll(); refreshHomeItemActionButtons(); } catch {} } }
+function runHomeItemAction(key, action, completed) {
+  const prior = homeItemActions.get(key);
+  if (prior) return prior.promise;
+  if (!homeItemActionsLive || document.body.classList.contains('home-save-protected')) return Promise.resolve(false);
+  let subject;
+  try { subject = homeItemSubject(); } catch { return Promise.resolve(false); }
+  const epoch = homeItemActionEpoch, entry = {};
+  let resolve;
+  entry.promise = new Promise(done => { resolve = done; });
+  homeItemActions.set(key, entry);
+  try { refreshHomeItemActionButtons(); } catch {}
+  const current = () => {
+    try { return !entry.cancelled && homeItemActionsLive && homeItemActionEpoch === epoch && homeItemSubject() === subject && !document.body.classList.contains('home-save-protected'); }
+    catch { return false; }
+  };
+  let committed = null;
+  void (async () => {
+    let result = null, failure = null;
+    try {
+      result = await withUfoArcadeRewardLock(() => {
+        if (localStorage.getItem(ufoArcadeRewardJournalKey)) {
+          const error = new Error('CONSTRUCTION_RECOVERY_PENDING');
+          error.constructionSaveConflict = true;
+          throw error;
+        }
+        const saved = window.ImasoraHomeSaveAccess.readState(localStorage, storeKey);
+        const prepared = constructionSaveGuard.prepare(state, saved);
+        constructionSaveGuard.adopt(state, prepared);
+        constructionSaveGuard.remember(saved ?? prepared, {persisted:saved !== undefined});
+        if (homeItemSubject() !== subject) return {changed:false,cancelled:true,message:'相棒が変わったよ。もう一度えらんでね。'};
+        const before = structuredClone(prepared);
+        try {
+          const outcome = action();
+          if (outcome && typeof outcome.then === 'function') { Promise.resolve(outcome).catch(()=>{}); throw new Error('HOME_ACTION_MUST_BE_SYNCHRONOUS'); }
+          if (!outcome?.changed) {
+            constructionSaveGuard.adopt(state, before);
+            return outcome;
+          }
+          const next = constructionSaveGuard.prepare(state, saved), encoded = JSON.stringify(next);
+          localStorage.setItem(storeKey, encoded);
+          // The lock backend does not roll back localStorage after this point.
+          committed = {...outcome, committed:true};
+          homeAutoSavedRaw = encoded;
+          constructionSaveGuard.adopt(state, next);
+          constructionSaveGuard.remember(next);
+          homeAutoSavedView = JSON.stringify(state);
+          return committed;
+        } catch (error) {
+          if (committed) return committed;
+          constructionSaveGuard.adopt(state, before);
+          constructionSaveGuard.remember(saved ?? before, {persisted:saved !== undefined});
+          throw error;
+        }
+      }, current);
+    } catch (error) {
+      if (committed) result = committed;
+      else failure = error;
+    }
+    if (homeItemActions.get(key) === entry) homeItemActions.delete(key);
+    if (homeItemActionsLive && homeItemActionEpoch === epoch) {
+      try { refreshHomeItemActionButtons(); } catch {}
+    }
+    if (!entry.cancelled && homeItemActionsLive && homeItemActionEpoch === epoch && !document.body.classList.contains('home-save-protected')) {
+      try {
+        if (failure?.homeSaveBlocked) window.ImasoraHomeSaveAccess.protect(failure);
+        renderAll();
+        if (failure) toast('保存できなかったよ。今回の消費は取り消したよ。');
+        else if (result && (current() || result.cancelled)) {
+          if (!result.changed && !result.resume) playSfx('error');
+          else if (result.changed && (!result.purchase || !playAudioSfx(shopPurchaseSfxFileKey, 0, .95))) playSfx(result.sound);
+          if (result.message) toast(result.message);
+          if ((result.committed || result.resume) && typeof completed === 'function') completed(result);
+        }
+      } catch (error) { console.warn('保存後の表示を更新できません。', error); }
+    }
+    resolve(Boolean(result?.committed || result?.resume));
+  })();
+  return entry.promise;
+}
+
 </script>
 <style>
   body.home-save-protected { margin:0; min-height:100dvh; overflow:auto; background:linear-gradient(155deg,#c8ecff,#e9f8ec); }

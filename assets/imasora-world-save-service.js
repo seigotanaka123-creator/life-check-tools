@@ -1,32 +1,36 @@
+import{assertCoastAccess,validateCoastAction,applyCoastEvent}from'./imasora-coast-forage.mjs?v=120ps';
+import {coastRigAccess} from './imasora-coast-rig.mjs?v=120mx';
 import {IndexedConstructionStore} from './imasora-construction-storage.js';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {EARTH_AUTHORITY_SCOPE,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js?v=120gf';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {EARTH_AUTHORITY_SCOPE,EARTH_LIVE_SCOPE} from './imasora-construction-earth-authority.js?v=120ov';
 import {canonical} from './imasora-construction-state.js';
-import {commitEarthRestore,readEarthRestore,readEarthRestoreState,validateEarthRestoreBefore,validateEarthRestoreJournal,createEarthRestoreLedger} from './imasora-construction-earth-restore-store.js?v=120gn';
-import {commitMapReset,readMapResetState,validateMapResetJournal,createMapResetLedger,validateMapResetBefore,mapBuildings,keptMapBuildings,removeOneMapBuilding,moveOneMapBuilding,mapResetKey} from './imasora-world-map-reset-store.js?v=120gn';
+import {commitEarthRestore,readEarthRestore,readEarthRestoreState,validateEarthRestoreBefore,validateEarthRestoreJournal,createEarthRestoreLedger} from './imasora-construction-earth-restore-store.js?v=120pv';
+import {commitMapReset,readMapResetState,validateMapResetJournal,createMapResetLedger,validateMapResetBefore,mapBuildings,keptMapBuildings,removeOneMapBuilding,moveOneMapBuilding,mapResetKey} from './imasora-world-map-reset-store.js?v=120pv';
 import {WorldDraftGuard} from './imasora-world-draft-guard.js';
-import {commitVehicleRestore,readVehicleRestoreState,validateVehicleRestoreJournal} from './imasora-construction-vehicle-restore-store.js?v=120gn';
-import {vehicleRestoreSpec,vehicleRestoreUndoCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=120gn';
+import {commitVehicleRestore,readVehicleRestoreState,validateVehicleRestoreJournal} from './imasora-construction-vehicle-restore-store.js?v=120pv';
+import {vehicleRestoreSpec,vehicleRestoreUndoCandidate,vehicleRestoreUndoMatches,validateVehicleRestoreBefore,createVehicleRestoreLedger} from './imasora-construction-vehicle-restore.js?v=120pv';
 import {withWorkshopWriteLock,createEquipmentCraft,validateEquipmentCraft,equipmentCraftWasPaid} from './imasora-workshop-write-guard.js';
-import {assertConstructionToolReceipt} from './imasora-construction-profile-site-controller.js?v=120gn';
-import {FREE_CONTACT_ACTIONS,assertFreeReceipt} from './imasora-construction-concrete/free-contact.mjs?v=120gn';
-import {FREE_VEHICLE_ACTIONS,assertVehicleReceipt} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120gn';
-import {PIPE_ACTIONS,assertPipeReceipt} from './imasora-construction-concrete/free-boom-contact.mjs?v=120gn';
-import {SUPPORTED_WORK_MOVE,assertSupportedWorkMoveReceipt} from './imasora-construction-concrete/free-supported-work-move.mjs?v=120gn';
-import {FOUNDATION_ACTIONS} from './imasora-construction-concrete/free-foundation-state.mjs?v=120gn';
-import {assertFoundationReceipt} from './imasora-construction-concrete/free-foundation-operation.mjs?v=120gn';
-import {projectStarterToolkit,assertStarterTool,requiredStarterTool} from './imasora-construction-toolkit.mjs?v=120fs';
-import {worldTransportTotals} from './imasora-construction-transport-authority.mjs?v=120gn';
-import {prepareTransportRestorePlan,snapshotTransportRestoreRecord,sameTransportRestoreValue,validateTransportRestoreJournal} from './imasora-construction-transport-restore.mjs?v=120gn';
-import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120gn';
-import {runWorldSaveTask,worldSaveCandidateNeedsWorker,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120gn';
-import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120gn';
-import {commitTransportRestore,readTransportRestoreState,rememberCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120gn';
-import {assertWorldTransportWorkReceipt,assertWorldTransportWorkReceiptIdentity,isWorldTransportWorkSnapshot} from './imasora-construction-transport-work-flow.mjs?v=120gn';
+import {assertConstructionToolReceipt} from './imasora-construction-profile-site-controller.js?v=120pv';
+import {FREE_CONTACT_ACTIONS,assertFreeReceipt} from './imasora-construction-concrete/free-contact.mjs?v=120pv';
+import {FREE_VEHICLE_ACTIONS,assertVehicleReceipt} from './imasora-construction-concrete/free-vehicle-contact.mjs?v=120pv';
+import {PIPE_ACTIONS,assertPipeReceipt} from './imasora-construction-concrete/free-boom-contact.mjs?v=120pv';
+import {SUPPORTED_WORK_MOVE,assertSupportedWorkMoveReceipt} from './imasora-construction-concrete/free-supported-work-move.mjs?v=120pv';
+import {FOUNDATION_ACTIONS} from './imasora-construction-concrete/free-foundation-state.mjs?v=120pv';
+import {assertFoundationReceipt} from './imasora-construction-concrete/free-foundation-operation.mjs?v=120pv';
+import {projectStarterToolkit,assertStarterTool,requiredStarterTool} from './imasora-construction-toolkit.mjs?v=120ho';
+import {worldTransportTotals} from './imasora-construction-transport-authority.mjs?v=120pv';
+import {prepareTransportRestorePlan,snapshotTransportRestoreRecord,sameTransportRestoreValue,validateTransportRestoreJournal} from './imasora-construction-transport-restore.mjs?v=120pv';
+import {runTransportRecoveryTask} from './imasora-construction-recovery-client.mjs?v=120pv';
+import {runWorldSaveTask,worldSaveCandidateNeedsWorker,isCheckedTransportRestorePoint} from './imasora-world-save-client.mjs?v=120pv';
+import {runSharedSaveTask} from './imasora-save-task-queue.mjs?v=120pv';
+import {commitTransportRestore,readTransportRestoreState,rememberCheckedTransportRestore} from './imasora-construction-transport-restore-store.mjs?v=120pv';
+import {assertWorldTransportWorkReceipt,assertWorldTransportWorkReceiptIdentity,isWorldTransportWorkSnapshot} from './imasora-construction-transport-work-flow.mjs?v=120pv';
 const preparedTransportSaves=new WeakMap();
+const transientSaveError=error=>['AbortError','UnknownError','InvalidStateError','WorldSaveTransientError'].includes(error?.name);
+async function retryTransientSave(action){for(let n=0;;n++){try{return await action();}catch(error){if(n>=2||!transientSaveError(error))throw error;await new Promise(resolve=>setTimeout(resolve,25*(n+1)));}}}
 import {captureConstructionJson,captureOwnedConstructionJson,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
-import {createTransportMigrationPlan,validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs?v=120gn';
-import {commitTransportMigration,readTransportMigrationState} from './imasora-construction-transport-migration-store.mjs?v=120gn';
+import {createTransportMigrationPlan,validateTransportMigrationJournal} from './imasora-construction-transport-migration.mjs?v=120pv';
+import {commitTransportMigration,readTransportMigrationState} from './imasora-construction-transport-migration-store.mjs?v=120pv';
 
 export const LIVE_WORLD_DB='imasora-world-authority-v1';
 export const WORLD_SHOP_TEST_DB='imasora-world-shop-integration-development-v1';
@@ -102,7 +106,7 @@ export class WorldSaveService{
   }
   // A failed job stays queued for reconciliation, but is no longer running.
   // Keep `blocked` true to prohibit new work while allowing the retry UI.
-  get busy(){return this.running||(!this.blocked&&this.jobs.length>0)||!!this.crafting||!!this.reconciling||!!this.preparingTransportRestore||!!this.preparingTransportSave;}
+  get busy(){return this.running||(!this.blocked&&this.jobs.length>0)||!!this.crafting||!!this.reconciling||!!this.preparingTransportRestore||!!this.preparingTransportSave||!!this.preparingReel||!!this.preparingTimberUnpack;}
   get world(){return this.ledger?this.issueDraft(structuredClone(this.ledger.world)):null;}
   issueDraft(draft){return this.draftGuard?.issue(draft)??draft;}
   deriveDraft(draft,overrides){return this.draftGuard?this.draftGuard.derive(draft,overrides):{...structuredClone(draft),...structuredClone(overrides)};}
@@ -127,6 +131,7 @@ export class WorldSaveService{
   get shopState(){return L.projectLinkedShop(this.ledger);}
   get constructionStock(){return L.projectConstructionStock(this.ledger);}
   get constructionPackTrialStock(){return L.projectConstructionPackTrial(this.ledger);}
+  get constructionPaintBudget(){return(this.constructionPackTrialStock?.quantities.paintSurfaceCredits??0)-(this.ledger?.world.constructionHighBuild?.outdoorSigns?.paintUsed??0);}
   get constructionToolkit(){
     if(!this.ledger)return null;
     if(this.toolkitLedger!==this.ledger){this.toolkitValue=projectStarterToolkit(this.constructionPackTrialStock,this.constructionTransferProfileId);this.toolkitLedger=this.ledger;}
@@ -209,12 +214,13 @@ export class WorldSaveService{
   async initialize(defaultWorld,{sceneOnly=false}={}){
     if(typeof sceneOnly!=='boolean')throw Error('画面の読込設定が不正です。');
     if(this.ready)throw Error('保存は初期化済みです。');
+    this.initialScene??={world:structuredClone(defaultWorld),sceneOnly};
     try{
       if(this.mode==='readonly'){
         this.ledger=L.createWorldPurchaseLedger(this.readLegacy()??JSON.stringify(defaultWorld),'new-world');this.ready=true;return sceneOnly?this.readWorldScene():this.world;
       }
-      const record=await this.store.read();
-      if(record)await this.acceptStored(record);
+      const record=await retryTransientSave(()=>this.store.read());
+      if(record)await retryTransientSave(()=>this.acceptStored(record));
       else{
         const legacy=this.mode==='live'?this.readLegacy():null;
         const seed=structuredClone(defaultWorld);
@@ -286,12 +292,29 @@ export class WorldSaveService{
     }else await this.#acceptCommitted(await this.store.commit(job.expected,job.packet),job);
     if(job.draftToken)this.draftGuard.committed(job.draftToken);
   }
+  async commitWithRecovery(job){
+    const ordinary=!job.earthRestore&&!job.mapReset&&!job.vehicleRestore&&!job.transportRestore&&!job.transportMigration;
+    for(let attempts=0;;attempts++){
+      try{await this.commitHead(job);return;}
+      catch(error){
+        if(!ordinary||attempts>=2||!transientSaveError(error))throw error;
+        // Never repeat a debit/reward blindly: an interrupted acknowledgement
+        // may follow a successful atomic write. Confirm its exact bytes first.
+        await new Promise(resolve=>setTimeout(resolve,25*(attempts+1)));
+        const record=await retryTransientSave(()=>this.store.read());
+        if(job.packet&&record?.generation===job.expected+1&&record.current===job.packet){await this.#acceptCommitted(record,job);if(job.draftToken)this.draftGuard.committed(job.draftToken);return;}
+        if((record?.generation??null)!==this.generation||record?.current!==this.raw?.current)throw Error('別の画面で保存が更新されています。古い状態で上書きしません。');
+        // Same authority and same captured job: retry in the background while
+        // the walker/boat keeps running. Later movement stays dirty for saving.
+      }
+    }
+  }
   async drain(){
     if(this.running||this.blocked)return;this.running=true;
     try{
       while(this.jobs.length&&!this.blocked){
         const job=this.jobs[0];
-        try{await this.commitHead(job);this.jobs.shift();job.resolve(this.shopState);}
+        try{await this.commitWithRecovery(job);this.jobs.shift();job.resolve(this.shopState);}
         catch(e){this.blocked=true;for(const waiting of this.jobs)waiting.reject(e);this.onError(e);}
         this.onChange(this);
       }
@@ -304,6 +327,7 @@ export class WorldSaveService{
   }
   async retry(){
     if(this.running||this.reconciling)throw Error('保存処理中です。');
+    if(!this.ready&&this.initialScene){this.blocked=false;return this.initialize(this.initialScene.world,{sceneOnly:this.initialScene.sceneOnly});}
     this.reconciling=true;this.onChange(this);
     try{return await this.#reconcileRetry();}
     finally{this.reconciling=false;this.onChange(this);}
@@ -753,17 +777,88 @@ export class WorldSaveService{
     await this.enqueueDraft(draft,(s,current)=>L.saveConstructionSoilDraft(s,next,current,expectedRevision));
     return structuredClone(this.ledger.world.constructionSoil);
   }
+  get coastForage(){
+    if(!this.ledger)return null;if(this.coastLedger!==this.ledger){const p=L.projectCoastForage(this.ledger);this.coastValue={lastAt:p.lastAt,picked:p.picked,bag:p.bag,cleaned:p.cleaned,totalCleaned:p.totalCleaned,recoveries:p.recoveries};this.coastLedger=this.ledger;}
+    return structuredClone(this.coastValue);
+  }
+  async saveAdventure(operation,value,draft,expectedRevision){
+    const frozen=structuredClone(value);await this.enqueueDraft(draft,async(s,current)=>{
+      const generation=this.generation,raw=this.raw.current,result=await runWorldSaveTask('prepare-adventure',{operation,value:frozen,ledger:s,draft:current,expectedRevision}),soil=s.world.constructionTransport?.work?.frame.soil;
+      preparedTransportSaves.set(result.ledger,{...result,base:s,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;
+    });
+  }
+  async saveCoastExploration(value,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    await this.saveAdventure('exploration',value,draft,expectedRevision);return this.ledger.world.coastExploration;
+  }
+  async saveCoastArrival(island,draft,expectedRevision,contact){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    if(this.ledger.world.coastRewards?.islands.includes(island))return this.ledger.world.coastRewards;
+    await this.saveAdventure('arrival',contact?{island,contact}:island,draft,expectedRevision);return this.ledger.world.coastRewards;
+  }
+  async saveCoastPebbleFind(value,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    const action={stone:value.stone,cycle:Math.floor(Date.now()/86400000)};if(value.cycle!==undefined&&value.cycle!==action.cycle)throw Error('石の下のパーツをもう一度たしかめよう。');
+    await this.saveAdventure('pebble',action,draft,expectedRevision);return this.ledger.events.findLast(e=>e.kind==='coast-pebble-find'&&e.stone===action.stone&&e.cycle===action.cycle);
+  }
+  async saveCoastFruit(value,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    // The caller selects a tree, never a prize or a clock. Preserve the same
+    // receipt on retry; reopening cannot reroll a fallen or empty result.
+    if(value.type==='shake')value={type:'shake',tree:value.tree,cycle:Math.floor(Date.now()/1800000)};
+    await this.saveAdventure('fruit',value,draft,expectedRevision);
+    return this.ledger.events.findLast(e=>e.kind==='coast-fruit'&&(value.type==='shake'?e.tree===value.tree&&e.cycle===value.cycle:e.id===value.id));
+  }
+  async saveCoastVisit(value,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    await this.saveAdventure('visit',value,draft,expectedRevision);return this.ledger.world.coastVisits.islands[value.island];
+  }
+  async receiveSailingAwards(awards,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わるまで待ってね。');
+    await this.saveAdventure('supplies',awards,draft,expectedRevision);return this.ledger.world.coastRewards;
+  }
+  async saveCoastRig(action,draft,expectedRevision){
+    if(this.mode!=='live'||!this.ready||this.blocked||this.busy)throw Error('セーブが終わってから、もう一度ためそう。');
+    // A stale/invalid shop approach is an action error, not a corrupt save.
+    // Reject it before starting a protected write, and retain the world's state.
+    coastRigAccess(draft,action);
+    await this.saveAdventure('rig',action,draft,expectedRevision);return this.world.coastRig;
+  }
+  async saveCoastForage(action,draft,expectedRevision,id){
+    if(this.mode!=='live'||this.store?.name!==LIVE_WORLD_DB||!this.ready||this.blocked||this.busy)throw Error('セーブが終わってから、もう一度ためそう。');
+    const prior=this.ledger.events.find(e=>e.id===id),frozen=structuredClone(action);frozen.at=prior?.kind==='coast'?prior.action.at:Math.max(Date.now(),this.coastForage.lastAt);validateCoastAction(frozen);
+    if(prior){if(canonical(prior)!==canonical({kind:'coast',id,action:frozen}))throw Error('同じ受取番号の中身が違うよ。');return this.coastForage;}
+    else{if(this.ledger.revision!==expectedRevision)throw Error('別のセーブが進んだよ。もう一度ためそう。');assertCoastAccess(draft,frozen);applyCoastEvent(L.projectCoastForage(this.ledger),{kind:'coast',id,action:frozen},this.constructionTransferProfileId);}
+    await this.enqueueDraft(draft,async(s,current)=>{
+      const generation=this.generation,raw=this.raw.current,result=await runWorldSaveTask('prepare-coast',{ledger:s,action:frozen,draft:current,expectedRevision,id}),soil=s.world.constructionTransport?.work?.frame.soil;
+      preparedTransportSaves.set(result.ledger,{...result,base:s,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;
+    });return this.coastForage;
+  }
   get constructionHighBuild(){return structuredClone(this.ledger?.world.constructionHighBuild??null);}
   async saveConstructionHighBuild(action,draft,expectedRevision){
     if(this.mode!=='live'||this.store?.name!==LIVE_WORLD_DB||!this.ready||this.blocked||this.busy)throw Error('セーブをたしかめてから、もう一度進もう。');
-    const frozen=structuredClone(action);
+    const {stampGardenAction,gardenHarvestEvent}=await import('./imasora-construction-garden-harvest.mjs?v=120ps');
+    const frozen=stampGardenAction(this.ledger,action);
     if(this.ledger.revision!==expectedRevision)throw Error('別のセーブが進んだよ。もう一度ひらいてね。');
-    const {transitionHighWorld,highMaterialCost,highWorldTimber}=await import('./imasora-construction-high-world.mjs?v=120gn');
-    const {assertEntranceDoorClear}=await import('./imasora-construction-building-door-guard.mjs?v=120gn');assertEntranceDoorClear(this.ledger.world,frozen,draft);
-    const {assertRoomLayoutWorld}=await import('./imasora-construction-room-layout-guard.mjs?v=120gn');assertRoomLayoutWorld(this.ledger.world,frozen);
-    const {assertRoomWalkWorld}=await import('./imasora-construction-room-walk-guard.mjs?v=120gn');const roomContext=assertRoomWalkWorld(this.ledger.world,frozen);
-    const candidateHigh=transitionHighWorld(this.ledger.world.constructionHighBuild??null,frozen,roomContext);if(['VISIT_PAINT','VISIT_ROOM_PAINT'].includes(frozen.type)||frozen.type==='START'&&frozen.jobType==='DOOR_VISIT'){const {assertHighWorkAccess}=await import('./imasora-construction-high-casting.mjs?v=120gn');assertHighWorkAccess({...this.ledger.world,constructionHighBuild:candidateHigh});}
-    const {assertBoardBayRetrofitWorld}=await import('./imasora-construction-board-bay-retrofit-guard.mjs?v=120gn');assertBoardBayRetrofitWorld(this.ledger.world,frozen,candidateHigh);
+    if(['REEL_EDIT','REEL_UNDO','REEL_GIRDER_PICK','REEL_GIRDER_INSTALL','REEL_GIRDER_RETURN'].includes(frozen.type)){
+      // Validate expected gameplay rejections in the worker before entering the
+      // durable queue. A blocked placement must not block ordinary autosaving.
+      const base=this.ledger,generation=this.generation,raw=this.raw.current;let result;
+      this.preparingReel=true;
+      try{result=await runWorldSaveTask('prepare-high',{ledger:base,action:frozen,draft,expectedRevision});}finally{this.preparingReel=false;}
+      if(this.ledger!==base||this.generation!==generation||this.raw.current!==raw)throw Error('現場が変わったよ。もう一度、同じ場所をえらぼう。');
+      await this.enqueueDraft(draft,(s)=>{if(s!==base)throw Error('別のセーブが進んだよ。もう一度ためそう。');const soil=base.world.constructionTransport?.work?.frame.soil;preparedTransportSaves.set(result.ledger,{...result,base,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;});
+      return this.constructionHighBuild;
+    }
+    const {transitionHighWorld,highMaterialCost,highWorldTimber}=await import('./imasora-construction-high-world.mjs?v=120pv');
+    const {assertEntranceDoorClear}=await import('./imasora-construction-building-door-guard.mjs?v=120pv');assertEntranceDoorClear(this.ledger.world,frozen,draft);
+    const {assertRoomLayoutWorld}=await import('./imasora-construction-room-layout-guard.mjs?v=120pv');assertRoomLayoutWorld(this.ledger.world,frozen);
+    const {assertRoomWalkWorld}=await import('./imasora-construction-room-walk-guard.mjs?v=120pv');const roomContext=assertRoomWalkWorld(this.ledger.world,frozen);
+    const candidateHigh=transitionHighWorld(this.ledger.world.constructionHighBuild??null,frozen,roomContext);gardenHarvestEvent(this.ledger,frozen,candidateHigh);if(['SIGN_EDIT','SIGN_UNDO'].includes(frozen.type)){const {assertOutdoorSignsWorld,assertOutdoorSignAction}=await import('./imasora-construction-outdoor-sign-guard.mjs?v=120pv');assertOutdoorSignsWorld({...this.ledger.world,constructionHighBuild:candidateHigh});assertOutdoorSignAction(this.ledger.world,frozen,draft,candidateHigh);}if(['VISIT_PAINT','VISIT_ROOM_PAINT'].includes(frozen.type)||frozen.type==='START'&&frozen.jobType==='DOOR_VISIT'){const {assertHighWorkAccess}=await import('./imasora-construction-high-casting.mjs?v=120pv');assertHighWorkAccess({...this.ledger.world,constructionHighBuild:candidateHigh});}
+    const {assertBoardBayRetrofitWorld}=await import('./imasora-construction-board-bay-retrofit-guard.mjs?v=120pv');assertBoardBayRetrofitWorld(this.ledger.world,frozen,candidateHigh);
+    const {assertOutdoorPaintBudget}=await import('./imasora-construction-outdoor-paint.mjs?v=120hh');assertOutdoorPaintBudget({...this.ledger.world,constructionHighBuild:candidateHigh});
+    if(['GARDEN_EDIT','GARDEN_UNDO'].includes(frozen.type)){const {assertGardenWorld,assertGardenAction}=await import('./imasora-construction-garden-guard.mjs?v=120pv');const {gardenCost,assertGardenMaterials,gardenWaterUsed}=await import('./imasora-construction-garden.mjs?v=120ps');const {gardenEarthTransition}=await import('./imasora-construction-garden-earth.mjs?v=120pv');const world=gardenEarthTransition(this.ledger.world,frozen,draft,candidateHigh);assertGardenWorld(world);assertGardenAction(this.ledger.world,frozen,draft,candidateHigh);assertGardenMaterials(world);if(gardenWaterUsed(candidateHigh)-gardenWaterUsed(this.ledger.world.constructionHighBuild)>this.constructionStock.stored['mars-water'])throw Error('保管庫の水が足りないよ。建材受取所で受け取ろう。');if(gardenCost(candidateHigh).soil-gardenCost(this.ledger.world.constructionHighBuild).soil>this.constructionStock.stored['mars-soil'])throw Error('土が足りないよ。建材受取所で受け取ろう。');}
+    if(['LIGHT_EDIT','LIGHT_UNDO'].includes(frozen.type)){const {assertLightsWorld,assertLightAction}=await import('./imasora-construction-lights-guard.mjs?v=120pv');const {assertGardenMaterials}=await import('./imasora-construction-garden.mjs?v=120ps');const world={...this.ledger.world,constructionHighBuild:candidateHigh};assertLightsWorld(world);assertLightAction(this.ledger.world,frozen,draft,candidateHigh);assertGardenMaterials(world);}
     const extraTimber=highWorldTimber(candidateHigh)-highWorldTimber(this.ledger.world.constructionHighBuild);if(extraTimber>this.constructionStock.stored['mars-timber'])throw Error('木材が足りないよ。建材受取所で受け取ろう。');
     if(frozen.type==='PLACE'&&this.constructionStock.stored['mars-timber']<highMaterialCost(frozen.blueprint))throw Error('この形をつくる木材が足りないよ。受取所で受け取ろう。');
     await this.enqueueDraft(draft,async(s,current)=>{
@@ -782,6 +877,15 @@ export class WorldSaveService{
       const generation=this.generation,raw=this.raw.current,result=await runWorldSaveTask('prepare-kit-transfer',{ledger:s,action:frozen,draft:current,expectedRevision}),soil=s.world.constructionTransport?.work?.frame.soil;
       preparedTransportSaves.set(result.ledger,{...result,base:s,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;
     });
+    return this.readConstructionVehicleWork('timber');
+  }
+  async unpackConstructionBeam(partId,id,draft,expectedRevision){
+    if(this.mode!=='live'||this.store?.name!==LIVE_WORLD_DB||!this.ready||this.blocked||this.busy)throw Error('セーブをたしかめてから、もう一度進もう。');
+    const base=this.ledger,generation=this.generation,raw=this.raw.current,snapshot=structuredClone(draft);let result;this.preparingTimberUnpack=true;
+    try{result=await runWorldSaveTask('prepare-beam-unpack',{ledger:base,partId,id,draft:snapshot,expectedRevision});}finally{this.preparingTimberUnpack=false;}
+    if(this.ledger!==base||this.generation!==generation||this.raw.current!==raw)throw Error('現場が変わったよ。もう一度、角材をえらぼう。');
+    if(result.unchanged)return this.readConstructionVehicleWork('timber');
+    await this.enqueueDraft(draft,s=>{if(s!==base)throw Error('別のセーブが進んだよ。もう一度ためそう。');const soil=base.world.constructionTransport?.work?.frame.soil;preparedTransportSaves.set(result.ledger,{...result,base,generation,raw,exactSoil:result.exactSoil===true&&isCapturedConstructionJson(soil),confirmedSoil:soil});return result.ledger;});
     return this.readConstructionVehicleWork('timber');
   }
   async saveConstructionTimber(work,draft,expectedRevision){

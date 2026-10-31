@@ -1,8 +1,9 @@
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {frameBlocked,frameRoute,frameLocal} from './free-frames.mjs?v=120gn';
-import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120gn';
-import {frameDeckHeight} from './free-frame-workspace.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {frameBlocked,frameRoute,frameLocal} from './free-frames.mjs?v=120pv';
+import {makeFrameScaffold,newScaffoldReceipt,assertScaffoldReceipt} from './free-frame-scaffold.mjs?v=120pv';
+import {frameDeckHeight} from './free-frame-workspace.mjs?v=120pv';
 
 export const finishNeedsScaffold=f=>constructionBase(f)+f.height>4;
 export const newFinishAccess=f=>Array.from({length:16},(_,cell)=>cell).filter(cell=>f.fill[cell]>0&&finishNeedsScaffold(f)).map(cell=>({cell,...newScaffoldReceipt()}));
@@ -11,15 +12,15 @@ export function assertFinishAccess(records,f){
  records.forEach((record,i)=>{if(record.cell!==expected[i].cell)throw Error('仕上げ用足場の対象が一致しません。');const {cell,...r}=record,low=frameDeckHeight(f);assertScaffoldReceipt(r,1,constructionBase(f)+f.height,{deckHeight:r.ascents===Math.ceil(low/2.5)+1?low:constructionBase(f)+f.height+2});});
 }
 export function finishHandReach(f,cell,stance,hand){
- const grip=frameLocal(stance,hand),c=freeCell(cell),y=Math.max(constructionBase(f)+f.fill[cell]/2+.7,constructionBase(f)+f.height+2);let max=0;
- for(const dx of [-6,6])for(const dz of [-6,6])max=Math.max(max,Math.hypot(c.x+dx-grip.x,y-grip.y,c.z+dz-grip.z));return max;
+ const grip=frameLocal(stance,hand),c=groundTile(cell,f),y=Math.max(constructionBase(f)+groundHeight(f,cell)+.7,constructionBase(f)+f.height+2);let max=0;
+ for(const dx of [-c.w*3/8,c.w*3/8])for(const dz of [-c.d*3/8,c.d*3/8])max=Math.max(max,Math.hypot(c.x+dx-grip.x,y-grip.y,c.z+dz-grip.z));return max;
 }
 export function finishAccessPlan(f,cell,from,hand,external=()=>false,heightAt=()=>0,sharedPlatform=null){
- const shared=sharedPlatform?.access(f,from,freeCell(cell),stance=>finishHandReach(f,cell,stance,hand)<=64,external,heightAt);if(shared)return shared;
+ const shared=sharedPlatform?.access(f,from,freeCell(cell,f),stance=>finishHandReach(f,cell,stance,hand)<=64,external,heightAt);if(shared)return shared;
  // Wet concrete cannot carry the scaffold. Keep every post and deck outside
  // the selected form footprint, including still-empty cells.
- const panels=Array.from({length:16},(_,i)=>i).filter(i=>f.mask&(1<<i)).map(i=>({...freeCell(i),width:16.7,depth:16.7}));
- const c=freeCell(cell),height=constructionBase(f)+f.height+2,candidates=[];
+ const panels=Array.from({length:16},(_,i)=>i).filter(i=>f.mask&(1<<i)).map(i=>{const t=groundTile(i,f);return{...t,width:t.w+.7,depth:t.d+.7};});
+ const c=groundTile(cell,f),height=constructionBase(f)+f.height+2,candidates=[];
  for(const d of [24,40,56])for(const [dx,dz]of [[d,0],[-d,0],[0,d],[0,-d]]){const stance={x:c.x+dx,z:c.z+dz,y:height,heading:Math.atan2(-dx,-dz)};if(!frameBlocked(f,panels,stance,external,14)&&finishHandReach(f,cell,stance,hand)<=64)candidates.push(stance);}
  candidates.sort((a,b)=>Math.hypot(a.x-from.x,a.z-from.z)-Math.hypot(b.x-from.x,b.z-from.z));
  let queries=0;const cached=(fn)=>{const cache=new Map();return(...args)=>{const key=args.join(',');if(cache.has(key))return cache.get(key);if(++queries>250000){const e=Error('仕上げの通路が複雑です。車両を離し、型枠の周りを空けてください。');e.code='FINISH_ACCESS_BUDGET';throw e;}const value=fn(...args);cache.set(key,value);return value;};};external=cached(external);heightAt=cached(heightAt);

@@ -1,6 +1,6 @@
-import {assertTransportField} from './imasora-construction-transport-field.mjs?v=120gf';
+import {assertTransportField} from './imasora-construction-transport-field.mjs?v=120ov';
 import {sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
-import {assertWorkField} from './imasora-construction-field-area.mjs?v=120ey';
+import {assertWorkField} from './imasora-construction-field-area.mjs?v=120ov';
 export const PARKING_ADAPTERS=Object.freeze([
  {id:'water',key:'constructionWater',material:'mars-water'},
  {id:'soil',key:'constructionSoil',material:'mars-soil'},

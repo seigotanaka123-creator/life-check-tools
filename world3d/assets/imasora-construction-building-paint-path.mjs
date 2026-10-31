@@ -1,10 +1,10 @@
-import{validateDecorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120gn';
+import{validateDecorSurface}from'./imasora-construction-decor-paint-path.mjs?v=120pv';
 import{wallDoorForPart,wallDoorPaintPatches}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
-import {roomPaintTarget,roomPaintToolPaths,roomPaintCamera} from './imasora-construction-building-room.mjs?v=120gn';
-import {buildingPaintPart,buildingPaintPatches} from './imasora-construction-building-paint.mjs?v=120gn';
-import {highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120gn';
-import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120gn';
-import {highLocalPoint,highWorldPoint,highWorldGeometry} from './imasora-construction-high-world.mjs?v=120gn';
+import {roomPaintTarget,roomPaintToolPaths,roomPaintCamera} from './imasora-construction-building-room.mjs?v=120pv';
+import {buildingPaintPart,buildingPaintPatches} from './imasora-construction-building-paint.mjs?v=120pv';
+import {highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120ov';
+import {upperSegmentHitsBox} from './imasora-construction-high-casting.mjs?v=120pv';
+import {highLocalPoint,highWorldPoint,highWorldGeometry} from './imasora-construction-high-world.mjs?v=120pv';
 const ok=(v,m)=>{if(!v)throw Error(m);};
 export function buildingPaintCamera(record,q){
  if(q.interior)return roomPaintCamera(record,q);

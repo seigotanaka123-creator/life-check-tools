@@ -1,9 +1,9 @@
-import {shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
-import {dumpRaisedBoxes} from './imasora-construction-dump-work.mjs?v=120gn';
-import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {armPose} from './imasora-construction-excavator.js?v=120gf';
+import {shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120pv';
+import {dumpRaisedBoxes} from './imasora-construction-dump-work.mjs?v=120pv';
+import {shovelMachineState} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {armPose} from './imasora-construction-excavator.js?v=120ov';
 import {bucketContactGeometry} from './imasora-construction-excavator-contact.js?v=120fc';
 // Transient scene checks supplement the saved soil model. They never mint a
 // save receipt, move an obstacle, or flatten a surface to let a vehicle through.
@@ -11,11 +11,12 @@ export function transportSceneMovementAllowed(before,next,{solids=[],blocked=()=
  if(next.frame.version!==2)return true;
  const f=next.frame,origin=f.soil.field.origin,walk=next.mode==='foot',exc=next.mode==='excavating';
  const p=f.player,boxes=walk?[{position:[p.x,p.y+14,p.z],half:[13.5,14,13.5]}]:exc?shovelMachines(f).filter((_,i)=>i!==1):[shovelDumpBody(f)];
- if(boxes.some(b=>solids.some(s=>boxesOverlap3D(b,s))))return false;
- for(const b of boxes){const e=boxExtent(b),pos=[origin[0]+b.position[0],b.position[1],origin[1]+b.position[2]],size=e.map(v=>v*2);if(blocked(pos,size))return false;}
+ const level=walk?f.player.y:exc?f.machineVehicle.groundY:f.dump.groundY;
+ if(boxes.some(b=>solids.some(s=>!(f.decks&&s.supportSurface&&s.position[1]+s.half[1]<=level+8)&&boxesOverlap3D(b,s))))return false;
+ for(const b of boxes){const e=boxExtent(b),pos=[origin[0]+b.position[0],b.position[1],origin[1]+b.position[2]],size=e.map(v=>v*2);if(!f.decks&&blocked(pos,size))return false;}
  if(heightAt){const v=walk?p:exc?f.machineVehicle:f.dump,c=Math.cos(v.heading),s=Math.sin(v.heading);
   const samples=walk?[[0,0],[-13,0],[13,0],[0,-13],[0,13]]:[[-28,-36],[28,-36],[-28,36],[28,36],[0,0]];
-  for(const [x,z]of samples){const px=v.x+c*x+s*z,pz=v.z-s*x+c*z,h=heightAt(origin[0]+px,origin[1]+pz),expected=nativeDumpHeightAt(f,px,pz);if(!Number.isFinite(h)||!Number.isFinite(expected)||Math.abs(h-expected)>.15)return false;}
+  for(const [x,z]of samples){const px=v.x+c*x+s*z,pz=v.z-s*x+c*z,h=heightAt(origin[0]+px,origin[1]+pz,level??0),expected=nativeDumpHeightAt(f,px,pz,level??0);if(!Number.isFinite(h)||!Number.isFinite(expected)||Math.abs(h-expected)>.15)return false;}
  }
  return true;
 }

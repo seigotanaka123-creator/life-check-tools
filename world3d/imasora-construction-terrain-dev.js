@@ -1,5 +1,5 @@
 import * as THREE from './assets/three.module.min.js';
-import { officialCharacter, measureCharacter } from './assets/imasora-construction-layout.js';
+import { officialCharacter, measureCharacter } from './assets/imasora-construction-layout.js?v=120ob';
 import { ConstructionSession, unpackConstruction } from './assets/imasora-construction-state.js?v=428';
 import { IndexedConstructionStore, CONSTRUCTION_TERRAIN_DEV_DB } from './assets/imasora-construction-storage.js?v=428';
 import { CELL, PILOT, SPAWN, FIXED, surfaceFaces, stepPlayer, previewEdit, planEdit, validatePlot } from './assets/imasora-construction-terrain.js?v=428';

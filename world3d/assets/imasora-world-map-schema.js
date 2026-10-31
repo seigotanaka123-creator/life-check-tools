@@ -1,4 +1,4 @@
-import {COAST_WORLD} from './imasora-coast-layout.mjs?v=120go';
+import {COAST_WORLD} from './imasora-coast-layout.mjs?v=120mx';
 export const IMASORA_WORLD_SCHEMA_VERSION = 4;
 
 const map = ({ world = {}, source, palette, spawn, entry, fixedStructures = [], buildZones, decoration, buildCatalog }) => ({
@@ -160,7 +160,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     world: COAST_WORLD,
     source: {
       title: "海岸マップ",
-      description: "街から橋を渡って、ひかりの浜へ。桟橋・灯台・潮だまりを自由に巡る小さな海辺です。",
+      description: "街から橋を渡って、ひかりの浜へ。桟橋のいかだに乗って、海と島を巡れます。",
       layout: "街は北、海は南。既存の建物と橋2の座標を保つ立体海岸",
       pixelSize: [1536, 1024],
 

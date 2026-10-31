@@ -1,5 +1,65 @@
 import * as THREE from "./three.module.min.js";
 
+// Every activity uses the same real palms. Rounded skin joins stay attached
+// to the authored torso, including in lessons, jumps and vehicle models.
+// They do not move a palm, a held tool, the actor or its collision footprint.
+const handAttachmentAnchors = new Map();
+function attachCharacterHands(model) {
+  const { body, hands = [], profileKey } = model.userData;
+  if (!body?.geometry || !hands.length) return model;
+  body.updateMatrix();
+  const geometry = new THREE.SphereGeometry(1, 12, 8);
+  const axis = new THREE.Vector3(0, 1, 0), delta = new THREE.Vector3();
+  const entries = hands.map((hand, index) => {
+    const neutral = hand.position.clone(), radius = Math.min(hand.scale.x, hand.scale.y, hand.scale.z);
+    const key = [profileKey, index, ...neutral.toArray(), ...body.matrix.elements].join(',');
+    let anchor = handAttachmentAnchors.get(key);
+    if (!anchor) {
+      const inverse = body.matrix.clone().invert(), point = neutral.clone().applyMatrix4(inverse);
+      const position = body.geometry.attributes.position, indices = body.geometry.index;
+      const triangle = new THREE.Triangle(), nearest = new THREE.Vector3();
+      let distance = Infinity; anchor = point.clone();
+      for (let n = 0; n < (indices?.count ?? position.count); n += 3) {
+        triangle.a.fromBufferAttribute(position, indices ? indices.getX(n) : n);
+        triangle.b.fromBufferAttribute(position, indices ? indices.getX(n + 1) : n + 1);
+        triangle.c.fromBufferAttribute(position, indices ? indices.getX(n + 2) : n + 2);
+        triangle.closestPointToPoint(point, nearest);
+        const d = nearest.distanceToSquared(point);
+        if (d < distance) { distance = d; anchor.copy(nearest); }
+      }
+      anchor.applyMatrix4(body.matrix);
+      handAttachmentAnchors.set(key, anchor.clone());
+    }
+    const sleeve = new THREE.Mesh(geometry, hand.material);
+    sleeve.name = index ? '体につながる右手' : '体につながる左手';
+    sleeve.castShadow = hand.castShadow; sleeve.receiveShadow = hand.receiveShadow;
+    model.add(sleeve);
+    return { hand, sleeve, anchor: anchor.clone(), neutral, radius,
+      last: new THREE.Vector3(Infinity, Infinity, Infinity), material: null };
+  });
+  function sync() {
+    for (const e of entries) {
+      if (e.sleeve.material !== e.hand.material) e.sleeve.material = e.hand.material;
+      e.sleeve.visible = e.hand.visible;
+      if (e.last.equals(e.hand.position)) continue;
+      e.last.copy(e.hand.position);
+      delta.subVectors(e.hand.position, e.anchor);
+      const length = delta.length(), width = e.radius * .56;
+      e.sleeve.position.copy(e.anchor).addScaledVector(delta, .5);
+      e.sleeve.scale.set(width, Math.max(width, length / 2 + width * .7), width);
+      e.sleeve.quaternion.setFromUnitVectors(axis, length > 1e-8 ? delta.multiplyScalar(1 / length) : axis);
+    }
+  }
+  // Matrix updates precede both tool contact measurements and rendering.
+  // Repeated stationary updates reuse the same two meshes and cached anchors.
+  const update = model.updateMatrixWorld, world = model.updateWorldMatrix;
+  model.updateMatrixWorld = function (force) { sync(); return update.call(this, force); };
+  model.updateWorldMatrix = function (parents, children) { sync(); return world.call(this, parents, children); };
+  model.userData.handConnections = entries;
+  sync();
+  return model;
+}
+
 export const WHITE_MICHI_ROAD_SABER_REN_ID = "star-white-hero-young-seed-walk-sky-cool-b-forest";
 export const WHITE_MICHI_ROAD_SABER_FLOWERING_ID = "hero-white-young-seed-walk-sky-cool-b";
 
@@ -1290,7 +1350,7 @@ function buildGenericMatureCharacter(descriptor, options = {}) {
     cameraTargetY: descriptor.profileKey === "walkBrave" ? 70 : descriptor.profileKey === "rioBrave" ? 74 : 78,
     cameraDistanceScale: descriptor.profileKey === "rioBrave" ? 1.12 : descriptor.profileKey === "walkBrave" ? 1.07 : 1
   };
-  return model;
+  return attachCharacterHands(model);
 }
 
 function buildCapeFastener(materials) {
@@ -1503,7 +1563,7 @@ export function buildWhiteMichiRoadSaberRen360(options = {}) {
     cameraTargetY: 78,
     cameraDistanceScale: 1
   };
-  return model;
+  return attachCharacterHands(model);
 }
 
 export function buildWhiteMichiStarCharacter360(characterId, options = {}) {
@@ -1570,11 +1630,13 @@ export function setWhiteMichiModelWireframe(model, enabled) {
 }
 
 export function disposeWhiteMichiModel(model) {
+  const geometries = new Set(), materials = new Set();
   model?.traverse?.(object => {
-    object.geometry?.dispose?.();
-    if (Array.isArray(object.material)) object.material.forEach(material => material?.dispose?.());
-    else object.material?.dispose?.();
+    if (object.geometry) geometries.add(object.geometry);
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) if (material) materials.add(material);
   });
+  geometries.forEach(geometry => geometry.dispose());
+  materials.forEach(material => material.dispose());
 }
 
 export const setMatureCharacterModelWireframe = setWhiteMichiModelWireframe;

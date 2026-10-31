@@ -24,7 +24,7 @@ body.world-player-game .world-shell{width:100%;padding:8px;min-height:100dvh;bac
 .world-player-brand>strong{display:block;font-size:17px;color:#f5ce81}.world-player-brand>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;margin-top:4px}
 .world-player-brand .save-state{padding:2px 7px;font-size:11px;color:#d2e3ef}.world-player-brand .scene-title{font-size:13px;color:#f0f7fc}
 .world-player-game .world-toolbar,.world-player-game .viewport-toolbar,.world-player-game .physics-badge,.world-player-game .world-shell>footer{display:none!important}
-.world-player-game .world-layout{display:block}.world-player-game .viewport{height:calc(100dvh - 174px);min-height:360px}.world-player-game .viewport-card{border-radius:14px}.world-player-game .viewport-footer{padding:8px 12px;font-size:12px;line-height:1.5}
+.world-player-game .world-layout{display:block}.world-player-game .viewport{height:calc(100dvh - 70px);min-height:360px}.world-player-game .viewport-card{border-radius:14px}.world-player-game .viewport-footer{padding:8px 12px;font-size:12px;line-height:1.5}
 .world-player-game .world-build-open{background:#f5c466;color:#172a37;border-color:#ffe2a0;font-size:14px;min-height:46px}
 .world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume) button{min-height:46px;padding:10px 12px;font-size:14px;font-weight:700;border:1px solid #7896aa;border-radius:11px;background:#294657;color:#f1f7fc;line-height:1.45;touch-action:manipulation}
 .world-player-game :is(.world-player-bar,.world-player-menu,.world-map-menu,.world-map-menu-resume) button:disabled{opacity:1;background:#283843;color:#b8c5ce;border-color:#526570;cursor:not-allowed}
@@ -56,4 +56,17 @@ html.imasora-player-ui:not(.game-developer-ui) :is([data-icp-dev-start],[data-ic
 html.imasora-player-ui .icp-auto-button{font-size:14px!important;min-height:46px}
 html.imasora-player-ui :is(.actions,.section-jump) button:is(.selected,.active,[aria-pressed=true]){background:#c5e7fa;color:#183748;border-color:#3179a7;box-shadow:inset 0 -3px #66b5df}
 .world-player-game .world-layout>.control-card{display:none}
+
+/* Keep the world visible: menu at the right, camera choices together above the pad. */
+body.world-player-game .world-header{position:absolute;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;z-index:20;margin:0;pointer-events:none}
+body.world-player-game .world-header .world-player-bar.world-player-bar{display:flex;justify-content:flex-end;flex-wrap:wrap;padding:0;border:0;background:transparent!important;box-shadow:none!important;pointer-events:none}
+body.world-player-game .world-player-bar>button,body.world-player-game .world-construction-shortcuts{pointer-events:auto}
+body.world-player-game .world-construction-shortcuts{order:-1}
+body.world-player-game .world-player-brand[hidden]{display:none!important}
+.world-camera-controls.camera-distance-control{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-height:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none}
+.world-camera-controls>:is(.camera-distance-control,.emergency-escape-control){position:static!important;transform:none!important;margin:0;min-height:44px;pointer-events:auto}
+body.world-player-game .world-camera-controls>button{border-radius:14px;background:#deeffb;color:#354b60;border-color:#b4d4e5;box-shadow:0 2px 0 #adced633}
+.world-camera-controls>button:focus-visible{outline:3px solid #3179a7;outline-offset:3px}
+
+@media(max-height:500px){body.world-player-game[data-ufo-world-map="coast"] .world-camera-controls{left:154px;right:auto}}
 .world-player-game .world-header:not(:has(.world-player-bar))::before{content:'マップをロード中…';display:block;padding:14px;color:#edf5fa;font-size:16px}

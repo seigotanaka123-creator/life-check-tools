@@ -24,7 +24,7 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
   moveButton.onclick=()=>{if(localBusy||!ready(context())||!move)return;screen='move';plan=null;notice='';changed();focusHeading();};
   if(buildList){
     const section=document.createElement('section');section.dataset.mapMenuScreen='build';section.hidden=true;
-    const intro=document.createElement('p');intro.textContent='建てたい建物を選んでください。選ぶだけでは建物は増えません。ゲームを再開し、配置場所を確認してから「ここに建てる」で確定します。';
+    const intro=document.createElement('p');intro.className='building-steps';intro.innerHTML='<span>🏡 えらぶ</span><i>›</i><span>📍 場所を決める</span><i>›</i><span>✨ 建てる</span>';
     section.append(intro,buildList);box.querySelector('.wmm-body').prepend(section);
     const choose=document.createElement('button');choose.type='button';choose.dataset.mapMenu='build';choose.textContent='建物を選ぶ';
     box.querySelector('[data-map-menu-screen="home"] .wmm-actions').prepend(choose);
@@ -41,7 +41,7 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
   function update(){
     const c=context(),busy=localBusy||!!c.busy;
     if(opened&&['confirm','move-confirm'].includes(screen)&&!localBusy&&(!samePlan(c)||!ready(c))){onMovePreview(null);plan=null;screen='home';notice='マップや保存の状態が変わりました。現在の内容を確認して、操作を選び直してください。';}
-    box.hidden=!opened;resumeBox.hidden=!paused||opened;q('[data-map-menu-name]').textContent=c.mapName||'現在のマップ';heading.textContent=screen==='confirm'?(plan?.kind==='undo'?(plan.context.undoKind==='move'?'移動を取り消しますか？':'片付けを取り消しますか？'):'建物を片付けますか？'):'建物メニュー';
+    box.hidden=!opened;box.dataset.screen=screen;resumeBox.hidden=!paused||opened;q('[data-map-menu-name]').textContent=c.mapName||'現在のマップ';heading.textContent=screen==='confirm'?(plan?.kind==='undo'?(plan.context.undoKind==='move'?'移動を取り消しますか？':'片付けを取り消しますか？'):'建物を片付けますか？'):'建物メニュー';
     if(screen==='build')heading.textContent='建物を選ぶ';
     if(screen==='remove')heading.textContent='片付ける建物を選ぶ';
     if(screen==='move')heading.textContent='移動する建物を選ぶ';
@@ -62,7 +62,7 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
         if(!c.movable?.length)list.textContent='移動できる工事現場の建物はありません。';
       }
     }
-    if(buildList){button('build').disabled=busy||!ready(c);for(const choice of buildList.querySelectorAll('button'))choice.disabled=busy||!ready(c)||choice.dataset.built==='true';}
+    if(buildList){button('build').disabled=busy||!ready(c);for(const choice of buildList.querySelectorAll('button'))choice.disabled=busy||!ready(c)||choice.dataset.built==='true'&&choice.dataset.buildInspect!=='true';}
     q('[data-map-menu-count]').textContent=number(c.count)?`片付け対象の建物：${c.count}個`:'建物の数を確認しています。';
     button('undo').textContent=c.undoKind==='move'?'前の移動を取り消す':'前の片付けを取り消す';
     q('[data-map-menu-undo-note]').textContent=c.canUndo&&number(c.undoCount)?`${c.undoKind==='move'?'前の移動':'前の片付け'}（${c.undoLabel||'このマップの対象建物'}）を取り消すと、建物${c.undoCount}個の状態へ戻せます。`:'取り消せる建物操作はありません。';
@@ -90,13 +90,14 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
       renderMoveMap(plan,c,moveCheck);
       onMovePreview({targetId:plan.target.id,position:[plan.position[0],plan.target.position[1],plan.position[1]],valid:!!moveCheck?.valid});
     }else onMovePreview(null);
+    if(screen==='build'){button('close').textContent='あそびにもどる';button('cancel').textContent='建物の管理';q('#'+id+'-paused').textContent='絵をえらび、現場で建てる場所を決めよう。';}else{button('close').textContent='閉じる（一時停止のまま）';q('#'+id+'-paused').textContent='閉じた後も一時停止しています。「ゲームを再開」で続けられます。';}
     q('[data-map-menu-status]').textContent=localBusy?'保存の結果を確認しています。終わるまでお待ちください。':c.busy?'保存中です。終わるまでお待ちください。':blockedReason(c)||notice;
     resumeButton.disabled=busy||!!c.blocked;reopenButton.disabled=localBusy;resumeReason.textContent=busy?'保存の確認が終わるまでお待ちください。':c.blocked?blockedReason(c):notice&&notice.startsWith('再開できません')?notice:'';resumeReason.hidden=!resumeReason.textContent;
   }
   function changed(){update();onChange({opened,paused,busy:localBusy||!!context().busy,screen});}
   function focusHeading(){heading.focus({preventScroll:true});q('.wmm-body').scrollTop=0;}
   function show(initialScreen='home'){if(opened||localBusy)return false;if(!paused)returnFocus=document.activeElement;onPause();paused=true;opened=true;screen=initialScreen==='build'&&buildList?'build':'home';plan=null;notice='';changed();focusHeading();return true;}
-  function close(){if(localBusy||context().busy)return false;onMovePreview(null);opened=false;screen='home';plan=null;notice='';changed();resumeButton.focus({preventScroll:true});return true;}
+  function close(){if(localBusy||context().busy)return false;const building=screen==='build';onMovePreview(null);opened=false;screen='home';plan=null;notice='';changed();resumeButton.focus({preventScroll:true});if(building)void resumeButton.onclick();return true;}
   function checkMovePlan(c){
     if(!plan||plan.kind!=='move'||!Array.isArray(plan.position)||plan.position.length!==2||!plan.position.every(Number.isFinite))return{valid:false,message:'X/Z座標を入力してください。'};
     if(plan.position[0]===plan.target.position[0]&&plan.position[1]===plan.target.position[2])return{valid:false,message:'移動先が現在位置と同じです。X/Zを変更してください。'};
@@ -140,4 +141,37 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
   box.addEventListener('keydown',event=>{if(handleKeyDown(event))event.stopPropagation();});update();
   function recovered(){onMovePreview(null);plan=null;screen='home';notice='保存を確認し、建物の表示を更新しました。';changed();requestAnimationFrame(()=>{if(opened&&!document.querySelector('.world-save-error[open]'))focusHeading();});}
   return {show,close,update,recovered,handleKeyDown,get opened(){return opened;},get paused(){return paused;}};
+}
+
+// Small, static illustrations follow the existing building silhouettes. No
+// second renderer, image downloads, or animation loop is needed in the menu.
+const BUILDING_CARDS=Object.freeze({
+ 'coast-house':{description:'海のそばに、あたたかい色の家を。',tags:['四角い家','屋根つき']},
+ 'coast-deck':{description:'海辺に広がる、大きな木の足場。',tags:['歩ける足場','木のデッキ']},
+ 'sky-garden':{description:'雲の上に、丸い屋根の休憩所を。',tags:['歩ける足場','丸い屋根']},
+ 'ufo-pad':{description:'UFOといっしょに置く、着陸用のパッド。',tags:['UFOつき','今いる場所へ']},
+ workshop:{description:'働く車のそばに、作業の拠点を。',tags:['大きな入口','丸屋根']},
+ storage:{description:'大きな入口と、丸い屋根が目印の倉庫。',tags:['大きな入口','丸屋根']}
+});
+const buildingEscape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function buildingCatalogPicture(item,mapKey='coast'){
+ const color='#'+(Number.isInteger(item.color)?item.color&0xffffff:0xffd8b1).toString(16).padStart(6,'0');
+ const ground=mapKey==='sky'?'#e5f4fc':mapKey==='construction'?'#f3dfb5':'#e2efda';
+ const base='<ellipse cx="151" cy="170" rx="122" ry="27" fill="'+ground+'"/><ellipse cx="149" cy="172" rx="87" ry="14" fill="#66827b" opacity=".13"/>';
+ let body='';
+ if(item.id==='ufo-pad')body='<ellipse cx="150" cy="159" rx="101" ry="26" fill="#78c6d1"/><ellipse cx="150" cy="151" rx="101" ry="26" fill="#d5eef4" stroke="#579fae" stroke-width="4"/><ellipse cx="150" cy="118" rx="86" ry="25" fill="#91abbc"/><path d="M66 116Q150 30 234 116Q150 162 66 116" fill="#d8e8ee" stroke="#809eac" stroke-width="3"/><path d="M112 98Q150 33 188 98Q150 113 112 98" fill="#9be2ee" stroke="#6aabbc" stroke-width="3"/><path d="M121 91Q150 55 177 91" fill="none" stroke="#ecffff" stroke-width="7" stroke-linecap="round"/><path d="M117 141L111 156M184 141L190 156" stroke="#7f96a6" stroke-width="9"/><g fill="#ffdfa1"><circle cx="94" cy="120" r="5"/><circle cx="124" cy="130" r="5"/><circle cx="156" cy="132" r="5"/><circle cx="188" cy="128" r="5"/><circle cx="211" cy="119" r="5"/></g>';
+ else if(item.id==='sky-garden')body='<ellipse cx="150" cy="154" rx="91" ry="27" fill="#84bbad"/><ellipse cx="150" cy="145" rx="91" ry="27" fill="'+color+'"/><g stroke="#f5edda" stroke-width="8">'+[80,113,150,187,220].map((x,n)=>'<path d="M'+x+' '+(135+Math.sin(n)*10)+'V83"/>').join('')+'</g><ellipse cx="150" cy="81" rx="87" ry="26" fill="#73bfd1"/><ellipse cx="150" cy="72" rx="87" ry="26" fill="#bcecf2" stroke="#72b4c5" stroke-width="3"/><path d="M82 66Q150 38 215 67" fill="none" stroke="#eaffff" stroke-width="6" stroke-linecap="round"/>';
+ else if(item.id==='coast-deck')body='<path d="M50 133L166 90 250 128 133 178Z" fill="#c99557" stroke="#ae7c42" stroke-width="3"/><path d="M50 133V146L133 191V178M250 128V141L133 191" fill="#a87847" stroke="#98683c" stroke-width="3"/>'+[0,1,2,3,4,5,6].map(n=>'<path d="M'+(60+n*16)+' '+(130-n*5.8)+'L'+(142+n*15)+' '+(171-n*5.9)+'" stroke="#f2dfb2" stroke-width="4"/>').join('')+'<g stroke="#577587" stroke-width="5" stroke-linecap="round"><path d="M54 133V101L167 59V92M134 178V146L247 104V128M54 116L167 74M134 161L247 119"/></g>';
+ else if(['storage','workshop'].includes(item.id))body='<path d="M69 92L169 64 235 103V164L135 190 69 151Z" fill="'+color+'" stroke="#8aabb1" stroke-width="2"/><path d="M135 128L235 103V164L135 190Z" fill="#8fa9b3" opacity=".22"/><path d="M69 93Q69 43 111 48L178 23Q222 21 235 103L135 131Q117 56 69 93" fill="#648397" stroke="#496a7e" stroke-width="3"/><path d="M78 78Q105 40 130 113M103 61L194 32M115 78L211 50M125 95L222 70" fill="none" stroke="#8aabbd" stroke-width="3"/><path d="M155 132L210 117V168L155 183Z" fill="#496473"/><path d="M163 135L201 125V168L163 178Z" fill="#a8dce8"/><path d="M164 145L201 135M164 156L201 146" stroke="#d8f1ef" stroke-width="2"/>';
+ else body='<path d="M68 96L165 66 232 105V165L135 195 68 156Z" fill="'+color+'" stroke="#c49e85" stroke-width="2"/><path d="M135 125L232 105V165L135 195Z" fill="#d0a78f" opacity=".26"/><path d="M50 100L149 30 249 105 135 137Z" fill="#668394" stroke="#476a7f" stroke-width="3"/><path d="M149 30L135 137 50 100" fill="#7b99aa"/><path d="M167 137L194 129V178L167 187Z" fill="#aa8055"/><path d="M86 120L110 132V151L86 139Z M203 124L222 119V140L203 145Z" fill="#a0e4ef" stroke="#f9f3df" stroke-width="4"/><circle cx="188" cy="160" r="2" fill="#ffe099"/>';
+ return '<svg viewBox="0 0 300 210" aria-hidden="true" focusable="false">'+base+body+'</svg>';
+}
+
+export function createBuildingCatalog({host,onPlace,allowed=()=>true}){
+ let items=[],built=new Set(),chosen=null,mapKey='',version='';
+ host.classList.add('building-catalog');host.innerHTML='<div class="building-choices" role="group" aria-label="建物の絵から選ぶ"></div><article class="building-hero" aria-label="選んだ建物"><div class="building-hero-picture"></div><div class="building-hero-caption"><span class="building-status"></span><h3></h3><p class="building-description"></p><div class="building-tags"></div></div><button type="button" class="building-place" data-build-place>この建物で場所を決める</button><p class="building-hint">現場で場所をたしかめてから「ここに建てる」</p></article><p class="building-empty" hidden>この場所では、建てられる建物はないよ。</p>';
+ const list=host.querySelector('.building-choices'),hero=host.querySelector('.building-hero'),place=host.querySelector('[data-build-place]'),q=s=>host.querySelector(s);
+ function paint(){const item=items.find(p=>p.id===chosen);hero.hidden=!item;q('.building-empty').hidden=!!items.length;if(!item)return;const made=built.has(item.id),meta=BUILDING_CARDS[item.id]??{description:item.note??'',tags:[]};q('.building-hero-picture').innerHTML=buildingCatalogPicture(item,mapKey);q('h3').textContent=item.name;q('.building-description').textContent=meta.description;q('.building-tags').innerHTML=meta.tags.map(t=>'<span>'+buildingEscape(t)+'</span>').join('');q('.building-status').textContent=made?'このマップに建っているよ':'これを建ててみよう';q('.building-status').dataset.built=String(made);place.dataset.built=String(made);place.disabled=made||!allowed();place.textContent=made?'建てた建物です':'この建物で場所を決める';q('.building-hint').textContent=made?'片付けるときは「建物の管理」へ。':'現場で場所をたしかめてから「ここに建てる」';for(const b of list.querySelectorAll('[data-build-id]'))b.setAttribute('aria-pressed',String(b.dataset.buildId===chosen));}
+ place.onclick=()=>{if(place.disabled||!allowed()||built.has(chosen)||!items.some(i=>i.id===chosen))return;onPlace(chosen);};
+ return{update(next){const key=JSON.stringify([next.mapKey,next.items,next.built,next.selected]);if(key===version)return;version=key;if(mapKey!==next.mapKey)chosen=null;mapKey=next.mapKey;items=next.items.filter(p=>!p.internal);built=new Set(next.built);if(next.selected&&items.some(i=>i.id===next.selected))chosen=next.selected;if(!items.some(i=>i.id===chosen))chosen=items.find(i=>!built.has(i.id))?.id??items[0]?.id??null;list.innerHTML=items.map(i=>'<button type="button" class="build-choice building-card" data-build-inspect="true" data-build-id="'+buildingEscape(i.id)+'" data-built="'+built.has(i.id)+'">'+buildingCatalogPicture(i,mapKey)+'<strong>'+buildingEscape(i.name)+'</strong><span class="building-card-state">'+(built.has(i.id)?'建てた建物':'えらぶ')+'</span></button>').join('');for(const b of list.querySelectorAll('[data-build-id]')){const ownerMap=mapKey;b.onclick=()=>{if(b.disabled||!allowed()||ownerMap!==mapKey||list.querySelector('[data-build-id="'+b.dataset.buildId+'"]')!==b)return;chosen=b.dataset.buildId;paint();};}paint();},get selected(){return chosen;}};
 }

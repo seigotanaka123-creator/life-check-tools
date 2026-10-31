@@ -1,7 +1,8 @@
-import{isKitCargo,kitPieceBoxes}from'./imasora-construction-kit-cargo.mjs?v=120gm';
+import{girderSections}from'./imasora-construction-girder-shape.mjs?v=120pl';
+import{isKitCargo,kitPieceBoxes}from'./imasora-construction-kit-cargo.mjs?v=120pl';
 import * as THREE from './three.module.min.js';
-import {createPart} from './imasora-construction-crane-model.js?v=120gn';
-import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
+import {createPart} from './imasora-construction-crane-model.js?v=120pv';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
 let grain;
 function woodTexture(){
   if(grain)return grain;
@@ -14,7 +15,8 @@ function woodTexture(){
 }
 export function createTimberPart(p){
   const root=createPart(p),iron=p.materialId==='earth-iron';root.userData.materialId=p.materialId;
-  if(isKitCargo(p)){
+  if(p.id.startsWith('structural-kit-')){const body=root.getObjectByName('inert-building-part');root.remove(body);body.geometry.dispose();for(const b of girderSections(iron?'steel':'wood',p.w)){const m=new THREE.Mesh(new THREE.BoxGeometry(b.w,b.h,b.d),body.material);m.name='inert-building-part';m.position.set(b.x,b.y,b.z);m.castShadow=m.receiveShadow=true;root.add(m);}}
+  else if(isKitCargo(p)){
     const body=root.getObjectByName('inert-building-part');root.remove(body);body.geometry.dispose();root.userData.kitPieces=[];
     for(const b of kitPieceBoxes(p.w/28)){const m=new THREE.Mesh(new THREE.BoxGeometry(b.w,b.h,b.d),body.material);m.name='inert-building-part';m.position.set(b.x,b.y,b.z);m.castShadow=m.receiveShadow=true;root.add(m);root.userData.kitPieces.push(m);}
     // Same protected kit is rendered by the crane and by its building.

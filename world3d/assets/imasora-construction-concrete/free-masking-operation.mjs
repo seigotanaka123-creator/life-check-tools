@@ -1,5 +1,5 @@
-import {assertPaintAccess} from './free-contact.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
+import {assertPaintAccess} from './free-contact.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
 const validMask=n=>Number.isInteger(n)&&n>=0&&n<=65535;
 export function maskingPlan(f,target,fromMask,toMask){
  if(!validMask(fromMask)||!validMask(toMask))throw Error('テープの場所を選び直そう。');

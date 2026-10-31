@@ -1,8 +1,9 @@
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 import * as T from '../three.module.min.js';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {placePaintPatch,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120gn';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {placePaintPatch,surfaceMaterial,surfaceMesh} from './free-paint-layer.mjs?v=120pv';
 import {placeWorkTargetLabel} from './work-target-layout.mjs?v=120dt';
 
 // A visual-only description derived from the same selected cells as the action.
@@ -11,20 +12,20 @@ export function describeWorkTarget(f,selection={}){
  if(selection.mode==='paint'){
   const {work,cell,face}=selection.paint??{},w=f.completed[work];
   if(!w||!freePlacedFill(w,cell)||!['top','north','south','east','west'].includes(face))return null;
-  const c=freeCell(cell),h=w.fill[cell]/2,base=constructionBase(w),p={x:w.x-f.location.x+c.x,y:base+h/2,z:w.z-f.location.z+c.z};
-  if(face==='top')p.y=base+h+.25;else if(face==='north'||face==='south')p.z+=face==='north'?-8.25:8.25;else p.x+=face==='west'?-8.25:8.25;
+  const c=groundTile(cell,w),h=groundHeight(w,cell),base=constructionBase(w),p={x:w.x-f.location.x+c.x,y:base+h/2,z:w.z-f.location.z+c.z};
+  if(face==='top')p.y=base+h+.25;else if(face==='north'||face==='south')p.z+=face==='north'?-c.d/2-.25:c.d/2+.25;else p.x+=face==='west'?-c.w/2-.25:c.w/2+.25;
   const pixels=[...new Set(selection.pixels??Array.from({length:16},(_,i)=>i))].filter(i=>Number.isInteger(i)&&i>=0&&i<16);
   return{kind:'paint',point:p,title:pixels.length?'ここを塗るよ！':'ここは保護中',detail:'作品 '+(work+1)+'・マス '+(cell+1)+'・'+({top:'上面',north:'北の面',south:'南の面',west:'西の面',east:'東の面'})[face],work:w,cell,face,pixels};
  }
  if(selection.mode==='build'){
-  const design=f.stage==='design',mask=design?(selection.mask??f.mask):f.mask;
+  const design=f.stage==='design'||selection.drafting===true,mask=design?(selection.mask??f.mask):f.mask;
   const pouring=['framed','wet'].includes(f.stage),selected=selection.cell??0;
   const cells=Array.from({length:16},(_,i)=>i).filter(i=>mask&(1<<i)).filter(i=>!pouring||i===selected);
   if(!cells.length)return null;
-  const height=design?(selection.height??f.height):f.height,base=constructionBase(f);
-  const points=cells.map(i=>({...freeCell(i),y:base+(pouring?f.fill[i]/2:height)}));
+  const height=design?(selection.height??f.height):f.height,base=design&&Number.isFinite(selection.baseY)?selection.baseY:constructionBase(f);
+  const points=cells.map(i=>({...groundTile(i,design?selection:f),y:base+(pouring?groundHeight(f,i):design?selection.levels?.[i]??height:height)}));
   const point={x:points.reduce((n,p)=>n+p.x,0)/points.length,y:base+height+.3,z:points.reduce((n,p)=>n+p.z,0)/points.length};
-  return{kind:'build',point,title:design?'ここにつくるよ！':pouring?'ここに注ぐよ！':f.stage==='complete'?'ここにできたよ！':'ここを仕上げるよ！',detail:pouring?'注ぐ場所：マス '+(selected+1):cells.length+'マス・高さ '+height,cells,base,height,points};
+  return{kind:'build',point,title:design?'ここにつくるよ！':pouring?'ここに注ぐよ！':f.stage==='complete'?'ここにできたよ！':'ここを仕上げるよ！',detail:pouring?'注ぐ場所：マス '+(selected+1)+(f.pourTargets?'・目印まで '+f.fill[selected]/4+'/'+f.pourTargets[selected]/4+'杯':''):cells.length+'マス・高さ '+height,cells,base,height,points};
  }
  return null;
 }
@@ -76,11 +77,11 @@ export function createWorkTarget({root,camera,host}){
    for(const pixel of next.pixels){const m=placePaintPatch(surfaceMesh(plane,fill),next.work,f.location,next.cell,next.face,pixel,.18);group.add(m);}
    // Continuous perimeter makes the selected face clear without covering its picture.
    const m=placePaintPatch(surfaceMesh(plane,fill),next.work,f.location,next.cell,next.face,0,.21);
-   const w=next.work,h=w.fill[next.cell]/2,c=freeCell(next.cell);m.position.set(next.point.x,next.point.y,next.point.z);m.scale.set(16,next.face==='top'?16:h,1);
-   const line=new T.LineSegments(edge,edgeMat);line.position.copy(m.position);line.rotation.copy(m.rotation);line.scale.copy(m.scale);line.renderOrder=24;group.add(line);rim(m,16,next.face==='top'?16:h);
+   const w=next.work,h=groundHeight(w,next.cell),c=groundTile(next.cell,w);m.position.set(next.point.x,next.point.y,next.point.z);m.scale.set(next.face==='west'||next.face==='east'?c.d:c.w,next.face==='top'?c.d:h,1);
+   const line=new T.LineSegments(edge,edgeMat);line.position.copy(m.position);line.rotation.copy(m.rotation);line.scale.copy(m.scale);line.renderOrder=24;group.add(line);rim(m,next.face==='west'||next.face==='east'?c.d:c.w,next.face==='top'?c.d:h);
   }else for(const p of next.points){
-   const m=surfaceMesh(plane,fill);m.rotation.x=-Math.PI/2;m.position.set(p.x,p.y+.2,p.z);m.scale.set(15.8,15.8,1);group.add(m);
-   const line=new T.LineSegments(edge,edgeMat);line.rotation.copy(m.rotation);line.position.copy(m.position);line.scale.copy(m.scale);group.add(line);rim(m,15.8,15.8);
+   const m=surfaceMesh(plane,fill);m.rotation.x=-Math.PI/2;m.position.set(p.x,p.y+.2,p.z);m.scale.set(p.w-.2,p.d-.2,1);group.add(m);
+   const line=new T.LineSegments(edge,edgeMat);line.rotation.copy(m.rotation);line.position.copy(m.position);line.scale.copy(m.scale);group.add(line);rim(m,p.w-.2,p.d-.2);
   }
  }
  return{group,update,get target(){return target;},setVisible(v){enabled=v;group.visible=v;if(!v||!target)label.hidden=true;},

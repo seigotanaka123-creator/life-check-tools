@@ -1,7 +1,7 @@
 import {BRIGHT_PAINTS,paintName} from './imasora-construction-concrete/paint-colors.mjs';
-import {colorStudioTemplate,installColorStudios} from './imasora-construction-concrete/color-studio.mjs';
-import {upperShapeTiles} from './imasora-construction-concrete/high-casting-shape.mjs';
-import {upperPaintFaces,upperPaintPlan} from './imasora-construction-concrete/high-paint.mjs?v=120fn';
+import {colorStudioTemplate,installColorStudios} from './imasora-construction-concrete/color-studio.mjs?v=120hg';
+import {upperShapeTiles} from './imasora-construction-concrete/high-casting-shape.mjs?v=120hb';
+import {upperPaintFaces,upperPaintPlan} from './imasora-construction-concrete/high-paint.mjs?v=120hb';
 const all=()=>Array.from({length:16},(_,i)=>i);
 export function createUpperPaintControls({host,item,project,credits,ready,perform,preview,look=()=>{},inspect=()=>{},generation=()=>null}){
  const root=document.createElement('section');root.className='upper-paint-controls';root.innerHTML='<button data-up-paint="open" aria-expanded="false">🎨 色をぬる</button><div data-up-paint-body hidden><div class="upper-paint-heading"><strong>🎨 作品に色をぬろう</strong><button data-up-paint="close">とじる</button></div><p>①道具と色 → ②ぬる面 → ③黄色いところにぬろう！</p><div data-paint-tools></div><div class="upper-paint-swatches" aria-label="ペンキの色"></div>'+colorStudioTemplate()+'<strong>どの面をぬる？</strong><div data-paint-faces></div><button data-up-paint="area">🧩 ぬるマスをえらぶ</button><div class="upper-paint-tiles" hidden aria-label="ぬる場所"></div><div data-paint-patterns></div><p data-up-paint-note role="status"></p><button data-up-paint="apply">ローラーでぬる</button></div>';host.append(root);

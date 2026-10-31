@@ -1,0 +1,25 @@
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));export const STEP=1/120;
+export const PARTS={sky:[['足元','すべるソール','つかむソール'],['ばね','大きく弾む','低く素早く'],['おもり','軽量','着地を安定']],mars:[['タイヤ','高速タイヤ','岩場タイヤ'],['足回り','大きく伸びる','着地を吸収'],['車体','軽量フレーム','安定フレーム']]};
+export function spec(parts=[0,0,0]){if(parts.length!==3||parts.some(x=>x!==0&&x!==1))throw Error('invalid setup');return{max:parts[0]?63:82,grip:parts[0]?8:1.4,accel:parts[2]?17:23,mass:parts[2]?1.7:1,bounce:parts[1]?5:12,land:parts[2]?.995:(parts[1]?.97:.76),turn:parts[2]?1.65:2.1,color:parts[0]?0x55cbb4:0xffb858};}
+export function course(kind='wide'){return kind==='wide'?{rx:290,rz:190,width:35,name:'のびのびコース'}:{rx:160,rz:65,width:23,name:'くねくねコース'};}
+export function point(c,t,offset=0){return{x:(c.rx+offset)*Math.sin(t),z:(c.rz+offset)*Math.cos(t)};}
+export function sample(c,x,z,map){const t=(Math.atan2(x/c.rx,z/c.rz)+Math.PI*2)%(Math.PI*2),r=Math.hypot(x/c.rx,z/c.rz),edge=Math.abs(r-1)*Math.min(c.rx,c.rz);return{t,edge,h:map==='sky'?5+3*Math.sin(3*t):4+10*Math.sin(2*t)+3*Math.sin(5*t)+(c.rx>200?2:6)*Math.max(0,1-Math.abs(t-1.3)/.25)+(c.rx>200?2:6)*Math.max(0,1-Math.abs(t-4.3)/.25),spring:map==='sky'&&Math.sin(3*t)>.94};}
+export function racer(c,parts,lane=0){const p=point(c,0,lane);return{...p,y:0,vx:0,vz:0,vy:0,yaw:Math.PI/2,setup:[...parts],gate:0,lap:0,finish:null,jumpHeld:false,grounded:true,air:0,landings:0,off:0};}
+export function pilot(c,a,map){const s=sample(c,a.x,a.z,map),v=Math.hypot(a.vx,a.vz),p=point(c,s.t+.12+v*.0015),aim=Math.atan2(p.x-a.x,p.z-a.z),delta=Math.atan2(Math.sin(aim-a.yaw),Math.cos(aim-a.yaw)),cfg=spec(a.setup),curve=Math.abs(delta),safe=cfg.max/(1+curve*4);return{steer:clamp(delta*2.7,-1,1),gas:v>safe?-.35:1,jump:map==='sky'&&s.spring&&a.grounded};}
+export function tick(c,a,input,map,dt=STEP,time=0,weather=null){if(a.finish!==null)return;const cfg=spec(a.setup),speed=Math.hypot(a.vx,a.vz),s=sample(c,a.x,a.z,map),gas=clamp(input.gas||0,-1,1),steer=clamp(input.steer||0,-1,1);a.yaw+=steer*cfg.turn*(a.grounded?1:.22)*Math.min(1,speed/8)*dt;
+const fx=Math.sin(a.yaw),fz=Math.cos(a.yaw),forward=a.vx*fx+a.vz*fz,lateral=a.vx*fz-a.vz*fx,grip=(a.grounded?cfg.grip:.05)*(s.edge>c.width?.35:1);let drive=forward+gas*(gas<0?35:cfg.accel)*dt;drive*=Math.exp(-(s.edge>c.width?1.4:.1)*dt);drive=clamp(drive,-10,cfg.max);const slip=lateral*Math.exp(-grip*dt);a.vx=fx*drive+fz*slip;a.vz=fz*drive-fx*slip;
+if(input.jump&&!a.jumpHeld&&a.grounded&&map==='sky'){a.vy=cfg.bounce/Math.sqrt(cfg.mass);a.grounded=false;}if(!input.jump&&a.jumpHeld&&a.vy>3)a.vy*=.65;a.jumpHeld=!!input.jump;
+if(map==='sky'&&weather){const wind=windAt(weather,time,a.x,a.z),response=(a.grounded?.16/Math.sqrt(cfg.grip):.85)/cfg.mass;a.vx+=(wind.x-a.vx*.08)*response*dt;a.vz+=(wind.z-a.vz*.08)*response*dt;}
+const oldH=s.h;a.x+=a.vx*dt;a.z+=a.vz*dt;const next=sample(c,a.x,a.z,map),g=map==='mars'?7:25;
+if(a.grounded){const slope=(next.h-oldH)/Math.max(dt,.001);if(map==='mars'&&speed>15&&next.h<a.y+a.vy*dt-.5*g*dt*dt-.005){a.grounded=false;}else if(map==='sky'&&next.spring&&!s.spring&&speed>10){a.vy=cfg.bounce;a.grounded=false;}else {a.y=next.h;if(map==='mars')a.vy=slope;}}
+if(!a.grounded){a.vy-=g*dt;a.y+=a.vy*dt;a.air+=dt;if(a.y<=next.h&&a.vy<=0){a.y=next.h;a.vy=0;a.grounded=true;a.vx*=cfg.land;a.vz*=cfg.land;a.landings++;}}
+if(next.edge>c.width*2.5){a.off+=dt;if(a.off>2){const p=point(c,(a.gate/16)*Math.PI*2);Object.assign(a,{...p,y:sample(c,p.x,p.z,map).h,vx:0,vz:0,vy:0,yaw:Math.atan2(c.rx*Math.cos(a.gate/16*Math.PI*2),-c.rz*Math.sin(a.gate/16*Math.PI*2)),grounded:true,off:0});}}else a.off=0;
+const expected=(a.gate+1)%16,target=point(c,expected/16*Math.PI*2);if(Math.hypot(a.x-target.x,a.z-target.z)<c.width*1.7){a.gate=expected;if(expected===0){a.lap++;if(a.lap===2)a.finish=time;}}
+}
+export function simulate(map,kind,parts,seconds=180,weather=null){const c=course(kind),a=racer(c,parts);a.y=sample(c,a.x,a.z,map).h;for(let i=0;i<seconds/STEP&&a.finish===null;i++)tick(c,a,pilot(c,a,map),map,STEP,i*STEP,weather);return a;}
+
+
+export function collide(a,b){const dx=b.x-a.x,dz=b.z-a.z,d=Math.hypot(dx,dz);if(d>=11||Math.abs(a.y-b.y)>9)return;const nx=d>1e-5?dx/d:1,nz=d>1e-5?dz/d:0,am=spec(a.setup).mass,bm=spec(b.setup).mass,total=am+bm,over=11-d;a.x-=nx*over*bm/total;a.z-=nz*over*bm/total;b.x+=nx*over*am/total;b.z+=nz*over*am/total;const rel=(b.vx-a.vx)*nx+(b.vz-a.vz)*nz;if(rel<0){const impulse=-1.2*rel/(1/am+1/bm);a.vx-=impulse*nx/am;a.vz-=impulse*nz/am;b.vx+=impulse*nx/bm;b.vz+=impulse*nz/bm;}}
+
+// One seeded wind field, sampled from the race clock by every racer and flag.
+export function windAt(weather,time,x=0,z=0){if(!weather)return{x:0,z:0,speed:0,heading:0};const seed=weather.seed>>>0,phase=(seed%65521)/65521*Math.PI*2,base=2+((seed>>>8)%600)/100,gust=Math.pow(Math.max(0,Math.sin(time*.31+phase)),4)*3,speed=Math.min(13,Math.max(.5,base+Math.sin(time*.17+phase)*1.4+gust)),heading=phase+Math.sin(time*.065+phase)*.65+Math.sin(x*.007+z*.004+time*.12)*.18;return{x:Math.sin(heading)*speed,z:Math.cos(heading)*speed,speed,heading};}

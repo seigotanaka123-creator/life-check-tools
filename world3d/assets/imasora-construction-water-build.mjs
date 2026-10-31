@@ -1,4 +1,4 @@
-import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 
 // One 8 x 8 x 8 earth block uses 4 L in the game's water scale.
 // Quantities remain integer 250 mL units, including partial fills and recovery.

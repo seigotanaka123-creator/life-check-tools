@@ -1,9 +1,9 @@
-import{createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120gf';
-import{stepRoomMotion}from'./imasora-construction-room-motion.mjs?v=120gn';
-import{ROOM_WALK_LIMIT,roomWalkStep,roomWalkEndAllowed}from'./imasora-construction-room-walk.mjs?v=120gn';
-import{roomToolFloor,roomToolApproaches}from'./imasora-construction-room-tool-approach.mjs?v=120gn';
-import{roomWalkWorldBoxes}from'./imasora-construction-room-walk-guard.mjs?v=120gn';
-import{highSelected,withHighWork}from'./imasora-construction-high-world.mjs?v=120gn';
+import{createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120od';
+import{stepRoomMotion,ROOM_JUMP_STYLE}from'./imasora-construction-room-motion.mjs?v=120pv';
+import{ROOM_WALK_LIMIT,roomWalkStep,roomWalkEndAllowed}from'./imasora-construction-room-walk.mjs?v=120pv';
+import{roomToolFloor,roomToolApproaches}from'./imasora-construction-room-tool-approach.mjs?v=120pv';
+import{roomWalkWorldBoxes}from'./imasora-construction-room-walk-guard.mjs?v=120pv';
+import{highSelected,withHighWork}from'./imasora-construction-high-world.mjs?v=120pv';
 export function createRoomWalkLive({host,service,record,collection,setCollection,setWork,snapshot,perform,clearInput,readInput,enabled,jumping=false,paused,setPaused,onStart,onStop,onError}){
  const root=document.createElement('section');root.className='room-walk-controls';root.innerHTML='<button data-rw="start">🚶 自分で歩く</button><div data-rw-body hidden><strong data-rw="where"></strong><p data-rw="status" role="status"></p><button data-rw="stop">道具をひらく</button><button data-rw="cancel" hidden>移動をやめる</button><button data-rw="pause">ひと休み</button></div>';host.insertBefore(root,host.querySelector('.upper-roof-controls'));
  const q=k=>root.querySelector('[data-rw='+k+']');let trail=[],saving=null,clock=0,moving=false,issue='',world=null,obstacles=[],waiting=null,planning=false,approach=null,stopping=false,upgrading=false;const jumpInput=createJumpIntent();let pendingJumps=0;
@@ -70,7 +70,7 @@ export function createRoomWalkLive({host,service,record,collection,setCollection
     }
    }else{
     const n=Math.max(1,Math.hypot(x,y)),distance=(i.fast?200:68)*dt,wx=(Math.cos(yaw)*x-Math.sin(yaw)*y)/n*distance,wz=(-Math.sin(yaw)*x-Math.cos(yaw)*y)/n*distance,a=record().site.turn*Math.PI/2,c=Math.cos(a),s=Math.sin(a),dx=c*wx-s*wz,dz=s*wx+c*wz,w=record().work;
-    if(w.roomMotion){const press=jumpInput.read();if(press&&!w.roomMotion.held)pendingJumps=Math.max(0,pendingJumps-1);const command={dt,x:dx/distance,z:dz/distance,heading:Math.hypot(dx,dz)>.0001?Math.atan2(dx,dz):w.actor.heading,fast:!!i.fast,jump:press,jumpStyle:2};try{const next=stepRoomMotion(w,command,obstacles);if(JSON.stringify([next.actor,next.roomMotion])!==JSON.stringify([w.actor,w.roomMotion])){trail.push(command);setWork(next);moving=Math.hypot(next.actor.x-w.actor.x,next.actor.z-w.actor.z)>1e-8;issue='';}}catch(e){setPaused(true);clearInput();issue=e.message;onError(e);refresh();}}else if(Math.hypot(dx,dz)>.0001)remember(w,roomWalkStep(w,w.actor,dx,dz,Math.atan2(dx,dz),obstacles));
+    if(w.roomMotion){const press=jumpInput.read();if(press&&!w.roomMotion.held)pendingJumps=Math.max(0,pendingJumps-1);const command={dt,x:dx/distance,z:dz/distance,heading:Math.hypot(dx,dz)>.0001?Math.atan2(dx,dz):w.actor.heading,fast:!!i.fast,jump:press,jumpStyle:ROOM_JUMP_STYLE};try{const next=stepRoomMotion(w,command,obstacles);if(JSON.stringify([next.actor,next.roomMotion])!==JSON.stringify([w.actor,w.roomMotion])){trail.push(command);setWork(next);moving=Math.hypot(next.actor.x-w.actor.x,next.actor.z-w.actor.z)>1e-8;issue='';}}catch(e){setPaused(true);clearInput();issue=e.message;onError(e);refresh();}}else if(Math.hypot(dx,dz)>.0001)remember(w,roomWalkStep(w,w.actor,dx,dz,Math.atan2(dx,dz),obstacles));
    }
    if(trail.length&&(clock>=3||trail.length>=ROOM_WALK_LIMIT-4)&&!saving&&!stopping)void save();
   }};

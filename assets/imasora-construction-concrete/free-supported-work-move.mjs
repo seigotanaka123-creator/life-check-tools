@@ -1,10 +1,11 @@
-import {constructionBase,supportedWorkMatches,assertFoundationSupport} from './free-supported-build.mjs?v=120gn';
-import {freeWorkMask,freeFilledMask,freeWorkCells} from './free-work-parts.mjs';
-import {freeWorkMoveProblem,freeWorkMoveEnvironmentProblem} from './free-work-move.mjs?v=120gn';
-import {rotateFreeWork} from './free-work-rotation.mjs';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
-import {foundationContains} from './free-foundation-state.mjs?v=120gn';
-import {canonicalFreeAction} from './free-build-state.mjs?v=120gn';
+import {groundTile} from './ground-grid.mjs?v=120hb';
+import {constructionBase,supportedWorkMatches,assertFoundationSupport} from './free-supported-build.mjs?v=120pv';
+import {freeWorkMask,freeFilledMask,freeWorkCells} from './free-work-parts.mjs?v=120hb';
+import {freeWorkMoveProblem,freeWorkMoveEnvironmentProblem} from './free-work-move.mjs?v=120pv';
+import {rotateFreeWork} from './free-work-rotation.mjs?v=120hb';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120pv';
+import {foundationContains} from './free-foundation-state.mjs?v=120pv';
+import {canonicalFreeAction} from './free-build-state.mjs?v=120pv';
 
 export const SUPPORTED_WORK_MOVE='FREE_TRANSFORM_SUPPORTED_WORK';
 // Old MOVE_WORK/TRANSFORM_WORK retain their historical ground-only meaning.
@@ -33,7 +34,7 @@ export function supportedWorkMoveEnvironmentProblem(p,index,position,environment
 export function supportedWorkSnapCandidates(p,index,quarterTurns=0,from=p.freeBuild?.completed[index]){
  const w=p.freeBuild?.completed[index],s=p.foundation;if(!w||!s||Math.abs(s.deckY-constructionBase(w))>1e-8)return [];
  const shape=rotateFreeWork(w,quarterTurns),cells=freeWorkCells(shape,freeWorkMask(shape)||freeFilledMask(shape)),found=new Map();
- for(const c of cells)for(let i=0;i<16;i++)if(s.mask&(1<<i)){const x=shape.x+s.x+(i%4-1.5)*16-c.x,z=shape.z+s.z+(Math.floor(i/4)-1.5)*16-c.z;const next={...shape,x,z};if(supportedWorkMatches({...p,schemaVersion:13},next,freeWorkMask(shape)||freeFilledMask(shape)))found.set(x+':'+z,{x,z});}
+ for(const c of cells)for(let i=0;i<16;i++)if(s.mask&(1<<i)){const x=shape.x+s.x+groundTile(i,s).x-c.x,z=shape.z+s.z+groundTile(i,s).z-c.z;const next={...shape,x,z};if(supportedWorkMatches({...p,schemaVersion:13},next,freeWorkMask(shape)||freeFilledMask(shape)))found.set(x+':'+z,{x,z});}
  return [...found.values()].sort((a,b)=>Math.hypot(a.x-from.x,a.z-from.z)-Math.hypot(b.x-from.x,b.z-from.z)||a.x-b.x||a.z-b.z);
 }
 const context=(p,a)=>JSON.stringify({profileId:p.profileId,revision:p.revision,action:canonicalFreeAction(a),freeBuild:p.freeBuild,foundation:p.foundation??null,location:p.location,completedFloors:p.completedFloors});

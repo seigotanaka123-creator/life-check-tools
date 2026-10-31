@@ -1,9 +1,9 @@
 import{stairPlacement,stairPoint,stairEntry,stairExit,stairGround,stairDoor,stairApproach,stairRoomBound}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import {roomGraphRoute} from './imasora-construction-building-room.mjs?v=120gn';
+import {roomGraphRoute} from './imasora-construction-building-room.mjs?v=120pv';
 import {highFloors} from './imasora-construction-high-shape.mjs?v=120gn';
-import {roomWalkGeometry,roomSurfaceAt as at,roomSupport as support,roomBodyClear} from './imasora-construction-room-contact.mjs?v=120gn';
-import {assertRoomMotion} from './imasora-construction-room-motion.mjs?v=120gn';
-export {roomWalkGeometry,roomWalkHullHit} from './imasora-construction-room-contact.mjs?v=120gn';
+import {roomWalkGeometry,roomSurfaceAt as at,roomSupport as support,roomBodyClear} from './imasora-construction-room-contact.mjs?v=120pv';
+import {assertRoomMotion} from './imasora-construction-room-motion.mjs?v=120pv';
+export {roomWalkGeometry,roomWalkHullHit} from './imasora-construction-room-contact.mjs?v=120pv';
 const ok=(v,m)=>{if(!v)throw Error(m);};
 export const ROOM_WALK_LIMIT=256;
 export function roomWalkPose(w,p,extra=[],geometry=roomWalkGeometry(w)){

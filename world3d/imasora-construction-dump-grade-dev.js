@@ -1,9 +1,9 @@
 import * as THREE from './assets/three.module.min.js';
-import {officialCharacter} from './assets/imasora-construction-layout.js';
-import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js?v=120ey';
+import {officialCharacter} from './assets/imasora-construction-layout.js?v=120ob';
+import {createDumpModel,updateDumpModel} from './assets/imasora-construction-dump-model.js?v=120ov';
 import {createDumpGait} from './assets/imasora-construction-dump-gait.js';
 import {createConstructionMovePad} from './assets/imasora-construction-concrete/move-pad.mjs';
-import {bindTravelBoost} from './assets/imasora-construction-travel-input.mjs';
+import {bindTravelBoost} from './assets/imasora-construction-travel-input.mjs?v=120lb';
 import {GRADE_COURSES,gradeHeightAt,gradeSupport,createGradeWorld,gradeStockAction,gradeDepotReady,stepGradeWorld,packGradeWorld,unpackGradeWorld} from './assets/imasora-construction-dump-grade.mjs';
 const $=id=>document.getElementById(id),key='imasora-dump-grade-practice-v1',canvas=$('scene'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(48,1,.5,2000);
 scene.background=new THREE.Color(0xcbded8);const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;

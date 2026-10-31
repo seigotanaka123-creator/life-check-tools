@@ -1,12 +1,13 @@
-import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
-import {pipeContactPath} from './free-boom-contact.mjs?v=120gn';
+import {groundTile,groundHeight,frameGrip,frameFastener} from './ground-grid.mjs?v=120hb';
+import {constructionBase,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120pv';
+import {pipeContactPath} from './free-boom-contact.mjs?v=120pv';
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
-import {makeFrameScaffold} from './free-frame-scaffold.mjs?v=120gn';
-import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs?v=120gn';
-import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs?v=120gn';
-import {walkingGroundAt} from './free-walking-ground.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {freeFramePanels,freeCell} from './free-build-state.mjs?v=120gn';
+import {makeFrameScaffold} from './free-frame-scaffold.mjs?v=120pv';
+import {frameDeckHeight,frameWorkBoxes,frameWorkspaceBlocked,frameExterior} from './free-frame-workspace.mjs?v=120pv';
+import {footingAt,FOOT_LEVEL_EPS,FOOTING_MESSAGE} from './free-footing.mjs?v=120pv';
+import {walkingGroundAt} from './free-walking-ground.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {freeFramePanels,freeCell} from './free-build-state.mjs?v=120pv';
 
 export const FREE_FRAME_ACTIONS=new Set(['FREE_FRAME','FREE_FRAME_RAISED','FREE_DEMOLD','FREE_UNFRAME']);
 export const FRAME_HAND_REACH=24,FRAME_TOOL_REACH=64,FRAME_GRIP_SPAN=4,FRAME_RACK={x:0,z:140},FRAME_RACK_STANCE={x:0,z:116,heading:0};
@@ -17,17 +18,17 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const ROUTE_WORLD_SEGMENT=Symbol('fixed-plan-world-segment');
 function shareWorldSegments(external,location){const segments=new Map();external[ROUTE_WORLD_SEGMENT]=(from,to,radius)=>{const key=[from.x,from.z,to.x,to.z,radius].join(',');if(segments.has(key))return segments.get(key);const hit=externalSegmentBlocked(location,from,to,radius,external);if(segments.size<40000)segments.set(key,hit);return hit;};return external;}
 const routeWorldBlocked=(external,location,from,to,radius)=>external[ROUTE_WORLD_SEGMENT]?.(from,to,radius)??externalSegmentBlocked(location,from,to,radius,external);
-export function frameOrder(mask){return freeFramePanels(mask).sort((a,b)=>a.z-b.z||a.x-b.x||a.id.localeCompare(b.id));}
+export function frameOrder(mask,w=null){return freeFramePanels(mask,w).sort((a,b)=>a.z-b.z||a.x-b.x||a.id.localeCompare(b.id));}
 // The default datum is Y=0; an explicit saved foundation supplies a raised datum.
 // Missing ground never supplies an invisible support or scaffold.
 export function assertFrameFoundation(f,heightAt=()=>0,panels=null){
  const check=(x,z)=>{const h=heightAt(f.location.x+x,f.location.z+z);if(!Number.isFinite(h)||Math.abs(h-constructionBase(f))>FOOT_LEVEL_EPS)throw Error('型枠の底・足場を支える平らな地面がありません。足元の穴や段差を避けて施工してください。');};
- if(panels){for(const p of panels)for(let i=0;i<=8;i++){const offset=-8+i*2;check(p.x+(p.width>p.depth?offset:0),p.z+(p.depth>p.width?offset:0));}}
- else{for(let i=0;i<16;i++)if(f.mask&(1<<i)){const c=freeCell(i);for(let x=-8;x<=8;x+=2)for(let z=-8;z<=8;z+=2)check(c.x+x,c.z+z);}}
+ if(panels){for(const p of panels)for(let i=0;i<=8;i++){const offset=-Math.max(p.width,p.depth)/2+i*Math.max(p.width,p.depth)/8;check(p.x+(p.width>p.depth?offset:0),p.z+(p.depth>p.width?offset:0));}}
+ else{for(let i=0;i<16;i++)if(f.mask&(1<<i)){const c=groundTile(i,f);for(let x=-c.w/2;x<=c.w/2;x+=2)for(let z=-c.d/2;z<=c.d/2;z+=2)check(c.x+x,c.z+z);}}
 }
 export function frameSurface(f,x,z){
- let height=0;const works=[...f.completed];if(f.stage==='cured')works.push({...f.location,fill:f.fill,baseY:constructionBase(f)});
- for(const w of works)for(let i=0;i<16;i++)if(freePlacedFill(w,i)){const c=freeCell(i);if(Math.abs(x-(w.x-f.location.x+c.x))<=8&&Math.abs(z-(w.z-f.location.z+c.z))<=8)height=Math.max(height,constructionBase(w)+w.fill[i]/2);}return height;
+ let height=0;const works=[...f.completed];if(f.stage==='cured')works.push({...f.location,fill:f.fill,baseY:constructionBase(f),...(f.layout?{layout:f.layout}:{})});
+ for(const w of works)for(let i=0;i<16;i++)if(freePlacedFill(w,i)){const c=groundTile(i,w);if(Math.abs(x-(w.x-f.location.x+c.x))<=c.w/2&&Math.abs(z-(w.z-f.location.z+c.z))<=c.d/2)height=Math.max(height,constructionBase(w)+groundHeight(w,i));}return height;
 }
 function* frameObstacles(f,panels,vehicleMargin){
  yield{box:{x:FRAME_RACK.x,z:FRAME_RACK.z,hx:11,hz:6},radius:14};
@@ -127,8 +128,8 @@ export function framePlan(f,type,start,handBases,external=()=>false,heightAt=()=
  const workspacePoints=new Map();let workspacePointCount=0;
  const deckExternal=(x,z,margin)=>{if(external(x,z,margin,deckHeight))return true;let row=workspacePoints.get(x);if(row?.has(z))return row.get(z);const blocked=frameWorkspaceBlocked(workBoxes,{x:x-f.location.x,z:z-f.location.z});if(workspacePointCount<40000){if(!row)workspacePoints.set(x,row=new Map());row.set(z,blocked);workspacePointCount++;}return blocked;};
  shareWorldSegments(deckExternal,f.location);
- const order=frameOrder(f.mask);if(!order.length)throw Error('型枠の形を選んでください。');
- if(frameAssembly(type))for(const board of order)for(let i=0;i<=8;i++){const offset=-8+i*2,point={x:board.x+(board.width>board.depth?offset:0),z:board.z+(board.depth>board.width?offset:0)};if(frameBlocked(f,[],point,external,.5))throw Error('型枠を置く場所に車両や建物があります。先に移動してください。');}
+ const order=frameOrder(f.mask,f);if(!order.length)throw Error('型枠の形を選んでください。');
+ if(frameAssembly(type))for(const board of order)for(let i=0;i<=8;i++){const length=Math.max(board.width,board.depth),offset=-length/2+i*length/8,point={x:board.x+(board.width>board.depth?offset:0),z:board.z+(board.depth>board.width?offset:0)};if(frameBlocked(f,[],point,external,.5))throw Error('型枠を置く場所に車両や建物があります。先に移動してください。');}
  const remove=!frameAssembly(type),scaffoldWork=remove||raised,sequence=remove?[...order].reverse():order,remaining=remove?[...order]:[],steps=[];let from={...start},preferredEntry=null;
  const rackSupport=footingAt(f,0,116,heightAt,true);if(!rackSupport)throw Error('資材置き場の足元を平らにしてください。');const rack={...FRAME_RACK_STANCE,y:rackSupport.height};
  function route(to,carrying,panel){const path=frameRoute(f,remaining,from,to,external,carrying?20:14,heightAt,supportAt,strictFooting);for(let i=1;i<path.length;i++)steps.push({kind:'walk',from:path[i-1],to:path[i],carrying,panel,obstacles:[...remaining],duration:Math.max(.08,distance(path[i-1],path[i])/FRAME_WORK_TEMPO.walkSpeed)});from={...to};}
@@ -147,8 +148,8 @@ export function framePlan(f,type,start,handBases,external=()=>false,heightAt=()=
   for(const {offset,targetHeadings,...stance}of stances){const support=scaffoldWork?supportAt(stance.x,stance.z):footingAt(f,stance.x,stance.z,heightAt,true);if(!support)continue;stance.y=support.height;
    if(scaffoldWork&&!exterior(stance)||frameBlocked(f,remove||raised?[panel]:remaining,stance,scaffoldWork?deckExternal:external))continue;
    for(const heading of targetHeadings){const target={x:panel.x,y:constructionBase(f)+f.height/2,z:panel.z,heading};
-    let max=0;for(let h=0;h<2;h++){const base=frameLocal(stance,handBases[h]),grip=frameLocal(target,{x:h?FRAME_GRIP_SPAN:-FRAME_GRIP_SPAN,y:0,z:-.2});max=Math.max(max,Math.hypot(base.x-grip.x,base.y-grip.y,base.z-grip.z));}
-    for(const hit of [-6,6])for(const lift of [0,4]){const base=frameLocal(stance,handBases[hit<0?0:1]),point=frameLocal(target,{x:hit,y:f.height/2+.4,z:-.4}),grip={x:point.x-Math.sin(stance.heading)*4,y:point.y+4+lift,z:point.z-Math.cos(stance.heading)*4};max=Math.max(max,Math.hypot(base.x-grip.x,base.y-grip.y,base.z-grip.z));}
+    let max=0;for(let h=0;h<2;h++){const base=frameLocal(stance,handBases[h]),grip=frameLocal(target,{x:h?frameGrip(panel):-frameGrip(panel),y:0,z:-.2});max=Math.max(max,Math.hypot(base.x-grip.x,base.y-grip.y,base.z-grip.z));}
+    for(const hit of [-frameFastener(panel),frameFastener(panel)])for(const lift of [0,4]){const base=frameLocal(stance,handBases[hit<0?0:1]),point=frameLocal(target,{x:hit,y:f.height/2+.4,z:-.4}),grip={x:point.x-Math.sin(stance.heading)*4,y:point.y+4+lift,z:point.z-Math.cos(stance.heading)*4};max=Math.max(max,Math.hypot(base.x-grip.x,base.y-grip.y,base.z-grip.z));}
     const useTool=max>FRAME_HAND_REACH-1;if(useTool){if(!scaffoldWork)continue;const handle=frameLocal(stance,{x:0,y:10,z:10}),clamp=frameLocal(target,{x:0,y:f.height/2+.8,z:-.4});if(Math.hypot(handle.x-clamp.x,handle.y-clamp.y,handle.z-clamp.z)>FRAME_TOOL_REACH-8)continue;}
     candidates.push({stance,target,useTool,cost:distance(stance,from)+Math.abs(offset)+(useTool?500:0)});
    }

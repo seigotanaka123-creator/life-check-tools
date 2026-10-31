@@ -1,14 +1,14 @@
 import * as T from '../three.module.min.js';
-import {foundationParts,foundationContains} from './free-foundation-state.mjs?v=120gn';
-import {assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120gn';
-import {frameRoute,frameBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120gn';
-import {walkingGroundAt,walkingGroundRotation} from './free-walking-ground.mjs?v=120gn';
+import {foundationParts,foundationContains} from './free-foundation-state.mjs?v=120pv';
+import {assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120pv';
+import {frameRoute,frameBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120pv';
+import {walkingGroundAt,walkingGroundRotation} from './free-walking-ground.mjs?v=120pv';
 import {ROUTE_EPS} from './free-route-clearance.mjs';
-import {footingAt} from './free-footing.mjs?v=120gn';
-import {foundationScaffoldBase,foundationScaffoldFor,foundationWorkSurface} from './free-foundation-work-scaffold.mjs?v=120gn';
-import {paintScaffoldSteps} from './free-paint-access.mjs?v=120gn';
+import {footingAt} from './free-footing.mjs?v=120pv';
+import {foundationScaffoldBase,foundationScaffoldFor,foundationWorkSurface} from './free-foundation-work-scaffold.mjs?v=120pv';
+import {paintScaffoldSteps} from './free-paint-access.mjs?v=120pv';
 export const FOUNDATION_HAND_REACH=24;
-export const foundationGrip=(part,i)=>part.id.startsWith('post-')?{x:i?.2:-.2,y:part.height/2-.1,z:-.3}:{x:i?6:-6,y:0,z:-1};
+export const foundationGrip=(part,i)=>part.id.startsWith('post-')?{x:i?.2:-.2,y:part.height/2-.1,z:-.3}:{x:(i?1:-1)*Math.min(6,part.width/2-.5),y:0,z:-1};
 export function* foundationHandPlanSteps(p,a,start,bases,env){
  const s=assertFoundationEnvironment(p,a,{...env,foot:start}),f=p.freeBuild,remove=a.type==='FREE_FOUNDATION_REMOVE',parts=foundationParts(s);
  // One part is planned per frame in the live HUD. Caches belong to that

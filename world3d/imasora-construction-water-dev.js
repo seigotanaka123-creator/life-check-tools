@@ -1,5 +1,5 @@
 import * as THREE from './assets/three.module.min.js';
-import {officialCharacter} from './assets/imasora-construction-layout.js';
+import {officialCharacter} from './assets/imasora-construction-layout.js?v=120ob';
 import {WATER,WATER_REGIONS,initialWater,waterAction,advanceWater,waterTotal,directionName,packWater} from './assets/imasora-construction-water.js?v=439';
 import {WaterSession} from './assets/imasora-construction-water-storage.js?v=439';
 import {createWaterLab,updateWaterLab} from './assets/imasora-construction-water-view.js?v=439';

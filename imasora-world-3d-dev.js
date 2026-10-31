@@ -1,49 +1,82 @@
+import {installWorldColour} from './assets/imasora-world-colour.mjs?v=120pp';
+import{chooseVehicleHeight,createVehicleSurfaceIndex}from'./assets/imasora-construction-vehicle-elevation.mjs?v=120ov';
+import {coastTerrainBodySamples,coastTerrainBodyFloor,coastTerrainBodyBlocked,coastTerrainBodyContact} from './assets/imasora-coast-terrain-contact.mjs?v=120mx';
+import {createCoastGroundCamera} from './assets/imasora-coast-camera-ground.mjs?v=120mx';
+import {createCoastPebbleUI} from './assets/imasora-coast-pebble-ui.mjs?v=120nd';
+import {createCoastFruitUI} from './assets/imasora-coast-fruit-ui.mjs?v=120ne';
+import {createSnorkelController} from './assets/imasora-coast-snorkel-ui.mjs?v=120od';
+import {createCoastWhaleScene} from './assets/imasora-coast-whale-scene.mjs?v=120oe';
+let coastWhaleScene=null;
+let coastPebbles=null,crabCameraRestore=null,coastFruits=null,coastSnorkel=null;
+import {createCoastCrabCamera} from './assets/imasora-coast-crab-view.mjs?v=120nd';
+const coastCrabCamera=createCoastCrabCamera();
+const coastGroundCamera=createCoastGroundCamera();
+import {createCoastRewardsUI} from './assets/imasora-coast-rewards-ui.mjs?v=120nd';
+import {createCoastRigUI} from './assets/imasora-coast-rig-ui.mjs?v=120nk';
+import {positionCoastCrewCharacter} from './assets/imasora-coast-crew-character.mjs?v=120oc';
+import {createCoastLandmarkControls} from './assets/imasora-coast-landmark-controls.mjs?v=120od';
+import {COAST_TOYS} from './assets/imasora-coast-landmark-play.mjs?v=120io';
+let coastLandmarks=null;
+import {coastTerrainStep} from './assets/imasora-coast-direct-play.mjs?v=120nz';
+import {firstPersonFov,CAMERA_DISTANCE_PRESETS,worldCameraDistance,nextCameraDistance,conversationFraming} from './assets/imasora-world-camera-distance.mjs?v=120np';
+import {createConstructionTownBridge,constructionTownArrival} from './assets/imasora-construction-town-bridge.mjs?v=120pr';
+import {createConstructionSurroundings} from './assets/imasora-construction-surroundings.mjs?v=120pn';
+import {createConstructionBridgeUI} from './assets/imasora-construction-bridge-ui.mjs?v=120pr';
+let constructionTownBridge=null,constructionBridgeUI=null,constructionSurroundings=null;
+import{createCoastForageUI}from'./assets/imasora-coast-forage-ui.mjs?v=120ps';
 import {createSkyCloudGround} from './assets/imasora-sky-cloud-ground.mjs?v=120gr';
-import {createSkyMapAtmosphere} from './assets/imasora-sky-map-atmosphere.mjs?v=120gq';
-import {createCoastWorld} from './assets/imasora-coast-world.mjs?v=120gp';
-import {createCoastUI} from './assets/imasora-coast-ui.mjs?v=120go';
-import {coastHeight,coastCanWade} from './assets/imasora-coast-layout.mjs?v=120go';
-let skyCloudGround=null,skyAtmosphere=null,coastWorld=null,coastUI=null,worldSun=null,worldHemi=null;
+import {createSkyMapAtmosphere} from './assets/imasora-sky-map-atmosphere.mjs?v=120pc';
+import {createCoastWorld} from './assets/imasora-coast-world.mjs?v=120ps';
+import {createCoastUI} from './assets/imasora-coast-ui.mjs?v=120ni';
+import {createCoastPlayController} from './assets/imasora-coast-physics-controls.mjs?v=120pt';
+import {coastCarryClearAt,coastCarryClearanceBatch} from './assets/imasora-coast-carry-clearance.mjs?v=120nu';
+import {coastHeight,coastWalkingHeight,coastCanWade,coastPierContains} from './assets/imasora-coast-layout.mjs?v=120mx';
+import {createCaveCrossingUI} from './assets/imasora-coast-cave-crossing-ui.mjs?v=120mx';
+let caveCrossing=null;
+let skyCloudGround=null,skyAtmosphere=null,constructionAtmosphere=null,coastWorld=null,coastUI=null,coastForageUI=null,coastRigUI=null,coastRewardsUI=null,coastPlay=null,worldSun=null,worldHemi=null;
 import {createRenderBudget} from './assets/imasora-world-render-budget.mjs?v=120gg';
-import {createWorldShadowCache} from './assets/imasora-world-shadow-cache.mjs?v=120gh';
-import {createHighLive} from './assets/imasora-construction-high-live.mjs?v=120gn';
-import './assets/imasora-autosave.js?v=120er';
-import {bindJumpButton,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,releasedJumpVelocity} from './assets/imasora-construction-locomotion.mjs?v=120gf';
+import {createWorldShadowCache,suspendHiddenDebugMatrices} from './assets/imasora-world-shadow-cache.mjs?v=120ld';
+import {createHighLive} from './assets/imasora-construction-high-live.mjs?v=120pv';
+import './assets/imasora-autosave.js?v=120qq';
+import {bindJumpButton,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,releasedJumpVelocity} from './assets/imasora-construction-locomotion.mjs?v=120od';
+import {createCharacterJumpAction} from './assets/imasora-character-jump-action.mjs?v=120lt';
 import {doorSpatialIndex} from './assets/imasora-construction-door-spatial.mjs?v=120eb';
 import {selectSharedParking,sharedParkingLayouts} from './assets/imasora-construction-shared-field.mjs?v=120ey';
-import {drawSharedParking} from './assets/imasora-construction-parking-view.mjs?v=120gf';
-import {fieldStaticVolumes} from './assets/imasora-construction-field-contact.mjs?v=120gn';
+import {drawSharedParking} from './assets/imasora-construction-parking-view.mjs?v=120ov';
+import {fieldStaticVolumes} from './assets/imasora-construction-field-contact.mjs?v=120pv';
 import {constructionContactCacheRevision} from './assets/imasora-construction-contact-cache.mjs?v=120ex';
-import {createNativeDoorNavigator} from './assets/imasora-construction-native-door.mjs?v=120gm';
+import {createNativeDoorNavigator} from './assets/imasora-construction-native-door.mjs?v=120ov';
 import {createDoorGroundProbe,createDoorSurfaceReader} from './assets/imasora-construction-door-ground.mjs?v=120ez';
-import {concreteWorldColliderBlocks} from './assets/imasora-construction-concrete/workshop-fence.mjs';
-import {createWorldPlayerUI} from './assets/imasora-world-player-ui.mjs?v=120go';
+import {createConcreteVehicleProbe,concreteWorldColliderBlocks} from './assets/imasora-construction-concrete/workshop-fence.mjs?v=120ov';
+import {createWorldPlayerUI} from './assets/imasora-world-player-ui.mjs?v=120pv';
 import {townReturnUrl,saveThenReturnToTown} from './assets/imasora-world-town-return.mjs?v=120go';
-import {createHeldDashButton} from './assets/imasora-hold-dash.mjs?v=119bf';
+import {createHeldDashButton,bindContextSpaceAction} from './assets/imasora-hold-dash.mjs?v=120od';
 import {concreteWorldPreview,concreteWorldProfileCheck} from './assets/imasora-construction-concrete/world-contract.mjs?v=116';
-import {createWorldConcreteController} from './assets/imasora-construction-concrete/world-controller.mjs?v=120gn';
-import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=120gn';
+import {createWorldConcreteController} from './assets/imasora-construction-concrete/world-controller.mjs?v=120pv';
+import {createReelLive} from './assets/imasora-construction-reel-live.mjs?v=120pv';
+import {reelGeometry,reelWorld,reelTop,reelLanding,reelStep,reelStairPass,reelStairGround} from './assets/imasora-construction-reel-world.mjs?v=120ps';
+import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=120pv';
 import {parkedConcreteVehicles} from './assets/imasora-construction-concrete/free-parking.mjs?v=120ey';
-import {vehiclePoseProblem,createConcreteSupportSampler} from './assets/imasora-construction-concrete/free-vehicle-contact.mjs?v=120gn';
-import {createWorldMapMenu} from './assets/imasora-world-map-menu.js?v=119bm';
+import {vehiclePoseProblem,createConcreteSupportSampler} from './assets/imasora-construction-concrete/free-vehicle-contact.mjs?v=120pv';
+import {createWorldMapMenu,createBuildingCatalog} from './assets/imasora-world-map-menu.js?v=120ni';
 import {createBuildingGroundProbe,constructionBuildingCandidate} from './assets/imasora-construction-building-ground.mjs?v=120et';
 import {buildingCameraFrame} from './assets/imasora-construction-building-camera.mjs?v=120et';
 import {nearbySceneObjects,readNearbySceneTargets} from './assets/imasora-world-nearby-scene.mjs?v=120ey';
-import {createNearbyNamesView} from './assets/imasora-world-nearby-view.mjs?v=120gg';
-import {createWorldMovePad} from './assets/imasora-world-move-pad.mjs?v=120ev';
+import {createNearbyNamesView} from './assets/imasora-world-nearby-view.mjs?v=120mt';
+import {createWorldMovePad} from './assets/imasora-world-move-pad.mjs?v=120od';
 let nearbyNamesView=null,nearbyNameObjects=[];
 function nameWorldObject(object,id,name,footprint,height=60,kind='building'){
   object.userData.nearbyName={id,name,hx:(footprint?.[0]||0)/2,hz:(footprint?.[1]||0)/2,height,kind};
 }
 function constructionWaterGroundReadRevision(){
-  const revision=constructionContactCacheRevision(constructionContactRevision,[worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]);
+  const revision=constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]);
   if(revision===undefined||ufoDoorControls.length||state.jumpY||state.jumpVelocity)return undefined;
   return [revision,state.map,state.position.x,state.position.z,state.groundY].join('/');
 }
 // Inactive display reuse is independent of the avatar's jump. Moving real
 // floors, an active tool or an unversioned scene always require a fresh draw.
 function constructionPresentationRevision(){
- const key=constructionContactCacheRevision(constructionContactRevision,[worldHighController,worldSoilController,worldWaterController,worldTimberController,worldConcreteController,worldExcavationController]);
+ const key=constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldWaterController,worldTimberController,worldConcreteController,worldExcavationController]);
  return ufoDoorControls.length||worldTimberController?.movingGround?undefined:key;
 }
 function updateNearbyNames(){
@@ -53,29 +86,29 @@ function updateNearbyNames(){
     enabled:worldBooted&&state.labels&&!document.hidden&&!state.ufoBoarded&&!state.selectedBuildId&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]')});
 }
 let constructionBuildingGroundProbe=null;
-import {isResettableBuilding} from './assets/imasora-world-map-reset-store.js?v=120gn';
+import {isResettableBuilding} from './assets/imasora-world-map-reset-store.js?v=120pv';
 import {createLookControls} from './assets/imasora-world-look-controls.js?v=492';
-import {buildWorldSceneSteps} from './assets/imasora-world-startup.mjs';
+import {buildWorldSceneSteps,shouldApplyTownArrival,completedTownArrivalUrl} from './assets/imasora-world-startup.mjs?v=120of';
 import * as THREE from "./assets/three.module.min.js";
 import {observeWorldCanvasSize} from './assets/imasora-world-canvas-size.js?v=490';
-import {createWorldTransportPlayController} from './assets/imasora-construction-transport-play-view.mjs?v=120gn';
-import {openSavedTransportWork} from './assets/imasora-construction-transport-runtime.mjs?v=120gn';
-import {createTransportMigrationView} from './assets/imasora-construction-transport-migration-view.mjs?v=120gn';
-import {createWorldTransportSceneBridge} from './assets/imasora-construction-transport-site-view.mjs?v=120gn';
-import {createTransportSceneReadStore} from './assets/imasora-construction-transport-site.mjs?v=120gn';
-import {EXCAVATION_YARDS} from './assets/imasora-construction-world-excavation.js?v=120gf';
-import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=120gn';
-import {ExcavationAuthoritySession,excavationAuthorityPreview} from './assets/imasora-construction-earth-session.js?v=120gn';
-import {ExcavationLedgerSession,excavationLedgerPreview} from './assets/imasora-construction-excavation-session.js?v=120gn';
+import {createWorldTransportPlayController} from './assets/imasora-construction-transport-play-view.mjs?v=120pv';
+import {openSavedTransportWork} from './assets/imasora-construction-transport-runtime.mjs?v=120pv';
+import {createTransportMigrationView} from './assets/imasora-construction-transport-migration-view.mjs?v=120pv';
+import {createWorldTransportSceneBridge} from './assets/imasora-construction-transport-site-view.mjs?v=120pv';
+import {createTransportSceneReadStore} from './assets/imasora-construction-transport-site.mjs?v=120pv';
+import {EXCAVATION_YARDS} from './assets/imasora-construction-world-excavation.js?v=120ov';
+import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=120pv';
+import {ExcavationAuthoritySession,excavationAuthorityPreview} from './assets/imasora-construction-earth-session.js?v=120pv';
+import {ExcavationLedgerSession,excavationLedgerPreview} from './assets/imasora-construction-excavation-session.js?v=120pv';
 import {createUfoFlightSurveyView} from './assets/imasora-ufo-flight-survey.js?v=464';
-import {WorldSaveService,WorldAuthorityStore,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=120gn';
-import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=120gn';
-import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=120gn';
-import {soilStartupResume} from './assets/imasora-construction-soil-startup.mjs?v=120gn';
-import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=120gn';
+import {WorldSaveService,WorldAuthorityStore,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=120pv';
+import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=120pv';
+import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=120pv';
+import {soilStartupResume} from './assets/imasora-construction-soil-startup.mjs?v=120pv';
+import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=120pv';
 import {DELIVERY_SITES,DELIVERY_SIZE,deliveryAccess,chooseDeliverySite} from './assets/imasora-construction-delivery.js?v=456';
-import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=120fs';
-import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=452';
+import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=120hq';
+import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=120pw';
 import { createSpaceMaterialGuide } from './assets/imasora-space-material-guide.js?v=20260924-c1';
 import { createMaterialBookContact } from './assets/imasora-space-material-catalog.js?v=441';
 import { createSpaceMaterialBook, disposeSpaceMaterialBook, MATERIAL_BOOK_SIZE } from './assets/imasora-space-material-book.js?v=120ds';
@@ -88,8 +121,8 @@ import {
   WHITE_MICHI_ROAD_SABER_REN_ID,
   buildMatureStarCharacter360,
   disposeMatureCharacterModel,
-} from "./assets/imasora-character-360.js";
-import { buildMarsShopkeeperAtEntrance360 } from './assets/imasora-mars-shopkeeper-360.js?v=20260905-back-apron-v415';
+} from "./assets/imasora-character-360.js?v=120ob";
+import { buildMarsShopkeeperAtEntrance360 } from './assets/imasora-mars-shopkeeper-360.js?v=120ob';
 import { buildMarsShopDisplays, disposeMarsShopDisplays } from './assets/imasora-mars-shop-displays.js?v=120ds';
 import { createMarsShopDialogState, MARS_SHOP_DIALOG_GREETING, MARS_SHOP_DIALOG_CHOICES } from './assets/imasora-mars-shop-dialog.js?v=20260905-greeting-v417';
 import {
@@ -98,19 +131,20 @@ import {
   mapBuildZone,
   mapSpawn,
   normalizedPoint,
-} from "./assets/imasora-world-map-schema.js?v=120go";
+} from "./assets/imasora-world-map-schema.js?v=120mx";
 
 const CONSTRUCTION_CONCRETE_PREVIEW=concreteWorldPreview(location.search,location.hostname);
 const CONSTRUCTION_CONCRETE_PROFILE_CHECK=concreteWorldProfileCheck(location.search,location.hostname,location.port);
 const CONSTRUCTION_DELIVERY_DOCK_CHECK=CONSTRUCTION_CONCRETE_PROFILE_CHECK&&new URLSearchParams(location.search).get('constructionDeliveryDockCheck')==='1';
 let worldHighController=null;
+let worldReelController=null;
 let worldConcreteController=null;
 const MATERIAL_GUIDE_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname)
   ? ['mars','construction'].find(map=>new URLSearchParams(location.search).get('materialGuidePreview')===map) : undefined;
 // All world-save paths use a separate key in the local manual preview.
 const SAVE_KEY = MATERIAL_GUIDE_PREVIEW ? 'imasora-material-guide-preview-v440' : "imasora-world-foundation-v3";
 const WORLD_SHOP_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname) && new URLSearchParams(location.search).get('worldShopPreview') === '1';
-let worldSaveService=null,worldShopOverlay=null,worldSaveErrorUI=null,worldBooted=false;
+let worldSaveService=null,worldShopOverlay=null,worldSaveErrorUI=null,worldBooted=false,worldSaveReloadRequested=false;
 let worldPlayerUI=null,transportMigrationUI=null;
 let worldMapMenu=null,mapMenuLoading=false,mapMenuReadError='',mapResetPoint=null,mapResetPending=null,mapMovePreviewGroup=null;
 const CONSTRUCTION_WATER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionWaterPreview')==='1';
@@ -376,12 +410,7 @@ const LOOK_PITCH_MIN = -.72;
 const LOOK_PITCH_MAX = .62;
 // 三人称カメラは距離だけを切り替え、上下の見下ろし角は共通にする。
 // 標準を従来値に合わせ、近景・引き・遠景を順番に選べるようにする。
-const THIRD_PERSON_DISTANCE_PRESETS = Object.freeze([
-  { label: "近景", distance: Math.hypot(92, 45) },
-  { label: "標準", distance: Math.hypot(112, 55) },
-  { label: "引き", distance: Math.hypot(150, 74) },
-  { label: "遠景", distance: Math.hypot(190, 94) },
-]);
+const THIRD_PERSON_DISTANCE_PRESETS = CAMERA_DISTANCE_PRESETS;
 const DEFAULT_THIRD_PERSON_DISTANCE_INDEX = 1;
 const UFO_CAMERA_BASE_FOV = 48;
 // UFO操縦時の画角は、空間の流れを読みやすい後方固定と、
@@ -1081,6 +1110,7 @@ const SKY_TRACK_VISIBLE_LENGTH = 2400;
 const SKY_TRACK_TIE_SPACING = 9;
 
 const MAPS = IMASORA_WORLD_MAPS;
+let buildingCatalogUI=null;
 
 const state = {
   map: "sky",
@@ -1245,6 +1275,7 @@ const els = {
   spaceTransitionOverlay: document.getElementById("spaceTransitionOverlay"),
   skyStationGuideDialog: document.getElementById("skyStationGuideDialog"),
   skyStationGuideDialogSpeaker: document.getElementById("skyStationGuideDialogSpeaker"),
+  skyStationGuideDialogClose: document.getElementById("skyStationGuideDialogClose"),
   skyStationGuideDialogText: document.getElementById("skyStationGuideDialogText"),
   skyStationGuideDialogChoices: document.getElementById("skyStationGuideDialogChoices"),
   skyStationGuideDialogFooter: document.getElementById("skyStationGuideDialogFooter"),
@@ -1303,6 +1334,7 @@ const els = {
 };
 
 let renderer;
+let updateWorldColour=()=>{};
 let scene;
 let camera;
 let clock;
@@ -1317,6 +1349,7 @@ let physicsMeshGroup;
 let physicsDebugGroup;
 let physicsContactMarker;
 let character;
+let jumpActionModel=null,characterJumpAction=null;
 let characterShadow;
 let skyStationGuide = null;
 let marsShopkeeper = null;
@@ -1584,11 +1617,12 @@ function sourceTextureFor(config) {
   return null;
 }
 
-function showToast(message) {
+function showToast(message, duration = 1900, kind = "") {
   els.toast.textContent = message;
+  els.toast.classList.toggle("coast-rescue-notice", kind === "coast-rescue");
   els.toast.classList.add("is-visible");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => els.toast.classList.remove("is-visible"), 1900);
+  toastTimer = setTimeout(() => els.toast.classList.remove("is-visible"), Number.isFinite(duration) ? Math.min(10000, Math.max(0, duration)) : 1900);
 }
 
 function clearUfoForwardScrollRewardFeed() {
@@ -1969,7 +2003,7 @@ function primeUfoAudio() {
 function primeUfoAudioFromGesture(event) {
   // Jumping needs no UFO audio. Do not start a group of media decoders on the
   // first jump or prime them twice through both the pointer and keyboard.
-  if(event.type==='keydown'&&(event.code==='Space'||event.key===' '))return;
+  if(event.type==='keydown'&&(event.code==='Space'||event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB'||event.code==='KeyK'||event.key===' '))return;
   if(event.target?.closest?.('#constructionJumpButton,[data-hold="jump"],[data-action="jump"],[aria-label^="ジャンプ"]'))return;
   window.removeEventListener('pointerdown',primeUfoAudioFromGesture,true);
   window.removeEventListener('keydown',primeUfoAudioFromGesture,true);
@@ -2007,7 +2041,7 @@ function worldStateSnapshot() {
     autoSaveVersion: 1,
     heading: state.heading,
     cameraDistanceIndex: state.cameraDistanceIndex,
-    constructionResume: [worldHighController,worldSoilController,worldWaterController,worldTimberController,worldExcavationController,worldConcreteController].find(c=>c?.active)?.resumePoint??null,
+    constructionResume: [worldReelController,worldHighController,worldSoilController,worldWaterController,worldTimberController,worldExcavationController,worldConcreteController].find(c=>c?.active)?.resumePoint??null,
     playCamera: {mode:state.cameraMode,heading:state.viewHeading,pitch:state.viewPitch},
     labels: state.labels,
     builtByMap,
@@ -2015,10 +2049,16 @@ function worldStateSnapshot() {
     ufoEquipment: { ...state.ufoEquipment },
     updatedAt: Date.now(),
   };
+  const sea=coastPlay?.snapshot();if(sea!==undefined)draft.coastPhysics=sea;
+  const toys=coastLandmarks?.snapshot();if(toys!==undefined)draft.coastToys=toys;
+  const snorkeling=coastSnorkel?.snapshot();if(snorkeling!==undefined)draft.coastSnorkel=snorkeling;
+  const pebbles=coastPebbles?.snapshot();if(pebbles!==undefined)draft.coastPebbles=pebbles;
+  if(coastUI)draft.coastDestination=coastUI.destination;
   return worldSaveService?.issueDraft(draft)??draft;
 }
 
 function mapEntryStart(mapKey = "sky") {
+  if(mapKey === "construction")return constructionTownArrival();
   if (mapKey === "sky") return { ...SKY_ENTRY_START };
   const config = MAPS[mapKey] || MAPS.sky;
   const entry = config.entry;
@@ -2034,21 +2074,24 @@ function mapEntryStart(mapKey = "sky") {
 
 function resetPlayerToMapSpawn(mapKey = state.map, options = {}) {
   walkDashControl?.cancel();
-  const spawn = options.fromEntry
+  const skyArrival = mapKey === "sky";
+  const spawn = options.fromEntry || (skyArrival && !options.fromEmergency)
     ? mapEntryStart(mapKey)
     : options.fromEmergency && mapKey === "sky"
     ? SKY_EMERGENCY_START
     : mapSpawn(MAPS[mapKey]);
-  state.position.set(spawn.x, spawn.y, spawn.z);
+  state.position.set(spawn.x, spawn.y ?? 0, spawn.z);
   state.heading = spawn.heading;
   state.viewHeading = spawn.heading;
   state.viewPitch = 0;
-  if (options.fromEntry && mapKey === "sky") {
-    state.viewHeading = SKY_ENTRY_CAMERA.heading;
+  if (skyArrival) {
+    // Every surface return uses the same station forecourt, including menu
+    // map switches. A fresh arrival starts outside in a readable third-person view.
+    state.cameraMode = "third";
+    state.viewHeading = options.fromEmergency ? SKY_EMERGENCY_CAMERA_HEADING : SKY_ENTRY_CAMERA.heading;
     state.viewPitch = SKY_ENTRY_CAMERA.pitch;
     state.cameraDistanceIndex = SKY_ENTRY_CAMERA.distanceIndex;
-  } else if (options.fromEmergency && mapKey === "sky") {
-    state.viewHeading = SKY_EMERGENCY_CAMERA_HEADING;
+    state.skyArrivalCameraPending = true;
   }
   state.groundY = 0;
   state.jumpY = 0;
@@ -2062,6 +2105,7 @@ function resetPlayerToMapSpawn(mapKey = state.map, options = {}) {
 
 function updateEmergencyReturnControl() {
   if (!els.emergencyEscapeButton) return;
+  els.emergencyEscapeButton.hidden=!!coastPlay?.rescuing;
   // 火星と工事現場では、そのマップ内で復帰する。作業途中の資材は
   // 各作業の保存を完了させてから停止し、復帰先へ持ち運んだり消したりしない。
   const destination = state.map === "mars"
@@ -2078,30 +2122,37 @@ function updateEmergencyReturnControl() {
 let worldAutoSave=null,lastAutoScene='',worldRenderBudget=null,pendingRenderQuality=null,worldShadowCache=null;
 function setWorldText(element,value){if(element&&element.textContent!==value)element.textContent=value;}
 
-function autoSceneKey(){const cs=[worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];return JSON.stringify([state.map,state.position.x,state.position.z,state.heading,state.viewHeading,state.viewPitch,state.cameraMode,state.cameraDistanceIndex,state.labels,state.ufoResources,state.ufoEquipment,(()=>{const c=cs.find(c=>c?.active);return c?.autoSaveKey??c?.resumePoint;})()]);}
+function autoSceneKey(){const cs=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];return JSON.stringify([state.map,state.position.x,state.position.z,state.heading,state.viewHeading,state.viewPitch,state.cameraMode,state.cameraDistanceIndex,state.labels,state.ufoResources,state.ufoEquipment,coastLandmarks?.autoSaveKey,coastPlay?.autoSaveKey,coastPebbles?.autoSaveKey,coastSnorkel?.autoSaveKey,coastUI?.destination,caveCrossing?.autoSaveKey,(()=>{const c=cs.find(c=>c?.active);return c?.autoSaveKey??c?.resumePoint;})()]);}
 function setupWorldAutoSave(){
  if(worldAutoSave||worldSaveService.mode!=='live'||CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW||CONSTRUCTION_DELIVERY_PREVIEW||CONSTRUCTION_EXPANSION_PREVIEW||SKY_STATION_INTERIOR_PREVIEW||MARS_RETURN_PREVIEW||MARS_SHOPKEEPER_PREVIEW||WORLD_SHOP_PREVIEW)return;
  lastAutoScene='';
  worldAutoSave=globalThis.ImasoraAutoSave.create({
-  ready:()=>worldBooted&&!worldSaveService.blocked&&!worldSaveService.busy&&!mapResetPending&&!worldSaveService.crafting&&![worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&c?.busy),
-  dirty:()=>[worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>!c?.active&&c?.dirty)||autoSceneKey()!==lastAutoScene,
-  save:async()=>{const cs=[worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController],ctrl=cs.find(c=>c?.active)??cs.find(c=>c?.dirty);if(ctrl?.busy)return false;const capturedScene=autoSceneKey();const ok=ctrl?await (ctrl.autosave?.()??ctrl.save()):await persistWorldSnapshot().then(()=>true);if(ok!==false)lastAutoScene=capturedScene;return ok;},
-  onError:error=>{els.saveState.textContent='セーブを確認してね';worldSaveErrorUI?.show(error);},
+  ready:()=>worldBooted&&!worldSaveService.blocked&&!worldSaveService.busy&&!mapResetPending&&!worldSaveService.crafting&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&c?.busy),
+  dirty:()=>[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>!c?.active&&c?.dirty)||autoSceneKey()!==lastAutoScene,
+  save:async()=>{const cs=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController],ctrl=cs.find(c=>c?.active)??cs.find(c=>c?.dirty);if(ctrl?.busy)return false;const capturedScene=autoSceneKey();if(!ctrl&&await caveCrossing?.flushPending?.()===false)return false;const ok=ctrl?await (ctrl.autosave?.()??ctrl.save()):await persistWorldSnapshot().then(()=>true);if(ok!==false)lastAutoScene=capturedScene;return ok;},
+  onError:error=>{els.saveState.textContent='セーブを確認してね';reportWorldSaveError(error);},
   onSaved:()=>{state.saved=true;els.saveState.textContent='オートセーブ済み';}
  });
+}
+
+function reportWorldSaveError(error){
+  if(worldBooted&&!worldSaveService?.blocked&&globalThis.ImasoraAutoSave?.deferred(error)){
+    state.saved=false;lastAutoScene='';void worldAutoSave?.flush('deferred');return;
+  }
+  worldSaveErrorUI?.show(error);
 }
 
 function persistWorldSnapshot(reward=null) {
   if(!worldSaveService)return Promise.resolve();
   const pending=worldSaveService.saveWorld(worldStateSnapshot(),reward);
-  pending.catch(error=>{state.saved=false;els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});
+  pending.catch(error=>{state.saved=false;els.saveState.textContent='保存の確認が必要';reportWorldSaveError(error);});
   return pending;
 }
 
 async function returnToTownFromConstruction() {
   if(!['construction','coast'].includes(state.map)||!worldBooted)return false;
   if(mapResetPending||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting){showToast('セーブをたしかめてから街へ戻ろう。');return false;}
-  const controllers=[worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];
+  const controllers=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];
   if(controllers.some(c=>c?.active)){showToast('作業メニューでセーブして、工事現場へ戻ってから押してね。');return false;}
   clearMarsShopDialogInput();lookControls?.cancel();
   const url=townReturnUrl(location.href,undefined,state.map==='coast'?'coast-return':'construction-return');
@@ -2140,7 +2191,7 @@ function loadState(saved) {
     state.position.set(saved.position.x,0,saved.position.z);state.pendingSafeEntry=false;state.groundY=Number.isFinite(saved.position.y)?saved.position.y:0;
     state.heading=state.viewHeading=Number.isFinite(saved.heading)?saved.heading:0;
   }
-  state.cameraDistanceIndex=Number.isInteger(saved.cameraDistanceIndex)?clamp(saved.cameraDistanceIndex,0,THIRD_PERSON_DISTANCE_PRESETS.length-1):0;
+  state.cameraDistanceIndex=Number.isInteger(saved.cameraDistanceIndex)?clamp(saved.cameraDistanceIndex,0,THIRD_PERSON_DISTANCE_PRESETS.length-1):DEFAULT_THIRD_PERSON_DISTANCE_INDEX;
   if(saved.playCamera){state.cameraMode=['third','first'].includes(saved.playCamera.mode)?saved.playCamera.mode:'third';if(Number.isFinite(saved.playCamera.heading))state.viewHeading=saved.playCamera.heading;if(Number.isFinite(saved.playCamera.pitch))state.viewPitch=saved.playCamera.pitch;}
   state.labels = saved.labels !== false;
   builtByMap = saved.builtByMap && typeof saved.builtByMap === "object" ? saved.builtByMap : {};
@@ -2248,10 +2299,10 @@ function mapMenuUnavailableReason({checkDirty=false}={}) {
   if(!worldBooted||!worldSaveService?.ready)return '準備が終わってから開いてください。';
   if(!['sky','mars','coast','construction'].includes(state.map))return '地上のマップに戻ってから開いてください。';
   if(state.ufoBoarded||state.ufoEngineMode!=='idle'||state.ufoSpaceTransitioning||state.ufoMarsArrivalExitPending)return 'UFOから降り、移動が終わってから開いてください。';
-  if([worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(c=>c?.active))return '車両の作業を保存して徒歩に戻ってから開いてください。';
+  if([worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(c=>c?.active))return '車両の作業を保存して徒歩に戻ってから開いてください。';
   // Unsaved, untouched preview yards start with revision 0 and no saved record.
   // They are not unfinished user work. Avoid hashing excavation every frame.
-  if(checkDirty&&state.map==='construction'&&[[worldHighController,'constructionHighBuild'],[worldWaterController,'constructionWater'],[worldSoilController,'constructionSoil'],[worldTimberController,'constructionTimber'],[worldExcavationController,'constructionExcavation']].some(([c,key])=>worldSaveService.ledger?.world[key]&&c?.dirty))return '車両の作業を保存してから開いてください。';
+  if(checkDirty&&state.map==='construction'&&[[worldReelController,'constructionHighBuild'],[worldHighController,'constructionHighBuild'],[worldWaterController,'constructionWater'],[worldSoilController,'constructionSoil'],[worldTimberController,'constructionTimber'],[worldExcavationController,'constructionExcavation']].some(([c,key])=>worldSaveService.ledger?.world[key]&&c?.dirty))return '車両の作業を保存してから開いてください。';
   if(state.falling||Math.abs(state.jumpY)>.01||Math.abs(state.jumpVelocity)>.01)return '着地してから開いてください。';
   if(worldShopOverlay?.open||constructionDeliveryMenu?.open||spaceMaterialGuide?.open||marsShopDialogState.open||isSkyStationGuideDialogOpen()||isUfoEquipmentWorkshopMenuOpen())return 'ほかのメニューを閉じてから開いてください。';
   return '';
@@ -2406,12 +2457,15 @@ function addCloudCluster(parent, x, z, scale = 1, tint = 0xf6fbff) {
 
 function makeGround(config) {
   if(config.decoration.coastOpenWorld){
-    coastWorld=createCoastWorld({collider:addRotatedCollider,surface:registerPhysicsFloor,reserved:buildItemsForMap()});
+    coastWorld=createCoastWorld({collider:addRotatedCollider,surface:registerPhysicsFloor,ceiling:addRotatedCeiling,reserved:buildItemsForMap(),pebbleState:coastPebbles?.snapshot()??worldSaveService?.ledger?.world.coastPebbles});
     scene.fog=new THREE.Fog(config.palette.fog,1800,6500);
-    camera.far=18000;camera.updateProjectionMatrix();
+    // The expanded islands expose distant waterlines. A 0.1 near plane wastes
+    // depth precision there and makes sea/shore fragments fight for the same
+    // depth value. Four world units remain well inside the close player view.
+    camera.near=4;camera.far=18000;camera.updateProjectionMatrix();
     return coastWorld.group;
   }
-  if (config.decoration.expandedConstruction) return createConstructionGround(config);
+  if (config.decoration.expandedConstruction){const ground=createConstructionGround(config);constructionAtmosphere=createSkyMapAtmosphere({cloudSea:false,lightWorld:true});scene.add(constructionAtmosphere.group);constructionSurroundings=createConstructionSurroundings(config);scene.add(constructionSurroundings.group);return ground;}
   const group = new THREE.Group();
   const { width, depth } = config.world;
   if(state.map==='sky'){skyAtmosphere=createSkyMapAtmosphere();group.add(skyAtmosphere.group);}
@@ -2556,6 +2610,16 @@ function clearThreeGroup(group) {
   while (group.children.length) group.remove(group.children[0]);
 }
 
+function replaceReelContacts(){
+ if(state.map!=='construction')return;
+ for(const list of[colliders,walkableSurfaces,ceilingSurfaces,...Object.values(physicsElements)])if(Array.isArray(list))for(let i=list.length-1;i>=0;i--)if(list[i]?.buildingId==='construction-reel')list.splice(i,1);
+ if(physicsMeshGroup)for(const child of [...physicsMeshGroup.children])if(child.name.includes('reel-')){child.removeFromParent();child.geometry?.dispose();child.material?.dispose();}
+ constructionContactRevision++;
+ const geometry=reelGeometry(worldSaveService.ledger?.world.constructionHighBuild);
+ for(const p of geometry.surfaces){addAuthoritativeSurface({id:p.id,buildingId:'construction-reel',x:p.x,z:p.z,size:[p.w,p.d],height:p.y,underside:p.underside,supportSlopeX:p.supportSlopeX,supportSlopeZ:p.supportSlopeZ});addRotatedCeiling(p.x,p.z,[p.w,p.d],0,p.underside,p.id+'-ceiling',{buildingId:'construction-reel',reelTop:p.y});}
+ for(const p of geometry.boxes)addRotatedCollider(p.x,p.z,[p.w,p.d],0,p.id,0,{buildingId:'construction-reel',minY:p.y-p.h/2,maxY:p.y+p.h/2,obstacleHeight:p.y+p.h/2});
+}
+
 function registerPhysicsFloor(surface) {
   constructionContactRevision++;
   walkableSurfaces.push(surface);
@@ -2605,7 +2669,7 @@ function addPhysicsMeshReplica(object, id, role = "solid") {
   physicsMeshGroup.add(replica);
 }
 
-function addAuthoritativeSurface({ id, buildingId = null, x, z, rotation = 0, size, height, underside = 0 }) {
+function addAuthoritativeSurface({ id, buildingId = null, x, z, rotation = 0, size, height, underside = 0, supportSlopeX = 0, supportSlopeZ = 0 }) {
   if (![x, z, rotation, size?.[0], size?.[1], height].every(Number.isFinite)) return;
   registerPhysicsFloor({
     id,
@@ -2617,6 +2681,7 @@ function addAuthoritativeSurface({ id, buildingId = null, x, z, rotation = 0, si
     halfZ: size[1] / 2,
     height,
     underside,
+    supportSlopeX,supportSlopeZ,
     physicsSource: "authored-physics-mesh",
   });
   // 手作りの上面にも、表示された縁の高さを持つ有限の段差面を
@@ -2928,6 +2993,7 @@ function addRotatedCollider(x, z, footprint, rotationY, id, clearance = 0, metad
     mesh.renderOrder = 18;
     physicsMeshGroup.add(mesh);
   }
+  return collider;
 }
 
 function scaleFootprint(footprint, scale = BUILDING_SCALE) {
@@ -3466,7 +3532,16 @@ function matchingWalkableSurfaceHeight(collider, referenceHeight = state.groundY
   return heights.length ? heights[heights.length - 1] : 0;
 }
 
+function isReelStepTransition(t){
+ if(state.map!=='construction'||Math.max(t.toHeight,t.probeHeight??t.toHeight)-t.fromHeight>6.01)return false;
+ const y=reelStep(reelWorld(worldSaveService.ledger?.world.constructionHighBuild),t.toX,t.toZ,t.fromHeight);
+ return y!==null&&Math.abs(y-t.toHeight)<.01;
+}
 function canPassStepCollider(collider, transition) {
+  // The reel's three-unit planks are a low doorstep. Its raised walls keep
+  // the ordinary jumping and body-collision rules.
+  if(collider?.buildingId==='construction-reel'&&reelStairPass(reelWorld(worldSaveService.ledger?.world.constructionHighBuild),transition.toX,transition.toZ,transition.fromHeight,transition.toHeight,collider.surfaceId))return true;
+  if(collider?.buildingId==='construction-reel'&&collider.surfaceId?.endsWith('-floor')&&collider.obstacleHeight-transition.fromHeight<=3.01)return true;
   if (collider?.surfaceEdge && collider.buildingId === 'sky-station' && isStationAccessRampTransition(transition)) {
     // The front slope covers the old plinth/stair edges. Test the slope at
     // the actual nearest edge contact, not at the root behind that edge.
@@ -4028,13 +4103,16 @@ function constructionGroundUpperBound(b, excludeBuilding = '') {
   return top;
 }
 function groundHeightCandidates(x, z, placementGround = false, excludeBuilding = '') {
-  const earth = state.map === 'construction' ? worldExcavationController?.groundHeightAt(x,z) : state.map==='coast'?coastHeight(x,z):undefined;
+  const earth = state.map === 'construction' ? worldExcavationController?.groundHeightAt(x,z,state.groundY+state.jumpY) : state.map==='coast'?coastWalkingHeight(x,z):undefined;
   const heights = earth === null ? [] : [earth ?? 0];
+  if(state.map==='coast'&&!placementGround){const sea=coastPlay?.surfaceAt(x,z);if(Number.isFinite(sea))heights.push(sea);}
   // Keep only surfaces registered by the authoritative physics layer. A low
   // plinth and the platform on top of it are separate real supports; visual
   // bounding boxes are never promoted to floors by this function.
   walkableSurfaces.forEach(surface => {
     if (excludeBuilding && surface.buildingId === excludeBuilding) return;
+    // A cave roof is a floor only from above, never a step blocking its tunnel.
+    if (!placementGround && Number.isFinite(surface.supportFromAbove) && state.groundY + state.jumpY < surface.supportFromAbove) return;
     // Placement validates concrete occupancy separately; its old surface and
     // auto-generated approach steps must not masquerade as underlying terrain.
     if (placementGround && surface.buildingId === 'construction-concrete') return;
@@ -4045,7 +4123,7 @@ function groundHeightCandidates(x, z, placementGround = false, excludeBuilding =
     if (surface.physicsSource === "ufo-opening-ramp"
       || surface.physicsSource === "ufo-interior-entry") return;
     const inside = surfaceContainsPoint(x, z, surface);
-    if (inside) heights.push(surface.height);
+    if (inside) heights.push(surface.height+(surface.supportSlopeX??0)*(x-surface.x)+(surface.supportSlopeZ??0)*(z-surface.z));
   });
   // The visible ramp is one continuous sloped top face. The narrow physics
   // strips remain useful for debug/support bookkeeping, but the movement and
@@ -4064,12 +4142,28 @@ function highestReachableSurface(candidates, referenceHeight, availableRise = ge
   return reachable.length ? reachable[reachable.length - 1] : undefined;
 }
 
+let vehicleSurfaceIndex=null,vehicleSurfaceEpoch=-1,vehicleSurfaceCount=-1,vehicleSurfaceTick=0,vehicleSurfaceReadTick=-1;
+let concreteVehicleProbe=null,concreteVehicleProbeEpoch=-1,concreteVehicleProbeCount=-1;
+function concreteVehicleWorldBlocked(x,z,r,y,h){if(!concreteVehicleProbe||concreteVehicleProbeEpoch!==constructionContactRevision||concreteVehicleProbeCount!==colliders.length){concreteVehicleProbe=createConcreteVehicleProbe(colliders,pointInsideCollider);concreteVehicleProbeEpoch=constructionContactRevision;concreteVehicleProbeCount=colliders.length;}return concreteVehicleProbe(x,z,r,y,h);}
+function getVehicleGroundHeight(x,z,reference,excludeBuilding=''){if(!Number.isFinite(reference))return getGroundHeight(x,z,excludeBuilding);if(!vehicleSurfaceIndex||vehicleSurfaceEpoch!==constructionContactRevision||vehicleSurfaceCount!==walkableSurfaces.length||worldTimberController?.movingGround&&vehicleSurfaceReadTick!==vehicleSurfaceTick){vehicleSurfaceIndex=createVehicleSurfaceIndex(walkableSurfaces,surfaceContainsPoint);vehicleSurfaceEpoch=constructionContactRevision;vehicleSurfaceCount=walkableSurfaces.length;vehicleSurfaceReadTick=vehicleSurfaceTick;}const earth=worldExcavationController?.groundHeightAt(x,z,reference)??0;return vehicleSurfaceIndex.heightAt(x,z,earth,reference,excludeBuilding);}
 function getGroundHeight(x, z, excludeBuilding = '') {
+  if(state.map==='construction'&&excludeBuilding!=='construction-reel'){
+    const reel=reelWorld(worldSaveService.ledger?.world.constructionHighBuild),plank=reelStep(reel,x,z,state.groundY);
+    if(plank!==null&&plank<=state.groundY+6.01
+      &&(plank>=state.groundY-.24||reelStairGround(reel,x,z,state.groundY)===plank))return plank;
+  }
+  const coastSlope=state.map==='coast'&&!state.jumpY&&!state.jumpVelocity?coastPlay?.rampAt?.(x,z,state.groundY):undefined;
+  if(Number.isFinite(coastSlope))return coastSlope;
   const stationSlope = state.map === 'sky' ? skyStationRampHeightAt(skyStationBuilding, x, z) : null;
   if (Number.isFinite(stationSlope)) return stationSlope;
   const candidates = groundHeightCandidates(x, z, false, excludeBuilding);
   const referenceHeight = Number.isFinite(state.groundY) ? state.groundY : 0;
   const atCurrentRoot = Math.hypot(x - state.position.x, z - state.position.z) < .01;
+
+  // The pier rests above descending sand. Preserve its actual zero-height deck,
+  // rather than following a nearly equal sand sample down through the planks.
+  // Below the underside or on higher placed objects the ordinary solver applies.
+  if(state.map==='coast'&&coastPierContains(x,z)&&referenceHeight>=-3&&referenceHeight<=.24&&candidates.includes(0))return 0;
 
   // Holding the current root on its current surface must not make it climb a
   // stacked platform merely because the upper surface overlaps the same X/Z.
@@ -4126,6 +4220,11 @@ function getLandingGroundHeight(x, z, takeoffHeight) {
 }
 
 function hasAuthoritativeSupportAt(x, z, height) {
+  const seaDeck = state.map === 'coast' ? coastPlay?.surfaceAt(x,z) : undefined;
+  if (Number.isFinite(seaDeck) && Math.abs(seaDeck-height) <= .24) return true;
+  // Natural island terrain is a real landing surface too. Treating only
+  // registered slabs as authoritative briefly dropped a landed player to y=0.
+  if (state.map === 'coast' && Math.abs(coastWalkingHeight(x,z)-height) <= .24) return true;
   if (height <= .2) return true;
   const authoredRampHeight = authoredUfoRampHeightAt(x, z);
   if (Number.isFinite(authoredRampHeight)
@@ -4722,11 +4821,39 @@ function groundCollisionPenetrationAt(x, z, groundY, jumpY = state.jumpY) {
 }
 
 function ensureSpawnCameraClearance() {
-  // Camera clearance is view-only.  Never move the character to make the
-  // third-person camera fit: doing so silently changed the requested build
-  // position (and could place the UFO pad at a different point).  The
-  // character position is owned exclusively by movement/jump physics.
-  return;
+  // Run once after arrival/resume, never during ordinary orbit or rebuilding
+  // a placed object. Preserve the actor, station and selected camera distance.
+  if (!state.skyArrivalCameraPending || state.map !== "sky") return;
+  state.skyArrivalCameraPending = false;
+  if (state.cameraMode !== "third" || state.ufoBoarded || !skyStationBuilding) return;
+  skyStationBuilding.updateWorldMatrix(true, true);
+  const target = new THREE.Vector3(state.position.x, 38 + state.groundY + state.jumpY, state.position.z);
+  const distance = worldCameraDistance(state.cameraDistanceIndex, {aspect: camera?.aspect ?? 1});
+  const pitch = THIRD_PERSON_BASE_PITCH + state.viewPitch;
+  const boxes = [], skin = Math.max(2, camera?.near ?? .1);
+  skyStationBuilding.traverse(mesh => {
+    if (!mesh.isMesh || !mesh.geometry || !mesh.visible) return;
+    for (let parent = mesh.parent; parent; parent = parent.parent) if (!parent.visible) return;
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    if (!materials.some(m => m && m.visible !== false && (!m.transparent || m.opacity >= .6))) return;
+    if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+    const box = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld).expandByScalar(skin);
+    if (!box.containsPoint(target)) boxes.push(box);
+  });
+  const blocked = heading => {
+    const horizontal = Math.cos(pitch) * distance;
+    const eye = new THREE.Vector3(target.x - Math.sin(heading) * horizontal,
+      Math.max(6, target.y - Math.sin(pitch) * distance), target.z - Math.cos(heading) * horizontal);
+    const direction = eye.clone().sub(target), length = direction.length();
+    if (!length) return false;
+    const ray = new THREE.Ray(target, direction.multiplyScalar(1 / length)), hit = new THREE.Vector3();
+    return boxes.some(box => ray.intersectBox(box, hit) && hit.distanceTo(target) <= length);
+  };
+  if (!blocked(state.viewHeading)) return;
+  for (const heading of [SKY_ENTRY_CAMERA.heading, state.viewHeading + Math.PI / 2,
+    state.viewHeading - Math.PI / 2, state.viewHeading + Math.PI]) {
+    if (!blocked(heading)) { state.viewHeading = heading; return; }
+  }
 }
 
 function cameraSegmentEntry(originX, originZ, targetX, targetZ, collider, margin = 5) {
@@ -4844,7 +4971,8 @@ function addFrontArch(group, centerX, baseY, z, radius, material, tubeRadius = .
 
 function addStationWindow(group, x, y, z, width, height, face, glass, gold) {
   const front = face === "front";
-  addBox(group, front ? [width, height, .75] : [.75, height, width], [x, y, z], glass);
+  const pane=addBox(group, front ? [width, height, .75] : [.75, height, width], [x, y, z], glass);
+  (group.userData.warmWindows??=[]).push(pane);
   const frameDepth = 1.05;
   [-1, 1].forEach(side => {
     addBox(
@@ -5130,6 +5258,7 @@ function buildSkyStation(entry) {
   });
   addStationFinial(group, 0, 62, -23, stoneLight, gold, 16);
   group.name = 'sky-station-building';
+  skyAtmosphere?.addStation(group);
   group.updateMatrixWorld(true);
   group.userData.cutawayMeshes = [];
   group.traverse(mesh => {
@@ -5799,6 +5928,7 @@ function addFixedStructure(parent, config, structure) {
 }
 
 function addMapEntry(parent, config) {
+  if(state.map === "construction"){constructionTownBridge=createConstructionTownBridge({collider:addRotatedCollider,surface:registerPhysicsFloor});parent.add(constructionTownBridge.group);return;}
   const entry = config.entry;
   const [x, , z] = normalizedPoint(config, entry.point);
   if (entry.terrainOnly) {
@@ -21389,10 +21519,34 @@ function constructionBuildGround(position,size) {
   return constructionBuildingGroundProbe.inspect(position,size.map(v=>v*BUILDING_SCALE));
 }
 
+function coastBuildingGround(position,size){
+  const fail=issue=>({valid:false,y:null,issue});
+  if(!position?.every(Number.isFinite)||!size?.every(v=>Number.isFinite(v)&&v>0))return fail('建てる場所を選び直そう。');
+  if(size[0]*BUILDING_SCALE>600||size[2]*BUILDING_SCALE>600)return fail('建物の大きさを確認してね。');
+  const cache=coastBuildingGround.cache??=new Map(),key=JSON.stringify([position[0],position[2],size]);if(cache.has(key))return cache.get(key);
+  const result=(()=>{
+  const hx=size[0]*BUILDING_SCALE/2,hz=size[2]*BUILDING_SCALE/2,[x,,z]=position;
+  if(Math.abs(x)+hx>MAPS.coast.world.width/2||Math.abs(z)+hz>MAPS.coast.world.depth/2)return fail('海岸の内側へ場所を変えよう。');
+  // This catalog remains a mainland activity, not island/harbor building.
+  if(Math.abs(x)+hx>1600||z-hz< -244||z+hz>175)return fail('浜の平らな場所へ動かそう。');
+  let low=Infinity,high=-Infinity;
+  // Static, smooth coastal terrain: inspect the whole footprint at <=16-unit
+  // intervals, including its edges. Never raycast the scene or scan the ocean.
+  const nx=Math.ceil(hx*2/16),nz=Math.ceil(hz*2/16);
+  for(let ix=0;ix<=nx;ix++)for(let iz=0;iz<=nz;iz++){
+    const y=coastWalkingHeight(x-hx+hx*2*ix/nx,z-hz+hz*2*iz/nz);if(!Number.isFinite(y))return fail('平らな砂浜に場所を変えよう。');low=Math.min(low,y);high=Math.max(high,y);
+  }
+  if(low<-.1)return fail('海や水路を避けて、平らな砂浜に場所を変えよう。');
+  if(high-low>.25)return fail('建物の下が平らな場所を選ぼう。');
+  return{valid:true,y:high,issue:''};
+  })();if(cache.size>=32)cache.delete(cache.keys().next().value);cache.set(key,result);return result;
+}
+
 function buildPlacementPosition(source) {
   if (source?.placement === "current") {
     return [state.position.x, 0, state.position.z];
   }
+  if(state.map==='coast'&&source){const position=constructionBuildingCandidate(state.position,state.heading,source.size.map(v=>v*BUILDING_SCALE),CHARACTER_COLLISION_RADIUS+24);position[1]=coastBuildingGround(position,source.size).y??0;return position;}
   if (state.map === 'construction' && source) {
     const position=constructionBuildingCandidate(state.position,state.heading,source.size.map(v=>v*BUILDING_SCALE),CHARACTER_COLLISION_RADIUS+24);
     const ground=constructionBuildGround(position,source.size);
@@ -22767,6 +22921,7 @@ function authoredCeilingHeightForCharacter(rootX, rootZ, groundY = state.groundY
   let lowestCeiling = null;
   ceilingSurfaces.forEach(ceiling => {
     if (!Number.isFinite(ceiling.underside)) return;
+    if(ceiling.buildingId==='construction-reel'&&state.groundY+state.jumpY>=(ceiling.reelTop??ceiling.underside+3)-.001)return;
     // A ceiling that already intersects the standing model cannot describe a
     // usable covered passage. Ignore it instead of snapping the player down;
     // authored roofs must be high enough for the displayed character first.
@@ -23239,9 +23394,12 @@ function rebuildMap(options) {for(const step of rebuildMapSteps(options)){} }
 
 function* rebuildMapSteps({saveRepairs=true}={}) {
   if (!mapGroup) return;
-  if(coastWorld&&state.map!=='coast'){camera.far=6000;camera.updateProjectionMatrix();}
+  if(coastWorld&&state.map!=='coast'){camera.near=.1;camera.far=6000;camera.updateProjectionMatrix();}
   coastWorld?.dispose();coastWorld=null;
   skyAtmosphere?.dispose();skyAtmosphere=null;
+  constructionAtmosphere?.dispose();constructionAtmosphere=null;
+  constructionSurroundings?.dispose();constructionSurroundings=null;
+  constructionTownBridge?.dispose();constructionTownBridge=null;
   skyCloudGround?.dispose();skyCloudGround=null;
   if(worldSun&&worldHemi){worldSun.color.set(0xffffff);worldSun.intensity=3.4;worldSun.position.set(-160,320,220);worldHemi.intensity=2.2;worldHemi.color.set(0xd9f4ff);worldHemi.groundColor.set(0x37506b);}
   constructionBuildingGroundProbe?.reset();
@@ -23277,6 +23435,7 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   ensureMarsReturnUfoPad();
   labelsGroup = new THREE.Group();
   let worldGround=makeGround(MAPS[state.map]);mapGroup.add(worldGround);
+  if(coastWorld)yield* coastWorld.prepare(state.position);
   addMarsBoundaryFence(mapGroup, MAPS[state.map]);
   addMapEntry(mapGroup, MAPS[state.map]);
   if (state.map === "sky") {
@@ -23323,22 +23482,23 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   yield;
   installConstructionDeliveryDock();
   yield;
-  worldWaterController?.install({group:mapGroup,contactRevision:()=>constructionContactCacheRevision(constructionContactRevision,[worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]),groundReadRevision:constructionWaterGroundReadRevision,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-water-'),groundHeightAt:(x,z)=>getGroundHeight(x,z),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
+  worldWaterController?.install({group:mapGroup,contactRevision:()=>constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]),groundReadRevision:constructionWaterGroundReadRevision,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-water-'),groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  worldSoilController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-soil-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z)=>getGroundHeight(x,z,'construction-soil'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-soil'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,surface:addAuthoritativeSurface,ceiling:addRotatedCeiling,
+  worldSoilController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-soil-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-soil'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-soil'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,surface:addAuthoritativeSurface,ceiling:addRotatedCeiling,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  worldTimberController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-timber-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z)=>getGroundHeight(x,z,'construction-timber'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-timber'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,physics:{floor:registerPhysicsFloor,ceiling:registerPhysicsCeiling,collider:registerPhysicsCollider},
+  worldTimberController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-timber-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-timber'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-timber'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,physics:{floor:registerPhysicsFloor,ceiling:registerPhysicsCeiling,collider:registerPhysicsCollider},
     contactGeometry:()=>{const soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  const excavationHole=worldExcavationController?.install({group:mapGroup,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-excavation-'),fieldBlocked:(position,size)=>[worldHighController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.overlapsBuild?.(position,size))||!!worldConcreteController?.overlapsVehicle?.(position,size),fieldHeightAt:(x,z)=>getGroundHeight(x,z),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
+  const excavationHole=worldExcavationController?.install({group:mapGroup,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-excavation-'),fieldBlocked:(position,size)=>[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.overlapsBuild?.(position,size))||!!worldConcreteController?.overlapsVehicle?.(position,size),fieldHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};},
     reserved:(p,size)=>!!(worldHighController?.overlapsBuild(p,size)||worldWaterController?.overlapsBuild(p,size)||worldSoilController?.overlapsBuild(p,size)||worldTimberController?.overlapsBuild(p,size)||worldConcreteController?.overlapsBuild(p,size))});
   yield;
-  worldConcreteController?.install({presentationRevision:constructionPresentationRevision,jumpCeilingAt:(x,z,head)=>{let lowest=Infinity;for(const ceiling of ceilingSurfaces){if(ceiling.underside>=head-.05&&pointInsideCollider(x,z,ceiling,14))lowest=Math.min(lowest,ceiling.underside);}return lowest;},upperPipeBlockedAt:(x,z,margin,y)=>colliders.some(c=>c.buildingId!=='upper-concrete'&&(!Number.isFinite(c.minY)||y+margin>c.minY)&&(!Number.isFinite(c.maxY)||y-margin<c.maxY)&&concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider)),travelBlockedAt:(x,z,margin,y)=>colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldHighController,worldWaterController,worldSoilController,worldTimberController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2]))||!!worldExcavationController?.vehicleBlockedAt(x,z,margin),blockedAt:(x,z,margin,y)=>colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2])),collider:addRotatedCollider,surface:addAuthoritativeSurface,placementHeightAt:createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:(x,z)=>groundHeightCandidates(x,z,true)}),supportHeightAt:createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:groundHeightCandidates})});
+  worldConcreteController?.install({presentationRevision:constructionPresentationRevision,jumpCeilingAt:(x,z,head)=>{let lowest=Infinity;for(const ceiling of ceilingSurfaces){if(ceiling.underside>=head-.05&&pointInsideCollider(x,z,ceiling,14))lowest=Math.min(lowest,ceiling.underside);}return lowest;},upperPipeBlockedAt:(x,z,margin,y)=>colliders.some(c=>c.buildingId!=='upper-concrete'&&(!Number.isFinite(c.minY)||y+margin>c.minY)&&(!Number.isFinite(c.maxY)||y-margin<c.maxY)&&concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider)),travelBlockedAt:(x,z,margin,y,height)=>Number.isFinite(y)?concreteVehicleWorldBlocked(x,z,margin,y,height??30):colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2]))||!!worldExcavationController?.vehicleBlockedAt(x,z,margin),blockedAt:(x,z,margin,y)=>colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2])),collider:addRotatedCollider,surface:addAuthoritativeSurface,placementHeightAt:createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:(x,z)=>groundHeightCandidates(x,z,true)}),supportHeightAt:(()=>{const read=createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:groundHeightCandidates});return(x,z,reference)=>Number.isFinite(reference)?getVehicleGroundHeight(x,z,reference):read(x,z);})()});
   yield;
   worldHighController?.install({group:mapGroup,surface:addAuthoritativeSurface,collider:addRotatedCollider,ceiling:addRotatedCeiling});
+  worldReelController?.install({group:mapGroup});
   if(state.map==='construction')drawSharedParking(mapGroup,worldSaveService.ledger?.world.constructionParking);
   let groundSignature='';const groundHost=mapGroup;groundHost.userData.syncEarthGround=()=>{const holes=worldExcavationController?.groundHoles?.();if(!holes)return;const sig=JSON.stringify(holes);if(sig===groundSignature)return;groundSignature=sig;groundHost.remove(worldGround);disposeConstructionGround(worldGround);worldGround=createConstructionGround(MAPS.construction,{holes});groundHost.add(worldGround);};
   if(excavationHole){mapGroup.remove(worldGround);disposeConstructionGround(worldGround);worldGround=createConstructionGround(MAPS[state.map],{holes:worldExcavationController?.groundHoles?.()??[excavationHole]});mapGroup.add(worldGround);}
@@ -23423,32 +23583,13 @@ function updateMapReadout() {
 }
 
 function updateBuildList() {
-  els.buildList.innerHTML = "";
-  const catalog = (MAPS[state.map].buildCatalog || []).filter(item => !item.internal);
-  catalog.forEach(item => {
-    const button = document.createElement("button");
-    button.type = "button"; button.className = "build-choice"; button.dataset.buildId = item.id;
-    button.innerHTML = `<strong>${item.name}</strong><span>${item.note}</span>`;
-    const exists=buildItemsForMap().some(b=>b.catalogId===item.id);
-    button.dataset.built=String(exists);button.disabled=exists;
-    if(exists){const note=document.createElement('span');note.textContent='建築済み（現在の建物を保持します）';button.append(note);}
-    button.addEventListener("click", () => selectBuild(item.id));
-    els.buildList.appendChild(button);
-  });
-  const selected = els.buildList.querySelector(`[data-build-id="${state.selectedBuildId}"]`);
-  selected?.classList.add("is-selected");
-  if (!catalog.length) {
-    if (state.map === "space") {
-      els.buildList.innerHTML = '<p class="muted">宇宙航行中は建造できません。</p>';
-      els.buildMessage.textContent = "緊急帰還で雲マップの空駅入口へ戻れます。";
-    } else if (state.map === "mars") {
-      els.buildList.innerHTML = '<p class="muted">火星のUFO乗り場は常設です。</p>';
-      els.buildMessage.textContent = "顔認証システムから搭乗して、UFOで帰還できます。";
-    }
-  }
+  buildingCatalogUI??=createBuildingCatalog({host:els.buildList,onPlace:selectBuild,allowed:()=>!!worldMapMenu?.opened&&!mapMenuLoading&&!mapMenuReadError&&worldSaveService?.mode==='live'&&!worldSaveService.busy&&!worldSaveService.blocked&&!coastPlay?.rescuing});
+  buildingCatalogUI.update({mapKey:state.map,items:(MAPS[state.map].buildCatalog||[]).filter(item=>!item.internal),built:buildItemsForMap().map(b=>b.catalogId),selected:state.selectedBuildId});
+  if(!MAPS[state.map].buildCatalog.some(item=>!item.internal)){if(state.map==='space')els.buildMessage.textContent='緊急帰還で雲マップの空駅入口へ戻れます。';else if(state.map==='mars')els.buildMessage.textContent='顔認証システムから搭乗して、UFOで帰還できます。';}
 }
 
 function selectBuild(id) {
+  if(coastPlay?.rescuing)return;
   if (CONSTRUCTION_EXPANSION_PREVIEW||worldSaveService.mode!=='live'||worldSaveService.busy||worldSaveService.blocked||mapMenuLoading||mapMenuReadError||mapMenuUnavailableReason()) return;
   const source = MAPS[state.map].buildCatalog.find(item => item.id === id&&!item.internal);
   if(!source||buildItemsForMap().some(b=>b.catalogId===id))return;
@@ -23460,7 +23601,7 @@ function selectBuild(id) {
   const previewItem = { ...source, position: buildPlacementPosition(source) };
   previewGroup.userData.anchor=[...previewItem.position];
   addBuilding(previewGroup, previewItem, { ...source, color: 0x7fffba });
-  if(state.map==='construction'){const bounds=new THREE.Box3().setFromObject(previewGroup);previewGroup.userData.buildBounds={min:bounds.min.toArray(),max:bounds.max.toArray()};}
+  if(['construction','coast'].includes(state.map)){const bounds=new THREE.Box3().setFromObject(previewGroup);previewGroup.userData.buildBounds={min:bounds.min.toArray(),max:bounds.max.toArray()};}
   previewGroup.traverse(object => { if (object.material) { object.material = object.material.clone(); object.material.transparent = true; object.material.opacity = .48; } });
   mapGroup.add(previewGroup);
   els.placeButton.disabled = !isValidBuildPosition(previewItem.position, source.size, source.id);
@@ -23471,10 +23612,11 @@ function selectBuild(id) {
 }
 
 function updateBuildPlacementControls(){
-  const source=MAPS[state.map].buildCatalog.find(item=>item.id===state.selectedBuildId);
-  const unavailable=!!mapMenuUnavailableReason()||worldSaveService?.mode!=='live'||worldSaveService.busy||worldSaveService.blocked;
+  const rescuing=!!coastPlay?.rescuing;
+  const source=!rescuing&&MAPS[state.map].buildCatalog.find(item=>item.id===state.selectedBuildId);
+  const unavailable=rescuing||!!mapMenuUnavailableReason()||worldSaveService?.mode!=='live'||worldSaveService.busy||worldSaveService.blocked;
   const button=document.getElementById('buildMenuButton');
-  button.hidden=state.map==='space'||state.ufoBoarded||!MAPS[state.map].buildCatalog.some(item=>!item.internal);
+  button.hidden=rescuing||state.map==='space'||state.ufoBoarded||!MAPS[state.map].buildCatalog.some(item=>!item.internal);
   button.disabled=unavailable;
   document.getElementById('buildPlacementControls').hidden=!source;
   const placement=String(!!source);
@@ -23485,14 +23627,15 @@ function updateBuildPlacementControls(){
   if(previewGroup?.userData.anchor){const anchor=previewGroup.userData.anchor;previewGroup.position.set(position[0]-anchor[0],position[1]-anchor[1],position[2]-anchor[2]);}
   els.placeButton.disabled=unavailable||!!worldMapMenu?.paused||!valid||buildItemsForMap().some(b=>b.catalogId===source.id);
   if(previewGroup&&previewGroup.userData.valid!==valid){previewGroup.userData.valid=valid;previewGroup.traverse(o=>{for(const m of(Array.isArray(o.material)?o.material:[o.material]))if(m?.color)m.color.setHex(valid?0x7fffba:0xff7187);});}
-  const groundIssue=state.map==='construction'?constructionBuildGround(position,source.size).issue:'';
-  const message=state.map==='construction'?(valid?'ここに建てるよ！歩いて向きを変えると、建てる場所を動かせます。':groundIssue||'車・建物やモンスターと重ならない場所へ動かそう。'):(valid?'プレビューの位置に建てられます。「ここに建てる」で確定します。':'建築区画がほかの物と重なっています。メニューで対象を確認してください。');
+  const groundIssue=state.map==='construction'?constructionBuildGround(position,source.size).issue:state.map==='coast'?coastBuildingGround(position,source.size).issue:'';
+  const message=state.map==='construction'?(valid?'ここに建てるよ！歩いて向きを変えると、建てる場所を動かせます。':groundIssue||'車・建物やモンスターと重ならない場所へ動かそう。'):(valid?'ここに建てるよ！歩いたり向きを変えたりして場所を決めよう。':groundIssue||'車・建物やモンスターと重ならない場所へ動かそう。');
   if(els.buildMessage.textContent!==message)els.buildMessage.textContent=message;
 }
 
 function isValidBuildPosition(position, size, sourceId = null, {ignoreBuildingId=null}={}) {
   const terrainSupport=state.map==='construction';
   if(typeof worldHighController!=='undefined'&&worldHighController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
+  if(state.map==='coast'){const ground=coastBuildingGround(position,size);if(!ground.valid||Math.abs(position[1]-ground.y)>.001)return false;const hx=size[0]*BUILDING_SCALE/2+CHARACTER_COLLISION_RADIUS,hz=size[2]*BUILDING_SCALE/2+CHARACTER_COLLISION_RADIUS;if(Math.abs(position[0]-state.position.x)<hx&&Math.abs(position[2]-state.position.z)<hz)return false;}
   if(terrainSupport){const ground=constructionBuildGround(position,size);if(!ground.valid||Math.abs(position[1]-ground.y)>.001)return false;const hx=size[0]*BUILDING_SCALE/2+CHARACTER_COLLISION_RADIUS,hz=size[2]*BUILDING_SCALE/2+CHARACTER_COLLISION_RADIUS;if(Math.abs(position[0]-state.position.x)<hx&&Math.abs(position[2]-state.position.z)<hz)return false;}
   if(worldConcreteController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE))||worldConcreteController?.overlapsVehicle?.(position,size.map(v=>v*BUILDING_SCALE)))return false;
   if(typeof worldWaterController!=='undefined'&&worldWaterController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
@@ -23500,7 +23643,7 @@ function isValidBuildPosition(position, size, sourceId = null, {ignoreBuildingId
   if(typeof worldTimberController!=='undefined'&&worldTimberController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE)))return false;
   if(typeof worldExcavationController!=='undefined'&&worldExcavationController?.overlapsBuild(position,size.map(v=>v*BUILDING_SCALE),{terrainSupport}))return false;
   const [sx, , sz] = size;
-  const inside = terrainSupport ? true : sourceId === "ufo-pad"
+  const inside = terrainSupport || state.map==='coast' ? true : sourceId === "ufo-pad"
     ? Math.abs(position[0]) <= MAPS[state.map].world.width / 2 - sx / 2
       && Math.abs(position[2]) <= MAPS[state.map].world.depth / 2 - sz / 2
     : MAPS[state.map].buildZones.some((zone, index) => {
@@ -23513,11 +23656,12 @@ function isValidBuildPosition(position, size, sourceId = null, {ignoreBuildingId
   // current open-floor position without a rectangular overlap gate.
   const overlaps = sourceId === "ufo-pad"
     ? false
-    : colliders.some(c => c.buildingId!==ignoreBuildingId&&c.id!==ignoreBuildingId&&!String(c.id??'').startsWith(`${ignoreBuildingId}-`)&&Math.abs(position[0] - c.x) < sx * BUILDING_SCALE / 2 + c.halfX && Math.abs(position[2] - c.z) < sz * BUILDING_SCALE / 2 + c.halfZ);
+    : colliders.some(c => !(state.map==='coast'&&(String(c.id??'').startsWith('coast-tree-')||c.id==='coast-lamp'))&&c.buildingId!==ignoreBuildingId&&c.id!==ignoreBuildingId&&!String(c.id??'').startsWith(`${ignoreBuildingId}-`)&&Math.abs(position[0] - c.x) < sx * BUILDING_SCALE / 2 + c.halfX && Math.abs(position[2] - c.z) < sz * BUILDING_SCALE / 2 + c.halfZ);
   return inside && !overlaps;
 }
 
 function placeSelectedBuild() {
+  if(coastPlay?.rescuing)return;
   if(worldMapMenu?.paused||worldSaveService.mode!=='live'||worldSaveService.busy||worldSaveService.blocked||mapMenuUnavailableReason())return;
   const source = MAPS[state.map].buildCatalog.find(item => item.id === state.selectedBuildId);
   if (!source) return;
@@ -23616,6 +23760,7 @@ function makeCharacter() {
     maxY: collisionBounds.max.y + grounding.verticalOffset,
   };
   model.userData.grounding = grounding;
+  model.userData.terrainBody = state.map==='coast'?coastTerrainBodySamples(model,grounding):[];
   model.position.set(state.position.x, model.userData.grounding.verticalOffset, state.position.z);
   model.rotation.y = state.heading;
   return model;
@@ -23777,8 +23922,8 @@ function updateSkyStationGuideDialogFooter() {
       : "";
   }
   if (els.skyStationGuideDialogNext) {
-    els.skyStationGuideDialogNext.hidden = !isReply || skyStationGuideDialogState.isTyping;
-    els.skyStationGuideDialogNext.textContent = isLastPage ? "とじる" : "つぎへ";
+    els.skyStationGuideDialogNext.hidden = !isReply;
+    els.skyStationGuideDialogNext.textContent = skyStationGuideDialogState.isTyping ? "全文を読む" : isLastPage ? "とじる" : "つぎへ";
     els.skyStationGuideDialogNext.dataset.lastPage = String(isLastPage);
   }
 }
@@ -23840,6 +23985,7 @@ function advanceSkyStationGuideDialogPage() {
 }
 
 function closeSkyStationGuideDialog({ resetTouchLatch = false } = {}) {
+  if(skyStationGuideDialogState.open){clearMarsShopDialogInput();if(els.skyStationGuideDialog?.contains(document.activeElement))document.activeElement.blur();}
   stopSkyStationGuideDialogTyping();
   skyStationGuideDialogState.open = false;
   skyStationGuideDialogState.phase = "idle";
@@ -23857,6 +24003,7 @@ function closeSkyStationGuideDialog({ resetTouchLatch = false } = {}) {
 
 function openSkyStationGuideDialog() {
   if (!els.skyStationGuideDialog || skyStationGuideDialogState.open) return;
+  clearMarsShopDialogInput();
   skyStationGuideDialogState.open = true;
   skyStationGuideDialogState.phase = "greeting";
   skyStationGuideDialogState.pages = [];
@@ -23870,7 +24017,7 @@ function openSkyStationGuideDialog() {
   if (els.skyStationGuideDialogChoices) els.skyStationGuideDialogChoices.hidden = false;
   updateSkyStationGuideDialogFooter();
   window.requestAnimationFrame(() => {
-    els.skyStationGuideDialogChoices?.querySelector("button")?.focus({ preventScroll: true });
+    if(skyStationGuideDialogState.open)els.skyStationGuideDialogChoices?.querySelector("button")?.focus({ preventScroll: true });
   });
 }
 
@@ -24517,7 +24664,11 @@ function reportPhysicsBlock(blocker) {
 }
 
 function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
-  if(state.map==='coast'&&!coastCanWade(x,z)&&coastHeight(x,z)<coastHeight(fromX,fromZ))return true;
+  // The pier's last eight units are solid floor, outside the deliberately
+  // inset wading area. Keep that real floor connected to the boarding plank;
+  // the body, rail and boat contact checks below still apply.
+  if(state.map==='coast'&&!coastCanWade(x,z)&&!coastPierContains(x,z)&&!coastPlay?.hasSupport(x,z)&&state.jumpY<.01&&state.jumpVelocity===0&&coastWalkingHeight(x,z)<coastWalkingHeight(fromX,fromZ))return true;
+  if(state.map==='coast'&&coastPlay?.blockedAt(x,z,fromX,fromZ,state.groundY+state.jumpY,(px,pz,c)=>characterColliderContact(px,pz,c),character.userData.collisionFootprint,character.rotation.y))return true;
   if(state.map==='construction'&&worldConcreteController?.pedestrianBlockedAt?.(x,z))return true;
   const config = MAPS[state.map];
   const limitX = config.world.width / 2 - PLAYER_RADIUS;
@@ -24529,8 +24680,8 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
   // actual overlap, so this does not make ordinary walls passable.
   const originHasContact = !state.jumpY && hasGroundCollisionAt(fromX, fromZ, state.groundY);
   const stepTransition = getStepTransition(fromX, fromZ, x, z);
-  const routeGradeWalk = nativeDoorGroundWalk(fromX,fromZ,x,z);
-  const isRampWalk = isContinuousUfoRampTransition(stepTransition) || routeGradeWalk;
+  const routeGradeWalk = coastGroundWalk(fromX,fromZ,x,z)||nativeDoorGroundWalk(fromX,fromZ,x,z)||!!coastPlay?.deckWalk(fromX,fromZ,x,z);
+  const isRampWalk = isReelStepTransition(stepTransition)||isContinuousUfoRampTransition(stepTransition) || routeGradeWalk;
   if (stepTransition?.ascending && !isRampWalk) {
     const targetHeight = Math.max(stepTransition.toHeight, stepTransition.probeHeight);
     const requiredRise = targetHeight - stepTransition.fromHeight;
@@ -24542,9 +24693,18 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
       return true;
     }
   }
+  if(state.map==='coast'){
+    const airborne=state.jumpY>0||state.jumpVelocity!==0;
+    const fromY=airborne?state.groundY+state.jumpY:Math.max(state.groundY,getGroundHeight(fromX,fromZ));
+    const toY=airborne?fromY:getGroundHeight(x,z);
+    if(coastTerrainBodyBlocked({x:fromX,z:fromZ,y:fromY},{x,z,y:toY},character.rotation.y,character.userData.terrainBody,undefined,{grounded:!airborne})){
+      reportPhysicsBlock('島の斜面');return true;
+    }
+  }
   return colliders.some(c => {
     if (characterSweepIsFarFromCollider(fromX, fromZ, x, z, c)) return false;
     if (isColliderPassage(x, z, c)) return false;
+    if (state.map==='coast'&&coastPlay?.floorPassageAt?.(c,fromX,fromZ,x,z)) return false;
     const fromContact = characterColliderContact(fromX, fromZ, c);
     const toContact = characterColliderContact(x, z, c);
     const fromInside = fromContact.intersects;
@@ -24592,7 +24752,7 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
 
 function readMoveVector() {
   // RPG会話中は移動入力を止め、選択肢の操作に集中できるようにする。
-  if (isSkyStationGuideDialogOpen() || marsShopDialogState.open || isUfoEquipmentWorkshopMenuOpen()) return new THREE.Vector3();
+  if (coastPlay?.seated || coastPlay?.crewWalking || coastPlay?.steering || constructionBridgeUI?.open || coastUI?.open || coastPlay?.modalOpen || isSkyStationGuideDialogOpen() || marsShopDialogState.open || isUfoEquipmentWorkshopMenuOpen()) return new THREE.Vector3();
   const strafe = (keys.has("d") || keys.has("arrowright") ? 1 : 0) - (keys.has("a") || keys.has("arrowleft") ? 1 : 0) + touchVector.x;
   const forward = (keys.has("w") || keys.has("arrowup") ? 1 : 0) - (keys.has("s") || keys.has("arrowdown") ? 1 : 0) - touchVector.y;
   const input = new THREE.Vector2(strafe, forward);
@@ -24656,10 +24816,14 @@ function updateStationWalkPreview(delta) {
 }
 
 function isFastWalking() {
-  return !!nativeDoorMove || state.fastWalking || (state.moving && walkDashControl?.active === true);
+  return !!nativeDoorMove || state.fastWalking || (state.moving && (keys.has(' ') || keys.has('k') || walkDashControl?.active === true));
 }
 
 function triggerJump() {
+  if(coastPlay?.rescuing)return false;
+  if(coastSnorkel?.active)return coastSnorkel.surface();
+  if(coastPebbles?.busy||coastPlay?.watchingWhale)return false;
+  if((coastPlay?.seated||coastPlay?.crewWalking)&&!coastPlay.leaveSeat())return false;
   if (state.jumpCount >= MAX_JUMPS) return false;
   const soilBoost=state.jumpCount===0&&state.jumpY===0&&!state.falling
     ? worldSoilController?.jumpMultiplier({x:state.position.x,y:state.groundY,z:state.position.z,heading:state.heading})??1 : 1;
@@ -24739,12 +24903,28 @@ function updateBoardedCharacter(delta) {
   return true;
 }
 
+function resolveReelLanding(previousFeet){
+ if(state.map!=='construction'||state.ufoBoarded||state.jumpVelocity>0)return false;
+ const y=reelLanding(reelWorld(worldSaveService.ledger?.world.constructionHighBuild),state.position.x,state.position.z,previousFeet,state.groundY+state.jumpY);
+ if(y===null||y<state.groundY-.001)return false;
+ state.groundY=y;state.jumpY=0;state.jumpVelocity=0;state.falling=false;state.jumpCount=0;return true;
+}
+
 function updateCharacter(delta) {
+  if(coastSnorkel?.characterPose()){if(characterShadow)characterShadow.visible=false;return;}
+  if(coastPebbles?.busy){state.moving=state.fastWalking=false;updateCharacterWalkAnimation(delta,false);character.rotation.y=state.heading;return;}
+  const coastRescuePose=coastPlay?.rescuePose;
+  if(coastRescuePose){state.moving=false;state.fastWalking=false;updateCharacterWalkAnimation(delta,false);positionCoastCrewCharacter(character,coastRescuePose);if(characterShadow)characterShadow.visible=false;return;}
+  const coastCrewPose=coastPlay?.crewPose;
+  if(coastCrewPose){state.moving=coastCrewPose.walking;state.fastWalking=false;updateCharacterWalkAnimation(delta,coastCrewPose.walking);positionCoastCrewCharacter(character,coastCrewPose);if(characterShadow)characterShadow.visible=false;return;}
+
   if (state.ufoBoarded && updateBoardedCharacter(delta)) return;
   ufoDoorControls.forEach(control => {
     control.seatedViewBlockers?.forEach(mesh => { mesh.visible = true; });
   });
   if (characterShadow) characterShadow.visible = true;
+  const coastFacingBefore=character.rotation.y;
+  const reelPreviousFeet=state.groundY+state.jumpY;
   const wasAirborne = state.jumpVelocity !== 0 || state.jumpY > 0;
   if (wasAirborne) {
     state.jumpY += state.jumpVelocity * delta - JUMP_GRAVITY * delta * delta / 2;
@@ -24756,12 +24936,13 @@ function updateCharacter(delta) {
       state.jumpCount = 0;
     }
   }
+  const reelLanded=wasAirborne&&resolveReelLanding(reelPreviousFeet);
   // Horizontal wall tests cannot detect a character moving only upward.
   // Resolve the rendered hemispherical canopy on the vertical axis as well,
   // so jumping in place or using a second/third jump never passes through it.
   constrainCharacterBelowUfoCapsule();
   constrainCharacterBelowAuthoredCeilings();
-  const landedThisFrame = wasAirborne && state.jumpY === 0 && state.jumpVelocity === 0;
+  let landedThisFrame = reelLanded || wasAirborne && state.jumpY === 0 && state.jumpVelocity === 0;
   const move = nativeDoorMove ? new THREE.Vector3(nativeDoorMove.x,0,nativeDoorMove.z) : readMoveVector();
   // The route's final fractional step is precise movement, not pad drift.
   state.moving = move.lengthSq() > (nativeDoorMove ? 1e-12 : .001);
@@ -24774,7 +24955,7 @@ function updateCharacter(delta) {
   if (state.moving) {
     const rotationBeforeMove = character.rotation.y;
     const movementScale = isFastWalking() ? FAST_WALK_MULTIPLIER : 1;
-    const speed = PLAYER_SPEED * movementScale;
+    const speed = PLAYER_SPEED * movementScale * (state.map==='coast'?(coastPlay?.walkScale??1):1);
     const distance = speed * delta;
     const substeps = Math.max(1, Math.ceil(distance / 2.5));
     const stepX = move.x * distance / substeps;
@@ -24795,7 +24976,7 @@ function updateCharacter(delta) {
       const risesWithoutJump = !originHasContact
         && !jumpInProgress
         && nextGroundY > currentGroundY + .2;
-      const rampWalk = isContinuousUfoRampTransition(stepTransition) || nativeDoorGroundWalk(fromX,fromZ,nextX,nextZ);
+      const rampWalk = isReelStepTransition(stepTransition)||isContinuousUfoRampTransition(stepTransition) || coastGroundWalk(fromX,fromZ,nextX,nextZ) || nativeDoorGroundWalk(fromX,fromZ,nextX,nextZ) || coastPlay?.deckWalk(fromX,fromZ,nextX,nextZ);
       if ((!risesWithoutJump || rampWalk) && !isBlocked(nextX, nextZ, fromX, fromZ)) {
         state.position.set(nextX, 0, nextZ);
       } else {
@@ -24807,7 +24988,7 @@ function updateCharacter(delta) {
         const xOriginHasContact = !wasAirborne && hasGroundCollisionAt(fromX, fromZ, state.groundY);
         const xTransition = getStepTransition(fromX, fromZ, nextX, fromZ);
         if ((!(!xOriginHasContact && state.jumpY === 0 && nextXGroundY > currentGroundY + .2)
-          || isContinuousUfoRampTransition(xTransition))
+          || isReelStepTransition(xTransition)||coastGroundWalk(fromX,fromZ,nextX,fromZ)||isContinuousUfoRampTransition(xTransition)||coastPlay?.deckWalk(fromX,fromZ,nextX,fromZ))
           && !isBlocked(nextX, fromZ, fromX, fromZ)) {
           state.position.x = nextX;
         }
@@ -24816,7 +24997,7 @@ function updateCharacter(delta) {
         const zOriginHasContact = !wasAirborne && hasGroundCollisionAt(zOriginX, fromZ, state.groundY);
         const zTransition = getStepTransition(zOriginX, fromZ, zOriginX, nextZ);
         if ((!(!zOriginHasContact && state.jumpY === 0 && nextZGroundY > currentGroundY + .2)
-          || isContinuousUfoRampTransition(zTransition))
+          || isReelStepTransition(zTransition)||coastGroundWalk(zOriginX,fromZ,zOriginX,nextZ)||isContinuousUfoRampTransition(zTransition)||coastPlay?.deckWalk(zOriginX,fromZ,zOriginX,nextZ))
           && !isBlocked(zOriginX, nextZ, zOriginX, fromZ)) {
           state.position.z = nextZ;
         }
@@ -24867,6 +25048,14 @@ function updateCharacter(delta) {
       }
     }
   }
+  // Turning the visible belly into a mountain must not lift the player onto
+  // its side. Keep the accepted contact/facing; camera look remains free.
+  if(state.map==='coast'&&!wasAirborne&&character.rotation.y!==coastFacingBefore){
+    const x=state.position.x,z=state.position.z,body=character.userData.terrainBody;
+    const before=coastTerrainBodyFloor(x,z,coastFacingBefore,body),after=coastTerrainBodyFloor(x,z,character.rotation.y,body);
+    if(after>Math.max(before,state.groundY)+.24){character.rotation.y=coastFacingBefore;state.heading=coastFacingBefore;}
+  }
+  if(wasAirborne&&resolveReelLanding(reelPreviousFeet))landedThisFrame=true;
   // Horizontal movement can enter a lower part of the curved dome after the
   // pre-movement ceiling sample has already run. Re-sample at the accepted
   // end position in the same frame so no rendered frame can protrude through
@@ -24918,6 +25107,12 @@ function updateCharacter(delta) {
   // The character is grounded only by a real floor under the feet. A nearby
   // edge with no foot overlap must not lift the whole body over empty ground.
   let targetGroundY = exactGroundY;
+  const reelStairY = !wasAirborne && state.map==='construction'
+    ? reelStairGround(reelWorld(worldSaveService.ledger?.world.constructionHighBuild),state.position.x,state.position.z,state.groundY) : null;
+  if(reelStairY!==null){
+    targetGroundY=reelStairY;
+    state.supportSurfaceId=null;
+  }
   const stationSlopeY = state.map === 'sky'
     ? skyStationRampHeightAt(skyStationBuilding, state.position.x, state.position.z) : null;
   if (!wasAirborne && Number.isFinite(stationSlopeY)) {
@@ -24932,14 +25127,17 @@ function updateCharacter(delta) {
   // ジャンプと同じ重力で落下させる。判定は現在の足元の実在面だけを
   // 使うため、空中に見えない床を作ったり建造物ごとの例外を増やさない。
   const walkingOffRaisedSurface = !wasAirborne
+    && reelStairY===null
     && !landedThisFrame
     && !state.falling
-    && state.moving
+    && (state.moving || (state.map==='coast'&&(coastPlay?.riding||coastPlay?.gangwayGrounded)))
     && state.jumpY === 0
     && state.jumpVelocity === 0
     && !isStationAccessRampTransition({ fromX: movementOrigin.x, fromZ: movementOrigin.z,
       toX: state.position.x, toZ: state.position.z, fromHeight: state.groundY, toHeight: targetGroundY })
     && !nativeDoorGroundWalk(movementOrigin.x,movementOrigin.z,state.position.x,state.position.z)
+    && !coastGroundWalk(movementOrigin.x,movementOrigin.z,state.position.x,state.position.z)
+    && !coastPlay?.deckWalk(movementOrigin.x,movementOrigin.z,state.position.x,state.position.z)
     && targetGroundY < state.groundY - .2;
   if (walkingOffRaisedSurface) {
     const fallDistance = Math.max(0, state.groundY - targetGroundY);
@@ -24947,6 +25145,16 @@ function updateCharacter(delta) {
     state.jumpY = fallDistance;
     state.jumpVelocity = 0;
     state.falling = fallDistance > .001;
+  }
+  // Descending onto a slope can touch the real belly before the root reaches
+  // its centre sample. Resolve that vertical contact in the same frame, also
+  // repairing an old embedded position without changing its X/Z or its save.
+  if(state.map==='coast'&&Math.abs(exactGroundY-coastWalkingHeight(state.position.x,state.position.z))<=.24){
+    const bodyFloor=coastTerrainBodyFloor(state.position.x,state.position.z,character.rotation.y,character.userData.terrainBody);
+    targetGroundY=Math.max(targetGroundY,bodyFloor);
+    if(state.jumpVelocity<=0&&state.groundY+state.jumpY<=targetGroundY){
+      state.groundY=targetGroundY;state.jumpY=0;state.jumpVelocity=0;state.falling=false;state.jumpCount=0;
+    }
   }
   // Once the jump has ended, place the feet on the resolved surface immediately.
   const grounded = state.jumpY === 0 && state.jumpVelocity === 0;
@@ -25022,9 +25230,13 @@ function lerpAngle(a, b, t) { let delta = (b - a + Math.PI) % (Math.PI * 2) - Ma
 
 function updateUfoFlightCameraFov() {
   if (!camera) return;
+  camera.userData.eyeViewBaseFov??=UFO_CAMERA_BASE_FOV;
   const mission = ufoDoorControls[0]?.spaceForwardScroll;
   const forwardScroll = isUfoForwardScrollActive() && mission;
-  const targetFov = forwardScroll
+  const eyeView=state.ufoBoarded&&state.ufoEngineMode!=="idle"
+    ? state.ufoEngineMode==="ready"&&UFO_CAMERA_PRESETS[state.ufoCameraPresetIndex]?.id==="monster-eye"
+    : state.cameraMode==="first";
+  const targetFov = eyeView ? firstPersonFov(camera.aspect) : forwardScroll
     ? (mission.phase === "playing" ? UFO_FORWARD_SCROLL_CRUISE_FOV : UFO_FORWARD_SCROLL_DEPARTURE_FOV)
     : UFO_CAMERA_BASE_FOV;
   // A wider fixed rear view increases peripheral flow without moving the
@@ -25137,7 +25349,70 @@ function applyUfoEquipmentDevelopmentComparisonCamera() {
   return true;
 }
 
+// Conversation framing is transient: never move the actors or alter saved view
+// preferences. Measure the bubble only when it opens/changes size, not per frame.
+let conversationCamera=null,conversationLayoutRevision=0,conversationActorVisibility=null;
+const conversationResize=new ResizeObserver(()=>conversationLayoutRevision++);
+for(const el of [els.viewport,els.skyStationGuideDialog,els.marsShopDialog])if(el)conversationResize.observe(el);
+function applyConversationCamera(){
+  const npc=isSkyStationGuideDialogOpen()?skyStationGuide:marsShopDialogState.open?marsShopkeeper:null;
+  const dialog=isSkyStationGuideDialogOpen()?els.skyStationGuideDialog:els.marsShopDialog;
+  if(!npc||!dialog||dialog.hidden){
+    if(conversationCamera){camera.clearViewOffset();conversationCamera=null;els.viewport.classList.remove('is-conversing');}
+    if(conversationActorVisibility){conversationActorVisibility.actor.visible=conversationActorVisibility.visible;conversationActorVisibility=null;}
+    els.cameraModeButton.disabled=false;
+    return false;
+  }
+  const key=state.map+'/'+state.cameraDistanceIndex+'/'+conversationLayoutRevision;
+  if(conversationCamera?.key!==key){
+    npc.updateWorldMatrix(true,true);
+    const face=new THREE.Vector3(),tmp=new THREE.Vector3(),features=npc.userData.faceFeatures??[];
+    if(features.length){for(const feature of features)face.add(feature.getWorldPosition(tmp));face.multiplyScalar(1/features.length);}
+    else{npc.getWorldPosition(face);face.y+=30;}
+    const front=new THREE.Vector3(0,0,1).applyQuaternion(npc.getWorldQuaternion(new THREE.Quaternion()));front.y=0;front.normalize();
+    const right=new THREE.Vector3(front.z,0,-front.x),toPlayer=new THREE.Vector3(state.position.x-face.x,0,state.position.z-face.z);
+    const side=toPlayer.dot(right)>0?-1:1;
+    const rect=els.canvas.getBoundingClientRect(),bubble=dialog.getBoundingClientRect();
+    const frame=conversationFraming({width:rect.width,height:rect.height,panel:{left:bubble.left-rect.left,top:bubble.top-rect.top},index:state.cameraDistanceIndex,fov:camera.fov});
+    const target=face.clone().add(new THREE.Vector3(0,-4,0));
+    const position=target.clone().addScaledVector(front,frame.distance*.94).addScaledVector(right,side*frame.distance*Math.sqrt(1-.94**2));position.y+=frame.distance*.08;
+    camera.setViewOffset(rect.width,rect.height,frame.offsetX,frame.offsetY,rect.width,rect.height);
+    conversationCamera={key,position,target};
+  }
+  camera.position.copy(conversationCamera.position);camera.lookAt(conversationCamera.target);
+  // This is a face-to-face conversation shot. The player's foreground head
+  // must not cover the speaker; only its rendering changes, never its pose.
+  if(character){conversationActorVisibility??={actor:character,visible:character.visible};character.visible=false;}
+  if(characterShadow)characterShadow.visible=false;
+  els.cameraModeButton.disabled=true;
+  els.viewport.classList.add('is-conversing');els.viewport.classList.remove('is-first-person');
+  setWorldText(els.cameraModeButton,'視点：会話');setWorldText(els.viewReadout,'会話');
+  setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);
+  return true;
+}
 function updateCamera() {
+  if(coastWhaleScene?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');return;}
+  if(coastSnorkel?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');setWorldText(els.cameraModeButton,state.cameraMode==='first'?'視点：目線':'視点：三人称');setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);return;}
+  const crabFocus=coastPebbles?.focus;
+  if(crabFocus){
+    if(!crabCameraRestore)crabCameraRestore={position:camera.position.clone(),rotation:camera.quaternion.clone()};
+    const frame=coastCrabCamera(crabFocus,{resolve:coastGroundCamera,heightAt:coastWalkingHeight,near:camera.near,fov:camera.fov,aspect:camera.aspect});
+    camera.position.copy(frame.eye);camera.lookAt(frame.target);camera.position.lerp(crabCameraRestore.position,1-crabFocus.weight);camera.quaternion.slerp(crabCameraRestore.rotation,1-crabFocus.weight);els.viewport.classList.remove('is-first-person');return;
+  }
+  crabCameraRestore=null;
+  const floatingRescue=coastPlay?.rescuePose;
+  if(floatingRescue){
+    // Show the survivor's face, even from eye view, without changing the
+    // player's chosen mode/pitch/distance or the saved rescue destination.
+    if(camera.userData.coastSluiceFrameKey){camera.clearViewOffset();delete camera.userData.coastSluiceFrameKey;}
+    const [x,y,z]=floatingRescue.point,h=floatingRescue.heading,back=camera.aspect<1?130:105;
+    camera.position.set(x+Math.sin(h)*back,y+52,z+Math.cos(h)*back);camera.lookAt(x,y+14,z);
+    setWorldText(els.viewReadout,'浮き輪でひと休み');setWorldText(els.cameraModeButton,'視点：ひと休み');
+    els.viewport.classList.remove('is-first-person');return;
+  }
+  const coastEditFocus=state.map==='coast'?(coastForageUI?.editFocus??coastLandmarks?.editFocus??(coastPlay?.open?coastPlay.editFocus:null)):null;
+  const sluiceFrame=coastEditFocus?.screenFrame;
+  if(!sluiceFrame&&camera.userData.coastSluiceFrameKey){camera.clearViewOffset();delete camera.userData.coastSluiceFrameKey;}
   if (CONSTRUCTION_EXPANSION_PREVIEW && constructionOverview && state.map === 'construction') {
     camera.near = 10; camera.far = 14000; camera.updateProjectionMatrix();
     camera.position.set(0, Math.max(5900, 3400 / Math.max(.3, camera.aspect)), 1900);
@@ -25145,9 +25420,10 @@ function updateCamera() {
     return;
   }
   updateUfoFlightCameraFov();
-  if(state.map==='construction'&&state.selectedBuildId&&previewGroup?.userData.buildBounds&&state.cameraMode==='third'){
+  if(applyConversationCamera())return;
+  if(['construction','coast'].includes(state.map)&&state.selectedBuildId&&previewGroup?.userData.buildBounds&&state.cameraMode==='third'){
     const b=previewGroup.userData.buildBounds,shift=previewGroup.position.toArray(),frame=buildingCameraFrame({min:b.min.map((v,i)=>v+shift[i]),max:b.max.map((v,i)=>v+shift[i]),actor:[state.position.x,state.groundY+state.jumpY,state.position.z],yaw:state.viewHeading,pitch:.7-state.viewPitch,fov:camera.fov,aspect:camera.aspect});
-    if(frame){camera.position.fromArray(frame.position);camera.lookAt(...frame.target);els.viewReadout.textContent='建てる場所';return;}
+    if(frame){const target=new THREE.Vector3(...frame.target),offset=new THREE.Vector3(...frame.position).sub(target);offset.setLength(worldCameraDistance(state.cameraDistanceIndex,{fit:offset.length(),base:0}));camera.position.copy(target).add(offset);camera.lookAt(target);setWorldText(els.viewReadout,'建てる場所');setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);return;}
   }
   const target = new THREE.Vector3(state.position.x, 38 + state.groundY + state.jumpY, state.position.z);
   if (applyUfoEquipmentDevelopmentComparisonCamera()) return;
@@ -25261,22 +25537,29 @@ function updateCamera() {
     els.cameraDistanceButton.textContent = `画角：${activePreset.label}`;
     return;
   }
-  if (state.cameraMode === "third") {
-    const orbitPitch = (state.map==='coast'?-.13:THIRD_PERSON_BASE_PITCH) + state.viewPitch;
-    const cameraDistance = THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].distance;
+
+  if (state.cameraMode === "third" || coastEditFocus) {
+    const seaPlaying=state.map==='coast'&&!!coastPlay?.hauling;
+    const orbitPitch = coastEditFocus?-.65:(seaPlaying?-.58:state.map==='coast'&&coastPlay?.steering?-.22:state.map==='coast'&&coastPlay?.riding?-.4:state.map==='coast'?-.13:THIRD_PERSON_BASE_PITCH) + state.viewPitch;
+    if(seaPlaying){target.y=state.groundY+state.jumpY+(window.innerHeight<500?-6:10);target.x+=Math.sin(state.viewHeading)*25;target.z+=Math.cos(state.viewHeading)*25;}
+    const seaFocus=coastEditFocus;if(seaFocus)target.fromArray(seaFocus.center);
+    const cameraDistance=worldCameraDistance(state.cameraDistanceIndex,{aspect:camera.aspect,fit:seaFocus?seaFocus.radius/(Math.tan(camera.fov*Math.PI/360)*Math.min(1,camera.aspect)):0});
     const horizontalDistance = Math.cos(orbitPitch) * cameraDistance;
-    const cameraForward = new THREE.Vector3(Math.sin(state.viewHeading), 0, Math.cos(state.viewHeading));
+    const orbitHeading = Number.isFinite(seaFocus?.heading)?seaFocus.heading:state.viewHeading;
+    const cameraForward = new THREE.Vector3(Math.sin(orbitHeading), 0, Math.cos(orbitHeading));
     let desired = new THREE.Vector3(
-      state.position.x - cameraForward.x * horizontalDistance,
+      target.x - cameraForward.x * horizontalDistance,
       Math.max(6, target.y - Math.sin(orbitPitch) * cameraDistance),
-      state.position.z - cameraForward.z * horizontalDistance,
+      target.z - cameraForward.z * horizontalDistance,
     );
     desired = keepThirdPersonCameraOutsideBuildings(target, desired);
+    if(state.map==='coast'&&!seaFocus)desired.copy(coastGroundCamera(target,desired,{near:camera.near,fov:camera.fov,aspect:camera.aspect}));
     // Apply the orbit directly so the configured distance is exact even when
     // the character is beside a wall. Interpolation could create a temporary
     // close-up while the target or view heading changed.
     camera.position.copy(desired);
     camera.lookAt(target);
+    if(seaFocus?.screenFrame){const f=seaFocus.screenFrame,key=f.width+':'+f.height+':'+f.offsetY;if(camera.userData.coastSluiceFrameKey!==key){camera.setViewOffset(f.width,f.height,0,f.offsetY,f.width,f.height);camera.userData.coastSluiceFrameKey=key;}}
   } else {
     character?.updateMatrixWorld(true);
     const eyeFeatures = character?.userData?.faceFeatures ?? [];
@@ -25296,11 +25579,11 @@ function updateCamera() {
     camera.position.copy(eye);
     camera.lookAt(eye.clone().addScaledVector(lookForward, 20));
   }
-  const cameraLabel = state.cameraMode === "third" ? "三人称" : "一人称・目線";
+  const cameraLabel = coastEditFocus ? (coastEditFocus.label || "置き先の見本") : state.cameraMode === "third" ? "三人称" : "一人称・目線";
   setWorldText(els.viewReadout, cameraLabel);
   setWorldText(els.cameraModeButton, `視点：${cameraLabel}`);
-  setWorldText(els.cameraDistanceButton, `距離：${THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label}`);
-  els.viewport.classList.toggle("is-first-person", state.cameraMode === "first");
+  setWorldText(els.cameraDistanceButton, state.cameraMode==="first"&&!coastEditFocus ? "後方視点に戻す" : `距離：${THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label}`);
+  els.viewport.classList.toggle("is-first-person", state.cameraMode === "first" && !coastEditFocus);
 }
 
 function startMarsArrivalDevelopmentPreview() {
@@ -25429,20 +25712,20 @@ function setMap(key) {
 
 function setupTouchPad() {
   const button=document.getElementById('constructionJumpButton');let jumpOwner=null;
-  const jumpReady=()=>worldInputAvailable()&&!state.ufoBoarded&&!worldMapMenu?.paused&&!mapResetPending&&!worldPlayerUI?.open&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!constructionDeliveryMenu?.open&&!document.querySelector('dialog[open]')&&![worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
+  const jumpReady=()=>worldInputAvailable()&&!state.ufoBoarded&&!worldMapMenu?.paused&&!mapResetPending&&!worldPlayerUI?.open&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!constructionDeliveryMenu?.open&&!document.querySelector('dialog[open]')&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
   constructionJumpControl=bindJumpButton({element:button,enabled:()=>jumpReady()&&(worldHighController?.roaming?worldHighController.canJump:state.jumpCount<MAX_JUMPS),canHold:()=>jumpReady()||worldInputAvailable()&&worldHighController?.jumpPreparing,activate:()=>{if(worldHighController?.roaming){jumpOwner=worldHighController;return jumpOwner.jump(true);}jumpOwner=null;if(nativeDoorNavigator?.active)nativeDoorNavigator.cancel('自分でジャンプするよ。');nativeDoorMove=null;return triggerJump();},release:()=>{if(jumpOwner)jumpOwner.releaseJump();else state.jumpVelocity=releasedJumpVelocity(state.jumpVelocity);jumpOwner=null;}});
-  walkDashControl=createHeldDashButton({element:els.dashButton,context:()=>state.map,enabled:()=>!state.ufoBoarded&&state.map!=='space'&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]')&&![worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming))});
+  walkDashControl=createHeldDashButton({element:els.dashButton,jump:{element:button,control:constructionJumpControl},context:()=>state.map,enabled:()=>!state.ufoBoarded&&!coastSnorkel?.active&&state.map!=='space'&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]')&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming))});
   els.touchStick.setAttribute('data-move-stick','');
-  worldWalkPad=createWorldMovePad({element:els.touchPad,enabled:()=>worldInputAvailable()&&!state.ufoBoarded&&![worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming)),context:()=>state.map+'/foot',onVector:(x,y)=>touchVector.set(x,y)});
+  worldWalkPad=createWorldMovePad({element:els.touchPad,enabled:()=>worldInputAvailable()&&!state.ufoBoarded&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming)),context:()=>state.map+'/foot',onVector:(x,y)=>touchVector.set(x,y)});
 }
 
-function worldInputAvailable(){return worldBooted&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]');}
+function worldInputAvailable(){return worldBooted&&!coastPlay?.watchingWhale&&!coastPlay?.rescuing&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]');}
 
 function setupLookControls() {
   lookControls = createLookControls({element:els.canvas,indicator:els.viewport,
     context(){
       if(worldMapMenu?.paused||marsShopDialogState.open||document.querySelector('dialog[open]')||(state.ufoBoarded&&state.ufoEngineMode!=='idle'))return null;
-      return [worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].find(controller=>controller?.active)||state.map+'/'+state.cameraMode;
+      return [worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].find(controller=>controller?.active)||state.map+'/'+state.cameraMode;
     },
     onDelta(dx,dy,type,owner){
       const sensitivity=type==='touch'?LOOK_TOUCH_SENSITIVITY:LOOK_MOUSE_SENSITIVITY;
@@ -25893,6 +26176,7 @@ async function setupScene() {
   }
   renderer = new THREE.WebGLRenderer({ canvas: els.canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.BasicShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
+  updateWorldColour=installWorldColour(renderer);
   const initialSpaceView = state.map === "space" ? ufoSpaceViewMetrics() : null;
   scene = new THREE.Scene(); scene.background = color(MAPS[state.map].palette.fog); scene.fog = initialSpaceView
     ? new THREE.Fog(MAPS.space.palette.fog, initialSpaceView.fogNear, initialSpaceView.fogFar)
@@ -25910,12 +26194,14 @@ async function setupScene() {
   physicsDebugGroup.name = "physics-debug-overlay";
   physicsDebugGroup.visible = state.physicsDebug;
   scene.add(physicsDebugGroup);
+  suspendHiddenDebugMatrices(physicsMeshGroup);
+  suspendHiddenDebugMatrices(physicsDebugGroup);
   worldHemi=new THREE.HemisphereLight(0xd9f4ff,0x37506b,2.2);scene.add(worldHemi);
   const sun = new THREE.DirectionalLight(0xffffff, 3.4); sun.position.set(-160, 320, 220); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -380; sun.shadow.camera.right = 380; sun.shadow.camera.top = 380; sun.shadow.camera.bottom = -380; sun.shadow.camera.far = 900; scene.add(sun);worldSun=sun;
   worldRenderBudget=createRenderBudget({apply:level=>{pendingRenderQuality={level,ratio:Math.min(window.devicePixelRatio||1,level===1?1.25:1)};}});
   worldShadowCache=createWorldShadowCache({renderer});
 
-  character = makeCharacter(); scene.add(character);
+  character = makeCharacter(); scene.add(character);coastPebbles?.prepare(scene);coastFruits?.prepare(scene);
   const shadowMaterial = new THREE.MeshBasicMaterial({ color: 0x19355b, transparent: true, opacity: .24, depthWrite: false }); characterShadow = new THREE.Mesh(new THREE.CircleGeometry(12, 32), shadowMaterial); characterShadow.rotation.x = -Math.PI / 2; scene.add(characterShadow);
   worldWaterController=createWorldWaterController({canResume:nativeDoorWalkAllowed,service:worldSaveService,practice:CONSTRUCTION_WATER_PRACTICE,preview:CONSTRUCTION_WATER_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
     onRestoreRebuild:()=>rebuildMap({saveRepairs:false}),onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},onError:error=>worldSaveErrorUI?.show(error),readout:()=>{
@@ -25932,16 +26218,17 @@ async function setupScene() {
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
     }});
-  if(transportPlaySession)worldExcavationController=createWorldTransportPlayController({service:worldSaveService,session:transportPlaySession,resumeAtSavedPose:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||worldSaveService.ledger?.world.constructionResume?.kind==='transport'||transportPlaySession.state.mode!=='foot'||!!transportPlaySession.state.frame.soil.pending||transportPlaySession.state.frame.soil.containers.shovel.amount>0,verification:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&new URLSearchParams(location.search).get('transportVerification')==='1',state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
+  if(transportPlaySession)worldExcavationController=createWorldTransportPlayController({onGarden:()=>worldHighController?.showGarden(),service:worldSaveService,session:transportPlaySession,resumeAtSavedPose:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||worldSaveService.ledger?.world.constructionResume?.kind==='transport'||transportPlaySession.state.mode!=='foot'||!!transportPlaySession.state.frame.soil.pending||transportPlaySession.state.frame.soil.containers.shovel.amount>0,verification:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&new URLSearchParams(location.search).get('transportVerification')==='1',state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   else if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldExcavationController=createWorldTransportSceneBridge({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   else if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,persistence:excavationLedgerSession,
     onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE){const createConcrete=CONSTRUCTION_CONCRETE_PREVIEW?createWorldConcreteController:createLiveConcreteController;worldConcreteController=createConcrete({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},onLayoutChange:()=>rebuildMap(),onError:error=>worldSaveErrorUI?.show(error)});}
-  worldHighController=createHighLive({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
-    readInput:()=>worldInputAvailable()?{x:(keys.has('d')?1:0)-(keys.has('a')?1:0)+touchVector.x,y:(keys.has('w')?1:0)-(keys.has('s')?1:0)-touchVector.y,fast:state.fastWalking||walkDashControl?.active===true}:{},
+  worldHighController=createHighLive({openPouch:()=>coastForageUI?.show(),syncSoil:()=>worldExcavationController?.syncGardenCommit?.(),service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
+    readInput:()=>worldInputAvailable()?{x:(keys.has('d')?1:0)-(keys.has('a')?1:0)+touchVector.x,y:(keys.has('w')?1:0)-(keys.has('s')?1:0)-touchVector.y,fast:state.fastWalking||keys.has(' ')||keys.has('k')||walkDashControl?.active===true}:{},
     allowed:nativeDoorWalkAllowed,rebuild:()=>rebuildMap({saveRepairs:false}),onExit:()=>{updateCharacter(0);updateCamera();},walkTo:goal=>{prepareNativeDoorRoute();void nativeDoorNavigator.start('high',goal);},
     environment:()=>({actor:{x:state.position.x,z:state.position.z},bounds:{minX:-MAPS.construction.world.width/2,maxX:MAPS.construction.world.width/2,minZ:-MAPS.construction.world.depth/2,maxZ:MAPS.construction.world.depth/2},heightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z)??0,
       blocked:(p,size)=>colliders.some(c=>Math.abs(p[0]-c.x)<size[0]/2+c.halfX&&Math.abs(p[2]-c.z)<size[2]/2+c.halfZ)||[worldConcreteController,worldSoilController,worldWaterController,worldTimberController].some(c=>c?.overlapsBuild(p,size))||worldConcreteController?.overlapsVehicle?.(p,size)||worldExcavationController?.overlapsBuild(p,size,{terrainSupport:true})})});
+  if(CONSTRUCTION_EXCAVATION_LIVE)worldReelController=createReelLive({service:worldSaveService,state,scene,camera,character,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,allowed:nativeDoorWalkAllowed,heightAt:(x,z)=>getGroundHeight(x,z,'construction-reel'),syncGarden:()=>worldHighController?.syncGarden(),replaceContacts:replaceReelContacts,onExit:()=>{updateCharacter(0);updateCamera();}});
   await buildWorldSceneSteps(rebuildMapSteps());
   setupConstructionExpansionPreview();
   setupConstructionDeliveryPreview();
@@ -26016,12 +26303,17 @@ async function setupScene() {
   requestAnimationFrame(frame);
 }
 
-function renderWorldFrame(){
+function renderWorldFrame(delta=0){
+  constructionAtmosphere?.update({scene,camera,sun:worldSun,hemi:worldHemi});
+  constructionSurroundings?.update();
   if(skyAtmosphere){skyAtmosphere.group.visible=state.map==='sky';if(state.map==='sky')skyAtmosphere.update({scene,camera,sun:worldSun,hemi:worldHemi});}
-  coastWorld?.update({scene,camera,sun:worldSun,hemi:worldHemi});
-  coastUI?.update();
+  coastWorld?.update({scene,camera,sun:worldSun,hemi:worldHemi,waveTime:coastPlay?.waveTime,actor:state.position,raft:coastPlay?.lanternPose,snorkeling:coastSnorkel?.active,wildlifePaused:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||worldSaveService?.blocked||mapResetPending,watchWhale:worldBooted&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!coastUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPlay?.rescuing&&!coastSnorkel?.active&&!coastPebbles?.busy&&!coastFruits?.busy&&!state.jumpY&&!state.jumpVelocity&&!state.falling});
+  coastWorld?.cave?.cutaway({x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},state.map==='coast'&&state.cameraMode==='third');
+  caveCrossing?.refreshVisibility();
+  constructionTownBridge?.update();constructionBridgeUI?.update();coastUI?.update();coastForageUI?.update();coastRigUI?.update();coastRewardsUI?.update();
+  coastPlay?.render({overlay:worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastRigUI?.open});
   // Resolution/lighting buffers change only at rest, never halfway through a jump.
-  const controllers=[worldHighController,worldConcreteController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController];
+  const controllers=[worldReelController,worldHighController,worldConcreteController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController];
   if(pendingRenderQuality&&!state.jumpY&&!state.jumpVelocity&&!state.moving&&!controllers.some(c=>c?.active)){
     const {level,ratio}=pendingRenderQuality;
     if(renderer.getPixelRatio()!==ratio)renderer.setPixelRatio(ratio);
@@ -26029,32 +26321,46 @@ function renderWorldFrame(){
     // new programs synchronously on landing and caused a visible freeze.
     pendingRenderQuality=null;
   }
-  updateNearbyNames();if(worldShadowCache)worldShadowCache.render(scene,camera);else renderer.render(scene,camera);
+  updateNearbyNames();
+  const draw=()=>{updateWorldColour(state.map);if(worldShadowCache)worldShadowCache.render(scene,camera);else renderer.render(scene,camera);};
+  if(character){
+    if(jumpActionModel!==character){characterJumpAction?.reset();jumpActionModel=character;characterJumpAction=createCharacterJumpAction(character);}
+    const owner=controllers.find(c=>c?.active),motion=owner?owner.jumpMotion:!state.ufoBoarded&&!coastPlay?.seated&&!coastPlay?.crewWalking&&!coastSnorkel?.active&&!coastPebbles?.busy?{owner:'main-'+state.map,stage:state.jumpCount,velocity:state.jumpVelocity,height:state.jumpY,airborne:state.jumpCount>0&&(state.jumpY>0||state.jumpVelocity>0)}:null;
+    characterJumpAction.render(motion,delta,draw);
+  }else draw();
   worldRenderBudget?.observe(performance.now(),{active:worldBooted&&!document.hidden&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldSaveService?.blocked&&!worldSaveService?.crafting});
 }
 
 function frame() {
+  vehicleSurfaceTick++;
   if(document.hidden){clock.getDelta();requestAnimationFrame(frame);return;}
   worldWalkPad?.sync();ufoMovePad?.sync();
-  constructionJumpControl?.sync();document.getElementById('constructionJumpButton').hidden=state.ufoBoarded||[worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
-  walkDashControl?.sync();els.dashButton.hidden=state.ufoBoarded||state.map==='space';
-  const delta = Math.min(.05, clock.getDelta());
+  constructionJumpControl?.sync();document.getElementById('constructionJumpButton').hidden=!!coastPlay?.rescuing||state.ufoBoarded||[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
+  walkDashControl?.sync();els.dashButton.hidden=!!coastPlay?.rescuing||!!coastSnorkel?.active||state.ufoBoarded||state.map==='space';
+  const frameDelta=clock.getDelta(),delta=Math.min(.05,frameDelta);
+  coastWhaleScene?.update();
+  if(coastPlay?.watchingWhale){coastPlay.beforeWalk(0);state.moving=state.fastWalking=false;updateCharacterWalkAnimation(0,false);updateCamera();renderWorldFrame();requestAnimationFrame(frame);return;}
+  // The brief crab scene uses elapsed time; slower drawing must not prolong the input lock.
+  coastSnorkel?.update(delta);coastPebbles?.update(Math.min(.25,frameDelta));coastFruits?.update(Math.min(.25,frameDelta));
+  document.getElementById('constructionJumpButton').hidden ||= !!coastSnorkel?.active;
   els.resetButton.disabled=!!mapMenuUnavailableReason();
   updateBuildPlacementControls();
-  if(worldPlayerUI?.open||transportMigrationUI?.open||worldMapMenu?.paused||mapResetPending){if(!worldPlayerUI?.guideOpen)renderWorldFrame();else nearbyNamesView?.hide();requestAnimationFrame(frame);return;}
+  if(constructionBridgeUI?.open||worldPlayerUI?.open||transportMigrationUI?.open||worldMapMenu?.paused||mapResetPending){if(!worldPlayerUI?.guideOpen)renderWorldFrame();else nearbyNamesView?.hide();requestAnimationFrame(frame);return;}
   if(worldShopOverlay?.open||worldSaveService?.blocked||worldSaveService?.crafting){renderWorldFrame();requestAnimationFrame(frame);return;}
-  if(worldHighController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
-  if(worldConcreteController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
+  worldHighController?.updateLighting();
+  if(worldReelController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
+  if(worldHighController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
+  if(worldConcreteController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
   updateConstructionDelivery();
   if(constructionDeliveryMenu?.open){renderWorldFrame();requestAnimationFrame(frame);return;}
   updateSpaceMaterialBook();
   // Reading cannot move the player, advance a mission, or consume energy.
   if(spaceMaterialGuide?.open){renderWorldFrame();requestAnimationFrame(frame);return;}
-  if(worldWaterController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
-  if(worldSoilController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
-  if(worldTimberController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
+  if(worldWaterController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
+  if(worldSoilController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
+  if(worldTimberController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
   if(state.map==='construction')mapGroup.userData.syncEarthGround?.();
-  if(worldExcavationController?.update(delta)){renderWorldFrame();requestAnimationFrame(frame);return;}
+  if(worldExcavationController?.update(delta)){renderWorldFrame(delta);requestAnimationFrame(frame);return;}
   if(nativeDoorNavigator?.running)nativeDoorGroundProbe?.reset();
   nativeDoorMove=nativeDoorNavigator?.input(delta)??null;
   if(worldConcreteController?.active||worldConcreteController?.busy||worldWaterController?.active||worldSoilController?.active||worldTimberController?.active||worldExcavationController?.active){renderWorldFrame();requestAnimationFrame(frame);return;}
@@ -26069,18 +26375,24 @@ function frame() {
     marsShopkeeper.userData.updateAnimation(marsShopkeeper.userData.idleElapsed);
   }
   updateMarsShopDialog();
-  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); updateCharacter(delta); updateMarsArrivalHatchExit(); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updateMarsSky(marsSky, camera, state.map); updatePhysicsDebugContact(); renderWorldFrame();
+  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); coastLandmarks?.update(delta); coastPlay?.beforeWalk(delta); updateCoastCaveSupport(); updateCharacter(delta); coastPlay?.afterWalk(); caveCrossing?.update(delta); updateMarsArrivalHatchExit(); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updateMarsSky(marsSky, camera, state.map); updatePhysicsDebugContact(); renderWorldFrame(delta);
   requestAnimationFrame(frame);
 }
 
 
+function updateCoastCaveSupport(time=coastPlay?.waveTime){
+  if(state.map!=='coast'||!coastWorld?.cave)return;
+  const grounded=!state.jumpY&&!state.jumpVelocity;
+  const lift=coastWorld.cave.update(time,{x:state.position.x,z:state.position.z,groundY:state.groundY+state.jumpY,grounded});
+  if(grounded&&Number.isFinite(lift))state.groundY+=lift;
+}
 function nativeDoorController(id){return {high:worldHighController,water:worldWaterController,soil:worldSoilController,crane:worldTimberController,excavator:worldExcavationController,dump:worldExcavationController,truck:worldConcreteController,pump:worldConcreteController}[id];}
 // A verified saved driver is already supported by the saved cab, not by the ground.
-function nativeDoorWalkAllowed(context){const savedDriver=context?.kind==='timber'&&context.savedDriver===true;return state.map==='construction'&&!state.ufoBoarded&&(savedDriver||!state.jumpY&&!state.falling)&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&![worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active||c?.busy);}
+function nativeDoorWalkAllowed(context){const savedDriver=context?.kind==='timber'&&context.savedDriver===true;return state.map==='construction'&&!state.ufoBoarded&&(savedDriver||!state.jumpY&&!state.falling)&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&![worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active||c?.busy);}
 function nativeDoorWalkReason(id){
  const ctrl=nativeDoorController(id);
  if(!ctrl)return ['truck','pump'].includes(id)?'「自由につくる」の車えらびから、ドアへ行けるよ。':'この車の土の現場へ歩いて行ってね。';
- if([worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active))return '作業をセーブして徒歩に戻ってからえらぼう。';
+ if([worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active))return '作業をセーブして徒歩に戻ってからえらぼう。';
  if(!ctrl.doorTarget)return '土の現場で「保存して新しい現場操作へ」を先に行おう。';
  return ctrl.doorTarget(id)?true:'作業の途中や乗車中の記録は、先にその続きを終えよう。';
 }
@@ -26090,7 +26402,7 @@ function setupSharedParkingPlay(){
  const button=document.createElement('button');button.type='button';button.dataset.playerParking='';button.textContent='みんなの駐車場をひらく';parent.before(button);
  const sync=()=>{button.hidden=state.map!=='construction'||worldSaveService.ledger?.world.constructionParking?.version===3;};sync();new MutationObserver(sync).observe(document.querySelector('#sceneTitle')??document.body,{childList:true,subtree:true});parent.parentElement.addEventListener('pointerdown',sync);
  button.onclick=async()=>{button.disabled=true;try{
-  if([worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active||c?.busy))throw Error('いまの作業をセーブして、車を降りてからひらこう。');
+  if([worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active||c?.busy))throw Error('いまの作業をセーブして、車を降りてからひらこう。');
   if(worldSaveService.ledger.world.constructionParking?.version===3){sync();return;}
   button.textContent='車と作品をたしかめています…';await worldSaveService.flush();
   const existing=worldSaveService.ledger.world.constructionParking;
@@ -26148,6 +26460,7 @@ function setupParkingMigrationCheck(){
 }
 
 function nativeDoorLowEarthEdge(c,h){return c.surfaceEdge&&c.buildingId==='construction-soil'&&Number.isFinite(c.obstacleHeight)&&c.obstacleHeight<=h+2.1;}
+function coastGroundWalk(fromX,fromZ,toX,toZ){return state.map==='coast'&&coastTerrainStep({x:fromX,z:fromZ,y:getGroundHeight(fromX,fromZ)},{x:toX,z:toZ,y:getGroundHeight(toX,toZ)});}
 function nativeDoorGroundWalk(fromX,fromZ,toX,toZ){return state.map==='construction'&&!!nativeDoorMove&&!state.jumpY&&!state.jumpVelocity&&!!nativeDoorGroundProbe?.step({x:fromX,z:fromZ},{x:toX,z:toZ},{contact:false});}
 
 function setupNativeDoorWalk(){
@@ -26167,25 +26480,47 @@ function setupNativeDoorWalk(){
  const stopWalk=()=>{if(nativeDoorNavigator.active){nativeDoorNavigator.cancel('移動を止めたよ。');nativeDoorMove=null;state.moving=false;state.fastWalking=false;}};
  stop.onclick=()=>{stopWalk();notice.hidden=true;};
  document.addEventListener('pointerdown',stopWalk,true);
- window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Escape'].includes(e.code))stopWalk();},true);
+ window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','KeyJ','KeyB','KeyK','Escape'].includes(e.code))stopWalk();},true);
  window.addEventListener('blur',stopWalk);document.addEventListener('visibilitychange',()=>{if(document.hidden)stopWalk();});
 }
 
 function wireUI() {
+  globalThis.IMASORA_KEYS?.connect({
+    enabled:()=>worldBooted,
+    context:()=>coastSnorkel?.active?'swim':coastPlay?.steering?'raft':state.ufoBoarded?'ufo':'walk',
+    clearInput:clearMarsShopDialogInput,
+    menu:()=>{if(worldPlayerUI?.open)worldPlayerUI.close();else if(!document.querySelector('dialog[open]')&&!worldMapMenu?.paused&&!worldSaveService?.blocked&&!worldSaveService?.crafting)worldPlayerUI?.show();}
+  });
   window.addEventListener('keyup',event=>keys.delete(event.key?.toLowerCase()),true);
+  bindContextSpaceAction({
+    enabled:()=>worldBooted&&nativeDoorWalkAllowed()&&!document.hidden,
+    buttons:()=>[worldReelController?.doorButton],clearInput:clearMarsShopDialogInput
+  });
+  bindContextSpaceAction({
+    enabled:()=>worldBooted&&state.map==='coast'&&!state.ufoBoarded&&!state.jumpY&&!state.jumpVelocity&&!state.falling&&!document.hidden&&!mapResetPending&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldShopOverlay?.open&&!coastUI?.open&&!coastForageUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPebbles?.busy&&!coastFruits?.busy&&!document.querySelector('dialog[open]'),
+    buttons:()=>[coastFruits?.button,coastPebbles?.button,document.querySelector('.coast-find-action'),document.querySelector('.coast-snorkel-start'),document.querySelector('.coast-rig-entry[data-mode="craft"]')],
+    clearInput:clearMarsShopDialogInput
+  });
   const stopWorldInput=(event)=>{if(event?.type==='blur'&&event.target!==window)return;clearMarsShopDialogInput();ufoMovePad?.cancel();for(const name of Object.keys(ufoFlightPointerInput))ufoFlightPointerInput[name]=0;};
   for(const type of ['blur','pagehide','resize','orientationchange'])window.addEventListener(type,stopWorldInput,true);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stopWorldInput();});
   const isolateWorldShopKeys=event=>{
     if(worldPlayerUI?.open){event.stopPropagation();return;}
+    if(constructionBridgeUI?.open||coastUI?.open||coastPlay?.modalOpen){
+      if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright','j','b','k',' '].includes(event.key.toLowerCase())){
+        if(!(event.key===' '&&event.target.closest?.('button')))event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      return;
+    }
     if(worldMapMenu?.paused||mapResetPending){
       if(event.target.closest?.('.world-save-error'))return;
       if(event.type==='keydown')worldMapMenu?.handleKeyDown(event);
-      if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright',' '].includes(event.key.toLowerCase())&&!event.target.closest?.('button'))event.preventDefault();
+      if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright','j','b','k',' '].includes(event.key.toLowerCase())&&!event.target.closest?.('button'))event.preventDefault();
       event.stopImmediatePropagation();return;
     }
     if(!worldShopOverlay?.open&&!constructionDeliveryMenu?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting)return;
-    if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright',' '].includes(event.key.toLowerCase())){
+    if(['w','a','s','d','x','f','arrowup','arrowdown','arrowleft','arrowright','j','b','k',' '].includes(event.key.toLowerCase())){
       if(!(event.key===' '&&event.target.closest?.('button')))event.preventDefault();
       event.stopImmediatePropagation();
     }
@@ -26207,6 +26542,9 @@ function wireUI() {
     renderUfoEquipmentWorkshopMenu();
   });
   window.addEventListener("keydown", event => {
+    if(event.ctrlKey||event.metaKey||event.altKey||event.isComposing||event.target?.closest?.('input,textarea,select,[contenteditable=true],[role=textbox]'))return;
+    if(event.key===' '&&event.target?.closest?.('button,[role=button]')&&(document.querySelector('dialog[open]')||event.target.closest?.('[role=dialog]')))return;
+    if(worldReelController?.active){worldReelController.handleKey(event);return;}
     if(worldConcreteController?.active){worldConcreteController.handleKey(event);return;}
     if(constructionDeliveryMenu?.open)return;
     const key = event.key.toLowerCase();
@@ -26223,7 +26561,9 @@ function wireUI() {
       return;
     }
     if (isSkyStationGuideDialogOpen()) {
-      const gameInput = [" ", "w", "a", "s", "d", "x", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
+      if(key==='escape'){event.preventDefault();closeSkyStationGuideDialog();return;}
+      if((key===' '||key==='enter')&&skyStationGuideDialogState.isTyping&&!event.target?.closest?.('button')){event.preventDefault();finishSkyStationGuideDialogPage();return;}
+      const gameInput = ["w", "a", "s", "d", "x", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
       if (gameInput) event.preventDefault();
       return;
     }
@@ -26272,10 +26612,13 @@ function wireUI() {
       event.preventDefault();
       return;
     }
-    if (key === " ") {
-      if(!event.target?.closest?.('input,textarea,select,[contenteditable=true]'))constructionJumpControl?.key(event);
+    if (key === " " || key === "k") {
       event.preventDefault();
+      if(!event.repeat||keys.has(key))keys.add(key);
       return;
+    }
+    if (event.code === 'KeyE' || event.code === 'KeyJ' || event.code === 'KeyB' || key === 'e' || key === 'j' || key === 'b') {
+      constructionJumpControl?.key(event);event.preventDefault();return;
     }
     const movementKey = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
     if (state.ufoEngineMode === "ready" && movementKey) {
@@ -26298,9 +26641,10 @@ function wireUI() {
     keys.add(key);
     if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault();
   });
-  window.addEventListener("keyup", event => {if(event.code==='Space')constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.key.toLowerCase());});
+  window.addEventListener("keyup", event => {if(event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB')constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.key.toLowerCase());});
   document.querySelectorAll("[data-map]").forEach(button => button.addEventListener("click", () => setMap(button.dataset.map)));
   els.cameraModeButton.addEventListener("click", () => {
+    if(isSkyStationGuideDialogOpen()||marsShopDialogState.open)return;
     state.cameraMode = state.cameraMode === "third" ? "first" : "third";
     state.viewHeading = state.heading;
     state.viewPitch = 0;
@@ -26315,14 +26659,26 @@ function wireUI() {
       showToast(`UFOカメラ：${preset.label}`);
       return;
     }
-    state.cameraDistanceIndex = (state.cameraDistanceIndex + 1) % THIRD_PERSON_DISTANCE_PRESETS.length;
+    const talking=isSkyStationGuideDialogOpen()||marsShopDialogState.open;
+    const selection=talking?{mode:state.cameraMode,index:(state.cameraDistanceIndex+1)%THIRD_PERSON_DISTANCE_PRESETS.length}:nextCameraDistance(state.cameraMode,state.cameraDistanceIndex);
+    state.cameraMode=selection.mode;state.cameraDistanceIndex=selection.index;
+    lookControls?.cancel();
     const preset = THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex];
-    showToast(`三人称カメラ：${preset.label}`);
+    showToast(`${talking?'会話の距離':'三人称カメラ'}：${preset.label}`);
   });
   els.cameraDistanceButton.addEventListener("pointerdown", event => event.stopPropagation());
   els.emergencyEscapeButton.addEventListener("click", emergencyEscape);
   els.emergencyEscapeButton.addEventListener("pointerdown", event => event.stopPropagation());
   setupMarsShopDialog();
+  els.skyStationGuideDialogClose?.addEventListener('click',()=>closeSkyStationGuideDialog());
+  els.skyStationGuideDialog?.addEventListener('pointerdown',event=>event.stopPropagation());
+  els.skyStationGuideDialogText?.addEventListener('click',()=>{if(skyStationGuideDialogState.isTyping)finishSkyStationGuideDialogPage();});
+  els.skyStationGuideDialog?.addEventListener('keydown',event=>{
+    if(event.key!=='Tab')return;
+    const buttons=[...els.skyStationGuideDialog.querySelectorAll('button')].filter(b=>!b.closest('[hidden]'));
+    const next=buttons[(buttons.indexOf(document.activeElement)+(event.shiftKey?-1:1)+buttons.length)%buttons.length];
+    if(next){event.preventDefault();next.focus({preventScroll:true});}
+  });
   els.skyStationGuideDialogChoices?.querySelectorAll("[data-guide-dialog-topic]").forEach(button => {
     button.addEventListener("click", () => selectSkyStationGuideDialogTopic(button.dataset.guideDialogTopic));
     button.addEventListener("pointerdown", event => event.stopPropagation());
@@ -26417,6 +26773,7 @@ async function startSavedWorld() {
     if(transportPlaySession?.intent)await transportPlaySession.retry();
     else if(CONSTRUCTION_EXCAVATION_SAVED&&excavationLedgerSession?.pending){if(!await excavationLedgerSession.retry())throw Error(excavationLedgerSession.message);}
     else await worldSaveService.retry();
+    await worldHighController?.recoverSaved?.();
     if(mapResetPending)await finishMapResetOperation();
     if(worldMapMenu?.paused)worldMapMenu.recovered();
     worldMapMenu?.update();
@@ -26424,7 +26781,7 @@ async function startSavedWorld() {
     if(!worldBooted)await prepareSavedConstruction();
     if(!worldBooted)await activateSavedWorld(worldSaveService.readWorldScene());
     else{const scene=worldSaveService.readWorldScene();Object.assign(state.ufoEquipment,scene.ufoEquipment);Object.assign(state.ufoResources,scene.ufoResources);refreshUfoEquipmentVisuals();renderUfoEquipmentWorkshopMenu();}
-  },exportRecord:()=>worldSaveService.exportRecovery()});
+  },pause:clearMarsShopDialogInput,reopen:()=>{clearMarsShopDialogInput();worldSaveReloadRequested=true;location.reload();},developer:new URLSearchParams(location.search).get('developer')==='1',exportRecord:()=>worldSaveService.exportRecovery()});
   worldSaveService=new WorldSaveService({mode,guardedDrafts:true,
     ...(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?{store:new WorldAuthorityStore('live'),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{store:createTransportSceneReadStore(new WorldAuthorityStore('live')),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_CONCRETE_PREVIEW?{store:new ConstructionProfileProjectPreviewStore(),constructionProjectPreview:true}:CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?{store:new ExcavationAuthorityStore(),excavationPreview:true,excavationOrigin:location.origin}:CONSTRUCTION_EXCAVATION_LIVE?{excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:{}),readLegacy:()=>CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK?null:localStorage.getItem(SAVE_KEY),
     materialsIO:mode==='live'&&!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
@@ -26474,12 +26831,61 @@ async function activateSavedWorld(saved) {
     onPause:clearMarsShopDialogInput,onResume:clearMarsShopDialogInput,onChange:syncWorldMapMenuPause});
   setupNativeDoorWalk();setupParkingMigrationCheck();
   worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput,getMap:()=>state.map,onReturnTown:returnToTownFromConstruction,canWalkVehicle:nativeDoorWalkReason,onWalkVehicle:id=>{const ctrl=nativeDoorController(id);prepareNativeDoorRoute();const goal=ctrl?.doorTarget?.(id);if(goal&&['truck','pump'].includes(id))goal.approach={x:goal.x-Math.sin(goal.heading)*60,z:goal.z-Math.cos(goal.heading)*60,heading:goal.heading};void nativeDoorNavigator.start(id,goal);}});
-  coastUI=createCoastUI({host:els.canvas.parentElement,clearInput:clearMarsShopDialogInput,returnTown:returnToTownFromConstruction,
-    context:()=>({map:state.map,x:state.position.x,z:state.position.z,blocked:worldSaveService.busy||worldSaveService.blocked,overlay:worldPlayerUI?.open||worldMapMenu?.paused})});
+  constructionBridgeUI=createConstructionBridgeUI({host:els.canvas.parentElement,clearInput:clearMarsShopDialogInput,returnTown:returnToTownFromConstruction,
+    context:()=>({map:state.map,x:state.position.x,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.groundY>6,
+      blocked:!worldBooted||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting||state.ufoBoarded||[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active||c?.busy),
+      overlay:worldPlayerUI?.open||worldMapMenu?.paused||mapResetPending||worldShopOverlay?.open||constructionDeliveryMenu?.open||spaceMaterialGuide?.open})});
+  coastUI=createCoastUI({host:els.canvas.parentElement,clearInput:clearMarsShopDialogInput,returnTown:returnToTownFromConstruction,onActivity:id=>coastPlay?.beginActivity(id),destination:saved.coastDestination,onDestinationChange:()=>{void worldAutoSave?.flush('coast-destination');},
+    context:()=>({map:state.map,x:state.position.x,z:state.position.z,heading:state.heading,viewHeading:state.viewHeading,riding:coastPlay?.riding,raftDanger:coastPlay?.raftDanger,returnBoat:coastPlay?.returnBoat,visited:worldSaveService.ledger?.world.coastRewards?.islands??[],airborne:state.jumpY>.001||state.jumpVelocity!==0,blocked:worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting,overlay:worldPlayerUI?.open||worldMapMenu?.paused||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending})});
+  coastForageUI=createCoastForageUI({workshopEnabled:false,host:els.canvas.parentElement,service:worldSaveService,clearInput:clearMarsShopDialogInput,view:()=>coastWorld?.forage,onWorkFocus:()=>{state.cameraMode='third';state.viewHeading=Math.PI;state.viewPitch=0;},showMap:()=>coastUI.showMap(),attachBag:b=>coastUI.addAction(b),onTravel:key=>{if(['coast','construction'].includes(key))document.querySelector('[data-map="'+key+'"]')?.click();},
+    context:()=>({map:state.map,x:state.position.x,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,blocked:!worldBooted||coastPebbles?.busy||coastFruits?.busy||coastSnorkel?.active,overlay:worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||worldShopOverlay?.open||constructionDeliveryMenu?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending}),snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}})});
+  coastPlay=createCoastPlayController({host:els.canvas.parentElement,getScene:()=>scene,getCharacter:()=>character,camera:()=>camera,canvas:els.canvas,state,service:worldSaveService,saved:saved.coastPhysics,swimming:()=>coastSnorkel?.active,suspended:()=>coastRigUI?.open===true||coastWhaleScene?.busy===true,watchingWhale:()=>coastWhaleScene?.busy===true,extraSurface:(x,z)=>coastWorld?.cave?.surfaceAt(x,z),
+    groundContact:()=>coastTerrainBodyContact(state.position.x,state.position.z,character.rotation.y,character.userData.terrainBody),
+    clearInput:clearMarsShopDialogInput,persist:persistWorldSnapshot,snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),showPouch:()=>coastForageUI?.show(),obstacles:()=>colliders,
+    readDrive:()=>({x:(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0)+touchVector.x,y:(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0)-touchVector.y,blocked:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastRigUI?.open||isSkyStationGuideDialogOpen()||marsShopDialogState.open||mapResetPending}),
+    prepareCarry:()=>coastCarryClearanceBatch(colliders,character?.userData?.collisionFootprint,characterColliderContact,CHARACTER_STRUCTURE_CONTACT_SKIN),canCarry:(x,y,z,heading,floors)=>coastCarryClearAt(colliders,character?.userData?.collisionFootprint,x,y,z,heading,characterColliderContact,CHARACTER_STRUCTURE_CONTACT_SKIN,floors),toast:showToast,showMap:id=>coastUI.showMap(id)});
+  coastUI.addAction(coastPlay.button);
+  coastPebbles=createCoastPebbleUI({host:els.canvas.parentElement,service:worldSaveService,snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY,z:state.position.z}}),saved:saved.coastPebbles,view:()=>coastWorld?.pebbles,getScene:()=>scene,clearInput:clearMarsShopDialogInput,
+    face:(x,z)=>{state.heading=Math.atan2(x-state.position.x,z-state.position.z);},
+    clearStone:(stone,delta)=>{const c=stone.solid;if(!c)return false;return !characterColliderContact(state.position.x,state.position.z,{...c,x:c.x+delta.x,z:c.z+delta.z,minY:c.minY+delta.y,maxY:c.maxY+delta.y,polygon:c.polygon?.map(p=>({x:p.x+delta.x,z:p.z+delta.z}))}).intersects;},
+    changed:id=>{constructionContactRevision++;const c=colliders.find(c=>c.id===id),m=physicsMeshGroup?.getObjectByName('physics-solid-'+id);if(c&&m)m.position.set(c.x,(c.minY+c.maxY)/2,c.z);},
+    context:()=>({map:state.map,position:{x:state.position.x,y:state.groundY,z:state.position.z},heading:character?.rotation.y??state.heading,body:character?.userData?.collisionFootprint,revision:constructionContactRevision,time:coastPlay?.waveTime??0,obstacles:colliders,
+      grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking||coastPlay?.hauling,
+      interrupted:worldSaveService.blocked||mapResetPending,paused:document.hidden,
+      blocked:!worldBooted||coastSnorkel?.active||coastFruits?.busy||coastFruits?.available||coastForageUI?.open||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending})});
+  coastFruits=createCoastFruitUI({host:els.canvas.parentElement,service:worldSaveService,view:()=>coastWorld?.trees,getScene:()=>scene,
+    snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),
+    context:()=>({map:state.map,position:{x:state.position.x,y:state.groundY,z:state.position.z},grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking||coastPlay?.hauling,
+      blocked:!worldBooted||coastSnorkel?.active||coastPebbles?.busy||coastForageUI?.open||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending,
+      overlay:coastSnorkel?.active||coastPebbles?.busy||coastForageUI?.open||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending})});
+  const swimClear=(x,y,z)=>coastCarryClearAt(colliders,character?.userData?.collisionFootprint,x,y,z,state.heading,characterColliderContact,CHARACTER_STRUCTURE_CONTACT_SKIN);
+  swimClear.cameraFloor=coastWalkingHeight;
+  coastSnorkel=createSnorkelController({host:els.canvas.parentElement,state,saved:saved.coastSnorkel,getScene:()=>scene,getCharacter:()=>character,clearInput:clearMarsShopDialogInput,persist:persistWorldSnapshot,clear:swimClear,
+    animateWalk:(dt,moving,scale)=>updateCharacterWalkAnimation(dt,moving,scale),
+    input:()=>{const v=readMoveVector();return{x:v.x,z:v.z,fast:isFastWalking()};},
+    context:()=>({ready:worldBooted,map:state.map,waveTime:coastPlay?.waveTime??0,grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking||coastPlay?.hauling,
+      blocked:!worldBooted||coastPebbles?.busy||coastFruits?.busy||coastForageUI?.open||worldSaveService?.blocked||worldSaveService?.crafting||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending})});
+  coastRewardsUI=createCoastRewardsUI({host:els.canvas.parentElement,service:worldSaveService,navigation:()=>coastPlay?.navigation,snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),
+    groundContact:()=>coastTerrainBodyContact(state.position.x,state.position.z,character.rotation.y,character.userData.terrainBody),
+    context:()=>({map:state.map,position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},airborne:state.jumpY>.001||state.jumpVelocity!==0||state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,overlay:worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||worldShopOverlay?.open||mapResetPending})});
+  // Background saving leaves movement live; stone contacts and timing must follow it.
+  caveCrossing=createCaveCrossingUI({host:els.canvas.parentElement,service:worldSaveService,view:()=>coastWorld?.cave,
+    canSave:()=>state.map!=='construction'||![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active||c?.dirty),
+    groundContact:()=>coastTerrainBodyContact(state.position.x,state.position.z,character.rotation.y,character.userData.terrainBody),
+    snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),
+    context:()=>({map:state.map,position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,
+    paused:!worldBooted||worldSaveService.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||worldShopOverlay?.open||mapResetPending})});
+  coastRigUI=createCoastRigUI({host:els.canvas.parentElement,service:worldSaveService,clearInput:clearMarsShopDialogInput,attach:b=>coastUI.addAction(b),snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),context:()=>({map:state.map,x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,blocked:!worldBooted||coastPebbles?.busy||coastFruits?.busy||coastSnorkel?.active||coastPlay?.rescuing,overlay:worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||worldShopOverlay?.open||mapResetPending})});
+  coastWhaleScene=createCoastWhaleScene({view:()=>coastWorld?.wildlife,clearInput:clearMarsShopDialogInput,context:()=>({map:state.map,interrupted:coastPlay?.rescuing||mapResetPending||worldSaveService?.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||!!document.querySelector('dialog[open]')})});
+  const refreshKeyboardHints=()=>{const keyboard=globalThis.IMASORA_KEYS;for(const button of[coastFruits?.button,coastPebbles?.button,document.querySelector('.coast-find-action'),document.querySelector('.coast-snorkel-start'),document.querySelector('.coast-rig-entry')])if(button){button.setAttribute('aria-keyshortcuts',keyboard?keyboard.bindings.confirm.filter(Boolean).map(keyboard.label).join(' '):'Space');button.title=(keyboard?.describe('confirm')??'Space')+'でも操作できます';}if(els.dashButton)els.dashButton.title=(keyboard?.describe('dash')??'Space ／ K')+'を押しながら移動でダッシュ';};
+  globalThis.IMASORA_KEYS?.onChange(refreshKeyboardHints);refreshKeyboardHints();
+  coastLandmarks=createCoastLandmarkControls({interactive:false,host:els.canvas.parentElement,service:worldSaveService,saved:saved.coastToys,view:()=>coastWorld?.toys,persist:persistWorldSnapshot,clearInput:clearMarsShopDialogInput,toast:showToast,
+    context:()=>({map:state.map,x:state.position.x,z:state.position.z,workshop:coastForageUI?.nearWorkshop,airborne:state.jumpY>.001||state.jumpVelocity!==0,camera,canvas:els.canvas,overlay:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||worldShopOverlay?.open||mapResetPending}),
+    look:id=>{coastLandmarks?.focus();state.cameraMode='third';state.viewHeading=id==='rocks'?0:Math.PI;state.viewPitch=0;}});
   setupSharedParkingPlay();
   if(CONSTRUCTION_EXCAVATION_LIVE&&saved.constructionExcavation&&worldSaveService.constructionTransportVersion===null){
     transportMigrationUI=createTransportMigrationView({service:worldSaveService,clearInput:clearMarsShopDialogInput,beforeCompare:async()=>{
-      if([worldHighController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.active||c?.dirty))throw Error('いまの作業を保存して終了してから引き継いでください。');
+      if([worldReelController,worldHighController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.active||c?.dirty))throw Error('いまの作業を保存して終了してから引き継いでください。');
       await worldSaveService.saveWorld(worldStateSnapshot());
     }});
     const migrate=document.createElement('button');migrate.type='button';migrate.textContent='保存して新しい現場操作へ';migrate.onclick=()=>void transportMigrationUI.show();document.querySelector('[data-player-tools]').append(migrate);
@@ -26494,8 +26900,11 @@ async function activateSavedWorld(saved) {
     else{
       const point=saved.constructionResume,arrival=new URLSearchParams(location.search).get('arrival'),ctrl={high:worldHighController,water:worldWaterController,timber:worldTimberController,transport:worldExcavationController,concrete:worldConcreteController}[point?.kind];
       const auto=mode==='live'&&saved.map==='construction'&&(!arrival||arrival==='town-bridge1')&&ctrl?.resumeSaved?.(point);
-      if(arrival==='town-bridge2'||!auto&&!(saved.autoSaveVersion===1&&saved.map===state.map))applyTownConstructionArrival();
+      if(shouldApplyTownArrival(saved,{arrival,auto}))applyTownConstructionArrival();
     }
+    // Consume the completed trip. Later in-game map changes must survive reload.
+    const arrived=mode==='live'&&completedTownArrivalUrl(location.href,state.map);
+    if(arrived)history.replaceState(history.state,'',arrived);
     setupWorldAutoSave();
     updateMapReadout();
   }finally{if(root){root.inert=wasInert;if(wasBusy===null)root.removeAttribute('aria-busy');else root.setAttribute('aria-busy',wasBusy);}}
@@ -26503,6 +26912,6 @@ async function activateSavedWorld(saved) {
     const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている古い開発画面は再読み込みしてから遊んでください。旧保存は保護して残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
     window.addEventListener('storage',event=>{if(event.key===SAVE_KEY)notice.textContent='古い画面が旧保存を更新しました。現在の金貨・建築は上書きされません。古い画面を再読み込みしてください。';});
   }
-  window.addEventListener('beforeunload',event=>{if(mapResetPending||worldSaveService.blocked||worldAutoSave?.error){event.preventDefault();event.returnValue='';}});
+  window.addEventListener('beforeunload',event=>{if(worldSaveReloadRequested)return;if(mapResetPending||worldSaveService.blocked||worldAutoSave?.error){event.preventDefault();event.returnValue='';}});
 }
 startSavedWorld().catch(error=>{els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});

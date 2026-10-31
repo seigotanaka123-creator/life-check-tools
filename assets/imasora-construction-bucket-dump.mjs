@@ -1,16 +1,17 @@
-import {excavatorGroundFrame,excavatorGroundHeight,excavatorWorkSupported,groundPoint,groundLocal} from './imasora-construction-native-excavator-ground.mjs?v=120gn';
-import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {transportExcavatorPositionSafe} from './imasora-construction-transport-drive.mjs?v=120gn';
-import {transportPoseKey} from './imasora-construction-transport-field.mjs?v=120gf';
+import {nativeDeckBoxes} from './imasora-construction-native-decks.mjs?v=120ps';
+import {excavatorGroundFrame,excavatorGroundHeight,excavatorWorkSupported,groundPoint,groundLocal} from './imasora-construction-native-excavator-ground.mjs?v=120pv';
+import {nativeDumpBox,nativeDumpLocal,boxAxes,boxLocal,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {transportExcavatorPositionSafe} from './imasora-construction-transport-drive.mjs?v=120pv';
+import {transportPoseKey} from './imasora-construction-transport-field.mjs?v=120ov';
 import {canonical} from './imasora-construction-state.js';
-import {dumpPositionSafe,createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs?v=120gn';
-import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js?v=120gf';
+import {dumpPositionSafe,createDumpWork,validateDumpWork,DUMP_WORK_FORMAT,DUMP_WORK_SCOPE,walkDumpWork,turnDumpWalker,driveDumpWork,boardDumpWork,leaveDumpWork,dumpBoardTarget,dumpUnloadPlan,dumpStoragePlan,startDumpStorage,startDumpUnload,progressDumpUnload,finishDumpUnload,cancelDumpUnload,startDumpHandWork,progressDumpHandWork,finishDumpHandWork,returnDumpHandWork} from './imasora-construction-dump-work.mjs?v=120pv';
+import {shovelMachineState,shovelMachines,shovelSoilBoxes,shovelSegmentHits,shovelDumpObstacles,shovelDumpPoint,shovelStanding} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {armPose,armIntersections,solveBucketPose,EX} from './imasora-construction-excavator.js?v=120ov';
 import {bucketContactGeometry,prismTouchesBox} from './imasora-construction-excavator-contact.js?v=120fc';
 import {bucketPoint,isContactDig,isBackhoe} from './imasora-construction-excavator-bucket.js';
-import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js?v=120gf';
-import {LOADER,WALKER,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
-import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120gn';
+import {excavatorAccessPath,excavatorAccessClear,EX_ACCESS} from './imasora-construction-excavator-access.js?v=120ov';
+import {LOADER,WALKER,localToWorld} from './imasora-construction-loader-physics.js?v=120ov';
+import {soilTransportCommand,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120pv';
 
 export const BUCKET_DUMP_FORMAT='imasora-shared-bucket-dump-checkpoint-v1';
 export const BUCKET_DUMP_SCOPE='imasora-shared-bucket-dump-isolated-v1';
@@ -24,7 +25,7 @@ const same=(a,b)=>canonical(a)===canonical(b);
 function freezePlan(value){if(value&&typeof value==='object'){for(const v of Object.values(value))freezePlan(v);Object.freeze(value);}return value;}
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,60}$/.test(v);
 const heading=n=>Math.atan2(Math.sin(n),Math.cos(n));
-const cabPath=(f,side,board=true)=>{const w=poseWork(f),v=w.loader.vehicle,g=w.groundPose;return excavatorAccessPath(v,f.machineArm.slew,side,board).map(p=>{if(!g)return{...p,heading:heading(p.heading)};const c=Math.cos(v.heading),s=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,q=groundPoint(g,c*dx-s*dz,p.y,s*dx+c*dz);return{...p,x:q[0],y:p.y===0?excavatorGroundHeight(f,q[0],q[2])??q[1]:q[1],z:q[2],heading:heading(p.heading)};});};
+const cabPath=(f,side,board=true)=>{const w=poseWork(f),v=w.loader.vehicle,g=w.groundPose;return excavatorAccessPath(v,f.machineArm.slew,side,board).map(p=>{if(!g)return{...p,heading:heading(p.heading)};const c=Math.cos(v.heading),s=Math.sin(v.heading),dx=p.x-v.x,dz=p.z-v.z,q=groundPoint(g,c*dx-s*dz,p.y,s*dx+c*dz);return{...p,x:q[0],y:p.y===0?excavatorGroundHeight(f,q[0],q[2],q[1])??q[1]:q[1],z:q[2],heading:heading(p.heading)};});};
 const legacy=s=>({format:DUMP_WORK_FORMAT,scope:DUMP_WORK_SCOPE,version:1,revision:s.revision,frame:s.frame,mode:s.mode==='excavating'?'foot':s.mode,vehicleTravel:s.vehicleTravel,wheelTravel:s.wheelTravel,unload:s.unload});
 const idle=s=>check(!s.link&&!s.unload&&!s.frame.job&&!s.frame.soil.pending,'今の作業を終えるか、メニューで一時停止してください。');
 const next=(s,frame,extra={})=>({...s,revision:s.revision+1,frame:{...frame,revision:s.frame.revision+1},...extra});
@@ -42,7 +43,7 @@ function boxContact(prism,box){
 function cargoBox(f){const amount=f.soil.containers.dump.amount;if(!amount)return null;const vol=amount*8,w=Math.min(48,Math.max(4,Math.sqrt(vol/4))),d=Math.min(29,Math.max(4,vol/(w*4))),height=vol/(w*d);return nativeDumpBox(f,[-24+w/2,17+height/2,-22],[w/2,height/2,d/2]);}
 export function linkedArmClear(frame,arm=frame.machineArm){
  let w,p;try{w=poseWork(frame,arm);p=armPose(w);}catch{return false;}if(armIntersections(w).size)return false;
- const parts=bucketContactGeometry(w,p).all,key=canonical(frame.dump);let entry=obstacleCache.get(frame.soil);if(!entry||entry.key!==key){const cargo=cargoBox(frame);entry={key,grid:new Map()};for(const b of [...shovelDumpObstacles(frame),...shovelSoilBoxes(frame.soil),...(cargo?[cargo]:[])]){const extent=boxExtent(b),item={b,extent};for(let x=Math.floor((b.position[0]-extent[0])/32);x<=Math.floor((b.position[0]+extent[0])/32);x++)for(let z=Math.floor((b.position[2]-extent[2])/32);z<=Math.floor((b.position[2]+extent[2])/32);z++){const cell=x+','+z,list=entry.grid.get(cell)??[];list.push(item);entry.grid.set(cell,list);}}obstacleCache.set(frame.soil,entry);}
+ const parts=bucketContactGeometry(w,p).all,key=canonical(frame.dump);let entry=obstacleCache.get(frame.soil);if(!entry||entry.key!==key||entry.decks!==frame.decks){const cargo=cargoBox(frame);entry={key,decks:frame.decks,grid:new Map()};for(const b of [...shovelDumpObstacles(frame),...nativeDeckBoxes(frame),...shovelSoilBoxes(frame.soil),...(cargo?[cargo]:[])]){const extent=boxExtent(b),item={b,extent};for(let x=Math.floor((b.position[0]-extent[0])/32);x<=Math.floor((b.position[0]+extent[0])/32);x++)for(let z=Math.floor((b.position[2]-extent[2])/32);z<=Math.floor((b.position[2]+extent[2])/32);z++){const cell=x+','+z,list=entry.grid.get(cell)??[];list.push(item);entry.grid.set(cell,list);}}obstacleCache.set(frame.soil,entry);}
  const min=[0,1,2].map(i=>Math.min(...p.world.map(v=>[v.x,v.y,v.z][i]-2.8),...parts.map(p=>p.min[i]))),max=[0,1,2].map(i=>Math.max(...p.world.map(v=>[v.x,v.y,v.z][i]+2.8),...parts.map(p=>p.max[i])));
  const nearby=new Set();for(let x=Math.floor(min[0]/32);x<=Math.floor(max[0]/32);x++)for(let z=Math.floor(min[2]/32);z<=Math.floor(max[2]/32);z++)for(const item of entry.grid.get(x+','+z)??[])nearby.add(item);
  for(const {b,extent} of nearby){if(extent.some((v,i)=>min[i]>b.position[i]+v||max[i]<b.position[i]-v))continue;

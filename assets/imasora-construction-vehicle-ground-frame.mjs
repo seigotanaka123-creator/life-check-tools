@@ -9,7 +9,7 @@ const trackPoints=[-36,0,36].flatMap(z=>[-28,28].map(x=>({x,z})));
 export function vehicleGroundFrame(v,heightAt=()=>0,{tracked=false,maxDegrees=8}={}){
  if(!v||![v.x,v.z,v.heading].every(Number.isFinite))throw Error('車の位置を確認できません。');
  const c=Math.cos(v.heading),s=Math.sin(v.heading),horizontal=(x,z)=>[v.x+c*x+s*z,v.z-s*x+c*z];
- const sample=(x,z)=>{const h=heightAt(x,z);if(!Number.isFinite(h))throw Error('この先に車を支える地面がありません。');return h;};
+ const sample=(x,z)=>{const h=heightAt(x,z,v.groundY??0);if(!Number.isFinite(h))throw Error('この先に車を支える地面がありません。');return h;};
  const points=tracked?trackPoints:wheelPoints,heights=points.map(p=>sample(...horizontal(p.x,p.z))),mz=points.reduce((n,p)=>n+p.z,0)/points.length,mh=heights.reduce((a,b)=>a+b,0)/points.length;
  const a=points.reduce((n,p,i)=>n+p.x*(heights[i]-mh),0)/points.reduce((n,p)=>n+p.x*p.x,0),b=points.reduce((n,p,i)=>n+(p.z-mz)*(heights[i]-mh),0)/points.reduce((n,p)=>n+(p.z-mz)**2,0),slope=Math.hypot(a,b);
  if(slope>Math.tan(maxDegrees*Math.PI/180)+1e-8)throw Error('坂が急すぎるよ。ゆるやかな道を通ろう。');

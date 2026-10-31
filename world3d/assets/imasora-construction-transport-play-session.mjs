@@ -1,9 +1,9 @@
 import {sameConstructionRecordValue as same} from './imasora-construction-record-equality.mjs';
-import {transportSiteGate,transportWorldPose,transportSiteOrigin} from './imasora-construction-transport-site.mjs?v=120gn';
-import {transportDoorApproach} from './imasora-construction-transport-door.mjs?v=120gn';
-import {shovelStanding} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {excavationEntry} from './imasora-construction-world-excavation.js?v=120gf';
-import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
+import {transportSiteGate,transportWorldPose,transportSiteOrigin} from './imasora-construction-transport-site.mjs?v=120pv';
+import {transportDoorApproach} from './imasora-construction-transport-door.mjs?v=120pv';
+import {shovelStanding} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {excavationEntry} from './imasora-construction-world-excavation.js?v=120ov';
+import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
 const require=(ok,text)=>{if(!ok)throw Error(text);};
 export const transportWorkMoving=w=>!!(w?.scoop||w?.link||w?.unload||w?.frame.job);
 // A short scoop has a durable reservation before it moves and a durable result

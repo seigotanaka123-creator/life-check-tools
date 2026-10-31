@@ -1,11 +1,12 @@
-import {foundationContains} from './free-foundation-state.mjs?v=120gn';
-import {foundationSurfaceAt,assertFoundationSupport,constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120gn';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {freePlacedFill} from './free-work-parts.mjs';
-import {footSurface,footingAt} from './free-footing.mjs?v=120gn';
-import {walkPath,walkingBlocked} from './free-contact.mjs?v=120gn';
-import {scaffoldSupport,scaffoldSurface} from './free-frame-scaffold.mjs?v=120gn';
-import {frameRoute} from './free-frames.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {foundationContains} from './free-foundation-state.mjs?v=120pv';
+import {foundationSurfaceAt,assertFoundationSupport,constructionBase,supportedWorkMatches} from './free-supported-build.mjs?v=120pv';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
+import {footSurface,footingAt} from './free-footing.mjs?v=120pv';
+import {walkPath,walkingBlocked} from './free-contact.mjs?v=120pv';
+import {scaffoldSupport,scaffoldSurface} from './free-frame-scaffold.mjs?v=120pv';
+import {frameRoute} from './free-frames.mjs?v=120pv';
 
 export const ACCESS_MAX_RISER=2.5,ACCESS_MAX_TREADS=16;
 // Bound the search, measure the actual stair entry, and retain the first legal
@@ -36,11 +37,11 @@ export function foundationAccessProblem(p){
 export function planFoundationAccess(p,from,heightAt,external,target=null){
  const issue=foundationAccessProblem(p);if(issue)throw Error(issue);assertFoundationSupport(p,{heightAt,blockedAt:external});
  const f=p.freeBuild,s=p.foundation,base=(x,z)=>foundationSurfaceAt(s,x,z)??heightAt(x,z),groundBlocked=(x,z,m)=>external(x,z,m)||foundationContains(s,x-s.x,z-s.z,m);
- let desiredHeight=null,near=from;if(target){const w=f.completed[target.work];if(p.schemaVersion<13||target.face!=='top'||!w||!Number.isInteger(target.cell)||target.cell<0||target.cell>15||!w.fill[target.cell]||!supportedWorkMatches(p,w,1<<target.cell))throw Error('階段を接続する施工面を確認してください。');desiredHeight=constructionBase(w)+w.fill[target.cell]/2;const c=freeCell(target.cell);near={x:w.x-f.location.x+c.x,z:w.z-f.location.z+c.z};}
+ let desiredHeight=null,near=from;if(target){const w=f.completed[target.work];if(p.schemaVersion<13||target.face!=='top'||!w||!Number.isInteger(target.cell)||target.cell<0||target.cell>15||!w.fill[target.cell]||!supportedWorkMatches(p,w,1<<target.cell))throw Error('階段を接続する施工面を確認してください。');desiredHeight=constructionBase(w)+groundHeight(w,target.cell);const c=freeCell(target.cell,w);near={x:w.x-f.location.x+c.x,z:w.z-f.location.z+c.z};}
  const gap=c=>desiredHeight===null?0:desiredHeight-footSurface(f,c.x,c.z,base);
  const score=c=>Math.abs(gap(c))<1e-8?0:1;
  const distance=c=>{const to=score(c)?from:near;return Math.hypot(c.x-to.x,c.z-to.z);};
- const cells=Array.from({length:16},(_,i)=>i).filter(i=>s.mask&(1<<i)).map(i=>({...freeCell(i),i})).filter(c=>gap(c)>=-1e-8&&gap(c)<=.5+1e-8).sort((a,b)=>score(a)-score(b)||distance(a)-distance(b));
+ const cells=Array.from({length:16},(_,i)=>i).filter(i=>s.mask&(1<<i)).map(i=>({...groundTile(i,s),i})).filter(c=>gap(c)>=-1e-8&&gap(c)<=.5+1e-8).sort((a,b)=>score(a)-score(b)||distance(a)-distance(b));
  let last;const causes=[];
  for(const cell of cells)for(const axis of ['z','x'])for(const direction of [-1,1])try{
   const height=footSurface(f,cell.x,cell.z,base),{entry,stairs,landing}=entryLayout(f,cell,height,axis,direction,heightAt);
@@ -53,7 +54,7 @@ export function planFoundationAccess(p,from,heightAt,external,target=null){
    const x=tread.x+dx,z=tread.z+dz,bottom=footSurface(f,x,z,base);if(!Number.isFinite(bottom)||bottom>tread.y+.15||external(f.location.x+x,f.location.z+z,.6))throw Error('階段・踊り場の支柱と通路を空けてください。');
    legs.push({x,z,y:tread.y,base:bottom});
   }
-  const cutouts=cells.map(c=>({x:c.x,z:c.z,width:16,depth:16})).filter(c=>Math.abs(footSurface(f,c.x,c.z,base)-height)<1e-8);
+  const cutouts=cells.map(c=>({x:c.x,z:c.z,width:c.w,depth:c.d})).filter(c=>Math.abs(footSurface(f,c.x,c.z,base)-height)<1e-8);
   const plan={kind:'foundation-access',thickness:.2,height,stairs,path,stance,entry,ground,legs,panels:[],axis,direction,cutouts,foundationKey:JSON.stringify(s)};
   scaffoldSupport(f,plan,base,external);
   const walkHeight=(x,z)=>foundationWalkHeight(p,x,z,heightAt,plan);
@@ -71,16 +72,16 @@ export function assertRaisedPaintSupport(p,a,heightAt,blockedAt){
 // patches use a separate paint scaffold, avoiding a forced unusable landing.
 export function foundationPaintUsesLanding(p,a){
  const w=p.freeBuild.completed[a.work];
- return p.schemaVersion>=13&&a.face==='top'&&!!constructionBase(w)&&freePlacedFill(w,a.cell)===1&&supportedWorkMatches(p,w,1<<a.cell);
+ return p.schemaVersion>=13&&a.face==='top'&&!!constructionBase(w)&&groundHeight(w,a.cell,freePlacedFill(w,a.cell))===.5&&supportedWorkMatches(p,w,1<<a.cell);
 }
 export function paintNeedsGroundAccess(p,a,plan){
  const w=p.freeBuild.completed[a.work];
- const gap=w?constructionBase(w)+w.fill[a.cell]/2-plan.height:Infinity;
+ const gap=w?constructionBase(w)+groundHeight(w,a.cell)-plan.height:Infinity;
  // A checked same-deck landing may feed a quarter-cup surface just above it.
  // Taller differences require their own stair height; the tool still validates
  // every actual route, sole and contact rather than assuming this grants reach.
  if(p.schemaVersion>=13&&a.face==='top'&&w&&supportedWorkMatches(p,w,1<<a.cell)&&plan.foundationKey===JSON.stringify(p.foundation)&&gap>=-1e-8&&gap<=.5+1e-8)return false;
- return a.face!=='top'||!w||!supportedWorkMatches(p,w,1<<a.cell)||Math.abs(constructionBase(w)+w.fill[a.cell]/2-plan.height)>1e-8;
+ return a.face!=='top'||!w||!supportedWorkMatches(p,w,1<<a.cell)||Math.abs(constructionBase(w)+groundHeight(w,a.cell)-plan.height)>1e-8;
 }
 // Rectangle subtraction keeps the metal landing around, rather than on top of,
 // the wooden deck / painted concrete at the same elevation.

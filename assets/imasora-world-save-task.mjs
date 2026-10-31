@@ -1,16 +1,31 @@
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120gn';
-import {prepareTransportRestorePlan,prepareTransportRestoreCommit,compactCheckedRestorePoints,validateTransportRestoreJournal,validateAndCompactTransportRestoreJournal,snapshotTransportRestoreJournal,sameTransportRestoreValue} from './imasora-construction-transport-restore.mjs?v=120gn';
-import {validateSoilTransport} from './imasora-construction-soil-transport.mjs?v=120gn';
-import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120gn';
-import {validateScoopDumpContinuation,basinScoopPlan,scoopDumpPlan} from './imasora-construction-fragment-scoop.mjs?v=120gn';
+import{unpackDeliveredBeam}from'./imasora-construction-beam-unpack.mjs?v=120pv';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {prepareTransportRestorePlan,prepareTransportRestoreCommit,compactCheckedRestorePoints,validateTransportRestoreJournal,validateAndCompactTransportRestoreJournal,snapshotTransportRestoreJournal,sameTransportRestoreValue} from './imasora-construction-transport-restore.mjs?v=120pv';
+import {validateSoilTransport} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
+import {validateScoopDumpContinuation,basinScoopPlan,scoopDumpPlan} from './imasora-construction-fragment-scoop.mjs?v=120pv';
 import {sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
 
 const exactValues=(a,b)=>{if(Object.is(a,b))return true;if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;if(Array.isArray(a)&&a.length===3&&b.length===3&&Object.keys(a).length===3&&Object.keys(b).length===3&&typeof a[0]==='number'&&typeof a[1]==='number'&&typeof a[2]==='number'&&typeof b[0]==='number'&&typeof b[1]==='number'&&typeof b[2]==='number')return Object.is(a[0],b[0])&&Object.is(a[1],b[1])&&Object.is(a[2],b[2]);const keys=Object.keys(a);return keys.length===Object.keys(b).length&&(!Array.isArray(a)||a.length===b.length)&&keys.every(k=>Object.hasOwn(b,k)&&exactValues(a[k],b[k]));};
 // Only encoding and full validation. Storage, receipts and write ordering
 // remain owned by the save service on the caller's side.
 export function executeWorldSaveTask(kind,args){
+ if(kind==='prepare-beam-unpack'){
+  const base=args.ledger,old=base.world.constructionTimber;if(args.draft?.map!=='construction')throw Error('工事現場で角材を使おう。');
+  const work=unpackDeliveredBeam(base.world,args.partId,args.id,{allowPaused:true}),unchanged=work===old;if(!unchanged&&old.revision!==args.expectedRevision)throw Error('別の木材作業が進んだよ。もう一度ためそう。');
+  const checked=executeWorldSaveTask('pack-checked',{ledger:unchanged?base:L.saveConstructionTimberDraft(base,work,args.draft,args.expectedRevision)}),before=base.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,unchanged,exactSoil:!!before&&!!after&&exactValues(before,after)};
+ }
+
  if(kind==='prepare-kit-transfer'){
   const next=L.transferConstructionKit(args.ledger,args.action,args.draft,args.expectedRevision),checked=executeWorldSaveTask('pack-checked',{ledger:next});
+  const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,exactSoil:before&&after?exactValues(before,after):false};
+ }
+ if(kind==='prepare-adventure'){
+  const methods={pebble:()=>L.applyCoastPebbleFind(args.ledger,args.value,args.draft,args.expectedRevision),fruit:()=>L.applyCoastFruit(args.ledger,args.value,args.draft,args.expectedRevision),visit:()=>L.applyCoastVisit(args.ledger,args.value,args.draft,args.expectedRevision),exploration:()=>L.recordCoastExploration(args.ledger,args.value,args.draft,args.expectedRevision),arrival:()=>L.applyCoastArrival(args.ledger,args.value,args.draft,args.expectedRevision),supplies:()=>L.receiveSailingAwards(args.ledger,args.value,args.draft,args.expectedRevision),rig:()=>L.applyCoastRig(args.ledger,args.value,args.draft,args.expectedRevision)};
+  if(!Object.hasOwn(methods,args.operation))throw Error('冒険のセーブをたしかめよう。');const checked=executeWorldSaveTask('pack-checked',{ledger:methods[args.operation]()}),before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,exactSoil:before&&after?exactValues(before,after):false};
+ }
+ if(kind==='prepare-coast'){
+  const next=L.applyCoastForage(args.ledger,args.action,args.draft,args.expectedRevision,args.id),checked=executeWorldSaveTask('pack-checked',{ledger:next});
   const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,exactSoil:before&&after?exactValues(before,after):false};
  }
  if(kind==='prepare-high'){

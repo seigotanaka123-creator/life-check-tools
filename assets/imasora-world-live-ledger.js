@@ -1,2 +1,2 @@
-import {createWorldLedgerAPI} from './imasora-world-ledger-engine.js?v=120gn';
+import {createWorldLedgerAPI} from './imasora-world-ledger-engine.js?v=120pv';
 export const WORLD_LEDGER=createWorldLedgerAPI({scope:'imasora-world-ledger-v1',kinds:['legacy-world','new-world'],immutablePackets:typeof WorkerGlobalScope!=='undefined'&&globalThis instanceof WorkerGlobalScope,verifiedPacketCacheBytes:typeof WorkerGlobalScope!=='undefined'&&globalThis instanceof WorkerGlobalScope?20*1024*1024:0});

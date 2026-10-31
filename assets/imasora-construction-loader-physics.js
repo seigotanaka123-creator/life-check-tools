@@ -1,6 +1,6 @@
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
-import {LEGACY_WORK_AREA,workArea,inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
-import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
+import {LEGACY_WORK_AREA,workArea,inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
+import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs?v=120lb';
 // Stage 3-1: flat-ground, kinematic vehicle/boarding prototype. No game-save access.
 import {atDriverDoor} from './imasora-construction-boarding.js';
 export const LOADER = Object.freeze({width:60,length:86,floor:9.12,seatZ:-8,seatX:-14,wheelbase:49,wheelRadius:8.9,maxSpeed:100,reverseSpeed:48,acceleration:65,coast:35,brake:190,steering:.47});
@@ -37,10 +37,21 @@ export function vehicleBlocker(vehicle,obstacles=OBSTACLES){
   // Extra 4 units each side cover the steered tyre corners; bucket is inside length 86.
   const p=polygon(vehicle,68,vehicle.waterTruck?94:86);
   if(!inside(p,vehicle))return'外周の柵';
-  for(const o of [...obstacles,...(vehicle.field?[]:[SAFE_ZONE])])if(polygonsOverlap(p,rect(o)))return o.id;
+  for(const o of [...obstacles,...(vehicle.field?[]:[SAFE_ZONE])])if(!(vehicle.field&&(o.supportSurface||Number.isFinite(o.minY)&&(o.height+(o.heightOffset??0)<=(vehicle.groundY??0)+.15||o.minY+(o.heightOffset??0)>=(vehicle.groundY??0)+(vehicle.waterTruck?56:46))))&&polygonsOverlap(p,rect(o)))return o.id;
   return'';
 }
-function personClear(p,obstacles,vehicle){const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);return inside(poly,vehicle)&&!obstacles.some(o=>polygonsOverlap(poly,rect(o)));}
+function personClear(p,obstacles,vehicle){
+  const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);
+  if(!inside(poly,vehicle))return false;
+  return !obstacles.some(o=>{
+    if(vehicle?.field&&Number.isFinite(o.height)){
+      const y=(p.y??0)+(o.actorGround??vehicle.groundY??0),base=o.heightOffset??0;
+      const lo=(o.minY??0)+base,hi=o.height+base;
+      if(hi<=y+.15||lo>=y+WALKER.height||o.supportSurface&&hi<=y+3.1)return false;
+    }
+    return polygonsOverlap(poly,rect(o));
+  });
+}
 export function walkingClear(p,vehicle,obstacles=OBSTACLES){
   if(!personClear(p,obstacles,vehicle))return false;
   const poly=polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2);

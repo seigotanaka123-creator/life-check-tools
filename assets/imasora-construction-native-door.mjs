@@ -1,6 +1,6 @@
-import {loaderCab} from './imasora-construction-loader-physics.js?v=120gf';
+import {loaderCab} from './imasora-construction-loader-physics.js?v=120ov';
 import {planFieldRoute,FIELD_RUN_SPEED,sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
-import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
+import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 
 // These are world-space door approaches, not new origins for saved works.
 export function nativeDoorTarget(record,origin,{busy=false,active=false,groundHeightAt=null}={}){
@@ -10,7 +10,7 @@ export function nativeDoorTarget(record,origin,{busy=false,active=false,groundHe
  const c=Math.cos(v.heading),s=Math.sin(v.heading),doorZ=loaderCab(v).seatZ;
  // Six units outside the door marker, within its eight-unit boarding zone.
  // This leaves the normal world's whole-body collider outside the side step.
- if(record.schema===2&&groundHeightAt){try{const g=vehicleGroundFrame(v,(x,z)=>groundHeightAt(origin.x+x,origin.z+z)),p=groundPoint(g,-64,0,doorZ),y=groundHeightAt(origin.x+p[0],origin.z+p[2]);if(!Number.isFinite(y)||Math.abs(y-p[1])>2.1)return null;return{x:origin.x+p[0],z:origin.z+p[2],y,heading:v.heading};}catch{return null;}}
+ if(record.schema===2&&groundHeightAt){try{const g=vehicleGroundFrame(v,(x,z,reference)=>groundHeightAt(origin.x+x,origin.z+z,reference)),p=groundPoint(g,-64,0,doorZ),y=groundHeightAt(origin.x+p[0],origin.z+p[2],g.position[1]);if(!Number.isFinite(y)||Math.abs(y-p[1])>2.1)return null;return{x:origin.x+p[0],z:origin.z+p[2],y,heading:v.heading};}catch{return null;}}
  return{x:origin.x+v.x-64*c+doorZ*s,z:origin.z+v.z+64*s+doorZ*c,y:0,heading:v.heading};
 }
 

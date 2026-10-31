@@ -1,26 +1,27 @@
+import{receivingCargo,receivingCargoAligned,receivingCargoName}from'./imasora-construction-timber-cargo.mjs?v=120pv';
 import{BOARD_LIFT as H,BOARD_BAY as B,boardLiftInstalled,boardLiftHeight,boardBayLevels}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
-import{liftState,putLiftState,validateBoardLiftState}from'./imasora-construction-board-lift-state.mjs?v=120gd';
-import{highProjects,highLocalPoint,highWorldPoint,highWorldGeometry}from'./imasora-construction-high-world.mjs?v=120gn';
-import{collides}from'./imasora-construction-crane.js?v=120gn';
+import{liftState,putLiftState,validateBoardLiftState}from'./imasora-construction-board-lift-state.mjs?v=120pv';
+import{highProjects,highLocalPoint,highWorldPoint,highWorldGeometry}from'./imasora-construction-high-world.mjs?v=120pv';
+import{collides}from'./imasora-construction-crane.js?v=120pv';
 import{TIMBER_YARDS}from'./imasora-construction-yard-origins.mjs';
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),key=r=>JSON.stringify([r.site,r.work.levels,r.work.blueprint,r.work.boardBayRetrofit,r.work.roomLayout,r.work.entranceDoor]),at=(a,b)=>Math.abs(a-b)<.001;
-const board=p=>p&&p.w===80&&p.d===56&&p.h===6&&p.fixed&&!p.hover&&!p.carrierId&&p.vx===0&&p.vy===0&&p.vz===0;
+const board=p=>receivingCargo(p)&&p.fixed&&!p.hover&&!p.carrierId&&p.vx===0&&p.vy===0&&p.vz===0;
 const ready=w=>!w.paused&&w.rig.mode==='driving'&&w.work&&w.deployment===1&&!w.held&&!w.rotation&&!w.joining&&!w.rig.transition&&Math.abs(w.rig.vehicle.speed)<.01;
 export function liftLocal(r,p,o){return highLocalPoint(r.site,{x:p.x+o.x,y:p.y,z:p.z+o.z});}
-function fits(r,p,o){const q=liftLocal(r,p,o);return board(p)&&at(q.x,H.x)&&Math.abs(Math.cos(p.angle-r.site.turn*Math.PI/2))<1e-7&&q.z>=B.outside-.001&&q.z<=H.z+.001;}
+function fits(r,p,o){const q=liftLocal(r,p,o);return board(p)&&at(q.x,H.x)&&receivingCargoAligned(p,r.site.turn)&&q.z>=B.outside-.001&&q.z<=H.z+.001;}
 export function boardLiftChoices(collection,w,{origin={x:0,z:0}}={}){
  if(!ready(w))return[];const out=[];for(const{id,record:r}of highProjects(collection)){if(!boardLiftInstalled(r.work)||r.work.job||r.work.roomWalkVersion||r.work.levels!==r.work.blueprint.storeys.length||Math.hypot(w.rig.vehicle.x+origin.x-r.site.x,w.rig.vehicle.z+origin.z-r.site.z)>550)continue;
   const car=liftState(w,id),p=w.parts.find(p=>p.id===car.partId)??w.parts.find(p=>fits(r,p,origin)&&at(liftLocal(r,p,origin).z,H.z)&&at(liftLocal(r,p,origin).y,car.height)),q=p?liftLocal(r,p,origin):null,levels=boardBayLevels(r.work).filter(l=>l>=2);
   const add=(kind,to,part,label)=>out.push({id:id+':lift:'+kind+':'+to+':'+(part?.id??'empty'),kind:'lift',mode:kind,projectId:id,partId:part?.id??null,target:to,origin:{x:origin.x,z:origin.z},key:key(r),from:{height:car.height,part:part?{x:part.x,y:part.y,z:part.z}:null},label:'建物 '+id.slice(9)+'・'+label});
   if(car.partId&&!p)continue;
-  if(!p||q&&at(q.z,H.z)){for(const level of[0,...levels])if(!at(car.height,level*40))add('vertical',level*40,p,(p?'床板を':'空のリフトを')+(level+1)+'階へ'+(level*40>car.height?'上げる':'下ろす'));}
+  if(!p||q&&at(q.z,H.z)){for(const level of[0,...levels])if(!at(car.height,level*40))add('vertical',level*40,p,(p?receivingCargoName(p)+'を':'空のリフトを')+(level+1)+'階へ'+(level*40>car.height?'上げる':'下ろす'));}
   const level=Math.round(car.height/40);if(at(car.height,level*40)&&levels.includes(level)){
    if(p&&fits(r,p,origin)&&q.y===car.height&&!at(q.z,B.outside))add('unload',B.outside,p,(level+1)+'階の受取台へ運ぶ');
    const waiting=p??w.parts.find(p=>fits(r,p,origin)&&at(liftLocal(r,p,origin).y,car.height)&&at(liftLocal(r,p,origin).z,B.outside));if(waiting&&fits(r,waiting,origin)&&!at(liftLocal(r,waiting,origin).z,H.z))add('load',H.z,waiting,(level+1)+'階でリフトにのせる');
   }
  }return out;
 }
-export function startBoardLift(collection,w,c){const n=boardLiftChoices(collection,w,{origin:c.origin}).find(n=>same(n,c));if(!n)throw Error('リフトと床板をもう一度たしかめよう。');return{...n,vehicle:JSON.stringify(w.rig.vehicle)};}
+export function startBoardLift(collection,w,c){const n=boardLiftChoices(collection,w,{origin:c.origin}).find(n=>same(n,c));if(!n)throw Error('リフトと建材をもう一度たしかめよう。');return{...n,vehicle:JSON.stringify(w.rig.vehicle)};}
 const geometry=new Map();export function boardLiftSolids(collection,origin){const k=JSON.stringify([collection,origin]);if(geometry.has(k))return geometry.get(k);const g=highWorldGeometry(collection),v=[...g.boxes.map(b=>({...b,x:b.x-origin.x,y:b.y-b.h/2,z:b.z-origin.z,angle:b.angle??g.angle})),...g.surfaces.map(b=>({...b,x:b.x-origin.x,y:b.y-2.5,z:b.z-origin.z,h:2.5,exactFloor:true,angle:b.angle??g.angle}))];if(geometry.size>=16)geometry.clear();geometry.set(k,v);return v;}
 // Live walking edges extend 0.09 into a touching deck. Replace only known floor
 // adapters with those same floors as full 2.5-thick slabs, keeping all real solids.
@@ -29,8 +30,8 @@ export function liftSweep(work,r,from,to,{collection,origin,external=[],ignorePa
  return true;
 }
 export function advanceBoardLift(job,state,seconds,context){if(!Number.isFinite(seconds)||seconds<0||seconds>1)throw Error('リフトの時間をたしかめよう。');let result={state,job,arrived:false,progress:0},remaining=seconds;while(remaining>1e-9&&result.job){result=step(result.job,result.state,Math.min(.1,remaining),context);remaining-=Math.min(.1,remaining);}return result;}
-function step(j,state,dt,context){const w=state.work,r=highProjects(context.collection).find(p=>p.id===j.projectId)?.record,stop=reason=>({state,job:null,arrived:false,reason}),yard=TIMBER_YARDS[state.siteIndex];if(!r||key(r)!==j.key||!ready(w)||JSON.stringify(w.rig.vehicle)!==j.vehicle)return stop('現場が変わったので止めたよ。荷物はその場に残っているよ。');if(j.kind!=='lift'||!['vertical','load','unload'].includes(j.mode)||!yard||j.origin?.x!==yard[0]||j.origin.z!==yard[1]||!Number.isFinite(j.from?.height)||j.mode==='vertical'&&!(j.target===0||boardBayLevels(r.work).filter(l=>l>=2).includes(j.target/40))||j.mode==='load'&&j.target!==H.z||j.mode==='unload'&&j.target!==B.outside)return stop('リフトの行き先をえらび直そう。');const car=liftState(w,j.projectId),p=w.parts.find(p=>p.id===j.partId),q=p?liftLocal(r,p,j.origin):null;if(j.partId&&(!fits(r,p,j.origin)||!at(q.y,car.height)||car.partId&&car.partId!==j.partId))return stop('床板が動いたので止めたよ。');
- const axis=j.mode==='vertical'?'y':'z',value=axis==='y'?car.height:q?.z;if(!Number.isFinite(value)||axis==='y'&&p&&!at(q.z,H.z)||axis==='z'&&(!p||!at(car.height,Math.round(car.height/40)*40)||!boardBayLevels(r.work).filter(l=>l>=2).includes(car.height/40)||!j.from.part||!['x','y','z'].every(k=>Number.isFinite(j.from.part[k]))))return stop('リフトに床板をのせてから運ぼう。');
+function step(j,state,dt,context){const w=state.work,r=highProjects(context.collection).find(p=>p.id===j.projectId)?.record,stop=reason=>({state,job:null,arrived:false,reason}),yard=TIMBER_YARDS[state.siteIndex];if(!r||key(r)!==j.key||!ready(w)||JSON.stringify(w.rig.vehicle)!==j.vehicle)return stop('現場が変わったので止めたよ。荷物はその場に残っているよ。');if(j.kind!=='lift'||!['vertical','load','unload'].includes(j.mode)||!yard||j.origin?.x!==yard[0]||j.origin.z!==yard[1]||!Number.isFinite(j.from?.height)||j.mode==='vertical'&&!(j.target===0||boardBayLevels(r.work).filter(l=>l>=2).includes(j.target/40))||j.mode==='load'&&j.target!==H.z||j.mode==='unload'&&j.target!==B.outside)return stop('リフトの行き先をえらび直そう。');const car=liftState(w,j.projectId),p=w.parts.find(p=>p.id===j.partId),q=p?liftLocal(r,p,j.origin):null;if(j.partId&&(!fits(r,p,j.origin)||!at(q.y,car.height)||car.partId&&car.partId!==j.partId))return stop('建材が動いたので止めたよ。');
+ const axis=j.mode==='vertical'?'y':'z',value=axis==='y'?car.height:q?.z;if(!Number.isFinite(value)||axis==='y'&&p&&!at(q.z,H.z)||axis==='z'&&(!p||!at(car.height,Math.round(car.height/40)*40)||!boardBayLevels(r.work).filter(l=>l>=2).includes(car.height/40)||!j.from.part||!['x','y','z'].every(k=>Number.isFinite(j.from.part[k]))))return stop('リフトに建材をのせてから運ぼう。');
  const next=Math.abs(j.target-value)<=H.speed*dt?j.target:value+Math.sign(j.target-value)*H.speed*dt,height=axis==='y'?next:car.height,local=axis==='y'?{x:H.x,y:height,z:H.z}:{x:H.x,y:height,z:next},end=highWorldPoint(r.site,local),candidate=p?{...p,x:end.x-j.origin.x,y:end.y,z:end.z-j.origin.z}:null,frame=highWorldPoint(r.site,{x:H.x,y:car.height-2,z:H.z+2}),frameEnd=highWorldPoint(r.site,{x:H.x,y:height-2,z:H.z+2});
  if(candidate&&!liftSweep(w,r,p,candidate,{...context,origin:j.origin,projectId:j.projectId},p.id))return stop('通り道にものがあるよ。荷物を残して止めたよ。');
  if(axis==='y'){const platform={id:'board-lift-platform',x:frame.x-j.origin.x,y:frame.y,z:frame.z-j.origin.z,w:56,d:84,h:2,angle:r.site.turn*Math.PI/2,vx:0,vy:0,vz:0};const without={...w,parts:w.parts.filter(a=>a.id!==p?.id)};if(!liftSweep(without,r,platform,{...platform,x:frameEnd.x-j.origin.x,y:frameEnd.y,z:frameEnd.z-j.origin.z},{...context,origin:j.origin,projectId:j.projectId,ignorePartIds:p?[p.id]:[]},null))return stop('リフトの下をあけよう。荷物はその場に残っているよ。');}

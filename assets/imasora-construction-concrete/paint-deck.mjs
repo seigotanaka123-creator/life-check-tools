@@ -1,6 +1,6 @@
 import {placedStencilPixels} from './stencil-placement.mjs?v=120dp';
 import {BRIGHT_PAINTS,paintColor,paintName} from './paint-colors.mjs?v=120ds';
-import {colorStudioTemplate} from './color-studio.mjs?v=120ds';
+import {colorStudioTemplate} from './color-studio.mjs?v=120hg';
 import {toolPicture} from '../imasora-pop-menu.mjs?v=120dg';
 import {STENCIL_TEMPLATES} from './free-stencil.mjs';
 

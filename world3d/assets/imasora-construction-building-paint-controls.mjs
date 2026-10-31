@@ -1,11 +1,11 @@
-import {roomPaintTarget} from './imasora-construction-building-room.mjs?v=120gn';
+import {roomPaintTarget} from './imasora-construction-building-room.mjs?v=120pv';
 import * as T from './three.module.min.js';
 import {BRIGHT_PAINTS} from './imasora-construction-concrete/paint-colors.mjs';
-import {colorStudioTemplate,installColorStudios} from './imasora-construction-concrete/color-studio.mjs';
-import {buildingPaintCandidates,buildingPaintPlan,buildingPaintPart} from './imasora-construction-building-paint.mjs?v=120gn';
-import {buildingPainterReady} from './imasora-construction-building-paint-path.mjs?v=120gn';
-import {highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
-import {freeStepUndoTarget} from './imasora-construction-concrete/free-step-undo.mjs?v=120ft';
+import {colorStudioTemplate,installColorStudios} from './imasora-construction-concrete/color-studio.mjs?v=120hg';
+import {buildingPaintCandidates,buildingPaintPlan,buildingPaintPart} from './imasora-construction-building-paint.mjs?v=120pv';
+import {buildingPainterReady} from './imasora-construction-building-paint-path.mjs?v=120pv';
+import {highWorldPoint} from './imasora-construction-high-world.mjs?v=120pv';
+import {freeStepUndoTarget} from './imasora-construction-concrete/free-step-undo.mjs?v=120hb';
 const all=()=>Array.from({length:16},(_,i)=>i);
 export function createBuildingPaintControls({host,record,buildingId,project,credits,show,ready,perform,navigate,preview,inspect,generation,look,activeBuildings=()=>[],closeLook=()=>{}}){
  const root=document.createElement('section');root.className='building-paint-controls upper-paint-controls';root.innerHTML='<button data-bp="open">🎨 建物の壁・柱をぬる</button><div data-bp-body hidden><div class="upper-paint-heading"><strong>🎨 建物をカラフルに！</strong><button data-bp="close">とじる</button></div><p data-bp-steps>①場所をえらぶ → ②歩く → ③色をぬる</p><div data-bp-spaces><button data-bp="outside">🌤️ 外からぬる</button><button data-bp="inside">🏠 中からぬる</button></div><div data-bp-floors></div><div data-bp-kinds></div><div data-bp-sides></div><div class="building-paint-location"><button data-bp="prev">◀</button><strong data-bp-target></strong><button data-bp="next">▶</button></div><button data-bp="pick">👆 現場の壁・柱をタップ</button><button data-bp="walk">ぬる場所へ歩く</button><div data-bp-tools></div><div class="upper-paint-swatches" aria-label="建物のペンキの色"></div>'+colorStudioTemplate()+'<div data-bp-patterns></div><p data-bp-note role="status"></p><button data-up-paint="apply" data-bp="apply">ローラーでぬる</button><button data-bp="undo">↶ 1つ前にもどす</button></div>';host.append(root);

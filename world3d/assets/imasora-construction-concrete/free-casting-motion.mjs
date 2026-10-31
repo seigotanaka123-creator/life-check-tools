@@ -1,22 +1,23 @@
-import {workVehicleState} from './work-vehicle-height.mjs';
-import {vehicleGroundPose,vehicleGroundError} from './free-vehicle-ground.mjs?v=120ek';
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {workVehicleState} from './work-vehicle-height.mjs?v=120ov';
+import {vehicleGroundPose,vehicleGroundError} from './free-vehicle-ground.mjs?v=120ov';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
 import * as T from '../three.module.min.js';
-import {freeCell} from './free-build-state.mjs?v=120gn';
-import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked,walkingBlocked} from './free-contact.mjs?v=120gn';
-import {CAST_PORTS,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs?v=120gn';
-import {createBoomMotion,BOOM_DURATIONS} from './free-boom-motion.mjs?v=120gn';
+import {freeCell} from './free-build-state.mjs?v=120pv';
+import {newFreeReceipt,assertFreeReceipt,walkPath,walkingSurface,walkingSegmentBlocked,walkingBlocked} from './free-contact.mjs?v=120pv';
+import {CAST_PORTS,castingProblem,finishBands,bucketSection,sectionVolume,pouringBucket} from './free-casting.mjs?v=120pv';
+import {createBoomMotion,BOOM_DURATIONS} from './free-boom-motion.mjs?v=120pv';
 
-import {footingAt} from './free-footing.mjs?v=120gn';
-import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
-import {finishNeedsScaffold,finishAccessPlan} from './free-finish-access.mjs?v=120gn';
-import {paintScaffoldSteps} from './free-paint-access.mjs?v=120gn';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
-import {frameBlocked,frameSegmentBlocked,assertFrameFoundation} from './free-frames.mjs?v=120gn';
-import {bucketLoadAccess} from './free-bucket-access.mjs?v=120gn';
+import {footingAt} from './free-footing.mjs?v=120pv';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120pv';
+import {finishNeedsScaffold,finishAccessPlan} from './free-finish-access.mjs?v=120pv';
+import {paintScaffoldSteps} from './free-paint-access.mjs?v=120pv';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120pv';
+import {frameBlocked,frameSegmentBlocked,assertFrameFoundation} from './free-frames.mjs?v=120pv';
+import {bucketLoadAccess} from './free-bucket-access.mjs?v=120pv';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z),mix=(a,b,t)=>a+(b-a)*t;
-const finishPoint=(f,cell,row,t)=>{const c=freeCell(cell);return{x:c.x-6+row*4,y:constructionBase(f)+f.fill[cell]/2,z:c.z-6+12*(row%2?1-t:t)};};
+const finishPoint=(f,cell,row,t)=>{const c=groundTile(cell,f);return{x:c.x-c.w*3/8+row*c.w/4,y:constructionBase(f)+groundHeight(f,cell),z:c.z-c.d*3/8+c.d*3/4*(row%2?1-t:t)};};
 export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles,tools,mats,line,external,supportHeightAt=()=>0,vehicleHeightAt=supportHeightAt,boomExternal=external,sharedPlatform=null}){
  const f=workVehicleState(p.freeBuild,vehicleHeightAt),r=newFreeReceipt(a,p),stages=[];
  const carNames=a.type==='FREE_BUCKET_LOAD'?['truck']:a.type==='FREE_POUR'&&a.source!=='bucket'?(a.source==='pump'?['truck','pump']:['truck']):[];
@@ -39,7 +40,7 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
   if(f.aboard)throw Error('車を降りてからコテを使ってください。');
   root.updateMatrixWorld(true);const handBase=actor.worldToLocal(hand.getWorldPosition(new T.Vector3()));
   for(const cell of [...new Set(finishBands(f).map(b=>b.cell))]){
-   const access=finishNeedsScaffold(f)?finishAccessPlan(f,cell,pose,handBase,external,supportHeightAt,sharedPlatform):null,stance=access?.stance??approach(freeCell(cell));
+   const access=finishNeedsScaffold(f)?finishAccessPlan(f,cell,pose,handBase,external,supportHeightAt,sharedPlatform):null,stance=access?.stance??approach(freeCell(cell,f));
    const addPath=(path,platform=null)=>{for(let i=1;i<path.length;i++)stages.push({kind:'walk',from:path[i-1],to:path[i],access,cell,scaffold:platform,duration:Math.max(.1,vec(path[i-1]).distanceTo(vec(path[i]))/60)});};
    if(access){const platform=access.scaffold,{up}=paintScaffoldSteps(access);addPath(access.ground);stages.push({kind:'scaffold-open',stance:platform.entry,access,cell,duration:.65});stages.push(...up.map(s=>({...s,access,cell})));addPath(platform.path,platform);}
    for(let row=0;row<4;row++){if(row)stages.push({kind:'finish-shift',cell,row,stance,access,duration:.65});stages.push({kind:'finish',cell,row,stance,access,duration:1.4});}
@@ -52,7 +53,7 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
  }else{
   const problem=castingProblem(f,a.source,a.cell);if(problem)throw Error(problem);
   if(a.source==='bucket'){
-   const stance=approach(freeCell(a.cell));stages.push({kind:'tilt',stance,from:0,to:pouringBucket(f.bucket*128).angle,volume:f.bucket*128,duration:.85},{kind:'pour',stance,duration:4.5},{kind:'tilt',stance,from:pouringBucket((f.bucket-1)*128).angle,to:0,volume:(f.bucket-1)*128,duration:.85});
+   const stance=approach(freeCell(a.cell,f)),bucketIssue=castingProblem(f,a.source,a.cell,{standY:stance.y});if(bucketIssue)throw Error(bucketIssue);stages.push({kind:'tilt',stance,from:0,to:pouringBucket(f.bucket*128).angle,volume:f.bucket*128,duration:.85},{kind:'pour',stance,duration:4.5},{kind:'tilt',stance,from:pouringBucket((f.bucket-1)*128).angle,to:0,volume:(f.bucket-1)*128,duration:.85});
   }else if(a.source==='pump'){
    boomMotion=createBoomMotion({f,cell:a.cell,vehicle:vehicles.pump,root,tools,line,mats,external:boomExternal,receipt:r});
    for(let phase=0;phase<BOOM_DURATIONS.length;phase++)stages.push({kind:'pump',phase,stance:{...pose},duration:BOOM_DURATIONS[phase]});
@@ -109,15 +110,15 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
   actor.position.copy(vec(s.stance));actor.rotation.y=s.stance.heading;resetFeet();if(s.access)platform.stand(s.access.scaffold);else footing?.stand();root.updateMatrixWorld(true);
   if(s.kind==='tilt'){bucket(s.volume,mix(s.from,s.to,t));return;}
   if(s.kind==='pump'){
-   const state=boomMotion.render(s.phase,t),c=freeCell(a.cell),amount=s.phase<5?0:s.phase===5?t:1,target={...c,y:constructionBase(f)+(f.fill[a.cell]+amount)/2};
+   const state=boomMotion.render(s.phase,t),c=groundTile(a.cell,f),amount=s.phase<5?0:s.phase===5?t:1,target={...c,y:constructionBase(f)+groundHeight(f,a.cell,f.fill[a.cell]+amount)};
    if(s.phase===5){stream(state.tip,target);mark(t);}
-   if(amount>0){const addition=box(tools,c.x,constructionBase(f)+f.fill[a.cell]/2+amount/4,c.z,16,amount/2,16,mats.wet,'casting-new-fill');r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs(addition.scale.x*addition.scale.y*addition.scale.z-amount*128));}
+   if(amount>0){const addition=box(tools,c.x,constructionBase(f)+groundHeight(f,a.cell)+groundHeight(f,a.cell,amount)/2,c.z,c.w,groundHeight(f,a.cell,amount),c.d,mats.wet,'casting-new-fill');r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs(addition.scale.x*addition.scale.y*addition.scale.z-amount*128));}
    return;
   }
   if(s.kind==='finish'||s.kind==='finish-shift'){
    const point=s.kind==='finish'?finishPoint(f,s.cell,s.row,t):vec(finishPoint(f,s.cell,s.row-1,1)).lerp(vec(finishPoint(f,s.cell,s.row,0)),t);
    if(s.kind==='finish-shift')point.y+=Math.sin(Math.PI*t)*1.2;
-   const head=box(tools,point.x,point.y+.2,point.z,4,.4,4,mats.metal,'casting-trowel'),grip=root.worldToLocal(hand.getWorldPosition(new T.Vector3())),tip={...point,y:Math.max(point.y+.7,constructionBase(f)+f.height+2)},pole=segment(grip,tip,.3,mats.wood,'casting-trowel-handle');
+   const head=box(tools,point.x,point.y+.2,point.z,groundTile(s.cell,f).w/4,.4,groundTile(s.cell,f).d/4,mats.metal,'casting-trowel'),grip=root.worldToLocal(hand.getWorldPosition(new T.Vector3())),tip={...point,y:Math.max(point.y+.7,constructionBase(f)+f.height+2)},pole=segment(grip,tip,.3,mats.wood,'casting-trowel-handle');
    segment(tip,{...point,y:point.y+.4},.3,mats.metal,'casting-trowel-neck');
    root.updateMatrixWorld(true);r.maxGripError=Math.max(r.maxGripError,localPoint(pole,{x:0,y:-.5,z:0}).distanceTo(grip));if(s.kind==='finish')r.maxContactError=Math.max(r.maxContactError,localPoint(head,{x:0,y:-.5,z:0}).distanceTo(vec(point)));r.maxPoleLength=Math.max(r.maxPoleLength,grip.distanceTo(vec(tip)));
    if(r.maxPoleLength>64)throw Error('コテの届く通路がありません。車両を移動してください。');
@@ -127,11 +128,11 @@ export function createFreeCastingMotion({a,p,root,actor,model,hand,feet,vehicles
    if(walkingBlocked(f,s.stance.x,s.stance.z,external))throw Error('汲む場所がふさがったため止めました。材料は変更していません。');
    const cup=bucket(t*512),source=actualPort('truck',CAST_PORTS.truck),tip={x:cup.surface.x,y:s.stance.y+11,z:cup.surface.z};r.maxPoleLength=Math.max(r.maxPoleLength,source.distanceTo(vec(tip)));if(r.maxPoleLength>64)throw Error('バケツに注ぎ口が届きません。車の後ろに空きを作ってください。');const out=trough(source,tip);stream(out,cup.surface);r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs((f.wet*128-t*512)+cup.volume-f.wet*128));mark(t);Object.assign(focus,{...cup.lip,y:12});return;
   }
-  const c=freeCell(a.cell),target={...c,y:constructionBase(f)+(f.fill[a.cell]+t)/2},tip={...c,y:constructionBase(f)+f.height+1};let out;
+  const c=groundTile(a.cell,f),target={...c,y:constructionBase(f)+groundHeight(f,a.cell,f.fill[a.cell]+t)},tip={...c,y:constructionBase(f)+f.height+1};let out;
   if(a.source==='bucket'){
    const remaining=(f.bucket-t)*128,cup=bucket(remaining,pouringBucket(remaining).angle);out=trough(cup.lip,tip);r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs(cup.volume+t*128-f.bucket*128));
   }else if(a.source==='truck')out=trough(actualPort('truck',CAST_PORTS.truck),tip);
-  stream(out,target);if(t>0){const addition=box(tools,c.x,constructionBase(f)+f.fill[a.cell]/2+t/4,c.z,16,t/2,16,mats.wet,'casting-new-fill');r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs(addition.scale.x*addition.scale.y*addition.scale.z-t*128));}
+  stream(out,target);if(t>0){const addition=box(tools,c.x,constructionBase(f)+groundHeight(f,a.cell)+groundHeight(f,a.cell,t)/2,c.z,c.w,groundHeight(f,a.cell,t),c.d,mats.wet,'casting-new-fill');r.maxVolumeError=Math.max(r.maxVolumeError,Math.abs(addition.scale.x*addition.scale.y*addition.scale.z-t*128));}
   mark(t);Object.assign(focus,target);
  }
  function clean(){resetFeet();boomMotion?.restore();vehicles.pump.boom.visible=oldBoomVisible;for(const s of scaffolds.values())s.dispose();root.remove(temporary);tools.clear();unit.dispose();liquidGeometry.dispose();done=true;}

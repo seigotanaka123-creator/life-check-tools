@@ -1,13 +1,14 @@
-import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120gn';
-import {footingAt} from './free-footing.mjs?v=120gn';
+import {frameLength,frameGrip,frameFastener} from './ground-grid.mjs?v=120hb';
+import {constructionBase,preparedFrameBuild,frameAssembly,RAISED_FRAME_ACTION} from './free-supported-build.mjs?v=120pv';
+import {footingAt} from './free-footing.mjs?v=120pv';
 import * as T from '../three.module.min.js';
-import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs?v=120gn';
-import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs?v=120gn';
+import {newFreeReceipt,assertFreeReceipt} from './free-contact.mjs?v=120pv';
+import {framePlan,frameLocal,assertFrameFoundation,frameSegmentBlocked,FRAME_HAND_REACH,FRAME_TOOL_REACH,FRAME_GRIP_SPAN,FRAME_RACK} from './free-frames.mjs?v=120pv';
 
-import {createFootingGuard} from './free-footing-motion.mjs?v=120gn';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
-import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120gn';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120gn';
+import {createFootingGuard} from './free-footing-motion.mjs?v=120pv';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120pv';
+import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120pv';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120pv';
 
 const vec=p=>new T.Vector3(p.x,p.y??0,p.z);
 export const frameRackPose=(rank,base=0)=>({x:FRAME_RACK.x,y:base+2+(rank+.5)*.45,z:FRAME_RACK.z,heading:0,tilt:-Math.PI/2});
@@ -25,8 +26,8 @@ export function createFreeFrameMotion({a,p,root,actor,model,hands,feet,tools,mat
  const rackBase=footingAt(f,0,116,supportHeightAt,true).height;box(staged,0,rackBase+1,FRAME_RACK.z,22,2,12,mats.dark,'frame-rack-base');
  function setPose(board,pose){board.position.copy(vec(pose));board.quaternion.copy(rotation(pose));}
  for(let i=0;i<plan.order.length;i++){
-  const panel=plan.order[i],board=new T.Group();board.name='working-frame:'+panel.id;staged.add(board);box(board,0,0,0,16,f.height,.35,mats.wood,'frame-board');
-  for(let hit=0;hit<2;hit++)box(board,hit?6:-6,f.height/2+.2,-.4,1.2,.4,1.2,mats.metal,'frame-fastener-'+hit).visible=remove;
+  const panel=plan.order[i],board=new T.Group();board.name='working-frame:'+panel.id;board.userData.panel=panel;staged.add(board);box(board,0,0,0,frameLength(panel),f.height,.35,mats.wood,'frame-board');
+  for(let hit=0;hit<2;hit++)box(board,(hit?1:-1)*frameFastener(panel),f.height/2+.2,-.4,1.2,.4,1.2,mats.metal,'frame-fastener-'+hit).visible=remove;
   setPose(board,remove?{...panel,y:constructionBase(f)+f.height/2,heading:panel.depth>panel.width?Math.PI/2:0}:frameRackPose(plan.order.length-1-i,rackBase));boards.set(panel.id,board);
  }
  const groundGuard=()=>createFootingGuard({f,root,actor,feet,record:receipt.footing,heightAt:supportHeightAt,includeCured:true});
@@ -52,9 +53,9 @@ export function createFreeFrameMotion({a,p,root,actor,model,hands,feet,tools,mat
   return group;
  }
  function holdBoard(board,useTool=false,stance=null){
-  if(!useTool){for(let i=0;i<2;i++)hold(i,actualLocal(board,{x:i?FRAME_GRIP_SPAN:-FRAME_GRIP_SPAN,y:0,z:-.2}));return;}
+  if(!useTool){for(let i=0;i<2;i++)hold(i,actualLocal(board,{x:(i?1:-1)*frameGrip(board.userData.panel),y:0,z:-.2}));return;}
   const end=actualLocal(board,{x:0,y:f.height/2+.8,z:-.4}),group=longTool(end,stance,'frame-placement-clamp');
-  for(const x of [-6,6]){const top=actualLocal(board,{x,y:f.height/2+.8,z:-.4}),jaw=actualLocal(board,{x,y:f.height/2-.2,z:-.4});line(group,end,top,.32,mats.metal);line(group,top,jaw,.35,mats.dark);}
+  for(const x of [-frameFastener(board.userData.panel),frameFastener(board.userData.panel)]){const top=actualLocal(board,{x,y:f.height/2+.8,z:-.4}),jaw=actualLocal(board,{x,y:f.height/2-.2,z:-.4});line(group,end,top,.32,mats.metal);line(group,top,jaw,.35,mats.dark);}
  }
  function transfer(board,from,to,progress,useTool=false,stance=null){
   const high=Math.max(from.y+(from.tilt?f.height/2+1:0),to.y+(to.tilt?f.height/2+1:0),f.height*1.5+1,13),position=vec(from);
@@ -92,8 +93,8 @@ export function createFreeFrameMotion({a,p,root,actor,model,hands,feet,tools,mat
    if(progress===1)verifySeat(board,target);
   }else{
    // A measured mallet strike fixes each of the two clamps; removal releases them.
-   setPose(board,s.target);const hit=actualLocal(board,{x:s.hit?6:-6,y:f.height/2+.4,z:-.4}),lift=4*(1-progress),head=box(tools,hit.x,hit.y+.5+lift,hit.z,2,1,1.5,mats.wood,'frame-mallet');
-   const grip={x:hit.x-Math.sin(s.stance.heading)*4,y:hit.y+4+lift,z:hit.z-Math.cos(s.stance.heading)*4};if(s.useTool)longTool({x:hit.x,y:hit.y+1+lift,z:hit.z},s.stance,'frame-long-fastener-tool');else{hold(1-s.hit,actualLocal(board,{x:s.hit?-FRAME_GRIP_SPAN:FRAME_GRIP_SPAN,y:0,z:-.2}));hold(s.hit,grip);line(tools,grip,{x:hit.x,y:hit.y+1+lift,z:hit.z},.25,mats.wood);}
+   setPose(board,s.target);const hit=actualLocal(board,{x:(s.hit?1:-1)*frameFastener(s.panel),y:f.height/2+.4,z:-.4}),lift=4*(1-progress),head=box(tools,hit.x,hit.y+.5+lift,hit.z,2,1,1.5,mats.wood,'frame-mallet');
+   const grip={x:hit.x-Math.sin(s.stance.heading)*4,y:hit.y+4+lift,z:hit.z-Math.cos(s.stance.heading)*4};if(s.useTool)longTool({x:hit.x,y:hit.y+1+lift,z:hit.z},s.stance,'frame-long-fastener-tool');else{hold(1-s.hit,actualLocal(board,{x:(s.hit?-1:1)*frameGrip(s.panel),y:0,z:-.2}));hold(s.hit,grip);line(tools,grip,{x:hit.x,y:hit.y+1+lift,z:hit.z},.25,mats.wood);}
    if(progress===1){receipt.maxHitError=Math.max(receipt.maxHitError,actualLocal(head,{x:0,y:-.5,z:0}).distanceTo(hit));record.hits[s.hit]=true;board.getObjectByName('frame-fastener-'+s.hit).visible=!remove;}
   }
  }

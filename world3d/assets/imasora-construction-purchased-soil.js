@@ -1,12 +1,12 @@
-import {soilWorkFrame,soilBucketPoint} from './imasora-construction-soil-ground.mjs?v=120gf';
+import {soilWorkFrame,soilBucketPoint} from './imasora-construction-soil-ground.mjs?v=120ov';
 import {soilBedProfile,soilBedBaseAt,validSoilBed} from './imasora-construction-soil-bed.mjs?v=120eo';
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
-import {workArea,inWorkArea,sharedSupply,assertVehicleField} from './imasora-construction-field-area.mjs?v=120ey';
-import {walkFactor} from './imasora-construction-travel-input.mjs';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
+import {workArea,inWorkArea,sharedSupply,assertVehicleField} from './imasora-construction-field-area.mjs?v=120ov';
+import {walkFactor} from './imasora-construction-travel-input.mjs?v=120lb';
 // 8-3b1: purchased Mars-soil COPY. No loan ledger, wallet mutation, or main-world hooks.
-import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120gn';
-import {fingerprint} from './imasora-world-purchase-ledger.js?v=120gn';
-import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER} from './imasora-construction-loader-physics.js?v=120gf';
+import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120pv';
+import {fingerprint} from './imasora-world-purchase-ledger.js?v=120pv';
+import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER} from './imasora-construction-loader-physics.js?v=120ov';
 import {SOIL_BODY} from './imasora-construction-mars-soil.js';
 export const SOIL_COPY_SCOPE='construction-purchased-soil-copy-v1';
 export const SOIL_RECEIVER=Object.freeze({x:0,z:-80});

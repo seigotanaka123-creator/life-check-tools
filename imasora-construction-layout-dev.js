@@ -1,6 +1,6 @@
 import * as THREE from './assets/three.module.min.js';
-import { IMASORA_WORLD_MAPS } from './assets/imasora-world-map-schema.js';
-import { officialCharacter, vehicleDimensions, parkingProposal, inspectProposal, bayExitPath, footprint, overlaps, rectPolygon, savedBuildingVolumes, createVehicleScaleMock, box } from './assets/imasora-construction-layout.js';
+import { IMASORA_WORLD_MAPS } from './assets/imasora-world-map-schema.js?v=120mx';
+import { officialCharacter, vehicleDimensions, parkingProposal, inspectProposal, bayExitPath, footprint, overlaps, rectPolygon, savedBuildingVolumes, createVehicleScaleMock, box } from './assets/imasora-construction-layout.js?v=120ob';
 
 const $ = id => document.getElementById(id);
 const status = $('status');

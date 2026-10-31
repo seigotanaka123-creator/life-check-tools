@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#d8eee8"><title>建築リール｜イマソラーズウォーク</title><link rel="stylesheet" href="./assets/imasora-construction-reel.css?v=120oh"></head>
+<body><main id="viewport" aria-label="建築リールの現場">
+<canvas id="scene" aria-label="床と壁を直接つくる現場"></canvas>
+<header><div><small>イマソラーズウォーク · 手作業の試作</small><h1>建築リール</h1></div><a href="./imasora-world-3d-dev.html?arrival=town-bridge1" id="exit">工事現場へ</a></header>
+<div class="reel-quick"><button id="undo" disabled>↶ 1つ前へ <span id="undo-count"></span></button><output id="count">床 0 · 壁 0</output></div>
+<p id="hint" role="status">地面を引くと、床が広がるよ</p>
+<div id="handles" aria-label="建物の持ち手"><svg id="leaders" aria-hidden="true"></svg></div>
+<div id="selection" hidden><strong id="size"></strong><span id="quantity"></span></div>
+<div class="reel-view"><button id="front" aria-label="正面の角度に戻す">↺ 正面</button><button id="zoom-in" aria-label="近づく">＋</button><button id="zoom-out" aria-label="離れる">−</button></div>
+<nav id="tools" aria-label="建築の道具"><button data-tool="floor" aria-pressed="true"><span aria-hidden="true">▱</span>床を広げる</button><button data-tool="wall" aria-pressed="false"><span aria-hidden="true">▥</span>壁を起こす</button><button data-tool="view" aria-pressed="false"><span aria-hidden="true">◉</span>見まわす</button></nav>
+<footer><span id="saved">この試作だけを保存 · いつもの材料は使わないよ</span></footer>
+<output id="metrics" class="sr-only" aria-label="操作の記録"></output>
+</main><script type="module" src="./assets/imasora-construction-reel-view.mjs?v=120ps"></script></body></html>

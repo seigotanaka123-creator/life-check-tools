@@ -1,7 +1,7 @@
-import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120gm';
+import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120pl';
 import * as THREE from './three.module.min.js';
-import {createTimberPart} from './imasora-construction-timber-model.js?v=120gn';
-import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
+import {createTimberPart} from './imasora-construction-timber-model.js?v=120pv';
+import{isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
 export function createFloatingPart(p){
   const root=createTimberPart(p);if(p.materialId!=='mars-timber'||isBeamBundle(p)||isKitCargo(p))return root;
   const ink=new THREE.MeshStandardMaterial({color:0xd6fff0,emissive:0x4ba697,emissiveIntensity:.65,roughness:.45});

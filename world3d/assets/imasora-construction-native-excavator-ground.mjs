@@ -1,12 +1,12 @@
-import {nativeDumpHeightAt,nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {nativeDumpHeightAt,nativeDumpHeightReader} from './imasora-construction-native-dump-support.mjs?v=120pv';
 export {nativeDumpHeightAt as excavatorGroundHeight};
-import {vehicleGroundFrame,groundPoint,groundLocal} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
+import {vehicleGroundFrame,groundPoint,groundLocal} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 export {groundPoint,groundLocal};
 const cache=new WeakMap();
 export function excavatorGroundFrame(frame){
  if(frame.version!==2)return null;
- let entries=cache.get(frame.soil);if(!entries){entries=new Map();cache.set(frame.soil,entries);}
- const v=frame.machineVehicle,key=[v.x,v.z,v.heading].join(',');if(entries.has(key))return entries.get(key);
+ let entry=cache.get(frame.decks??frame.soil);if(!entry||entry.soil!==frame.soil){entry={soil:frame.soil,entries:new Map()};cache.set(frame.decks??frame.soil,entry);}const entries=entry.entries;
+ const v=frame.machineVehicle,key=[v.x,v.z,v.heading,v.groundY].join(',');if(entries.has(key))return entries.get(key);
  const g=vehicleGroundFrame(v,nativeDumpHeightReader(frame),{tracked:true,maxDegrees:8});
  Object.freeze(g.position);g.axes.forEach(Object.freeze);Object.freeze(g.axes);Object.freeze(g.suspension);Object.freeze(g);
  if(entries.size>=96)entries.delete(entries.keys().next().value);entries.set(key,g);return g;

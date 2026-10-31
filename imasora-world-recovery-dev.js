@@ -1,5 +1,5 @@
-import {collectRecoveryBundle,unpackRecoveryBundle,inspectRecoveryBundle,MAX_RECOVERY_FILE} from './assets/imasora-world-recovery-bundle.js?v=120fp';
-import {createRecoveryReader} from './assets/imasora-world-recovery-reader.js?v=120fp';
+import {collectRecoveryBundle,unpackRecoveryBundle,inspectRecoveryBundle,MAX_RECOVERY_FILE} from './assets/imasora-world-recovery-bundle.js?v=120pv';
+import {createRecoveryReader} from './assets/imasora-world-recovery-reader.js?v=120pv';
 const el=id=>document.getElementById(id),record=el('record'),status=el('status'),result=el('result');
 let verified=null,busy=false;
 el('origin').textContent=`保存元：${location.origin}`;

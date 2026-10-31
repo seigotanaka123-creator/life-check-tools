@@ -10,7 +10,7 @@
 .world-timber-controls .wt-work label{display:flex;align-items:center;gap:5px;color:#bde4df}.world-timber-controls footer{border-top:1px solid #587370;margin-top:7px;padding-top:7px;justify-content:flex-end}
 .world-timber-operating .touch-pad,.world-timber-operating .touch-hint,.world-timber-operating .camera-distance-control,.world-timber-operating .jump-control,.world-timber-operating .touch-actions{display:none!important}
 @media(max-width:620px){.world-timber-controls{left:4px;right:4px;bottom:4px;padding:7px;font-size:11px;max-height:52%}.world-timber-controls button{padding:4px 7px}.world-timber-controls .wt-work button{flex:1 1 27%}.world-timber-controls .wt-stats{font-size:10px}}
-.world-timber-near .world-water-controls,.world-timber-near .world-soil-controls{display:none!important}
+.world-timber-near .world-water-controls:not(.world-vehicle-controls-active),.world-timber-near .world-soil-controls:not(.world-vehicle-controls-active){display:none!important}
 .world-timber-near:not(.world-timber-operating) .world-timber-controls{top:8px;bottom:auto;max-height:24%}
 .world-timber-controls .wt-surface{margin-top:6px;color:#f1c8e7;font-size:11px}
 .world-timber-controls .wt-detail{margin-top:6px;color:#d1edcc;font-size:11px}
@@ -70,3 +70,57 @@
 .world-timber-controls[data-point-selecting=true] .wt-point-note{font-size:11px;padding:5px 7px}
 .world-timber-controls .wt-stock-help{grid-column:1/-1;padding:7px 9px;line-height:1.55;color:#385363;background:#fff5d8;border-radius:10px}
 .world-timber-controls .wt-kit{grid-column:1/-1;display:grid;gap:8px;padding:10px;border:2px solid #e4c875;border-radius:16px;background:#fff8e8;color:#395754}.world-timber-controls .wt-kit strong{color:#395754}.world-timber-controls .wt-kit small{display:block;line-height:1.5}.world-timber-controls .wt-kit-choices{display:grid;gap:8px}.world-timber-controls .wt-kit-choices>div{display:grid;gap:3px}.world-timber-controls .wt-kit button{min-height:44px;background:#d6f2de;color:#2d5543;border-color:#7ab797}
+
+.world-timber-controls .wt-direct{display:grid;grid-template-columns:minmax(140px,1fr) 1fr;align-items:center;gap:8px;margin:5px 0}.world-timber-controls .wt-direct[hidden]{display:none}.world-timber-controls .wt-direct button{background:#ffe4a4;color:#3e4743;border:2px solid #dfad55;font-size:13px;min-height:46px}.world-timber-controls .wt-direct small{font-size:12px;line-height:1.4}
+
+/* The working scene stays large; primary controls keep full finger targets. */
+.world-vehicle-playing #viewport:has(>.wt-console){grid-template-areas:"scene" "dock";grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(122px + max(8px,env(safe-area-inset-bottom)));background:#ddf3eb}
+.world-vehicle-playing #viewport>.wt-console.world-vehicle-controls-active{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:0!important;padding:5px max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))!important;border:0;border-top:3px solid #fffdf2;border-radius:0;overflow:visible;background:linear-gradient(110deg,#bfeee0,#fff0bc 53%,#c9e8fc)!important;color:#294e59;box-shadow:0 -3px 12px #31566b20}
+#viewport>.wt-console .wt-mode,#viewport>.wt-console>.gv-message,#viewport>.wt-console .gv-load,#viewport>.wt-console .gv-quick{display:none!important}
+/* Utilities are three equally sized buttons at the edge of the scene. */
+#viewport>.wt-console>header{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));bottom:auto;left:auto;width:104px;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,48px);gap:7px;z-index:2}
+#viewport>.wt-console>header strong{display:none}
+#viewport>.wt-console .wc-head{display:contents}
+#viewport>.wt-console .wc-mode{grid-column:1;grid-row:1}
+#viewport>.wt-console .wc-tools{grid-column:1;grid-row:2}
+#viewport>.wt-console .gv-menu-button{grid-column:1;grid-row:3}
+#viewport>.wt-console .wc-head button,#viewport>.wt-console .gv-menu-button{width:100%;min-width:0;min-height:48px;padding:5px 8px;border:3px solid #fffdf5;border-bottom-width:5px;border-radius:17px;background:linear-gradient(#e7f6ff,#aad9f3)!important;color:#2b546c;font-size:16px;font-weight:900;white-space:nowrap;box-shadow:0 3px 8px #214a682a}
+#viewport>.wt-console .wc-head .wc-mode{background:linear-gradient(#e1fbe8,#a2e3bb)!important;color:#255b47}
+#viewport>.wt-console .wc-head .wc-tools{background:linear-gradient(#fff0d9,#ffd08e)!important;color:#754e26}
+#viewport>.wt-console[data-console-aboard=false]>header{grid-template-rows:repeat(2,48px)}
+#viewport>.wt-console[data-console-aboard=false] .wc-tools{grid-row:1}
+#viewport>.wt-console[data-console-aboard=false] .gv-menu-button{grid-row:2}
+#viewport>.wt-console .gv-active{display:block;min-height:0}
+#viewport>.wt-console .wc-console{height:100%;display:grid;grid-template-columns:108px minmax(90px,164px) 72px;align-items:center;justify-content:space-between;gap:8px;max-width:570px;margin:auto}
+#viewport>.wt-console .wc-stick-wrap,#viewport>.wt-console .wc-lift-wrap{display:grid;justify-items:center;gap:0}
+#viewport>.wt-console .wc-pad-title,#viewport>.wt-console .wc-lift-wrap>span,#viewport>.wt-console .wc-picture{display:none}
+#viewport>.wt-console .wc-stick,#viewport>.wt-console .wc-lift{position:relative;display:block;padding:0;overflow:hidden;touch-action:none;user-select:none;border:3px solid #70b5c7;background:radial-gradient(circle,#f1fcff 30%,#a9e0f4);box-shadow:inset 0 3px 7px #fff,0 4px 0 #6eabbc;color:#245f78;transform:none}
+#viewport>.wt-console .wc-stick{width:108px;height:108px;border-radius:50%}
+#viewport>.wt-console .wc-stick span{position:absolute;font-size:14px;font-weight:900;line-height:20px;pointer-events:none}
+#viewport>.wt-console .wc-up{top:5px;left:0;right:0}#viewport>.wt-console .wc-down{bottom:5px;left:0;right:0}#viewport>.wt-console .wc-left{left:6px;top:42px;font-size:19px}#viewport>.wt-console .wc-right{right:6px;top:42px;font-size:19px}
+#viewport>.wt-console .wc-stick i,#viewport>.wt-console .wc-lift i{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:linear-gradient(#fff7b5,#ffc958);border:2px solid #d5a349;box-shadow:0 3px 4px #3e6b7838;transform:translate(var(--stick-x,0px),var(--stick-y,0px));pointer-events:none}
+#viewport>.wt-console .wc-lift{width:72px;height:108px;border-radius:30px;background:linear-gradient(90deg,#e1c8f5,#fff5ff,#e1c8f5);border-color:#b898d4;box-shadow:inset 0 2px 5px #fff,0 4px 0 #a283bd;color:#60467e}
+#viewport>.wt-console .wc-lift>span{position:absolute;left:0;right:0;top:2px;font-size:14px;font-weight:900;line-height:15px;pointer-events:none}#viewport>.wt-console .wc-lift>span:last-child{top:auto;bottom:2px}
+#viewport>.wt-console .wc-lift i{width:46px;height:24px;margin:-12px 0 0 -23px;border-radius:12px}
+#viewport>.wt-console .wc-task{display:grid;justify-items:center;gap:5px;text-align:center;min-width:0}
+#viewport>.wt-console .wc-note{font-size:14px;font-weight:700;line-height:1.35;margin:0;min-height:0;color:#36586b;text-wrap:balance}
+#viewport>.wt-console .wc-primary{width:100%;max-width:164px;min-height:54px;border:3px solid #dfac47;border-bottom-width:5px;border-radius:19px;background:linear-gradient(#fff1a3,#ffd166)!important;color:#694413;font-size:17px;font-weight:900;line-height:1.25;padding:7px 8px;box-shadow:0 3px 7px #a27a2520}
+#viewport>.wt-console .wc-primary:disabled{opacity:1;background:linear-gradient(#f3f5f6,#dae5e9)!important;color:#576b77;border-color:#afc4cd;box-shadow:0 3px 0 #b7cbd2}
+#viewport>.wt-console .wc-head button:disabled{opacity:1;color:#627e74;background:#d8e9e0;border-color:#eef8f1;box-shadow:0 2px 4px #31566b15}
+#viewport>.wt-console .wc-primary:active:not(:disabled),#viewport>.wt-console .wc-head button:active:not(:disabled),#viewport>.wt-console .gv-menu-button:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+#viewport>.wt-console .wc-jump{width:72px;height:64px;border-radius:24px;background:#f6bdd8;color:#733e59;font-size:16px;font-weight:900}
+#viewport>.wt-console[data-console-aboard=true][data-console-arm=false] .wc-console{grid-template-columns:108px minmax(90px,164px);justify-content:center;column-gap:24px}
+#viewport>.wt-console .wc-extras{height:100%;min-height:0;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto minmax(0,1fr);gap:5px}
+#viewport>.wt-console .wc-extras .gv-nav,#viewport>.wt-console .wc-extras .gv-pages{grid-column:1/-1}
+#viewport>.wt-console .wc-extras .gv-nav>button:nth-child(-n+2),#viewport>.wt-console .wc-extras .gv-hint{display:none}
+#viewport>.wt-console .wc-extras .gv-nav{grid-auto-columns:1fr}
+#viewport>.wt-console .wc-extras>.wc-tools-close{border-radius:14px;background:#f6d7e5;color:#674759;border-color:#d5a6bd;font-size:15px;min-height:44px}
+.world-vehicle-playing #viewport:has(>.wt-console[data-console-tools=true]){grid-template-rows:minmax(0,1fr) min(340px,48dvh)}
+#viewport>.wt-console .wc-utilities{display:flex;gap:5px;min-width:0}
+#viewport>.wt-console .wc-utilities button{flex:1;min-width:0;font-size:14px;min-height:44px;padding:4px}
+#viewport>.wt-console .wc-extras .gv-nav button{font-size:14px;min-height:44px}
+#viewport>.wt-console .wc-extras .gv-page{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#viewport>.wt-console .wc-material-actions>button:disabled{display:none}
+#viewport>.wt-console .wc-extras .gv-page>button{min-height:50px;border:2px solid #a4ccc4;border-bottom-width:4px;border-radius:15px;background:#e3fae9;color:#365b57;font-size:15px;padding:8px}
+#viewport>.wt-console.gv-menu-open .wc-console,#viewport>.wt-console.gv-menu-open .wc-extras,#viewport>.wt-console.gv-menu-open>header{visibility:hidden}
+@media(max-width:360px){#viewport>.wt-console .wc-console{gap:6px;grid-template-columns:108px minmax(82px,1fr) 72px}#viewport>.wt-console .wc-primary{font-size:16px}#viewport>.wt-console .wc-note{font-size:13px}}

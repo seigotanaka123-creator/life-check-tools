@@ -1,15 +1,15 @@
-import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120el';
-import {localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
+import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
+import {localToWorld} from './imasora-construction-loader-physics.js?v=120ov';
 const unit=a=>{const n=Math.hypot(...a);return a.map(x=>x/n);};
 export function craneGroundContext(s,heightAt,{deploy=s.work||s.deployment>0}={}){
  if(!s.rig.vehicle.field||typeof heightAt!=='function')return null;
  const g=vehicleGroundFrame(s.rig.vehicle,heightAt),v=s.rig.vehicle;
  if(!deploy)return{drive:g,levelY:g.position[1],feet:[]};
- if(g.position[1]<0||g.position[1]>48)throw Error('クレーンは高さ0〜48の、脚で支えられる地面へ停めよう。');
+ if(g.position[1]<0||g.position[1]>(Number.isFinite(v.groundY)?516:48))throw Error('支持脚で支えられる高さへ停めよう。');
  const feet=[];
  for(const z of[-32,24])for(const side of[-1,1]){
   const p=localToWorld(v,side*55,z);let lo=Infinity,hi=-Infinity;
-  for(let x=-6;x<=6;x++)for(let dz=-6;dz<=6;dz++){const q=localToWorld({x:p.x,z:p.z,heading:v.heading},x,dz),y=heightAt(q.x,q.z);if(!Number.isFinite(y))throw Error('支持脚の下に地面がないよ。停める場所を変えよう。');lo=Math.min(lo,y);hi=Math.max(hi,y);}
+  for(let x=-6;x<=6;x++)for(let dz=-6;dz<=6;dz++){const q=localToWorld({x:p.x,z:p.z,heading:v.heading},x,dz),y=heightAt(q.x,q.z,v.groundY??0);if(!Number.isFinite(y))throw Error('支持脚の下に地面がないよ。停める場所を変えよう。');lo=Math.min(lo,y);hi=Math.max(hi,y);}
   if(hi-lo>2.01)throw Error('支持脚の下の段差が大きいよ。平らにしてから使おう。');
   feet.push({side,station:z,height:hi});
  }

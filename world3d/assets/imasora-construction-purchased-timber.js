@@ -1,15 +1,15 @@
-import{isKitCargo,kitTemplate,ownedTimberParts,validateKitBinding}from'./imasora-construction-kit-cargo.mjs?v=120gm';
-import{BEAM_ISSUE,beamTemplate,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120gl';
-import{validateBoardLiftState}from'./imasora-construction-board-lift-state.mjs?v=120gd';
-import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ey';
+import{isKitCargo,kitTemplate,ownedTimberParts,validateKitBinding}from'./imasora-construction-kit-cargo.mjs?v=120pl';
+import{BEAM_ISSUE,BEAM_UNPACK,beamTemplate,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
+import{validateBoardLiftState}from'./imasora-construction-board-lift-state.mjs?v=120pv';
+import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ov';
 // 8-3b2: finite purchased floors. Source receipts are immutable READ-ONLY copies.
 // This adapter reuses the approved crane + spring/load/contact solvers unchanged.
-import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120gn';
-import {worldToLocal} from './imasora-construction-loader-physics.js?v=120gf';
-import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120gn';
-import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120gn';
-import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120gn';
-import {fingerprint} from './imasora-world-purchase-ledger.js?v=120gn';
+import {initialCrane,actCrane,stepCrane,validateCrane,collides,pickOption} from './imasora-construction-crane.js?v=120pv';
+import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ov';
+import {CRANE_WALK,cranePersonBlocked,craneWalkingRouteClear} from './imasora-construction-crane-walk.js?v=120pv';
+import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120pv';
+import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120pv';
+import {fingerprint} from './imasora-world-purchase-ledger.js?v=120pv';
 export {floatReadout};
 export const OWNED_TIMBER_SCOPE='construction-purchased-timber-copy-v1';
 export const FLOOR_VOLUME=26880,MAX_ACTIVE_FLOORS=8;
@@ -67,13 +67,13 @@ export function validatePurchasedTimber(s){
   else ok((src.mode==='world'||src.mode==='practice'&&src.total===2||src.mode==='empty'&&src.total===0)&&Object.keys(src).sort().join(',')==='mode,total','貸出材を購入品へ混入できません。');
   ok(Array.isArray(s.parts)&&s.parts.length<=MAX_ACTIVE_FLOORS&&s.stock+ownedTimberParts(s).length===src.total,'木材の収支が一致しません。');
   ok(Array.isArray(s.events)&&s.events.length<=2000,'木材の履歴が不正です。');let next=1;const active=new Set(),seen=new Set(),kinds=new Map();
-  for(const e of s.events){ok(validId(e.id)&&!seen.has(e.id)&&Object.keys(e).sort().join(',')==='id,kind,partId','操作番号が不正・重複しています。');seen.add(e.id);if(e.kind==='issue'||e.kind===BEAM_ISSUE){ok(e.partId===`owned-deck-${next++}`&&!active.has(e.partId),'床板の出庫IDが不正です。');active.add(e.partId);kinds.set(e.partId,e.kind);ok(active.size<=src.total&&active.size<=MAX_ACTIVE_FLOORS,'購入量を超える出庫です。');}else{ok(e.kind==='return-stock'&&active.has(e.partId),'存在しない床板を回収しています。');active.delete(e.partId);}}
+  for(const e of s.events){ok(validId(e.id)&&!seen.has(e.id)&&Object.keys(e).sort().join(',')==='id,kind,partId','操作番号が不正・重複しています。');seen.add(e.id);if(e.kind==='issue'||e.kind===BEAM_ISSUE){ok(e.partId===`owned-deck-${next++}`&&!active.has(e.partId),'床板の出庫IDが不正です。');active.add(e.partId);kinds.set(e.partId,e.kind);ok(active.size<=src.total&&active.size<=MAX_ACTIVE_FLOORS,'購入量を超える出庫です。');}else{ok((e.kind==='return-stock'||e.kind===BEAM_UNPACK&&src.mode==='world'&&kinds.get(e.partId)===BEAM_ISSUE)&&active.has(e.partId),'存在しない建材を回収しています。');active.delete(e.partId);}}
   ok(next===s.nextId&&active.size===ownedTimberParts(s).length&&ownedTimberParts(s).every(p=>active.has(p.id))&&new Set(s.parts.map(p=>p.id)).size===s.parts.length,'床板と出庫履歴が一致しません。');
   const kits=s.buildingKits??[];ok(Array.isArray(kits)&&kits.length<=1&&(!kits.length||src.mode==='world'),'建築キットは本体の建物から受け取ろう。');kits.forEach(validateKitBinding);ok(kits.length===s.parts.filter(isKitCargo).length&&kits.every(b=>s.parts.some(p=>p.id===b.partId)),'建築キットの部材を残そう。');
-  validateBoardLiftState(s);validateCrane(s,s.parts.map(p=>isKitCargo(p)?kitTemplate(kits.find(b=>b.partId===p.id)):kinds.get(p.id)===BEAM_ISSUE?beamTemplate(p.id):template(p.id)),s.highCargoVersion===1?260:180);
-  for(const p of s.parts){ok(p.materialId==='mars-timber'&&Math.abs(p.vx)<=200&&Math.abs(p.vz)<=200&&Math.abs(p.vy)<=(p.hover?30:2000),'材質・速度が不正です。');
+  validateBoardLiftState(s);validateCrane(s,s.parts.map(p=>isKitCargo(p)?kitTemplate(kits.find(b=>b.partId===p.id)):kinds.get(p.id)===BEAM_ISSUE?beamTemplate(p.id):template(p.id)),[1,2].includes(s.highCargoVersion)?260:180);
+  for(const p of s.parts){ok((p.materialId==='mars-timber'||p.materialId==='earth-iron'&&kits.some(b=>b.partId===p.id&&b.version===2&&b.material==='steel'))&&Math.abs(p.vx)<=200&&Math.abs(p.vz)<=200&&Math.abs(p.vy)<=(p.hover?30:2000),'材質・速度が不正です。');
     ok(p.carrierId===null||typeof p.carrierId==='string'&&p.carrierId!==p.id&&p.id!==s.held&&!p.hover&&s.parts.some(q=>q.id===p.carrierId&&q.hover),'積載状態が不正です。');
-    if(isBeamBundle(p)||isKitCargo(p))ok(p.hover===null&&!s.boardLifts?.sites.some(r=>r.partId===p.id),'角材の束は床や地面に置こう。');
+    if(isBeamBundle(p)||isKitCargo(p))ok(p.hover===null&&(!s.boardLifts?.sites.some(r=>r.partId===p.id)||isBeamBundle(p)&&s.highCargoVersion===2),'角材の束は床や地面に置こう。');
     if(p.hover!==null)ok(p.hover&&!p.fixed&&p.id!==s.held&&Number.isFinite(p.hover.height)&&p.hover.height>=0&&p.hover.height<=150&&typeof p.hover.contact==='string','浮遊状態が不正です。');
     ok(!collides(s,p),'床板が車体・柵・ほかの床板と重なっています。');
   }

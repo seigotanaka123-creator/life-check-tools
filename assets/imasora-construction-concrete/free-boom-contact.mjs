@@ -1,34 +1,37 @@
-import {workVehicleState} from './work-vehicle-height.mjs';
-import {constructionBase} from './free-supported-build.mjs?v=120gn';
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
+import {workVehicleState} from './work-vehicle-height.mjs?v=120ov';
+import {constructionBase} from './free-supported-build.mjs?v=120pv';
 import {curveSupplyHose,hangingHose,hoseLength,hoseBlocks,hoseCorners,hoseGeometry,SUPPLY_HOSE_RADIUS,HOSE_CLEARANCE} from './free-hose-shape.mjs';
 import {drapeSupplyHose,hoseTerrainClear,HOSE_TERRAIN_QUERY_LIMIT} from './free-hose-terrain.mjs';
 import {findSupplyHoseRoute} from './free-hose-route.mjs';
 import {settleSupplyHose} from './free-hose-gravity.mjs';
 import {hoseSelfClear,hoseSegmentDistance} from './free-hose-self-contact.mjs';
 import {createHoseDynamics,HOSE_MOTION_LIMITS,hangingHoseResponse} from './free-hose-dynamics.mjs';
-import {freePlacedFill} from './free-work-parts.mjs';
+import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
 import * as T from '../three.module.min.js';
-import {freeCell,freeFramePanels,canonicalFreeAction} from './free-build-state.mjs?v=120gn';
-import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120gn';
+import {freeCell,freeFramePanels,canonicalFreeAction} from './free-build-state.mjs?v=120pv';
+import {castPoint,CAST_PORTS} from './free-casting.mjs?v=120pv';
 const v=p=>new T.Vector3(p.x,p.y??0,p.z),mix=(a,b,t)=>a+(b-a)*t;
 export const BOOM_SIZES=[[8,8,43],[8,7,40],[7,6,34]];
 export const BOOM_PHASES=['lift','raise','swing','reach','hose','pour','hose-up','fold','swing-back','lower','stow'];
 export const PIPE_ACTIONS=new Set(['FREE_CONNECT']);
 const NO_PIPE_OBSTACLE=()=>false;
-const pipeKey=f=>JSON.stringify([f.location,f.truck,f.pump,f.mask,f.height,constructionBase(f),f.stage,f.completed.map(w=>[w.x,w.z,w.fill,w.placedMask,constructionBase(w)])]);
+const pipeKey=f=>JSON.stringify([f.location,f.truck,f.pump,f.mask,f.layout,f.height,constructionBase(f),f.stage,f.completed.map(w=>[w.x,w.z,w.layout,w.fill,w.placedMask,constructionBase(w)])]);
 function obb(center,half,axes=[new T.Vector3(1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,1)]){return{center:v(center),half,axes};}
 function beamBox(a,b,w,h,guide=null){const z=v(a).sub(v(b)).normalize(),x=guide?.clone()??new T.Vector3(z.z,0,-z.x);if(x.length()<.00001)x.set(1,0,0);x.normalize();const y=new T.Vector3().crossVectors(z,x).normalize();return obb(v(a).add(v(b)).multiplyScalar(.5),[w/2,h/2,v(a).distanceTo(v(b))/2],[x,y,z]);}
 function carBox(car,x,y,z,hx,hy,hz){const c=Math.cos(car.heading),s=Math.sin(car.heading);return obb(castPoint(car,{x,y,z}),[hx,hy,hz],[new T.Vector3(c,0,-s),new T.Vector3(0,1,0),new T.Vector3(s,0,c)]);}
 export function boxesOverlap(a,b,pad=.3){
- const delta=b.center.clone().sub(a.center),axes=[...a.axes,...b.axes];for(const x of a.axes)for(const y of b.axes){const n=new T.Vector3().crossVectors(x,y);if(n.lengthSq()>1e-12)axes.push(n.normalize());}
- const span=(r,n)=>r.half.reduce((sum,h,i)=>sum+h*Math.abs(r.axes[i].dot(n)),0);
- return axes.every(n=>Math.abs(delta.dot(n))<span(a,n)+span(b,n)+pad);
+ const delta=b.center.clone().sub(a.center),span=(r,n)=>r.half.reduce((sum,h,i)=>sum+h*Math.abs(r.axes[i].dot(n)),0),touch=n=>Math.abs(delta.dot(n))<span(a,n)+span(b,n)+pad;
+ // Keep the same axes, normalisation, order and tolerance. Allocate cross axes
+ // only after all six existing face tests pass. Most distant pairs stop here.
+ for(const n of a.axes)if(!touch(n))return false;for(const n of b.axes)if(!touch(n))return false;
+ for(const x of a.axes)for(const y of b.axes){const n=new T.Vector3().crossVectors(x,y);if(n.lengthSq()>1e-12&&!touch(n.normalize()))return false;}return true;
 }
 export function boomObstacles(f){
  const result=[];
  for(const name of ['truck','pump']){const c=f[name];result.push(carBox(c,0,32.5,23,32,18.5,19),carBox(c,0,10,-1,33,10,42));result.push(carBox(c,0,name==='truck'?38:23,-19,27,name==='truck'?22:8,22));}
- if(!['design','complete'].includes(f.stage))for(const p of freeFramePanels(f.mask))result.push(obb({x:p.x,y:constructionBase(f)+f.height/2,z:p.z},[p.width/2,f.height/2,p.depth/2]));
- for(const w of f.completed)for(let i=0;i<16;i++)if(freePlacedFill(w,i)){const c=freeCell(i),height=w.fill[i]/2;result.push(obb({x:w.x-f.location.x+c.x,y:constructionBase(w)+height/2,z:w.z-f.location.z+c.z},[8,height/2,8]));}
+ if(!['design','complete'].includes(f.stage))for(const p of freeFramePanels(f.mask,f))result.push(obb({x:p.x,y:constructionBase(f)+f.height/2,z:p.z},[p.width/2,f.height/2,p.depth/2]));
+ for(const w of f.completed)for(let i=0;i<16;i++)if(freePlacedFill(w,i)){const c=groundTile(i,w),height=groundHeight(w,i);result.push(obb({x:w.x-f.location.x+c.x,y:constructionBase(w)+height/2,z:w.z-f.location.z+c.z},[c.w/2,height/2,c.d/2]));}
  result.push(obb({x:0,y:3,z:140},[11,3,6]));return result;
 }
 function externalBox(f,box,external){
@@ -112,7 +115,7 @@ export const pipeContactGeometry=(f,heightAt=null)=>hoseGeometry(pipeContactPath
 export function pipeProblem(f,a,external,heightAt=()=>0){if(a.type==='FREE_CONNECT'&&a.connected||a.type==='FREE_PRIME'||a.type==='FREE_POUR'&&a.source==='pump'){try{pipeRoute(f,external,heightAt);}catch(e){return e.message;}}return '';}
 export function createBoomPlan(f,cell,heightAt=null){
  f=workVehicleState(f,heightAt);
- const target=freeCell(cell),base=castPoint(f.pump,{x:-6,y:40,z:3.5}),dx=target.x-base.x,dz=target.z-base.z,horizontal=Math.hypot(dx,dz);
+ const target=freeCell(cell,f),base=castPoint(f.pump,{x:-6,y:40,z:3.5}),dx=target.x-base.x,dz=target.z-base.z,horizontal=Math.hypot(dx,dz);
  const q=Math.sqrt(Math.max(0,horizontal*horizontal-19*19)),distance=q-3.5,remaining=distance-34,d=Math.hypot(remaining,15);
  if(horizontal<=19||d>82.5||d<4)throw Error('ブームの長さが届きません。作業台の外側で停車位置・向きを変え、届くマスへ分けて注いでください。');
  const angle=Math.atan2(15,remaining),a1=angle+Math.acos((43*43+d*d-40*40)/(2*43*d)),a2=angle-Math.acos((40*40+d*d-43*43)/(2*40*d));

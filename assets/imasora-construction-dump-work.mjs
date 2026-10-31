@@ -1,13 +1,14 @@
-import {transportArea,transportPoseKey} from './imasora-construction-transport-field.mjs?v=120gf';
-import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,nativeDumpAnchorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120gn';
-import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {nativeDeckBoxes} from './imasora-construction-native-decks.mjs?v=120ps';
+import {transportArea,transportPoseKey} from './imasora-construction-transport-field.mjs?v=120ov';
+import {nativeDumpPose,nativeDumpLocal,nativeDumpBox,nativeDumpDoorPoint,nativeDumpAnchorPoint,boxExtent,boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
+import {nativeDumpHeightAt} from './imasora-construction-native-dump-support.mjs?v=120pv';
 import {canonical} from './imasora-construction-state.js';
-import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelNearbySoil,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120gn';
-import {LOADER,SITE} from './imasora-construction-loader-physics.js?v=120gf';
-import {BIN} from './imasora-construction-excavator.js?v=120gf';
-import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs?v=120gn';
-import {nativeDumpSupport,nativeDumpRecoveryStep} from './imasora-construction-native-dump-support.mjs?v=120gn';
+import {createShovelWork,validateShovelWork,shovelSoilBoxes,shovelNearbySoil,shovelMachines,shovelGroundHeight,shovelStanding,shovelDumpBody,shovelDumpPoint,walkShovelWork,turnShovelWork,startShovelWork,progressShovelWork,finishShovelWork,returnShovelWork} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {soilTransportCommand,soilVoxel,SOIL_CAPACITY,SOIL_LIMITS} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {LOADER,SITE} from './imasora-construction-loader-physics.js?v=120ov';
+import {BIN} from './imasora-construction-excavator.js?v=120ov';
+import {shovelStorageObstacles} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {nativeDumpSupport,nativeDumpRecoveryStep,nativeDumpTerrainUnloadReady} from './imasora-construction-native-dump-support.mjs?v=120pv';
 
 export const DUMP_WORK_SCOPE='imasora-shared-soil-dump-work-isolated-v1';
 export const DUMP_WORK_FORMAT='imasora-shared-soil-dump-work-checkpoint-v1';
@@ -21,7 +22,7 @@ const cachedObstacles=new WeakMap(),identity=new WeakMap();
 const local=(s,p)=>nativeDumpLocal(s,p);
 const horizontalLocal=(s,p)=>{const dx=p[0]-s.dump.x,dz=p[2]-s.dump.z,c=Math.cos(s.dump.heading),sn=Math.sin(s.dump.heading);return[c*dx-sn*dz,p[1],sn*dx+c*dz];};
 export function dumpBoxesOverlap(a,b){return boxesOverlap3D(a,b);}
-function obstacles(frame){const key=frame.machineArm??frame.soil;let entry=cachedObstacles.get(key),boxes=entry?.soil===frame.soil&&entry.pose===transportPoseKey(frame)?entry.boxes:null;if(!boxes){boxes=[...shovelMachines(frame),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)];cachedObstacles.set(key,{soil:frame.soil,pose:transportPoseKey(frame),boxes});}return boxes;}
+function obstacles(frame){const key=frame.machineArm??frame.soil;let entry=cachedObstacles.get(key),boxes=entry?.soil===frame.soil&&entry.decks===frame.decks&&entry.pose===transportPoseKey(frame)?entry.boxes:null;if(!boxes){boxes=[...shovelMachines(frame),...nativeDeckBoxes(frame,{vehicleY:nativeDumpPose(frame).groundPosition[1]}),...shovelSoilBoxes(frame.soil).filter(b=>b.position[1]+b.size/2>.01)];cachedObstacles.set(key,{soil:frame.soil,decks:frame.decks,pose:transportPoseKey(frame),boxes});}return boxes;}
 export function dumpRaisedBoxes(frame,angle){
  check(finite(angle,0,.8),'荷台の角度が不正です。');const c=Math.cos(angle),sn=Math.sin(angle),gate=Math.min(1.45,angle*2),gc=Math.cos(gate),gs=Math.sin(gate);
  return[nativeDumpBox(frame,[0,16+6*c+18*sn,-40-6*sn+18*c],[27,7*c+20*sn,7*sn+20*c]),nativeDumpBox(frame,[0,16+12*c-6*gc,-40-12*sn-6*gs],[26,6*gc+.7*gs,6*gs+.7*gc])];
@@ -48,7 +49,7 @@ export function dumpPositionSafe(frame,{preciseArm=false,legacySupport=false}={}
  // tilted body's full projected envelope includes the cab and both corners;
  // intersecting cubes (including loose fragments) keep the same exact SAT.
  const nearby=shovelNearbySoil(frame.soil,body.position[0],body.position[2],Math.max(extent[0],extent[2])+.01).filter(b=>b.position[1]+b.size/2>.01);
- const blocks=[...(preciseArm?shovelMachines(frame).slice(0,2):shovelMachines(frame)),...nearby];
+ const blocks=[...(preciseArm?shovelMachines(frame).slice(0,2):shovelMachines(frame)),...nativeDeckBoxes(frame,{vehicleY:nativeDumpPose(frame).groundPosition[1],x:frame.dump.x,z:frame.dump.z,r:80}),...nearby];
  return !blocks.some(b=>Math.abs(b.position[0]-body.position[0])<100+(b.size??90)&&Math.abs(b.position[2]-body.position[2])<100+(b.size??90)&&dumpBoxesOverlap(body,b));
 }
 const seat=frame=>{const p=nativeDumpAnchorPoint(frame,-14,LOADER.floor,18);return{...frame.player,x:p[0],y:p[1],z:p[2],heading:frame.dump.heading};};
@@ -70,7 +71,7 @@ export function driveDumpWork(s,throttle,steer,dt,{fast=false}={}){
  idle(s);check(s.mode==='driving','ドアの前で車に乗ってください。');check(finite(throttle,-1,1)&&finite(steer,-1,1)&&finite(dt,Number.EPSILON,.05),'走行の入力が不正です。');if(!throttle)return s;
  const slope=nativeDumpSupport(s.frame),up=throttle*Math.tan(slope.pitch??0),load=s.frame.soil.containers.dump.amount/SOIL_CAPACITY.dump,grade=up>0?Math.max(.45,1-up*(1.2+load)):up<0?Math.max(.55,1+up*(1.2+load)):1,speed=(throttle>0?48:30)*(1-load*.3)*(fast?2.5:1)*grade,length=throttle*speed*dt,n=Math.max(1,Math.ceil(Math.abs(length)/.5));let frame=s.frame,moved=0;
  for(let i=0;i<n;i++){
-  const h=heading(frame.dump.heading-steer*length/n/65),dump={x:frame.dump.x+Math.sin(h)*length/n,z:frame.dump.z+Math.cos(h)*length/n,heading:h},candidate={...frame,dump};
+  const h=heading(frame.dump.heading-steer*length/n/65),dump={...frame.dump,x:frame.dump.x+Math.sin(h)*length/n,z:frame.dump.z+Math.cos(h)*length/n,heading:h};let candidate={...frame,dump};if(frame.decks){const support=nativeDumpSupport(candidate);if(!support.driveReady)break;candidate={...candidate,dump:{...dump,groundY:support.y}};}
   if(Math.abs(nativeDumpPose(candidate).groundPosition[1]-nativeDumpPose(frame).groundPosition[1])>2.01)break;if(!dumpPositionSafe(candidate)&&!(dumpPositionSafe(frame,{legacySupport:true})&&dumpPositionSafe(candidate,{legacySupport:true})&&nativeDumpRecoveryStep(frame,candidate)))break;moved+=Math.abs(length/n);frame={...candidate,player:seat(candidate)};
  }
  return moved?next(s,{...frame,revision:s.frame.revision+1},{vehicleTravel:s.vehicleTravel+moved,wheelTravel:s.wheelTravel+Math.sign(throttle)*moved}):s;
@@ -84,12 +85,12 @@ export const returnDumpHandWork=s=>next(s,returnShovelWork(s.frame));
 // voxels have support and clear volume before any soil leaves the bed.
 export function dumpUnloadPlan(s){
  if(s.mode!=='driving'||s.frame.job||s.unload||s.frame.soil.pending||!s.frame.soil.containers.dump.amount)return null;
- if(!dumpPositionSafe(s.frame))return null;const support=nativeDumpSupport(s.frame);if(Math.abs(support.pitch)>8*Math.PI/180||Math.abs(support.roll)>6*Math.PI/180)return null;
+ if(!dumpPositionSafe(s.frame)||!nativeDumpTerrainUnloadReady(s.frame))return null;const support=nativeDumpSupport(s.frame);if(Math.abs(support.pitch)>8*Math.PI/180||Math.abs(support.roll)>6*Math.PI/180)return null;
  if(!dumpRaiseClear(s.frame))return null;
  const frame=s.frame,area=transportArea(frame),centre=shovelDumpPoint(frame,0,0,-62),columns=[];
  for(let x=Math.floor((centre[0]-40)/2);x<=Math.ceil((centre[0]+40)/2);x++)for(let z=Math.floor((centre[2]-40)/2);z<=Math.ceil((centre[2]+40)/2);z++){
   const p=[x*2+1,0,z*2+1],l=horizontalLocal(frame,p);if(Math.abs(l[0])>23||l[2]<-76||l[2]>-48||(frame.version===2?(p[0]<area.minX+24||p[0]>area.maxX-24||p[2]<area.minZ+34||p[2]>area.maxZ-34):(Math.abs(p[0])>296||Math.abs(p[2])>216)))continue;
-  const h=nativeDumpHeightAt(frame,p[0],p[2]);if(!Number.isFinite(h)||Math.abs(h/2-Math.round(h/2))>1e-8)continue;columns.push({x,z,l,y:Math.round(h/2)});
+  const h=nativeDumpHeightAt(frame,p[0],p[2],frame.dump.groundY??0);if(!Number.isFinite(h)||Math.abs(h/2-Math.round(h/2))>1e-8)continue;columns.push({x,z,l,y:Math.round(h/2)});
  }
  columns.sort((a,b)=>Math.abs(a.l[2]+62)-Math.abs(b.l[2]+62)||Math.abs(a.l[0])-Math.abs(b.l[0])||a.x-b.x||a.z-b.z);
  const positions=[],amount=frame.soil.containers.dump.amount;
@@ -184,8 +185,8 @@ export function validateDumpWork(s,{liveArm=false,aboardExcavator=false,bucketTr
   for(let i=0;i<j.positions.length;i++){
    const q=j.positions[i],l=horizontalLocal(s.frame,q.map(n=>n*2+1)),box={position:q.map(n=>n*2+1),size:2};check(Math.abs(l[0])<=23.01&&l[2]>=-76.01&&l[2]<=-47.99,'荷台の後ろ以外へ土は下ろせません。');
    if(i<j.done)check(soilVoxel(s.frame.soil,q)===j.materialId,'下ろした土が見つかりません。');
-   else{check(!soilVoxel(s.frame.soil,q)&&!blocked.some(b=>dumpBoxesOverlap(box,b)),'置く場所に別の土や機械があります。');if(!supporting.has([q[0],q[1]-1,q[2]].join(',')))check(Math.abs(nativeDumpHeightAt(s.frame,q[0]*2+1,q[2]*2+1)-q[1]*2)<.05,'盛土の足元に地面がありません。');}
-   if(q[1]>-16&&!supporting.has([q[0],q[1]-1,q[2]].join(',')))check(!!soilVoxel(s.frame.soil,[q[0],q[1]-1,q[2]])||q[1]===0,'盛土に支えがありません。');supporting.add(q.join(','));
+   else{check(!soilVoxel(s.frame.soil,q)&&!blocked.some(b=>dumpBoxesOverlap(box,b)),'置く場所に別の土や機械があります。');if(!supporting.has([q[0],q[1]-1,q[2]].join(',')))check(Math.abs(nativeDumpHeightAt(s.frame,q[0]*2+1,q[2]*2+1,q[1]*2-8)-q[1]*2)<.05,'盛土の足元に地面がありません。');}
+   if(q[1]>-16&&!supporting.has([q[0],q[1]-1,q[2]].join(',')))check(!!soilVoxel(s.frame.soil,[q[0],q[1]-1,q[2]])||q[1]===0||s.frame.decks&&Math.abs(nativeDumpHeightAt(s.frame,q[0]*2+1,q[2]*2+1,q[1]*2-8)-q[1]*2)<.05,'盛土に支えがありません。');supporting.add(q.join(','));
   }
  }else check(!s.frame.soil.pending||!!s.frame.job||bucketTransfer||storageTransfer,'途中の土に作業がありません。');return s;
 }

@@ -1,10 +1,12 @@
 import{stairPlacement,stairRoomBound}from'./imasora-construction-stair-placement.mjs?v=120gn';
-import {roomWalkGeometry,roomSupport,roomBodyClear} from './imasora-construction-room-contact.mjs?v=120gn';
-import {SKY_MAX_JUMPS,SKY_JUMP_VELOCITY as JUMP,SKY_JUMP_GRAVITY as NEW_G,releasedJumpVelocity} from './imasora-construction-locomotion.mjs?v=120gf';
+import {roomWalkGeometry,roomSupport,roomBodyClear} from './imasora-construction-room-contact.mjs?v=120pv';
+import {SKY_MAX_JUMPS,SKY_JUMP_VELOCITY as JUMP,SKY_JUMP_GRAVITY as NEW_G,releasedJumpVelocity} from './imasora-construction-locomotion.mjs?v=120od';
 
 export const ROOM_MOTION_LIMIT=256;
+export const ROOM_JUMP_STYLE=3;
 export const ROOM_JUMP_RISE=SKY_MAX_JUMPS*JUMP*JUMP/(2*NEW_G)+.02;
-const OLD_JUMP=44*Math.sqrt(2),OLD_G=118;
+// Saved input batches must replay with their original launch speed.
+const OLD_JUMP=44*Math.sqrt(2),OLD_G=118,STYLE_TWO_JUMP=72;
 const ok=(v,m)=>{if(!v)throw Error(m);},epsilon=1e-7;
 const initial=()=>({version:1,vy:0,jumps:0,grounded:true,held:false,support:'building'});
 const flat=(b,x,z)=>{const a=b.angle??0,c=Math.cos(a),s=Math.sin(a),dx=x-b.x,dz=z-b.z;return Math.abs(c*dx-s*dz)<=b.w/2+.0001&&Math.abs(s*dx+c*dz)<=b.d/2+.0001;};
@@ -37,9 +39,9 @@ export function beginRoomMotion(w){
  ok(w?.roomWalkVersion===1&&!Object.hasOwn(w,'roomMotion'),'広い床からジャンプをはじめよう。');
  const n={...w,roomMotion:initial(),revision:w.revision+1};assertRoomMotion(n);return n;
 }
-function command(c){ok(c&&Object.keys(c).sort().join('|')===(c.jumpStyle===2?'dt|fast|heading|jump|jumpStyle|x|z':'dt|fast|heading|jump|x|z')&&[c.dt,c.x,c.z,c.heading].every(Number.isFinite)&&c.dt>0&&c.dt<=.05&&Math.abs(c.x)<=1&&Math.abs(c.z)<=1&&Math.hypot(c.x,c.z)<=1+epsilon&&Math.abs(c.heading)<=Math.PI*8&&typeof c.fast==='boolean'&&typeof c.jump==='boolean','ジャンプの操作をたしかめよう。');}
+function command(c){ok(c&&Object.keys(c).sort().join('|')===([2,ROOM_JUMP_STYLE].includes(c.jumpStyle)?'dt|fast|heading|jump|jumpStyle|x|z':'dt|fast|heading|jump|x|z')&&[c.dt,c.x,c.z,c.heading].every(Number.isFinite)&&c.dt>0&&c.dt<=.05&&Math.abs(c.x)<=1&&Math.abs(c.z)<=1&&Math.hypot(c.x,c.z)<=1+epsilon&&Math.abs(c.heading)<=Math.PI*8&&typeof c.fast==='boolean'&&typeof c.jump==='boolean','ジャンプの操作をたしかめよう。');}
 function simulate(w,c,extra,g,sg){
- const variable=c.jumpStyle===2,G=variable?NEW_G:OLD_G,launch=variable?JUMP:OLD_JUMP;let p={...w.actor},m={...w.roomMotion};const speed=c.fast?200:68,dx=c.x*speed,dz=c.z*speed;
+ const variable=c.jumpStyle===2||c.jumpStyle===ROOM_JUMP_STYLE,G=variable?NEW_G:OLD_G,launch=c.jumpStyle===ROOM_JUMP_STYLE?JUMP:c.jumpStyle===2?STYLE_TWO_JUMP:OLD_JUMP;let p={...w.actor},m={...w.roomMotion};const speed=c.fast?200:68,dx=c.x*speed,dz=c.z*speed;
  // Sweep the full body while turning; a blocked turn never prevents backing away.
  const angle=Math.atan2(Math.sin(c.heading-p.heading),Math.cos(c.heading-p.heading)),turns=Math.ceil(Math.abs(angle)/.05);let canTurn=true;
  for(let i=1;i<=turns;i++){const q={...p,heading:p.heading+angle*i/turns},y=m.support==='building'?roomSupport(g,q,p.y):height(sg,q,p.y,.0001);if(!inside(q,w)||!roomBodyClear(w,q,extra,g,m.grounded?2.5:0)||(m.grounded&&(y===undefined||Math.abs(y-p.y)>.0001))){canTurn=false;break;}}

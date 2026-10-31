@@ -24,3 +24,157 @@ body[data-ufo-world-map="coast"] .emergency-escape-control{bottom:206px}
 body[data-ufo-world-map="coast"] .camera-distance-control{bottom:156px}
 @media(max-width:600px){.coast-hud{top:95px;left:12px;gap:7px}.coast-weather{padding:6px 10px}.coast-weather strong{font-size:18px}.coast-weather small{font-size:8px}.coast-hud button{font-size:12px;padding:8px 13px}.coast-atlas{padding:16px}.coast-atlas h2{font-size:20px}.coast-atlas-places{grid-template-columns:1fr}.coast-atlas article{padding:9px}}
 @media(max-height:500px){.coast-hud{top:82px;left:12px;flex-direction:row;align-items:center}.coast-weather small{display:none}.coast-weather strong{font-size:17px}.coast-weather span{font-size:10px}.coast-atlas{max-height:94dvh}.coast-atlas svg{max-height:65dvh}}
+/* A numbered, touchable map with readable names outside the scaled drawing. */
+.coast-atlas{width:min(980px,96vw);max-height:94dvh;overflow:auto;padding:18px;background:#fffaf0}
+.coast-atlas header{position:sticky;top:-18px;background:#fffaf0;z-index:2;padding:8px 0 12px}
+.coast-atlas header button{flex-shrink:0;background:#fff0cb}
+.coast-atlas-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(245px,1fr);gap:18px;align-items:start}
+.coast-atlas-picture{min-width:0}.coast-map-key{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;font-size:14px;font-weight:800;color:#355768}
+.coast-map-key span{display:flex;align-items:center;gap:6px}.coast-map-key i{display:inline-block;width:13px;height:13px;border:2px solid white;box-shadow:0 0 0 1px #de7c68;border-radius:50%;background:#f06e52}
+.coast-atlas svg{display:block;width:100%;max-height:none;height:auto;border:2px solid white;box-sizing:border-box;background:#dcf0cc;border-radius:20px}
+.coast-atlas svg text{font:800 20px sans-serif;stroke-width:0;fill:#295b62}.coast-atlas .coast-map-title{font-size:21px;fill:#355d69;paint-order:stroke;stroke:#ffffffb0;stroke-width:4px}
+.coast-map-places circle{fill:#fffdf0;stroke:#477c72;stroke-width:3}.coast-map-places .is-selected circle{fill:#ffe29b;stroke:#ac6182;stroke-width:5}
+.coast-map-tip{font-size:13px;line-height:1.6;margin:8px 3px;color:#546979}
+.coast-atlas-places{display:grid;grid-template-columns:1fr;gap:8px;margin:0}
+.coast-atlas-places button{display:flex;gap:10px;text-align:left;align-items:center;min-height:49px;background:#eef7e9;border:2px solid white;border-radius:17px;padding:8px 12px;color:#2f5260;box-shadow:0 3px 0 #c9dfcc;font-size:15px}
+.coast-atlas-places button[aria-pressed="true"]{background:#ffe5ad;border-color:#c6819c;box-shadow:0 3px 0 #dcbb9a}
+.coast-place-number{display:grid;place-items:center;border-radius:50%;width:29px;height:29px;flex-shrink:0;background:white;color:#477c72;font-size:17px}
+.coast-place-name{display:grid;gap:4px}.coast-place-name small{font-size:12px;font-weight:600;color:#7d5670}
+.coast-map-choice{padding:12px 14px;margin-top:14px;border-radius:18px;background:#f5e9f2;color:#5d4c70;font-size:15px}.coast-map-choice p{font-size:13px;line-height:1.6;margin:6px 0 0}
+.coast-return-dialog{box-sizing:border-box;width:min(410px,92vw);max-height:90dvh;overflow:auto;border:4px solid white;border-radius:30px;padding:24px;text-align:center;color:#365b66;background:#fff7df;box-shadow:0 20px 70px #23475950}
+.coast-return-dialog::backdrop{background:#244e6555}.coast-return-icon{font-size:46px}.coast-return-dialog h2{font-size:26px;margin:8px 0}.coast-return-dialog p{font-size:15px;line-height:1.7}
+.coast-return-dialog>div{display:flex;gap:14px}.coast-return-dialog button{flex:1;min-height:50px;border:2px solid white;border-radius:18px;font-size:19px;font-weight:800;touch-action:manipulation;-webkit-user-select:none;user-select:none;color:#345866;background:#e3f1ea;box-shadow:0 4px 0 #bfd9cd;cursor:pointer}
+.coast-return-dialog [data-return-yes]{background:#ffdd91;box-shadow:0 4px 0 #dfbd70}.coast-return-dialog button:disabled{opacity:.65;cursor:wait}.coast-return-dialog [data-return-error]{background:#fff;border-radius:14px;padding:10px;color:#8c3c49}
+@media(max-width:650px) and (min-height:501px){.coast-atlas{padding:12px}.coast-atlas header{top:-12px}.coast-atlas-layout{grid-template-columns:1fr;gap:8px}.coast-atlas-places{grid-template-columns:1fr 1fr;gap:8px}.coast-atlas-places button{padding:8px;gap:6px;min-height:64px;font-size:14px}.coast-place-number{width:25px;height:25px;font-size:16px}.coast-place-name small{font-size:11px}.coast-map-choice{margin-top:10px}.coast-map-tip{margin:6px 0}}
+@media(max-height:500px){.coast-atlas{padding:10px;max-height:96dvh}.coast-atlas header{top:-10px;padding:2px 0 6px}.coast-atlas header small{display:none}.coast-atlas-layout{grid-template-columns:minmax(0,1.25fr) minmax(210px,1fr);gap:12px}.coast-atlas-picture{position:sticky;top:58px}.coast-atlas svg{max-height:65dvh}.coast-map-tip{display:none}.coast-map-key{font-size:12px}.coast-atlas-destinations{max-height:69dvh;overflow:auto;padding:0 3px 6px}.coast-atlas-places button{min-height:46px;font-size:14px}.coast-return-dialog{padding:14px}.coast-return-icon{font-size:30px}.coast-return-dialog h2{font-size:23px;margin:3px 0}}
+
+.construction-bridge-return{position:absolute;top:100px;left:16px;z-index:12;min-height:44px;padding:10px 16px;border:2px solid white;border-radius:24px;background:#fff0cb;color:#365b66;font-weight:800;box-shadow:0 4px 12px #28526918;touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:pointer}
+.construction-bridge-return[hidden]{display:none!important}
+
+.coast-chart-tabs{display:flex;gap:10px;margin:0 0 14px}.coast-chart-tabs button{flex:1;background:#e1f1f7;min-height:48px}.coast-chart-tabs button[aria-pressed="true"]{background:#ffe5ad;border-color:#d393a5;box-shadow:0 3px 0 #dbbf9a}
+
+/* Keep the player marker readable even when the chart is in the narrow game shelf. */
+.coast-atlas-map{position:relative;isolation:isolate}
+.coast-map-key [data-coast-locate]{padding:7px 10px;min-height:44px;font-size:13px;background:#fff0dd;white-space:nowrap}
+.coast-map-key>span{font-size:11px}
+.coast-map-location{position:absolute;width:0;height:0;z-index:1;pointer-events:none;color:#813e35}
+.coast-map-location-ring{position:absolute;left:-9px;top:-9px;width:18px;height:18px;box-sizing:border-box;border:3px solid white;border-radius:50%;background:#ed674f;box-shadow:0 0 0 2px #b54535,0 0 0 6px #ffffff85}
+.coast-map-location-heading{position:absolute;left:0;top:0;transform-origin:0 0}
+.coast-map-location-heading::before{content:"";position:absolute;left:-5px;top:-20px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #9d382d;filter:drop-shadow(0 -1px 0 white) drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white)}
+.coast-map-location strong{position:absolute;left:0;bottom:23px;transform:translateX(-50%);padding:4px 8px;border:2px solid #ed8f78;border-radius:12px;background:#fffdf5;font:800 13px/1.2 system-ui,sans-serif;white-space:nowrap;box-shadow:0 2px 5px #793f3820}
+.coast-map-location[data-label-x="left"] strong{transform:none}
+.coast-map-location[data-label-x="right"] strong{left:auto;right:0;transform:none}
+.coast-map-location[data-label-y="below"] strong{bottom:auto;top:23px}
+.coast-map-places .is-selected .coast-search-area{fill:#ffe6ad;stroke:#ae7291;stroke-width:4}
+.coast-map-places [role=button]{cursor:pointer;outline:none}
+.coast-atlas [hidden]{display:none!important}
+.coast-map-places [role=button]:focus-visible .coast-search-area{stroke:#8051a2;stroke-width:5}
+.coast-map-places .is-destination .coast-search-area{stroke:#257c77;stroke-width:5;stroke-dasharray:none}
+.coast-map-destination{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#e7f5ee;border-radius:15px;padding:8px 12px;margin:0 0 10px;font-size:14px;font-weight:800}
+.coast-map-destination[hidden],.coast-map-sail[hidden],.coast-map-destination button[hidden]{display:none}
+.coast-map-destination button{min-height:44px;padding:6px 12px;background:#fffaf0}
+.coast-atlas .coast-map-sail{display:block;width:100%;min-height:48px;margin-top:10px;background:#bceadc;border:2px solid #79b9a4;color:#234f55;font-size:16px;font-weight:800;touch-action:manipulation}
+@media(max-width:650px) and (min-height:501px){.coast-atlas-destinations{display:flex;flex-direction:column}.coast-atlas .coast-map-choice{order:-1;margin:0 0 8px}}
+.coast-atlas .coast-search-area+text{font-size:26px}
+.coast-atlas-map{aspect-ratio:600/470}.coast-atlas-map>svg{width:100%;height:100%;max-height:none}
+/* The optional chart is for looking before sailing, not a tiny work shelf. */
+dialog.coast-atlas[open]{inset:0;width:min(960px,calc(100vw - 24px));max-width:none;height:fit-content;max-height:calc(100dvh - 24px);overflow-x:hidden;overflow-y:auto;scrollbar-gutter:stable;margin:auto;padding:16px;border-radius:24px;box-shadow:0 12px 50px #183f4d40}
+.coast-atlas[open] .coast-atlas-layout{grid-template-columns:minmax(0,1.4fr) minmax(230px,1fr);gap:18px}
+.coast-atlas[open] .coast-atlas-places{grid-template-columns:1fr}
+@media(max-width:650px) and (min-height:501px){dialog.coast-atlas[open]{padding:12px}.coast-atlas[open] .coast-atlas-layout{grid-template-columns:1fr;gap:8px}.coast-atlas[open] .coast-atlas-places{grid-template-columns:1fr 1fr}.coast-atlas[open] .coast-atlas-places button{min-height:44px}.coast-atlas[open] header small,.coast-atlas[open] .coast-map-tip{display:none}.coast-atlas[open] header{top:-12px;padding:0 0 8px;flex-wrap:nowrap}.coast-atlas[open] .coast-chart-tabs{margin-bottom:8px}.coast-atlas[open] .coast-map-choice{padding:9px 11px;margin-top:8px}}
+@media(max-height:500px){body.world-player-game[data-ufo-world-map="coast"] .coast-hud{left:12px;flex-direction:column;align-items:flex-start;width:140px;max-width:140px;gap:6px}body.world-player-game[data-ufo-world-map="coast"] .coast-hud>button{max-width:140px;box-sizing:border-box}}
+/* An on-screen sailing instrument; tapping it opens the sea chart. */
+
+/* A chart opens from the instrument. Map and destination choices share one top edge. */
+.coast-hud>[data-coast-map]{max-width:140px;font-size:12px;padding:8px 12px;white-space:nowrap}
+dialog.coast-atlas[open]{display:flex;flex-direction:column;gap:0;width:min(760px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:14px;overflow:hidden;border-width:3px;scrollbar-gutter:stable}
+.coast-atlas[open]>header{position:static;flex-shrink:0;padding:0 0 8px;gap:8px}
+.coast-atlas[open]>header small{display:none}
+.coast-atlas[open] h2{font-size:19px;margin:0}
+.coast-atlas[open]>header button{min-height:44px;padding:8px 12px;font-size:13px}
+.coast-atlas[open] .coast-chart-tabs{flex-shrink:0;gap:8px;margin:0 0 8px}
+.coast-atlas[open] .coast-chart-tabs button{min-height:44px;padding:7px 10px;font-size:14px}
+.coast-atlas[open]>.coast-map-key{flex-shrink:0;margin:0 0 8px}
+.coast-atlas[open] .coast-map-key [data-coast-locate]{min-height:44px;padding:6px 9px;font-size:12px}
+.coast-atlas[open] .coast-map-destination{flex-shrink:0;min-height:44px;box-sizing:border-box;margin:0 0 8px;padding:4px 10px;font-size:12px}
+.coast-atlas[open] .coast-atlas-layout{flex:1 1 auto;min-height:0;grid-template-columns:minmax(0,1.35fr) minmax(220px,1fr);gap:12px;align-items:start;overflow:auto;overscroll-behavior:contain}
+.coast-atlas[open] .coast-atlas-picture{position:static;min-width:0}
+.coast-atlas[open] .coast-atlas-map{width:100%;max-width:380px;margin:0 auto}
+.coast-atlas[open] .coast-map-tip{display:none}
+.coast-atlas[open] .coast-atlas-destinations{display:flex;flex-direction:column;max-height:none;overflow:visible;min-width:0;padding:0}
+.coast-atlas[open] .coast-atlas-places{gap:6px;margin:0}
+.coast-atlas[open] .coast-atlas-places button{min-height:44px;padding:6px 8px;gap:6px;font-size:13px;box-sizing:border-box}
+.coast-atlas[open] .coast-place-number{width:24px;height:24px;font-size:15px}
+.coast-atlas[open] .coast-place-name small{font-size:11px}
+.coast-atlas[open] .coast-map-choice{order:0;margin:8px 0 0;padding:8px 10px;font-size:13px}
+.coast-atlas[open] .coast-map-choice p{font-size:12px;line-height:1.4;margin:4px 0 0}
+.coast-atlas[open] .coast-map-choice .coast-map-sail{min-height:44px;margin-top:6px;font-size:13px;padding:8px}
+button.coast-search-compass{width:134px;min-height:52px;padding:5px 7px;gap:5px;pointer-events:auto;touch-action:manipulation;cursor:pointer;text-align:left;font:inherit}
+button.coast-search-compass svg{width:38px;height:38px}
+button.coast-search-compass strong{font-size:11px;white-space:normal}
+button.coast-search-compass span{font-size:10px}
+button.coast-search-compass span:empty{display:none}
+button.coast-search-compass:focus-visible{outline:3px solid #25868f;outline-offset:3px}
+button.coast-search-compass:active{box-shadow:inset 0 2px 6px #24586333}
+@media(max-width:650px) and (min-height:501px){
+ dialog.coast-atlas[open]{width:min(360px,calc(100vw - 24px));padding:10px;max-height:calc(100dvh - 28px)}
+ .coast-atlas[open] .coast-atlas-layout{grid-template-columns:1fr;gap:8px}
+ .coast-atlas[open] .coast-atlas-map{max-width:300px}
+ .coast-atlas[open] .coast-atlas-places{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .coast-atlas[open] .coast-atlas-places button{font-size:12px}
+ button.coast-search-compass{width:126px;min-height:50px}
+}
+@media(max-height:500px){
+ dialog.coast-atlas[open]{width:min(740px,calc(100vw - 24px));max-height:calc(100dvh - 20px);padding:8px 10px}
+ .coast-atlas[open] .coast-atlas-layout{grid-template-columns:minmax(0,1.3fr) minmax(210px,1fr)}
+ .coast-atlas[open] .coast-map-destination{min-height:36px}
+ .coast-atlas[open] .coast-atlas-places{grid-template-columns:repeat(2,minmax(0,1fr))}
+ button.coast-search-compass{width:126px;min-height:50px}
+}
+
+
+/* One small utility row, a full chart, and an always reachable destination action. */
+.coast-atlas[open]>.coast-map-key{min-height:14px;justify-content:flex-end;margin-bottom:6px;line-height:1.25}
+.coast-atlas[open] .coast-chart-tabs [data-coast-locate]{flex:0 0 44px;min-width:44px;padding:6px;font-size:18px}
+.coast-atlas[open]>.coast-map-choice{display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;margin:8px 0 0;padding:6px 8px}
+.coast-atlas[open]>.coast-map-choice>strong{flex:1;min-width:0;overflow-wrap:anywhere}
+.coast-atlas[open]>.coast-map-choice>p{flex-basis:100%;order:2;margin:0}
+.coast-atlas[open]:has([data-chart="sea"][aria-pressed="true"])>.coast-map-choice>p{display:none}
+.coast-atlas[open]>.coast-map-choice>:is(.coast-map-sail,.coast-map-play){width:auto;min-height:44px;margin:0;padding:8px;font-size:12px;flex:0 1 auto}
+.coast-atlas[open] [data-destination-clear]{min-height:44px;padding:7px 9px;background:#fffaf0;font-size:12px}
+@media(max-height:500px){
+ dialog.coast-atlas[open]{--coast-chart-chrome:172px}
+ dialog.coast-atlas[open]:has(>.coast-map-choice:not([hidden])){--coast-chart-chrome:232px}
+ .coast-atlas[open] .coast-atlas-layout{overflow:hidden}
+ .coast-atlas[open] .coast-atlas-map{max-width:calc((100dvh - var(--coast-chart-chrome)) * 1.2765957)}
+ .coast-atlas[open] .coast-atlas-destinations{max-height:calc(100dvh - var(--coast-chart-chrome));overflow-y:auto}
+}
+
+.coast-search-compass{position:absolute;right:16px;bottom:205px;z-index:12;display:flex;align-items:center;gap:6px;box-sizing:border-box;width:158px;padding:6px 8px;background:linear-gradient(135deg,#f6fffaed,#dff8f4ed);border:2px solid #b0e1d8;border-radius:16px;box-shadow:inset 0 0 0 2px #ffffffa0,0 3px 10px #234c6520;color:#245863;pointer-events:none;user-select:none;-webkit-user-select:none}
+/* Current raft danger, never a wave forecast. The passive instrument keeps
+   its existing size; no flashing, extra labels or input targets. */
+.coast-search-compass[data-danger="caution"]{background:linear-gradient(135deg,#fff6cd,#ffe196);border-color:#d29a28;color:#725019}
+.coast-search-compass[data-danger="caution"] .coast-device-rim{fill:#fff2bf;stroke:#bd8723}
+.coast-search-compass[data-danger="caution"] .coast-device-ticks{stroke:#b08225}
+.coast-search-compass[data-danger="caution"] .coast-device-needle{fill:#ab7017}
+.coast-search-compass[data-danger="caution"] .coast-device-sector{fill:#e5b94866}
+.coast-search-compass[data-danger="caution"] svg text{fill:#77521b}
+.coast-search-compass[data-danger="danger"]{background:linear-gradient(135deg,#ffd8d4,#ffa798);border-color:#d74f43;color:#7b2824}
+.coast-search-compass[data-danger="danger"] .coast-device-rim{fill:#ffc4b8;stroke:#c7463d}
+.coast-search-compass[data-danger="danger"] .coast-device-ticks{stroke:#bc433b}
+.coast-search-compass[data-danger="danger"] .coast-device-needle{fill:#ad2c29}
+.coast-search-compass[data-danger="danger"] .coast-device-sector{fill:#e16e5c77}
+.coast-search-compass[data-danger="danger"] svg text{fill:#862722}
+.coast-search-compass[hidden]{display:none}.coast-search-compass svg{width:48px;height:48px;flex:none;fill:none;stroke:#5ca8ad;stroke-width:1.5}.coast-device-rim{fill:#f0fff9;stroke:#78beb9;stroke-width:2}.coast-device-ticks{stroke:#75bbb7;stroke-width:2}.coast-search-compass svg text{font:800 11px ui-monospace,monospace;fill:#367c84;stroke:none}.coast-search-compass .coast-device-sector{fill:#a7e6d66b;stroke:none}.coast-search-compass .coast-device-needle{fill:#189ba8;stroke:#fff;stroke-width:1}.coast-search-compass .coast-device-boat{fill:#ecb867;stroke:#735f3a;stroke-width:1}.coast-search-compass .coast-device-near{font-size:17px}
+.coast-search-compass div{display:grid;gap:3px;min-width:0}.coast-search-compass strong{font-size:12px;line-height:1.3;white-space:nowrap}.coast-search-compass span{font-size:11px;font-weight:700;line-height:1.3;white-space:nowrap}
+@media(max-width:650px) and (min-height:501px){.coast-search-compass{right:10px;bottom:auto;top:228px;width:148px;padding:5px 7px;gap:5px}.coast-search-compass svg{width:44px;height:44px}}
+@media(max-height:500px){.coast-search-compass{right:12px;bottom:auto;top:154px;width:148px;padding:5px 7px;gap:5px}.coast-search-compass svg{width:44px;height:44px}}
+
+/* Place/time stay at the left edge; map and pouch belong under Menu. */
+body.world-player-game[data-ufo-world-map=coast] .coast-place-clock{position:absolute;z-index:12;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));max-width:calc(100% - 165px);padding:8px 12px;display:grid;gap:2px;border:2px solid #fff;border-radius:18px;background:#fffaf0ec;color:#315568;text-shadow:none;box-shadow:0 3px 0 #bcd7d333;pointer-events:none}.coast-place-clock[hidden]{display:none!important}.coast-place-clock small{display:none}.coast-place-clock strong{font-size:16px;line-height:1.3;letter-spacing:.02em}.coast-place-clock span{font-size:12px;line-height:1.3;color:#647a86}
+body.world-player-game[data-ufo-world-map=coast] .coast-hud{left:auto;right:max(12px,env(safe-area-inset-right));top:calc(max(12px,env(safe-area-inset-top)) + 52px);width:140px;max-width:140px;align-items:stretch;flex-direction:column;gap:7px}body.world-player-game[data-ufo-world-map=coast] .coast-hud>button{width:100%;max-width:100%;min-height:44px;box-sizing:border-box;font-size:12px;padding:8px 10px;border-radius:16px;white-space:normal}
+body.world-player-game[data-ufo-world-map=coast] .world-camera-controls.camera-distance-control{left:max(12px,env(safe-area-inset-left));right:auto;top:calc(max(12px,env(safe-area-inset-top)) + 72px);bottom:auto;width:120px;max-width:120px}
+body.world-player-game[data-ufo-world-map=coast] .world-build-open{left:max(12px,env(safe-area-inset-left));right:auto;top:calc(max(12px,env(safe-area-inset-top)) + 224px);max-width:140px;border-radius:17px;background:#ffe9b7;color:#5b552c;min-height:44px}
+@media(max-height:500px){body.world-player-game[data-ufo-world-map=coast] .coast-place-clock{padding:6px 10px}.coast-place-clock strong{font-size:14px}.coast-place-clock span{font-size:11px}body.world-player-game[data-ufo-world-map=coast] .world-camera-controls.camera-distance-control{top:calc(max(12px,env(safe-area-inset-top)) + 56px)}body.world-player-game[data-ufo-world-map=coast] .world-build-open{top:calc(max(12px,env(safe-area-inset-top)) + 208px)}}
+
+@media(max-height:400px){body.world-player-game[data-ufo-world-map=coast] .world-camera-controls.camera-distance-control{display:grid;grid-template-columns:120px 120px;grid-template-rows:44px 44px;gap:6px 12px;width:252px}body.world-player-game[data-ufo-world-map=coast] #emergencyEscapeButton{grid-column:2;grid-row:1}body.world-player-game[data-ufo-world-map=coast] #cameraDistanceButton{grid-column:1;grid-row:1}body.world-player-game[data-ufo-world-map=coast] #cameraModeButton{grid-column:1;grid-row:2}body.world-player-game[data-ufo-world-map=coast] .world-build-open{left:144px;top:calc(max(12px,env(safe-area-inset-top)) + 106px)}}

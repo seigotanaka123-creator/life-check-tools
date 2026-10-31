@@ -1,8 +1,8 @@
 import{wallDoorPaintPatches}from'./imasora-construction-wall-door-shape.mjs?v=120gn';
 import * as T from './three.module.min.js';
-import {highProjects,highWorldPoint} from './imasora-construction-high-world.mjs?v=120gn';
-import {highAssembly,highBuildingParts} from './imasora-construction-high-build.mjs?v=120gn';
-import {buildingPaintPatches,buildingPaintFixedParts,buildingPaintKey} from './imasora-construction-building-paint.mjs?v=120gn';
+import {highProjects,highWorldPoint} from './imasora-construction-high-world.mjs?v=120pv';
+import {highAssembly,highBuildingParts} from './imasora-construction-high-build.mjs?v=120pv';
+import {buildingPaintPatches,buildingPaintFixedParts,buildingPaintKey} from './imasora-construction-building-paint.mjs?v=120pv';
 import {paintColor} from './imasora-construction-concrete/paint-colors.mjs';
 export function buildingPaintQuad(site,patch,r){return[[-1,-1],[1,-1],[1,1],[-1,-1],[1,1],[-1,1]].map(([x,y])=>{const p={x:0,y:y<0?r.y0:r.y1,z:0};p[patch.axis]=patch.plane;p[patch.tan]=x<0?r.x0:r.x1;return highWorldPoint(site,p);});}
 export function createBuildingPaintView(parent){

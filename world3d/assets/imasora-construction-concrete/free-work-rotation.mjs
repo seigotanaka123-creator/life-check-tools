@@ -1,3 +1,4 @@
+import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 // Clockwise as seen from above (north is -Z): (x,z) -> (-z,x).
 // Bake quarter turns into the 4x4 data so every existing render/contact reader
 // continues to consume the same cells, heights and face-local paint patches.
@@ -15,7 +16,7 @@ export function rotateFreeWork(work,quarterTurns=0){
  for(let n=0;n<quarterTurns;n++){
   const fill=Array(16).fill(0),paint={};for(let i=0;i<16;i++)fill[rotateFreeIndex(i)]=w.fill[i];
   for(const [key,pixels]of Object.entries(w.paint)){const [cell,face]=key.split(':');paint[rotateFreeIndex(Number(cell))+':'+faceNext[face]]=rotateFreePaint(face,pixels);}
-  w={...w,mask:rotateFreeMask(w.mask),fill,paint,...(w.placedMask!==undefined?{placedMask:rotateFreeMask(w.placedMask)}:{})};
+  w={...w,...(w.layout?{layout:{version:1,columns:[...w.layout.rows].reverse(),rows:[...w.layout.columns],x:-w.layout.z,z:w.layout.x}}:{}),mask:rotateFreeMask(w.mask),fill,paint,...(w.placedMask!==undefined?{placedMask:rotateFreeMask(w.placedMask)}:{})};
  }
  return w;
 }

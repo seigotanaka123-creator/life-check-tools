@@ -1,6 +1,6 @@
 import * as T from './three.module.min.js';
-import {upperShapeTiles} from './imasora-construction-concrete/high-casting-shape.mjs';
-import {upperPaintFaces,upperPaintPatch} from './imasora-construction-concrete/high-paint.mjs?v=120fn';
+import {upperShapeTiles} from './imasora-construction-concrete/high-casting-shape.mjs?v=120hb';
+import {upperPaintFaces,upperPaintPatch} from './imasora-construction-concrete/high-paint.mjs?v=120hb';
 import {paintColor} from './imasora-construction-concrete/paint-colors.mjs';
 export function upperPaintWorld(c,p){const a=c.anchor.turn*Math.PI/2,co=Math.round(Math.cos(a)),si=Math.round(Math.sin(a));return{x:c.anchor.x+p.x*co+p.z*si,y:c.anchor.y+p.y,z:c.anchor.z-p.x*si+p.z*co};}
 const id=(c,p)=>[c.id,p.cell,p.face,p.pixel].join('|');

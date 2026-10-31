@@ -1,5 +1,5 @@
-import {waterBuildTotal,validateWaterBuilds} from './imasora-construction-water-build.mjs?v=120fb';
-import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ey';
+import {waterBuildTotal,validateWaterBuilds} from './imasora-construction-water-build.mjs?v=120ov';
+import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 
 // Water placed in the field belongs to the same finite tank circuit. A pool
 // keeps its measured volume and position through saving and recovery.

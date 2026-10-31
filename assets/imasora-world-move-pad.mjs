@@ -1,4 +1,4 @@
-import {createMonsterTravelInput} from './imasora-construction-concrete/monster-travel-input.mjs';
+import {createMonsterTravelInput} from './imasora-construction-concrete/monster-travel-input.mjs?v=120od';
 import {createConstructionMovePad} from './imasora-construction-concrete/move-pad.mjs';
 
 // Main-world and UFO sticks use the same release rules as construction play.

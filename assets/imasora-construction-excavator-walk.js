@@ -1,10 +1,10 @@
-import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120gf';
-import {walkFactor} from './imasora-construction-travel-input.mjs';
+import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
+import {walkFactor} from './imasora-construction-travel-input.mjs?v=120lb';
 // 9-1b: solid voxel floors/walls/ceilings, not a top-height-only terrain.
 // The approved excavator remains the owner of soil quantities and arm actions.
-import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js?v=120gf';
-import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120gf';
-import {EX_ACCESS} from './imasora-construction-excavator-access.js?v=120gf';
+import {initialExcavator,actExcavator,stepExcavator,armPose,CELL,PLOT,BIN} from './imasora-construction-excavator.js?v=120ov';
+import {WALKER,SITE,worldToLocal,localToWorld} from './imasora-construction-loader-physics.js?v=120ov';
+import {EX_ACCESS} from './imasora-construction-excavator-access.js?v=120ov';
 export const DIG_WALK=Object.freeze({...WALKER,step:8.01,gravity:SKY_JUMP_GRAVITY,jump:SKY_JUMP_VELOCITY});
 const EPS=1e-6;
 const volume=(name,x,y,z,w,h,d,angle=0,step=true)=>({name,x,y,z,w,h,d,angle,step});

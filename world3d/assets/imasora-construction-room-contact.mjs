@@ -1,8 +1,8 @@
-import{highPlatform}from'./imasora-construction-high-build.mjs?v=120gn';
+import{highPlatform}from'./imasora-construction-high-build.mjs?v=120pv';
 import{stairPlacement,stairRoomBound}from'./imasora-construction-stair-placement.mjs?v=120gn';
 import {highFloorPieces} from './imasora-construction-high-shape.mjs?v=120gn';
 import {highInnerStairs} from './imasora-construction-high-interior.mjs?v=120gn';
-import {highAccessLandings,highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120gn';
+import {highAccessLandings,highWorkSolids} from './imasora-construction-high-work-position.mjs?v=120ov';
 import {entranceDoorParts} from './imasora-construction-building-door.mjs?v=120gn';
 import {ROOM_WALK_BODY} from './imasora-construction-room-walk-body.mjs?v=120fx';
 const bodyBounds=(()=>{let l=Infinity,r=-Infinity,b=Infinity,t=-Infinity;for(const[,,points]of ROOM_WALK_BODY)for(const[x,z]of points){l=Math.min(l,x);r=Math.max(r,x);b=Math.min(b,z);t=Math.max(t,z);}return{cx:(l+r)/2,cz:(b+t)/2,hx:(r-l)/2,hz:(t-b)/2};})();

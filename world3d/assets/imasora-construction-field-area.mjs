@@ -1,8 +1,9 @@
+import{assertVehicleHeight}from'./imasora-construction-vehicle-elevation.mjs?v=120ov';
 import {FIELD,sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
 export const LEGACY_WORK_AREA=Object.freeze({minX:-320,maxX:320,minZ:-250,maxZ:250});
 const layouts=sharedParkingLayouts();
 export function assertVehicleField(v){
- const f=v?.field;if(f===undefined)return null;
+ assertVehicleHeight(v);const f=v?.field;if(f===undefined)return null;
  if(!f||Object.keys(f).sort().join(',')!=='corner,origin'||!layouts.some(l=>l.corner===f.corner)||!Array.isArray(f.origin)||f.origin.length!==2||!f.origin.every(Number.isFinite)||Math.abs(f.origin[0])>2400||Math.abs(f.origin[1])>1500)throw Error('車と作品の基準位置を確認できません。');
  return f;
 }

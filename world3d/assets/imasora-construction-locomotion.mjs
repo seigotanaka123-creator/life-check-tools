@@ -2,9 +2,9 @@
 export const SKY_WALK_SPEED=68;
 export const SKY_RUN_SPEED=SKY_WALK_SPEED*2.5;
 export const SKY_MAX_JUMPS=3;
-// Article profile: v0=12, g=25, release=0.5; one design unit is 6 world units.
-// Constant acceleration preserves the same time-to-apex (0.48s) at game scale.
-export const SKY_JUMP_VELOCITY=72;
+// Constant acceleration and the early-release cut keep tap/hold control.
+// Launch 72 -> 76 raises each stage about 11%, with the same gravity.
+export const SKY_JUMP_VELOCITY=76;
 export const SKY_JUMP_GRAVITY=150;
 export const JUMP_RELEASE_MULTIPLIER=.5;
 export function releasedJumpVelocity(v){return v>0?v*JUMP_RELEASE_MULTIPLIER:v;}
@@ -46,21 +46,23 @@ export function createThreeJump(){
 
 // All physical owners share one held gesture. A second finger is not a new jump.
 export function bindJumpButton({element,enabled,canHold=enabled,activate,release=()=>{},windowTarget=globalThis.window,documentTarget=globalThis.document}){
- const held=new Set(),listeners=[];let keyClickUntil=0;
+ element.setAttribute?.('aria-keyshortcuts','E B J');if(!element.title)element.title='E／B／J：ジャンプ（長押しで高く、押し直して3段まで）';
+ const keyboard=globalThis.IMASORA_KEYS,updateKeys=()=>{if(!keyboard)return;element.setAttribute?.('aria-keyshortcuts',keyboard.bindings.jump.filter(Boolean).map(keyboard.label).join(' '));element.title=keyboard.describe('jump')+'：ジャンプ（長押しで高く、押し直して3段まで）';};updateKeys();const removeKeyHint=keyboard?.onChange(updateKeys);
+ const held=new Set(),listeners=[];let keyClickUntil=0,disposed=false;
  const listen=(target,type,fn,options)=>{target?.addEventListener(type,fn,options);listeners.push(()=>target?.removeEventListener(type,fn,options));};
  const allowed=()=>!documentTarget?.hidden&&enabled();
  const end=source=>{if(!held.delete(source))return;if(!held.size)release();};
  const cancel=()=>{if(held.size){held.clear();release();}};
  const press=(source,e)=>{if(held.has(source)||!allowed()&&!held.size)return false;e.preventDefault?.();e.stopPropagation?.();const first=!held.size;held.add(source);if(first&&activate()===false){held.delete(source);return false;}return true;};
- const key=e=>{if(!['Space','Enter'].includes(e.code))return false;if(e.type==='keyup'){end('key:'+e.code);return true;}if(e.repeat)return true;keyClickUntil=Date.now()+500;return press('key:'+e.code,e);};
+ const key=e=>{if(e.type!=='keyup'&&(e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target?.closest?.('input,textarea,select,[contenteditable=true],[role=textbox]')))return false;if(e.code==='Space'){e.preventDefault?.();return false;}if(!['KeyE','KeyB','KeyJ','Enter'].includes(e.code))return false;if(e.type==='keyup'){end('key:'+e.code);return true;}if(e.repeat)return true;keyClickUntil=Date.now()+500;return press('key:'+e.code,e);};
  listen(element,'touchstart',e=>{keyClickUntil=0;for(const t of Array.from(e.changedTouches??[]))press('touch:'+t.identifier,e);},{passive:false});
  for(const type of ['touchend','touchcancel'])listen(windowTarget,type,e=>{for(const t of Array.from(e.changedTouches??[]))end('touch:'+t.identifier);},true);
  listen(element,'pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0)return;keyClickUntil=0;if(press('pointer:'+e.pointerId,e))element.setPointerCapture?.(e.pointerId);});
  for(const type of ['pointerup','pointercancel','lostpointercapture'])listen(windowTarget,type,e=>end('pointer:'+e.pointerId),true);
- listen(element,'keydown',key);listen(windowTarget,'keyup',e=>{if(['Space','Enter'].includes(e.code))end('key:'+e.code);},true);
+ listen(element,'keydown',key);listen(windowTarget,'keyup',e=>{if(['KeyE','KeyB','KeyJ','Enter'].includes(e.code))end('key:'+e.code);},true);
  listen(element,'click',e=>{e.preventDefault();if(e.detail===0&&Date.now()>keyClickUntil&&!held.size&&allowed()){activate();release();}});
  for(const type of ['blur','pagehide'])listen(windowTarget,type,cancel);
  listen(documentTarget,'visibilitychange',()=>{if(documentTarget.hidden)cancel();});
  for(const type of ['contextmenu','selectstart','dragstart'])listen(element,type,e=>e.preventDefault());
- return{key,cancel,get held(){return held.size>0;},sync(){element.disabled=!allowed();if(documentTarget?.hidden||!canHold())cancel();},dispose(){cancel();listeners.forEach(fn=>fn());}};
+ return{key,cancel,press:source=>!disposed&&press("action:"+source,{}),release:source=>end("action:"+source),get held(){return held.size>0;},sync(){element.disabled=!allowed();if(documentTarget?.hidden||!canHold())cancel();},dispose(){cancel();disposed=true;removeKeyHint?.();listeners.forEach(fn=>fn());}};
 }

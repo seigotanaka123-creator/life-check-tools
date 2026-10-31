@@ -1,13 +1,13 @@
-import {createWorkPlatformRecord,assertWorkPlatformRecord} from './free-platform-record.mjs?v=120gn';
-import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120gn';
-import {frameBlocked,frameRoute,frameGroundRoute,frameSegmentBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120gn';
-import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120gn';
-import {scaffoldSupport} from './free-frame-scaffold.mjs?v=120gn';
-import {footSurface} from './free-footing.mjs?v=120gn';
-import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120gn';
-import {vehicleFootprints} from './free-vehicle-contact.mjs?v=120gn';
+import {createWorkPlatformRecord,assertWorkPlatformRecord} from './free-platform-record.mjs?v=120pv';
+import {fixedWorkPlatform} from './free-fixed-work-platform.mjs?v=120pv';
+import {frameBlocked,frameRoute,frameGroundRoute,frameSegmentBlocked,FRAME_RACK_STANCE} from './free-frames.mjs?v=120pv';
+import {frameWorkBoxes,frameWorkspaceBlocked} from './free-frame-workspace.mjs?v=120pv';
+import {scaffoldSupport} from './free-frame-scaffold.mjs?v=120pv';
+import {footSurface} from './free-footing.mjs?v=120pv';
+import {createScaffoldMotion} from './free-scaffold-motion.mjs?v=120pv';
+import {liveVehicleFootprints} from './free-vehicle-contact.mjs?v=120pv';
 import {pointBoxDistance} from './free-route-clearance.mjs';
-import {boardingAccess} from './free-boarding.mjs?v=120gn';
+import {boardingAccess} from './free-boarding.mjs?v=120pv';
 
 const inside=(plan,x,z)=>plan.pieces.some(p=>Math.abs(x-p.x)<=p.width/2+1e-8&&Math.abs(z-p.z)<=p.depth/2+1e-8);
 const pointSegment=(p,a,b)=>{const dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/(dx*dx+dz*dz||1)));return Math.hypot(p.x-a.x-dx*t,p.z-a.z-dz*t);};
@@ -39,10 +39,11 @@ export function workPlatformSphereBlocked(plan,x,y,z,r){
 // Added floor squares avoid vehicles and never cover the concrete footprint.
 export function reserveWorkPlatform(plans,f,heightAt,external){
  if(!plans.length)return null;
- const boxes=frameWorkBoxes(f),xs=boxes.map(b=>b.x),zs=boxes.map(b=>b.z),height=plans[0].height;
+ // Completed works remain collision obstacles, but distant works do not enlarge this job’s platform.
+ const boxes=frameWorkBoxes({...f,completed:[]}),xs=boxes.map(b=>b.x),zs=boxes.map(b=>b.z),height=plans[0].height;
  if(!boxes.length)return fixedWorkPlatform(plans,f,heightAt,external);
  const x0=Math.min(...xs)-32,x1=Math.max(...xs)+32,z0=Math.min(...zs)-32,z1=Math.max(...zs)+32;
- const vehicles=[...vehicleFootprints(f.truck),...vehicleFootprints({...f.pump,legs:true})],corridors=boardingCorridors(f,heightAt);
+ const vehicles=[...liveVehicleFootprints(f.truck,'truck'),...liveVehicleFootprints({...f.pump,legs:true},'pump')],corridors=boardingCorridors(f,heightAt);
  const ring={...plans[0],stairs:[],legs:[],path:[{x:x0,z:z0,y:height},{x:x1,z:z0,y:height},{x:x1,z:z1,y:height},{x:x0,z:z1,y:height},{x:x0,z:z0,y:height}],allowed:q=>vehicles.every(v=>pointBoxDistance(q,v)>=7)&&corridorClear(corridors,q,15)&&!frameBlocked(f,[],q,(x,z,m)=>external(x,z,m,height),2)};
  const plan=fixedWorkPlatform([...plans,ring],f,heightAt,external);plan.primaryStairs=plans[0].stairs;const seen=new Set(plan.legs.map(p=>p.x+','+p.z));
  for(const piece of plan.pieces)for(let x=piece.x-piece.width/2+1;x<piece.x+piece.width/2;x+=8)for(let z=piece.z-piece.depth/2+1;z<piece.z+piece.depth/2;z+=8){
@@ -72,33 +73,39 @@ export function workPlatformAccess(plan,f,from,center,reach,external,heightAt,{f
  candidates.sort((a,b)=>Math.hypot(a.x-center.x,a.z-center.z)-Math.hypot(b.x-center.x,b.z-center.z));
  const ground=frameGroundRoute(f,plan.panels,from,plan.entry,external,margin,heightAt);
  const landing=plan.path[0],panels=exact?[]:plan.panels;let last;
- function deckRoute(stance){
-  try{return frameRoute(f,panels,landing,stance,allowed,margin,heightAt,()=>({height:plan.height}),false,{minX:-220,maxX:220,minZ:-220,maxZ:220});}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
+ function deckRoute(stance,start=landing){
+  try{return frameRoute(f,panels,start,stance,allowed,margin,heightAt,()=>({height:plan.height}),false,{minX:-220,maxX:220,minZ:-220,maxZ:220});}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
   // Long narrow strips can exhaust the continuous-probe budget on one edge.
   // Use short edges through actual floor centre lines, retaining all original
   // whole-edge checks and their finite budgets. Saved geometry never changes.
   const axes={x:[minX+13,maxX-13,...plan.pieces.map(p=>p.x)],z:[minZ+13,maxZ-13,...plan.pieces.map(p=>p.z)]};
   for(const axis of ['x','z'])for(const value of [...new Set(axes[axis])]){
-   const other=axis==='x'?'z':'x',turns=[landing,{[axis]:value,[other]:landing[other]},{[axis]:value,[other]:stance[other]},stance],path=[landing];let safe=true;
+   const other=axis==='x'?'z':'x',turns=[start,{[axis]:value,[other]:start[other]},{[axis]:value,[other]:stance[other]},stance],path=[start];let safe=true;
    for(let i=1;i<turns.length&&safe;i++){const a=turns[i-1],b=turns[i],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/24));for(let j=1;j<=n;j++){const q={x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n};if(frameSegmentBlocked(f,panels,path.at(-1),q,allowed,margin)){safe=false;break;}path.push(q);}}
    if(safe)return path;
   }
   throw last;
  }
- for(const stance of candidates.slice(0,80))try{const path=deckRoute(stance).map(p=>({...p,y:plan.height}));return{stance,ground,scaffold:{...plan,stairs:plan.primaryStairs??plan.stairs,path,ground}};}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;}
+ // Fine grids can place a narrow entrance diagonally between the route grid nodes.
+ // Follow the retained, fully checked entrance before branching along deck centre lines.
+ const retained=f.layout&&plan.path.length>1&&plan.path.slice(1).every((b,i)=>!frameSegmentBlocked(f,panels,plan.path[i],b,allowed,margin))?plan.path:null;
+ for(const stance of candidates.slice(0,80)){
+  let path;try{path=deckRoute(stance);}catch(e){if(e.code==='SHARED_PLATFORM_BUDGET')throw e;last=e;if(retained)try{path=retained.slice(0,-1).concat(deckRoute(stance,retained.at(-1)));}catch(other){if(other.code==='SHARED_PLATFORM_BUDGET')throw other;last=other;}}
+  if(path)return{stance,ground,scaffold:{...plan,stairs:plan.primaryStairs??plan.stairs,path:path.map(p=>({...p,y:plan.height})),ground}};
+ }
  throw Error('共通作業台から施工面へ届く通路がありません。車やホースを離すか、作業台を片付けて配置を見直してください。',{cause:last});
 }
 export function createWorkPlatformSession({root,actor,feet,box,mats,heightAt,external}){
  let plan=null,reference=null,renderer=null,shown=false,frameChoices=new Map(),contactBounds=null,contactCache=new Map(),groundCache=new Map();
  const compatible=f=>reference&&f.location.x===reference.location.x&&f.location.z===reference.location.z;
- const current=f=>({...reference,...f,mask:reference.mask,baseY:reference.baseY,height:reference.height});
+ const current=f=>({...reference,...f,mask:reference.mask,layout:reference.layout,baseY:reference.baseY,height:reference.height});
  function clear(){renderer?.dispose();if(renderer)root.remove(renderer.group);renderer=null;plan=reference=null;shown=false;frameChoices.clear();contactBounds=null;contactCache.clear();groundCache.clear();}
  return{
   routeExternal(f,at,blocked){const corridors=boardingCorridors(f,at);return(x,z,m,y)=>blocked(x,z,m,y)||Number.isFinite(y)&&!corridorClear(corridors,{x:x-f.location.x,z:z-f.location.z},13+m);},
-  prepare(plans,f,at,blocked,steps=[]){if(plan){if(!compatible(f)||plan.height!==plans[0]?.height||f.mask!==reference.mask)throw Error('前の作業台をメニューから片付けてください。');scaffoldSupport(current(f),plan,at,blocked);return plan;}plan=reserveWorkPlatform(plans,f,at,blocked);reference=structuredClone(f);for(const s of steps)if(['place','hammer','unlock','lift'].includes(s.kind)&&s.scaffold&&s.stance&&s.target&&!frameChoices.has(s.panel.id))frameChoices.set(s.panel.id,{stance:s.stance,target:s.target,useTool:s.useTool,scaffold:s.scaffold});return plan;},
+  prepare(plans,f,at,blocked,steps=[]){if(plan){if(!compatible(f)||plan.height!==plans[0]?.height||f.mask!==reference.mask||JSON.stringify(f.layout??null)!==JSON.stringify(reference.layout??null))throw Error('前の作業台をメニューから片付けてください。');scaffoldSupport(current(f),plan,at,blocked);return plan;}plan=reserveWorkPlatform(plans,f,at,blocked);reference=structuredClone(f);for(const s of steps)if(['place','hammer','unlock','lift'].includes(s.kind)&&s.scaffold&&s.stance&&s.target&&!frameChoices.has(s.panel.id))frameChoices.set(s.panel.id,{stance:s.stance,target:s.target,useTool:s.useTool,scaffold:s.scaffold});return plan;},
   show(){if(!plan||shown)return;renderer=createScaffoldMotion({f:reference,root,actor,feet,record:{maxSupportError:0},footing:{},heightAt:(...args)=>heightAt(...args),external:(...args)=>external(...args),parent:root,box,mats,name:'shared-construction-platform',fixedPlan:plan});try{renderer.open(plan,0);}finally{shown=true;}},
   access(f,from,center,reach,blocked,at,options){if(!plan||!shown)return null;if(!compatible(f))throw Error('別の施工場所の作業台です。片付けてください。');return workPlatformAccess(plan,current(f),from,center,reach,blocked,at,options);},
-  frameChoice(f,panel,blocked,at){if(!compatible(f)||f.mask!==reference.mask||f.height!==reference.height||(f.baseY??0)!==(reference.baseY??0))throw Error('型枠の形や高さが変わりました。前の作業台を片付けてください。');const old=frameChoices.get(panel.id);if(!old)throw Error('型枠の形が変わりました。前の作業台を片付けてください。');scaffoldSupport(current(f),plan,at,blocked);const ground=frameGroundRoute(f,plan.panels,{...FRAME_RACK_STANCE,y:footSurface(f,0,116,at,true)},old.scaffold.entry,blocked,20,at),path=old.scaffold.path,deckBlocked=(x,z,m)=>blocked(x,z,m,plan.height)||frameWorkspaceBlocked(frameWorkBoxes(f),{x:x-f.location.x,z:z-f.location.z});for(let i=1;i<path.length;i++)if(frameSegmentBlocked(f,[panel],path[i-1],path[i],deckBlocked,20))throw Error('作業台の通路がふさがりました。車やホースを離してください。');return{...old,scaffold:{...old.scaffold,ground}};},
+  frameChoice(f,panel,blocked,at){if(!compatible(f)||f.mask!==reference.mask||JSON.stringify(f.layout??null)!==JSON.stringify(reference.layout??null)||f.height!==reference.height||(f.baseY??0)!==(reference.baseY??0))throw Error('型枠の形や高さが変わりました。前の作業台を片付けてください。');const old=frameChoices.get(panel.id);if(!old)throw Error('型枠の形が変わりました。前の作業台を片付けてください。');scaffoldSupport(current(f),plan,at,blocked);const ground=frameGroundRoute(f,plan.panels,{...FRAME_RACK_STANCE,y:footSurface(f,0,116,at,true)},old.scaffold.entry,blocked,20,at),path=old.scaffold.path,deckBlocked=(x,z,m)=>blocked(x,z,m,plan.height)||frameWorkspaceBlocked(frameWorkBoxes(f),{x:x-f.location.x,z:z-f.location.z});for(let i=1;i<path.length;i++)if(frameSegmentBlocked(f,[panel],path[i-1],path[i],deckBlocked,20))throw Error('作業台の通路がふさがりました。車やホースを離してください。');return{...old,scaffold:{...old.scaffold,ground}};},
   verify(f,at,blocked){if(plan&&shown)scaffoldSupport(current(f),plan,at,blocked);},
   exportRecord(p){return shown?createWorkPlatformRecord(reference,plan,frameChoices,p):null;},
   restore(record,p){clear();if(!record)return '';assertWorkPlatformRecord(record,p);plan=structuredClone(record.plan);reference={...structuredClone(p.freeBuild),...structuredClone(record.anchor),location:structuredClone(record.anchor.location)};frameChoices=new Map(record.choices.map(({id,...c})=>[id,structuredClone(c)]));try{this.show();this.verify(p.freeBuild,heightAt,external);return '';}catch(e){return e.message+' メニューから作業台を片付けてください。';}},

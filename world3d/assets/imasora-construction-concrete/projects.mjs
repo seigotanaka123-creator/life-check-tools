@@ -1,6 +1,6 @@
-import {freeWorkMask,freeWorkCells} from './free-work-parts.mjs';
-import {freeGeometry} from './free-build-state.mjs?v=120gn';
-import {floorMask,floorPanels,floorPanelsProblem,boxesOverlap} from './floor-parts.mjs?v=120ds';
+import {freeWorkMask,freeWorkCells} from './free-work-parts.mjs?v=120hb';
+import {freeGeometry} from './free-build-state.mjs?v=120pv';
+import {floorMask,floorPanels,floorPanelsProblem,boxesOverlap} from './floor-parts.mjs?v=120hb';
 export const DEFAULT_CONCRETE_LOCATION=Object.freeze({x:600,z:1450});
 export const MAX_CONCRETE_FLOORS=16;
 export const concreteLocation=project=>project.location??DEFAULT_CONCRETE_LOCATION;
@@ -35,7 +35,7 @@ export function completedConcreteGeometry(project){
   if(!floorMask(f))return [];
   // Preserve the old floor and surface IDs until the user edits its panels.
   const steps=(suffix,x,z,width)=>[.5,1,1.5,2].map((h,i)=>part(`${suffix}${i}`,x,z+10.5-i*3,width,3,h));
-  const clearSteps=items=>items.filter(g=>!allPanels.some(p=>boxesOverlap({x:g.x,z:g.z,w:g.size[0],d:g.size[1]},{...p,w:16,d:16})));
+  const clearSteps=items=>items.filter(g=>!allPanels.some(p=>boxesOverlap({x:g.x,z:g.z,w:g.size[0],d:g.size[1]},{...p,w:p.w??16,d:p.d??16})));
   if(f.panelMask===undefined&&!f.paint)return [part('floor',f.x,f.z,32,32,2),...clearSteps(steps('step-',f.x,f.z+16,24))];
   return floorPanels(f).flatMap(p=>[
    {...part(`panel-${p.index}-floor`,p.x,p.z,16,16,2),paint:p.color},

@@ -1,5 +1,5 @@
 // Keyboard state belongs to the current input gesture, never to a save record.
-export const EXCAVATION_KEYS=Object.freeze(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyR','KeyF','KeyT','KeyG','KeyQ','KeyE','KeyZ','KeyC']);
+export const EXCAVATION_KEYS=Object.freeze(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyJ','KeyB','KeyK','KeyR','KeyF','KeyT','KeyG','KeyQ','KeyE','KeyZ','KeyC']);
 export function createExcavationKeyboard(){
   const keys=new Set(),down=new Set();
   return {keys,

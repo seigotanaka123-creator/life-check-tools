@@ -1,4 +1,4 @@
-import {openArcadeCheckpoint,bindTriLinkSave} from './imasora-arcade-autosave.mjs?v=120er';
+import {openArcadeCheckpoint,bindTriLinkSave} from './imasora-arcade-autosave.mjs?v=120qq';
 import * as THREE from "./three.module.min.js";
 import {
   ALL_FLOWERING_HERO_CHARACTERS,

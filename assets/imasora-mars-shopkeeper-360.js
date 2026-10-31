@@ -1,5 +1,5 @@
 import * as THREE from './three.module.min.js';
-import { buildWhiteMichiRoadSaberRen360, disposeMatureCharacterModel } from './imasora-character-360.js';
+import { buildWhiteMichiRoadSaberRen360, disposeMatureCharacterModel } from './imasora-character-360.js?v=120ob';
 
 // A reusable mesh character, not a camera-facing picture. +Z is the face direction.
 export const MARS_SHOPKEEPER_ID = 'mars-material-shopkeeper-jellyfish-lavender';

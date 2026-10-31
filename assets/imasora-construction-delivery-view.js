@@ -2,7 +2,7 @@ import * as THREE from './three.module.min.js';
 import {createMaterialSourceClient} from './imasora-construction-material-source.mjs';
 import {SHOP_OFFERS} from './imasora-mars-construction-shop.js?v=503';
 import {deliveryAccess} from './imasora-construction-delivery.js';
-import {toolkitSummary,toolkitDetails} from './imasora-construction-toolkit.mjs?v=120fs';
+import {toolkitSummary,toolkitDetails} from './imasora-construction-toolkit.mjs?v=120ho';
 import {deliveryConcreteSummary} from './imasora-construction-concrete/delivery-summary.mjs';
 
 export function createConstructionDeliveryDock(){
@@ -31,7 +31,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
   const dialog=document.createElement('dialog');dialog.className='construction-delivery-menu';dialog.setAttribute('aria-labelledby','delivery-title');
   dialog.innerHTML=`<header><span class="delivery-crest" aria-hidden="true">▤</span><div><small>工事現場の保管庫</small><h2 id="delivery-title">建材受取所</h2></div><button type="button" class="delivery-close" aria-label="受取所を閉じる">閉じる</button></header>
     <div class="delivery-body">
-    <p class="delivery-intro">おかえりなさい！<br>火星で買った建材を、ここで大切に保管します。</p>
+    <p class="delivery-intro">おかえりなさい！<br>街や海辺から届いた建材と、火星で買った材料を大切に保管するよ。</p>
     <p class="delivery-mode"></p><div class="delivery-stock-list"></div>
     <section class="delivery-pack-transfer" aria-labelledby="pack-transfer-title">
       <h3 id="pack-transfer-title">開封済み建築セットを受け取る</h3>
@@ -54,9 +54,9 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
       <p class="delivery-project-message" role="status" aria-live="polite" data-concrete-project-message></p>
     </section>
     <p class="delivery-message" role="status" aria-live="polite"></p>
-    <p class="delivery-help">保管した火星水は給水ローダー、火星土は土ローダー、火星木材は木材クレーンの区画で使えます。</p>
+    <p class="delivery-help">水は給水車、土はローダー、木材はクレーンで使えるよ。同じ現場の好きな場所で作業しよう。海辺で開いたセットや、花からつくったペンキ・かざりは受取済みだよ。</p>
     </div>
-    <footer><p>購入済みの分だけを保管します。<br>ここでは金貨を使いません。</p><button type="button" class="delivery-return">ゲームに戻る</button></footer>`;
+    <footer><p>海辺から届いた材料もここに入るよ。<br>保管・受取に金貨は使わないよ。</p><button type="button" class="delivery-return">ゲームに戻る</button></footer>`;
   document.body.append(dialog);
   let working=false,opening=false,success='';
   const closeButton=dialog.querySelector('.delivery-close'),returnButton=dialog.querySelector('.delivery-return'),message=dialog.querySelector('.delivery-message');
@@ -98,7 +98,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
     dialog.querySelector('[data-toolkit-detail]').textContent=toolkitDetails(service.constructionToolkit);
     const q=trial?.quantities;
     dialog.querySelector('[data-pack-transfer-stock]').textContent=q
-      ? `受け取った建材：生コンの材料 ${q.concreteBlockCredits}杯分 / ペンキ ${q.paintSurfaceCredits}面分 / 型枠 ${q.auxiliaryUnits.formwork} / 鉄筋 ${q.auxiliaryUnits.rebar} / タイル ${q.auxiliaryUnits.tiles} / 装飾材 ${q.auxiliaryUnits.decoration}（${trial.transfers.length}件）`
+      ? `受け取った合計：生コンの材料 ${q.concreteBlockCredits}杯分 / ペンキ ${q.paintSurfaceCredits}面分 / 型枠 ${q.auxiliaryUnits.formwork} / 鉄筋 ${q.auxiliaryUnits.rebar} / タイル ${q.auxiliaryUnits.tiles} / 装飾材 ${q.auxiliaryUnits.decoration}（${trial.transfers.length}件）`
       : '保存情報を確認できません。';
     const priorSelection=projectSelect.value, concreteStock=service.constructionConcreteStock, project=service.constructionConcreteProject;
     const imported=new Set(project?.importedTransfers?.map(entry=>entry.transferId)??[]);

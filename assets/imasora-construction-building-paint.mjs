@@ -1,7 +1,7 @@
 import{boardBayRetiredPart}from'./imasora-construction-board-bay-shape.mjs?v=120gn';
 import {validateHighShape,highFloors,shapedHighParts} from './imasora-construction-high-shape.mjs?v=120gn';
-import {highBuildingParts,highAssembly,highAssemblyAt,highDisassemblyAt,highJobPlan,highRouteSeconds} from './imasora-construction-high-build.mjs?v=120gn';
-import {validateUpperPaintAction} from './imasora-construction-concrete/high-paint.mjs';
+import {highBuildingParts,highAssembly,highAssemblyAt,highDisassemblyAt,highJobPlan,highRouteSeconds} from './imasora-construction-high-build.mjs?v=120pv';
+import {validateUpperPaintAction} from './imasora-construction-concrete/high-paint.mjs?v=120hb';
 import {paintResultColor} from './imasora-construction-concrete/free-paint-removal.mjs';
 const ok=(v,m)=>{if(!v)throw Error(m);};
 export const BUILDING_PAINT_FACES=['south','east','north','west'];

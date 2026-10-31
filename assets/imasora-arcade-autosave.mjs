@@ -1,4 +1,4 @@
-import './imasora-autosave.js?v=120er';
+import './imasora-autosave.js?v=120qq';
 import * as C from './cannon-es.js';
 const A=globalThis.ImasoraAutoSave;
 const vector=v=>({x:v.x,y:v.y,z:v.z,...(typeof v.w==='number'?{w:v.w}:{})});

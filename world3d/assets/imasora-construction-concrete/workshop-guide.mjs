@@ -1,13 +1,16 @@
+import {freePourLimit} from './design-levels.mjs?v=120hb';
 import {availableMixCells} from './mixing.mjs';
 // A task has an outcome, visible progress, and one next action. It never mutates game state.
-export function workshopGuide(f,mode,{vehicle='truck',paintTool='roller',hasWork=false,designReady=false}={}){
+export function workshopGuide(f,mode,{vehicle='truck',paintTool='roller',hasWork=false,designReady=false,reframe=false,supported=false,partialSupport=false}={}){
  const result=(title,body,steps,index,action,label)=>({title,body,steps,index,action,label});
  if(mode==='build'){
   const steps=['形をえらぶ','型枠を組む','生コンを注ぐ','表面をならす','固めて完成'];
   if(f.aboard&&['design','finished','cured'].includes(f.stage))return result('降りて道具を使おう','型枠やコテは、車を降りて手で使うよ。',steps,0,'dismount','車を降りる');
+  if(reframe)return result('同じ土台で、もうひとつ！',partialSupport?'土台の空いた場所につくれるよ。形・大きさ・位置をえらぼう。重なる作品は保管してから組み立ててね。':'前の作品を保管したら、設計帳の形やマスごとの高さをえらんで組み立てよう。土台と重なる作品が残っている時は、先に保管してね。',steps,1,'frame','足場で型枠を組む');
+  if(supported&&f.stage==='design')return result('土台の上につくろう！',partialSupport?'土台の上につくる形と大きさをえらぼう。空いたマスへ形をずらしてから、型枠を組めるよ。':'土台と同じ形でつくるよ。「高さ」でマスの高さをえらんだら、型枠を組もう！',steps,1,'frame','足場で型枠を組む');
   if(f.stage==='design')return designReady?result('この形でつくろう！','現場の下描きができあがりの形だよ。変えたい時は「かたち」「高さ」をえらぼう。',steps,1,'frame','型枠を組む'):result('形からつくろう','床や花壇の形と高さをえらぶと、現場に下描きが出るよ。',steps,0,'shape','形と高さをえらぶ');
   if(['framed','wet'].includes(f.stage)){
-   const full=f.fill.every((v,i)=>!(f.mask&(1<<i))||v>=f.height*2);
+   const full=f.fill.every((v,i)=>!(f.mask&(1<<i))||v>=freePourLimit(f,i));
    if(f.aboard&&!full){
     if((f.aboard==='truck'?f.wet:f.hose)<1)return result('注ぐ材料を用意しよう','「車両」で生コンを用意してから、ここへ戻ろう。',steps,2,'vehicle','材料を用意する');
     return result('車から型枠へ注ごう','注ぐ場所をえらぶと、車の注ぎ口やホースがそこへ向かうよ。',steps,2,'pour','生コンを注ぐ');

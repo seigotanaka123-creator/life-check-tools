@@ -1,4 +1,4 @@
-import {openArcadeCheckpoint,bindCatcherSave} from './imasora-arcade-autosave.mjs?v=120er';
+import {openArcadeCheckpoint,bindCatcherSave} from './imasora-arcade-autosave.mjs?v=120qq';
 import * as THREE from "./three.module.min.js";
 import * as CANNON from "./cannon-es.js";
 import { CatcherControlSound } from "./imasora-catcher-control-sound.js?v=20260917-control-sound-v1";

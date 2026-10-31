@@ -3,9 +3,9 @@
 // 1180 and 2100 are half-cell offsets on the stage 2-2 grid.
 import {cellAddress,SOIL_UNIT} from './imasora-construction-state.js';
 import {cellBox} from './imasora-construction-terrain.js';
-import {totals,CELL} from './imasora-construction-excavator.js?v=120gf';
-import {EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120gf';
-import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js?v=120gf';
+import {totals,CELL} from './imasora-construction-excavator.js?v=120ov';
+import {EXCAVATION_YARDS} from './imasora-construction-world-excavation.js?v=120ov';
+import {CONTACT_EXCAVATION_FORMAT,packExcavation,unpackExcavation,resumeExcavation} from './imasora-construction-excavator-save.js?v=120ov';
 
 export const PREVIEW_IMPORT_LIMIT=2*1024*1024;
 function originFor(site){

@@ -1,13 +1,14 @@
-import {highCastingBoards} from './imasora-construction-concrete/high-casting-state.mjs?v=120ft';
+import {highCastingBoards} from './imasora-construction-concrete/high-casting-state.mjs?v=120hc';
+import {DESIGN_BOOK_ACTIONS,canonicalDesignAction,applyDesignAction} from './imasora-construction-concrete/saved-designs.mjs?v=120pv';
 import {PROJECT_HISTORY_PAGE,PROJECT_HISTORY_LIMIT,projectOperationCount,findProjectOperation,archiveProjectPage} from './imasora-construction-concrete/project-history.mjs';
-import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs?v=120gn';
-import './imasora-construction-pack-transfer.js?v=530';
+import {newFreeBuild,canonicalFreeAction,applyFreeAction,freeStock,freeFrameBoards} from './imasora-construction-concrete/free-build-state.mjs?v=120pv';
+import './imasora-construction-pack-transfer.js?v=120ho';
 import {createTrialState,assertTrialState,transitionTrial} from './imasora-construction-concrete-site-state.js';
 import {createMixer,supplyIngredients,startMix,advanceMix,cancelMix,availableMixCells,CURE_DURATION_MS} from './imasora-construction-concrete/mixing.mjs';
-import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs?v=120gn';
-import {floorMask,floorPanelsProblem,paintCost,paintRemaining} from './imasora-construction-concrete/floor-parts.mjs?v=120ds';
-import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs?v=120gn';
-import {captureFreeStep,finishFreeStep,restoreFreeStep,enableFreeStepHistory,advanceLegacyStepHistory,FREE_STEP_ACTIONS} from './imasora-construction-concrete/free-step-undo.mjs?v=120ft';
+import {DEFAULT_CONCRETE_LOCATION,nextFloorProblem,moveConcreteFloorProblem} from './imasora-construction-concrete/projects.mjs?v=120pv';
+import {floorMask,floorPanelsProblem,paintCost,paintRemaining} from './imasora-construction-concrete/floor-parts.mjs?v=120hb';
+import {foundationBoardCount} from './imasora-construction-concrete/free-foundation-state.mjs?v=120pv';
+import {captureFreeStep,finishFreeStep,restoreFreeStep,enableFreeStepHistory,advanceLegacyStepHistory,FREE_STEP_ACTIONS} from './imasora-construction-concrete/free-step-undo.mjs?v=120hb';
 
 export const PROFILE_PROJECT_SCOPE='imasora-construction-profile-project-v1';
 export const PROFILE_PROJECT_SITE='construction';
@@ -38,6 +39,7 @@ export function createProfileProject(profileId,schemaVersion=5){
 function canonical(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw)||!validId(raw.operationId))fail('INVALID_PROJECT_ACTION');
  if(typeof raw.type==='string'&&raw.type.startsWith('FREE_'))return canonicalFreeAction(raw);
+ if(DESIGN_BOOK_ACTIONS.has(raw.type))return canonicalDesignAction(raw);
  const action={type:raw.type,operationId:raw.operationId},allowed=['type','operationId'];
  if(['IMPORT_PACK_CONCRETE','IMPORT_PACK_INGREDIENTS'].includes(action.type)){
   if(typeof raw.transferId!=='string'||!/^pack-transfer-[A-Za-z0-9_-]{8,180}$/.test(raw.transferId))fail('INVALID_PACK_TRANSFER_ID');
@@ -76,6 +78,7 @@ function apply(state,action,packLedger){
  const step=captureFreeStep(state,action);
  if(action.type==='PLACE_FORMWORK'&&(state.foundation||highCastingBoards(state.freeBuild))&&highCastingBoards(state.freeBuild)+(state.foundation?foundationBoardCount(state.foundation):0)+(state.schemaVersion>=11&&!['design','complete'].includes(state.freeBuild.stage)?freeFrameBoards(state.freeBuild.mask):0)+8>(packLedger.quantities?.auxiliaryUnits?.formwork??0))fail('土台で使用中の板を回収してから型枠を組んでください。');
  if(action.type==='FREE_UNDO_STEP'){restoreFreeStep(state,action);
+ }else if(DESIGN_BOOK_ACTIONS.has(action.type)){applyDesignAction(state,action);
  }else if(action.type.startsWith('FREE_')){applyFreeAction(state,action,packLedger);
  }else if(['IMPORT_PACK_CONCRETE','IMPORT_PACK_INGREDIENTS'].includes(action.type)){
   const packet=packetFor(packLedger,action.transferId,state.profileId),previous=state.importedTransfers.find(receipt=>receipt.transferId===packet.id);
