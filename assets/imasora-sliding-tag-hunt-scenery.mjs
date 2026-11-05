@@ -1,29 +1,82 @@
+import{cornerStairGeometry}from'./imasora-sliding-tag-hunt-corner-stairs.mjs';
+import{huntBuildingArchitecture}from'./imasora-sliding-tag-hunt-architecture.mjs';
 import * as T from './three.module.min.js';
-import {WORLD,WORLD_JUMP_STEPS,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_BASIN,worldBasinContours,WORLD_DECK,WORLD_RISE,WORLD_RIDGE,WORLD_ICE_LOOP,WORLD_HILL,WORLD_PATHS,WORLD_BLOCKS,WORLD_TREES,worldGroundHeight,worldHeight} from './imasora-sliding-tag-hunt-world.mjs';
+import {WORLD,WORLD_CORNER_STAIRS,WORLD_JUMP_STEPS,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_BASIN,worldBasinContours,WORLD_DECK,WORLD_RISE,WORLD_RIDGE,WORLD_ICE_LOOP,WORLD_HILL,WORLD_PATHS,WORLD_BLOCKS,WORLD_TREES,worldGroundHeight,worldHeight,worldSurface} from './imasora-sliding-tag-hunt-world.mjs';
 import {tagAtmosphere} from './imasora-sliding-tag-model.mjs';
+// Build the tread and retaining faces from the same profile so the slope
+// meets its sides without gaps. The paint is baked into the tread geometry.
+function raisedRouteGeometry(x,width,profile){
+ const left=x-width/2,right=x+width/2,base=-.16;
+ const tread={positions:[],colors:[]},walls={positions:[],colors:[]};
+ function quad(mesh,tint,a,b,c,d){
+  const color=new T.Color(tint);
+  for(const p of [a,b,c,a,c,d]){
+   mesh.positions.push(...p);
+   mesh.colors.push(color.r,color.g,color.b);
+  }
+ }
+ for(let i=1;i<profile.length;i++){
+  const [z0,h0]=profile[i-1],[z1,h1]=profile[i];
+  const top=(px,t,offset=0)=>[px,h0+(h1-h0)*t+offset,z0+(z1-z0)*t];
+  quad(tread,h0===h1?0xe5cead:0xd0b894,top(left,0),top(left,1),top(right,1),top(right,0));
+  const highLeft0=top(left,0),highLeft1=top(left,1);
+  const highRight0=top(right,0),highRight1=top(right,1);
+  quad(walls,0x506d7c,[left,base,z0],[left,base,z1],highLeft1,highLeft0);
+  quad(walls,0x506d7c,[right,base,z0],highRight0,highRight1,[right,base,z1]);
+  if(h0===h1)continue;
+  for(const line of [left+.45,right-1.1]){
+   quad(tread,0xffdc90,top(line,0,.016),top(line,1,.016),top(line+.65,1,.016),top(line+.65,0,.016));
+  }
+  // Chevron marks point uphill from the approach.
+  for(const progress of [.19,.36,.53]){
+   const direction=Math.sign(h1-h0),at=direction>0?progress:1-progress,point=at+direction*2.8/(z1-z0),depth=.65/(z1-z0);
+   const a=top(x-2.4,at,.018),b=top(x,point,.018),c=top(x+2.4,at,.018);
+   const a1=top(x-2.4,at+depth,.018),b1=top(x,point+depth,.018),c1=top(x+2.4,at+depth,.018);
+   quad(tread,0xf8ead0,a,a1,b1,b);
+   quad(tread,0xf8ead0,b,b1,c1,c);
+  }
+ }
+ const [near,low]=profile[0],[far,high]=profile.at(-1);
+ quad(walls,0x506d7c,[left,base,near],[left,low,near],[right,low,near],[right,base,near]);
+ quad(walls,0x506d7c,[left,base,far],[right,base,far],[right,high,far],[left,high,far]);
+ quad(walls,0x506d7c,[left,base,near],[right,base,near],[right,base,far],[left,base,far]);
+ return {tread,walls};
+}
+function raisedRouteMesh(name,...parts){
+ const geometry=new T.BufferGeometry();
+ geometry.setAttribute('position',new T.Float32BufferAttribute(parts.flatMap(p=>p.positions),3));
+ geometry.setAttribute('color',new T.Float32BufferAttribute(parts.flatMap(p=>p.colors),3));
+ geometry.computeVertexNormals();
+ const mesh=new T.Mesh(geometry,new T.MeshStandardMaterial({vertexColors:true,roughness:.86}));
+ mesh.name=name;
+ return mesh;
+}
 export function createHuntScenery({scene,camera,canvas,hemi,sun}){
 const material=color=>new T.MeshStandardMaterial({color,roughness:.65}),boxGeo=new T.BoxGeometry(1,1,1),cylinderGeo=new T.CylinderGeometry(1,1,1,10);
-function box(x,y,z,w,h,d,color){const m=new T.Mesh(boxGeo,material(color));m.position.set(x,y,z);m.scale.set(w,h,d);scene.add(m);return m;}
-function batch(geometry,color,rows){const mesh=new T.InstancedMesh(geometry,material(color),rows.length),matrix=new T.Matrix4(),q=new T.Quaternion();rows.forEach((r,i)=>{matrix.compose(new T.Vector3(...r.slice(0,3)),q,new T.Vector3(...r.slice(3)));mesh.setMatrixAt(i,matrix);});mesh.computeBoundingSphere();scene.add(mesh);return mesh;}
-function surfaceTexture(kind){const c=document.createElement('canvas');c.width=c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=kind==='ice'?'#a6cbd8':'#d0c5b1';ctx.fillRect(0,0,256,256);for(let i=0;i<600;i++){const x=(i*73)%256,y=(i*137)%256;ctx.strokeStyle=kind==='ice'?'rgba(236,251,255,.12)':'rgba(105,112,103,.10)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+3+i%12,y+1);ctx.stroke();}if(kind==='road'){ctx.strokeStyle='rgba(100,106,100,.2)';for(let i=0;i<=256;i+=32){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,256);ctx.moveTo(0,i);ctx.lineTo(256,i);ctx.stroke();}}const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;return texture;}
+// Fixed opaque boxes are grouped by the exact same material colour.
+const staticBoxes=new Map(),staticBoxMaterials=new Map();
+function box(x,y,z,w,h,d,color){const key=color+':'+Math.floor((x+WORLD.width/2)/96)+':'+Math.floor((z+WORLD.depth/2)/96);let group=staticBoxes.get(key);if(!group)staticBoxes.set(key,group={color,rows:[]});group.rows.push([x,y,z,w,h,d]);}
+function batch(geometry,color,rows,sharedMaterial){const mesh=new T.InstancedMesh(geometry,sharedMaterial??material(color),rows.length),matrix=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);rows.forEach((r,i)=>{if(r[6])q.setFromAxisAngle(up,r[6]);else q.identity();matrix.compose(new T.Vector3(...r.slice(0,3)),q,new T.Vector3(...r.slice(3,6)));mesh.setMatrixAt(i,matrix);});mesh.computeBoundingSphere();scene.add(mesh);return mesh;}
+function surfaceTexture(kind){const c=document.createElement('canvas');c.width=c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=kind==='ice'?'#a6cbd8':kind==='ground'?'#e2e5dc':'#d0c5b1';ctx.fillRect(0,0,256,256);for(let i=0;i<600;i++){const x=(i*73)%256,y=(i*137)%256;ctx.strokeStyle=kind==='ice'?'rgba(236,251,255,.12)':'rgba(105,112,103,.10)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+3+i%12,y+1);ctx.stroke();}if(kind==='road'){ctx.strokeStyle='rgba(100,106,100,.2)';for(let i=0;i<=256;i+=32){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,256);ctx.moveTo(0,i);ctx.lineTo(256,i);ctx.stroke();}}const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;return texture;}
+const groundTexture=surfaceTexture('ground');groundTexture.repeat.set(WORLD.width/28,WORLD.depth/28);
 const iceTexture=surfaceTexture('ice');iceTexture.repeat.set(WORLD.width/28,WORLD.depth/28);
 // The closed backing sits below the deepest ground instead of filling the basin.
-const backingTop=-WORLD_BASIN.depth-.5;batch(boxGeo,0xa3cddd,[[0,backingTop-2.5,0,WORLD.width,5,WORLD.depth],[-WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[0,backingTop/2,-WORLD.depth/2,WORLD.width,-backingTop,1],[0,backingTop/2,WORLD.depth/2,WORLD.width,-backingTop,1]]);function terrainSheet(w,d,x=0,z=0,color=0xffffff){const geometry=new T.PlaneGeometry(w,d,Math.ceil(w/4),Math.ceil(d/4)),pos=geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,worldGroundHeight(pos.getX(i)+x,-pos.getY(i)+z));geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,material(color));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);return mesh;}const ice=terrainSheet(WORLD.width,WORLD.depth,0,0,0xd9f1f5);ice.rotation.x=-Math.PI/2;ice.material.roughness=.26;ice.material.map=iceTexture;ice.position.y=0;scene.add(ice);
+const backingTop=-WORLD_BASIN.depth-.5;batch(boxGeo,0xa3cddd,[[0,backingTop-2.5,0,WORLD.width,5,WORLD.depth],[-WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[0,backingTop/2,-WORLD.depth/2,WORLD.width,-backingTop,1],[0,backingTop/2,WORLD.depth/2,WORLD.width,-backingTop,1]]);function terrainSheet(w,d,x=0,z=0,color=0xffffff){const geometry=new T.PlaneGeometry(w,d,Math.ceil(w/4),Math.ceil(d/4)),pos=geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,worldGroundHeight(pos.getX(i)+x,-pos.getY(i)+z));geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,material(color));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);return mesh;}const ice=terrainSheet(WORLD.width,WORLD.depth,0,0,0xd9f1f5);ice.rotation.x=-Math.PI/2;ice.material.roughness=.88;ice.material.map=groundTexture;ice.position.y=0;scene.add(ice);
 // A baked bank tint makes depth legible without extra lights or per-frame work.
 const iceVertices=ice.geometry.attributes.position,iceColors=new Float32Array(iceVertices.count*3);
 for(let i=0;i<iceVertices.count;i++){
- const depth=Math.max(0,Math.min(1,-iceVertices.getZ(i)/WORLD_BASIN.depth)),gleam=Math.sin(depth*Math.PI),at=i*3;
- iceColors[at]=1+.4*gleam-.15*depth;iceColors[at+1]=1+.35*gleam-.04*depth;iceColors[at+2]=1+.25*gleam;
+ const icy=worldSurface(iceVertices.getX(i),-iceVertices.getY(i))==='ice',depth=Math.max(0,Math.min(1,-iceVertices.getZ(i)/WORLD_BASIN.depth)),gleam=Math.sin(depth*Math.PI),at=i*3;
+ iceColors[at]=(icy?.63:1)+.4*gleam-.15*depth;iceColors[at+1]=(icy?.87:1)+.35*gleam-.04*depth;iceColors[at+2]=(icy?1:.94)+.25*gleam;
 }
 ice.geometry.setAttribute('color',new T.BufferAttribute(iceColors,3));ice.material.vertexColors=true;
-for(const p of WORLD_PATHS){const parts=p.x===WORLD_DECK.x&&p.w===WORLD_DECK.w&&p.d===WORLD.depth?[-1,1].map(sign=>{const end=WORLD_DECK.length/2+WORLD_DECK.ramp,length=WORLD.depth/2-end;return{...p,d:length,z:sign*(end+length/2)};}):[p];for(const part of parts){const path=terrainSheet(part.w,part.d,part.x,part.z,0xd2d9bd);path.position.y=.06;path.material.roughness=.9;path.material.depthWrite=false;}}
+for(const p of WORLD_PATHS){const parts=p.x===WORLD_DECK.x&&p.w===WORLD_DECK.w&&p.d===WORLD.depth?[-1,1].map(sign=>{const end=WORLD_DECK.length/2+WORLD_DECK.ramp,length=WORLD.depth/2-end;return{...p,d:length,z:sign*(end+length/2)};}):[p];for(const part of parts){const path=terrainSheet(part.w,part.d,part.x,part.z,0xd2d9bd);path.position.y=.06;path.material.roughness=.9;path.material.depthWrite=true;}}
 // Painted contours reveal the bank and follow the physical four-unit terrain.
 const{positions:basinPaint,indices:basinIndices}=worldBasinContours();
 const basinGeo=new T.BufferGeometry();basinGeo.setAttribute('position',new T.Float32BufferAttribute(basinPaint,3));basinGeo.setIndex(basinIndices);basinGeo.computeVertexNormals();const basinContours=new T.Mesh(basinGeo,material(0xbde5df));basinContours.material.depthWrite=false;scene.add(basinContours);
 // Ice on the lower loop and grippy roads over the rise are visible directly in the world.
 for(const p of WORLD_ICE_LOOP){const track=terrainSheet(p.w,p.d,p.x,p.z,0x9ecfdf);track.position.y=.025;track.material.map=iceTexture;track.material.roughness=.3;}
 for(const sign of[-1,1])for(const vertical of[false,true]){const r=WORLD_RISE,edge=terrainSheet(vertical?.55:r.topW*2,vertical?r.topD*2:.55,r.x+(vertical?sign*r.topW:0),r.z+(vertical?0:sign*r.topD),vertical?0x6bbbc2:0xe7bd73);edge.position.y=.09;}
-const windows=[],nightWindows=[],lampMarkers=[],roofs=[],doors=[],trim=[],bases=[],roofUnits=[];for(const [i,b]of WORLD_BLOCKS.entries()){if(b.kind==='garden')continue;if(b.kind==='arch'){box(b.x,b.base+b.h/2,b.z,b.w,b.h,b.d,0x6ebbbd);lampMarkers.push({x:b.x,y:b.base+1,z:b.z+b.d/2+.25});continue;}box(b.x,(b.base??0)+b.h/2,b.z,b.w,b.h,b.d,b.kind==='courtyard'?[0xf0c9b8,0xbcdcd4,0xf1d2ab][i%3]:[0xf0d8b3,0xc7d6dc,0xe4cbd2,0xc3d5c7][i%4]);for(const side of[-1,1])lampMarkers.push({x:b.x+side*Math.min(10,b.w/2-2),y:6.5,z:b.z+b.d/2+.25});bases.push([b.x,1,b.z,b.w+.1,2,b.d+.1]);roofUnits.push([b.x+Math.min(5,b.w/2-3),b.h+1.3,b.z-Math.min(5,b.d/2-3),5,2.6,4]);roofs.push([b.x,b.h+.3,b.z,b.w+1,.6,b.d+1]);doors.push([b.x,2.7,b.z+b.d/2+.08,3,5.4,.16]);for(const sign of[-1,1])for(let y=6;y<b.h-1;y+=4)for(let x=-b.w/2+4;x<b.w/2-2;x+=5)((i+Math.round(x)+Math.round(y)+sign)%4===0?windows:nightWindows).push([b.x+x,y,b.z+sign*(b.d/2+.08),2.7,2,.16]);trim.push([b.x,b.h-1,b.z+b.d/2+.15,b.w,.25,.25]);}batch(boxGeo,0x617b8a,roofs);batch(boxGeo,0x6c9cae,windows);const litWindows=batch(boxGeo,0x6c9cae,nightWindows);batch(boxGeo,0x8a7060,doors);batch(boxGeo,0xfff0d1,trim);batch(boxGeo,0x8a9da4,bases);batch(boxGeo,0xb5c0c5,roofUnits);
+const windows=[],nightWindows=[],lampMarkers=[],roofs=[],doors=[],trim=[],bases=[],roofUnits=[];for(const [i,b]of WORLD_BLOCKS.entries()){if(b.kind==='garden')continue;if(b.kind==='arch'){box(b.x,b.base+b.h/2,b.z,b.w,b.h,b.d,0x6ebbbd);lampMarkers.push({x:b.x,y:b.base+1,z:b.z+b.d/2+.25});continue;}box(b.x,(b.base??0)+b.h/2,b.z,b.w,b.h,b.d,b.kind==='courtyard'?[0xf0c9b8,0xbcdcd4,0xf1d2ab][i%3]:[0xf0d8b3,0xc7d6dc,0xe4cbd2,0xc3d5c7][i%4]);for(const side of[-1,1])lampMarkers.push({x:b.x+side*Math.min(10,b.w/2-2),y:6.5,z:b.z+b.d/2+.25});bases.push([b.x,1,b.z,b.w+.1,2,b.d+.1]);roofUnits.push([b.x+Math.min(5,b.w/2-3),b.h+1.3,b.z-Math.min(5,b.d/2-3),5,2.6,4]);roofs.push([b.x,b.h+.3,b.z,b.w+1,.6,b.d+1]);doors.push([b.x,2.7,b.z+b.d/2+.08,3,5.4,.16]);for(const sign of[-1,1])for(let y=6;y<b.h-1;y+=4)for(let x=-b.w/2+4;x<b.w/2-2;x+=5)((i+Math.round(x)+Math.round(y)+sign)%4===0?windows:nightWindows).push([b.x+x,y,b.z+sign*(b.d/2+.08),2.7,2,.16]);trim.push([b.x,b.h-1,b.z+b.d/2+.15,b.w,.25,.25]);}const facadeFrames=[];let facadeBuildings=0,sideWindows=0,facadeTrim=0;for(const [i,b]of WORLD_BLOCKS.entries()){const a=huntBuildingArchitecture(b,i);if(!b.kind)facadeBuildings++;facadeFrames.push(...a.frames);trim.push(...a.trim);windows.push(...a.windows);nightWindows.push(...a.nightWindows);sideWindows+=a.windows.length+a.nightWindows.length;facadeTrim+=a.trim.length;}const frames=batch(boxGeo,0x526d7e,facadeFrames);frames.name='hunt-building-facades';canvas.dataset.architecture=JSON.stringify({buildings:facadeBuildings,frames:facadeFrames.length,sideWindows,trim:facadeTrim,extraDrawBatches:1});batch(boxGeo,0x617b8a,roofs);batch(boxGeo,0x6c9cae,windows);const litWindows=batch(boxGeo,0x6c9cae,nightWindows);batch(boxGeo,0x8a7060,doors);batch(boxGeo,0xfff0d1,trim);batch(boxGeo,0x8a9da4,bases);batch(boxGeo,0xb5c0c5,roofUnits);
 // Solid planted beds share the exact colliders, including the open eight-unit shortcut.
 const hedgeCores=[],hedgeCrowns=[],gardenStone=[],pinkFlowers=[],creamFlowers=[];
 for(const b of WORLD_GARDEN_BEDS){const leaf=(x,y,z,sx,sy,sz)=>{let seed=Math.sin(x*12.9898+z*78.233+y*17.7)*43758.5453;const r=seed-Math.floor(seed);sx*=.88+r*.12;sy*=.87+(1-r)*.13;sz*=.86+r*.14;x=Math.max(b.x-b.w/2+sx,Math.min(b.x+b.w/2-sx,x+(r-.5)*1.6));z=Math.max(b.z-b.d/2+sz,Math.min(b.z+b.d/2-sz,z+(r-.5)*1.3));y=Math.min(b.h-sy,y+(r-.5)*.7);hedgeCrowns.push([x,y,z,sx,sy,sz]);};gardenStone.push([b.x,.35,b.z,b.w,.7,b.d]);hedgeCores.push([b.x,4.2,b.z,b.w-3,7.5,b.d-3]);for(let x=-b.w/2+3;x<=b.w/2-3;x+=6)for(let z=-b.d/2+3;z<=b.d/2-3;z+=6){leaf(b.x+x,7.7,b.z+z,3,1.3,3);if((Math.round(x*7+z*11)+b.x)%5===0)(hedgeCrowns.length%2?pinkFlowers:creamFlowers).push([hedgeCrowns.at(-1)[0],hedgeCrowns.at(-1)[1]+hedgeCrowns.at(-1)[4]*.93+.12,hedgeCrowns.at(-1)[2],.42,.25,.42]);}for(const side of[-1,1])for(const y of[2,4.2,6.4]){for(let x=-b.w/2+3;x<=b.w/2-3;x+=6)leaf(b.x+x,y,b.z+side*(b.d/2-1.8),3,1.7,1.8);for(let z=-b.d/2+3;z<=b.d/2-3;z+=6)leaf(b.x+side*(b.w/2-1.8),y,b.z+z,1.8,1.7,3);}}
@@ -31,7 +84,10 @@ for(const rows of[hedgeCores,hedgeCrowns,pinkFlowers,creamFlowers])for(const row
 // Painted crest edges follow the same solid bank; nothing floats above a walkable void.
 for(const sign of[-1,1]){const guide=terrainSheet(WORLD_RIDGE.end-WORLD_RIDGE.start,.4,(WORLD_RIDGE.start+WORLD_RIDGE.end)/2,sign*(WORLD_RIDGE.halfTop-1),0xf4d9a6);guide.position.y=.1;}
 // Continuous upper walk: two ramps, a supported deck, and the same heights in physics.
-const deckX=WORLD_DECK.x,halfDeck=WORLD_DECK.length/2,zs=[-halfDeck-WORLD_DECK.ramp,-halfDeck,halfDeck,halfDeck+WORLD_DECK.ramp],ys=[0,WORLD_DECK.h,WORLD_DECK.h,0],vertices=[],indices=[];for(let i=0;i<4;i++)for(const side of[-1,1])vertices.push(deckX+side*WORLD_DECK.w/2,ys[i],zs[i]);for(let i=0;i<3;i++){const a=i*2;indices.push(a,a+2,a+1,a+1,a+2,a+3);}const deckGeo=new T.BufferGeometry();deckGeo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));deckGeo.setIndex(indices);deckGeo.computeVertexNormals();const walkway=new T.Mesh(deckGeo,material(0xe5cead));walkway.material.side=T.DoubleSide;walkway.position.y=.05;scene.add(walkway);const retaining=[],retainingIndices=[];for(const side of[-1,1]){const start=retaining.length/3;for(let i=0;i<4;i++)retaining.push(deckX+side*WORLD_DECK.w/2,-.1,zs[i],deckX+side*WORLD_DECK.w/2,ys[i],zs[i]);for(let i=0;i<3;i++){const j=start+i*2;retainingIndices.push(j,j+1,j+2,j+1,j+3,j+2);}}const retainingGeo=new T.BufferGeometry();retainingGeo.setAttribute('position',new T.Float32BufferAttribute(retaining,3));retainingGeo.setIndex(retainingIndices);retainingGeo.computeVertexNormals();const retainingWall=new T.Mesh(retainingGeo,material(0x8c9ba4));retainingWall.material.side=T.DoubleSide;scene.add(retainingWall);for(const side of[-1,1])box(deckX+side*(WORLD_DECK.w/2-.5),WORLD_DECK.h+.09,0,.35,.08,WORLD_DECK.length,0xe2b95d);
+const deckX=WORLD_DECK.x,halfDeck=WORLD_DECK.length/2,deckEnd=halfDeck+WORLD_DECK.ramp,deckTop=WORLD_DECK.h+.05;
+const raisedDeck=raisedRouteGeometry(deckX,WORLD_DECK.w,[[-deckEnd,.05],[-halfDeck,deckTop],[halfDeck,deckTop],[deckEnd,.05]]);
+scene.add(raisedRouteMesh('hunt-raised-deck-tread',raisedDeck.tread),raisedRouteMesh('hunt-raised-deck-walls',raisedDeck.walls));
+for(const side of[-1,1])box(deckX+side*(WORLD_DECK.w/2-.5),WORLD_DECK.h+.09,0,.35,.08,WORLD_DECK.length,0xe2b95d);
 const trunks=[],crowns=[];for(const {x,z,y}of WORLD_TREES){trunks.push([x,y+2.4,z,.55,4.8,.55]);crowns.push([x,y+7,z,3.6,4.5,3.6]);}batch(cylinderGeo,0x9a7c61,trunks);batch(new T.IcosahedronGeometry(1,1),0x91b99d,crowns);
 // Low-detail surrounding land grounds the play area; no floating platform edge.
 function surroundingLand(w,d,x,z){const g=new T.PlaneGeometry(w,d,Math.ceil(w/40),Math.ceil(d/40)),pos=g.attributes.position;for(let i=0;i<pos.count;i++){const wx=pos.getX(i)+x,wz=-pos.getY(i)+z,edge=Math.max(0,Math.abs(wx)-WORLD.width/2,Math.abs(wz)-WORLD.depth/2),blend=Math.min(1,edge/180),rolling=14+23*(Math.sin(wx*.009+wz*.004)**2)+19*(Math.cos(wz*.011-wx*.003)**2);pos.setZ(i,-.15+blend*rolling);}g.computeVertexNormals();const mesh=new T.Mesh(g,material(0xaec6cc));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);}
@@ -55,8 +111,24 @@ const poolGeometry=new T.BufferGeometry();poolGeometry.setAttribute('position',n
 // Explicit preview parameter only changes this scene's lighting, never the device clock or game state.
 const reviewPhase=new URL(location.href).searchParams.get('tagLightingReview'),reviewHours={morning:7.5,day:12,evening:17,night:22};
 function lightingDate(){const d=new Date();if(Object.hasOwn(reviewHours,reviewPhase)){const hour=reviewHours[reviewPhase];d.setHours(Math.floor(hour),Math.round(hour%1*60),0,0);}return d;}
-const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6),warmWindow=new T.Color(0xe5c797);let lastLighting=-Infinity;
-function updateLighting(now){if(now-lastLighting<10000)return;lastLighting=now;const l=tagAtmosphere(lightingDate());skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;litWindows.material.color.set(0x6c9cae).lerp(warmWindow,l.lamps);litWindows.material.emissive.set(0xffcf8c);litWindows.material.emissiveIntensity=l.lamps*.9;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
-for(const p of WORLD_JUMP_STEPS){box(p.x,p.h/2,p.z,p.w,p.h,p.d,0xc5dcd8);box(p.x,p.h+.03,p.z,p.w,.06,p.d,0xf2d6a8);const x0=p.x-p.w/2,x1=p.x+p.w/2,z0=p.z-p.d/2-p.ramp,z1=p.z-p.d/2,g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([x0,0,z0,x1,0,z0,x0,p.h,z1,x1,p.h,z1],3));g.setIndex([0,2,1,1,2,3]);g.computeVertexNormals();const m=new T.Mesh(g,material(0xbfd4cc));scene.add(m);}
-return{update(now){updateLighting(now);skyMesh.position.copy(camera.position);stars.position.copy(camera.position);skyUniforms.time.value=now/1000;}};
+const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6),warmWindow=new T.Color(0xe5c797);let lastLighting=-Infinity,liveLighting=null,appliedLighting=null;
+function updateLighting(now,recorded){
+ if(!recorded&&now-lastLighting>=10000){
+  lastLighting=now;
+  liveLighting=Object.freeze(tagAtmosphere(lightingDate()));
+ }
+ const l=recorded??liveLighting;
+ if(l===appliedLighting)return;
+ appliedLighting=l;
+ skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;litWindows.material.color.set(0x6c9cae).lerp(warmWindow,l.lamps);litWindows.material.emissive.set(0xffcf8c);litWindows.material.emissiveIntensity=l.lamps*.9;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
+for(const p of WORLD_JUMP_STEPS){
+ box(p.x,p.h/2,p.z,p.w,p.h,p.d,0xc5dcd8);
+ box(p.x,p.h+.03,p.z,p.w,.06,p.d,0xf2d6a8);
+ const top=p.z-p.d/2,{tread,walls}=raisedRouteGeometry(p.x,p.w,[[top-p.ramp,0],[top,p.h]]);
+ scene.add(raisedRouteMesh('hunt-jump-step-ramp-'+p.x,tread,walls));
+}
+const stairGeometry=cornerStairGeometry(WORLD_CORNER_STAIRS),stairSlabs=batch(boxGeo,0x7196a3,stairGeometry.slabs);stairSlabs.name='corner-stair-slabs';const stairEdges=batch(boxGeo,0xffdba0,stairGeometry.edges);stairEdges.name='corner-stair-tread-edges';const rampGeometry=new T.BufferGeometry();rampGeometry.setAttribute('position',new T.Float32BufferAttribute(stairGeometry.positions,3));rampGeometry.computeVertexNormals();const rampMaterial=material(0x8eabb0);rampMaterial.side=T.DoubleSide;rampMaterial.polygonOffset=true;rampMaterial.polygonOffsetFactor=-1;rampMaterial.polygonOffsetUnits=-1;const stairRamps=new T.Mesh(rampGeometry,rampMaterial);stairRamps.name='corner-stair-side-ramps';scene.add(stairRamps);canvas.dataset.cornerStairs=JSON.stringify({corners:4,count:WORLD_CORNER_STAIRS[0].count,rise:WORLD_CORNER_STAIRS[0].rise,tread:WORLD_CORNER_STAIRS[0].tread,top:WORLD_CORNER_STAIRS[0].top,rampWidth:WORLD_CORNER_STAIRS[0].rampWidth,extraDrawBatches:3});
+let boxCount=0;for(const[key,{color,rows}]of staticBoxes){let shared=staticBoxMaterials.get(color);if(!shared)staticBoxMaterials.set(color,shared=material(color));const mesh=batch(boxGeo,color,rows,shared);mesh.name='hunt-static-boxes-'+key;boxCount+=rows.length;}canvas.dataset.staticBoxes=JSON.stringify({boxes:boxCount,batches:staticBoxes.size,colours:staticBoxMaterials.size,cell:96,savedDrawBatches:boxCount-staticBoxes.size,savedMaterials:boxCount-staticBoxMaterials.size});
+function centerSky(view=camera){skyMesh.position.copy(view.position);stars.position.copy(view.position);}
+return{centerSky,get lighting(){return appliedLighting;},update(now,recordedLighting){updateLighting(now,recordedLighting);centerSky();skyUniforms.time.value=now/1000;}};
 }

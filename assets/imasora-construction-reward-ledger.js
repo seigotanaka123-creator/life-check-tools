@@ -69,7 +69,7 @@
       || new Set(arcadeAwards).size !== arcadeAwards.length) {
       return invalidLedger(value);
     }
-    if (value.sailingAwards !== undefined && (!Array.isArray(value.sailingAwards) || value.sailingAwards.length>10000 || new Set(value.sailingAwards.map(a=>a?.id)).size!==value.sailingAwards.length || value.sailingAwards.some(a=>!a || Object.keys(a).sort().join('|')!=='amount|id|route' || typeof a.id!=='string' || a.id.length>220 || a.amount!==({walk:3,tournament:4,catcher:1,triLink:2,pachicoin:2}[a.route])))) return invalidLedger(value);
+    if (value.sailingAwards !== undefined && (!Array.isArray(value.sailingAwards) || value.sailingAwards.length>10000 || new Set(value.sailingAwards.map(a=>a?.id)).size!==value.sailingAwards.length || value.sailingAwards.some(a=>!a || Object.keys(a).sort().join('|')!=='amount|id|route' || typeof a.id!=='string' || a.id.length>220 || a.amount!==({walk:3,tournament:4,catcher:1,triLink:2,pachicoin:2,tag:1}[a.route])))) return invalidLedger(value);
     return {
       ...value,
       sailingAwards: (value.sailingAwards||[]).map(a=>({...a})),
@@ -83,7 +83,7 @@
     };
   }
 
-  const sailingAmounts = { walk:3, tournament:4, catcher:1, triLink:2, pachicoin:2 };
+  const sailingAmounts = { walk:3, tournament:4, catcher:1, triLink:2, pachicoin:2, tag:1 };
   function addSailing(ledger, route, id) {
     ledger.sailingAwards ||= [];
     if (ledger.sailingAwards.some(a => a.id === id)) return 0;
@@ -189,5 +189,6 @@
     return { ledger, status: "granted", granted: true, toolkitGranted, boxes, id, sailingParts };
   }
 
-  return Object.freeze({ defaultLedger, normalize, awardWalkCheckpoint, awardWalkTile, awardTournamentWin, awardArcadeEvent });
+  function awardTagResult(current,event={}) { const ledger=normalize(current),{id,boxes,sailingParts}=event;if(ledger.blocked||typeof id!=='string'||!/^tag:[A-Za-z0-9_-]{8,80}$/.test(id)||![boxes,sailingParts].every(n=>Number.isSafeInteger(n)&&n>=0&&n<=1))return{ledger,status:'unavailable',granted:false};const awards=ledger.tagAwards??[];if(!Array.isArray(awards)||awards.length>=50000||awards.some(v=>typeof v!=='string'||!/^tag:[A-Za-z0-9_-]{8,80}$/.test(v))||new Set(awards).size!==awards.length)return{ledger,status:'unavailable',granted:false};if(awards.includes(id))return{ledger,status:'duplicate',granted:false};if(!Number.isSafeInteger(ledger.unopenedBoxes+boxes))return{ledger,status:'unavailable',granted:false};ledger.unopenedBoxes+=boxes;if(boxes)ledger.starterToolkitEntitled=true;if(sailingParts)addSailing(ledger,'tag',id);ledger.tagAwards=[...awards,id];return{ledger,status:'granted',granted:true}; }
+  return Object.freeze({ defaultLedger, normalize, awardTagResult, awardWalkCheckpoint, awardWalkTile, awardTournamentWin, awardArcadeEvent });
 });

@@ -3,12 +3,12 @@ import {COAST_ISLANDS} from './imasora-coast-geography.mjs?v=120li';
 import {islandTriangleHeight} from './imasora-coast-island-ground.mjs?v=120mu';
 import {rigPart} from './imasora-coast-fitting.mjs?v=120js';
 export const ISLAND_CRYSTALS=4,OAR_PARTS_COST=6;
-export const SAILING_ROUTES=Object.freeze({walk:3,tournament:4,catcher:1,triLink:2,pachicoin:2});
+export const SAILING_ROUTES=Object.freeze({walk:3,tournament:4,catcher:1,triLink:2,pachicoin:2,tag:1});
 const ok=(v,m)=>{if(!v)throw Error(m);};
 const exact=(v,k)=>v&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join('|')===k;
 export function validateSailingAward(a){
  ok(exact(a,'amount|id|route')&&Object.hasOwn(SAILING_ROUTES,a.route)&&a.amount===SAILING_ROUTES[a.route],'航海パーツの受取内容が違うよ。');
- const patterns={walk:/^walk:\d{4}-\d{2}-\d{2}:[1-9]\d{0,8}$/,tournament:/^tournament:[a-z0-9-]{1,32}:[1-9]\d{0,15}$/,catcher:/^arcade:catcher:[A-Za-z0-9_-]{8,180}$/,triLink:/^arcade:triLink:[A-Za-z0-9_-]{8,180}$/,pachicoin:/^arcade:pachicoin:[A-Za-z0-9_-]{8,180}$/};
+ const patterns={tag:/^tag:[A-Za-z0-9_-]{8,80}$/,walk:/^walk:\d{4}-\d{2}-\d{2}:[1-9]\d{0,8}$/,tournament:/^tournament:[a-z0-9-]{1,32}:[1-9]\d{0,15}$/,catcher:/^arcade:catcher:[A-Za-z0-9_-]{8,180}$/,triLink:/^arcade:triLink:[A-Za-z0-9_-]{8,180}$/,pachicoin:/^arcade:pachicoin:[A-Za-z0-9_-]{8,180}$/};
  ok(typeof a.id==='string'&&patterns[a.route].test(a.id),'航海パーツの受取番号が違うよ。');return a;
 }
 export function readHomeSailingAwards(raw){

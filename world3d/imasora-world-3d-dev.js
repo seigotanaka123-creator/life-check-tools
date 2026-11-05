@@ -197,7 +197,7 @@ const PLAYER_RADIUS = 7;
 // 360度モデルの実際の外周（胴体・手足・マント）に合わせた余白。
 // 16を一律で使うと、細い柱まで大きな見えない壁になり通路を塞ぐため、
 // 建物本体は10、細い部材は個別にさらに小さい余白を使う。
-// 白ミチロードセイバーレン360度モデルの胴体・手・マントを
+// セハルネ360度モデルの胴体・手・マントを
 // 水平面へ投影した実外周。個別部品の余白がこれを下回らないようにする。
 const CHARACTER_COLLISION_RADIUS = 12;
 // Visible model against visible structure collision.  This is deliberately a
@@ -260,7 +260,7 @@ const SKY_STATION_GUIDE_DIALOG_TYPE_INTERVAL = 7;
 const SKY_STATION_GUIDE_DIALOG_TYPE_INTERVAL_MS = 34;
 const SKY_STATION_GUIDE_DIALOG_GREETING = "やあ、長旅ごくろうさま！今日は何しに来たの？";
 // 詳しい本文は後から差し替える前提で、現段階では選択した話題を
-// ミチメバンブレイブルが受け取る最小限の会話だけを表示する。
+// バルティアが受け取る最小限の会話だけを表示する。
 const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
   "sky-map": {
     label: "空マップについて",
@@ -286,7 +286,7 @@ const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
     ],
   },
   visit: {
-    label: "ミチメバンブレイブルに会いに来た",
+    label: "バルティアに会いに来た",
     pages: [
       "会いに来てくれたんだね！すごくうれしいなあ。",
       "ここではゆっくりしていってね。空マップやUFOのことで困ったときは、いつでも声をかけて！",
@@ -414,7 +414,7 @@ const THIRD_PERSON_DISTANCE_PRESETS = CAMERA_DISTANCE_PRESETS;
 const DEFAULT_THIRD_PERSON_DISTANCE_INDEX = 1;
 const UFO_CAMERA_BASE_FOV = 48;
 // UFO操縦時の画角は、空間の流れを読みやすい後方固定と、
-// 白ミチロードセイバーレンの目線の2種類だけにする。遠めの画角は設けない。
+// セハルネの目線の2種類だけにする。遠めの画角は設けない。
 const UFO_CAMERA_PRESETS = Object.freeze([
   { id: "fixed", label: "固定", back: 320, up: 230, targetForward: 14, targetUp: 27 },
   { id: "monster-eye", label: "モンスター目線", back: 0, up: 0, targetForward: 20, targetUp: 7 },
@@ -427,7 +427,7 @@ const THIRD_PERSON_PITCH_MIN = -.56;
 const THIRD_PERSON_PITCH_MAX = .72;
 const TOUCH_PAD_DEAD_ZONE = .1;
 const BUILDING_SCALE = 2.5;
-// 白ミチロードセイバーレン360の実際の足中心間隔を、顔認証装置の
+// セハルネ360の実際の足中心間隔を、顔認証装置の
 // 建造物スケールへ換算した足マークの半間隔（ワールド換算で約10.9）。
 const UFO_FACE_AUTH_FOOT_MARKER_HALF_SPACING = 2.18;
 // 顔認証装置は、保存した立ち位置の少し手前に置く。立ち位置自体は
@@ -452,7 +452,7 @@ const UFO_PLACEMENT_POSITION = Object.freeze({ x: -157.8, z: 118.3 });
 const SKY_STATION_GUIDE = Object.freeze({
   id: "sky-station-guide-michi-meban-brave",
   characterId: "star-hero-young-seed-walk-walk-cool-a-comet",
-  name: "ミチメバンブレイブル",
+  name: "バルティア",
   x: -74.5,
   z: -163.7,
 });
@@ -3236,7 +3236,7 @@ function ufoCapsuleOpeningHalfAngle(control) {
 }
 
 function ufoBoardingBodyClearanceLocal(control) {
-  // 表示された通路は、根元の一点ではなく白ミチロードセイバーレンの
+  // 表示された通路は、根元の一点ではなくセハルネの
   // 実際の360度モデル全体が通るためのもの。モデルを差し替えても同じ
   // 入口設計を使えるよう、表示モデルから測定した水平外周をローカル
   // 座標へ戻して、物理開口の接触余白に使う。
@@ -6514,7 +6514,7 @@ function buildCatalogModel(source) {
     const hatchOpenPosition = new THREE.Vector3(-24, 12, 0);
     hatchCover.position.copy(hatchClosedPosition);
 
-    // UFO右側のランプ先端に、白ミチロードセイバーレン専用の顔認証装置を
+    // UFO右側のランプ先端に、セハルネ専用の顔認証装置を
     // 追加する。装置本体は衝突させるが、前の認証スペースと足跡マーカーは
     // 歩行を塞がない。装置本体の個々の表示メッシュだけを後段で物理化する。
     const faceAuthAssembly = new THREE.Group();
@@ -6612,7 +6612,7 @@ function buildCatalogModel(source) {
     footMarkerAssembly.position.set(18, .22, 0);
     footMarkerAssembly.userData.nonCollidable = true;
     faceAuthAssembly.add(footMarkerAssembly);
-    // 足跡は白ミチロードセイバーレンの実モデルと同じ足色を使う。
+    // 足跡はセハルネの実モデルと同じ足色を使う。
     // 内側に別色の飾りを重ねず、足跡そのものを単一の形状で表示する。
     const footMarkerMaterial = physicalMaterial(0x8b5a34, .68, .08);
     const footBaseMaterial = physicalMaterial(0x183246, .46, .34, 0x0a7c8e, .26);
@@ -10884,7 +10884,7 @@ function isUfoForwardScrollLowEnergyAlert(mission = ufoDoorControls[0]?.spaceFor
 function updateUfoForwardScrollLowEnergyAlert(control, mission) {
   const active = isUfoForwardScrollLowEnergyAlert(mission);
   if (control?.cabinLights && state.ufoBoarded && state.ufoEngineMode === "ready") {
-    // 暗い拍でも完全消灯にはしない。操縦席と白ミチロードセイバーレンの
+    // 暗い拍でも完全消灯にはしない。操縦席とセハルネの
     // 輪郭を残しつつ、残量不足をはっきり伝える暖色の点滅にする。
     const blinkOn = !active || Math.sin(
       (mission?.elapsed || 0) * Math.PI * 2 * UFO_FORWARD_SCROLL_LOW_ENERGY_BLINK_HZ,
@@ -21887,7 +21887,7 @@ function updateUfoEngineOverlay() {
     els.ufoEngineDetail.textContent = "火星へ着陸。エンジンを停止してから降車用の引き戸を開きます";
   } else if (mode === "seating") {
     els.ufoEnginePhase.textContent = "着座位置を固定";
-    els.ufoEngineDetail.textContent = "白ミチロードセイバーレンを操縦席へ固定しています";
+    els.ufoEngineDetail.textContent = "セハルネを操縦席へ固定しています";
   } else if (mode === "closing") {
     els.ufoEnginePhase.textContent = "搭乗口を密閉";
     els.ufoEngineDetail.textContent = "顔認証で展開した足場を収納し、UFOの扉を閉じています";
@@ -23094,7 +23094,7 @@ function updateUfoFaceAuthentication() {
     state.ufoFaceAuthLatched = true;
     state.ufoFaceAuth = true;
     playUfoMechEquipOpenAudio();
-    setUfoDoorState(true, "白ミチロードセイバーレンを認証。UFOの搭乗足場を引き出します");
+    setUfoDoorState(true, "セハルネを認証。UFOの搭乗足場を引き出します");
   } else if (!recognized) {
     state.ufoFaceAuthLatched = false;
   }
@@ -23238,7 +23238,7 @@ function updateUfoControls() {
   else if (!hasPad) setWorldText(els.ufoStatus, "UFO乗り場を建造してください。");
   else if (state.ufoEngineMode === "lighting") setWorldText(els.ufoStatus, "エンジン始動。カプセル内部の車内灯を点灯しています。");
   else if (state.ufoEngineMode === "closing") setWorldText(els.ufoStatus, "搭乗足場を収納し、UFOの入口を閉じています。");
-  else if (state.ufoEngineMode === "seating") setWorldText(els.ufoStatus, "白ミチロードセイバーレンを固定着座位置へ合わせています。");
+  else if (state.ufoEngineMode === "seating") setWorldText(els.ufoStatus, "セハルネを固定着座位置へ合わせています。");
   else if (state.ufoEngineMode === "arrival-shutdown") setWorldText(els.ufoStatus, "火星へ到着。エンジンを停止してから、UFO本体の引き戸を開きます。");
   else if (marsArrivalHatchOpen) setWorldText(els.ufoStatus, "火星へ到着。火星の地面に足が着くまで、UFO本体の引き戸と搭乗足場は開いたままです。");
   else if (marsFaceAuthOnly) setWorldText(els.ufoStatus, "火星のUFO本体の引き戸は、顔認証で開けられます。");
@@ -23296,7 +23296,7 @@ function toggleUfoBoarding() {
   updateCharacter(0);
   updateCamera();
   updateUfoControls();
-  showToast("白ミチロードセイバーレンが操縦席に乗り込みました");
+  showToast("セハルネが操縦席に乗り込みました");
 }
 
 function installSpaceMaterialBook() {
@@ -24067,7 +24067,7 @@ function renderMarsShopDialog() {
   els.marsShopDialog.hidden = !marsShopDialogState.open;
   els.marsShopDialog.dataset.phase = marsShopDialogState.phase;
   const playerResponse = marsShopDialogState.phase === 'player-response';
-  els.marsShopDialogSpeaker.textContent = playerResponse ? '白ミチロードセイバーレン' : '宇宙人';
+  els.marsShopDialogSpeaker.textContent = playerResponse ? 'セハルネ' : '宇宙人';
   els.marsShopDialogText.textContent = playerResponse ? marsShopDialogState.selectedText : MARS_SHOP_DIALOG_GREETING;
   els.marsShopDialogChoices.hidden = playerResponse;
 }
@@ -25462,7 +25462,7 @@ function updateCamera() {
       .add(new THREE.Vector3(0, activePreset.up, 0));
     if (state.ufoEngineMode === "ready" && activePreset.id === "monster-eye") {
       // 公式360度モデルの顔パーツ中心を使い、胴体の中央ではなく
-      // 白ミチロードセイバーレンの目の高さ・前後位置から見る。
+      // セハルネの目の高さ・前後位置から見る。
       character?.updateMatrixWorld(true);
       const eyeFeatures = character?.userData?.faceFeatures ?? [];
       if (eyeFeatures.length) {

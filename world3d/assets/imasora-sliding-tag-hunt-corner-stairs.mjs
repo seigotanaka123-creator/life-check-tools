@@ -1,0 +1,14 @@
+// Shared dimensions for collision, navigation, camera occlusion and scenery.
+// The two side approaches remain walkable by the widest six-unit body.
+export const CORNER_STAIR_SPEC=Object.freeze({count:4,rise:1.4,tread:18,top:32,rampWidth:24,rampRun:72,rampSlopeRun:10});
+export function makeCornerStairs(width,depth){const p=CORNER_STAIR_SPEC;return Object.freeze([-1,1].flatMap(sx=>[-1,1].map(sz=>Object.freeze({sx,sz,x:sx*width/2,z:sz*depth/2,...p,span:p.top+(p.count-1)*p.tread,height:p.count*p.rise,reach:p.top+p.rampRun}))));}
+export function cornerRampHeight(distance,c){if(distance<=c.top)return c.height;const d=distance-c.top;if(d>=c.rampRun)return 0;const i=Math.floor(d/c.tread),along=d-i*c.tread;return c.height-i*c.rise-Math.min(1,along/c.rampSlopeRun)*c.rise;}
+export function cornerStairHeight(x,z,corners){const c=corners[(x<0?0:2)+(z<0?0:1)],u=(c.x-x)*c.sx,v=(c.z-z)*c.sz;if(u<0||v<0||u>c.reach||v>c.reach)return 0;const d=Math.max(u,v);let height=d<=c.span?(c.count-Math.max(0,Math.ceil((d-c.top)/c.tread)))*c.rise:0;if(u<=c.rampWidth)height=Math.max(height,cornerRampHeight(v,c));if(v<=c.rampWidth)height=Math.max(height,cornerRampHeight(u,c));return height;}
+
+export function cornerStairReserved(x,z,corners,padding=0){return corners.some(c=>{const u=(c.x-x)*c.sx,v=(c.z-z)*c.sz;return u>=-padding&&v>=-padding&&u<=c.reach+padding&&v<=c.reach+padding&&((u<=c.span+padding&&v<=c.span+padding)||u<=c.rampWidth+padding||v<=c.rampWidth+padding);});}
+// Solid nested slabs and closed ramp prisms. No new scene objects per frame.
+export function cornerStairGeometry(corners){const slabs=[],edges=[],positions=[];const triangle=(a,b,c)=>positions.push(...a,...b,...c),quad=(a,b,c,d)=>{triangle(a,b,c);triangle(a,c,d);};
+ for(const c of corners){for(let i=0;i<c.count;i++){const span=c.span-i*c.tread,h=(i+1)*c.rise;slabs.push([c.x-c.sx*span/2,h-c.rise/2,c.z-c.sz*span/2,span,c.rise,span]);const length=span-c.rampWidth,mid=c.rampWidth+length/2;edges.push([c.x-c.sx*mid,h+.025,c.z-c.sz*(span-.3),length,.05,.6],[c.x-c.sx*(span-.3),h+.025,c.z-c.sz*mid,.6,.05,length]);}
+  for(const swap of[false,true]){const p=(u,y,v)=>[c.x-c.sx*(swap?v:u),y,c.z-c.sz*(swap?u:v)],profile=[[c.top,c.height]];for(let i=0;i<c.count;i++){const v=c.top+i*c.tread,h=c.height-(i+1)*c.rise;profile.push([v+c.rampSlopeRun,Math.max(0,h)],[v+c.tread,Math.max(0,h)]);}for(let i=0;i<profile.length-1;i++){const[v0,h0]=profile[i],[v1,h1]=profile[i+1];if(h0<=1e-9&&h1<=1e-9)continue;quad(p(0,h0,v0),p(c.rampWidth,h0,v0),p(c.rampWidth,h1,v1),p(0,h1,v1));quad(p(0,0,v0),p(0,h0,v0),p(0,h1,v1),p(0,0,v1));quad(p(c.rampWidth,0,v0),p(c.rampWidth,0,v1),p(c.rampWidth,h1,v1),p(c.rampWidth,h0,v0));}quad(p(0,0,c.top),p(c.rampWidth,0,c.top),p(c.rampWidth,c.height,c.top),p(0,c.height,c.top));quad(p(0,0,c.top),p(0,0,c.reach),p(c.rampWidth,0,c.reach),p(c.rampWidth,0,c.top));}
+
+ }return{slabs,edges,positions};}

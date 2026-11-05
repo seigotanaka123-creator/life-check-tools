@@ -1,86 +1,708 @@
+import{huntThreatCuePosition}from'./imasora-sliding-tag-hunt-threat-layout.mjs';
+import{createHuntRearMirror,huntRearMirrorActive}from'./imasora-sliding-tag-hunt-rear-mirror.mjs';
+import{createHuntBestRecords}from'./imasora-sliding-tag-hunt-bests.mjs';
+import{createHuntGrowth}from'./imasora-sliding-tag-hunt-growth.mjs';
+import{createHuntUpdateNotice}from'./imasora-sliding-tag-hunt-update-notice.mjs';
+import{createHuntReplayCamera}from'./imasora-sliding-tag-hunt-replay-camera.mjs';
+import{createHuntOrbitDemand}from'./imasora-sliding-tag-hunt-orbit-demand.mjs';
+import{installHuntMenu}from'./imasora-sliding-tag-hunt-menu.mjs';
+import{createHuntSunglasses}from'./imasora-sliding-tag-hunt-sunglasses.mjs';
+import{createHuntDizzyView}from'./imasora-sliding-tag-hunt-dizzy-view.mjs';
+import{huntTouchShapeKey}from'./imasora-sliding-tag-hunt-body-touch.mjs';
+import{MATCH_SECONDS}from'./imasora-sliding-tag-hunt-match.mjs';
+import{createHuntInkView}from'./imasora-sliding-tag-hunt-ink-view.mjs';
+import{createHuntInkFeet}from'./imasora-sliding-tag-hunt-ink-display.mjs';
+import{createHuntItemNotice}from'./imasora-sliding-tag-hunt-item-notice.mjs';
+import{createHuntProofClient}from'./imasora-sliding-tag-hunt-proof-client.mjs';
+import{createHuntItemStatus,huntItemFailureHint,huntItemUseAcknowledged}from'./imasora-sliding-tag-hunt-item-status.mjs';
+import{createHuntRenderQuality}from'./imasora-sliding-tag-hunt-render-quality.mjs';
+import{createHuntRenderRecovery}from'./imasora-sliding-tag-hunt-render-recovery.mjs';
+import{createLiveBroadcastUI}from'./imasora-live-broadcast-ui.mjs';
+import{createHuntBroadcastViews}from'./imasora-sliding-tag-hunt-broadcast-views.mjs';
+import{huntJumpRestRemaining}from'./imasora-sliding-tag-hunt-jump-rest.mjs';
+import{huntFacingCameraYaw,holdHuntCameraView}from'./imasora-sliding-tag-hunt-follow-camera.mjs';
+import{huntPadMovement}from'./imasora-sliding-tag-hunt-pad-steering.mjs';
+import{createHuntSmoothCamera}from'./imasora-sliding-tag-hunt-smooth-camera.mjs';
+import{createHuntRoleMarkers}from'./imasora-sliding-tag-hunt-role-markers.mjs';
+import{createHuntItemGuide}from'./imasora-sliding-tag-hunt-item-guide.mjs';
+import{recordReadyHunt,recordFreshHunt}from'./imasora-sliding-tag-hunt-start.mjs';
+import{createHuntReplay,createHuntReplaySound,updateHuntReplayView}from'./imasora-sliding-tag-hunt-replay.mjs';
+import{createHuntReplayAudio,createHuntReplayVideo,createHuntVideoShare}from'./imasora-sliding-tag-hunt-video.mjs';
+import{applyHuntActorVisibility,huntActorConcealed}from'./imasora-sliding-tag-hunt-visibility.mjs';
+import{createHuntCompassView}from'./imasora-sliding-tag-hunt-compass-view.mjs';
+import{createHuntRadarHud}from'./imasora-sliding-tag-hunt-radar-hud.mjs';
+import{createHuntFrameBudget}from'./imasora-sliding-tag-hunt-frame.mjs';
+import{createHuntMaterialState}from'./imasora-sliding-tag-hunt-materials.mjs';
 import*as T from'./three.module.min.js';
 import{buildMatureStarCharacter360,buildFloweringHeroCharacter360,getFloweringHeroCharacter}from'./imasora-character-360.js';
 import{buildTagCompanion}from'./imasora-sliding-tag-companion.mjs';
-import{createCharacterJumpAction}from'./imasora-character-jump-action.mjs';
+import{createHuntModelCache,disposeHuntModel,resetHuntModel}from'./imasora-sliding-tag-hunt-model-cache.mjs';
+import{renderHuntActorPoses,createHuntHandAttachments}from'./imasora-sliding-tag-hunt-pose.mjs';
+import{createHuntGait}from'./imasora-sliding-tag-hunt-gait.mjs';
+import{trampolineSurface}from'./imasora-sliding-tag-hunt-trampoline.mjs';
+import{createCharacterJumpAction}from'./imasora-character-jump-action.mjs?v=120yo';
 import{createJumpIntent}from'./imasora-construction-locomotion.mjs';
-import{resolveTouchLayout,readTouchLayouts,TOUCH_LAYOUT_KEY}from'./imasora-touch-layout.mjs';
-import{WORLD_STARTS,TAG_CHARACTERS,worldCameraPose,worldCameraInput,worldGradient,HUNT_CHARACTER_HEIGHT}from'./imasora-sliding-tag-hunt-world.mjs';
-import{recordHunt,STEP,HUNT_RULES,huntThreatCues}from'./imasora-sliding-tag-hunt.mjs';
-import{ITEM_DEFS,PLAYER_ITEMS,itemIcon}from'./imasora-sliding-tag-hunt-items.mjs';
+import{TOUCH_LAYOUT_KEY}from'./imasora-touch-layout.mjs';
+import{createHuntTouchSettings}from'./imasora-sliding-tag-hunt-touch.mjs';
+import{TAG_CHARACTERS,worldCameraInput,worldGradient,worldSurface,HUNT_CHARACTER_HEIGHT}from'./imasora-sliding-tag-hunt-world.mjs';
+import{STEP,COURTYARD_TEAM_RULES,recordHunt,huntThreatCues,controlledHuntActor}from'./imasora-sliding-tag-hunt.mjs';
+import{readHuntDashMode,saveHuntDashMode,huntMenuCommand,HUNT_DIVE_KEY,huntDiveShortcutAvailable,huntItemShortcutAvailable,huntItemKeyCodes,createHuntJumpOwners,createHuntButtonOwners,releaseHuntPointerCaptures,bindHuntLifecycle,captureHuntPointer,createHuntActionInput,huntKeyboardContext,bindHuntTouchGuard}from'./imasora-sliding-tag-hunt-input.mjs';
+import{huntCompass}from'./imasora-sliding-tag-hunt-radar.mjs';
+import{ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon}from'./imasora-sliding-tag-hunt-items.mjs';
 import{createHuntScenery}from'./imasora-sliding-tag-hunt-scenery.mjs';
+import{createHuntFeedback}from'./imasora-sliding-tag-hunt-feedback.mjs';
+import{createHuntResults,huntResultSummary}from'./imasora-sliding-tag-hunt-results.mjs';
 import{createHuntProps}from'./imasora-sliding-tag-hunt-props.mjs';
 import{createTagCharacterSelect}from'./imasora-sliding-tag-hunt-select.mjs';
 import{createHuntSound,huntSoundPreference,saveHuntSound}from'./imasora-sliding-tag-hunt-audio.mjs';
 const $=s=>document.querySelector(s),canvas=$('#rink'),scene=new T.Scene(),camera=new T.PerspectiveCamera(56,1,.15,900),renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;scene.background=new T.Color(0xc9e6f1);scene.fog=new T.Fog(0xc9e6f1,210,620);
+installHuntMenu(document);
 const hemi=new T.HemisphereLight(0xf7fcff,0x8eb5b0,1.8),sun=new T.DirectionalLight(0xfff0d7,1.9);scene.add(hemi,sun);sun.position.set(-100,160,60);const scenery=createHuntScenery({scene,camera,canvas,hemi,sun});
-const PREF_KEY='imasora-tag-three-settings-v3',BEST_KEY='imasora-tag-three-best-v4',roster=new Map(TAG_CHARACTERS.map(c=>[c.id,c]));let storage;try{storage=localStorage;}catch{}
+const rearMirror=createHuntRearMirror(renderer,scene,{withoutLabels:draw=>roleMarkers.withoutLabels(draw)});
+const PREF_KEY='imasora-tag-three-settings-v3',BEST_KEY='imasora-tag-three-best-v61',roster=new Map(TAG_CHARACTERS.map(c=>[c.id,c]));let storage,session;try{storage=localStorage;session=sessionStorage;}catch{}
+const bestRecords=createHuntBestRecords({storage,key:BEST_KEY});
 const homeMode=new URLSearchParams(location.search).get('from')==='home';function readCompanion(){try{return globalThis.ImasoraSlidingTagEntry.read({session:sessionStorage,storage,required:true});}catch{return{status:'unavailable'};}}
 const entry=homeMode?readCompanion():null,companion=entry?.status==='ready'?entry.companion:null;
+const updateNotice=createHuntUpdateNotice({container:$('#panel .tm-scroll'),pageUrl:location.href,homePath:companion?.homePath,version:new URL(import.meta.url).searchParams.get('v'),visible:()=>!$('#panel').hidden});void updateNotice.check();
+const growth=createHuntGrowth({api:globalThis.ImasoraTagGrowth,entryApi:globalThis.ImasoraSlidingTagEntry,companion,storage,session,onStartNotice:showStartNotice,onNotice:text=>{document.querySelector('.practice-note').textContent=text;if(started&&s.phase==='finished'){growthStatus.hidden=false;growthStatus.textContent=text;}}});document.querySelector('.practice-note').textContent=growth.status();
 let preferences={};try{preferences=JSON.parse(storage?.getItem(PREF_KEY)||'{}')||{};}catch{}
-let opponents=Array.isArray(preferences.opponents)&&preferences.opponents.length===3&&preferences.opponents.every(id=>roster.has(id))?[...preferences.opponents]:['walkBrave','rioSaber','walkCute'].map(p=>TAG_CHARACTERS.find(c=>c.profileKey===p).id),startKey=WORLD_STARTS.some(s=>s.id===preferences.startKey)?preferences.startKey:'boulevard',playerItem=PLAYER_ITEMS.includes(preferences.playerItem)?preferences.playerItem:'speed';
-function saveChoices(){try{storage?.setItem(PREF_KEY,JSON.stringify({version:1,opponents,startKey,playerItem}));}catch{}}
-const models=[],balloons=[],handWorld=new T.Vector3(),roles={pursuit:'追跡',intercept:'先回り',patrol:'巡回'},roleNames=['追跡役','先回り役','巡回役'];
-function avatar(id,player=false){const m=player&&companion?buildTagCompanion(companion):getFloweringHeroCharacter(id)?buildFloweringHeroCharacter360(id):buildMatureStarCharacter360(id),b=new T.Box3().setFromObject(m),scale=HUNT_CHARACTER_HEIGHT/(b.max.y-b.min.y);m.scale.multiplyScalar(scale);m.position.y=-b.min.y*scale;const root=new T.Group();root.add(m);root.rotation.order='YXZ';scene.add(root);return{root,model:m,action:createCharacterJumpAction(m),radius:Math.max(2,Math.min(6,Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*scale/2)),materials:new Set(),feet:(m.userData.feet??[]).map(f=>({part:f,x:f.rotation.x}))};}
+let opponents=Array.isArray(preferences.opponents)&&preferences.opponents.length===3&&preferences.opponents.every(id=>roster.has(id))?[...preferences.opponents]:['walkBrave','rioSaber','walkCute'].map(p=>TAG_CHARACTERS.find(c=>c.profileKey===p).id),startKey='random';
+let mode=preferences.mode==='hunt'?'hunt':'escape';
+function saveChoices(){try{storage?.setItem(PREF_KEY,JSON.stringify({version:4,opponents,mode}));}catch{}}
+const soleShadowGeometry=new T.CircleGeometry(1,24),soleShadows=Array.from({length:4},()=>{const m=new T.Mesh(soleShadowGeometry,new T.MeshBasicMaterial({color:0x375363,transparent:true,opacity:.22,depthWrite:false}));m.rotation.x=-Math.PI/2;scene.add(m);return m;});
+const models=[],balloons=[],handAttachments=createHuntHandAttachments(),roles={pursuit:'追跡',intercept:'先回り',patrol:'巡回'},roleNames=['追跡役','先回り役','巡回役'];
+function avatar(id,player=false){const m=player&&companion?buildTagCompanion(companion):getFloweringHeroCharacter(id)?buildFloweringHeroCharacter360(id):buildMatureStarCharacter360(id),b=new T.Box3().setFromObject(m),scale=HUNT_CHARACTER_HEIGHT/(b.max.y-b.min.y);m.scale.multiplyScalar(scale);m.position.y=-b.min.y*scale;const root=new T.Group();root.add(m);root.rotation.order='YXZ';scene.add(root);return{root,model:m,contactKey:player?huntTouchShapeKey(companion):id,controlled:player,gait:createHuntGait(m),action:createCharacterJumpAction(m),diveLift:Math.max(1,(b.max.z-b.min.z)*scale/2+.1),diveBounds:{minX:b.min.x*scale,maxX:b.max.x*scale,minY:0,maxY:HUNT_CHARACTER_HEIGHT,minZ:b.min.z*scale,maxZ:b.max.z*scale},radius:Math.max(2,Math.min(6,Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*scale/2)),materials:new Set(),feet:(m.userData.feet??[]).map(f=>({part:f,x:f.rotation.x}))};}
 function balloon(){const root=new T.Group(),body=new T.Mesh(new T.SphereGeometry(1,12,9),new T.MeshStandardMaterial({color:0xffa9c7,roughness:.5}));body.scale.set(1.7,2.1,1.7);root.add(body);const knot=new T.Mesh(new T.ConeGeometry(.22,.5,8),new T.MeshStandardMaterial({color:0xf9df98}));knot.position.y=-2.15;root.add(knot);scene.add(root);const ropeGeo=new T.BufferGeometry(),ends=new Float32Array(6);ropeGeo.setAttribute('position',new T.BufferAttribute(ends,3));const rope=new T.Line(ropeGeo,new T.LineBasicMaterial({color:0xcba465}));rope.frustumCulled=false;scene.add(rope);root.visible=rope.visible=false;return{root,rope,ends};}
-const disc=new T.CylinderGeometry(1,1,.05,18),poolMat=new T.MeshStandardMaterial({color:0xaaa0df}),footMat=new T.MeshStandardMaterial({color:0x9689cb}),poolMeshes=[],footMeshes=[];
-for(let i=0;i<4;i++){const m=new T.Mesh(disc,poolMat);scene.add(m);poolMeshes.push(m);}for(let i=0;i<64;i++){const m=new T.Mesh(disc,footMat);m.scale.set(.55,1,.9);scene.add(m);footMeshes.push(m);}
-let round=recordHunt({opponents,startKey,playerItem}),s=round.state,paused=true,started=false,last=0,acc=0,hudAt=0,yaw=0,renderYaw=0,pitch=.38,drag=null,padId=null,axis={x:0,z:0},usePressed=false,viewOnly=false,dirty=true,paintAt=0,bellUntil=0,bellPosition=null,lastCount=-1,lastItem='',lastPhase='';
-const keys=new Set(),holds=new Set(),jump=createJumpIntent(),inputMemory={},thumbPresses=new Map(),soundPreference=huntSoundPreference(storage),audio=createHuntSound(soundPreference);
-function releaseModels(){for(const a of models){const geometries=new Set(),mats=new Set();a.root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material])if(m)mats.add(m);});a.root.removeFromParent();geometries.forEach(g=>g.dispose());mats.forEach(m=>{m.map?.dispose();m.dispose();});}models.length=0;}
-function rebuild(){releaseModels();models.push(avatar('white-michi-road-saber-ren',true),...s.hunters.map(a=>avatar(a.id)));for(let i=1;i<models.length;i++){const c=document.createElement('canvas');c.width=192;c.height=64;const ctx=c.getContext('2d');ctx.fillStyle=['#ffd6bc','#c5ebf7','#d1efcb'][i-1];ctx.beginPath();ctx.roundRect(2,2,188,60,20);ctx.fill();ctx.fillStyle='#345b69';ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(roles[s.hunters[i-1].role],96,33);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const label=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true,transparent:true,toneMapped:false}));label.position.y=6.6;label.scale.set(6,2,1);models[i].root.add(label);}models.forEach(a=>a.model.traverse(o=>{if(o.isMesh)for(const m of Array.isArray(o.material)?o.material:[o.material])if(m)a.materials.add(m);}));while(balloons.length<3)balloons.push(balloon());for(const b of balloons)b.root.visible=b.rope.visible=false;dirty=true;}
-rebuild();const props=createHuntProps({scene,makeClone:()=>avatar('white-michi-road-saber-ren',true)});
-const worker=new Worker(new URL('./imasora-sliding-tag-hunt-worker.mjs',import.meta.url),{type:'module'}),pending=new Map();let receiptId=0,showedFullHint=false;
-function bestKey(config){return config.opponents.join('|')+':'+config.startKey+':'+config.playerItem;}
-function readBests(){try{const v=JSON.parse(storage?.getItem(BEST_KEY)||'{}');return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}catch{return{};}}
-function updateBest(){const row=readBests()[bestKey({opponents,startKey,playerItem})];$('#best').textContent=Number.isFinite(row)&&row>=0&&row<=90?'この組合せの最高 '+row.toFixed(1)+'秒':'';}
-worker.onmessage=e=>{const proof=pending.get(e.data.id);if(!proof)return;pending.delete(e.data.id);canvas.dataset.proof=e.data.ok?'checked':'failed';if(!e.data.ok)return;const bests=readBests(),k=bestKey(proof.config),old=Number.isFinite(bests[k])?bests[k]:0;bests[k]=Math.max(old,proof.claim.time);try{storage?.setItem(BEST_KEY,JSON.stringify(bests));}catch{}updateBest();};worker.onerror=()=>canvas.dataset.proof='unavailable';
-function clear(){keys.clear();holds.clear();thumbPresses.clear();jump.reset();axis={x:0,z:0};padId=null;usePressed=false;drag=null;Object.assign(inputMemory,{x:0,z:0});$('#pad i').style.transform='';}
-function newSeed(){try{return crypto.getRandomValues(new Uint32Array(1))[0];}catch{return Date.now()>>>0;}}
-function begin(){if(homeMode&&!companion)return;viewOnly=false;clear();const playerRadius=models[0].radius;round=recordHunt({opponents,startKey,playerItem,playerRadius,seed:newSeed()});s=round.state;rebuild();const a=s.hunters[0];yaw=Math.atan2(a.x-s.player.x,a.z-s.player.z);renderYaw=yaw;paused=false;started=true;acc=0;last=performance.now();lastCount=-1;bellUntil=0;$('#panel').hidden=true;document.body.classList.add('playing','active');canvas.dataset.proof='recording';audio.activate();canvas.focus();}
-function pause(){if(!started||s.phase==='finished')return;paused=true;clear();audio.pause();$('#panel').hidden=false;$('#resume').hidden=false;$('#title').textContent='ひと休み';$('#note').textContent='同じ勝負をつづける？ 次の組合せも選べるよ。';document.body.classList.remove('playing','active');dirty=true;}
-$('#begin').onclick=begin;$('#observe').onclick=()=>{viewOnly=true;$('#panel').hidden=true;dirty=true;};$('#pause').onclick=()=>{if(viewOnly){viewOnly=false;$('#panel').hidden=false;}else pause();};$('#resume').onclick=()=>{clear();paused=false;last=performance.now();acc=0;$('#panel').hidden=true;document.body.classList.add('playing','active');audio.activate();canvas.focus();};
-for(const area of WORLD_STARTS){const b=$('#areas [data-start="'+area.id+'"]')||document.createElement('button');b.dataset.start=area.id;b.disabled=false;b.textContent=area.name;b.setAttribute('aria-pressed',String(area.id===startKey));b.onclick=()=>{startKey=area.id;for(const child of $('#areas').children)child.setAttribute('aria-pressed',String(child===b));saveChoices();updateBest();};$('#areas').append(b);}
-let selectingSlot=0;const select=createTagCharacterSelect({characters:TAG_CHARACTERS,onChoose:id=>{opponents[selectingSlot]=id;refreshSlots();saveChoices();updateBest();}});
-function refreshSlots(){$('#opponent-slots').replaceChildren(...opponents.map((id,i)=>{const c=roster.get(id),b=document.createElement('button');b.className='opponent-slot';b.innerHTML='<b>'+roleNames[i]+'</b><strong></strong><small></small><span>選びなおす ›</span>';b.querySelector('strong').textContent=c.name;b.querySelector('small').textContent=c.ability.title;b.onclick=()=>{selectingSlot=i;clear();select.open(id,roleNames[i]+'をえらぶ');};return b;}));}refreshSlots();
-for(const id of PLAYER_ITEMS){const def=ITEM_DEFS[id],b=document.createElement('button');b.innerHTML=itemIcon(id)+'<small>'+def.name+'</small>';b.title=def.hint;b.setAttribute('aria-label',def.name+'：'+def.hint);b.setAttribute('aria-pressed',String(id===playerItem));b.onclick=()=>{playerItem=id;for(const child of $('#start-items').children)child.setAttribute('aria-pressed',String(child===b));$('#item-hint').textContent=def.hint;saveChoices();updateBest();};$('#start-items').append(b);}$('#item-hint').textContent=ITEM_DEFS[playerItem].hint;
-const bindings=()=>globalThis.IMASORA_KEYS.bindings,active=id=>holds.has(id)||bindings()[id].some(k=>keys.has(k));
-const keyPanel=globalThis.IMASORA_KEYS.createPanel({clearInput:clear});for(const row of keyPanel.querySelectorAll('.keyboard-settings-row'))if(!['forward','back','left','right','jump','dash','tool','menu'].includes(row.querySelector('[data-key-action]')?.dataset.keyAction))row.remove();for(const group of keyPanel.querySelectorAll('.keyboard-settings-group'))if(!group.querySelector('.keyboard-settings-row'))group.remove();$('#keys').append(keyPanel);globalThis.IMASORA_KEYS.connect({clearInput:clear});
-function soundLabel(){$('#sound-toggle').textContent=soundPreference.enabled?'🔊 効果音：オン':'🔇 効果音：オフ';$('#sound-toggle').setAttribute('aria-pressed',String(soundPreference.enabled));}soundLabel();$('#sound-toggle').onclick=()=>{soundPreference.enabled=!soundPreference.enabled;audio.setEnabled(soundPreference.enabled);saveHuntSound(storage,soundPreference);soundLabel();};
-addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing||globalThis.IMASORA_KEYS.capturing)return;const b=bindings();if(b.menu.includes(e.code)){if(!paused){e.preventDefault();pause();}return;}if(paused)return;if(Object.values(b).some(row=>row.includes(e.code))){e.preventDefault();if(b.jump.includes(e.code)&&!e.repeat&&!keys.has(e.code))jump.press();if(b.tool.includes(e.code)&&!e.repeat)usePressed=true;keys.add(e.code);}});addEventListener('keyup',e=>{keys.delete(e.code);if(bindings().jump.includes(e.code))jump.release();});
-canvas.onpointerdown=e=>{if(paused&&!viewOnly||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);};canvas.onpointermove=e=>{if(drag?.id!==e.pointerId)return;yaw-=(e.clientX-drag.x)*.006;pitch=Math.max(.15,Math.min(1.15,pitch+(e.clientY-drag.y)*.004));drag.x=e.clientX;drag.y=e.clientY;inputMemory.yaw=renderYaw;dirty=true;};for(const type of['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,e=>{if(drag?.id===e.pointerId)drag=null;});
-function pad(e){if(e.pointerId!==padId)return;const r=$('#pad').getBoundingClientRect(),x=e.clientX-r.left-r.width/2,z=e.clientY-r.top-r.height/2,d=Math.hypot(x,z),n=Math.min(1,d/44);axis=d>5?{x:x/d*n,z:z/d*n}:{x:0,z:0};$('#pad i').style.transform=`translate(${axis.x*29}px,${axis.z*29}px)`;}
-$('#pad').onpointerdown=e=>{if(paused||padId!==null)return;e.preventDefault();padId=e.pointerId;$('#pad').setPointerCapture(padId);pad(e);};$('#pad').onpointermove=pad;for(const type of['pointerup','pointercancel','lostpointercapture'])$('#pad').addEventListener(type,e=>{if(e.pointerId===padId){padId=null;axis={x:0,z:0};$('#pad i').style.transform='';}});
-function thumbSync(){const before=holds.has('jump');holds.clear();for(const values of thumbPresses.values())for(const v of values)holds.add(v);if(!before&&holds.has('jump'))jump.press();if(before&&!holds.has('jump'))jump.release();}for(const id of['dash','jump']){const b=$('#'+id),other=id==='dash'?'jump':'dash';b.onpointerdown=e=>{if(paused)return;e.preventDefault();b.setPointerCapture(e.pointerId);thumbPresses.set(e.pointerId,new Set([id]));thumbSync();};b.onpointermove=e=>{if(!thumbPresses.has(e.pointerId))return;const r=$('#'+other).getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;thumbPresses.set(e.pointerId,new Set(inside?[id,other]:[id]));thumbSync();};for(const type of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,e=>{thumbPresses.delete(e.pointerId);thumbSync();});}
-$('#use').onpointerdown=e=>{if(!paused){e.preventDefault();usePressed=true;}};
-addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});addEventListener('pagehide',()=>{worker.terminate();clear();audio.dispose();});
-function resize(){clear();const w=innerWidth,h=innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);let saved=null;try{saved=readTouchLayouts(storage?.getItem(TOUCH_LAYOUT_KEY));}catch{}const layout=resolveTouchLayout(w,h,saved?.[h>w?'portrait':'landscape']);$('#pad').style.left=layout.pad.x+'px';$('#pad').style.top=layout.pad.y+'px';$('#pair').style.left=layout.pair.x+'px';$('#pair').style.top=Math.min(layout.pair.y,h-65)+'px';dirty=true;}addEventListener('resize',resize);resize();
-function failHint(type){$('#notice').textContent=type==='hook'?'ポールの近くで使おう':type==='magnet'?'道具が近くに見える場所で使おう':'少し広い場所で使おう';$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+1.6);}
-function frameEvent(e){if(e.type==='bell-ring'){bellUntil=s.time+1.3;bellPosition=e.position;audio.play({type:'bell'});}else if(e.owner==='player'&&['pickup','item-use','landing-boost'].includes(e.type))audio.play({type:'item'});}
-const threatPoint=new T.Vector3(),threatArrows=['#f5ad78','#85cce9','#8bc999'].map((color,i)=>{const el=document.createElement('i');el.className='threat-cue';el.hidden=true;el.setAttribute('aria-hidden','true');el.title=roleNames[i];el.style.setProperty('--role-color',color);el.innerHTML='<svg viewBox="0 0 22 25"><path d="M11 2L21 21L11 16L1 21Z" fill="currentColor" stroke="#fff" stroke-width="2"/></svg>';document.body.append(el);return el;});
-function updateThreats(){const cues=paused?[]:huntThreatCues(s),w=innerWidth,h=innerHeight,blocks=[$('#pad'),$('#pair')].filter(el=>getComputedStyle(el).display!=='none').map(el=>el.getBoundingClientRect());let shown=0;
- for(let i=0;i<3;i++){const a=s.hunters[i],cue=cues.find(c=>c.owner===a.owner),el=threatArrows[i];el.hidden=true;if(!cue)continue;threatPoint.set(cue.x,cue.y,cue.z).project(camera);if(threatPoint.z>=-1&&threatPoint.z<=1&&Math.abs(threatPoint.x)<.9&&Math.abs(threatPoint.y)<.85)continue;
-  const angle=Math.PI-Math.atan2(cue.x-s.player.x,cue.z-s.player.z)+renderYaw;let x=w*(.5+Math.sin(angle)*.45),y=h*(.5-Math.cos(angle)*.39);
-  for(const r of blocks)if(x>r.left-24&&x<r.right+24&&y>r.top-24&&y<r.bottom+24)y=Math.max(88,r.top-28);
-  el.style.left=x+'px';el.style.top=y+'px';el.style.setProperty('--bearing',angle+'rad');el.dataset.preparing=String(cue.preparing);el.hidden=false;shown++;
- }canvas.dataset.threatCues=String(shown);
+const inkView=createHuntInkView(scene),inkNotice=createHuntItemNotice(),smoothCamera=createHuntSmoothCamera(),replayCamera=createHuntReplayCamera(),orbitDemand=createHuntOrbitDemand();
+const recordPlayableHunt=config=>recordHunt(config,{rules:COURTYARD_TEAM_RULES});
+let round=recordReadyHunt({opponents,startKey,mode},recordPlayableHunt),s=round.state,paused=true,started=false,last=0,hudAt=0,yaw=0,renderYaw=0,pitch=.28,drag=null,padGesture=null,axis={x:0,z:0},viewOnly=false,dirty=true,paintAt=0,lastCount=-1,lastItem='',lastItemCue='',lastPhase='';
+let padCamera=false;
+let liveWasPlaying=false;
+const jumpCaption=document.createTextNode('ジャンプ'),jumpRestLabel=document.createElement('small');jumpRestLabel.hidden=true;jumpRestLabel.style.cssText='display:block;font-size:11px;line-height:1.1;white-space:nowrap';$('#jump').style.padding='3px';$('#jump').replaceChildren(jumpCaption,jumpRestLabel);
+const frameBudget=createHuntFrameBudget(STEP),replay=createHuntReplay(),replaySound=createHuntReplaySound();let replayQueued=false;
+const renderQuality=createHuntRenderQuality({maxRatio:renderer.getPixelRatio(),onChange(ratio){renderer.setPixelRatio(ratio);rearMirror.invalidate();dirty=true;canvas.dataset.renderQuality=JSON.stringify(renderQuality.stats());}});canvas.dataset.renderQuality=JSON.stringify(renderQuality.stats());
+const keys=new Set(),jump=createJumpIntent(),jumpOwners=createHuntJumpOwners(jump),touchButtons=createHuntButtonOwners(jumpOwners,{dashMode:readHuntDashMode(storage),onDashChange:paintTouchDash}),holds=touchButtons.held,thumbPresses=touchButtons.presses,inputMemory={},soundPreference=huntSoundPreference(storage),audio=createHuntSound(soundPreference);
+const footGround=(x,z)=>trampolineSurface(s,x,z),stepSound=()=>playMatchCue({type:'step'});
+const actorModels=createHuntModelCache({create(spec){const m=avatar(spec.id,spec.controlled);m.inkFeet=createHuntInkFeet(m.model);m.sunglasses=createHuntSunglasses(m.model);m.dizzy=createHuntDizzyView({model:m.model,root:m.root,eyeFit:m.sunglasses.fit,eyes:m.sunglasses.eyes});m.model.traverse(o=>{if(o.isMesh)for(const v of Array.isArray(o.material)?o.material:[o.material])if(v)m.materials.add(v);});m.materialState=createHuntMaterialState(m.materials);return m;},release:disposeHuntModel,reset:resetHuntModel});
+const liveViews=createHuntBroadcastViews({renderer,scene,source:canvas});
+const liveBroadcast=createLiveBroadcastUI({canvas,audio,captureCanvas:liveViews.captureCanvas,onLayout(layout){liveViews.setLayout(layout);dirty=true;},onScreenViews(enabled){dirty=true;return liveViews.setScreen(enabled);},onOutput(){liveViews.reset();if(renderRecovery.lost)liveBroadcast.update(liveRenderRecoveryMessage);dirty=true;},onOpen(){liveWasPlaying=started&&!paused&&s.phase!=='finished';if(viewOnly)clear();else pause();},onClose(){if(liveWasPlaying)resumeRound();liveWasPlaying=false;}});$('#pause').before(liveBroadcast.button);$('#keys').before(liveBroadcast.settings);
+function rebuild(){const humanIndex=s.config.mode==='hunt'?1:0,specs=[s.player,...s.hunters].map((a,i)=>{const id=a.id==='player'?'white-michi-road-saber-ren':a.id,controlled=i===humanIndex;return{id,controlled,key:controlled&&companion?'companion:'+companion.id:'roster:'+id};}),next=actorModels.reconcile(specs);models.length=0;models.push(...next);while(balloons.length<3)balloons.push(balloon());for(const b of balloons)b.root.visible=b.rope.visible=false;dirty=true;}
+rebuild();const props=createHuntProps({scene,camera,handAttachments,makeClone:()=>avatar(s.player.id==='player'?'white-michi-road-saber-ren':s.player.id,s.config.mode!=='hunt')}),feedback=createHuntFeedback({scene});props.prepare(models[0],{needed:s.player.item==='clone'});
+const itemStatus=createHuntItemStatus(),itemCueStyle=document.createElement('style');itemCueStyle.textContent='#use{transition:box-shadow .14s,border-color .14s}#use[data-item-cue="pickup"]{box-shadow:inset 0 0 0 3px #73dca9,0 0 14px #73dca955}#use[data-item-cue="full"]{box-shadow:inset 0 0 0 3px #e3a844,0 0 14px #e3a84455}#notice{white-space:pre-line}@media(prefers-reduced-motion:reduce){#use{transition:none}}';document.head.append(itemCueStyle);$('#notice').setAttribute('role','status');$('#notice').setAttribute('aria-live','polite');
+const proofClient=createHuntProofClient({createWorker:()=>new Worker(new URL('./imasora-sliding-tag-hunt-worker.mjs',import.meta.url),{type:'module'}),onReply:receiveProof});let receiptId=0;
+let replayTicket=0,recordingReplay=false;const recordShare=createHuntVideoShare({onChange:info=>results.setShareState(info)});
+function saveReplayFile(url,name){const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();}
+const results=createHuntResults({onSaveVideo:()=>recordShare.activate(saveReplayFile,{save:true}),onRetry:()=>begin(),onConfigure:()=>openResultConfig(),onShare:()=>{if(recordShare.snapshot().status!=='ready'){startReplay();return;}return recordShare.activate(saveReplayFile);}}),resultBack=document.createElement('button');resultBack.id='result-back';resultBack.textContent='結果へ戻る';resultBack.hidden=true;$('#begin').insertAdjacentElement('afterend',resultBack);resultBack.onclick=showResult;
+
+const growthStatus=document.createElement('output');growthStatus.id='round-growth-status';growthStatus.hidden=true;growthStatus.setAttribute('aria-live','polite');growthStatus.style.cssText='white-space:pre-line;font-size:13px;line-height:1.5;margin:8px 0;color:#325c53';document.querySelector('#round-result .tr-actions').before(growthStatus);
+const startNotice=growthStatus.cloneNode(false);startNotice.id='round-start-notice';growthStatus.after(startNotice);
+function showStartNotice(text){
+ document.querySelector('.practice-note').textContent=text;
+ startNotice.textContent=text;
+ // The result panel already controls visibility when closed.
+ startNotice.hidden=!text;
 }
-function draw(now){requestAnimationFrame(draw);const dt=Math.min(.25,(now-last)/1000||0);last=now;if(document.hidden)return;if(paused&&!dirty&&now-paintAt<1000)return;paintAt=now;dirty=false;
- if(!paused){acc+=dt;while(acc>=STEP){const x=axis.x+(active('right')?1:0)-(active('left')?1:0),z=axis.z+(active('back')?1:0)-(active('forward')?1:0),input=worldCameraInput(inputMemory,x,z,renderYaw),use=usePressed,item=s.player.item,grounded=s.player.grounded,jumps=s.player.jumps;round.tick({...input,jump:jump.read(),dash:active('dash'),use});if(use&&item&&!s.events.some(e=>e.type==='item-use'&&e.owner==='player'))failHint(item);for(const e of s.events)frameEvent(e);if(s.player.jumps>jumps)audio.play({type:'jump',stage:s.player.jumps});if(!grounded&&s.player.grounded)audio.play({type:'land'});usePressed=false;acc-=STEP;
- if(s.phase==='finished'){paused=true;clear();audio.play({type:s.result.caught?'touch':'win'});audio.setGlide(0);const proof=round.proof(),id=++receiptId;pending.set(id,proof);worker.postMessage({...proof,id});$('#panel').hidden=false;$('#resume').hidden=true;$('#title').textContent=s.result.caught?'タッチされた！':'にげきった！';$('#note').textContent=s.result.time.toFixed(1)+'秒 にげた！';$('#begin').textContent='もう一度あそぶ';document.body.classList.remove('playing','active');break;}}}
- const count=s.phase==='countdown'?Math.ceil(s.countdown):s.time<.65?'GO!':'';$('#count').textContent=count;$('#count').hidden=paused||count==='';if(count!==lastCount&&count!==''){audio.play(typeof count==='number'?{type:'count',count}:{type:'go'});lastCount=count;}
- const actors=[s.player,...s.hunters];for(let i=0;i<actors.length;i++){const a=actors[i],m=models[i];m.root.position.set(a.x,a.y,a.z);m.root.rotation.y=a.yaw;const grade=a.grounded?worldGradient(a.x,a.z):{x:0,z:0};m.root.rotation.x=-Math.atan(grade.x*Math.sin(a.yaw)+grade.z*Math.cos(a.yaw));m.root.rotation.z=Math.atan(grade.x*Math.cos(a.yaw)-grade.z*Math.sin(a.yaw));for(const f of m.feet)f.part.rotation.x=f.x+Math.sin(s.time*17+i)*Math.min(.3,Math.hypot(a.vx,a.vz)*.018);const cloak=(a.effects.cloak??0)>s.time;for(const material of m.materials){material.transparent=cloak;material.opacity=cloak?.32:1;}
- if(i){const b=balloons[i-1],flight=a.flight;b.root.visible=b.rope.visible=!!flight;if(flight){const size=flight.stage==='prepare'?Math.min(1,(s.time-flight.since)/.8):1;b.root.scale.setScalar(Math.max(.01,size));m.root.updateMatrixWorld(true);const hand=m.model.userData.hands?.[0];if(hand)hand.getWorldPosition(handWorld);else handWorld.set(a.x-.6,a.y+3,a.z);b.root.position.set(handWorld.x+(handWorld.x-a.x)*.6,a.y+10.5+Math.sin(s.time*2)*.25,handWorld.z+(handWorld.z-a.z)*.6);b.ends.set([handWorld.x,handWorld.y,handWorld.z,b.root.position.x,b.root.position.y-2.3*size,b.root.position.z]);b.rope.geometry.attributes.position.needsUpdate=true;}}
+let lastGrowthReply=null;
+function showGrowthResult(id,reply){if(!results.isCurrent(id))return;lastGrowthReply={id,reply};const r=growth.describe(id,reply);if(!r)return;growthStatus.hidden=false;growthHome.textContent=r.status==='received'?'ホームへ':'ホームで成果を受け取る';growthStatus.textContent=r.status==='received'?'この試合の成果は受取済みです。':r.status==='pending'?'今回の育成時間 +'+globalThis.ImasoraTagGrowth.formatSeconds(r.activeSeconds)+'\n'+(!r.durable?'この画面を閉じず、ホームで受け取ってね。':r.activeSeconds?'ホームでまとめて受け取れます。':'操作した時間が育成に貯まります。'):r.durable===false?'この画面を閉じず、ホームで成果を受け取ってね。':r.status==='checking'?'育成時間を確認中…':'育成時間はホームで再確認できます。';}
+const growthHome=document.createElement('button');growthHome.id='growth-home-return';growthHome.textContent='ホームへ';growthHome.hidden=!companion;growthHome.style.cssText='min-height:44px;width:100%;margin-top:8px;background:#ffe3a1;color:#294556;font-weight:bold';document.querySelector('#round-result .tr-actions').before(growthHome);growthHome.onclick=returnHuntHome;
+function returnHuntHome(event){
+ if(!companion)return;
+ // Session storage and the emergency handoff belong to this tab.
+ event?.preventDefault();
+ let previousName,transferName;
+ try{
+  try{growth.flush();}catch{
+   previousName=window.name;
+   transferName=growth.handoff(previousName);
+   window.name=transferName;
+   if(window.name!==transferName)throw Error('TAG_HANDOFF_UNAVAILABLE');
+  }
+  location.assign(companion.homePath+'?from=sliding-tag');
+ }catch{
+  if(transferName!==undefined)try{
+   if(window.name===transferName)window.name=previousName;
+  }catch{}
+  showStartNotice('ホームへ戻れませんでした。この画面を残して、もう一度試してね。');
  }
- props.update(s,models,now);for(let i=0;i<poolMeshes.length;i++){const p=s.pools[i],m=poolMeshes[i];m.visible=!!p;if(p){m.position.set(p.x,p.y+.08,p.z);m.scale.set(p.radius,1,p.radius);}}for(let i=0;i<footMeshes.length;i++){const f=s.footprints[i],m=footMeshes[i];m.visible=!!f;if(f)m.position.set(f.x,f.y+.13,f.z);}
- const target={x:s.player.x,y:s.player.y+4,z:s.player.z},pose=worldCameraPose(target,{yaw,pitch,distance:innerHeight>innerWidth?37:31,minDistance:innerHeight>innerWidth?28:16,previousYaw:renderYaw,maxTurn:drag?Infinity:Math.min(dt,.2)*3});renderYaw=pose.yaw;camera.position.set(pose.position.x,pose.position.y,pose.position.z);camera.lookAt(target.x,target.y,target.z);scenery.update(now);
- function renderActor(i){if(i===models.length){renderer.render(scene,camera);return;}const a=actors[i];models[i].action.render({owner:a,airborne:!a.grounded,stage:a.jumps,velocity:a.vy,height:a.y},dt,()=>renderActor(i+1));}renderActor(0);
- $('#bell-alert').hidden=paused||s.time>=bellUntil;if(bellPosition&&s.time<bellUntil){const angle=Math.atan2(bellPosition.x-s.player.x,bellPosition.z-s.player.z)-renderYaw;$('#bell-arrow').style.transform='rotate('+angle+'rad)';$('#bell-alert').style.left=Math.sin(angle)<0?'16px':'auto';$('#bell-alert').style.right=Math.sin(angle)>=0?'16px':'auto';}
- if(now-hudAt>100){updateThreats();$('#hud').textContent='鬼3匹　'+Math.max(0,Math.ceil(s.duration-s.time))+'秒';const item=s.player.item;if(item!==lastItem){lastItem=item;const def=ITEM_DEFS[item];$('#use').innerHTML=def?itemIcon(item)+'<small>'+def.name+'</small>':'<b>◇</b><small>道具なし</small>';$('#use').setAttribute('aria-label',def?'使う：'+def.name:'道具なし');$('#use').disabled=!def;}if(s.time>=Number($('#notice').dataset.until||0))$('#notice').hidden=true;
- if(!paused&&!showedFullHint&&item&&s.pickups.some(p=>p.audience==='player'&&p.readyAt<=s.time&&Math.hypot(p.x-s.player.x,p.z-s.player.z)<s.player.radius+1.5&&Math.abs(p.y-s.player.y)<1)){showedFullHint=true;$('#notice').textContent='持っている道具を使うと、つぎをひろえるよ';$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+2);}
- canvas.dataset.rules=HUNT_RULES;canvas.dataset.hunterCount=String(s.hunters.length);canvas.dataset.phase=s.phase;canvas.dataset.item=item||'';canvas.dataset.playerPosition=[s.player.x,s.player.y,s.player.z].map(x=>x.toFixed(2)).join(',');canvas.dataset.hunters=JSON.stringify(s.hunters.map(a=>({role:a.role,item:a.item,x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),flight:a.flight?.stage??null})));canvas.dataset.frameGap=(dt*1000).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.gadgets=JSON.stringify(s.gadgets.map(g=>({kind:g.kind,x:+g.x.toFixed(1),z:+g.z.toFixed(1)})));canvas.dataset.pickupTypes=s.pickups.map(p=>p.type).join(',');hudAt=now;}
- if(!paused)audio.setGlide(s.player.grounded?Math.min(1,Math.hypot(s.player.vx,s.player.vz)/30):0);
 }
-if(companion){$('#home-return').href=companion.homePath+'?from=sliding-tag';$('#companion-note').textContent=companion.name+' と あそぶ';}else if(homeMode){$('#begin').disabled=true;$('#note').textContent='育成画面から今の相棒で入りなおしてね。';}
-addEventListener('storage',e=>{if(e.key===TOUCH_LAYOUT_KEY)resize();if(homeMode&&e.key==='lifeQuestWalkV1'&&readCompanion().companion?.id!==companion?.id){pause();$('#begin').disabled=true;$('#resume').hidden=true;$('#note').textContent='相棒が変わったよ。育成画面から入りなおしてね。';}});
+function refreshGrowthResult(){if(lastGrowthReply)showGrowthResult(lastGrowthReply.id,lastGrowthReply.reply);}
+addEventListener('storage',event=>{if(event.key===null||event.key===globalThis.ImasoraSlidingTagEntry?.HOME_KEY)refreshGrowthResult();});
+addEventListener('pageshow',refreshGrowthResult);
+const replayLabel=document.createElement('output');replayLabel.id='touch-replay-label';replayLabel.textContent='▶ リプレイ';replayLabel.hidden=true;replayLabel.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:9px 15px;background:#244b65d9;color:#fff7d9;border:2px solid #fff9;border-radius:24px;font:bold 15px system-ui;pointer-events:none;z-index:7';document.body.append(replayLabel);
+const replayChoices=document.createElement('div');
+replayChoices.hidden=true;
+replayChoices.setAttribute('role','group');
+replayChoices.setAttribute('aria-label','見るリプレイを選ぶ');
+replayChoices.style.cssText='margin-top:7px';
+function replayButton(id,label,scope){
+ const button=document.createElement('button');
+ button.id=id;button.textContent=label;
+ button.style.cssText='min-height:44px;padding:5px 10px;margin:0 6px 5px 0;font-size:14px;border-radius:16px;background:#dceff3;color:#31566a';
+ button.onclick=()=>startReplay(undefined,scope);
+ replayChoices.append(button);
+}
+replayButton('touch-replay-again','▶ 決着シーン','finish');
+replayButton('touch-replay-full','▶ 試合全体','full');
+$('#round-result .tr-actions').insertAdjacentElement('afterend',replayChoices);
+const replayControls=document.createElement('div');
+replayControls.className='tag-replay-controls';
+replayControls.hidden=true;
+replayControls.setAttribute('role','group');
+replayControls.setAttribute('aria-label','試合全体の再生操作');
+replayControls.innerHTML='<button type="button">一時停止</button><input type="range" min="0" step="any" aria-label="リプレイの再生位置"><span aria-hidden="true"></span><select data-replay-rate aria-label="リプレイの再生速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select><select data-replay-highlights aria-label="リプレイの見どころ"></select>';
+document.body.append(replayControls);
+const replayToggle=replayControls.querySelector('button'),replayPosition=replayControls.querySelector('input'),replayTime=replayControls.querySelector('span'),replayHighlight=replayControls.querySelector('[data-replay-highlights]'),replayRate=replayControls.querySelector('[data-replay-rate]');
+let replayHighlights=[];
+function replayTimeText(time){
+ const seconds=Math.floor(time+1e-8);
+ return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');
+}
+function updateReplayControls(time){
+ const current=replayTimeText(time),total=replayTimeText(Number(replayPosition.max));
+ replayPosition.value=String(time);
+ const label=current+' / '+total;
+ if(replayTime.textContent!==label){
+  replayTime.textContent=label;
+  replayPosition.setAttribute('aria-valuetext',label);
+ }
+}
+function setReplayPaused(next){
+ if(!next&&(document.hidden||renderRecovery.lost))return false;
+ if(!replay.setPaused(next))return false;
+ replayToggle.textContent=replay.paused?'再生':'一時停止';
+ if(replay.paused)audio.pause();else audio.activate();
+ last=performance.now();dirty=true;
+ return true;
+}
+function suspendReplay(){
+ if(!replay.active)return false;
+ // Full replay can resume from its existing playhead. End the short replay
+ // so the recorder never publishes a clip interrupted by a hidden tab.
+ if(!setReplayPaused(true))finishReplay();
+ return true;
+}
+replayToggle.onclick=()=>setReplayPaused(!replay.paused);
+replayPosition.oninput=()=>seekReplayAt(Number(replayPosition.value));
+replayPosition.title='矢印で1秒、Page Up・Page Downで10秒移動';
+replayPosition.onkeydown=event=>{
+ if(event.isComposing||event.keyCode===229||event.altKey||event.ctrlKey||event.metaKey||event.defaultPrevented)return;
+ const position=Number(replayPosition.value),end=Number(replayPosition.max);
+ let time;
+ switch(event.key){
+  case 'ArrowLeft':case 'ArrowDown':time=position-1;break;
+  case 'ArrowRight':case 'ArrowUp':time=position+1;break;
+  case 'PageDown':time=position-10;break;
+  case 'PageUp':time=position+10;break;
+  case 'Home':time=0;break;
+  case 'End':time=end;break;
+  case 'Escape':event.preventDefault();finishReplay();return;
+  default:return;
+ }
+ event.preventDefault();
+ seekReplayAt(Math.max(0,Math.min(end,time)));
+};
+replayRate.onchange=()=>{
+ if(!replay.setSpeed(Number(replayRate.value)))return;
+ last=performance.now();dirty=true;
+};
+replayHighlight.onchange=()=>{
+ const index=replayHighlight.value;
+ replayHighlight.value='';
+ const chapter=index===''?null:replayHighlights[Number(index)];
+ if(chapter)seekReplayAt(chapter.seek);
+};
+function seekReplayAt(time){
+ if(!replay.seek(time))return;
+ // A paused seek may paint only once, so the broadcast must take that frame.
+ if(liveBroadcast.output.opened)liveViews.reset();
+ audio.pause();replayToggle.textContent='再生';
+ replayCamera.reset();rearMirror.invalidate();resetReplayPoses();replaySound.reset();
+ updateReplayControls(time);
+ dirty=true;
+}
+function openReplayControls(scope){
+ replayControls.hidden=scope!=='full';
+ if(replayControls.hidden)return;
+ replayRate.value='1';
+ replayHighlights=replay.highlightList();
+ const prompt=new Option('見どころ','');
+ replayHighlight.replaceChildren(prompt,...replayHighlights.map((chapter,index)=>new Option(replayTimeText(chapter.time)+' · '+chapter.label,String(index))));
+ replayPosition.max=String(s.time);
+ replayToggle.textContent='一時停止';
+ updateReplayControls(0);
+}
+const replayVideo=createHuntReplayVideo({makeAudio(){return createHuntReplayAudio(audio);}});
+function resetReplayPoses(){for(const m of models){m.gait.reset();m.action.reset();}props.prepare(models[0],{needed:s.player.item==='clone'});feedback.reset();}
+function startReplay(state,scope="finish"){if(renderRecovery?.lost||replay.active)return false;if(!replay.start(state,{scope}))return false;replayCamera.reset();clear();resetReplayPoses();replaySound.reset();audio.pause();audio.activate();audio.setGlide(0);if(scope==="finish")recordShare.prepare(replayTicket,()=>{recordingReplay=true;const summary=huntResultSummary({result:s.result,config:s.config,controlledOwner:controlledHuntActor(s).owner,ticket:replayTicket});return replayVideo.start(canvas,summary);});results.hide();$('#panel').hidden=true;resultBack.hidden=true;replayLabel.textContent=scope==='full'?'▶ 試合全体':'▶ 決着シーン';replayLabel.hidden=false;replayChoices.hidden=false;openReplayControls(scope);$('#pause').textContent='リプレイをとばす';document.body.classList.remove('playing','active');dirty=true;last=performance.now();(scope==="full"?replayToggle:canvas).focus({preventScroll:true});return true;}
+function finishReplay(completed=false){if(!replay.active)return;if(recordingReplay){if(completed)replayVideo.finish();else{recordShare.cancel(replayTicket);replayVideo.cancel();}recordingReplay=false;}audio.pause();replay.stop();yaw=renderYaw;clear();resetReplayPoses();replayLabel.hidden=true;const full=!replayControls.hidden;replayControls.hidden=true;$('#pause').textContent='結果を隠す';results.open({focus:!full});if(full)$('#touch-replay-full').focus();dirty=true;last=performance.now();}
+
+function showResult(){if(replay.active)finishReplay();if(!results.hasResult)return;yaw=renderYaw;clear();viewOnly=false;$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;$('#pause').textContent='結果を隠す';results.open();retryBestRecords();dirty=true;}
+function openResultConfig(){if(replay.active)finishReplay();if(!results.hasResult)return;yaw=renderYaw;clear();viewOnly=false;results.hide();$('#panel').hidden=false;$('#resume').hidden=true;resultBack.hidden=false;$('#title').textContent='次の組合せ';$('#note').textContent='相手を選んで、もう一度勝負しよう。';$('#begin').textContent='この組合せであそぶ';$('#pause').textContent='結果を見る';void updateNotice.check();dirty=true;resultBack.focus({preventScroll:true});}
+function updateBest(){
+ const {time,temporary}=bestRecords.readState({opponents,startKey,mode});
+ $('#best').textContent=Number.isFinite(time)?(mode==='hunt'?'最速 ':'この組合せの最高 ')+time.toFixed(1)+'秒'+(temporary?'（このタブのみ）':''):'';
+}
+function refreshBestDisplay(){
+ updateBest();
+ if(s.phase!=='finished'||canvas.dataset.proof!=='checked'||!results.isCurrent(receiptId))return;
+ const {time,temporary}=bestRecords.readState(s.config);
+ if(time!==undefined)results.verify(receiptId,time,temporary);
+}
+function retryBestRecords(){
+ if(document.hidden||!bestRecords.hasPending)return;
+ void bestRecords.retry().then(refreshBestDisplay).catch(()=>{});
+}
+addEventListener('focus',retryBestRecords);
+function receiveProof(reply,proof){
+ if(results.isCurrent(reply.id)){
+  canvas.dataset.proof=reply.unavailable?'unavailable':reply.ok?'checked':'failed';
+  showGrowthResult(reply.id,reply);
+ }
+ if(!reply.ok)return;
+ if(proof.config.mode==='hunt'&&!proof.claim.win)return;
+ const saving=bestRecords.store(proof.config,proof.claim);
+ function showBest(){
+  const {time,temporary}=bestRecords.readState(proof.config);
+  if(time===undefined)return;
+  results.verify(reply.id,time,temporary);
+  updateBest();
+ }
+ showBest();
+ void saving.then(showBest).catch(()=>{});
+}
+
+function holdCameraView(){const held=holdHuntCameraView(smoothCamera.stats(),{yaw:renderYaw,pitch});yaw=held.yaw;pitch=held.pitch;}
+function clear(){holdCameraView();orbitDemand.clear();frameBudget.reset();renderQuality.reset();const captures=[[canvas,drag?.id],[$('#pad'),padGesture?.id]];for(const id of thumbPresses.keys())for(const name of['dash','jump'])captures.push([$('#'+name),id]);keys.clear();touchButtons.clear();jumpOwners.reset();axis={x:0,z:0};padGesture=null;drag=null;useInput.clear();diveInput.clear();Object.assign(inputMemory,{x:0,z:0});$('#pad i').style.transform='';releaseHuntPointerCaptures(captures);}
+function newSeed(){try{return crypto.getRandomValues(new Uint32Array(1))[0];}catch{return Date.now()>>>0;}}
+const renderStatus=document.createElement('output');renderStatus.id='render-recovery-status';renderStatus.hidden=true;renderStatus.setAttribute('role','status');renderStatus.setAttribute('aria-live','polite');renderStatus.style.cssText='position:fixed;top:16%;left:50%;transform:translateX(-50%);max-width:280px;padding:12px 18px;border:2px solid #d5f8ff;border-radius:18px;background:#244b65ed;color:#fff8df;font:bold 16px/1.5 system-ui;text-align:center;white-space:pre-line;pointer-events:none;z-index:12';renderStatus.textContent='画面を復旧中…\n対戦は止まっています';document.body.append(renderStatus);
+const liveRenderRecoveryMessage='ゲーム映像を復旧中…';
+const renderRecovery=createHuntRenderRecovery({canvas,isActive:()=>started&&!paused&&s.phase!=='finished',suspend(){rearMirror.hide();liveViews.showScreen(false);yaw=renderYaw;clear();audio.pause();paused=true;frameBudget.reset();last=performance.now();dirty=true;suspendReplay();},restore(wasPlaying){clear();liveViews.reset();frameBudget.reset();last=performance.now();dirty=true;if(wasPlaying&&$('#panel').hidden)resumeRound({focus:false});},onStatus(state){renderStatus.hidden=!state.lost;canvas.dataset.renderRecovery=JSON.stringify(state);if(state.lost)liveBroadcast.update(liveRenderRecoveryMessage);}});canvas.dataset.renderRecovery=JSON.stringify(renderRecovery.stats());
+function begin(){
+ if(renderRecovery.lost||!growth.canStart())return;
+ if(!companionGuard())return;
+ const player=models.find(actor=>actor.controlled);
+ const playerRadius=player?.radius??2.7,playerShape=player?.contactKey??huntTouchShapeKey(companion);
+ let nextRound;
+ try{
+  nextRound=recordFreshHunt({opponents,startKey,playerRadius,playerShape,mode,seed:newSeed()},started?s:null,recordPlayableHunt);
+  growth.admit(nextRound.state.config);
+ }catch{
+  showStartNotice('次の対戦を準備できません。もう一度ためしてね。');
+  return;
+ }
+ round=nextRound;
+ s=round.state;
+ document.querySelector('.practice-note').textContent=growth.status();
+ startNotice.hidden=true;startNotice.textContent='';
+ lastGrowthReply=null;growthStatus.hidden=true;growthStatus.textContent='';
+ viewOnly=false;padCamera=false;clear();inkNotice.reset();itemStatus.reset();lastItemCue='';$('#use').dataset.itemCue='';$('#notice').hidden=true;$('#notice').dataset.kind='';$('#notice').dataset.until='0';roleMarkers.reset();replay.reset();replayQueued=false;replayLabel.hidden=true;replayChoices.hidden=true;feedback.reset();replayVideo.cancel();recordingReplay=false;replayTicket=0;recordShare.reset();results.reset();resultBack.hidden=true;$('#resume').hidden=true;$('#pause').textContent='ひと休み';canvas.dataset.spawnLayout=JSON.stringify(s.spawnLayout);canvas.dataset.startItems=JSON.stringify([s.player,...s.hunters].map(a=>a.item));canvas.dataset.seed=String(s.config.seed);rebuild();props.prepare(models[0],{needed:s.player.item==='clone'});yaw=controlledHuntActor(s).yaw+Math.PI;renderYaw=yaw;smoothCamera.reset({yaw:renderYaw,pitch});paused=false;started=true;frameBudget.restart();last=performance.now();lastCount=-1;$('#panel').hidden=true;document.body.dataset.playingRole=s.config.mode;document.body.classList.add('playing','active');canvas.dataset.proof='recording';canvas.setAttribute('aria-label',mode==='hunt'?'広い氷の街で仲間の鬼と追いかけるフィールド':'広い氷の街で鬼3匹から逃げるフィールド');audio.activate();canvas.focus({preventScroll:true});}
+function pause(){
+ renderRecovery.cancelResume();
+ if(suspendReplay())return;
+ if(!closeOrbit({focus:false})){yaw=renderYaw;clear();}
+ audio.pause();dirty=true;
+ if(!started||s.phase==='finished')return;
+ paused=true;$('#panel').hidden=false;$('#resume').hidden=false;
+ void updateNotice.check();
+ $('#title').textContent='ひと休み';$('#begin').textContent='新しい勝負';
+ $('#note').textContent='同じ勝負をつづける？ 次の組合せも選べるよ。';
+ document.body.classList.remove('playing','active');
+}
+function closeOrbit({focus=true}={}){
+ if(!viewOnly)return false;
+ viewOnly=false;
+ clear();
+ $('#panel').hidden=false;
+ $('#pause').textContent=results.hasResult?'結果を見る':'ひと休み';
+ if(focus)$('#observe').focus({preventScroll:true});
+ dirty=true;
+ return true;
+}
+$('#begin').onclick=begin;
+$('#observe').onclick=()=>{
+ if(renderRecovery.lost)return;
+ viewOnly=true;orbitDemand.clear();$('#panel').hidden=true;dirty=true;
+ $('#pause').textContent='見回しを終える';
+ $('#pause').focus({preventScroll:true});
+};
+$('#pause').onclick=()=>{
+ if(replay.active){finishReplay();return;}
+ if(closeOrbit())return;
+ if(results.hasResult){
+  if(results.visible){results.hide();$('#pause').textContent='結果を見る';dirty=true;}
+  else showResult();
+  return;
+ }
+ pause();
+};
+$('#resume').onclick=()=>resumeRound();
+function resumeRound({focus=true}={}){
+ if(renderRecovery.lost||!started||s.phase==='finished')return false;
+ if(document.hidden){pause();return false;}
+ if(!companionGuard())return false;
+ clear();
+ viewOnly=false;paused=false;last=performance.now();frameBudget.reset();
+ $('#panel').hidden=true;document.body.classList.add('playing','active');
+ audio.activate();
+ if(focus)canvas.focus({preventScroll:true});
+ return true;
+}
+let selectingSlot=0;const select=createTagCharacterSelect({characters:TAG_CHARACTERS,onChoose:id=>{opponents[selectingSlot]=id;refreshSlots();saveChoices();updateBest();}});
+function refreshSlots(){$('#opponent-slots').replaceChildren(...opponents.map((id,i)=>{const c=roster.get(id),b=document.createElement('button');b.className='opponent-slot';b.style.setProperty('--slot-color',['#ffbd9b','#a6d5f2','#a8dfbc'][i]);b.innerHTML='<b>'+(mode==='hunt'&&i===0?'逃げ役':roleNames[i])+'</b><strong></strong><small></small><span>選びなおす ›</span>';b.querySelector('strong').textContent=c.name;b.querySelector('small').textContent=c.ability.title;const scores=document.createElement('div');scores.className='tm-scores';scores.setAttribute('aria-label','走りの能力');scores.innerHTML=['加速','速さ','小回り'].map((name,j)=>'<div class="tm-score"><label>'+name+'</label><i style="--score:'+c.ability.scores[j]*20+'%" aria-label="'+name+' '+c.ability.scores[j]+'/5"></i></div>').join('');b.insertBefore(scores,b.querySelector('span'));b.onclick=()=>{selectingSlot=i;clear();select.open(id,(mode==='hunt'&&i===0?'逃げ役':roleNames[i])+'をえらぶ');};return b;}));}refreshSlots();
+function refreshRoleCopy(){$('#roles').textContent=mode==='hunt'?'あなた＋先回り役・巡回役':'追跡役・先回り役・巡回役';if(!started)$('#note').textContent=mode==='hunt'?'道具を拾って、仲間の鬼2匹と逃げ役を追おう！':'角の階段では、鬼との間合いを見て2段ジャンプで切り返そう！';}refreshRoleCopy();
+const itemGuide=createHuntItemGuide({onOpen:clear});if($('#menu-guide-slot'))$('#menu-guide-slot').append(itemGuide.button);else $('#begin').insertAdjacentElement('beforebegin',itemGuide.button);
+itemGuide.setRole(mode);
+for(const b of document.querySelectorAll('[data-role]')){b.setAttribute('aria-pressed',String(b.dataset.role===mode));b.onclick=()=>{mode=b.dataset.role;for(const c of document.querySelectorAll('[data-role]'))c.setAttribute('aria-pressed',String(c===b));refreshSlots();itemGuide.setRole(mode);refreshRoleCopy();saveChoices();updateBest();};}
+const focusField=()=>canvas.focus({preventScroll:true});
+bindHuntTouchGuard(document,()=>document.body.classList.contains('playing'));
+const useInput=createHuntActionInput($('#use'),()=>!paused,focusField);
+const diveInput=createHuntActionInput($('#dive'),()=>!paused&&s.config.mode==='hunt',focusField);
+const bindings=()=>globalThis.IMASORA_KEYS.bindings,active=id=>holds.has(id)||bindings()[id].some(k=>keys.has(k));
+let itemUseHint='';function refreshItemKeys(){itemUseHint=huntItemKeyCodes(bindings()).map(code=>globalThis.IMASORA_KEYS.label(code)).join('・')+'キー';itemGuide.setShortcut(itemUseHint);const hint=$('#dive-key-hint');if(hint)hint.textContent=huntDiveShortcutAvailable(bindings())?'ダイブ：Hキー（鬼のみ）':'ダイブ：画面のボタン（Hは別の操作に設定中）';lastItem='@keys';dirty=true;}globalThis.IMASORA_KEYS.onChange(refreshItemKeys);refreshItemKeys();
+const keyPanel=globalThis.IMASORA_KEYS.createPanel({clearInput:clear});for(const row of keyPanel.querySelectorAll('.keyboard-settings-row'))if(!['forward','back','left','right','jump','dash','tool','menu'].includes(row.querySelector('[data-key-action]')?.dataset.keyAction))row.remove();for(const group of keyPanel.querySelectorAll('.keyboard-settings-group'))if(!group.querySelector('.keyboard-settings-row'))group.remove();const diveKeyHint=document.createElement('p');diveKeyHint.id='dive-key-hint';diveKeyHint.textContent=huntDiveShortcutAvailable(bindings())?'ダイブ：Hキー（鬼のみ）':'ダイブ：画面のボタン（Hは別の操作に設定中）';$('#keys').append(diveKeyHint,keyPanel);const touchSettings=createHuntTouchSettings({storage,clearInput:clear,onOpen:pause,onApply:layout=>{$('#pad').style.left=layout.pad.x+'px';$('#pad').style.top=layout.pad.y+'px';$('#pair').style.left=layout.pair.x+'px';$('#pair').style.top=layout.pair.y+'px';}});$('#keys').parentElement.insertBefore(touchSettings.panel,$('#keys'));globalThis.IMASORA_KEYS.connect({clearInput:clear});
+function paintTouchDash({mode,latched}){const button=$('#dash');button.textContent=latched?'ダッシュ中':'ダッシュ';button.dataset.latched=String(latched);if(mode==='toggle')button.setAttribute('aria-pressed',String(latched));else button.removeAttribute('aria-pressed');button.title=mode==='toggle'?'押すたびにダッシュを切替':'押している間ダッシュ';}
+const dashSetting=document.createElement('div');dashSetting.className='tag-dash-setting';dashSetting.innerHTML='<label>鬼ごっこのタッチダッシュ <select aria-label="タッチダッシュの押し方"><option value="hold">押している間</option><option value="toggle">押すたび切替</option></select></label><p>切替なら、指を離してジャンプできます。休止で解除。</p><p data-dash-save role="status"></p>';const dashSelect=dashSetting.querySelector('select');dashSelect.value=touchButtons.stats().mode;dashSelect.onchange=()=>{clear();touchButtons.setMode(dashSelect.value);dashSetting.querySelector('[data-dash-save]').textContent=saveHuntDashMode(storage,dashSelect.value)?'':'保存できないため、今回はこの設定で遊べます。';dirty=true;};touchSettings.panel.append(dashSetting);
+const dashStyle=document.createElement('style');dashStyle.textContent='.tag-dash-setting{margin-top:12px}.tag-dash-setting label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;font-weight:bold}.tag-dash-setting select{min-height:44px;padding:6px 10px;border:2px solid #fff;border-radius:12px;background:#d9eee8;color:#234e5f;font:inherit}body.hunt #dash[data-latched=true]{background:linear-gradient(#fff0ad,#f1be5d);box-shadow:0 0 0 3px #fff1aa,0 3px 8px #7d531c55}';document.head.append(dashStyle);
+function soundLabel(){$('#sound-toggle').textContent=soundPreference.enabled?'🔊 効果音：オン':'🔇 効果音：オフ';$('#sound-toggle').setAttribute('aria-pressed',String(soundPreference.enabled));}soundLabel();$('#sound-toggle').onclick=()=>{soundPreference.enabled=!soundPreference.enabled;audio.setEnabled(soundPreference.enabled);saveHuntSound(storage,soundPreference);soundLabel();};
+const fieldActive=()=>replay.active||started&&!paused&&s.phase!=='finished';
+function releaseKeyboard(){
+ for(const code of keys)jumpOwners.set('key:'+code,false);
+ keys.clear();
+ useInput.releaseKeyboard();
+ diveInput.releaseKeyboard();
+}
+canvas.addEventListener('blur',releaseKeyboard);
+addEventListener('keydown',e=>{
+ const context=huntKeyboardContext(e,{canvas,playing:fieldActive(),capturing:globalThis.IMASORA_KEYS.capturing,dialogOpen:!!document.querySelector('dialog[open]')});
+ if(!context)return;
+ const b=bindings();
+ if(replay.active){
+  const menu=b.menu.includes(e.code),activation=['Space','Enter'].includes(e.code);
+  if(activation&&replayControls.contains(e.target))return;
+  if(!e.repeat&&(menu||activation)){e.preventDefault();finishReplay();}
+  return;
+ }
+ if(b.menu.includes(e.code)){
+  const command=huntMenuCommand({repeat:e.repeat,hasResult:results.hasResult,configVisible:!$('#panel').hidden,resultVisible:results.visible,paused,viewOnly});
+  if(command==='native'||command==='none')return;
+  e.preventDefault();
+  if(command==='close-orbit')closeOrbit();
+  else if(command==='show-result')showResult();
+  else if(command==='hide-result'){results.hide();$('#pause').textContent='結果を見る';dirty=true;}
+  else if(command==='pause')pause();
+  return;
+ }
+ if(!context.field||paused)return;
+ const diveKey=e.code===HUNT_DIVE_KEY&&s.config.mode==='hunt'&&huntDiveShortcutAvailable(b);
+ const itemKey=e.code==='KeyL'&&huntItemShortcutAvailable(b);
+ if(!diveKey&&!itemKey&&!['forward','back','left','right','jump','dash','tool'].some(id=>b[id].includes(e.code)))return;
+ e.preventDefault();
+ if(e.repeat)return;
+ if(diveKey){diveInput.press();return;}
+ if(itemKey){useInput.press();return;}
+ if(b.jump.includes(e.code)&&!keys.has(e.code))jumpOwners.set('key:'+e.code,true);
+ if(b.tool.includes(e.code))useInput.press();
+ keys.add(e.code);
+});
+addEventListener('keyup',e=>{keys.delete(e.code);jumpOwners.set('key:'+e.code,false);});
+canvas.onpointerdown=e=>{if(replay.active)return;if(drag||paused&&!viewOnly&&s.phase!=='finished'||!captureHuntPointer(canvas,e))return;if(fieldActive())canvas.focus({preventScroll:true});yaw=orbitDemand.captureYaw(renderYaw,yaw,{viewOnly});if(e.pointerType==='touch'&&!paused)padCamera=true;drag={id:e.pointerId,x:e.clientX,y:e.clientY};};canvas.onpointermove=e=>{if(drag?.id!==e.pointerId)return;yaw-=(e.clientX-drag.x)*.006;pitch=Math.max(.15,Math.min(1.15,pitch+(e.clientY-drag.y)*.004));drag.x=e.clientX;drag.y=e.clientY;inputMemory.yaw=renderYaw;if(viewOnly)orbitDemand.request();dirty=true;};for(const type of['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,e=>{if(drag?.id===e.pointerId)drag=null;});
+function pad(e){
+ if(e.pointerId!==padGesture?.id)return;
+ const x=e.clientX-padGesture.x,z=e.clientY-padGesture.y;
+ const distance=Math.hypot(x,z),strength=Math.min(1,distance/44);
+ axis=distance>5?{x:x/distance*strength,z:z/distance*strength}:{x:0,z:0};
+ $('#pad i').style.transform=`translate(${axis.x*29}px,${axis.z*29}px)`;
+}
+const movementPad=$('#pad');
+movementPad.onpointerdown=e=>{
+ if(paused||padGesture||!captureHuntPointer(movementPad,e))return;
+ e.preventDefault();
+ const box=movementPad.getBoundingClientRect();
+ // A browser-bar resize may move the visible pad during this gesture.
+ padGesture={id:e.pointerId,x:box.left+box.width/2,y:box.top+box.height/2,heading:null};
+ if(!padCamera&&!drag)holdCameraView();
+ padCamera=true;
+ pad(e);
+};
+movementPad.onpointermove=pad;
+for(const type of ['pointerup','pointercancel','lostpointercapture']){
+ movementPad.addEventListener(type,e=>{
+  if(e.pointerId!==padGesture?.id)return;
+  padGesture=null;
+  axis={x:0,z:0};
+  $('#pad i').style.transform='';
+ });
+}
+function readHuntMovement(human){
+ const x=(active('right')?1:0)-(active('left')?1:0),z=(active('back')?1:0)-(active('forward')?1:0);
+ if(!padGesture){
+  if(x||z)padCamera=false;
+  return worldCameraInput(inputMemory,x,z,renderYaw);
+ }
+ const key=worldCameraInput(inputMemory,x,z,renderYaw);
+ if(s.phase!=='playing')return key;
+ const move=huntPadMovement(padGesture.heading??human.yaw,axis,STEP);
+ padGesture.heading=move.heading;
+ const dx=move.x+key.x,dz=move.z+key.z,limit=Math.max(1,Math.hypot(dx,dz));
+ return{x:dx/limit,z:dz/limit};
+}
+for(const id of['dash','jump']){const b=$('#'+id),other=id==='dash'?'jump':'dash';b.onpointerdown=e=>{if(paused||!captureHuntPointer(b,e))return;e.preventDefault();touchButtons.set(e.pointerId,[id]);};b.onpointermove=e=>{if(!thumbPresses.has(e.pointerId))return;const r=$('#'+other).getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;touchButtons.set(e.pointerId,inside?[id,other]:[id]);};b.addEventListener('pointerup',e=>touchButtons.release(e.pointerId));for(const type of['pointercancel','lostpointercapture'])b.addEventListener(type,e=>touchButtons.cancel(e.pointerId));}
+let companionReadBlocked=false,companionInvalidated=false;
+function companionGuard(){
+ if(!homeMode)return true;
+ if(companionInvalidated)return false;
+ const current=readCompanion();
+ if(companion&&current.status==='ready'&&current.companion?.id===companion.id){
+  if(companionReadBlocked){
+   companionReadBlocked=false;
+   showStartNotice('');
+   document.querySelector('.practice-note').textContent=growth.status();
+  }
+  return true;
+ }
+ if(started&&s.phase!=='finished'&&(!paused||$('#panel').hidden)){
+  pause();
+ }
+ if(current.status==='unavailable'&&companion){
+  companionReadBlocked=true;
+  showStartNotice('相棒の保存を確認できません。「つづける」か「あそぶ」で再確認できます。');
+  return false;
+ }
+ companionInvalidated=true;
+ const message='ホームから相棒を連れて入りなおしてね。';
+ $('#begin').disabled=true;
+ $('#resume').hidden=true;
+ $('#note').textContent=message;
+ results.setUnavailable(message);
+ showStartNotice(message);
+ return false;
+}
+bindHuntLifecycle({windowTarget:window,documentTarget:document,pause,worker:proofClient,audio,onRestore:companionGuard});
+let viewportWidth=innerWidth,viewportPortrait=innerHeight>innerWidth,viewportSideTools;
+function resize(){
+ const w=innerWidth,h=innerHeight,portrait=h>w;
+ const {sideTools}=touchSettings.apply();
+ // Browser bars may resize the field mid-gesture. Release input when the
+ // controls reflow, but keep a hold through ordinary height changes.
+ const reflowed=viewportSideTools!==undefined&&sideTools!==viewportSideTools;
+ if(w!==viewportWidth||portrait!==viewportPortrait||reflowed)clear();
+ viewportWidth=w;
+ viewportPortrait=portrait;
+ viewportSideTools=sideTools;
+ rearMirror.invalidate();
+ camera.aspect=w/h;
+ camera.updateProjectionMatrix();
+ renderer.setSize(w,h,false);
+ dirty=true;
+}
+addEventListener('resize',resize);
+resize();
+function showItemNotice(text,duration,kind='pickup'){$('#notice').dataset.kind=kind;$('#notice').textContent=text;$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+duration);}
+function failHint(text){if(!text)return;itemStatus.defer(s.time+1.6);$('#notice').dataset.kind='use-error';$('#notice').textContent=text;$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+1.6);}
+function playMatchCue(cue){audio.play(cue);replay.recordSound(s.time,cue);}
+function frameEvent(e){replay.recordHighlight(e,controlledHuntActor(s).owner);inkNotice.event(s,e);if(e.owner===controlledHuntActor(s).owner&&['item-use','hook-released'].includes(e.type)&&['use-error','full'].includes($('#notice').dataset.kind)){$('#notice').hidden=true;$('#notice').dataset.kind='';}const gained=itemStatus.event(s,e);if(gained&&s.phase==='playing')showItemNotice((ITEM_DEFS[gained.item]?.name??'道具')+'をひろった',gained.duration);feedback.event(s,e);if(e.type==='trampoline-bounce'&&e.owner!==controlledHuntActor(s).owner)playMatchCue({type:'jump',stage:3});if(e.owner===controlledHuntActor(s).owner&&['pickup','item-use'].includes(e.type))playMatchCue({type:'item'});}
+const threatPoint=new T.Vector3(),threatArrows=['#f5ad78','#85cce9','#8bc999'].map((color,i)=>{const el=document.createElement('i');el.className='threat-cue';el.hidden=true;el.setAttribute('aria-hidden','true');el.title=roleNames[i];el.style.setProperty('--role-color',color);el.innerHTML='<svg viewBox="0 0 22 25"><path d="M11 2L21 21L11 16L1 21Z" fill="currentColor" stroke="#fff" stroke-width="2"/></svg>';document.body.append(el);return el;});
+function updateThreats(){
+ const cues=paused||s.phase!=='playing'||s.config.mode==='hunt'?[]:huntThreatCues(s),w=innerWidth,h=innerHeight;
+ let blocks,safeView,shown=0;
+ for(let i=0;i<threatArrows.length;i++){
+  const cue=cues.find(c=>c.owner===s.hunters[i].owner),el=threatArrows[i];
+  el.hidden=true;
+  if(!cue)continue;
+  threatPoint.set(cue.x,cue.y,cue.z).project(camera);
+  if(threatPoint.z>=-1&&threatPoint.z<=1&&Math.abs(threatPoint.x)<.9&&Math.abs(threatPoint.y)<.85)continue;
+  if(!blocks){
+   blocks=[];
+   const hud=$('.game-hud').getBoundingClientRect();
+   safeView={left:hud.left,right:hud.right,top:hud.top,bottom:h-hud.top};
+   // Tools can extend above or beside the dash and jump group.
+   const elements=document.querySelectorAll('.game-hud > *, #pad, #pair > button, #notice, #radar, .tag-radar-time, .tag-rear-mirror, .tag-ink-paint, .tag-screen-broadcast');
+   for(const element of elements){
+    if(element.hidden)continue;
+    const rect=element.getBoundingClientRect();
+    if(rect.width&&rect.height)blocks.push(rect);
+   }
+  }
+  const angle=Math.PI-Math.atan2(cue.x-s.player.x,cue.z-s.player.z)+renderYaw;
+  const point=huntThreatCuePosition(w*(.5+Math.sin(angle)*.45),h*(.5-Math.cos(angle)*.39),safeView,blocks);
+  if(!point)continue;
+  const {x,y}=point;
+  blocks.push({left:x-19,right:x+19,top:y-19,bottom:y+19});
+  el.style.left=x+'px';el.style.top=y+'px';el.style.setProperty('--bearing',angle+'rad');el.dataset.preparing=String(cue.preparing);el.hidden=false;shown++;
+ }
+ canvas.dataset.threatCues=String(shown);
+}
+function refreshThreats(sampleHud,curtainChanged){
+ const inactive=paused||s.phase!=='playing'||s.config.mode==='hunt';
+ if(sampleHud||curtainChanged||(inactive&&canvas.dataset.threatCues!=='0'))updateThreats();
+}
+const roleMarkers=createHuntRoleMarkers({scene,onDiscover:()=>audio.play({type:'detect'})});
+const compassView=createHuntCompassView($('#radar'));
+const radarTime=document.createElement('output');radarTime.className='tag-radar-time';radarTime.hidden=true;document.body.append(radarTime);
+const radarHud=createHuntRadarHud({radar:$('#radar'),time:radarTime,diagnostics:canvas,compass:compassView});
+function drawRadar(human,diagnose,replayState=null){
+ const state=replayState??s;
+ const fieldVisible=replayState!==null||(!replay.active&&started&&(!paused||viewOnly));
+ const visible=fieldVisible&&state.phase!=='finished'&&(human.effects.radar??0)>state.time;
+ const map=visible||diagnose?huntCompass(state,renderYaw):null;
+ radarHud.update(map,{visible,diagnose});
+}
+const countHud=$('#count'),clockHud=$('#hud'),jumpHud=$('#jump'),diveHud=$('#dive');
+const dashHud=$('#dash'),useHud=$('#use');
+const diveHudStages={prepare:'構え中',slide:'ダイブ中',recover:'復帰中'};
+function setHudValue(target,key,value){
+ if(target[key]!==value)target[key]=value;
+}
+function setHudAttribute(target,key,value){
+ if(target.getAttribute(key)!==value)target.setAttribute(key,value);
+}
+function updateControlHud(human,jumpWait,clockTime=s.time){
+ const count=s.phase==='countdown'?Math.ceil(s.countdown):s.time<.65?'GO!':'';
+ setHudValue(countHud,'textContent',String(count));
+ setHudValue(countHud,'hidden',paused||count==='');
+ if(count!==lastCount&&count!==''){
+  audio.play(typeof count==='number'?{type:'count',count}:{type:'go'});
+  lastCount=count;
+ }
+ const dizzy=(human.effects?.dizzy??0)>s.time,waiting=jumpWait>0;
+ const jumpSeconds=waiting?(Math.ceil(jumpWait*10)/10).toFixed(1)+'秒':'';
+ setHudValue(jumpRestLabel,'hidden',!waiting&&!dizzy);
+ if(waiting||dizzy)setHudValue(jumpRestLabel,'textContent',dizzy?'ピヨピヨ':jumpSeconds);
+ setHudAttribute(jumpHud,'aria-label',dizzy?'ジャンプ ピヨピヨ中':waiting?'ジャンプ 待機 '+jumpSeconds:'ジャンプ');
+ setHudAttribute(jumpHud,'aria-disabled',String(waiting||dizzy));
+ setHudValue(jumpHud.style,'opacity',waiting||dizzy?'0.65':'');
+ setHudValue(jumpHud,'title',dizzy?'ピヨピヨ中':waiting?'着地後の待機時間':human.jumpRestRelease?'指を離してからジャンプ':'ジャンプ');
+ setHudAttribute(dashHud,'aria-disabled',String(dizzy));
+ setHudValue(dashHud.style,'opacity',dizzy?'0.65':'');
+ const hunting=s.config.mode==='hunt';
+ setHudValue(diveHud,'hidden',!hunting);
+ if(hunting){
+  const remaining=(human.nextDiveAt??0)-s.time,airborne=!human.grounded||!!human.flight;
+  const stage=diveHudStages[human.dive?.stage];
+  setHudValue(diveHud,'title',dizzy?'ピヨピヨ中':airborne?'着地してからダイブ':huntDiveShortcutAvailable(bindings())?'ヘッドスライディング（Hキー）':'ヘッドスライディング');
+  setHudValue(diveHud,'disabled',dizzy||airborne||!!human.pendingItem||!!human.dive||remaining>0);
+  setHudValue(diveHud,'textContent',stage??(airborne?'着地後':remaining>0?'ダイブ '+Math.ceil(remaining):'ダイブ'));
+ }
+ setHudValue(clockHud,'textContent',(hunting?'あなた＋鬼2匹　':'鬼3匹　')+Math.max(0,Math.ceil(s.duration-clockTime))+'秒');
+ const item=human.item,useKey=human.hook?'release-hook':item;if(useKey!==lastItem){lastItem=useKey;const def=ITEM_DEFS[human.hook?'hook':item],name=human.hook?'フックをはなす':def?.name;$('#use').innerHTML=def?itemIcon(human.hook?'hook':item)+'<small>'+name+'</small>':'<b>◇</b><small>道具なし</small>';$('#use').setAttribute('aria-label',human.hook?'フックをはなす':def?'使う：'+name:'道具なし');}
+ const hasTool=!!ITEM_DEFS[human.hook?'hook':item];
+ setHudValue(useHud,'disabled',!hasTool||dizzy);
+ setHudAttribute(useHud,'aria-disabled',String(!hasTool||dizzy));
+ setHudValue(useHud,'title',hasTool?(dizzy?'ピヨピヨ中':itemUseHint+(human.hook?'で放す':'で使う')):'');
+ const itemCue=itemStatus.cue(s.time,!paused&&!replay.active);if(itemCue!==lastItemCue){lastItemCue=itemCue;$('#use').dataset.itemCue=itemCue;}
+ if(s.phase==='finished'||s.time>=Number($('#notice').dataset.until||0))setHudValue($('#notice'),'hidden',true);
+}
+function updateBalloons(view,actors){
+ for(let i=1;i<actors.length;i++){
+  const actor=actors[i],balloon=balloons[i-1];
+  if(huntActorConcealed(view,actor))balloon.root.visible=balloon.rope.visible=false;
+  else handAttachments.balloon(balloon,actor,models[i].model.userData.hands?.[0],view.time);
+ }
+}
+function screenActorNodes(actors,rivals){
+ return rivals?.flatMap(rival=>{
+  const i=actors.indexOf(rival),balloon=balloons[i-1];
+  const nodes=[models[i].root,soleShadows[i],...props.attachedNodes(i,rival)];
+  if(balloon)nodes.push(balloon.root,balloon.rope);
+  return nodes;
+ });
+}
+function draw(now){const human=controlledHuntActor(s);requestAnimationFrame(draw);const dt=Math.max(0,(now-last)/1000||0);last=now;if(renderRecovery.lost){liveViews.showScreen(false);return;}const frameSteps=frameBudget.consume(dt,{running:!paused,visible:!document.hidden});let physicsTicks=0;if(document.hidden){liveViews.showScreen(false);renderQuality.reset();return;}renderQuality.sample(dt,started&&!paused&&!replay.active&&!liveBroadcast.output.opened);if(replay.paused&&!dirty)return;let replayFrame=replay.advance(dt);if(replayFrame?.done){finishReplay(true);replayFrame=null;}
+ // Keep the final full-replay image until results. A resize, explicit redraw
+ // or live output still needs a frame, and the replay clock advances above.
+ if(replayFrame?.progress===1&&replayFrame.delta===0&&replay.scope==='full'&&!dirty&&!liveBroadcast.output.opened)return;
+ if(paused&&!replay.active&&!dirty&&!orbitDemand.pending&&now-paintAt<1000)return;paintAt=now;dirty=false;
+ if(!paused){for(let tick=0;tick<frameSteps.steps;tick++){const input=readHuntMovement(human),use=useInput.read(),attempt=use&&!s.useHeld,item=human.item,failureHint=attempt&&item?huntItemFailureHint(s,human):'',grounded=human.grounded,jumps=human.jumps;const applied={...input,jump:jump.read(),dash:active('dash'),use,dive:diveInput.read()};if(use)canvas.dataset.lastUseInput=JSON.stringify(applied);round.tick(applied);physicsTicks++;if(attempt&&item&&!huntItemUseAcknowledged(s,human.owner))failHint(failureHint);for(const e of s.events)frameEvent(e);if(itemStatus.sample(s))showItemNotice('道具は1つまで\n手持ちを使うと拾えます',1.6,'full');if(human.jumps>jumps)playMatchCue({type:'jump',stage:human.jumps});if(!grounded&&human.grounded)playMatchCue({type:'land'});replay.record(s,{force:s.phase==="finished",lighting:scenery.lighting,feedbackCues:feedback.replayCues});
+ if(s.phase==='finished'){yaw=renderYaw;paused=true;clear();audio.play({type:s.result.win?'win':'touch'});audio.setGlide(0);const proof=round.proof(),id=++receiptId;const growthResult=growth.finish(proof,id);growthStatus.hidden=!companion;growthStatus.textContent=growthResult.formal?(growthResult.queued?'育成時間を確認中…':'この画面を閉じず、ホームで成果を受け取ってね。'):companion?'今回は試遊です（育成の加算なし）。':'';growthHome.hidden=!companion;growthHome.textContent=growthResult.formal?'ホームで成果を受け取る':'ホームへ';const submitted=proofClient.submit(proof,id);if(!submitted)canvas.dataset.proof='unavailable';$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;const best=bestRecords.readState(s.config);results.show({result:s.result,config:s.config,controlledOwner:human.owner,ticket:id,best:best.time,bestTemporary:best.temporary});if(growthResult.formal)showGrowthResult(id,submitted?null:{ok:false,unavailable:true});replayTicket=id;$('#pause').textContent='結果を隠す';replayQueued=true;document.body.classList.remove('playing','active');break;}}}
+ const jumpWait=huntJumpRestRemaining(s,human);
+ const visual=replayFrame?.state??s,visualHuman=controlledHuntActor(visual),visualGround=(x,z)=>trampolineSurface(visual,x,z),visualDt=replayFrame?replayFrame.delta:physicsTicks*STEP,visualPaused=replayFrame?visualDt<=0:paused;
+ const fullReplay=!!replayFrame&&replay.scope==="full";
+ updateControlHud(human,jumpWait,fullReplay?visual.time:s.time);
+ if(replayFrame&&!replay.paused)for(const cue of replaySound.sample(replay.soundsAt(visual.time,replayFrame.delta),{atEnd:replayFrame.progress>=1,caught:!!replayFrame.catcher}))audio.play(cue);const actors=[visual.player,...visual.hunters];for(let i=0;i<actors.length;i++){const a=actors[i],m=models[i];m.root.position.set(a.x,a.y,a.z);m.root.rotation.y=a.yaw;const grade=a.grounded?worldGradient(a.x,a.z):{x:0,z:0};m.root.rotation.x=-Math.atan(grade.x*Math.sin(a.yaw)+grade.z*Math.cos(a.yaw));m.root.rotation.z=Math.atan(grade.x*Math.cos(a.yaw)-grade.z*Math.sin(a.yaw));const shadow=soleShadows[i],floor=visualGround(a.x,a.z),height=Math.max(0,a.y-floor);shadow.position.set(a.x,floor+.035,a.z);shadow.scale.set(a.radius*.78,Math.max(.6,a.radius*.58),1);shadow.material.opacity=.23/(1+height*.18);applyHuntActorVisibility(visual,a,m,shadow);m.sunglasses.setActive((a.effects.sunglasses??0)>visual.time);m.dizzy.update({time:visual.time,until:a.effects.dizzy??0,sunglasses:(a.effects.sunglasses??0)>visual.time,radius:a.radius});m.inkFeet.setInked(a.owner===visual.player.owner&&(a.effects.ink??0)>visual.time);
+ }
+ feedback.update(visual,replayFrame?visual.feedbackCues??[]:null);inkView.update(visual);inkNotice.update(s,{visible:!paused&&!replay.active});
+ const cameraDt=orbitDemand.frameDt(replay.paused?0:dt,{paused,viewOnly,dragging:!!drag,replaying:!!replayFrame});
+ let target,pose;
+ if(replayFrame){
+  ({target,pose}=updateHuntReplayView(replayCamera,visual,{catcher:fullReplay?null:replayFrame.catcher,aspect:camera.aspect,focus:fullReplay?visualHuman:visual.player,dt:cameraDt,scope:replay.scope,viewPlan:replay.viewPlan(camera.aspect)}));
+ }else{
+  target={x:human.x,y:human.y+4,z:human.z};
+  pose=smoothCamera.update(target,{yaw:huntFacingCameraYaw(visualHuman,{freeYaw:yaw,paused,dragging:!!drag||padCamera}),pitch,keepAngle:padCamera,distance:innerHeight>innerWidth?39:33,minDistance:innerHeight>innerWidth?30:17,dt:cameraDt});
+ }
+ orbitDemand.accept(pose,{viewOnly});renderYaw=pose.yaw;camera.position.set(pose.position.x,pose.position.y,pose.position.z);camera.lookAt(target.x,target.y,target.z);const near=pose.near??.15;if(camera.near!==near){camera.near=near;camera.updateProjectionMatrix();}scenery.update(now,replayFrame?visual.lighting:null);camera.updateMatrixWorld();
+ const desktop=liveBroadcast.output.opened,screen=liveViews.showScreen(!paused&&!replayFrame&&s.phase==='playing');
+ const output=desktop||screen?liveViews.begin(now,visual,visualHuman,{round:s,replaying:replayFrame?replay.scope:null,paused:visualPaused,desktop,screen,mainCamera:camera}):null;
+ let curtainChanged=false;
+ renderHuntActorPoses({actors,models,dt:visualDt,groundAt:visualGround,isIce:a=>worldSurface(a.x,a.z)==='ice',paused:visualPaused,human:visualHuman,onStep:replayFrame?null:stepSound,replayTime:replayFrame?.state.time},()=>{
+  if(output?.opponent){
+   const otherView={...visual,config:{...visual.config,mode:visual.config.mode==='hunt'?'escape':'hunt'}};
+   actors.forEach((a,i)=>applyHuntActorVisibility(otherView,a,models[i],soleShadows[i]));
+   try{
+    props.update(otherView,models,now,{paused:true,groundAt:visualGround,includePickupNames:false});
+    updateBalloons(otherView,actors);
+    roleMarkers.withoutLabels(()=>props.render(()=>liveViews.capture('opponent',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals))));
+   }finally{
+    actors.forEach((a,i)=>applyHuntActorVisibility(visual,a,models[i],soleShadows[i]));
+   }
+  }
+  curtainChanged=roleMarkers.update(visual,{camera,models,now:now/1000,active:!paused&&!replayFrame&&s.phase==='playing'});
+  props.update(visual,models,now,{dt:visualDt,paused:visualPaused,groundAt:visualGround,isIce:a=>worldSurface(a.x,a.z)==='ice'});
+  updateBalloons(visual,actors);
+  props.render(()=>{
+   if(output?.multi)roleMarkers.withoutLabels(()=>liveViews.capture('wide',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals)));
+   if(output?.multi)scenery.centerSky();
+   renderer.render(scene,camera);
+   if((fullReplay||!paused&&!replayFrame)&&huntRearMirrorActive(visual))rearMirror.draw(now,visualHuman,models[0].root,soleShadows[0],{refresh:curtainChanged});else rearMirror.hide();
+   if(output)liveViews.finish();
+   if(replayFrame&&recordingReplay)replayVideo.draw(canvas,now);
+  });});
+ if(replayQueued){
+  replayQueued=false;
+  if(replay.complete(s)){
+   replayChoices.hidden=false;
+   if(!globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches)startReplay();
+  }
+ }
+ const sampleHud=now-hudAt>100;
+ // A paused replay might not draw another frame until the next input.
+ if(sampleHud||fullReplay&&(replay.paused||replayFrame.progress===1&&replayFrame.delta>0)){
+  if(fullReplay)updateReplayControls(visual.time);
+  canvas.dataset.replay=JSON.stringify({...replay.stats(),time:replayFrame?.state.time??null});
+ }
+ drawRadar(fullReplay?visualHuman:human,sampleHud,fullReplay?visual:null);
+ refreshThreats(sampleHud,curtainChanged);
+ if(sampleHud){canvas.dataset.jumpRest=JSON.stringify({remaining:jumpWait,readyAt:human.nextJumpAt??0,needsRelease:!!human.jumpRestRelease,jumps:human.jumps,grounded:human.grounded});const item=human.item;
+ canvas.dataset.discoveryAudio=String(audio.stats().counts.detect??0);canvas.dataset.roleMarkers=JSON.stringify(roleMarkers.stats());canvas.dataset.cameraSmooth=JSON.stringify((replayFrame?replayCamera:smoothCamera).stats());canvas.dataset.cameraMode=replayFrame?'replay':'normal';canvas.dataset.orbitDemand=JSON.stringify(orbitDemand.stats());canvas.dataset.cameraFollow=JSON.stringify({actorYaw:human.yaw,cameraYaw:renderYaw,following:!paused&&!drag&&!padCamera&&!replayFrame});canvas.dataset.actorVisibility=JSON.stringify(actors.map((a,i)=>({owner:a.owner,visible:models[i].root.visible,shadow:soleShadows[i].visible,cloaked:(a.effects.cloak??0)>visual.time})));canvas.dataset.compassPaint=JSON.stringify({...compassView.stats(),hud:radarHud.stats()});canvas.dataset.decoyResources=JSON.stringify(props.stats());canvas.dataset.windVisibility=JSON.stringify(props.windStats());canvas.dataset.stepBudget=JSON.stringify(frameBudget.stats());canvas.dataset.materialUpdates=JSON.stringify(models.map(m=>m.materialState.stats()));canvas.dataset.modelResources=JSON.stringify({...actorModels.stats(),geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});canvas.dataset.inkRender=JSON.stringify(inkView.stats());canvas.dataset.dizzy=JSON.stringify(models.map(m=>m.dizzy.stats()));canvas.dataset.feedback=JSON.stringify(feedback.stats());canvas.dataset.proofQueue=JSON.stringify(proofClient.stats());canvas.dataset.trampoline=JSON.stringify(s.trampoline);canvas.dataset.mode=s.config.mode;canvas.dataset.controlled=human.owner;canvas.dataset.rules=s.rules;canvas.dataset.surface=worldSurface(human.x,human.z);canvas.dataset.speed=Math.hypot(human.vx,human.vz).toFixed(3);canvas.dataset.gaitPhase=models.find(m=>m.controlled)?.gait.phase.toFixed(3);canvas.dataset.hunterCount=String(s.hunters.length);canvas.dataset.phase=s.phase;canvas.dataset.item=item||'';canvas.dataset.playerPosition=[human.x,human.y,human.z].map(x=>x.toFixed(2)).join(',');canvas.dataset.hunters=JSON.stringify(s.hunters.map(a=>({role:a.role,item:a.item,x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),flight:a.flight?.stage??null,dive:a.dive?.stage??null})));canvas.dataset.frameGap=(dt*1000).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.gadgets=JSON.stringify(s.gadgets.map(g=>({kind:g.kind,x:+g.x.toFixed(1),z:+g.z.toFixed(1)})));const pickupStats=props.pickupStats();canvas.dataset.pickupDisplay=JSON.stringify(pickupStats);canvas.dataset.pickupNameVisibility=JSON.stringify(pickupStats.visibility);canvas.dataset.pickupTypes=s.pickups.map(p=>p.type).join(',');hudAt=now;}
+ if((desktop&&output)||(sampleHud&&!desktop)){
+  let status;
+  if(replayFrame){
+   const label=fullReplay?'試合全体リプレイ':'決着シーン';
+   status=label+' · '+visual.time.toFixed(1)+'秒';
+  }else if(s.phase==='finished'&&results.summary){
+   const {mode,title,time}=results.summary;
+   status=(mode==='hunt'?'鬼役':'逃走役')+' · '+title+' · '+time+'秒';
+  }else if(s.phase==='countdown'){
+   status='スタートまで '+Math.ceil(s.countdown);
+  }else{
+   const label=paused?'ひと休み':s.config.mode==='hunt'?'鬼で挑戦':'逃走中';
+   status=label+' · '+Math.max(0,Math.ceil(s.duration-s.time))+'秒';
+  }
+  liveBroadcast.update(status);
+ }
+ if(!paused||replayFrame&&!replay.paused){
+  const actor=replayFrame?visualHuman:human;
+  audio.setGlide(actor.grounded&&(actor.slippery||worldSurface(actor.x,actor.z)==='ice')?Math.min(1,Math.hypot(actor.vx,actor.vz)/30):0);
+ }
+}
+if(companion){$('#home-return').href=companion.homePath+'?from=sliding-tag';$('#companion-note').textContent=companion.name+' と あそぶ';}else if(homeMode){$('#begin').disabled=true;$('#note').textContent='ホームの「鬼ごっこ」から入りなおしてね。';}
+addEventListener('storage',e=>{
+ if(e.key===TOUCH_LAYOUT_KEY){clear();touchSettings.apply();dirty=true;}
+ if(e.key===null||e.key===BEST_KEY)refreshBestDisplay();
+ if(homeMode&&(e.key===null||e.key===globalThis.ImasoraSlidingTagEntry?.HOME_KEY))companionGuard();
+});
+$('#home-return').addEventListener('click',returnHuntHome);
+$('#home-return').addEventListener('auxclick',event=>{
+ if(event.button===1)returnHuntHome(event);
+});
 $('#begin').disabled=homeMode&&!companion;$('#panel').setAttribute('aria-busy','false');updateBest();requestAnimationFrame(draw);

@@ -25,7 +25,8 @@ export function createCharacterJumpAction(model){
   const changed=n!==stage||owner!==motion.owner;
   if(changed){stage=n;owner=motion.owner;elapsed=0;}
   const advanced=changed||motion.velocity!==lastVelocity||motion.height!==lastHeight;
-  if(advanced&&Number.isFinite(dt)&&dt>0)elapsed+=Math.min(.05,dt);
+  if(Number.isFinite(motion.elapsed))elapsed=Math.max(0,motion.elapsed);
+  else if(advanced&&Number.isFinite(dt)&&dt>0)elapsed+=Math.min(.05,dt);
   lastVelocity=motion.velocity;lastHeight=motion.height;
   const pose=jumpActionPose(stage,elapsed);
   auto=model.matrixAutoUpdate;if(auto)model.updateMatrix();baseMatrix.copy(model.matrix);applied=true;

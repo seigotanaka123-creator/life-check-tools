@@ -273,7 +273,7 @@ function updateCharacterControls(descriptor) {
   if (state.growthStage === 'guest') {
     bodyCheckText.textContent='傘・触手・顔を前後左右から確認できる立体メッシュ';
     decorCheckText.textContent='エプロンは背中の結び目まで造形。鉱石も立体です';
-    rearCheckText.textContent='正式な白ミチロードセイバーレンと全高・接地位置を統一';
+    rearCheckText.textContent='正式なセハルネと全高・接地位置を統一';
     document.getElementById('sizeComparison').textContent=`全高：レンと同じ（${model.userData.referenceHeight.toFixed(2)}）`;
   } else if (state.growthStage === "flowering") {
     decorCheckText.textContent = "王冠・流星翼・マントなど満開期専用装飾を付けない開花期の姿";

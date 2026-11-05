@@ -71,7 +71,7 @@
           <span class="coords" id="coords">X 0.0 / Z 0.0</span>
         </div>
         <div class="viewport" id="viewport" data-game-gesture-surface>
-          <canvas id="worldCanvas" aria-label="白ミチロードセイバーレンが歩く3Dワールド"></canvas>
+          <canvas id="worldCanvas" aria-label="セハルネが歩く3Dワールド"></canvas>
           <button type="button" id="buildMenuButton" class="world-build-open" disabled>建物を選ぶ</button>
           <section id="buildPlacementControls" class="world-build-placement" hidden aria-label="建物の配置">
             <strong id="buildPlacementName"></strong>
@@ -90,7 +90,7 @@
           <div class="ufo-engine-overlay" id="ufoEngineOverlay" aria-live="polite">
             <span>ENGINE START MODE</span>
             <strong id="ufoEnginePhase">着座位置を固定</strong>
-            <small id="ufoEngineDetail">白ミチロードセイバーレンを操縦席へ固定しています</small>
+            <small id="ufoEngineDetail">セハルネを操縦席へ固定しています</small>
             <i aria-hidden="true"></i>
           </div>
           <div class="space-transition-overlay" id="spaceTransitionOverlay" aria-live="polite">
@@ -99,14 +99,14 @@
             <small>空の外周を越えました。UFOの航行状態を維持したまま宇宙へ接続します。</small>
             <i aria-hidden="true"></i>
           </div>
-          <section class="sky-station-guide-dialog" id="skyStationGuideDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="ミチメバンブレイブルとの会話">
-            <header class="conversation-heading"><div class="sky-station-guide-dialog-name" id="skyStationGuideDialogSpeaker">ミチメバンブレイブル</div><button type="button" id="skyStationGuideDialogClose" aria-label="会話を閉じる">とじる ×</button></header><div class="conversation-body">
+          <section class="sky-station-guide-dialog" id="skyStationGuideDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="バルティアとの会話">
+            <header class="conversation-heading"><div class="sky-station-guide-dialog-name" id="skyStationGuideDialogSpeaker">バルティア</div><button type="button" id="skyStationGuideDialogClose" aria-label="会話を閉じる">とじる ×</button></header><div class="conversation-body">
             <p class="sky-station-guide-dialog-text" id="skyStationGuideDialogText" title="タップで全文を読む"></p>
             <div class="sky-station-guide-dialog-choices" id="skyStationGuideDialogChoices" aria-label="会話の選択肢">
               <button type="button" data-guide-dialog-topic="sky-map">空マップについて</button>
               <button type="button" data-guide-dialog-topic="ufo">UFOについて</button>
               <button type="button" data-guide-dialog-topic="ufo-equipment">UFO装備倉庫について</button>
-              <button type="button" data-guide-dialog-topic="visit">ミチメバンブレイブルに会いに来た</button>
+              <button type="button" data-guide-dialog-topic="visit">バルティアに会いに来た</button>
             </div>
             <div class="sky-station-guide-dialog-footer" id="skyStationGuideDialogFooter" hidden>
               <span class="sky-station-guide-dialog-page" id="skyStationGuideDialogPage" aria-live="off"></span>
@@ -117,7 +117,7 @@
           <section class="sky-station-guide-dialog" id="marsShopDialog" hidden role="dialog" aria-modal="true" aria-live="polite" aria-label="火星素材ショップの宇宙人との会話" aria-describedby="marsShopDialogText">
             <header class="conversation-heading"><div class="sky-station-guide-dialog-name" id="marsShopDialogSpeaker">宇宙人</div><button type="button" id="marsShopDialogClose" aria-label="会話を閉じる">とじる ×</button></header><div class="conversation-body">
             <p class="sky-station-guide-dialog-text" id="marsShopDialogText"></p>
-            <div class="sky-station-guide-dialog-choices" id="marsShopDialogChoices" aria-label="白ミチロードセイバーレンの返答"></div>
+            <div class="sky-station-guide-dialog-choices" id="marsShopDialogChoices" aria-label="セハルネの返答"></div>
 
             </div>
           </section>
@@ -188,7 +188,7 @@
       <aside class="control-card">
         <section class="panel-section">
           <p class="eyebrow">CHARACTER</p>
-          <h2>白ミチロードセイバーレン</h2>
+          <h2>セハルネ</h2>
           <p class="muted">既存の360度立体モデルを、移動方向に合わせて回転させています。</p>
           <div class="readout-grid">
             <div><span>視点</span><strong id="viewReadout">三人称</strong></div>
@@ -209,7 +209,7 @@
         <section class="panel-section ufo-section">
           <p class="eyebrow">UFO ACCESS</p>
           <h2>UFO乗り場</h2>
-          <p class="muted">乗り場にUFOを建造すると、右側に白ミチロードセイバーレン専用の顔認証装置が現れます。装置の前に立つと認証され、収納式の搭乗足場が引き出されて側面ハッチが開きます。</p>
+          <p class="muted">乗り場にUFOを建造すると、右側にセハルネ専用の顔認証装置が現れます。装置の前に立つと認証され、収納式の搭乗足場が引き出されて側面ハッチが開きます。</p>
           <div class="ufo-actions" id="ufoActions">
             <button type="button" id="ufoDoorButton" disabled>右側搭乗足場を手動切替</button>
             <button type="button" id="ufoBoardButton" class="primary-button" disabled>UFOに乗る</button>

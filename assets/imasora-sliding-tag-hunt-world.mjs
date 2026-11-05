@@ -1,3 +1,4 @@
+import{makeCornerStairs,cornerStairHeight,cornerStairReserved}from'./imasora-sliding-tag-hunt-corner-stairs.mjs';
 // New hunt-world physics under construction. The live v13 preview stays untouched.
 // Shared roster and timing; coordinate scale follows the canonical .36-scale Ren model.
 import {STEP,actor,match,opponentSpec,OPPONENTS,TAG_CHARACTERS,BODY as LEGACY_BODY} from './imasora-sliding-tag-model.mjs';
@@ -7,8 +8,9 @@ export {STEP,TAG_CHARACTERS,actor,opponentSpec};
 export const HUNT_REFERENCE_HEIGHT=26.485200549316403;
 export const HUNT_CHARACTER_HEIGHT=5.4;
 export const HUNT_MAP_SCALE=HUNT_CHARACTER_HEIGHT/HUNT_REFERENCE_HEIGHT;
-export const HUNT_JUMP=Object.freeze({launch:SKY_JUMP_VELOCITY*HUNT_MAP_SCALE,gravity:SKY_JUMP_GRAVITY*HUNT_MAP_SCALE,maxJumps:SKY_MAX_JUMPS});
-export const BODY=Object.freeze({...LEGACY_BODY,gravity:HUNT_JUMP.gravity});
+// Short low-obstacle jumps get clearance without changing open-ground jump arcs.
+export const HUNT_JUMP=Object.freeze({launch:SKY_JUMP_VELOCITY*HUNT_MAP_SCALE,gravity:SKY_JUMP_GRAVITY*HUNT_MAP_SCALE,maxJumps:SKY_MAX_JUMPS,tapRelease:.9});
+export const BODY=Object.freeze({...LEGACY_BODY,dash:20,gravity:HUNT_JUMP.gravity});
 const characterById=new Map(TAG_CHARACTERS.map(c=>[c.id,c]));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function bounce(a,nx,nz,restitution){const v=a.vx*nx+a.vz*nz;if(v<0){a.vx-=(1+restitution)*v*nx;a.vz-=(1+restitution)*v*nz;}}
@@ -16,6 +18,7 @@ export const WORLD_RADII=Object.freeze({walkCute:3.2,walkBrave:4.5,walkSaber:3.6
 export const WORLD_RULES='tag-hunt-foundation-v1';
 export const WORLD_DASH_FORCE=1.18;
 export const WORLD=Object.freeze({width:640,depth:480,duration:90,grid:16});
+export const WORLD_CORNER_STAIRS=makeCornerStairs(WORLD.width,WORLD.depth);
 export const WORLD_JUMP_STEPS=Object.freeze([80,112,144].map((x,i)=>Object.freeze({x,z:-172,w:32,d:32,h:[1.5,4.5,8][i],ramp:32})));
 export const WORLD_HILL=Object.freeze({x:-267,z:-20,rx:44,rz:108,h:8,cell:4});
 export const WORLD_BASIN=Object.freeze({x:112,z:172,rx:54,rz:44,depth:5.5,brake:Object.freeze({x:112,z:172,w:16,d:24})});
@@ -49,16 +52,16 @@ export const WORLD_COURTYARD=Object.freeze({x:0,z:-80,halfW:38,halfD:32,wall:8,n
 function courtyardParts(){const c=WORLD_COURTYARD,parts=[],wall=(x,z,w,d)=>parts.push(Object.freeze({x:c.x+x,z:c.z+z,w,d,h:c.h,kind:'courtyard'})),arch=(x,z,w,d)=>parts.push(Object.freeze({x:c.x+x,z:c.z+z,w,d,h:c.h-c.archBase,base:c.archBase,kind:'arch'}));wall(-c.halfW+c.wall/2,0,c.wall,c.halfD*2);for(const side of[-1,1]){const north=c.halfW-c.wideNorth/2,south=c.halfW-c.narrowWidth/2,east=c.halfD-c.wideEast/2;wall(side*(c.wideNorth/2+north/2),-c.halfD,north,c.wall);wall(side*(c.narrowWidth/2+south/2),c.halfD,south,c.wall);wall(c.halfW-c.wall/2,side*(c.wideEast/2+east/2),c.wall,east);}arch(0,c.halfD,c.narrowWidth,c.wall);arch(0,-c.halfD,c.wideNorth,c.wall);arch(c.halfW-c.wall/2,0,c.wall,c.wideEast);return parts;}
 export const WORLD_BLOCKS=Object.freeze([...Array.from({length:30},(_,i)=>{const col=i%6,row=Math.floor(i/6),x=(col-2.5)*76,z=(row-2)*78;return Object.freeze({x,z,w:34+(i%3)*4,d:32+(i%2)*8,h:30+(i%4)*6});}).filter(b=>!(Math.abs(b.x-112)<104&&Math.abs(b.z+172)<60)&&!(Math.abs(b.x-WORLD_BASIN.x)<WORLD_BASIN.rx+b.w/2&&Math.abs(b.z-WORLD_BASIN.z)<WORLD_BASIN.rz+b.d/2)&&b.z!==0&&!(Math.abs(b.x)<55&&Math.abs(b.z)<90)&&!(Math.abs(b.x-WORLD_GARDEN.x)<32&&Math.abs(b.z-WORLD_GARDEN.z)<WORLD_GARDEN.halfD)),
  ...courtyardParts(),...WORLD_GARDEN_BEDS]);
-export const WORLD_TREES=Object.freeze(Array.from({length:100},(_,i)=>({x:-292+(i%10)*61,z:-222+Math.floor(i/10)*49,r:2.8,h:11})).filter(p=>!(Math.abs(p.x-112)<100&&Math.abs(p.z+180)<50)&&(((p.x-WORLD_BASIN.x)/WORLD_BASIN.rx)**2+((p.z-WORLD_BASIN.z)/WORLD_BASIN.rz)**2>1.15)&&(Math.abs(p.x-WORLD_GARDEN.x)>WORLD_GARDEN.halfW||Math.abs(p.z-WORLD_GARDEN.z)>WORLD_GARDEN.halfD)&&Math.abs(p.x)>=25&&Math.abs(p.z)>=22&&WORLD_BLOCKS.every(b=>Math.abs(p.x-b.x)>b.w/2+8||Math.abs(p.z-b.z)>b.d/2+8)&&Math.abs(p.x-260)>=23&&WORLD_PATHS.every(r=>Math.abs(p.x-r.x)>r.w/2+6||Math.abs(p.z-r.z)>r.d/2+6)).map(p=>Object.freeze({...p,y:worldGroundHeight(p.x,p.z)})));
+export const WORLD_TREES=Object.freeze(Array.from({length:100},(_,i)=>({x:-292+(i%10)*61,z:-222+Math.floor(i/10)*49,r:2.8,h:11})).filter(p=>!cornerStairReserved(p.x,p.z,WORLD_CORNER_STAIRS,p.r+7)&&!(Math.abs(p.x-112)<100&&Math.abs(p.z+180)<50)&&(((p.x-WORLD_BASIN.x)/WORLD_BASIN.rx)**2+((p.z-WORLD_BASIN.z)/WORLD_BASIN.rz)**2>1.15)&&(Math.abs(p.x-WORLD_GARDEN.x)>WORLD_GARDEN.halfW||Math.abs(p.z-WORLD_GARDEN.z)>WORLD_GARDEN.halfD)&&Math.abs(p.x)>=25&&Math.abs(p.z)>=22&&WORLD_BLOCKS.every(b=>Math.abs(p.x-b.x)>b.w/2+8||Math.abs(p.z-b.z)>b.d/2+8)&&Math.abs(p.x-260)>=23&&WORLD_PATHS.every(r=>Math.abs(p.x-r.x)>r.w/2+6||Math.abs(p.z-r.z)>r.d/2+6)).map(p=>Object.freeze({...p,y:worldGroundHeight(p.x,p.z)})));
 
-export function worldHeight(x,z){let ground=worldGroundHeight(x,z);for(const t of WORLD_JUMP_STEPS){if(Math.abs(x-t.x)<=t.w/2){if(Math.abs(z-t.z)<=t.d/2)ground=Math.max(ground,t.h);else if(z<t.z-t.d/2&&z>t.z-t.d/2-t.ramp)ground=Math.max(ground,t.h*(z-(t.z-t.d/2-t.ramp))/t.ramp);}}if(Math.abs(x-deck.x)>deck.w/2)return ground;const az=Math.abs(z);return Math.max(ground,az<=deck.length/2?deck.h:az<deck.length/2+deck.ramp?deck.h*(1-(az-deck.length/2)/deck.ramp):0);}
-export function worldSurface(x,z){return WORLD_PATHS.some(p=>Math.abs(x-p.x)<=p.w/2&&Math.abs(z-p.z)<=p.d/2)?'grip':'ice';}
+export function worldHeight(x,z){let ground=Math.max(worldGroundHeight(x,z),cornerStairHeight(x,z,WORLD_CORNER_STAIRS));for(const t of WORLD_JUMP_STEPS){if(Math.abs(x-t.x)<=t.w/2){if(Math.abs(z-t.z)<=t.d/2)ground=Math.max(ground,t.h);else if(z<t.z-t.d/2&&z>t.z-t.d/2-t.ramp)ground=Math.max(ground,t.h*(z-(t.z-t.d/2-t.ramp))/t.ramp);}}if(Math.abs(x-deck.x)>deck.w/2)return ground;const az=Math.abs(z);return Math.max(ground,az<=deck.length/2?deck.h:az<deck.length/2+deck.ramp?deck.h*(1-(az-deck.length/2)/deck.ramp):0);}
+export function worldSurface(x,z){if(WORLD_PATHS.some(p=>Math.abs(x-p.x)<=p.w/2&&Math.abs(z-p.z)<=p.d/2))return'grip';return WORLD_ICE_LOOP.some(p=>Math.abs(x-p.x)<=p.w/2&&Math.abs(z-p.z)<=p.d/2)||((x-WORLD_BASIN.x)/WORLD_BASIN.rx)**2+((z-WORLD_BASIN.z)/WORLD_BASIN.rz)**2<1?'ice':'grip';}
 export function worldValid(p,padding=BODY.radius){return Math.abs(p.x)<WORLD.width/2-padding&&Math.abs(p.z)<WORLD.depth/2-padding&&WORLD_BLOCKS.every(b=>(p.y??worldHeight(p.x,p.z))+5.4<=(b.base??0)+.001||Math.abs(p.x-b.x)>b.w/2+padding||Math.abs(p.z-b.z)>b.d/2+padding)&&WORLD_TREES.every(t=>Math.hypot(p.x-t.x,p.z-t.z)>t.r+padding)&&HOOK_POLES.every(t=>(p.y??worldHeight(p.x,p.z))>worldHeight(t.x,t.z)+4||Math.hypot(p.x-t.x,p.z-t.z)>.65+padding); }
 // Slab intersection tests the whole segment; roof/floor separation cannot tag through a wall.
 // Immutable broad-phase bounds are shared by navigation, sight and camera rays.
 // The narrow phase retains the same divisions, axis order and contact rules.
 const sightBoxes=WORLD_BLOCKS.map(b=>({minX:b.x-b.w/2,maxX:b.x+b.w/2,minZ:b.z-b.d/2,maxZ:b.z+b.d/2,minY:b.base??0,maxY:(b.base??0)+b.h}));
-const sightRaisedGround=[...WORLD_JUMP_STEPS.map(t=>({minX:t.x-t.w/2,maxX:t.x+t.w/2,minZ:t.z-t.d/2-t.ramp,maxZ:t.z+t.d/2})),
+const sightRaisedGround=[...WORLD_CORNER_STAIRS.map(c=>({minX:Math.min(c.x,c.x-c.sx*c.reach),maxX:Math.max(c.x,c.x-c.sx*c.reach),minZ:Math.min(c.z,c.z-c.sz*c.reach),maxZ:Math.max(c.z,c.z-c.sz*c.reach)})),...WORLD_JUMP_STEPS.map(t=>({minX:t.x-t.w/2,maxX:t.x+t.w/2,minZ:t.z-t.d/2-t.ramp,maxZ:t.z+t.d/2})),
  {minX:WORLD_HILL.x-WORLD_HILL.rx-WORLD_HILL.cell,maxX:WORLD_HILL.x+WORLD_HILL.rx+WORLD_HILL.cell,minZ:WORLD_HILL.z-WORLD_HILL.rz-WORLD_HILL.cell,maxZ:WORLD_HILL.z+WORLD_HILL.rz+WORLD_HILL.cell},
  {minX:WORLD_RISE.x-WORLD_RISE.halfW-WORLD_HILL.cell,maxX:WORLD_RISE.x+WORLD_RISE.halfW+WORLD_HILL.cell,minZ:WORLD_RISE.z-WORLD_RISE.halfD-WORLD_HILL.cell,maxZ:WORLD_RISE.z+WORLD_RISE.halfD+WORLD_HILL.cell},
  {minX:WORLD_RIDGE.start-WORLD_RIDGE.cap-WORLD_HILL.cell,maxX:WORLD_DECK.x+WORLD_DECK.w/2+WORLD_HILL.cell,minZ:-WORLD_RIDGE.halfBase-WORLD_HILL.cell,maxZ:WORLD_RIDGE.halfBase+WORLD_HILL.cell},
@@ -87,28 +90,48 @@ export function worldSight(a,b,padding=0){
  if(minY>=sightMaxGround+.05||minY>=.05&&!sightRaisedGround.some(r=>maxX>=r.minX&&minX<=r.maxX&&maxZ>=r.minZ&&minZ<=r.maxZ))return true;
  const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/3));for(let i=1;i<steps;i++){const t=i/steps,x=ax+dx*t,z=az+dz*t,y=ay+dy*t;if(y<worldHeight(x,z)+.05)return false;}return true;
 }
+function stairJumpAccess(a,x,z,n,radius){const reach=radius+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5)),probe=(dx,dz)=>{const px=a.x+dx*reach,pz=a.z+dz*reach,h=cornerStairHeight(px,pz,WORLD_CORNER_STAIRS);return h>worldGroundHeight(px,pz)&&h>a.y+.6&&h<=a.y+1.41;};return n>.05?probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0):probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);}
 export function worldMove(a,input={},dt=STEP){
- const radius=a.radius??2.7;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
+ const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
+ const intendedYaw=n>.05?Math.atan2(x,z):a.yaw;
+
  const t=a.tuning??{accel:1,speed:1,turn:1,brake:1},before={x:a.x,z:a.z,y:a.y},ground=a.grounded,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
- if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
- const velocity=Math.hypot(a.vx,a.vz);if(velocity>.1){const nx=a.vx/velocity,nz=a.vz/velocity,dot=x*nx+z*nz;x=dot*nx+(x-dot*nx)*t.turn;z=dot*nz+(z-dot*nz)*t.turn;}
- const drag=ground?(grip?4.7:.32)*t.brake:.08,decay=Math.exp(-drag*dt),force=BODY.accel*t.accel*(ground?(grip?2.7:1):.22)*(ground&&input.dash?WORLD_DASH_FORCE:1);
- a.vx=a.vx*decay+x*force*dt;a.vz=a.vz*decay+z*force*dt;
- const slope=worldGradient(a.x,a.z),rest=!a.externalForce&&ground&&grip&&Math.hypot(x,z)<.05&&velocity<.45&&Math.hypot(slope.x,slope.z)<.32*t.brake;if(rest){a.vx=0;a.vz=0;}else if(ground){a.vx-=slope.x*BODY.gravity*dt;a.vz-=slope.z*BODY.gravity*dt;}
- const speed=Math.hypot(a.vx,a.vz),downhill=ground?clamp(-(slope.x*a.vx+slope.z*a.vz)/(Math.hypot(a.vx,a.vz)||1)*10,0,3):0,max=(input.dash?BODY.dash:BODY.max)*t.speed+downhill;if(speed>max){const cap=Math.min(speed,Math.max(max,velocity-16*dt));a.vx*=cap/speed;a.vz*=cap/speed;}
+ if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
+ const velocity=Math.hypot(a.vx,a.vz),running=ground&&grip&&!a.externalForce&&!['cushion','sticky'].includes(a.kind);
+ if(running){
+  const amount=Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=x*limit,tz=z*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*x+a.vz*z)/(velocity*amount)<.95;
+  const rate=amount<.05?150*t.brake:100*t.accel*(turning?.5+.5*t.turn:1),step=Math.min(d,rate*dt);
+  if(d>1e-9){a.vx+=dx/d*step;a.vz+=dz/d*step;}if(amount<.05&&Math.hypot(a.vx,a.vz)<.03){a.vx=0;a.vz=0;}
+ }else{
+  if(velocity>.1){const nx=a.vx/velocity,nz=a.vz/velocity,dot=x*nx+z*nz;x=dot*nx+(x-dot*nx)*t.turn;z=dot*nz+(z-dot*nz)*t.turn;}
+  // Retain directional control from a standing jump, not just a running takeoff.
+  const drag=ground?(grip?4.7:(n<.05?1.8:.6))*t.brake:.08,decay=Math.exp(-drag*dt),force=BODY.accel*t.accel*(ground?(grip?2.7:1):a.stepJump?3:.22)*(ground&&input.dash?WORLD_DASH_FORCE:1);
+  a.vx=a.vx*decay+x*force*dt;a.vz=a.vz*decay+z*force*dt;
+ }
+ const slope=worldGradient(a.x,a.z),rest=running&&n<.05;if(!rest&&ground){a.vx-=slope.x*BODY.gravity*dt;a.vz-=slope.z*BODY.gravity*dt;}
+ const speed=Math.hypot(a.vx,a.vz),downhill=ground?clamp(-(slope.x*a.vx+slope.z*a.vz)/(Math.hypot(a.vx,a.vz)||1)*10,0,3):0,max=Math.max((input.dash?dash:BODY.max)*t.speed+downhill,a.trampolineBoost&&!ground&&a.vy>0&&Number.isFinite(a.trampolineForwardSpeed)?clamp(a.trampolineForwardSpeed,0,34):0);if(speed>max){const cap=Math.min(speed,Math.max(max,velocity-16*dt));a.vx*=cap/speed;a.vz*=cap/speed;}
  a.x+=a.vx*dt;a.z+=a.vz*dt;
  for(const box of WORLD_BLOCKS){if(a.y>=(box.base??0)+box.h-.01||a.y+5.4<=(box.base??0)+.001)continue;const minX=box.x-box.w/2-radius,maxX=box.x+box.w/2+radius,minZ=box.z-box.d/2-radius,maxZ=box.z+box.d/2+radius;if(a.x>minX&&a.x<maxX&&a.z>minZ&&a.z<maxZ){const options=[[Math.abs(a.x-minX),'x',minX,-1],[Math.abs(maxX-a.x),'x',maxX,1],[Math.abs(a.z-minZ),'z',minZ,-1],[Math.abs(maxZ-a.z),'z',maxZ,1]];const chosen=options.reduce((m,v)=>v[0]<m[0]?v:m);a[chosen[1]]=chosen[2];bounce(a,chosen[1]==='x'?chosen[3]:0,chosen[1]==='z'?chosen[3]:0,.2);}}
- for(const tree of WORLD_TREES){if(a.y>tree.y+tree.h||a.y+5.4<tree.y)continue;const dx=a.x-tree.x,dz=a.z-tree.z,d=Math.hypot(dx,dz),r=tree.r+radius;if(d<r){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0;a.x=tree.x+nx*r;a.z=tree.z+nz*r;bounce(a,nx,nz,.2);}}
- for(const pole of HOOK_POLES){if(a.y>worldHeight(pole.x,pole.z)+4)continue;const dx=a.x-pole.x,dz=a.z-pole.z,d=Math.hypot(dx,dz),r=.65+radius;if(d<r){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0;a.x=pole.x+nx*r;a.z=pole.z+nz*r;bounce(a,nx,nz,.2);}}
+ // A falling foot can reach the canopy during this same fixed step.
+ const treeFootY=a.grounded?a.y:Math.min(a.y,a.y+a.vy*dt-BODY.gravity*dt*dt/2);
+ for(const tree of WORLD_TREES){if(!a.flight&&(treeFootY>tree.y+tree.h||a.y+5.4<tree.y))continue;const dx=a.x-tree.x,dz=a.z-tree.z,d=Math.hypot(dx,dz),r=tree.r+radius;if(d<r){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0;a.x=tree.x+nx*r;a.z=tree.z+nz*r;bounce(a,nx,nz,.2);}}
+ // Resolve poles against the full vertical step, including a descending foot.
+ const poleFootY=a.grounded?a.y:Math.min(a.y,a.y+a.vy*dt-BODY.gravity*dt*dt/2);
+ for(const pole of HOOK_POLES){if(poleFootY>worldHeight(pole.x,pole.z)+4)continue;const dx=a.x-pole.x,dz=a.z-pole.z,d=Math.hypot(dx,dz),r=.65+radius;if(d<r){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0;a.x=pole.x+nx*r;a.z=pole.z+nz*r;bounce(a,nx,nz,.2);}}
  for(const axis of['x','z'])for(const sign of[-1,1]){const edge={x:a.x,z:a.z};edge[axis]+=sign*radius;if(sign*(a[axis]-before[axis])>0&&worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge)){a[axis]=before[axis];a[axis==='x'?'vx':'vz']*= -.2;break;}}
  a.x=clamp(a.x,-WORLD.width/2+radius,WORLD.width/2-radius);a.z=clamp(a.z,-WORLD.depth/2+radius,WORLD.depth/2-radius);
  const floor=worldHeight(a.x,a.z);if(a.grounded){if(floor<=before.y+.6&&floor>=before.y-.6)a.y=floor;else if(floor>before.y+.6){a.x=before.x;a.z=before.z;a.vx=0;a.vz=0;}else a.grounded=false;}
- if(!a.grounded&&floor>before.y+.6){a.x=before.x;a.z=before.z;}
- if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;}}
- if(Math.hypot(a.vx,a.vz)>.2)a.yaw=Math.atan2(a.vx,a.vz);return a;
+ if(!a.grounded&&floor>before.y+(cornerStairHeight(a.x,a.z,WORLD_CORNER_STAIRS)>worldGroundHeight(a.x,a.z)?.01:.6)){a.x=before.x;a.z=before.z;}
+ if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;}}
+ if(a.keepInputFacing)a.yaw=intendedYaw;else if(Math.hypot(a.vx,a.vz)>.2)a.yaw=Math.atan2(a.vx,a.vz);return a;
 }
 function terrainContinuous(a,b){const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)*2));let h=worldHeight(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,next=worldHeight(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(Math.abs(next-h)>.3)return false;h=next;}return true;}
-export function worldTraversable(a,b,padding=BODY.radius+.2){if(!worldSight({...a,y:worldHeight(a.x,a.z)+2},{...b,y:worldHeight(b.x,b.z)+2},padding))return false;const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)*2));let h=worldHeight(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,next=worldHeight(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(Math.abs(next-h)>.3)return false;h=next;}return true;}
+export function worldTraversable(a,b,padding=BODY.radius+.2){
+ // A visible ray may leave the map; a walking destination must stay inside it.
+ // Check the destination, so a body already at the physical rim can return
+ // inward even when the planning margin is wider than its actual radius.
+ if(Math.abs(b.x)>WORLD.width/2-padding||Math.abs(b.z)>WORLD.depth/2-padding)return false;
+ if(!worldSight({...a,y:worldHeight(a.x,a.z)+2},{...b,y:worldHeight(b.x,b.z)+2},padding))return false;const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)*2));let h=worldHeight(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,next=worldHeight(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(Math.abs(next-h)>.3)return false;h=next;}return true;}
 // A fixed sparse graph, built once. Search runs on decisions, never once per render frame.
 const WORLD_NODES=[];for(let z=-224;z<=224;z+=16)for(let x=-304;x<=304;x+=16)if(worldValid({x,z},BODY.radius+1))WORLD_NODES.push({x,z,y:worldHeight(x,z)});
 const worldCell=new Map(WORLD_NODES.map((n,i)=>[n.x+','+n.z,i]));
@@ -135,11 +158,11 @@ function routeSamples(a,b){
  if(cacheable)worldTravelCache.set(key,rows);return rows;
 }
 const worldTravelMemos=new Map();
-function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(t.speed??1),accel=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
+function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(t.speed??1),accel=100*(t.accel??1),iceDrive=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,iceDrive,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
 function segmentSeconds(config,a,b,prior,initial=false){
- const samples=routeSamples(a,b),cached=config.memo.get(samples);let seconds=cached?.seconds??0,cruise=cached?.cruise??config.top;if(!cached){for(const row of samples){const force=config.accel*(row.grip?2.7:1),drag=(row.grip?4.7:.32)*config.brake,limit=config.top+clamp(-row.grade*10,0,3);cruise=clamp(Math.min(limit,(force-row.grade*BODY.gravity)/drag),2,limit);seconds+=row.length/cruise;}config.memo.set(samples,{seconds,cruise});}
+ const samples=routeSamples(a,b),cached=config.memo.get(samples);let seconds=cached?.seconds??0,cruise=cached?.cruise??config.top;if(!cached){for(const row of samples){const limit=config.top+clamp(-row.grade*10,0,3);cruise=row.grip?limit:clamp((config.iceDrive-row.grade*BODY.gravity)/(.6*config.brake),2,limit);seconds+=row.length/cruise;}config.memo.set(samples,{seconds,cruise});}
  const dx=b.x-a.x,dz=b.z-a.z,length=Math.hypot(dx,dz)||1;
- if(initial){const forward=(config.vx*dx+config.vz*dz)/length;seconds+=Math.max(0,cruise-Math.max(0,forward))**2/(2*config.accel*cruise);seconds+=Math.max(0,-forward)/(config.accel*Math.max(.3,config.brake));}
+ if(initial){const forward=(config.vx*dx+config.vz*dz)/length,accel=samples[0]?.grip?config.accel:config.iceDrive*.7;seconds+=Math.max(0,cruise-Math.max(0,forward))**2/(2*accel*cruise);seconds+=Math.max(0,-forward)/(accel*Math.max(.3,config.brake));}
  else if(prior){const ux=a.x-prior.x,uz=a.z-prior.z,cos=(ux*dx+uz*dz)/((Math.hypot(ux,uz)||length)*length);seconds+=Math.max(0,1-cos)*.22/Math.max(.3,config.turn);}
  return seconds;
 }
@@ -163,16 +186,25 @@ export function worldRoute(a,b){
 
 
 export function worldRouteLookahead(a,path,start=0,threat=null){
- if(!path.length)return 0;let at=start;const remaining=path.slice(start),margin=threat?worldEscapeClearance(a,threat,remaining):-Infinity;
+ if(!path.length)return 0;let at=start;const remaining=path.slice(start),threats=threat?(Array.isArray(threat)?threat:[threat]):[],clearance=p=>Math.min(...threats.map(t=>worldEscapeClearance(a,t,p))),margin=threats.length?clearance(remaining):-Infinity;
  for(let i=start+1;i<Math.min(path.length,start+5);i++){
   if(!worldTraversable(a,path[i],(a.radius??2.7)-.05))break;
-  if(threat&&worldEscapeClearance(a,threat,[path[i]])+.001<margin)break;
+  if(threats.length&&clearance([path[i]])+.001<margin)break;
   if(worldRouteSeconds(a,[path[i]])>worldRouteSeconds(a,path.slice(start,i+1))*1.03+.02)break;
   at=i;
  }
  return at;
 }
-export function worldSearchPlan(seen,radius=2.7){const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];for(const offset of[0,.8,-.8,1.8,-1.8,Math.PI]){let best=-Infinity,pick;for(const n of candidates){if(used.has(n))continue;const dx=n.x-seen.x,dz=n.z-seen.z,d=Math.hypot(dx,dz),score=(dx*Math.sin(heading+offset)+dz*Math.cos(heading+offset))/d*20-Math.abs(d-40)*.2-Math.abs(n.y-(seen.y??0))*.6;if(score>best){best=score;pick=n;}}if(pick){used.add(pick);plan.push({...pick});}}return plan;}
+export function worldSearchPlan(seen,radius=2.7,{role,reserved=[]}={}){
+ const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];
+ const offsets=role==='intercept'?[.8,-.8,0,1.8,-1.8,Math.PI]:role==='patrol'?[-1.8,1.8,Math.PI,-.8,.8,0]:[0,.8,-.8,1.8,-1.8,Math.PI];
+ for(const offset of offsets){let best=-Infinity,pick;
+  for(const n of candidates){if(used.has(n))continue;const dx=n.x-seen.x,dz=n.z-seen.z,d=Math.hypot(dx,dz),occupied=plan.length===0?reserved.reduce((penalty,p)=>penalty+Math.max(0,24-Math.hypot(n.x-p.x,n.z-p.z))*1.6,0):0;
+   const score=(dx*Math.sin(heading+offset)+dz*Math.cos(heading+offset))/d*20-Math.abs(d-40)*.2-Math.abs(n.y-(seen.y??0))*.6-occupied;
+   if(score>best){best=score;pick=n;}
+  }if(pick){used.add(pick);plan.push({...pick});}
+ }return plan;
+}
 function localPatrol(a,m){m.patrol=(m.patrol??0)+1;const angle=m.patrol*2.399963,tx=a.x+Math.sin(angle)*45,tz=a.z+Math.cos(angle)*45;let best=Infinity,pick=a;for(const n of WORLD_NODES){const d=Math.hypot(n.x-a.x,n.z-a.z);if(d<20||d>70||!worldValid(n,(a.radius??2.7)+.2))continue;const score=Math.hypot(n.x-tx,n.z-tz)+Math.abs(n.y-a.y)*2;if(score<best){best=score;pick=n;}}return {...pick};}
 // Inspect the real escape route, not just its endpoint. Only visible threats enter this planner.
 export function worldEscapeClearance(a,threat,path,horizon=80){
@@ -190,6 +222,17 @@ export function worldEscapePlan(a,threat,preferred){
  const sectors=new Array(8);for(const n of WORLD_NODES){const dx=n.x-a.x,dz=n.z-a.z,d=Math.hypot(dx,dz);if(d<22||d>65||!worldValid(n,(a.radius??2.7)+.2))continue;const sector=Math.floor((Math.atan2(dz,dx)+Math.PI)*4/Math.PI)%8;if(!sectors[sector]||score(n)>score(sectors[sector]))sectors[sector]=n;}
  for(const n of sectors.filter(Boolean).sort((a,b)=>score(b)-score(a))){const candidate=plan(n);if(candidate.clearance>best.clearance+.001||Math.abs(candidate.clearance-best.clearance)<=.001&&score(n)>score(best.target))best=candidate;if(best.clearance>=safe)break;}
  return best;
+}
+// Bounded team evasion uses only observations supplied by the runner's senses.
+export function worldEscapeTeamPlan(a,threats,prior){
+ const forecasts=threats.map(t=>{const cap=Math.min(1,24/(Math.hypot(t.vx??0,t.vz??0)||1)),p={x:t.x+(t.vx??0)*cap*1.2,z:t.z+(t.vz??0)*cap*1.2,y:t.y};return{...t,end:worldTraversable(t,p,(t.radius??2.7)-.05)?p:t};}),top=BODY.dash*(a.tuning?.speed??1),endpoint=n=>Math.min(...forecasts.map(t=>Math.min(Math.hypot(n.x-t.x,n.z-t.z),Math.hypot(n.x-t.end.x,n.z-t.end.z))-(a.radius+t.radius)))-Math.hypot(n.x-a.x,n.z-a.z)*.2;
+ const sectors=new Array(8);for(const n of WORLD_NODES){const dx=n.x-a.x,dz=n.z-a.z,d=Math.hypot(dx,dz);if(d<22||d>88||!worldValid(n,(a.radius??2.7)+.2))continue;const sector=Math.floor((Math.atan2(dz,dx)+Math.PI)*4/Math.PI)%8;if(!sectors[sector]||endpoint(n)>endpoint(sectors[sector]))sectors[sector]=n;}
+ const choices=[];if(prior&&Math.hypot(prior.x-a.x,prior.z-a.z)>12&&Math.hypot(prior.x-a.x,prior.z-a.z)<100&&worldValid(prior,a.radius+.2))choices.push(prior);const velocity=Math.hypot(a.vx,a.vz);if(velocity>3){const forward={x:a.x+a.vx/velocity*60,z:a.z+a.vz/velocity*60},coast=WORLD_NODES.filter(n=>Math.hypot(n.x-forward.x,n.z-forward.z)<18&&worldValid(n,a.radius+.2)).sort((x,y)=>Math.hypot(x.x-forward.x,x.z-forward.z)-Math.hypot(y.x-forward.x,y.z-forward.z))[0];if(coast)choices.push(coast);}for(const n of sectors.filter(Boolean).sort((a,b)=>endpoint(b)-endpoint(a)))if(choices.length<6&&!choices.includes(n))choices.push(n);
+ let best={target:a,path:[],clearance:-Infinity,score:-Infinity};
+ for(const target of choices){const path=worldRoute(a,target);if(!path.length)continue;let from=a,travel=0,min=Infinity,sum=0,count=0;
+  for(const to of path){const length=Math.hypot(to.x-from.x,to.z-from.z),steps=Math.max(1,Math.ceil(length/8));for(let i=1;i<=steps;i++){const fraction=i/steps,x=from.x+(to.x-from.x)*fraction,z=from.z+(to.z-from.z)*fraction,at=Math.min(1,(travel+length*fraction)/Math.max(8,top)/1.2),margin=Math.min(...forecasts.map(t=>Math.min(Math.hypot(x-t.x,z-t.z),Math.hypot(x-(t.x+(t.end.x-t.x)*at),z-(t.z+(t.end.z-t.z)*at)))-a.radius-t.radius));min=Math.min(min,margin);sum+=margin;count++;}travel+=length;from=to;if(travel>=48)break;}
+  const first=path.find(p=>Math.hypot(p.x-a.x,p.z-a.z)>2)??target,dx=first.x-a.x,dz=first.z-a.z,alignment=velocity>3?(a.vx*dx+a.vz*dz)/(velocity*(Math.hypot(dx,dz)||1)):1,turnCost=(1-alignment)*Math.min(30,velocity)*(a.grounded&&worldSurface(a.x,a.z)==='grip'?1:2),cover=forecasts.filter(t=>!worldSight({...t,y:t.y+3},{...target,y:target.y+3})).length*4,exits=[[18,0],[-18,0],[0,18],[0,-18]].filter(([x,z])=>worldTraversable(target,{x:target.x+x,z:target.z+z},a.radius+.2)).length,pressure=Math.min(...threats.map(t=>Math.hypot(t.x-a.x,t.z-a.z)))<50,score=min*4+sum/Math.max(1,count)*.45+cover+exits*4+(target===prior?(pressure?4:12):0)-turnCost;if(score>best.score)best={target,path,clearance:min,score};if(best.clearance>22&&Math.min(...threats.map(t=>Math.hypot(t.x-a.x,t.z-a.z)))>65)break;
+ }return best;
 }
 // One room probe per current path leg; old actors and paths are not retained.
 const worldSteeringMemos = new WeakMap();
@@ -215,9 +258,9 @@ export function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
   const nx=next.x-goal.x,nz=next.z-goal.z,length=Math.hypot(nx,nz);
   const cos=length?(dx*nx+dz*nz)/(d*length):1;
   if(cos<.96) {
-   const grounded=a.grounded!==false,grip=worldSurface(a.x,a.z)==='grip';
-   const drive=BODY.accel*(t.accel??1)*(grounded?(grip?2.7:1):.22)*(grounded&&sprint?WORLD_DASH_FORCE:1);
-   const drag=grounded?(grip?4.7:.32)*(t.brake??1):.08;
+   const grounded=a.grounded!==false,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
+   const drive=grounded&&grip?100*(t.accel??1):BODY.accel*(t.accel??1)*(grounded?1:.22)*(grounded&&sprint?WORLD_DASH_FORCE:1);
+   const drag=grounded?(grip?4.7:.6)*(t.brake??1):.08;
    // The reserve accounts for discrete waypoint changes and the motor's response time.
    const corner=Math.min(top,Math.sqrt(drive*(t.turn??1)*Math.max(.25,room)*.12/Math.max(.25,1-cos)));
    const v=Math.hypot(a.vx,a.vz),slope=grounded?worldGradient(a.x,a.z):{x:0,z:0};
@@ -226,6 +269,7 @@ export function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
    speed=Math.min(speed,Math.sqrt(corner*corner+2*brake*Math.max(0,d-5)));
   }
  }
+ if(a.grounded!==false&&!a.slippery&&worldSurface(a.x,a.z)==='grip')return{x:dx/(d||1)*speed/top,z:dz/(d||1)*speed/top,dash:!!sprint,jump:false};
  let x=dx/(d||1)*speed-a.vx,z=dz/(d||1)*speed-a.vz,n=Math.hypot(x,z);
  if(n>1){x/=n;z/=n;}
  return {x,z,dash:!!sprint,jump:false};
@@ -247,19 +291,47 @@ export function worldHuntAim(a,other,m){
  }
  return{target,mode:m.role==='intercept'?'intercept':'pursuit'};
 }
-export function worldPilot(a,other,chasing,time,m){
- if(time>=m.next||!m.path){m.next=time+.65;const spec=opponentSpec(m.profile)??OPPONENTS[1],style=m.role==='pursuit'?'direct':m.role==='intercept'?'cutoff':m.role==='patrol'?'patrol':spec.movement?.style??spec.id,visible=!m.suppressSight&&Math.hypot(a.x-other.x,a.z-other.z)<(m.role==='patrol'?70:140)&&worldSight({...a,y:a.y+3},{...other,y:other.y+3});
+function huntContactApproach(a,observed){
+ const radius=a.radius??2.7,padding=radius+.2;
+ if(worldValid(observed,padding))return observed;
+ const margin=padding+.05;
+ const x=clamp(observed.x,-WORLD.width/2+margin,WORLD.width/2-margin);
+ const z=clamp(observed.z,-WORLD.depth/2+margin,WORLD.depth/2-margin);
+ const y=observed.y??worldHeight(observed.x,observed.z);
+ const contact={x:observed.x,y:y+2.7,z:observed.z};
+ const candidate=(x,z)=>{
+  const p={x,y:worldHeight(x,z),z};
+  return Math.abs(p.y-y)<=2.8&&worldValid(p,padding)&&worldSight({...p,y:p.y+2.7},contact,.05)?p:null;
+ };
+ const edge=candidate(x,z);
+ if(edge)return edge;
+ for(const distance of [1,2,3,4,6])for(let i=0;i<8;i++){
+  const yaw=i*Math.PI/4;
+  const p=candidate(x+Math.sin(yaw)*distance,z+Math.cos(yaw)*distance);
+  if(p)return p;
+ }
+ return observed;
+}
+export function worldPilot(a,other,chasing,time,m,reachObserved=false){
+ if(time>=m.next||!m.path){m.next=time+(!chasing&&m.escapeThreats?.length ? .4 : .65);const spec=opponentSpec(m.profile)??OPPONENTS[1],style=m.role==='pursuit'?'direct':m.role==='intercept'?'cutoff':m.role==='patrol'?'patrol':spec.movement?.style??spec.id,visible=!m.suppressSight&&Math.hypot(a.x-other.x,a.z-other.z)<(m.role==='patrol'?70:140)&&worldSight({...a,y:a.y+3},{...other,y:other.y+3});
  const movement=m.lastDecision?Math.hypot(a.x-m.lastDecision.x,a.z-m.lastDecision.z):Infinity;m.stuck=movement<.4&&m.target&&Math.hypot(m.target.x-a.x,m.target.z-a.z)>10?(m.stuck??0)+1:0;m.lastDecision={x:a.x,z:a.z};
  if(visible){m.seen={x:other.x,z:other.z,y:other.y,vx:other.vx,vz:other.vz};m.seenAt=time;m.searchPlan=null;m.searchIndex=0;}m.visible=visible;let target,plannedPath;if(!chasing&&visible&&Math.hypot(a.x-other.x,a.z-other.z)<55)m.sprintUntil=time+1.6;
  if(chasing&&visible){if(['pursuit','intercept','patrol'].includes(m.role)){const aim=worldHuntAim(a,other,m);target=aim.target;m.mode=aim.mode;}else{const horizon=style==='cutoff'?clamp(Math.hypot(a.x-other.x,a.z-other.z)/(BODY.dash*(a.tuning?.speed??1))*.65,.35,2.8):style==='direct'?.18:.8;target={x:other.x+other.vx*horizon,z:other.z+other.vz*horizon,y:other.y};if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05))target={x:other.x,z:other.z,y:other.y};m.mode=style==='cutoff'?'intercept':'pursuit';}m.goalSince=time;}
- else if(chasing&&m.seen&&time-m.seenAt<18){const last=m.seen,atLast=Math.hypot(a.x-last.x,a.z-last.z)<12;
-  if(!atLast&&m.stuck<3&&m.path?.length!==0){target={x:last.x,z:last.z,y:last.y};m.mode='last-seen';}
-  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius);m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){m.searchIndex++;m.goalSince=time;}target=m.searchPlan[m.searchIndex%m.searchPlan.length];m.mode='search';}
+ else if(chasing&&m.seen&&time-m.seenAt<18){const last=m.seen,gap=Math.hypot(a.x-last.x,a.z-last.z),atLast=gap<12;
+  // The pursuer checks the actual old contact. Other roles may investigate
+  // different exits nearby, using only that observation's direction and age.
+  const branch=m.role==='intercept'?gap<70&&time-m.seenAt>=.75:m.role==='patrol'?gap<80&&time-m.seenAt>=1.1:false;
+  if(!m.searchPlan&&!atLast&&!branch&&m.stuck<3&&m.path?.length!==0){target={x:last.x,z:last.z,y:last.y};m.mode='last-seen';}
+  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius,{role:m.role,reserved:m.searchReservations});m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){
+   m.searchIndex++;for(let i=0;i<m.searchPlan.length;i++){const p=m.searchPlan[(m.searchIndex+i)%m.searchPlan.length];if((m.searchReservations??[]).every(q=>Math.hypot(p.x-q.x,p.z-q.z)>=20)){m.searchIndex+=i;break;}}m.goalSince=time;
+  }target=m.searchPlan[m.searchIndex%m.searchPlan.length];m.mode='search';}
  }
+ else if(!chasing&&m.escapeThreats?.length){const escape=worldEscapeTeamPlan(a,m.escapeThreats,m.target);target=escape.target;plannedPath=escape.path;m.mode='escape';m.goalSince=time;}
  else if(!chasing&&visible){let best=-Infinity;const candidates=[];for(let i=0;i<WORLD_NODES.length;i+=3){const n=WORLD_NODES[i],distance=Math.hypot(n.x-a.x,n.z-a.z);if(distance<22||distance>75||!worldValid(n,(a.radius??2.7)+.2))continue;candidates.push({n,score:Math.hypot(n.x-other.x,n.z-other.z)-distance*.35});}candidates.sort((a,b)=>b.score-a.score);for(const c of candidates.slice(0,24)){const score=c.score+(worldSight({...other,y:other.y+3},{...c.n,y:c.n.y+3})?0:12+spec.cover*4);if(score>best){best=score;target=c.n;}}if(target){const escape=worldEscapePlan(a,other,target);target=escape.target;plannedPath=escape.path;}m.mode='escape';m.goalSince=time;
  }
  if(!target){if(m.target&&time-(m.goalSince??0)<4&&Math.hypot(a.x-m.target.x,a.z-m.target.z)>8&&m.stuck<3)target=m.target;else{target=localPatrol(a,m);m.goalSince=time;}m.mode='patrol';}
- m.path=plannedPath??worldRoute(a,target);m.target={...target};m.at=worldRouteLookahead(a,m.path,0,!chasing&&visible?m.seen:null);
+ if(chasing&&reachObserved&&['pursuit','intercept','last-seen'].includes(m.mode))target=huntContactApproach(a,target);
+ m.path=plannedPath??worldRoute(a,target);m.target={...target};m.at=worldRouteLookahead(a,m.path,0,!chasing&&m.escapeThreats?.length?m.escapeThreats:!chasing&&visible?m.seen:null);
  }
  const path=m.path??[];while(m.at<path.length-1&&Math.hypot(path[m.at].x-a.x,path[m.at].z-a.z)<2.8)m.at++;const goal=path[m.at]??a,next=path[m.at+1];let memo=worldSteeringMemos.get(a);if(!memo||memo.path!==path||memo.at!==m.at||memo.radius!==a.radius){memo={path,at:m.at,radius:a.radius,room:steeringRoom(a,goal,next)};worldSteeringMemos.set(a,memo);}return worldSteering(a,goal,next,{sprint:chasing||time<(m.sprintUntil??0),room:memo.room});
 }
