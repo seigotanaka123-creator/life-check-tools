@@ -114,7 +114,7 @@ function validateOperation(op) {
   } else if (op.type === 'remove-cell') {
     keys(op, ['type', 'to', 'position']); position(op.position);
     requireValue(MOBILE.includes(op.to), '土の回収先が不正です。');
-  } else throw new Error('この段階では未対応の建設操作です。');
+  } else throw new Error('この建設操作は利用できません。');
 }
 function applyOperation(state, op) {
   validateOperation(op);
@@ -142,7 +142,7 @@ function applyOperation(state, op) {
 function dataView(state) { return canonical({ materials: state.materials, chunks: state.chunks }); }
 export function validateConstructionState(state, { verifyHistory = true } = {}) {
   keys(state, ['schemaVersion', 'mapId', 'scope', 'revision', 'updatedAt', 'world', 'materials', 'chunks', 'parts', 'fluids', 'vehicles', 'history', 'transactions']);
-  requireValue(state.schemaVersion === CONSTRUCTION_SCHEMA && state.mapId === 'construction' && ['development-loan', TERRAIN_SCOPE].includes(state.scope), 'この保存版・マップ・開発区分には対応していません。');
+  requireValue(state.schemaVersion === CONSTRUCTION_SCHEMA && state.mapId === 'construction' && ['development-loan', TERRAIN_SCOPE].includes(state.scope), 'この保存形式・マップ・区画には対応していません。');
   requireValue(integer(state.revision, 0, Number.MAX_SAFE_INTEGER - 1) && integer(state.updatedAt, 0, Number.MAX_SAFE_INTEGER), '保存番号または日時が不正です。');
   requireValue(canonical(state.world) === canonical(WORLD), '保存された建設範囲が一致しません。');
   keys(state.materials, ['earth-soil']);
@@ -152,7 +152,7 @@ export function validateConstructionState(state, { verifyHistory = true } = {}) 
   requireValue(materialTotals(state)['earth-soil'] === m.issued, '素材の総量が一致しません。上書きせず停止します。');
   // These records are reserved, not a claim of implemented vehicle/fluid/part physics.
   for (const reserved of ['parts', 'fluids', 'vehicles']) keys(state[reserved], []);
-  requireValue(m.accounts.fixed === 0 && m.accounts.fluid === 0, '未実装の素材保管先が使われています。');
+  requireValue(m.accounts.fixed === 0 && m.accounts.fluid === 0, 'この素材の保管先を利用できません。');
   requireValue(object(state.chunks) && Object.keys(state.chunks).length <= loan / SOIL_UNIT, '区画データが不正です。');
   for (const [chunk, values] of Object.entries(state.chunks)) {
     requireValue(/^-?\d+,-?\d+,-?\d+$/.test(chunk) && object(values) && Object.keys(values).length > 0, '区画の座標が不正です。');
@@ -199,7 +199,7 @@ export function reduceConstruction(state, command, txId, now = Date.now()) {
   if (Object.hasOwn(state.transactions, txId)) {
     requireValue(prior.fingerprint === fingerprint, '同じ取引IDに違う操作は指定できません。'); return state;
   }
-  requireValue(Object.keys(state.transactions).length < MAX_TRANSACTIONS, '開発用取引の上限です。保存を書き出してください。');
+  requireValue(Object.keys(state.transactions).length < MAX_TRANSACTIONS, '保存できる取引数の上限です。保存を書き出してください。');
   const next = copy(state);
   if (command?.type === 'undo' || command?.type === 'redo') {
     keys(command, ['type']);
@@ -240,15 +240,15 @@ export class ConstructionSession {
       this.generation = record?.generation ?? null;
       if (!record) return null;
       requireValue(integer(record.generation, 1, Number.MAX_SAFE_INTEGER - 1) && Array.isArray(record.backups), '保存管理情報が不正です。元データを保護したまま停止します。');
-      try { const candidate = unpackConstruction(record.current); requireValue(candidate.scope === this.scope, '別の開発区分の保存です。'); this.state = candidate; }
+      try { const candidate = unpackConstruction(record.current); requireValue(candidate.scope === this.scope, '別の区画の保存です。'); this.state = candidate; }
       catch (error) {
         this.readOnly = true;
         // Never roll a future schema backwards, even if an older backup parses.
         let newer = false;
         try { newer = JSON.parse(record.current)?.state?.schemaVersion > CONSTRUCTION_SCHEMA; } catch {}
-        if (newer) { this.incompatible = true; throw new Error('新しい版の保存データです。この開発画面では上書きしません。'); }
+        if (newer) { this.incompatible = true; throw new Error('新しい版の保存データです。この画面では上書きしません。'); }
         for (const backup of record.backups) {
-          try { const candidate = unpackConstruction(backup); requireValue(candidate.scope === this.scope, '別の開発区分の保存です。'); this.state = candidate; break; } catch {}
+          try { const candidate = unpackConstruction(backup); requireValue(candidate.scope === this.scope, '別の区画の保存です。'); this.state = candidate; break; } catch {}
         }
         this.warning = this.state ? '最新の保存に異常があります。直近の正常データを読み取り専用で表示中です。復旧を確定するまで変更しません。' : '正常な保存を読み込めません。元データを保護しています。書き出し後に復元してください。';
         if (!this.state) throw new Error(this.warning);
@@ -265,7 +265,7 @@ export class ConstructionSession {
     requireValue(!this.busy, '保存処理中です。');
     requireValue(!this.incompatible, '新しい版の保存データは上書きできません。');
     requireValue(!this.readOnly || recovery, '読み取り専用です。復旧を確定してください。');
-    requireValue(next.scope === this.scope, '別の開発区分の保存は書き込めません。');
+    requireValue(next.scope === this.scope, '別の区画の保存は書き込めません。');
     this.busy = true;
     try {
       const packet = packConstruction(next);

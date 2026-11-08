@@ -14,7 +14,7 @@ export class WorldPurchaseSession{
       this.blocked=false;return this.state;
     }finally{this.busy=false;}
   }
-  checkKind(s){const wanted=this.store.mode==='copy'?'copied-world':'fixture-world';if(s.source.kind!==wanted)throw Error('複製と検証用データを混ぜることはできません。');}
+  checkKind(s){const wanted=this.store.mode==='copy'?'copied-world':'fixture-world';if(s.source.kind!==wanted)throw Error('複製と練習用の記録を混ぜることはできません。');}
   async importSource(raw,kind){
     if(this.ledger||this.raw||this.generation!==null||this.blocked||this.busy)throw Error('複製済みの保存は再取り込みできません。');
     const s=createWorldPurchaseLedger(raw,kind);this.checkKind(s);return this.write(s);

@@ -23,7 +23,7 @@ export function createWorldSaveErrorUI({retry,reopen=()=>location.reload(),expor
  // Read-only technical output remains available only to an explicit developer
  // view. Normal players are never asked to handle a file or raw save text.
  if(developer&&typeof exportRecord==='function'){
-  const tools=document.createElement('details'),summary=document.createElement('summary'),button=document.createElement('button'),pre=document.createElement('pre');summary.textContent='開発用の記録';button.type='button';button.textContent='保護した記録を表示';pre.hidden=true;button.onclick=()=>{if(flow.state.busy)return;try{pre.textContent=exportRecord();pre.hidden=false;}catch(error){pre.textContent=error.message;pre.hidden=false;}};tools.append(summary,button,pre);d.append(tools);
+  const tools=document.createElement('details'),summary=document.createElement('summary'),button=document.createElement('button'),pre=document.createElement('pre');summary.textContent='保存エラーの詳しい記録';button.type='button';button.textContent='保護した記録を表示';pre.hidden=true;button.onclick=()=>{if(flow.state.busy)return;try{pre.textContent=exportRecord();pre.hidden=false;}catch(error){pre.textContent=error.message;pre.hidden=false;}};tools.append(summary,button,pre);d.append(tools);
  }
  return{show:flow.show,startWork:flow.startWork,endWork:flow.endWork};
 }

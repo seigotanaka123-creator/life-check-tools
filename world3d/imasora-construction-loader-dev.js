@@ -93,4 +93,4 @@ function frame(now){
   ui+=dt;if(ui>.12){ui=0;refresh();}
 }
 window.addEventListener('error',e=>{state.message=`表示エラー：${e.message}`;refresh();});window.addEventListener('unhandledrejection',e=>{state.message=`処理エラー：${e.reason?.message??e.reason}`;refresh();});
-if(!local)state.message='ローカル開発専用の確認画面です。';refresh();requestAnimationFrame(frame);
+if(!local)state.message='この練習区画は、今の端末で開いてください。';refresh();requestAnimationFrame(frame);

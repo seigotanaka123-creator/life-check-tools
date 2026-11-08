@@ -136,6 +136,6 @@ function frame(now){
 }
 function stopOnError(message){clearInput();workSession.blocked=true;saveText=message;workWorld.message=message;refresh();}
 window.addEventListener('error',e=>stopOnError(`表示エラー：${e.message}`));window.addEventListener('unhandledrejection',e=>stopOnError(`処理エラー：${e.reason?.message??e.reason}`));
-if(!local)saveText='ローカル開発専用の確認画面です。';refresh();requestAnimationFrame(frame);
+if(!local)saveText='この練習区画は、今の端末で開いてください。';refresh();requestAnimationFrame(frame);
 setInterval(()=>{if(!dumpCheck&&workReady&&!workSession.blocked&&!workSession.busy&&workSession.savedRevision!==workWorld.revision&&!state.transition&&Math.abs(state.vehicle.speed)<.01&&!workWorld.air.length&&!held.size&&!keys.size&&!prepareBucket&&!dumpTask)saveWork();},2500);
 window.addEventListener('beforeunload',e=>{if(!dumpCheck&&workReady&&workSession.savedRevision!==workWorld.revision){e.preventDefault();e.returnValue='';}});

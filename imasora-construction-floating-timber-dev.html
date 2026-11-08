@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>火星木材の浮く床｜イマソラーズウォーク</title><link rel="stylesheet" href="./imasora-construction-crane-dev.css?v=437"><link rel="stylesheet" href="./imasora-construction-timber-dev.css?v=446"><link rel="stylesheet" href="./imasora-construction-floating-timber-dev.css?v=447">  <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
 </head>
-<body><canvas id="scene" aria-label="クレーン車と試験用部材の開発区画"></canvas>
-<header><div><small>建設開発 7-1</small><h1>火星木材の浮く床</h1></div><nav><button id="stock-open" class="primary">素材置場</button><button id="save">保存</button><button id="camera">視点：作業</button><button id="roof" hidden disabled aria-hidden="true" style="display:none">屋根</button><button id="help-open">使い方</button><button id="home">緊急帰還</button></nav></header>
+<body><canvas id="scene" aria-label="クレーン車と試験用部材の練習区画"></canvas>
+<header><div><small>工事現場 · 浮く床</small><h1>火星木材の浮く床</h1></div><nav><button id="stock-open" class="primary">素材置場</button><button id="save">保存</button><button id="camera">視点：作業</button><button id="roof" hidden disabled aria-hidden="true" style="display:none">屋根</button><button id="help-open">使い方</button><button id="home">緊急帰還</button></nav></header>
 <div id="notice"><span id="mode">徒歩</span><span id="message" role="status"></span></div>
 <aside id="readout"><strong id="cargo">吊り荷なし</strong><span id="count">部材 4 / 4</span><span id="height"></span><span id="hook-position" hidden></span><span id="material-summary"></span><strong id="float-load"></strong><span id="float-warning" role="status"></span><span id="return-hint" hidden></span><span id="save-status">読み込み中</span></aside>
 <div id="placement" hidden></div>
@@ -28,14 +28,14 @@
 <p>クレーンの操作はこれまでと同じです。回転は約1.8秒、微調整は¼速。普通の木材・火星木材・鉄の量は別々に保存します。</p>
 <p>まず性質を比べたい時（現在の作業は保存して切り替えます）：</p>
 <p class="demo-links"><a data-example href="./imasora-construction-floating-timber-dev.html?check=floating-drop-v447&amp;floatingTest=1&amp;floatingDemo=drop">同じ高さからの落下・浮遊を比較</a><a data-example href="./imasora-construction-floating-timber-dev.html?check=floating-walk-v447&amp;floatingTest=1&amp;floatingDemo=walk">低い浮遊床へ歩いて乗る</a><a data-example href="./imasora-construction-floating-timber-dev.html?check=floating-timber-v447">保存した作業場に戻る</a></p>
-<p>比較画面は保存なしの開発用見本です。素材の購入・通常の所持品とは無関係です。複数の浮遊部材の接合、車両・水の積載は後続段階です。</p>
-<p>開発キーボード：徒歩W/S前後・A/D左右、スペースジャンプ。作業中A/D旋回、W/S伸縮、↑/↓巻上げ・巻下げ。スマホは下の操作ボタンを使用します。</p>
+<p>比較画面は保存なしの練習用の見本です。素材の購入・通常の所持品とは無関係です。この区画では、浮遊床の作り方や浮き方を試せます。</p>
+<p>操作キーボード：徒歩W/S前後・A/D左右、スペースジャンプ。作業中A/D旋回、W/S伸縮、↑/↓巻上げ・巻下げ。スマホは下の操作ボタンを使用します。</p>
 <button id="export">保存データを書き出す</button><button id="help-close" class="primary">閉じる</button><pre id="export-data" hidden></pre></dialog>
 <dialog id="stock-dialog">
 <h2>素材置場</h2>
 <p>火星木材・普通の木材・鉄を比べる独立した建設テストです。貸出部材のみで、散歩の所持品・火星素材・通常の作品には影響しません。</p>
 <div class="ledger-scroll"><table><caption>素材の収支（材積）</caption><thead><tr><th>材質</th><th>保管</th><th>置場</th><th>吊り荷</th><th>浮遊</th><th>設置</th><th>合計</th></tr></thead><tbody id="material-ledger"></tbody></table></div>
-<p>材積は部材の体積を数える開発単位です。散歩の獲得数や加工レシピは後の段階で接続します。火星木材・普通の木材・鉄は別々に数え、回収しても増減しません。</p>
+<p>材積は部材の大きさを表します。この区画の材料は散歩の持ちものと別に管理されます。火星木材・普通の木材・鉄は別々に数え、回収しても増減しません。</p>
 <p id="stock-message" role="status">部材を選んで、色枠の置場へ出してください。</p>
 <div id="stock-list"></div><button id="stock-close" class="primary">作業に戻る</button>
 </dialog>

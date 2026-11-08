@@ -79,7 +79,7 @@ export function flightSurveyText(r){
 export function createUfoFlightSurveyView(host,{enabled=false,now}={}){
   if(!enabled||!host)return null;
   const survey=new UfoFlightSurvey({now});host.hidden=false;
-  host.innerHTML='<summary>航行計測（開発用）</summary><p>直近8航行をこの画面だけで記録します。財布・価格・難易度は変えません。再読込で記録は消えます。</p><label>表示する航行 <select aria-label="表示する航行記録"><option value="latest">最新の航行</option></select></label><pre aria-label="航行計測結果"></pre>';
+  host.innerHTML='<summary>航行の記録</summary><p>直近8回の航行を見返せます。画面を開き直すと記録は消えます。</p><label>表示する航行 <select aria-label="表示する航行記録"><option value="latest">最新の航行</option></select></label><pre aria-label="航行計測結果"></pre>';
   const select=host.querySelector('select'),output=host.querySelector('pre'),summary=host.querySelector('summary');
   let lastRender=-Infinity,recordIds='';
   function refresh(m,force=false){
@@ -87,7 +87,7 @@ export function createUfoFlightSurveyView(host,{enabled=false,now}={}){
     const records=survey.snapshot(),latest=records.at(-1),ids=records.map(r=>r.id).join(',');
     if(recordIds!==ids){const selected=select.value;select.replaceChildren(new Option('最新の航行','latest'));for(const r of records)select.add(new Option(`${r.id}：${r.origin}→${r.destination}`,String(r.id)));select.value=records.some(r=>String(r.id)===selected)?selected:'latest';recordIds=ids;}
     const shown=select.value==='latest'?latest:records.find(r=>String(r.id)===select.value);
-    output.textContent=flightSurveyText(shown);summary.textContent=latest?`航行計測：${outcomeName[latest.outcome]}・金貨${latest.coins}枚`:'航行計測（開発用）';
+    output.textContent=flightSurveyText(shown);summary.textContent=latest?`航行計測：${outcomeName[latest.outcome]}・金貨${latest.coins}枚`:'航行の記録';
   }
   select.addEventListener('change',()=>refresh(null,true));host.addEventListener('toggle',()=>refresh(null,true));
   document.addEventListener('visibilitychange',()=>survey.visibility(document.hidden));

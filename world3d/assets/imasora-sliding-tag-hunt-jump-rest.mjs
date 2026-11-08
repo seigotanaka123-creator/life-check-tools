@@ -1,4 +1,5 @@
 export const HUNT_JUMP_REST=1.3;
+export const HUNT_JUMP_QUICK_REST=1.1;
 export function huntJumpRestRemaining(s,a){return a.jumps>0?0:Math.max(0,(a.nextJumpAt??0)-s.time);}
 // Only the start of a new chain rests. A human press during the rest is not
 // queued; release it before the next chain. CPU commands use ordinary input

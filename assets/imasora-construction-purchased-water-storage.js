@@ -6,7 +6,7 @@ export const PURCHASED_WATER_DB='imasora-construction-purchased-water-copy-devel
 export class PurchasedWaterStore extends IndexedConstructionStore{constructor(idb=globalThis.indexedDB){super(idb);this.name=PURCHASED_WATER_DB;}}
 // Sources expose READ only. There is no purchase, award, debit, or source writer here.
 export function purchasedSourceReader(kind){
-  if(!['v451-copy','v452-integration'].includes(kind))throw Error('開発用の購入済み保存を選んでください。');
+  if(!['v451-copy','v452-integration'].includes(kind))throw Error('練習用の購入記録を選んでください。');
   const store=kind==='v451-copy'?new WorldPurchaseStore('copy'):new WorldAuthorityStore('integration');
   return {async read(){try{return await store.read();}finally{store.close();}}};
 }

@@ -44,7 +44,7 @@ function validateOrder(order,statuses){
 }
 export function validateShop(s){
   keys(s,['schemaVersion','scope','catalogVersion','revision','grant','balance','materials','orders','pending']);
-  ok(s.schemaVersion===1&&s.scope===SHOP_SCOPE&&s.catalogVersion===1,'この保存版・開発区分は読み込めません。');
+  ok(s.schemaVersion===1&&s.scope===SHOP_SCOPE&&s.catalogVersion===1,'この保存形式・区画は読み込めません。');
   ok(s.grant===TRIAL_COINS&&integer(s.balance,0,TRIAL_COINS),'試験用金貨の残高が不正です。');
   keys(s.materials,ids);
   ok(Array.isArray(s.orders)&&s.orders.length<=MAX_ORDERS,'注文記録の上限または形式が不正です。');

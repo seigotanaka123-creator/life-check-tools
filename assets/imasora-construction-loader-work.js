@@ -126,7 +126,7 @@ export function stepWork(w,input,dt){
 export function workTotals(w){return{ground:sum(w.ground)*VOLUME,air:w.air.length*VOLUME,bucket:w.load*VOLUME,total:(sum(w.ground)+w.air.length+w.load)*VOLUME};}
 export function validateWork(w){
   const require=(ok,message)=>{if(!ok)throw new Error(message);};
-  require(w&&w.schema===1&&w.scope===WORK_SCOPE,'別の開発区分・保存版です。');validateConstructionState(w.ledger);
+  require(w&&w.schema===1&&w.scope===WORK_SCOPE,'別の区画・保存版です。');validateConstructionState(w.ledger);
   require(w.ledger.scope==='development-loan'&&w.ledger.materials['earth-soil'].issued===32000,'貸出土の区分が違います。');
   require(w.ground&&Object.getPrototypeOf(w.ground)===Object.prototype&&Object.keys(w.ground).length<=256,'土の山の保存が不正です。');
   for(const [k,n] of Object.entries(w.ground)){require(/^-?\d+,-?\d+$/.test(k)&&Number.isInteger(n)&&n>0&&n<=256,'土の粒数が不正です。');const [x,z]=k.split(',').map(Number);require(k===key(x,z)&&!staticBlocked((x+.5)*4,(z+.5)*4,2),'土が保護範囲に入っています。');}

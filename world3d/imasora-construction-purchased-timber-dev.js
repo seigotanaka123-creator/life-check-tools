@@ -54,7 +54,7 @@ function refreshStock(){
   const t=timberCopyTotals(state);
   $('material-ledger').replaceChildren();
   const row=document.createElement('tr');for(const text of['火星木材',...['stored','loose','held','floating','fixed','total'].map(k=>t[k]+'枚')]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}$('material-ledger').append(row);
-  $('scope').textContent=testMode?'貸出2枚 · 保存しない操作体験':'建設開発 8-3b2 · 購入済み木材の複製';
+  $('scope').textContent=testMode?'貸出2枚 · 保存しない操作体験':'工事現場 · 浮遊床づくり · 購入済み木材の複製';
   $('source-info').textContent=testMode?'これは操作体験用の貸出床2枚です。金貨・購入品・既存の作業保存へ入りません。':state.source.mode==='copy'?`購入元：${state.source.kind} ／ 元の金貨 ${state.source.coins}枚 ／ 購入木材 ${state.source.total}枚分（原本は変更しません）。`:'購入済みの素材を一度だけ複製してください。木材0の保存なら0枚のままです。';
   $('imports').hidden=testMode||state.source.mode==='copy';
   $('reload').disabled=testMode||loading||session.busy;
@@ -129,7 +129,7 @@ function refresh(){
   $('pause').textContent=state.paused?'作業を再開':'一時停止';$('pause').disabled=!ready||loading||session.blocked||transition;
 }
 async function boot(){
-  if(!local){state.message='ローカル開発専用です。';refresh();return;}
+  if(!local){state.message='この練習区画は、今の端末で開いてください。';refresh();return;}
   try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'貸出2枚：保存しません':state.source.mode==='copy'?'保存を読込（一時停止中）':'購入品を未複製';}
   catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}
   refresh();refreshStock();if(!testMode&&state.source.mode==='empty')$('stock-dialog').showModal();

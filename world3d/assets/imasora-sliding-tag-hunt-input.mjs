@@ -34,7 +34,7 @@ export function bindHuntLifecycle({windowTarget,documentTarget,pause,worker,audi
 }
 
 // Menu keys are one-shot; modal dialogs retain native text and close handling.
-export function huntMenuCommand({repeat=false,dialogOpen=false,hasResult=false,configVisible=false,resultVisible=false,paused=true,viewOnly=false}={}){if(dialogOpen)return'native';if(repeat)return'ignore';if(viewOnly)return'close-orbit';if(hasResult)return configVisible||!resultVisible?'show-result':'hide-result';return paused?'none':'pause';}
+export function huntMenuCommand({repeat=false,dialogOpen=false,hasResult=false,configVisible=false,resultVisible=false,paused=true}={}){if(dialogOpen)return'native';if(repeat)return'ignore';if(hasResult)return configVisible||!resultVisible?'show-result':'hide-result';return paused?'none':'pause';}
 
 // Claim a pointer only after the browser accepts its capture.
 export function captureHuntPointer(target, event) {

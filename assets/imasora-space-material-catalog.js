@@ -42,7 +42,7 @@ const rows=[
   [60,'life','火星波紋砂','踏んだ場所の盛り上がりが、隣へ波のように伝わって戻ります。','歩くと波打つ庭や、荷物を少しずつ送る砂の床を作れます。'],
 ];
 // Display numbers are contiguous. Stable IDs/proposal numbers keep material identity unchanged.
-export const SPACE_MATERIALS=Object.freeze(rows.map(([proposalNumber,group,name,property,play],index)=>Object.freeze({number:index+1,proposalNumber,id:`space-material-${proposalNumber}`,group,name,property,play,status:'採用・実装予定'})));
+export const SPACE_MATERIALS=Object.freeze(rows.map(([proposalNumber,group,name,property,play],index)=>Object.freeze({number:index+1,proposalNumber,id:`space-material-${proposalNumber}`,group,name,property,play,status:'図鑑で確認できます'})));
 export function findSpaceMaterials(query='',group='all'){
   const q=query.normalize('NFKC').toLocaleLowerCase('ja').trim();
   return SPACE_MATERIALS.filter(m=>(group==='all'||m.group===group)&&(!q||(/^\d+$/.test(q)?m.number===Number(q):`${m.name} ${m.property} ${m.play}`.toLocaleLowerCase('ja').includes(q))));

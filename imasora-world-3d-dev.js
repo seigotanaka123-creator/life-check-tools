@@ -2149,6 +2149,13 @@ function persistWorldSnapshot(reward=null) {
   return pending;
 }
 
+async function openMapRace(){
+ if(!worldBooted||!['sky','mars'].includes(state.map)||state.ufoBoarded||mapResetPending||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting)return false;
+ clearMarsShopDialogInput();lookControls?.cancel();
+ if(worldSaveService.mode!=='readonly'){await persistWorldSnapshot();await worldSaveService.flush();}
+ location.assign(new URL('./imasora-bounce-race-preview.html?game='+state.map,location.href).href);return true;
+}
+
 async function returnToTownFromConstruction() {
   if(!['construction','coast'].includes(state.map)||!worldBooted)return false;
   if(mapResetPending||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting){showToast('セーブをたしかめてから街へ戻ろう。');return false;}
@@ -13184,7 +13191,7 @@ function finishUfoGravityPinballRound(mission) {
   document.body.dataset.ufoGravityPinballPhase = "complete";
   document.body.dataset.ufoGravityPinballScore = String(mission.score);
   spawnUfoGravityPinballImpact(mission, 0, 62, 0xffffff, 2.8);
-  showToast("採掘コアを回収しました。物理連鎖の試作は成功です。");
+  showToast("採掘コアを回収しました。ミッション達成！");
 }
 
 function drainUfoGravityPinballCore(mission) {
@@ -19915,7 +19922,7 @@ function updateUfoSpaceRescueHud() {
             ? "到着リング内で航行を維持しています。姿勢固定パルスで収容してください。"
             : "左右操縦で到着リングへ。必要に応じて姿勢固定パルスを使います。"
           : phase === "complete"
-            ? "この試作任務は完了です。再度開始して別の航行を試せます。"
+            ? "この任務は完了です。再度開始して別の航行を試せます。"
             : "開拓ユニットが損傷しました。救助任務を再開できます。";
   }
   if (els.ufoSpaceStartButton) {
@@ -26049,7 +26056,7 @@ function startUfoSpaceTransitionTestIfRequested() {
 function setupMarsReturnDevelopmentPreview() {
   if (!MARS_RETURN_PREVIEW) return;
   const button = document.createElement('button');
-  button.textContent = '火星の柵から地球へ出発（開発確認）';
+  button.textContent = '火星から地球へ出発';
   button.id = 'marsReturnPreviewStart';
   button.addEventListener('pointerdown', event => event.stopPropagation());
   els.viewport.prepend(button);
@@ -26109,7 +26116,7 @@ function setupConstructionExpansionPreview() {
     if (hasGroundCollisionAt(x, z, 0)) { status.textContent = '保存済み建物と重なるため、この確認地点への移動を中止しました。'; return false; }
     state.position.set(x, 0, z); state.groundY = 0; state.jumpY = 0; state.jumpVelocity = 0; state.falling = false; state.supportSurfaceId = null;
     state.heading = state.viewHeading = heading; state.viewPitch = -.06; state.cameraMode = 'third'; state.fastWalking = false;
-    updateCharacter(0); updateCamera(); status.textContent = `確認地点 X ${x.toFixed(1)} / Z ${z.toFixed(1)}（開発用移動）`; return true;
+    updateCharacter(0); updateCamera(); status.textContent = `確認地点 X ${x.toFixed(1)} / Z ${z.toFixed(1)}（移動先）`; return true;
   };
   addButton('全体を見る', () => { stopTest(); constructionOverview = true; constructionPreviewGuides.visible = true; status.textContent = '外枠が拡張後の土地。中央の小さい枠が元の540×360です。'; });
   addButton('歩行に戻る', () => { stopTest(); walking(); status.textContent = '通常のパッドで拡張した土地を歩けます。'; });
@@ -26830,7 +26837,7 @@ async function activateSavedWorld(saved) {
     move:(context,targetId,position)=>commitMapResetOperation('move',context,targetId,position),canMove:worldMapBuildingMoveCheck,onMovePreview:updateWorldMapBuildingMovePreview,undo:context=>commitMapResetOperation('undo',context),
     onPause:clearMarsShopDialogInput,onResume:clearMarsShopDialogInput,onChange:syncWorldMapMenuPause});
   setupNativeDoorWalk();setupParkingMigrationCheck();
-  worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput,getMap:()=>state.map,onReturnTown:returnToTownFromConstruction,canWalkVehicle:nativeDoorWalkReason,onWalkVehicle:id=>{const ctrl=nativeDoorController(id);prepareNativeDoorRoute();const goal=ctrl?.doorTarget?.(id);if(goal&&['truck','pump'].includes(id))goal.approach={x:goal.x-Math.sin(goal.heading)*60,z:goal.z-Math.cos(goal.heading)*60,heading:goal.heading};void nativeDoorNavigator.start(id,goal);}});
+  worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput,getMap:()=>state.map,onReturnTown:returnToTownFromConstruction,onRace:openMapRace,canWalkVehicle:nativeDoorWalkReason,onWalkVehicle:id=>{const ctrl=nativeDoorController(id);prepareNativeDoorRoute();const goal=ctrl?.doorTarget?.(id);if(goal&&['truck','pump'].includes(id))goal.approach={x:goal.x-Math.sin(goal.heading)*60,z:goal.z-Math.cos(goal.heading)*60,heading:goal.heading};void nativeDoorNavigator.start(id,goal);}});
   constructionBridgeUI=createConstructionBridgeUI({host:els.canvas.parentElement,clearInput:clearMarsShopDialogInput,returnTown:returnToTownFromConstruction,
     context:()=>({map:state.map,x:state.position.x,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.groundY>6,
       blocked:!worldBooted||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting||state.ufoBoarded||[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active||c?.busy),
@@ -26894,7 +26901,7 @@ async function activateSavedWorld(saved) {
   const root=els.canvas.closest('main'),wasInert=root?.inert,wasBusy=root?.getAttribute('aria-busy');
   if(root){root.inert=true;root.setAttribute('aria-busy','true');}
   try{
-    await setupScene();renderer.compile(scene,camera);renderWorldFrame();await worldSaveService.flush();worldBooted=true;
+    await setupScene();renderer.compile(scene,camera);renderWorldFrame();await worldSaveService.flush();worldBooted=true;const raceReturn=new URLSearchParams(location.search).get('race-return');if(['sky','mars'].includes(raceReturn)&&state.map!==raceReturn)setMap(raceReturn);
     const resume=soilStartupResume(saved,{mode,arrival:new URLSearchParams(location.search).get('arrival'),preview:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW});
     if(resume){if(state.map!=='construction')setMap('construction');worldSoilController.resumeSaved(resume);}
     else{
@@ -26909,7 +26916,7 @@ async function activateSavedWorld(saved) {
     updateMapReadout();
   }finally{if(root){root.inert=wasInert;if(wasBusy===null)root.removeAttribute('aria-busy');else root.setAttribute('aria-busy',wasBusy);}}
   if(mode==='live'){
-    const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている古い開発画面は再読み込みしてから遊んでください。旧保存は保護して残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
+    const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている画面は、開き直してから遊んでください。これまでの記録は残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
     window.addEventListener('storage',event=>{if(event.key===SAVE_KEY)notice.textContent='古い画面が旧保存を更新しました。現在の金貨・建築は上書きされません。古い画面を再読み込みしてください。';});
   }
   window.addEventListener('beforeunload',event=>{if(worldSaveReloadRequested)return;if(mapResetPending||worldSaveService.blocked||worldAutoSave?.error){event.preventDefault();event.returnValue='';}});

@@ -175,7 +175,7 @@
     if (Array.isArray(savedState.logs) && typeof event.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(event.date)) {
       const selected = auxiliaryBundles[event.auxiliaryKind];
       const label = { formwork: "型枠", rebar: "鉄筋", tiles: "タイル", decoration: "装飾材" }[event.auxiliaryKind];
-      const text = `建築セットを${event.boxes}箱開封（試作 ${recipeVersion}）：コンクリートブロック相当 ${result.plan.concreteBlockCredits} / 塗装面相当 ${result.plan.paintSurfaceCredits} / ${label} ${selected.unitsPerBox * event.boxes}`;
+      const text = `建築セットを${event.boxes}箱開封：コンクリートブロック相当 ${result.plan.concreteBlockCredits} / 塗装面相当 ${result.plan.paintSurfaceCredits} / ${label} ${selected.unitsPerBox * event.boxes}`;
       nextState.logs = [{ date: event.date, text }, ...savedState.logs].slice(0, 40);
     }
     return { ...result, rewardLedger: nextRewardLedger, state: nextState };
@@ -201,7 +201,7 @@
         concreteBlockCredits: ledger.concreteBlockCredits,
         paintSurfaceCredits: ledger.paintSurfaceCredits,
         auxiliaryUnits: ledger.auxiliaryUnits
-      })) throw new Error("試作ポイントと未移送の箱開封記録が一致しません。");
+      })) throw new Error("建築ポイントと未移送の箱開封記録が一致しません。");
       return { ready: openingReceipts.length > 0, blocked: false, reason: "", openingReceipts, quantities: expected };
     } catch (error) {
       return { ready: false, blocked: true, reason: error.message, openingReceipts: [] };
@@ -240,7 +240,7 @@
     if (normalize(nextLedger).blocked) return { status: "blocked", transferred: false, state: savedState };
     const nextState = { ...savedState, constructionMaterialLedger: nextLedger };
     if (Array.isArray(savedState.logs) && typeof event.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(event.date)) {
-      nextState.logs = [{ date: event.date, text: `建築セットの試作ポイントを工事現場へ移送準備（${packet.id}）。` }, ...savedState.logs].slice(0, 40);
+      nextState.logs = [{ date: event.date, text: `建築セットの建築ポイントを工事現場へ移送準備（${packet.id}）。` }, ...savedState.logs].slice(0, 40);
     }
     return { status: "exported", transferred: true, packet, ledger: nextLedger, state: nextState };
   }

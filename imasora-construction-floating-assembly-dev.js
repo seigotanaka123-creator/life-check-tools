@@ -77,7 +77,7 @@ function refreshStock(){
 $('stock-open').onclick=()=>{clearInput();refreshStock();$('stock-message').textContent='部材を選んで、色枠の置場へ出してください。';$('stock-dialog').showModal();};$('stock-close').onclick=()=>$('stock-dialog').close();
 $('return-stock').onclick=()=>action('return-stock');
 $('export').onclick=()=>{try{$('export-data').textContent=JSON.stringify(session.blocked?session.raw:packCrane(state),null,2);$('export-data').hidden=false;}catch(e){state.message=e.message;refresh();}};
-async function save(){clearInput();if(testMode){$('save-status').textContent='操作確認用：保存しません';return true;}if(!ready||loading||session.busy||session.blocked||state.rig.transition)return false;let saved=false;try{await session.save(state);$('save-status').textContent='保存済み（浮遊建築の開発専用）';dirtySince=0;saved=true;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();return saved;}
+async function save(){clearInput();if(testMode){$('save-status').textContent='操作確認用：保存しません';return true;}if(!ready||loading||session.busy||session.blocked||state.rig.transition)return false;let saved=false;try{await session.save(state);$('save-status').textContent='保存済み（浮遊建築の練習区画専用）';dirtySince=0;saved=true;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();return saved;}
 $('save').onclick=save;
 for(const link of document.querySelectorAll('[data-example]'))link.onclick=async e=>{
   e.preventDefault();clearInput();
@@ -138,11 +138,11 @@ function refresh(){
   $('placement').hidden=!p||!!state.joining;$('placement').textContent=joinPreview.ok?joinPreview.reason:preview?.reason||'';$('placement').classList.toggle('bad',!preview?.ok&&!joinPreview.ok);$('save').disabled=blocked||session.busy||transition||testMode;
 }
 async function boot(){
-  if(!local){state.message='ローカル開発専用です。';refresh();return;}
+  if(!local){state.message='この練習区画は、今の端末で開いてください。';refresh();return;}
   const demo=new URLSearchParams(location.search).get('assemblyDemo');
   if(testMode&&demo){state=floatingDemo(demo);orbit=Math.PI;pitch=.7;distance=demo==='join'?285:350;}
   if(dropDemo){pitch=.65;distance=350;$('drop-demo').showModal();}
-  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しい浮遊建築の開発データ':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
+  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しい浮遊建築の作業の記録':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
 }
 const focus=new THREE.Vector3(0,18,-30);let last=0,accumulator=0,ui=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;if(document.hidden)return;time+=dt;

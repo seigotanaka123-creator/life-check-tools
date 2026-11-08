@@ -3,7 +3,7 @@
 export function createHuntGrowth({api,entryApi,companion,storage,session,now=Date.now,newId=()=> 'tag:'+crypto.randomUUID(),onNotice=()=>{},onStartNotice=onNotice}){
  let ticket=null,pending=null,latest=null,retrySessionResults=!!companion;
  function current(){if(!companion||!api)return null;const saved=JSON.parse(storage.getItem(entryApi.HOME_KEY));if(api.subject(saved)!==companion.subject)throw Error('TAG_SUBJECT_CHANGED');return saved;}
- function status(){if(!companion||!api)return'試遊：育成はホームから始めます。';if((companion.growthAllowed===false||now()>=(companion.growthUntil??Infinity)))return'引退準備中：今回は試遊です。';try{const saved=current();return api.skyValid(api.progress(saved).sky,companion.subject,now())?'育成中：成果はホームで同じモンスターに反映します。':'試遊：育成するには、ホームで今の空を撮ってね。';}catch{return'育成の保存を確認できません。ホームへ戻ってね。';}}
+ function status(){if(!companion||!api)return'この対戦では育成の報酬は受け取れません。育成するときはホームから始めてね。';if((companion.growthAllowed===false||now()>=(companion.growthUntil??Infinity)))return'相棒は引退の準備中です。この対戦では育成の報酬は受け取れません。';try{const saved=current();return api.skyValid(api.progress(saved).sky,companion.subject,now())?'育成中：成果はホームで同じモンスターに反映します。':'育成の報酬を受け取るには、ホームで今の空を撮ってね。';}catch{return'育成の保存を確認できません。ホームへ戻ってね。';}}
  function persistPending(){
   if(!pending)return;
   let durable=false;

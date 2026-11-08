@@ -11,7 +11,7 @@ export function installHuntMenu(doc=globalThis.document){
  hero.append(brand,doc.querySelector('#title'),meta,art,doc.querySelector('#note'));
  const move=(parent,selector)=>{const node=card.querySelector(selector);if(node)parent.append(node);};
  scroll.append(heading);for(const q of['#play-roles','#roles','#opponent-slots','.start-auto'])move(scroll,q);
- utilities.append(guide);move(utilities,'#observe');scroll.append(utilities);for(const q of['#best','details','#companion-note','#home-return','.practice-note'])move(scroll,q);
+ utilities.append(guide);scroll.append(utilities);for(const q of['#best','details','#companion-note','#home-return','.practice-note'])move(scroll,q);
  for(const q of['#resume','#begin'])move(actions,q);setup.append(scroll,actions);card.replaceChildren(hero,setup);card.classList.add('tag-menu-shell');
 }
 

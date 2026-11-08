@@ -173,5 +173,5 @@ function frame(now){
   uiTime+=dt;if(uiTime>.12){uiTime=0;$('coordinates').textContent=`X ${player.x.toFixed(1)} / Y ${player.y.toFixed(1)} / Z ${player.z.toFixed(1)}`;$('contact').textContent=clock-lastHit<.8?'天井に接触':player.grounded?'足元の床に接地':'落下・ジャンプ中';updateSelection();}
 }
 requestAnimationFrame(frame);
-if(!local){message('ローカル開発専用です。通常ゲームには保存しません。',true);refresh();}
+if(!local){message('この練習区画は、今の端末で開いてください。通常ゲームには保存しません。',true);refresh();}
 else await run(async()=>{await session.load();if(!session.state&&!session.readOnly)await session.initialize();if(session.state)validatePlot(session.state);},'土の面をタップして選び、「掘る」を押してください。左下のパッドで歩けます。');

@@ -1,9 +1,9 @@
-import{recordHunt,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES}from'./imasora-sliding-tag-hunt.mjs';
+import{recordHunt,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES}from'./imasora-sliding-tag-hunt.mjs';
 
 // Use the accepted layout seed, not the originally requested (possibly rejected)
 // seed. Carry only round settings: never inventory, effects, time or a result.
 export function huntRetryConfig(state){
- if(![HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES].includes(state?.rules)||state.phase!=='finished'||!state.result)throw Error('NO_FINISHED_RETRY');
+ if(![HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES].includes(state?.rules)||state.phase!=='finished'||!state.result)throw Error('NO_FINISHED_RETRY');
  const c=state.config;
  if(!c||!Array.isArray(c.opponents)||c.opponents.length!==3||!Number.isInteger(c.seed)||c.seed<0||c.seed>0xffffffff)throw Error('INVALID_RETRY_CONFIG');
  const{hunterCount,startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem}=c;

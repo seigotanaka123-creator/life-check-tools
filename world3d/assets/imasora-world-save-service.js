@@ -97,8 +97,8 @@ export class WorldSaveService{
     this.transportAuthority=transportAuthority;
     if(transportWork&&!transportAuthority)throw Error('人物と車両の保存には共有土への対応が必要です。');
     this.transportWork=transportWork;
-    if(constructionProjectPreview&&(mode!=='integration'||this.store?.name!==CONSTRUCTION_PROFILE_PROJECT_TEST_DB))throw Error('施工プロフィール試作は専用の隔離保存領域で行ってください。');
-    if(this.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB&&!constructionProjectPreview)throw Error('施工プロフィール試作の保存先には専用確認画面が必要です。');
+    if(constructionProjectPreview&&(mode!=='integration'||this.store?.name!==CONSTRUCTION_PROFILE_PROJECT_TEST_DB))throw Error('この区画の施工記録には、専用の保存先を選んでください。');
+    if(this.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB&&!constructionProjectPreview)throw Error('この施工記録は、対応する区画から開いてください。');
     this.constructionProjectPreview=constructionProjectPreview;
     this.excavationPreview=excavationPreview;this.excavationLive=excavationLive;this.excavationOrigin=excavationOrigin;
     this.draftGuard=guardedDrafts?new WorldDraftGuard():null;this.workshopLock=workshopLock;
@@ -910,7 +910,7 @@ export class WorldSaveService{
     return this.constructionStock;
   }
   async receiveConstructionPackTrial(packet,context){
-    if(!this.canReceiveConstructionPackTrial())throw Error('通常の工事現場保存でだけ試作ポイントを受け取れます。');
+    if(!this.canReceiveConstructionPackTrial())throw Error('通常の工事現場保存でだけ建築ポイントを受け取れます。');
     if(!this.ready||this.blocked)throw Error('保存を確認するまで受取できません。');
     const payload=structuredClone(packet),place=structuredClone(context);
     // Reject invalid files and wrong-place attempts before they can enter the

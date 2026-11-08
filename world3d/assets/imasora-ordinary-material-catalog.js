@@ -30,7 +30,7 @@ export const ORDINARY_MATERIALS=Object.freeze(rows.map(([key,group,name,property
   id:`earth-${key}`,number:index+1,group,name:`普通の${name}`,property,play,vehicles,
   origin:'earth',acquisition:'walking',marsShop:false,
   source:key==='soil'?'日々の散歩などのゲーム内報酬／工事現場での掘削':'日々の散歩などのゲーム内報酬（火星ショップでは販売しません）',
-  status:['cement','concrete','paint'].includes(key)?'図鑑に設計登録済み。散歩等の報酬・配合・施工は未実装です。':key==='soil'?'開発画面で掘削・運搬・設置を確認済み。散歩報酬との接続は今後です。':['timber','iron'].includes(key)?'独立した開発画面で木材部材・鉄の柱の出庫・吊上げ・設置・回収・保存を確認。散歩報酬、本体施工、浮力や材質別の重量差は今後です。':'建設素材として設計登録済み。散歩報酬・施工・物理は順次実装します。',
+  status:['cement','concrete','paint'].includes(key)?'図鑑で素材の特徴を確認できます。現在は受け取りや施工には使えません。':key==='soil'?'練習区画で掘る・運ぶ・置く作業に使えます。散歩の報酬からは受け取れません。':['timber','iron'].includes(key)?'練習区画で、取り出す・吊り上げる・置く・回収する作業に使えます。散歩の報酬からは受け取れません。':'図鑑で素材の特徴を確認できます。現在は受け取りや施工には使えません。',
 })));
 export function findOrdinaryMaterials(query='',group='all'){
   const q=query.normalize('NFKC').toLocaleLowerCase('ja').trim();

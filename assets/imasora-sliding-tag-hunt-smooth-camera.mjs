@@ -32,12 +32,18 @@ export function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={})
   if(clear===clearRay)lastRay={x:target.x,y:target.y,z:target.z,yaw,pitch,distance,safe};
   return safe;
  }
- return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false}={}){
+ return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false,following=false}={}){
    const t=clamp(Number.isFinite(dt)?dt:0,0,.1),idealPitch=clamp(pitch,.1,1.3);if(!state)state={yaw,pitch:idealPitch,distance:null};
    // The old obstacle planner selects only a goal. Its side/high-angle choices
    // are never used as an immediate rendered camera position.
-   const goal=keepAngle?{yaw,pitch:idealPitch}:cameraGoal(target,yaw,idealPitch,distance,minDistance),oldYaw=state.yaw,oldPitch=state.pitch;
-   state.yaw+=clamp(easeHuntCamera(state.yaw,goal.yaw,t,{angle:true})-state.yaw,-DEG,DEG);
+   const goal=keepAngle||following?{yaw,pitch:idealPitch}:cameraGoal(target,yaw,idealPitch,distance,minDistance),oldYaw=state.yaw,oldPitch=state.pitch;
+   // A following camera must be able to catch a continuously turning actor.
+   // A per-render-frame cap made 30 Hz following half as fast as 60 Hz and
+   // eventually sent the camera the opposite way around the actor. Follow
+   // the committed body pose with bounded, time-based lag; walls shorten the
+   // ray instead of choosing a new heading unrelated to the player's turn.
+   const yawStep=easeHuntCamera(state.yaw,goal.yaw,t,{angle:true,rate:(following?180:60)*DEG,response:8})-state.yaw;
+   state.yaw+=following?yawStep:clamp(yawStep,-DEG,DEG);
    state.pitch+=clamp(easeHuntCamera(state.pitch,goal.pitch,t,{rate:45*DEG})-state.pitch,-DEG,DEG);
    const h=Math.cos(state.pitch),rayX=Math.sin(state.yaw)*h,rayY=Math.sin(state.pitch),rayZ=Math.cos(state.yaw)*h;
    const at=d=>({x:target.x+rayX*d,y:target.y+rayY*d,z:target.z+rayZ*d});

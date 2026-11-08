@@ -31,7 +31,7 @@ for(const button of document.querySelectorAll('[data-close]'))button.onclick=()=
 function render(){
   const s=session.state,locked=working||session.blocked||!s;
   $('balance').textContent=s?s.balance:'—';
-  $('save-status').textContent=working?'保存を確認中…':session.blocked?'確認が必要：購入は停止中':s?'保存済み・開発専用':'未開始';
+  $('save-status').textContent=working?'保存を確認中…':session.blocked?'確認が必要：購入は停止中':s?'保存済み・練習区画専用':'未開始';
   for(const o of SHOP_OFFERS)buttons.get(o.id).disabled=working;
   renderBrowse();
   $('reload').disabled=working;$('export').disabled=working||!session.raw;

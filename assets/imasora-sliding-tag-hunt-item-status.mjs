@@ -1,4 +1,5 @@
 import{huntSupplyContact}from'./imasora-sliding-tag-hunt-contact.mjs';
+import{pickupUseful}from'./imasora-sliding-tag-hunt-pickup-view.mjs';
 const controlled=s=>s.config?.mode==='hunt'?s.hunters[0]:s.player;
 // Capture before attempting the action. A CPU can start another tool later in
 // the same tick; its new state must not become the reason for our earlier failure.
@@ -33,7 +34,7 @@ export function createHuntItemStatus(){
   const a=controlled(s);if(!a?.item){blocked='';awaySince=null;return false;}
   const audience=a.owner==='player'?'player':'hunters',reach=(a.radius+1.45)**2;
   let touching=null;
-  for(const p of s.pickups){if(p.audience!==audience||p.readyAt>s.time)continue;const dx=p.x-a.x,dz=p.z-a.z;
+  for(const p of s.pickups){if(p.audience!==audience||p.readyAt>s.time||!pickupUseful(p,s,a))continue;const dx=p.x-a.x,dz=p.z-a.z;
    if(dx*dx+dz*dz<=reach&&huntSupplyContact(a,p,s.time)){touching=p;break;}}
   if(!touching){if(awaySince===null)awaySince=s.time;if(s.time-awaySince>=.5)blocked='';return false;}
   awaySince=null;const key=a.owner+':'+a.item+':'+touching.id;

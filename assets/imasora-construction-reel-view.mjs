@@ -87,8 +87,8 @@ function positionHandles(){
 }
 function metrics(){q('#metrics').textContent=JSON.stringify({...stats,rooms:state.rooms.length,walls:state.rooms.reduce((n,r)=>n+Object.values(r.walls).filter(Boolean).length,0),history:state.past.length});}
 function save(){
- if(!writeAllowed||!storage){q('#saved').textContent='このタブで試作中 · いつもの材料は使わないよ';return;}
- try{const raw=JSON.stringify(state),current=storage.getItem(REEL_KEY);if(current!==lastRaw&&current!==raw){writeAllowed=false;say('別のタブで変わったよ。この画面では試作を続けられるよ');return;}if(raw!==lastRaw)storage.setItem(REEL_KEY,raw);lastRaw=raw;q('#saved').textContent='試作を保存したよ · いつもの材料は使わないよ';}catch{writeAllowed=false;q('#saved').textContent='このタブで試作中 · 保存する場所がいっぱいだよ';}
+ if(!writeAllowed||!storage){q('#saved').textContent='この画面で作業中 · いつもの材料は使わないよ';return;}
+ try{const raw=JSON.stringify(state),current=storage.getItem(REEL_KEY);if(current!==lastRaw&&current!==raw){writeAllowed=false;say('別のタブで変わったよ。この画面では作業を続けられるよ');return;}if(raw!==lastRaw)storage.setItem(REEL_KEY,raw);lastRaw=raw;q('#saved').textContent='作業を保存したよ · いつもの材料は使わないよ';}catch{writeAllowed=false;q('#saved').textContent='この画面で作業中 · 保存する場所がいっぱいだよ';}
 }
 function begin(e,kind,extra={}){
  if(gesture||e.button!==0)return false;e.preventDefault();e.stopPropagation();gesture={id:e.pointerId,el:e.currentTarget,kind,x:e.clientX,y:e.clientY,started:clock(),moved:false,...extra};try{gesture.el.setPointerCapture(e.pointerId);}catch{gesture=null;return false;}stats.gestures++;syncHandles();return true;
@@ -141,4 +141,4 @@ let last=clock();function frame(now){requestAnimationFrame(frame);const dt=Math.
  if(now>noticeUntil&&notice){notice='';q('#hint').textContent=defaultHint();q('#hint').dataset.error='false';}
  renderer.render(scene,camera);
 }
-resize();renderParts();metrics();if(!writeAllowed)q('#saved').textContent='このタブで試作中 · いつもの記録は変更しないよ';requestAnimationFrame(frame);
+resize();renderParts();metrics();if(!writeAllowed)q('#saved').textContent='この画面で作業中 · いつもの記録は変更しないよ';requestAnimationFrame(frame);

@@ -41,7 +41,8 @@ export function createCoastLandmarkGesture({canvas,events=window,doc=document,av
   stop(e);cancel();if(g.kind==='aim'&&tap)onAim(g.aim);
  });
  for(const type of['pointercancel','lostpointercapture'])listen(events,type,e=>{if(owner?.pointer===e.pointerId)cancel();});
- listen(events,'blur',cancel);listen(events,'pagehide',cancel);listen(doc,'visibilitychange',()=>{if(doc.hidden)cancel();});
+ for(const type of ['blur','pagehide','pageshow','resize','orientationchange'])listen(events,type,cancel);
+ listen(doc,'visibilitychange',()=>{if(doc.hidden)cancel();});
  return{get active(){return!!owner;},get id(){return owner?.id??null;},get kind(){return owner?.kind??null;},
   read(state){if(owner&&!ready())cancel();return coastHandleInput(owner,state);},cancel,
   dispose(){cancel();disposed=true;for(const remove of listeners)remove();}

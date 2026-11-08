@@ -52,5 +52,5 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   ui+=dt;if(ui>.12){ui=0;refresh();}if(autosave>8&&!testMode&&Math.abs(l.vehicle.speed)<.01&&!held.size&&!keys.size)save();
 }
 function fail(message){clear();session.blocked=true;state.message=message;saveText=message;refresh();}window.addEventListener('error',e=>fail('表示エラー：'+e.message));window.addEventListener('unhandledrejection',e=>fail('処理エラー：'+(e.reason?.message||e.reason)));
-if(local){try{if(!testMode){const loaded=await session.load();if(loaded){state=upgradeWaterTruck(loaded);state.message='水量・車両位置・移送を復元しました。「再開する」で続けられます。';}}ready=true;saveText='水運搬専用・通常セーブは変更しません';}catch(e){fail('保存を保護して停止：'+e.message);}}else state.message='ローカル開発専用です。';refresh();requestAnimationFrame(frame);
+if(local){try{if(!testMode){const loaded=await session.load();if(loaded){state=upgradeWaterTruck(loaded);state.message='水量・車両位置・移送を復元しました。「再開する」で続けられます。';}}ready=true;saveText='水運搬専用・通常セーブは変更しません';}catch(e){fail('保存を保護して停止：'+e.message);}}else state.message='この練習区画は、今の端末で開いてください。';refresh();requestAnimationFrame(frame);
 window.addEventListener('beforeunload',e=>{if(!testMode&&ready&&session.savedRevision!==state.revision){e.preventDefault();e.returnValue='';}});

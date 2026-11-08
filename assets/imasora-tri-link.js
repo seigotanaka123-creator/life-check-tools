@@ -1078,10 +1078,10 @@ class ImasoraTriLink3D {
     const selectors = this.players.map(player => {
       const descriptor = player.characterDescriptor || DEVELOPMENT_CHARACTER_ROSTER[0];
       const profile = characterAbilityProfile(descriptor);
-      return `<label class="itl3-dev-character-field"><span>PLAYER ${player.index + 1}</span><select data-itl3-dev-character="${player.index}" aria-label="プレイヤー${player.index + 1}の開発用モンスター">${developmentCharacterOptionsMarkup(descriptor?.id || "")}</select><small data-itl3-dev-ability="${player.index}">${escapeHtml(profile.tier)}｜${escapeHtml(profile.label)}｜${escapeHtml(characterAbilityNames(profile).join("・") || "補正なし")}</small></label>`;
+      return `<label class="itl3-dev-character-field"><span>PLAYER ${player.index + 1}</span><select data-itl3-dev-character="${player.index}" aria-label="プレイヤー${player.index + 1}の対戦モンスター">${developmentCharacterOptionsMarkup(descriptor?.id || "")}</select><small data-itl3-dev-ability="${player.index}">${escapeHtml(profile.tier)}｜${escapeHtml(profile.label)}｜${escapeHtml(characterAbilityNames(profile).join("・") || "補正なし")}</small></label>`;
     }).join("");
-    return `<section class="itl3-dev-character-panel" aria-label="ゲーム機2 モンスター能力検証">
-      <div class="itl3-dev-character-heading"><div><small>DEVELOPMENT / 192 CHARACTERS</small><strong>モンスター能力・対戦選択</strong></div><span>開花期48種＋満開期144種</span></div>
+    return `<section class="itl3-dev-character-panel" aria-label="ゲーム機2 モンスターの能力">
+      <div class="itl3-dev-character-heading"><div><small>MONSTER SELECT / 192 CHARACTERS</small><strong>モンスター能力・対戦選択</strong></div><span>開花期48種＋満開期144種</span></div>
       <div class="itl3-dev-character-grid">${selectors}</div>
       <div class="itl3-dev-character-actions"><p>色・白系・装飾では能力差を付けず、6体格系統だけで補正します。</p><button type="button" data-itl3-dev-apply>選んだ3体を適用</button></div>
     </section>`;

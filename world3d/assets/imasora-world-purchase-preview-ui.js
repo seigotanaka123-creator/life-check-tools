@@ -5,19 +5,19 @@ const SOURCE_KEY='imasora-world-foundation-v3';
 const $=id=>document.getElementById(id);
 export function makeWalletPreview(mode){
   if(!['copy','fixture'].includes(mode)||!['127.0.0.1','localhost'].includes(location.hostname))throw Error('接続確認はローカル専用です。');
-  document.title='火星素材ショップ｜建設開発8-2a（接続確認）';
+  document.title='火星素材ショップ';
   const session=new WorldPurchaseSession(new WorldPurchaseStore(mode));
   const panel=document.createElement('section');panel.className='pending';panel.id='wallet-connection-panel';
   panel.innerHTML=`<h2>本体財布との接続確認 · 8-2a</h2><p id="wallet-origin"></p><p id="wallet-source-status" role="status"></p><div class="actions"><button id="wallet-check-source">元のセーブが変わっていないか確認</button><a id="wallet-alternate" class="wallet-alternate"></a></div><p class="scope">これは複製上の検証です。本体の金貨・建築・装備には書き戻しません。候補価格：水3枚／土2枚／木材4枚。実プレイヤーの収益計測はこれからです。</p>`;
   document.querySelector('.shop-footer').before(panel);
   const style=document.createElement('style');style.textContent='.wallet-alternate{color:#f8dfaa;align-self:center;font-size:12px}.wallet-notice{color:#e4ddbb!important}#wallet-connection-panel{margin-top:12px;border-width:1px;background:#26393c}#wallet-connection-panel h2{font-size:15px}#wallet-connection-panel p{font-size:11px}#wallet-connection-panel button{font-size:11px}';document.head.append(style);
   const entry=document.createElement('dialog');entry.className='game-dialog';entry.id='wallet-import';entry.setAttribute('aria-labelledby','wallet-import-title');
-  entry.innerHTML=`<h2 id="wallet-import-title">${mode==='copy'?'本体のセーブを複製して試す':'検証用データで試す'}</h2><p>${mode==='copy'?'このポートに保存された本体の金貨・建築・装備を、接続確認専用の保存へ一度だけ複製します。購入テストで使うのは複製側の金貨です。':'本体と同じセーブ形式の検証データです。金貨12枚と確認用の建築データを一度だけ用意します。本体や前のショップの金貨は使いません。'}</p><p class="scope">元の保存を消さず、上書きもせず、他ポートからの転送もしません。複製済みのデータを取り込み直して残高を増やす操作はありません。</p><p id="wallet-import-error" role="alert"></p><div class="actions"><button id="wallet-import-confirm" class="primary">${mode==='copy'?'本体セーブの複製を作る':'検証用12枚で開始'}</button><button id="wallet-import-close">あとで</button></div>`;document.body.append(entry);
+  entry.innerHTML=`<h2 id="wallet-import-title">${mode==='copy'?'本体のセーブを複製して試す':'練習用の記録で試す'}</h2><p>${mode==='copy'?'このポートに保存された本体の金貨・建築・装備を、接続確認専用の保存へ一度だけ複製します。購入テストで使うのは複製側の金貨です。':'本体と同じセーブ形式の検証データです。金貨12枚と確認用の建築データを一度だけ用意します。本体や前のショップの金貨は使いません。'}</p><p class="scope">元の保存を消さず、上書きもせず、他ポートからの転送もしません。複製済みのデータを取り込み直して残高を増やす操作はありません。</p><p id="wallet-import-error" role="alert"></p><div class="actions"><button id="wallet-import-confirm" class="primary">${mode==='copy'?'本体セーブの複製を作る':'練習用の金貨12枚で開始'}</button><button id="wallet-import-close">あとで</button></div>`;document.body.append(entry);
   const sample={version:3,mapSchemaVersion:4,physicsRevision:12,characterId:'star-white-hero-young-seed-walk-sky-cool-b-forest',map:'mars',position:{x:-74.5,z:163.7},heading:1.7,cameraDistanceIndex:0,labels:true,
     builtByMap:{sky:[{id:'fixture-anchor',position:[-157.8,0,118.3],rotation:0,customField:'keep-sky'}],construction:[{id:'fixture-work',position:[80,0,-16],customField:'keep-work'}]},
     ufoResources:{spaceCoins:12,energyCells:3,starMaterials:2},ufoEquipment:{energyAbsorptionTankLevel:1,coinGainMultiplier:1,simultaneousShotEnabled:false,legacyUnknown:'keep-equipment'},unknownExtension:{keep:true},updatedAt:0};
   let perform,tell;
-  const originText=()=>session.ledger?.source.kind==='copied-world'?'本体セーブの複製を使用中（実金貨は変わりません）':'検証用の金貨を使用中（本体とは別）';
+  const originText=()=>session.ledger?.source.kind==='copied-world'?'本体セーブの複製を使用中（実金貨は変わりません）':'練習用の金貨を使用中（本体とは別）';
   function refresh(){
     $('wallet-origin').textContent=session.ledger?`${originText()} · 元の金貨 ${session.ledger.source.world.ufoResources?.spaceCoins??0}枚 · 報酬記録 ${session.ledger.events.filter(e=>e.kind==='reward').length}件`:'まだ接続確認用の保存を作っていません。';
     $('wallet-check-source').disabled=mode!=='copy'||!session.ledger;
@@ -28,8 +28,8 @@ export function makeWalletPreview(mode){
   $('development').append(extra);
   const alt=new URL(location.href);alt.searchParams.set('walletPreview',mode==='copy'?'fixture':'copy');$('wallet-alternate').href=alt.href;$('wallet-alternate').textContent=mode==='copy'?'本体を使わない検証画面へ':'本体セーブの複製で試す';
   // Keep the approved v450 UI. Labels must not imply the old 60-coin grant here.
-  document.querySelector('.wallet small').textContent=mode==='copy'?'複製側の宇宙金貨':'検証用 宇宙金貨';
-  document.querySelector('.wallet').setAttribute('aria-label',mode==='copy'?'複製側の所持金':'検証用の所持金');
+  document.querySelector('.wallet small').textContent=mode==='copy'?'複製側の宇宙金貨':'練習用の宇宙金貨';
+  document.querySelector('.wallet').setAttribute('aria-label',mode==='copy'?'複製側の所持金':'練習用の所持金');
   document.querySelector('.shop-footer>span').innerHTML='財布接続テスト・価格は候補値<br>本体への書き戻しはありません。';
   document.querySelector('#development>.scope').textContent='本体セーブ形式と購入の接続確認です。元データの取り込みは一度だけ。価格は調整候補です。';
   document.querySelector('#confirm>.scope').textContent='接続確認用の金貨だけを使います。本体の金貨は変わりません。価格は候補値です。';

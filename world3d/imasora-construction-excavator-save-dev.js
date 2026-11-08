@@ -8,9 +8,9 @@ const restoreTest=new URLSearchParams(location.search).has('excavationRestoreTes
 const session=new ExcavationSession(new ExcavationStore(undefined,{restoreTest}));let initial=initialExcavatorBuild(),paused=false,writing=false,ready=false,saveText='未保存・保存ボタンで開始',api,guide;
 let restorePoint=null,pendingRestore=false,importCandidates=[],importGeneration=null,importReadId=0;
 if(local){try{const saved=await session.load();if(saved){initial=saved;paused=true;saveText='保存を読み込みました。一時停止中です。';}ready=true;}catch(error){paused=true;initial=session.recovery||initial;saveText=error.message+(session.recovery?' 正常な控えを表示しています。復旧は確認後に行います。':' 作業データは未読込です。');}}
-else {paused=true;saveText='ローカル開発専用です。通常ゲームには保存しません。';}
+else {paused=true;saveText='この練習区画は、今の端末で開いてください。通常ゲームには保存しません。';}
 if(local)try{restorePoint=await session.store.readRestorePoint();}catch{saveText+=' 復元前の控えは読み込めていません。';}
-if(restoreTest){document.querySelector('header small').textContent='工事現場 · 9-1c2a · 復元確認専用';document.querySelector('header p').textContent='通常の開発保存にも書き込まない復元テスト区画';}
+if(restoreTest){document.querySelector('header small').textContent='工事現場 · 9-1c2a · 復元確認専用';document.querySelector('header p').textContent='通常の練習用の保存にも書き込まない復元テスト区画';}
 const editable=()=>local&&ready&&!paused&&!writing&&!session.blocked;
 const disabledBeforePause=new Map();
 function restoreButtons(){for(const [button,disabled] of disabledBeforePause)button.disabled=disabled;disabledBeforePause.clear();}
@@ -37,7 +37,7 @@ function renderSave(){
   $('save-import-before-export').hidden=!restorePoint;$('save-import-before-export').disabled=writing;
   if(!editable())document.querySelectorAll('.controls button').forEach(b=>{if(!disabledBeforePause.has(b))disabledBeforePause.set(b,b.disabled);b.disabled=true;});else restoreButtons();
   $('save-state').textContent=writing?'保存中':session.blocked?'保護停止':paused?'一時停止':'作業中';
-  $('debug').textContent=$('debug').textContent.replace('保存：なし（貸出区画）',`保存：専用の開発用区画 / 番号 ${session.generation??'未保存'} / ${paused?'一時停止':'作業中'}`);
+  $('debug').textContent=$('debug').textContent.replace('保存：なし（貸出区画）',`保存：専用の練習区画 / 番号 ${session.generation??'未保存'} / ${paused?'一時停止':'作業中'}`);
   const state=api.getState(),action=state.action||state.loader.transition;
   if(!$('debug').textContent.includes('\n中断点：'))$('debug').textContent+=`\n中断点：${state.action?.kind||state.loader.mode} ${action?`${action.elapsed.toFixed(3)}秒 / ${action.duration??'旋回'}秒`:''}`;
 }
@@ -56,7 +56,7 @@ function confirm(message,action){pause();$('save-confirm-text').textContent=mess
 $('save-confirm-cancel').onclick=()=>{confirmation=null;$('save-confirm').close();};
 $('save-confirm').addEventListener('cancel',()=>confirmation=null);
 $('save-confirm-ok').onclick=()=>{const action=confirmation;confirmation=null;$('save-confirm').close();action?.();};
-$('save-recover').onclick=()=>confirm('正常な控えで、この開発用区画を復旧します。破損した原本は保存履歴にも残します。必要なら先に原本を書き出してください。',async()=>{
+$('save-recover').onclick=()=>confirm('正常な控えで、この練習区画を復旧します。破損した原本は保存履歴にも残します。必要なら先に原本を書き出してください。',async()=>{
   writing=true;renderSave();try{const state=await session.recover();api.setState(state);ready=true;saveText='正常な控えから復旧しました。一時停止中です。';}catch(e){failed(e);}finally{writing=false;renderSave();}
 });
 $('save-reload').onclick=()=>confirm('画面上の未保存の作業を離れ、最新の保存を読み込み直します。残したい作業は先に「作業を書き出す」で保管してください。',()=>location.reload());

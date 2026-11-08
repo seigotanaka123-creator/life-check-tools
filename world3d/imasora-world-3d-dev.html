@@ -19,8 +19,8 @@
   <script src="./assets/imasora-game-touch-guard.js?v=119bg"></script>
 <link rel="stylesheet" href="./assets/imasora-player-ui.css?v=120mz">
 <link rel="stylesheet" href="./assets/imasora-construction-player-menu.css?v=120mz">
-<link rel="stylesheet" href="./assets/imasora-game-pastel.css?v=120ds">
-<link rel="stylesheet" href="./assets/imasora-pop-menu.css?v=120ds">
+<link rel="stylesheet" href="./assets/imasora-game-pastel.css?v=1211o">
+<link rel="stylesheet" href="./assets/imasora-pop-menu.css?v=1211o-120ds">
 <link rel="stylesheet" href="./assets/imasora-construction-high-live.css?v=120pb">
   <link rel="stylesheet" href="./assets/imasora-coast.css?v=120ni">
 <link rel="stylesheet" href="./assets/imasora-coast-forage.css?v=120nw">
@@ -30,6 +30,33 @@
 <link rel="stylesheet" href="./assets/imasora-coast-adventure.css?v=120oc">
 <link rel="stylesheet" href="./assets/imasora-keyboard-settings.css?v=120od">
 <link rel="stylesheet" href="./assets/imasora-touch-layout.css?v=120og">
+<style>
+/* Opaque menu surfaces and separate rows keep labels out of each other's space. */
+body.world-player-game:has(.world-player-menu[open],.world-map-menu:not([hidden])) .world-shell :is(.world-player-bar,.viewport-footer){opacity:0!important;pointer-events:none!important}
+body.world-player-game:has(.world-player-menu[open],.world-map-menu:not([hidden])) .viewport-card>:not(.viewport){opacity:0!important;pointer-events:none!important}
+body.world-player-game:has(.world-player-menu[open],.world-map-menu:not([hidden])) #viewport>:not(canvas,dialog,[role="dialog"],[role="alertdialog"],.world-map-menu,.world-map-menu-resume){opacity:0!important;pointer-events:none!important}
+body.world-player-game .world-player-menu{background:#fff6e4!important;opacity:1;isolation:isolate}
+body.world-player-game .world-player-menu::backdrop{background:#263b35d9!important}
+body.world-player-game .world-player-menu>header{flex:none;gap:14px;align-items:center}
+body.world-player-game .world-player-menu>header>div{min-width:0}
+body.world-player-game .world-player-menu>header>button{flex:none}
+body.world-player-game .world-player-menu .world-menu-tabs{flex:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+body.world-player-game .world-player-menu .world-menu-tabs button{padding:9px 4px;font-size:14px;min-width:0;white-space:nowrap}
+body.world-player-game .world-player-menu-scroll{min-height:0;padding:16px;scrollbar-gutter:stable}
+body.world-player-game .world-player-menu [data-player-start]{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:16px 0}
+body.world-player-game .world-player-menu [data-player-start]>button{margin:0!important;min-height:50px!important;line-height:1.6!important}
+body.world-player-game .world-player-menu :is(.world-construction-start,.world-player-help){background:#fff1ca!important}
+body.world-player-game .world-player-menu h3{font-size:19px!important;line-height:1.5;margin:8px 0 14px}
+body.world-player-game .world-player-menu :is(.world-start-hint,.world-facilities-intro,.world-player-help p){font-size:15px!important;line-height:1.8!important}
+body.world-player-game .world-map-menu{background:#263b35e8!important;isolation:isolate}
+body.world-player-game .world-map-menu .wmm-card{background:#fff6e4!important;opacity:1;min-height:0}
+body.world-player-game .world-map-menu .wmm-body{min-height:0;overflow:auto;scrollbar-gutter:stable}
+body.world-player-game .world-map-menu :is(.wmm-actions,.wmm-footer-actions){gap:12px}
+body.world-player-game .world-map-menu :is(.wmm-header,.wmm-footer){position:relative;flex:none;background:#fff4da!important}
+@media(max-width:430px){body.world-player-game .world-player-menu{width:calc(100% - 16px);max-height:calc(100dvh - 16px)}body.world-player-game .world-player-menu>header{padding:12px;gap:8px}body.world-player-game .world-player-menu .world-menu-tabs{padding:10px;gap:5px}body.world-player-game .world-player-menu .world-menu-tabs button{font-size:12px}body.world-player-game .world-player-menu-scroll{padding:12px}body.world-player-game .world-player-menu>header button{font-size:13px!important}}
+
+</style>
+<style>body.world-player-game:has(.world-player-menu[open],.world-map-menu:not([hidden])){overflow:hidden!important}</style>
 </head>
 <body class="world-player-game">
   <main class="world-shell">
@@ -217,7 +244,7 @@
           <p class="build-message" id="ufoStatus">UFO乗り場を建造してください。</p>
         </section>
 
-        <section class="panel-section ufo-equipment-development-section" aria-label="UFO装備の開発テスト">
+        <section class="panel-section ufo-equipment-development-section" aria-label="UFO装備の操作">
           <p class="eyebrow">UFO EQUIPMENT DEV TEST</p>
           <h2>UFO装備テスト</h2>
           <p class="muted">保存データや素材を変えずに、装備の外観と宇宙航行中の効果を比較できます。</p>

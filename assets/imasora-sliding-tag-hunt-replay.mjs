@@ -181,6 +181,8 @@ function sampleFrame(frames,time,view,shareGadgets=false){
  const {player,hunters}=out;
  Object.assign(out,a);
  out.time=time;
+ if(a.motionCues||b.motionCues){const priorMotion=a.motionCues??EMPTY_GADGETS,newMotion=(b.motionCues??EMPTY_GADGETS).filter(c=>c.at>a.time&&c.at<=time);out.motionCues=newMotion.length?Object.freeze([...priorMotion,...newMotion]):priorMotion;}
+ else delete out.motionCues;
  if(b.trampoline?.used&&Number.isFinite(b.trampoline.usedAt)&&time>=b.trampoline.usedAt)out.trampoline=b.trampoline;
  out.pickups=samplePickups(a.pickups,b.pickups,time);
  out.footprints=sampleFootprints(a,b,time);
@@ -321,7 +323,7 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
   }
   actorChanges.set(owner,changes);
  }
- function record(s,{force=false,lighting,feedbackCues}={}){if(active||!['playing','finished'].includes(s.phase)||!Number.isFinite(s.time))return false;const prev=frames.at(-1);if(prev&&s.time<prev.time)return false;
+ function record(s,{force=false,lighting,feedbackCues,motionCues}={}){if(active||!['playing','finished'].includes(s.phase)||!Number.isFinite(s.time))return false;const prev=frames.at(-1);if(prev&&s.time<prev.time)return false;
   for(const event of s.events){
    if(event.type==='pickup'){
     pickupTimes.set(event.pickup,event.time);
@@ -425,6 +427,7 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
   if(recordedLighting)snap.lighting=recordedLighting;
   const recordedCues=feedbackCues??prev?.feedbackCues;
   if(recordedCues)snap.feedbackCues=recordedCues;
+  const recordedMotion=motionCues??prev?.motionCues;if(recordedMotion)snap.motionCues=recordedMotion;
   if(prev?.time===s.time)frames[frames.length-1]=snap;else frames.push(snap);
   const fullPrev=fullFrames.at(-1);
   if(fullPrev?.time===s.time)fullFrames[fullFrames.length-1]=snap;
@@ -489,7 +492,7 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
   if(!s?.result)return false;
   record(s,{force:true});
   if(frames.length<2||frames.at(-1).time<=frames[0].time)return false;
-  outcome={catcher:s.result.catcher,end:frames.at(-1).time};
+  outcome={catcher:s.result.catcher,win:s.result.win,end:frames.at(-1).time};
   return true;
  }
  function start(s,{scope='finish'}={}){
@@ -546,19 +549,25 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
   const holdingEnd=time===clip.end&&previous===clip.end;
   const done=!paused&&elapsed>=duration&&holdingEnd;
   return{state:view,delta:previous===null?0:Math.max(0,time-previous),done,
-   catcher:clip.catcher,progress:clamp((time-clip.start)/(clip.end-clip.start),0,1)};
+   catcher:clip.catcher,win:clip.win,progress:clamp((time-clip.start)/(clip.end-clip.start),0,1)};
  }
  return{record,recordHighlight,highlightList,recordSound,soundsAt,complete,start,advance,viewPlan,seek,setSpeed,setPaused,stop(){active=false;paused=false;view=null;lastTime=null;},reset(){frames=[];fullFrames=[];sounds=[];lastStepSoundAt=-Infinity;actionSoundCount=0;highlights=[];pickupTimes.clear();actorChanges.clear();recentClones.clear();hookWasAttached=false;flightStages.fill(null);for(const changes of flightChanges)changes.length=0;gadgetStarts=new WeakMap();activeDives.fill(false);diveEndTimes.fill(null);scarfPreparations.fill(null);outcome=null;clip=null;active=false;paused=false;view=null;lastTime=null;elapsed=0;jumpStages.fill(0);jumpTimes.fill(null);footprintCache=new WeakMap();footprintRowsCreated=footprintRowsReused=0;},get active(){return active;},get paused(){return paused;},get scope(){return clip?.scope??null;},get available(){return!!outcome;},stats:()=>({frames:frames.length,capacity:HUNT_REPLAY_CAPACITY,fullFrames:fullFrames.length,fullCapacity:HUNT_FULL_REPLAY_CAPACITY,scope:clip?.scope??null,active,available:!!outcome,start:clip?.start??null,end:clip?.end??null,elapsed,footprintRowsCreated,footprintRowsReused})};
 }
 
+export function huntResultAudioCues({caught=false,win}={}){
+ const cues=[{type:caught?'touch':'timeout'}];
+ // Old replay fixtures may not carry a win. Do not turn an absent value into a loss.
+ if(typeof win==='boolean')cues.push({type:win?'win':'loss'});
+ return cues;
+}
 export function createHuntReplaySound(){
  let ended=false;
  return{
   reset(){ended=false;},
-  sample(cues,{atEnd=false,caught=false}={}){
+  sample(cues,{atEnd=false,caught=false,win}={}){
    if(!atEnd||ended)return cues;
    ended=true;
-   return [...cues,{type:caught?'touch':'timeout'}];
+   return [...cues,...huntResultAudioCues({caught,win})];
   },
  };
 }

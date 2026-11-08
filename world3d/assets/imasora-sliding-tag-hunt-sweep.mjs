@@ -1,3 +1,4 @@
+import{freshHuntSweep}from'./imasora-sliding-tag-hunt-search-refresh.mjs';
 import{HUNTER_STARTS}from'./imasora-sliding-tag-hunt-random-starts.mjs';
 import{WORLD_CORNER_STAIRS,worldHeight}from'./imasora-sliding-tag-hunt-world.mjs';
 // Public, already traversable map locations. No current target position, item,
@@ -32,12 +33,14 @@ function sweepCorner(a,time,coverage,team){
  setSweepDestination(m,cornerChecks[index]);
  return true;
 }
-export function huntSweepControl(a,{time,seed,visible=false,coverage,team}){
+export function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false}){
  const m=a.brain;
  if(visible||m.seen&&time-(m.seenAt??-Infinity)<18){
+  if(refresh){m.freshSweep=null;m.sweep=null;}
   if(coverage&&m.cornerIndex!==undefined){delete m.cornerIndex;m.sweep=null;}
   return false;
  }
+ if(refresh&&coverage)return freshHuntSweep(a,{time,seed,coverage,team});
  if(coverage&&time>=45&&sweepCorner(a,time,coverage,team)){
   m.goalSince=time;
   return true;

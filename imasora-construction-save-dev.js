@@ -89,7 +89,7 @@ function refresh() {
     $('revision').textContent = '保存番号 —'; $('history').textContent = '取り消し — ／ やり直し —';
     $('conservation').textContent = '正常な保存データは未読込です';
   }
-  $('storage-info').textContent = `保存先：${CONSTRUCTION_DEV_DB} ／ ${location.origin} ／ ${persistence || 'ブラウザー内の保存。重要な試作はファイルにも書き出してください。'}`;
+  $('storage-info').textContent = `保存先：${CONSTRUCTION_DEV_DB} ／ ${location.origin} ／ ${persistence || 'ブラウザー内の保存。大切な作品はファイルにも書き出してください。'}`;
   drawState();
 }
 async function run(action, success) {
@@ -152,11 +152,11 @@ function restoreSnapshot(text) {
 $('restore').onclick = () => restoreSnapshot(restoreText);
 $('restore-text').oninput = refresh;
 $('restore-pasted').onclick = () => restoreSnapshot($('restore-text').value.trim());
-$('recover').onclick = () => askRestore('表示中の正常データで開発用セーブを復旧しますか？異常があった元データもバックアップに残します。', () => run(() => session.confirmRecovery(), '正常データで復旧しました。'));
+$('recover').onclick = () => askRestore('表示中の正常データで練習区画の記録を復旧しますか？異常があった元データもバックアップに残します。', () => run(() => session.confirmRecovery(), '正常データで復旧しました。'));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && session.state && !working) store.read().then(record => { if (record?.generation !== session.generation) message('別タブで保存が更新されました。操作前に「保存を読み直す」を押してください。', true); }).catch(e => message(e.message, true)); });
-if (!local) { message('これはローカル開発専用の確認画面です。通常ゲームには接続しません。', true); refresh(); }
+if (!local) { message('これはこの練習区画は、今の端末で開いてください。通常ゲームには接続しません。', true); refresh(); }
 else {
   await run(() => session.load(), '保存の読み込みを確認しました。');
   if (!session.state && !session.readOnly) message('確認用セーブがありません。「確認用の土32個で開始」から作成できます。');
-  if (navigator.storage?.persisted) { const persistent = await navigator.storage.persisted(); persistence = persistent ? '永続保存が許可されています。' : 'ブラウザーが保存を整理する場合があります。重要な試作はファイルにも書き出してください。'; refresh(); }
+  if (navigator.storage?.persisted) { const persistent = await navigator.storage.persisted(); persistence = persistent ? '永続保存が許可されています。' : 'ブラウザーが保存を整理する場合があります。大切な作品はファイルにも書き出してください。'; refresh(); }
 }

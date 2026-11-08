@@ -1,0 +1,9 @@
+.monster-eye[data-base-expression]{width:calc(6px * var(--expression-eye-x,1));height:calc(6px * var(--expression-eye-y,1));transform:rotate(var(--expression-angle,0deg));border-radius:50%}
+.monster-eye[data-base-expression]::after{content:"";position:absolute;left:17%;top:15%;width:24%;height:24%;border-radius:50%;background:#fff}
+.monster-eye[data-base-expression="proud"]::before,.monster-eye[data-base-expression="determined"]::before,.monster-eye[data-base-expression="serene"]::before,.monster-eye[data-base-expression="curious"]::before{content:"";position:absolute;left:-10%;top:-4px;width:120%;height:2px;border-top:.9px solid #243246;border-radius:50%;opacity:1}
+.monster-expression-mouth{position:absolute;left:calc(50% - 5px);top:55px;width:10px;height:4px;border-bottom:1.4px solid #16202c;border-radius:0 0 60% 60%;z-index:6}
+.monster-expression-mouth[data-base-expression="joyful"]{height:6px;width:12px;left:calc(50% - 6px)}
+.monster-expression-mouth[data-base-expression="curious"]{left:calc(50% - 2px);width:4px;height:5px;border:1px solid #16202c;border-radius:50%}
+.monster-expression-mouth[data-base-expression="determined"]{height:1px;border-radius:30%}
+.monster.sprout:has(.monster-expression-mouth)>.monster-mark,.monster.trail:has(.monster-expression-mouth)>.monster-mark{visibility:hidden}
+.direction-frame.back .monster-expression-mouth,.direction-frame.back .monster-eye[data-base-expression]{visibility:hidden}

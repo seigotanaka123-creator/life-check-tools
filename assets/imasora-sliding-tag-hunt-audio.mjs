@@ -1,9 +1,9 @@
 // BEGIN TAG AUDIO
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.ImasoraTagAudio=api;})(globalThis,function(){
  'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect']);
- function preference(storage){try{const p=JSON.parse(storage.getItem(KEY));if(p?.version===1&&typeof p.enabled==='boolean'&&Number.isFinite(p.volume)&&p.volume>0&&p.volume<=1)return{enabled:p.enabled,volume:p.volume};}catch{}try{const level=Number(JSON.parse(storage.getItem('lifeQuestWalkV1'))?.soundVolumes?.sfx??5);if(Number.isFinite(level)&&level>=0&&level<=5)return{enabled:level>0,volume:level>0?level/5:1};}catch{}return{enabled:true,volume:1};}
+ function preference(storage){try{const p=JSON.parse(storage.getItem(KEY));if(p?.version===1&&typeof p.enabled==='boolean'&&Number.isFinite(p.volume)&&p.volume>0&&p.volume<=1)return{enabled:p.enabled,volume:p.volume};}catch{}try{const level=Number(JSON.parse(storage.getItem('lifeQuestWalkV1'))?.soundVolumes?.sfx??1);if(Number.isFinite(level)&&level>=0&&level<=5)return{enabled:level>0,volume:level>0?level/5:.2};}catch{}return{enabled:true,volume:.2};}
  function savePreference(storage,p){try{storage.setItem(KEY,JSON.stringify({version:1,enabled:!!p.enabled,volume:p.volume}));return true;}catch{return false;}}
- function create({enabled=true,volume=1,getContext=()=>{const C=globalThis.AudioContext||globalThis.webkitAudioContext;return C?new C():null;},onState=()=>{},setTimer=setTimeout,clearTimer=clearTimeout}={}){
+ function create({enabled=true,volume=.2,getContext=()=>{const C=globalThis.AudioContext||globalThis.webkitAudioContext;return C?new C():null;},onState=()=>{},setTimer=setTimeout,clearTimer=clearTimeout}={}){
   let monitor=true,context=null,master=null,noise=null,glide=null,wanted=false,disposed=false,available=true,generation=0,suspendTimer=null,lastGlide=-Infinity;const voices=new Set(),lastCue=new Map(),counts={};
   const emit=()=>{try{onState({enabled,available,context:context?.state??'idle'});}catch{}};
   const safe=promise=>Promise.resolve(promise).catch(()=>{});

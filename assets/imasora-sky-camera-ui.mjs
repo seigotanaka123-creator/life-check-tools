@@ -17,7 +17,7 @@ export function mountSkyCamera({document:doc=globalThis.document,environment=glo
  const camera=createSkyCamera({openStream:async()=>{if(!preview)throw Error('PREVIEW_CLOSED');return preview.stream;},readFrame:async()=>preview.captureFrame(),recognize:candidateClient.recognize});
  async function start(){if(disposed||!['idle','unavailable','result'].includes(phase))return;release(phase==='result');erase();const token=++generation,controller=new AbortController();opening=controller;setPhase('opening','カメラをひらいているよ。');try{const own=await openPreview({video:e.video,snapshot:e.snapshot,signal:controller.signal,environment});if(token!==generation||disposed){own.stop();return;}preview=own;opening=null;candidateClient.prepare?.();setPhase('preview','空だけを枠に入れてね。');}catch(error){if(token!==generation||disposed)return;setPhase('unavailable',error?.message==='CAMERA_SECURE_CONTEXT_REQUIRED'?'カメラを使える接続で開いてね。今は撮影できません。':error?.name==='NotAllowedError'?'カメラが許可されていません。設定を確かめて、もう一度ためしてね。':'カメラをひらけませんでした。もう一度ためしてね。');}}
  async function shoot(){if(disposed||phase!=='preview')return;const token=generation,own=preview;lastCandidate=null;setPhase('checking','空の色や模様をたしかめているよ。');const result=await camera.capture();own?.stop();if(preview===own)preview=null;if(token!==generation||disposed)return;lastCandidate=result.status==='candidate'?result.candidate:null;setPhase('result',skyCaptureMessage(result)+(confirm&&lastCandidate?'\n写真の空と合っていれば「この空を使う」。違えば撮り直してね。':''));}
- async function accept(){if(disposed||phase!=='result'||!lastCandidate||confirming)return;const token=generation;confirming=true;confirm.disabled=true;try{await onConfirm({...lastCandidate});if(token===generation&&!disposed)e.status.textContent='空を記録しました。';}catch{if(token===generation&&!disposed)e.status.textContent='空を記録できませんでした。もう一度ためしてね。';}finally{confirming=false;confirm.disabled=false;}}
+ async function accept(){if(disposed||phase!=='result'||!lastCandidate||confirming)return;const token=generation;confirming=true;confirm.disabled=true;try{await onConfirm({...lastCandidate});if(token===generation&&!disposed)e.status.textContent='空を記録しました。';}catch(error){if(token===generation&&!disposed)e.status.textContent=skyConfirmMessage(error);}finally{confirming=false;confirm.disabled=false;}}
  if(confirm)confirm.addEventListener('click',accept);
  function close(){generation++;lastCandidate=null;release();erase();e.video.hidden=true;if(!disposed)setPhase('idle','写真は端末に保存せず、外にも送りません。');}
  const hidden=()=>{if(doc.hidden){close();}},leave=()=>close();e.start.addEventListener('click',start);e.shoot.addEventListener('click',shoot);e.retake.addEventListener('click',start);e.back.addEventListener('click',leave);doc.addEventListener('visibilitychange',hidden);environment.addEventListener?.('pagehide',leave);
@@ -30,4 +30,11 @@ export function skyCaptureMessage(result){
  if(result.status==='unavailable')return'空をたしかめる処理が動きませんでした。\nもう一度ためすか、閉じてね。';
  const messages={dark:'暗くて空を見分けられなかったよ。\n撮り直すか、閉じてね。',glare:'白く明るすぎて、空を見分けられなかったよ。\n太陽を枠から外して撮り直してね。',flat:'空の模様を見分けられなかったよ。\n少し向きを変えて撮り直してね。',incomplete:'写真をうまく読み取れなかったよ。\nもう一度撮り直してね。', 'not-sky':'空かどうか、はっきり分からなかったよ。\n空だけを大きくうつして撮り直してね。'};
  return messages[result.reason]??'空を見分けられなかったよ。\n空だけを大きくうつして撮り直してね。';
+}
+
+export function skyConfirmMessage(error){
+ if(error?.message==='SKY_PHOTO_PENDING')return'まだ受け取っていない空の写真があります。「閉じる」でホームへ戻り、受け取りを確かめてね。';
+ if(['MONSTER_CHANGED','WALK_CAPTURE_CHANGED'].includes(error?.message))return'育成や散歩の状況が変わりました。ホームに戻り、撮影を開き直してね。';
+ if(error?.message==='TAG_PHOTO_UNCONFIRMED')return'写真を確認できる時間を過ぎました。今の空を撮り直してね。';
+ return'空を記録できませんでした。もう一度ためすか、閉じてホームで受け取りを確かめてね。';
 }

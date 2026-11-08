@@ -141,7 +141,7 @@
     if (!exactKeys(ledger, ["version", "scope", "profileId", "quantities", "transfers"])
       || ledger.version !== 1 || ledger.scope !== LEDGER_SCOPE || !validProfileId(ledger.profileId)
       || ledger.profileId !== profileId || !Array.isArray(ledger.transfers) || ledger.transfers.length > RECEIPT_LIMIT) {
-      fail("本体の試作保管記録が不正です。");
+      fail("材料の保管記録を読み取れません。");
     }
     const ids = new Set(), openingIds = new Set();
     const totals = emptyTrialLedger(profileId).quantities;

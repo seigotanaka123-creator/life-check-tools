@@ -115,7 +115,7 @@ for (const bridge of proposal.entry) {
 }
 const spawn = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 1, 24), mat(0x4cad9f)); spawn.position.fromArray(proposal.spawn); spawn.position.y = 1; layout.add(spawn);
 label(layout, '開始位置', proposal.spawn[0], 9, proposal.spawn[2], 75);
-let savedNote = 'この開発用オリジンには保存済み建物なし。別ポートの保存内容は参照しません。', savedIssues = [];
+let savedNote = 'この練習区画に保存された建物はありません。ほかの区画の記録は使いません。', savedIssues = [];
 try {
   const buildings = savedBuildingVolumes(localStorage.getItem('imasora-world-foundation-v3'));
   if (buildings.length) savedNote = `保存済み建物 ${buildings.length}件を占有範囲で参考表示（読取専用）。`;
@@ -127,7 +127,7 @@ try {
 } catch (error) { savedNote = `保存済み建物は未検証：${error.message}。保存は変更していません。`; }
 
 const inspectionText = [...inspection.issues, ...savedIssues];
-$('diagnostics').textContent = `正式モデル倍率 ${d.measurement.scale}。外周幅 ${d.measurement.width.toFixed(3)}／奥行 ${d.measurement.depth.toFixed(3)}／高さ ${d.measurement.height.toFixed(3)}。頭上余白 ${inspection.headroom.toFixed(2)}。各車の出庫 ${inspection.pathSamples}姿勢＋旋回361姿勢を幾何検査。${inspectionText.length ? inspectionText.join(' ') : '候補地内・駐車車体との干渉なし。'} ${savedNote} 実走行の衝突・乗降アニメーションは未実装です。`;
+$('diagnostics').textContent = `正式モデル倍率 ${d.measurement.scale}。外周幅 ${d.measurement.width.toFixed(3)}／奥行 ${d.measurement.depth.toFixed(3)}／高さ ${d.measurement.height.toFixed(3)}。頭上余白 ${inspection.headroom.toFixed(2)}。各車の出庫 ${inspection.pathSamples}姿勢＋旋回361姿勢を幾何検査。${inspectionText.length ? inspectionText.join(' ') : '候補地内・駐車車体との干渉なし。'} ${savedNote} この画面は配置の練習区画です。車両の走行・乗降はできません。`;
 const metric = (name, value, unit = '') => `<div class="metric"><span>${name}</span><strong>${value}</strong><small>${unit}</small></div>`;
 let view = 'vehicle';
 const target = new THREE.Vector3(), orbit = { yaw: .7, pitch: .49, distance: 220 };

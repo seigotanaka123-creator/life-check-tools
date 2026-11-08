@@ -8,6 +8,7 @@ export function bindCranePointInput({canvas,events=globalThis,doc=globalThis.doc
  on(events,'pointerdown',e=>{if(gesture&&e.pointerId!==gesture.id)cancel();});
  on(events,'pointermove',e=>{if(gesture&&e.pointerId===gesture.id&&(!ready()||!Number.isFinite(e.clientX)||!Number.isFinite(e.clientY)||Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)>8))cancel();});
  on(events,'pointerup',e=>{const g=gesture;if(!g||g.id!==e.pointerId)return;cancel();if(ready()&&!doc.hidden&&[e.clientX,e.clientY].every(Number.isFinite)&&Math.hypot(e.clientX-g.x,e.clientY-g.y)<=8)pick(e.clientX,e.clientY);});
- on(events,'pointercancel',cancel);on(events,'blur',cancel);on(doc,'visibilitychange',cancel);
+ for(const type of ['pointercancel','blur','pagehide','pageshow','resize','orientationchange'])on(events,type,cancel);
+ on(canvas,'lostpointercapture',cancel);on(doc,'visibilitychange',cancel);
  return{cancel,dispose(){cancel();for(const remove of listeners)remove();}};
 }

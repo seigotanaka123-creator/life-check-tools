@@ -3,9 +3,9 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>工事現場・保存基盤の確認｜イマソラーズウォーク</title><link rel="stylesheet" href="./imasora-construction-save-dev.css?v=427">  <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
 </head>
 <body>
-<header><div><p class="eyebrow">イマソラーズウォーク · 工事現場開発</p><h1>作ったものを、残す。</h1><p>段階2-1 ／ 保存・取り消し・素材管理の確認</p></div><a href="./imasora-world-3d-dev.html?constructionExpansionPreview=1&amp;check=construction-expansion-v426">広げた工事現場へ</a></header>
+<header><div><p class="eyebrow">イマソラーズウォーク · 工事現場</p><h1>作ったものを、残す。</h1><p>段階2-1 ／ 保存・取り消し・素材管理の確認</p></div><a href="./imasora-world-3d-dev.html?constructionExpansionPreview=1&amp;check=construction-expansion-v426">広げた工事現場へ</a></header>
 <main>
-<section class="preview" aria-label="保存された土の配置"><canvas id="scene" aria-label="確認区画の立体表示"></canvas><div class="scene-label">保存内容の立体プレビュー<small>土の配置確認用です。掘削・歩行・車両操作は次の段階で実装します。</small></div><div class="camera"><button id="rotate-left">左から見る</button><button id="rotate-right">右から見る</button><button id="camera-reset">正面に戻す</button></div></section>
+<section class="preview" aria-label="保存された土の配置"><canvas id="scene" aria-label="確認区画の立体表示"></canvas><div class="scene-label">保存内容の立体プレビュー<small>保存した土の配置を立体で見られます。この画面では掘る・歩く・車両を動かす操作はできません。</small></div><div class="camera"><button id="rotate-left">左から見る</button><button id="rotate-right">右から見る</button><button id="camera-reset">正面に戻す</button></div></section>
 <section class="controls" aria-label="保存の確認操作">
 <p class="notice">確認用の土32個だけを使います。通常ゲームの素材・所持金・UFO装備は変更しません。</p>
 <div id="status" role="status" aria-live="polite">保存を確認しています…</div>
@@ -21,7 +21,7 @@
 <button id="abort-save" data-edit>土1個の保存失敗を試す</button><p>別タブで同じ確認画面を開くと競合検査もできます。古いタブからは上書きできません。</p>
 <div class="buttons"><button id="export">確認セーブを書き出す</button><button id="raw-export">保管中のデータを書き出す</button></div>
 <div id="backup-panel" hidden><label class="file-label" for="backup-text">書き出したバックアップ文字列</label><textarea id="backup-text" readonly rows="5" spellcheck="false"></textarea><p>ダウンロードを保存できない場合は、この文字列をコピーし、テキストファイルに保存できます。復元時は下の欄に貼り付けてください。</p></div>
-<label class="file-label">確認セーブを選ぶ<input type="file" id="restore-file" accept=".json,application/json"></label><button id="restore" disabled>選んだ確認セーブへ復元</button><p>復元はこの開発用データだけを置き換えます。変更前の保存も5世代保持します。</p>
+<label class="file-label">確認セーブを選ぶ<input type="file" id="restore-file" accept=".json,application/json"></label><button id="restore" disabled>選んだ確認セーブへ復元</button><p>復元はこの練習区画の記録だけを置き換えます。変更前の保存も5世代保持します。</p>
 <label class="file-label" for="restore-text">バックアップ文字列から復元する場合</label><textarea id="restore-text" rows="3" spellcheck="false" placeholder="確認セーブの文字列を貼り付け"></textarea><button id="restore-pasted" disabled>貼り付けた確認セーブへ復元</button>
 <button id="recover" hidden>正常データへの復旧を確定</button><p id="storage-info"></p></details>
 </section></main><footer>5,400 × 3,600 の工事現場に対応した疎な区画保存 ／ 通常ゲームへの接続前の独立した確認画面</footer>

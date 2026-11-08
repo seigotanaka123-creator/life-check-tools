@@ -22,7 +22,7 @@ const supported=['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','
 window.addEventListener('keydown',e=>{if(!supported.includes(e.code)||$('help').open||state.paused||e.target instanceof HTMLInputElement)return;e.preventDefault();if(!keys.has(e.code))taps.set(e.code,state.time+.12);keys.add(e.code);});
 window.addEventListener('keyup',e=>{if(supported.includes(e.code)){e.preventDefault();keys.delete(e.code);}});
 window.addEventListener('blur',()=>{focused=false;clearInput();});window.addEventListener('focus',()=>{focused=true;last=performance.now();});document.addEventListener('visibilitychange',()=>{clearInput();last=performance.now();});
-$('view').onclick=()=>{view=(view+1)%2;clearInput();yaw=view?.55:0;pitch=view?.5:.28;$('view').textContent=view?'視点：区画全体':'視点：レンを追う';};
+$('view').onclick=()=>{view=(view+1)%2;clearInput();yaw=view?.55:0;pitch=view?.5:.28;$('view').textContent=view?'視点：区画全体':'視点：相棒を追う';};
 $('help-open').onclick=()=>{clearInput();$('help').showModal();};$('help-close').onclick=()=>$('help').close();$('help').addEventListener('close',()=>{clearInput();last=performance.now();});
 $('scene').onpointerdown=e=>{if(drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch};$('scene').setPointerCapture(e.pointerId);};
 $('scene').onpointermove=e=>{if(drag?.id!==e.pointerId)return;yaw=drag.yaw-(e.clientX-drag.x)*.007;pitch=THREE.MathUtils.clamp(drag.pitch+(e.clientY-drag.y)*.006,-.08,1.3);};
@@ -48,4 +48,4 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   ui+=dt;if(ui>.1){ui=0;refresh();}
 }
 window.addEventListener('error',e=>{state.message='表示エラー：'+e.message;refresh();});window.addEventListener('unhandledrejection',e=>{state.message='処理エラー：'+(e.reason?.message||e.reason);refresh();});
-if(['localhost','127.0.0.1','[::1]'].includes(location.hostname))ready=true;else state.message='ローカル開発専用です。';refresh();requestAnimationFrame(frame);
+if(['localhost','127.0.0.1','[::1]'].includes(location.hostname))ready=true;else state.message='この練習区画は、今の端末で開いてください。';refresh();requestAnimationFrame(frame);

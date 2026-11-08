@@ -96,7 +96,7 @@ function validateWorld(world){
   return world;
 }
 function resources(world){return Object.fromEntries(RESOURCE_KEYS.map(k=>[k,world.ufoResources?.[k]??0]));}
-function readWorldSource(raw){ok(typeof raw==='string'&&raw.length<=8000000,'同じオリジンの本体セーブがありません。別ポートの保存は読み込みません。');const world=JSON.parse(raw);validateWorld(world);return world;}
+function readWorldSource(raw){ok(typeof raw==='string'&&raw.length<=8000000,'この区画の保存が見つかりません。ほかの区画の記録は読み込みません。');const world=JSON.parse(raw);validateWorld(world);return world;}
 function quoteLinkedOrder(id,quantity=1){const o=LINK_OFFERS.find(o=>o.id===id);ok(o,'販売対象でない素材です。');ok(int(quantity,5)&&quantity>0,'購入数は1〜5セットで選んでください。');return{offerId:id,quantity,cost:o.price*quantity,amount:o.amount*quantity};}
 function createWorldPurchaseLedger(raw,kind){
   ok(kinds.includes(kind),'複製元の区分が不正です。');const original=readWorldSource(raw),world=clone(original);
@@ -115,7 +115,7 @@ function validateWorldPurchaseLedger(s){
   ok([1,2,3,4].includes(s.schemaVersion)&&s.scope===LINK_SCOPE,'接続保存の版・区分が不正です。');
   keys(s.source,['kind','fingerprint','world']);ok(kinds.includes(s.source.kind),'複製元の区分が不正です。');
   validateWorld(s.source.world);validateWorld(s.world);ok(fingerprint(s.source.world)===s.source.fingerprint,'複製元の記録が変わっています。');
-  ok(s.source.world.constructionPackTrialLedger===undefined,'複製元の試作受取台帳は新しい保存へ持ち込めません。');
+  ok(s.source.world.constructionPackTrialLedger===undefined,'複製元の材料の受取記録は新しい保存へ持ち込めません。');
   if(s.world.constructionPackTrialLedger!==undefined)PACK_TRANSFER.validateTrialLedger(s.world.constructionPackTrialLedger,s.source.fingerprint);
   if(s.world.constructionProfileProject!==undefined)assertProfileProject(s.world.constructionProfileProject,s.world.constructionPackTrialLedger);
   if(s.world.constructionWorkPlatform!==undefined)assertWorkPlatformRecord(s.world.constructionWorkPlatform,s.world.constructionProfileProject);
@@ -532,7 +532,7 @@ function receiveConstructionMaterial(s,offerId,quantity,id,context){
 }
 function receiveConstructionPackTrial(s,packet,context){
   validateWorldPurchaseLedger(s);ok(packet?.version===1,'海辺のセットは海辺の工房でひらこう。');
-  ok(LINK_SCOPE==='imasora-world-ledger-v1','試作ポイントは通常の工事現場プロフィールだけで受け取れます。');
+  ok(LINK_SCOPE==='imasora-world-ledger-v1','建築ポイントは通常の工事現場プロフィールだけで受け取れます。');
   const profileId=s.source.fingerprint,old=s.world.constructionPackTrialLedger;
   const nextTrial=PACK_TRANSFER.receiveTransfer(old,packet,profileId);
   if(nextTrial===old)return s; // A committed receipt is idempotent even away from the dock.

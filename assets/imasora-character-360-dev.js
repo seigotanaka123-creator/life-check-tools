@@ -216,7 +216,7 @@ function updateCharacterControls(descriptor) {
   currentCharacterName.textContent = descriptor.name;
   modelIdReadout.textContent = descriptor.id;
   canvas.setAttribute("aria-label", `${descriptor.name}の360度3Dモデル`);
-  document.title = `${descriptor.name} ${catalog.label}360°開発`;
+  document.title = `${descriptor.name} ${catalog.label}360°モンスター図鑑`;
   document.documentElement.style.setProperty("--character-color", descriptor.bodyColorCss);
   primaryToggleLabel.textContent = model.userData.primaryDecorationLabel;
   secondaryToggleLabel.textContent = model.userData.secondaryDecorationLabel;
@@ -343,7 +343,7 @@ function buildCharacterRoster() {
 function updateGrowthStageCopy() {
   const catalog = currentCatalog();
   const total = catalog.roster.length;
-  growthStageTitleText.textContent = `${catalog.label}全${total}種 360°開発`;
+  growthStageTitleText.textContent = `${catalog.label}全${total}種 360°モンスター図鑑`;
   growthStageLead.textContent = catalog.lead;
   rosterEyebrow.textContent = catalog.rosterEyebrow;
   characterSelect.setAttribute("aria-label", `${catalog.label}キャラクターを選択`);
@@ -445,7 +445,7 @@ function initialize() {
     updateView();
     animationFrameId = requestAnimationFrame(render);
   } catch (error) {
-    console.error("360°キャラクター開発ページの初期化に失敗しました。", error);
+    console.error("360°モンスター図鑑ページの初期化に失敗しました。", error);
     stage.classList.add("has-error");
     document.getElementById("dragGuide").textContent = "3D表示を初期化できませんでした。ページを更新してください。";
   }

@@ -88,7 +88,7 @@ function refresh(){
   $('placement').hidden=!p;$('placement').textContent=preview?.reason||'';$('placement').classList.toggle('bad',!preview?.ok);$('save').disabled=blocked||session.busy||transition||testMode;
 }
 async function boot(){
-  if(!local){state.message='ローカル開発専用です。';refresh();return;}
+  if(!local){state.message='この練習区画は、今の端末で開いてください。';refresh();return;}
   // A copy of the reported jam, only in the existing no-save test mode.
   // Never import this fixture into the player's persistent session.
   if(testMode&&new URLSearchParams(location.search).get('craneContactTest')==='1'){
@@ -100,7 +100,7 @@ async function boot(){
     try{const {craneAssemblyExample}=await import('./assets/imasora-construction-crane-examples.js?v=120pv');state=craneAssemblyExample(example,{finishWithCrane:new URLSearchParams(location.search).get('craneFinishTest')==='1'});orbit=example==='bridge'?-Math.PI/2:Math.PI;pitch=.3;distance=200;}
     catch(e){state.message=e.message;refresh();return;}
   }
-  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しいクレーン開発データ':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
+  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しいクレーン作業の記録':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
 }
 const focus=new THREE.Vector3(0,18,-30);let last=0,accumulator=0,ui=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;if(document.hidden)return;time+=dt;
