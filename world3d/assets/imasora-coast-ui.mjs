@@ -3,7 +3,8 @@ import {COAST_PLACES,COAST_TOWN_CANAL,coastTime,coastShore} from './imasora-coas
 import {coastAtlasPoint,coastAtlasLocation,coastAtlasMode,createCoastReturnGate} from './imasora-coast-navigation.mjs?v=120mx';
 import {coastDestination,coastSearchAreas,coastSearchBearing,coastMapFrame,createCoastBoatReturnBearing} from './imasora-coast-wayfinding.mjs?v=120mx';
 
-export function createCoastUI({host,context,clearInput,returnTown,onActivity=()=>{},destination=null,onDestinationChange=()=>{}}){
+export function createCoastUI({host,context,clearInput,returnTown,onActivity=()=>{},destination=null,onDestinationChange=()=>{},focusGame=()=>host.querySelector('canvas')?.focus({preventScroll:true})}){
+ let disposed=false;
  const el=document.createElement('div');el.className='coast-hud';el.hidden=true;
  el.innerHTML='<div class="coast-weather"><small>IMASORA · SHORE</small><strong>ひかりの海岸</strong><span data-coast-time></span></div><button type="button" data-coast-map aria-label="海辺の地図・海図">🗺️ 地図・海図</button><button type="button" data-coast-town hidden>橋を渡って街へ</button><p data-coast-water hidden>浮きの内側で、波と遊ぼう</p>';
  const clock=el.querySelector('.coast-weather');clock.className+=' coast-place-clock';clock.querySelector('small').hidden=true;host.append(clock);
@@ -98,7 +99,14 @@ export function createCoastUI({host,context,clearInput,returnTown,onActivity=()=
  compass.onclick=()=>{showMap('sea');compass.setAttribute('aria-expanded',String(dialog.open));};
  dialog.addEventListener('close',()=>compass.setAttribute('aria-expanded','false'));
  dialog.querySelector('[data-coast-close]').onclick=()=>dialog.close();
- for(const d of [dialog,confirm]){d.addEventListener('close',clearInput);d.addEventListener('cancel',e=>{if(busy)e.preventDefault();clearInput();});}
+ // Closing a chart must return Space/WASD to play, rather than leaving the
+ // opener button focused (Space would immediately open the chart again).
+ function restorePlayFocus(){
+  clearInput();
+  const c=context();
+  if(!disposed&&c.map==='coast'&&!c.overlay&&!c.blocked&&!busy&&!document.hidden&&!document.querySelector('dialog[open]'))focusGame();
+ }
+ for(const d of [dialog,confirm]){d.addEventListener('close',restorePlayFocus);d.addEventListener('cancel',e=>{if(busy)e.preventDefault();clearInput();});}
  no.onclick=()=>{if(!busy)confirm.close();};
  yes.onclick=async()=>{
   if(busy)return;busy=true;clearInput();yes.disabled=no.disabled=true;yes.textContent='セーブ中…';error.hidden=true;
@@ -124,5 +132,5 @@ export function createCoastUI({host,context,clearInput,returnTown,onActivity=()=
   if(dialog.open&&now-atlasAt>=100){atlasAt=now;updateAtlas(c);}
   if(gate.update({...c,blocked}))askReturn();
  }
- return {showMap,addAction:button=>el.append(button),update,get destination(){return navigationTarget;},get open(){return dialog.open||confirm.open;},dispose(){dialog.remove();confirm.remove();el.remove();compass.remove();clock.remove();}};
+ return {showMap,addAction:button=>el.append(button),update,get destination(){return navigationTarget;},get open(){return dialog.open||confirm.open;},dispose(){disposed=true;dialog.remove();confirm.remove();el.remove();compass.remove();clock.remove();}};
 }

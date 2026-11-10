@@ -3387,7 +3387,7 @@ function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlights=[],
    if(time-lastStepSoundAt<.12-1e-9)return;
    lastStepSoundAt=time;
   }else{
-   if(!['jump','land','item'].includes(type)||actionSoundCount>=2048)return;
+   if(!['jump','land','item','dive'].includes(type)||actionSoundCount>=2048)return;
    actionSoundCount++;
   }
   sounds.push({time,cue:type==='jump'?{type,stage}:{type}});
@@ -5205,7 +5205,7 @@ return {createTagCharacterSelect};
 const __tagModule82=(()=>{
 // BEGIN TAG AUDIO
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.ImasoraTagAudio=api;})(globalThis,function(){
- 'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect']);
+ 'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect','dive']);
  function preference(storage){try{const p=JSON.parse(storage.getItem(KEY));if(p?.version===1&&typeof p.enabled==='boolean'&&Number.isFinite(p.volume)&&p.volume>0&&p.volume<=1)return{enabled:p.enabled,volume:p.volume};}catch{}try{const level=Number(JSON.parse(storage.getItem('lifeQuestWalkV1'))?.soundVolumes?.sfx??1);if(Number.isFinite(level)&&level>=0&&level<=5)return{enabled:level>0,volume:level>0?level/5:.2};}catch{}return{enabled:true,volume:.2};}
  function savePreference(storage,p){try{storage.setItem(KEY,JSON.stringify({version:1,enabled:!!p.enabled,volume:p.volume}));return true;}catch{return false;}}
  function create({enabled=true,volume=.2,getContext=()=>{const C=globalThis.AudioContext||globalThis.webkitAudioContext;return C?new C():null;},onState=()=>{},setTimer=setTimeout,clearTimer=clearTimeout}={}){
@@ -5228,6 +5228,7 @@ const __tagModule82=(()=>{
    case'go':[523,659,784].forEach((f,i)=>tone(f,.16,.09,i*.06));break;
    case'jump':{const f=[392,523,659][Math.max(0,Math.min(2,(cue.stage||1)-1))];tone(f*.8,.12,.1,0,f*1.1);break;}
    case'land':tone(125,.09,.09,0,72);break;
+   case'dive':ok=voice('noise',0,.22,.1)||ok;tone(210,.2,.055,0,65);break;
    case'step':ok=voice('noise',0,.075,.07)||ok;tone(145,.055,.035,0,100);break;
    case'touch':tone(330,.16,.1,0,660);tone(880,.12,.06,.07);break;
    case'timeout':tone(392,.12,.07);break;
@@ -5247,7 +5248,13 @@ const createHuntSound=globalThis.ImasoraTagAudio.create;
 const huntSoundPreference=globalThis.ImasoraTagAudio.preference;
 const saveHuntSound=globalThis.ImasoraTagAudio.savePreference;
 
-return {createHuntSound,huntSoundPreference,saveHuntSound};
+// The burst, rather than the key press, owns the sound. Blocked dives and
+// cancelled wind-ups stay silent; the slide's later frames never repeat it.
+function huntDiveAudioCue(previousStage,actor){
+ return previousStage!=='slide'&&actor?.dive?.stage==='slide'?{type:'dive'}:null;
+}
+
+return {createHuntSound,huntSoundPreference,saveHuntSound,huntDiveAudioCue};
 })();
 const __tagModule0=(()=>{
 const {huntThreatCuePosition}=__tagModule1;
@@ -5307,7 +5314,7 @@ const {createHuntMotionTrails}=__tagModule73;
 const {createHuntResults,huntResultSummary}=__tagModule74;
 const {createHuntProps}=__tagModule76;
 const {createTagCharacterSelect}=__tagModule80;
-const {createHuntSound,huntSoundPreference,saveHuntSound}=__tagModule82;
+const {createHuntSound,huntSoundPreference,saveHuntSound,huntDiveAudioCue}=__tagModule82;
 const $=s=>document.querySelector(s),canvas=$('#rink'),scene=new T.Scene(),camera=new T.PerspectiveCamera(56,1,.15,900),renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;scene.background=new T.Color(0xc9e6f1);scene.fog=new T.Fog(0xc9e6f1,210,620);
 installHuntMenu(document);
@@ -5865,7 +5872,7 @@ function draw(now){now=performance.now();const human=controlledHuntActor(s);requ
  // or live output still needs a frame, and the replay clock advances above.
  if(replayFrame?.progress===1&&replayFrame.delta===0&&replay.scope==='full'&&!dirty&&!liveBroadcast.output.opened)return;
  if(paused&&!replay.active&&!dirty&&now-paintAt<1000)return;paintAt=now;dirty=false;
- if(!paused){for(let tick=0;tick<frameSteps.steps;tick++){const input=readHuntMovement(human),use=useInput.read(),attempt=use&&!s.useHeld,item=human.item,failureHint=attempt&&item?huntItemFailureHint(s,human):'',grounded=human.grounded,jumps=human.jumps;const applied={...input,jump:jump.read(),dash:active('dash'),use,dive:diveInput.read()};if(use)canvas.dataset.lastUseInput=JSON.stringify(applied);round.tick(applied);physicsTicks++;if(attempt&&item&&!huntItemUseAcknowledged(s,human.owner))failHint(failureHint);for(const e of s.events)frameEvent(e);if(itemStatus.sample(s))showItemNotice('道具は1つまで\n手持ちを使うと拾えます',1.6,'full');if(human.jumps>jumps)playMatchCue({type:'jump',stage:human.jumps});if(!grounded&&human.grounded)playMatchCue({type:'land'});motionTrails.sample(s);replay.record(s,{force:s.phase==="finished",lighting:scenery.lighting,feedbackCues:feedback.replayCues,motionCues:motionTrails.cues});
+ if(!paused){for(let tick=0;tick<frameSteps.steps;tick++){const input=readHuntMovement(human),use=useInput.read(),attempt=use&&!s.useHeld,item=human.item,failureHint=attempt&&item?huntItemFailureHint(s,human):'',grounded=human.grounded,jumps=human.jumps,diveStage=human.dive?.stage;const applied={...input,jump:jump.read(),dash:active('dash'),use,dive:diveInput.read()};if(use)canvas.dataset.lastUseInput=JSON.stringify(applied);round.tick(applied);physicsTicks++;const diveCue=huntDiveAudioCue(diveStage,human);if(diveCue)playMatchCue(diveCue);if(attempt&&item&&!huntItemUseAcknowledged(s,human.owner))failHint(failureHint);for(const e of s.events)frameEvent(e);if(itemStatus.sample(s))showItemNotice('道具は1つまで\n手持ちを使うと拾えます',1.6,'full');if(human.jumps>jumps)playMatchCue({type:'jump',stage:human.jumps});if(!grounded&&human.grounded)playMatchCue({type:'land'});motionTrails.sample(s);replay.record(s,{force:s.phase==="finished",lighting:scenery.lighting,feedbackCues:feedback.replayCues,motionCues:motionTrails.cues});
  if(s.phase==='finished'){yaw=renderYaw;paused=true;clear();for(const cue of huntResultAudioCues(s.result))audio.play(cue);audio.setGlide(0);const proof=round.proof(),id=++receiptId;const growthResult=growth.finish(proof,id);growthStatus.hidden=!companion;growthStatus.textContent=growthResult.formal?(growthResult.queued?'育成時間を確認中…':'この画面を閉じず、ホームで成果を受け取ってね。'):companion?'この対戦では育成の報酬はありません。次はホームで今の空を撮ってから始めよう。':'';growthHome.hidden=!companion;growthHome.textContent=growthResult.formal?'ホームで成果を受け取る':'ホームへ';const submitted=proofClient.submit(proof,id);if(!submitted)canvas.dataset.proof='unavailable';$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;results.show({result:s.result,config:s.config,controlledOwner:human.owner,ticket:id});if(growthResult.formal)showGrowthResult(id,submitted?null:{ok:false,unavailable:true});replayTicket=id;$('#pause').textContent='結果を隠す';replayQueued=true;document.body.classList.remove('playing','active');break;}}}
  const jumpWait=huntJumpRestRemaining(s,human);
  const visual=replayFrame?.state??s,visualHuman=controlledHuntActor(visual),visualGround=(x,z)=>trampolineSurface(visual,x,z),visualDt=replayFrame?replayFrame.delta:physicsTicks*STEP,visualPaused=replayFrame?visualDt<=0:paused;

@@ -470,7 +470,7 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
    if(time-lastStepSoundAt<.12-1e-9)return;
    lastStepSoundAt=time;
   }else{
-   if(!['jump','land','item'].includes(type)||actionSoundCount>=2048)return;
+   if(!['jump','land','item','dive'].includes(type)||actionSoundCount>=2048)return;
    actionSoundCount++;
   }
   sounds.push({time,cue:type==='jump'?{type,stage}:{type}});

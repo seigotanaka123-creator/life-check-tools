@@ -26,7 +26,7 @@ export function buildEarlyMonsterCharacter360(THREE,Characters,id,options={}){
   const vein=mesh(new THREE.CylinderGeometry(.4,.6,20,6),material('#bbdf96'),'leaf-vein');leaf.add(vein);vein.position.set(0,12,1.8);vein.rotation.z=-.07;
  }
  if(!seed){
-  for(const side of[-1,1]){const eye=oval(materials.eye,side<0?'eye-left':'eye-right',side*9,sprout?42:43,sky?17.7:sprout?16.7:18.4,3.1,3.8,1.3);eyes.push(eye);oval(material('#ffffff'),'eye-highlight',side*9-.7,sprout?43:44,sky?19:sprout?18:19.7,.8,.9,.35);feet.push(oval(materials.foot,side<0?'foot-left':'foot-right',side*11,7,7,7.5,4.6,8.5));}
+  for(const side of[-1,1]){const eye=oval(materials.eye,side<0?'eye-left':'eye-right',side*9,sprout?42:43,sky?17.7:sprout?16.7:18.4,3.1,3.1,1.3);eyes.push(eye);oval(material('#ffffff'),'eye-highlight',side*9-.7,sprout?43:44,sky?19:sprout?18:19.7,.8,.9,.35);feet.push(oval(materials.foot,side<0?'foot-left':'foot-right',side*11,7,7,7.5,4.6,8.5));}
   if(sky){mesh(extrude([[-37,40],[-27,47],[-16,41],[-5,48],[7,41],[20,48],[37,40],[23,29],[10,34],[-3,28],[-17,34],[-28,29]],4,1),materials.band,'cloud-wings',0,0,-3);}
   else if(!sprout){mesh(extrude([[-18,31],[17,34],[18,39],[-19,36]],2,.5),materials.band,'trail-scarf',0,0,19);}
   else{oval(material('#578554'),'little-mouth',0,32,17.5,3,.9,.6);}

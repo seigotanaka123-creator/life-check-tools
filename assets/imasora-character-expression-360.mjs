@@ -1,7 +1,9 @@
 // Face-only styling. Original eyes remain the first two faceFeatures for cameras, blinking and sunglasses.
 export function applyMonsterExpression360(THREE,model,id,{surfaceZ}={}){
- const api=globalThis.ImasoraMonsterExpressions,row=api?.get(id),p=api?.style(row);if(!p||model.userData.baseExpression?.sourceVersion===api.version)return model;
+ const api=globalThis.ImasoraMonsterExpressions,row=api?.get(id),p=api?.style(row);
  const eyes=model.userData.faceFeatures?.slice(0,2);if(eyes?.length!==2)return model;
+ for(const eye of eyes)eye.scale.y=eye.scale.x;
+ if(!p||model.userData.baseExpression?.sourceVersion===api.version)return model;
  const sorted=[...eyes].sort((a,b)=>a.position.x-b.position.x),centerX=(sorted[0].position.x+sorted[1].position.x)/2,eyeY=(sorted[0].position.y+sorted[1].position.y)/2,gap=sorted[1].position.x-sorted[0].position.x;if(!(gap>0))return model;
  // The old front band on trail-shaped young forms crosses the new mouth and reads as a second mouth.
  // Replace it along with the old sprout mouth only when a reviewed new expression is present.
@@ -14,9 +16,9 @@ export function applyMonsterExpression360(THREE,model,id,{surfaceZ}={}){
  const curve=(name,points,radius,material=faceInk)=>{const plan=new THREE.CatmullRomCurve3(points.map(([x,y])=>new THREE.Vector3(x,y,0))).getPoints(32),positions=plan.map(({x,y})=>new THREE.Vector3(x,y,faceSurface(x,y)+radius*1.18+.04)),mesh=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(positions),64,radius,8,false),material);mesh.name=name;mesh.renderOrder=4;model.add(mesh);parts.push(mesh);return mesh;};
  const glintMaterial=new THREE.MeshBasicMaterial({color:'#ffffff',toneMapped:false});
  const browMaterial=p.brow?faceInk:null;
- for(const[side,eye]of[[-1,sorted[0]],[1,sorted[1]]]){const base=eye.scale.clone();eye.scale.x=base.x*p.eyeX;eye.scale.y=base.y*p.eyeY;eye.rotation.z=side*p.tilt;
-  const highlight=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),glintMaterial);highlight.name='base-expression-glint';highlight.position.set(-.22,.28,.97);highlight.scale.set(p.glint,p.glint*1.08,.12);eye.add(highlight);parts.push(highlight);
-  if(p.brow){const half=base.x*1.10,y=eye.position.y+eye.scale.y+gap*.09,slope=side*p.tilt*.8;curve(side<0?'base-expression-brow-left':'base-expression-brow-right',[[-half,y-half*slope],[0,y+.16],[half,y+half*slope]].map(([x,py])=>[eye.position.x+x,py]),gap*(.008+p.brow*.00135),browMaterial);}
+ for(const[side,eye]of[[-1,sorted[0]],[1,sorted[1]]]){const base=eye.scale.clone();eye.scale.x=base.x;eye.scale.y=base.x;eye.rotation.z=side*p.tilt;
+  const highlight=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),glintMaterial);highlight.name='base-expression-glint';highlight.position.set(-.22,.28,.97);highlight.scale.set(p.glint,p.glint,.12);eye.add(highlight);parts.push(highlight);
+  if(p.brow){const half=base.x*.96,y=eye.position.y+eye.scale.y+gap*.12,slope=side*p.browTilt;curve(side<0?'base-expression-brow-left':'base-expression-brow-right',[[-half,y-half*slope],[0,y+gap*.05],[half,y+half*slope]].map(([x,py])=>[eye.position.x+x,py]),gap*(.008+p.brow*.00135),browMaterial);}
  }
  const cape=model.userData.decorationType==='forest',w=gap*p.mouthWidth;let y=eyeY-gap*(cape?.10:.28),mouthDepth=gap*p.smile*(cape?.65:1);
  const clasp=model.userData.capeClasp??model.userData.capeFastener?.userData?.clasp;

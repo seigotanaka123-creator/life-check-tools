@@ -632,8 +632,8 @@ const UFO_FORWARD_SCROLL_COIN_STAR_RATIO = .62;
 // 大型の実体恒星をエネルギー星にする割合。すべての近傍恒星を対象化
 // せず少し絞り、宇宙金貨星を狙う場面との偏りを緩和する。
 const UFO_FORWARD_SCROLL_ENERGY_STAR_RATIO = .7;
-// 帰路は補給機会を増やす。金貨・素材の配置や1個の回復量は変えず、
-// 既存の大型恒星がエネルギー星になる割合だけを上げる。
+// 帰路の大型恒星はすべて補給候補にする。これに加え、航路上の
+// 24地点のうち18地点を大きなエネルギー星へ置き換える（回復量は同じ）。
 const UFO_FORWARD_SCROLL_RETURN_ENERGY_STAR_RATIO = 1;
 // 回収星は射撃対象であると同時に、UFOと実際にぶつかる実体として扱う。
 // 接触ごとに航行エネルギーを30失い、星の中心へ食い込まず横・上下へ押し戻す。
@@ -662,7 +662,7 @@ const UFO_FORWARD_SCROLL_LOW_ENERGY_BLINK_HZ = 1.75;
 const UFO_FORWARD_SCROLL_LOW_ENERGY_DIM_LIGHT_AMOUNT = .16;
 const UFO_FORWARD_SCROLL_LOW_ENERGY_ROCK_MULTIPLIER = 1.32;
 const UFO_FORWARD_SCROLL_LOW_ENERGY_IDLE_ROCK_ANGLE = THREE.MathUtils.degToRad(.7);
-// エネルギー切れの通知を読める長さだけ残してから、雲マップの安全地点へ戻す。
+// エネルギー切れの通知を読める長さだけ残してから、出発元の安全地点へ戻す。
 const UFO_FORWARD_SCROLL_ENERGY_EMPTY_RETURN_DELAY = 1.4;
 // 標準エネルギーだけでは航路の55%前後で尽きる。青い星を拾うことで
 // 継続でき、寄り道した横・上下移動も実際の移動距離として消費する。
@@ -2031,18 +2031,24 @@ function stopUfoGroundTakeoffAudio() {
 }
 
 function worldStateSnapshot() {
+  // A flight is transient. Reloads resume safely at its departure surface,
+  // rather than restoring astronomical flight coordinates on the cloud map.
+  const resumeMap = state.map === 'space' ? ufoEmergencyReturnMap() : state.map;
+  const resume = state.map === 'space'
+    ? (resumeMap === 'sky' ? SKY_EMERGENCY_START : mapSpawn(MAPS[resumeMap])) : null;
+  if (resume) restoreUfoReturnFacility(resumeMap);
   const draft = {
     version: 3,
     mapSchemaVersion: IMASORA_WORLD_SCHEMA_VERSION,
     physicsRevision: WORLD_PHYSICS_REVISION,
     characterId: CHARACTER_ID,
-    map: state.map,
-    position: { x: state.position.x, y: state.groundY, z: state.position.z },
+    map: resumeMap,
+    position: resume ? {x:resume.x,y:resume.y||0,z:resume.z} : { x: state.position.x, y: state.groundY, z: state.position.z },
     autoSaveVersion: 1,
-    heading: state.heading,
+    heading: resume ? resume.heading : state.heading,
     cameraDistanceIndex: state.cameraDistanceIndex,
     constructionResume: [worldReelController,worldHighController,worldSoilController,worldWaterController,worldTimberController,worldExcavationController,worldConcreteController].find(c=>c?.active)?.resumePoint??null,
-    playCamera: {mode:state.cameraMode,heading:state.viewHeading,pitch:state.viewPitch},
+    playCamera: resume ? {mode:'third',heading:resume.heading,pitch:0} : {mode:state.cameraMode,heading:state.viewHeading,pitch:state.viewPitch},
     labels: state.labels,
     builtByMap,
     ufoResources: { ...state.ufoResources },
@@ -2103,17 +2109,45 @@ function resetPlayerToMapSpawn(mapKey = state.map, options = {}) {
   state.ufoFaceAuthLatched = false;
 }
 
+function ufoEmergencyReturnMap(control = ufoDoorControls[0]) {
+  // Emergency recovery returns to the launch surface, never the destination.
+  // Keep the mission's route authoritative across departure, cruise and retries.
+  const origin = control?.spaceForwardScroll?.route?.origin;
+  if (origin === 'mars') return 'mars';
+  if (origin === 'earth') return 'sky';
+  return control?.spaceLaunchMap === 'mars' ? 'mars' : 'sky';
+}
+
+function restoreUfoReturnFacility(mapKey, control = ufoDoorControls[0]) {
+  if (!['sky','mars'].includes(mapKey)) return false;
+  const items = Array.isArray(builtByMap[mapKey]) ? builtByMap[mapKey] : [];
+  if (items.some(item => item?.catalogId === 'ufo-pad')) return false;
+  // The ship already exists in this flight. Restore its landing place and
+  // scanner as one unit if a legacy/missing surface record omitted them.
+  const remembered = control?.spaceLaunchMap === mapKey ? control.spaceLaunchFacility : null;
+  const item = remembered ? structuredClone(remembered) : {
+    id: mapKey === 'mars' ? 'mars-return-ufo-pad' : 'sky-return-ufo-pad',
+    catalogId:'ufo-pad',name:'UFO乗り場',...(mapKey==='mars'?{fixed:true}:{}),
+  };
+  item.position=[UFO_PLACEMENT_POSITION.x,0,UFO_PLACEMENT_POSITION.z];
+  item.faceAuthPosition=[UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x,UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z];
+  item.faceAuthAnchorLocked=true;
+  builtByMap[mapKey]=[...items,item];
+  return true;
+}
+
 function updateEmergencyReturnControl() {
   if (!els.emergencyEscapeButton) return;
   els.emergencyEscapeButton.hidden=!!coastPlay?.rescuing;
   // 火星と工事現場では、そのマップ内で復帰する。作業途中の資材は
   // 各作業の保存を完了させてから停止し、復帰先へ持ち運んだり消したりしない。
-  const destination = state.map === "mars"
+  const returnMap = state.map === 'space' ? ufoEmergencyReturnMap() : state.map;
+  const destination = returnMap === "mars"
     ? "火星マップの安全地点へ戻ります"
-    : state.map === "construction"
+    : returnMap === "construction"
     ? "作業中の資材を残して工事現場の安全地点へ戻ります"
-    : state.map === "coast" ? "海岸の入口へ戻ります"
-    : "どこにいても雲マップの空駅入口へ帰還します";
+    : returnMap === "coast" ? "海岸の入口へ戻ります"
+    : "雲マップの空駅入口へ戻ります";
   els.emergencyEscapeButton.title = destination;
   els.emergencyEscapeButton.setAttribute("aria-label", `緊急帰還：${destination}`);
   setWorldText(els.emergencyEscapeButton,state.map==='coast'?'入口に戻る':'緊急帰還');
@@ -2202,6 +2236,7 @@ function loadState(saved) {
   if(saved.playCamera){state.cameraMode=['third','first'].includes(saved.playCamera.mode)?saved.playCamera.mode:'third';if(Number.isFinite(saved.playCamera.heading))state.viewHeading=saved.playCamera.heading;if(Number.isFinite(saved.playCamera.pitch))state.viewPitch=saved.playCamera.pitch;}
   state.labels = saved.labels !== false;
   builtByMap = saved.builtByMap && typeof saved.builtByMap === "object" ? saved.builtByMap : {};
+  if (saved.map === 'space') restoreUfoReturnFacility(map);
   const savedResources = saved.ufoResources && typeof saved.ufoResources === "object"
     ? saved.ufoResources
     : {};
@@ -2244,7 +2279,9 @@ function emergencyEscape() {
   // The return destination is decided before the engine runtime resets its
   // map-dependent state. Construction recovery, like Mars recovery, stays
   // on the current surface. The controllers above checkpoint cargo first.
-  const returnMap = ["mars", "construction", "coast"].includes(state.map) ? state.map : "sky";
+  const returnMap = ["mars", "construction", "coast"].includes(state.map)
+    ? state.map : state.map === 'space' ? ufoEmergencyReturnMap() : 'sky';
+  if (state.map === 'space') restoreUfoReturnFacility(returnMap);
   resetUfoSpaceHazardState();
   // 移動入力と視点ドラッグを同時に解除し、ワープ直後に同じ入力で
   // 再び壁へ押し付けられないようにする。
@@ -9102,7 +9139,10 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
   const dummies = Object.create(null);
   const haloDummies = Object.create(null);
   const spriteMaterials = Object.create(null);
-  Object.entries(UFO_FORWARD_SCROLL_PICKUP_TYPES).forEach(([typeId, type]) => {
+  const pickupTypes = route.origin === 'mars'
+    ? {...UFO_FORWARD_SCROLL_PICKUP_TYPES,energy:UFO_FORWARD_SCROLL_ENERGY_STAR_TYPE}
+    : UFO_FORWARD_SCROLL_PICKUP_TYPES;
+  Object.entries(pickupTypes).forEach(([typeId, type]) => {
     const material = new THREE.MeshStandardMaterial({
       color: type.color,
       emissive: type.emissive,
@@ -9152,11 +9192,11 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
   const random = makeUfoSpaceSeededRandom(mixUfoSpaceRouteSeed(routeSeed, 0x454d4152));
   const pickups = [];
   const fields = [];
-  const typeCounts = { coin: 0, material: 0 };
+  const typeCounts = Object.fromEntries(Object.keys(pickupTypes).map(type=>[type,0]));
   const addPickup = (typeId, basePosition, size, field) => {
-    const type = UFO_FORWARD_SCROLL_PICKUP_TYPES[typeId];
+    const type = pickupTypes[typeId];
     const index = typeCounts[typeId]++;
-    const displaySize = size * UFO_FORWARD_SCROLL_PICKUP_VISUAL_SCALE;
+    const displaySize = size * (typeId === 'energy' ? 5.5 : UFO_FORWARD_SCROLL_PICKUP_VISUAL_SCALE);
     const position = basePosition.clone();
     const sprite = new THREE.Sprite(spriteMaterials[typeId]);
     sprite.name = `ufo-forward-scroll-${typeId}-star-glow-${index + 1}`;
@@ -9189,8 +9229,9 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
     field.nodes.push(pickup);
   };
 
-  // 小型の青いエネルギー星は使わない。小型星は金色の宇宙金貨星と
-  // 紫色の素材星だけに分け、航行エネルギーは大型の実体恒星から得る。
+  // Outbound keeps its exact seeded coin/material layout. Homeward replaces
+  // 18 of the 24 authored stops with large blue energy stars: no long supply
+  // drought, even with an unmodified ship. Three gold and three material remain.
   for (let pickupIndex = 0; pickupIndex < UFO_FORWARD_SCROLL_PICKUP_COUNT; pickupIndex += 1) {
     const progress = .05 + pickupIndex / (UFO_FORWARD_SCROLL_PICKUP_COUNT - 1) * .88;
     const distance = forwardDistanceToMars * (progress + (random() * 2 - 1) * .011);
@@ -9218,7 +9259,15 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
     };
     fields.push(field);
     const typeRoll = random();
-    const typeId = typeRoll < UFO_FORWARD_SCROLL_COIN_STAR_RATIO ? "coin" : "material";
+    const typeId = route.origin === 'mars'
+      ? (pickupIndex % 8 === 3 ? 'material' : pickupIndex % 8 === 7 ? 'coin' : 'energy')
+      : typeRoll < UFO_FORWARD_SCROLL_COIN_STAR_RATIO ? "coin" : "material";
+    if (typeId === 'energy') {
+      nodePosition.copy(cruiseOrigin).addScaledVector(forward,distance+depth)
+        .addScaledVector(right,Math.sign(lateral||1)*(480+Math.abs(lateral)*.2))
+        .addScaledVector(up,vertical*.35);
+      field.anchor.copy(nodePosition);
+    }
     addPickup(typeId, nodePosition, 27 + random() * 5, field);
   }
   Object.entries(typeCounts).forEach(([typeId, count]) => {
@@ -9373,6 +9422,11 @@ function rerollUfoForwardScrollPickupRoute(mission, routeSeed) {
       .addScaledVector(mission.forward, distance + depth)
       .addScaledVector(mission.right, lateral)
       .addScaledVector(mission.up, vertical);
+    if (pickup.typeId === 'energy') {
+      nodePosition.copy(mission.origin).addScaledVector(mission.forward,distance+depth)
+        .addScaledVector(mission.right,Math.sign(lateral||1)*(480+Math.abs(lateral)*.2))
+        .addScaledVector(mission.up,vertical*.35);
+    }
     field.anchor.copy(nodePosition);
     field.driftAxis.copy(mission.right).multiplyScalar(random() > .5 ? 1 : -1)
       .addScaledVector(mission.up, (random() * 2 - 1) * .58).normalize();
@@ -10835,7 +10889,13 @@ function updateUfoForwardScrollHud() {
     els.ufoSpaceStartButton.setAttribute("aria-label", `${route.originName}から${route.destinationName}航路を再出発する`);
   }
   setUfoSpaceReturnButtonVisible(canRestart);
+  if (els.ufoSpaceReturnButton) {
+    const name=ufoEmergencyReturnMap(control)==='mars'?'火星マップ':'雲マップ';
+    els.ufoSpaceReturnButton.textContent=name+'に戻る';
+    els.ufoSpaceReturnButton.setAttribute('aria-label',name+'の安全地点へ戻る');
+  }
   if (els.ufoSpaceFireButton) {
+    els.ufoSpaceFireButton.title='射撃：Space / J（長押しで連射）';
     const canShoot = mission.phase === "playing";
     els.ufoSpaceFireButton.hidden = mission.phase !== "playing";
     els.ufoSpaceFireButton.disabled = !canShoot;
@@ -10939,7 +10999,7 @@ function triggerUfoForwardScrollEnergyEmergencyReturn(control, mission) {
   setSpaceTransitionMessage(
     "ENERGY EMPTY",
     "エネルギー切れのため緊急帰還します",
-    "雲マップへ帰還します。",
+    `${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`,
   );
   els.spaceTransitionOverlay?.classList.remove("is-earth-departure", "is-mars-atmosphere");
   els.spaceTransitionOverlay?.classList.add("is-energy-empty", "is-active");
@@ -11427,7 +11487,7 @@ function updateUfoForwardScrollMission(delta) {
     // 長押しだけは一定間隔の連射にする。手動入力はkeydown時に即時発射済みで、
     // ここでは予約弾や待機中の入力を処理しない。
     if (mission.phase === "playing" && mission.energy > 0
-      && keys.has(" ") && mission.elapsed >= (mission.holdFireReadyAt || 0)) {
+      && (keys.has(" ") || keys.has('j')) && mission.elapsed >= (mission.holdFireReadyAt || 0)) {
       fireUfoForwardScrollLockOn({ silent: true });
     }
   }
@@ -18954,7 +19014,7 @@ function updateUfoMarsBreakthroughMission(control, mission, frameDelta) {
   } else if (mission.integrity <= 0) {
     mission.phase = "failed";
     mission.speed = 0;
-    showToast("船体耐久が尽きました。緊急帰還で空マップへ帰還します。");
+    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`);
     window.setTimeout(() => { if (state.map === "space" && mission.phase === "failed") emergencyEscape(); }, 700);
   } else if (mission.timeRemaining <= 0) {
     mission.phase = "failed";
@@ -19111,7 +19171,7 @@ function updateUfoMarsBreakthroughMissionV2(control, mission, frameDelta) {
   } else if (mission.integrity <= 0) {
     mission.phase = "failed";
     mission.speed = 0;
-    showToast("船体耐久が尽きました。緊急帰還で雲マップへ帰還します。");
+    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`);
     window.setTimeout(() => { if (state.map === "space" && mission.phase === "failed") emergencyEscape(); }, 700);
   } else if (mission.timeRemaining <= 0) {
     mission.phase = "failed";
@@ -20632,7 +20692,7 @@ function triggerUfoSpaceEmergencyEscape() {
   setSpaceTransitionMessage(
     "UFO DAMAGE",
     "緊急帰還",
-    "宇宙のチリでUFOのライフが尽きました。雲マップへ帰還します。",
+    `宇宙のチリでUFOのライフが尽きました。${ufoEmergencyReturnMap() === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`,
   );
   els.spaceTransitionOverlay?.classList.add("is-active");
   updateUfoSpaceLifeHud();
@@ -20941,6 +21001,7 @@ function enterUfoSpaceMap(control, exit, sequence) {
     || !control?.craftAssembly) return;
   const launchMap = state.map;
   const craft = control.craftAssembly;
+  control.spaceLaunchFacility = currentUfoPadItem() ? structuredClone(currentUfoPadItem()) : null;
   const route = interplanetaryRoute(launchMap);
   const departureOrientation = craft.getWorldQuaternion(new THREE.Quaternion());
   const currentForward = new THREE.Vector3(0, 0, -1).applyQuaternion(departureOrientation);
@@ -21247,6 +21308,7 @@ function returnUfoToSkyMap(sequence) {
     || !state.ufoSpaceTransitioning
     || state.map !== "space") return;
   const preservedHeading = state.ufoFlightHeading;
+  restoreUfoReturnFacility('sky');
   const completedMission = ufoDoorControls[0]?.spaceForwardScroll;
   if (completedMission) resetUfoForwardScrollMission(completedMission);
   keys.clear();
@@ -21441,6 +21503,29 @@ function runUfoLiftAttachmentSelfTest(control) {
   }
 }
 
+function matchUfoLandingPadSurface(group) {
+  if (state.map !== 'mars') return;
+  const slab = group.getObjectByName('ufo-pad-static-landing-slab');
+  if (!slab) return;
+  const config = MAPS.mars, map = sourceTextureFor(config);
+  // Only the stationary ground cover changes. The ship's shared luminous
+  // white material belongs to the hull/rotor and must not be recoloured.
+  slab.material = new THREE.MeshStandardMaterial({
+    color: map ? 0xffffff : config.palette.ground,
+    map, roughness: .88, metalness: .01,
+  });
+  // Sample the exact ground texels at the pad's world position, so no pale
+  // circle or differently scaled patch is left behind when the craft lifts.
+  slab.updateWorldMatrix(true, false);
+  const positions = slab.geometry.attributes.position, uv = slab.geometry.attributes.uv;
+  const point = new THREE.Vector3();
+  for (let i = 0; i < positions.count; i++) {
+    point.fromBufferAttribute(positions, i).applyMatrix4(slab.matrixWorld);
+    uv.setXY(i, .5 + point.x / config.world.width, .5 - point.z / config.world.depth);
+  }
+  uv.needsUpdate = true;
+}
+
 function addBuilding(parent, item, source = item) {
   const [sx, sy, sz] = source.size;
   const group = buildCatalogModel(source);
@@ -21516,6 +21601,7 @@ function addBuilding(parent, item, source = item) {
   }
   if(!parent.userData?.preview)nameWorldObject(group,'built:'+item.id,item.name||source.name,[sx,sz],sy);
   parent.add(group);
+  if (source.id === 'ufo-pad') matchUfoLandingPadSurface(group);
 }
 
 function constructionBuildGround(position,size) {
@@ -23592,7 +23678,7 @@ function updateMapReadout() {
 function updateBuildList() {
   buildingCatalogUI??=createBuildingCatalog({host:els.buildList,onPlace:selectBuild,allowed:()=>!!worldMapMenu?.opened&&!mapMenuLoading&&!mapMenuReadError&&worldSaveService?.mode==='live'&&!worldSaveService.busy&&!worldSaveService.blocked&&!coastPlay?.rescuing});
   buildingCatalogUI.update({mapKey:state.map,items:(MAPS[state.map].buildCatalog||[]).filter(item=>!item.internal),built:buildItemsForMap().map(b=>b.catalogId),selected:state.selectedBuildId});
-  if(!MAPS[state.map].buildCatalog.some(item=>!item.internal)){if(state.map==='space')els.buildMessage.textContent='緊急帰還で雲マップの空駅入口へ戻れます。';else if(state.map==='mars')els.buildMessage.textContent='顔認証システムから搭乗して、UFOで帰還できます。';}
+  if(!MAPS[state.map].buildCatalog.some(item=>!item.internal)){if(state.map==='space')els.buildMessage.textContent=ufoEmergencyReturnMap()==='mars'?'緊急帰還で火星マップの安全地点へ戻れます。':'緊急帰還で雲マップの空駅入口へ戻れます。';else if(state.map==='mars')els.buildMessage.textContent='顔認証システムから搭乗して、UFOで帰還できます。';}
 }
 
 function selectBuild(id) {
@@ -26576,7 +26662,7 @@ function wireUI() {
     }
     if (state.ufoEngineMode === "ready" && key === "f" && !event.repeat) {
       if (state.map === "space" && isUfoForwardScrollActive()) {
-        // 前進スクロール中のロック星射撃はSpaceキーに限定する。
+        // Forward-scroll shooting uses Space/J, independently of legacy actions.
       } else if (state.map === "space" && ufoDoorControls[0]?.spaceStarMining?.active) {
         useUfoStarMiningAction();
       } else if (state.map === "space" && ufoDoorControls[0]?.spaceSolarSail?.active) {
@@ -26604,13 +26690,14 @@ function wireUI() {
       return;
     }
     if (state.ufoEngineMode === "ready"
-      && key === " "
+      && (key === " " || key === 'j' || event.code === 'KeyJ' || event.code === 'Space')
       && state.map === "space"
       && isUfoForwardScrollActive()) {
-      // OSごとのキーリピートは、物理的にSpaceを離さない限り連打に
-      // 数えない。これにより長押しでは必ず低速連射だけが動く。
-      const isFreshSpacePress = !keys.has(key);
-      keys.add(key);
+      // Both keys own one shooting action; OS repeats never add manual shots.
+      const shootKey = event.code === 'KeyJ' ? 'j' : key;
+      if (event.repeat && !keys.has(shootKey)) { event.preventDefault(); return; }
+      const isFreshSpacePress = !keys.has(' ') && !keys.has('j');
+      keys.add(shootKey);
       if (isFreshSpacePress) requestUfoForwardScrollManualShot();
       event.preventDefault();
       return;
@@ -26648,7 +26735,7 @@ function wireUI() {
     keys.add(key);
     if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault();
   });
-  window.addEventListener("keyup", event => {if(event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB')constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.key.toLowerCase());});
+  window.addEventListener("keyup", event => {if((event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB')&&!(event.code==='KeyJ'&&state.map==='space'&&state.ufoEngineMode==='ready'))constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.code==='KeyJ'?'j':event.key.toLowerCase());});
   document.querySelectorAll("[data-map]").forEach(button => button.addEventListener("click", () => setMap(button.dataset.map)));
   els.cameraModeButton.addEventListener("click", () => {
     if(isSkyStationGuideDialogOpen()||marsShopDialogState.open)return;

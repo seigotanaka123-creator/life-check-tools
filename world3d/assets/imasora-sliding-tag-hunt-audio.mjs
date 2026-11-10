@@ -1,6 +1,6 @@
 // BEGIN TAG AUDIO
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.ImasoraTagAudio=api;})(globalThis,function(){
- 'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect']);
+ 'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect','dive']);
  function preference(storage){try{const p=JSON.parse(storage.getItem(KEY));if(p?.version===1&&typeof p.enabled==='boolean'&&Number.isFinite(p.volume)&&p.volume>0&&p.volume<=1)return{enabled:p.enabled,volume:p.volume};}catch{}try{const level=Number(JSON.parse(storage.getItem('lifeQuestWalkV1'))?.soundVolumes?.sfx??1);if(Number.isFinite(level)&&level>=0&&level<=5)return{enabled:level>0,volume:level>0?level/5:.2};}catch{}return{enabled:true,volume:.2};}
  function savePreference(storage,p){try{storage.setItem(KEY,JSON.stringify({version:1,enabled:!!p.enabled,volume:p.volume}));return true;}catch{return false;}}
  function create({enabled=true,volume=.2,getContext=()=>{const C=globalThis.AudioContext||globalThis.webkitAudioContext;return C?new C():null;},onState=()=>{},setTimer=setTimeout,clearTimer=clearTimeout}={}){
@@ -23,6 +23,7 @@
    case'go':[523,659,784].forEach((f,i)=>tone(f,.16,.09,i*.06));break;
    case'jump':{const f=[392,523,659][Math.max(0,Math.min(2,(cue.stage||1)-1))];tone(f*.8,.12,.1,0,f*1.1);break;}
    case'land':tone(125,.09,.09,0,72);break;
+   case'dive':ok=voice('noise',0,.22,.1)||ok;tone(210,.2,.055,0,65);break;
    case'step':ok=voice('noise',0,.075,.07)||ok;tone(145,.055,.035,0,100);break;
    case'touch':tone(330,.16,.1,0,660);tone(880,.12,.06,.07);break;
    case'timeout':tone(392,.12,.07);break;
@@ -41,3 +42,9 @@
 export const createHuntSound=globalThis.ImasoraTagAudio.create;
 export const huntSoundPreference=globalThis.ImasoraTagAudio.preference;
 export const saveHuntSound=globalThis.ImasoraTagAudio.savePreference;
+
+// The burst, rather than the key press, owns the sound. Blocked dives and
+// cancelled wind-ups stay silent; the slide's later frames never repeat it.
+export function huntDiveAudioCue(previousStage,actor){
+ return previousStage!=='slide'&&actor?.dive?.stage==='slide'?{type:'dive'}:null;
+}
