@@ -64,7 +64,7 @@ export function createHuntRearMirror(renderer,scene,{withoutLabels=draw=>draw()}
  return{
   hide,
   invalidate(){bounds=null;lastFrame=-Infinity;},
-  draw(now,runner,avatar,shadow,{refresh=false}={}){
+  draw(now,runner,avatar,shadow,{refresh=false,renderView=(_camera,draw)=>draw()}={}){
    if(!target)prepare();
    if(frame.hidden)frame.hidden=false;
    if(!bounds&&!layout())return;
@@ -80,7 +80,7 @@ export function createHuntRearMirror(renderer,scene,{withoutLabels=draw=>draw()}
      try{
       renderer.setRenderTarget(target);
       renderer.autoClear=true;
-      withoutLabels(()=>renderer.render(scene,rearCamera));
+      withoutLabels(()=>renderView(rearCamera,()=>renderer.render(scene,rearCamera)));
       lastFrame=now;
      }finally{
       renderer.setRenderTarget(null);

@@ -376,4 +376,11 @@ body.world-player-game.imasora-pop-menus .free-concrete .paint-recent button{min
 @media(max-width:600px){.work-target-callout{padding:6px 10px;max-width:185px}.work-target-callout strong{font-size:16px}}
 
 /* Native vehicle-door routes stay inside the game HUD. */
+@media (pointer:fine) and (min-width:701px) and (min-height:501px){
+ .world-free-playing .free-concrete>[data-free-jump]{
+  left:max(144px,calc(env(safe-area-inset-left) + 144px));
+  right:auto;
+  bottom:max(12px,env(safe-area-inset-bottom));
+ }
+}
 .free-door-routes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.free-door-routes[hidden],[data-door-run][hidden]{display:none!important}.free-door-routes button{min-height:48px;white-space:normal;font-size:14px}.free-door-routes small{grid-column:1/-1;font-size:12px;color:#43505c}.free-concrete [data-door-run]{display:flex;align-items:center;justify-content:space-between;gap:8px;grid-column:1/-1;background:#fff5d8;border-radius:12px;padding:6px 10px;color:#493d32;font-size:13px}.free-concrete [data-door-run] button{min-height:44px;min-width:64px}

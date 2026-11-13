@@ -2,6 +2,7 @@ import * as T from './three.module.min.js';
 import {createHuntReplayCamera} from './imasora-sliding-tag-hunt-replay-camera.mjs';
 import {huntReplayCamera} from './imasora-sliding-tag-hunt-replay.mjs';
 import {huntActorConcealed} from './imasora-sliding-tag-hunt-visibility.mjs';
+import {huntFoamViewHidden} from './imasora-sliding-tag-hunt-foam-visibility.mjs';
 import {worldCameraPose,worldSight,worldValid} from './imasora-sliding-tag-hunt-world.mjs';
 
 const W=1280,H=720,SCREEN_W=384,SCREEN_H=108;
@@ -139,14 +140,14 @@ export function createHuntBroadcastViews({renderer,scene,source,documentTarget=d
   const origin={x:active.x,y:active.y+3,z:active.z};
   return rivals.filter(rival=>{
    const point={x:rival.x,y:rival.y+3,z:rival.z};
-   if(huntActorConcealed(state,rival)||!worldSight(origin,point,.8))return true;
+   if(huntActorConcealed(state,rival)||!worldSight(origin,point,.8)||huntFoamViewHidden(state,origin,rival,active))return true;
    if(!mainCamera)return false;
    projected.set(point.x,point.y,point.z).project(mainCamera);
    return Math.abs(projected.x)>1||Math.abs(projected.y)>1||Math.abs(projected.z)>1||
-    !worldSight(mainCamera.position,point);
+    !worldSight(mainCamera.position,point)||huntFoamViewHidden(state,mainCamera,rival,active);
   });
  }
- function capture(view,centerSky,screenMask=[]){
+ function capture(view,centerSky,screenMask=[],renderView=(_camera,draw)=>draw()){
   if(!frame)return;
   const opponent=view==='opponent',desktopTile=opponent?(frame.hunting?topTile:bottomTile):wideTile;
   const screenTile=frame.screen&&(!opponent||frame.screenOpponent)?screenTiles[view]:null;
@@ -180,7 +181,7 @@ export function createHuntBroadcastViews({renderer,scene,source,documentTarget=d
    renderer.setScissorTest(true);
    if(frame.desktopMulti){
     pointCamera(frame[view],smooth);
-    renderer.render(scene,camera);
+    renderView(camera,()=>renderer.render(scene,camera));
     ctx.drawImage(source,0,source.height-h,w,h,desktopTile.x,desktopTile.y,desktopTile.w,desktopTile.h);
    }
    if(screenTile){
@@ -190,7 +191,7 @@ export function createHuntBroadcastViews({renderer,scene,source,documentTarget=d
      const separateOpponent=opponent&&(!frame.desktopMulti||!frame.sharedOpponent);
      if(separateOpponent)pointCamera(frame.screenOpponent,screenOpponentSmooth);
      else if(!frame.desktopMulti)pointCamera(frame[view],smooth);
-     if(!frame.desktopMulti||separateOpponent||visible.length)renderer.render(scene,camera);
+     if(!frame.desktopMulti||separateOpponent||visible.length)renderView(camera,()=>renderer.render(scene,camera));
      screenContext.drawImage(source,0,source.height-h,w,h,screenTile.x,screenTile.y,screenTile.w,screenTile.h);
     }finally{
      for(const node of visible)node.visible=true;

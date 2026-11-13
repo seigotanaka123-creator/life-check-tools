@@ -20,6 +20,8 @@ export const ITEM_TYPES=Object.freeze(rows.map(r=>r[0]));
 export const PLAYER_ITEMS=Object.freeze(rows.filter(r=>r[4]==='player'||r[4]==='both').map(r=>r[0]));
 export const HUNTER_ITEMS=Object.freeze(rows.filter(r=>r[4]==='hunters'||r[4]==='both').map(r=>r[0]));
 export const SUPPLY_COUNT=PLAYER_ITEMS.length+HUNTER_ITEMS.length;
+export const EXTRA_BALLOON_COUNT=2;
+export const SUPPLY_CAPACITY=SUPPLY_COUNT+EXTRA_BALLOON_COUNT;
 export const INK=Object.freeze({markUntilRoundEnd:true,trailSeconds:15,maxFootprints:256});
 export const HUNT_FIELDS=Object.freeze({sheetRadius:16,curtainRadius:18,curtainHeight:12,fanRadius:4.5,fanHeight:9.7,fanSeconds:12,windRange:42});
 // These are actual visible poles; the rope never attaches to an invisible point.

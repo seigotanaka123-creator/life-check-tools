@@ -32,7 +32,7 @@ export function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={})
   if(clear===clearRay)lastRay={x:target.x,y:target.y,z:target.z,yaw,pitch,distance,safe};
   return safe;
  }
- return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false,following=false}={}){
+ return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false,following=false,reversing=false}={}){
    const t=clamp(Number.isFinite(dt)?dt:0,0,.1),idealPitch=clamp(pitch,.1,1.3);if(!state)state={yaw,pitch:idealPitch,distance:null};
    // The old obstacle planner selects only a goal. Its side/high-angle choices
    // are never used as an immediate rendered camera position.
@@ -42,7 +42,8 @@ export function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={})
    // eventually sent the camera the opposite way around the actor. Follow
    // the committed body pose with bounded, time-based lag; walls shorten the
    // ray instead of choosing a new heading unrelated to the player's turn.
-   const yawStep=easeHuntCamera(state.yaw,goal.yaw,t,{angle:true,rate:(following?180:60)*DEG,response:8})-state.yaw;
+   const quickReverse=following&&reversing;
+   const yawStep=easeHuntCamera(state.yaw,goal.yaw,quickReverse?Math.min(t,1/13):t,{angle:true,rate:(quickReverse?255:following?180:60)*DEG,response:quickReverse?11:8})-state.yaw;
    state.yaw+=following?yawStep:clamp(yawStep,-DEG,DEG);
    state.pitch+=clamp(easeHuntCamera(state.pitch,goal.pitch,t,{rate:45*DEG})-state.pitch,-DEG,DEG);
    const h=Math.cos(state.pitch),rayX=Math.sin(state.yaw)*h,rayY=Math.sin(state.pitch),rayZ=Math.cos(state.yaw)*h;

@@ -8,20 +8,25 @@ export function huntPreviewVersion(html,pageUrl){
  }catch{return null;}
 }
 
+// Both the world folder and the game-root alias must return to this install.
+export function huntHomeUrl(pageUrl,homePath){
+ const page=new URL(pageUrl);
+ let home=new URL(/\/world3d\/[^/]*$/.test(page.pathname)?'../life-quest-walk.html':'./life-quest-walk.html',page);
+ if(homePath)try{
+  const candidate=new URL(homePath,page);
+  if(candidate.origin===page.origin&&candidate.protocol===page.protocol&&!candidate.username&&!candidate.password&&!candidate.pathname.startsWith('//')&&candidate.pathname.endsWith('/life-quest-walk.html'))home=candidate;
+ }catch{}
+ home.search='?from=sliding-tag';
+ home.hash='';
+ return home;
+}
+
 // Check only at a preparation/pause boundary or on return to a visible menu.
 // The old match is never reloaded. A normal link opens a separate new page.
 export function createHuntUpdateNotice({document:doc=globalThis.document,windowTarget=doc?.defaultView,container,pageUrl,homePath,version,visible=()=>true,fetcher=globalThis.fetch,clock=Date.now,setTimer=setTimeout,clearTimer=clearTimeout,Controller=globalThis.AbortController}={}){
  const page=new URL(pageUrl),link=doc.createElement('a'),style=doc.createElement('style');
  const homeMode=page.searchParams.get('from')==='home';
- let home=new URL('./life-quest-walk.html',page);
- if(homeMode&&homePath)try{
-  const candidate=new URL(homePath,page);
-  if(candidate.origin===page.origin&&!candidate.username&&!candidate.password&&!candidate.pathname.startsWith('//')&&candidate.pathname.endsWith('/life-quest-walk.html')){
-   candidate.search='';
-   candidate.hash='';
-   home=candidate;
-  }
- }catch{}
+ const home=huntHomeUrl(page,homeMode?homePath:null);
  // The home entry belongs to this tab's sessionStorage. A separate tab
  // starts from home so it can create its own valid entry.
  link.className='hunt-update-link';link.textContent=homeMode?'ホームから更新版へ ↗':'更新版を開く ↗';link.title=homeMode?'新しいタブでホームを開きます。ホームの「鬼ごっこ」から始めてください。':'今の勝負を残して、新しい画面を開きます';link.target='_blank';link.rel='noopener';link.hidden=true;link.dataset.currentVersion=version??'';

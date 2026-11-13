@@ -55,7 +55,7 @@ import {concreteWorldPreview,concreteWorldProfileCheck} from './assets/imasora-c
 import {createWorldConcreteController} from './assets/imasora-construction-concrete/world-controller.mjs?v=120pv';
 import {createReelLive} from './assets/imasora-construction-reel-live.mjs?v=120pv';
 import {reelGeometry,reelWorld,reelTop,reelLanding,reelStep,reelStairPass,reelStairGround} from './assets/imasora-construction-reel-world.mjs?v=120ps';
-import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=120pv';
+import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=12175';
 import {parkedConcreteVehicles} from './assets/imasora-construction-concrete/free-parking.mjs?v=120ey';
 import {vehiclePoseProblem,createConcreteSupportSampler} from './assets/imasora-construction-concrete/free-vehicle-contact.mjs?v=120pv';
 import {createWorldMapMenu,createBuildingCatalog} from './assets/imasora-world-map-menu.js?v=120ni';
@@ -26582,7 +26582,24 @@ function wireUI() {
     enabled:()=>worldBooted,
     context:()=>coastSnorkel?.active?'swim':coastPlay?.steering?'raft':state.ufoBoarded?'ufo':'walk',
     clearInput:clearMarsShopDialogInput,
-    menu:()=>{if(worldPlayerUI?.open)worldPlayerUI.close();else if(!document.querySelector('dialog[open]')&&!worldMapMenu?.paused&&!worldSaveService?.blocked&&!worldSaveService?.crafting)worldPlayerUI?.show();}
+    menu:()=>{
+      if(worldPlayerUI?.open){worldPlayerUI.close();return;}
+      if(document.querySelector('dialog[open]')||worldMapMenu?.paused||worldSaveService?.blocked||worldSaveService?.crafting)return;
+      if(!worldConcreteController?.openKeyboardMenu?.())worldPlayerUI?.show();
+    }
+  });
+  globalThis.IMASORA_BUTTON_FEEDBACK?.setKeyboardScope?.(event=>{
+    if(state.map!=='construction')return document;
+    if(!worldInputAvailable()||event.target?.closest?.('[role=dialog],[role=alertdialog],[data-color-hue],[data-color-tone]'))return null;
+    const workshopScope=worldConcreteController?.keyboardScope;
+    if(workshopScope!==undefined)return workshopScope;
+    if(worldReelController?.active)return document.querySelector('.reel-live');
+    if(worldHighController?.active&&!worldHighController.roaming)return document.querySelector('.high-live-panel');
+    if(worldWaterController?.active)return document.querySelector('.world-water-controls');
+    if(worldSoilController?.active)return document.querySelector('.world-soil-controls');
+    if(worldTimberController?.active)return document.querySelector('.world-timber-controls');
+    if(worldExcavationController?.active)return document.querySelector('.transport-play:not([hidden]),.world-excavation-controls:not([hidden])');
+    return document;
   });
   window.addEventListener('keyup',event=>keys.delete(event.key?.toLowerCase()),true);
   bindContextSpaceAction({

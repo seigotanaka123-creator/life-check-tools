@@ -6,7 +6,62 @@ export const HUNT_DIVE_KEY='KeyH';
 export function huntDiveShortcutAvailable(bindings){return shortcutAvailable(bindings,HUNT_DIVE_KEY);}
 export function huntItemShortcutAvailable(bindings){return shortcutAvailable(bindings,'KeyL');}
 export function huntItemKeyCodes(bindings){return[...new Set([...(huntItemShortcutAvailable(bindings)?['KeyL']:[]),...(bindings.tool??[]).filter(Boolean)])];}
-export function createHuntJumpOwners(intent){const owners=new Set();return{set(source,down){const before=owners.size>0;if(down)owners.add(source);else owners.delete(source);const after=owners.size>0;if(!before&&after)intent.press();if(before&&!after)intent.release();},reset(){owners.clear();intent.reset();},get held(){return owners.size>0;}};}
+export function createHuntJumpOwners(){
+ const owners=new Set();
+ const edges=[];
+ let gesture=null,sampled=null;
+ const isKeyboard=source=>source.startsWith('key:');
+ const queue=(down,owner)=>{if(edges.length<12)edges.push({down,owner});};
+ return{
+  set(source,down){
+   if(down){
+    if(!gesture){gesture={touch:false};queue(true,gesture);}
+    if(!isKeyboard(source))gesture.touch=true;
+    owners.add(source);
+   }else if(owners.delete(source)&&!owners.size){
+    queue(false,gesture);
+    gesture=null;
+   }
+  },
+  releaseKeyboard(){
+   for(const source of owners)if(isKeyboard(source))this.set(source,false);
+   // A pending keyboard tap must not fire after the field loses focus.
+   // Keep touch taps and the release of a jump the simulation already saw.
+   for(let i=edges.length-1;i>=0;i--)if(!edges[i].owner.touch&&edges[i].owner!==sampled)edges.splice(i,1);
+  },
+  read(){
+   const edge=edges.shift();
+   sampled=edge?(edge.down?edge.owner:null):gesture;
+   return !!sampled;
+  },
+  reset(){owners.clear();edges.length=0;gesture=sampled=null;},
+  get held(){return owners.size>0;},
+ };
+}
+
+// A render can run several simulation steps. Reconstruct movement keys at
+// each step rather than applying the last event to the whole render gap.
+// Sampling starts at the retained end of the gap; old taps in discarded
+// time are consumed as state changes, not played back after a stall.
+export function createHuntKeyboardTimeline(){
+ const physical=new Set(),sampled=new Set(),pending=[];
+ let lastSample=-Infinity;
+ return{
+  set(code,down,at){
+   if(down===physical.has(code))return;
+   if(down)physical.add(code);else physical.delete(code);
+   pending.push({code,down,at:Math.max(lastSample,pending.at(-1)?.at??-Infinity,at)});
+  },
+  sample(at){
+   lastSample=Math.max(lastSample,at);
+   let i=0;
+   for(;i<pending.length&&pending[i].at<=lastSample;i++){const{code,down}=pending[i];if(down)sampled.add(code);else sampled.delete(code);}
+   if(i)pending.splice(0,i);
+  },
+  has:code=>sampled.has(code),
+  clear(){physical.clear();sampled.clear();pending.length=0;lastSample=-Infinity;},
+ };
+}
 
 // Each finger owns its buttons independently. Lifting/cancelling one finger
 // must not release another finger's dash, jump, item, or the movement pad.

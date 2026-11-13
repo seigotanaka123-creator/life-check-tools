@@ -192,7 +192,16 @@ export function createLiveConcreteController({service,state,scene,camera,charact
   view.cancel();moving=false;const floorIndex=Number(launcher.querySelector('[data-completed-menu] select').value),f=project().completedFloors?.[floorIndex];if(!f)return;
   planning={mode:'edit',floorIndex,x:f.x,z:f.z,mask:floorMask(f)};refresh();
  }
- function ask(type,message,extra={}){view.cancel();confirmation={type,message,extra};refresh();button('confirm').focus();}
+ function ask(type, message, extra = {}) {
+  view.cancel();
+  // The save submenu is modal. Close it so the confirmation can take focus.
+  const menu = panel.querySelector('[data-menu]');
+  menu.querySelector('dialog[open]')?.close();
+  menu.open = false;
+  confirmation = {type, message, extra};
+  refresh();
+  button('confirm').focus();
+ }
  async function pause(){if(busy||clockSaving)return;if(!paused){view.cancel();paused=true;await flushClocks(true);}else paused=false;refresh();}
  const handlers={enter,entrance:toEntrance,visitfloor:visitFloor,leave:()=>leave(),save,pause,site:()=>view.walkTo('site'),stock:()=>view.walkTo('stock'),floor:()=>view.walkTo('floor'),stop:()=>view.cancel(),cancel:()=>view.cancelAction(),camera:()=>view.resetCamera(),
   nextfloor:planNext,movefloor:planMoveFloor,editfloor:planEditFloor,cancelplace:()=>{planning=null;view.setPlacementPreview(null);refresh();},placefloor:()=>{const problem=placementProblem(planning);if(problem){note=problem;refresh();return;}if(planning.mode==='edit'){ask('SET_FLOOR_PANELS',`${planning.floorIndex+1}枚目の床を配置${partCount(planning.mask)}部分・保管${4-partCount(planning.mask)}部分にします。床の材料と塗装は保持します。`,{floorIndex:planning.floorIndex,mask:planning.mask});}else if(planning.mode==='move'){const from=project().completedFloors[planning.floorIndex];ask('MOVE_COMPLETED_FLOOR',`${planning.floorIndex+1}枚目の完成床を、${from.x}／${from.z} から ${planning.x}／${planning.z} へ移設します。材料とほかの保存内容は変わりません。`,{...planning});}else ask('START_NEXT_FLOOR','完成した床をその場に残し、この場所へ工房と残りの材料を移します。新しい床には4杯分の生コンが必要です。',{...planning});},
@@ -216,5 +225,5 @@ export function createLiveConcreteController({service,state,scene,camera,charact
   if(free.update(delta))return true;
   if(active&&!paused&&!document.hidden){view.tick(delta);if(!busy&&!clockSaving&&!service.blocked&&!controller.pending&&!confirmation){const p=project(),dt=Math.max(0,Math.min(.05,delta))*1000;if(p.mixer?.pending)mixMs=Math.min(MIX_DURATION_MS-p.mixer.pending.elapsedMs,mixMs+dt);if(p.site.stage==='curing'&&p.cureElapsedMs!=null)cureMs=Math.min(CURE_DURATION_MS-p.cureElapsedMs,cureMs+dt);void flushClocks();}}
   uiElapsed+=delta;if(uiElapsed>.12){uiElapsed=0;refresh();}return active;
- }};
+ },openKeyboardMenu:()=>free.openKeyboardMenu(),get keyboardScope(){return free.active?free.keyboardScope:undefined;}};
 }

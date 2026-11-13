@@ -10,7 +10,136 @@ const VIDEO_FPS=24;
 export function huntReplayAudioAllowed(view=globalThis){return !view.top||view.top===view.self;}
 // Attach before a pending resume resolves; recording must not lose its audio
 // track merely because the context was suspended on the result screen.
-export function createHuntReplayAudio(audio,view=globalThis){if(!huntReplayAudioAllowed(view))return null;const context=audio?.context;if(!context?.createMediaStreamDestination||context.state==='closed')return null;let destination;try{destination=context.createMediaStreamDestination();audio.tap(destination);return{stream:destination.stream,release:()=>audio.untap(destination)};}catch{if(destination)try{audio.untap(destination);}catch{}for(const t of destination?.stream?.getTracks?.()??[])try{t.stop();}catch{}return null;}}
+export function createHuntReplayAudio(audio,view=globalThis){
+ if(!huntReplayAudioAllowed(view))return null;
+ const context=audio?.context;if(!context?.createMediaStreamDestination||context.state==='closed')return null;
+ let destination,clock,released=false;
+ const release=()=>{if(released)return;released=true;if(clock){try{clock.stop();}catch{}try{clock.disconnect();}catch{}}if(destination)try{audio.untap(destination);}catch{}};
+ try{
+  destination=context.createMediaStreamDestination();audio.tap(destination);
+  // Keep silent intervals on the exported audio timeline. This zero-valued
+  // source belongs only to the recording destination, never to the speakers.
+  if(context.createConstantSource){clock=context.createConstantSource();clock.offset.value=0;clock.connect(destination);clock.start();}
+  return{stream:destination.stream,release};
+ }catch{release();for(const t of destination?.stream?.getTracks?.()??[])try{t.stop();}catch{}return null;}
+}
+const mp4Type=(d,p)=>String.fromCharCode(...new Uint8Array(d.buffer,d.byteOffset+p,4));
+function mp4Box(d,p,limit){
+ if(p+8>d.byteLength)return null;
+ let size=d.getUint32(p),header=8;
+ if(size===1){if(p+16>d.byteLength)return null;size=Number(d.getBigUint64(p+8));header=16;}
+ else if(size===0)size=limit-p;
+ if(!Number.isSafeInteger(size)||size<header||size>limit-p)return null;
+ return{type:mp4Type(d,p+4),body:p+header,end:p+size};
+}
+function mp4Children(d){
+ const rows=[];
+ for(let p=0;p<d.byteLength;){
+  const box=mp4Box(d,p,d.byteLength);
+  if(!box||rows.length>=1024)throw Error('MP4_BOX');
+  rows.push(box);p=box.end;
+ }
+ return rows;
+}
+function mp4Child(d,type){
+ const box=mp4Children(d).find(row=>row.type===type);
+ return box&&mp4Payload(d,box);
+}
+const mp4Payload=(d,box)=>new DataView(d.buffer,d.byteOffset+box.body,box.end-box.body);
+function mp4U64(d,p){const n=Number(d.getBigUint64(p));return Number.isSafeInteger(n)?n:NaN;}
+function mp4Clock(d){
+ if(!d||d.byteLength<4)return null;
+ const version=d.getUint8(0),p=version===1?20:12;
+ if(version>1||d.byteLength<p+(version===1?12:8))return null;
+ const scale=d.getUint32(p),ticks=version===1?mp4U64(d,p+4):d.getUint32(p+4);
+ return scale>0?{scale,duration:ticks>0&&ticks!==0xffffffff?ticks/scale:null}:null;
+}
+function mp4VideoTrack(movie,movieClock){
+ for(const box of mp4Children(movie)){
+  if(box.type!=='trak')continue;
+  const track=mp4Payload(movie,box),media=mp4Child(track,'mdia');
+  if(!media)continue;
+  const handler=mp4Child(media,'hdlr');
+  if(!handler||handler.byteLength<12||mp4Type(handler,8)!=='vide')continue;
+  const header=mp4Child(track,'tkhd'),clock=mp4Clock(mp4Child(media,'mdhd'));
+  if(!header||header.byteLength<24||!clock)return null;
+  const version=header.getUint8(0),p=version===1?20:12;
+  if(version>1||header.byteLength<p+(version===1?16:12))return null;
+  const id=header.getUint32(p),ticks=version===1?mp4U64(header,p+8):header.getUint32(p+8);
+  const duration=movieClock?.scale&&ticks>0&&ticks!==0xffffffff?ticks/movieClock.scale:clock.duration;
+  let defaultDuration=0;
+  const extensions=mp4Child(movie,'mvex');
+  if(extensions)for(const ext of mp4Children(extensions)){
+   if(ext.type!=='trex')continue;
+   const row=mp4Payload(extensions,ext);
+   if(row.byteLength>=24&&row.getUint32(4)===id)defaultDuration=row.getUint32(12);
+  }
+  return{id,scale:clock.scale,duration,defaultDuration,decodeEnd:0,presentEnd:0,samples:0};
+ }
+ return null;
+}
+function addMp4VideoFragment(fragment,video){
+ for(const box of mp4Children(fragment)){
+  if(box.type!=='traf')continue;
+  const track=mp4Payload(fragment,box),header=mp4Child(track,'tfhd');
+  if(!header||header.getUint32(4)!==video.id)continue;
+  const flags=header.getUint32(0)&0xffffff;
+  const durationOffset=8+(flags&1?8:0)+(flags&2?4:0);
+  const defaultDuration=flags&8?header.getUint32(durationOffset):video.defaultDuration;
+  const base=mp4Child(track,'tfdt'),version=base?.getUint8(0);
+  let decode=base?(version===1?mp4U64(base,4):version===0?base.getUint32(4):NaN):video.decodeEnd;
+  if(!Number.isSafeInteger(decode))throw Error('MP4_TIME');
+  for(const runBox of mp4Children(track)){
+   if(runBox.type!=='trun')continue;
+   const run=mp4Payload(track,runBox),info=run.getUint32(0),count=run.getUint32(4);
+   if((info>>>24)>1||video.samples+count>32768)throw Error('MP4_SAMPLES');
+   let p=8+(info&1?4:0)+(info&4?4:0);
+   const step=((info&0x100?1:0)+(info&0x200?1:0)+(info&0x400?1:0)+(info&0x800?1:0))*4;
+   if(p+count*step>run.byteLength)throw Error('MP4_SAMPLES');
+   for(let i=0;i<count;i++,p+=step){
+    const duration=info&0x100?run.getUint32(p):defaultDuration;
+    const composition=!(info&0x800)?0:info>>>24?run.getInt32(p+step-4):run.getUint32(p+step-4);
+    if((!duration&&!(info&0x100))||!Number.isSafeInteger(decode+duration)||!Number.isSafeInteger(decode+duration+composition))throw Error('MP4_TIME');
+    video.presentEnd=Math.max(video.presentEnd,decode+duration+composition);
+    decode+=duration;
+   }
+   video.samples+=count;
+  }
+  video.decodeEnd=Math.max(video.decodeEnd,decode);
+ }
+}
+// Check the video timeline, not the AAC or movie length. In fragmented MP4
+// those summary headers can describe only the first fragment, or be zero.
+// Read bounded metadata only: never copy the recorded mdat payloads.
+export const huntRecordedVideoDuration=async blob=>{
+ if(!blob?.type?.startsWith('video/mp4')||!blob.slice)return null;
+ let movieClock=null,video=null,fragments=0,metadata=0,offset=0,boxes=0;
+ try{
+  for(;offset+8<=blob.size&&boxes++<1024;){
+   let head=new DataView(await blob.slice(offset,offset+8).arrayBuffer());
+   if(head.byteLength===8&&head.getUint32(0)===1)head=new DataView(await blob.slice(offset,offset+16).arrayBuffer());
+   const box=mp4Box(head,0,blob.size-offset);
+   if(!box)return null;
+   if(box.type==='moov'||box.type==='moof'){
+    const bytes=box.end-box.body;
+    metadata+=bytes;
+    if(bytes>256*1024||metadata>2*1024*1024)return null;
+    const data=new DataView(await blob.slice(offset+box.body,offset+box.end).arrayBuffer());
+    if(box.type==='moov'){
+     movieClock=mp4Clock(mp4Child(data,'mvhd'));
+     video=mp4VideoTrack(data,movieClock);
+    }else{
+     fragments++;
+     if(video)addMp4VideoFragment(data,video);
+    }
+   }
+   offset+=box.end;
+  }
+  if(offset!==blob.size)return null;
+  if(fragments&&video)return video.presentEnd/video.scale;
+  return video?.duration??movieClock?.duration??null;
+ }catch{return null;}
+};
 export function huntVideoSize(width,height){if(!Number.isFinite(width)||!Number.isFinite(height)||width<=0||height<=0)throw Error('INVALID_VIDEO_SIZE');const scale=720/Math.max(width,height);return{width:Math.max(2,Math.round(width*scale/2)*2),height:Math.max(2,Math.round(height*scale/2)*2)};}
 export const HUNT_VIDEO_MP4='video/mp4;codecs=avc1.42E01E,mp4a.40.2';
 // Prefer an explicit share-friendly AVC/AAC pair. A bare MP4 probe selected
@@ -25,7 +154,7 @@ function startHuntRecorder(Recorder,stream,types,preferred,bitrate){const ordere
 // before some destination tracks join the canvas stream; release their union.
 function stopHuntCaptureTracks(...streams){const tracks=new Set();for(const stream of streams)for(const method of['getTracks','getVideoTracks','getAudioTracks'])try{for(const track of stream?.[method]?.()??[])tracks.add(track);}catch{}for(const track of tracks)try{track.stop();}catch{}}
 export function createHuntReplayVideo({createCanvas=()=>document.createElement('canvas'),Recorder=globalThis.MediaRecorder,makeAudio=()=>null,setTimer=setTimeout,clearTimer=clearTimeout}={}){
- let current=null,preferredMime=null;
+ let current=null,preferredMime=null,sequence=0;
  function clean(c){
   if(c.cleaned)return;
   c.cleaned=true;
@@ -39,7 +168,7 @@ export function createHuntReplayVideo({createCanvas=()=>document.createElement('
  // Every callback owns its recording; late work must never cancel a newer one.
  function abort(c){if(!c||c.cleaned)return;c.cancelled=true;try{if(c.recorder?.state!=='inactive')c.recorder?.stop();}catch{}clean(c);c.resolve(null);}
  function cancel(){abort(current);}
- function start(frame,summary,{scope='finish',seconds=6}={}){cancel();return new Promise(resolve=>{let c;try{const limits=huntVideoLimits(scope,seconds);const types=huntVideoMimes(Recorder);if(!types.length)throw Error('VIDEO_UNSUPPORTED');const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();Object.assign(canvas,size);const context=canvas.getContext('2d');if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');const stream=canvas.captureStream(VIDEO_FPS);const caption=summary?(summary.mode==="hunt"?"鬼役":"逃走役")+"  ·  "+summary.title+"  "+summary.time+"秒":"";c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};current=c;c.audio=makeAudio();for(const t of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(t);const selected=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate),mime=selected.mime;c.recorder=selected.recorder;c.types=types;c.mime=mime;preferredMime=mime;c.recorder.ondataavailable=e=>{if(!e.data?.size||c.cancelled||c.cleaned)return;c.bytes+=e.data.size;if(c.bytes>limits.maxBytes){abort(c);return;}c.chunks.push(e.data);};c.recorder.onerror=()=>{if(c.cleaned||c.cancelled)return;preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];abort(c);};c.recorder.onstop=()=>{if(c.cleaned)return;const type=(c.recorder.mimeType||mime).startsWith('video/mp4')?'video/mp4':'video/webm',blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null;clean(c);resolve(blob);};c.timer=setTimer(()=>abort(c),limits.timeout);}catch{abort(c);resolve(null);}});}
+ function start(frame,summary,{scope='finish',seconds=6}={}){cancel();return new Promise(resolve=>{let c;try{const limits=huntVideoLimits(scope,seconds);const types=huntVideoMimes(Recorder);if(!types.length)throw Error('VIDEO_UNSUPPORTED');const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();Object.assign(canvas,size);const context=canvas.getContext('2d');if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');const stream=canvas.captureStream(VIDEO_FPS);const caption=summary?(summary.mode==="hunt"?"鬼役":"逃走役")+"  ·  "+summary.title+"  "+summary.time+"秒":"";c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};current=c;c.sequence=++sequence;c.audio=makeAudio();for(const t of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(t);const selected=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate),mime=selected.mime;c.recorder=selected.recorder;c.types=types;c.mime=mime;preferredMime=mime;c.recorder.ondataavailable=e=>{if(!e.data?.size||c.cancelled||c.cleaned)return;c.bytes+=e.data.size;if(c.bytes>limits.maxBytes){abort(c);return;}c.chunks.push(e.data);};c.recorder.onerror=()=>{if(c.cleaned||c.cancelled)return;preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];abort(c);};c.recorder.onstop=()=>{if(c.cleaned)return;const type=(c.recorder.mimeType||mime).startsWith('video/mp4')?'video/mp4':'video/webm',blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null,expected=((c.lastFrameAt??c.firstFrameAt??0)-(c.firstFrameAt??0))/1000;clean(c);if(!blob){resolve(null);return;}huntRecordedVideoDuration(blob).then(duration=>{if(c.sequence!==sequence){resolve(null);return;}if(expected>.5&&duration!==null&&Math.abs(duration-expected)>Math.max(.35,Math.min(.75,expected*.01))){preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];resolve(null);return;}resolve(blob);},()=>resolve(null));};c.timer=setTimer(()=>abort(c),limits.timeout);}catch{abort(c);resolve(null);}});}
  return{start,cancel,finish(){const c=current;if(!c||c.cancelled||c.complete)return false;c.complete=true;try{c.recorder.stop();return true;}catch{preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];c.cancelled=true;clean(c);c.resolve(null);return false;}},draw(frame,now){
   const c=current;
   if(!c||c.complete||!Number.isFinite(now))return false;
@@ -47,7 +176,7 @@ export function createHuntReplayVideo({createCanvas=()=>document.createElement('
   // Use the recording clock so quantization to the display refresh does not accumulate.
   const slot=Math.floor((now-c.firstFrameAt)*VIDEO_FPS/1000+1e-9);
   if(slot<=c.lastSlot)return false;
-  c.lastSlot=slot;
+  c.lastSlot=slot;c.lastFrameAt=now;
   try{
    if(!Number.isFinite(frame.width)||!Number.isFinite(frame.height)||frame.width<=0||frame.height<=0)throw Error('INVALID_VIDEO_SIZE');
    const {width:w,height:h}=c.canvas;

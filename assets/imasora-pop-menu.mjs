@@ -32,11 +32,46 @@ function enhanceSelect(select){
  const group=document.createElement('div');group.className='pop-choices';group.setAttribute('role','group');const label=labelFor(select);group.setAttribute('aria-label',label);select.classList.add('pop-native-choice');select.after(group);
  const row={select,group,label,key:'',buttons:[]};choices.set(select,row);updateChoice(row);
 }
+function choiceDisabled(select, option) {
+ return select.disabled || option.disabled || option.closest('optgroup')?.disabled === true || !option.value;
+}
 function updateChoice(row){
- const {select,group,label}=row;if(!select.isConnected){group.remove();choices.delete(select);return;}
- const options=[...select.options],key=options.map(o=>o.value+'\t'+o.textContent).join('\n');
- if(key!==row.key){row.key=key;group.replaceChildren();row.buttons=options.map(o=>{const b=document.createElement('button');b.type='button';b.className='pop-option';b.dataset.value=o.value;b.innerHTML=choicePicture(label,o.value)+'<strong>'+esc(o.textContent)+'</strong><span class="pop-picked" aria-hidden="true">★</span>';b.onclick=e=>{e.preventDefault();e.stopPropagation();if(select.disabled||o.disabled||!o.isConnected)return;select.value=o.value;select.dispatchEvent(new Event('input',{bubbles:true}));select.dispatchEvent(new Event('change',{bubbles:true}));refreshPopMenus();};group.append(b);return b;});group.dataset.many=String(options.length>8);}
- group.hidden=select.hidden;for(let i=0;i<row.buttons.length;i++){const b=row.buttons[i],o=options[i],disabled=select.disabled||o.disabled||!o.value; if(b.disabled!==disabled)b.disabled=disabled;setAttr(b,'aria-pressed',o.selected);}
+ const {select,group,label}=row;
+ if(!select.isConnected){group.remove();choices.delete(select);return;}
+ const options=[...select.options];
+ const key=JSON.stringify(options.map(o=>[o.value,o.textContent]));
+ if(key!==row.key){
+  row.key=key;
+  group.replaceChildren();
+  row.buttons=options.map((option,index)=>{
+   const {value,textContent}=option;
+   const b=document.createElement('button');
+   b.type='button';
+   b.className='pop-option';
+   b.dataset.value=value;
+   b.innerHTML=choicePicture(label,value)+'<strong>'+esc(textContent)+'</strong><span class="pop-picked" aria-hidden="true">★</span>';
+   b.onclick=e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    // A refresh can replace the native options while keeping the same visible buttons.
+    const current=select.options[index];
+    if(!select.isConnected||!current||current.value!==value||current.textContent!==textContent||choiceDisabled(select,current))return;
+    select.selectedIndex=index;
+    select.dispatchEvent(new Event('input',{bubbles:true}));
+    select.dispatchEvent(new Event('change',{bubbles:true}));
+    refreshPopMenus();
+   };
+   group.append(b);
+   return b;
+  });
+  group.dataset.many=String(options.length>8);
+ }
+ group.hidden=select.hidden;
+ for(let i=0;i<row.buttons.length;i++){
+  const b=row.buttons[i],o=options[i],disabled=choiceDisabled(select,o);
+  if(b.disabled!==disabled)b.disabled=disabled;
+  setAttr(b,'aria-pressed',o.selected);
+ }
 }
 function enhanceCheck(input){
  if(checks.has(input)||!allowed(input))return;input.classList.add('pop-native-choice');const b=document.createElement('button');b.type='button';b.className='pop-check-choice';b.setAttribute('aria-label',labelFor(input));input.after(b);

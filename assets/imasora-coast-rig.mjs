@@ -25,7 +25,7 @@ export function coastRigAccess(world,action){
 export function nextCoastRig(old,action,available){
  validateCoastRig(old);const r=old??{version:1,oars:0,equipped:0};
  if(!action||Object.keys(action).sort().join('|')!=='level|type'||!Number.isInteger(action.level))throw Error('装備の操作が違います。');
- if(action.type==='buy'){if(action.level!==r.oars+1||!COAST_OARS[action.level])throw Error('作成済みのオールです。');if(!Number.isSafeInteger(available)||available<COAST_OARS[action.level].cost)throw Error(action.level===3?'航海パーツが足りないよ。散歩・大会・ゲーム・宇宙で集めよう。':'木材が足りないよ。火星の素材ショップで集めよう。');return{...r,oars:action.level,equipped:action.level};}
+ if(action.type==='buy'){if(action.level!==r.oars+1||!COAST_OARS[action.level])throw Error('作成済みのオールです。');if(!Number.isSafeInteger(available)||available<COAST_OARS[action.level].cost)throw Error(action.level===3?'航海パーツが足りないよ。鬼ごっこ・散歩・大会・ゲームセンター・宇宙で集めよう。':'木材が足りないよ。火星の素材ショップで集めよう。');return{...r,oars:action.level,equipped:action.level};}
  if(action.type==='equip'&&action.level>=0&&action.level<=r.oars)return{...r,equipped:action.level};
  throw Error('まだ持っていないオールです。');
 }

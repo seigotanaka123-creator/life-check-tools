@@ -1,3 +1,6 @@
+import{usesRenderedContact}from'./imasora-sliding-tag-hunt-contact-rules.mjs';
+export const JUMP_REST_CONTINUITY_RULES='tag-jump-rest-continuity-v78';
+export const usesContinuousJumpRest=rules=>rules===JUMP_REST_CONTINUITY_RULES||usesRenderedContact(rules);
 export const HUNT_JUMP_REST=1.3;
 export const HUNT_JUMP_QUICK_REST=1.1;
 export function huntJumpRestRemaining(s,a){return a.jumps>0?0:Math.max(0,(a.nextJumpAt??0)-s.time);}

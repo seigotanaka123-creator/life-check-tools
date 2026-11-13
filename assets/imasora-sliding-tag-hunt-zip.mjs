@@ -23,7 +23,7 @@ export function startHuntZip(s,a,p){a.hook={x:p.x,y:p.y,z:p.z,fromX:a.x,fromY:a.
 export function moveHuntZip(s,a,dt){
  const h=a.hook;if(!h)return false;const t=Math.max(0,Math.min(1,(s.time-h.since)/HUNT_ZIP.seconds)),target=point(s,h,t),steps=Math.max(1,Math.ceil(Math.hypot(target.x-a.x,target.z-a.z, target.y-a.y)/HUNT_ZIP.sweep)),from={x:a.x,y:a.y,z:a.z};let stopped=false;
  for(let i=1;i<=steps;i++){const q={x:from.x+(target.x-from.x)*i/steps,y:from.y+(target.y-from.y)*i/steps,z:from.z+(target.z-from.z)*i/steps};if(!clear(s,a,a,q)){stopped=true;break;}Object.assign(a,q);
-  const catcher=s.hunters.find(b=>!b.flight&&!((b.effects?.dizzy??0)>s.time)&&s.time>=(b.noTagUntil??0)&&s.time>=(a.trampolineSafeUntil??0)&&huntBodiesTouch(b,a));if(catcher){s.zipTouch=catcher.owner;stopped=true;break;}
+  const catcher=s.hunters.find(b=>!b.flight&&!((b.effects?.dizzy??0)>s.time)&&s.time>=(b.noTagUntil??0)&&s.time>=(a.trampolineSafeUntil??0)&&huntBodiesTouch(b,a,s));if(catcher){s.zipTouch=catcher.owner;stopped=true;break;}
  }
  a.grounded=false;a.externalForce=true;a.vx=(a.x-from.x)/dt;a.vy=(a.y-from.y)/dt;a.vz=(a.z-from.z)/dt;
  if(stopped||t>=1){const dx=h.toX-h.fromX,dz=h.toZ-h.fromZ,d=Math.hypot(dx,dz)||1;a.hook=null;a.vx=stopped?0:dx/d*HUNT_ZIP.exitSpeed;a.vz=stopped?0:dz/d*HUNT_ZIP.exitSpeed;a.vy=0;const floor=surface(s,a.x,a.z);if(a.y<=floor+.05){a.y=floor;a.grounded=true;a.jumps=0;}}

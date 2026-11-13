@@ -90,13 +90,26 @@ export function worldSight(a,b,padding=0){
  if(minY>=sightMaxGround+.05||minY>=.05&&!sightRaisedGround.some(r=>maxX>=r.minX&&minX<=r.maxX&&maxZ>=r.minZ&&minZ<=r.maxZ))return true;
  const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/3));for(let i=1;i<steps;i++){const t=i/steps,x=ax+dx*t,z=az+dz*t,y=ay+dy*t;if(y<worldHeight(x,z)+.05)return false;}return true;
 }
-function stairJumpAccess(a,x,z,n,radius){const reach=radius+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5)),probe=(dx,dz)=>{const px=a.x+dx*reach,pz=a.z+dz*reach,h=cornerStairHeight(px,pz,WORLD_CORNER_STAIRS);return h>worldGroundHeight(px,pz)&&h>a.y+.6&&h<=a.y+1.41;};return n>.05?probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0):probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);}
+function stairJumpAccess(a,x,z,n,radius,allowTrainingStep){
+ const reach=radius+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5));
+ const lowestStep=WORLD_JUMP_STEPS[0];
+ const probe=(dx,dz)=>{
+  const px=a.x+dx*reach,pz=a.z+dz*reach;
+  const cornerHeight=cornerStairHeight(px,pz,WORLD_CORNER_STAIRS);
+  if(cornerHeight>worldGroundHeight(px,pz)&&cornerHeight>a.y+.6&&cornerHeight<=a.y+1.41)return true;
+  return allowTrainingStep&&lowestStep.h>a.y+.6&&lowestStep.h<=a.y+1.51&&
+   Math.abs(px-lowestStep.x)<=lowestStep.w/2&&Math.abs(pz-lowestStep.z)<=lowestStep.d/2&&
+   worldHeight(px,pz)===lowestStep.h;
+ };
+ if(n>.05)return probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0);
+ return probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);
+}
 export function worldMove(a,input={},dt=STEP){
  const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
  const intendedYaw=n>.05?Math.atan2(x,z):a.yaw;
 
  const t=a.tuning??{accel:1,speed:1,turn:1,brake:1},before={x:a.x,z:a.z,y:a.y},ground=a.grounded,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
- if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
+ if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
  const velocity=Math.hypot(a.vx,a.vz),running=ground&&grip&&!a.externalForce&&!['cushion','sticky'].includes(a.kind);
  if(running){
   const amount=Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=x*limit,tz=z*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*x+a.vz*z)/(velocity*amount)<.95;

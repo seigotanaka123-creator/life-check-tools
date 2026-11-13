@@ -1,5 +1,5 @@
 import{WORLD_BLOCKS,worldHeight,worldSight,worldValid}from'./imasora-sliding-tag-hunt-world.mjs';
-import{INK,ITEM_DEFS,SUPPLY_COUNT}from'./imasora-sliding-tag-hunt-items.mjs';
+import{INK,ITEM_DEFS,SUPPLY_CAPACITY}from'./imasora-sliding-tag-hunt-items.mjs';
 import{MATCH_SECONDS}from'./imasora-sliding-tag-hunt-match.mjs';
 import{controlledHuntActor}from'./imasora-sliding-tag-hunt.mjs';
 import{HUNT_DIVE}from'./imasora-sliding-tag-hunt-dive.mjs';
@@ -34,12 +34,12 @@ function actor(a,previous){return{...row(a),effects:shareEffects(a.effects,previ
 function replaySnapshot(s,pickups,footprints,gadgets,previous){
  const config=previous&&previous.config.mode===s.config.mode?previous.config:Object.freeze({mode:s.config.mode});
  const trampoline=sameRow(s.trampoline,previous?.trampoline)?previous?.trampoline??null:Object.freeze(row(s.trampoline));
- return{time:s.time,phase:s.phase,config,player:actor(s.player,previous?.player),
+ return{rules:s.rules,time:s.time,phase:s.phase,config,player:actor(s.player,previous?.player),
   hunters:s.hunters.slice(0,3).map((hunter,i)=>actor(hunter,previous?.hunters[i])),trampoline,pickups,
   pools:s.pools.slice(0,4).map(row),footprints,gadgets};
 }
 export function huntReplaySnapshot(s){
- return replaySnapshot(s,s.pickups.slice(0,SUPPLY_COUNT).map(row),s.footprints.slice(-INK.maxFootprints).map(row),s.gadgets.slice(0,12).map(row));
+ return replaySnapshot(s,s.pickups.slice(0,SUPPLY_CAPACITY).map(row),s.footprints.slice(-INK.maxFootprints).map(row),s.gadgets.slice(0,12).map(row));
 }
 function sameRow(source,previous){
  if(!source||!previous)return !source&&previous===null;
@@ -380,7 +380,7 @@ export function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlig
    if(diving&&hunter===human)recordHighlight({type:'dive-start',owner:hunter.owner,time:s.time},hunter.owner);
   }
   if(!force&&prev&&s.time-prev.time<1/HUNT_REPLAY_HZ-1e-8)return false;
-  const pickupRows=shareRows(s.pickups,0,Math.min(s.pickups.length,SUPPLY_COUNT),prev?.pickups??[],copySupply);
+  const pickupRows=shareRows(s.pickups,0,Math.min(s.pickups.length,SUPPLY_CAPACITY),prev?.pickups??[],copySupply);
   const footprintCount=Math.min(s.footprints.length,INK.maxFootprints);
   const footprintRows=shareRows(s.footprints,s.footprints.length-footprintCount,footprintCount,prev?.footprints??[],copyFootprint);
   const gadgetRows=shareRows(s.gadgets,0,Math.min(s.gadgets.length,12),prev?.gadgets??EMPTY_GADGETS,(source,previous)=>{

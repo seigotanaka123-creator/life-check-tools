@@ -1,7 +1,7 @@
 import*as T from'./three.module.min.js';
 import{worldSurface}from'./imasora-sliding-tag-hunt-world.mjs';
 import{huntActorConcealed}from'./imasora-sliding-tag-hunt-visibility.mjs';
-import{huntCanObserve}from'./imasora-sliding-tag-hunt-sight.mjs';
+import{huntVisualActorSight}from'./imasora-sliding-tag-hunt-foam-visibility.mjs';
 const EMPTY=Object.freeze([]),CAPACITY=128,SMOKE_LIFE=.62,ECHO_LIFE=.24;
 // Presentation records only. Positions, inputs, contact and round proofs are
 // never modified. Timestamped, immutable puffs also survive replay seeking.
@@ -56,7 +56,7 @@ export function createHuntMotionTrails({scene,reducedMotion}={}){
  });
  const matrix=new T.Matrix4(),position=new T.Vector3(),scale=new T.Vector3(),rotation=new T.Quaternion(),axis=new T.Vector3(0,1,0);
  function put(mesh,index,x,y,z,sx,sy,sz,q,opacity){position.set(x,y,z);scale.set(sx,sy,sz);matrix.compose(position,q,scale);mesh.setMatrixAt(index,matrix);mesh.geometry.attributes.trailAlpha.setX(index,opacity);}
- function setView(s){const actors=[s.player,...s.hunters],viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player;for(let i=0;i<rows.length;i++){const r=rows[i],a=actors[i],hasCues=r.smokeCount>0||r.echoCount>0,visible=!!a&&hasCues&&!huntActorConcealed(s,a)&&(a.owner===viewer.owner?(a.effects?.cloak??0)<=s.time:huntCanObserve(s,viewer,a,Infinity));r.smoke.visible=visible&&r.smokeCount>0;r.echo.visible=visible&&r.echoCount>0;}}
+ function setView(s){const actors=[s.player,...s.hunters],viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player;for(let i=0;i<rows.length;i++){const r=rows[i],a=actors[i],hasCues=r.smokeCount>0||r.echoCount>0,visible=!!a&&hasCues&&!huntActorConcealed(s,a)&&(a.owner===viewer.owner?(a.effects?.cloak??0)<=s.time:huntVisualActorSight(s,{x:viewer.x,y:viewer.y+3,z:viewer.z},a,viewer));r.smoke.visible=visible&&r.smokeCount>0;r.echo.visible=visible&&r.echoCount>0;}}
  function update(s,camera,recorded){
   for(let i=0;i<rows.length;i++){const r=rows[i];r.owner=[s.player,...s.hunters][i]?.owner;r.smokeCount=r.echoCount=0;}
   for(const c of recorded??history.cues){const age=s.time-c.at;if(age<0||age>=c.life)continue;const r=rows.find(r=>r.owner===c.owner);if(!r)continue;const u=age/c.life,fade=(1-u)**1.65;

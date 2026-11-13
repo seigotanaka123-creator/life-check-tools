@@ -31,7 +31,17 @@ export function installColorStudios(panel,{getColor,choose,enabled,changed}){
    target.addEventListener('pointermove',e=>{if(pointer?.id===e.pointerId){e.preventDefault();sample(e,target);}});
    target.addEventListener('pointerup',e=>{if(pointer?.id===e.pointerId){sample(e,target);end();}});
    for(const name of ['pointercancel','lostpointercapture'])target.addEventListener(name,e=>{if(pointer?.id===e.pointerId)end(true);});
-   target.addEventListener('keydown',e=>{if(!enabled()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();if(target.hasAttribute('data-color-hue'))hsv.h=(hsv.h+(e.key==='ArrowLeft'||e.key==='ArrowDown'?-3:3)+360)%360;else if(e.key==='ArrowLeft'||e.key==='ArrowRight')hsv.s=Math.max(0,Math.min(1,hsv.s+(e.key==='ArrowLeft'?-.04:.04)));else hsv.v=Math.max(0,Math.min(1,hsv.v+(e.key==='ArrowDown'?-.04:.04)));set();remember();});
+   target.addEventListener('keydown',event=>{
+    if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(!enabled())return;
+    if(target.hasAttribute('data-color-hue'))hsv.h=(hsv.h+(event.key==='ArrowLeft'||event.key==='ArrowDown'?-3:3)+360)%360;
+    else if(event.key==='ArrowLeft'||event.key==='ArrowRight')hsv.s=Math.max(0,Math.min(1,hsv.s+(event.key==='ArrowLeft'?-.04:.04)));
+    else hsv.v=Math.max(0,Math.min(1,hsv.v+(event.key==='ArrowDown'?-.04:.04)));
+    set();
+    remember();
+   });
   }
  }
  return {refresh:render,cancel:()=>end(true),get busy(){return !!pointer;}};

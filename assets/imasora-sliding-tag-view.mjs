@@ -6,31 +6,61 @@ import*as __tagExternal3 from "./imasora-character-360.js";
 import*as __tagExternal4 from "./imasora-sliding-tag-companion.mjs";
 import*as __tagExternal5 from "./imasora-character-jump-action.mjs?v=120yo";
 import*as __tagExternal6 from "./imasora-touch-layout.mjs";
-const __tagModule1=(()=>{
-// Keep the full rotated arrow clear of viewport edges and occupied HUD regions.
-function huntThreatCuePosition(x,y,view,regions){
- const radius=19;
- const left=view.left+radius,right=view.right-radius,top=view.top+radius,bottom=view.bottom-radius;
- if(left>right||top>bottom)return null;
- const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- const xs=[clamp(x,left,right)],ys=[clamp(y,top,bottom)];
- const blocks=regions.map(r=>({left:r.left-radius,right:r.right+radius,top:r.top-radius,bottom:r.bottom+radius}));
- for(const r of blocks){
-  for(const edge of [r.left,r.right])if(edge>=left&&edge<=right)xs.push(edge);
-  for(const edge of [r.top,r.bottom])if(edge>=top&&edge<=bottom)ys.push(edge);
- }
- let best=null,nearest=Infinity;
- for(const cx of xs)for(const cy of ys){
-  const distance=(cx-x)**2+(cy-y)**2;
-  if(distance>=nearest||blocks.some(r=>cx>r.left&&cx<r.right&&cy>r.top&&cy<r.bottom))continue;
-  best={x:cx,y:cy};nearest=distance;
- }
- return best;
-}
+const __tagModule3=(()=>{
+const RENDERED_CONTACT_RULES='tag-rendered-contact-v79';
+const BALLOON_FAN_DESCENT_RULES='tag-balloon-fan-descent-v80';
+const BALLOON_AIR_APPROACH_RULES='tag-balloon-air-approach-v81';
+const CLOAK_WITNESS_RULES='tag-cloak-witness-v82';
+const DIVE_FACING_RULES='tag-dive-facing-v83';
+const OPENING_SUPPLY_RULES='tag-opening-supply-v84';
+const BALLOON_DROP_PURSUIT_RULES='tag-balloon-drop-pursuit-v85';
+const EXTRA_BALLOONS_RULES='tag-extra-balloons-v86';
+const TRAINING_STEP_RULES='tag-training-step-v87';
+const BALLOON_DESCENT_TURN_RULES='tag-balloon-descent-turn-v88';
+const usesTrainingStep=rules=>rules===TRAINING_STEP_RULES||rules===BALLOON_DESCENT_TURN_RULES;
+const usesExtraBalloons=rules=>rules===EXTRA_BALLOONS_RULES||usesTrainingStep(rules);
+const usesBalloonDropPursuit=rules=>rules===BALLOON_DROP_PURSUIT_RULES||usesExtraBalloons(rules);
+const usesOpeningSupply=rules=>rules===OPENING_SUPPLY_RULES||usesBalloonDropPursuit(rules);
+const usesDiveFacing=rules=>rules===DIVE_FACING_RULES||usesOpeningSupply(rules);
+const usesCloakWitness=rules=>rules===CLOAK_WITNESS_RULES||usesDiveFacing(rules);
+const usesBalloonAirApproach=rules=>rules===BALLOON_AIR_APPROACH_RULES||usesCloakWitness(rules);
+const usesCommittedBalloonDescent=rules=>rules===BALLOON_FAN_DESCENT_RULES||usesBalloonAirApproach(rules);
+const usesRenderedContact=rules=>rules===RENDERED_CONTACT_RULES||usesCommittedBalloonDescent(rules);
 
-return {huntThreatCuePosition};
+return {RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,CLOAK_WITNESS_RULES,DIVE_FACING_RULES,OPENING_SUPPLY_RULES,BALLOON_DROP_PURSUIT_RULES,EXTRA_BALLOONS_RULES,TRAINING_STEP_RULES,BALLOON_DESCENT_TURN_RULES,usesTrainingStep,usesExtraBalloons,usesBalloonDropPursuit,usesOpeningSupply,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,usesCommittedBalloonDescent,usesRenderedContact};
 })();
 const __tagModule2=(()=>{
+const {usesRenderedContact}=__tagModule3;
+const JUMP_REST_CONTINUITY_RULES='tag-jump-rest-continuity-v78';
+const usesContinuousJumpRest=rules=>rules===JUMP_REST_CONTINUITY_RULES||usesRenderedContact(rules);
+const HUNT_JUMP_REST=1.3;
+const HUNT_JUMP_QUICK_REST=1.1;
+function huntJumpRestRemaining(s,a){return a.jumps>0?0:Math.max(0,(a.nextJumpAt??0)-s.time);}
+// Only the start of a new chain rests. A human press during the rest is not
+// queued; release it before the next chain. CPU commands use ordinary input
+// again when ready without keeping a physical key latched.
+function huntJumpInput(s,a,input,{releaseRequired=false}={}){
+ const waiting=huntJumpRestRemaining(s,a)>0;
+ if(releaseRequired){if(!input.jump)delete a.jumpRestRelease;else if(waiting)a.jumpRestRelease=true;}
+ return input.jump&&a.jumps===0&&(waiting||releaseRequired&&a.jumpRestRelease)?{...input,jump:false}:input;
+}
+function recordHuntJumpLanding(s,a,before,rest=HUNT_JUMP_REST){
+ if(!a.kind&&before&&!before.grounded&&before.jumps>0&&a.grounded)a.nextJumpAt=s.time+rest;
+}
+
+return {JUMP_REST_CONTINUITY_RULES,usesContinuousJumpRest,HUNT_JUMP_REST,HUNT_JUMP_QUICK_REST,huntJumpRestRemaining,huntJumpInput,recordHuntJumpLanding};
+})();
+const __tagModule1=(()=>{
+const {usesContinuousJumpRest}=__tagModule2;
+const CLOAK_INK_RULES='tag-cloak-ink-v77';
+// Cloak temporarily hides the whole runner trail, including existing marks.
+// Keep the ink and each mark's ordinary lifetime: nothing is erased or paused.
+// Sunglasses reveal the body as before, but do not restore a suppressed trail.
+function huntInkTrailSuppressed(s){return (s.rules===CLOAK_INK_RULES||usesContinuousJumpRest(s.rules))&&(s.player?.effects?.cloak??0)>s.time;}
+
+return {CLOAK_INK_RULES,huntInkTrailSuppressed};
+})();
+const __tagModule4=(()=>{
 const T=__tagExternal0;
 
 function huntRearMirrorActive(state){
@@ -97,7 +127,7 @@ function createHuntRearMirror(renderer,scene,{withoutLabels=draw=>draw()}={}){
  return{
   hide,
   invalidate(){bounds=null;lastFrame=-Infinity;},
-  draw(now,runner,avatar,shadow,{refresh=false}={}){
+  draw(now,runner,avatar,shadow,{refresh=false,renderView=(_camera,draw)=>draw()}={}){
    if(!target)prepare();
    if(frame.hidden)frame.hidden=false;
    if(!bounds&&!layout())return;
@@ -113,7 +143,7 @@ function createHuntRearMirror(renderer,scene,{withoutLabels=draw=>draw()}={}){
      try{
       renderer.setRenderTarget(target);
       renderer.autoClear=true;
-      withoutLabels(()=>renderer.render(scene,rearCamera));
+      withoutLabels(()=>renderView(rearCamera,()=>renderer.render(scene,rearCamera)));
       lastFrame=now;
      }finally{
       renderer.setRenderTarget(null);
@@ -136,7 +166,7 @@ function createHuntRearMirror(renderer,scene,{withoutLabels=draw=>draw()}={}){
 
 return {huntRearMirrorActive,createHuntRearMirror};
 })();
-const __tagModule3=(()=>{
+const __tagModule5=(()=>{
 // Transfer a completed, recorded round to the home writer. No home save is
 // written by the renderer or the replay verifier.
 function createHuntGrowth({api,entryApi,companion,storage,session,now=Date.now,newId=()=> 'tag:'+crypto.randomUUID(),onNotice=()=>{},onStartNotice=onNotice}){
@@ -211,7 +241,7 @@ function createHuntGrowth({api,entryApi,companion,storage,session,now=Date.now,n
 
 return {createHuntGrowth};
 })();
-const __tagModule4=(()=>{
+const __tagModule6=(()=>{
 const versionOK=v=>typeof v==='string'&&/^[a-z0-9_-]{1,64}$/i.test(v);
 const attribute=(tag,name)=>{const m=tag.match(new RegExp('(?:^|\\s)'+name+'\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))','i'));return m?.[1]??m?.[2]??m?.[3]??null;};
 function huntPreviewVersion(html,pageUrl){
@@ -222,20 +252,25 @@ function huntPreviewVersion(html,pageUrl){
  }catch{return null;}
 }
 
+// Both the world folder and the game-root alias must return to this install.
+function huntHomeUrl(pageUrl,homePath){
+ const page=new URL(pageUrl);
+ let home=new URL(/\/world3d\/[^/]*$/.test(page.pathname)?'../life-quest-walk.html':'./life-quest-walk.html',page);
+ if(homePath)try{
+  const candidate=new URL(homePath,page);
+  if(candidate.origin===page.origin&&candidate.protocol===page.protocol&&!candidate.username&&!candidate.password&&!candidate.pathname.startsWith('//')&&candidate.pathname.endsWith('/life-quest-walk.html'))home=candidate;
+ }catch{}
+ home.search='?from=sliding-tag';
+ home.hash='';
+ return home;
+}
+
 // Check only at a preparation/pause boundary or on return to a visible menu.
 // The old match is never reloaded. A normal link opens a separate new page.
 function createHuntUpdateNotice({document:doc=globalThis.document,windowTarget=doc?.defaultView,container,pageUrl,homePath,version,visible=()=>true,fetcher=globalThis.fetch,clock=Date.now,setTimer=setTimeout,clearTimer=clearTimeout,Controller=globalThis.AbortController}={}){
  const page=new URL(pageUrl),link=doc.createElement('a'),style=doc.createElement('style');
  const homeMode=page.searchParams.get('from')==='home';
- let home=new URL('./life-quest-walk.html',page);
- if(homeMode&&homePath)try{
-  const candidate=new URL(homePath,page);
-  if(candidate.origin===page.origin&&!candidate.username&&!candidate.password&&!candidate.pathname.startsWith('//')&&candidate.pathname.endsWith('/life-quest-walk.html')){
-   candidate.search='';
-   candidate.hash='';
-   home=candidate;
-  }
- }catch{}
+ const home=huntHomeUrl(page,homeMode?homePath:null);
  // The home entry belongs to this tab's sessionStorage. A separate tab
  // starts from home so it can create its own valid entry.
  link.className='hunt-update-link';link.textContent=homeMode?'ホームから更新版へ ↗':'更新版を開く ↗';link.title=homeMode?'新しいタブでホームを開きます。ホームの「鬼ごっこ」から始めてください。':'今の勝負を残して、新しい画面を開きます';link.target='_blank';link.rel='noopener';link.hidden=true;link.dataset.currentVersion=version??'';
@@ -261,9 +296,9 @@ function createHuntUpdateNotice({document:doc=globalThis.document,windowTarget=d
  return{check,dispose,stats:()=>({requests,inFlight:!!request,ready:!link.hidden,version,latest,disposed})};
 }
 
-return {huntPreviewVersion,createHuntUpdateNotice};
+return {huntPreviewVersion,huntHomeUrl,createHuntUpdateNotice};
 })();
-const __tagModule8=(()=>{
+const __tagModule10=(()=>{
 // Shared dimensions for collision, navigation, camera occlusion and scenery.
 // The two side approaches remain walkable by the widest six-unit body.
 const CORNER_STAIR_SPEC=Object.freeze({count:4,rise:1.4,tread:18,top:32,rampWidth:24,rampRun:72,rampSlopeRun:10});
@@ -281,7 +316,7 @@ function cornerStairGeometry(corners){const slabs=[],edges=[],positions=[];const
 
 return {CORNER_STAIR_SPEC,makeCornerStairs,cornerRampHeight,cornerStairHeight,cornerStairReserved,cornerStairGeometry};
 })();
-const __tagModule9=(()=>{
+const __tagModule11=(()=>{
 // One catalogue for simulation, pickup models and the single use button.
 const rows=[
  ['speed','かぜリボン','🎀','#ffcf62','player','3秒、ぐんと加速'],
@@ -304,6 +339,8 @@ const ITEM_TYPES=Object.freeze(rows.map(r=>r[0]));
 const PLAYER_ITEMS=Object.freeze(rows.filter(r=>r[4]==='player'||r[4]==='both').map(r=>r[0]));
 const HUNTER_ITEMS=Object.freeze(rows.filter(r=>r[4]==='hunters'||r[4]==='both').map(r=>r[0]));
 const SUPPLY_COUNT=PLAYER_ITEMS.length+HUNTER_ITEMS.length;
+const EXTRA_BALLOON_COUNT=2;
+const SUPPLY_CAPACITY=SUPPLY_COUNT+EXTRA_BALLOON_COUNT;
 const INK=Object.freeze({markUntilRoundEnd:true,trailSeconds:15,maxFootprints:256});
 const HUNT_FIELDS=Object.freeze({sheetRadius:16,curtainRadius:18,curtainHeight:12,fanRadius:4.5,fanHeight:9.7,fanSeconds:12,windRange:42});
 // These are actual visible poles; the rope never attaches to an invisible point.
@@ -329,15 +366,15 @@ function itemIcon(id){const c=ITEM_DEFS[id]?.color||'#d7e9ef',shapes={
 // intentionally differ from opponent-only ink; do not infer target from user.
 const ITEM_EFFECT_SCOPE=Object.freeze({speed:'self',cloak:'self',clone:'hunter-decoy',cushion:'physical-all',curtain:'sight-all',fan:'physical-all',sheet:'terrain-all',hook:'self',scarf:'self',sunglasses:'self',ink:'runner-only',balloon:'self',radar:'self',mirror:'self'});
 
-return {ITEM_DEFS,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,SUPPLY_COUNT,INK,HUNT_FIELDS,HOOK_POLES,itemIcon,ITEM_EFFECT_SCOPE};
+return {ITEM_DEFS,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,SUPPLY_COUNT,EXTRA_BALLOON_COUNT,SUPPLY_CAPACITY,INK,HUNT_FIELDS,HOOK_POLES,itemIcon,ITEM_EFFECT_SCOPE};
 })();
-const __tagModule7=(()=>{
-const {makeCornerStairs,cornerStairHeight,cornerStairReserved}=__tagModule8;
+const __tagModule9=(()=>{
+const {makeCornerStairs,cornerStairHeight,cornerStairReserved}=__tagModule10;
 // New hunt-world physics under construction. The live v13 preview stays untouched.
 // Shared roster and timing; coordinate scale follows the canonical .36-scale Ren model.
 const {STEP,actor,match,opponentSpec,OPPONENTS,TAG_CHARACTERS,BODY : LEGACY_BODY}=__tagExternal1;
 const {SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,SKY_MAX_JUMPS,releasedJumpVelocity}=__tagExternal2;
-const {HOOK_POLES}=__tagModule9;
+const {HOOK_POLES}=__tagModule11;
 
 const HUNT_REFERENCE_HEIGHT=26.485200549316403;
 const HUNT_CHARACTER_HEIGHT=5.4;
@@ -424,13 +461,26 @@ function worldSight(a,b,padding=0){
  if(minY>=sightMaxGround+.05||minY>=.05&&!sightRaisedGround.some(r=>maxX>=r.minX&&minX<=r.maxX&&maxZ>=r.minZ&&minZ<=r.maxZ))return true;
  const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/3));for(let i=1;i<steps;i++){const t=i/steps,x=ax+dx*t,z=az+dz*t,y=ay+dy*t;if(y<worldHeight(x,z)+.05)return false;}return true;
 }
-function stairJumpAccess(a,x,z,n,radius){const reach=radius+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5)),probe=(dx,dz)=>{const px=a.x+dx*reach,pz=a.z+dz*reach,h=cornerStairHeight(px,pz,WORLD_CORNER_STAIRS);return h>worldGroundHeight(px,pz)&&h>a.y+.6&&h<=a.y+1.41;};return n>.05?probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0):probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);}
+function stairJumpAccess(a,x,z,n,radius,allowTrainingStep){
+ const reach=radius+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5));
+ const lowestStep=WORLD_JUMP_STEPS[0];
+ const probe=(dx,dz)=>{
+  const px=a.x+dx*reach,pz=a.z+dz*reach;
+  const cornerHeight=cornerStairHeight(px,pz,WORLD_CORNER_STAIRS);
+  if(cornerHeight>worldGroundHeight(px,pz)&&cornerHeight>a.y+.6&&cornerHeight<=a.y+1.41)return true;
+  return allowTrainingStep&&lowestStep.h>a.y+.6&&lowestStep.h<=a.y+1.51&&
+   Math.abs(px-lowestStep.x)<=lowestStep.w/2&&Math.abs(pz-lowestStep.z)<=lowestStep.d/2&&
+   worldHeight(px,pz)===lowestStep.h;
+ };
+ if(n>.05)return probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0);
+ return probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);
+}
 function worldMove(a,input={},dt=STEP){
  const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
  const intendedYaw=n>.05?Math.atan2(x,z):a.yaw;
 
  const t=a.tuning??{accel:1,speed:1,turn:1,brake:1},before={x:a.x,z:a.z,y:a.y},ground=a.grounded,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
- if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
+ if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
  const velocity=Math.hypot(a.vx,a.vz),running=ground&&grip&&!a.externalForce&&!['cushion','sticky'].includes(a.kind);
  if(running){
   const amount=Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=x*limit,tz=z*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*x+a.vz*z)/(velocity*amount)<.95;
@@ -690,8 +740,8 @@ function worldCameraInput(memory,x,z,renderYaw){const length=Math.hypot(x,z);if(
 
 return {STEP,TAG_CHARACTERS,actor,opponentSpec,HUNT_REFERENCE_HEIGHT,HUNT_CHARACTER_HEIGHT,HUNT_MAP_SCALE,HUNT_JUMP,BODY,WORLD_RADII,WORLD_RULES,WORLD_DASH_FORCE,WORLD,WORLD_CORNER_STAIRS,WORLD_JUMP_STEPS,WORLD_HILL,WORLD_BASIN,WORLD_RISE,WORLD_ICE_LOOP,WORLD_DECK,WORLD_RIDGE,worldGroundHeight,worldGradient,worldBasinContours,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_PATHS,WORLD_COURTYARD,WORLD_BLOCKS,WORLD_TREES,worldHeight,worldSurface,worldValid,worldSight,worldMove,worldTraversable,WORLD_NAV_COUNT,worldRouteSeconds,worldRoute,worldRouteLookahead,worldSearchPlan,worldEscapeClearance,worldEscapePlan,worldEscapeTeamPlan,worldSteering,worldHuntAim,worldPilot,WORLD_STARTS,worldStart,worldNextStart,worldMatch,worldStep,worldCameraPose,worldCameraInput};
 })();
-const __tagModule6=(()=>{
-const {worldCameraPose,worldHeight,worldSight}=__tagModule7;
+const __tagModule8=(()=>{
+const {worldCameraPose,worldHeight,worldSight}=__tagModule9;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),DEG=Math.PI/180;
 // Exact rate-limited first-order easing. No rounding to direction sectors.
 function easeHuntCamera(value,goal,dt,{rate=60*DEG,response=8,angle=false}={}){
@@ -725,7 +775,7 @@ function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={}){
   if(clear===clearRay)lastRay={x:target.x,y:target.y,z:target.z,yaw,pitch,distance,safe};
   return safe;
  }
- return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false,following=false}={}){
+ return{reset(options){state=options&&Number.isFinite(options.yaw)?{yaw:options.yaw,pitch:options.pitch??.28,distance:null}:null;lastPlan=lastRay=null;frames=maxYawStep=maxPitchStep=collisions=planChecks=rayChecks=0;},update(target,{yaw=0,pitch=.28,distance=31,minDistance=16,dt=0,keepAngle=false,following=false,reversing=false}={}){
    const t=clamp(Number.isFinite(dt)?dt:0,0,.1),idealPitch=clamp(pitch,.1,1.3);if(!state)state={yaw,pitch:idealPitch,distance:null};
    // The old obstacle planner selects only a goal. Its side/high-angle choices
    // are never used as an immediate rendered camera position.
@@ -735,7 +785,8 @@ function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={}){
    // eventually sent the camera the opposite way around the actor. Follow
    // the committed body pose with bounded, time-based lag; walls shorten the
    // ray instead of choosing a new heading unrelated to the player's turn.
-   const yawStep=easeHuntCamera(state.yaw,goal.yaw,t,{angle:true,rate:(following?180:60)*DEG,response:8})-state.yaw;
+   const quickReverse=following&&reversing;
+   const yawStep=easeHuntCamera(state.yaw,goal.yaw,quickReverse?Math.min(t,1/13):t,{angle:true,rate:(quickReverse?255:following?180:60)*DEG,response:quickReverse?11:8})-state.yaw;
    state.yaw+=following?yawStep:clamp(yawStep,-DEG,DEG);
    state.pitch+=clamp(easeHuntCamera(state.pitch,goal.pitch,t,{rate:45*DEG})-state.pitch,-DEG,DEG);
    const h=Math.cos(state.pitch),rayX=Math.sin(state.yaw)*h,rayY=Math.sin(state.pitch),rayZ=Math.cos(state.yaw)*h;
@@ -751,9 +802,9 @@ function createHuntSmoothCamera({plan=worldCameraPose,clear=clearRay}={}){
 
 return {easeHuntCamera,createHuntSmoothCamera};
 })();
-const __tagModule5=(()=>{
-const {createHuntSmoothCamera}=__tagModule6;
-const {worldCameraPose,worldSight}=__tagModule7;
+const __tagModule7=(()=>{
+const {createHuntSmoothCamera}=__tagModule8;
+const {worldCameraPose,worldSight}=__tagModule9;
 // A replay begins with its own establishing shot. The ordinary camera's
 // history remains available when returning to the result or starting again.
 function createHuntReplayCamera({plan=worldCameraPose,clear}={}){
@@ -793,7 +844,7 @@ function createHuntReplayCamera({plan=worldCameraPose,clear}={}){
 
 return {createHuntReplayCamera};
 })();
-const __tagModule10=(()=>{
+const __tagModule12=(()=>{
 function createHuntSettingsMenu({documentTarget=document,clearInput=()=>{},touchPanel,liveButton}={}){
  const doc=documentTarget,keys=doc.getElementById('keys'),sound=doc.getElementById('sound-toggle'),old=keys.closest('details'),dialog=doc.createElement('dialog');dialog.className='tag-options';dialog.id='tag-options';dialog.setAttribute('aria-labelledby','tag-options-title');
  dialog.innerHTML='<div class="to-shell"><header><div><small>IMASORA TAG</small><h2 id="tag-options-title">操作・サウンド設定</h2></div><button type="button" data-to-close aria-label="設定を閉じる">閉じる ×</button></header><nav role="tablist" aria-label="設定の種類"><button role="tab" data-to-tab="keyboard">⌨ キーボード</button><button role="tab" data-to-tab="touch">☝ スマホ</button><button role="tab" data-to-tab="sound">♪ サウンド</button></nav><div class="to-scroll"><section data-to-panel="keyboard" role="tabpanel"></section><section data-to-panel="touch" role="tabpanel"></section><section data-to-panel="sound" role="tabpanel"><h3>効果音</h3><p>音を出さなくても、画面の合図で遊べます。</p></section></div><footer>変更は自動で保存されます。</footer></div>';
@@ -817,18 +868,29 @@ function createHuntSettingsMenu({documentTarget=document,clearInput=()=>{},touch
 
 return {createHuntSettingsMenu};
 })();
-const __tagModule12=(()=>{
+const __tagModule14=(()=>{
 const MATCH_SECONDS=180;
 // 120 physics ticks/sec, including countdown and floating-point boundary margin.
 const TRACE_CAPACITY=(MATCH_SECONDS+2)*120+32;
 
 return {MATCH_SECONDS,TRACE_CAPACITY};
 })();
-const __tagModule11=(()=>{
-const {MATCH_SECONDS}=__tagModule12;
+const __tagModule13=(()=>{
+const {MATCH_SECONDS}=__tagModule14;
 // Decorative SVG and CSS only. Existing controls are moved, never replaced,
 // so pause/resume, keyboard settings and saved choices retain their owners.
 const illustration=`<svg viewBox="0 0 440 330" aria-hidden="true" focusable="false"><defs><linearGradient id="tm-ice" x2="1" y2="1"><stop stop-color="#77d9d4"/><stop offset="1" stop-color="#335d80"/></linearGradient><linearGradient id="tm-body" x2=".5" y2="1"><stop stop-color="#fffef2"/><stop offset="1" stop-color="#b6dfdf"/></linearGradient><g id="tm-pal"><ellipse cx="0" cy="42" rx="34" ry="9" fill="#102d47" opacity=".3"/><ellipse cx="-15" cy="34" rx="12" ry="7" fill="#6f5266"/><ellipse cx="17" cy="32" rx="12" ry="7" fill="#6f5266"/><path d="M-35 10Q-45-37-8-47Q27-57 37-10Q47 37 8 39Q-27 44-35 10" fill="url(#tm-body)" stroke="#fff" stroke-width="2"/><ellipse cx="-37" cy="8" rx="9" ry="10" fill="#58baa9"/><ellipse cx="38" cy="4" rx="9" ry="10" fill="#58baa9"/><circle cx="-11" cy="-5" r="4" fill="#24425b"/><circle cx="12" cy="-7" r="4" fill="#24425b"/><path d="M-3 5q7 6 13-1" fill="none" stroke="#24425b" stroke-width="2" stroke-linecap="round"/></g></defs><g opacity=".45" fill="#487b95" stroke="#83c9d0"><path d="M20 180V70l40-20 42 25v105M116 190V30l48-20 40 28v142M272 180V64l30-19 47 28v100M359 195V35l38-20 32 27v150"/><path d="M30 90l50-10m-50 30 50-10m50-42 53-15m-53 40 53-15m99 25 43 6m44-53 32-10m-32 36 32-10" fill="none" stroke-width="5"/></g><path d="M0 242l216-97 224 113-218 72z" fill="url(#tm-ice)"/><path d="M-5 284l219-97 205 101M91 205l226 107M157 177l231 107" fill="none" stroke="#b5f9ec" stroke-opacity=".35"/><path d="M53 241q55-93 138-42t148 13" fill="none" stroke="#ffdc90" stroke-width="3" stroke-dasharray="5 9"/><g transform="translate(101 166) scale(.63) rotate(-13)"><use href="#tm-pal"/><path d="M-34-1q31 14 69-7" fill="none" stroke="#f29c99" stroke-width="8"/></g><g transform="translate(166 142) scale(.55) rotate(10)"><use href="#tm-pal"/><path d="M-34-1q31 14 69-7" fill="none" stroke="#a7a4ed" stroke-width="8"/></g><g transform="translate(198 209) scale(.58) rotate(-8)"><use href="#tm-pal"/><path d="M-34-1q31 14 69-7" fill="none" stroke="#ffcb77" stroke-width="8"/></g><g transform="translate(311 204) rotate(10)"><use href="#tm-pal"/><path d="M-33-1q31 14 68-7l-9 15-29 2 19 22-25-5-13-20z" fill="#76cbe1"/></g><g fill="none" stroke="#fff0c7" stroke-width="3" stroke-linecap="round"><path d="M244 195l-23 4m22 11-17 7M342 132v14m-7-7h14M67 143v12m-6-6h12"/></g></svg>`;
+
+function rollHuntOpponents(ids, current, random = Math.random) {
+ const previous = new Set(current);
+ const available = [...new Set(ids)].filter(id => !previous.has(id));
+ if (available.length < current.length) return null;
+
+ return current.map(() => {
+  const index = Math.floor(random() * available.length);
+  return available.splice(index, 1)[0];
+ });
+}
 
 function installHuntMenu(doc=globalThis.document){
  const card=doc.querySelector('#panel .card');if(!card||card.classList.contains('tag-menu-shell'))return;
@@ -838,8 +900,12 @@ function installHuntMenu(doc=globalThis.document){
  hero.append(brand,doc.querySelector('#title'),meta,art,doc.querySelector('#note'));
  const move=(parent,selector)=>{const node=card.querySelector(selector);if(node)parent.append(node);};
  scroll.append(heading);for(const q of['#play-roles','#roles','#opponent-slots','.start-auto'])move(scroll,q);
- utilities.append(guide);scroll.append(utilities);for(const q of['#best','details','#companion-note','#home-return','.practice-note'])move(scroll,q);
- for(const q of['#resume','#begin'])move(actions,q);setup.append(scroll,actions);card.replaceChildren(hero,setup);card.classList.add('tag-menu-shell');
+
+ const roulette = make('div', 'tm-roulette');
+ roulette.innerHTML = '<button type="button" id="roll-opponents" aria-controls="opponent-slots"><span aria-hidden="true">⟳</span>CPUメンバールーレット</button><span id="roll-opponents-result" role="status" class="tm-sr-only"></span>';
+ scroll.insertBefore(roulette, scroll.querySelector('.start-auto'));
+ utilities.append(guide);scroll.append(utilities);for(const q of['#best','details','#companion-note','.practice-note'])move(scroll,q);
+ for(const q of['#resume','#begin','#home-return'])move(actions,q);setup.append(scroll,actions);card.replaceChildren(hero,setup);card.classList.add('tag-menu-shell');
 }
 
 const menuCss=`
@@ -853,21 +919,36 @@ body.hunt:has(#panel:not([hidden])) .game-hud #live-open[data-owned=true]{visibi
 .tm-match{display:flex;flex-wrap:wrap;gap:8px}.tm-match>span{border:1px solid #9bcbd34d;background:#08263e55;padding:7px 12px;border-radius:10px;font-size:12px;color:#c2dfe1}.tm-match b{font-size:21px;color:#ffe1a0;margin-right:3px}.tm-art{margin:24px -28px 0;flex:1;display:flex;align-items:center;min-height:130px}.tm-art svg{width:100%;max-height:330px;overflow:visible}#panel .tag-menu-hero #note{color:#cbe4e3;font-size:14px;line-height:1.7;margin:10px 0 0}
 .tag-menu-setup{min-width:0;min-height:0;display:flex;flex-direction:column;background:linear-gradient(150deg,#19394e,#112b40)}.tm-scroll{padding:26px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;scrollbar-color:#5b8290 #122e43}.tm-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.tm-heading b{font-size:19px;color:#fff5d6}.tm-heading small{font-size:11px;color:#a1c8cc;border:1px solid #72aaa355;border-radius:20px;padding:5px 9px}
 #panel #play-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 10px}#panel #play-roles button{border:1px solid #6c9aa7;border-radius:15px;min-height:56px;background:#23475a;color:#bfd6df;box-shadow:0 3px 0 #061c30;font-size:18px}#panel #play-roles button[aria-pressed=true]{border-color:#9ff3d7;background:linear-gradient(135deg,#76d6bd,#b6ebce);color:#163d4c;box-shadow:0 3px 0 #347b76,inset 0 1px #fff9}#panel #play-roles button[data-role=hunt][aria-pressed=true]{border-color:#ffe0ae;background:linear-gradient(135deg,#f0b08c,#ffdbaf);color:#583e44;box-shadow:0 3px 0 #9a6a58,inset 0 1px #fff9}
-#panel #roles{font-size:12px;letter-spacing:.02em;color:#9fc2ce;text-align:center;margin:8px 0 16px}#panel #opponent-slots{gap:9px;margin:0 0 10px}#panel .opponent-slot{position:relative;overflow:hidden;min-width:0;min-height:164px;padding:14px 9px 11px;border:1px solid #7796a0;border-top:3px solid var(--slot-color,#8ee0d6);border-radius:15px;background:linear-gradient(155deg,#2c5367,#1b3b51);color:#e8f6f6;box-shadow:0 4px 0 #091e31;text-align:left;transition:border-color .15s,transform .15s}#panel .opponent-slot:hover{border-color:#c4f2e0;transform:translateY(-2px)}#panel .opponent-slot b{font-size:11px;color:var(--slot-color,#8ee0d6);letter-spacing:.04em;margin-bottom:9px}#panel .opponent-slot strong{font-size:13px;line-height:1.5;min-height:39px;color:#fff9e8}#panel .opponent-slot small{font-size:10px;color:#b1d0d6;margin:5px 0 10px}#panel .opponent-slot>span{font-size:10px;color:#e6ddbd;margin-top:10px}.tm-scores{display:grid;gap:4px}.tm-score{display:flex;align-items:center;gap:5px}.tm-score label{font-size:9px;min-width:3em;color:#a4c6ce}.tm-score i{height:4px;flex:1;background:#0b273b;border-radius:4px;overflow:hidden}.tm-score i:before{content:'';display:block;width:var(--score);height:100%;border-radius:4px;background:var(--slot-color,#8ee0d6)}
+#panel #roles{font-size:12px;letter-spacing:.02em;color:#9fc2ce;text-align:center;margin:8px 0 16px}#panel #opponent-slots{gap:9px;margin:0 0 10px}#panel .opponent-slot{position:relative;overflow:hidden;min-width:0;min-height:164px;padding:14px 9px 11px;border:1px solid #7796a0;border-top:3px solid var(--slot-color,#8ee0d6);border-radius:15px;background:linear-gradient(155deg,#2c5367,#1b3b51);color:#e8f6f6;box-shadow:0 4px 0 #091e31;text-align:left;transition:border-color .15s,transform .15s}#panel .opponent-slot:hover{border-color:#c4f2e0;transform:translateY(-2px)}#panel .opponent-slot b{font-size:11px;color:var(--slot-color,#8ee0d6);letter-spacing:.04em;margin-bottom:9px}#panel .opponent-slot strong{font-size:13px;line-height:1.5;min-height:39px;color:#fff9e8}#panel .opponent-slot small{font-size:10px;color:#b1d0d6;margin:5px 0 10px}#panel .opponent-slot>span{font-size:10px;color:#e6ddbd;margin-top:10px}
+#panel .tm-roulette{margin:12px 0 0}
+#panel #roll-opponents{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:46px;padding:7px 14px;border:1px solid #8ccabf;border-radius:13px;background:linear-gradient(110deg,#285c64,#1e455c);color:#f4fff2;font-size:15px;font-weight:850;box-shadow:0 3px #0c2436}
+#panel #roll-opponents:hover{background:linear-gradient(110deg,#367472,#285771)}
+#panel #roll-opponents span{display:grid;place-items:center;width:26px;height:26px;border:1px solid #b6ece0;border-radius:50%;color:#f9deb0;font-size:19px;line-height:1}
+.tm-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(prefers-reduced-motion:no-preference){
+ #panel .opponent-slot[data-rolled] strong{animation:tag-roulette-name 300ms cubic-bezier(.18,.73,.31,1) var(--roll-delay,0ms) backwards}
+ #panel .opponent-slot[data-rolled]::after{content:'';position:absolute;inset:0;border-radius:inherit;border:2px solid var(--slot-color);background:linear-gradient(transparent 30%,#c1fff333 55%,transparent 80%);pointer-events:none;animation:tag-roulette-glow 420ms ease-out var(--roll-delay,0ms) both}
+ @keyframes tag-roulette-name{from{transform:translateY(-10px);opacity:.32}to{transform:translateY(0);opacity:1}}
+ @keyframes tag-roulette-glow{from{opacity:.8}to{opacity:0}}
+}
+.tm-scores{display:grid;gap:4px}.tm-score{display:flex;align-items:center;gap:5px}.tm-score label{font-size:9px;min-width:3em;color:#a4c6ce}.tm-score i{height:4px;flex:1;background:#0b273b;border-radius:4px;overflow:hidden}.tm-score i:before{content:'';display:block;width:var(--score);height:100%;border-radius:4px;background:var(--slot-color,#8ee0d6)}
 #panel .start-auto{font-size:11px;color:#91b8c2;margin:12px 0 17px;text-align:right}.tm-utilities{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:stretch}.tm-guide-slot{display:contents}.tm-utilities>button,.tm-utilities .tag-guide-open{margin:0!important;min-height:48px!important;font-size:13px!important;padding:8px 10px!important;border:1px solid #5a8898!important;border-radius:13px!important;background:#254a60!important;color:#e0f1f0!important;box-shadow:0 3px #0c2235!important}.tm-utilities>button:hover,.tm-utilities .tag-guide-open:hover{background:#34647a!important}
 #panel .tm-actions{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;padding:17px 26px 20px;border-top:1px solid #6c9ea744;background:#0c263c;box-shadow:0 -10px 24px #0b263b33}#panel .tm-actions>button{flex:1;margin:0;min-width:0;min-height:55px;border-radius:15px;font-size:20px;font-weight:900}#panel .tm-actions #begin{border:1px solid #ffedbc;background:linear-gradient(#ffe1a0,#f4bb6e);color:#4e3a35;box-shadow:0 4px #a57346,inset 0 1px #fff}#panel .tm-actions #resume{border:1px solid #bcf4d6;background:linear-gradient(#bceccf,#70cdb7);color:#1f4b4e;box-shadow:0 4px #397d76,inset 0 1px #fff}#panel .tm-actions #resume:not([hidden])~#begin{font-size:14px;background:#27475b;border-color:#668895;color:#d6e7e7;box-shadow:0 3px #071b2b}
-#panel details{border:1px solid #547f8e;border-radius:12px;padding:12px;background:#183c50;color:#cee2e4;margin:18px 0 0}#panel summary{font-size:13px}#panel details button{color:#264e61}#panel #keys{color:#dceef1}#panel #home-return{background:transparent;border:0;box-shadow:none;text-decoration:underline;text-underline-offset:3px;color:#b8eee0;font-size:12px;padding:12px 0 3px}#panel #best,#panel #companion-note,#panel .practice-note{color:#93b7c3;font-size:11px}#panel .practice-note{line-height:1.7}
-.tag-select{border-color:#80b0bc!important;background:#17384d!important;color:#e9f7ef!important;box-shadow:0 30px 100px #051a39aa!important}.tag-select::backdrop{background:#061a36cc!important}.tag-select header,.tag-select footer{background:#102b43!important;color:#fff1cf!important}.tag-select h2,.tag-select h3{color:#fff1cf!important}.tag-select button{background:#2d556a;color:#edf8ee;border:1px solid #7ba8b6;box-shadow:0 3px #091e35}.tag-select button[aria-pressed=true],.tag-select [data-choose]{background:linear-gradient(#b4ebd1,#7bcebc)!important;color:#173f4e!important;border-color:#cef8da!important}.tag-select .ts-stage{background:radial-gradient(ellipse at 50% 45%,#deece5,#85b5bb)!important}.tag-select .ts-info{background:#20445a!important;border-color:#5f8b9c!important}.tag-select .ts-grid button{background:#244a61!important;color:#fff4de!important;border-color:#668d9f!important}.tag-select .ts-search{background:#102c43!important;color:#edf7ee!important;border-color:#5e899a!important}.tag-select input::placeholder{color:#a4c6cf}
+#panel details{border:1px solid #547f8e;border-radius:12px;padding:12px;background:#183c50;color:#cee2e4;margin:18px 0 0}#panel summary{font-size:13px}#panel details button{color:#264e61}#panel #keys{color:#dceef1}#panel .tm-actions #home-return{display:flex;justify-content:center;align-items:center;gap:8px;flex:0 1 auto;padding:9px 16px;border:1px solid #9ecfc7;background:linear-gradient(#326075,#24465c);box-shadow:inset 0 1px #b9eed653,0 4px #102b40;color:#f2fff7;font-size:clamp(13px,2.8vw,16px);line-height:1.25;text-align:center}#panel #home-return svg{width:19px;height:19px;flex:none}#panel #home-return:active{transform:translateY(2px);box-shadow:inset 0 1px #b9eed626,0 1px #102b40}#panel #home-return:focus-visible{outline:2px solid #fff1b7;outline-offset:3px}#panel #best,#panel #companion-note,#panel .practice-note{color:#93b7c3;font-size:11px}#panel .practice-note{line-height:1.7}
 @media(max-width:650px){#panel{padding:10px}#panel .tag-menu-shell{display:flex;flex-direction:column;width:100%;height:calc(100dvh - 20px);max-height:calc(100dvh - 20px);border-radius:22px}.tag-menu-hero{padding:18px 19px;min-height:145px;flex-shrink:0;border-right:0;border-bottom:1px solid #87b7c333}.tag-menu-hero .tm-art{position:absolute;width:180px;height:145px;min-height:0;right:-6px;bottom:-18px;opacity:.85;margin:0;pointer-events:none}#panel .tm-brand{font-size:8px;letter-spacing:1.3px;margin-bottom:8px}#panel .tag-menu-hero h1{font-size:26px;line-height:1.2;max-width:none;margin:0 0 10px;z-index:1}.tm-match{gap:6px}.tm-match>span{font-size:10px;padding:4px 7px}.tm-match b{font-size:16px}#panel .tag-menu-hero #note{font-size:11px;max-width:68%;margin-top:7px;line-height:1.5}.tag-menu-setup{flex:1}.tm-scroll{padding:17px 15px}.tm-heading b{font-size:16px}.tm-heading small{font-size:9px}#panel #play-roles{margin-top:12px}#panel #play-roles button{font-size:16px;min-height:49px}#panel .opponent-slot{padding:11px 8px 9px;min-height:159px}#panel .opponent-slot strong{font-size:12px;line-height:1.45;min-height:33px}#panel .opponent-slot b{font-size:10px}#panel .opponent-slot small{font-size:9px}#panel .opponent-slot>span{font-size:9px}#panel #opponent-slots{gap:6px}.tm-score label{font-size:8px}#panel .tm-actions{padding:13px 15px 16px}#panel .tm-actions>button{min-height:53px;font-size:18px}.tm-utilities>button,.tm-utilities .tag-guide-open{font-size:12px!important}}
 @media(max-height:480px) and (min-width:651px){#panel{padding:8px}#panel .tag-menu-shell{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px);grid-template-columns:32% 68%;border-radius:19px}.tag-menu-hero{padding:20px}.tag-menu-hero .tm-art{margin:0 -20px;min-height:60px}.tag-menu-hero .tm-art svg{max-height:160px}#panel .tm-brand{font-size:8px;margin-bottom:12px}#panel .tag-menu-hero h1{font-size:28px;margin-bottom:12px}#panel .tag-menu-hero #note{font-size:11px}.tm-match>span{padding:4px 7px;font-size:10px}.tm-match b{font-size:16px}.tm-scroll{padding:16px 19px}#panel .tm-actions{padding:10px 19px 13px}#panel .tm-actions>button{min-height:48px;font-size:18px}}
 
 body.hunt .imasora-live-card{background:linear-gradient(145deg,#244b60,#132f46);color:#dfeee8;border:1px solid #8bb6bd;box-shadow:0 24px 80px #061e38aa}body.hunt .imasora-live-card h2{color:#fff0cc}body.hunt .imasora-live-card button{background:#345d70;color:#f3efd7;border-color:#86a8af;box-shadow:0 3px #0c263b}body.hunt .imasora-live-status{background:#102d44;color:#bfe5db}body.hunt .imasora-live-card a{color:#b7e7dd}body.hunt .imasora-live-card input{background:#eaf4eb;color:#173b4d}body.hunt #round-result{background:linear-gradient(145deg,#254c60,#122e44);border:1px solid #8ab9c1;color:#e5f3ef;box-shadow:0 5px #0a2238,0 18px 50px #061d3a66}body.hunt #round-result h2,body.hunt #round-result .tr-metric strong{color:#ffdfa1}body.hunt #round-result .tr-best{color:#b9e8cf}body.hunt #round-result .tr-metric small,body.hunt #round-result .tr-share-notice{color:#afcfd2}body.hunt #round-result button{border-color:#95b2b6}body.hunt #round-result [data-configure],body.hunt #round-result [data-share]{background:#355c70;color:#e8f1e8}
+/* Keep secondary actions readable on the actual dark result card. */
+body.hunt #round-result .tr-replays::before,body.hunt #round-result .tr-video-tools>summary,body.hunt #round-result .tr-video-preview>summary{color:#e2f3ec}
+body.hunt #round-result .tr-video-tools .sharing-inline-notice{color:#cfe6e3}body.hunt #round-result .tr-video-tools .sharing-inline-notice a{color:#b7f0e4}
+body.hunt #round-result #round-growth-status{color:#d2f1de!important}
 #panel button:focus-visible,.tag-select button:focus-visible{outline:3px solid #fff0b5;outline-offset:3px}@media(prefers-reduced-motion:reduce){#panel .opponent-slot{transition:none}}
 `;
 
-return {installHuntMenu};
+return {rollHuntOpponents,installHuntMenu};
 })();
-const __tagModule13=(()=>{
+const __tagModule15=(()=>{
 const T=__tagExternal0;
 // Fit once in the character's own coordinates. Model normalization, slopes,
 // diving and somersaults then move the fitted glasses together with the face.
@@ -891,7 +972,7 @@ function createHuntSunglasses(model){
 
 return {createHuntSunglasses};
 })();
-const __tagModule14=(()=>{
+const __tagModule16=(()=>{
 const T=__tagExternal0;
 // Fit crosses to the same real eyes used for the glasses. Stars stay above
 // the normalized character height, without changing the body/contact volume.
@@ -909,19 +990,59 @@ function createHuntDizzyView({model,root,eyeFit,eyes=[]}){
 
 return {createHuntDizzyView};
 })();
-const __tagModule16=(()=>{
+const __tagModule18=(()=>{
 // Generated from the actual normalized body and hand meshes; accessories are excluded.
 const HUNT_TOUCH_SHAPES=Object.freeze({"white-michi-road-saber-ren":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"hero-white-young-seed-walk-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-white-young-seed-walk-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-white-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-white-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-white-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-white-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-walk-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-walk-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-sky-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-sky-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-sky-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-sky-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-sky-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-sky-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-leaf-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-leaf-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-leaf-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-leaf-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-leaf-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-leaf-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-city-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-city-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-city-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-city-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-city-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-city-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-river-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-river-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-river-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-river-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-river-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-river-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-night-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-night-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-night-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-night-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-night-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-night-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-luck-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-luck-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-luck-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-luck-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-luck-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-luck-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"star-white-hero-young-seed-walk-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-white-hero-young-seed-walk-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-white-hero-young-seed-walk-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-white-hero-young-seed-walk-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-white-hero-young-seed-walk-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-white-hero-young-seed-walk-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-white-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-white-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-white-hero-young-seed-walk-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-white-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-white-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-white-hero-young-seed-walk-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-white-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-white-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-white-hero-young-seed-walk-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-white-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-white-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-white-hero-young-seed-walk-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-walk-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-walk-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-walk-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-walk-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-walk-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-walk-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-walk-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-walk-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-walk-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-walk-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-sky-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-sky-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-sky-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-sky-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-sky-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-sky-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-sky-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-sky-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-sky-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-sky-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-sky-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-sky-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-sky-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-sky-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-sky-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-sky-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-sky-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-sky-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-leaf-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-leaf-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-leaf-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-leaf-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-leaf-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-leaf-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-leaf-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-leaf-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-leaf-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-leaf-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-leaf-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-leaf-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-leaf-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-leaf-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-leaf-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-leaf-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-leaf-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-leaf-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-city-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-city-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-city-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-city-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-city-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-city-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-city-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-city-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-city-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-city-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-city-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-city-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-city-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-city-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-city-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-city-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-city-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-city-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-river-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-river-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-river-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-river-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-river-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-river-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-river-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-river-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-river-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-river-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-river-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-river-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-river-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-river-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-river-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-river-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-river-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-river-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-night-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-night-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-night-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-night-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-night-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-night-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-night-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-night-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-night-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-night-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-night-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-night-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-night-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-night-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-night-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-night-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-night-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-night-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-luck-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-luck-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-luck-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-luck-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-luck-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-luck-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-luck-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-luck-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-luck-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-luck-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-luck-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-luck-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-luck-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-luck-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-luck-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-luck-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-luck-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-luck-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"companion-seed":{"c":[0,2.21993526,0],"axes":[1.65426045,2.11377725,1.37855038],"inner":1.43154194,"head":{"c":[0,3.44089965,0],"axes":[1.20901283,0.89125945,1.0591779]},"hands":[],"originY":-0.48259462,"bounds":[-1.73734064,0,-1.44778386,1.73734064,5.4,1.44778386],"diveLift":1.54778386},"companion-sprout":{"c":[0,2.4808205,0],"axes":[1.51854871,1.94036779,1.26545725],"inner":1.31410151,"head":{"c":[0,3.60161977,0],"axes":[1.10982818,0.81814257,0.97228537]},"hands":[{"c":[-1.77201465,2.21501831,0.17720146],"axes":[0.43635861,0.43635861,0.43635861]},{"c":[1.77201465,2.21501831,0.17720146],"axes":[0.43635861,0.43635861,0.43635861]}],"originY":0,"bounds":[-2.21501831,0,-1.32901098,2.21501831,5.4,1.37331135],"diveLift":1.45116117},"companion-young":{"c":[0,2.65263158,0],"axes":[1.62371693,2.07474941,1.35309744],"inner":1.40511059,"head":{"c":[0,3.85105263,0],"axes":[1.18669015,0.87480364,1.03962172]},"hands":[{"c":[-1.89473684,2.36842105,0.18947368],"axes":[0.46657895,0.46657895,0.46657895]},{"c":[1.89473684,2.36842105,0.18947368],"axes":[0.46657895,0.46657895,0.46657895]}],"originY":0,"bounds":[-2.36842105,0,-1.42105263,2.36842105,5.4,1.46842105],"diveLift":1.54473684}});
 
 return {HUNT_TOUCH_SHAPES};
 })();
-const __tagModule17=(()=>{
-const {BODY,worldMove,worldValid,worldHeight}=__tagModule7;
+const __tagModule19=(()=>{
+// Generated from current character meshes. Older match rules use the original shape table.
+const HUNT_RENDERED_TOUCH_UPDATES=Object.freeze({"hero-white-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-white-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-white-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-white-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-white-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-sky-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18927636],"diveLift":1.8742223},"hero-young-seed-sky-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-sky-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-sky-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-sky-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-leaf-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-leaf-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-leaf-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-leaf-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-leaf-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-city-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-city-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-city-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-city-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-city-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-river-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-river-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-river-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-river-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-river-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-night-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18997538],"diveLift":1.87457181},"hero-young-seed-night-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-night-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-night-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-night-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-luck-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-luck-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-luck-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-luck-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-luck-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"star-white-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-white-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-white-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-white-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-white-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-white-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-white-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-white-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60761685],"diveLift":2.21190369},"star-white-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-white-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-white-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-sky-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.18927636],"diveLift":1.8742223},"star-hero-young-seed-sky-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-hero-young-seed-sky-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-sky-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-sky-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-sky-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-sky-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-sky-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-sky-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-sky-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-sky-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-leaf-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-leaf-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-leaf-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-leaf-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-leaf-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-leaf-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-leaf-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-leaf-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-leaf-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-city-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-city-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-city-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-city-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-city-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-city-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-city-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-city-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-city-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-city-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-city-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-river-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-river-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-river-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-river-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-river-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-river-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-river-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-hero-young-seed-river-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-night-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-night-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-night-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-night-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-night-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-night-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-night-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-night-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60588799],"diveLift":2.21103926},"star-hero-young-seed-night-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-night-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-luck-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19147849],"diveLift":1.87532337},"star-hero-young-seed-luck-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-luck-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-luck-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-luck-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-luck-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-luck-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-luck-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-luck-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-luck-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-luck-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093}});
+
+return {HUNT_RENDERED_TOUCH_UPDATES};
+})();
+const __tagModule20=(()=>{
+const {HUNT_JUMP,worldHeight,worldTraversable,worldValid}=__tagModule9;
+const TRAMPOLINE=Object.freeze({x:0,z:0,radius:9,matRadius:7.85,top:2.2,launch:HUNT_JUMP.launch*Math.sqrt(HUNT_JUMP.maxJumps*1.25),forwardMin:28,forwardMax:34,forwardAdded:8});
+function trampolineLaunchSpeed(speed){return Math.min(TRAMPOLINE.forwardMax,Math.max(TRAMPOLINE.forwardMin,(Number.isFinite(speed)?Math.max(0,speed):0)+TRAMPOLINE.forwardAdded));}
+function createHuntTrampoline(){return{...TRAMPOLINE,y:worldHeight(0,0)+TRAMPOLINE.top,used:false,usedAt:null};}
+function trampolineJumpAccess(s,a){const p=s.trampoline;return !!p&&!p.used&&a.grounded&&a.y<p.y-.05&&Math.hypot(a.x-p.x,a.z-p.z)<=p.radius+(a.radius??2.7)+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5));}
+function trampolineInput(a,input){if(a.trampolineBoost&&a.vy>0)return{...input,jump:true};a.trampolineBoost=false;a.trampolineForwardSpeed=0;return input;}
+function trampolineSurface(s,x,z){const p=s.trampoline;return p&&!p.used&&Math.hypot(x-p.x,z-p.z)<=p.radius?p.y:worldHeight(x,z);}
+function trampolineClear(s,a,radius=a.radius??2.7){const p=s.trampoline;return !p||p.used||a.y>=p.y-.001||Math.hypot(a.x-p.x,a.z-p.z)>=p.radius+radius-.001;}
+function resolveTrampoline(s,a,before){const p=s.trampoline;if(!p||p.used)return null;const dx=a.x-p.x,dz=a.z-p.z,d=Math.hypot(dx,dz),lowRadius=a.kind==='cushion'||a.kind==='sticky'?a.radius:Math.min(1.25,a.radius*.35),foot=p.matRadius+lowRadius,support=p.radius+lowRadius,descending=a.y<=p.y&&a.vy<=0,above=before.y>p.y+1e-5&&descending,onTop=before.y>=p.y-.03&&descending;
+ if(d<=support&&(above||onTop)){
+  if(d<=foot&&a===s.player&&!before.grounded&&before.jumps>0&&above){const speed=Math.hypot(a.vx,a.vz),launch=trampolineLaunchSpeed(speed),nx=speed>2?a.vx/speed:Math.sin(a.yaw),nz=speed>2?a.vz/speed:Math.cos(a.yaw);p.used=true;p.usedAt=s.time;delete a.stepJump;a.y=p.y;a.vy=p.launch;a.vx=nx*launch;a.vz=nz*launch;a.trampolineForwardSpeed=launch;a.grounded=false;a.jumps=HUNT_JUMP.maxJumps;a.jumpHeld=true;a.trampolineBoost=true;a.trampolineSafeUntil=s.time+.25;return'bounce';}
+  a.y=p.y;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;return'support';
+ }
+ if(a.y<p.y-.001&&d<support){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0,r=support+.001,q={x:p.x+nx*r,z:p.z+nz*r,y:a.y};if(worldValid(q,a.radius-.01)){a.x=q.x;a.z=q.z;const inward=a.vx*nx+a.vz*nz;if(inward<0){a.vx-=nx*inward;a.vz-=nz*inward;}}}return null;
+}
+function trampolineObstacleJump(s,a,input){const p=s.trampoline;if(!p||p.used||!a.grounded||a.y>=p.y-.05)return false;const dx=p.x-a.x,dz=p.z-a.z,d=Math.hypot(dx,dz);return d<p.radius+a.radius+8&&dx*(input.x??0)+dz*(input.z??0)>1;}
+function trampolineEscapeControl(s,a,input,underPressure){const p=s.trampoline,m=a.brain;if(!m||!p||p.used||a.trampolineBoost){if(m)m.trampolineApproach=false;return input;}const dx=p.x-a.x,dz=p.z-a.z,d=Math.hypot(dx,dz);
+ if(!m.trampolineApproach){if(!underPressure||d>48)return input;if(s.time<(m.trampolineCheckAt??0))return input;m.trampolineCheckAt=s.time+.3;if(!worldTraversable(a,p,a.radius+.2))return input;m.trampolineApproach=true;}
+ if(d>65){m.trampolineApproach=false;return input;}m.supply=null;return{...input,x:dx/(d||1),z:dz/(d||1),dash:true,jump:a.grounded?d<20:a.jumpHeld&&a.vy>0};
+}
+
+return {TRAMPOLINE,trampolineLaunchSpeed,createHuntTrampoline,trampolineJumpAccess,trampolineInput,trampolineSurface,trampolineClear,resolveTrampoline,trampolineObstacleJump,trampolineEscapeControl};
+})();
+const __tagModule21=(()=>{
+const {BODY,worldMove,worldValid,worldHeight,worldGradient}=__tagModule9;
+function huntTerrainTilt(actor){
+ if(!actor.grounded)return {pitch:0,roll:0};
+ const grade=worldGradient(actor.x,actor.z),yaw=actor.yaw??0;
+ const sine=Math.sin(yaw),cosine=Math.cos(yaw);
+ return {pitch:-Math.atan(grade.x*sine+grade.z*cosine),roll:Math.atan(grade.x*cosine-grade.z*sine)};
+}
 const HUNT_DIVE=Object.freeze({prepare:.12,slide:.44,recover:.55,cooldown:5.7,speed:38});
-function startHuntDive(s,a,cooldown=HUNT_DIVE.cooldown){if(s.phase!=='playing'||a.owner==='player'||(a.effects?.dizzy??0)>s.time||!a.grounded||a.flight||a.pendingItem||a.dive||s.time<(a.nextDiveAt??0))return false;const speed=Math.hypot(a.vx,a.vz),yaw=speed>2?Math.atan2(a.vx,a.vz):a.yaw;a.dive={since:s.time,age:0,stage:'prepare',x:Math.sin(yaw),z:Math.cos(yaw)};a.nextDiveAt=s.time+cooldown;return true;}
+function startHuntDive(s,a,cooldown=HUNT_DIVE.cooldown,{aimFromFacing=false}={}){if(s.phase!=='playing'||a.owner==='player'||(a.effects?.dizzy??0)>s.time||!a.grounded||a.flight||a.pendingItem||a.dive||s.time<(a.nextDiveAt??0))return false;const speed=Math.hypot(a.vx,a.vz),yaw=!aimFromFacing&&speed>2?Math.atan2(a.vx,a.vz):a.yaw;a.dive={since:s.time,age:0,stage:'prepare',x:Math.sin(yaw),z:Math.cos(yaw),...(aimFromFacing?{aimFromFacing:true}:{})};a.nextDiveAt=s.time+cooldown;return true;}
 function moveHuntDive(s,a,input,dt){const d=a.dive;if(!d)return false;if(input.jump||a.flight){a.dive=null;return false;}d.age=s.time-d.since;const end=HUNT_DIVE.prepare+HUNT_DIVE.slide,total=end+HUNT_DIVE.recover;if(d.age>=total||!a.grounded){a.dive=null;return false;}const previous=d.stage;d.stage=d.age<HUNT_DIVE.prepare?'prepare':d.age<end?'slide':'recover';const tuning=a.tuning;a.tuning={...tuning};try{
  if(d.stage==='slide'){const speed=HUNT_DIVE.speed*Math.min(1.18,Math.max(.9,tuning.speed));a.vx=d.x*speed;a.vz=d.z*speed;a.tuning.speed=Math.max(a.tuning.speed,speed/BODY.dash);a.tuning.accel=0;const before={x:a.x,z:a.z};worldMove(a,{x:d.x,z:d.z,dash:true},dt);a.yaw=Math.atan2(d.x,d.z);if(Math.hypot(a.x-before.x,a.z-before.z)<speed*dt*.35){d.since=s.time-end;d.age=end;d.stage='recover';a.vx=a.vz=0;}}
- else{if(previous==='slide'){a.vx*=.32;a.vz*=.32;}a.tuning.speed*=d.stage==='recover'?.45:.65;worldMove(a,{...input,jump:false,dash:false},dt);}
+ else{if(previous==='slide'){a.vx*=.32;a.vz*=.32;}a.tuning.speed*=d.stage==='recover'?.45:.65;worldMove(a,{...input,jump:false,dash:false},dt);
+  // Aim with the visible body during the wind-up, even when ice is still
+  // carrying the feet sideways. The actual slide stays committed to that aim.
+  if(d.aimFromFacing&&d.stage==='prepare'){d.x=Math.sin(a.yaw);d.z=Math.cos(a.yaw);}
+ }
  }finally{a.tuning=tuning;}
  // A normal collision or an edge ends the burst; it never goes through a wall.
  if(d.stage==='slide'&&(!worldValid(a,a.radius-.01)||Math.abs(worldHeight(a.x,a.z)-a.y)>.6)){a.dive=null;}
@@ -930,33 +1051,60 @@ function moveHuntDive(s,a,input,dt){const d=a.dive;if(!d)return false;if(input.j
 function diveCanTouch(a,b){return a.dive?.stage!=='slide'||b.y<a.y+2;}
 function huntDiveTilt(d){if(!d)return 0;const {prepare,slide,recover}=HUNT_DIVE;if(d.age<prepare)return .35*Math.max(0,d.age/prepare);if(d.age<prepare+slide)return .35+1.1*Math.min(1,(d.age-prepare)/.08);return 1.45*Math.max(0,1-(d.age-prepare-slide)/recover);}
 
-return {HUNT_DIVE,startHuntDive,moveHuntDive,diveCanTouch,huntDiveTilt};
+return {huntTerrainTilt,HUNT_DIVE,startHuntDive,moveHuntDive,diveCanTouch,huntDiveTilt};
 })();
-const __tagModule15=(()=>{
-const {HUNT_TOUCH_SHAPES}=__tagModule16;
-const {worldHeight,worldSight}=__tagModule7;
-const {huntDiveTilt}=__tagModule17;
+const __tagModule17=(()=>{
+const {HUNT_TOUCH_SHAPES}=__tagModule18;
+const {usesRenderedContact}=__tagModule3;
+const {HUNT_RENDERED_TOUCH_UPDATES}=__tagModule19;
+const {trampolineSurface}=__tagModule20;
+const {worldHeight,worldSight}=__tagModule9;
+const {huntDiveTilt,huntTerrainTilt}=__tagModule21;
 const DEFAULT_TOUCH_SHAPE='white-michi-road-saber-ren';
 function huntTouchShapeKey(companion){return companion?['seed','sprout','young'].includes(companion.stage)?'companion-'+companion.stage:companion.artId:DEFAULT_TOUCH_SHAPE;}
 function validHuntTouchShape(key){return typeof key==='string'&&Object.hasOwn(HUNT_TOUCH_SHAPES,key);}
 const cache=new WeakMap();
 const xyzPairs=[[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]];
-function rotate(p,yaw,pitch){const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),y=p[1]*cp-p[2]*sp,z=p[1]*sp+p[2]*cp;return[p[0]*cy+z*sy,y,-p[0]*sy+z*cy];}
+function rotate([x,y,z],yaw,pitch,roll){
+ if(roll){const c=Math.cos(roll),s=Math.sin(roll);[x,y]=[x*c-y*s,x*s+y*c];}
+ const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+ const py=y*cp-z*sp,pz=y*sp+z*cp;
+ return [x*cy+pz*sy,py,-x*sy+pz*cy];
+}
 // A conservative solid-body proxy, not the broad navigation/cape/hand radius.
 // The air sphere is inside the rotating body at every flip angle; no enlarged
 // upright catch volume remains around an airborne or somersaulting monster.
-function huntSolidBody(a){
+function huntSolidBody(a,match){
  if(!a||![a.x,a.y,a.z,a.yaw??0].every(Number.isFinite))return null;
- const key=a.contactKey??(validHuntTouchShape(a.id)?a.id:DEFAULT_TOUCH_SHAPE),b=HUNT_TOUCH_SHAPES[key];if(!b)return null;
- const speed=Math.hypot(a.vx??0,a.vz??0),dive=!!a.dive&&Number.isFinite(a.dive.age),pose=dive?a.dive.age:a.grounded?Math.min(.07,speed*.0035)*.5:-1,signature=[a.x,a.y,a.z,a.yaw??0,pose,key],old=cache.get(a);if(old&&signature.every((n,i)=>n===old.signature[i]))return old.body;
- let pitch=0,position=[a.x,a.y,a.z],centre=b.c,axes;
- if(dive){pitch=huntDiveTilt(a.dive);const sine=Math.sin(pitch),pivot=2.7,back=-pivot*sine;position=[a.x+Math.sin(a.yaw)*back,a.y+(b.diveLift-pivot)*sine*sine+pivot*(1-Math.cos(pitch)),a.z+Math.cos(a.yaw)*back];let correction=0;
-  for(const x of[b.bounds[0],b.bounds[3]])for(const y of[b.bounds[1],b.bounds[4]])for(const z of[b.bounds[2],b.bounds[5]]){const p=rotate([x,y,z],a.yaw,pitch);correction=Math.max(correction,worldHeight(position[0]+p[0],position[2]+p[2])+.03-position[1]-p[1]);}position[1]+=correction;axes=b.axes.map(v=>Math.max(.08,v-.04));
+ const key=a.contactKey??(validHuntTouchShape(a.id)?a.id:DEFAULT_TOUCH_SHAPE);
+ const rendered=usesRenderedContact(match?.rules);
+ const b=(rendered?HUNT_RENDERED_TOUCH_UPDATES[key]:undefined)??HUNT_TOUCH_SHAPES[key];
+ if(!b)return null;
+ const speed=Math.hypot(a.vx??0,a.vz??0),dive=!!a.dive&&Number.isFinite(a.dive.age);
+ const pose=dive?a.dive.age:a.grounded?Math.min(.07,speed*.0035)*.5:-1;
+ const trampoline=rendered&&dive?match.trampoline:null;
+ const signature=[a.x,a.y,a.z,a.yaw??0,pose,key,rendered,trampoline,trampoline?.used,a.grounded];
+ const old=cache.get(a);
+ if(old&&signature.every((n,i)=>n===old.signature[i]))return old.body;
+ let pitch=0,roll=0,position=[a.x,a.y,a.z],centre=b.c,axes;
+ if(dive){
+  const angle=huntDiveTilt(a.dive),sine=Math.sin(angle),pivot=2.7,back=-pivot*sine;
+  const terrain=rendered?huntTerrainTilt(a):null;
+  pitch=angle+(terrain?.pitch??0);roll=terrain?.roll??0;
+  position=[a.x+Math.sin(a.yaw)*back,a.y+(b.diveLift-pivot)*sine*sine+pivot*(1-Math.cos(angle)),a.z+Math.cos(a.yaw)*back];
+  let correction=0;
+  for(const x of[b.bounds[0],b.bounds[3]])for(const y of[b.bounds[1],b.bounds[4]])for(const z of[b.bounds[2],b.bounds[5]]){
+   const p=rotate([x,y,z],a.yaw,pitch,roll),floorX=position[0]+p[0],floorZ=position[2]+p[2];
+   const floor=rendered?trampolineSurface(match,floorX,floorZ):worldHeight(floorX,floorZ);
+   correction=Math.max(correction,floor+.03-position[1]-p[1]);
+  }
+  position[1]+=correction;
+  axes=b.axes.map(v=>Math.max(.08,v-.04));
  }else if(!a.grounded){axes=[b.inner-.06,b.inner-.06,b.inner-.06];}
  else{pitch=pose;centre=[b.c[0],b.c[1]-b.originY,b.c[2]];position[1]+=b.originY-.03;axes=b.axes.map(v=>Math.max(.08,v-.24));}
- const u=rotate([1,0,0],a.yaw??0,pitch),v=rotate([0,1,0],a.yaw??0,pitch),w=rotate([0,0,1],a.yaw??0,pitch);
+ const u=rotate([1,0,0],a.yaw??0,pitch,roll),v=rotate([0,1,0],a.yaw??0,pitch,roll),w=rotate([0,0,1],a.yaw??0,pitch,roll);
  function solid(centre,axes){
-  const c=rotate(centre,a.yaw??0,pitch).map((value,i)=>value+position[i]);
+  const c=rotate(centre,a.yaw??0,pitch,roll).map((value,i)=>value+position[i]);
   const q=xyzPairs.map(([i,j])=>axes[0]**2*u[i]*u[j]+axes[1]**2*v[i]*v[j]+axes[2]**2*w[i]*w[j]);
   return {c,q,axes};
  }
@@ -973,9 +1121,9 @@ function solidBodiesOverlap(a,b){if(!a||!b)return false;const d=a.c.map((v,i)=>b
 function contact(a,b){
  return solidBodiesOverlap(a,b)&&worldSight({x:a.c[0],y:a.c[1],z:a.c[2]},{x:b.c[0],y:b.c[1],z:b.c[2]},.01);
 }
-function huntBodiesTouch(a,b){
+function huntBodiesTouch(a,b,match){
  if(!a||!b||Math.abs(a.x-b.x)>20||Math.abs(a.z-b.z)>20)return false;
- const x=huntSolidBody(a),y=huntSolidBody(b);
+ const x=huntSolidBody(a,match),y=huntSolidBody(b,match);
  if(contact(x,y))return true;
  // Only the diving actor gets extra contact shapes, all in the actual pose.
  return !!(x?.diveParts?.some(part=>contact(part,y))||y?.diveParts?.some(part=>contact(x,part)));
@@ -983,9 +1131,32 @@ function huntBodiesTouch(a,b){
 
 return {DEFAULT_TOUCH_SHAPE,huntTouchShapeKey,validHuntTouchShape,huntSolidBody,solidBodiesOverlap,huntBodiesTouch};
 })();
-const __tagModule18=(()=>{
+const __tagModule22=(()=>{
+const {huntInkTrailSuppressed}=__tagModule1;
 const T=__tagExternal0;
-const {INK}=__tagModule9;
+const {INK}=__tagModule11;
+const {worldHeight}=__tagModule9;
+
+const SOLE_CLEARANCE=.13;
+const SOLE_PROBE=.85;
+
+function placeInkSole(matrix,foot){
+ const {x,y,z,trampolineSupport}=foot;
+ matrix.setPosition(x,y+SOLE_CLEARANCE,z);
+ if(trampolineSupport)return;
+ const ground=worldHeight(x,z);
+ if(Math.abs(ground-y)>.42)return;
+ const west=worldHeight(x-SOLE_PROBE,z),east=worldHeight(x+SOLE_PROBE,z);
+ const north=worldHeight(x,z-SOLE_PROBE),south=worldHeight(x,z+SOLE_PROBE);
+ // Keep a stair lip from tilting the mark off its tread.
+ if(Math.abs((west+east)/2-ground)>.035||Math.abs((north+south)/2-ground)>.035)return;
+ const slopeX=(east-west)/(2*SOLE_PROBE),slopeZ=(south-north)/(2*SOLE_PROBE);
+ if(Math.hypot(slopeX,slopeZ)<.015)return;
+ const basis=matrix.elements;
+ basis[1]=basis[0]*slopeX+basis[2]*slopeZ;
+ basis[9]=basis[8]*slopeX+basis[10]*slopeZ;
+ matrix.setPosition(x,ground+SOLE_CLEARANCE,z);
+}
 
 function createHuntInkView(scene){
  const sole=new T.Shape();sole.moveTo(-.3,-.55);sole.bezierCurveTo(-.5,-.1,-.36,.55,-.03,.48);sole.bezierCurveTo(.34,.42,.31,.1,.22,-.13);sole.bezierCurveTo(.12,-.4,.13,-.63,-.3,-.55);const shapes=[sole];for(const[x,y,r]of[[-.26,.68,.16],[.02,.66,.12],[.22,.59,.1],[.35,.45,.08]]){const toe=new T.Shape();toe.absarc(x,y,r,0,Math.PI*2,false);shapes.push(toe);}
@@ -1003,13 +1174,14 @@ function createHuntInkView(scene){
    if(n===INK.maxFootprints)break;
    if(f.owner!=='player')continue;
    const at=n*5,side=f.id%2?-1:1,yaw=f.yaw??0;
-   if(n>=previousCount||!Object.is(cached[at],f.x)||!Object.is(cached[at+1],f.y)||!Object.is(cached[at+2],f.z)||!Object.is(cached[at+3],yaw)||cached[at+4]!==side){
+   const soleKey=side*(f.trampolineSupport?2:1);
+   if(n>=previousCount||!Object.is(cached[at],f.x)||!Object.is(cached[at+1],f.y)||!Object.is(cached[at+2],f.z)||!Object.is(cached[at+3],yaw)||cached[at+4]!==soleKey){
     matrix.makeScale(side,1,1);
     rotation.makeRotationY(yaw);
     matrix.premultiply(rotation);
-    matrix.setPosition(f.x,f.y+.13,f.z);
+    placeInkSole(matrix,f);
     feet.setMatrixAt(n,matrix);
-    cached[at]=f.x;cached[at+1]=f.y;cached[at+2]=f.z;cached[at+3]=yaw;cached[at+4]=side;
+    cached[at]=f.x;cached[at+1]=f.y;cached[at+2]=f.z;cached[at+3]=yaw;cached[at+4]=soleKey;
     matrixWrites++;
     firstChanged=Math.min(firstChanged,n);
     lastChanged=n;
@@ -1018,7 +1190,7 @@ function createHuntInkView(scene){
   }
   previousCount=n;
   feet.count=n;
-  feet.visible=n>0;
+  feet.visible=n>0&&!huntInkTrailSuppressed(s);
   if(lastChanged>=0){
    let start=firstChanged*matrices.itemSize,end=(lastChanged+1)*matrices.itemSize;
    const pending=matrices.updateRanges[0];
@@ -1036,7 +1208,7 @@ function createHuntInkView(scene){
 
 return {createHuntInkView};
 })();
-const __tagModule19=(()=>{
+const __tagModule23=(()=>{
 const {Color}=__tagExternal0;
 const clamp=v=>Math.max(0,Math.min(1,v)),smooth=v=>v*v*(3-2*v);
 const INK_PAINT_SECONDS=1.8;
@@ -1055,9 +1227,9 @@ function createHuntInkFeet(model){const copies=new Map(),rows=[],ink=new Color('
 
 return {INK_PAINT_SECONDS,inkPaintFrame,createHuntInkNotice,createHuntInkFeet};
 })();
-const __tagModule20=(()=>{
-const {ITEM_DEFS,itemIcon}=__tagModule9;
-const {createHuntInkNotice,INK_PAINT_SECONDS}=__tagModule19;
+const __tagModule24=(()=>{
+const {ITEM_DEFS,itemIcon}=__tagModule11;
+const {createHuntInkNotice,INK_PAINT_SECONDS}=__tagModule23;
 
 const ITEM_USE_SECONDS=INK_PAINT_SECONDS;
 const HOOK_USE_SECONDS=4.2;
@@ -1149,7 +1321,7 @@ function createHuntItemNotice({document:doc=globalThis.document,reducedMotion=gl
 
 return {ITEM_USE_SECONDS,HOOK_USE_SECONDS,itemUseDuration,itemUseArtwork,itemUseFrame,hookUseFrame,createHuntItemNotice};
 })();
-const __tagModule21=(()=>{
+const __tagModule25=(()=>{
 // The verifier owns the input trace after postMessage. Keep only the small
 // result metadata here, and bound both waiting work and its lifetime.
 function compactReceipt(value,expected){try{if(!value||typeof value!=='object'||typeof value.rules!=='string'||value.rules.length>100||typeof value.caught!=='boolean'||typeof value.win!=='boolean'||!Number.isFinite(value.time)||value.time<0||!(value.catcher===null||['hunter-0','hunter-1','hunter-2'].includes(value.catcher)))return null;const copy={rules:value.rules,caught:value.caught,win:value.win,time:value.time,catcher:value.catcher};return Object.keys(copy).every(k=>Object.is(copy[k],expected[k]))?Object.freeze(copy):null;}catch{return null;}}
@@ -1185,8 +1357,8 @@ function createHuntProofClient({createWorker,onReply=()=>{},timeoutMs=45000,idle
 
 return {createHuntProofClient};
 })();
-const __tagModule23=(()=>{
-const {HUNT_CHARACTER_HEIGHT}=__tagModule7;
+const __tagModule27=(()=>{
+const {HUNT_CHARACTER_HEIGHT}=__tagModule9;
 // Feet-based body intervals match the world solver. Rolling spheres narrow at
 // their top/bottom, so jumping over an item cannot trigger a hit or spend a guard.
 // Returns the horizontal contact distance, or -1 for separated body heights.
@@ -1212,9 +1384,9 @@ function huntSupplyContact(a,p,time=0){
 
 return {movingItemContactRadius,huntPickupHeight,huntSupplyContact};
 })();
-const __tagModule25=(()=>{
-const {HUNT_FIELDS,ITEM_DEFS}=__tagModule9;
-const {worldSight}=__tagModule7;
+const __tagModule29=(()=>{
+const {HUNT_FIELDS,ITEM_DEFS}=__tagModule11;
+const {worldSight}=__tagModule9;
 function huntHasClearSight(s,a){return(a?.effects?.sunglasses??0)>s.time;}
 function huntOpticalHidden(s,viewer,a){return a?.owner!==viewer?.owner&&(a?.effects?.cloak??0)>s.time&&!huntHasClearSight(s,viewer);}
 function huntCanObserve(s,a,b,range=140){
@@ -1236,8 +1408,8 @@ function huntPermanentToolUseful(s,a,type){
 
 return {huntHasClearSight,huntOpticalHidden,huntCanObserve,huntPermanentToolUseful};
 })();
-const __tagModule24=(()=>{
-const {huntPermanentToolUseful}=__tagModule25;
+const __tagModule28=(()=>{
+const {huntPermanentToolUseful}=__tagModule29;
 const pickupAudience=mode=>mode==='hunt'?'hunters':'player';
 // Persistent equipment cannot be collected a second time. Keep the field and
 // pickup hints consistent with the simulation without changing anyone's stock.
@@ -1252,9 +1424,9 @@ function pickupNameIndices(s,view,{visible=()=>true}={}){
 
 return {pickupAudience,pickupUseful,pickupEquipmentKey,pickupVisible,pickupNameIndices};
 })();
-const __tagModule22=(()=>{
-const {huntSupplyContact}=__tagModule23;
-const {pickupUseful}=__tagModule24;
+const __tagModule26=(()=>{
+const {huntSupplyContact}=__tagModule27;
+const {pickupUseful}=__tagModule28;
 const controlled=s=>s.config?.mode==='hunt'?s.hunters[0]:s.player;
 // Capture before attempting the action. A CPU can start another tool later in
 // the same tick; its new state must not become the reason for our earlier failure.
@@ -1301,38 +1473,51 @@ function createHuntItemStatus(){
 
 return {huntItemFailureHint,huntItemUseAcknowledged,createHuntItemStatus};
 })();
-const __tagModule26=(()=>{
+const __tagModule30=(()=>{
 // Change only the drawing buffer after sustained load. Physics, CSS sizes,
 // pointer ownership and camera settings are outside this controller.
 function createHuntRenderQuality({maxRatio=1.5,onChange=()=>{}}={}){
  if(!Number.isFinite(maxRatio)||maxRatio<=0)throw Error('INVALID_RENDER_RATIO');
- const maximum=Math.min(1.5,maxRatio),levels=[1,1.25,1.5].filter(n=>n<maximum);levels.push(maximum);
- let level=levels.length-1,seconds=0,frames=0,slowFrames=0,slow=0,fast=0,cooldown=0,changes=0;
- const windowReset=()=>{seconds=frames=slowFrames=0;};
- function reset(){windowReset();slow=fast=0;}
- const ratio=()=>levels[level];
+ const maximum=Math.min(1.5,maxRatio),levels=maximum<1?[]:[.7,.85,1,1.25,1.5].filter(n=>n<maximum);levels.push(maximum);
+ let level=levels.length-1,seconds=0,frames=0,slowFrames=0,severeFrames=0,lateFrames=0,lateSeconds=0,slow=0,severe=0,fast=0,cooldown=0,changes=0,capturing=false;
+ const windowReset=()=>{seconds=frames=slowFrames=severeFrames=lateFrames=lateSeconds=0;};
+ function reset(){windowReset();slow=severe=fast=0;}
+ const ratio=()=>capturing?Math.max(levels[level],Math.min(1,maximum)):levels[level];
  function change(next){level=next;changes++;cooldown=8;reset();onChange(ratio());}
  return{sample(delta,active=true){
   if(levels.length===1)return ratio();
   // Menu/recording/background time and isolated large stalls are not a GPU
   // measurement. In particular, never recover quality from an idle screen.
-  if(!active||!Number.isFinite(delta)||delta<=0||delta>.25){reset();return ratio();}
-  cooldown=Math.max(0,cooldown-delta);seconds+=delta;frames++;if(delta>1/36)slowFrames++;
+  if(capturing||!active||!Number.isFinite(delta)||delta<=0||delta>.5){reset();return ratio();}
+  // Bound the weight of any one long frame, but keep repeated visible stalls
+  // in the measurement. A full reset on each slow frame never adapted at 1x.
+  const interval=Math.min(.2,delta);
+  cooldown=Math.max(0,cooldown-interval);seconds+=interval;frames++;if(delta>1/36)slowFrames++;if(delta>1/12)severeFrames++;
+  // Twelve fixed physics steps cover 100ms. Recurring gaps can discard
+  // time even in a window with many fast frames and a good average FPS.
+  if(interval>.1){lateFrames++;lateSeconds+=interval-.1;}
   if(seconds<2)return ratio();
   const average=seconds/frames;
   if(average>1/32&&slowFrames/frames>.45){slow=Math.min(8,slow+seconds);fast=0;}
   else if(average<1/52&&slowFrames===0){fast=Math.min(18,fast+seconds);slow=0;}
   else slow=fast=0;
+  const fallingBehind=lateFrames>=4&&lateSeconds>=seconds*.05;
+  severe=(average>1/18&&severeFrames/frames>=1/3||fallingBehind)?Math.min(8,severe+seconds):0;
   windowReset();
-  if(cooldown===0&&slow>=4&&level>0)change(level-1);
+  if(cooldown===0&&level>0&&(levels[level-1]>=1?slow>=4:severe>=4))change(level-1);
   else if(cooldown===0&&fast>=16&&level<levels.length-1)change(level+1);
   return ratio();
+ },setCapture(active){
+  if(capturing===!!active)return;
+  const prior=ratio();capturing=!!active;reset();
+  // Keep the existing native-resolution minimum for video and live output.
+  if(ratio()!==prior)onChange(ratio());
  },reset,stats:()=>({ratio:ratio(),maximum,changes,cooldown,windowSeconds:seconds,windowFrames:frames})};
 }
 
 return {createHuntRenderQuality};
 })();
-const __tagModule27=(()=>{
+const __tagModule31=(()=>{
 // Rendering can disappear while a mobile browser still runs timers and input.
 // Suspend the existing round, never replace it or simulate hidden catch-up.
 function createHuntRenderRecovery({canvas,isActive,suspend,restore,onStatus=()=>{}}){
@@ -1358,7 +1543,7 @@ function createHuntRenderRecovery({canvas,isActive,suspend,restore,onStatus=()=>
 
 return {createHuntRenderRecovery};
 })();
-const __tagModule29=(()=>{
+const __tagModule33=(()=>{
 // OBS WebSocket 5.x. No platform tokens, stream keys or saved passwords.
 const LIVE_WINDOW_TITLE='イマソラーズウォーク｜ゲーム配信用画面';
 function obsLocalUrl(port=4455){const n=Number(port);if(!Number.isInteger(n)||n<1||n>65535)throw Error('ポート番号を確認してください。');return 'ws://127.0.0.1:'+n;}
@@ -1645,8 +1830,8 @@ function createLiveBroadcast({
 
 return {LIVE_WINDOW_TITLE,obsLocalUrl,obsAuthentication,createObsConnection,verifyObsGameScene,createLiveBroadcast};
 })();
-const __tagModule30=(()=>{
-const {LIVE_WINDOW_TITLE}=__tagModule29;
+const __tagModule34=(()=>{
+const {LIVE_WINDOW_TITLE}=__tagModule33;
 // The live window owns its audio destination, including partially connected taps.
 function createLiveOutputAudio(audio){
  const context=audio?.context;if(!context?.createMediaStreamDestination||context.state==='closed')return null;
@@ -1672,7 +1857,39 @@ function createLiveOutput({canvas,captureCanvas=()=>canvas,windowTarget=globalTh
   try{const previous=child.document.documentElement?.dataset.liveOwner;if(previous&&previous!==owner){child=null;throw Error('別のゲームの配信用画面が開いています。先にそちらで配信を終了してください。');}}catch(e){child=null;throw e;}
 
   try{const id=++generation;lastHud='';const doc=child.document;doc.open();doc.write('<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title></title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#102231;color:white;font:600 18px system-ui}video{width:100%;height:100%;object-fit:contain}header{position:absolute;left:20px;right:20px;top:16px;display:flex;justify-content:space-between;gap:18px;text-shadow:0 2px 5px #000}small{font-size:13px;opacity:.8}button{position:absolute;bottom:18px;right:20px;padding:10px 18px;border:0;border-radius:12px}#waiting{position:absolute;inset:0;display:grid;place-items:center;background:#102231}</style><video autoplay playsinline></video><header><span>イマソラーズウォーク <small>鬼ごっこ</small></span><span id="live-hud"></span></header><div id="waiting">ゲーム映像を準備中</div><button hidden>音を有効にする</button></html>');doc.close();if(doc.documentElement)doc.documentElement.dataset.liveOwner=owner;doc.title=LIVE_WINDOW_TITLE;doc.querySelector('small').textContent=String(gameName).slice(0,30);
-   video=doc.querySelector('video');stream=source.captureStream(30);attachAudio();video.srcObject=stream;const enable=doc.querySelector('button');const play=()=>Promise.resolve(video.play()).then(()=>{if(!child||id!==generation)return;ready=true;doc.querySelector('#waiting').hidden=true;doc.querySelector('#waiting').style.display='none';enable.hidden=true;audio?.monitor?.(false);}).catch(()=>{if(child&&id===generation){video.muted=true;Promise.resolve(video.play()).then(()=>{if(id!==generation)return;ready=true;doc.querySelector('#waiting').style.display='none';enable.hidden=false;}).catch(()=>{});}});enable.onclick=()=>{video.muted=false;play();};play();for(const track of stream.getVideoTracks())track.addEventListener?.('ended',()=>{if(id===generation)close(true);},{once:true});watch();return true;
+   video=doc.querySelector('video');stream=source.captureStream(30);attachAudio();video.srcObject=stream;
+   const player=video,openedChild=child,enable=doc.querySelector('button'),waiting=doc.querySelector('#waiting');
+   let playback=0;
+   // A rejected play() may arrive after this popup is closed or replaced.
+   // Both the output and the latest user activation must still own the reply.
+   const current=attempt=>id===generation&&child===openedChild&&!openedChild.closed&&video===player&&attempt===playback;
+   const monitor=value=>{try{audio?.monitor?.(value);}catch{}};
+   async function play(){
+    const attempt=++playback;
+    try{
+     await player.play();
+     if(!current(attempt))return;
+     ready=true;waiting.hidden=true;waiting.style.display='none';enable.hidden=true;
+     monitor(false);
+    }catch{
+     if(!current(attempt))return;
+     player.muted=true;
+     try{
+      await player.play();
+      if(!current(attempt))return;
+      ready=true;waiting.hidden=true;waiting.style.display='none';
+      enable.textContent='音を有効にする';enable.hidden=false;
+      monitor(true);
+     }catch{
+      if(!current(attempt))return;
+      ready=false;waiting.hidden=false;waiting.style.display='grid';
+      waiting.textContent='映像を再開するには、右下のボタンを押してください';
+      enable.textContent='映像を再開する';enable.hidden=false;
+      monitor(true);
+     }
+    }
+   }
+   enable.onclick=()=>{player.muted=false;void play();};void play();for(const track of stream.getVideoTracks())track.addEventListener?.('ended',()=>{if(id===generation)close(true);},{once:true});watch();return true;
   }catch(e){close();throw Error('配信用画面を準備できませんでした。');}}
  function update(text){if(!child||child.closed)return;try{attachAudio();}catch{}const value=String(text).slice(0,160);if(value===lastHud)return;lastHud=value;try{child.document.querySelector('#live-hud').textContent=value;}catch{close(true);}}
  return{open,close,update,get ready(){return ready&&!!child&&!child.closed&&stream?.getVideoTracks?.().some(t=>t.readyState==='live');},get opened(){return!!child&&!child.closed;}};
@@ -1680,9 +1897,9 @@ function createLiveOutput({canvas,captureCanvas=()=>canvas,windowTarget=globalTh
 
 return {createLiveOutputAudio,createLiveOutput};
 })();
-const __tagModule28=(()=>{
-const {createLiveBroadcast,LIVE_WINDOW_TITLE}=__tagModule29;
-const {createLiveOutput,createLiveOutputAudio}=__tagModule30;
+const __tagModule32=(()=>{
+const {createLiveBroadcast,LIVE_WINDOW_TITLE}=__tagModule33;
+const {createLiveOutput,createLiveOutputAudio}=__tagModule34;
 function createLiveBroadcastUI({canvas,audio,captureCanvas,onLayout,onScreenViews,onOpen=()=>{},onClose=()=>{},onOutput=()=>{},documentTarget=document,windowTarget=window,makeSocket}={}){
  const doc=documentTarget,style=doc.createElement('style');style.textContent=`.game-hud{z-index:11}.imasora-live-open,.imasora-live-settings{padding:9px 14px;border:1px solid #c8e4e7;border-radius:15px;background:#e3f4ee;color:#184955;font:700 14px system-ui;min-height:44px}.imasora-live-open{margin-left:auto;margin-right:8px}.imasora-live-open[data-state=live]{background:#a72d4e;color:white}.imasora-live-open[data-state=unknown],.imasora-live-open[data-state=reconnecting]{background:#ffeab0}.imasora-live-panel{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;place-items:center;background:transparent;padding:14px;box-sizing:border-box}.imasora-live-panel[open]{display:grid}.imasora-live-panel::backdrop{background:#142b4055}.imasora-live-card{width:min(100%,480px);max-height:calc(100dvh - 28px);overflow:auto;box-sizing:border-box;background:linear-gradient(145deg,#f8fcf1,#d8eeef);border:2px solid #fff;border-radius:24px;padding:20px;color:#173e4d;box-shadow:0 12px 40px #172b4966;font:15px system-ui}.imasora-live-card h2{margin:0 0 12px;font-size:22px}.imasora-live-card p{line-height:1.6;margin:10px 0}.imasora-live-card button{font:700 15px system-ui;padding:11px 16px;margin:4px;border:1px solid #c0dbda;border-radius:14px;background:#fff7d7;color:#234552;min-height:44px}.imasora-live-card button:disabled{opacity:.5}.imasora-live-card label{display:block;margin:12px 0}.imasora-live-card input,.imasora-live-card select{display:block;width:100%;box-sizing:border-box;padding:10px;font:16px system-ui;border:1px solid #a3c7c9;border-radius:10px}.imasora-live-card summary{cursor:pointer;padding:10px 0}.imasora-live-card ol{padding-left:22px;line-height:1.7}.imasora-live-card a{color:#185879}.imasora-live-status{padding:10px;border-radius:12px;background:#ffffffb8}.imasora-live-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.imasora-live-hero{background:#236d79!important;color:white!important;width:100%;margin:4px 0!important}`;doc.head.append(style);
  const button=doc.createElement('button');button.className='imasora-live-open';button.textContent='配信';button.id='live-open';button.title='ゲームをライブ配信';button.dataset.state='disconnected';button.dataset.owned='false';canvas.dataset.liveState='disconnected';const settings=doc.createElement('button');settings.textContent='配信の設定';settings.className='imasora-live-settings';settings.id='live-settings';
@@ -1740,33 +1957,193 @@ function createLiveBroadcastUI({canvas,audio,captureCanvas,onLayout,onScreenView
 
 return {createLiveBroadcastUI};
 })();
-const __tagModule34=(()=>{
-const HUNT_JUMP_REST=1.3;
-const HUNT_JUMP_QUICK_REST=1.1;
-function huntJumpRestRemaining(s,a){return a.jumps>0?0:Math.max(0,(a.nextJumpAt??0)-s.time);}
-// Only the start of a new chain rests. A human press during the rest is not
-// queued; release it before the next chain. CPU commands use ordinary input
-// again when ready without keeping a physical key latched.
-function huntJumpInput(s,a,input,{releaseRequired=false}={}){
- const waiting=huntJumpRestRemaining(s,a)>0;
- if(releaseRequired){if(!input.jump)delete a.jumpRestRelease;else if(waiting)a.jumpRestRelease=true;}
- return input.jump&&a.jumps===0&&(waiting||releaseRequired&&a.jumpRestRelease)?{...input,jump:false}:input;
-}
-function recordHuntJumpLanding(s,a,before,rest=HUNT_JUMP_REST){
- if(!a.kind&&before&&!before.grounded&&before.jumps>0&&a.grounded)a.nextJumpAt=s.time+rest;
+const __tagModule39=(()=>{
+const {movingItemContactRadius}=__tagModule27;
+const CUSHION_DIZZY_SECONDS=2;
+const huntIsDizzy=(s,a)=>(a?.effects?.dizzy??0)>s.time;
+// Each rolling cushion can daze a body once. Resting against the same ball
+// must never keep renewing the two-second timer.
+function applyCushionDizzy(s,a,g){
+ if(g.kind!=='cushion'||g.until<=s.time||g.owner===a.owner&&s.time-g.spawnedAt<.35||g.ignore===a.owner&&s.time<g.ignoreUntil||g.dizzyHits?.[a.owner])return false;
+ const r=movingItemContactRadius(a,g);if(r<0||Math.hypot(a.x-g.x,a.z-g.z)>r)return false;
+ (g.dizzyHits??={})[a.owner]=true;(a.effects??={}).dizzy=s.time+CUSHION_DIZZY_SECONDS;
+ a.hook=null;a.flight=null;a.dive=null;a.pendingItem=null;a.vx*=.25;a.vz*=.25;return true;
 }
 
-return {HUNT_JUMP_REST,HUNT_JUMP_QUICK_REST,huntJumpRestRemaining,huntJumpInput,recordHuntJumpLanding};
+return {CUSHION_DIZZY_SECONDS,huntIsDizzy,applyCushionDizzy};
 })();
 const __tagModule38=(()=>{
+const {huntCanObserve,huntHasClearSight}=__tagModule29;
+const {huntIsDizzy}=__tagModule39;
+const {worldHeight,worldSteering,worldTraversable,worldValid}=__tagModule9;
+
+const advanceSeconds=.58, holdSeconds=.95;
+
+function approachPoint(hunter,lastSeen){
+ const dx=lastSeen.x+lastSeen.vx*.45-hunter.x;
+ const dz=lastSeen.z+lastSeen.vz*.45-hunter.z;
+ const gap=Math.hypot(dx,dz),speed=Math.hypot(hunter.vx,hunter.vz);
+ if(Math.hypot(lastSeen.vx,lastSeen.vz)>1&&dx*lastSeen.vx+dz*lastSeen.vz<0)return null;
+ if(gap<2||speed>1&&dx*hunter.vx+dz*hunter.vz<0)return null;
+ const travel=Math.min(gap,Math.max(4,Math.min(12,speed*.5)));
+ const radius=hunter.radius-.05;
+ for(const scale of[1,.55,.25]){
+  const x=hunter.x+dx/gap*travel*scale,z=hunter.z+dz/gap*travel*scale;
+  const point={x,z,y:worldHeight(x,z)};
+  if(worldValid(point,radius)&&worldTraversable(hunter,point,radius))return point;
+ }
+ return null;
+}
+
+function rememberCloakDisappearance(state){
+ const {player,time}=state;
+ const lastSeen={x:player.x,y:player.y,z:player.z,vx:player.vx,vz:player.vz};
+ for(const hunter of state.hunters){
+  if(hunter.flight||huntIsDizzy(state,hunter)||huntHasClearSight(state,hunter)
+     ||!huntCanObserve(state,hunter,player,hunter.role==='patrol'?70:140))continue;
+  const brain=hunter.brain;
+  const point=approachPoint(hunter,lastSeen);
+  brain.cloakReaction={point,advanceUntil:time+advanceSeconds,holdUntil:time+advanceSeconds+holdSeconds};
+  brain.seen={...lastSeen};
+  brain.seenAt=time;
+  brain.next=0;
+  brain.searchPlan=null;
+  brain.closeChase=null;
+  brain.airPursuit=null;
+  brain.supply=null;
+ }
+}
+
+function cloakDisappearanceMovement(hunter,time,runnerVisible){
+ const reaction=hunter.brain.cloakReaction;
+ if(!reaction)return null;
+ if(runnerVisible||time>=reaction.holdUntil){
+  delete hunter.brain.cloakReaction;
+  hunter.brain.next=0;
+  return null;
+ }
+ const point=reaction.point;
+ if(point&&time<reaction.advanceUntil&&Math.hypot(hunter.x-point.x,hunter.z-point.z)>1.8){
+  return worldSteering(hunter,point,null,{sprint:false});
+ }
+ // Brake through the usual movement solver, including on ice. On arrival
+ // the same reaction cannot restart if a collision nudges the hunter.
+ reaction.point=null;
+ return Math.hypot(hunter.vx,hunter.vz)>.22?worldSteering(hunter,hunter,null,{sprint:false}):{};
+}
+
+return {rememberCloakDisappearance,cloakDisappearanceMovement};
+})();
+const __tagModule40=(()=>{
+const {BODY,worldHeight,worldSight,worldValid}=__tagModule9;
+
+const RANGE=42,MIN_DROP=2.2;
+function dropLane(hunter,target){
+ const dx=target.x-hunter.x,dz=target.z-hunter.z,distance=Math.hypot(dx,dz);
+ if(distance<2||distance>RANGE+8)return null;
+ const x=dx/distance,z=dz/distance,top=hunter.y,radius=hunter.radius+.1;
+ const at=d=>({x:hunter.x+x*d,z:hunter.z+z*d});
+ let previous=top,edge=-1;
+ const limit=Math.min(26,distance);
+ for(let d=.75;d<=limit;d+=.75){
+  const p=at(d),floor=worldHeight(p.x,p.z);
+  // We can run off a lip, but must not skip a wall or an uphill step.
+  if(floor>top+.45||floor>previous+.45)return null;
+  if(previous-floor>=MIN_DROP){edge=d;break;}
+  previous=floor;
+ }
+ if(edge<0)return null;
+ const speed=BODY.dash*(hunter.tuning?.speed??1);
+ const landing=at(edge+speed*Math.sqrt(2*Math.max(0,top-target.floor)/BODY.gravity));
+ const lip=at(edge);
+ if(!worldSight({...hunter,y:top+2.5},{...lip,y:top+2.5},radius))return null;
+ // Sample the falling lane out past the lip. Use the same floor and body
+ // clearance as movement; contact and the fall itself are still simulated.
+ let airborne=true;
+ const span=Math.hypot(landing.x-lip.x,landing.z-lip.z);
+ for(let d=0;d<=span+.5;d+=.75){
+  const p=at(edge+d),floor=worldHeight(p.x,p.z);
+  const falling=top-BODY.gravity*(d/speed)**2/2;
+  if(floor>top+.45||(d<1.5&&floor>top-1))return null;
+  if(airborne&&falling<=floor)airborne=false;
+  if(!worldValid({...p,y:airborne?falling:floor},radius))return null;
+ }
+ return {x,z,edge};
+}
+
+// Only a personally seen descent can start this shortcut. A moment of terrain
+// occlusion can finish the committed run, but cannot redirect it to an unseen runner.
+function huntDropPursuit(s,hunter,runner,seen,{cancel=false}={}){
+ const brain=hunter.brain;
+ if(cancel||hunter.dive||(hunter.recoverUntil??0)>s.time){brain.dropPursuit=null;return null;}
+ let plan=brain.dropPursuit;
+ if(plan){
+  if(!hunter.grounded)plan.airborne=true;
+  if((plan.airborne&&hunter.grounded)||s.time>=plan.until){brain.dropPursuit=null;plan=null;}
+  else return{x:plan.x,z:plan.z,dash:true,jump:false};
+ }
+ if(!seen||!hunter.grounded||runner.grounded||runner.vy>1.5||
+    Math.hypot(runner.x-hunter.x,runner.z-hunter.z)>RANGE)return null;
+ const floor=worldHeight(runner.x,runner.z),drop=hunter.y-floor;
+ if(drop<MIN_DROP||runner.y<floor+.35||runner.y>hunter.y+4.5||s.time<(brain.nextDropCheck??0))return null;
+ brain.nextDropCheck=s.time+.1;
+ const lane=dropLane(hunter,{x:runner.x+runner.vx*.2,z:runner.z+runner.vz*.2,floor})??
+   dropLane(hunter,{x:runner.x,z:runner.z,floor});
+ if(!lane)return null;
+ brain.dropPursuit={...lane,airborne:false,until:s.time+Math.min(2.3,.85+lane.edge/18+Math.sqrt(2*drop/BODY.gravity))};
+ brain.supply=null;
+ return {x:lane.x,z:lane.z,dash:true,jump:false};
+}
+
+
+return {huntDropPursuit};
+})();
+const __tagModule41=(()=>{
+const {worldHeight,worldValid,worldTraversable,worldSteering,worldHuntAim}=__tagModule9;
+const HUNT_TEAM_CONTACT=Object.freeze({interval:.5,delay:.2,lifetime:4});
+// Input consists exclusively of real optical sightings. No hidden target,
+// radar, inventory, prediction of future inputs or player controls enter here.
+function updateHuntTeamContact(s,observations){
+ const pending=s.teamContactPending;
+ if(pending&&pending.availableAt<=s.time){s.teamContact=pending;s.teamContactPending=null;}
+ if(s.teamContact&&s.time-s.teamContact.at>HUNT_TEAM_CONTACT.lifetime)s.teamContact=null;
+ if(observations.length&&s.time>=(s.nextTeamContactAt??0)){
+  const sighting=observations[0];s.nextTeamContactAt=s.time+HUNT_TEAM_CONTACT.interval;
+  s.teamContactPending={owner:sighting.owner,at:s.time,availableAt:s.time+HUNT_TEAM_CONTACT.delay,point:{...sighting.point}};
+ }
+}
+function receiveHuntTeamContact(a,contact,time){
+ const m=a.brain;if(!contact||contact.owner===a.owner||time<contact.availableAt||time-contact.at>HUNT_TEAM_CONTACT.lifetime||contact.at<=(m.seenAt??-Infinity))return false;
+ m.seen={...contact.point};m.seenAt=contact.at;m.teamSeenAt=contact.at;m.next=0;m.searchPlan=null;m.supply=null;m.freshSweep=null;m.sweep=null;return true;
+}
+// Refresh the observed destination ten times a second. On open ground steer
+// towards it directly; walls, steps and narrow passages retain normal routing.
+// worldMove still supplies every acceleration, turn, speed limit and collision.
+function observedHuntChase(a,observed,time,m){
+ if(!observed){m.closeChase=null;return null;}
+ if(!m.closeChase||time>=m.closeChase.next){
+  const gap=Math.hypot(observed.x-a.x,observed.z-a.z),aim=gap>55?worldHuntAim(a,observed,m).target:(()=>{
+   const lead=Math.min(.35,Math.max(.06,gap/120));return{x:observed.x+(observed.vx??0)*lead,z:observed.z+(observed.vz??0)*lead,y:observed.y};})();
+  const padding=(a.radius??2.7)-.05,point={x:aim.x,z:aim.z,y:worldHeight(aim.x,aim.z)},current={x:observed.x,z:observed.z,y:worldHeight(observed.x,observed.z)};
+  let goal=null;
+  if(gap<=60&&worldValid(point,padding)&&worldTraversable(a,point,padding))goal=point;
+  else if(gap<=60&&worldValid(current,padding)&&worldTraversable(a,current,padding))goal=current;
+  m.closeChase={goal,next:time+.1};
+ }
+ return m.closeChase.goal?worldSteering(a,m.closeChase.goal,null):null;
+}
+
+return {HUNT_TEAM_CONTACT,updateHuntTeamContact,receiveHuntTeamContact,observedHuntChase};
+})();
+const __tagModule45=(()=>{
 // Geometry and camera checked by outputs/tag-corner-stairs-20261103/curate-starts.mjs.
 const RANDOM_START_DATA=Object.freeze({"minOpponentGap":180,"minHunterGap":85,"runners":[{"id":"runner-0","x":288,"z":-16,"y":0},{"id":"runner-1","x":-288,"z":-112,"y":0.01734204773108508},{"id":"runner-2","x":-64,"z":208,"y":0},{"id":"runner-3","x":0,"z":-208,"y":0},{"id":"runner-4","x":192,"z":208,"y":0},{"id":"runner-5","x":-128,"z":16,"y":0},{"id":"runner-6","x":224,"z":-208,"y":0},{"id":"runner-7","x":64,"z":48,"y":0},{"id":"runner-8","x":-160,"z":-208,"y":0},{"id":"runner-9","x":96,"z":-112,"y":0},{"id":"runner-10","x":-224,"z":112,"y":0},{"id":"runner-11","x":64,"z":176,"y":-0.223560870297598},{"id":"runner-12","x":288,"z":112,"y":0},{"id":"runner-13","x":-64,"z":-80,"y":0},{"id":"runner-14","x":192,"z":48,"y":0},{"id":"runner-15","x":-32,"z":48,"y":0},{"id":"runner-16","x":-192,"z":208,"y":0},{"id":"runner-17","x":-160,"z":-80,"y":0},{"id":"runner-18","x":192,"z":-112,"y":0},{"id":"runner-19","x":96,"z":-208,"y":1.6875}],"hunters":[{"id":"hunter-0","x":160,"z":80,"y":0},{"id":"hunter-1","x":-288,"z":-208,"y":0},{"id":"hunter-2","x":-256,"z":208,"y":0},{"id":"hunter-3","x":64,"z":-208,"y":0.5625},{"id":"hunter-4","x":-96,"z":-16,"y":0},{"id":"hunter-5","x":288,"z":-112,"y":0},{"id":"hunter-6","x":-32,"z":208,"y":0},{"id":"hunter-7","x":288,"z":208,"y":0},{"id":"hunter-8","x":-288,"z":-16,"y":4.753542132201249},{"id":"hunter-9","x":64,"z":-48,"y":0},{"id":"hunter-10","x":-128,"z":-208,"y":0},{"id":"hunter-11","x":160,"z":208,"y":0},{"id":"hunter-12","x":0,"z":80,"y":0},{"id":"hunter-13","x":-160,"z":112,"y":0},{"id":"hunter-14","x":288,"z":48,"y":0},{"id":"hunter-15","x":192,"z":-208,"y":0},{"id":"hunter-16","x":-192,"z":-112,"y":0},{"id":"hunter-17","x":192,"z":-48,"y":0},{"id":"hunter-18","x":-256,"z":80,"y":0.051406517844878284},{"id":"hunter-19","x":-64,"z":-112,"y":0}],"layouts":[[[6,13,1],[11,9,1],[15,9,2],[6,19,1],[9,13,1],[9,19,1],[11,13,1],[11,19,1]],[[3,0,7],[10,6,0],[17,11,5],[3,0,14],[6,0,5],[6,0,14],[6,0,15],[10,0,7]],[[4,0,1],[8,3,14],[16,3,14],[18,0,3],[0,1,5],[0,1,14],[4,0,3],[0,8,3],[0,3,14]],[[4,14,2],[16,4,2],[13,14,2],[17,13,2],[16,14,2],[17,14,2]],[[9,5,1],[5,16,8],[19,5,1],[13,5,1],[17,5,1],[9,13,1],[9,19,1],[17,13,1]],[[6,1,0],[2,0,3],[2,0,5],[2,0,14],[2,0,15],[6,0,3],[0,3,7]],[[0,4,2],[12,16,2],[14,4,2],[0,14,2],[0,16,2],[0,4,6],[0,4,7],[0,14,4]],[[13,7,1],[19,7,1],[13,14,1],[19,14,1],[13,2,14],[13,15,2]],[[4,0,2],[0,2,5],[0,2,14],[4,0,5],[4,0,6],[4,0,7]],[[0,4,1],[0,5,1],[0,1,7],[0,1,14],[0,4,2],[0,5,2]],[[4,6,3],[4,3,7],[4,3,14],[4,16,3],[6,3,14],[6,16,3]],[[4,5,1],[13,5,1],[17,5,1],[19,5,1],[17,13,1],[17,19,1]],[[6,4,1],[6,17,1],[6,19,1],[9,19,1],[17,19,1],[15,4,2]],[[3,0,2],[0,2,5],[0,2,14],[0,15,2],[3,6,0],[3,0,7]],[[6,5,1],[7,13,1],[13,5,1],[19,5,1],[12,6,1],[6,13,1],[6,19,1]],[[0,7,1],[0,1,14],[0,3,2],[0,2,14],[0,2,15],[0,16,2]],[[4,0,3],[0,3,14],[16,0,3],[4,0,5],[4,0,10],[4,0,14]],[[1,0,5],[1,6,0],[1,0,7],[1,0,14],[3,2,0],[2,0,5]],[[0,4,1],[0,7,1],[0,14,1],[0,19,1],[0,4,2],[0,14,2]],[[4,0,2],[0,14,2],[16,0,2],[4,0,6],[4,0,14],[4,16,0]]]});
 
 return {RANDOM_START_DATA};
 })();
-const __tagModule37=(()=>{
-const {RANDOM_START_DATA : data}=__tagModule38;
-const {WORLD_CORNER_STAIRS,worldHeight,worldValid,worldSight}=__tagModule7;
+const __tagModule44=(()=>{
+const {RANDOM_START_DATA : data}=__tagModule45;
+const {WORLD_CORNER_STAIRS,worldHeight,worldValid,worldSight}=__tagModule9;
 // New raised terrain must not leave a starting actor facing an immediate riser.
 function groundedStart(p){let{x,z}=p;for(const c of WORLD_CORNER_STAIRS){const u=(c.x-x)*c.sx,v=(c.z-z)*c.sz;if(u>c.rampWidth&&v>c.rampWidth&&u<=c.span&&v<=c.span){if(u<=v)x=c.x-c.sx*16;else z=c.z-c.sz*16;break;}}return Object.freeze({...p,x,z,y:worldHeight(x,z)});}
 const RUNNER_STARTS=Object.freeze(data.runners.map(groundedStart));
@@ -1791,9 +2168,9 @@ function randomHuntStart(random,mode='escape'){
 
 return {RUNNER_STARTS,HUNTER_STARTS,RANDOM_START_LAYOUTS,MIN_OPPONENT_START_GAP,mixHuntStartSeed,randomHuntStart};
 })();
-const __tagModule36=(()=>{
-const {RUNNER_STARTS}=__tagModule37;
-const {WORLD_CORNER_STAIRS,worldHeight,worldSight}=__tagModule7;
+const __tagModule43=(()=>{
+const {RUNNER_STARTS}=__tagModule44;
+const {WORLD_CORNER_STAIRS,worldHeight,worldSight}=__tagModule9;
 // Only public, traversable locations and teammates' assignments are used.
 // There is deliberately no runner/target argument or read of hidden equipment.
 const SEARCH_PLACES=Object.freeze([
@@ -1833,10 +2210,10 @@ function freshHuntSweep(a,{time,seed,coverage,team}){
 
 return {SEARCH_PLACES,SEARCH_REFRESH_SECONDS,freshHuntSweep};
 })();
-const __tagModule35=(()=>{
-const {freshHuntSweep}=__tagModule36;
-const {HUNTER_STARTS}=__tagModule37;
-const {WORLD_CORNER_STAIRS,worldHeight}=__tagModule7;
+const __tagModule42=(()=>{
+const {freshHuntSweep}=__tagModule43;
+const {HUNTER_STARTS}=__tagModule44;
+const {WORLD_CORNER_STAIRS,worldHeight}=__tagModule9;
 // Public, already traversable map locations. No current target position, item,
 // or unseen observation enters this broad search. Each stride covers all 20.
 const patterns={pursuit:{offset:0,stride:7},intercept:{offset:7,stride:9},patrol:{offset:14,stride:11}};
@@ -1893,8 +2270,8 @@ function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false
 
 return {huntSweepControl};
 })();
-const __tagModule39=(()=>{
-const {worldHeight,worldValid,worldTraversable,worldSight,worldCameraPose}=__tagModule7;
+const __tagModule46=(()=>{
+const {worldHeight,worldValid,worldTraversable,worldSight,worldCameraPose}=__tagModule9;
 // Round layout only. Initial positions constrain the starting camera, just as
 // they constrain spawn spacing. Never called by CPU perception or during play.
 // Bounded work at round creation; no camera or steering updates during play.
@@ -1921,9 +2298,10 @@ function huntStartFacing(a,others=[]){
 
 return {huntStartFacing};
 })();
-const __tagModule40=(()=>{
-const {HUNT_FIELDS}=__tagModule9;
-const {worldSight,worldValid,worldHeight}=__tagModule7;
+const __tagModule47=(()=>{
+const {HUNT_FIELDS}=__tagModule11;
+const {worldSight,worldValid,worldHeight}=__tagModule9;
+const {usesCommittedBalloonDescent}=__tagModule3;
 // A stationary, visible source. Only the forward stream applies force;
 // ordinary world collision still resolves the resulting movement.
 function huntFanExposure(a,g,now){
@@ -1934,7 +2312,15 @@ function huntFanExposure(a,g,now){
 }
 function applyHuntWind(s,a,dt){let hit=false;for(const g of s.gadgets){const strength=huntFanExposure(a,g,s.time);if(!strength)continue;hit=true;
  const mass=Math.sqrt(3/Math.max(2,a.radius)),dx=Math.sin(g.yaw),dz=Math.cos(g.yaw),along=a.vx*dx+a.vz*dz,force=Math.max(0,Math.min(100*strength*mass*dt,38-along));a.vx+=dx*force;a.vz+=dz*force;a.externalForce=true;
- if(s.time>(a.windContactUntil??0)){a.vy=Math.max(a.vy,5.5*mass);a.grounded=false;a.jumps=Math.max(1,a.jumps);s.events.push({id:s.nextId++,type:'fan-push',owner:a.owner,at:s.time});}a.windContactUntil=s.time+.25;
+ if(s.time>(a.windContactUntil??0)){
+  // A committed landing holds the horizontal position. Lifting the actor
+  // again here can trap it above the fan until the fan expires.
+ if(!usesCommittedBalloonDescent(s.rules)||a.flight?.stage!=='descend'){
+   a.vy=Math.max(a.vy,5.5*mass);a.grounded=false;a.jumps=Math.max(1,a.jumps);
+   s.events.push({id:s.nextId++,type:'fan-push',owner:a.owner,at:s.time});
+  }
+ }
+ a.windContactUntil=s.time+.25;
  }return hit;}
 // Include a swept test so a fast dash cannot tunnel through the fan pedestal.
 function resolveHuntFans(s,a,before){if(!before)return;for(const g of s.gadgets){if(g.kind!=='fan'||g.until<=s.time||a.y>=g.y+HUNT_FIELDS.fanHeight||a.y+5.4<=g.y)continue;const radius=g.radius+a.radius,dx=a.x-before.x,dz=a.z-before.z,ox=before.x-g.x,oz=before.z-g.z,A=dx*dx+dz*dz,B=ox*dx+oz*dz,C=ox*ox+oz*oz-radius*radius,D=B*B-A*C;let x=a.x,z=a.z;const d=Math.hypot(x-g.x,z-g.z);if(d>=radius&&!(A>1e-9&&C>0&&B<0&&D>=0&&(-B-Math.sqrt(D))/A<=1))continue;
@@ -1945,10 +2331,10 @@ function steerAroundHuntFans(s,a,input){const n=Math.hypot(input.x??0,input.z??0
 
 return {huntFanExposure,applyHuntWind,resolveHuntFans,steerAroundHuntFans};
 })();
-const __tagModule41=(()=>{
-const {BODY,HUNT_JUMP,WORLD_COURTYARD,worldHeight,worldSteering,worldTraversable}=__tagModule7;
-const {huntCanObserve}=__tagModule25;
-const {huntFanExposure,steerAroundHuntFans}=__tagModule40;
+const __tagModule48=(()=>{
+const {BODY,HUNT_JUMP,WORLD_COURTYARD,worldHeight,worldSteering,worldTraversable}=__tagModule9;
+const {huntCanObserve}=__tagModule29;
+const {huntFanExposure,steerAroundHuntFans}=__tagModule47;
 
 const SCAN=.2,MEMORY=.45,REACTION=.24,DECIDE=.18;
 const offsets=[0,.4,-.4,.8,-.8,1.2,-1.2,1.57,-1.57];
@@ -2106,11 +2492,11 @@ function steerClearOfHuntWind(s,a,input,{visible=g=>huntCanObserve(s,a,g,72),cou
 
 return {steerClearOfHuntWind};
 })();
-const __tagModule42=(()=>{
-const {huntJumpRestRemaining}=__tagModule34;
-const {worldSurface,worldTraversable,worldSight,worldHeight}=__tagModule7;
-const {huntCanObserve}=__tagModule25;
-const {movingItemContactRadius}=__tagModule23;
+const __tagModule49=(()=>{
+const {huntJumpRestRemaining}=__tagModule2;
+const {worldSurface,worldTraversable,worldSight,worldHeight}=__tagModule9;
+const {huntCanObserve}=__tagModule29;
+const {movingItemContactRadius}=__tagModule27;
 const SCAN=.1,MEMORY=.22,REACTION=.18;
 // A short estimate using the observed rolling speed and ordinary drag. It is
 // advice for a jump, never a new impact volume or a guaranteed dodge.
@@ -2153,51 +2539,12 @@ function cushionJumpControl(s,a,input,{visible=g=>huntCanObserve(s,a,g,55)}={}){
 
 return {cushionImpactTime,cushionJumpControl};
 })();
-const __tagModule43=(()=>{
-const {movingItemContactRadius}=__tagModule23;
-const CUSHION_DIZZY_SECONDS=2;
-const huntIsDizzy=(s,a)=>(a?.effects?.dizzy??0)>s.time;
-// Each rolling cushion can daze a body once. Resting against the same ball
-// must never keep renewing the two-second timer.
-function applyCushionDizzy(s,a,g){
- if(g.kind!=='cushion'||g.until<=s.time||g.owner===a.owner&&s.time-g.spawnedAt<.35||g.ignore===a.owner&&s.time<g.ignoreUntil||g.dizzyHits?.[a.owner])return false;
- const r=movingItemContactRadius(a,g);if(r<0||Math.hypot(a.x-g.x,a.z-g.z)>r)return false;
- (g.dizzyHits??={})[a.owner]=true;(a.effects??={}).dizzy=s.time+CUSHION_DIZZY_SECONDS;
- a.hook=null;a.flight=null;a.dive=null;a.pendingItem=null;a.vx*=.25;a.vz*=.25;return true;
-}
-
-return {CUSHION_DIZZY_SECONDS,huntIsDizzy,applyCushionDizzy};
-})();
-const __tagModule45=(()=>{
-const {HUNT_JUMP,worldHeight,worldTraversable,worldValid}=__tagModule7;
-const TRAMPOLINE=Object.freeze({x:0,z:0,radius:9,matRadius:7.85,top:2.2,launch:HUNT_JUMP.launch*Math.sqrt(HUNT_JUMP.maxJumps*1.25),forwardMin:28,forwardMax:34,forwardAdded:8});
-function trampolineLaunchSpeed(speed){return Math.min(TRAMPOLINE.forwardMax,Math.max(TRAMPOLINE.forwardMin,(Number.isFinite(speed)?Math.max(0,speed):0)+TRAMPOLINE.forwardAdded));}
-function createHuntTrampoline(){return{...TRAMPOLINE,y:worldHeight(0,0)+TRAMPOLINE.top,used:false,usedAt:null};}
-function trampolineJumpAccess(s,a){const p=s.trampoline;return !!p&&!p.used&&a.grounded&&a.y<p.y-.05&&Math.hypot(a.x-p.x,a.z-p.z)<=p.radius+(a.radius??2.7)+Math.max(3,Math.min(10,Math.hypot(a.vx,a.vz)*.5));}
-function trampolineInput(a,input){if(a.trampolineBoost&&a.vy>0)return{...input,jump:true};a.trampolineBoost=false;a.trampolineForwardSpeed=0;return input;}
-function trampolineSurface(s,x,z){const p=s.trampoline;return p&&!p.used&&Math.hypot(x-p.x,z-p.z)<=p.radius?p.y:worldHeight(x,z);}
-function trampolineClear(s,a,radius=a.radius??2.7){const p=s.trampoline;return !p||p.used||a.y>=p.y-.001||Math.hypot(a.x-p.x,a.z-p.z)>=p.radius+radius-.001;}
-function resolveTrampoline(s,a,before){const p=s.trampoline;if(!p||p.used)return null;const dx=a.x-p.x,dz=a.z-p.z,d=Math.hypot(dx,dz),lowRadius=a.kind==='cushion'||a.kind==='sticky'?a.radius:Math.min(1.25,a.radius*.35),foot=p.matRadius+lowRadius,support=p.radius+lowRadius,descending=a.y<=p.y&&a.vy<=0,above=before.y>p.y+1e-5&&descending,onTop=before.y>=p.y-.03&&descending;
- if(d<=support&&(above||onTop)){
-  if(d<=foot&&a===s.player&&!before.grounded&&before.jumps>0&&above){const speed=Math.hypot(a.vx,a.vz),launch=trampolineLaunchSpeed(speed),nx=speed>2?a.vx/speed:Math.sin(a.yaw),nz=speed>2?a.vz/speed:Math.cos(a.yaw);p.used=true;p.usedAt=s.time;delete a.stepJump;a.y=p.y;a.vy=p.launch;a.vx=nx*launch;a.vz=nz*launch;a.trampolineForwardSpeed=launch;a.grounded=false;a.jumps=HUNT_JUMP.maxJumps;a.jumpHeld=true;a.trampolineBoost=true;a.trampolineSafeUntil=s.time+.25;return'bounce';}
-  a.y=p.y;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;return'support';
- }
- if(a.y<p.y-.001&&d<support){const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0,r=support+.001,q={x:p.x+nx*r,z:p.z+nz*r,y:a.y};if(worldValid(q,a.radius-.01)){a.x=q.x;a.z=q.z;const inward=a.vx*nx+a.vz*nz;if(inward<0){a.vx-=nx*inward;a.vz-=nz*inward;}}}return null;
-}
-function trampolineObstacleJump(s,a,input){const p=s.trampoline;if(!p||p.used||!a.grounded||a.y>=p.y-.05)return false;const dx=p.x-a.x,dz=p.z-a.z,d=Math.hypot(dx,dz);return d<p.radius+a.radius+8&&dx*(input.x??0)+dz*(input.z??0)>1;}
-function trampolineEscapeControl(s,a,input,underPressure){const p=s.trampoline,m=a.brain;if(!m||!p||p.used||a.trampolineBoost){if(m)m.trampolineApproach=false;return input;}const dx=p.x-a.x,dz=p.z-a.z,d=Math.hypot(dx,dz);
- if(!m.trampolineApproach){if(!underPressure||d>48)return input;if(s.time<(m.trampolineCheckAt??0))return input;m.trampolineCheckAt=s.time+.3;if(!worldTraversable(a,p,a.radius+.2))return input;m.trampolineApproach=true;}
- if(d>65){m.trampolineApproach=false;return input;}m.supply=null;return{...input,x:dx/(d||1),z:dz/(d||1),dash:true,jump:a.grounded?d<20:a.jumpHeld&&a.vy>0};
-}
-
-return {TRAMPOLINE,trampolineLaunchSpeed,createHuntTrampoline,trampolineJumpAccess,trampolineInput,trampolineSurface,trampolineClear,resolveTrampoline,trampolineObstacleJump,trampolineEscapeControl};
-})();
-const __tagModule44=(()=>{
-const {huntBodiesTouch}=__tagModule15;
-const {worldHeight,worldValid,worldSight}=__tagModule7;
-const {HOOK_POLES}=__tagModule9;
-const {trampolineSurface,trampolineClear}=__tagModule45;
-const {diveCanTouch}=__tagModule17;
+const __tagModule50=(()=>{
+const {huntBodiesTouch}=__tagModule17;
+const {worldHeight,worldValid,worldSight}=__tagModule9;
+const {HOOK_POLES}=__tagModule11;
+const {trampolineSurface,trampolineClear}=__tagModule20;
+const {diveCanTouch}=__tagModule21;
 const HUNT_ZIP=Object.freeze({range:132,seconds:.28,loft:3,sweep:.65,exitSpeed:30});
 const surface=(s,x,z)=>s?trampolineSurface(s,x,z):worldHeight(x,z);
 function point(s,h,t){const x=h.fromX+(h.toX-h.fromX)*t,z=h.fromZ+(h.toZ-h.fromZ)*t;return{x,z,y:Math.max(surface(s,x,z),h.fromY+(h.toY-h.fromY)*t+Math.sin(Math.PI*t)*HUNT_ZIP.loft)};}
@@ -2218,7 +2565,7 @@ function startHuntZip(s,a,p){a.hook={x:p.x,y:p.y,z:p.z,fromX:a.x,fromY:a.y,fromZ
 function moveHuntZip(s,a,dt){
  const h=a.hook;if(!h)return false;const t=Math.max(0,Math.min(1,(s.time-h.since)/HUNT_ZIP.seconds)),target=point(s,h,t),steps=Math.max(1,Math.ceil(Math.hypot(target.x-a.x,target.z-a.z, target.y-a.y)/HUNT_ZIP.sweep)),from={x:a.x,y:a.y,z:a.z};let stopped=false;
  for(let i=1;i<=steps;i++){const q={x:from.x+(target.x-from.x)*i/steps,y:from.y+(target.y-from.y)*i/steps,z:from.z+(target.z-from.z)*i/steps};if(!clear(s,a,a,q)){stopped=true;break;}Object.assign(a,q);
-  const catcher=s.hunters.find(b=>!b.flight&&!((b.effects?.dizzy??0)>s.time)&&s.time>=(b.noTagUntil??0)&&s.time>=(a.trampolineSafeUntil??0)&&huntBodiesTouch(b,a));if(catcher){s.zipTouch=catcher.owner;stopped=true;break;}
+  const catcher=s.hunters.find(b=>!b.flight&&!((b.effects?.dizzy??0)>s.time)&&s.time>=(b.noTagUntil??0)&&s.time>=(a.trampolineSafeUntil??0)&&huntBodiesTouch(b,a,s));if(catcher){s.zipTouch=catcher.owner;stopped=true;break;}
  }
  a.grounded=false;a.externalForce=true;a.vx=(a.x-from.x)/dt;a.vy=(a.y-from.y)/dt;a.vz=(a.z-from.z)/dt;
  if(stopped||t>=1){const dx=h.toX-h.fromX,dz=h.toZ-h.fromZ,d=Math.hypot(dx,dz)||1;a.hook=null;a.vx=stopped?0:dx/d*HUNT_ZIP.exitSpeed;a.vz=stopped?0:dz/d*HUNT_ZIP.exitSpeed;a.vy=0;const floor=surface(s,a.x,a.z);if(a.y<=floor+.05){a.y=floor;a.grounded=true;a.jumps=0;}}
@@ -2227,19 +2574,126 @@ function moveHuntZip(s,a,dt){
 
 return {HUNT_ZIP,findHuntZipAnchor,startHuntZip,moveHuntZip};
 })();
-const __tagModule46=(()=>{
-const {huntOpticalHidden}=__tagModule25;
+const __tagModule52=(()=>{
+const HUNT_TURN_RATE=110*Math.PI/180;
+const PAD_TURN_TRAVEL=.75;
+const KEY_TURN_TRAVEL=.24;
+
+// The pad steers the actor independently of the viewing camera.
+function huntPadMovement(heading,{x,z},dt,turnTravel=PAD_TURN_TRAVEL){
+ const turn=Math.sign(x)*Math.max(0,(Math.abs(x)-.10)/.90);
+ const yaw=heading-turn*HUNT_TURN_RATE*dt;
+ const nextHeading=Math.atan2(Math.sin(yaw),Math.cos(yaw));
+ const travel=turnTravel*Math.abs(x)*(1-Math.abs(z))-z;
+ return {heading:nextHeading,x:Math.sin(nextHeading)*travel,z:Math.cos(nextHeading)*travel};
+}
+
+// Keyboard and pad share this single heading. Keep it while reversing so the
+// body's backward-facing pose cannot flip the next input. If a special move
+// took over the body, resume from its actual facing, never from turns queued
+// invisibly during the interruption.
+function huntKeyboardMovement(memory,heading,axis,dt,{keyboard=true}={}){
+ if(Number.isFinite(memory.facing)&&Math.abs(Math.atan2(Math.sin(heading-memory.facing),Math.cos(heading-memory.facing)))>.001)memory.heading=null;
+ // A digital sideways key is all-or-nothing. Reduce its travel so a
+ // small correction beside a pickup doesn't carry the body past it.
+ const move=huntPadMovement(memory.heading??heading,axis,dt,keyboard?KEY_TURN_TRAVEL:PAD_TURN_TRAVEL);
+ memory.heading=axis.x||axis.z?move.heading:null;
+ memory.facing=Math.hypot(move.x,move.z)>.05?Math.atan2(move.x,move.z):null;
+ return {x:move.x,z:move.z};
+}
+
+return {HUNT_TURN_RATE,huntPadMovement,huntKeyboardMovement};
+})();
+const __tagModule51=(()=>{
+const {worldHeight,worldSight,worldValid}=__tagModule9;
+const {HUNT_TURN_RATE}=__tagModule52;
+const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+// Keep one approach side for the whole flight. Do not alternate between a
+// tangent and the opposite bearing whenever the runner crosses a distance band.
+function stableBalloonTarget(s,a,gap){
+ const f=a.flight??{},runner=s.player,aim={x:runner.x+runner.vx*.18,z:runner.z+runner.vz*.18};
+ const angle=f.stableBearing??Math.atan2(a.x-aim.x,a.z-aim.z),radius=a.radius+runner.radius+gap;
+ for(const offset of[0,.25,-.25,.5,-.5,.75,-.75,1,-1,1.5,-1.5,2,-2,2.5,-2.5,Math.PI]){
+  const bearing=angle+offset,p={x:aim.x+Math.sin(bearing)*radius,z:aim.z+Math.cos(bearing)*radius};p.y=worldHeight(p.x,p.z);
+  if(!worldValid(p,a.radius+.2))continue;
+  f.stableBearing=bearing;return p;
+ }
+ return null;
+}
+function stableBalloonSteer(a,goal,dt){
+ const f=a.flight,dx=goal.x-a.x,dz=goal.z-a.z,d=Math.hypot(dx,dz);
+ const requested=d>.5?Math.atan2(dx,dz):f.steerYaw??a.yaw;
+ const prior=f.steerYaw??a.yaw,delta=Math.atan2(Math.sin(requested-prior),Math.cos(requested-prior));
+ f.turnRate??=0;
+ const acceleration=clamp(delta*16-f.turnRate*8,-4.2,4.2);
+ f.turnRate=clamp(f.turnRate+acceleration*dt,-2.1,2.1);
+ f.steerYaw=prior+f.turnRate*dt;
+ return{x:a.x+Math.sin(f.steerYaw)*d,z:a.z+Math.cos(f.steerYaw)*d};
+}
+function stableBalloonHeight(f,wanted,dt){
+ f.hoverY??=f.launchY;
+ f.hoverY+=clamp(wanted-f.hoverY,-5*dt,12*dt);
+ return f.hoverY;
+}
+
+// The descent holds the landing column. Directional input can still turn
+// the monster and its follow camera while it comes down.
+function balloonDescentFacing(a,input,dt){
+ if(Math.hypot(input.x??0,input.z??0)<=.05)return;
+ const heading=Math.atan2(input.x,input.z);
+ const delta=Math.atan2(Math.sin(heading-a.yaw),Math.cos(heading-a.yaw));
+ a.yaw+=clamp(delta,-HUNT_TURN_RATE*dt,HUNT_TURN_RATE*dt);
+}
+
+// A raised street can split the walking graph even when there is room to
+// float across it. Keep the same building, tree and pole clearances as
+// balloon movement, and never use the air path as the descent footprint.
+function balloonAirApproach(a,target){
+ const dx=target.x-a.x,dz=target.z-a.z,distance=Math.hypot(dx,dz),floor=worldHeight(a.x,a.z);
+ if(distance<8||distance>190||a.y<floor+6)return null;
+ const pad=a.radius+.35,steps=Math.ceil(distance/2),cap=Math.max(a.y,floor+14.5);
+ let altitude=Math.max(floor,worldHeight(target.x,target.z))+.9;
+ for(let i=0;i<=steps;i++){
+  const u=i/steps,x=a.x+dx*u,z=a.z+dz*u;
+  altitude=Math.max(altitude,Math.max(worldHeight(x,z),worldHeight(x-pad,z),worldHeight(x+pad,z),worldHeight(x,z-pad),worldHeight(x,z+pad))+.9);
+  if(altitude>cap)return null;
+ }
+ if(!worldSight({...a,y:altitude},{...target,y:altitude},pad))return null;
+ for(let i=0;i<=steps;i++){
+  const u=i/steps;
+  if(!worldValid({x:a.x+dx*u,z:a.z+dz*u,y:altitude},pad))return null;
+ }
+ return altitude;
+}
+
+return {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonDescentFacing,balloonAirApproach};
+})();
+const __tagModule53=(()=>{
+const {huntOpticalHidden}=__tagModule29;
 // Coarse sectors and three distance bands: no exact position, distance or route.
 // Both UI and CPU receive coarse information only while their own item is active.
-function huntRadarFor(s,observer,yaw=0){
+function huntRadarFor(s,observer,yaw=0,{dial=false}={}){
  const remaining=Math.max(0,(observer.effects?.radar??0)-s.time),hunting=observer!==s.player;
  if(!remaining||s.phase==='finished')return{active:false,remaining:0,mode:hunting?'hunt':'escape',danger:'clear',contacts:[]};
- const enemies=hunting?[s.player,...(s.gadgets??[]).filter(g=>g.kind==='clone'&&g.owner===s.player.owner&&Number.isFinite(g.until)&&g.until>s.time).map(g=>({x:g.x,z:g.z,vx:g.vx,vz:g.vz,owner:'echo:'+g.id,role:'runner'}))]:s.hunters,contacts=[];let danger='clear';
+ const enemies=hunting?[s.player,...(s.gadgets??[]).filter(g=>g.kind==='clone'&&g.owner===s.player.owner&&Number.isFinite(g.until)&&g.until>s.time).map(g=>({x:g.x,y:g.y,z:g.z,vx:g.vx,vz:g.vz,owner:'echo:'+g.id,role:'runner'}))]:s.hunters,contacts=[];let danger='clear';
  for(const a of enemies){if(huntOpticalHidden(s,observer,a))continue;const dx=a.x-observer.x,dz=a.z-observer.z,d=Math.hypot(dx,dz);
   const closing=-((a.vx-observer.vx)*dx+(a.vz-observer.vz)*dz)/(d||1),level=d<36?'danger':d<95||closing>3&&d<130?'warning':'clear';
   if(level==='danger'||level==='warning'&&danger==='clear')danger=level;
-  const sector=((Math.round((Math.atan2(dx,dz)-yaw)*4/Math.PI)%8)+8)%8,band=d<45?1:d<110?2:3;
-  contacts.push({owner:a.owner,sector,band,level,role:a.role??'runner'});
+  const bearing=Math.atan2(dx,dz)-yaw;
+  const sector=((Math.round(bearing*4/Math.PI)%8)+8)%8,band=d<45?1:d<110?2:3;
+  const contact={owner:a.owner,sector,band,level,role:a.role??'runner'};
+  if(dial){
+   if(band===1){
+    const height=a.y-observer.y;
+    if(height>=6)contact.height='above';
+    else if(height<=-6)contact.height='below';
+   }else{
+    // The outer rings have room for intermediate directions. CPU contacts
+    // retain the eight sectors used by the recorded match rules.
+    contact.dialSector=((Math.round(bearing*8/Math.PI)%16)+16)%16;
+   }
+  }
+  contacts.push(contact);
  }return{active:true,remaining,mode:hunting?'hunt':'escape',danger,contacts};
 }
 function huntRadar(s,yaw=0){return huntRadarFor(s,s.config.mode==='hunt'?s.hunters[0]:s.player,yaw);}
@@ -2248,15 +2702,15 @@ function huntRadar(s,yaw=0){return huntRadarFor(s,s.config.mode==='hunt'?s.hunte
 function radarObservations(s,a){return huntRadarFor(s,a).contacts.map(p=>{const angle=p.sector*Math.PI/4,d=[0,24,76,148][p.band];return{owner:p.owner,x:a.x+Math.sin(angle)*d,z:a.z+Math.cos(angle)*d,y:a.y,vx:0,vz:0,radius:2.7,radar:true};});}
 // North is -Z. Live UI passes the actual resolved camera yaw, including orbit
 // and obstacle avoidance. Body facing remains a fallback for non-view callers.
-function huntCompass(s,viewYaw){const a=s.config.mode==='hunt'?s.hunters[0]:s.player,camera=Number.isFinite(viewYaw),angle=camera?-viewYaw:Math.PI-a.yaw,heading=((angle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);return{...huntRadar(s,0),heading,facing:['北','北東','東','南東','南','南西','西','北西'][Math.round(heading/(Math.PI/4))%8],headingSource:camera?'camera':'body'};}
+function huntCompass(s,viewYaw){const a=s.config.mode==='hunt'?s.hunters[0]:s.player,camera=Number.isFinite(viewYaw),angle=camera?-viewYaw:Math.PI-a.yaw,heading=((angle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);return{...huntRadarFor(s,a,0,{dial:true}),heading,facing:['北','北東','東','南東','南','南西','西','北西'][Math.round(heading/(Math.PI/4))%8],headingSource:camera?'camera':'body'};}
 
 return {huntRadarFor,huntRadar,radarObservations,huntCompass};
 })();
-const __tagModule48=(()=>{
-const {findHuntZipAnchor}=__tagModule44;
-const {worldHeight,worldValid,worldSight}=__tagModule7;
-const {trampolineSurface,trampolineClear}=__tagModule45;
-const {HOOK_POLES,HUNT_FIELDS}=__tagModule9;
+const __tagModule55=(()=>{
+const {findHuntZipAnchor}=__tagModule50;
+const {worldHeight,worldValid,worldSight}=__tagModule9;
+const {trampolineSurface,trampolineClear}=__tagModule20;
+const {HOOK_POLES,HUNT_FIELDS}=__tagModule11;
 const radii=Object.freeze({cushion:3,curtain:HUNT_FIELDS.curtainRadius,sheet:HUNT_FIELDS.sheetRadius,fan:HUNT_FIELDS.fanRadius});
 function huntGadgetRadius(type,a){return type==='clone'?a.radius:radii[type]??null;}
 // The same physical footprint is used by human placement and CPU planning.
@@ -2268,10 +2722,10 @@ function huntHookAnchor(a,s,allowed){return findHuntZipAnchor(a,s,allowed);}
 
 return {huntGadgetRadius,huntGadgetPlacement,huntHookAnchor};
 })();
-const __tagModule47=(()=>{
-const {worldHeight}=__tagModule7;
-const {HOOK_POLES}=__tagModule9;
-const {huntHookAnchor}=__tagModule48;
+const __tagModule54=(()=>{
+const {worldHeight}=__tagModule9;
+const {HOOK_POLES}=__tagModule11;
+const {huntHookAnchor}=__tagModule55;
 const key=p=>p.x+':'+p.z,gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const RUNNER_HOOK=Object.freeze({scan:.4,plan:.2,memory:6,sight:132,approach:21,urgent:26});
 // Observed poles and remembered threats only. Do not detour toward unseen poles.
@@ -2287,10 +2741,10 @@ function runnerHookControl(s,input,{poleVisible=()=>false}={}){
 
 return {RUNNER_HOOK,runnerHookControl};
 })();
-const __tagModule49=(()=>{
-const {huntPermanentToolUseful}=__tagModule25;
-const {PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES}=__tagModule9;
-const {WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldHeight,worldValid,worldSight,worldTraversable}=__tagModule7;
+const __tagModule56=(()=>{
+const {huntPermanentToolUseful}=__tagModule29;
+const {PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,EXTRA_BALLOON_COUNT}=__tagModule11;
+const {WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldHeight,worldValid,worldSight,worldTraversable}=__tagModule9;
 
 // Both factions have a radar, alongside the existing props, spread over the world instead of a ring at the start.
 // Static geometry work is shared between rounds, never repeated every frame.
@@ -2323,6 +2777,75 @@ function createHuntSupplies(random,actors=[]){
   const {x,y,z}=ranked[0].p;result.push({x,y,z,lift:audience==='player'?PICKUP_LIFT:0,bobPhase:index,home:{x,y,z},region:zone.id,id:'pickup-'+result.length,type,audience,readyAt:0,pull:null});
  }
  return result;
+}
+
+
+// Add coverage to regions without a pickup after the ordinary layout and
+// opening tool have been placed. The original layout and its RNG are retained.
+function addHuntBalloonSupplies(pickups, actors) {
+ const occupied = new Set(pickups.map(p => p.region));
+ for (let added = 0; added < EXTRA_BALLOON_COUNT; added++) {
+  const balloons = pickups.filter(p => p.type === 'balloon');
+  let best = null;
+  let bestScore = -Infinity;
+  for (const zone of SUPPLY_ZONES) {
+   if (occupied.has(zone.id)) continue;
+   for (const point of candidates(zone)) {
+    if (actors.some(a => distance(a, point) <= a.radius + 12)) continue;
+    const nearest = Math.min(...pickups.map(p => distance(p, point)));
+    if (nearest <= 48) continue;
+    const nearestBalloon = Math.min(...balloons.map(p => distance(p, point)));
+    // Cover a different area without pushing the new tools to the map corners.
+    const score = Math.min(160, nearestBalloon) + Math.min(90, nearest) * .25 -
+      Math.hypot(point.x, point.z) * .1;
+    if (score > bestScore) {
+     best = {point, region:zone.id};
+     bestScore = score;
+    }
+   }
+  }
+  if (!best) throw Error('NO_SAFE_EXTRA_BALLOON');
+  const {x, y, z} = best.point;
+  const index = pickups.length;
+  pickups.push({
+   x, y, z, home:{x, y, z}, region:best.region, id:'pickup-' + index,
+   type:'balloon', audience:'hunters', lift:0, bobPhase:index, readyAt:0, pull:null
+  });
+  occupied.add(best.region);
+ }
+}
+
+const approachDistances=[44,36,52,28,60,68];
+const approachAngles=[0,Math.PI/12,-Math.PI/12,Math.PI/6,-Math.PI/6];
+function onOpeningApproach(hunter,pickup){
+ const dx=pickup.x-hunter.x,dz=pickup.z-hunter.z;
+ const forward=dx*Math.sin(hunter.yaw)+dz*Math.cos(hunter.yaw);
+ return forward>=Math.hypot(dx,dz)*Math.cos(Math.PI/6)-.01&&
+  worldTraversable(hunter,pickup,hunter.radius+.25)&&
+  worldSight({...hunter,y:hunter.y+4},{...pickup,y:pickup.y+3.5});
+}
+
+// Keep one regular ground tool within reach of the opening route. Do not
+// change the assortment or consume any extra random numbers for the match.
+function placeHuntOpeningSupply(pickups,hunter,actors){
+ const groundTools=pickups.filter(p=>p.audience==='hunters');
+ if(groundTools.some(p=>distance(hunter,p)<=65&&onOpeningApproach(hunter,p)))return;
+ groundTools.sort((a,b)=>distance(hunter,a)-distance(hunter,b));
+ for(const angle of approachAngles){
+  const yaw=hunter.yaw+angle;
+  for(const gap of approachDistances){
+   const x=hunter.x+Math.sin(yaw)*gap,z=hunter.z+Math.cos(yaw)*gap;
+   const point={x,y:worldHeight(x,z),z};
+   if(!worldValid(point,padding)||!onOpeningApproach(hunter,point))continue;
+   if(actors.some(a=>distance(a,point)<(a.owner==='player'?55:a.radius+12)))continue;
+   const neighbors=pickups.filter(p=>distance(p,point)<=48);
+   if(neighbors.length>1)continue;
+   const tool=neighbors[0]??groundTools[0];
+   if(tool?.audience!=='hunters')continue;
+   Object.assign(tool,point,{home:point,region:'opening-approach'});
+   return;
+  }
+ }
 }
 
 const preferences={pursuit:{scarf:5,ink:4,sunglasses:4,radar:4},intercept:{balloon:5,sunglasses:4},patrol:{sunglasses:5,ink:3,radar:4}};
@@ -2361,12 +2884,12 @@ function steer(a,p,control,time){const d=distance(a,p);if(!p.lift)return{...cont
  if(d<a.radius+5){if(a.grounded){a.brain.supplyJumpAt=time+.24;out.jump=true;}else if(a.jumps===1&&time>=a.brain.supplyJumpAt)out.jump=!a.jumpHeld;else out.jump=a.vy>0;}return out;
 }
 
-return {PICKUP_LIFT,SUPPLY_ZONES,createHuntSupplies,huntSupplySteering};
+return {PICKUP_LIFT,SUPPLY_ZONES,createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,huntSupplySteering};
 })();
-const __tagModule50=(()=>{
-const {huntJumpRestRemaining}=__tagModule34;
-const {BODY,worldPilot,worldTraversable,worldSight}=__tagModule7;
-const {trampolineLaunchSpeed}=__tagModule45;
+const __tagModule57=(()=>{
+const {huntJumpRestRemaining}=__tagModule2;
+const {BODY,worldPilot,worldTraversable,worldSight}=__tagModule9;
+const {trampolineLaunchSpeed}=__tagModule20;
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 function observeRunnerThreats(s,observations){
  const a=s.player,m=a.brain,old=m.avoidMemory??{},memory={},gear=m.observedGlasses??{};
@@ -2422,11 +2945,11 @@ function runnerPressureControl(s,input){const a=s.player,m=a.brain,threats=(m.es
 
 return {observeRunnerThreats,runnerControl,runnerJumpControl,safeTrampolineApproach,runnerPressureControl};
 })();
-const __tagModule51=(()=>{
-const {huntFanExposure}=__tagModule40;
-const {huntPermanentToolUseful}=__tagModule25;
-const {huntGadgetPlacement,huntGadgetRadius,huntHookAnchor}=__tagModule48;
-const {BODY,worldHeight,worldSurface,worldSight,worldTraversable,worldRoute,worldRouteLookahead,worldSteering}=__tagModule7;
+const __tagModule58=(()=>{
+const {huntFanExposure}=__tagModule47;
+const {huntPermanentToolUseful}=__tagModule29;
+const {huntGadgetPlacement,huntGadgetRadius,huntHookAnchor}=__tagModule55;
+const {BODY,worldHeight,worldSurface,worldSight,worldTraversable,worldRoute,worldRouteLookahead,worldSteering}=__tagModule9;
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const priority={radar:4,cloak:7,speed:6,curtain:5,clone:4,cushion:4,hook:6,fan:6,sheet:2};
 const optical=item=>item==='cloak'||item==='curtain';
@@ -2518,35 +3041,42 @@ function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure
 
 return {runnerSupplyControl,runnerItemTactic};
 })();
-const __tagModule33=(()=>{
-const {huntJumpInput,huntJumpRestRemaining,recordHuntJumpLanding,HUNT_JUMP_QUICK_REST}=__tagModule34;
-const {huntSweepControl}=__tagModule35;
-const {huntStartFacing}=__tagModule39;
-const {huntCanObserve,huntOpticalHidden,huntHasClearSight,huntPermanentToolUseful}=__tagModule25;
-const {applyHuntWind,resolveHuntFans}=__tagModule40;
-const {steerClearOfHuntWind}=__tagModule41;
-const {cushionJumpControl}=__tagModule42;
-const {applyCushionDizzy,huntIsDizzy}=__tagModule43;
-const {huntBodiesTouch,DEFAULT_TOUCH_SHAPE,validHuntTouchShape}=__tagModule15;
-const {startHuntZip,moveHuntZip}=__tagModule44;
-const {MATCH_SECONDS,TRACE_CAPACITY}=__tagModule12;
+const __tagModule37=(()=>{
+const {CLOAK_INK_RULES,huntInkTrailSuppressed}=__tagModule1;
+const {BALLOON_DESCENT_TURN_RULES,usesTrainingStep,TRAINING_STEP_RULES,usesExtraBalloons,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,usesBalloonDropPursuit,usesOpeningSupply,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES}=__tagModule3;
+const {rememberCloakDisappearance,cloakDisappearanceMovement}=__tagModule38;
+const {huntDropPursuit}=__tagModule40;
 
-const {radarObservations}=__tagModule46;
-const {runnerHookControl}=__tagModule47;
-const {huntGadgetPlacement,huntHookAnchor}=__tagModule48;
-const {startHuntDive,moveHuntDive,diveCanTouch,HUNT_DIVE}=__tagModule17;
+const {updateHuntTeamContact,receiveHuntTeamContact,observedHuntChase}=__tagModule41;
+const {JUMP_REST_CONTINUITY_RULES,usesContinuousJumpRest,huntJumpInput,huntJumpRestRemaining,recordHuntJumpLanding,HUNT_JUMP_QUICK_REST}=__tagModule2;
+const {huntSweepControl}=__tagModule42;
+const {huntStartFacing}=__tagModule46;
+const {huntCanObserve,huntOpticalHidden,huntHasClearSight,huntPermanentToolUseful}=__tagModule29;
+const {applyHuntWind,resolveHuntFans}=__tagModule47;
+const {steerClearOfHuntWind}=__tagModule48;
+const {cushionJumpControl}=__tagModule49;
+const {applyCushionDizzy,huntIsDizzy}=__tagModule39;
+const {huntBodiesTouch,DEFAULT_TOUCH_SHAPE,validHuntTouchShape}=__tagModule17;
+const {startHuntZip,moveHuntZip}=__tagModule50;
+const {MATCH_SECONDS,TRACE_CAPACITY}=__tagModule14;
+const {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonAirApproach,balloonDescentFacing}=__tagModule51;
+
+const {radarObservations}=__tagModule53;
+const {runnerHookControl}=__tagModule54;
+const {huntGadgetPlacement,huntHookAnchor}=__tagModule55;
+const {startHuntDive,moveHuntDive,diveCanTouch,HUNT_DIVE}=__tagModule21;
 // Experimental simulation for the accepted multi-hunter redesign.
 // The normal trial uses this simulation; formal growth/rewards remain disabled.
-const {STEP,BODY,HUNT_JUMP,WORLD,WORLD_STARTS,WORLD_RADII,TAG_CHARACTERS,actor,opponentSpec,worldHeight,worldValid,worldSight,worldTraversable,worldMove,worldPilot,worldSteering,worldRoute,worldRouteSeconds}=__tagModule7;
-const {ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,INK,HUNT_FIELDS}=__tagModule9;
-const {createHuntSupplies,huntSupplySteering}=__tagModule49;
-const {movingItemContactRadius,huntSupplyContact}=__tagModule23;
+const {STEP,BODY,HUNT_JUMP,WORLD,WORLD_STARTS,WORLD_RADII,TAG_CHARACTERS,actor,opponentSpec,worldHeight,worldValid,worldSight,worldTraversable,worldMove,worldPilot,worldSteering,worldRoute,worldRouteSeconds}=__tagModule9;
+const {ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,INK,HUNT_FIELDS}=__tagModule11;
+const {createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,huntSupplySteering}=__tagModule56;
+const {movingItemContactRadius,huntSupplyContact}=__tagModule27;
 
 
-const {runnerControl,runnerJumpControl,runnerPressureControl,safeTrampolineApproach}=__tagModule50;
-const {runnerSupplyControl,runnerItemTactic}=__tagModule51;
-const {randomHuntStart,mixHuntStartSeed}=__tagModule37;
-const {trampolineJumpAccess,createHuntTrampoline,trampolineInput,resolveTrampoline,trampolineEscapeControl,trampolineSurface,trampolineClear,trampolineObstacleJump}=__tagModule45;
+const {runnerControl,runnerJumpControl,runnerPressureControl,safeTrampolineApproach}=__tagModule57;
+const {runnerSupplyControl,runnerItemTactic}=__tagModule58;
+const {randomHuntStart,mixHuntStartSeed}=__tagModule44;
+const {trampolineJumpAccess,createHuntTrampoline,trampolineInput,resolveTrampoline,trampolineEscapeControl,trampolineSurface,trampolineClear,trampolineObstacleJump}=__tagModule20;
 const HUNT_RULES='tag-corner-reversal-v64';
 const CONTACT_APPROACH_RULES='tag-contact-approach-v65';
 const CORNER_SEARCH_RULES='tag-corner-search-v66';
@@ -2558,10 +3088,15 @@ const COURTYARD_REACQUIRE_RULES='tag-courtyard-reacquire-v71';
 const COURTYARD_TEAM_RULES='tag-courtyard-team-v72';
 const JUMP_RECOVERY_RULES='tag-jump-recovery-v73';
 const TERRITORY_SEARCH_RULES='tag-territory-search-v74';
+const STABLE_BALLOON_RULES='tag-stable-balloon-v75';
+const TEAM_PRESSURE_RULES='tag-team-pressure-v76';
+const usesStableBalloon=s=>usesContinuousJumpRest(s.rules)||s.rules===STABLE_BALLOON_RULES||s.rules===TEAM_PRESSURE_RULES||s.rules===CLOAK_INK_RULES;
+const usesTeamPressure=s=>(usesContinuousJumpRest(s.rules)||s.rules===TEAM_PRESSURE_RULES||s.rules===CLOAK_INK_RULES)&&s.config.mode==='escape';
 const SHORTER_REST_RULES='tag-shorter-rest-v63';
 const AIR_PURSUIT_RULES='tag-air-pursuit-v62';
 const PREVIOUS_HUNT_RULES='tag-rear-mirror-v61';
-const usesCourtyardTeam=s=>s.rules===TERRITORY_SEARCH_RULES||s.rules===JUMP_RECOVERY_RULES||s.rules===COURTYARD_TEAM_RULES;
+const usesTerritorySearch=s=>usesStableBalloon(s)||s.rules===TERRITORY_SEARCH_RULES;
+const usesCourtyardTeam=s=>usesTerritorySearch(s)||s.rules===JUMP_RECOVERY_RULES||s.rules===COURTYARD_TEAM_RULES;
 const usesCourtyardReacquire=s=>usesCourtyardTeam(s)||s.rules===COURTYARD_REACQUIRE_RULES;
 const usesCourtyardWind=s=>usesCourtyardReacquire(s)||s.rules===COURTYARD_WIND_RULES;
 const usesRunnerFan=s=>usesCourtyardWind(s)||s.rules===RUNNER_FAN_RULES;
@@ -2580,7 +3115,7 @@ const visible=(a,b,range=140)=>near(a,b)<range&&worldSight(raised(a),raised(b));
 const alive=(s,a,key)=>(a.effects[key]??0)>s.time;
 function body(x,z,id,radius){const spec=opponentSpec(id),a=Object.assign(actor(x,z),{y:worldHeight(x,z),id,radius,keepInputFacing:true,contactKey:id==='player'?DEFAULT_TOUCH_SHAPE:id,baseTuning:{accel:1,speed:1,turn:1,brake:1,...spec?.movement},effects:{},item:null,flight:null,nextHop:0});a.tuning={...a.baseTuning};return a;}
 function random(s){s.randomState=(Math.imul(s.randomState,1664525)+1013904223)>>>0;return s.randomState/4294967296;}
-function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none'}={}){
+function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none'}={}, {rules=HUNT_RULES}={}){
  if(hunterCount!==HUNTER_COUNT||!Number.isSafeInteger(seed)||seed<0||seed>0xffffffff||duration!==MATCH_SECONDS)throw Error('INVALID_HUNT_CONFIG');
  if(!validHuntTouchShape(playerShape))throw Error('INVALID_TOUCH_SHAPE');
  if(playerItem!=='none'&&!PLAYER_ITEMS.includes(playerItem)||!Number.isFinite(playerRadius)||playerRadius<2||playerRadius>6)throw Error('INVALID_PLAYER_CONFIG');
@@ -2589,7 +3124,7 @@ function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=1
  const defaults=['walkBrave','rioSaber','walkCute'].map(p=>TAG_CHARACTERS.find(c=>c.profileKey===p).id),ids=opponents??defaults;
  if(!Array.isArray(ids)||ids.length!==3||ids.some(id=>!byId.has(id)))throw Error('INVALID_OPPONENTS');
  const initial={randomState:mixHuntStartSeed(seed)},layout=randomHuntStart(()=>random(initial),mode);
- const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[byId.get(ids[0]).profileKey]:playerRadius),s={rules:HUNT_RULES,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
+ const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[byId.get(ids[0]).profileKey]:playerRadius),s={rules,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
  const spawns=layout.hunters;
  if(mode==='hunt'){const costs=new Map(spawns.map(p=>{const a={...p,radius:playerRadius,tuning:{accel:1,speed:1,turn:1,brake:1},vx:0,vz:0},path=worldRoute(a,player);return[p,path.length?worldRouteSeconds(a,path):1000+near(a,player)];}));spawns.sort((a,b)=>costs.get(a)-costs.get(b));[spawns[1],spawns[2]]=[spawns[2],spawns[1]];}
  s.spawnLayout={runner:layout.runner.id,hunters:spawns.map(p=>p.id),positions:[layout.runner,...spawns].map(p=>({x:p.x,y:p.y,z:p.z}))};
@@ -2597,10 +3132,15 @@ function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=1
  (mode==='hunt'?s.hunters[0]:player).contactKey=playerShape;player.owner='player';player.brain={profile:ids[0],next:0};
  for(const[i,a]of s.hunters.entries()){worldPilot(a,player,true,0,a.brain);a.brain.next=.4+i*.16;}
  const human=controlledHuntActor(s);human.yaw=huntStartFacing(human,[player,...s.hunters].filter(a=>a!==human));
- s.trampoline=createHuntTrampoline();s.pickups=createHuntSupplies(()=>random(s),[player,...s.hunters]);return s;
+ const actors=[player,...s.hunters];
+ s.trampoline=createHuntTrampoline();
+ s.pickups=createHuntSupplies(()=>random(s),actors);
+ if(usesOpeningSupply(rules)&&mode==='hunt')placeHuntOpeningSupply(s.pickups,human,actors);
+ if(usesExtraBalloons(rules))addHuntBalloonSupplies(s.pickups,actors);
+ return s;
 }
 function controlledHuntActor(s){return s.config.mode==='hunt'?s.hunters[0]:s.player;}
-function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
+function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a),trainingStepJump:usesTrainingStep(s.rules)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
 function participants(s){return[s.player,...s.hunters];}
 function emit(s,type,a,extra={}){s.events.push({id:s.nextId++,type,owner:a.owner,time:s.time,...extra});}
 function tune(s,a){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed','turn','brake'])t[k]=b[k];if(a===s.player)t.speed*=1.04;if(alive(s,a,'speed')){t.speed*=1.4;t.accel*=1.2;}if(s.gadgets.some(g=>g.kind==='sheet'&&near(g,a)<g.radius&&Math.abs(a.y-g.y)<.6)){t.brake*=.35;t.turn*=.65;a.slippery=true;}else a.slippery=false;}
@@ -2608,6 +3148,7 @@ function tune(s,a){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed
 // A live lower bound also prevents an approaching runner shortening the landing.
 const BALLOON_GAP=28, BALLOON_MIN_GAP=26;
 function landingFor(s,a,tracking=false){
+ if(tracking&&usesStableBalloon(s))return stableBalloonTarget(s,a,BALLOON_GAP);
  // This specific homing item tracks the runner independently of ordinary vision.
  const speed=Math.hypot(s.player.vx,s.player.vz),lead=tracking?.4:Math.min(.5,15/(speed||1)),ahead={x:s.player.x+s.player.vx*lead,z:s.player.z+s.player.vz*lead,y:s.player.y};
  const aim=worldTraversable(s.player,ahead,s.player.radius-.05)?ahead:s.player;
@@ -2652,7 +3193,10 @@ function activateHuntItem(s,owner='player'){
  else if(type==='radar'||type==='mirror')a.effects[type]=s.duration+STEP;
  else if(type==='speed')a.effects.speed=s.time+3;
  else if(type==='scarf'){a.pendingItem={type,at:s.time+.6};emit(s,'item-prepare',a,{item:type});}
- else if(type==='cloak')a.effects.cloak=s.time+4;
+ else if(type==='cloak'){
+  if(usesCloakWitness(s.rules)&&s.config.mode==='escape')rememberCloakDisappearance(s);
+  a.effects.cloak=s.time+4;
+ }
  else if(type==='hook'){
   const p=huntHookAnchor(a,s);if(!p)return false;
   startHuntZip(s,a,p);emit(s,'hook-attached',a,{anchor:{...p}});
@@ -2683,7 +3227,7 @@ function itemForces(s,a,dt){
  if(a.pendingItem&&a.pendingItem.type!=='scarf')a.pendingItem=null;
  if(a.pendingItem&&s.time>=a.pendingItem.at){const p=a.pendingItem;a.pendingItem=null;if(p.type==='scarf')a.effects.speed=s.time+3;}
 }
-function afterMove(s,a){resolveHuntFans(s,a,a.fanStepOrigin);recordHuntJumpLanding(s,a,a.fanStepOrigin,s.rules===JUMP_RECOVERY_RULES?HUNT_JUMP_QUICK_REST:usesShorterRest(s)?undefined:1.5);}
+function afterMove(s,a){resolveHuntFans(s,a,a.fanStepOrigin);recordHuntJumpLanding(s,a,a.fanStepOrigin,(s.rules===JUMP_RECOVERY_RULES||usesContinuousJumpRest(s.rules))?HUNT_JUMP_QUICK_REST:usesShorterRest(s)?undefined:1.5);}
 function updateGadgets(s,dt){
  for(const p of s.pickups)delete p.pull;
  for(const g of s.gadgets){
@@ -2719,10 +3263,43 @@ function balloonNearbyLanding(a){
  }
  return null;
 }
-function descendBalloon(s,a,dt){
+const BALLOON_CHASE_SECONDS=8.5,BALLOON_NEAR_SECONDS=1.15;
+function fastBalloonLanding(s,a,flight,elapsed,gap){
+ if(gap<BALLOON_GAP+11)flight.firstNearAt??=s.time;
+ if(!flight.landingRequested&&(elapsed>=BALLOON_CHASE_SECONDS||
+     (elapsed>=1.2&&flight.firstNearAt!=null&&s.time-flight.firstNearAt>=BALLOON_NEAR_SECONDS))){
+  flight.landingRequested=true;
+  flight.air=null;
+ }
+ if(!flight.landingRequested)return null;
+ const here=balloonLandingSpot(a);
+ if(flight.landingApproach)return near(a,flight.target)<=1?here:null;
+ if(here&&gap>=BALLOON_MIN_GAP)return here;
+ if(s.time>=(flight.landingCheckAt??0)){
+  flight.landingCheckAt=s.time+.15;
+  const enoughSpace=p=>near(p,s.player)-a.radius-s.player.radius>=BALLOON_MIN_GAP+1;
+  findSpot:for(const distance of [3,6,10,15,22,30])for(let i=0;i<8;i++){
+   const angle=i*Math.PI/4,x=a.x+Math.sin(angle)*distance,z=a.z+Math.cos(angle)*distance;
+   const spot={x,z,y:worldHeight(x,z)},above={x,z,y:a.y},padding=a.radius+.05;
+   if(spot.y>a.y+.05||!enoughSpace(spot)||!worldValid(spot,padding)||!worldValid(above,padding)||
+     !worldSight({...a,y:a.y+.15},{...above,y:a.y+.15},padding))continue;
+   flight.target=spot;
+   flight.landingApproach=true;
+   flight.landingAltitude=a.y;
+   flight.routeAt=0;
+   break findSpot;
+  }
+  // The current column is still a real landing if the runner has moved
+  // right under the balloon and the surroundings offer no wider exit.
+  if(!flight.landingApproach&&here)return here;
+ }
+ return null;
+}
+function descendBalloon(s,a,dt,input){
  const before={y:a.y,grounded:a.grounded,jumps:a.jumps};
  const floor=trampolineSurface(s,a.x,a.z);
  // Commit horizontally and ease into a controlled vertical descent.
+ if(s.rules===BALLOON_DESCENT_TURN_RULES)balloonDescentFacing(a,input,dt);
  a.vx=a.vz=0;
  if(!a.grounded||a.y>floor){
   a.grounded=false;
@@ -2740,44 +3317,75 @@ function descendBalloon(s,a,dt){
  return true;
 }
 function floatMove(s,a,dt,input={}){const f=a.flight;if(!f)return false;
- if(s.time<f.launchAt){worldMove(a,input,dt);return true;}
+ if(s.time<f.launchAt){if(usesStableBalloon(s)){const target=landingFor(s,a,true);if(target)f.target=target;}worldMove(a,input,dt);return true;}
  const t=s.time-f.launchAt;if(f.stage==='prepare'){f.stage='float';f.launchY=a.y;f.peak=Math.max(f.peak,a.y+1);emit(s,'balloon-lift',a);}
- if(f.stage==='descend')return descendBalloon(s,a,dt);
- if(!f.landingApproach&&s.time>=f.nextTrack){f.nextTrack=s.time+.12;const target=landingFor(s,a,true);if(target){f.target=target;f.targetVx=s.player.vx;f.targetVz=s.player.vz;}else f.targetVx=f.targetVz=0;}
+ if(f.stage==='descend')return descendBalloon(s,a,dt,input);
+ const fastLanding=usesBalloonDropPursuit(s.rules);if(!f.landingApproach&&(!fastLanding||!f.landingRequested)&&(usesStableBalloon(s)||s.time>=f.nextTrack)){f.nextTrack=s.time+.12;const target=landingFor(s,a,true);if(target){f.target=target;f.targetVx=s.player.vx;f.targetVz=s.player.vz;}else f.targetVx=f.targetVz=0;}
  const gap=near(a,s.player)-a.radius-s.player.radius,close=gap>=BALLOON_MIN_GAP&&gap<BALLOON_GAP+4;
- if(gap<45)f.nearSince??=s.time;
- else f.nearSince=null;
- const forced=t>=BALLOON_TRACK_LIMIT||f.nearSince!=null&&s.time-f.nearSince>=8;
+ const fastSpot=fastLanding?fastBalloonLanding(s,a,f,t,gap):null;
+ if(fastSpot){f.target=fastSpot;f.stage='descend';return descendBalloon(s,a,dt,input);}
+ // Legacy proofs retain their original watch time and finish criteria.
+ let forced=false;
+ if(!fastLanding){
+  if(gap<45)f.nearSince??=s.time;
+  else f.nearSince=null;
+  forced=t>=BALLOON_TRACK_LIMIT||f.nearSince!=null&&s.time-f.nearSince>=8;
+ }
  const seconds=clamp((a.y-worldHeight(a.x,a.z))/16+.35,.35,1.6);
  const predictedGap=Math.hypot(a.x-s.player.x-s.player.vx*seconds,a.z-s.player.z-s.player.vz*seconds)-a.radius-s.player.radius;
  const ready=close&&predictedGap>=BALLOON_MIN_GAP&&predictedGap<BALLOON_GAP+12;
  if(ready)f.closeSince??=s.time;
  else f.closeSince=null;
- if(forced||t>1.2&&f.closeSince!=null&&s.time-f.closeSince>=.18){
+ if(forced||!f.landingRequested&&t>1.2&&f.closeSince!=null&&s.time-f.closeSince>=.18){
   const spot=balloonLandingSpot(a);
   if(spot){
    f.target=spot;
    f.stage='descend';
-   return descendBalloon(s,a,dt);
+   return descendBalloon(s,a,dt,input);
   }
   if(forced&&!f.landingApproach){
    const nearby=balloonNearbyLanding(a);
    if(nearby){f.target=nearby;f.landingApproach=true;f.routeAt=0;}
   }
  }
- if(!f.route||s.time>=(f.routeAt??0)){f.routeAt=s.time+.6;f.route=worldRoute({...a,y:worldHeight(a.x,a.z)},f.target);}
- while(f.route.length>1&&near(a,f.route[0])<Math.max(10,a.radius+4)&&worldTraversable(a,f.route[1],a.radius+.1))f.route.shift();
- let steer=close&&!f.landingApproach?f.target:f.route[0]??f.target;
- if(!close||f.landingApproach){for(const p of f.route){if(near(a,p)>80||!worldTraversable(a,p,a.radius+.2)||!worldSight({...a,y:a.y+3},{...p,y:a.y+3},a.radius+.2))break;steer=p;}if(worldTraversable(a,f.target,a.radius+.2)&&worldSight({...a,y:a.y+3},{...f.target,y:a.y+3},a.radius+.2))steer=f.target;}
+ let air=null;
+ if(usesBalloonAirApproach(s.rules)&&!close&&!f.landingApproach&&!f.landingRequested){
+  if(s.time>=(f.airAt??0)){
+   f.airAt=s.time+.18;
+   const altitude=balloonAirApproach(a,f.target);
+   f.air=altitude==null?null:{point:f.target,altitude};
+  }
+  air=f.air;
+ }
+ let steer;
+ if(fastLanding&&f.landingApproach)steer=f.target;
+ else if(air&&a.y>=air.altitude-.25)steer=air.point;
+ else{
+  if(!f.route||s.time>=(f.routeAt??0)){f.routeAt=s.time+.6;f.route=worldRoute({...a,y:worldHeight(a.x,a.z)},f.target);}
+  while(f.route.length>1&&near(a,f.route[0])<Math.max(10,a.radius+4)&&worldTraversable(a,f.route[1],a.radius+.1))f.route.shift();
+  steer=close&&!f.landingApproach?f.target:f.route[0]??f.target;
+  if(!close||f.landingApproach){for(const p of f.route){if(near(a,p)>80||!worldTraversable(a,p,a.radius+.2)||!worldSight({...a,y:a.y+3},{...p,y:a.y+3},a.radius+.2))break;steer=p;}if(worldTraversable(a,f.target,a.radius+.2)&&worldSight({...a,y:a.y+3},{...f.target,y:a.y+3},a.radius+.2))steer=f.target;}
+ }
+ const tracking=(steer===f.target||steer===air?.point)&&!f.landingApproach;
  const ahead={x:a.x+(steer.x-a.x)*Math.min(1,8/(near(a,steer)||1)),z:a.z+(steer.z-a.z)*Math.min(1,8/(near(a,steer)||1))};
  let lift=0;for(const h of[13,6,2,.1,0]){const p={x:a.x,z:a.z,y:worldHeight(a.x,a.z)+h},q={...ahead,y:worldHeight(ahead.x,ahead.z)+h};if(worldValid(p,a.radius+.1)&&worldValid(q,a.radius+.1)&&worldSight({...p,y:p.y+3},{...q,y:q.y+3},a.radius+.1)){lift=h;break;}}
- f.peak=worldHeight(a.x,a.z)+lift;
- const wanted=t<.8?f.launchY+(f.peak-f.launchY)*smooth(t/.8):f.peak;
+ f.peak=Math.max(worldHeight(a.x,a.z)+lift,air?.altitude??-Infinity,f.landingAltitude??-Infinity);
+ let wanted=t<.8?f.launchY+(f.peak-f.launchY)*smooth(t/.8):f.peak;
+ if(usesStableBalloon(s))wanted=stableBalloonHeight(f,wanted,dt);
  // Match the runner's velocity only on the final approach. At a detour
  // waypoint that velocity can point into the very tree we must go around.
- {a.grounded=false;a.vy+=(BODY.gravity+clamp((wanted-a.y)*14-a.vy*6,-55,55))*dt;const tracking=steer===f.target&&!f.landingApproach,vx=(steer.x-a.x)*8+((tracking?f.targetVx??0:0)-a.vx)*6,vz=(steer.z-a.z)*8+((tracking?f.targetVz??0:0)-a.vz)*6,k=Math.min(1,90/(Math.hypot(vx,vz)||1));a.vx+=vx*k*dt;a.vz+=vz*k*dt;}
+ {a.grounded=false;a.vy+=(BODY.gravity+clamp((wanted-a.y)*14-a.vy*6,-55,55))*dt;const vx=(steer.x-a.x)*8+((tracking?f.targetVx??0:0)-a.vx)*6,vz=(steer.z-a.z)*8+((tracking?f.targetVz??0:0)-a.vz)*6,k=Math.min(1,90/(Math.hypot(vx,vz)||1));a.vx+=vx*k*dt;a.vz+=vz*k*dt;}
  const horizontal=Math.hypot(a.vx,a.vz);if(horizontal>54){a.vx*=54/horizontal;a.vz*=54/horizontal;}
- const before={x:a.x,z:a.z,y:a.y,grounded:a.grounded,jumps:a.jumps},speed=a.tuning.speed;a.tuning.speed*=3;worldMove(a,{x:clamp((steer.x-a.x)/12,-1,1),z:clamp((steer.z-a.z)/12,-1,1),dash:true},dt);a.tuning.speed=speed;resolveTrampoline(s,a,before);
+ const before={x:a.x,z:a.z,y:a.y,yaw:a.yaw,grounded:a.grounded,jumps:a.jumps},speed=a.tuning.speed;a.tuning.speed*=3;
+ const steerScale=usesStableBalloon(s)?Math.max(12,near(a,steer)):12;
+ worldMove(a,{x:clamp((steer.x-a.x)/steerScale,-1,1),z:clamp((steer.z-a.z)/steerScale,-1,1),dash:true},dt);a.tuning.speed=speed;resolveTrampoline(s,a,before);
+ if(usesStableBalloon(s)){
+  // Smooth the hanging body's facing, not the collision-checked route itself.
+  // Turning a distant waypoint into a rotating virtual point sends the flight
+  // past corners and can strand it on the wrong side of the city.
+  if(f.steerYaw===undefined)f.steerYaw=before.yaw??a.yaw;
+  stableBalloonSteer(a,Math.hypot(a.vx,a.vz)>1?{x:a.x+a.vx,z:a.z+a.vz}:steer,dt);a.yaw=f.steerYaw;
+ }
  if(!worldValid(a,a.radius-.01)){a.y=before.y;a.vy=0;if(!worldValid(a,a.radius-.01)){a.x=before.x;a.z=before.z;a.vx*=.2;a.vz*=.2;f.routeAt=0;}}
  // The bowl rim can rise by a small permitted step while the balloon ascends.
  // Keep feet on the surface instead of waiting for downward-velocity landing.
@@ -2842,6 +3450,7 @@ function airbornePursuitAction(s,hunter,runner,control){
  return dive&&worldTraversable(hunter,{x:hunter.x+x,z:hunter.z+z},hunter.radius-.05)?{...control,dive:true}:control;
 }
 function footprintAwareness(s,a){
+ if(huntInkTrailSuppressed(s))return;
  if(canSee(s,a,s.player,a.role==='patrol'?70:140))return;
  for(let i=s.footprints.length-1;i>=0;i--){const f=s.footprints[i];if(f.owner!=='player'||f.id===(a.brain.lastFootId??-1)||!canSee(s,a,{...f,y:f.y+.1},80))continue;const at=f.at??f.until-3.5;if(at<(a.brain.seenAt??-Infinity))continue;a.brain.lastFootId=f.id;a.brain.seen={x:f.x,z:f.z,y:f.y,vx:0,vz:0};a.brain.seenAt=at;a.brain.searchPlan=null;return;}
 }
@@ -2870,9 +3479,11 @@ function huntStep(s,input={},dt=STEP){
  s.gadgets=s.gadgets.filter(g=>['clone','cushion','curtain','sheet','fan'].includes(g.kind));
  s.zipTouch=null;s.time=Math.min(s.duration,s.time+dt);for(const h of s.hunters){delete h.effects.ink;} s.pools=[];s.footprints=s.footprints.filter(p=>p.owner===s.player.owner&&p.until>s.time&&!(p.trampolineSupport&&s.trampoline.used));
  const diveCooldown=usesShorterRest(s)?HUNT_DIVE.cooldown:6;
- const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown);s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player);
+ const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown,{aimFromFacing:usesDiveFacing(s.rules)});s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player);
  let runnerInput=input;if(s.config.mode==='hunt'&&!huntIsDizzy(s,s.player)){const runner=s.player,observations=s.hunters.filter(a=>canSee(s,runner,a,140)),seenOwners=new Set(observations.map(a=>a.owner));if(alive(s,runner,'radar')){if(s.time>=(runner.brain.radarAt??0)){runner.brain.radarAt=s.time+.75;runner.brain.radarContacts=radarObservations(s,runner);}observations.push(...(runner.brain.radarContacts??[]).filter(p=>!seenOwners.has(p.owner)));}const threat=observations.sort((a,b)=>near(a,runner)-near(b,runner))[0];runnerInput=runnerControl(s,observations);runnerInput=runnerHookControl(s,runnerInput,{poleVisible:p=>canSee(s,runner,{...p,y:p.y-3},132)});runnerInput=runnerSupplyControl(s,runnerInput,{usableOnly:usesRunnerSupply(s),itemVisible:p=>canSee(s,runner,{...p,y:p.y+(p.lift??0)},72)});const tactic=runnerItemTactic(s,runnerInput,{checkAllCushionThreats:usesRunnerCushion(s),checkFanExposure:usesRunnerFan(s)});if(tactic){runner.brain.nextToolAt=s.time+.35;const yaw=runner.yaw;runner.yaw=tactic.yaw;if(activateHuntItem(s)){runner.brain.nextToolAt=s.time+.8;if(['cloak','clone','curtain'].includes(tactic.item)){runner.brain.next=0;runner.brain.target=null;}}runner.yaw=yaw;}const padSafe=!s.trampoline.used&&near(runner,s.trampoline)<48&&safeTrampolineApproach(s);if(!padSafe)runner.brain.trampolineApproach=false;else runnerInput=trampolineEscapeControl(s,runner,runnerInput,!!threat);runnerInput=runnerPressureControl(s,runnerInput);runnerInput=cushionJumpControl(s,runner,runnerJumpControl(s,hopControl(s,runner,runnerInput)));}if(!moveHuntZip(s,s.player,dt))moveWithTrampoline(s,s.player,runnerInput,dt);afterMove(s,s.player);collectAndPaint(s,s.player);
- const coverage=usesCornerSearch(s)&&(s.rules===TERRITORY_SEARCH_RULES||s.time>=45)?(s.cornerSearch??={visited:0}):null;
+ const teamPressure=usesTeamPressure(s);
+ if(teamPressure)updateHuntTeamContact(s,s.hunters.filter(a=>!huntIsDizzy(s,a)&&!a.flight&&canSee(s,a,s.player,a.role==='patrol'?70:140)).map(a=>({owner:a.owner,point:{x:s.player.x,y:s.player.y,z:s.player.z,vx:s.player.vx,vz:s.player.vz}})));
+ const coverage=usesCornerSearch(s)&&(usesTerritorySearch(s)||s.time>=45)?(s.cornerSearch??={visited:0}):null;
  for(const a of s.hunters){
   itemForces(s,a,dt);tune(s,a);if(huntIsDizzy(s,a)){moveWithTrampoline(s,a,{},dt);afterMove(s,a);continue;}const actualVisible=canSee(s,a,s.player,a.role==='patrol'?70:140),decoy=!actualVisible?s.gadgets.find(g=>g.kind==='clone'&&canSee(s,a,g,a.role==='patrol'?70:140)):null;
   a.brain.suppressSight=!actualVisible&&!decoy;footprintAwareness(s,a);
@@ -2884,24 +3495,40 @@ function huntStep(s,input={},dt=STEP){
    a.brain.searchReservations=s.hunters.filter(h=>h!==a&&h.brain.target&&h.brain.seen&&a.brain.seen&&['search','last-seen'].includes(h.brain.mode)&&s.time-h.brain.seenAt<18&&Math.abs(h.brain.seenAt-a.brain.seenAt)<3&&near(h.brain.seen,a.brain.seen)<32).map(h=>({...h.brain.target}));
   }
   if(a===human){if(actualVisible){a.brain.seen={x:s.player.x,z:s.player.z,y:s.player.y,vx:s.player.vx,vz:s.player.vz};a.brain.seenAt=s.time;}if(a.flight)floatMove(s,a,dt,input);else if(!moveHuntDive(s,a,input,dt))moveWithTrampoline(s,a,input,dt);afterMove(s,a);collectAndPaint(s,a);continue;}
-  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:s.rules===TERRITORY_SEARCH_RULES});
+  const cloakReaction=cloakDisappearanceMovement(a,s.time,actualVisible);
+  if(cloakReaction){
+   if(usesBalloonDropPursuit(s.rules))a.brain.dropPursuit=null;
+   if(!a.dive||!moveHuntDive(s,a,cloakReaction,dt))moveWithTrampoline(s,a,cloakReaction,dt);
+   afterMove(s,a);collectAndPaint(s,a);continue;
+  }
+  if(teamPressure){if(!actualVisible&&!decoy)receiveHuntTeamContact(a,s.teamContact,s.time);if(actualVisible)a.brain.next=Math.min(a.brain.next,s.time+.22);}
+  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:usesTerritorySearch(s)});
   const target=decoy??s.player;
+  const drop=usesBalloonDropPursuit(s.rules)?huntDropPursuit(s,a,s.player,actualVisible,{cancel:!!decoy||huntOpticalHidden(s,a,s.player)}):null;
+  if(drop){
+   // No ground-route or uphill hop until the committed fall finishes.
+   moveWithTrampoline(s,a,cushionJumpControl(s,a,drop),dt);
+   afterMove(s,a);collectAndPaint(s,a);continue;
+  }
   const route=worldPilot(a,target,true,s.time,a.brain,usesContactApproach(s));
   const pressure=s.rules!==PREVIOUS_HUNT_RULES?airbornePursuit(s,a,s.player,actualVisible,route):null;
   if(pressure)a.brain.supply=null;
-  const control=pressure??huntSupplySteering(s,a,route,{playerVisible:actualVisible,itemVisible:p=>canSee(s,a,p,24)});
+  const closeChase=teamPressure?observedHuntChase(a,actualVisible?s.player:null,s.time,a.brain):null;
+  const joining=teamPressure&&!actualVisible&&s.teamContact&&s.time-s.teamContact.at<4;
+  if(teamPressure&&(actualVisible||joining))a.brain.supply=null;
+  const control=pressure??closeChase??(teamPressure&&(actualVisible||joining)?route:huntSupplySteering(s,a,route,{playerVisible:actualVisible,itemVisible:p=>canSee(s,a,p,24)}));
   if(s.time>(a.nextItemAt??2)&&huntItemOpportunity(s,a,{playerVisible:actualVisible})){a.nextItemAt=s.time+.35;if(activateHuntItem(s,a.owner))a.nextItemAt=s.time+12;}
   if(a.flight){floatMove(s,a,dt);afterMove(s,a);continue;}
   if(s.time<(a.recoverUntil??0))control.dash=false;
   let movement=hopControl(s,a,control);
-  if(pressure&&a.brain.airPursuit.goal)movement=airbornePursuitAction(s,a,s.player,movement);
+  if(pressure&&a.brain.airPursuit.goal||teamPressure&&actualVisible)movement=airbornePursuitAction(s,a,s.player,movement);
   movement=cushionJumpControl(s,a,movement);
   if(movement.dive&&!movement.jump)startHuntDive(s,a,diveCooldown);
   if(!a.dive||!moveHuntDive(s,a,movement,dt))moveWithTrampoline(s,a,movement,dt);
   afterMove(s,a);collectAndPaint(s,a);
  }
  hunterContacts(s);updateGadgets(s,dt);
- const catcher=s.hunters.find(a=>a.owner===s.zipTouch&&!huntIsDizzy(s,a))??s.hunters.find(a=>s.time>=(s.player.trampolineSafeUntil??0)&&!a.flight&&!huntIsDizzy(s,a)&&s.time>=(a.noTagUntil??0)&&huntBodiesTouch(a,s.player));
+ const catcher=s.hunters.find(a=>a.owner===s.zipTouch&&!huntIsDizzy(s,a))??s.hunters.find(a=>s.time>=(s.player.trampolineSafeUntil??0)&&!a.flight&&!huntIsDizzy(s,a)&&s.time>=(a.noTagUntil??0)&&huntBodiesTouch(a,s.player,s));
  if(catcher||s.time>=s.duration){s.phase='finished';s.result={caught:!!catcher,win:s.config.mode==='hunt'?!!catcher:!catcher,time:s.time,catcher:catcher?.owner??null};}
  return s;
 }
@@ -2909,17 +3536,17 @@ function huntStep(s,input={},dt=STEP){
 function huntThreatCues(s){return s.hunters.filter(a=>canSee(s,s.player,a,52)).map(a=>({owner:a.owner,role:a.role,x:a.x,y:a.y+3,z:a.z,preparing:!!a.pendingItem||a.flight?.stage==='prepare'}));}
 // Display data is read-only and includes an always-visual counterpart to sounds.
 function huntPresentation(s){const view=a=>({owner:a.owner,character:a.id,role:a.role,x:a.x,y:a.y,z:a.z,yaw:a.yaw,item:a.item,grounded:a.grounded,jumps:a.jumps,vy:a.vy,cloaked:alive(s,a,'cloak'),speedUp:alive(s,a,'speed'),flight:a.flight?structuredClone(a.flight):null});return{time:s.time,phase:s.phase,player:view(s.player),hunters:s.hunters.map(view),events:s.events.map(e=>structuredClone(e)),pools:s.pools.map(p=>({...p})),footprints:s.footprints.map(f=>({...f}))};}
-function recordHunt(config,{rules=HUNT_RULES}={}){if(![TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config),frames=[];s.rules=rules;return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
-function verifyHunt(proof){if(![TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config);s.rules=proof.rules;let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>15)throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
+function recordHunt(config,{rules=HUNT_RULES}={}){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config,{rules}),frames=[];return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
+function verifyHunt(proof){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config,{rules:proof.rules});let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>15)throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
 
-return {STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES,HUNTER_COUNT,HUNTER_ROLES,createHunt,controlledHuntActor,activateHuntItem,huntItemOpportunity,huntStep,huntThreatCues,huntPresentation,recordHunt,verifyHunt};
+return {BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,CLOAK_INK_RULES,JUMP_REST_CONTINUITY_RULES,RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES,STABLE_BALLOON_RULES,TEAM_PRESSURE_RULES,HUNTER_COUNT,HUNTER_ROLES,createHunt,controlledHuntActor,activateHuntItem,huntItemOpportunity,huntStep,huntThreatCues,huntPresentation,recordHunt,verifyHunt};
 })();
-const __tagModule32=(()=>{
-const {WORLD_BLOCKS,worldHeight,worldSight,worldValid}=__tagModule7;
-const {INK,ITEM_DEFS,SUPPLY_COUNT}=__tagModule9;
-const {MATCH_SECONDS}=__tagModule12;
-const {controlledHuntActor}=__tagModule33;
-const {HUNT_DIVE}=__tagModule17;
+const __tagModule36=(()=>{
+const {WORLD_BLOCKS,worldHeight,worldSight,worldValid}=__tagModule9;
+const {INK,ITEM_DEFS,SUPPLY_CAPACITY}=__tagModule11;
+const {MATCH_SECONDS}=__tagModule14;
+const {controlledHuntActor}=__tagModule37;
+const {HUNT_DIVE}=__tagModule21;
 // A bounded, presentation-only history. No CPU brains, proofs, home saves,
 // models, video frames or input replay; playback cannot run a second match.
 const HUNT_REPLAY_SECONDS=6,HUNT_REPLAY_HZ=20,HUNT_REPLAY_CAPACITY=122;
@@ -2951,12 +3578,12 @@ function actor(a,previous){return{...row(a),effects:shareEffects(a.effects,previ
 function replaySnapshot(s,pickups,footprints,gadgets,previous){
  const config=previous&&previous.config.mode===s.config.mode?previous.config:Object.freeze({mode:s.config.mode});
  const trampoline=sameRow(s.trampoline,previous?.trampoline)?previous?.trampoline??null:Object.freeze(row(s.trampoline));
- return{time:s.time,phase:s.phase,config,player:actor(s.player,previous?.player),
+ return{rules:s.rules,time:s.time,phase:s.phase,config,player:actor(s.player,previous?.player),
   hunters:s.hunters.slice(0,3).map((hunter,i)=>actor(hunter,previous?.hunters[i])),trampoline,pickups,
   pools:s.pools.slice(0,4).map(row),footprints,gadgets};
 }
 function huntReplaySnapshot(s){
- return replaySnapshot(s,s.pickups.slice(0,SUPPLY_COUNT).map(row),s.footprints.slice(-INK.maxFootprints).map(row),s.gadgets.slice(0,12).map(row));
+ return replaySnapshot(s,s.pickups.slice(0,SUPPLY_CAPACITY).map(row),s.footprints.slice(-INK.maxFootprints).map(row),s.gadgets.slice(0,12).map(row));
 }
 function sameRow(source,previous){
  if(!source||!previous)return !source&&previous===null;
@@ -3297,7 +3924,7 @@ function createHuntReplay(){let frames=[],fullFrames=[],sounds=[],highlights=[],
    if(diving&&hunter===human)recordHighlight({type:'dive-start',owner:hunter.owner,time:s.time},hunter.owner);
   }
   if(!force&&prev&&s.time-prev.time<1/HUNT_REPLAY_HZ-1e-8)return false;
-  const pickupRows=shareRows(s.pickups,0,Math.min(s.pickups.length,SUPPLY_COUNT),prev?.pickups??[],copySupply);
+  const pickupRows=shareRows(s.pickups,0,Math.min(s.pickups.length,SUPPLY_CAPACITY),prev?.pickups??[],copySupply);
   const footprintCount=Math.min(s.footprints.length,INK.maxFootprints);
   const footprintRows=shareRows(s.footprints,s.footprints.length-footprintCount,footprintCount,prev?.footprints??[],copyFootprint);
   const gadgetRows=shareRows(s.gadgets,0,Math.min(s.gadgets.length,12),prev?.gadgets??EMPTY_GADGETS,(source,previous)=>{
@@ -3491,8 +4118,8 @@ function createHuntReplaySound(){
 
 return {HUNT_REPLAY_SECONDS,HUNT_FULL_REPLAY_CAPACITY,huntReplaySnapshot,sampleHuntReplay,huntReplayCamera,updateHuntReplayView,createHuntReplay,huntResultAudioCues,createHuntReplaySound};
 })();
-const __tagModule52=(()=>{
-const {huntOpticalHidden}=__tagModule25;
+const __tagModule59=(()=>{
+const {huntOpticalHidden}=__tagModule29;
 // Rendering only: a cloak must not advertise an opponent through an opaque
 // held prop. The controlled actor keeps a faint body for steering; contact,
 // item effects, CPU perception, decoys and public world objects are untouched.
@@ -3509,12 +4136,58 @@ function applyHuntActorVisibility(s,actor,model,shadow){
 
 return {huntActorConcealed,applyHuntActorVisibility};
 })();
-const __tagModule31=(()=>{
+const __tagModule60=(()=>{
+const {HUNT_FIELDS}=__tagModule11;
+const {HUNT_CHARACTER_HEIGHT,worldSight}=__tagModule9;
+const {huntHasClearSight,huntOpticalHidden}=__tagModule29;
+const active=(s,g)=>g.kind==='curtain'&&(g.until??Infinity)>s.time;
+const runnerSide=actor=>actor?.owner==='player'||/^(?:decoy|echo):/.test(actor?.owner??'');
+const controlledViewer=s=>s.config?.mode==='hunt'?s.hunters[0]:s.player;
+const cameraPosition=camera=>camera?.position??camera;
+const actorCenter=actor=>({x:actor.x,y:actor.y+HUNT_CHARACTER_HEIGHT*.55,z:actor.z});
+function huntFoamLineBlocked(s,camera,actor){
+ if(!actor||!camera)return false;
+ const start=cameraPosition(camera),end=actorCenter(actor);
+ if(![start.x,start.y,start.z,end.x,end.y,end.z].every(Number.isFinite))return false;
+ const dx=end.x-start.x,dz=end.z-start.z,dy=end.y-start.y,len=dx*dx+dz*dz;
+ return(s.gadgets??[]).some(g=>{
+  if(!active(s,g))return false;const ox=start.x-g.x,oz=start.z-g.z,c=ox*ox+oz*oz-g.radius*g.radius;let enter=0,exit=1;
+  if(len<1e-8){if(c>=0)return false;}else{const dot=ox*dx+oz*dz,disc=dot*dot-len*c;if(disc<=0)return false;const root=Math.sqrt(disc);enter=Math.max(0,(-dot-root)/len);exit=Math.min(1,(-dot+root)/len);if(enter>=exit)return false;}
+  const y0=start.y+dy*enter,y1=start.y+dy*exit;return Math.max(y0,y1)>=g.y&&Math.min(y0,y1)<=g.y+HUNT_FIELDS.curtainHeight;
+ });
+}
+function huntFoamViewHidden(s,camera,actor,viewer=controlledViewer(s)){
+ if(!runnerSide(actor)||!viewer?.owner?.startsWith('hunter-')||huntHasClearSight(s,viewer))return false;
+ return huntFoamLineBlocked(s,camera,actor);
+}
+
+// Presentation sight keeps labels and cues in sync with the body mask.
+function huntVisualActorSight(s,camera,actor,viewer=controlledViewer(s),upperBody){
+ if(huntOpticalHidden(s,viewer,actor)||huntFoamViewHidden(s,camera,actor,viewer))return false;
+ const from=cameraPosition(camera);
+ return worldSight(from,actorCenter(actor))||Boolean(upperBody&&worldSight(from,upperBody));
+}
+// Per-camera mask for the runner, their shadow, and their owned props.
+// The original visibility is restored even when a render pass throws.
+function withHuntFoamOcclusion(s,camera,actors,nodesFor,draw,{viewer,extraEntries=()=>[]}={}){
+ if(!(s.gadgets??[]).some(g=>active(s,g)))return draw();
+ const changed=[],seen=new Set(),hide=node=>{if(node?.visible&&!seen.has(node)){seen.add(node);changed.push(node);node.visible=false;}};
+ try{
+  actors.forEach((actor,i)=>{if(huntFoamViewHidden(s,camera,actor,viewer))for(const node of nodesFor(actor,i))hide(node);});
+  for(const row of extraEntries())if(huntFoamViewHidden(s,camera,row.actor,viewer))for(const node of row.nodes)hide(node);
+  return draw();
+ }finally{for(const node of changed)node.visible=true;}
+}
+
+return {huntFoamLineBlocked,huntFoamViewHidden,huntVisualActorSight,withHuntFoamOcclusion};
+})();
+const __tagModule35=(()=>{
 const T=__tagExternal0;
-const {createHuntReplayCamera}=__tagModule5;
-const {huntReplayCamera}=__tagModule32;
-const {huntActorConcealed}=__tagModule52;
-const {worldCameraPose,worldSight,worldValid}=__tagModule7;
+const {createHuntReplayCamera}=__tagModule7;
+const {huntReplayCamera}=__tagModule36;
+const {huntActorConcealed}=__tagModule59;
+const {huntFoamViewHidden}=__tagModule60;
+const {worldCameraPose,worldSight,worldValid}=__tagModule9;
 
 const W=1280,H=720,SCREEN_W=384,SCREEN_H=108;
 const wideTile={x:24,y:143,w:778,h:460,max:560},topTile={x:822,y:100,w:434,h:258,max:360},bottomTile={...topTile,y:376};
@@ -3651,14 +4324,14 @@ function createHuntBroadcastViews({renderer,scene,source,documentTarget=document
   const origin={x:active.x,y:active.y+3,z:active.z};
   return rivals.filter(rival=>{
    const point={x:rival.x,y:rival.y+3,z:rival.z};
-   if(huntActorConcealed(state,rival)||!worldSight(origin,point,.8))return true;
+   if(huntActorConcealed(state,rival)||!worldSight(origin,point,.8)||huntFoamViewHidden(state,origin,rival,active))return true;
    if(!mainCamera)return false;
    projected.set(point.x,point.y,point.z).project(mainCamera);
    return Math.abs(projected.x)>1||Math.abs(projected.y)>1||Math.abs(projected.z)>1||
-    !worldSight(mainCamera.position,point);
+    !worldSight(mainCamera.position,point)||huntFoamViewHidden(state,mainCamera,rival,active);
   });
  }
- function capture(view,centerSky,screenMask=[]){
+ function capture(view,centerSky,screenMask=[],renderView=(_camera,draw)=>draw()){
   if(!frame)return;
   const opponent=view==='opponent',desktopTile=opponent?(frame.hunting?topTile:bottomTile):wideTile;
   const screenTile=frame.screen&&(!opponent||frame.screenOpponent)?screenTiles[view]:null;
@@ -3692,7 +4365,7 @@ function createHuntBroadcastViews({renderer,scene,source,documentTarget=document
    renderer.setScissorTest(true);
    if(frame.desktopMulti){
     pointCamera(frame[view],smooth);
-    renderer.render(scene,camera);
+    renderView(camera,()=>renderer.render(scene,camera));
     ctx.drawImage(source,0,source.height-h,w,h,desktopTile.x,desktopTile.y,desktopTile.w,desktopTile.h);
    }
    if(screenTile){
@@ -3702,7 +4375,7 @@ function createHuntBroadcastViews({renderer,scene,source,documentTarget=document
      const separateOpponent=opponent&&(!frame.desktopMulti||!frame.sharedOpponent);
      if(separateOpponent)pointCamera(frame.screenOpponent,screenOpponentSmooth);
      else if(!frame.desktopMulti)pointCamera(frame[view],smooth);
-     if(!frame.desktopMulti||separateOpponent||visible.length)renderer.render(scene,camera);
+     if(!frame.desktopMulti||separateOpponent||visible.length)renderView(camera,()=>renderer.render(scene,camera));
      screenContext.drawImage(source,0,source.height-h,w,h,screenTile.x,screenTile.y,screenTile.w,screenTile.h);
     }finally{
      for(const node of visible)node.visible=true;
@@ -3759,7 +4432,7 @@ function createHuntBroadcastViews({renderer,scene,source,documentTarget=document
 
 return {huntBroadcastShots,createHuntBroadcastViews};
 })();
-const __tagModule53=(()=>{
+const __tagModule61=(()=>{
 // Actors face local +Z; an aligned third-person camera sits behind them.
 function huntFacingCameraYaw(actor,{freeYaw=0,paused=false,dragging=false}={}){
  if(paused||dragging||!Number.isFinite(actor?.yaw))return freeYaw;
@@ -3773,68 +4446,99 @@ function holdHuntCameraView(actual,{yaw=0,pitch=.28}={}){
 
 return {huntFacingCameraYaw,holdHuntCameraView};
 })();
-const __tagModule54=(()=>{
-const TURN_RATE=110*Math.PI/180;
-
-// The pad steers the actor independently of the viewing camera.
-function huntPadMovement(heading,{x,z},dt){
- const turn=Math.sign(x)*Math.max(0,(Math.abs(x)-.10)/.90);
- const yaw=heading-turn*TURN_RATE*dt;
- const nextHeading=Math.atan2(Math.sin(yaw),Math.cos(yaw));
- const travel=.75*Math.abs(x)*(1-Math.abs(z))-z;
- return {heading:nextHeading,x:Math.sin(nextHeading)*travel,z:Math.cos(nextHeading)*travel};
-}
-
-// Keyboard and pad share this single heading. Keep it while reversing so the
-// body's backward-facing pose cannot flip the next input. If a special move
-// took over the body, resume from its actual facing, never from turns queued
-// invisibly during the interruption.
-function huntKeyboardMovement(memory,heading,axis,dt){
- if(Number.isFinite(memory.facing)&&Math.abs(Math.atan2(Math.sin(heading-memory.facing),Math.cos(heading-memory.facing)))>.001)memory.heading=null;
- const move=huntPadMovement(memory.heading??heading,axis,dt);
- memory.heading=axis.x||axis.z?move.heading:null;
- memory.facing=Math.hypot(move.x,move.z)>.05?Math.atan2(move.x,move.z):null;
- return {x:move.x,z:move.z};
-}
-
-return {huntPadMovement,huntKeyboardMovement};
-})();
-const __tagModule56=(()=>{
+const __tagModule63=(()=>{
 function discoveryOpacity(age){if(age<0||age>=3)return 0;return age<.72?(.10+.28*(.5+.5*Math.cos(age*Math.PI*2/.18))):.20*(3-age)/2.28;}
 function createHuntDiscoveryTracker(){const entries=new Map();return{reset(){entries.clear();},sample(key,visible,time){let r=entries.get(key);if(!r||time<r.time){r={start:-Infinity,lost:null,armed:true,time};entries.set(key,r);}r.time=time;let discovered=false;if(visible){if(r.lost!==null&&time-r.lost>=1.2)r.armed=true;if(r.armed){r.armed=false;if(time-r.start>=6){r.start=time;discovered=true;}}r.lost=null;}else if(r.lost===null)r.lost=time;return{discovered,opacity:visible?discoveryOpacity(time-r.start):0,age:time-r.start};},size:()=>entries.size};}
 
 return {discoveryOpacity,createHuntDiscoveryTracker};
 })();
-const __tagModule55=(()=>{
+const __tagModule64=(()=>{
+// Capture the character's own translucency before any gameplay effect. These
+// materials belong to one cached actor; scenery and held props are untouched.
+function createHuntMaterialState(materials){
+ const base=[...new Set(materials)].map(material=>({material,transparent:material.transparent,opacity:material.opacity,depthWrite:material.depthWrite,side:material.side}));
+ let cloaked=false,cameraFade=1,writes=0,transitions=0;
+ function apply(hidden){for(const row of base){const m=row.material,t=hidden||cameraFade<1?true:row.transparent,o=(hidden?Math.min(row.opacity,.32):row.opacity)*cameraFade,d=cameraFade<1?false:row.depthWrite,side=cameraFade<1?0:row.side;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true;writes++;}if(m.opacity!==o){m.opacity=o;writes++;}if(m.depthWrite!==d){m.depthWrite=d;writes++;}if(m.side!==side){m.side=side;m.needsUpdate=true;writes++;}}}
+ return{setCloaked(value){value=!!value;if(value===cloaked)return false;apply(value);cloaked=value;transitions++;return true;},setCameraFade(value){value=Number.isFinite(value)?Math.max(0,Math.min(1,value)):1;if(value===cameraFade)return false;cameraFade=value;apply(cloaked);return true;},reset(){cameraFade=1;apply(false);cloaked=false;},stats:()=>({materials:base.length,writes,transitions,cloaked})};
+}
+
+// A wall may safely shorten the camera arm into a body. Keep that collision
+// and the player's heading; fade only the body covering the lens for this draw.
+// Restore before mirrors / other views, without touching scenery or perception.
+function huntCameraBodyOpacity(actor,position){
+ const radius=Number.isFinite(actor.radius)?Math.max(2,Math.min(6,actor.radius)):2.7;
+ const distance=Math.hypot(position.x-actor.x,position.y-actor.y-2.7,position.z-actor.z);
+ const inner=radius*1.05+3,t=Math.max(0,Math.min(1,(distance-inner)/7)),smooth=t*t*(3-2*t);
+ return smooth*smooth;
+}
+function withHuntCameraClearance(actors,models,position,draw){
+ const changed=[];let minOpacity=1;
+ try{
+  for(let i=0;i<actors.length;i++){
+   const m=models[i];if(!m?.root.visible)continue;
+   const alpha=huntCameraBodyOpacity(actors[i],position);if(alpha>=1)continue;
+   m.materialState.setCameraFade(alpha);changed.push(m);minOpacity=Math.min(minOpacity,alpha);
+  }
+  draw();return{fadedActors:changed.length,minOpacity};
+ }finally{for(const m of changed)m.materialState.setCameraFade(1);}
+}
+
+return {createHuntMaterialState,huntCameraBodyOpacity,withHuntCameraClearance};
+})();
+const __tagModule62=(()=>{
 const T=__tagExternal0;
-const {HUNT_CHARACTER_HEIGHT}=__tagModule7;
-const {huntCanObserve,huntHasClearSight}=__tagModule25;
-const {huntActorConcealed}=__tagModule52;
-const {createHuntDiscoveryTracker}=__tagModule56;
-// Use the actual rendered camera ray, with only the controlled actor's lenses.
-// huntCanObserve adds three units to its endpoints; offset the view proxies
-// so this shares the physical foam volume without shifting that visual ray.
-function huntMarkerSight(s,camera,actor){
- const viewer=s.config.mode==='hunt'?s.hunters[0]:s.player,p=camera.position;
- return huntCanObserve(s,{owner:viewer.owner,effects:viewer.effects,x:p.x,y:p.y-3,z:p.z},{...actor,y:actor.y+HUNT_CHARACTER_HEIGHT*.55-3},Infinity);
+const {HUNT_CHARACTER_HEIGHT}=__tagModule9;
+const {huntHasClearSight}=__tagModule29;
+const {huntVisualActorSight}=__tagModule60;
+const {huntActorConcealed}=__tagModule59;
+const {createHuntDiscoveryTracker}=__tagModule63;
+const {huntCameraBodyOpacity}=__tagModule64;
+const NEAR_MARKER_RANGE=135;
+const LIVE_MARKER_RANGE=320;
+const PREVIOUS_MARKER_RANGE=200;
+const MIN_DISTANT_BODY_PIXELS=8;
+const LABEL_WIDTH=2.94;
+const LABEL_HEIGHT=.9996;
+const LABEL_FONT_FRACTION=40/64;
+const LEGIBLE_FONT_PIXELS=9;
+const MAX_LABEL_SCALE=7;
+const UPPER_BODY_HEIGHT=HUNT_CHARACTER_HEIGHT*.84;
+
+function liveMarkerRange(camera,viewportHeight){
+ if(!(viewportHeight>0))return PREVIOUS_MARKER_RANGE;
+ const focalPixels=viewportHeight*camera.projectionMatrix.elements[5]/2;
+ const readableRange=focalPixels*HUNT_CHARACTER_HEIGHT/MIN_DISTANT_BODY_PIXELS;
+ return Math.max(PREVIOUS_MARKER_RANGE,Math.min(LIVE_MARKER_RANGE,readableRange));
+}
+
+function labelScale(camera,position,viewportHeight){
+ if(!(viewportHeight>0))return 1;
+ const cameraDepth=-position.applyMatrix4(camera.matrixWorldInverse).z;
+ const focalPixels=viewportHeight*camera.projectionMatrix.elements[5]/2;
+ return Math.max(1,Math.min(MAX_LABEL_SCALE,LEGIBLE_FONT_PIXELS*cameraDepth/(focalPixels*LABEL_HEIGHT*LABEL_FONT_FRACTION)));
+}
+// Use the same camera and foam rules for the body and overhead labels.
+function huntMarkerSight(s,camera,actor,upperBody){
+ return huntVisualActorSight(s,camera,actor,undefined,upperBody);
 }
 function createHuntRoleMarkers({scene,document:doc=globalThis.document,onDiscover=()=>{}}){
- const labels=['逃走者','鬼'],colors=[0x64e4df,0xff8478],materials=labels.map(label=>{
-  const canvas=doc.createElement('canvas');canvas.width=192;canvas.height=64;const c=canvas.getContext('2d');c.clearRect(0,0,192,64);c.font='bold 40px system-ui,sans-serif';c.textAlign='center';c.textBaseline='middle';c.strokeStyle='#173243';c.lineWidth=6;c.strokeText(label,96,33);c.fillStyle='#fff';c.fillText(label,96,33);
+ const labels=['逃走者','鬼'],colors=[0x64e4df,0xff8478],materials=labels.map((label,role)=>{
+  const canvas=doc.createElement('canvas');canvas.width=192;canvas.height=64;const c=canvas.getContext('2d');c.clearRect(0,0,192,64);c.font='bold 40px system-ui,sans-serif';c.textAlign='center';c.textBaseline='middle';c.strokeStyle='#173243';c.lineWidth=6;c.strokeText(label,96,33);c.fillStyle='#'+colors[role].toString(16).padStart(6,'0');c.fillText(label,96,33);
   const map=new T.CanvasTexture(canvas);map.colorSpace=T.SRGBColorSpace;const m=new T.SpriteMaterial({map,transparent:true,depthTest:true,depthWrite:false,toneMapped:false,fog:true});m.userData.label=label;return m;
  });
+ const ownFadeMaterials=[];
  const canvas=doc.createElement('canvas');canvas.width=canvas.height=256;const c=canvas.getContext('2d');c.clearRect(0,0,256,256);c.strokeStyle='#fff';c.lineWidth=4;for(let j=0;j<4;j++){const angle=j*Math.PI/2;c.beginPath();c.arc(128,128,108,angle+.14,angle+1.35);c.stroke();c.beginPath();c.moveTo(128+Math.cos(angle)*99,128+Math.sin(angle)*99);c.lineTo(128+Math.cos(angle)*122,128+Math.sin(angle)*122);c.stroke();}
  const ringMap=new T.CanvasTexture(canvas);ringMap.colorSpace=T.SRGBColorSpace;
- const sprites=[],rings=[],tracker=createHuntDiscoveryTracker(),sight=new Map(),projected=new T.Vector3();let visible=0,cloneCount=0,pulses=0,discoveries=0;
- function sprite(i){if(!sprites[i]){const a=new T.Sprite(materials[0]);a.name='hunt-role-marker-'+i;a.scale.set(2.8,.952,1);scene.add(a);sprites[i]=a;const ring=new T.Sprite(new T.SpriteMaterial({map:ringMap,transparent:true,depthTest:true,depthWrite:false,toneMapped:false,fog:true,opacity:0}));ring.name='hunt-discovery-'+i;ring.visible=false;scene.add(ring);rings[i]=ring;}return sprites[i];}
+ const sprites=[],rings=[],tracker=createHuntDiscoveryTracker(),sight=new Map(),projected=new T.Vector3(),upperBody=new T.Vector3();let visible=0,cloneCount=0,pulses=0,discoveries=0;
+ function sprite(i){if(!sprites[i]){const a=new T.Sprite(materials[0]);a.name='hunt-role-marker-'+i;a.scale.set(LABEL_WIDTH,LABEL_HEIGHT,1);scene.add(a);sprites[i]=a;const ring=new T.Sprite(new T.SpriteMaterial({map:ringMap,transparent:true,depthTest:true,depthWrite:false,toneMapped:false,fog:true,opacity:0}));ring.name='hunt-discovery-'+i;ring.visible=false;scene.add(ring);rings[i]=ring;}return sprites[i];}
  for(let i=0;i<4;i++)sprite(i);
  // Ordinary camera/actor movement uses the short sight cache, but the
  // curtain's silhouette and the opposing marker must change together.
  const curtainBounds=[];
- function refreshCurtainSight(gadgets){
+ function refreshCurtainSight(gadgets,time){
   let i=0,changed=false;
   for(const g of gadgets){
-   if(g.kind!=='curtain')continue;
+   if(g.kind!=='curtain'||(g.until??Infinity)<=time)continue;
    if(curtainBounds[i]!==g.x||curtainBounds[i+1]!==g.y||
       curtainBounds[i+2]!==g.z||curtainBounds[i+3]!==g.radius){
     changed=true;
@@ -3853,35 +4557,74 @@ function createHuntRoleMarkers({scene,document:doc=globalThis.document,onDiscove
   return false;
  }
  function place(i,a,role,s,options){const m=sprite(i),show=!huntActorConcealed(s,a),ring=rings[i];m.material=materials[role];m.userData.role=labels[role];m.userData.owner=a.owner;m.visible=show;m.position.set(a.x,a.y+HUNT_CHARACTER_HEIGHT+.6,a.z);const model=options.models?.[i];if(model){m.position.set(0,HUNT_CHARACTER_HEIGHT,0).applyMatrix4(model.root.matrixWorld);m.position.y+=.7;}ring.visible=false;
-  const enemy=s.config.mode==='hunt'?role===0:role===1,camera=options.camera;let seen=false;
-  if(camera&&enemy){projected.set(a.x,a.y+HUNT_CHARACTER_HEIGHT*.55,a.z).project(camera);const view=camera.position,inView=show&&projected.z>=-1&&projected.z<=1&&Math.abs(projected.x)<.96&&Math.abs(projected.y)<.96&&Math.hypot(a.x-view.x,a.z-view.z)<135;
-   if(inView){const now=options.now??s.time,viewer=s.config.mode==='hunt'?s.hunters[0]:s.player,lenses=huntHasClearSight(s,viewer);let cached=sight.get(a.owner);if(!cached||now<cached.at||s.time<cached.roundAt||now-cached.at>=.1||lenses!==cached.lenses){cached={at:now,roundAt:s.time,lenses,seen:huntMarkerSight(s,camera,a)};sight.set(a.owner,cached);}seen=cached.seen;}else sight.delete(a.owner);
+  const enemy=s.config.mode==='hunt'?role===0:role===1,camera=options.camera;
+  const viewer=s.config.mode==='hunt'?s.hunters[0]:s.player;
+  if(camera&&a===viewer){
+   const opacity=huntCameraBodyOpacity(a,camera.position);
+   if(opacity===0)m.visible=false;
+   else if(opacity<1){
+    const material=ownFadeMaterials[role]??=materials[role].clone();
+    material.opacity=opacity;
+    m.material=material;
+   }
+  }
+  let seen=false,range=Infinity,scale=1;
+  if(camera&&enemy){
+   projected.set(a.x,a.y+HUNT_CHARACTER_HEIGHT*.55,a.z).project(camera);
+   range=Math.hypot(a.x-camera.position.x,a.z-camera.position.z);
+   const limit=options.active?liveMarkerRange(camera,options.viewportHeight):NEAR_MARKER_RANGE;
+   const inView=show&&projected.z>=-1&&projected.z<=1&&Math.abs(projected.x)<.96&&Math.abs(projected.y)<.96&&range<limit;
+   if(inView){
+    const now=options.now??s.time;
+    const lenses=huntHasClearSight(s,viewer);
+    let cached=sight.get(a.owner);
+    if(!cached||now<cached.at||s.time<cached.roundAt||now-cached.at>=.1||lenses!==cached.lenses||cached.active!==!!options.active){
+     // At the crest of a slope or behind low cover, the top of the
+     // body can be visible while the ray to its centre is blocked.
+     let exposedPoint;
+     if(options.active&&a.dive?.stage!=='slide'){
+      exposedPoint=model
+       ?upperBody.set(0,UPPER_BODY_HEIGHT,0).applyMatrix4(model.root.matrixWorld)
+       :upperBody.set(a.x,a.y+UPPER_BODY_HEIGHT,a.z);
+     }
+     cached={at:now,roundAt:s.time,lenses,active:!!options.active,seen:huntMarkerSight(s,camera,a,exposedPoint)};
+     sight.set(a.owner,cached);
+    }
+    seen=cached.seen;
+   }else sight.delete(a.owner);
    m.visible=seen;
-  }if(m.visible)visible++;if(!options.active||!camera||!enemy)return;
-  const p=tracker.sample(a.owner,seen,s.time);if(p.discovered){discoveries++;onDiscover();}if(p.opacity<=0)return;ring.material.opacity=p.opacity;ring.material.color.setHex(colors[role]);ring.material.rotation=p.age*.35;ring.position.set(a.x,a.y+HUNT_CHARACTER_HEIGHT*.62,a.z);ring.scale.set(Math.max(6.8,(a.radius??2.7)*2.2),6.5,1);ring.visible=true;pulses++;
+   if(seen&&options.active)scale=labelScale(camera,projected.copy(m.position),options.viewportHeight);
+  }
+  m.scale.set(LABEL_WIDTH*scale,LABEL_HEIGHT*scale,1);
+  if(m.visible)visible++;
+  if(!options.active||!camera||!enemy)return;
+  const p=tracker.sample(a.owner,seen&&range<NEAR_MARKER_RANGE,s.time);
+  if(p.discovered){discoveries++;onDiscover();}
+  if(p.opacity<=0)return;
+  ring.material.opacity=p.opacity;ring.material.color.setHex(colors[role]);ring.material.rotation=p.age*.35;ring.position.set(a.x,a.y+HUNT_CHARACTER_HEIGHT*.62,a.z);ring.scale.set(Math.max(6.8,(a.radius??2.7)*2.2),6.5,1);ring.visible=true;pulses++;
  }
- return{withoutLabels(draw){const labels=[...sprites,...rings],visible=labels.map(label=>label.visible);for(const label of labels)label.visible=false;try{return draw();}finally{labels.forEach((label,i)=>{label.visible=visible[i];});}},reset(){tracker.reset();sight.clear();discoveries=0;for(const r of rings)r.visible=false;},update(s,options={}){const curtainChanged=refreshCurtainSight(s.gadgets);visible=0;cloneCount=0;pulses=0;place(0,s.player,0,s,options);for(let i=0;i<s.hunters.length;i++)place(i+1,s.hunters[i],1,s,options);for(const g of s.gadgets)if(g.kind==='clone'&&g.owner==='player'&&g.until>s.time&&cloneCount<2){place(4+cloneCount,{...g,owner:'echo:'+g.id},0,s,options);cloneCount++;}for(let i=4+cloneCount;i<sprites.length;i++)sprites[i].visible=rings[i].visible=false;return curtainChanged;},stats(){return{visible,clones:cloneCount,allocated:sprites.length,textures:3,pulses,discoveries,labels:sprites.filter(s=>s.visible).map(s=>s.userData.role)};},dispose(){for(const s of sprites)scene.remove(s);for(const r of rings){scene.remove(r);r.material.dispose();}for(const m of materials){m.map.dispose();m.dispose();}ringMap.dispose();}};
+ return{withoutLabels(draw){const labels=[...sprites,...rings],visible=labels.map(label=>label.visible);for(const label of labels)label.visible=false;try{return draw();}finally{labels.forEach((label,i)=>{label.visible=visible[i];});}},reset(){tracker.reset();sight.clear();discoveries=0;for(const r of rings)r.visible=false;},update(s,options={}){const curtainChanged=refreshCurtainSight(s.gadgets,s.time);visible=0;cloneCount=0;pulses=0;place(0,s.player,0,s,options);for(let i=0;i<s.hunters.length;i++)place(i+1,s.hunters[i],1,s,options);for(const g of s.gadgets)if(g.kind==='clone'&&g.owner==='player'&&g.until>s.time&&cloneCount<2){place(4+cloneCount,{...g,owner:'echo:'+g.id},0,s,options);cloneCount++;}for(let i=4+cloneCount;i<sprites.length;i++)sprites[i].visible=rings[i].visible=false;return curtainChanged;},stats(){return{visible,clones:cloneCount,allocated:sprites.length,textures:3,pulses,discoveries,labels:sprites.filter(s=>s.visible).map(s=>s.userData.role)};},dispose(){for(const s of sprites)scene.remove(s);for(const r of rings){scene.remove(r);r.material.dispose();}for(const m of ownFadeMaterials)m?.dispose();for(const m of materials){m.map.dispose();m.dispose();}ringMap.dispose();}};
 }
 
 return {huntMarkerSight,createHuntRoleMarkers};
 })();
-const __tagModule57=(()=>{
-const {ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon,HUNT_FIELDS}=__tagModule9;
+const __tagModule65=(()=>{
+const {ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon,HUNT_FIELDS}=__tagModule11;
 const notes={
- radar:['索敵','見失った時や、周りを確かめたい時に使う。','試合終了まで表示。相手のおおまかな方角が分かる。'],
+ radar:['索敵','見失った時や、周りを確かめたい時に使う。','試合終了まで表示。近くの相手が高い位置なら▲、低い位置なら▼。'],
  mirror:['後方確認','使うと画面上部にバックミラーを装着。','試合終了まで、走りながら後ろの道や鬼を確認できる。'],
  speed:['加速','直線に入る時に使う。','鬼が近づく前に、距離をあけよう。'],
- cloak:['かく乱','見失わせたい時に使う。','サングラスを着けた鬼には見える。曲がって離れよう。'],
+ cloak:['かく乱','姿と足跡インクの足あとを4秒間隠す。','マントが切れると足あとも再表示。サングラスには姿が見える。'],
  clone:['かく乱','前が空いた場所で使う。','分身とは別の道へ走ろう。'],
  cushion:['妨害','走りながら、後ろの鬼へ転がす。','当たると2秒ピヨピヨ。自分にも効くので進路を変えよう。'],
- curtain:['かく乱','広い通路や分かれ道で使う。','サングラスを着けた鬼は見通す。自分の視界も遮る。'],
+ curtain:['かく乱','鬼から逃走者の姿や手持ちの道具を隠す。泡に紛れて進路を変えよう。','逃走者からは泡の中の鬼が見える。サングラスを着けた鬼も泡を見通せる。'],
  fan:['設置','向いた先に巨大扇風機を設置。12秒間、前方へ送風。','風は自分にも効き、壁を通らない。鬼は横から回り込み、狭い道では別の入口へ。'],
  sheet:['地形','通路の先に置いて使う。','自分も滑るので、跳んで越えよう。'],
  hook:['高速移動','前方のポールへ、紐に引かれてビュンと移動。','壁を貫通しない。行き先が空いている方向を向こう。'],
  scarf:['加速','追いかける直線で使う。','短い予兆のあと加速する。'],
  sunglasses:['見通し','使うと装着。試合終了まで透明化と泡を見通す。','着用した鬼だけに有効。壁は見通さない。'],
- ink:['追跡','使った瞬間、逃走者へ無条件で付着。','試合終了まで足あとを残す。1つの足あとは15秒で消える。'],
- balloon:['浮遊','地上でも空中でも使える。','障害物を回り込み追尾。ダイブ1回では届かない間隔で着地。']
+ ink:['追跡','使った瞬間、逃走者へ無条件で付着。','試合終了まで有効。足あとは15秒。透明マント中は隠れ、終了後に再表示。'],
+ balloon:['浮遊','地上でも空中でも使える。','逃走者を追い、着地点を決めたらそのまま降りる。着地後は間合いを見て追いかけよう。']
 };
 function huntGuideEntries(mode){return(mode==='hunt'?HUNTER_ITEMS:PLAYER_ITEMS).map(id=>{const d=ITEM_DEFS[id],[category,how,tip]=notes[id];return Object.freeze({...d,category,how,tip});});}
 // The guide always reads the live, role-specific catalogue above. No separate
@@ -3890,7 +4633,7 @@ function createHuntItemGuide({onOpen=()=>{}}={}){
  const style=document.createElement('style');style.textContent=guideCss;document.head.append(style);
  const dialog=document.createElement('dialog');dialog.className='tag-item-guide';dialog.setAttribute('aria-label','アイテム図鑑');dialog.innerHTML='<header><div><span class="tg-eyebrow">FIELD EQUIPMENT</span><h2>アイテム図鑑</h2><p data-role-name></p></div><button data-close aria-label="図鑑を閉じる">閉じる ×</button></header><div class="tg-body"><section class="tg-library"><div class="tg-list-title"><b>道具を選ぶ</b><small>現行のラインナップ</small></div><div class="tg-grid" role="group" aria-label="道具を選ぶ"></div></section><section class="tg-detail" aria-live="polite" aria-atomic="true"></section></div><footer><span class="tg-help">使う：Lキー ／ アイテムボタン</span><span>道具なしで開始 · 拾って1つ持てる</span></footer>';document.body.append(dialog);
  const button=document.createElement('button');button.className='tag-guide-open';button.id='item-guide-open';let mode='escape',selected={escape:'speed',hunt:'sunglasses'};
- const facts={radar:['試合終了まで','相手の方角'],mirror:['試合終了まで','逃走者の後方映像'],speed:['3秒','自分が加速'],cloak:['4秒','自分の姿を隠す'],clone:['5秒','分身が走る'],cushion:['後方へ発射','当たった全員'],curtain:['5秒','視界を遮る'],fan:[HUNT_FIELDS.fanSeconds+'秒','風に当たった全員'],sheet:['7秒','踏んだ全員'],hook:['前方のポールへ','自分が移動'],scarf:['予兆のあと3秒','自分が加速'],sunglasses:['試合終了まで','着用した鬼だけ'],ink:['試合終了まで','逃走者に付着'],balloon:['近くまで追尾','自分が浮遊']};
+ const facts={radar:['試合終了まで','相手の方角'],mirror:['試合終了まで','逃走者の後方映像'],speed:['3秒','自分が加速'],cloak:['4秒','自分の姿を隠す'],clone:['5秒','分身が走る'],cushion:['後方へ発射','当たった全員'],curtain:['5秒','鬼から逃走者を隠す'],fan:[HUNT_FIELDS.fanSeconds+'秒','風に当たった全員'],sheet:['7秒','踏んだ全員'],hook:['前方のポールへ','自分が移動'],scarf:['予兆のあと3秒','自分が加速'],sunglasses:['試合終了まで','着用した鬼だけ'],ink:['試合終了まで','逃走者に付着'],balloon:['追尾のあと着地','自分が浮遊']};
  function select(id){const entries=huntGuideEntries(mode),d=entries.find(d=>d.id===id)??entries[0];selected[mode]=d.id;for(const tile of dialog.querySelectorAll('.tg-tile'))tile.setAttribute('aria-pressed',String(tile.dataset.item===d.id));const [duration,target]=facts[d.id];dialog.querySelector('.tg-detail').innerHTML='<div class="tg-detail-top"><span class="tg-category">'+d.category+'</span><span class="tg-side">'+(mode==='hunt'?'鬼の道具':'逃走者の道具')+'</span></div><div class="tg-hero" style="--item-color:'+d.color+'"><div class="tg-display">'+itemIcon(d.id)+'</div><div><p class="tg-overline">'+(d.id==='sunglasses'||d.id==='ink'?'試合中ずっと有効':'拾って、使って、切り抜ける')+'</p><h3>'+d.name+'</h3><p class="tg-effect">'+d.hint+'</p></div></div><div class="tg-facts"><span><small>持続・動き</small><b>'+duration+'</b></span><span><small>効く相手</small><b>'+target+'</b></span></div><div class="tg-how"><b>使いどころ</b><p>'+d.how+'</p></div><div class="tg-tip"><span>POINT</span><p>'+d.tip+'</p></div>';dialog.dataset.selectedItem=d.id;}
  function populate(){const entries=huntGuideEntries(mode);dialog.dataset.audience=mode==='hunt'?'hunters':'player';dialog.querySelector('[data-role-name]').textContent=(mode==='hunt'?'鬼':'逃走者')+'の道具 · '+entries.length+'種類';dialog.querySelector('.tg-grid').replaceChildren(...entries.map(d=>{const tile=document.createElement('button');tile.type='button';tile.className='tg-tile';tile.dataset.item=d.id;tile.style.setProperty('--item-color',d.color);tile.innerHTML='<span class="tg-tile-art">'+itemIcon(d.id)+'</span><span class="tg-tile-name">'+d.name+'</span><small>'+d.category+'</small>';tile.onclick=()=>select(d.id);return tile;}));select(selected[mode]);}
  function setRole(value){mode=value==='hunt'?'hunt':'escape';button.textContent='アイテム図鑑　'+huntGuideEntries(mode).length+'種類';if(dialog.open)populate();}
@@ -3908,8 +4651,8 @@ const guideCss=`
 
 return {huntGuideEntries,createHuntItemGuide};
 })();
-const __tagModule58=(()=>{
-const {recordHunt,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES}=__tagModule33;
+const __tagModule66=(()=>{
+const {recordHunt,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES}=__tagModule37;
 
 // Use the accepted layout seed, not the originally requested (possibly rejected)
 // seed. Carry only round settings: never inventory, effects, time or a result.
@@ -3954,7 +4697,7 @@ function recordFreshHunt(config,previous,record=recordHunt){
 
 return {huntRetryConfig,recordReadyHunt,recordFreshHunt};
 })();
-const __tagModule59=(()=>{
+const __tagModule67=(()=>{
 const HUNT_VIDEO_MAX_BYTES=12*1024*1024;
 const HUNT_FULL_VIDEO_MAX_BYTES=48*1024*1024;
 function huntVideoLimits(scope='finish',seconds=6){
@@ -3967,7 +4710,136 @@ const VIDEO_FPS=24;
 function huntReplayAudioAllowed(view=globalThis){return !view.top||view.top===view.self;}
 // Attach before a pending resume resolves; recording must not lose its audio
 // track merely because the context was suspended on the result screen.
-function createHuntReplayAudio(audio,view=globalThis){if(!huntReplayAudioAllowed(view))return null;const context=audio?.context;if(!context?.createMediaStreamDestination||context.state==='closed')return null;let destination;try{destination=context.createMediaStreamDestination();audio.tap(destination);return{stream:destination.stream,release:()=>audio.untap(destination)};}catch{if(destination)try{audio.untap(destination);}catch{}for(const t of destination?.stream?.getTracks?.()??[])try{t.stop();}catch{}return null;}}
+function createHuntReplayAudio(audio,view=globalThis){
+ if(!huntReplayAudioAllowed(view))return null;
+ const context=audio?.context;if(!context?.createMediaStreamDestination||context.state==='closed')return null;
+ let destination,clock,released=false;
+ const release=()=>{if(released)return;released=true;if(clock){try{clock.stop();}catch{}try{clock.disconnect();}catch{}}if(destination)try{audio.untap(destination);}catch{}};
+ try{
+  destination=context.createMediaStreamDestination();audio.tap(destination);
+  // Keep silent intervals on the exported audio timeline. This zero-valued
+  // source belongs only to the recording destination, never to the speakers.
+  if(context.createConstantSource){clock=context.createConstantSource();clock.offset.value=0;clock.connect(destination);clock.start();}
+  return{stream:destination.stream,release};
+ }catch{release();for(const t of destination?.stream?.getTracks?.()??[])try{t.stop();}catch{}return null;}
+}
+const mp4Type=(d,p)=>String.fromCharCode(...new Uint8Array(d.buffer,d.byteOffset+p,4));
+function mp4Box(d,p,limit){
+ if(p+8>d.byteLength)return null;
+ let size=d.getUint32(p),header=8;
+ if(size===1){if(p+16>d.byteLength)return null;size=Number(d.getBigUint64(p+8));header=16;}
+ else if(size===0)size=limit-p;
+ if(!Number.isSafeInteger(size)||size<header||size>limit-p)return null;
+ return{type:mp4Type(d,p+4),body:p+header,end:p+size};
+}
+function mp4Children(d){
+ const rows=[];
+ for(let p=0;p<d.byteLength;){
+  const box=mp4Box(d,p,d.byteLength);
+  if(!box||rows.length>=1024)throw Error('MP4_BOX');
+  rows.push(box);p=box.end;
+ }
+ return rows;
+}
+function mp4Child(d,type){
+ const box=mp4Children(d).find(row=>row.type===type);
+ return box&&mp4Payload(d,box);
+}
+const mp4Payload=(d,box)=>new DataView(d.buffer,d.byteOffset+box.body,box.end-box.body);
+function mp4U64(d,p){const n=Number(d.getBigUint64(p));return Number.isSafeInteger(n)?n:NaN;}
+function mp4Clock(d){
+ if(!d||d.byteLength<4)return null;
+ const version=d.getUint8(0),p=version===1?20:12;
+ if(version>1||d.byteLength<p+(version===1?12:8))return null;
+ const scale=d.getUint32(p),ticks=version===1?mp4U64(d,p+4):d.getUint32(p+4);
+ return scale>0?{scale,duration:ticks>0&&ticks!==0xffffffff?ticks/scale:null}:null;
+}
+function mp4VideoTrack(movie,movieClock){
+ for(const box of mp4Children(movie)){
+  if(box.type!=='trak')continue;
+  const track=mp4Payload(movie,box),media=mp4Child(track,'mdia');
+  if(!media)continue;
+  const handler=mp4Child(media,'hdlr');
+  if(!handler||handler.byteLength<12||mp4Type(handler,8)!=='vide')continue;
+  const header=mp4Child(track,'tkhd'),clock=mp4Clock(mp4Child(media,'mdhd'));
+  if(!header||header.byteLength<24||!clock)return null;
+  const version=header.getUint8(0),p=version===1?20:12;
+  if(version>1||header.byteLength<p+(version===1?16:12))return null;
+  const id=header.getUint32(p),ticks=version===1?mp4U64(header,p+8):header.getUint32(p+8);
+  const duration=movieClock?.scale&&ticks>0&&ticks!==0xffffffff?ticks/movieClock.scale:clock.duration;
+  let defaultDuration=0;
+  const extensions=mp4Child(movie,'mvex');
+  if(extensions)for(const ext of mp4Children(extensions)){
+   if(ext.type!=='trex')continue;
+   const row=mp4Payload(extensions,ext);
+   if(row.byteLength>=24&&row.getUint32(4)===id)defaultDuration=row.getUint32(12);
+  }
+  return{id,scale:clock.scale,duration,defaultDuration,decodeEnd:0,presentEnd:0,samples:0};
+ }
+ return null;
+}
+function addMp4VideoFragment(fragment,video){
+ for(const box of mp4Children(fragment)){
+  if(box.type!=='traf')continue;
+  const track=mp4Payload(fragment,box),header=mp4Child(track,'tfhd');
+  if(!header||header.getUint32(4)!==video.id)continue;
+  const flags=header.getUint32(0)&0xffffff;
+  const durationOffset=8+(flags&1?8:0)+(flags&2?4:0);
+  const defaultDuration=flags&8?header.getUint32(durationOffset):video.defaultDuration;
+  const base=mp4Child(track,'tfdt'),version=base?.getUint8(0);
+  let decode=base?(version===1?mp4U64(base,4):version===0?base.getUint32(4):NaN):video.decodeEnd;
+  if(!Number.isSafeInteger(decode))throw Error('MP4_TIME');
+  for(const runBox of mp4Children(track)){
+   if(runBox.type!=='trun')continue;
+   const run=mp4Payload(track,runBox),info=run.getUint32(0),count=run.getUint32(4);
+   if((info>>>24)>1||video.samples+count>32768)throw Error('MP4_SAMPLES');
+   let p=8+(info&1?4:0)+(info&4?4:0);
+   const step=((info&0x100?1:0)+(info&0x200?1:0)+(info&0x400?1:0)+(info&0x800?1:0))*4;
+   if(p+count*step>run.byteLength)throw Error('MP4_SAMPLES');
+   for(let i=0;i<count;i++,p+=step){
+    const duration=info&0x100?run.getUint32(p):defaultDuration;
+    const composition=!(info&0x800)?0:info>>>24?run.getInt32(p+step-4):run.getUint32(p+step-4);
+    if((!duration&&!(info&0x100))||!Number.isSafeInteger(decode+duration)||!Number.isSafeInteger(decode+duration+composition))throw Error('MP4_TIME');
+    video.presentEnd=Math.max(video.presentEnd,decode+duration+composition);
+    decode+=duration;
+   }
+   video.samples+=count;
+  }
+  video.decodeEnd=Math.max(video.decodeEnd,decode);
+ }
+}
+// Check the video timeline, not the AAC or movie length. In fragmented MP4
+// those summary headers can describe only the first fragment, or be zero.
+// Read bounded metadata only: never copy the recorded mdat payloads.
+const huntRecordedVideoDuration=async blob=>{
+ if(!blob?.type?.startsWith('video/mp4')||!blob.slice)return null;
+ let movieClock=null,video=null,fragments=0,metadata=0,offset=0,boxes=0;
+ try{
+  for(;offset+8<=blob.size&&boxes++<1024;){
+   let head=new DataView(await blob.slice(offset,offset+8).arrayBuffer());
+   if(head.byteLength===8&&head.getUint32(0)===1)head=new DataView(await blob.slice(offset,offset+16).arrayBuffer());
+   const box=mp4Box(head,0,blob.size-offset);
+   if(!box)return null;
+   if(box.type==='moov'||box.type==='moof'){
+    const bytes=box.end-box.body;
+    metadata+=bytes;
+    if(bytes>256*1024||metadata>2*1024*1024)return null;
+    const data=new DataView(await blob.slice(offset+box.body,offset+box.end).arrayBuffer());
+    if(box.type==='moov'){
+     movieClock=mp4Clock(mp4Child(data,'mvhd'));
+     video=mp4VideoTrack(data,movieClock);
+    }else{
+     fragments++;
+     if(video)addMp4VideoFragment(data,video);
+    }
+   }
+   offset+=box.end;
+  }
+  if(offset!==blob.size)return null;
+  if(fragments&&video)return video.presentEnd/video.scale;
+  return video?.duration??movieClock?.duration??null;
+ }catch{return null;}
+};
 function huntVideoSize(width,height){if(!Number.isFinite(width)||!Number.isFinite(height)||width<=0||height<=0)throw Error('INVALID_VIDEO_SIZE');const scale=720/Math.max(width,height);return{width:Math.max(2,Math.round(width*scale/2)*2),height:Math.max(2,Math.round(height*scale/2)*2)};}
 const HUNT_VIDEO_MP4='video/mp4;codecs=avc1.42E01E,mp4a.40.2';
 // Prefer an explicit share-friendly AVC/AAC pair. A bare MP4 probe selected
@@ -3982,7 +4854,7 @@ function startHuntRecorder(Recorder,stream,types,preferred,bitrate){const ordere
 // before some destination tracks join the canvas stream; release their union.
 function stopHuntCaptureTracks(...streams){const tracks=new Set();for(const stream of streams)for(const method of['getTracks','getVideoTracks','getAudioTracks'])try{for(const track of stream?.[method]?.()??[])tracks.add(track);}catch{}for(const track of tracks)try{track.stop();}catch{}}
 function createHuntReplayVideo({createCanvas=()=>document.createElement('canvas'),Recorder=globalThis.MediaRecorder,makeAudio=()=>null,setTimer=setTimeout,clearTimer=clearTimeout}={}){
- let current=null,preferredMime=null;
+ let current=null,preferredMime=null,sequence=0;
  function clean(c){
   if(c.cleaned)return;
   c.cleaned=true;
@@ -3996,7 +4868,7 @@ function createHuntReplayVideo({createCanvas=()=>document.createElement('canvas'
  // Every callback owns its recording; late work must never cancel a newer one.
  function abort(c){if(!c||c.cleaned)return;c.cancelled=true;try{if(c.recorder?.state!=='inactive')c.recorder?.stop();}catch{}clean(c);c.resolve(null);}
  function cancel(){abort(current);}
- function start(frame,summary,{scope='finish',seconds=6}={}){cancel();return new Promise(resolve=>{let c;try{const limits=huntVideoLimits(scope,seconds);const types=huntVideoMimes(Recorder);if(!types.length)throw Error('VIDEO_UNSUPPORTED');const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();Object.assign(canvas,size);const context=canvas.getContext('2d');if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');const stream=canvas.captureStream(VIDEO_FPS);const caption=summary?(summary.mode==="hunt"?"鬼役":"逃走役")+"  ·  "+summary.title+"  "+summary.time+"秒":"";c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};current=c;c.audio=makeAudio();for(const t of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(t);const selected=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate),mime=selected.mime;c.recorder=selected.recorder;c.types=types;c.mime=mime;preferredMime=mime;c.recorder.ondataavailable=e=>{if(!e.data?.size||c.cancelled||c.cleaned)return;c.bytes+=e.data.size;if(c.bytes>limits.maxBytes){abort(c);return;}c.chunks.push(e.data);};c.recorder.onerror=()=>{if(c.cleaned||c.cancelled)return;preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];abort(c);};c.recorder.onstop=()=>{if(c.cleaned)return;const type=(c.recorder.mimeType||mime).startsWith('video/mp4')?'video/mp4':'video/webm',blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null;clean(c);resolve(blob);};c.timer=setTimer(()=>abort(c),limits.timeout);}catch{abort(c);resolve(null);}});}
+ function start(frame,summary,{scope='finish',seconds=6}={}){cancel();return new Promise(resolve=>{let c;try{const limits=huntVideoLimits(scope,seconds);const types=huntVideoMimes(Recorder);if(!types.length)throw Error('VIDEO_UNSUPPORTED');const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();Object.assign(canvas,size);const context=canvas.getContext('2d');if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');const stream=canvas.captureStream(VIDEO_FPS);const caption=summary?(summary.mode==="hunt"?"鬼役":"逃走役")+"  ·  "+summary.title+"  "+summary.time+"秒":"";c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};current=c;c.sequence=++sequence;c.audio=makeAudio();for(const t of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(t);const selected=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate),mime=selected.mime;c.recorder=selected.recorder;c.types=types;c.mime=mime;preferredMime=mime;c.recorder.ondataavailable=e=>{if(!e.data?.size||c.cancelled||c.cleaned)return;c.bytes+=e.data.size;if(c.bytes>limits.maxBytes){abort(c);return;}c.chunks.push(e.data);};c.recorder.onerror=()=>{if(c.cleaned||c.cancelled)return;preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];abort(c);};c.recorder.onstop=()=>{if(c.cleaned)return;const type=(c.recorder.mimeType||mime).startsWith('video/mp4')?'video/mp4':'video/webm',blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null,expected=((c.lastFrameAt??c.firstFrameAt??0)-(c.firstFrameAt??0))/1000;clean(c);if(!blob){resolve(null);return;}huntRecordedVideoDuration(blob).then(duration=>{if(c.sequence!==sequence){resolve(null);return;}if(expected>.5&&duration!==null&&Math.abs(duration-expected)>Math.max(.35,Math.min(.75,expected*.01))){preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];resolve(null);return;}resolve(blob);},()=>resolve(null));};c.timer=setTimer(()=>abort(c),limits.timeout);}catch{abort(c);resolve(null);}});}
  return{start,cancel,finish(){const c=current;if(!c||c.cancelled||c.complete)return false;c.complete=true;try{c.recorder.stop();return true;}catch{preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];c.cancelled=true;clean(c);c.resolve(null);return false;}},draw(frame,now){
   const c=current;
   if(!c||c.complete||!Number.isFinite(now))return false;
@@ -4004,7 +4876,7 @@ function createHuntReplayVideo({createCanvas=()=>document.createElement('canvas'
   // Use the recording clock so quantization to the display refresh does not accumulate.
   const slot=Math.floor((now-c.firstFrameAt)*VIDEO_FPS/1000+1e-9);
   if(slot<=c.lastSlot)return false;
-  c.lastSlot=slot;
+  c.lastSlot=slot;c.lastFrameAt=now;
   try{
    if(!Number.isFinite(frame.width)||!Number.isFinite(frame.height)||frame.width<=0||frame.height<=0)throw Error('INVALID_VIDEO_SIZE');
    const {width:w,height:h}=c.canvas;
@@ -4071,10 +4943,10 @@ function createHuntVideoShare({nav=globalThis.navigator,urlApi=URL,makeFile=(blo
  return{prepare,activate,cancel,reset,snapshot};
 }
 
-return {HUNT_VIDEO_MAX_BYTES,HUNT_FULL_VIDEO_MAX_BYTES,huntVideoLimits,huntReplayAudioAllowed,createHuntReplayAudio,huntVideoSize,HUNT_VIDEO_MP4,huntVideoMime,createHuntReplayVideo,createHuntVideoShare};
+return {HUNT_VIDEO_MAX_BYTES,HUNT_FULL_VIDEO_MAX_BYTES,huntVideoLimits,huntReplayAudioAllowed,createHuntReplayAudio,huntRecordedVideoDuration,huntVideoSize,HUNT_VIDEO_MP4,huntVideoMime,createHuntReplayVideo,createHuntVideoShare};
 })();
-const __tagModule60=(()=>{
-const {createHuntVideoShare,HUNT_FULL_VIDEO_MAX_BYTES,HUNT_VIDEO_MAX_BYTES}=__tagModule59;
+const __tagModule68=(()=>{
+const {createHuntVideoShare,HUNT_FULL_VIDEO_MAX_BYTES,HUNT_VIDEO_MAX_BYTES}=__tagModule67;
 // Two bounded clips for the current round only. Choosing a view never silently
 // discards the other completed video or starts an external share.
 function createHuntScopedVideoShare({onChange=()=>{},...options}={}){
@@ -4095,30 +4967,50 @@ function createHuntScopedVideoShare({onChange=()=>{},...options}={}){
 
 return {createHuntScopedVideoShare};
 })();
-const __tagModule61=(()=>{
+const __tagModule69=(()=>{
 const border={danger:'#ff6464',warning:'#ffd35d',clear:'#a6e8e9'};
+const dialCenter=48;
+const distanceRings=[16.5,23,29.5];
+const cardinalLabels=[['北',48,9],['東',87,48],['南',48,87],['西',9,48]];
+const contactColors={danger:'#ff6868',warning:'#ffe16b',clear:'#a5e9ed'};
+const dialBearing=contact=>contact.dialSector??2*contact.sector;
 // North stays at the top. The central arrow itself turns clockwise with the
 // resolved camera heading; world-space contacts stay on the same cardinal map.
 function createHuntCompassView(canvas,{createCanvas=()=>document.createElement('canvas')}={}){
  const c=canvas.getContext('2d'),dials=new Map();let draws=0,pointerRotation=0;
  let lastDanger=null,lastContacts=[];
  canvas.addEventListener?.('contextrestored',()=>{lastDanger=null;});
- function dial(danger){const key=Object.hasOwn(border,danger)?danger:'clear';if(dials.has(key))return dials.get(key);const image=createCanvas();image.width=image.height=96;const x=image.getContext('2d');x.fillStyle='#173a4ddd';x.beginPath();x.arc(48,48,45,0,Math.PI*2);x.fill();x.strokeStyle=border[key];x.lineWidth=3;x.stroke();x.lineWidth=1;x.strokeStyle='#c9e8ed44';for(const r of[14,25,35]){x.beginPath();x.arc(48,48,r,0,Math.PI*2);x.stroke();}x.font='bold 11px system-ui';x.textAlign='center';x.textBaseline='middle';for(const[name,px,py]of[['北',48,11],['東',85,48],['南',48,85],['西',11,48]]){x.fillStyle=name==='北'?'#ffb8a8':'#d6eef6';x.fillText(name,px,py);}dials.set(key,image);return image;}
+ function dial(danger){const key=Object.hasOwn(border,danger)?danger:'clear';if(dials.has(key))return dials.get(key);const image=createCanvas();image.width=image.height=96;const x=image.getContext('2d');x.fillStyle='#173a4ddd';x.beginPath();x.arc(48,48,45,0,Math.PI*2);x.fill();x.strokeStyle=border[key];x.lineWidth=3;x.stroke();x.lineWidth=1;x.strokeStyle='#c9e8ed44';for(const r of distanceRings){x.beginPath();x.arc(48,48,r,0,Math.PI*2);x.stroke();}x.font='bold 11px system-ui';x.textAlign='center';x.textBaseline='middle';for(const[name,px,py]of cardinalLabels){x.fillStyle=name==='北'?'#ffb8a8':'#d6eef6';x.fillText(name,px,py);}dials.set(key,image);return image;}
  return{draw(map){
   const heading=Number.isFinite(map.heading)?map.heading:0;
   const danger=Object.hasOwn(border,map.danger)?map.danger:'clear';
   // Time and owner IDs are diagnostics. Only the heading and visible dots affect pixels.
   if(heading===pointerRotation&&danger===lastDanger&&map.contacts.length===lastContacts.length&&map.contacts.every((p,i)=>{
    const last=lastContacts[i];
-   return p.sector===last.sector&&p.band===last.band&&p.level===last.level;
+   return dialBearing(p)===last.bearing&&p.band===last.band&&p.level===last.level&&p.height===last.height;
   }))return false;
   c.clearRect(0,0,96,96);
   c.drawImage(dial(danger),0,0);
-  for(const p of map.contacts){const angle=p.sector*Math.PI/4,r=[0,12,23,31][p.band];c.fillStyle=p.level==='danger'?'#ff6868':p.level==='warning'?'#ffe16b':'#a5e9ed';c.beginPath();c.arc(48+Math.sin(angle)*r,48+Math.cos(angle)*r,3,0,Math.PI*2);c.fill();}
-  c.save();c.translate(48,48);c.rotate(heading);c.fillStyle='#fff';c.strokeStyle='#163c50';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-18);c.lineTo(8,8);c.lineTo(0,3);c.lineTo(-8,8);c.closePath();c.fill();c.stroke();c.restore();
+  for(const p of map.contacts){
+   const angle=dialBearing(p)*Math.PI/8,r=distanceRings[p.band-1];
+   const x=dialCenter+Math.sin(angle)*r,y=dialCenter+Math.cos(angle)*r;
+   c.fillStyle=contactColors[p.level]??contactColors.clear;
+   c.beginPath();
+   if(p.height==='above'||p.height==='below'){
+    const sign=p.height==='above'?-1:1;
+    c.moveTo(x,y+sign*3.6);
+    c.lineTo(x-3,y-sign*2);
+    c.lineTo(x+3,y-sign*2);
+    c.closePath();
+   }else{
+    c.arc(x,y,3,0,Math.PI*2);
+   }
+   c.fill();
+  }
+  c.save();c.translate(dialCenter,dialCenter);c.rotate(heading);c.fillStyle='#fff';c.strokeStyle='#163c50';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-12);c.lineTo(7,7);c.lineTo(0,3);c.lineTo(-7,7);c.closePath();c.fill();c.stroke();c.restore();
   pointerRotation=heading;
   lastDanger=danger;
-  lastContacts=map.contacts.map(({sector,band,level})=>({sector,band,level}));
+  lastContacts=map.contacts.map(p=>({bearing:dialBearing(p),band:p.band,level:p.level,height:p.height}));
   draws++;
   return true;
  },stats:()=>({cachedDials:dials.size,draws,dialRotation:0,pointerRotation,headingUp:false})};
@@ -4126,7 +5018,7 @@ function createHuntCompassView(canvas,{createCanvas=()=>document.createElement('
 
 return {createHuntCompassView};
 })();
-const __tagModule62=(()=>{
+const __tagModule70=(()=>{
 // Keep the exact live heading. The canvas can reuse an identical frame.
 function createHuntRadarHud({radar,time,diagnostics,compass}){
  let updates=0,writes=0,paints=0;
@@ -4134,17 +5026,24 @@ function createHuntRadarHud({radar,time,diagnostics,compass}){
  const data=(el,key,value)=>{if(el.dataset[key]!==value){el.dataset[key]=value;writes++;}};
  const attribute=(el,key,value)=>{if(el.getAttribute(key)!==value){el.setAttribute(key,value);writes++;}};
  return{update(map,{visible=false,diagnose=true}={}){updates++;prop(radar,'hidden',!visible);prop(time,'hidden',!visible);
-  if(visible){prop(time,'textContent','試合終了まで');data(radar,'danger',map.danger);attribute(radar,'aria-label','方位磁石：視点は'+map.facing+'向き。'+({danger:'近くに相手',warning:'相手が接近',clear:'周囲を確認'}[map.danger]));if(compass.draw(map)!==false)paints++;}
+  if(visible){
+   prop(time,'textContent','試合終了まで');
+   data(radar,'danger',map.danger);
+   const above=map.contacts.some(p=>p.height==='above'),below=map.contacts.some(p=>p.height==='below');
+   const height=above&&below?'。上と下に相手':above?'。上に相手':below?'。下に相手':'';
+   attribute(radar,'aria-label','方位磁石：視点は'+map.facing+'向き。'+({danger:'近くに相手',warning:'相手が接近',clear:'周囲を確認'}[map.danger])+height);
+   if(compass.draw(map)!==false)paints++;
+  }
   if(diagnose)data(diagnostics,'radar',JSON.stringify(map));
  },stats:()=>({updates,domWrites:writes,paints})};
 }
 
 return {createHuntRadarHud};
 })();
-const __tagModule63=(()=>{
-// Fixed physics ticks remain unchanged. A stalled display must not force a
-// burst of stale movement or an ever-growing catch-up queue on the next frame.
-function createHuntFrameBudget(step,{maxSteps=8,maxDelta=.25}={}){
+const __tagModule71=(()=>{
+// A 10 FPS display still has time for twelve 120 Hz steps. Bound work on
+// longer stalls and carry only the fraction needed for the next fixed step.
+function createHuntFrameBudget(step,{maxSteps=12,maxDelta=.25}={}){
  if(!Number.isFinite(step)||step<=0||!Number.isSafeInteger(maxSteps)||maxSteps<1||!Number.isFinite(maxDelta)||maxDelta<step)throw Error('INVALID_HUNT_FRAME_BUDGET');
  let remainder=0,frames=0,ticks=0,limitedFrames=0,droppedSeconds=0,lastSteps=0;
  return{consume(delta,{running=true,visible=true}={}){
@@ -4152,24 +5051,67 @@ function createHuntFrameBudget(step,{maxSteps=8,maxDelta=.25}={}){
   delta=Number.isFinite(delta)?Math.max(0,delta):0;const bounded=Math.min(delta,maxDelta),available=remainder+bounded,whole=Math.floor((available+step*1e-9)/step),steps=Math.min(whole,maxSteps);
   remainder=Math.max(0,available-whole*step);frames++;ticks+=steps;lastSteps=steps;const discarded=Math.max(0,delta-bounded)+(whole-steps)*step;if(discarded>step*1e-8){limitedFrames++;droppedSeconds+=discarded;}
   return{steps,delta:steps*step};
+ },firstStepAt(now){
+  // Midpoint of the first retained step, on the same millisecond clock as
+  // browser key events. The earlier part of a capped stall was discarded.
+  return now-(remainder+(lastSteps-.5)*step)*1000;
  },reset(){remainder=0;lastSteps=0;},restart(){remainder=frames=ticks=limitedFrames=droppedSeconds=lastSteps=0;},stats:()=>({maxSteps,lastSteps,frames,ticks,limitedFrames,droppedSeconds,remainder})};
 }
 
-return {createHuntFrameBudget};
-})();
-const __tagModule64=(()=>{
-// Capture the character's own translucency before any gameplay effect. These
-// materials belong to one cached actor; scenery and held props are untouched.
-function createHuntMaterialState(materials){
- const base=[...new Set(materials)].map(material=>({material,transparent:material.transparent,opacity:material.opacity}));
- let cloaked=false,writes=0,transitions=0;
- function apply(hidden){for(const row of base){const m=row.material,t=hidden?true:row.transparent,o=hidden?Math.min(row.opacity,.32):row.opacity;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true;writes++;}if(m.opacity!==o){m.opacity=o;writes++;}}}
- return{setCloaked(value){value=!!value;if(value===cloaked)return false;apply(value);cloaked=value;transitions++;return true;},reset(){apply(false);cloaked=false;},stats:()=>({materials:base.length,writes,transitions,cloaked})};
+// A visible browser can throttle animation callbacks independently of timers.
+// Start the backup near the fixed-step limit, even if slow callbacks still arrive.
+function startHuntFrameDriver(draw,{
+ isInteractive,
+ now=()=>performance.now(),
+ requestFrame=callback=>requestAnimationFrame(callback),
+ schedule=(callback,ms)=>setTimeout(callback,ms),
+ cancel=timer=>clearTimeout(timer)
+}){
+ const slowFrameMs=110,backupIntervalMs=34;
+ let lastRaf=now(),lastDraw=-Infinity,timer=null,usingTimer=false;
+ function dispatch(time){
+  lastDraw=time;
+  draw(time);
+ }
+ function poll(){
+  timer=null;
+  if(!isInteractive()){
+   usingTimer=false;
+   return;
+  }
+  const time=now(),untilSlowFrame=slowFrameMs-(time-lastRaf);
+  if(!usingTimer&&untilSlowFrame>0){
+   timer=schedule(poll,Math.ceil(untilSlowFrame));
+   return;
+  }
+  usingTimer=true;
+  dispatch(time);
+  timer=schedule(poll,backupIntervalMs);
+ }
+ function frame(){
+  requestFrame(frame);
+  const time=now(),gap=time-lastRaf;
+  lastRaf=time;
+  if(!isInteractive()){
+   usingTimer=false;
+   if(timer!==null)cancel(timer);
+   timer=null;
+  }else if(timer===null){
+   timer=schedule(poll,slowFrameMs);
+  }
+  if(usingTimer){
+   if(gap>=slowFrameMs)return;
+   usingTimer=false;
+   if(time-lastDraw<8)return;
+  }
+  dispatch(time);
+ }
+ requestFrame(frame);
 }
 
-return {createHuntMaterialState};
+return {createHuntFrameBudget,startHuntFrameDriver};
 })();
-const __tagModule65=(()=>{
+const __tagModule72=(()=>{
 // Four actor slots, not an ever-growing roster cache. Duplicate characters need
 // independent instances so their poses and equipment cannot move each other.
 function createHuntModelCache({create,release,reset}){
@@ -4187,8 +5129,8 @@ function disposeHuntModel(actor){const root=actor?.root;if(!root||disposed.has(r
 
 return {createHuntModelCache,resetHuntModel,disposeHuntModel};
 })();
-const __tagModule66=(()=>{
-const {huntDiveTilt}=__tagModule17;
+const __tagModule73=(()=>{
+const {huntDiveTilt}=__tagModule21;
 const {Vector3,Quaternion}=__tagExternal0;
 const divePoint=new Vector3();
 // Attachments live under the scene and must be placed while all actors' final
@@ -4204,7 +5146,7 @@ function createHuntHandAttachments(){const handPosition=new Vector3(),offset=new
 
 return {renderHuntActorPoses,createHuntHandAttachments};
 })();
-const __tagModule67=(()=>{
+const __tagModule74=(()=>{
 const {Vector3}=__tagExternal0;
 const TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // Distance drives the planted sole backward at the actor's actual ground speed.
@@ -4234,7 +5176,7 @@ function createHuntGait(model){
 
 return {huntFootPose,createHuntGait};
 })();
-const __tagModule68=(()=>{
+const __tagModule75=(()=>{
 const {createTouchLayoutStore,resolveTouchLayout,TOUCH_LAYOUT_KEY}=__tagExternal6;
 const clamp=(v,min,max)=>Math.min(Math.max(v,min),Math.max(min,max));
 function resolveHuntTouchLayout(width,height,saved=null,safe={}){
@@ -4314,7 +5256,7 @@ function createHuntTouchSettings({storage,clearInput=()=>{},onApply=()=>{},onOpe
 
 return {resolveHuntTouchLayout,moveHuntTouchDraft,mergeHuntTouchDraft,createHuntTouchSettings};
 })();
-const __tagModule69=(()=>{
+const __tagModule76=(()=>{
 // One held jump gesture can have several physical owners. Releasing one key
 // or finger must not cut a jump which another owner is still holding.
 const activeActions=['forward','back','left','right','jump','dash','tool','menu'];
@@ -4323,7 +5265,62 @@ const HUNT_DIVE_KEY='KeyH';
 function huntDiveShortcutAvailable(bindings){return shortcutAvailable(bindings,HUNT_DIVE_KEY);}
 function huntItemShortcutAvailable(bindings){return shortcutAvailable(bindings,'KeyL');}
 function huntItemKeyCodes(bindings){return[...new Set([...(huntItemShortcutAvailable(bindings)?['KeyL']:[]),...(bindings.tool??[]).filter(Boolean)])];}
-function createHuntJumpOwners(intent){const owners=new Set();return{set(source,down){const before=owners.size>0;if(down)owners.add(source);else owners.delete(source);const after=owners.size>0;if(!before&&after)intent.press();if(before&&!after)intent.release();},reset(){owners.clear();intent.reset();},get held(){return owners.size>0;}};}
+function createHuntJumpOwners(){
+ const owners=new Set();
+ const edges=[];
+ let gesture=null,sampled=null;
+ const isKeyboard=source=>source.startsWith('key:');
+ const queue=(down,owner)=>{if(edges.length<12)edges.push({down,owner});};
+ return{
+  set(source,down){
+   if(down){
+    if(!gesture){gesture={touch:false};queue(true,gesture);}
+    if(!isKeyboard(source))gesture.touch=true;
+    owners.add(source);
+   }else if(owners.delete(source)&&!owners.size){
+    queue(false,gesture);
+    gesture=null;
+   }
+  },
+  releaseKeyboard(){
+   for(const source of owners)if(isKeyboard(source))this.set(source,false);
+   // A pending keyboard tap must not fire after the field loses focus.
+   // Keep touch taps and the release of a jump the simulation already saw.
+   for(let i=edges.length-1;i>=0;i--)if(!edges[i].owner.touch&&edges[i].owner!==sampled)edges.splice(i,1);
+  },
+  read(){
+   const edge=edges.shift();
+   sampled=edge?(edge.down?edge.owner:null):gesture;
+   return !!sampled;
+  },
+  reset(){owners.clear();edges.length=0;gesture=sampled=null;},
+  get held(){return owners.size>0;},
+ };
+}
+
+// A render can run several simulation steps. Reconstruct movement keys at
+// each step rather than applying the last event to the whole render gap.
+// Sampling starts at the retained end of the gap; old taps in discarded
+// time are consumed as state changes, not played back after a stall.
+function createHuntKeyboardTimeline(){
+ const physical=new Set(),sampled=new Set(),pending=[];
+ let lastSample=-Infinity;
+ return{
+  set(code,down,at){
+   if(down===physical.has(code))return;
+   if(down)physical.add(code);else physical.delete(code);
+   pending.push({code,down,at:Math.max(lastSample,pending.at(-1)?.at??-Infinity,at)});
+  },
+  sample(at){
+   lastSample=Math.max(lastSample,at);
+   let i=0;
+   for(;i<pending.length&&pending[i].at<=lastSample;i++){const{code,down}=pending[i];if(down)sampled.add(code);else sampled.delete(code);}
+   if(i)pending.splice(0,i);
+  },
+  has:code=>sampled.has(code),
+  clear(){physical.clear();sampled.clear();pending.length=0;lastSample=-Infinity;},
+ };
+}
 
 // Each finger owns its buttons independently. Lifting/cancelling one finger
 // must not release another finger's dash, jump, item, or the movement pad.
@@ -4439,9 +5436,9 @@ function huntKeyboardContext(event,{canvas,playing,capturing,dialogOpen}){
  return ime&&!field?null:{field};
 }
 
-return {HUNT_DIVE_KEY,huntDiveShortcutAvailable,huntItemShortcutAvailable,huntItemKeyCodes,createHuntJumpOwners,HUNT_DASH_MODE_KEY,readHuntDashMode,saveHuntDashMode,createHuntButtonOwners,releaseHuntPointerCaptures,bindHuntLifecycle,huntMenuCommand,captureHuntPointer,bindHuntTouchGuard,createHuntActionInput,huntKeyboardContext};
+return {HUNT_DIVE_KEY,huntDiveShortcutAvailable,huntItemShortcutAvailable,huntItemKeyCodes,createHuntJumpOwners,createHuntKeyboardTimeline,HUNT_DASH_MODE_KEY,readHuntDashMode,saveHuntDashMode,createHuntButtonOwners,releaseHuntPointerCaptures,bindHuntLifecycle,huntMenuCommand,captureHuntPointer,bindHuntTouchGuard,createHuntActionInput,huntKeyboardContext};
 })();
-const __tagModule71=(()=>{
+const __tagModule78=(()=>{
 // Static visual rows only. Keep the existing solid buildings and passageways;
 // no new doors, supports, navigation targets or collision geometry are added.
 function huntBuildingArchitecture(b,index=0){
@@ -4463,12 +5460,467 @@ function huntBuildingArchitecture(b,index=0){
 
 return {huntBuildingArchitecture};
 })();
-const __tagModule70=(()=>{
-const {cornerStairGeometry}=__tagModule8;
-const {huntBuildingArchitecture}=__tagModule71;
+const __tagModule79=(()=>{
 const T=__tagExternal0;
-const {WORLD,WORLD_CORNER_STAIRS,WORLD_JUMP_STEPS,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_BASIN,worldBasinContours,WORLD_DECK,WORLD_RISE,WORLD_RIDGE,WORLD_ICE_LOOP,WORLD_HILL,WORLD_PATHS,WORLD_BLOCKS,WORLD_TREES,worldGroundHeight,worldHeight,worldSurface}=__tagModule7;
+
+function canvasTexture(width, height, paint) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  paint(canvas.getContext('2d'), width, height);
+  const texture = new T.CanvasTexture(canvas);
+  texture.colorSpace = T.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function randomSequence(seed) {
+  return () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}
+
+function huntBarkMaterial() {
+  const map = canvasTexture(128, 256, (ctx, width, height) => {
+    ctx.fillStyle = '#927d64';
+    ctx.fillRect(0, 0, width, height);
+    const random = randomSequence(5021);
+    for (let i = 0; i < 280; i++) {
+      const x = random() * width, y = random() * height;
+      ctx.fillStyle = i % 3 ? '#534c40' : '#d2b996';
+      ctx.globalAlpha = .12 + random() * .35;
+      ctx.fillRect(x, y, .5 + random() * 2, 8 + random() * 72);
+    }
+    ctx.globalAlpha = 1;
+  });
+  map.wrapS = map.wrapT = T.RepeatWrapping;
+  const material = new T.MeshStandardMaterial({map, roughness:.95});
+  material.bumpMap = map;
+  material.bumpScale = .09;
+  return material;
+}
+
+function foliageTexture(opaque = false) {
+  return canvasTexture(256, 256, ctx => {
+    if (opaque) {
+      ctx.fillStyle = '#45633d';
+      ctx.fillRect(0,0,256,256);
+    }
+    const random = randomSequence(73183);
+    for (let i = 0; i < 640; i++) {
+      const angle = random() * Math.PI * 2, radius = Math.sqrt(random()) * 107;
+      const x = 128 + Math.cos(angle) * radius;
+      const y = 128 + Math.sin(angle) * radius * .92;
+      const leafSize = 3.5 + random() * 6.5;
+      ctx.fillStyle = ['#314c35','#456d43','#658447','#7c9959','#a2b579'][Math.floor(random()*5)];
+      ctx.beginPath();
+      ctx.ellipse(x, y, leafSize, leafSize * .43, angle - .6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(211,218,151,.18)';
+      ctx.lineWidth = .7;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(angle - .6) * leafSize * .78, y + Math.sin(angle - .6) * leafSize * .78);
+      ctx.stroke();
+    }
+  });
+}
+
+function huntCanopyMaterial() {
+  return new T.MeshStandardMaterial({map:foliageTexture(true),color:0xf2f0d5,roughness:.96});
+}
+
+// Cutout foliage adds fine silhouettes using one shared texture and draw call.
+function huntFoliageDetails(treeCrowns, hedgeCrowns) {
+  const cards = [];
+  const random = randomSequence(12095);
+  for (const [x,y,z,sx,sy,sz] of treeCrowns) {
+    for (const [level,radius,width] of [[-.65,.2,.7],[-.32,.62,.9],[0,.7,1],[.35,.58,.88],[.67,.18,.65]]) for (let i = 0; i < 6; i++) {
+      const angle = i * Math.PI * 2 / 6 + random() * .45 + level;
+      const elevation = level + (random()-.5)*.14;
+      cards.push([x + Math.cos(angle)*sx*radius, y + sy*elevation, z + Math.sin(angle)*sz*radius,
+        sx*width,sy*(.7+random()*.15),Math.PI/2-angle]);
+    }
+  }
+  for (let i = 0; i < hedgeCrowns.length; i += 2) {
+    const [x,y,z,sx,sy,sz] = hedgeCrowns[i];
+    for (let side = 0; side < 2; side++) {
+      const angle = i*.91 + side*Math.PI;
+      cards.push([x+Math.cos(angle)*sx*.57,y,z+Math.sin(angle)*sz*.57,sx*.85,sy*1.2,Math.PI/2-angle]);
+    }
+  }
+  const map = foliageTexture();
+  const material = new T.MeshStandardMaterial({
+    map, color:0xf2f0d5, alphaTest:.48, side:T.DoubleSide, roughness:.96,
+  });
+  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1,1), material, cards.length);
+  const matrix = new T.Matrix4(), rotation = new T.Quaternion(), axis = new T.Vector3(0,1,0);
+  cards.forEach(([x,y,z,w,h,yaw],i) => {
+    rotation.setFromAxisAngle(axis,yaw);
+    matrix.compose(new T.Vector3(x,y,z),rotation,new T.Vector3(w,h,1));
+    mesh.setMatrixAt(i,matrix);
+  });
+  mesh.computeBoundingSphere();
+  mesh.name = 'hunt-detailed-foliage';
+  return mesh;
+}
+
+// Project fine wall joints in metres, independently of each building's size.
+function applyHuntWallDetail(material, texture) {
+  material.map = texture;
+  material.roughness = .86;
+  material.onBeforeCompile = shader => {
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', [
+      '#include <common>','varying vec3 wallPosition;','varying vec3 wallNormal;',
+    ].join('\n')).replace('#include <begin_vertex>', [
+      '#include <begin_vertex>',
+      'wallPosition=position;',
+      '#ifdef USE_INSTANCING',
+      'wallPosition=(instanceMatrix*vec4(position,1.)).xyz;',
+      '#endif',
+      'wallNormal=normal;',
+    ].join('\n'));
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', [
+      '#include <common>','varying vec3 wallPosition;','varying vec3 wallNormal;',
+    ].join('\n')).replace('#include <map_fragment>', [
+      'vec2 masonryUv=abs(wallNormal.z)>.5?wallPosition.xy:wallPosition.zy;',
+      'vec4 stone=texture2D(map,masonryUv/vec2(15.,9.));',
+      'float baseShade=mix(.77,1.,smoothstep(.2,3.2,wallPosition.y));',
+      'diffuseColor*=vec4(stone.rgb*baseShade,stone.a);',
+    ].join('\n'));
+  };
+  material.customProgramCacheKey = () => 'hunt-world-stone-v1';
+}
+
+return {huntBarkMaterial,huntCanopyMaterial,huntFoliageDetails,applyHuntWallDetail};
+})();
+const __tagModule80=(()=>{
+
+const T=__tagExternal0;
+
+const surfaceColors = {
+  frost: ['#dce5e8', '#839ba3', '#ffffff'],
+  asphalt: ['#718b96', '#233f4c', '#c5dce0'],
+  paving: ['#b4bdc1', '#697f85', '#edf3ec'],
+  ice: ['#a8d7e5', '#497e95', '#f1fcff'],
+};
+
+function paintedTexture(width, height, paint) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  paint(canvas.getContext('2d'), width, height);
+  const texture = new T.CanvasTexture(canvas);
+  texture.colorSpace = T.SRGBColorSpace;
+  return texture;
+}
+
+function randomTextureSeed(seed) {
+  return () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 0x100000000;
+  };
+}
+
+function huntSurfaceTexture(kind) {
+  const [base, dark, light] = surfaceColors[kind];
+  const texture = paintedTexture(256, 256, (ctx, width, height) => {
+    const random = randomTextureSeed(0xa713f + kind.length * 1024);
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, width, height);
+    for (let i = 0; i < 3300; i++) {
+      const x = random() * width, y = random() * height;
+      const long = kind === 'ice' ? 3 + random() * 19 : 1 + random() * 3;
+      ctx.fillStyle = i % 3 === 0 ? dark : light;
+      ctx.globalAlpha = kind === 'ice' ? .045 + random() * .08 : .055 + random() * .18;
+      ctx.fillRect(x, y, long, 1 + random() * (kind === 'frost' ? 2 : .8));
+    }
+    ctx.globalAlpha = 1;
+    if (kind === 'paving') {
+      for (let row = 0; row < 8; row++) {
+        const y = row * 32;
+        ctx.fillStyle = '#647b83';ctx.globalAlpha = .35;
+        ctx.fillRect(0, y, width, 2);
+        for (let x = row % 2 ? 32 : 0; x < width; x += 64)ctx.fillRect(x, y, 1.5, 32);
+        ctx.fillStyle = '#f1fbfc';ctx.globalAlpha = .22;
+        ctx.fillRect(0, y + 2, width, 1.5);
+      }
+    }
+    ctx.globalAlpha = 1;
+  });
+  texture.wrapS = texture.wrapT = T.RepeatWrapping;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+// Use world coordinates for the texture grain. Adjacent paths then line up
+// and the same material reads at the same scale on both a plaza and a lane.
+function setHuntTerrainUV(geometry, x, z, tileSize) {
+  const positions = geometry.getAttribute('position'), uv = geometry.getAttribute('uv');
+  for (let i = 0; i < positions.count; i++) {
+    uv.setXY(i, (positions.getX(i) + x) / tileSize, (z - positions.getY(i)) / tileSize);
+  }
+}
+
+function huntMasonryTexture() {
+  const texture=paintedTexture(256, 256, (ctx, width, height) => {
+    const random = randomTextureSeed(0x154b6);
+    ctx.fillStyle = '#b0b9bb';
+    ctx.fillRect(0, 0, width, height);
+    for (let row = 0; row < 8; row++) {
+      for (let col = -1; col < 6; col++) {
+        const x = col * 48 + (row % 2) * 24, y = row * 32;
+        const shade = 215 + Math.floor(random() * 19);
+        ctx.fillStyle = 'rgb(' + shade + ',' + shade + ',' + shade + ')';
+        ctx.fillRect(x, y, 47, 31);
+        ctx.fillStyle = '#f8f9f4';
+        ctx.fillRect(x+1, y+1, 46, 1);
+      }
+    }
+    for (let i = 0; i < 1900; i++) {
+      ctx.fillStyle = i % 3 === 0 ? '#81929a' : '#fcffff';
+      ctx.globalAlpha = .08 + random() * .15;
+      ctx.fillRect(random() * width, random() * height, 1 + random() * 2, 1);
+    }
+    ctx.globalAlpha = 1;
+  });
+  texture.wrapS=texture.wrapT=T.RepeatWrapping;
+  texture.anisotropy=4;
+  return texture;
+}
+
+function huntRoadMarkings(groundHeight) {
+  const positions = [], indices = [], colors = [];
+  const trafficPaint=new T.Color(0xd1d3c3),curbStone=new T.Color(0xaab9b9);
+  function stripe(x, z, width, depth, color=trafficPaint) {
+    const base = positions.length / 3;
+    for (const [dx, dz] of [[-width/2,-depth/2],[-width/2,depth/2],[width/2,-depth/2],[width/2,depth/2]]) {
+      positions.push(x + dx, groundHeight(x + dx, z + dz) + .088, z + dz);
+      colors.push(color.r,color.g,color.b);
+    }
+    indices.push(base, base + 1, base + 2, base + 2, base + 1, base + 3);
+  }
+  // Main avenue and side streets. Break the center line at the junctions.
+  for (let x = -308; x <= 218; x += 14) if (Math.abs(x) > 26 && x < 55) stripe(x, 0, 5, .24);
+  for (let z = -218; z <= 218; z += 14) {
+    if (Math.abs(z) > 31 && (z < -128 || z > -33)) stripe(0, z, .24, 5);
+    if (Math.abs(z) > 24 && Math.abs(Math.abs(z) - 164) > 15) stripe(260, z, .24, 5);
+  }
+  for (let x = -8; x <= 8; x += 2) {
+    stripe(x, -15.5, .8, 4.4);
+    stripe(x, 15.5, .8, 4.4);
+  }
+  for (const side of [-1,1]) {
+    for (let x = -310; x < 55; x += 4) if (Math.abs(x) > 16) stripe(x,side*11.6,3.95,.8,curbStone);
+    for (let z = -220; z <= 220; z += 4) if (Math.abs(z) > 20 && (z < -119 || z > -36)) stripe(side*13.6,z,.8,3.95,curbStone);
+  }
+  const geometry = new T.BufferGeometry();
+  geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const mesh = new T.Mesh(geometry, new T.MeshStandardMaterial({vertexColors:true,roughness:.9,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-12}));
+  mesh.name = 'hunt-painted-road-markings';
+  return mesh;
+}
+
+function glassTexture(lit) {
+  return paintedTexture(192, 256, (ctx, width, height) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    for (const [at, color] of lit
+      ? [[0,'#b89363'],[.43,'#e8c898'],[.73,'#fff0bd'],[1,'#dbac76']]
+      : [[0,'#b8dbe8'],[.25,'#739dac'],[.54,'#4b738a'],[1,'#2c485d']]) gradient.addColorStop(at, color);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = lit ? '#fff0c6' : '#d6eff3';
+    ctx.globalAlpha = lit ? .25 : .36;
+    ctx.fillRect(6, 0, 4, height);
+    ctx.fillRect(0, 8, width, 3);
+    ctx.fillStyle = lit ? '#9b693d' : '#1c374a';
+    ctx.globalAlpha = .48;
+    ctx.fillRect(width/2-1.5, 0, 3, height);
+    ctx.fillRect(0, height - 9, width, 7);
+    ctx.globalAlpha=1;
+    // A recessed metal frame, an inner sill and a restrained sky reflection.
+    ctx.fillStyle='#263a44';
+    ctx.fillRect(0,0,5,height);ctx.fillRect(width-5,0,5,height);
+    ctx.fillRect(0,0,width,5);ctx.fillRect(0,height-5,width,5);
+    ctx.fillStyle=lit?'#e8d5b7':'#bed1d9';
+    ctx.fillRect(5,5,width-10,2);ctx.fillRect(5,5,2,height-10);
+    ctx.globalAlpha=lit?.22:.1;
+    ctx.fillStyle=lit?'#4b3128':'#192f3f';
+    ctx.fillRect(10,height*.7,width-20,height*.18);
+    ctx.fillStyle=lit?'#faf0d3':'#e5f5ff';
+    ctx.globalAlpha=lit?.15:.2;
+    ctx.beginPath();ctx.moveTo(12,12);ctx.lineTo(width*.48,12);ctx.lineTo(12,height*.66);ctx.closePath();ctx.fill();
+    ctx.globalAlpha=1;
+  });
+}
+
+function huntEntranceMaterial() {
+  const map=paintedTexture(96,128,(ctx,width,height)=>{
+    const frame=ctx.createLinearGradient(0,0,width,height);
+    frame.addColorStop(0,'#ac987e');
+    frame.addColorStop(.46,'#594d49');
+    frame.addColorStop(1,'#272f39');
+    ctx.fillStyle=frame;ctx.fillRect(0,0,width,height);
+    const panes=ctx.createLinearGradient(0,6,0,96);
+    panes.addColorStop(0,'#bad0d4');
+    panes.addColorStop(.48,'#55717e');
+    panes.addColorStop(1,'#2c424d');
+    ctx.fillStyle=panes;
+    ctx.fillRect(8,7,37,87);ctx.fillRect(51,7,37,87);
+    ctx.fillStyle='#cfb78d';ctx.fillRect(41,68,2,15);ctx.fillRect(53,68,2,15);
+    ctx.fillStyle='#b6bec0';ctx.fillRect(4,117,width-8,6);
+  });
+  return new T.MeshStandardMaterial({map,roughness:.45,metalness:.14});
+}
+
+function createHuntGlass() {
+  const day = glassTexture(false), warm = glassTexture(true);
+  const shaded = new T.MeshStandardMaterial({color:0xc9e5ed,map:day,roughness:.18,metalness:.22});
+  const lit = shaded.clone();
+  lit.emissiveMap = warm;
+  const dayColor=new T.Color(0xc9e5ed),nightColor=new T.Color(0xd8c7aa);
+  function update(amount) {
+    lit.color.copy(dayColor).lerp(nightColor,amount);
+    lit.emissive.set(0xffcc8e);
+    lit.emissiveIntensity = amount * .75;
+  }
+  return {shaded,lit,update};
+}
+
+function createHuntSunShadows(terrain, world, buildings, trees) {
+  const width = 1024, height = 768;
+  let ctx;
+  const texture = paintedTexture(width, height, context => { ctx = context; });
+  const geometry = terrain.clone();
+  geometry.deleteAttribute('color');
+  const pos = geometry.getAttribute('position');
+  const uv = geometry.getAttribute('uv');
+  for (let i = 0; i < pos.count; i++) {
+    uv.setXY(i, pos.getX(i) / world.width + .5, -pos.getY(i) / world.depth + .5);
+  }
+  const material = new T.MeshBasicMaterial({
+    map:texture, transparent:true, depthWrite:false, polygonOffset:true,
+    polygonOffsetFactor:-3, polygonOffsetUnits:-8, opacity:0,
+  });
+  const mesh = new T.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = .069;
+  mesh.name = 'hunt-city-sun-shadows';
+  const casters = buildings.filter(b => b.kind !== 'arch').map(b => ({...b}));
+  for (const {x,z,r,h} of trees) casters.push({x,z,w:r*1.35,d:r*1.35,h});
+  let previous = '';
+  function update(light) {
+    material.opacity = Math.min(.76, light.power * .34 * (1 - light.night) ** 2);
+    mesh.visible = material.opacity > .035 && light.elevation > 0;
+    if (!mesh.visible) return;
+    const yaw = Math.round(light.azimuth * 35) / 35;
+    const elevation = Math.round(light.elevation * 35) / 35;
+    const key = yaw + ':' + elevation;
+    if (key === previous) return;
+    previous = key;
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(32,55,80,.42)';
+    ctx.filter = 'blur(1.6px)';
+    const slope = 1 / Math.max(.18, Math.tan(elevation));
+    const dx = -Math.sin(yaw), dz = -Math.cos(yaw);
+    for (const b of casters) {
+      const halfW = b.w / 2, halfD = b.d / 2;
+      const distance = Math.min(b.h * slope, 70);
+      const sx = dx * distance, sz = dz * distance;
+      const sideX = sx < 0 ? -1 : 1, sideZ = sz < 0 ? -1 : 1;
+      const x = b.x + (sx < 0 ? -halfW : halfW);
+      const z = b.z + (sz < 0 ? -halfD : halfD);
+      const outline = [[x-b.w*sideX,z],[x-b.w*sideX,z-b.d*sideZ],[x,z-b.d*sideZ],[x+sx,z-b.d*sideZ+sz],[x+sx,z+sz],[x-b.w*sideX+sx,z+sz]];
+      ctx.beginPath();
+      for (const [i,[px,pz]] of outline.entries()) {
+        const u = (px / world.width + .5) * width, v = (.5 - pz / world.depth) * height;
+        if (i === 0) ctx.moveTo(u,v); else ctx.lineTo(u,v);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.filter = 'none';
+    texture.needsUpdate = true;
+  }
+  return {mesh, update};
+}
+
+function huntContactShadows(buildings, trees, groundHeight) {
+  const positions = [], uv = [], footprints = [], indices = [];
+  function footprint(x, z, width, depth, round) {
+    const spread = round ? 5.7 : 5;
+    const halfX = width / 2 + spread, halfZ = depth / 2 + spread;
+    const nx = Math.ceil(halfX / 3), nz = Math.ceil(halfZ / 3);
+    const base = positions.length / 3;
+    for (let iz = 0; iz <= nz; iz++) for (let ix = 0; ix <= nx; ix++) {
+      const u = ix / nx, v = iz / nz;
+      const wx = x + (u * 2 - 1) * halfX, wz = z + (v * 2 - 1) * halfZ;
+      positions.push(wx, groundHeight(wx, wz) + .084, wz);
+      uv.push(u, v);
+      footprints.push(width / 2 / halfX, depth / 2 / halfZ, round ? 1 : 0);
+      if (iz < nz && ix < nx) {
+        const a = base + iz * (nx + 1) + ix, b = a + nx + 1;
+        indices.push(a, b, a + 1, a + 1, b, b + 1);
+      }
+    }
+  }
+  for (const b of buildings) if (b.kind !== 'arch') footprint(b.x, b.z, b.w, b.d, false);
+  for (const tree of trees) footprint(tree.x, tree.z, tree.r * 1.15, tree.r * 1.15, true);
+  const geometry = new T.BufferGeometry();
+  geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+  geometry.setAttribute('footprint', new T.Float32BufferAttribute(footprints, 3));
+  geometry.setIndex(indices);
+  const material = new T.ShaderMaterial({
+    transparent:true, depthWrite:false, toneMapped:false, fog:true,
+    uniforms:{...T.UniformsUtils.clone(T.UniformsLib.fog),opacity:{value:.29}},
+    vertexShader:[
+      'attribute vec3 footprint;',
+      'varying vec2 shadeUv;',
+      'varying vec3 shadeFootprint;',
+      '#include <fog_pars_vertex>',
+      'void main() {',
+      ' shadeUv=uv; shadeFootprint=footprint;',
+      ' vec4 mvPosition=modelViewMatrix*vec4(position,1.);',
+      ' gl_Position=projectionMatrix*mvPosition;',
+      ' #include <fog_vertex>',
+      '}',
+    ].join('\n'),
+    fragmentShader:[
+      'uniform float opacity;',
+      'varying vec2 shadeUv;',
+      'varying vec3 shadeFootprint;',
+      '#include <fog_pars_fragment>',
+      'void main() {',
+      ' vec2 p=abs(shadeUv*2.-1.);',
+      ' vec2 gap=max(vec2(0.),p-shadeFootprint.xy)/(1.-shadeFootprint.xy);',
+      ' float distanceToEdge=mix(length(gap),length(p),shadeFootprint.z);',
+      ' float falloff=1.-smoothstep(0.,1.,distanceToEdge);',
+      ' gl_FragColor=vec4(.055,.12,.15,falloff*opacity*mix(1.,.73,shadeFootprint.z));',
+      ' #include <fog_fragment>',
+      '}',
+    ].join('\n'),
+  });
+  const shadow = new T.Mesh(geometry, material);
+  shadow.name = 'hunt-city-contact-shadows';
+  return shadow;
+}
+
+
+return {huntSurfaceTexture,setHuntTerrainUV,huntMasonryTexture,huntRoadMarkings,huntEntranceMaterial,createHuntGlass,createHuntSunShadows,huntContactShadows};
+})();
+const __tagModule77=(()=>{
+const {cornerStairGeometry}=__tagModule10;
+const {huntBuildingArchitecture}=__tagModule78;
+const T=__tagExternal0;
+const {huntBarkMaterial,huntCanopyMaterial,huntFoliageDetails,applyHuntWallDetail}=__tagModule79;
+const {WORLD,WORLD_CORNER_STAIRS,WORLD_JUMP_STEPS,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_BASIN,worldBasinContours,WORLD_DECK,WORLD_RISE,WORLD_RIDGE,WORLD_ICE_LOOP,WORLD_HILL,WORLD_PATHS,WORLD_BLOCKS,WORLD_TREES,worldGroundHeight,worldHeight,worldSurface}=__tagModule9;
 const {tagAtmosphere}=__tagExternal1;
+const {huntSurfaceTexture,setHuntTerrainUV,huntMasonryTexture,huntRoadMarkings,createHuntSunShadows,huntEntranceMaterial,createHuntGlass,huntContactShadows}=__tagModule80;
 // Build the tread and retaining faces from the same profile so the slope
 // meets its sides without gaps. The paint is baked into the tread geometry.
 function raisedRouteGeometry(x,width,profile){
@@ -4521,32 +5973,48 @@ function createHuntScenery({scene,camera,canvas,hemi,sun}){
 const material=color=>new T.MeshStandardMaterial({color,roughness:.65}),boxGeo=new T.BoxGeometry(1,1,1),cylinderGeo=new T.CylinderGeometry(1,1,1,10);
 // Fixed opaque boxes are grouped by the exact same material colour.
 const staticBoxes=new Map(),staticBoxMaterials=new Map();
-function box(x,y,z,w,h,d,color){const key=color+':'+Math.floor((x+WORLD.width/2)/96)+':'+Math.floor((z+WORLD.depth/2)/96);let group=staticBoxes.get(key);if(!group)staticBoxes.set(key,group={color,rows:[]});group.rows.push([x,y,z,w,h,d]);}
+function box(x,y,z,w,h,d,color,masonry=false){const style=color+(masonry?":stone":":plain"),key=style+':'+Math.floor((x+WORLD.width/2)/96)+':'+Math.floor((z+WORLD.depth/2)/96);let group=staticBoxes.get(key);if(!group)staticBoxes.set(key,group={color,masonry,style,rows:[]});group.rows.push([x,y,z,w,h,d]);}
 function batch(geometry,color,rows,sharedMaterial){const mesh=new T.InstancedMesh(geometry,sharedMaterial??material(color),rows.length),matrix=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);rows.forEach((r,i)=>{if(r[6])q.setFromAxisAngle(up,r[6]);else q.identity();matrix.compose(new T.Vector3(...r.slice(0,3)),q,new T.Vector3(...r.slice(3,6)));mesh.setMatrixAt(i,matrix);});mesh.computeBoundingSphere();scene.add(mesh);return mesh;}
-function surfaceTexture(kind){const c=document.createElement('canvas');c.width=c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=kind==='ice'?'#a6cbd8':kind==='ground'?'#e2e5dc':'#d0c5b1';ctx.fillRect(0,0,256,256);for(let i=0;i<600;i++){const x=(i*73)%256,y=(i*137)%256;ctx.strokeStyle=kind==='ice'?'rgba(236,251,255,.12)':'rgba(105,112,103,.10)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+3+i%12,y+1);ctx.stroke();}if(kind==='road'){ctx.strokeStyle='rgba(100,106,100,.2)';for(let i=0;i<=256;i+=32){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,256);ctx.moveTo(0,i);ctx.lineTo(256,i);ctx.stroke();}}const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;return texture;}
-const groundTexture=surfaceTexture('ground');groundTexture.repeat.set(WORLD.width/28,WORLD.depth/28);
-const iceTexture=surfaceTexture('ice');iceTexture.repeat.set(WORLD.width/28,WORLD.depth/28);
+const frostTexture=huntSurfaceTexture('frost'),iceTexture=huntSurfaceTexture('ice');
+const asphaltTexture=huntSurfaceTexture('asphalt'),pavingTexture=huntSurfaceTexture('paving');
+const glass=createHuntGlass(),masonryTexture=huntMasonryTexture();
 // The closed backing sits below the deepest ground instead of filling the basin.
-const backingTop=-WORLD_BASIN.depth-.5;batch(boxGeo,0xa3cddd,[[0,backingTop-2.5,0,WORLD.width,5,WORLD.depth],[-WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[0,backingTop/2,-WORLD.depth/2,WORLD.width,-backingTop,1],[0,backingTop/2,WORLD.depth/2,WORLD.width,-backingTop,1]]);function terrainSheet(w,d,x=0,z=0,color=0xffffff){const geometry=new T.PlaneGeometry(w,d,Math.ceil(w/4),Math.ceil(d/4)),pos=geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,worldGroundHeight(pos.getX(i)+x,-pos.getY(i)+z));geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,material(color));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);return mesh;}const ice=terrainSheet(WORLD.width,WORLD.depth,0,0,0xd9f1f5);ice.rotation.x=-Math.PI/2;ice.material.roughness=.88;ice.material.map=groundTexture;ice.position.y=0;scene.add(ice);
+const backingTop=-WORLD_BASIN.depth-.5;batch(boxGeo,0xa3cddd,[[0,backingTop-2.5,0,WORLD.width,5,WORLD.depth],[-WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[WORLD.width/2,backingTop/2,0,1,-backingTop,WORLD.depth],[0,backingTop/2,-WORLD.depth/2,WORLD.width,-backingTop,1],[0,backingTop/2,WORLD.depth/2,WORLD.width,-backingTop,1]]);function terrainSheet(w,d,x=0,z=0,color=0xffffff){const geometry=new T.PlaneGeometry(w,d,Math.ceil(w/4),Math.ceil(d/4)),pos=geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,worldGroundHeight(pos.getX(i)+x,-pos.getY(i)+z));geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,material(color));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);return mesh;}const ice=terrainSheet(WORLD.width,WORLD.depth,0,0,0xf1faff);ice.material.roughness=.9;ice.material.map=frostTexture;ice.material.bumpMap=frostTexture;ice.material.bumpScale=.035;setHuntTerrainUV(ice.geometry,0,0,15);ice.name='hunt-frosted-terrain';
 // A baked bank tint makes depth legible without extra lights or per-frame work.
 const iceVertices=ice.geometry.attributes.position,iceColors=new Float32Array(iceVertices.count*3);
 for(let i=0;i<iceVertices.count;i++){
  const icy=worldSurface(iceVertices.getX(i),-iceVertices.getY(i))==='ice',depth=Math.max(0,Math.min(1,-iceVertices.getZ(i)/WORLD_BASIN.depth)),gleam=Math.sin(depth*Math.PI),at=i*3;
- iceColors[at]=(icy?.63:1)+.4*gleam-.15*depth;iceColors[at+1]=(icy?.87:1)+.35*gleam-.04*depth;iceColors[at+2]=(icy?1:.94)+.25*gleam;
+ const x=iceVertices.getX(i),z=-iceVertices.getY(i);
+ const bankTint=.93+.064*Math.sin(x*.041+z*.026)*Math.cos(z*.069-x*.01);
+ iceColors[at]=bankTint*((icy?.63:1)+.4*gleam-.15*depth);iceColors[at+1]=bankTint*((icy?.87:1)+.35*gleam-.04*depth);iceColors[at+2]=bankTint*((icy?1:.97)+.25*gleam);
 }
 ice.geometry.setAttribute('color',new T.BufferAttribute(iceColors,3));ice.material.vertexColors=true;
-for(const p of WORLD_PATHS){const parts=p.x===WORLD_DECK.x&&p.w===WORLD_DECK.w&&p.d===WORLD.depth?[-1,1].map(sign=>{const end=WORLD_DECK.length/2+WORLD_DECK.ramp,length=WORLD.depth/2-end;return{...p,d:length,z:sign*(end+length/2)};}):[p];for(const part of parts){const path=terrainSheet(part.w,part.d,part.x,part.z,0xd2d9bd);path.position.y=.06;path.material.roughness=.9;path.material.depthWrite=true;}}
+const castShadows=createHuntSunShadows(ice.geometry,WORLD,WORLD_BLOCKS,WORLD_TREES);
+scene.add(castShadows.mesh);
+for(const p of WORLD_PATHS){const parts=p.x===WORLD_DECK.x&&p.w===WORLD_DECK.w&&p.d===WORLD.depth?[-1,1].map(sign=>{const end=WORLD_DECK.length/2+WORLD_DECK.ramp,length=WORLD.depth/2-end;return{...p,d:length,z:sign*(end+length/2)};}):[p];for(const part of parts){const arterial=Math.min(part.w,part.d)>=22&&Math.max(part.w,part.d)>=110;
+ const path=terrainSheet(part.w,part.d,part.x,part.z,arterial?0xc5d6db:0xebeee9);
+ path.name=arterial?'hunt-asphalt-street':'hunt-stone-walkway';path.position.y=arterial?.061:.054;
+ path.material.map=arterial?asphaltTexture:pavingTexture;path.material.roughness=arterial?.76:.89;path.material.bumpMap=path.material.map;path.material.bumpScale=arterial?.055:.08;
+ path.material.polygonOffset=true;path.material.polygonOffsetFactor=arterial?-2:-1;path.material.polygonOffsetUnits=arterial?-4:-2;
+ setHuntTerrainUV(path.geometry,part.x,part.z,arterial?11:14);}}
+scene.add(huntRoadMarkings(worldGroundHeight));
 // Painted contours reveal the bank and follow the physical four-unit terrain.
 const{positions:basinPaint,indices:basinIndices}=worldBasinContours();
 const basinGeo=new T.BufferGeometry();basinGeo.setAttribute('position',new T.Float32BufferAttribute(basinPaint,3));basinGeo.setIndex(basinIndices);basinGeo.computeVertexNormals();const basinContours=new T.Mesh(basinGeo,material(0xbde5df));basinContours.material.depthWrite=false;scene.add(basinContours);
 // Ice on the lower loop and grippy roads over the rise are visible directly in the world.
-for(const p of WORLD_ICE_LOOP){const track=terrainSheet(p.w,p.d,p.x,p.z,0x9ecfdf);track.position.y=.025;track.material.map=iceTexture;track.material.roughness=.3;}
+for(const p of WORLD_ICE_LOOP){const track=terrainSheet(p.w,p.d,p.x,p.z,0x9ecfdf);track.position.y=.025;track.material.map=iceTexture;track.material.roughness=.19;track.material.bumpMap=iceTexture;track.material.bumpScale=.018;track.material.polygonOffset=true;track.material.polygonOffsetFactor=-1;track.material.polygonOffsetUnits=-1;track.name='hunt-polished-ice';setHuntTerrainUV(track.geometry,p.x,p.z,24);}
 for(const sign of[-1,1])for(const vertical of[false,true]){const r=WORLD_RISE,edge=terrainSheet(vertical?.55:r.topW*2,vertical?r.topD*2:.55,r.x+(vertical?sign*r.topW:0),r.z+(vertical?0:sign*r.topD),vertical?0x6bbbc2:0xe7bd73);edge.position.y=.09;}
-const windows=[],nightWindows=[],lampMarkers=[],roofs=[],doors=[],trim=[],bases=[],roofUnits=[];for(const [i,b]of WORLD_BLOCKS.entries()){if(b.kind==='garden')continue;if(b.kind==='arch'){box(b.x,b.base+b.h/2,b.z,b.w,b.h,b.d,0x6ebbbd);lampMarkers.push({x:b.x,y:b.base+1,z:b.z+b.d/2+.25});continue;}box(b.x,(b.base??0)+b.h/2,b.z,b.w,b.h,b.d,b.kind==='courtyard'?[0xf0c9b8,0xbcdcd4,0xf1d2ab][i%3]:[0xf0d8b3,0xc7d6dc,0xe4cbd2,0xc3d5c7][i%4]);for(const side of[-1,1])lampMarkers.push({x:b.x+side*Math.min(10,b.w/2-2),y:6.5,z:b.z+b.d/2+.25});bases.push([b.x,1,b.z,b.w+.1,2,b.d+.1]);roofUnits.push([b.x+Math.min(5,b.w/2-3),b.h+1.3,b.z-Math.min(5,b.d/2-3),5,2.6,4]);roofs.push([b.x,b.h+.3,b.z,b.w+1,.6,b.d+1]);doors.push([b.x,2.7,b.z+b.d/2+.08,3,5.4,.16]);for(const sign of[-1,1])for(let y=6;y<b.h-1;y+=4)for(let x=-b.w/2+4;x<b.w/2-2;x+=5)((i+Math.round(x)+Math.round(y)+sign)%4===0?windows:nightWindows).push([b.x+x,y,b.z+sign*(b.d/2+.08),2.7,2,.16]);trim.push([b.x,b.h-1,b.z+b.d/2+.15,b.w,.25,.25]);}const facadeFrames=[];let facadeBuildings=0,sideWindows=0,facadeTrim=0;for(const [i,b]of WORLD_BLOCKS.entries()){const a=huntBuildingArchitecture(b,i);if(!b.kind)facadeBuildings++;facadeFrames.push(...a.frames);trim.push(...a.trim);windows.push(...a.windows);nightWindows.push(...a.nightWindows);sideWindows+=a.windows.length+a.nightWindows.length;facadeTrim+=a.trim.length;}const frames=batch(boxGeo,0x526d7e,facadeFrames);frames.name='hunt-building-facades';canvas.dataset.architecture=JSON.stringify({buildings:facadeBuildings,frames:facadeFrames.length,sideWindows,trim:facadeTrim,extraDrawBatches:1});batch(boxGeo,0x617b8a,roofs);batch(boxGeo,0x6c9cae,windows);const litWindows=batch(boxGeo,0x6c9cae,nightWindows);batch(boxGeo,0x8a7060,doors);batch(boxGeo,0xfff0d1,trim);batch(boxGeo,0x8a9da4,bases);batch(boxGeo,0xb5c0c5,roofUnits);
+const windows=[],nightWindows=[],lampMarkers=[],roofs=[],doors=[],trim=[],bases=[],roofUnits=[];for(const [i,b]of WORLD_BLOCKS.entries()){if(b.kind==='garden')continue;if(b.kind==='arch'){box(b.x,b.base+b.h/2,b.z,b.w,b.h,b.d,0x6ebbbd);lampMarkers.push({x:b.x,y:b.base+1,z:b.z+b.d/2+.25});continue;}box(b.x,(b.base??0)+b.h/2,b.z,b.w,b.h,b.d,b.kind==='courtyard'?[0xd2b5a8,0xbbd2d0,0xdcc3a3][i%3]:[0xdedbd1,0xb0c4cf,0xc1b2b9,0xc9d4ca][i%4],true);for(const side of[-1,1])lampMarkers.push({x:b.x+side*Math.min(10,b.w/2-2),y:6.5,z:b.z+b.d/2+.25});bases.push([b.x,1,b.z,b.w+.1,2,b.d+.1]);roofUnits.push([b.x+Math.min(5,b.w/2-3),b.h+1.3,b.z-Math.min(5,b.d/2-3),5,2.6,4]);roofs.push([b.x,b.h+.3,b.z,b.w+1,.6,b.d+1]);doors.push([b.x,2.7,b.z+b.d/2+.08,3,5.4,.16]);for(const sign of[-1,1])for(let y=6;y<b.h-1;y+=4)for(let x=-b.w/2+4;x<b.w/2-2;x+=5)(Math.abs(i*13+Math.round(x)*19+Math.round(y)*3+sign*7)%7<3?nightWindows:windows).push([b.x+x,y,b.z+sign*(b.d/2+.08),2.7,2,.16]);trim.push([b.x,b.h-1,b.z+b.d/2+.15,b.w,.25,.25]);}const facadeFrames=[];let facadeBuildings=0,sideWindows=0,facadeTrim=0;for(const [i,b]of WORLD_BLOCKS.entries()){const a=huntBuildingArchitecture(b,i);if(!b.kind)facadeBuildings++;facadeFrames.push(...a.frames);trim.push(...a.trim);windows.push(...a.windows);nightWindows.push(...a.nightWindows);sideWindows+=a.windows.length+a.nightWindows.length;facadeTrim+=a.trim.length;}const frames=batch(boxGeo,0x435f71,facadeFrames);frames.name='hunt-building-facades';canvas.dataset.architecture=JSON.stringify({buildings:facadeBuildings,frames:facadeFrames.length,sideWindows,trim:facadeTrim,extraDrawBatches:1});batch(boxGeo,0x546a7b,roofs).name='hunt-building-parapets';
+batch(boxGeo,0x6c9cae,windows,glass.shaded).name='hunt-reflective-window-glass';
+batch(boxGeo,0x6c9cae,nightWindows,glass.lit).name='hunt-lit-window-glass';
+batch(boxGeo,0x76574e,doors,huntEntranceMaterial()).name='hunt-building-doors';
+batch(boxGeo,0xe5e4d8,trim).name='hunt-stone-trim';
+batch(boxGeo,0x788c97,bases).name='hunt-building-foundations';
+batch(boxGeo,0x8da3ab,roofUnits).name='hunt-rooftop-units';
 // Solid planted beds share the exact colliders, including the open eight-unit shortcut.
 const hedgeCores=[],hedgeCrowns=[],gardenStone=[],pinkFlowers=[],creamFlowers=[];
 for(const b of WORLD_GARDEN_BEDS){const leaf=(x,y,z,sx,sy,sz)=>{let seed=Math.sin(x*12.9898+z*78.233+y*17.7)*43758.5453;const r=seed-Math.floor(seed);sx*=.88+r*.12;sy*=.87+(1-r)*.13;sz*=.86+r*.14;x=Math.max(b.x-b.w/2+sx,Math.min(b.x+b.w/2-sx,x+(r-.5)*1.6));z=Math.max(b.z-b.d/2+sz,Math.min(b.z+b.d/2-sz,z+(r-.5)*1.3));y=Math.min(b.h-sy,y+(r-.5)*.7);hedgeCrowns.push([x,y,z,sx,sy,sz]);};gardenStone.push([b.x,.35,b.z,b.w,.7,b.d]);hedgeCores.push([b.x,4.2,b.z,b.w-3,7.5,b.d-3]);for(let x=-b.w/2+3;x<=b.w/2-3;x+=6)for(let z=-b.d/2+3;z<=b.d/2-3;z+=6){leaf(b.x+x,7.7,b.z+z,3,1.3,3);if((Math.round(x*7+z*11)+b.x)%5===0)(hedgeCrowns.length%2?pinkFlowers:creamFlowers).push([hedgeCrowns.at(-1)[0],hedgeCrowns.at(-1)[1]+hedgeCrowns.at(-1)[4]*.93+.12,hedgeCrowns.at(-1)[2],.42,.25,.42]);}for(const side of[-1,1])for(const y of[2,4.2,6.4]){for(let x=-b.w/2+3;x<=b.w/2-3;x+=6)leaf(b.x+x,y,b.z+side*(b.d/2-1.8),3,1.7,1.8);for(let z=-b.d/2+3;z<=b.d/2-3;z+=6)leaf(b.x+side*(b.w/2-1.8),y,b.z+z,1.8,1.7,3);}}
-for(const rows of[hedgeCores,hedgeCrowns,pinkFlowers,creamFlowers])for(const row of rows){row[1]*=WORLD_GARDEN.h/9;row[4]*=WORLD_GARDEN.h/9;}batch(boxGeo,0x8bba9c,hedgeCores);batch(boxGeo,0xc9cec1,gardenStone);const leafGeo=new T.IcosahedronGeometry(1,0),leafNormals=leafGeo.attributes.normal,leafVertices=leafGeo.attributes.position;for(let i=0;i<leafVertices.count;i++){const x=leafVertices.getX(i),y=leafVertices.getY(i),z=leafVertices.getZ(i),length=Math.hypot(x,y,z);leafNormals.setXYZ(i,x/length,y/length,z/length);}const gardenLeaves=batch(leafGeo,0xffffff,hedgeCrowns),leafColor=new T.Color();for(let i=0;i<hedgeCrowns.length;i++)gardenLeaves.setColorAt(i,leafColor.set([0x83c49c,0x8bc7a2,0x78b98e,0x91c8a0][(i*7+Math.floor(i/5))%4]));batch(leafGeo,0xefb0bc,pinkFlowers);batch(leafGeo,0xf5df9b,creamFlowers);
+for(const rows of[hedgeCores,hedgeCrowns,pinkFlowers,creamFlowers])for(const row of rows){row[1]*=WORLD_GARDEN.h/9;row[4]*=WORLD_GARDEN.h/9;}batch(boxGeo,0x426656,hedgeCores);batch(boxGeo,0x9caeac,gardenStone);const leafGeo=new T.IcosahedronGeometry(1,2),leafNormals=leafGeo.attributes.normal,leafVertices=leafGeo.attributes.position;for(let i=0;i<leafVertices.count;i++){const x=leafVertices.getX(i),y=leafVertices.getY(i),z=leafVertices.getZ(i),length=Math.hypot(x,y,z);leafNormals.setXYZ(i,x/length,y/length,z/length);}const gardenLeaves=batch(leafGeo,0xaabca5,hedgeCrowns),leafColor=new T.Color();for(let i=0;i<hedgeCrowns.length;i++)gardenLeaves.setColorAt(i,leafColor.set([0x527a62,0x6c9779,0x5d8565,0x83a98e][(i*7+Math.floor(i/5))%4]));batch(leafGeo,0xefb0bc,pinkFlowers);batch(leafGeo,0xf5df9b,creamFlowers);
 // Painted crest edges follow the same solid bank; nothing floats above a walkable void.
 for(const sign of[-1,1]){const guide=terrainSheet(WORLD_RIDGE.end-WORLD_RIDGE.start,.4,(WORLD_RIDGE.start+WORLD_RIDGE.end)/2,sign*(WORLD_RIDGE.halfTop-1),0xf4d9a6);guide.position.y=.1;}
 // Continuous upper walk: two ramps, a supported deck, and the same heights in physics.
@@ -4554,10 +6022,63 @@ const deckX=WORLD_DECK.x,halfDeck=WORLD_DECK.length/2,deckEnd=halfDeck+WORLD_DEC
 const raisedDeck=raisedRouteGeometry(deckX,WORLD_DECK.w,[[-deckEnd,.05],[-halfDeck,deckTop],[halfDeck,deckTop],[deckEnd,.05]]);
 scene.add(raisedRouteMesh('hunt-raised-deck-tread',raisedDeck.tread),raisedRouteMesh('hunt-raised-deck-walls',raisedDeck.walls));
 for(const side of[-1,1])box(deckX+side*(WORLD_DECK.w/2-.5),WORLD_DECK.h+.09,0,.35,.08,WORLD_DECK.length,0xe2b95d);
-const trunks=[],crowns=[];for(const {x,z,y}of WORLD_TREES){trunks.push([x,y+2.4,z,.55,4.8,.55]);crowns.push([x,y+7,z,3.6,4.5,3.6]);}batch(cylinderGeo,0x9a7c61,trunks);batch(new T.IcosahedronGeometry(1,1),0x91b99d,crowns);
-// Low-detail surrounding land grounds the play area; no floating platform edge.
-function surroundingLand(w,d,x,z){const g=new T.PlaneGeometry(w,d,Math.ceil(w/40),Math.ceil(d/40)),pos=g.attributes.position;for(let i=0;i<pos.count;i++){const wx=pos.getX(i)+x,wz=-pos.getY(i)+z,edge=Math.max(0,Math.abs(wx)-WORLD.width/2,Math.abs(wz)-WORLD.depth/2),blend=Math.min(1,edge/180),rolling=14+23*(Math.sin(wx*.009+wz*.004)**2)+19*(Math.cos(wz*.011-wx*.003)**2);pos.setZ(i,-.15+blend*rolling);}g.computeVertexNormals();const mesh=new T.Mesh(g,material(0xaec6cc));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);}
+const trunks=[],crowns=[];
+for(const [i,{x,z,y,r,h}]of WORLD_TREES.entries()){
+ const variation=.89+(i*13%8)*.015;
+ trunks.push([x,y+2.35,z,.55,4.7,.55]);
+ crowns.push([x,y+h*.65,z,r*.96*variation,h*.33,r*.95*variation,i*.31]);
+ crowns.push([x+r*.25,y+h*.48,z+r*.17,r*.69*variation,h*.24,r*.7*variation,i*.48]);
+ crowns.push([x-r*.31,y+h*.54,z-r*.23,r*.64*variation,h*.24,r*.64*variation,i*.79]);
+}
+batch(cylinderGeo,0x796357,trunks,huntBarkMaterial()).name='hunt-tree-trunks';
+const treeCoreRows=crowns.map(row=>row.map((value,i)=>i>=3&&i<=5?value*.65:value));
+const treeLeaves=batch(leafGeo,0xd9dfc3,treeCoreRows,huntCanopyMaterial());treeLeaves.name='hunt-tree-crowns';
+for(let i=0;i<crowns.length;i++)treeLeaves.setColorAt(i,leafColor.set([0xe9f0dc,0xf6f3df,0xdbe9d5,0xffffff][i%4]));
+scene.add(huntFoliageDetails(crowns,hedgeCrowns));
+const contactShadows=huntContactShadows(WORLD_BLOCKS,WORLD_TREES,worldGroundHeight);scene.add(contactShadows);
+// Rolling hills and tree lines sit beyond the playable perimeter.
+function surroundingHeight(x,z){
+ const edge=Math.max(0,Math.abs(x)-WORLD.width/2,Math.abs(z)-WORLD.depth/2);
+ const rise=Math.min(1,edge/180);
+ const hills=12+31*Math.sin(x*.009+z*.004)**2+26*Math.cos(z*.011-x*.003)**2;
+ return -.15+rise*hills;
+}
+function surroundingLand(w,d,x,z){
+ const geometry=new T.PlaneGeometry(w,d,Math.ceil(w/30),Math.ceil(d/30));
+ const positions=geometry.attributes.position,colors=[];
+ const shade=new T.Color(),base=new T.Color(0xbbd0d6),pine=new T.Color(0x809ca8);
+ for(let i=0;i<positions.count;i++){
+  const wx=positions.getX(i)+x,wz=-positions.getY(i)+z;
+  positions.setZ(i,surroundingHeight(wx,wz));
+  const mottling=.25+.25*Math.sin(wx*.017+wz*.021)*Math.sin(wz*.03);
+  shade.copy(base).lerp(pine,mottling);colors.push(shade.r,shade.g,shade.b);
+ }
+ geometry.setAttribute('color',new T.Float32BufferAttribute(colors,3));geometry.computeVertexNormals();
+ const mesh=new T.Mesh(geometry,new T.MeshStandardMaterial({vertexColors:true,roughness:1}));
+ mesh.rotation.x=-Math.PI/2;mesh.position.set(x,0,z);scene.add(mesh);
+}
 surroundingLand(1600,640,0,-560);surroundingLand(1600,640,0,560);surroundingLand(480,480,-560,0);surroundingLand(480,480,560,0);
+const pineLower=[],pineMiddle=[],pineTips=[];
+function landscapePine(x,z,index){
+ const h=10+(index*37%17),radius=h*(.18+(index%4)*.018),y=surroundingHeight(x,z);
+ pineLower.push([x,y+h*.34,z,radius,h*.64,radius,index*.91]);
+ pineMiddle.push([x,y+h*.56,z,radius*.77,h*.60,radius*.77,index*.32]);
+ pineTips.push([x,y+h*.77,z,radius*.52,h*.49,radius*.52,index*.71]);
+}
+for(const side of [-1,1]){
+ for(let i=0;i<43;i++){
+  const x=-385+i*18+(i*71%13),z=side*(278+(i*43%105));
+  landscapePine(x,z,i);
+ }
+ for(let i=0;i<23;i++){
+  const x=side*(354+(i*29%67)),z=-222+i*20+(i*41%15);
+  landscapePine(x,z,i+43);
+ }
+}
+const pineGeo=new T.ConeGeometry(1,1,6);
+batch(pineGeo,0x426371,pineLower).name='hunt-distant-conifer-lower';
+batch(pineGeo,0x64858b,pineMiddle).name='hunt-distant-conifer-middle';
+batch(pineGeo,0xaac2c6,pineTips).name='hunt-distant-conifer-tips';
 const barriers=[];for(let x=-320;x<=320;x+=20)for(const z of[-240,240])barriers.push([x,1,z,19,2,1]);for(let z=-220;z<=220;z+=20)for(const x of[-320,320])barriers.push([x,1,z,1,2,19]);batch(boxGeo,0x9aabb7,barriers);
 
 // One small baked cloud texture, one sky draw and one star draw. No bloom or shadow maps.
@@ -4565,19 +6086,36 @@ const cloudCanvas=document.createElement('canvas');cloudCanvas.width=512;cloudCa
 for(let i=0;i<18;i++)for(let j=0;j<5;j++)for(const wrap of[-512,0,512]){const x=(i*137)%512+j*8+wrap,y=28+(i*29)%60-(j%3)*5,r=12+(i+j)%14,g=cloudCtx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(255,255,255,0)');cloudCtx.fillStyle=g;cloudCtx.fillRect(x-r,y-r,r*2,r*2);}
 const cloudTex=new T.CanvasTexture(cloudCanvas);cloudTex.wrapS=T.RepeatWrapping;cloudTex.generateMipmaps=false;cloudTex.minFilter=T.LinearFilter;
 const skyUniforms={top:{value:new T.Color()},horizon:{value:new T.Color()},sun:{value:new T.Color()},sunDir:{value:new T.Vector3()},night:{value:0},time:{value:0},clouds:{value:cloudTex}};
-const skyMaterial=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,toneMapped:false,uniforms:skyUniforms,vertexShader:'varying vec3 worldPoint;void main(){vec4 w=modelMatrix*vec4(position,1.);worldPoint=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;gl_Position.z=gl_Position.w;}',fragmentShader:`varying vec3 worldPoint;uniform vec3 top,horizon,sun,sunDir;uniform float night,time;uniform sampler2D clouds;void main(){vec3 d=normalize(worldPoint-cameraPosition);vec3 col=mix(horizon,top,pow(max(d.y,0.),.6));float u=atan(d.z,d.x)/6.2831853+.5+time*.0015;vec4 c=texture2D(clouds,vec2(u,clamp(d.y*1.8,0.,1.)));float mask=smoothstep(.02,.12,d.y)*(1.-smoothstep(.5,.8,d.y));col=mix(col,mix(vec3(1.,.96,.9),vec3(.04,.075,.13),night),c.a*mask*.7);float facing=max(0.,dot(d,sunDir));col+=sun*pow(facing,100.)*.18;float disc=smoothstep(.99945,.99975,facing);col=mix(col,sun,disc);gl_FragColor=vec4(col,1.);#include <colorspace_fragment>
+const skyMaterial=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,toneMapped:false,uniforms:skyUniforms,vertexShader:'varying vec3 worldPoint;void main(){vec4 w=modelMatrix*vec4(position,1.);worldPoint=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;gl_Position.z=gl_Position.w;}',fragmentShader:`varying vec3 worldPoint;uniform vec3 top,horizon,sun,sunDir;uniform float night,time;uniform sampler2D clouds;void main(){vec3 d=normalize(worldPoint-cameraPosition);vec3 col=mix(horizon,top,pow(max(d.y,0.),.6));float u=atan(d.z,d.x)/6.2831853+.5+time*.0015;vec4 c=texture2D(clouds,vec2(u,clamp(d.y*1.8,0.,1.)));float mask=smoothstep(.02,.12,d.y)*(1.-smoothstep(.5,.8,d.y));col=mix(col,mix(vec3(1.,.96,.9),vec3(.04,.075,.13),night),c.a*mask*.7);float facing=max(0.,dot(d,sunDir));float horizonGlow=pow(facing,9.)*exp(-max(d.y,0.)*8.);col+=sun*(pow(facing,100.)*.18+horizonGlow*(1.-night)*.15);float disc=smoothstep(.99945,.99975,facing);col=mix(col,sun,disc);gl_FragColor=vec4(col,1.);#include <colorspace_fragment>
 }`.replace(';#include',';\n#include')});
-const skyMesh=new T.Mesh(new T.SphereGeometry(800,24,12),skyMaterial);skyMesh.frustumCulled=false;skyMesh.renderOrder=-10;scene.add(skyMesh);
+const skyMesh=new T.Mesh(new T.SphereGeometry(800,24,12),skyMaterial);skyMesh.frustumCulled=false;
+// Its shader uses the far depth. Paint after opaque scenery so the depth test
+// skips the expensive sky shading where buildings or terrain already fill the view.
+skyMesh.renderOrder=1000;scene.add(skyMesh);
 const starPositions=[];for(let i=0;i<140;i++){const a=i*2.399963,e=.08+((i*37)%100)/100*1.25,r=760;starPositions.push(Math.sin(a)*Math.cos(e)*r,Math.sin(e)*r,Math.cos(a)*Math.cos(e)*r);}const starGeo=new T.BufferGeometry();starGeo.setAttribute('position',new T.Float32BufferAttribute(starPositions,3));const starMat=new T.PointsMaterial({color:0xffefd5,size:2,sizeAttenuation:false,transparent:true,depthWrite:false,fog:false,opacity:0});const stars=new T.Points(starGeo,starMat);stars.frustumCulled=false;stars.renderOrder=-9;scene.add(stars);
+// Streetlights are mounted on the existing perimeter barrier.
+const posts=[],lampArms=[];
+for(const z of [-240,240])for(let x=-290;x<=290;x+=48){
+ posts.push([x,4.7,z,.18,9.4,.18]);
+ lampArms.push([x,9.4,z-Math.sign(z)*.8,.28,.24,1.9]);
+ lampMarkers.push({x,y:9.24,z:z-Math.sign(z)*1.65,poolOffset:-Math.sign(z)*3});
+}
+for(const x of [-320,320])for(let z=-210;z<=210;z+=48){
+ posts.push([x,4.7,z,.18,9.4,.18]);
+ lampArms.push([x-Math.sign(x)*.8,9.4,z,1.9,.24,.28]);
+ lampMarkers.push({x:x-Math.sign(x)*1.65,y:9.24,z,poolOffset:0});
+}
+batch(cylinderGeo,0x536877,posts).name='hunt-perimeter-lamp-posts';
+batch(boxGeo,0x536877,lampArms).name='hunt-perimeter-lamp-arms';
 const lampCores=batch(boxGeo,0xfff1cf,lampMarkers.map(p=>[p.x,p.y,p.z,.65,.36,.45]));lampCores.material.emissive.set(0xffd79c);
 const glowMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,depthTest:true,toneMapped:false,uniforms:{strength:{value:0}},vertexShader:'varying vec2 v;void main(){v=uv;vec4 p=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.);p.xy+=position.xy*7.;gl_Position=projectionMatrix*p;}',fragmentShader:'varying vec2 v;uniform float strength;void main(){float r=length((v-.5)*2.);gl_FragColor=vec4(1.,.68,.3,(1.-smoothstep(.0,1.,r))*strength*.24);}' });
 const lampHalos=new T.InstancedMesh(new T.PlaneGeometry(1,1),glowMaterial,lampMarkers.length),lampMatrix=new T.Matrix4();lampMarkers.forEach((p,i)=>{lampMatrix.makeTranslation(p.x,p.y,p.z+.12);lampHalos.setMatrixAt(i,lampMatrix);});lampHalos.frustumCulled=false;scene.add(lampHalos);
-const poolPositions=[],poolUV=[],poolIndices=[];for(const p of lampMarkers){const base=poolPositions.length/3,r=9;for(let z=0;z<=4;z++)for(let x=0;x<=4;x++){const wx=p.x+(x/4-.5)*r*2,wz=p.z+5+(z/4-.5)*r*2;poolPositions.push(wx,worldHeight(wx,wz)+.13,wz);poolUV.push(x/4,z/4);}for(let z=0;z<4;z++)for(let x=0;x<4;x++){const n=base+z*5+x;poolIndices.push(n,n+5,n+1,n+1,n+5,n+6);}}
+const poolPositions=[],poolUV=[],poolIndices=[];for(const p of lampMarkers){const base=poolPositions.length/3,r=9;for(let z=0;z<=4;z++)for(let x=0;x<=4;x++){const wx=p.x+(x/4-.5)*r*2,wz=p.z+(p.poolOffset??5)+(z/4-.5)*r*2;poolPositions.push(wx,worldHeight(wx,wz)+.13,wz);poolUV.push(x/4,z/4);}for(let z=0;z<4;z++)for(let x=0;x<4;x++){const n=base+z*5+x;poolIndices.push(n,n+5,n+1,n+1,n+5,n+6);}}
 const poolGeometry=new T.BufferGeometry();poolGeometry.setAttribute('position',new T.Float32BufferAttribute(poolPositions,3));poolGeometry.setAttribute('uv',new T.Float32BufferAttribute(poolUV,2));poolGeometry.setIndex(poolIndices);const poolMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,blending:T.AdditiveBlending,uniforms:{strength:{value:0}},vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 v;uniform float strength;void main(){float r=length((v-.5)*2.);gl_FragColor=vec4(1.,.66,.28,(1.-smoothstep(.0,1.,r))*strength*.17);}'});const pools=new T.Mesh(poolGeometry,poolMaterial);scene.add(pools);
 // Explicit preview parameter only changes this scene's lighting, never the device clock or game state.
 const reviewPhase=new URL(location.href).searchParams.get('tagLightingReview'),reviewHours={morning:7.5,day:12,evening:17,night:22};
 function lightingDate(){const d=new Date();if(Object.hasOwn(reviewHours,reviewPhase)){const hour=reviewHours[reviewPhase];d.setHours(Math.floor(hour),Math.round(hour%1*60),0,0);}return d;}
-const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6),warmWindow=new T.Color(0xe5c797);let lastLighting=-Infinity,liveLighting=null,appliedLighting=null;
+const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6);let lastLighting=-Infinity,liveLighting=null,appliedLighting=null;
 function updateLighting(now,recorded){
  if(!recorded&&now-lastLighting>=10000){
   lastLighting=now;
@@ -4586,7 +6124,7 @@ function updateLighting(now,recorded){
  const l=recorded??liveLighting;
  if(l===appliedLighting)return;
  appliedLighting=l;
- skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;litWindows.material.color.set(0x6c9cae).lerp(warmWindow,l.lamps);litWindows.material.emissive.set(0xffcf8c);litWindows.material.emissiveIntensity=l.lamps*.9;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
+ skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;glass.update(l.lamps);castShadows.update(l);contactShadows.material.uniforms.opacity.value=.29-l.night*.075;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
 for(const p of WORLD_JUMP_STEPS){
  box(p.x,p.h/2,p.z,p.w,p.h,p.d,0xc5dcd8);
  box(p.x,p.h+.03,p.z,p.w,.06,p.d,0xf2d6a8);
@@ -4594,15 +6132,15 @@ for(const p of WORLD_JUMP_STEPS){
  scene.add(raisedRouteMesh('hunt-jump-step-ramp-'+p.x,tread,walls));
 }
 const stairGeometry=cornerStairGeometry(WORLD_CORNER_STAIRS),stairSlabs=batch(boxGeo,0x7196a3,stairGeometry.slabs);stairSlabs.name='corner-stair-slabs';const stairEdges=batch(boxGeo,0xffdba0,stairGeometry.edges);stairEdges.name='corner-stair-tread-edges';const rampGeometry=new T.BufferGeometry();rampGeometry.setAttribute('position',new T.Float32BufferAttribute(stairGeometry.positions,3));rampGeometry.computeVertexNormals();const rampMaterial=material(0x8eabb0);rampMaterial.side=T.DoubleSide;rampMaterial.polygonOffset=true;rampMaterial.polygonOffsetFactor=-1;rampMaterial.polygonOffsetUnits=-1;const stairRamps=new T.Mesh(rampGeometry,rampMaterial);stairRamps.name='corner-stair-side-ramps';scene.add(stairRamps);canvas.dataset.cornerStairs=JSON.stringify({corners:4,count:WORLD_CORNER_STAIRS[0].count,rise:WORLD_CORNER_STAIRS[0].rise,tread:WORLD_CORNER_STAIRS[0].tread,top:WORLD_CORNER_STAIRS[0].top,rampWidth:WORLD_CORNER_STAIRS[0].rampWidth,extraDrawBatches:3});
-let boxCount=0;for(const[key,{color,rows}]of staticBoxes){let shared=staticBoxMaterials.get(color);if(!shared)staticBoxMaterials.set(color,shared=material(color));const mesh=batch(boxGeo,color,rows,shared);mesh.name='hunt-static-boxes-'+key;boxCount+=rows.length;}canvas.dataset.staticBoxes=JSON.stringify({boxes:boxCount,batches:staticBoxes.size,colours:staticBoxMaterials.size,cell:96,savedDrawBatches:boxCount-staticBoxes.size,savedMaterials:boxCount-staticBoxMaterials.size});
+let boxCount=0;for(const[key,{color,masonry,style,rows}]of staticBoxes){let shared=staticBoxMaterials.get(style);if(!shared){shared=material(color);if(masonry)applyHuntWallDetail(shared,masonryTexture);staticBoxMaterials.set(style,shared);}const mesh=batch(boxGeo,color,rows,shared);mesh.name='hunt-static-boxes-'+key;boxCount+=rows.length;}canvas.dataset.staticBoxes=JSON.stringify({boxes:boxCount,batches:staticBoxes.size,colours:staticBoxMaterials.size,cell:96,savedDrawBatches:boxCount-staticBoxes.size,savedMaterials:boxCount-staticBoxMaterials.size});
 function centerSky(view=camera){skyMesh.position.copy(view.position);stars.position.copy(view.position);}
 return{centerSky,get lighting(){return appliedLighting;},update(now,recordedLighting){updateLighting(now,recordedLighting);centerSky();skyUniforms.time.value=now/1000;}};
 }
 
 return {createHuntScenery};
 })();
-const __tagModule72=(()=>{
-const T=__tagExternal0;const {ITEM_DEFS}=__tagModule9;
+const __tagModule81=(()=>{
+const T=__tagExternal0;const {ITEM_DEFS}=__tagModule11;
 const BURSTS=8,SPARKS=6,colors={'fan-push':'#b1f5e8',pickup:'#a6efc4','guard-block':'#ffe69e','cushion-bump':'#ffbf8a','clone-popped':'#a5e4f5','trampoline-bounce':'#f5a3c8','balloon-land':'#a8e5e8'};
 const controlled=s=>s.config?.mode==='hunt'?s.hunters[0]:s.player;
 // Only the player's own physical events create cues. In particular, a hidden
@@ -4622,11 +6160,11 @@ function createHuntFeedback({scene}){
 
 return {huntFeedbackCue,createHuntFeedback};
 })();
-const __tagModule73=(()=>{
+const __tagModule82=(()=>{
 const T=__tagExternal0;
-const {worldSurface}=__tagModule7;
-const {huntActorConcealed}=__tagModule52;
-const {huntCanObserve}=__tagModule25;
+const {worldSurface}=__tagModule9;
+const {huntActorConcealed}=__tagModule59;
+const {huntVisualActorSight}=__tagModule60;
 const EMPTY=Object.freeze([]),CAPACITY=128,SMOKE_LIFE=.62,ECHO_LIFE=.24;
 // Presentation records only. Positions, inputs, contact and round proofs are
 // never modified. Timestamped, immutable puffs also survive replay seeking.
@@ -4681,7 +6219,7 @@ function createHuntMotionTrails({scene,reducedMotion}={}){
  });
  const matrix=new T.Matrix4(),position=new T.Vector3(),scale=new T.Vector3(),rotation=new T.Quaternion(),axis=new T.Vector3(0,1,0);
  function put(mesh,index,x,y,z,sx,sy,sz,q,opacity){position.set(x,y,z);scale.set(sx,sy,sz);matrix.compose(position,q,scale);mesh.setMatrixAt(index,matrix);mesh.geometry.attributes.trailAlpha.setX(index,opacity);}
- function setView(s){const actors=[s.player,...s.hunters],viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player;for(let i=0;i<rows.length;i++){const r=rows[i],a=actors[i],hasCues=r.smokeCount>0||r.echoCount>0,visible=!!a&&hasCues&&!huntActorConcealed(s,a)&&(a.owner===viewer.owner?(a.effects?.cloak??0)<=s.time:huntCanObserve(s,viewer,a,Infinity));r.smoke.visible=visible&&r.smokeCount>0;r.echo.visible=visible&&r.echoCount>0;}}
+ function setView(s){const actors=[s.player,...s.hunters],viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player;for(let i=0;i<rows.length;i++){const r=rows[i],a=actors[i],hasCues=r.smokeCount>0||r.echoCount>0,visible=!!a&&hasCues&&!huntActorConcealed(s,a)&&(a.owner===viewer.owner?(a.effects?.cloak??0)<=s.time:huntVisualActorSight(s,{x:viewer.x,y:viewer.y+3,z:viewer.z},a,viewer));r.smoke.visible=visible&&r.smokeCount>0;r.echo.visible=visible&&r.echoCount>0;}}
  function update(s,camera,recorded){
   for(let i=0;i<rows.length;i++){const r=rows[i];r.owner=[s.player,...s.hunters][i]?.owner;r.smokeCount=r.echoCount=0;}
   for(const c of recorded??history.cues){const age=s.time-c.at;if(age<0||age>=c.life)continue;const r=rows.find(r=>r.owner===c.owner);if(!r)continue;const u=age/c.life,fade=(1-u)**1.65;
@@ -4702,7 +6240,7 @@ function createHuntMotionTrails({scene,reducedMotion}={}){
 
 return {createHuntMotionCues,createHuntMotionTrails};
 })();
-const __tagModule75=(()=>{
+const __tagModule84=(()=>{
 // The share controller owns the Blob URL. Release the decoder when the
 // preview is out of sight, retaining the paused position for that clip.
 function createHuntVideoPreview({video,details,document:doc}){
@@ -4769,9 +6307,9 @@ function createHuntVideoPreview({video,details,document:doc}){
 
 return {createHuntVideoPreview};
 })();
-const __tagModule74=(()=>{
-const {createHuntVideoPreview}=__tagModule75;
-const {MATCH_SECONDS}=__tagModule12;
+const __tagModule83=(()=>{
+const {createHuntVideoPreview}=__tagModule84;
+const {MATCH_SECONDS}=__tagModule14;
 // Result presentation is independent of the simulation and reward settlement.
 const validTime=n=>Number.isFinite(n)&&n>=0&&n<=MATCH_SECONDS;
 function formatBest(mode,best,temporary){return validTime(best)?(mode==='hunt'?'最速 ':'最高 ')+best.toFixed(1)+'秒'+(temporary?'（このタブのみ）':''):'';}
@@ -4819,7 +6357,8 @@ function createHuntResults({onRetry,onRetrySame,onConfigure,onShare,onSaveVideo,
  .tag-rematch::before{content:'';position:absolute;inset:0 0 auto;height:6px;background:linear-gradient(90deg,#f3b3cd,#95d9d4,#f5d47f)}
  .tag-rematch[data-win=true]{box-shadow:0 5px 0 #d6b26b88,0 9px 28px #234e6740}
  .tag-rematch h2{font-size:25px;line-height:1.25;margin:2px 0 4px;font-weight:900;overflow-wrap:anywhere}.tr-metric{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tr-metric strong{font-size:38px;font-variant-numeric:tabular-nums;line-height:1.2}.tr-metric span{font-size:15px}.tr-metric small{font-size:12px;color:#557886}.tr-record{margin:7px 0 5px;padding:6px 10px;border-radius:10px;background:#ffe7a3;color:#664510;font-size:14px;font-weight:850}.tr-best{font-size:13px;font-weight:800;color:#876e3f;margin:5px 0}.tr-actions{display:grid;grid-template-columns:1.1fr 1fr;gap:8px;margin-top:10px}.tr-actions button{min-width:0;min-height:50px;padding:8px 6px;border-radius:17px;font-size:16px;line-height:1.3;box-shadow:0 3px 0 #729c9d55}.tr-actions [data-retry]{background:linear-gradient(#ffe5a7,#f8d382);font-size:16px;color:#674e29}.tr-same{min-height:44px;padding:7px 13px;margin-top:8px;border-radius:14px;background:#dceff3;color:#31566a;font-size:14px}.tr-actions [data-configure]{background:#dceff3}.tr-unavailable{font-size:13px;line-height:1.5;margin:7px 0 0}
- .tag-rematch[data-share=true] .tr-actions{grid-template-columns:1fr 1fr 1fr} .tag-rematch[data-save-choice=true] .tr-actions{grid-template-columns:1fr 1fr}.tr-actions [data-share],.tr-actions [data-save-video]{font-size:15px;background:#efe4f8}.tr-actions [data-save-video]{background:#dbeff0}.tr-share-notice{font-size:12px;line-height:1.4;margin:7px 0 0;color:#557886}
+ .tr-replays{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 4px}.tr-replays::before{content:'リプレイを見る';grid-column:1/-1;font-size:14px;font-weight:850;color:#31566a}.tr-replays button{min-width:0;min-height:54px;padding:10px 6px;border:2px solid #fff;border-radius:16px;background:linear-gradient(#d8f3f6,#b8e0e9);color:#244e63;font-size:16px;line-height:1.4;font-weight:850;box-shadow:0 3px 0 #79aab466}.tr-replays button:last-child{background:linear-gradient(#e6f5d9,#c8e7c5);color:#315b40}
+ .tr-video-tools{margin-top:14px;padding-top:10px;border-top:1px solid #acc9ca}.tr-video-tools>summary{cursor:pointer;padding:6px 0;color:#426574;font-size:14px;font-weight:750;line-height:1.5}.tr-video-tools[open]>summary{margin-bottom:8px}.tr-video-actions{display:flex;flex-wrap:wrap;gap:8px}.tr-video-actions button{flex:1;min-height:44px;padding:8px 10px;border-radius:14px;font-size:14px;background:#e8e3f2;color:#344d66}.tr-share-notice,.tr-video-tools .sharing-inline-notice{font-size:12px;line-height:1.6;margin:9px 0 0;color:#426574}
  .tag-rematch .tag-video-scope{display:flex;flex-direction:column;gap:10px;min-width:0;margin:12px 0;padding:12px;border:1px solid #91b5ad;border-radius:15px;background:#edf6eb;text-align:left}
  .tag-rematch #tag-video-scope-title{position:static;display:block;inset:auto;transform:none;width:auto;height:auto;margin:0;padding:0;font-size:15px;line-height:1.5;font-weight:850;color:#284e57}
  .tag-rematch .tag-video-scope-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
@@ -4828,9 +6367,12 @@ function createHuntResults({onRetry,onRetrySame,onConfigure,onShare,onSaveVideo,
  @media(max-width:340px){.tag-rematch .tag-video-scope-buttons{grid-template-columns:minmax(0,1fr)}}
  @media(orientation:landscape){.tag-rematch{width:min(340px,calc(50vw - 24px));max-height:calc(100dvh - 85px);overflow:auto}.tag-rematch h2{font-size:23px}.tr-metric strong{font-size:34px}}
  @media(prefers-reduced-motion:reduce){.tag-rematch{scroll-behavior:auto}}
- `;doc.head.append(style);const el=doc.createElement('section');el.id='round-result';el.className='tag-rematch';el.hidden=true;el.tabIndex=-1;el.setAttribute('aria-labelledby','round-result-title');el.setAttribute('aria-label','ラウンドの結果');el.dataset.share=String(typeof onShare==='function');el.innerHTML='<h2 id="round-result-title"></h2><div class="tr-metric"><strong data-time></strong><span>秒</span><small data-label></small></div><p class="tr-record" data-record role="status" hidden></p><p class="tr-best" data-best hidden></p><div class="tr-actions"><button data-retry>配置を変えて再戦</button><button data-configure>組合せ変更</button><button data-share disabled>リプレイ動画</button><button data-save-video hidden disabled>動画を保存</button></div><button class="tr-same" data-retry-same>↺ 同じ配置で再挑戦</button><details class="tr-video-preview" hidden><summary>動画を確認</summary><video controls playsinline preload="metadata" style="display:block;width:100%;height:min(38vh,280px);object-fit:contain;background:#102932;border-radius:10px;margin-top:8px"></video></details><p class="tr-share-notice" data-share-notice role="status" hidden></p><p class="sharing-inline-notice">公開前に、音楽の権利・顔や居場所の映り込み・公開範囲・年齢条件を確認。<a href="./life-quest-walk.html?from=sharing-guidelines&revision=1210s#sharing-guidelines" target="_blank" rel="noopener noreferrer">配信・投稿のルール</a></p><p class="tr-unavailable" data-unavailable hidden></p>';doc.body.append(el);const q=s=>el.querySelector(s),clipPreview=createHuntVideoPreview({video:q('video'),details:q('.tr-video-preview'),document:doc});q('[data-share]').hidden=typeof onShare!=='function';q('[data-retry-same]').hidden=typeof onRetrySame!=='function';q('[data-retry-same]').onclick=()=>{if(state.current&&!q('[data-retry-same]').disabled)onRetrySame?.();};
+ `;doc.head.append(style);const el=doc.createElement('section');el.id='round-result';el.className='tag-rematch';el.hidden=true;el.tabIndex=-1;el.setAttribute('aria-labelledby','round-result-title');el.setAttribute('aria-label','ラウンドの結果');el.dataset.share=String(typeof onShare==='function');el.innerHTML='<h2 id="round-result-title"></h2><div class="tr-metric"><strong data-time></strong><span>秒</span><small data-label></small></div><p class="tr-record" data-record role="status" hidden></p><p class="tr-best" data-best hidden></p><div class="tr-actions"><button data-retry>配置を変えて再戦</button><button data-configure>組合せ変更</button></div><button class="tr-same" data-retry-same>↺ 同じ配置で再挑戦</button><details class="tr-video-tools"><summary>動画を保存・共有</summary><div class="tr-video-actions"><button data-share disabled>動画を作る</button><button data-save-video hidden disabled>動画を保存</button></div><details class="tr-video-preview" hidden><summary>動画を確認</summary><video controls playsinline preload="metadata" style="display:block;width:100%;height:min(38vh,280px);object-fit:contain;background:#102932;border-radius:10px;margin-top:8px"></video></details><p class="tr-share-notice" data-share-notice role="status" hidden></p><p class="sharing-inline-notice">公開前に、音楽の権利・顔や居場所の映り込み・公開範囲・年齢条件を確認。<a href="./life-quest-walk.html?from=sharing-guidelines&revision=1210s#sharing-guidelines" target="_blank" rel="noopener noreferrer">配信・投稿のルール</a></p></details><p class="tr-unavailable" data-unavailable hidden></p>';doc.body.append(el);const q=s=>el.querySelector(s),clipPreview=createHuntVideoPreview({video:q('video'),details:q('.tr-video-preview'),document:doc});q('[data-share]').hidden=typeof onShare!=='function';q('[data-retry-same]').hidden=typeof onRetrySame!=='function';q('[data-retry-same]').onclick=()=>{if(state.current&&!q('[data-retry-same]').disabled)onRetrySame?.();};
  function render(){const m=state.current;if(!m)return;el.dataset.win=String(m.win);q('h2').textContent=m.title;q('[data-time]').textContent=m.time;q('[data-label]').textContent=m.label;q('[data-best]').textContent=m.best;q('[data-best]').hidden=!m.best;const record=q('[data-record]');if(record.textContent!==m.recordNotice)record.textContent=m.recordNotice;record.hidden=!m.recordNotice;}
- function open({focus=true}={}){if(!state.current)return false;render();el.hidden=false;clipPreview.show();if(focus)el.focus({preventScroll:true});return true;}
+ const videoTools=q('.tr-video-tools');videoTools.hidden=typeof onShare!=='function';
+ function syncVideoPreview(){if(!el.hidden&&videoTools.open)clipPreview.show();else clipPreview.hide();}
+ videoTools.addEventListener('toggle',syncVideoPreview);
+ function open({focus=true}={}){if(!state.current)return false;render();el.hidden=false;syncVideoPreview();if(focus)el.focus({preventScroll:true});return true;}
  q('[data-retry]').onclick=()=>{if(state.current&&!q('[data-retry]').disabled)onRetry();};q('[data-configure]').onclick=()=>{if(state.current)onConfigure();};
  q('[data-share]').onclick=()=>{if(!q('[data-share]').disabled)onShare?.();};
  q('[data-save-video]').onclick=()=>{if(!q('[data-save-video]').hidden&&!q('[data-save-video]').disabled)onSaveVideo?.();};
@@ -4853,6 +6395,7 @@ function createHuntResults({onRetry,onRetrySame,onConfigure,onShare,onSaveVideo,
  }
  function clearRoundUi(){
   clipPreview.reset();
+  videoTools.open=false;
   el.scrollTop=0;
   q('[data-retry]').disabled=false;
   q('[data-retry-same]').disabled=false;
@@ -4878,7 +6421,7 @@ function createHuntResults({onRetry,onRetrySame,onConfigure,onShare,onSaveVideo,
   setUnavailable(text){q('[data-retry]').disabled=true;q('[data-retry-same]').disabled=true;q('[data-unavailable]').textContent=text;q('[data-unavailable]').hidden=false;},
   verify(ticket,best,temporary){if(!state.verify(ticket,best,temporary))return false;render();return true;},
   isCurrent:ticket=>state.isCurrent(ticket),
-  dispose(){clipPreview.dispose();state.clear();el.remove();style.remove();},
+  dispose(){videoTools.removeEventListener('toggle',syncVideoPreview);clipPreview.dispose();state.clear();el.remove();style.remove();},
   get hasResult(){return!!state.current;},
   get summary(){return state.current;},
   get visible(){return!el.hidden;},
@@ -4887,9 +6430,9 @@ function createHuntResults({onRetry,onRetrySame,onConfigure,onShare,onSaveVideo,
 
 return {huntResultSummary,createHuntResultState,createHuntResults};
 })();
-const __tagModule77=(()=>{
+const __tagModule86=(()=>{
 const T=__tagExternal0;
-const {HUNT_FIELDS}=__tagModule9;
+const {HUNT_FIELDS}=__tagModule11;
 
 // Match the wind cone. Contact adds the monster's body radius separately.
 const halfWidth=distance=>3+distance*.2;
@@ -4957,9 +6500,9 @@ function createHuntWindGeometry({sight,onRay}){
 
 return {huntWindBounds,createHuntWindCulling,createHuntWindGeometry};
 })();
-const __tagModule78=(()=>{
+const __tagModule87=(()=>{
 const T=__tagExternal0;
-const {worldSight}=__tagModule7;
+const {worldSight}=__tagModule9;
 // Use the actual resolved camera, including orbit, portrait framing and replay.
 // Reuse one vector. Offscreen points never request an occlusion query.
 function createHuntPickupNameView(camera,{rayClear=worldSight}={}){
@@ -4972,7 +6515,7 @@ function createHuntPickupNameView(camera,{rayClear=worldSight}={}){
 
 return {createHuntPickupNameView};
 })();
-const __tagModule79=(()=>{
+const __tagModule88=(()=>{
 const {Mesh,CircleGeometry,MeshBasicMaterial}=__tagExternal0;
 // Two owned render bodies at most. Build on roster changes, never per frame or
 // per bubble. Character builders provide independent limb rigs and materials.
@@ -4984,32 +6527,33 @@ function createHuntDecoys({create,release}){
  function place(index,g,{self=false,paused=false,dt=0,groundAt=()=>0,isIce=()=>false,radius=2.7}={}){
   const row=slots[index];if(!row)return false;const a=row.actor,owner='decoy:'+g.id;if(row.owner!==owner){a.gait?.reset();a.action?.reset();row.owner=owner;}
   if(row.ghost!==self){for(const b of row.base){const m=b.material,t=self?true:b.transparent,o=self?Math.min(.55,b.opacity):b.opacity;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true;}if(m.opacity!==o)m.opacity=o;}row.ghost=self;}
-  a.root.visible=true;a.root.position.set(g.x,g.y,g.z);a.root.rotation.set(0,g.yaw,0);const ground=groundAt(g.x,g.z),height=Math.max(0,g.y-ground);row.shadow.position.y=ground-g.y+.035;row.shadow.scale.set(radius*.78,Math.max(.6,radius*.58),1);row.shadow.material.opacity=.23/(1+height*.18)*(self?.55:1);
+  row.gadget=g;a.root.visible=true;a.root.position.set(g.x,g.y,g.z);a.root.rotation.set(0,g.yaw,0);const ground=groundAt(g.x,g.z),height=Math.max(0,g.y-ground);row.shadow.position.y=ground-g.y+.035;row.shadow.scale.set(radius*.78,Math.max(.6,radius*.58),1);row.shadow.material.opacity=.23/(1+height*.18)*(self?.55:1);
   // Gait is applied temporarily by render(), so restore only after the scene
   // has been rendered, just as with the four real actors.
   row.motion={owner,grounded:g.grounded,x:g.x,z:g.z,speed:Math.hypot(g.vx,g.vz),ice:isIce(g),groundAt,frozen:paused};row.jump={owner,airborne:!g.grounded,stage:g.jumps,velocity:g.vy,height:g.y,handsFree:true};row.dt=paused?0:dt;return true;
  }
  function render(draw){function next(i){if(i===slots.length)return draw();const row=slots[i];if(!row.actor.root.visible||!row.actor.gait||!row.motion)return next(i+1);return row.actor.gait.render(row.motion,row.dt,()=>row.actor.action?row.actor.action.render(row.jump,row.dt,()=>next(i+1)):next(i+1));}return next(0);}
  function reset(){hide();for(const row of slots){row.owner=null;row.motion=null;row.actor.gait?.reset();row.actor.action?.reset();}}
- return{prepare,reset,hide,place,render,dispose(){for(const row of slots)destroy(row);slots=[];source=null;},stats:()=>({live:slots.length,created,released,visible:slots.filter(r=>r.actor.root.visible).length})};
+ return{prepare,reset,hide,place,render,occlusionEntries:()=>slots.filter(row=>row.actor.root.visible&&row.gadget).map(row=>({actor:row.gadget,nodes:[row.actor.root]})),dispose(){for(const row of slots)destroy(row);slots=[];source=null;},stats:()=>({live:slots.length,created,released,visible:slots.filter(r=>r.actor.root.visible).length})};
 }
 
 return {createHuntDecoys};
 })();
-const __tagModule76=(()=>{
-const {createHuntWindCulling,createHuntWindGeometry}=__tagModule77;
-const {createHuntPickupNameView}=__tagModule78;
-const {huntHasClearSight}=__tagModule25;
-const {huntPickupHeight}=__tagModule23;
-const {pickupAudience,pickupVisible,pickupNameIndices,pickupEquipmentKey}=__tagModule24;
-const {huntActorConcealed}=__tagModule52;
-const {createHuntDecoys}=__tagModule79;
-const {disposeHuntModel}=__tagModule65;
+const __tagModule85=(()=>{
+const {createHuntWindCulling,createHuntWindGeometry}=__tagModule86;
+const {createHuntPickupNameView}=__tagModule87;
+const {huntHasClearSight}=__tagModule29;
+const {huntPickupHeight}=__tagModule27;
+const {pickupAudience,pickupVisible,pickupNameIndices,pickupEquipmentKey}=__tagModule28;
+const {huntActorConcealed}=__tagModule59;
+const {createHuntDecoys}=__tagModule88;
+const {disposeHuntModel}=__tagModule72;
 const T=__tagExternal0;
-const {createHuntHandAttachments}=__tagModule66;
-const {ITEM_DEFS,ITEM_TYPES,HOOK_POLES,SUPPLY_COUNT}=__tagModule9;
-const {TRAMPOLINE}=__tagModule45;
-const {worldHeight,worldSight}=__tagModule7;
+const {createHuntHandAttachments}=__tagModule73;
+const {ITEM_DEFS,ITEM_TYPES,HOOK_POLES,SUPPLY_CAPACITY}=__tagModule11;
+const {huntFoamLineBlocked}=__tagModule60;
+const {TRAMPOLINE}=__tagModule20;
+const {worldHeight,worldSight}=__tagModule9;
 // Geometry and materials are shared. Static pieces of each item are baked by
 // colour, rather than giving every little ornament its own draw call.
 // Only visible ground rings occupy instance slots. Keep their matrices
@@ -5041,7 +6585,7 @@ function createHuntProps({scene,makeClone,camera=null,handAttachments=createHunt
  const nameView=camera?createHuntPickupNameView(camera):null,windCulling=createHuntWindCulling(camera);
  const updateWind=createHuntWindGeometry({sight:worldSight,onRay:windCulling.ray});
  const propDocument=document;
- const sphere=new T.SphereGeometry(1,10,7),box=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(1,1,1,12),torus=new T.TorusGeometry(.7,.16,5,16),mats=new Map(),curtainMaterials=new Map();
+ const sphere=new T.SphereGeometry(1,10,7),curtainSphere=new T.SphereGeometry(1,20,14),box=new T.BoxGeometry(1,1,1),cylinder=new T.CylinderGeometry(1,1,1,12),torus=new T.TorusGeometry(.7,.16,5,16),mats=new Map(),curtainMaterials=new Map();
  function material(color,alpha=1){const key=color+':'+alpha;if(!mats.has(key))mats.set(key,alpha<1?new T.MeshBasicMaterial({color,transparent:true,opacity:alpha,depthWrite:false,toneMapped:false}):new T.MeshStandardMaterial({color,roughness:.48,emissive:color,emissiveIntensity:.13}));return mats.get(key);}
  function part(root,geo,color,p=[0,0,0],scale=[1,1,1],r=[0,0,0],alpha=1){const m=new T.Mesh(geo,material(color,alpha));m.position.set(...p);m.scale.set(...scale);m.rotation.set(...r);root.add(m);return m;}
  function bake(root){root.updateMatrixWorld(true);const buckets=new Map();root.traverse(m=>{if(!m.isMesh)return;let b=buckets.get(m.material);if(!b)buckets.set(m.material,b=[]);b.push(m.geometry.clone().applyMatrix4(m.matrixWorld).toNonIndexed());});const out=new T.Group();for(const [mat,geos]of buckets){const positions=[],normals=[];for(const g of geos){positions.push(...g.attributes.position.array);normals.push(...g.attributes.normal.array);g.dispose();}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setAttribute('normal',new T.Float32BufferAttribute(normals,3));geo.computeBoundingSphere();out.add(new T.Mesh(geo,mat));}return out;}
@@ -5051,7 +6595,7 @@ function createHuntProps({scene,makeClone,camera=null,handAttachments=createHunt
   else if(type==='scarf'){part(root,torus,c,[0,.45,0],[1.2,.65,.65]);part(root,box,c,[.55,-.45,0],[.6,1.6,.2],[0,0,-.15]);part(root,box,white,[.64,-1.1,.02],[.62,.14,.22]);}
   else if(type==='cloak'){part(root,new T.ConeGeometry(1,2.1,8,1,true),c,[0,0,0],[1,1,.55]);part(root,sphere,white,[0,1,0],[.22,.22,.22]);}
   else if(type==='clone'){part(root,sphere,c,[0,.15,0],[1,1,1],[0,0,0],.45);part(root,sphere,white,[-.8,-.35,.4],[.65,.65,.65],[0,0,0],.55);part(root,sphere,c,[.85,.5,-.25],[.6,.6,.6],[0,0,0],.45);}
-  else if(type==='curtain'){for(let i=0;i<6;i++){const a=i*Math.PI/3;part(root,sphere,i%2?white:c,[Math.sin(a)*.85,0,Math.cos(a)*.85],[.6,.6,.6],[0,0,0],.42);}for(let i=0;i<3;i++){const a=i*Math.PI*2/3;part(root,sphere,c,[Math.sin(a)*.45,.8,Math.cos(a)*.45],[.6,.6,.6],[0,0,0],.38);}}
+  else if(type==='curtain'){for(let i=0;i<6;i++){const a=i*Math.PI/3;part(root,curtainSphere,i%2?white:c,[Math.sin(a)*.85,0,Math.cos(a)*.85],[.6,.6,.6],[0,0,0],.72);}for(let i=0;i<3;i++){const a=i*Math.PI*2/3;part(root,curtainSphere,c,[Math.sin(a)*.45,.8,Math.cos(a)*.45],[.6,.6,.6],[0,0,0],.68);}part(root,curtainSphere,white,[0,.15,0],[.8,.6,.8],[0,0,0],.65);part(root,curtainSphere,c,[0,.65,0],[.65,.6,.65],[0,0,0],.65);}
   else if(type==='cushion'){part(root,sphere,c);part(root,torus,white,[0,0,0],[1.16,1.16,1.16]);}
   else if(type==='fan'){part(root,cylinder,white,[0,-1,0],[.9,.2,.8]);part(root,box,c,[0,-.4,0],[.3,1.2,.3]);part(root,new T.TorusGeometry(1.35,.07,6,24),c,[0,.7,0]);for(let i=0;i<6;i++){const a=i*Math.PI/3;part(root,box,white,[0,.7,.17],[.045,2.6,.04],[0,0,a]);}part(root,sphere,white,[0,.7,.24],[.2,.2,.16]);}
   else if(type==='sheet'){part(root,box,c,[0,0,0],[1.9,.25,1.5],[0,0,.15]);part(root,box,white,[.4,.05,0],[.12,.3,1.5]);}
@@ -5082,11 +6626,11 @@ function createHuntProps({scene,makeClone,camera=null,handAttachments=createHunt
  part(trampolineDesign,cylinder,'#375a72',[0,.015,0],[9.1,.02,9.1],[0,0,0],.16);
  const trampoline=bake(trampolineDesign);trampoline.name='runner-trampoline';trampoline.position.set(TRAMPOLINE.x,worldHeight(TRAMPOLINE.x,TRAMPOLINE.z),TRAMPOLINE.z);scene.add(trampoline);
  const pickups=[],held=[],gadgets=Array.from({length:12},()=>{const r=new T.Group();scene.add(r);return r;}),ropes=[],winds=[];
- const supplyRings=new T.InstancedMesh(new T.RingGeometry(.85,1,20),new T.MeshBasicMaterial({color:'#e1f7ce',transparent:true,opacity:.65,side:T.DoubleSide,depthWrite:false}),SUPPLY_COUNT);supplyRings.frustumCulled=false;scene.add(supplyRings);const rings=createHuntSupplyRings(supplyRings);
+ const supplyRings=new T.InstancedMesh(new T.RingGeometry(.85,1,20),new T.MeshBasicMaterial({color:'#e1f7ce',transparent:true,opacity:.65,side:T.DoubleSide,depthWrite:false}),SUPPLY_CAPACITY);supplyRings.frustumCulled=false;scene.add(supplyRings);const rings=createHuntSupplyRings(supplyRings);
  for(let i=0;i<12;i++){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(new Float32Array(72),3));const line=new T.LineSegments(geo,new T.LineBasicMaterial({color:0xb1f5e8,transparent:true,opacity:.65,depthWrite:false}));line.frustumCulled=false;scene.add(line);winds.push(line);}
  function apply(root,type){if(root.userData.kind===type)return;root.clear();root.userData.kind=type;root.userData.label=null;root.userData.fanRotor=null;root.add(templates[type].clone(true));if(type==='fan'){const rotor=new T.Group();rotor.position.set(0,.7,0);for(let i=0;i<3;i++){const a=i*Math.PI*2/3;part(rotor,box,ITEM_DEFS.fan.color,[Math.sin(a)*.6,Math.cos(a)*.6,0],[.45,1.1,.13],[0,0,-a]);}root.add(rotor);root.userData.fanRotor=rotor;}}
  function line(color){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(new Float32Array(6),3));const m=new T.Line(geo,new T.LineBasicMaterial({color}));m.frustumCulled=false;scene.add(m);return m;}
- for(let i=0;i<SUPPLY_COUNT;i++){const r=new T.Group();r.name='hunt-pickup-'+i;scene.add(r);pickups.push(r);}
+ for(let i=0;i<SUPPLY_CAPACITY;i++){const r=new T.Group();r.name='hunt-pickup-'+i;scene.add(r);pickups.push(r);}
  for(let i=0;i<4;i++){const r=new T.Group();r.name='hunt-held-'+i;scene.add(r);held.push(r);const rope=line('#efd49e');rope.name='hunt-hook-'+i;ropes.push(rope);}
  for(const p of HOOK_POLES){const pole=new T.Group();part(pole,cylinder,'#799aab',[0,2,0],[.65,4,.65]);part(pole,torus,'#ffe29b',[0,4.2,0],[.7,.7,.7],[Math.PI/2,0,0]);pole.position.set(p.x,worldHeight(p.x,p.z),p.z);scene.add(pole);}
  const decoys=createHuntDecoys({create:makeClone,release:disposeHuntModel});
@@ -5102,7 +6646,9 @@ function createHuntProps({scene,makeClone,camera=null,handAttachments=createHunt
   if(actor===landingRingActor)nodes.push(landingRing);
   return nodes;
  }
- return{prepare,attachedNodes,windStats:()=>windCulling.stats(),render:draw=>decoys.render(draw),stats:()=>decoys.stats(),pickupStats:()=>({audience:nameAudience,visible:pickups.filter(r=>r.visible).map(r=>r.userData.kind),names:pickups.filter(r=>r.visible&&r.userData.label?.visible).map(r=>ITEM_DEFS[r.userData.kind].name),cachedNames:nameMaterials.size,visibility:nameView?.stats()??null}),update(s,models,now,{dt=0,paused=false,groundAt=worldHeight,isIce=()=>false,nameVisible=nameView?.visible??(()=>true),includePickupNames=true}={}){const needed=s.player.item==='clone'||s.gadgets.some(g=>g.kind==='clone');if(models[0]!==decoySource)prepare(models[0],{needed});else if(needed)decoys.prepare(models[0]);
+ // Keep the controlled body readable, while the separate mask still hides rivals.
+ function withFoamView(s,viewCamera,draw){if(!s.gadgets.some(g=>g.kind==='curtain'&&(g.until??Infinity)>s.time))return draw();const viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player,selfCovered=viewer===s.player||huntFoamLineBlocked(s,viewCamera,viewer),limit=huntHasClearSight(s,viewer)?.08:selfCovered?.18:1,changed=[];for(const [m,opacity]of curtainMaterials){const next=Math.min(limit,opacity);if(m.opacity!==next){changed.push([m,m.opacity]);m.opacity=next;}}try{return draw();}finally{for(const[m,opacity]of changed)m.opacity=opacity;}}
+ return{prepare,attachedNodes,withFoamView,occlusionEntries:()=>decoys.occlusionEntries(),windStats:()=>windCulling.stats(),render:draw=>decoys.render(draw),stats:()=>decoys.stats(),pickupStats:()=>({audience:nameAudience,visible:pickups.filter(r=>r.visible).map(r=>r.userData.kind),names:pickups.filter(r=>r.visible&&r.userData.label?.visible).map(r=>ITEM_DEFS[r.userData.kind].name),cachedNames:nameMaterials.size,visibility:nameView?.stats()??null}),update(s,models,now,{dt=0,paused=false,groundAt=worldHeight,isIce=()=>false,nameVisible=nameView?.visible??(()=>true),includePickupNames=true}={}){const needed=s.player.item==='clone'||s.gadgets.some(g=>g.kind==='clone');if(models[0]!==decoySource)prepare(models[0],{needed});else if(needed)decoys.prepare(models[0]);
   trampoline.visible=!!s.trampoline&&!s.trampoline.used;const viewer=s.config?.mode==='hunt'?s.hunters[0]:s.player,clearSight=huntHasClearSight(s,viewer);for(const [m,opacity]of curtainMaterials)m.opacity=clearSight?.08:opacity;
   const actors=[s.player,...s.hunters],view=s.config?.mode==='hunt'?s.hunters[0]:s.player,flyer=s.hunters.find(a=>a.flight&&!huntActorConcealed(s,a));landingRingActor=flyer;landingRing.visible=!!flyer;
   const audience=pickupAudience(s.config?.mode),equipment=pickupEquipmentKey(s,view);if(includePickupNames&&(nameSeed!==s.config?.seed||nameAudience!==audience||nameEquipment!==equipment||now-nameAt>=200||now<nameAt)){nameIndices=new Set(pickupNameIndices(s,view,{visible:p=>{labelPoint.x=p.x;labelPoint.y=(p.audience==='hunters'?p.y+groundOffsets[p.type]:huntPickupHeight(p,s.time))+2.7*1.35;labelPoint.z=p.z;return nameVisible(labelPoint,p);}}));nameAt=now;nameSeed=s.config?.seed;nameAudience=audience;nameEquipment=equipment;}
@@ -5129,7 +6675,7 @@ function createHuntProps({scene,makeClone,camera=null,handAttachments=createHunt
 
 return {createHuntSupplyRings,createHuntProps};
 })();
-const __tagModule81=(()=>{
+const __tagModule90=(()=>{
 // Only completed PNG strings are retained, never live models, textures or GL
 // contexts. Two pages at most; a byte cap also bounds unusually large images.
 function createHuntThumbnailCache({maxEntries=24,maxBytes=3*1024*1024}={}){
@@ -5147,15 +6693,61 @@ function huntThumbnailKey(character,pixelRatio){return character.stage+':'+chara
 
 return {createHuntThumbnailCache,huntThumbnailKey};
 })();
-const __tagModule80=(()=>{
-const {captureHuntPointer}=__tagModule69;
-const {createHuntRenderRecovery}=__tagModule27;
-const {createHuntThumbnailCache,huntThumbnailKey}=__tagModule81;
+const __tagModule89=(()=>{
+const {captureHuntPointer}=__tagModule76;
+const {createHuntRenderRecovery}=__tagModule31;
+const {createHuntThumbnailCache,huntThumbnailKey}=__tagModule90;
 const T=__tagExternal0;
 const {buildMatureStarCharacter360,buildFloweringHeroCharacter360}=__tagExternal3;
 // BEGIN TAG CHARACTER SELECT
 function createTagCharacterSelect({characters,onChoose}){
- const dialog=document.createElement('dialog');dialog.className='tag-select';dialog.innerHTML=`<header><div><small>イマソラリンクの仲間たち</small><h2>だれと鬼ごっこする？</h2></div><button data-close>戻る ×</button></header><div class="ts-main"><section><div class="ts-stage" role="img" aria-label="選んだモンスターの3Dモデル"><p data-preview-note hidden style="margin:auto;padding:18px;font-weight:700;text-align:center;line-height:1.6">3D表示を準備できません。<br>名前と能力で選べます。</p></div><div class="ts-rotate"><button data-left aria-label="左から見る">↶</button><span>なぞって回せるよ</span><button data-right aria-label="右から見る">↷</button></div></section><section class="ts-info" aria-live="polite"><small data-stage></small><h3></h3><b data-type></b><p data-hint></p><p class="ts-width" data-width></p><div class="ts-stats"></div><small>能力は鬼ごっこでの走りの目安（5段階）</small><button data-choose>このモンスターに決める</button></section></div><nav class="ts-filter" aria-label="成長段階"><button data-filter="all">みんな</button><button data-filter="hero">開花期</button><button data-filter="star">満開期</button></nav><input class="ts-search" type="search" placeholder="名前でさがす" aria-label="モンスターの名前"><div class="ts-grid" role="group" aria-label="モンスター一覧"></div><footer><button data-prev>◀ 前へ</button><output></output><button data-next>次へ ▶</button></footer><p class="ts-error" role="status"></p>`;document.body.append(dialog);
+ const dialog=document.createElement('dialog');
+ dialog.className='tag-select';
+ dialog.setAttribute('aria-labelledby','tag-select-title');
+ dialog.innerHTML=`
+  <header>
+   <h2 id="tag-select-title">だれと鬼ごっこする？</h2>
+   <button type="button" data-close>戻る ×</button>
+  </header>
+  <div class="ts-body">
+   <div class="ts-main">
+    <div class="ts-showcase">
+     <div class="ts-stage" role="img" aria-label="選んだモンスターの3Dモデル">
+      <p data-preview-note hidden>3D表示を準備できません。<br>名前と能力で選べます。</p>
+     </div>
+     <div class="ts-rotate">
+      <button type="button" data-left aria-label="左から見る">↶</button>
+      <span>なぞって回せるよ</span>
+      <button type="button" data-right aria-label="右から見る">↷</button>
+     </div>
+    </div>
+    <section class="ts-info" aria-live="polite">
+     <div class="ts-tags"><small data-stage></small><b data-type></b></div>
+     <h3></h3>
+     <p data-hint></p>
+     <div class="ts-stats" role="group" aria-label="走りの能力（5段階）"></div>
+    </section>
+   </div>
+   <div class="ts-roster-tools">
+    <nav class="ts-filter" aria-label="成長段階">
+     <button type="button" data-filter="all" aria-pressed="true">みんな</button>
+     <button type="button" data-filter="hero" aria-pressed="false">開花期</button>
+     <button type="button" data-filter="star" aria-pressed="false">満開期</button>
+    </nav>
+    <input class="ts-search" type="search" placeholder="名前でさがす" aria-label="モンスターの名前">
+   </div>
+   <div class="ts-grid" role="group" aria-label="モンスター一覧"></div>
+   <p class="ts-empty" hidden>見つかりませんでした。名前や成長段階を変えて探してみてね。</p>
+   <div class="ts-pages">
+    <button type="button" data-prev>◀ 前へ</button><output></output><button type="button" data-next>次へ ▶</button>
+   </div>
+   <p class="ts-error" role="status"></p>
+  </div>
+  <footer>
+   <span class="ts-picked"><small>選択中</small><strong data-picked-name></strong></span>
+   <button type="button" data-choose>このモンスターに決める</button>
+  </footer>`;
+ document.body.append(dialog);
  const q=s=>dialog.querySelector(s),thumbnails=createHuntThumbnailCache(),pixelRatio=Math.min(devicePixelRatio,1.5);let selected=characters[0],page=0,filter='all',renderer,scene,camera,root,ro,angle=0,job=0,drag,thumbnailBuilds=0,previewRecovery;
  function previewReady(){
   if(!renderer||!scene||!camera||previewRecovery?.lost)return false;
@@ -5175,9 +6767,61 @@ function createTagCharacterSelect({characters,onChoose}){
   q('.ts-rotate span').textContent='なぞって回せるよ';
   q('.ts-stage').setAttribute('aria-label',selected.name+'の実際の3Dモデル');
  }
- function select(c){selected=c;angle=0;dispose(root);root=null;q('h3').textContent=c.name;q('[data-stage]').textContent=c.stage==='hero'?'開花期':'満開期';q('[data-type]').textContent=c.ability.title;q('[data-hint]').textContent=c.ability.hint;q('[data-width]').textContent='体格差は、走りの特徴に反映';q('.ts-stage').setAttribute('aria-label',c.name+'の実際の3Dモデル');q('.ts-stats').replaceChildren(...['加速','最高速','小回り','減速'].map((name,i)=>{const e=document.createElement('div');e.className='ts-stat';const label=document.createElement('span'),bar=document.createElement('meter'),value=document.createElement('b');label.textContent=name;bar.min=0;bar.max=5;bar.value=c.ability.scores[i];bar.setAttribute('aria-label',name);value.textContent=c.ability.scores[i]+'/5';e.append(label,bar,value);return e;}));for(const b of q('.ts-grid').children)b.setAttribute('aria-pressed',String(b.dataset.id===c.id));if(previewReady()){try{root=build(c);paintSelected();}catch{previewUnavailable();}}else previewUnavailable();}
+ function select(c){
+  selected=c;
+  angle=-.38;
+  dispose(root);
+  root=null;
+  q('h3').textContent=c.name;
+  q('[data-picked-name]').textContent=c.name;
+  q('.ts-main').dataset.growth=c.stage;
+  q('[data-stage]').textContent=c.stage==='hero'?'開花期':'満開期';
+  q('[data-type]').textContent=c.ability.title;
+  q('[data-hint]').textContent=c.ability.hint;
+  q('.ts-stage').setAttribute('aria-label',c.name+'の実際の3Dモデル');
+  q('.ts-stats').replaceChildren(...['加速','最高速','小回り','減速'].map((name,i)=>{
+   const stat=document.createElement('div'),label=document.createElement('span'),bar=document.createElement('meter'),value=document.createElement('b');
+   stat.className='ts-stat';
+   label.textContent=name;
+   bar.min=0;
+   bar.max=5;
+   bar.value=c.ability.scores[i];
+   bar.setAttribute('aria-label',name);
+   value.textContent=c.ability.scores[i]+'/5';
+   stat.append(label,bar,value);
+   return stat;
+  }));
+  for(const button of q('.ts-grid').children)button.setAttribute('aria-pressed',String(button.dataset.id===c.id));
+  if(!previewReady()){previewUnavailable();return;}
+  try{root=build(c);paintSelected();}catch{previewUnavailable();}
+ }
  function filtered(){const word=q('input').value.trim();return characters.filter(c=>(filter==='all'||c.stage===filter)&&(!word||c.name.includes(word)));}
- async function grid(){const token=++job,list=filtered(),pages=Math.max(1,Math.ceil(list.length/12));page=Math.max(0,Math.min(page,pages-1));q('output').textContent=`${list.length}体 ／ ${page+1} / ${pages}`;q('[data-prev]').disabled=page===0;q('[data-next]').disabled=page===pages-1;q('.ts-grid').replaceChildren();const cards=list.slice(page*12,page*12+12).map(c=>{const b=document.createElement('button'),img=document.createElement('img'),label=document.createElement('span');b.dataset.id=c.id;b.setAttribute('aria-pressed',String(c.id===selected.id));img.alt='';img.hidden=true;label.textContent=c.name;b.append(img,label);b.onclick=()=>select(c);q('.ts-grid').append(b);return{c,img};});for(const {c,img}of cards){
+ async function grid(){
+  const token=++job,list=filtered(),pages=Math.max(1,Math.ceil(list.length/12));
+  page=Math.max(0,Math.min(page,pages-1));
+  q('output').textContent=`${list.length}体 ／ ${page+1} / ${pages}`;
+  q('[data-prev]').disabled=page===0;
+  q('[data-next]').disabled=page===pages-1;
+  q('.ts-empty').hidden=list.length>0;
+  const roster=q('.ts-grid');
+  roster.replaceChildren();
+  const cards=list.slice(page*12,page*12+12).map(c=>{
+   const button=document.createElement('button'),portrait=document.createElement('span'),img=document.createElement('img'),label=document.createElement('span');
+   button.type='button';
+   button.dataset.id=c.id;
+   button.setAttribute('aria-pressed',String(c.id===selected.id));
+   portrait.className='ts-portrait';
+   img.alt='';
+   img.hidden=true;
+   label.className='ts-card-name';
+   label.textContent=c.name;
+   portrait.append(img);
+   button.append(portrait,label);
+   button.onclick=()=>select(c);
+   roster.append(button);
+   return{c,img};
+  });
+  for(const {c,img}of cards){
   const key=huntThumbnailKey(c,pixelRatio),cached=thumbnails.get(key);if(cached){img.src=cached;img.hidden=false;continue;}if(!previewReady())continue;
   await new Promise(requestAnimationFrame);if(token!==job||!dialog.open)return;if(!previewReady())continue;let thumb;try{thumbnailBuilds++;thumb=build(c);if(root)scene.remove(root);if(!paint(thumb,true))continue;const image=renderer.domElement.toDataURL('image/png');if(!previewReady())continue;img.src=image;img.hidden=false;thumbnails.put(key,image);}catch{q('.ts-error').textContent='表示の準備に時間がかかっています。名前からも選べます。';}finally{dispose(thumb);if(root){scene.add(root);paintSelected();}}
  }thumbnailStats();}
@@ -5202,7 +6846,7 @@ function createTagCharacterSelect({characters,onChoose}){
 
 return {createTagCharacterSelect};
 })();
-const __tagModule82=(()=>{
+const __tagModule91=(()=>{
 // BEGIN TAG AUDIO
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.ImasoraTagAudio=api;})(globalThis,function(){
  'use strict';const KEY='imasora-sliding-tag-sound-v1',types=new Set(['count','go','jump','land','step','touch','timeout','win','loss','bell','item','detect','dive']);
@@ -5257,64 +6901,65 @@ function huntDiveAudioCue(previousStage,actor){
 return {createHuntSound,huntSoundPreference,saveHuntSound,huntDiveAudioCue};
 })();
 const __tagModule0=(()=>{
-const {huntThreatCuePosition}=__tagModule1;
-const {createHuntRearMirror,huntRearMirrorActive}=__tagModule2;
-const {createHuntGrowth}=__tagModule3;
-const {createHuntUpdateNotice}=__tagModule4;
-const {createHuntReplayCamera}=__tagModule5;
-const {createHuntSettingsMenu}=__tagModule10;
-const {installHuntMenu}=__tagModule11;
-const {createHuntSunglasses}=__tagModule13;
-const {createHuntDizzyView}=__tagModule14;
-const {huntTouchShapeKey}=__tagModule15;
-const {MATCH_SECONDS}=__tagModule12;
-const {createHuntInkView}=__tagModule18;
-const {createHuntInkFeet}=__tagModule19;
-const {createHuntItemNotice}=__tagModule20;
-const {createHuntProofClient}=__tagModule21;
-const {createHuntItemStatus,huntItemFailureHint,huntItemUseAcknowledged}=__tagModule22;
-const {createHuntRenderQuality}=__tagModule26;
-const {createHuntRenderRecovery}=__tagModule27;
-const {createLiveBroadcastUI}=__tagModule28;
-const {createHuntBroadcastViews}=__tagModule31;
-const {huntJumpRestRemaining}=__tagModule34;
-const {huntFacingCameraYaw,holdHuntCameraView}=__tagModule53;
-const {huntKeyboardMovement}=__tagModule54;
-const {createHuntSmoothCamera}=__tagModule6;
-const {createHuntRoleMarkers}=__tagModule55;
-const {createHuntItemGuide}=__tagModule57;
-const {recordReadyHunt,recordFreshHunt}=__tagModule58;
-const {createHuntReplay,createHuntReplaySound,huntResultAudioCues,updateHuntReplayView}=__tagModule32;
-const {createHuntReplayAudio,createHuntReplayVideo}=__tagModule59;
-const {createHuntScopedVideoShare}=__tagModule60;
-const {applyHuntActorVisibility,huntActorConcealed}=__tagModule52;
-const {createHuntCompassView}=__tagModule61;
-const {createHuntRadarHud}=__tagModule62;
-const {createHuntFrameBudget}=__tagModule63;
-const {createHuntMaterialState}=__tagModule64;
+const {huntInkTrailSuppressed}=__tagModule1;
+const {createHuntRearMirror,huntRearMirrorActive}=__tagModule4;
+const {createHuntGrowth}=__tagModule5;
+const {createHuntUpdateNotice,huntHomeUrl}=__tagModule6;
+const {createHuntReplayCamera}=__tagModule7;
+const {createHuntSettingsMenu}=__tagModule12;
+const {installHuntMenu,rollHuntOpponents}=__tagModule13;
+const {createHuntSunglasses}=__tagModule15;
+const {createHuntDizzyView}=__tagModule16;
+const {huntTouchShapeKey}=__tagModule17;
+const {MATCH_SECONDS}=__tagModule14;
+const {createHuntInkView}=__tagModule22;
+const {createHuntInkFeet}=__tagModule23;
+const {createHuntItemNotice}=__tagModule24;
+const {createHuntProofClient}=__tagModule25;
+const {createHuntItemStatus,huntItemFailureHint,huntItemUseAcknowledged}=__tagModule26;
+const {createHuntRenderQuality}=__tagModule30;
+const {createHuntRenderRecovery}=__tagModule31;
+const {createLiveBroadcastUI}=__tagModule32;
+const {createHuntBroadcastViews}=__tagModule35;
+const {huntJumpRestRemaining}=__tagModule2;
+const {huntFacingCameraYaw,holdHuntCameraView}=__tagModule61;
+const {huntKeyboardMovement}=__tagModule52;
+const {createHuntSmoothCamera}=__tagModule8;
+const {createHuntRoleMarkers}=__tagModule62;
+const {withHuntFoamOcclusion}=__tagModule60;
+const {createHuntItemGuide}=__tagModule65;
+const {recordReadyHunt,recordFreshHunt}=__tagModule66;
+const {createHuntReplay,createHuntReplaySound,huntResultAudioCues,updateHuntReplayView}=__tagModule36;
+const {createHuntReplayAudio,createHuntReplayVideo}=__tagModule67;
+const {createHuntScopedVideoShare}=__tagModule68;
+const {applyHuntActorVisibility,huntActorConcealed}=__tagModule59;
+const {createHuntCompassView}=__tagModule69;
+const {createHuntRadarHud}=__tagModule70;
+const {createHuntFrameBudget,startHuntFrameDriver}=__tagModule71;
+const {createHuntMaterialState,withHuntCameraClearance}=__tagModule64;
 const T=__tagExternal0;
 const {buildMatureStarCharacter360,buildFloweringHeroCharacter360,getFloweringHeroCharacter}=__tagExternal3;
 const {buildTagCompanion}=__tagExternal4;
-const {createHuntModelCache,disposeHuntModel,resetHuntModel}=__tagModule65;
-const {renderHuntActorPoses,createHuntHandAttachments}=__tagModule66;
-const {createHuntGait}=__tagModule67;
-const {trampolineSurface}=__tagModule45;
+const {createHuntModelCache,disposeHuntModel,resetHuntModel}=__tagModule72;
+const {renderHuntActorPoses,createHuntHandAttachments}=__tagModule73;
+const {createHuntGait}=__tagModule74;
+const {trampolineSurface}=__tagModule20;
 const {createCharacterJumpAction}=__tagExternal5;
-const {createJumpIntent}=__tagExternal2;
 const {TOUCH_LAYOUT_KEY}=__tagExternal6;
-const {createHuntTouchSettings}=__tagModule68;
-const {TAG_CHARACTERS,worldGradient,worldSurface,HUNT_CHARACTER_HEIGHT}=__tagModule7;
-const {STEP,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,recordHunt,huntThreatCues,controlledHuntActor}=__tagModule33;
-const {readHuntDashMode,saveHuntDashMode,huntMenuCommand,HUNT_DIVE_KEY,huntDiveShortcutAvailable,huntItemShortcutAvailable,huntItemKeyCodes,createHuntJumpOwners,createHuntButtonOwners,releaseHuntPointerCaptures,bindHuntLifecycle,captureHuntPointer,createHuntActionInput,huntKeyboardContext,bindHuntTouchGuard}=__tagModule69;
-const {huntCompass}=__tagModule46;
-const {ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon}=__tagModule9;
-const {createHuntScenery}=__tagModule70;
-const {createHuntFeedback}=__tagModule72;
-const {createHuntMotionTrails}=__tagModule73;
-const {createHuntResults,huntResultSummary}=__tagModule74;
-const {createHuntProps}=__tagModule76;
-const {createTagCharacterSelect}=__tagModule80;
-const {createHuntSound,huntSoundPreference,saveHuntSound,huntDiveAudioCue}=__tagModule82;
+const {createHuntTouchSettings}=__tagModule75;
+const {TAG_CHARACTERS,worldSurface,HUNT_CHARACTER_HEIGHT}=__tagModule9;
+const {huntTerrainTilt}=__tagModule21;
+const {STEP,BALLOON_DESCENT_TURN_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,recordHunt,controlledHuntActor}=__tagModule37;
+const {readHuntDashMode,saveHuntDashMode,huntMenuCommand,HUNT_DIVE_KEY,huntDiveShortcutAvailable,huntItemShortcutAvailable,huntItemKeyCodes,createHuntJumpOwners,createHuntKeyboardTimeline,createHuntButtonOwners,releaseHuntPointerCaptures,bindHuntLifecycle,captureHuntPointer,createHuntActionInput,huntKeyboardContext,bindHuntTouchGuard}=__tagModule76;
+const {huntCompass}=__tagModule53;
+const {ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon}=__tagModule11;
+const {createHuntScenery}=__tagModule77;
+const {createHuntFeedback}=__tagModule81;
+const {createHuntMotionTrails}=__tagModule82;
+const {createHuntResults,huntResultSummary}=__tagModule83;
+const {createHuntProps}=__tagModule85;
+const {createTagCharacterSelect}=__tagModule89;
+const {createHuntSound,huntSoundPreference,saveHuntSound,huntDiveAudioCue}=__tagModule91;
 const $=s=>document.querySelector(s),canvas=$('#rink'),scene=new T.Scene(),camera=new T.PerspectiveCamera(56,1,.15,900),renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;scene.background=new T.Color(0xc9e6f1);scene.fog=new T.Fog(0xc9e6f1,210,620);
 installHuntMenu(document);
@@ -5335,24 +6980,31 @@ const models=[],balloons=[],handAttachments=createHuntHandAttachments(),roles={p
 function avatar(id,player=false){const m=player&&companion?buildTagCompanion(companion):getFloweringHeroCharacter(id)?buildFloweringHeroCharacter360(id):buildMatureStarCharacter360(id),b=new T.Box3().setFromObject(m),scale=HUNT_CHARACTER_HEIGHT/(b.max.y-b.min.y);m.scale.multiplyScalar(scale);m.position.y=-b.min.y*scale;const root=new T.Group();root.add(m);root.rotation.order='YXZ';scene.add(root);return{root,model:m,contactKey:player?huntTouchShapeKey(companion):id,controlled:player,gait:createHuntGait(m),action:createCharacterJumpAction(m),diveLift:Math.max(1,(b.max.z-b.min.z)*scale/2+.1),diveBounds:{minX:b.min.x*scale,maxX:b.max.x*scale,minY:0,maxY:HUNT_CHARACTER_HEIGHT,minZ:b.min.z*scale,maxZ:b.max.z*scale},radius:Math.max(2,Math.min(6,Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*scale/2)),materials:new Set(),feet:(m.userData.feet??[]).map(f=>({part:f,x:f.rotation.x}))};}
 function balloon(){const root=new T.Group(),body=new T.Mesh(new T.SphereGeometry(1,12,9),new T.MeshStandardMaterial({color:0xffa9c7,roughness:.5}));body.scale.set(1.7,2.1,1.7);root.add(body);const knot=new T.Mesh(new T.ConeGeometry(.22,.5,8),new T.MeshStandardMaterial({color:0xf9df98}));knot.position.y=-2.15;root.add(knot);scene.add(root);const ropeGeo=new T.BufferGeometry(),ends=new Float32Array(6);ropeGeo.setAttribute('position',new T.BufferAttribute(ends,3));const rope=new T.Line(ropeGeo,new T.LineBasicMaterial({color:0xcba465}));rope.frustumCulled=false;scene.add(rope);root.visible=rope.visible=false;return{root,rope,ends};}
 const inkView=createHuntInkView(scene),inkNotice=createHuntItemNotice(),smoothCamera=createHuntSmoothCamera(),replayCamera=createHuntReplayCamera();
-const recordPlayableHunt=config=>recordHunt(config,{rules:TERRITORY_SEARCH_RULES});
+const recordPlayableHunt=config=>recordHunt(config,{rules:BALLOON_DESCENT_TURN_RULES});
 let round=recordReadyHunt({opponents,startKey,mode},recordPlayableHunt),s=round.state,paused=true,started=false,last=0,hudAt=0,yaw=0,renderYaw=0,pitch=.28,drag=null,padGesture=null,axis={x:0,z:0},dirty=true,paintAt=0,lastCount=-1,lastItem='',lastItemCue='',lastPhase='';
 let padCamera=false;
 let liveWasPlaying=false;
 const jumpCaption=document.createTextNode('ジャンプ'),jumpRestLabel=document.createElement('small');jumpRestLabel.hidden=true;jumpRestLabel.style.cssText='display:block;font-size:11px;line-height:1.1;white-space:nowrap';$('#jump').style.padding='3px';$('#jump').replaceChildren(jumpCaption,jumpRestLabel);
 const frameBudget=createHuntFrameBudget(STEP),replay=createHuntReplay(),replaySound=createHuntReplaySound();let replayQueued=false;
 const renderQuality=createHuntRenderQuality({maxRatio:renderer.getPixelRatio(),onChange(ratio){renderer.setPixelRatio(ratio);rearMirror.invalidate();dirty=true;canvas.dataset.renderQuality=JSON.stringify(renderQuality.stats());}});canvas.dataset.renderQuality=JSON.stringify(renderQuality.stats());
-const keys=new Set(),jump=createJumpIntent(),jumpOwners=createHuntJumpOwners(jump),touchButtons=createHuntButtonOwners(jumpOwners,{dashMode:readHuntDashMode(storage),onDashChange:paintTouchDash}),holds=touchButtons.held,thumbPresses=touchButtons.presses,inputMemory={},soundPreference=huntSoundPreference(storage),audio=createHuntSound(soundPreference);
+const keys=new Set(),keyboardTimeline=createHuntKeyboardTimeline(),jumpOwners=createHuntJumpOwners(),touchButtons=createHuntButtonOwners(jumpOwners,{dashMode:readHuntDashMode(storage),onDashChange:paintTouchDash}),holds=touchButtons.held,thumbPresses=touchButtons.presses,inputMemory={},soundPreference=huntSoundPreference(storage),audio=createHuntSound(soundPreference);
 const footGround=(x,z)=>trampolineSurface(s,x,z),stepSound=()=>playMatchCue({type:'step'});
 const actorModels=createHuntModelCache({create(spec){const m=avatar(spec.id,spec.controlled);m.inkFeet=createHuntInkFeet(m.model);m.sunglasses=createHuntSunglasses(m.model);m.dizzy=createHuntDizzyView({model:m.model,root:m.root,eyeFit:m.sunglasses.fit,eyes:m.sunglasses.eyes});m.model.traverse(o=>{if(o.isMesh)for(const v of Array.isArray(o.material)?o.material:[o.material])if(v)m.materials.add(v);});m.materialState=createHuntMaterialState(m.materials);return m;},release:disposeHuntModel,reset:resetHuntModel});
 const liveViews=createHuntBroadcastViews({renderer,scene,source:canvas});
 const liveBroadcast=createLiveBroadcastUI({canvas,audio,captureCanvas:liveViews.captureCanvas,onLayout(layout){liveViews.setLayout(layout);dirty=true;},onScreenViews(enabled){dirty=true;return liveViews.setScreen(enabled);},onOutput(){liveViews.reset();updateLiveInterruption(renderRecovery.lost);dirty=true;},onOpen(){liveWasPlaying=started&&!paused&&s.phase!=='finished';pause();},onClose(){if(liveWasPlaying)resumeRound();liveWasPlaying=false;}});$('#pause').before(liveBroadcast.button);$('#keys').before(liveBroadcast.settings);
 function rebuild(){const humanIndex=s.config.mode==='hunt'?1:0,specs=[s.player,...s.hunters].map((a,i)=>{const id=a.id==='player'?'white-michi-road-saber-ren':a.id,controlled=i===humanIndex;return{id,controlled,key:controlled&&companion?'companion:'+companion.id:'roster:'+id};}),next=actorModels.reconcile(specs);models.length=0;models.push(...next);while(balloons.length<3)balloons.push(balloon());for(const b of balloons)b.root.visible=b.rope.visible=false;dirty=true;}
 rebuild();const props=createHuntProps({scene,camera,handAttachments,makeClone:()=>avatar(s.player.id==='player'?'white-michi-road-saber-ren':s.player.id,s.config.mode!=='hunt')}),feedback=createHuntFeedback({scene}),motionTrails=createHuntMotionTrails({scene});props.prepare(models[0],{needed:s.player.item==='clone'});
-const itemStatus=createHuntItemStatus(),itemCueStyle=document.createElement('style');itemCueStyle.textContent='#use{transition:box-shadow .14s,border-color .14s}#use[data-item-cue="pickup"]{box-shadow:inset 0 0 0 3px #73dca9,0 0 14px #73dca955}#use[data-item-cue="full"]{box-shadow:inset 0 0 0 3px #e3a844,0 0 14px #e3a84455}#notice{white-space:pre-line}@media(prefers-reduced-motion:reduce){#use{transition:none}}';document.head.append(itemCueStyle);$('#notice').setAttribute('role','status');$('#notice').setAttribute('aria-live','polite');
-const proofClient=createHuntProofClient({createWorker:()=>new Worker(new URL('./imasora-sliding-tag-proof-worker.mjs?v=1211o',import.meta.url),{type:'module'}),onReply:receiveProof});let receiptId=0;
+const itemStatus=createHuntItemStatus(),itemCueStyle=document.createElement('style');itemCueStyle.textContent='#use{transition:box-shadow .14s,border-color .14s}#use[data-item-cue="pickup"]{box-shadow:inset 0 0 0 3px #73dca9,0 0 14px #73dca955}#use[data-item-cue="full"]{box-shadow:inset 0 0 0 3px #e3a844,0 0 14px #e3a84455}#notice{white-space:pre-line}body.hunt:has(.tag-ink-paint:not([hidden])) #notice{display:none}@media(prefers-reduced-motion:reduce){#use{transition:none}}';document.head.append(itemCueStyle);$('#notice').setAttribute('role','status');$('#notice').setAttribute('aria-live','polite');
+const proofClient=createHuntProofClient({createWorker:()=>new Worker(new URL('./imasora-sliding-tag-proof-worker.mjs?v=121a1',import.meta.url),{type:'module'}),onReply:receiveProof});let receiptId=0;
 let replayTicket=0,recordingReplay=false,recordingScope='finish';
-const recordShare=createHuntScopedVideoShare({onChange:info=>{results.setShareState(info);if(typeof videoScopeChoices!=='undefined')refreshVideoScopeChoices(info);}});
+const recordShare=createHuntScopedVideoShare({onChange:syncReplayShare});
+function syncReplayShare(info){
+ const currentResult=results.setShareState(info);
+ if(typeof videoScopeChoices!=='undefined')refreshVideoScopeChoices(info);
+ if(currentResult&&recordingReplay&&info.status==='failed'&&info.ticket===replayTicket&&info.scope===recordingScope){
+  finishReplay(false,{recordingFailed:true});
+ }
+}
 function saveReplayFile(url,name){const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();}
 const results=createHuntResults({onSaveVideo:()=>recordShare.activate(saveReplayFile,{save:true}),onRetry:()=>begin(),onConfigure:()=>openResultConfig(),onShare:()=>{if(recordShare.snapshot().status!=='ready'){startReplay(undefined,recordShare.scope,{record:true});return;}return recordShare.activate(saveReplayFile);}}),resultBack=document.createElement('button');resultBack.id='result-back';resultBack.textContent='結果へ戻る';resultBack.hidden=true;$('#begin').insertAdjacentElement('afterend',resultBack);resultBack.onclick=showResult;
 
@@ -5365,21 +7017,20 @@ function showStartNotice(text){
  startNotice.hidden=!text;
 }
 let lastGrowthReply=null;
-function showGrowthResult(id,reply){if(!results.isCurrent(id))return;lastGrowthReply={id,reply};const r=growth.describe(id,reply);if(!r)return;growthStatus.hidden=false;growthHome.textContent=r.status==='received'?'ホームへ':'ホームで成果を受け取る';growthStatus.textContent=r.status==='received'?'この試合の成果は受取済みです。':r.status==='pending'?'今回の育成時間 +'+globalThis.ImasoraTagGrowth.formatSeconds(r.activeSeconds)+(r.victory?.points?'\n勝利ポイント +'+r.victory.points+'pt（ホームで確定）':r.victory?.reason==='participation'?'\n勝利ポイントは、自分で操作して移動した時間が試合の30%以上ある勝利でもらえます（180秒の試合なら54秒以上）。':'')+'\n'+(!r.durable?'この画面を閉じず、ホームで受け取ってね。':r.activeSeconds?'ホームでまとめて受け取れます。':'操作した時間が育成に貯まります。'):r.durable===false?'この画面を閉じず、ホームで成果を受け取ってね。':r.status==='checking'?'育成時間を確認中…':'育成時間はホームで再確認できます。';}
-const growthHome=document.createElement('button');growthHome.id='growth-home-return';growthHome.textContent='ホームへ';growthHome.hidden=!companion;growthHome.style.cssText='min-height:44px;width:100%;margin-top:8px;background:#ffe3a1;color:#294556;font-weight:bold';document.querySelector('#round-result .tr-actions').before(growthHome);growthHome.onclick=returnHuntHome;
+function showGrowthResult(id,reply){if(!results.isCurrent(id))return;lastGrowthReply={id,reply};const r=growth.describe(id,reply);if(!r)return;growthStatus.hidden=false;growthHome.textContent=r.status==='received'?'ホームへ戻る':'ホームで成果を受け取る';growthStatus.textContent=r.status==='received'?'この試合の成果は受取済みです。':r.status==='pending'?'今回の育成時間 +'+globalThis.ImasoraTagGrowth.formatSeconds(r.activeSeconds)+(r.victory?.points?'\n勝利ポイント +'+r.victory.points+'pt（ホームで確定）':r.victory?.reason==='participation'?'\n勝利ポイントは、自分で操作して移動した時間が試合の30%以上ある勝利でもらえます（180秒の試合なら54秒以上）。':'')+'\n'+(!r.durable?'この画面を閉じず、ホームで受け取ってね。':r.activeSeconds?'ホームでまとめて受け取れます。':'操作した時間が育成に貯まります。'):r.durable===false?'この画面を閉じず、ホームで成果を受け取ってね。':r.status==='checking'?'育成時間を確認中…':'育成時間はホームで再確認できます。';}
+const growthHome=document.createElement('button');growthHome.id='growth-home-return';growthHome.textContent='ホームへ戻る';growthHome.hidden=!companion;growthHome.style.cssText='min-height:44px;width:100%;margin-top:8px;background:#ffe3a1;color:#294556;font-weight:bold';document.querySelector('#round-result .tr-actions').before(growthHome);growthHome.onclick=returnHuntHome;
 function returnHuntHome(event){
- if(!companion)return;
  // Session storage and the emergency handoff belong to this tab.
  event?.preventDefault();
  let previousName,transferName;
  try{
-  try{growth.flush();}catch{
+  if(companion)try{growth.flush();}catch{
    previousName=window.name;
    transferName=growth.handoff(previousName);
    window.name=transferName;
    if(window.name!==transferName)throw Error('TAG_HANDOFF_UNAVAILABLE');
   }
-  location.assign(companion.homePath+'?from=sliding-tag');
+  location.assign(huntHomeUrl(location.href,companion?.homePath).href);
  }catch{
   if(transferName!==undefined)try{
    if(window.name===transferName)window.name=previousName;
@@ -5395,22 +7046,22 @@ const replayChoices=document.createElement('div');
 replayChoices.hidden=true;
 replayChoices.setAttribute('role','group');
 replayChoices.setAttribute('aria-label','見るリプレイを選ぶ');
-replayChoices.style.cssText='margin-top:7px';
+replayChoices.className='tr-replays';
 function replayButton(id,label,scope){
  const button=document.createElement('button');
  button.id=id;button.textContent=label;
- button.style.cssText='min-height:44px;padding:5px 10px;margin:0 6px 5px 0;font-size:14px;border-radius:16px;background:#dceff3;color:#31566a';
+
  button.onclick=()=>startReplay(undefined,scope);
  replayChoices.append(button);
 }
 replayButton('touch-replay-again','▶ 決着シーン','finish');
 replayButton('touch-replay-full','▶ 試合全体','full');
-$('#round-result .tr-actions').insertAdjacentElement('afterend',replayChoices);
-const videoScopeChoices=document.createElement('div');videoScopeChoices.className='tag-video-scope';videoScopeChoices.setAttribute('role','group');videoScopeChoices.setAttribute('aria-labelledby','tag-video-scope-title');videoScopeChoices.innerHTML='<h3 id="tag-video-scope-title">動画にする範囲</h3><div class="tag-video-scope-buttons"><button type="button" data-video-scope="finish" aria-pressed="true">決着シーン</button><button type="button" data-video-scope="full" aria-pressed="false">試合全体</button></div><p data-video-scope-note>タッチ直前からの短い動画です。</p>';
-$('#round-result .tr-actions').before(videoScopeChoices);
+$('#round-result .tr-actions').before(replayChoices);
+const videoScopeChoices=document.createElement('div');videoScopeChoices.className='tag-video-scope';videoScopeChoices.setAttribute('role','group');videoScopeChoices.setAttribute('aria-labelledby','tag-video-scope-title');videoScopeChoices.innerHTML='<h3 id="tag-video-scope-title">動画にする範囲</h3><div class="tag-video-scope-buttons"><button type="button" data-video-scope="finish" aria-pressed="true">決着シーン</button><button type="button" data-video-scope="full" aria-pressed="false">試合全体</button></div><p data-video-scope-note>決着の少し前からの短い動画です。</p>';
+$('#round-result .tr-video-actions').before(videoScopeChoices);
 function refreshVideoScopeChoices(info){
  for(const button of videoScopeChoices.querySelectorAll('[data-video-scope]')){button.setAttribute('aria-pressed',String(button.dataset.videoScope===info.scope));button.disabled=info.blocked;}
- videoScopeChoices.querySelector('[data-video-scope-note]').textContent=info.scope==='full'?'試合の長さと同じ時間をかけて動画を作ります。画面を開いたまま待ってね。途中で中止できます。':'タッチ直前からの短い動画です。';
+ videoScopeChoices.querySelector('[data-video-scope-note]').textContent=info.scope==='full'?'試合の長さと同じ時間をかけて動画を作ります。画面を開いたまま待ってね。途中で中止できます。':'決着の少し前からの短い動画です。';
 }
 for(const button of videoScopeChoices.querySelectorAll('[data-video-scope]'))button.onclick=()=>recordShare.select(button.dataset.videoScope);
 
@@ -5510,9 +7161,10 @@ function startReplay(state,scope='finish',{record=false}={}){
  if(renderRecovery?.lost||replay.active)return false;
  if(!replay.start(state,{scope}))return false;
  replayCamera.reset();clear();resetReplayPoses();replaySound.reset();audio.pause();audio.activate();audio.setGlide(0);
- if(scope==='finish'||record){
+ // Watching a replay never allocates an encoder. Only the video action records.
+ if(record){
   recordShare.prepare(replayTicket,()=>{
-   recordingReplay=true;recordingScope=scope;
+   recordingReplay=true;recordingScope=scope;renderQuality.setCapture(true);
    const summary=huntResultSummary({result:s.result,config:s.config,controlledOwner:controlledHuntActor(s).owner,ticket:replayTicket});
    return replayVideo.start(canvas,summary,{scope,seconds:s.time});
   },{scope});
@@ -5525,16 +7177,34 @@ function startReplay(state,scope='finish',{record=false}={}){
  document.body.classList.remove('playing','active');dirty=true;last=performance.now();
  (scope==='full'&&!recordingReplay?replayToggle:canvas).focus({preventScroll:true});return true;
 }
-function finishReplay(completed=false){
+function finishReplay(completed=false,{recordingFailed=false}={}){
  if(!replay.active)return;
  const full=replay.scope==='full';
- if(recordingReplay){if(completed)replayVideo.finish();else{recordShare.cancel(replayTicket,recordingScope);replayVideo.cancel();}recordingReplay=false;}
+ if(recordingReplay){
+  recordingReplay=false;
+  if(completed)replayVideo.finish();
+  else{
+   if(!recordingFailed)recordShare.cancel(replayTicket,recordingScope);
+   replayVideo.cancel();
+  }
+ }
  audio.pause();replay.stop();yaw=renderYaw;clear();resetReplayPoses();replayLabel.hidden=true;replayControls.hidden=true;
- $('#pause').textContent='結果を隠す';results.open({focus:!full});if(full)$('#touch-replay-full').focus();dirty=true;last=performance.now();
+ const focusTarget=recordingFailed?$('#round-result [data-share]'):full?$('#touch-replay-full'):null;
+ $('#pause').textContent='結果を隠す';results.open({focus:!focusTarget});focusTarget?.focus({preventScroll:true});dirty=true;last=performance.now();
 }
-function showResult(){if(replay.active)finishReplay();if(!results.hasResult)return;yaw=renderYaw;clear();$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;$('#pause').textContent='結果を隠す';results.open();retryBestRecords();dirty=true;}
+function showResult(){
+ if(replay.active)finishReplay();
+ if(!results.hasResult)return;
+ // Returning from setup discards choices that never entered a match.
+ if(!$('#panel').hidden&&(mode!==s.config.mode||opponents.some((id,i)=>id!==s.config.opponents[i]))){
+  mode=s.config.mode;opponents=[...s.config.opponents];refreshChoiceControls();
+ }
+ yaw=renderYaw;clear();
+ $('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;
+ $('#pause').textContent='結果を隠す';results.open();dirty=true;
+}
+function hideResult(){results.hide();const button=$('#pause');button.textContent='結果を見る';button.focus({preventScroll:true});dirty=true;}
 function openResultConfig(){if(replay.active)finishReplay();if(!results.hasResult)return;yaw=renderYaw;clear();results.hide();$('#panel').hidden=false;$('#resume').hidden=true;resultBack.hidden=false;$('#title').textContent='次の組合せ';$('#note').textContent='相手を選んで、もう一度勝負しよう。';$('#begin').textContent='この組合せであそぶ';$('#pause').textContent='結果を見る';void updateNotice.check();dirty=true;resultBack.focus({preventScroll:true});}
-function updateBest(){const box=$('#best');if(box){box.textContent='';box.hidden=true;}}
 // Proof checking still protects shared growth; times are no longer saved or ranked.
 function receiveProof(reply,proof){
  if(results.isCurrent(reply.id)){
@@ -5544,7 +7214,7 @@ function receiveProof(reply,proof){
 }
 
 function holdCameraView(){const held=holdHuntCameraView(smoothCamera.stats(),{yaw:renderYaw,pitch});yaw=held.yaw;pitch=held.pitch;}
-function clear(){holdCameraView();frameBudget.reset();renderQuality.reset();const captures=[[canvas,drag?.id],[$('#pad'),padGesture?.id]];for(const id of thumbPresses.keys())for(const name of['dash','jump'])captures.push([$('#'+name),id]);keys.clear();touchButtons.clear();jumpOwners.reset();axis={x:0,z:0};padGesture=null;drag=null;useInput.clear();diveInput.clear();inputMemory.heading=null;$('#pad i').style.transform='';releaseHuntPointerCaptures(captures);}
+function clear(){globalThis.IMASORA_BUTTON_FEEDBACK?.release();holdCameraView();frameBudget.reset();renderQuality.reset();const captures=[[canvas,drag?.id],[$('#pad'),padGesture?.id]];for(const id of thumbPresses.keys())for(const name of['dash','jump'])captures.push([$('#'+name),id]);keys.clear();keyboardTimeline.clear();touchButtons.clear();jumpOwners.reset();axis={x:0,z:0};padGesture=null;drag=null;useInput.clear();diveInput.clear();inputMemory.heading=null;inputMemory.reverseCameraUntil=0;$('#pad i').style.transform='';releaseHuntPointerCaptures(captures);}
 function newSeed(){try{return crypto.getRandomValues(new Uint32Array(1))[0];}catch{return Date.now()>>>0;}}
 const renderStatus=document.createElement('output');renderStatus.id='render-recovery-status';renderStatus.hidden=true;renderStatus.setAttribute('role','status');renderStatus.setAttribute('aria-live','polite');renderStatus.style.cssText='position:fixed;top:16%;left:50%;transform:translateX(-50%);max-width:280px;padding:12px 18px;border:2px solid #d5f8ff;border-radius:18px;background:#244b65ed;color:#fff8df;font:bold 16px/1.5 system-ui;text-align:center;white-space:pre-line;pointer-events:none;z-index:12';renderStatus.textContent='画面を復旧中…\n対戦は止まっています';document.body.append(renderStatus);
 const liveRenderRecoveryMessage='ゲーム映像を復旧中…';
@@ -5566,6 +7236,8 @@ function begin(){
   showStartNotice('次の対戦を準備できません。もう一度ためしてね。');
   return;
  }
+ // Persist a result-screen edit only after the new match was admitted.
+ if(results.hasResult)saveChoices();
  round=nextRound;
  s=round.state;
  document.querySelector('.practice-note').textContent=growth.status();
@@ -5588,7 +7260,7 @@ $('#begin').onclick=begin;
 $('#pause').onclick=()=>{
  if(replay.active){finishReplay();return;}
  if(results.hasResult){
-  if(results.visible){results.hide();$('#pause').textContent='結果を見る';dirty=true;}
+  if(results.visible)hideResult();
   else showResult();
   return;
  }
@@ -5606,17 +7278,64 @@ function resumeRound({focus=true}={}){
  if(focus)canvas.focus({preventScroll:true});
  return true;
 }
-let selectingSlot=0;const select=createTagCharacterSelect({characters:TAG_CHARACTERS,onChoose:id=>{opponents[selectingSlot]=id;refreshSlots();saveChoices();updateBest();}});
-function refreshSlots(){$('#opponent-slots').replaceChildren(...opponents.map((id,i)=>{const c=roster.get(id),b=document.createElement('button');b.className='opponent-slot';b.style.setProperty('--slot-color',['#ffbd9b','#a6d5f2','#a8dfbc'][i]);b.innerHTML='<b>'+(mode==='hunt'&&i===0?'逃げ役':roleNames[i])+'</b><strong></strong><small></small><span>選びなおす ›</span>';b.querySelector('strong').textContent=c.name;b.querySelector('small').textContent=c.ability.title;const scores=document.createElement('div');scores.className='tm-scores';scores.setAttribute('aria-label','走りの能力');scores.innerHTML=['加速','速さ','小回り'].map((name,j)=>'<div class="tm-score"><label>'+name+'</label><i style="--score:'+c.ability.scores[j]*20+'%" aria-label="'+name+' '+c.ability.scores[j]+'/5"></i></div>').join('');b.insertBefore(scores,b.querySelector('span'));b.onclick=()=>{selectingSlot=i;clear();select.open(id,(mode==='hunt'&&i===0?'逃げ役':roleNames[i])+'をえらぶ');};return b;}));}refreshSlots();
-function refreshRoleCopy(){$('#roles').textContent=mode==='hunt'?'あなた＋先回り役・巡回役':'追跡役・先回り役・巡回役';if(!started)$('#note').textContent=mode==='hunt'?'道具を拾って、仲間の鬼2匹と逃げ役を追おう！':'角の階段では、鬼との間合いを見て2段ジャンプで切り返そう！';}refreshRoleCopy();
+let selectingSlot=0;const select=createTagCharacterSelect({characters:TAG_CHARACTERS,onChoose:id=>{opponents[selectingSlot]=id;refreshSlots();if(!results.hasResult)saveChoices();}});
+const opponentSlots = $('#opponent-slots');
+const rollButton = $('#roll-opponents');
+const rollResult = $('#roll-opponents-result');
+const cpuRoleName = index => mode === 'hunt' && index === 0 ? '逃げ役' : roleNames[index];
+
+function refreshSlots({ rolled = false } = {}) {
+ rollResult.textContent = '';
+ opponentSlots.replaceChildren(...opponents.map((id, index) => {
+  const character = roster.get(id);
+  const role = cpuRoleName(index);
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'opponent-slot';
+  button.style.setProperty('--slot-color', ['#ffbd9b', '#a6d5f2', '#a8dfbc'][index]);
+  if (rolled) {
+   button.dataset.rolled = '';
+   button.style.setProperty('--roll-delay', index * 65 + 'ms');
+  }
+  button.innerHTML = '<b></b><strong></strong><small></small><div class="tm-scores" aria-label="走りの能力"></div><span>選びなおす ›</span>';
+  button.querySelector('b').textContent = role;
+  button.querySelector('strong').textContent = character.name;
+  button.querySelector('small').textContent = character.ability.title;
+  button.querySelector('.tm-scores').innerHTML = ['加速', '速さ', '小回り'].map((name, i) => {
+   const score = character.ability.scores[i];
+   return '<div class="tm-score"><label>' + name + '</label><i style="--score:' + score * 20 + '%" aria-label="' + name + ' ' + score + '/5"></i></div>';
+  }).join('');
+  button.onclick = () => {
+   selectingSlot = index;
+   clear();
+   select.open(id, role + 'をえらぶ');
+  };
+  return button;
+ }));
+}
+
+rollButton.onclick = () => {
+ if ($('#panel').hidden) return;
+ const next = rollHuntOpponents(roster.keys(), opponents);
+ if (!next) return;
+ opponents = next;
+ refreshSlots({ rolled: true });
+ if (!results.hasResult) saveChoices();
+ rollResult.textContent = opponents.map((id, index) => cpuRoleName(index) + ' ' + roster.get(id).name).join('、');
+};
+function refreshRoleCopy(){$('#roles').textContent=mode==='hunt'?'あなた＋先回り役・巡回役':'追跡役・先回り役・巡回役';if(!started)$('#note').textContent=mode==='hunt'?'道具を拾って、仲間の鬼2匹と逃げ役を追おう！':'角の階段では、鬼との間合いを見て2段ジャンプで切り返そう！';}
 const itemGuide=createHuntItemGuide({onOpen:clear});if($('#menu-guide-slot'))$('#menu-guide-slot').append(itemGuide.button);else $('#begin').insertAdjacentElement('beforebegin',itemGuide.button);
-itemGuide.setRole(mode);
-for(const b of document.querySelectorAll('[data-role]')){b.setAttribute('aria-pressed',String(b.dataset.role===mode));b.onclick=()=>{mode=b.dataset.role;for(const c of document.querySelectorAll('[data-role]'))c.setAttribute('aria-pressed',String(c===b));refreshSlots();itemGuide.setRole(mode);refreshRoleCopy();saveChoices();updateBest();};}
+function refreshChoiceControls(){
+ for(const b of document.querySelectorAll('[data-role]'))b.setAttribute('aria-pressed',String(b.dataset.role===mode));
+ refreshSlots();itemGuide.setRole(mode);refreshRoleCopy();
+}
+for(const b of document.querySelectorAll('[data-role]'))b.onclick=()=>{mode=b.dataset.role;refreshChoiceControls();if(!results.hasResult)saveChoices();};
+refreshChoiceControls();
 const focusField=()=>canvas.focus({preventScroll:true});
 bindHuntTouchGuard(document,()=>document.body.classList.contains('playing'));
 const useInput=createHuntActionInput($('#use'),()=>!paused,focusField);
 const diveInput=createHuntActionInput($('#dive'),()=>!paused&&s.config.mode==='hunt',focusField);
-const bindings=()=>globalThis.IMASORA_KEYS.bindings,active=id=>holds.has(id)||bindings()[id].some(k=>keys.has(k));
+const bindings=()=>globalThis.IMASORA_KEYS.bindings,active=id=>holds.has(id)||bindings()[id].some(k=>keyboardTimeline.has(k));
 function buttonKeyHint(id){const names=globalThis.IMASORA_KEYS.bindings[id].filter(Boolean).map(code=>globalThis.IMASORA_KEYS.label(code));return names.join('・')+'キー';}
 let itemUseHint='';function refreshItemKeys(){itemUseHint=huntItemKeyCodes(bindings()).map(code=>globalThis.IMASORA_KEYS.label(code)).join('・')+'キー';itemGuide.setShortcut(itemUseHint);paintTouchDash(touchButtons.stats());$('#jump').title=$('#jump').dataset.keyHint='ジャンプ：'+buttonKeyHint('jump');const diveAvailable=huntDiveShortcutAvailable(bindings());$('#dive').title=$('#dive').dataset.keyHint=diveAvailable?'ヘッドスライディング（Hキー）':'ヘッドスライディング（画面のボタン）';const hint=$('#dive-key-hint');if(hint)hint.textContent=diveAvailable?'ダイブ：Hキー（鬼のみ）':'ダイブ：画面のボタン（Hは別の操作に設定中）';lastItem='@keys';dirty=true;}globalThis.IMASORA_KEYS.onChange(refreshItemKeys);refreshItemKeys();
 const keyPanel=globalThis.IMASORA_KEYS.createPanel({clearInput:clear});for(const row of keyPanel.querySelectorAll('.keyboard-settings-row'))if(!['forward','back','left','right','jump','dash','tool','menu'].includes(row.querySelector('[data-key-action]')?.dataset.keyAction))row.remove();for(const group of keyPanel.querySelectorAll('.keyboard-settings-group'))if(!group.querySelector('.keyboard-settings-row'))group.remove();const diveKeyHint=document.createElement('p');diveKeyHint.id='dive-key-hint';diveKeyHint.textContent=huntDiveShortcutAvailable(bindings())?'ダイブ：Hキー（鬼のみ）':'ダイブ：画面のボタン（Hは別の操作に設定中）';$('#keys').append(diveKeyHint,keyPanel);const touchSettings=createHuntTouchSettings({storage,clearInput:clear,onOpen:pause,onApply:layout=>{$('#pad').style.left=layout.pad.x+'px';$('#pad').style.top=layout.pad.y+'px';$('#pair').style.left=layout.pair.x+'px';$('#pair').style.top=layout.pair.y+'px';}});$('#keys').parentElement.insertBefore(touchSettings.panel,$('#keys'));globalThis.IMASORA_KEYS.connect({clearInput:clear});
@@ -5626,9 +7345,12 @@ const dashStyle=document.createElement('style');dashStyle.textContent='.tag-dash
 function soundLabel(){$('#sound-toggle').textContent=soundPreference.enabled?'🔊 効果音：オン':'🔇 効果音：オフ';$('#sound-toggle').setAttribute('aria-pressed',String(soundPreference.enabled));}soundLabel();$('#sound-toggle').onclick=()=>{soundPreference.enabled=!soundPreference.enabled;audio.setEnabled(soundPreference.enabled);saveHuntSound(storage,soundPreference);soundLabel();};
 const settingsMenu=createHuntSettingsMenu({clearInput:clear,touchPanel:touchSettings.panel,liveButton:liveBroadcast.settings});
 const fieldActive=()=>replay.active||started&&!paused&&s.phase!=='finished';
+const movementKeys=['forward','back','left','right','dash'];
+function keyTime(e){const now=performance.now(),at=e.timeStamp;return Number.isFinite(at)&&at>0&&at<=now?at:now;}
 function releaseKeyboard(){
- for(const code of keys)jumpOwners.set('key:'+code,false);
+ jumpOwners.releaseKeyboard();
  keys.clear();
+ keyboardTimeline.clear();
  useInput.releaseKeyboard();
  diveInput.releaseKeyboard();
 }
@@ -5648,7 +7370,7 @@ addEventListener('keydown',e=>{
   if(command==='native'||command==='none')return;
   e.preventDefault();
   if(command==='show-result')showResult();
-  else if(command==='hide-result'){results.hide();$('#pause').textContent='結果を見る';dirty=true;}
+  else if(command==='hide-result')hideResult();
   else if(command==='pause')pause();
   return;
  }
@@ -5662,9 +7384,10 @@ addEventListener('keydown',e=>{
  if(itemKey){useInput.press();return;}
  if(b.jump.includes(e.code)&&!keys.has(e.code))jumpOwners.set('key:'+e.code,true);
  if(b.tool.includes(e.code))useInput.press();
+ if(movementKeys.some(id=>b[id].includes(e.code)))keyboardTimeline.set(e.code,true,keyTime(e));
  keys.add(e.code);
 });
-addEventListener('keyup',e=>{keys.delete(e.code);jumpOwners.set('key:'+e.code,false);});
+addEventListener('keyup',e=>{if(keys.delete(e.code))keyboardTimeline.set(e.code,false,keyTime(e));jumpOwners.set('key:'+e.code,false);});
 canvas.onpointerdown=e=>{if(replay.active)return;if(drag||paused&&s.phase!=='finished'||!captureHuntPointer(canvas,e))return;if(fieldActive())canvas.focus({preventScroll:true});yaw=renderYaw;if(e.pointerType==='touch'&&!paused)padCamera=true;drag={id:e.pointerId,x:e.clientX,y:e.clientY};};canvas.onpointermove=e=>{if(drag?.id!==e.pointerId)return;yaw-=(e.clientX-drag.x)*.006;pitch=Math.max(.15,Math.min(1.15,pitch+(e.clientY-drag.y)*.004));drag.x=e.clientX;drag.y=e.clientY;dirty=true;};for(const type of['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,e=>{if(drag?.id===e.pointerId)drag=null;});
 function pad(e){
  if(e.pointerId!==padGesture?.id)return;
@@ -5695,10 +7418,11 @@ function readHuntMovement(human){
  const x=(active('right')?1:0)-(active('left')?1:0),z=(active('back')?1:0)-(active('forward')?1:0);
  // Both devices steer one body heading. Never sum vectors produced from two
  // independently accumulated headings (they can cancel or reverse a turn).
- const steering=x||z?{x,z}:padGesture?axis:{x:0,z:0};
+ const keyboard=Boolean(x||z);
+ const steering=keyboard?{x,z}:padGesture?axis:{x:0,z:0};
  if(s.phase!=='playing'){inputMemory.heading=null;return{x:0,z:0};}
  if(steering.x||steering.z)padCamera=false;
- return huntKeyboardMovement(inputMemory,human.yaw,steering,STEP);
+ return huntKeyboardMovement(inputMemory,human.yaw,steering,STEP,{keyboard});
 }
 for(const id of['dash','jump']){const b=$('#'+id),other=id==='dash'?'jump':'dash';b.onpointerdown=e=>{if(paused||!captureHuntPointer(b,e))return;e.preventDefault();touchButtons.set(e.pointerId,[id]);};b.onpointermove=e=>{if(!thumbPresses.has(e.pointerId))return;const r=$('#'+other).getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;touchButtons.set(e.pointerId,inside?[id,other]:[id]);};b.addEventListener('pointerup',e=>touchButtons.release(e.pointerId));for(const type of['pointercancel','lostpointercapture'])b.addEventListener(type,e=>touchButtons.cancel(e.pointerId));}
 let companionReadBlocked=false,companionInvalidated=false;
@@ -5760,41 +7484,19 @@ resize();
 function showItemNotice(text,duration,kind='pickup'){$('#notice').dataset.kind=kind;$('#notice').textContent=text;$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+duration);}
 function failHint(text){if(!text)return;itemStatus.defer(s.time+1.6);$('#notice').dataset.kind='use-error';$('#notice').textContent=text;$('#notice').hidden=false;$('#notice').dataset.until=String(s.time+1.6);}
 function playMatchCue(cue){audio.play(cue);replay.recordSound(s.time,cue);}
-function frameEvent(e){replay.recordHighlight(e,controlledHuntActor(s).owner);inkNotice.event(s,e);if(e.owner===controlledHuntActor(s).owner&&['item-use','hook-released'].includes(e.type)&&['use-error','full'].includes($('#notice').dataset.kind)){$('#notice').hidden=true;$('#notice').dataset.kind='';}const gained=itemStatus.event(s,e);if(gained&&s.phase==='playing')showItemNotice((ITEM_DEFS[gained.item]?.name??'道具')+'をひろった',gained.duration);feedback.event(s,e);if(e.type==='trampoline-bounce'&&e.owner!==controlledHuntActor(s).owner)playMatchCue({type:'jump',stage:3});if(e.owner===controlledHuntActor(s).owner&&['pickup','item-use'].includes(e.type))playMatchCue({type:'item'});}
-const threatPoint=new T.Vector3(),threatArrows=['#f5ad78','#85cce9','#8bc999'].map((color,i)=>{const el=document.createElement('i');el.className='threat-cue';el.hidden=true;el.setAttribute('aria-hidden','true');el.title=roleNames[i];el.style.setProperty('--role-color',color);el.innerHTML='<svg viewBox="0 0 22 25"><path d="M11 2L21 21L11 16L1 21Z" fill="currentColor" stroke="#fff" stroke-width="2"/></svg>';document.body.append(el);return el;});
-function updateThreats(){
- const cues=paused||s.phase!=='playing'||s.config.mode==='hunt'?[]:huntThreatCues(s),w=innerWidth,h=innerHeight;
- let blocks,safeView,shown=0;
- for(let i=0;i<threatArrows.length;i++){
-  const cue=cues.find(c=>c.owner===s.hunters[i].owner),el=threatArrows[i];
-  el.hidden=true;
-  if(!cue)continue;
-  threatPoint.set(cue.x,cue.y,cue.z).project(camera);
-  if(threatPoint.z>=-1&&threatPoint.z<=1&&Math.abs(threatPoint.x)<.9&&Math.abs(threatPoint.y)<.85)continue;
-  if(!blocks){
-   blocks=[];
-   const hud=$('.game-hud').getBoundingClientRect();
-   safeView={left:hud.left,right:hud.right,top:hud.top,bottom:h-hud.top};
-   // Tools can extend above or beside the dash and jump group.
-   const elements=document.querySelectorAll('.game-hud > *, #pad, #pair > button, #notice, #radar, .tag-radar-time, .tag-rear-mirror, .tag-ink-paint, .tag-screen-broadcast');
-   for(const element of elements){
-    if(element.hidden)continue;
-    const rect=element.getBoundingClientRect();
-    if(rect.width&&rect.height)blocks.push(rect);
-   }
-  }
-  const angle=Math.PI-Math.atan2(cue.x-s.player.x,cue.z-s.player.z)+renderYaw;
-  const point=huntThreatCuePosition(w*(.5+Math.sin(angle)*.45),h*(.5-Math.cos(angle)*.39),safeView,blocks);
-  if(!point)continue;
-  const {x,y}=point;
-  blocks.push({left:x-19,right:x+19,top:y-19,bottom:y+19});
-  el.style.left=x+'px';el.style.top=y+'px';el.style.setProperty('--bearing',angle+'rad');el.dataset.preparing=String(cue.preparing);el.hidden=false;shown++;
+function frameEvent(e){
+ const owner=controlledHuntActor(s).owner,own=e.owner===owner;
+ replay.recordHighlight(e,owner);
+ inkNotice.event(s,e);
+ if(own&&['item-use','hook-released'].includes(e.type)){
+  const notice=$('#notice');
+  if(['pickup','use-error','full'].includes(notice.dataset.kind)){notice.hidden=true;notice.dataset.kind='';}
  }
- canvas.dataset.threatCues=String(shown);
-}
-function refreshThreats(sampleHud,curtainChanged){
- const inactive=paused||s.phase!=='playing'||s.config.mode==='hunt';
- if(sampleHud||curtainChanged||(inactive&&canvas.dataset.threatCues!=='0'))updateThreats();
+ const gained=itemStatus.event(s,e);
+ if(gained&&s.phase==='playing')showItemNotice((ITEM_DEFS[gained.item]?.name??'道具')+'をひろった',gained.duration);
+ feedback.event(s,e);
+ if(e.type==='trampoline-bounce'&&!own)playMatchCue({type:'jump',stage:3});
+ if(own&&['pickup','item-use'].includes(e.type))playMatchCue({type:'item'});
 }
 const roleMarkers=createHuntRoleMarkers({scene,onDiscover:()=>audio.play({type:'detect'})});
 const compassView=createHuntCompassView($('#radar'));
@@ -5867,18 +7569,23 @@ function screenActorNodes(actors,rivals){
   return nodes;
  });
 }
-function draw(now){now=performance.now();const human=controlledHuntActor(s);requestAnimationFrame(draw);const dt=Math.max(0,(now-last)/1000||0);last=Math.max(last,now);if(renderRecovery.lost){liveViews.showScreen(false);return;}const frameSteps=frameBudget.consume(dt,{running:!paused,visible:!document.hidden});let physicsTicks=0;if(document.hidden){liveViews.showScreen(false);renderQuality.reset();return;}renderQuality.sample(dt,started&&!paused&&!replay.active&&!liveBroadcast.output.opened);if(replay.paused&&!dirty)return;let replayFrame=replay.advance(dt);if(replayFrame?.done){finishReplay(true);replayFrame=null;}
+function foamRender(view,drawCamera,actors,draw){return props.withFoamView(view,drawCamera,()=>withHuntFoamOcclusion(view,drawCamera,actors,actor=>screenActorNodes(actors,[actor]),draw,{extraEntries:()=>props.occlusionEntries()}));}
+function draw(now){now=performance.now();const human=controlledHuntActor(s);const dt=Math.max(0,(now-last)/1000||0);last=Math.max(last,now);if(renderRecovery.lost){liveViews.showScreen(false);return;}const frameSteps=frameBudget.consume(dt,{running:!paused,visible:!document.hidden});let physicsTicks=0;if(document.hidden){liveViews.showScreen(false);renderQuality.reset();return;}renderQuality.setCapture(recordingReplay||liveBroadcast.output.opened);renderQuality.sample(dt,started&&!paused&&!replay.active);if(replay.paused&&!dirty)return;let replayFrame=replay.advance(dt);if(replayFrame?.done){finishReplay(true);replayFrame=null;}
  // Keep the final full-replay image until results. A resize, explicit redraw
  // or live output still needs a frame, and the replay clock advances above.
  if(replayFrame?.progress===1&&replayFrame.delta===0&&replay.scope==='full'&&!dirty&&!liveBroadcast.output.opened)return;
  if(paused&&!replay.active&&!dirty&&now-paintAt<1000)return;paintAt=now;dirty=false;
- if(!paused){for(let tick=0;tick<frameSteps.steps;tick++){const input=readHuntMovement(human),use=useInput.read(),attempt=use&&!s.useHeld,item=human.item,failureHint=attempt&&item?huntItemFailureHint(s,human):'',grounded=human.grounded,jumps=human.jumps,diveStage=human.dive?.stage;const applied={...input,jump:jump.read(),dash:active('dash'),use,dive:diveInput.read()};if(use)canvas.dataset.lastUseInput=JSON.stringify(applied);round.tick(applied);physicsTicks++;const diveCue=huntDiveAudioCue(diveStage,human);if(diveCue)playMatchCue(diveCue);if(attempt&&item&&!huntItemUseAcknowledged(s,human.owner))failHint(failureHint);for(const e of s.events)frameEvent(e);if(itemStatus.sample(s))showItemNotice('道具は1つまで\n手持ちを使うと拾えます',1.6,'full');if(human.jumps>jumps)playMatchCue({type:'jump',stage:human.jumps});if(!grounded&&human.grounded)playMatchCue({type:'land'});motionTrails.sample(s);replay.record(s,{force:s.phase==="finished",lighting:scenery.lighting,feedbackCues:feedback.replayCues,motionCues:motionTrails.cues});
- if(s.phase==='finished'){yaw=renderYaw;paused=true;clear();for(const cue of huntResultAudioCues(s.result))audio.play(cue);audio.setGlide(0);const proof=round.proof(),id=++receiptId;const growthResult=growth.finish(proof,id);growthStatus.hidden=!companion;growthStatus.textContent=growthResult.formal?(growthResult.queued?'育成時間を確認中…':'この画面を閉じず、ホームで成果を受け取ってね。'):companion?'この対戦では育成の報酬はありません。次はホームで今の空を撮ってから始めよう。':'';growthHome.hidden=!companion;growthHome.textContent=growthResult.formal?'ホームで成果を受け取る':'ホームへ';const submitted=proofClient.submit(proof,id);if(!submitted)canvas.dataset.proof='unavailable';$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;results.show({result:s.result,config:s.config,controlledOwner:human.owner,ticket:id});if(growthResult.formal)showGrowthResult(id,submitted?null:{ok:false,unavailable:true});replayTicket=id;$('#pause').textContent='結果を隠す';replayQueued=true;document.body.classList.remove('playing','active');break;}}}
+ if(!paused&&frameSteps.steps){const firstInputAt=frameBudget.firstStepAt(now);for(let tick=0;tick<frameSteps.steps;tick++){keyboardTimeline.sample(firstInputAt+tick*STEP*1000);const input=readHuntMovement(human),use=useInput.read(),attempt=use&&!s.useHeld,item=human.item,failureHint=attempt&&item?huntItemFailureHint(s,human):'',grounded=human.grounded,jumps=human.jumps,diveStage=human.dive?.stage;const applied={...input,jump:jumpOwners.read(),dash:active('dash'),use,dive:diveInput.read()};if(use)canvas.dataset.lastUseInput=JSON.stringify(applied);const oldFacing=human.yaw;round.tick(applied);
+ // Catch up faster to an actual keyboard U-turn, after the body has turned.
+ if(s.phase==='playing'&&active('back')&&!active('forward')&&!human.flight&&!human.dive&&!human.hook&&
+    Math.cos(human.yaw-oldFacing)<-.9)inputMemory.reverseCameraUntil=s.time+.95;
+ physicsTicks++;const diveCue=huntDiveAudioCue(diveStage,human);if(diveCue)playMatchCue(diveCue);if(attempt&&item&&!huntItemUseAcknowledged(s,human.owner))failHint(failureHint);for(const e of s.events)frameEvent(e);if(itemStatus.sample(s))showItemNotice('道具は1つまで\n手持ちを使うと拾えます',1.6,'full');if(human.jumps>jumps)playMatchCue({type:'jump',stage:human.jumps});if(!grounded&&human.grounded)playMatchCue({type:'land'});motionTrails.sample(s);replay.record(s,{force:s.phase==="finished",lighting:scenery.lighting,feedbackCues:feedback.replayCues,motionCues:motionTrails.cues});
+ if(s.phase==='finished'){yaw=renderYaw;paused=true;clear();for(const cue of huntResultAudioCues(s.result))audio.play(cue);audio.setGlide(0);const proof=round.proof(),id=++receiptId;const growthResult=growth.finish(proof,id);growthStatus.hidden=!companion;growthStatus.textContent=growthResult.formal?(growthResult.queued?'育成時間を確認中…':'この画面を閉じず、ホームで成果を受け取ってね。'):companion?'この対戦では育成の報酬はありません。次はホームで今の空を撮ってから始めよう。':'';growthHome.hidden=!companion;growthHome.textContent=growthResult.formal?'ホームで成果を受け取る':'ホームへ戻る';const submitted=proofClient.submit(proof,id);if(!submitted)canvas.dataset.proof='unavailable';$('#panel').hidden=true;$('#resume').hidden=true;resultBack.hidden=true;results.show({result:s.result,config:s.config,controlledOwner:human.owner,ticket:id});if(growthResult.formal)showGrowthResult(id,submitted?null:{ok:false,unavailable:true});replayTicket=id;$('#pause').textContent='結果を隠す';replayQueued=true;document.body.classList.remove('playing','active');break;}}}
  const jumpWait=huntJumpRestRemaining(s,human);
  const visual=replayFrame?.state??s,visualHuman=controlledHuntActor(visual),visualGround=(x,z)=>trampolineSurface(visual,x,z),visualDt=replayFrame?replayFrame.delta:physicsTicks*STEP,visualPaused=replayFrame?visualDt<=0:paused;
  const fullReplay=!!replayFrame&&replay.scope==="full";
  updateControlHud(human,jumpWait,fullReplay?visual.time:s.time);
- if(replayFrame&&!replay.paused)for(const cue of replaySound.sample(replay.soundsAt(visual.time,replayFrame.delta),{atEnd:replayFrame.progress>=1,caught:!!replayFrame.catcher,win:replayFrame.win}))audio.play(cue);const actors=[visual.player,...visual.hunters];for(let i=0;i<actors.length;i++){const a=actors[i],m=models[i];m.root.position.set(a.x,a.y,a.z);m.root.rotation.y=a.yaw;const grade=a.grounded?worldGradient(a.x,a.z):{x:0,z:0};m.root.rotation.x=-Math.atan(grade.x*Math.sin(a.yaw)+grade.z*Math.cos(a.yaw));m.root.rotation.z=Math.atan(grade.x*Math.cos(a.yaw)-grade.z*Math.sin(a.yaw));const shadow=soleShadows[i],floor=visualGround(a.x,a.z),height=Math.max(0,a.y-floor);shadow.position.set(a.x,floor+.035,a.z);shadow.scale.set(a.radius*.78,Math.max(.6,a.radius*.58),1);shadow.material.opacity=.23/(1+height*.18);applyHuntActorVisibility(visual,a,m,shadow);m.sunglasses.setActive((a.effects.sunglasses??0)>visual.time);m.dizzy.update({time:visual.time,until:a.effects.dizzy??0,sunglasses:(a.effects.sunglasses??0)>visual.time,radius:a.radius});m.inkFeet.setInked(a.owner===visual.player.owner&&(a.effects.ink??0)>visual.time);
+ if(replayFrame&&!replay.paused)for(const cue of replaySound.sample(replay.soundsAt(visual.time,replayFrame.delta),{atEnd:replayFrame.progress>=1,caught:!!replayFrame.catcher,win:replayFrame.win}))audio.play(cue);const actors=[visual.player,...visual.hunters];for(let i=0;i<actors.length;i++){const a=actors[i],m=models[i];m.root.position.set(a.x,a.y,a.z);m.root.rotation.y=a.yaw;const tilt=huntTerrainTilt(a);m.root.rotation.x=tilt.pitch;m.root.rotation.z=tilt.roll;const shadow=soleShadows[i],floor=visualGround(a.x,a.z),height=Math.max(0,a.y-floor);shadow.position.set(a.x,floor+.035,a.z);shadow.scale.set(a.radius*.78,Math.max(.6,a.radius*.58),1);shadow.material.opacity=.23/(1+height*.18);applyHuntActorVisibility(visual,a,m,shadow);m.sunglasses.setActive((a.effects.sunglasses??0)>visual.time);m.dizzy.update({time:visual.time,until:a.effects.dizzy??0,sunglasses:(a.effects.sunglasses??0)>visual.time,radius:a.radius});m.inkFeet.setInked(a.owner===visual.player.owner&&(a.effects.ink??0)>visual.time&&!huntInkTrailSuppressed(visual));
  }
  feedback.update(visual,replayFrame?visual.feedbackCues??[]:null);inkView.update(visual);inkNotice.update(s,{visible:!paused&&!replay.active});
  const cameraDt=paused&&!drag&&!replayFrame?0:replay.paused?0:dt;
@@ -5887,7 +7594,7 @@ function draw(now){now=performance.now();const human=controlledHuntActor(s);requ
   ({target,pose}=updateHuntReplayView(replayCamera,visual,{catcher:fullReplay?null:replayFrame.catcher,aspect:camera.aspect,focus:fullReplay?visualHuman:visual.player,dt:cameraDt,scope:replay.scope,viewPlan:replay.viewPlan(camera.aspect)}));
  }else{
   target={x:human.x,y:human.y+4,z:human.z};
-  pose=smoothCamera.update(target,{yaw:huntFacingCameraYaw(visualHuman,{freeYaw:yaw,paused,dragging:!!drag||padCamera}),pitch,keepAngle:padCamera,following:!paused&&!drag&&!padCamera,distance:innerHeight>innerWidth?39:33,minDistance:innerHeight>innerWidth?30:17,dt:cameraDt});
+  pose=smoothCamera.update(target,{yaw:huntFacingCameraYaw(visualHuman,{freeYaw:yaw,paused,dragging:!!drag||padCamera}),pitch,keepAngle:padCamera,following:!paused&&!drag&&!padCamera,reversing:s.time<(inputMemory.reverseCameraUntil??0),distance:innerHeight>innerWidth?39:33,minDistance:innerHeight>innerWidth?30:17,dt:cameraDt});
  }
  renderYaw=pose.yaw;camera.position.set(pose.position.x,pose.position.y,pose.position.z);camera.lookAt(target.x,target.y,target.z);const near=pose.near??.15;if(camera.near!==near){camera.near=near;camera.updateProjectionMatrix();}scenery.update(now,replayFrame?visual.lighting:null);camera.updateMatrixWorld();motionTrails.update(visual,camera,replayFrame?visual.motionCues??[]:undefined);
  const desktop=liveBroadcast.output.opened,screen=liveViews.showScreen(!paused&&!replayFrame&&s.phase==='playing');
@@ -5900,19 +7607,19 @@ function draw(now){now=performance.now();const human=controlledHuntActor(s);requ
    try{
     props.update(otherView,models,now,{paused:true,groundAt:visualGround,includePickupNames:false});motionTrails.setView(otherView);
     updateBalloons(otherView,actors);
-    roleMarkers.withoutLabels(()=>props.render(()=>liveViews.capture('opponent',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals))));
+    roleMarkers.withoutLabels(()=>props.render(()=>liveViews.capture('opponent',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals),(viewCamera,draw)=>foamRender(otherView,viewCamera,actors,draw))));
    }finally{
     actors.forEach((a,i)=>applyHuntActorVisibility(visual,a,models[i],soleShadows[i]));motionTrails.setView(visual);
    }
   }
-  curtainChanged=roleMarkers.update(visual,{camera,models,now:now/1000,active:!paused&&!replayFrame&&s.phase==='playing'});
+  curtainChanged=roleMarkers.update(visual,{camera,models,viewportHeight:innerHeight,now:now/1000,active:!paused&&!replayFrame&&s.phase==='playing'});
   props.update(visual,models,now,{dt:visualDt,paused:visualPaused,groundAt:visualGround,isIce:a=>worldSurface(a.x,a.z)==='ice'});
   updateBalloons(visual,actors);
   props.render(()=>{
-   if(output?.multi)roleMarkers.withoutLabels(()=>liveViews.capture('wide',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals)));
+   if(output?.multi)roleMarkers.withoutLabels(()=>liveViews.capture('wide',scenery.centerSky,screenActorNodes(actors,output.hiddenRivals),(viewCamera,draw)=>foamRender(visual,viewCamera,actors,draw)));
    if(output?.multi)scenery.centerSky();
-   renderer.render(scene,camera);
-   if((fullReplay||!paused&&!replayFrame)&&huntRearMirrorActive(visual))rearMirror.draw(now,visualHuman,models[0].root,soleShadows[0],{refresh:curtainChanged});else rearMirror.hide();
+   canvas.dataset.cameraClearance=JSON.stringify(foamRender(visual,camera,actors,()=>withHuntCameraClearance(actors,models,camera.position,()=>renderer.render(scene,camera))));
+   if((fullReplay||!paused&&!replayFrame)&&huntRearMirrorActive(visual))rearMirror.draw(now,visualHuman,models[0].root,soleShadows[0],{refresh:curtainChanged,renderView:(viewCamera,draw)=>foamRender(visual,viewCamera,actors,draw)});else rearMirror.hide();
    if(output)liveViews.finish();
    if(replayFrame&&recordingReplay)replayVideo.draw(canvas,now);
   });});
@@ -5931,7 +7638,7 @@ function draw(now){now=performance.now();const human=controlledHuntActor(s);requ
   canvas.dataset.replay=JSON.stringify({...replay.stats(),time:replayFrame?.state.time??null});
  }
  drawRadar(fullReplay?visualHuman:human,sampleHud,fullReplay?visual:null);
- refreshThreats(sampleHud,curtainChanged);
+
  if(sampleHud){canvas.dataset.jumpRest=JSON.stringify({remaining:jumpWait,readyAt:human.nextJumpAt??0,needsRelease:!!human.jumpRestRelease,jumps:human.jumps,grounded:human.grounded});const item=human.item;
  canvas.dataset.discoveryAudio=String(audio.stats().counts.detect??0);canvas.dataset.roleMarkers=JSON.stringify(roleMarkers.stats());canvas.dataset.cameraSmooth=JSON.stringify((replayFrame?replayCamera:smoothCamera).stats());canvas.dataset.cameraMode=replayFrame?'replay':'normal';canvas.dataset.cameraFollow=JSON.stringify({actorYaw:human.yaw,cameraYaw:renderYaw,following:!paused&&!drag&&!padCamera&&!replayFrame});canvas.dataset.actorVisibility=JSON.stringify(actors.map((a,i)=>({owner:a.owner,visible:models[i].root.visible,shadow:soleShadows[i].visible,cloaked:(a.effects.cloak??0)>visual.time})));canvas.dataset.compassPaint=JSON.stringify({...compassView.stats(),hud:radarHud.stats()});canvas.dataset.decoyResources=JSON.stringify(props.stats());canvas.dataset.windVisibility=JSON.stringify(props.windStats());canvas.dataset.stepBudget=JSON.stringify(frameBudget.stats());canvas.dataset.materialUpdates=JSON.stringify(models.map(m=>m.materialState.stats()));canvas.dataset.modelResources=JSON.stringify({...actorModels.stats(),geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});canvas.dataset.inkRender=JSON.stringify(inkView.stats());canvas.dataset.dizzy=JSON.stringify(models.map(m=>m.dizzy.stats()));canvas.dataset.feedback=JSON.stringify(feedback.stats());canvas.dataset.motionTrails=JSON.stringify(motionTrails.stats());canvas.dataset.proofQueue=JSON.stringify(proofClient.stats());canvas.dataset.trampoline=JSON.stringify(s.trampoline);canvas.dataset.mode=s.config.mode;canvas.dataset.controlled=human.owner;canvas.dataset.rules=s.rules;canvas.dataset.surface=worldSurface(human.x,human.z);canvas.dataset.speed=Math.hypot(human.vx,human.vz).toFixed(3);canvas.dataset.gaitPhase=models.find(m=>m.controlled)?.gait.phase.toFixed(3);canvas.dataset.hunterCount=String(s.hunters.length);canvas.dataset.phase=s.phase;canvas.dataset.item=item||'';canvas.dataset.playerPosition=[human.x,human.y,human.z].map(x=>x.toFixed(2)).join(',');canvas.dataset.hunters=JSON.stringify(s.hunters.map(a=>({role:a.role,item:a.item,x:+a.x.toFixed(2),y:+a.y.toFixed(2),z:+a.z.toFixed(2),flight:a.flight?.stage??null,dive:a.dive?.stage??null})));canvas.dataset.frameGap=(dt*1000).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.gadgets=JSON.stringify(s.gadgets.map(g=>({kind:g.kind,x:+g.x.toFixed(1),z:+g.z.toFixed(1)})));const pickupStats=props.pickupStats();canvas.dataset.pickupDisplay=JSON.stringify(pickupStats);canvas.dataset.pickupNameVisibility=JSON.stringify(pickupStats.visibility);canvas.dataset.pickupTypes=s.pickups.map(p=>p.type).join(',');hudAt=now;}
  if((desktop&&output)||(sampleHud&&!desktop)){
@@ -5955,16 +7662,18 @@ function draw(now){now=performance.now();const human=controlledHuntActor(s);requ
   audio.setGlide(actor.grounded&&(actor.slippery||worldSurface(actor.x,actor.z)==='ice')?Math.min(1,Math.hypot(actor.vx,actor.vz)/30):0);
  }
 }
-if(companion){$('#home-return').href=companion.homePath+'?from=sliding-tag';$('#companion-note').textContent=companion.name+' と あそぶ';}else if(homeMode){$('#begin').disabled=true;$('#note').textContent='ホームの「鬼ごっこ」から入りなおしてね。';}
+if(companion){$('#companion-note').textContent=companion.name+' と あそぶ';}else if(homeMode){$('#begin').disabled=true;$('#note').textContent='ホームの「鬼ごっこ」から入りなおしてね。';}
 addEventListener('storage',e=>{
  if(e.key===TOUCH_LAYOUT_KEY){clear();touchSettings.apply();dirty=true;}
  if(homeMode&&(e.key===null||e.key===globalThis.ImasoraSlidingTagEntry?.HOME_KEY))companionGuard();
 });
 $('#home-return').addEventListener('click',returnHuntHome);
+$('#home-return').disabled=false;
 $('#home-return').addEventListener('auxclick',event=>{
  if(event.button===1)returnHuntHome(event);
 });
-$('#begin').disabled=homeMode&&!companion;$('#panel').setAttribute('aria-busy','false');updateBest();requestAnimationFrame(draw);
+$('#begin').disabled=homeMode&&!companion;$('#panel').setAttribute('aria-busy','false');
+startHuntFrameDriver(draw,{isInteractive:()=>started&&!paused&&!replay.active&&!renderRecovery.lost&&!document.hidden&&document.hasFocus()});
 
 return {};
 })();

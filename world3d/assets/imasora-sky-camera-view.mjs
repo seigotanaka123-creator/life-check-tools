@@ -1,10 +1,12 @@
-import {mountSkyCamera} from './imasora-sky-camera-ui.mjs?v=1210p';
+import {mountSkyCamera} from './imasora-sky-camera-ui.mjs?v=1219a';
 import {createSkyCandidateClient} from './imasora-sky-candidate-client.mjs?v=120qm';
 // Both playable routes use the same camera, pixel classifier and confirmation.
 // A route can only transfer metadata for the subject and walk it opened with.
 export function createSkyPhotoDestination({url,storage,session,entry,growth,now=Date.now,navigate}={}){
- const params=new URL(url).searchParams,source=params.get('from'),walk=source==='walk-growth',tag=source==='tag-growth',enabled=!['semantic','balanced'].includes(params.get('skyAnalysis'))&&(walk||tag);
- const returnHome='../life-quest-walk.html?from='+(walk?'walk-sky-camera':params.get('return')==='monster'?'sky-camera':'tag-sky-camera');
+ const cameraUrl=new URL(url),params=cameraUrl.searchParams,source=params.get('from'),walk=source==='walk-growth',tag=source==='tag-growth',enabled=!['semantic','balanced'].includes(params.get('skyAnalysis'))&&(walk||tag);
+ const homeFolder=cameraUrl.pathname.split('/').at(-2)==='world3d'?'../':'./';
+ const destination=enabled?(walk?'walk-sky-camera':params.get('return')==='monster'?'sky-camera':'tag-sky-camera'):'sky-camera';
+ const returnHome=homeFolder+'life-quest-walk.html?from='+destination;
  let subject=null,request=null;
  const read=()=>JSON.parse(storage.getItem(entry.HOME_KEY));
  if(enabled)try{const state=read();subject=growth.subject(state);if(walk){request=state.walkSkyRequest;if(request?.subject!==subject)subject=null;}}catch{}
@@ -27,7 +29,9 @@ const params=new URL(location.href).searchParams,semantic=params.get('skyAnalysi
 const client=createSkyCandidateClient(semantic||balanced?{workerFactory:()=>new Worker(new URL(balanced?'./imasora-sky-semantic-worker.mjs?v=120qk&input=balanced':'./imasora-sky-semantic-worker.mjs?v=120qk',import.meta.url),{type:'module'})}:{});
 let photoStorage,photoSession;try{photoStorage=localStorage;photoSession=sessionStorage;}catch{}
 const destination=createSkyPhotoDestination({url:location.href,storage:photoStorage,session:photoSession,entry:globalThis.ImasoraSlidingTagEntry,growth:globalThis.ImasoraTagGrowth,navigate:url=>location.assign(url)});
-if(destination.enabled){document.querySelector('footer small').textContent=destination.ready?'写真から空を推定します。写真と合っていることを確認して、同じモンスターの育成に使います。':'育成の準備を確認できません。ホームから撮影を開き直してください。';document.querySelector('#back').href=destination.returnHome;document.querySelector('#back').setAttribute('aria-label',destination.walk?'閉じて散歩へ戻る':params.get('return')==='monster'?'閉じて育成大会へ戻る':'閉じて鬼ごっこへ戻る');}
+const back=document.querySelector('#back');
+back.href=destination.returnHome;
+if(destination.enabled){document.querySelector('footer small').textContent=destination.ready?'写真から空を推定します。写真と合っていることを確認して、同じモンスターの育成に使います。':'育成の準備を確認できません。ホームから撮影を開き直してください。';back.setAttribute('aria-label',destination.walk?'閉じて散歩へ戻る':params.get('return')==='monster'?'閉じて育成大会へ戻る':'閉じて鬼ごっこへ戻る');}
 const screen=mountSkyCamera({candidateClient:client,...destination.confirm?{onConfirm:destination.confirm}:{}});
 if(semantic||balanced)document.querySelector('footer small').textContent=balanced?'明るさを整える比較版です。育成には反映しません。':'空の見分け方を調整中です。育成には反映しません。';
 addEventListener('pagehide',event=>{if(!event.persisted)screen.dispose();});

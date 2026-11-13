@@ -5,7 +5,53 @@ import*as T from'./three.module.min.js';
 import{buildMatureStarCharacter360,buildFloweringHeroCharacter360}from'./imasora-character-360.js';
 // BEGIN TAG CHARACTER SELECT
 export function createTagCharacterSelect({characters,onChoose}){
- const dialog=document.createElement('dialog');dialog.className='tag-select';dialog.innerHTML=`<header><div><small>イマソラリンクの仲間たち</small><h2>だれと鬼ごっこする？</h2></div><button data-close>戻る ×</button></header><div class="ts-main"><section><div class="ts-stage" role="img" aria-label="選んだモンスターの3Dモデル"><p data-preview-note hidden style="margin:auto;padding:18px;font-weight:700;text-align:center;line-height:1.6">3D表示を準備できません。<br>名前と能力で選べます。</p></div><div class="ts-rotate"><button data-left aria-label="左から見る">↶</button><span>なぞって回せるよ</span><button data-right aria-label="右から見る">↷</button></div></section><section class="ts-info" aria-live="polite"><small data-stage></small><h3></h3><b data-type></b><p data-hint></p><p class="ts-width" data-width></p><div class="ts-stats"></div><small>能力は鬼ごっこでの走りの目安（5段階）</small><button data-choose>このモンスターに決める</button></section></div><nav class="ts-filter" aria-label="成長段階"><button data-filter="all">みんな</button><button data-filter="hero">開花期</button><button data-filter="star">満開期</button></nav><input class="ts-search" type="search" placeholder="名前でさがす" aria-label="モンスターの名前"><div class="ts-grid" role="group" aria-label="モンスター一覧"></div><footer><button data-prev>◀ 前へ</button><output></output><button data-next>次へ ▶</button></footer><p class="ts-error" role="status"></p>`;document.body.append(dialog);
+ const dialog=document.createElement('dialog');
+ dialog.className='tag-select';
+ dialog.setAttribute('aria-labelledby','tag-select-title');
+ dialog.innerHTML=`
+  <header>
+   <h2 id="tag-select-title">だれと鬼ごっこする？</h2>
+   <button type="button" data-close>戻る ×</button>
+  </header>
+  <div class="ts-body">
+   <div class="ts-main">
+    <div class="ts-showcase">
+     <div class="ts-stage" role="img" aria-label="選んだモンスターの3Dモデル">
+      <p data-preview-note hidden>3D表示を準備できません。<br>名前と能力で選べます。</p>
+     </div>
+     <div class="ts-rotate">
+      <button type="button" data-left aria-label="左から見る">↶</button>
+      <span>なぞって回せるよ</span>
+      <button type="button" data-right aria-label="右から見る">↷</button>
+     </div>
+    </div>
+    <section class="ts-info" aria-live="polite">
+     <div class="ts-tags"><small data-stage></small><b data-type></b></div>
+     <h3></h3>
+     <p data-hint></p>
+     <div class="ts-stats" role="group" aria-label="走りの能力（5段階）"></div>
+    </section>
+   </div>
+   <div class="ts-roster-tools">
+    <nav class="ts-filter" aria-label="成長段階">
+     <button type="button" data-filter="all" aria-pressed="true">みんな</button>
+     <button type="button" data-filter="hero" aria-pressed="false">開花期</button>
+     <button type="button" data-filter="star" aria-pressed="false">満開期</button>
+    </nav>
+    <input class="ts-search" type="search" placeholder="名前でさがす" aria-label="モンスターの名前">
+   </div>
+   <div class="ts-grid" role="group" aria-label="モンスター一覧"></div>
+   <p class="ts-empty" hidden>見つかりませんでした。名前や成長段階を変えて探してみてね。</p>
+   <div class="ts-pages">
+    <button type="button" data-prev>◀ 前へ</button><output></output><button type="button" data-next>次へ ▶</button>
+   </div>
+   <p class="ts-error" role="status"></p>
+  </div>
+  <footer>
+   <span class="ts-picked"><small>選択中</small><strong data-picked-name></strong></span>
+   <button type="button" data-choose>このモンスターに決める</button>
+  </footer>`;
+ document.body.append(dialog);
  const q=s=>dialog.querySelector(s),thumbnails=createHuntThumbnailCache(),pixelRatio=Math.min(devicePixelRatio,1.5);let selected=characters[0],page=0,filter='all',renderer,scene,camera,root,ro,angle=0,job=0,drag,thumbnailBuilds=0,previewRecovery;
  function previewReady(){
   if(!renderer||!scene||!camera||previewRecovery?.lost)return false;
@@ -25,9 +71,61 @@ export function createTagCharacterSelect({characters,onChoose}){
   q('.ts-rotate span').textContent='なぞって回せるよ';
   q('.ts-stage').setAttribute('aria-label',selected.name+'の実際の3Dモデル');
  }
- function select(c){selected=c;angle=0;dispose(root);root=null;q('h3').textContent=c.name;q('[data-stage]').textContent=c.stage==='hero'?'開花期':'満開期';q('[data-type]').textContent=c.ability.title;q('[data-hint]').textContent=c.ability.hint;q('[data-width]').textContent='体格差は、走りの特徴に反映';q('.ts-stage').setAttribute('aria-label',c.name+'の実際の3Dモデル');q('.ts-stats').replaceChildren(...['加速','最高速','小回り','減速'].map((name,i)=>{const e=document.createElement('div');e.className='ts-stat';const label=document.createElement('span'),bar=document.createElement('meter'),value=document.createElement('b');label.textContent=name;bar.min=0;bar.max=5;bar.value=c.ability.scores[i];bar.setAttribute('aria-label',name);value.textContent=c.ability.scores[i]+'/5';e.append(label,bar,value);return e;}));for(const b of q('.ts-grid').children)b.setAttribute('aria-pressed',String(b.dataset.id===c.id));if(previewReady()){try{root=build(c);paintSelected();}catch{previewUnavailable();}}else previewUnavailable();}
+ function select(c){
+  selected=c;
+  angle=-.38;
+  dispose(root);
+  root=null;
+  q('h3').textContent=c.name;
+  q('[data-picked-name]').textContent=c.name;
+  q('.ts-main').dataset.growth=c.stage;
+  q('[data-stage]').textContent=c.stage==='hero'?'開花期':'満開期';
+  q('[data-type]').textContent=c.ability.title;
+  q('[data-hint]').textContent=c.ability.hint;
+  q('.ts-stage').setAttribute('aria-label',c.name+'の実際の3Dモデル');
+  q('.ts-stats').replaceChildren(...['加速','最高速','小回り','減速'].map((name,i)=>{
+   const stat=document.createElement('div'),label=document.createElement('span'),bar=document.createElement('meter'),value=document.createElement('b');
+   stat.className='ts-stat';
+   label.textContent=name;
+   bar.min=0;
+   bar.max=5;
+   bar.value=c.ability.scores[i];
+   bar.setAttribute('aria-label',name);
+   value.textContent=c.ability.scores[i]+'/5';
+   stat.append(label,bar,value);
+   return stat;
+  }));
+  for(const button of q('.ts-grid').children)button.setAttribute('aria-pressed',String(button.dataset.id===c.id));
+  if(!previewReady()){previewUnavailable();return;}
+  try{root=build(c);paintSelected();}catch{previewUnavailable();}
+ }
  function filtered(){const word=q('input').value.trim();return characters.filter(c=>(filter==='all'||c.stage===filter)&&(!word||c.name.includes(word)));}
- async function grid(){const token=++job,list=filtered(),pages=Math.max(1,Math.ceil(list.length/12));page=Math.max(0,Math.min(page,pages-1));q('output').textContent=`${list.length}体 ／ ${page+1} / ${pages}`;q('[data-prev]').disabled=page===0;q('[data-next]').disabled=page===pages-1;q('.ts-grid').replaceChildren();const cards=list.slice(page*12,page*12+12).map(c=>{const b=document.createElement('button'),img=document.createElement('img'),label=document.createElement('span');b.dataset.id=c.id;b.setAttribute('aria-pressed',String(c.id===selected.id));img.alt='';img.hidden=true;label.textContent=c.name;b.append(img,label);b.onclick=()=>select(c);q('.ts-grid').append(b);return{c,img};});for(const {c,img}of cards){
+ async function grid(){
+  const token=++job,list=filtered(),pages=Math.max(1,Math.ceil(list.length/12));
+  page=Math.max(0,Math.min(page,pages-1));
+  q('output').textContent=`${list.length}体 ／ ${page+1} / ${pages}`;
+  q('[data-prev]').disabled=page===0;
+  q('[data-next]').disabled=page===pages-1;
+  q('.ts-empty').hidden=list.length>0;
+  const roster=q('.ts-grid');
+  roster.replaceChildren();
+  const cards=list.slice(page*12,page*12+12).map(c=>{
+   const button=document.createElement('button'),portrait=document.createElement('span'),img=document.createElement('img'),label=document.createElement('span');
+   button.type='button';
+   button.dataset.id=c.id;
+   button.setAttribute('aria-pressed',String(c.id===selected.id));
+   portrait.className='ts-portrait';
+   img.alt='';
+   img.hidden=true;
+   label.className='ts-card-name';
+   label.textContent=c.name;
+   portrait.append(img);
+   button.append(portrait,label);
+   button.onclick=()=>select(c);
+   roster.append(button);
+   return{c,img};
+  });
+  for(const {c,img}of cards){
   const key=huntThumbnailKey(c,pixelRatio),cached=thumbnails.get(key);if(cached){img.src=cached;img.hidden=false;continue;}if(!previewReady())continue;
   await new Promise(requestAnimationFrame);if(token!==job||!dialog.open)return;if(!previewReady())continue;let thumb;try{thumbnailBuilds++;thumb=build(c);if(root)scene.remove(root);if(!paint(thumb,true))continue;const image=renderer.domElement.toDataURL('image/png');if(!previewReady())continue;img.src=image;img.hidden=false;thumbnails.put(key,image);}catch{q('.ts-error').textContent='表示の準備に時間がかかっています。名前からも選べます。';}finally{dispose(thumb);if(root){scene.add(root);paintSelected();}}
  }thumbnailStats();}

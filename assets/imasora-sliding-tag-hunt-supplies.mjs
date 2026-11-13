@@ -1,5 +1,5 @@
 import{huntPermanentToolUseful}from'./imasora-sliding-tag-hunt-sight.mjs';
-import{PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES}from'./imasora-sliding-tag-hunt-items.mjs';
+import{PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,EXTRA_BALLOON_COUNT}from'./imasora-sliding-tag-hunt-items.mjs';
 import{WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldHeight,worldValid,worldSight,worldTraversable}from'./imasora-sliding-tag-hunt-world.mjs';
 
 // Both factions have a radar, alongside the existing props, spread over the world instead of a ring at the start.
@@ -33,6 +33,75 @@ export function createHuntSupplies(random,actors=[]){
   const {x,y,z}=ranked[0].p;result.push({x,y,z,lift:audience==='player'?PICKUP_LIFT:0,bobPhase:index,home:{x,y,z},region:zone.id,id:'pickup-'+result.length,type,audience,readyAt:0,pull:null});
  }
  return result;
+}
+
+
+// Add coverage to regions without a pickup after the ordinary layout and
+// opening tool have been placed. The original layout and its RNG are retained.
+export function addHuntBalloonSupplies(pickups, actors) {
+ const occupied = new Set(pickups.map(p => p.region));
+ for (let added = 0; added < EXTRA_BALLOON_COUNT; added++) {
+  const balloons = pickups.filter(p => p.type === 'balloon');
+  let best = null;
+  let bestScore = -Infinity;
+  for (const zone of SUPPLY_ZONES) {
+   if (occupied.has(zone.id)) continue;
+   for (const point of candidates(zone)) {
+    if (actors.some(a => distance(a, point) <= a.radius + 12)) continue;
+    const nearest = Math.min(...pickups.map(p => distance(p, point)));
+    if (nearest <= 48) continue;
+    const nearestBalloon = Math.min(...balloons.map(p => distance(p, point)));
+    // Cover a different area without pushing the new tools to the map corners.
+    const score = Math.min(160, nearestBalloon) + Math.min(90, nearest) * .25 -
+      Math.hypot(point.x, point.z) * .1;
+    if (score > bestScore) {
+     best = {point, region:zone.id};
+     bestScore = score;
+    }
+   }
+  }
+  if (!best) throw Error('NO_SAFE_EXTRA_BALLOON');
+  const {x, y, z} = best.point;
+  const index = pickups.length;
+  pickups.push({
+   x, y, z, home:{x, y, z}, region:best.region, id:'pickup-' + index,
+   type:'balloon', audience:'hunters', lift:0, bobPhase:index, readyAt:0, pull:null
+  });
+  occupied.add(best.region);
+ }
+}
+
+const approachDistances=[44,36,52,28,60,68];
+const approachAngles=[0,Math.PI/12,-Math.PI/12,Math.PI/6,-Math.PI/6];
+function onOpeningApproach(hunter,pickup){
+ const dx=pickup.x-hunter.x,dz=pickup.z-hunter.z;
+ const forward=dx*Math.sin(hunter.yaw)+dz*Math.cos(hunter.yaw);
+ return forward>=Math.hypot(dx,dz)*Math.cos(Math.PI/6)-.01&&
+  worldTraversable(hunter,pickup,hunter.radius+.25)&&
+  worldSight({...hunter,y:hunter.y+4},{...pickup,y:pickup.y+3.5});
+}
+
+// Keep one regular ground tool within reach of the opening route. Do not
+// change the assortment or consume any extra random numbers for the match.
+export function placeHuntOpeningSupply(pickups,hunter,actors){
+ const groundTools=pickups.filter(p=>p.audience==='hunters');
+ if(groundTools.some(p=>distance(hunter,p)<=65&&onOpeningApproach(hunter,p)))return;
+ groundTools.sort((a,b)=>distance(hunter,a)-distance(hunter,b));
+ for(const angle of approachAngles){
+  const yaw=hunter.yaw+angle;
+  for(const gap of approachDistances){
+   const x=hunter.x+Math.sin(yaw)*gap,z=hunter.z+Math.cos(yaw)*gap;
+   const point={x,y:worldHeight(x,z),z};
+   if(!worldValid(point,padding)||!onOpeningApproach(hunter,point))continue;
+   if(actors.some(a=>distance(a,point)<(a.owner==='player'?55:a.radius+12)))continue;
+   const neighbors=pickups.filter(p=>distance(p,point)<=48);
+   if(neighbors.length>1)continue;
+   const tool=neighbors[0]??groundTools[0];
+   if(tool?.audience!=='hunters')continue;
+   Object.assign(tool,point,{home:point,region:'opening-approach'});
+   return;
+  }
+ }
 }
 
 const preferences={pursuit:{scarf:5,ink:4,sunglasses:4,radar:4},intercept:{balloon:5,sunglasses:4},patrol:{sunglasses:5,ink:3,radar:4}};

@@ -1,19 +1,19 @@
 import{ITEM_DEFS,PLAYER_ITEMS,HUNTER_ITEMS,itemIcon,HUNT_FIELDS}from'./imasora-sliding-tag-hunt-items.mjs';
 const notes={
- radar:['索敵','見失った時や、周りを確かめたい時に使う。','試合終了まで表示。相手のおおまかな方角が分かる。'],
+ radar:['索敵','見失った時や、周りを確かめたい時に使う。','試合終了まで表示。近くの相手が高い位置なら▲、低い位置なら▼。'],
  mirror:['後方確認','使うと画面上部にバックミラーを装着。','試合終了まで、走りながら後ろの道や鬼を確認できる。'],
  speed:['加速','直線に入る時に使う。','鬼が近づく前に、距離をあけよう。'],
- cloak:['かく乱','見失わせたい時に使う。','サングラスを着けた鬼には見える。曲がって離れよう。'],
+ cloak:['かく乱','姿と足跡インクの足あとを4秒間隠す。','マントが切れると足あとも再表示。サングラスには姿が見える。'],
  clone:['かく乱','前が空いた場所で使う。','分身とは別の道へ走ろう。'],
  cushion:['妨害','走りながら、後ろの鬼へ転がす。','当たると2秒ピヨピヨ。自分にも効くので進路を変えよう。'],
- curtain:['かく乱','広い通路や分かれ道で使う。','サングラスを着けた鬼は見通す。自分の視界も遮る。'],
+ curtain:['かく乱','鬼から逃走者の姿や手持ちの道具を隠す。泡に紛れて進路を変えよう。','逃走者からは泡の中の鬼が見える。サングラスを着けた鬼も泡を見通せる。'],
  fan:['設置','向いた先に巨大扇風機を設置。12秒間、前方へ送風。','風は自分にも効き、壁を通らない。鬼は横から回り込み、狭い道では別の入口へ。'],
  sheet:['地形','通路の先に置いて使う。','自分も滑るので、跳んで越えよう。'],
  hook:['高速移動','前方のポールへ、紐に引かれてビュンと移動。','壁を貫通しない。行き先が空いている方向を向こう。'],
  scarf:['加速','追いかける直線で使う。','短い予兆のあと加速する。'],
  sunglasses:['見通し','使うと装着。試合終了まで透明化と泡を見通す。','着用した鬼だけに有効。壁は見通さない。'],
- ink:['追跡','使った瞬間、逃走者へ無条件で付着。','試合終了まで足あとを残す。1つの足あとは15秒で消える。'],
- balloon:['浮遊','地上でも空中でも使える。','障害物を回り込み追尾。ダイブ1回では届かない間隔で着地。']
+ ink:['追跡','使った瞬間、逃走者へ無条件で付着。','試合終了まで有効。足あとは15秒。透明マント中は隠れ、終了後に再表示。'],
+ balloon:['浮遊','地上でも空中でも使える。','逃走者を追い、着地点を決めたらそのまま降りる。着地後は間合いを見て追いかけよう。']
 };
 export function huntGuideEntries(mode){return(mode==='hunt'?HUNTER_ITEMS:PLAYER_ITEMS).map(id=>{const d=ITEM_DEFS[id],[category,how,tip]=notes[id];return Object.freeze({...d,category,how,tip});});}
 // The guide always reads the live, role-specific catalogue above. No separate
@@ -22,7 +22,7 @@ export function createHuntItemGuide({onOpen=()=>{}}={}){
  const style=document.createElement('style');style.textContent=guideCss;document.head.append(style);
  const dialog=document.createElement('dialog');dialog.className='tag-item-guide';dialog.setAttribute('aria-label','アイテム図鑑');dialog.innerHTML='<header><div><span class="tg-eyebrow">FIELD EQUIPMENT</span><h2>アイテム図鑑</h2><p data-role-name></p></div><button data-close aria-label="図鑑を閉じる">閉じる ×</button></header><div class="tg-body"><section class="tg-library"><div class="tg-list-title"><b>道具を選ぶ</b><small>現行のラインナップ</small></div><div class="tg-grid" role="group" aria-label="道具を選ぶ"></div></section><section class="tg-detail" aria-live="polite" aria-atomic="true"></section></div><footer><span class="tg-help">使う：Lキー ／ アイテムボタン</span><span>道具なしで開始 · 拾って1つ持てる</span></footer>';document.body.append(dialog);
  const button=document.createElement('button');button.className='tag-guide-open';button.id='item-guide-open';let mode='escape',selected={escape:'speed',hunt:'sunglasses'};
- const facts={radar:['試合終了まで','相手の方角'],mirror:['試合終了まで','逃走者の後方映像'],speed:['3秒','自分が加速'],cloak:['4秒','自分の姿を隠す'],clone:['5秒','分身が走る'],cushion:['後方へ発射','当たった全員'],curtain:['5秒','視界を遮る'],fan:[HUNT_FIELDS.fanSeconds+'秒','風に当たった全員'],sheet:['7秒','踏んだ全員'],hook:['前方のポールへ','自分が移動'],scarf:['予兆のあと3秒','自分が加速'],sunglasses:['試合終了まで','着用した鬼だけ'],ink:['試合終了まで','逃走者に付着'],balloon:['近くまで追尾','自分が浮遊']};
+ const facts={radar:['試合終了まで','相手の方角'],mirror:['試合終了まで','逃走者の後方映像'],speed:['3秒','自分が加速'],cloak:['4秒','自分の姿を隠す'],clone:['5秒','分身が走る'],cushion:['後方へ発射','当たった全員'],curtain:['5秒','鬼から逃走者を隠す'],fan:[HUNT_FIELDS.fanSeconds+'秒','風に当たった全員'],sheet:['7秒','踏んだ全員'],hook:['前方のポールへ','自分が移動'],scarf:['予兆のあと3秒','自分が加速'],sunglasses:['試合終了まで','着用した鬼だけ'],ink:['試合終了まで','逃走者に付着'],balloon:['追尾のあと着地','自分が浮遊']};
  function select(id){const entries=huntGuideEntries(mode),d=entries.find(d=>d.id===id)??entries[0];selected[mode]=d.id;for(const tile of dialog.querySelectorAll('.tg-tile'))tile.setAttribute('aria-pressed',String(tile.dataset.item===d.id));const [duration,target]=facts[d.id];dialog.querySelector('.tg-detail').innerHTML='<div class="tg-detail-top"><span class="tg-category">'+d.category+'</span><span class="tg-side">'+(mode==='hunt'?'鬼の道具':'逃走者の道具')+'</span></div><div class="tg-hero" style="--item-color:'+d.color+'"><div class="tg-display">'+itemIcon(d.id)+'</div><div><p class="tg-overline">'+(d.id==='sunglasses'||d.id==='ink'?'試合中ずっと有効':'拾って、使って、切り抜ける')+'</p><h3>'+d.name+'</h3><p class="tg-effect">'+d.hint+'</p></div></div><div class="tg-facts"><span><small>持続・動き</small><b>'+duration+'</b></span><span><small>効く相手</small><b>'+target+'</b></span></div><div class="tg-how"><b>使いどころ</b><p>'+d.how+'</p></div><div class="tg-tip"><span>POINT</span><p>'+d.tip+'</p></div>';dialog.dataset.selectedItem=d.id;}
  function populate(){const entries=huntGuideEntries(mode);dialog.dataset.audience=mode==='hunt'?'hunters':'player';dialog.querySelector('[data-role-name]').textContent=(mode==='hunt'?'鬼':'逃走者')+'の道具 · '+entries.length+'種類';dialog.querySelector('.tg-grid').replaceChildren(...entries.map(d=>{const tile=document.createElement('button');tile.type='button';tile.className='tg-tile';tile.dataset.item=d.id;tile.style.setProperty('--item-color',d.color);tile.innerHTML='<span class="tg-tile-art">'+itemIcon(d.id)+'</span><span class="tg-tile-name">'+d.name+'</span><small>'+d.category+'</small>';tile.onclick=()=>select(d.id);return tile;}));select(selected[mode]);}
  function setRole(value){mode=value==='hunt'?'hunt':'escape';button.textContent='アイテム図鑑　'+huntGuideEntries(mode).length+'種類';if(dialog.open)populate();}

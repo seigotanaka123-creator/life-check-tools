@@ -38,6 +38,7 @@ import {inspectFormGround,requireFormGround} from './free-foundation-check.mjs?v
 import {FOUNDATION_ACTIONS,foundationBoardCount,foundationAvailableBoards,foundationContains,foundationGeometry} from './free-foundation-state.mjs?v=120pv';
 import {foundationActionFromPlan,assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120pv';
 import {createMonsterTravelInput,constructionTravelAllowed} from './monster-travel-input.mjs?v=120od';
+import {travelDirection} from '../imasora-construction-travel-input.mjs?v=120lb';
 import {createConstructionMovePad} from './move-pad.mjs?v=119bf';
 import {FREE_PLAY_MODES,FREE_PLAY_LABELS,nextFreePlayMode,freePlayActions,freePlayTemplate,freeModeNavigationKey,freeStageGuide,freeConfirmation,freeMenuBlocked} from './free-play-ui.mjs?v=120pv';
 import {createFreeBuildView} from './free-build-view.mjs?v=120pv';
@@ -71,12 +72,18 @@ export function createFreeBuildController({service,state,scene,camera,character,
  if(typeof ResizeObserver!=='undefined'){const hudSize=new ResizeObserver(()=>{const h=Math.ceil(q('.free-hud-top').getBoundingClientRect().height);if(h>0)panel.style.setProperty('--free-hud-size',h+'px');const b=Math.ceil(q('.free-basics').getBoundingClientRect().height);if(b>0)panel.style.setProperty('--free-basics-size',b+'px');});hudSize.observe(q('.free-hud-top'));hudSize.observe(q('.free-basics'));}
  const doorActions=button('truck').parentElement,travel=q('.concrete-travel');
  const writeText=(selector,value)=>{const element=q(selector);if(element.textContent!==value)element.textContent=value;};
- let travelBoost=null,dashControl=null,driving=false,progressSaving=false,groundPreview=false,workWatching=false;
+ let travelBoost=null,dashControl=null,driving=false,progressSaving=false,autoSaveOnFoot=false,groundPreview=false,workWatching=false;
  let paintTool='roller',vehicleJob='truck',moreActions=false,colorStudios=null;
  let buildPage='shape';let deckFolded=false;let mode='move',sheet=null,restoreFocus=null,swipe=null,suppressModeClick=false;
  let doorWalk=null,doorSearch=null;
  function stopDoorWalk(){doorSearch?.abort();doorSearch=null;doorWalk=null;view.stopWalking();}
- function clearFoot(){jumpControl?.cancel();view.releaseJump();stopDoorWalk();travelBoost?.reset();view.stopWalking();}
+ function clearFoot(){
+  jumpControl?.cancel();
+  view.releaseJump();
+  stopDoorWalk();
+  travelBoost?.reset();
+  globalThis.IMASORA_BUTTON_FEEDBACK?.releaseKeyboard?.();
+ }
  async function walkToVehicle(name){if(!ready()||free().aboard||view.onAccess)return;clearFoot();sheet=null;mode='move';deckFolded=true;const search=new AbortController();doorSearch=search;const version=project().revision;note='ドアまでの道をたしかめているよ。';refresh();try{const path=await view.planDoorWalk(name,{signal:search.signal});if(search.signal.aborted||doorSearch!==search)return;if(!ready()||project().revision!==version)throw Error('現場が変わったよ。もう一度、行きたい車をえらぼう。');doorWalk={name,path,stuck:0};note=(name==='truck'?'ミキサー車':'ポンプ車')+'のドアへ走っているよ。';}catch(e){if(!search.signal.aborted)note=e.message;}finally{if(doorSearch===search)doorSearch=null;refresh();}}
  function advanceDoorWalk(dt){if(!doorWalk)return;const run=doorWalk,p=view.footPosition;while(run.path.length&&Math.hypot(run.path[0].x-p.x,run.path[0].z-p.z)<.08)run.path.shift();if(!run.path.length){stopDoorWalk();note='ドアに着いたよ！「'+(run.name==='truck'?'ミキサー車':'ポンプ車')+'に乗る」を押そう。';refresh();return;}view.walkDoorStep(run.path[0],dt);const q=view.footPosition;run.stuck=Math.hypot(q.x-p.x,q.z-p.z)<.01?run.stuck+dt:0;if(run.stuck>.35){stopDoorWalk();note='通り道がふさがったので止まったよ。もう一度ドアをえらぼう。';refresh();}}
  document.addEventListener('imasora-menu-peek-start',clearFoot);
@@ -96,17 +103,18 @@ export function createFreeBuildController({service,state,scene,camera,character,
  const free=()=>project().freeBuild;
  const loadGuard=createVehicleLoadGuard(()=>service.ledger?.world);view.setVehicleLoadProblem((f,name,v)=>{const moving=Math.hypot(v.x-f[name].x,v.z-f[name].z)>.001,pose=moving?{...v,speed:24}:v;return loadGuard('constructionProfileProject',{...project(),freeBuild:f},{...project(),freeBuild:{...f,[name]:pose}},{heightAt:supportHeightAt});});
  const ready=()=>active&&!busy&&!paused&&!service.blocked&&!service.busy&&!confirm;
- const menuBlocked=()=>freeMenuBlocked({busy,progressSaving,confirm});
+ const menuBlocked=()=>freeMenuBlocked({busy,progressSaving:progressSaving||autoSaveOnFoot,confirm});
  const focusHigh=(anchor,detail=null)=>view.focusUpper(anchor,detail,anchor?upperWorkViewAngle(service.constructionHighBuild,anchor):null); const upperHost=document.createElement('div');q('.free-primary-actions').after(upperHost);
  let pumpDirect=null;const upperPump=createUpperPumpControls({host:upperHost,service,project,ready,run,show:()=>active&&mode==='vehicle'&&free().aboard==='pump'&&!sheet&&!confirm&&!deckFolded&&!pumpDirect?.working,paused:()=>!active||paused||!!sheet||!!confirm,onView:focusHigh,notice:text=>{note=text;}});
  pumpDirect=createPumpDirectPlay({panel,canvas,camera,scene,project,high:()=>service.constructionHighBuild,visible:()=>active&&free()?.aboard==='pump',uncovered:()=>!sheet&&!confirm&&!paused&&!constructionOverlayOpen(),ready,run,selectCell:i=>{cell=i;view.select(i);},focusHigh,clearInput:clearFoot,onMode:working=>{mode=working?'vehicle':'move';deckFolded=true;},notice:text=>{note=text;refresh();},refresh});
  let upperPipeBlockedAt=()=>true;
  const movementReady=()=>ready()&&!sheet;
  const vehicleSelector=createVehicleSelector({ids:['truck','pump'],onOpen:clearFoot,onClose:clearFoot,canWalk:()=>ready()&&!free().aboard&&!view.onAccess?true:'作業を終えて車を降りてから、ドアへ向かおう。',onWalk:walkToVehicle});
- const travelReady=()=>!pumpDirect?.working&&!pumpDirect?.pending&&!(free()?.aboard&&projectHistoryStatus(project()).full)&&constructionTravelAllowed({active,paused,blocked:service.blocked,confirm,sheet,busy,serviceBusy:service.busy,driving,progressSaving});
+ const travelReady=()=>!constructionOverlayOpen()&&!pumpDirect?.working&&!pumpDirect?.pending&&!(free()?.aboard&&projectHistoryStatus(project()).full)&&constructionTravelAllowed({active,paused,blocked:service.blocked,confirm,sheet,busy,serviceBusy:service.busy,driving,progressSaving:progressSaving||autoSaveOnFoot});
+ const pedestrianReady=()=>!free()?.aboard&&travelReady();
  travelBoost=createMonsterTravelInput({enabled:travelReady,context:()=>free()?.aboard??'foot',onStop:()=>view.stopWalking(),fastHeld:()=>dashControl?.active===true,clearFast:()=>dashControl?.cancel()});
- function tryJump(){if(!movementReady()||free().aboard)return false;stopDoorWalk();if(!view.jump())return false;note=view.jumpCount+'段ジャンプ！';refresh();return true;}
- const jumpControl=bindJumpButton({element:q('[data-free-jump]'),enabled:()=>movementReady()&&!free().aboard&&view.jumpCount<3,canHold:()=>movementReady()&&!free().aboard,activate:tryJump,release:()=>view.releaseJump()});
+ function tryJump(){if(!pedestrianReady())return false;stopDoorWalk();if(!view.jump())return false;note=view.jumpCount+'段ジャンプ！';refresh();return true;}
+ const jumpControl=bindJumpButton({element:q('[data-free-jump]'),enabled:()=>pedestrianReady()&&view.jumpCount<3,canHold:pedestrianReady,activate:tryJump,release:()=>view.releaseJump()});
  const padAllowed=()=>!pumpDirect?.working&&!pumpDirect?.pending&&travelReady()&&(!free()?.aboard||!free().connected&&!free().hose&&!free()[free().aboard]?.legs);
  dashControl=createHeldDashButton({element:q('[data-hold-dash]'),jump:{element:q('[data-free-jump]'),control:jumpControl},enabled:padAllowed,context:()=>free()?.aboard??'foot'});
  const movePad=createConstructionMovePad({element:q('[data-construction-pad]'),input:travelBoost,enabled:padAllowed,onChange:()=>refresh()});
@@ -155,10 +163,15 @@ export function createFreeBuildController({service,state,scene,camera,character,
   if(!active||busy||service.busy||service.blocked||confirm)return false;clearFoot();sheet=null;paused=false;busy=true;workWatching=true;refresh();try{await view.access(up,target);view.verifyFooting();view.complete(true);view.sync(project());note=up?'土台に上がりました。スマホは丸いパッド、PCはWASDで歩けます。降りる時は階段ボタンを使います。':'地上へ戻り、階段と踊り場を片付けました。';return true;}catch(e){view.complete(false);view.sync(project());note=e.message;return false;}finally{busy=false;workWatching=false;refresh();}
  }
  async function savePlatform({automatic=false}={}){
-  if(busy||service.busy||service.blocked)return false;if(view.airborne){note='着地してからセーブしよう。';refresh();return false;}if(!automatic)clearFoot();busy=true;refresh();
+  if(busy||service.busy||service.blocked)return false;
+  if(view.airborne){if(!automatic){note='着地してからセーブしよう。';refresh();}return false;}
+  autoSaveOnFoot=automatic&&!free().aboard;
+  if(!automatic)clearFoot();
+  busy=true;
+  if(!autoSaveOnFoot)refresh();
   try{if(!free().aboard)copyFootToHost();await service.saveConstructionWorkPlatform(view.exportWorkPlatform(),project().revision,snapshot());note='保存しました。';return true;}
-  catch(e){note=e.message;if(service.blocked){paused=true;sheet='menu';onError(e);}return false;}
-  finally{busy=false;refresh();}
+  catch(e){note=e.message;if(service.blocked){clearFoot();paused=true;sheet='menu';onError(e);}return false;}
+  finally{busy=false;autoSaveOnFoot=false;refresh();}
  }
  async function clearDoorStep(){
   if(!nativeEntry||!nativeVehicle)return true;
@@ -331,7 +344,26 @@ export function createFreeBuildController({service,state,scene,camera,character,
  }
  function endDrawing(cancel=false){const id=drawingPointer;drawingPointer=null;drawing.finish(cancel);const board=q('[data-drawing-board]');if(id!=null&&board.hasPointerCapture(id))board.releasePointerCapture(id);}
  function selectMode(next){if(busy||confirm||paused||service.blocked||!FREE_PLAY_MODES.includes(next))return;clearFoot();clearBrush();mode=next;moreActions=false;sheet=null;deckFolded=false;refresh();}
- function setSheet(next){if(menuBlocked())return;clearFoot();clearBrush();if(next){restoreFocus=document.activeElement;sheet=next;refresh();q('[data-ui="close"]').focus();}else{sheet=null;refresh();if(restoreFocus?.isConnected&&restoreFocus.offsetWidth)restoreFocus.focus();else q(`[data-mode="${mode}"]`).focus();}}
+ function setSheet(next){
+  if(menuBlocked())return;
+  if(!next&&sheet==='menu'&&paused){
+   if(service.blocked)return;
+   paused=false;
+  }
+  clearFoot();
+  clearBrush();
+  if(next){
+   restoreFocus=document.activeElement;
+   sheet=next;
+   refresh();
+   q('[data-ui="close"]').focus();
+  }else{
+   sheet=null;
+   refresh();
+   if(restoreFocus?.isConnected&&restoreFocus.offsetWidth)restoreFocus.focus();
+   else q(`[data-mode="${mode}"]`).focus();
+  }
+ }
  function refreshChrome(f){
   panel.dataset.workPeek=String(active&&(!busy||progressSaving)&&!paused&&!service.blocked&&!confirm&&(!sheet||FREE_PLAY_MODES.includes(sheet)));
   panel.dataset.busy=String(busy||view.busy);
@@ -361,11 +393,40 @@ export function createFreeBuildController({service,state,scene,camera,character,
   q('[data-shape-help]').textContent=project().foundation?'明るいマスが土台の上だよ。形・大きさ・位置をえらんで、好きなところにつくろう！':'下の板をタッチして、自分だけの形にもできるよ！';q('[data-build-help]').hidden=buildPage==='book';q('[data-ui=build-done]').textContent=buildPage==='book'?'現場へ戻る':buildPage==='pour'?'ここへ注ぐ！ 現場へ':buildPage==='base'?'現場でたしかめる':'この形で現場へ！';
  }
  function dismissConfirmation(){const edit=['FREE_SET_WORK_PARTS','FREE_MOVE_WORK','FREE_TRANSFORM_WORK',SUPPORTED_WORK_MOVE].includes(confirm?.type);confirm=null;if(edit)setSheet('works');else{refresh();q(`[data-mode="${mode}"]`).focus();}}
+ function openKeyboardMenu(){
+  if(!active)return false;
+  if(busy&&!progressSaving&&!autoSaveOnFoot)return true;
+  if(confirm)dismissConfirmation();else setSheet(sheet?null:'menu');
+  return true;
+ }
  function handleMenuKey(e){
-  if(e.key==='Escape'){e.preventDefault();if(busy&&!progressSaving)return true;if(confirm)dismissConfirmation();else setSheet(sheet?null:'menu');return true;}
+  if(e.key==='Escape'){e.preventDefault();return openKeyboardMenu();}
   if(e.key==='Tab'&&(sheet||confirm)){const modal=q(confirm?'[data-confirm]':'[data-play-sheet]'),items=[...modal.querySelectorAll('button,select,input,textarea,summary,[tabindex="0"]')].filter(el=>!el.disabled&&el.offsetWidth),i=items.indexOf(document.activeElement);if(items.length&&(i<0||(!e.shiftKey&&i===items.length-1)||(e.shiftKey&&i===0))){e.preventDefault();items[e.shiftKey?items.length-1:0].focus();}return true;}
   if(e.target.closest?.('[data-mode]')&&freeModeNavigationKey(e)){e.preventDefault();selectMode(e.key==='Home'?'move':e.key==='End'?'paint':nextFreePlayMode(mode,e.key==='ArrowRight'?1:-1));q(`[data-mode="${mode}"]`).focus();return true;}
   return !!sheet||!!confirm;
+ }
+ function handleKey(event){
+  const {code}=event;
+  const jumpKey=code==='KeyE'||code==='KeyJ'||code==='KeyB';
+  if(event.type==='keyup'){
+   if(jumpKey)jumpControl.key(event);
+   travelBoost.key(event);
+   return;
+  }
+  if(handleMenuKey(event))return;
+  if(jumpKey){
+   event.preventDefault();
+   jumpControl.key(event);
+   return;
+  }
+  if(!travelDirection(code)&&code!=='Space'&&code!=='KeyK')return;
+  // Native scrolling or button activation must not take an in-game key,
+  // including repeats and keys pressed while an action is finishing.
+  event.preventDefault();
+  if(travelBoost.key(event)&&travelDirection(code)&&(doorWalk||doorSearch)){
+   stopDoorWalk();
+   note='自分で歩く操作に切り替えたよ。';
+  }
  }
  function refreshMask(can,w,mask,applied){
   const count=16-unmaskedPaintPixels(Array.from({length:16},(_,i)=>i),mask).length;
@@ -495,9 +556,8 @@ export function createFreeBuildController({service,state,scene,camera,character,
  };
  q('[data-ui=clear-platform]').onclick=()=>ask('CLEAR_PLATFORM',{},'作業台と階段を片付けます。作品・型枠・材料はそのままです。次の作業で必要な足場を用意します。');
  for(const b of panel.querySelectorAll('[data-free]'))b.onclick=()=>Promise.resolve(actions[b.dataset.free]()).catch(e=>{note=e.message;refresh();});
- function move(dx,dz,dt=.05){
-  if(!movementReady())return;
-  if(free().aboard){if(projectHistoryStatus(project()).full){clearFoot();return;}const name=free().aboard,action=chooseSteeredVehicleTravel(free()[name],name,-dz,dx,a=>view.vehicleProblem(a));if(action){try{const {type,...extra}=view.measuredVehicleMove(action);void run(type,extra);}catch(e){note=e.message;refresh();}}return;}
+ function move(dx,dz,dt){
+  if(free().aboard){if(!movementReady())return;if(projectHistoryStatus(project()).full){clearFoot();return;}const name=free().aboard,action=chooseSteeredVehicleTravel(free()[name],name,-dz,dx,a=>view.vehicleProblem(a));if(action){try{const {type,...extra}=view.measuredVehicleMove(action);void run(type,extra);}catch(e){note=e.message;refresh();}}return;}
   const world=view.travelVector(dx,dz);dx=world.x;dz=world.z;
   const strength=Math.min(1,Math.hypot(dx,dz));if(!strength)return;
   view.walkFoot(dx,dz,dt*strength,travelBoost.fast);
@@ -509,13 +569,22 @@ export function createFreeBuildController({service,state,scene,camera,character,
  // Actual background/page departure still suspends via visibility/pagehide.
  window.addEventListener('blur',()=>{if(constructionOverlayOpen()&&!document.hidden){clearFoot();return;}suspend();});document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});window.addEventListener('pagehide',suspend);
  function contactGeometry(){return{floors:[],walls:[...concreteVehicleGeometry(free(),supportHeightAt).walls,...pipeContactGeometry(free(),supportHeightAt).walls,...foundationGeometry(project()).walls]};}
- return{get resumePoint(){return active?{kind:'concrete',revision:project().revision,view:0,foot:view.worldFootPose}:null;},resumeSaved(point){if(point?.kind!=='concrete'||active||entering||busy||service.busy||service.blocked||state.map!=='construction'||!free()?.location||point.revision>project().revision)return false;paused=false;if(point.foot)view.setResumeFoot(point.foot);openView();return true;},autosave:()=>active&&!busy&&!view.busy?savePlatform({automatic:true}):false,contactGeometry,doorTarget,enterAtDoor,get busy(){return busy||entering;},pedestrianBlockedAt:(x,z)=>view.pedestrianBlockedAt(x,z),overlapsVehicle:(p,size)=>contactGeometry().walls.some(w=>overlaps({x:w.x,z:w.z,hx:w.localHalfX,hz:w.localHalfZ,heading:w.rotation},{x:p[0],z:p[2],hx:size[0]/2,hz:size[2]/2,heading:0})),get jumpMotion(){return active?view.jumpMotion:null;},get active(){return active;},leave,save:savePlatform,look:(...args)=>{if(!sheet&&!confirm&&!paused)view.look(...args);},handleKey:e=>{if(e.type!=='keyup'&&(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB')&&!e.target?.closest?.('input,select,textarea,[contenteditable=true]')){if(sheet||confirm||paused)return;e.preventDefault();jumpControl.key(e);return;}if(e.type==='keyup'){if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'))jumpControl.key(e);travelBoost.key(e);return;}if(handleMenuKey(e))return;if(travelBoost.key(e)){e.preventDefault();const v=travelBoost.vector;move(v.x,v.z);refresh();}},
+ return{get resumePoint(){return active?{kind:'concrete',revision:project().revision,view:0,foot:view.worldFootPose}:null;},resumeSaved(point){if(point?.kind!=='concrete'||active||entering||busy||service.busy||service.blocked||state.map!=='construction'||!free()?.location||point.revision>project().revision)return false;paused=false;if(point.foot)view.setResumeFoot(point.foot);openView();return true;},autosave:()=>active&&!busy&&!view.busy?savePlatform({automatic:true}):false,contactGeometry,doorTarget,enterAtDoor,get busy(){return busy||entering;},pedestrianBlockedAt:(x,z)=>view.pedestrianBlockedAt(x,z),overlapsVehicle:(p,size)=>contactGeometry().walls.some(w=>overlaps({x:w.x,z:w.z,hx:w.localHalfX,hz:w.localHalfZ,heading:w.rotation},{x:p[0],z:p[2],hx:size[0]/2,hz:size[2]/2,heading:0})),get jumpMotion(){return active?view.jumpMotion:null;},get active(){return active;},leave,save:savePlatform,look:(...args)=>{if(!sheet&&!confirm&&!paused)view.look(...args);},
+  handleKey,openKeyboardMenu,get keyboardScope(){return travelReady()?panel:null;},
   install(options){readPresentationRevision=options.presentationRevision??null;backgroundPresentation.reset();upperPipeBlockedAt=options.upperPipeBlockedAt??(()=>true);blockedAt=options.blockedAt;const travelBlocked=options.travelBlockedAt??blockedAt;view.setBlockedAt(travelBlocked);supportHeightAt=options.supportHeightAt??(()=>null);placementHeightAt=options.placementHeightAt??supportHeightAt;view.setSupportHeightAt(supportHeightAt);view.setJumpCeilingAt(options.jumpCeilingAt??(()=>Infinity));view.setToolEnvironment({heightAt:toolHeightAt,blockedAt:(...args)=>supportedToolBlocked(project(),travelBlocked)(...args)});view.setFoundationEnvironment(()=>({heightAt:placementHeightAt,blockedAt}));view.root.visible=state.map==='construction';view.sync(project());if(!active&&!entering&&free()?.location)syncDoorEnvironment();const f=free();if(state.map==='construction'&&f?.location){// Pedestrians use the actual vehicles, wet forms, rack, hose and platform.
 for(const w of contactGeometry().walls)options.collider(w.x,w.z,[w.localHalfX*2,w.localHalfZ*2],w.rotation,w.id,0,{...w,buildingId:'construction-concrete'});}},
-  update(dt){jumpControl.sync();if(!active&&!entering&&state.map!=='construction')return false;q('[data-free-jump]').hidden=!!free()?.aboard||!!sheet||!!confirm||paused||busy&&!progressSaving;if(constructionOverlayOpen()){upperPump.pause();return active||entering;}dashControl.sync();movePad.sync();upperPump.tick(dt);pumpDirect.tick();if(active&&!paused&&!document.hidden){
+  update(dt){jumpControl.sync();if(!active&&!entering&&state.map!=='construction')return false;q('[data-free-jump]').hidden=!!free()?.aboard||!!sheet||!!confirm||paused||busy&&!progressSaving&&!autoSaveOnFoot;if(constructionOverlayOpen()){upperPump.pause();return active||entering;}dashControl.sync();movePad.sync();upperPump.tick(dt);pumpDirect.tick();if(active&&!paused&&!document.hidden){
    progress.sync(free(),service.blocked?0:dt);
    if(!busy&&!service.busy&&!service.blocked&&!confirm&&!projectHistoryStatus(project()).full){const next=progress.next(free());if(next)void run(next.type,{elapsedMs:next.elapsedMs},false);}
-   const v=travelBoost.vector;if(movementReady()){if(v.x||v.z){if(doorWalk||doorSearch)note='自分で歩く操作に切り替えたよ。';stopDoorWalk();move(v.x,v.z,dt);}else if(doorWalk)advanceDoorWalk(dt);else view.stopWalking();}view.tick(dt);if(HOSE_TRANSFER_ACTIONS.has(view.hoseTransferType))hoseFeedback.advance(view.hoseTransferProgress);
-  }lastUI+=dt;if(lastUI>.15){lastUI=0;const p=project();backgroundPresentation.draw({project:p,stock:service.constructionPackTrialStock},readPresentationRevision?.(),()=>{view.sync(p);refresh();},{live:active||entering});}return active||entering;}
+   const v=travelBoost.vector;
+   if(travelReady()){
+    if(v.x||v.z){
+     if(doorWalk||doorSearch){stopDoorWalk();note='自分で歩く操作に切り替えたよ。';}
+     move(v.x,v.z,dt);
+    }else if(doorWalk)advanceDoorWalk(dt);
+    else view.stopWalking();
+   }
+   view.tick(dt);if(HOSE_TRANSFER_ACTIONS.has(view.hoseTransferType))hoseFeedback.advance(view.hoseTransferProgress);
+  }lastUI+=dt;if(lastUI>.15&&!autoSaveOnFoot){lastUI=0;const p=project();backgroundPresentation.draw({project:p,stock:service.constructionPackTrialStock},readPresentationRevision?.(),()=>{view.sync(p);refresh();},{live:active||entering});}return active||entering;}
  };
 }

@@ -26,6 +26,21 @@ body.world-player-game .free-hose-meter progress::-moz-progress-bar{background:#
 body.world-player-game :is(.free-seat-actions,.transport-pad,.concrete-travel)>span{color:#263e4e!important;background:#dceffc!important}
 body.world-player-game :is(button,summary):focus-visible{outline:3px solid #5f8ba4!important;outline-offset:2px}
 
+/* Pair the delivery dialog's dark text with the light game palette. */
+body.world-player-game .construction-delivery-menu :is(.delivery-pack-stock,.delivery-project-stock) {
+  background: #dceffc;
+  border-left-color: #6698b2;
+  font-size: 13px !important;
+}
+body.world-player-game .construction-delivery-menu :is(.delivery-pack-message,.delivery-project-message,.delivery-message) {
+  background: #dcefe7;
+  border-color: #72a494;
+  font-size: 14px;
+}
+body.world-player-game .construction-delivery-menu .delivery-stock b {
+  color: #263e4e;
+}
+
 /* Keep movement hints legible on the same light palette. */
 body.world-player-game .construction-keyboard-hint,body.world-player-game .construction-move-pad,body.world-player-game .construction-hold-dash{background:#e0f2fa!important;color:#294959!important;border-color:#aecdda!important;box-shadow:0 3px 0 #c0d9d7!important}
 body.world-player-game .construction-move-stick{background:#b7e5d1!important;border-color:#75b7a8!important}

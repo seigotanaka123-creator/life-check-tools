@@ -9,12 +9,12 @@ export function createHuntDecoys({create,release}){
  function place(index,g,{self=false,paused=false,dt=0,groundAt=()=>0,isIce=()=>false,radius=2.7}={}){
   const row=slots[index];if(!row)return false;const a=row.actor,owner='decoy:'+g.id;if(row.owner!==owner){a.gait?.reset();a.action?.reset();row.owner=owner;}
   if(row.ghost!==self){for(const b of row.base){const m=b.material,t=self?true:b.transparent,o=self?Math.min(.55,b.opacity):b.opacity;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true;}if(m.opacity!==o)m.opacity=o;}row.ghost=self;}
-  a.root.visible=true;a.root.position.set(g.x,g.y,g.z);a.root.rotation.set(0,g.yaw,0);const ground=groundAt(g.x,g.z),height=Math.max(0,g.y-ground);row.shadow.position.y=ground-g.y+.035;row.shadow.scale.set(radius*.78,Math.max(.6,radius*.58),1);row.shadow.material.opacity=.23/(1+height*.18)*(self?.55:1);
+  row.gadget=g;a.root.visible=true;a.root.position.set(g.x,g.y,g.z);a.root.rotation.set(0,g.yaw,0);const ground=groundAt(g.x,g.z),height=Math.max(0,g.y-ground);row.shadow.position.y=ground-g.y+.035;row.shadow.scale.set(radius*.78,Math.max(.6,radius*.58),1);row.shadow.material.opacity=.23/(1+height*.18)*(self?.55:1);
   // Gait is applied temporarily by render(), so restore only after the scene
   // has been rendered, just as with the four real actors.
   row.motion={owner,grounded:g.grounded,x:g.x,z:g.z,speed:Math.hypot(g.vx,g.vz),ice:isIce(g),groundAt,frozen:paused};row.jump={owner,airborne:!g.grounded,stage:g.jumps,velocity:g.vy,height:g.y,handsFree:true};row.dt=paused?0:dt;return true;
  }
  function render(draw){function next(i){if(i===slots.length)return draw();const row=slots[i];if(!row.actor.root.visible||!row.actor.gait||!row.motion)return next(i+1);return row.actor.gait.render(row.motion,row.dt,()=>row.actor.action?row.actor.action.render(row.jump,row.dt,()=>next(i+1)):next(i+1));}return next(0);}
  function reset(){hide();for(const row of slots){row.owner=null;row.motion=null;row.actor.gait?.reset();row.actor.action?.reset();}}
- return{prepare,reset,hide,place,render,dispose(){for(const row of slots)destroy(row);slots=[];source=null;},stats:()=>({live:slots.length,created,released,visible:slots.filter(r=>r.actor.root.visible).length})};
+ return{prepare,reset,hide,place,render,occlusionEntries:()=>slots.filter(row=>row.actor.root.visible&&row.gadget).map(row=>({actor:row.gadget,nodes:[row.actor.root]})),dispose(){for(const row of slots)destroy(row);slots=[];source=null;},stats:()=>({live:slots.length,created,released,visible:slots.filter(r=>r.actor.root.visible).length})};
 }

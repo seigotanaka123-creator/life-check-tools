@@ -1,4 +1,10 @@
-import{huntJumpInput,huntJumpRestRemaining,recordHuntJumpLanding,HUNT_JUMP_QUICK_REST}from'./imasora-sliding-tag-hunt-jump-rest.mjs';
+import{CLOAK_INK_RULES,huntInkTrailSuppressed}from'./imasora-sliding-tag-hunt-cloak-ink.mjs';
+import{BALLOON_DESCENT_TURN_RULES,usesTrainingStep,TRAINING_STEP_RULES,usesExtraBalloons,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,usesBalloonDropPursuit,usesOpeningSupply,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES}from'./imasora-sliding-tag-hunt-contact-rules.mjs';
+import{rememberCloakDisappearance,cloakDisappearanceMovement}from'./imasora-sliding-tag-hunt-cloak-reaction.mjs';
+import{huntDropPursuit}from'./imasora-sliding-tag-hunt-drop-pursuit.mjs';
+export{BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,CLOAK_INK_RULES,JUMP_REST_CONTINUITY_RULES,RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES};
+import{updateHuntTeamContact,receiveHuntTeamContact,observedHuntChase}from'./imasora-sliding-tag-hunt-team-pressure.mjs';
+import{JUMP_REST_CONTINUITY_RULES,usesContinuousJumpRest,huntJumpInput,huntJumpRestRemaining,recordHuntJumpLanding,HUNT_JUMP_QUICK_REST}from'./imasora-sliding-tag-hunt-jump-rest.mjs';
 import{huntSweepControl}from'./imasora-sliding-tag-hunt-sweep.mjs';
 import{huntStartFacing}from'./imasora-sliding-tag-hunt-start-facing.mjs';
 import{huntCanObserve,huntOpticalHidden,huntHasClearSight,huntPermanentToolUseful}from'./imasora-sliding-tag-hunt-sight.mjs';
@@ -9,6 +15,7 @@ import{applyCushionDizzy,huntIsDizzy}from'./imasora-sliding-tag-hunt-cushion-stu
 import{huntBodiesTouch,DEFAULT_TOUCH_SHAPE,validHuntTouchShape}from'./imasora-sliding-tag-hunt-body-touch.mjs';
 import{startHuntZip,moveHuntZip}from'./imasora-sliding-tag-hunt-zip.mjs';
 import{MATCH_SECONDS,TRACE_CAPACITY}from'./imasora-sliding-tag-hunt-match.mjs';
+import{stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonAirApproach,balloonDescentFacing}from'./imasora-sliding-tag-hunt-balloon-steering.mjs';
 
 import{radarObservations}from'./imasora-sliding-tag-hunt-radar.mjs';
 import{runnerHookControl}from'./imasora-sliding-tag-hunt-runner-hook.mjs';
@@ -18,7 +25,7 @@ import{startHuntDive,moveHuntDive,diveCanTouch,HUNT_DIVE}from'./imasora-sliding-
 // The normal trial uses this simulation; formal growth/rewards remain disabled.
 import{STEP,BODY,HUNT_JUMP,WORLD,WORLD_STARTS,WORLD_RADII,TAG_CHARACTERS,actor,opponentSpec,worldHeight,worldValid,worldSight,worldTraversable,worldMove,worldPilot,worldSteering,worldRoute,worldRouteSeconds}from'./imasora-sliding-tag-hunt-world.mjs';
 import{ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,INK,HUNT_FIELDS}from'./imasora-sliding-tag-hunt-items.mjs';
-import{createHuntSupplies,huntSupplySteering}from'./imasora-sliding-tag-hunt-supplies.mjs';
+import{createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,huntSupplySteering}from'./imasora-sliding-tag-hunt-supplies.mjs';
 import{movingItemContactRadius,huntSupplyContact}from'./imasora-sliding-tag-hunt-contact.mjs';
 
 export{STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS};
@@ -37,10 +44,15 @@ export const COURTYARD_REACQUIRE_RULES='tag-courtyard-reacquire-v71';
 export const COURTYARD_TEAM_RULES='tag-courtyard-team-v72';
 export const JUMP_RECOVERY_RULES='tag-jump-recovery-v73';
 export const TERRITORY_SEARCH_RULES='tag-territory-search-v74';
+export const STABLE_BALLOON_RULES='tag-stable-balloon-v75';
+export const TEAM_PRESSURE_RULES='tag-team-pressure-v76';
+const usesStableBalloon=s=>usesContinuousJumpRest(s.rules)||s.rules===STABLE_BALLOON_RULES||s.rules===TEAM_PRESSURE_RULES||s.rules===CLOAK_INK_RULES;
+const usesTeamPressure=s=>(usesContinuousJumpRest(s.rules)||s.rules===TEAM_PRESSURE_RULES||s.rules===CLOAK_INK_RULES)&&s.config.mode==='escape';
 const SHORTER_REST_RULES='tag-shorter-rest-v63';
 const AIR_PURSUIT_RULES='tag-air-pursuit-v62';
 const PREVIOUS_HUNT_RULES='tag-rear-mirror-v61';
-const usesCourtyardTeam=s=>s.rules===TERRITORY_SEARCH_RULES||s.rules===JUMP_RECOVERY_RULES||s.rules===COURTYARD_TEAM_RULES;
+const usesTerritorySearch=s=>usesStableBalloon(s)||s.rules===TERRITORY_SEARCH_RULES;
+const usesCourtyardTeam=s=>usesTerritorySearch(s)||s.rules===JUMP_RECOVERY_RULES||s.rules===COURTYARD_TEAM_RULES;
 const usesCourtyardReacquire=s=>usesCourtyardTeam(s)||s.rules===COURTYARD_REACQUIRE_RULES;
 const usesCourtyardWind=s=>usesCourtyardReacquire(s)||s.rules===COURTYARD_WIND_RULES;
 const usesRunnerFan=s=>usesCourtyardWind(s)||s.rules===RUNNER_FAN_RULES;
@@ -59,7 +71,7 @@ const visible=(a,b,range=140)=>near(a,b)<range&&worldSight(raised(a),raised(b));
 const alive=(s,a,key)=>(a.effects[key]??0)>s.time;
 function body(x,z,id,radius){const spec=opponentSpec(id),a=Object.assign(actor(x,z),{y:worldHeight(x,z),id,radius,keepInputFacing:true,contactKey:id==='player'?DEFAULT_TOUCH_SHAPE:id,baseTuning:{accel:1,speed:1,turn:1,brake:1,...spec?.movement},effects:{},item:null,flight:null,nextHop:0});a.tuning={...a.baseTuning};return a;}
 function random(s){s.randomState=(Math.imul(s.randomState,1664525)+1013904223)>>>0;return s.randomState/4294967296;}
-export function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none'}={}){
+export function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none'}={}, {rules=HUNT_RULES}={}){
  if(hunterCount!==HUNTER_COUNT||!Number.isSafeInteger(seed)||seed<0||seed>0xffffffff||duration!==MATCH_SECONDS)throw Error('INVALID_HUNT_CONFIG');
  if(!validHuntTouchShape(playerShape))throw Error('INVALID_TOUCH_SHAPE');
  if(playerItem!=='none'&&!PLAYER_ITEMS.includes(playerItem)||!Number.isFinite(playerRadius)||playerRadius<2||playerRadius>6)throw Error('INVALID_PLAYER_CONFIG');
@@ -68,7 +80,7 @@ export function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random'
  const defaults=['walkBrave','rioSaber','walkCute'].map(p=>TAG_CHARACTERS.find(c=>c.profileKey===p).id),ids=opponents??defaults;
  if(!Array.isArray(ids)||ids.length!==3||ids.some(id=>!byId.has(id)))throw Error('INVALID_OPPONENTS');
  const initial={randomState:mixHuntStartSeed(seed)},layout=randomHuntStart(()=>random(initial),mode);
- const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[byId.get(ids[0]).profileKey]:playerRadius),s={rules:HUNT_RULES,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
+ const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[byId.get(ids[0]).profileKey]:playerRadius),s={rules,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
  const spawns=layout.hunters;
  if(mode==='hunt'){const costs=new Map(spawns.map(p=>{const a={...p,radius:playerRadius,tuning:{accel:1,speed:1,turn:1,brake:1},vx:0,vz:0},path=worldRoute(a,player);return[p,path.length?worldRouteSeconds(a,path):1000+near(a,player)];}));spawns.sort((a,b)=>costs.get(a)-costs.get(b));[spawns[1],spawns[2]]=[spawns[2],spawns[1]];}
  s.spawnLayout={runner:layout.runner.id,hunters:spawns.map(p=>p.id),positions:[layout.runner,...spawns].map(p=>({x:p.x,y:p.y,z:p.z}))};
@@ -76,10 +88,15 @@ export function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random'
  (mode==='hunt'?s.hunters[0]:player).contactKey=playerShape;player.owner='player';player.brain={profile:ids[0],next:0};
  for(const[i,a]of s.hunters.entries()){worldPilot(a,player,true,0,a.brain);a.brain.next=.4+i*.16;}
  const human=controlledHuntActor(s);human.yaw=huntStartFacing(human,[player,...s.hunters].filter(a=>a!==human));
- s.trampoline=createHuntTrampoline();s.pickups=createHuntSupplies(()=>random(s),[player,...s.hunters]);return s;
+ const actors=[player,...s.hunters];
+ s.trampoline=createHuntTrampoline();
+ s.pickups=createHuntSupplies(()=>random(s),actors);
+ if(usesOpeningSupply(rules)&&mode==='hunt')placeHuntOpeningSupply(s.pickups,human,actors);
+ if(usesExtraBalloons(rules))addHuntBalloonSupplies(s.pickups,actors);
+ return s;
 }
 export function controlledHuntActor(s){return s.config.mode==='hunt'?s.hunters[0]:s.player;}
-function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
+function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a),trainingStepJump:usesTrainingStep(s.rules)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
 function participants(s){return[s.player,...s.hunters];}
 function emit(s,type,a,extra={}){s.events.push({id:s.nextId++,type,owner:a.owner,time:s.time,...extra});}
 function tune(s,a){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed','turn','brake'])t[k]=b[k];if(a===s.player)t.speed*=1.04;if(alive(s,a,'speed')){t.speed*=1.4;t.accel*=1.2;}if(s.gadgets.some(g=>g.kind==='sheet'&&near(g,a)<g.radius&&Math.abs(a.y-g.y)<.6)){t.brake*=.35;t.turn*=.65;a.slippery=true;}else a.slippery=false;}
@@ -87,6 +104,7 @@ function tune(s,a){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed
 // A live lower bound also prevents an approaching runner shortening the landing.
 const BALLOON_GAP=28, BALLOON_MIN_GAP=26;
 function landingFor(s,a,tracking=false){
+ if(tracking&&usesStableBalloon(s))return stableBalloonTarget(s,a,BALLOON_GAP);
  // This specific homing item tracks the runner independently of ordinary vision.
  const speed=Math.hypot(s.player.vx,s.player.vz),lead=tracking?.4:Math.min(.5,15/(speed||1)),ahead={x:s.player.x+s.player.vx*lead,z:s.player.z+s.player.vz*lead,y:s.player.y};
  const aim=worldTraversable(s.player,ahead,s.player.radius-.05)?ahead:s.player;
@@ -131,7 +149,10 @@ export function activateHuntItem(s,owner='player'){
  else if(type==='radar'||type==='mirror')a.effects[type]=s.duration+STEP;
  else if(type==='speed')a.effects.speed=s.time+3;
  else if(type==='scarf'){a.pendingItem={type,at:s.time+.6};emit(s,'item-prepare',a,{item:type});}
- else if(type==='cloak')a.effects.cloak=s.time+4;
+ else if(type==='cloak'){
+  if(usesCloakWitness(s.rules)&&s.config.mode==='escape')rememberCloakDisappearance(s);
+  a.effects.cloak=s.time+4;
+ }
  else if(type==='hook'){
   const p=huntHookAnchor(a,s);if(!p)return false;
   startHuntZip(s,a,p);emit(s,'hook-attached',a,{anchor:{...p}});
@@ -162,7 +183,7 @@ function itemForces(s,a,dt){
  if(a.pendingItem&&a.pendingItem.type!=='scarf')a.pendingItem=null;
  if(a.pendingItem&&s.time>=a.pendingItem.at){const p=a.pendingItem;a.pendingItem=null;if(p.type==='scarf')a.effects.speed=s.time+3;}
 }
-function afterMove(s,a){resolveHuntFans(s,a,a.fanStepOrigin);recordHuntJumpLanding(s,a,a.fanStepOrigin,s.rules===JUMP_RECOVERY_RULES?HUNT_JUMP_QUICK_REST:usesShorterRest(s)?undefined:1.5);}
+function afterMove(s,a){resolveHuntFans(s,a,a.fanStepOrigin);recordHuntJumpLanding(s,a,a.fanStepOrigin,(s.rules===JUMP_RECOVERY_RULES||usesContinuousJumpRest(s.rules))?HUNT_JUMP_QUICK_REST:usesShorterRest(s)?undefined:1.5);}
 function updateGadgets(s,dt){
  for(const p of s.pickups)delete p.pull;
  for(const g of s.gadgets){
@@ -198,10 +219,43 @@ function balloonNearbyLanding(a){
  }
  return null;
 }
-function descendBalloon(s,a,dt){
+const BALLOON_CHASE_SECONDS=8.5,BALLOON_NEAR_SECONDS=1.15;
+function fastBalloonLanding(s,a,flight,elapsed,gap){
+ if(gap<BALLOON_GAP+11)flight.firstNearAt??=s.time;
+ if(!flight.landingRequested&&(elapsed>=BALLOON_CHASE_SECONDS||
+     (elapsed>=1.2&&flight.firstNearAt!=null&&s.time-flight.firstNearAt>=BALLOON_NEAR_SECONDS))){
+  flight.landingRequested=true;
+  flight.air=null;
+ }
+ if(!flight.landingRequested)return null;
+ const here=balloonLandingSpot(a);
+ if(flight.landingApproach)return near(a,flight.target)<=1?here:null;
+ if(here&&gap>=BALLOON_MIN_GAP)return here;
+ if(s.time>=(flight.landingCheckAt??0)){
+  flight.landingCheckAt=s.time+.15;
+  const enoughSpace=p=>near(p,s.player)-a.radius-s.player.radius>=BALLOON_MIN_GAP+1;
+  findSpot:for(const distance of [3,6,10,15,22,30])for(let i=0;i<8;i++){
+   const angle=i*Math.PI/4,x=a.x+Math.sin(angle)*distance,z=a.z+Math.cos(angle)*distance;
+   const spot={x,z,y:worldHeight(x,z)},above={x,z,y:a.y},padding=a.radius+.05;
+   if(spot.y>a.y+.05||!enoughSpace(spot)||!worldValid(spot,padding)||!worldValid(above,padding)||
+     !worldSight({...a,y:a.y+.15},{...above,y:a.y+.15},padding))continue;
+   flight.target=spot;
+   flight.landingApproach=true;
+   flight.landingAltitude=a.y;
+   flight.routeAt=0;
+   break findSpot;
+  }
+  // The current column is still a real landing if the runner has moved
+  // right under the balloon and the surroundings offer no wider exit.
+  if(!flight.landingApproach&&here)return here;
+ }
+ return null;
+}
+function descendBalloon(s,a,dt,input){
  const before={y:a.y,grounded:a.grounded,jumps:a.jumps};
  const floor=trampolineSurface(s,a.x,a.z);
  // Commit horizontally and ease into a controlled vertical descent.
+ if(s.rules===BALLOON_DESCENT_TURN_RULES)balloonDescentFacing(a,input,dt);
  a.vx=a.vz=0;
  if(!a.grounded||a.y>floor){
   a.grounded=false;
@@ -219,44 +273,75 @@ function descendBalloon(s,a,dt){
  return true;
 }
 function floatMove(s,a,dt,input={}){const f=a.flight;if(!f)return false;
- if(s.time<f.launchAt){worldMove(a,input,dt);return true;}
+ if(s.time<f.launchAt){if(usesStableBalloon(s)){const target=landingFor(s,a,true);if(target)f.target=target;}worldMove(a,input,dt);return true;}
  const t=s.time-f.launchAt;if(f.stage==='prepare'){f.stage='float';f.launchY=a.y;f.peak=Math.max(f.peak,a.y+1);emit(s,'balloon-lift',a);}
- if(f.stage==='descend')return descendBalloon(s,a,dt);
- if(!f.landingApproach&&s.time>=f.nextTrack){f.nextTrack=s.time+.12;const target=landingFor(s,a,true);if(target){f.target=target;f.targetVx=s.player.vx;f.targetVz=s.player.vz;}else f.targetVx=f.targetVz=0;}
+ if(f.stage==='descend')return descendBalloon(s,a,dt,input);
+ const fastLanding=usesBalloonDropPursuit(s.rules);if(!f.landingApproach&&(!fastLanding||!f.landingRequested)&&(usesStableBalloon(s)||s.time>=f.nextTrack)){f.nextTrack=s.time+.12;const target=landingFor(s,a,true);if(target){f.target=target;f.targetVx=s.player.vx;f.targetVz=s.player.vz;}else f.targetVx=f.targetVz=0;}
  const gap=near(a,s.player)-a.radius-s.player.radius,close=gap>=BALLOON_MIN_GAP&&gap<BALLOON_GAP+4;
- if(gap<45)f.nearSince??=s.time;
- else f.nearSince=null;
- const forced=t>=BALLOON_TRACK_LIMIT||f.nearSince!=null&&s.time-f.nearSince>=8;
+ const fastSpot=fastLanding?fastBalloonLanding(s,a,f,t,gap):null;
+ if(fastSpot){f.target=fastSpot;f.stage='descend';return descendBalloon(s,a,dt,input);}
+ // Legacy proofs retain their original watch time and finish criteria.
+ let forced=false;
+ if(!fastLanding){
+  if(gap<45)f.nearSince??=s.time;
+  else f.nearSince=null;
+  forced=t>=BALLOON_TRACK_LIMIT||f.nearSince!=null&&s.time-f.nearSince>=8;
+ }
  const seconds=clamp((a.y-worldHeight(a.x,a.z))/16+.35,.35,1.6);
  const predictedGap=Math.hypot(a.x-s.player.x-s.player.vx*seconds,a.z-s.player.z-s.player.vz*seconds)-a.radius-s.player.radius;
  const ready=close&&predictedGap>=BALLOON_MIN_GAP&&predictedGap<BALLOON_GAP+12;
  if(ready)f.closeSince??=s.time;
  else f.closeSince=null;
- if(forced||t>1.2&&f.closeSince!=null&&s.time-f.closeSince>=.18){
+ if(forced||!f.landingRequested&&t>1.2&&f.closeSince!=null&&s.time-f.closeSince>=.18){
   const spot=balloonLandingSpot(a);
   if(spot){
    f.target=spot;
    f.stage='descend';
-   return descendBalloon(s,a,dt);
+   return descendBalloon(s,a,dt,input);
   }
   if(forced&&!f.landingApproach){
    const nearby=balloonNearbyLanding(a);
    if(nearby){f.target=nearby;f.landingApproach=true;f.routeAt=0;}
   }
  }
- if(!f.route||s.time>=(f.routeAt??0)){f.routeAt=s.time+.6;f.route=worldRoute({...a,y:worldHeight(a.x,a.z)},f.target);}
- while(f.route.length>1&&near(a,f.route[0])<Math.max(10,a.radius+4)&&worldTraversable(a,f.route[1],a.radius+.1))f.route.shift();
- let steer=close&&!f.landingApproach?f.target:f.route[0]??f.target;
- if(!close||f.landingApproach){for(const p of f.route){if(near(a,p)>80||!worldTraversable(a,p,a.radius+.2)||!worldSight({...a,y:a.y+3},{...p,y:a.y+3},a.radius+.2))break;steer=p;}if(worldTraversable(a,f.target,a.radius+.2)&&worldSight({...a,y:a.y+3},{...f.target,y:a.y+3},a.radius+.2))steer=f.target;}
+ let air=null;
+ if(usesBalloonAirApproach(s.rules)&&!close&&!f.landingApproach&&!f.landingRequested){
+  if(s.time>=(f.airAt??0)){
+   f.airAt=s.time+.18;
+   const altitude=balloonAirApproach(a,f.target);
+   f.air=altitude==null?null:{point:f.target,altitude};
+  }
+  air=f.air;
+ }
+ let steer;
+ if(fastLanding&&f.landingApproach)steer=f.target;
+ else if(air&&a.y>=air.altitude-.25)steer=air.point;
+ else{
+  if(!f.route||s.time>=(f.routeAt??0)){f.routeAt=s.time+.6;f.route=worldRoute({...a,y:worldHeight(a.x,a.z)},f.target);}
+  while(f.route.length>1&&near(a,f.route[0])<Math.max(10,a.radius+4)&&worldTraversable(a,f.route[1],a.radius+.1))f.route.shift();
+  steer=close&&!f.landingApproach?f.target:f.route[0]??f.target;
+  if(!close||f.landingApproach){for(const p of f.route){if(near(a,p)>80||!worldTraversable(a,p,a.radius+.2)||!worldSight({...a,y:a.y+3},{...p,y:a.y+3},a.radius+.2))break;steer=p;}if(worldTraversable(a,f.target,a.radius+.2)&&worldSight({...a,y:a.y+3},{...f.target,y:a.y+3},a.radius+.2))steer=f.target;}
+ }
+ const tracking=(steer===f.target||steer===air?.point)&&!f.landingApproach;
  const ahead={x:a.x+(steer.x-a.x)*Math.min(1,8/(near(a,steer)||1)),z:a.z+(steer.z-a.z)*Math.min(1,8/(near(a,steer)||1))};
  let lift=0;for(const h of[13,6,2,.1,0]){const p={x:a.x,z:a.z,y:worldHeight(a.x,a.z)+h},q={...ahead,y:worldHeight(ahead.x,ahead.z)+h};if(worldValid(p,a.radius+.1)&&worldValid(q,a.radius+.1)&&worldSight({...p,y:p.y+3},{...q,y:q.y+3},a.radius+.1)){lift=h;break;}}
- f.peak=worldHeight(a.x,a.z)+lift;
- const wanted=t<.8?f.launchY+(f.peak-f.launchY)*smooth(t/.8):f.peak;
+ f.peak=Math.max(worldHeight(a.x,a.z)+lift,air?.altitude??-Infinity,f.landingAltitude??-Infinity);
+ let wanted=t<.8?f.launchY+(f.peak-f.launchY)*smooth(t/.8):f.peak;
+ if(usesStableBalloon(s))wanted=stableBalloonHeight(f,wanted,dt);
  // Match the runner's velocity only on the final approach. At a detour
  // waypoint that velocity can point into the very tree we must go around.
- {a.grounded=false;a.vy+=(BODY.gravity+clamp((wanted-a.y)*14-a.vy*6,-55,55))*dt;const tracking=steer===f.target&&!f.landingApproach,vx=(steer.x-a.x)*8+((tracking?f.targetVx??0:0)-a.vx)*6,vz=(steer.z-a.z)*8+((tracking?f.targetVz??0:0)-a.vz)*6,k=Math.min(1,90/(Math.hypot(vx,vz)||1));a.vx+=vx*k*dt;a.vz+=vz*k*dt;}
+ {a.grounded=false;a.vy+=(BODY.gravity+clamp((wanted-a.y)*14-a.vy*6,-55,55))*dt;const vx=(steer.x-a.x)*8+((tracking?f.targetVx??0:0)-a.vx)*6,vz=(steer.z-a.z)*8+((tracking?f.targetVz??0:0)-a.vz)*6,k=Math.min(1,90/(Math.hypot(vx,vz)||1));a.vx+=vx*k*dt;a.vz+=vz*k*dt;}
  const horizontal=Math.hypot(a.vx,a.vz);if(horizontal>54){a.vx*=54/horizontal;a.vz*=54/horizontal;}
- const before={x:a.x,z:a.z,y:a.y,grounded:a.grounded,jumps:a.jumps},speed=a.tuning.speed;a.tuning.speed*=3;worldMove(a,{x:clamp((steer.x-a.x)/12,-1,1),z:clamp((steer.z-a.z)/12,-1,1),dash:true},dt);a.tuning.speed=speed;resolveTrampoline(s,a,before);
+ const before={x:a.x,z:a.z,y:a.y,yaw:a.yaw,grounded:a.grounded,jumps:a.jumps},speed=a.tuning.speed;a.tuning.speed*=3;
+ const steerScale=usesStableBalloon(s)?Math.max(12,near(a,steer)):12;
+ worldMove(a,{x:clamp((steer.x-a.x)/steerScale,-1,1),z:clamp((steer.z-a.z)/steerScale,-1,1),dash:true},dt);a.tuning.speed=speed;resolveTrampoline(s,a,before);
+ if(usesStableBalloon(s)){
+  // Smooth the hanging body's facing, not the collision-checked route itself.
+  // Turning a distant waypoint into a rotating virtual point sends the flight
+  // past corners and can strand it on the wrong side of the city.
+  if(f.steerYaw===undefined)f.steerYaw=before.yaw??a.yaw;
+  stableBalloonSteer(a,Math.hypot(a.vx,a.vz)>1?{x:a.x+a.vx,z:a.z+a.vz}:steer,dt);a.yaw=f.steerYaw;
+ }
  if(!worldValid(a,a.radius-.01)){a.y=before.y;a.vy=0;if(!worldValid(a,a.radius-.01)){a.x=before.x;a.z=before.z;a.vx*=.2;a.vz*=.2;f.routeAt=0;}}
  // The bowl rim can rise by a small permitted step while the balloon ascends.
  // Keep feet on the surface instead of waiting for downward-velocity landing.
@@ -321,6 +406,7 @@ function airbornePursuitAction(s,hunter,runner,control){
  return dive&&worldTraversable(hunter,{x:hunter.x+x,z:hunter.z+z},hunter.radius-.05)?{...control,dive:true}:control;
 }
 function footprintAwareness(s,a){
+ if(huntInkTrailSuppressed(s))return;
  if(canSee(s,a,s.player,a.role==='patrol'?70:140))return;
  for(let i=s.footprints.length-1;i>=0;i--){const f=s.footprints[i];if(f.owner!=='player'||f.id===(a.brain.lastFootId??-1)||!canSee(s,a,{...f,y:f.y+.1},80))continue;const at=f.at??f.until-3.5;if(at<(a.brain.seenAt??-Infinity))continue;a.brain.lastFootId=f.id;a.brain.seen={x:f.x,z:f.z,y:f.y,vx:0,vz:0};a.brain.seenAt=at;a.brain.searchPlan=null;return;}
 }
@@ -349,9 +435,11 @@ export function huntStep(s,input={},dt=STEP){
  s.gadgets=s.gadgets.filter(g=>['clone','cushion','curtain','sheet','fan'].includes(g.kind));
  s.zipTouch=null;s.time=Math.min(s.duration,s.time+dt);for(const h of s.hunters){delete h.effects.ink;} s.pools=[];s.footprints=s.footprints.filter(p=>p.owner===s.player.owner&&p.until>s.time&&!(p.trampolineSupport&&s.trampoline.used));
  const diveCooldown=usesShorterRest(s)?HUNT_DIVE.cooldown:6;
- const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown);s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player);
+ const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown,{aimFromFacing:usesDiveFacing(s.rules)});s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player);
  let runnerInput=input;if(s.config.mode==='hunt'&&!huntIsDizzy(s,s.player)){const runner=s.player,observations=s.hunters.filter(a=>canSee(s,runner,a,140)),seenOwners=new Set(observations.map(a=>a.owner));if(alive(s,runner,'radar')){if(s.time>=(runner.brain.radarAt??0)){runner.brain.radarAt=s.time+.75;runner.brain.radarContacts=radarObservations(s,runner);}observations.push(...(runner.brain.radarContacts??[]).filter(p=>!seenOwners.has(p.owner)));}const threat=observations.sort((a,b)=>near(a,runner)-near(b,runner))[0];runnerInput=runnerControl(s,observations);runnerInput=runnerHookControl(s,runnerInput,{poleVisible:p=>canSee(s,runner,{...p,y:p.y-3},132)});runnerInput=runnerSupplyControl(s,runnerInput,{usableOnly:usesRunnerSupply(s),itemVisible:p=>canSee(s,runner,{...p,y:p.y+(p.lift??0)},72)});const tactic=runnerItemTactic(s,runnerInput,{checkAllCushionThreats:usesRunnerCushion(s),checkFanExposure:usesRunnerFan(s)});if(tactic){runner.brain.nextToolAt=s.time+.35;const yaw=runner.yaw;runner.yaw=tactic.yaw;if(activateHuntItem(s)){runner.brain.nextToolAt=s.time+.8;if(['cloak','clone','curtain'].includes(tactic.item)){runner.brain.next=0;runner.brain.target=null;}}runner.yaw=yaw;}const padSafe=!s.trampoline.used&&near(runner,s.trampoline)<48&&safeTrampolineApproach(s);if(!padSafe)runner.brain.trampolineApproach=false;else runnerInput=trampolineEscapeControl(s,runner,runnerInput,!!threat);runnerInput=runnerPressureControl(s,runnerInput);runnerInput=cushionJumpControl(s,runner,runnerJumpControl(s,hopControl(s,runner,runnerInput)));}if(!moveHuntZip(s,s.player,dt))moveWithTrampoline(s,s.player,runnerInput,dt);afterMove(s,s.player);collectAndPaint(s,s.player);
- const coverage=usesCornerSearch(s)&&(s.rules===TERRITORY_SEARCH_RULES||s.time>=45)?(s.cornerSearch??={visited:0}):null;
+ const teamPressure=usesTeamPressure(s);
+ if(teamPressure)updateHuntTeamContact(s,s.hunters.filter(a=>!huntIsDizzy(s,a)&&!a.flight&&canSee(s,a,s.player,a.role==='patrol'?70:140)).map(a=>({owner:a.owner,point:{x:s.player.x,y:s.player.y,z:s.player.z,vx:s.player.vx,vz:s.player.vz}})));
+ const coverage=usesCornerSearch(s)&&(usesTerritorySearch(s)||s.time>=45)?(s.cornerSearch??={visited:0}):null;
  for(const a of s.hunters){
   itemForces(s,a,dt);tune(s,a);if(huntIsDizzy(s,a)){moveWithTrampoline(s,a,{},dt);afterMove(s,a);continue;}const actualVisible=canSee(s,a,s.player,a.role==='patrol'?70:140),decoy=!actualVisible?s.gadgets.find(g=>g.kind==='clone'&&canSee(s,a,g,a.role==='patrol'?70:140)):null;
   a.brain.suppressSight=!actualVisible&&!decoy;footprintAwareness(s,a);
@@ -363,24 +451,40 @@ export function huntStep(s,input={},dt=STEP){
    a.brain.searchReservations=s.hunters.filter(h=>h!==a&&h.brain.target&&h.brain.seen&&a.brain.seen&&['search','last-seen'].includes(h.brain.mode)&&s.time-h.brain.seenAt<18&&Math.abs(h.brain.seenAt-a.brain.seenAt)<3&&near(h.brain.seen,a.brain.seen)<32).map(h=>({...h.brain.target}));
   }
   if(a===human){if(actualVisible){a.brain.seen={x:s.player.x,z:s.player.z,y:s.player.y,vx:s.player.vx,vz:s.player.vz};a.brain.seenAt=s.time;}if(a.flight)floatMove(s,a,dt,input);else if(!moveHuntDive(s,a,input,dt))moveWithTrampoline(s,a,input,dt);afterMove(s,a);collectAndPaint(s,a);continue;}
-  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:s.rules===TERRITORY_SEARCH_RULES});
+  const cloakReaction=cloakDisappearanceMovement(a,s.time,actualVisible);
+  if(cloakReaction){
+   if(usesBalloonDropPursuit(s.rules))a.brain.dropPursuit=null;
+   if(!a.dive||!moveHuntDive(s,a,cloakReaction,dt))moveWithTrampoline(s,a,cloakReaction,dt);
+   afterMove(s,a);collectAndPaint(s,a);continue;
+  }
+  if(teamPressure){if(!actualVisible&&!decoy)receiveHuntTeamContact(a,s.teamContact,s.time);if(actualVisible)a.brain.next=Math.min(a.brain.next,s.time+.22);}
+  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:usesTerritorySearch(s)});
   const target=decoy??s.player;
+  const drop=usesBalloonDropPursuit(s.rules)?huntDropPursuit(s,a,s.player,actualVisible,{cancel:!!decoy||huntOpticalHidden(s,a,s.player)}):null;
+  if(drop){
+   // No ground-route or uphill hop until the committed fall finishes.
+   moveWithTrampoline(s,a,cushionJumpControl(s,a,drop),dt);
+   afterMove(s,a);collectAndPaint(s,a);continue;
+  }
   const route=worldPilot(a,target,true,s.time,a.brain,usesContactApproach(s));
   const pressure=s.rules!==PREVIOUS_HUNT_RULES?airbornePursuit(s,a,s.player,actualVisible,route):null;
   if(pressure)a.brain.supply=null;
-  const control=pressure??huntSupplySteering(s,a,route,{playerVisible:actualVisible,itemVisible:p=>canSee(s,a,p,24)});
+  const closeChase=teamPressure?observedHuntChase(a,actualVisible?s.player:null,s.time,a.brain):null;
+  const joining=teamPressure&&!actualVisible&&s.teamContact&&s.time-s.teamContact.at<4;
+  if(teamPressure&&(actualVisible||joining))a.brain.supply=null;
+  const control=pressure??closeChase??(teamPressure&&(actualVisible||joining)?route:huntSupplySteering(s,a,route,{playerVisible:actualVisible,itemVisible:p=>canSee(s,a,p,24)}));
   if(s.time>(a.nextItemAt??2)&&huntItemOpportunity(s,a,{playerVisible:actualVisible})){a.nextItemAt=s.time+.35;if(activateHuntItem(s,a.owner))a.nextItemAt=s.time+12;}
   if(a.flight){floatMove(s,a,dt);afterMove(s,a);continue;}
   if(s.time<(a.recoverUntil??0))control.dash=false;
   let movement=hopControl(s,a,control);
-  if(pressure&&a.brain.airPursuit.goal)movement=airbornePursuitAction(s,a,s.player,movement);
+  if(pressure&&a.brain.airPursuit.goal||teamPressure&&actualVisible)movement=airbornePursuitAction(s,a,s.player,movement);
   movement=cushionJumpControl(s,a,movement);
   if(movement.dive&&!movement.jump)startHuntDive(s,a,diveCooldown);
   if(!a.dive||!moveHuntDive(s,a,movement,dt))moveWithTrampoline(s,a,movement,dt);
   afterMove(s,a);collectAndPaint(s,a);
  }
  hunterContacts(s);updateGadgets(s,dt);
- const catcher=s.hunters.find(a=>a.owner===s.zipTouch&&!huntIsDizzy(s,a))??s.hunters.find(a=>s.time>=(s.player.trampolineSafeUntil??0)&&!a.flight&&!huntIsDizzy(s,a)&&s.time>=(a.noTagUntil??0)&&huntBodiesTouch(a,s.player));
+ const catcher=s.hunters.find(a=>a.owner===s.zipTouch&&!huntIsDizzy(s,a))??s.hunters.find(a=>s.time>=(s.player.trampolineSafeUntil??0)&&!a.flight&&!huntIsDizzy(s,a)&&s.time>=(a.noTagUntil??0)&&huntBodiesTouch(a,s.player,s));
  if(catcher||s.time>=s.duration){s.phase='finished';s.result={caught:!!catcher,win:s.config.mode==='hunt'?!!catcher:!catcher,time:s.time,catcher:catcher?.owner??null};}
  return s;
 }
@@ -388,5 +492,5 @@ export function huntStep(s,input={},dt=STEP){
 export function huntThreatCues(s){return s.hunters.filter(a=>canSee(s,s.player,a,52)).map(a=>({owner:a.owner,role:a.role,x:a.x,y:a.y+3,z:a.z,preparing:!!a.pendingItem||a.flight?.stage==='prepare'}));}
 // Display data is read-only and includes an always-visual counterpart to sounds.
 export function huntPresentation(s){const view=a=>({owner:a.owner,character:a.id,role:a.role,x:a.x,y:a.y,z:a.z,yaw:a.yaw,item:a.item,grounded:a.grounded,jumps:a.jumps,vy:a.vy,cloaked:alive(s,a,'cloak'),speedUp:alive(s,a,'speed'),flight:a.flight?structuredClone(a.flight):null});return{time:s.time,phase:s.phase,player:view(s.player),hunters:s.hunters.map(view),events:s.events.map(e=>structuredClone(e)),pools:s.pools.map(p=>({...p})),footprints:s.footprints.map(f=>({...f}))};}
-export function recordHunt(config,{rules=HUNT_RULES}={}){if(![TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config),frames=[];s.rules=rules;return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
-export function verifyHunt(proof){if(![TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config);s.rules=proof.rules;let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>15)throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
+export function recordHunt(config,{rules=HUNT_RULES}={}){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config,{rules}),frames=[];return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
+export function verifyHunt(proof){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config,{rules:proof.rules});let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>15)throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
