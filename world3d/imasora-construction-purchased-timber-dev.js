@@ -3,6 +3,7 @@ import * as THREE from './assets/three.module.min.js';
 import {officialCharacter} from './assets/imasora-construction-layout.js?v=120ob';
 import {actorPose,localToWorld,loaderDrivingInput} from './assets/imasora-construction-loader-physics.js?v=120ov';
 import {hook,pickOption,craneBoardOption,craneExitOption} from './assets/imasora-construction-crane.js?v=120pv';
+import {displayTimberCargoText} from './assets/imasora-construction-timber-cargo.mjs?v=120pv';
 import {emptyPurchasedTimber,initialTimberPractice,purchasedTimberAction as actCrane,advancePurchasedTimber as stepCrane,packPurchasedTimber as packCrane,floatReadout,timberPhysicsState,FLOOR,TIMBER_MATERIALS,RETURN_PAD,returnOption,issueOption,timberCopyTotals} from './assets/imasora-construction-purchased-timber.js?v=120pv';
 const TIMBER_PARTS=[FLOOR];
 import {createCrane,updateCraneModel} from './assets/imasora-construction-crane-model.js?v=120pv';
@@ -53,7 +54,7 @@ const unit=n=>(n/1000).toLocaleString('ja-JP',{maximumFractionDigits:3});
 function refreshStock(){
   const t=timberCopyTotals(state);
   $('material-ledger').replaceChildren();
-  const row=document.createElement('tr');for(const text of['火星木材',...['stored','loose','held','floating','fixed','total'].map(k=>t[k]+'枚')]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}$('material-ledger').append(row);
+  const row=document.createElement('tr');for(const text of['アマネ星木材',...['stored','loose','held','floating','fixed','total'].map(k=>t[k]+'枚')]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}$('material-ledger').append(row);
   $('scope').textContent=testMode?'貸出2枚 · 保存しない操作体験':'工事現場 · 浮遊床づくり · 購入済み木材の複製';
   $('source-info').textContent=testMode?'これは操作体験用の貸出床2枚です。金貨・購入品・既存の作業保存へ入りません。':state.source.mode==='copy'?`購入元：${state.source.kind} ／ 元の金貨 ${state.source.coins}枚 ／ 購入木材 ${state.source.total}枚分（原本は変更しません）。`:'購入済みの素材を一度だけ複製してください。木材0の保存なら0枚のままです。';
   $('imports').hidden=testMode||state.source.mode==='copy';
@@ -102,11 +103,11 @@ new ResizeObserver(()=>{const r=$('scene').getBoundingClientRect();renderer.setS
 new ResizeObserver(([entry])=>document.documentElement.style.setProperty('--crane-controls-height',`${entry.target.getBoundingClientRect().height}px`)).observe(document.querySelector('footer'));
 function refresh(){
   const aboard=state.rig.mode==='driving',transition=!!state.rig.transition,work=state.work,p=state.parts.find(p=>p.id===state.held),candidate=pickOption(state),preview=placement(state),blocked=!ready||session.blocked||loading||state.paused;
-  $('mode').textContent=state.paused?'一時停止':aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.paused?'「作業を再開」で動き出します。':state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:state.message||'低い浮遊床へ歩いて乗ると、レンの重さで沈みます。'):state.message||state.rig.message;
-  $('cargo').textContent=p?`吊り荷：${p.name}`:candidate?`フック下：${candidate.name}`:'吊り荷なし';$('count').textContent=`置場 ${state.parts.filter(p=>!p.fixed&&!p.hover&&p.id!==state.held).length} ・吊り荷 ${p?1:0} ・浮遊 ${state.parts.filter(p=>p.hover).length} ・設置 ${state.parts.filter(p=>p.fixed).length} ・保管 ${state.stock}`;
+  $('mode').textContent=state.paused?'一時停止':aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=displayTimberCargoText(state.paused?'「作業を再開」で動き出します。':state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:state.message||'低い浮遊床へ歩いて乗ると、レンの重さで沈みます。'):state.message||state.rig.message||'');
+  $('cargo').textContent=p?`吊り荷：${displayTimberCargoText(p.name)}`:candidate?`フック下：${displayTimberCargoText(candidate.name)}`:'吊り荷なし';$('count').textContent=`置場 ${state.parts.filter(p=>!p.fixed&&!p.hover&&p.id!==state.held).length} ・吊り荷 ${p?1:0} ・浮遊 ${state.parts.filter(p=>p.hover).length} ・設置 ${state.parts.filter(p=>p.fixed).length} ・保管 ${state.stock}`;
   $('material-summary').textContent=`${testMode?'貸出':'購入木材'} 合計 ${state.source.total}枚 ／ 保管 ${state.stock}枚 ／ 作業場 ${state.parts.length}枚`; 
   const active=state.parts.find(p=>p.hover);const floating=floatReadout(state,active?.id);
-  $('float-load').textContent=floating.active?`浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'火星木材を吊り、浮遊を開始すると高さを覚えます。';
+  $('float-load').textContent=floating.active?`浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'アマネ星木材を吊り、浮遊を開始すると高さを覚えます。';
   $('float-warning').textContent=floating.active?(floating.contact?`${floating.contact}に接触：安全停止`:floating.overload?'荷重オーバー：ゆっくり降下します':floating.rider?'レンの重さで沈んでいます。降りると戻ります。':'浮遊を保持しています。'):'';
   $('float-warning').classList.toggle('overload',floating.overload);
   $('release').textContent=p?.materialId==='mars-timber'?'浮遊を開始（吊り索解除）':'吊り索を外す';

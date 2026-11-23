@@ -20,8 +20,15 @@ export function createObsConnection({makeSocket=url=>new WebSocket(url,'obswebso
 }
 
 // Dedicated game capture is required. Do not start a desktop-only scene.
+function matchesLiveOutputWindow(windowId, title) {
+ const [caption, windowClass, executable] = String(windowId ?? '').split(':');
+ if (caption === title) return true;
+ if (windowClass !== 'Chrome_WidgetWin_1' || executable?.toLowerCase() !== 'chrome.exe') return false;
+ return caption === title + ' - Google Chrome' || caption === title + ' - Google Chrome for Testing';
+}
+
 export const verifyObsGameScene=async(request,title=LIVE_WINDOW_TITLE)=>{const {currentProgramSceneName:sceneName}=await request('GetCurrentProgramScene');if(!sceneName)throw Error('OBSでゲーム用のシーンを選んでください。');const {sceneItems=[]}=await request('GetSceneItemList',{sceneName});let found=false;
- for(const item of sceneItems.filter(x=>x.sceneItemEnabled)){if(item.isGroup||item.sourceType==='OBS_SOURCE_TYPE_SCENE'||['monitor_capture','display_capture','screen_capture','browser_source','game_capture'].includes(item.inputKind))throw Error('OBSは配信用画面だけを映す専用シーンにしてください。');if(item.inputKind==='window_capture'){const {inputSettings}=await request('GetInputSettings',{inputName:item.sourceName});if(inputSettings?.window?.split(':')[0]!==title)throw Error('OBSのウィンドウキャプチャでゲーム配信用画面を選んでください。');found=true;}}
+ for(const item of sceneItems.filter(x=>x.sceneItemEnabled)){if(item.isGroup||item.sourceType==='OBS_SOURCE_TYPE_SCENE'||['monitor_capture','display_capture','screen_capture','browser_source','game_capture'].includes(item.inputKind))throw Error('OBSは配信用画面だけを映す専用シーンにしてください。');if(item.inputKind==='window_capture'){const {inputSettings}=await request('GetInputSettings',{inputName:item.sourceName});if(!matchesLiveOutputWindow(inputSettings?.window,title))throw Error('OBSのウィンドウキャプチャでゲーム配信用画面を選んでください。');found=true;}}
  if(!found)throw Error('OBSに「ウィンドウキャプチャ」を追加し、ゲーム配信用画面を選んでください。');return sceneName;
 };
 
@@ -47,7 +54,15 @@ export function createLiveBroadcast({
   function status(data) {
     if (typeof data?.outputActive !== 'boolean') return;
     statusRevision++;
-    if (data.outputReconnecting) {
+    if (data.outputState === 'OBS_WEBSOCKET_OUTPUT_STOPPING') {
+      clearStartConfirmation();
+      state = 'stopping';
+      notice = '配信を停止しています。';
+    } else if (state === 'stopping' && (data.outputActive || data.outputReconnecting ||
+               data.outputState === 'OBS_WEBSOCKET_OUTPUT_RECONNECTING')) {
+      // OBS remains active while it finishes sending the last frames.
+      return;
+    } else if (data.outputReconnecting || data.outputState === 'OBS_WEBSOCKET_OUTPUT_RECONNECTING') {
       clearStartConfirmation();
       state = 'reconnecting';
       notice = '再接続中。OBSで配信状態を確認できます。';
@@ -249,7 +264,7 @@ export function createLiveBroadcast({
     return started;
   }
   async function stop() {
-    if (busy || !owned || !obs.connected) return false;
+    if (busy || state === 'stopping' || !owned || !obs.connected) return false;
     const id = generation;
     const request = scopedRequest(id);
     state = 'stopping';
@@ -258,7 +273,7 @@ export function createLiveBroadcast({
       await request('StopStream');
       clearStartConfirmation();
       await refresh(request);
-      return state === 'ready';
+      return state === 'ready' || state === 'stopping';
     } catch {
       if (id === generation) {
         state = 'unknown';

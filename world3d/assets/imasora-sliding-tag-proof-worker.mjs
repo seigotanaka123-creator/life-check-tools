@@ -12,7 +12,62 @@ const BALLOON_DROP_PURSUIT_RULES='tag-balloon-drop-pursuit-v85';
 const EXTRA_BALLOONS_RULES='tag-extra-balloons-v86';
 const TRAINING_STEP_RULES='tag-training-step-v87';
 const BALLOON_DESCENT_TURN_RULES='tag-balloon-descent-turn-v88';
-const usesTrainingStep=rules=>rules===TRAINING_STEP_RULES||rules===BALLOON_DESCENT_TURN_RULES;
+const ROLE_BALANCE_RULES='tag-role-balance-v89';
+const RUNNER_TACTICS_RULES='tag-runner-tactics-v90';
+const OPENING_PICKUP_RULES='tag-opening-pickup-v91';
+const FAIR_CHASE_RULES='tag-fair-chase-v92';
+const CORNER_CHASE_RULES='tag-corner-chase-v93';
+const BALLOON_PURSUIT_RULES='tag-balloon-pursuit-v94';
+const LANDING_DIVE_RULES='tag-landing-dive-v95';
+const CONTINUOUS_CHASE_RULES='tag-continuous-chase-v96';
+const CORNER_EXIT_RULES='tag-corner-exit-v97';
+const TRAINING_LEDGE_RULES='tag-training-ledge-v98';
+const BALLOON_EXIT_RULES='tag-balloon-exit-v99';
+const BALLOON_GLIDE_RULES='tag-balloon-glide-v100';
+const BALLOON_CORNER_RULES='tag-balloon-corner-v101';
+const ESCAPE_TURN_RULES='tag-escape-turn-v102';
+const ESCAPE_DASH_RULES='tag-escape-dash-v103';
+const CHASE_RESTORE_RULES='tag-chase-restore-v104';
+const CPU_CHASE_RESTORE_RULES='tag-cpu-chase-restore-v105';
+const LEDGE_PURSUIT_RULES='tag-ledge-pursuit-v106';
+const ESCAPE_BALANCE_RESTORE_RULES='tag-escape-balance-restore-v107';
+const HUNTER_PURSUIT_RULES='tag-hunter-pursuit-v108';
+const HUNTER_DASH_RULES='tag-hunter-dash-v109';
+const DIRECT_DROP_RULES='tag-direct-drop-v110';
+const FASTEST_DASH_CAP_RULES='tag-fastest-dash-cap-v111';
+const PERIMETER_ROUTE_RULES='tag-perimeter-route-v112';
+const INTERCEPT_LEAD_RULES='tag-intercept-lead-v113';
+const JUMP_REACTION_RULES='tag-jump-reaction-v114';
+const JUMP_ONSET_DELAY_RULES='tag-jump-onset-delay-v115';
+const usesInterceptLead=rules=>rules===INTERCEPT_LEAD_RULES||rules===JUMP_REACTION_RULES||rules===JUMP_ONSET_DELAY_RULES;
+const usesStableRamps=rules=>rules===PERIMETER_ROUTE_RULES||usesInterceptLead(rules);
+const usesRaisedApproaches=rules=>rules===FASTEST_DASH_CAP_RULES||usesStableRamps(rules);
+const usesDirectDrop=rules=>rules===DIRECT_DROP_RULES||usesRaisedApproaches(rules);
+const usesHunterPursuit=rules=>rules===HUNTER_PURSUIT_RULES||rules===HUNTER_DASH_RULES||usesDirectDrop(rules);
+function huntHunterDashBoost(rules,time){
+ if(!usesHunterPursuit(rules))return 0;
+ const perMinute=rules===HUNTER_PURSUIT_RULES?3:usesInterceptLead(rules)?1.25:1;
+ return perMinute*Math.max(0,Math.min(2,Math.floor((time+1e-9)/60)));
+}
+const usesEscapeBalanceRestore=rules=>rules===ESCAPE_BALANCE_RESTORE_RULES||usesHunterPursuit(rules);
+const usesLedgePursuit=rules=>rules===LEDGE_PURSUIT_RULES||usesEscapeBalanceRestore(rules);
+const usesCpuChaseRestore=rules=>rules===CPU_CHASE_RESTORE_RULES||usesLedgePursuit(rules);
+const usesChaseRestore=rules=>rules===CHASE_RESTORE_RULES||usesCpuChaseRestore(rules);
+const usesEscapeTurn=rules=>!usesEscapeBalanceRestore(rules)&&(rules===ESCAPE_TURN_RULES||rules===ESCAPE_DASH_RULES||usesChaseRestore(rules));
+const usesBalloonCorner=rules=>rules===BALLOON_CORNER_RULES||usesEscapeBalanceRestore(rules)||usesEscapeTurn(rules);
+const usesBalloonGlide=rules=>rules===BALLOON_GLIDE_RULES||usesBalloonCorner(rules);
+const usesBalloonExit=rules=>rules===BALLOON_EXIT_RULES||usesBalloonGlide(rules);
+const usesTrainingLedge=rules=>rules===TRAINING_LEDGE_RULES||usesBalloonExit(rules);
+const usesCornerExit=rules=>rules===CORNER_EXIT_RULES||usesTrainingLedge(rules);
+const usesContinuousChase=rules=>rules===CONTINUOUS_CHASE_RULES||usesCornerExit(rules);
+const usesLandingDive=rules=>rules===LANDING_DIVE_RULES||usesContinuousChase(rules);
+const usesBalloonPursuit=rules=>rules===BALLOON_PURSUIT_RULES||usesLandingDive(rules);
+const usesCornerChase=rules=>rules===CORNER_CHASE_RULES||usesBalloonPursuit(rules);
+const usesFairChase=rules=>rules===FAIR_CHASE_RULES||usesCornerChase(rules);
+const usesOpeningPickup=rules=>rules===OPENING_PICKUP_RULES||usesFairChase(rules);
+const usesRunnerTactics=rules=>rules===RUNNER_TACTICS_RULES||usesOpeningPickup(rules);
+const usesRoleBalance=rules=>rules===ROLE_BALANCE_RULES||usesRunnerTactics(rules);
+const usesTrainingStep=rules=>rules===TRAINING_STEP_RULES||rules===BALLOON_DESCENT_TURN_RULES||usesRoleBalance(rules);
 const usesExtraBalloons=rules=>rules===EXTRA_BALLOONS_RULES||usesTrainingStep(rules);
 const usesBalloonDropPursuit=rules=>rules===BALLOON_DROP_PURSUIT_RULES||usesExtraBalloons(rules);
 const usesOpeningSupply=rules=>rules===OPENING_SUPPLY_RULES||usesBalloonDropPursuit(rules);
@@ -22,7 +77,7 @@ const usesBalloonAirApproach=rules=>rules===BALLOON_AIR_APPROACH_RULES||usesCloa
 const usesCommittedBalloonDescent=rules=>rules===BALLOON_FAN_DESCENT_RULES||usesBalloonAirApproach(rules);
 const usesRenderedContact=rules=>rules===RENDERED_CONTACT_RULES||usesCommittedBalloonDescent(rules);
 
-return {RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,CLOAK_WITNESS_RULES,DIVE_FACING_RULES,OPENING_SUPPLY_RULES,BALLOON_DROP_PURSUIT_RULES,EXTRA_BALLOONS_RULES,TRAINING_STEP_RULES,BALLOON_DESCENT_TURN_RULES,usesTrainingStep,usesExtraBalloons,usesBalloonDropPursuit,usesOpeningSupply,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,usesCommittedBalloonDescent,usesRenderedContact};
+return {RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,CLOAK_WITNESS_RULES,DIVE_FACING_RULES,OPENING_SUPPLY_RULES,BALLOON_DROP_PURSUIT_RULES,EXTRA_BALLOONS_RULES,TRAINING_STEP_RULES,BALLOON_DESCENT_TURN_RULES,ROLE_BALANCE_RULES,RUNNER_TACTICS_RULES,OPENING_PICKUP_RULES,FAIR_CHASE_RULES,CORNER_CHASE_RULES,BALLOON_PURSUIT_RULES,LANDING_DIVE_RULES,CONTINUOUS_CHASE_RULES,CORNER_EXIT_RULES,TRAINING_LEDGE_RULES,BALLOON_EXIT_RULES,BALLOON_GLIDE_RULES,BALLOON_CORNER_RULES,ESCAPE_TURN_RULES,ESCAPE_DASH_RULES,CHASE_RESTORE_RULES,CPU_CHASE_RESTORE_RULES,LEDGE_PURSUIT_RULES,ESCAPE_BALANCE_RESTORE_RULES,HUNTER_PURSUIT_RULES,HUNTER_DASH_RULES,DIRECT_DROP_RULES,FASTEST_DASH_CAP_RULES,PERIMETER_ROUTE_RULES,INTERCEPT_LEAD_RULES,JUMP_REACTION_RULES,JUMP_ONSET_DELAY_RULES,usesInterceptLead,usesStableRamps,usesRaisedApproaches,usesDirectDrop,usesHunterPursuit,huntHunterDashBoost,usesEscapeBalanceRestore,usesLedgePursuit,usesCpuChaseRestore,usesChaseRestore,usesEscapeTurn,usesBalloonCorner,usesBalloonGlide,usesBalloonExit,usesTrainingLedge,usesCornerExit,usesContinuousChase,usesLandingDive,usesBalloonPursuit,usesCornerChase,usesFairChase,usesOpeningPickup,usesRunnerTactics,usesRoleBalance,usesTrainingStep,usesExtraBalloons,usesBalloonDropPursuit,usesOpeningSupply,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,usesCommittedBalloonDescent,usesRenderedContact};
 })();
 const __tagModule2=(()=>{
 const {usesRenderedContact}=__tagModule3;
@@ -63,7 +118,7 @@ const rows=[
  ['clone','分身シャボン','🫧','#9fdef0','player','分身が別の道へ走る'],
  ['cushion','ころころクッション','🟠','#ffbd88','player','後ろに転がし、当たると2秒ピヨピヨ'],
  ['curtain','泡のカーテン','🫧','#c3eafa','player','泡の向こうから姿を隠す'],
- ['fan','吹き飛ばしファン','🪭','#a8ddd6','player','巨大扇風機を設置。前方の風で吹き飛ばす'],
+ ['fan','吹き飛ばしファン','🪭','#a8ddd6','player','背後に扇風機を設置。追ってくる鬼を風で遠ざける'],
  ['sheet','すべりシート','❄','#b2d9f3','player','踏むとだれでも滑りやすい'],
  ['hook','ビュンフック','🪝','#fac9a1','player','前方のポールへ紐で一気に移動する'],
  ['scarf','追い風スカーフ','🎀','#ffba9a','hunters','予兆のあと短く加速'],
@@ -147,7 +202,45 @@ const WORLD_RULES='tag-hunt-foundation-v1';
 const WORLD_DASH_FORCE=1.18;
 const WORLD=Object.freeze({width:640,depth:480,duration:90,grid:16});
 const WORLD_CORNER_STAIRS=makeCornerStairs(WORLD.width,WORLD.depth);
+function worldNearCornerStairs(a,margin=0){
+ return cornerStairReserved(a.x,a.z,WORLD_CORNER_STAIRS,margin);
+}
+function worldCornerIndex(point){
+ if(cornerStairHeight(point.x,point.z,WORLD_CORNER_STAIRS)<=0)return -1;
+ return (point.x<0?0:2)+(point.z<0?0:1);
+}
+function worldCornerPathAllowed(from,to,allowed){
+ if(allowed===undefined)return true;
+ const minX=Math.min(from.x,to.x),maxX=Math.max(from.x,to.x);
+ const minZ=Math.min(from.z,to.z),maxZ=Math.max(from.z,to.z);
+ const steps=Math.max(1,Math.ceil(Math.hypot(to.x-from.x,to.z-from.z)/2));
+ let previous=cornerStairHeight(from.x,from.z,WORLD_CORNER_STAIRS);
+ if(!WORLD_CORNER_STAIRS.some((c,i)=>i!==allowed&&
+   (c.sx>0?maxX>=c.x-c.reach:minX<=c.x+c.reach)&&
+   (c.sz>0?maxZ>=c.z-c.reach:minZ<=c.z+c.reach)))return true;
+ for(let i=1;i<=steps;i++){
+  const x=from.x+(to.x-from.x)*i/steps,z=from.z+(to.z-from.z)*i/steps;
+  const height=cornerStairHeight(x,z,WORLD_CORNER_STAIRS);
+  if(height>previous+.001&&worldCornerIndex({x,z})!==allowed)return false;
+  previous=height;
+ }
+ return true;
+}
+function worldForwardBlocked(a){
+ if(worldSurface(a.x,a.z)!=='grip')return false;
+ const dx=Math.sin(a.yaw),dz=Math.cos(a.yaw),radius=a.radius??BODY.radius;
+ const points=[2,5].map(distance=>({x:a.x+dx*distance,z:a.z+dz*distance,y:a.y}));
+ return points.some(p=>!worldValid(p,radius))||
+  points.some(p=>{const edge={x:p.x+dx*radius,z:p.z+dz*radius};
+   return worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);});
+}
 const WORLD_JUMP_STEPS=Object.freeze([80,112,144].map((x,i)=>Object.freeze({x,z:-172,w:32,d:32,h:[1.5,4.5,8][i],ramp:32})));
+const trainingMinX=WORLD_JUMP_STEPS[0].x-WORLD_JUMP_STEPS[0].w/2;
+const trainingMaxX=WORLD_JUMP_STEPS.at(-1).x+WORLD_JUMP_STEPS.at(-1).w/2;
+const trainingNorth=WORLD_JUMP_STEPS[0].z-WORLD_JUMP_STEPS[0].d/2-WORLD_JUMP_STEPS[0].ramp;
+const trainingSouth=WORLD_JUMP_STEPS[0].z+WORLD_JUMP_STEPS[0].d/2;
+const nearTrainingSteps=(x,z,margin)=>
+ x>=trainingMinX-margin&&x<=trainingMaxX+margin&&z>=trainingNorth-margin&&z<=trainingSouth+margin;
 const WORLD_HILL=Object.freeze({x:-267,z:-20,rx:44,rz:108,h:8,cell:4});
 const WORLD_BASIN=Object.freeze({x:112,z:172,rx:54,rz:44,depth:5.5,brake:Object.freeze({x:112,z:172,w:16,d:24})});
 const WORLD_RISE=Object.freeze({x:116,z:0,halfW:48,halfD:48,topW:16,topD:16,h:7.5});
@@ -232,16 +325,86 @@ function stairJumpAccess(a,x,z,n,radius,allowTrainingStep){
  if(n>.05)return probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0);
  return probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);
 }
+
+function trainingLedgeRise(a,x,z,n,radius){
+ if(n<=.05||!nearTrainingSteps(a.x,a.z,radius+7))return 0;
+ const reach=radius+Math.max(3,Math.min(6,Math.hypot(a.vx,a.vz)*.3));
+ for(let distance=.5;distance<=reach+.5;distance+=.5){
+  const px=a.x+x/n*distance,pz=a.z+z/n*distance;
+  const platform=WORLD_JUMP_STEPS.find(step=>
+   Math.abs(px-step.x)<=step.w/2&&Math.abs(pz-step.z)<=step.d/2);
+  const rise=platform?worldHeight(px,pz)-a.y:0;
+  if(rise>.6&&!terrainContinuous(a,{x:px,z:pz}))return rise<=3.51?rise:0;
+ }
+ return 0;
+}
+// At a shallow contact, keep the player's sideways intent rather than letting
+// the wall eat nearly all of a dash. The solid collision still runs afterwards.
+function dashAlongBarrier(a,x,z,radius,dt,trainingLedge=false){
+ const reach=.12+Math.max(Math.hypot(a.vx,a.vz),18)*dt,ux=a.x+x*reach,uz=a.z+z*reach;
+ let blockX=false,blockZ=false;
+ if(Math.abs(ux)>WORLD.width/2-radius&&Math.abs(ux)>Math.abs(a.x))blockX=true;
+ if(Math.abs(uz)>WORLD.depth/2-radius&&Math.abs(uz)>Math.abs(a.z))blockZ=true;
+ for(const b of WORLD_BLOCKS){
+  const base=b.base??0;if(a.y>=base+b.h-.01||a.y+5.4<=base+.001)continue;
+  const minX=b.x-b.w/2-radius,maxX=b.x+b.w/2+radius,minZ=b.z-b.d/2-radius,maxZ=b.z+b.d/2+radius;
+  if(uz>minZ&&uz<maxZ&&(a.x<=minX&&ux>minX||a.x>=maxX&&ux<maxX))blockX=true;
+  if(ux>minX&&ux<maxX&&(a.z<=minZ&&uz>minZ||a.z>=maxZ&&uz<maxZ))blockZ=true;
+ }
+ // Use the same height/continuity test as the terrain collision below.
+ const onTrainingGround=trainingLedge&&nearTrainingSteps(a.x,a.z,radius+1);
+ if(!blockX&&Math.abs(x)>.12){const edge={x:ux+Math.sign(x)*radius,z:a.z};blockX=worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);}
+ if(!blockZ&&Math.abs(z)>.12){const edge={x:a.x,z:uz+Math.sign(z)*radius};blockZ=worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);}
+ if(blockX===blockZ)return null;
+ const tangent=blockX?z:x;if(Math.abs(tangent)<(onTrainingGround?.075:.18))return null;
+ const along=Math.sign(tangent)*Math.min(Math.hypot(x,z),.55+Math.abs(tangent)*.50);
+ return blockX?{x:0,z:along}:{x:along,z:0};
+}
+
+function steerAlongPerimeter(a,x,z,radius,dt){
+ const reach=.12+Math.max(Math.hypot(a.vx,a.vz),18)*dt;
+ const limitX=WORLD.width/2-radius,limitZ=WORLD.depth/2-radius;
+ const outsideX=Math.abs(a.x+x*reach)>limitX&&x*a.x>0;
+ const outsideZ=Math.abs(a.z+z*reach)>limitZ&&z*a.z>0;
+ if(!outsideX&&!outsideZ)return null;
+ const tangentX=outsideX?0:x,tangentZ=outsideZ?0:z;
+ const magnitude=Math.hypot(tangentX,tangentZ);
+ if(magnitude<.04)return {x:0,z:0,outsideX,outsideZ};
+ const scale=Math.min(Math.hypot(x,z)/magnitude,1.8);
+ return {x:tangentX*scale,z:tangentZ*scale,outsideX,outsideZ};
+}
 function worldMove(a,input={},dt=STEP){
- const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
+ const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash*(a.dive?1:a.dashScale??1);let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
  const intendedYaw=n>.05?Math.atan2(x,z):a.yaw;
+ const edgeInput=input.perimeterGrip&&!a.flight&&!a.externalForce&&n>.05?
+  steerAlongPerimeter(a,x,z,radius,dt):null;
+ if(edgeInput){
+  x=edgeInput.x;z=edgeInput.z;n=Math.hypot(x,z);
+  if(edgeInput.outsideX&&a.x*a.vx>0)a.vx=0;
+  if(edgeInput.outsideZ&&a.z*a.vz>0)a.vz=0;
+ }
 
  const t=a.tuning??{accel:1,speed:1,turn:1,brake:1},before={x:a.x,z:a.z,y:a.y},ground=a.grounded,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
- if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
+ if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){
+  const rise=a.grounded&&input.trainingLedge?trainingLedgeRise(a,x,z,n,radius):0;
+  if(a.grounded&&(rise||input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;
+  else delete a.stepJump;
+  if(rise) a.trainingJumpTop=a.y+rise+.26;
+  else delete a.trainingJumpTop;
+  a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;
+ }
+ if(!input.jump&&a.jumpHeld){
+  const release=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);
+  const clearance=a.trainingJumpTop==null?0:Math.max(0,a.trainingJumpTop-a.y);
+  a.vy=clearance>0&&a.vy>0?Math.min(a.vy,Math.max(release,Math.sqrt(2*BODY.gravity*clearance))):release;
+ }
+ a.jumpHeld=!!input.jump;
  const velocity=Math.hypot(a.vx,a.vz),running=ground&&grip&&!a.externalForce&&!['cushion','sticky'].includes(a.kind);
  if(running){
-  const amount=Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=x*limit,tz=z*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*x+a.vz*z)/(velocity*amount)<.95;
-  const rate=amount<.05?150*t.brake:100*t.accel*(turning?.5+.5*t.turn:1),step=Math.min(d,rate*dt);
+  const follow=input.cornerGrip&&input.dash&&n>.6&&a.grounded&&!a.flight?dashAlongBarrier(a,x,z,radius,dt,input.trainingLedge):null;
+  const driveX=follow?.x??x,driveZ=follow?.z??z,amount=follow?Math.hypot(driveX,driveZ):Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=driveX*limit,tz=driveZ*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*driveX+a.vz*driveZ)/(velocity*amount)<.95;
+  const steeringRate=input.balloonCornerTurn?150:100;
+  const rate=amount<.05?150*t.brake:steeringRate*t.accel*(turning?.5+.5*t.turn:1),step=Math.min(d,rate*dt);
   if(d>1e-9){a.vx+=dx/d*step;a.vz+=dz/d*step;}if(amount<.05&&Math.hypot(a.vx,a.vz)<.03){a.vx=0;a.vz=0;}
  }else{
   if(velocity>.1){const nx=a.vx/velocity,nz=a.vz/velocity,dot=x*nx+z*nz;x=dot*nx+(x-dot*nx)*t.turn;z=dot*nz+(z-dot*nz)*t.turn;}
@@ -263,7 +426,7 @@ function worldMove(a,input={},dt=STEP){
  a.x=clamp(a.x,-WORLD.width/2+radius,WORLD.width/2-radius);a.z=clamp(a.z,-WORLD.depth/2+radius,WORLD.depth/2-radius);
  const floor=worldHeight(a.x,a.z);if(a.grounded){if(floor<=before.y+.6&&floor>=before.y-.6)a.y=floor;else if(floor>before.y+.6){a.x=before.x;a.z=before.z;a.vx=0;a.vz=0;}else a.grounded=false;}
  if(!a.grounded&&floor>before.y+(cornerStairHeight(a.x,a.z,WORLD_CORNER_STAIRS)>worldGroundHeight(a.x,a.z)?.01:.6)){a.x=before.x;a.z=before.z;}
- if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;}}
+ if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;delete a.trainingJumpTop;}}
  if(a.keepInputFacing)a.yaw=intendedYaw;else if(Math.hypot(a.vx,a.vz)>.2)a.yaw=Math.atan2(a.vx,a.vz);return a;
 }
 function terrainContinuous(a,b){const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)*2));let h=worldHeight(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,next=worldHeight(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(Math.abs(next-h)>.3)return false;h=next;}return true;}
@@ -288,7 +451,7 @@ function worldWidthEdges(padding){
  return edges;
 }
 const WORLD_NAV_COUNT=WORLD_NODES.length;
-function worldNear(p,padding){const candidates=[],gx=Math.round(p.x/16)*16,gz=Math.round(p.z/16)*16,h=worldHeight(p.x,p.z);for(let dz=-32;dz<=32;dz+=16)for(let dx=-32;dx<=32;dx+=16){const i=worldCell.get((gx+dx)+','+(gz+dz));if(i===undefined)continue;const n=WORLD_NODES[i];candidates.push({i,d:Math.hypot(n.x-p.x,n.z-p.z)+Math.abs(n.y-h)*4});}candidates.sort((a,b)=>a.d-b.d);for(const c of candidates)if(worldValid(WORLD_NODES[c.i],padding)&&worldTraversable(p,WORLD_NODES[c.i],Math.max(0,padding-.25)))return c.i;return -1;}
+function worldNear(p,padding,cornerAccess,reverse=false){const candidates=[],gx=Math.round(p.x/16)*16,gz=Math.round(p.z/16)*16,h=worldHeight(p.x,p.z);for(let dz=-32;dz<=32;dz+=16)for(let dx=-32;dx<=32;dx+=16){const i=worldCell.get((gx+dx)+','+(gz+dz));if(i===undefined)continue;const n=WORLD_NODES[i];candidates.push({i,d:Math.hypot(n.x-p.x,n.z-p.z)+Math.abs(n.y-h)*4});}candidates.sort((a,b)=>a.d-b.d);for(const c of candidates)if((!reverse||cornerAccess===undefined||worldCornerIndex(WORLD_NODES[c.i])<0||worldCornerIndex(WORLD_NODES[c.i])===cornerAccess)&&worldValid(WORLD_NODES[c.i],padding)&&worldCornerPathAllowed(reverse?WORLD_NODES[c.i]:p,reverse?p:WORLD_NODES[c.i],cornerAccess)&&worldTraversable(p,WORLD_NODES[c.i],Math.max(0,padding-.25)))return c.i;return -1;}
 // Geometry-only edge samples are shared across bodies; the cache is limited to graph edges.
 const worldTravelCache=new Map();
 function routeSamples(a,b){
@@ -299,7 +462,7 @@ function routeSamples(a,b){
  if(cacheable)worldTravelCache.set(key,rows);return rows;
 }
 const worldTravelMemos=new Map();
-function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(t.speed??1),accel=100*(t.accel??1),iceDrive=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,iceDrive,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
+function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(a.dashScale??1)*(t.speed??1),accel=100*(t.accel??1),iceDrive=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,iceDrive,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
 function segmentSeconds(config,a,b,prior,initial=false){
  const samples=routeSamples(a,b),cached=config.memo.get(samples);let seconds=cached?.seconds??0,cruise=cached?.cruise??config.top;if(!cached){for(const row of samples){const limit=config.top+clamp(-row.grade*10,0,3);cruise=row.grip?limit:clamp((config.iceDrive-row.grade*BODY.gravity)/(.6*config.brake),2,limit);seconds+=row.length/cruise;}config.memo.set(samples,{seconds,cruise});}
  const dx=b.x-a.x,dz=b.z-a.z,length=Math.hypot(dx,dz)||1;
@@ -310,34 +473,115 @@ function segmentSeconds(config,a,b,prior,initial=false){
 function worldRouteSeconds(a,path){const config=routeConfig(a);let seconds=0,from=a,prior=null;for(const to of path){if(Math.hypot(to.x-from.x,to.z-from.z)<1e-6)continue;seconds+=segmentSeconds(config,from,to,prior,prior===null);prior=from;from=to;}return seconds;}
 function routePush(heap,item){let at=heap.length;heap.push(item);while(at){const parent=(at-1)>>1;if(heap[parent].f<=item.f)break;heap[at]=heap[parent];at=parent;}heap[at]=item;}
 function routePop(heap){const first=heap[0],last=heap.pop();if(heap.length){let at=0;while(at*2+1<heap.length){let child=at*2+1;if(child+1<heap.length&&heap[child+1].f<heap[child].f)child++;if(heap[child].f>=last.f)break;heap[at]=heap[child];at=child;}heap[at]=last;}return first;}
-function worldRoute(a,b){
- const padding=(a.radius??2.7)+.2,start=worldNear(a,padding),end=worldNear(b,padding);if(start<0||end<0)return[];
+function worldRoute(a,b,cornerAccess){
+ const padding=(a.radius??2.7)+.2,start=worldNear(a,padding,cornerAccess),end=worldNear(b,padding,cornerAccess,true);if(start<0||end<0)return[];
  const widthEdges=worldWidthEdges(padding),config=routeConfig(a),fastest=Math.max(config.top+3,Math.hypot(config.vx,config.vz)),heuristic=i=>Math.hypot(WORLD_NODES[i].x-WORLD_NODES[end].x,WORLD_NODES[i].z-WORLD_NODES[end].z)/fastest,cost=new Float64Array(WORLD_NODES.length).fill(Infinity),prev=new Int32Array(WORLD_NODES.length).fill(-1),heap=[];
  cost[start]=0;routePush(heap,{i:start,g:0,f:heuristic(start)});let at=-1,visits=0;
  while(heap.length&&visits<WORLD_NODES.length*3){const item=routePop(heap);if(item.g!==cost[item.i])continue;at=item.i;visits++;if(at===end)break;
   for(const i of WORLD_LINKS[at]){const edge=Math.min(at,i)+':'+Math.max(at,i);let clearance=worldEdgeCache.get(edge);if(clearance===undefined){clearance=segmentClearance(WORLD_NODES[at],WORLD_NODES[i]);worldEdgeCache.set(edge,clearance);}if(clearance<padding)continue;
-   let allowed=widthEdges.get(edge);if(allowed===undefined){allowed=worldTraversable(WORLD_NODES[at],WORLD_NODES[i],padding);widthEdges.set(edge,allowed);}if(!allowed)continue;
+   let allowed=widthEdges.get(edge);if(allowed===undefined){allowed=worldTraversable(WORLD_NODES[at],WORLD_NODES[i],padding);widthEdges.set(edge,allowed);}if(!allowed||!worldCornerPathAllowed(WORLD_NODES[at],WORLD_NODES[i],cornerAccess))continue;
    const from=WORLD_NODES[at],to=WORLD_NODES[i],prior=prev[at]>=0?WORLD_NODES[prev[at]]:a,c=cost[at]+segmentSeconds(config,from,to,prior,prev[at]<0);
    if(c<cost[i]){cost[i]=c;prev[i]=at;routePush(heap,{i,g:c,f:c+heuristic(i)});}
   }
  }
  if(at!==end)return[];const path=[WORLD_NODES[end]];while(at!==start){at=prev[at];if(at<0)return[];path.push(WORLD_NODES[at]);}
- const route=path.reverse(),endNode=route.at(-1),endHeight=worldHeight(b.x,b.z);if(worldValid(b,padding)&&Math.abs(endHeight-endNode.y)<=Math.hypot(b.x-endNode.x,b.z-endNode.z)*.32+.01&&worldTraversable(endNode,b,padding))route.push({x:b.x,z:b.z,y:endHeight});return route;
+ const route=path.reverse(),endNode=route.at(-1),endHeight=worldHeight(b.x,b.z);if(worldValid(b,padding)&&Math.abs(endHeight-endNode.y)<=Math.hypot(b.x-endNode.x,b.z-endNode.z)*.32+.01&&worldTraversable(endNode,b,padding)&&worldCornerPathAllowed(endNode,b,cornerAccess))route.push({x:b.x,z:b.z,y:endHeight});return route;
 }
 
+function cornerRampRoute(a,target,corner,ordinary){
+ const c=WORLD_CORNER_STAIRS[corner],padding=(a.radius??2.7)+.2;
+ if(!c||Math.hypot(a.x-c.x,a.z-c.z)>160)return ordinary;
+ const at=(u,v)=>{const x=c.x-c.sx*u,z=c.z-c.sz*v;return{x,z,y:worldHeight(x,z)};};
+ const clear=(from,to)=>worldTraversable(from,to,padding)&&worldCornerPathAllowed(from,to,corner);
+ if(clear(a,target))return [target];
+ const u=(c.x-a.x)*c.sx,v=(c.z-a.z)*c.sz;
+ let best=ordinary,bestTime=ordinary.length?worldRouteSeconds(a,ordinary):Infinity;
+ for(const acrossX of [true,false]){
+  const onRamp=(acrossX?u:v)<=c.rampWidth-padding;
+  const length=acrossX?v:u,lane=c.rampWidth/2;
+  const ramp=position=>acrossX?at(lane,position):at(position,lane);
+  const exits=[c.top,...Array.from({length:c.count},(_,i)=>c.top+i*c.tread+c.rampSlopeRun)];
+  const entries=onRamp?[Math.min(length,c.reach+2)]:[c.reach+2,...exits.map(distance=>distance+2)];
+  for(const entry of entries){
+   const entrance=ramp(entry);
+   if(!worldValid(entrance,padding)||!clear(a,entrance))continue;
+   for(const distance of [entry,...exits]){
+    if(distance>entry)continue;
+    const exit=ramp(distance);
+    if(!clear(entrance,exit)||!clear(exit,target))continue;
+    const path=[entrance,...(entry===distance?[]:[exit]),target];
+    const seconds=worldRouteSeconds(a,path);
+    if(seconds+.15<bestTime){best=path;bestTime=seconds;}
+   }
+  }
+ }
+ return best;
+}
 
-function worldRouteLookahead(a,path,start=0,threat=null){
+function deckRampRoute(a,target,preferredEnd=0,stable=false){
+ const d=WORLD_DECK,half=d.length/2,foot=half+d.ramp,padding=(a.radius??2.7)+.2;
+ if(Math.abs(target.x-d.x)>d.w/2||Math.abs(target.z-d.z)>=foot||worldHeight(target.x,target.z)<2||
+    Math.abs(a.x-d.x)>66||Math.abs(a.z-d.z)>foot+34)return null;
+ const floor=(x,z)=>({x,z,y:worldHeight(x,z)});
+ const goal=floor(clamp(target.x,d.x-d.w/2+1,d.x+d.w/2-1),target.z);
+ if(worldTraversable(a,goal,padding)&&(!stable||!preferredEnd||Math.abs(a.x-d.x)<d.w/2-padding))return [goal];
+ let best=null,cost=Infinity,committed=null,committedCost=Infinity;
+ for(const side of [1,-1])for(const offset of [2,0,4]){
+  const z=d.z+side*(foot+offset),entry=floor(d.x,z),top=floor(d.x,d.z+side*half);
+  const flank=floor(d.x+(a.x>=d.x?1:-1)*(d.w/2+padding+3),z);
+  for(const lead of [[],[flank]]){
+   const points=[...lead,entry,...(Math.abs(goal.z-d.z)<=half||Math.sign(goal.z-d.z)!==side?[top]:[]),goal];
+   let from=a,ok=true;
+   for(const p of points){
+    if(!worldTraversable(from,p,padding)){ok=false;break;}
+    from=p;
+   }
+   if(ok){
+    const seconds=worldRouteSeconds(a,points);
+    if(seconds<cost){best=stable?{points,end:side}:points;cost=seconds;}
+    if(stable&&side===preferredEnd&&seconds<committedCost){committed={points,end:side};committedCost=seconds;}
+   }
+  }
+ }
+ return committed??best;
+}
+
+function steerHuntRoute(a,path,at,sprint){
+ const goal=path[at]??a,next=path[at+1];
+ let memo=worldSteeringMemos.get(a);
+ if(!memo||memo.path!==path||memo.at!==at||memo.radius!==a.radius){
+  memo={path,at,radius:a.radius,room:steeringRoom(a,goal,next)};worldSteeringMemos.set(a,memo);
+ }
+ return worldSteering(a,goal,next,{sprint,room:memo.room});
+}
+
+function deckPerimeterSearch(a,cornerAccess){
+ const d=WORLD_DECK,padding=(a.radius??2.7)+.2,foot=d.length/2+d.ramp;
+ if(a.x<d.x+d.w/2+padding||Math.abs(a.z-d.z)>foot-2)return null;
+ const floor=(x,z)=>({x,z,y:worldHeight(x,z)});
+ const clear=(from,to)=>worldTraversable(from,to,padding)&&worldCornerPathAllowed(from,to,cornerAccess);
+ let best=null,cost=Infinity;
+ for(const side of [1,-1])for(const offset of [2,0,4]){
+  const z=d.z+side*(foot+offset),edge=floor(d.x+d.w/2+padding+3,z),inside=floor(d.x-d.w/2-padding-7,z);
+  if(!clear(a,edge)||!clear(edge,inside))continue;
+  const points=[edge,inside],seconds=worldRouteSeconds(a,points);
+  if(seconds<cost){best=points;cost=seconds;}
+ }
+ return best;
+}
+
+function worldRouteLookahead(a,path,start=0,threat=null,cornerAccess){
  if(!path.length)return 0;let at=start;const remaining=path.slice(start),threats=threat?(Array.isArray(threat)?threat:[threat]):[],clearance=p=>Math.min(...threats.map(t=>worldEscapeClearance(a,t,p))),margin=threats.length?clearance(remaining):-Infinity;
  for(let i=start+1;i<Math.min(path.length,start+5);i++){
-  if(!worldTraversable(a,path[i],(a.radius??2.7)-.05))break;
+  if(!worldTraversable(a,path[i],(a.radius??2.7)-.05)||!worldCornerPathAllowed(a,path[i],cornerAccess))break;
   if(threats.length&&clearance([path[i]])+.001<margin)break;
   if(worldRouteSeconds(a,[path[i]])>worldRouteSeconds(a,path.slice(start,i+1))*1.03+.02)break;
   at=i;
  }
  return at;
 }
-function worldSearchPlan(seen,radius=2.7,{role,reserved=[]}={}){
- const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];
+function worldSearchPlan(seen,radius=2.7,{role,reserved=[],cornerAccess}={}){
+ const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2)&&(cornerAccess===undefined||worldCornerIndex(n)<0||worldCornerIndex(n)===cornerAccess);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];
  const offsets=role==='intercept'?[.8,-.8,0,1.8,-1.8,Math.PI]:role==='patrol'?[-1.8,1.8,Math.PI,-.8,.8,0]:[0,.8,-.8,1.8,-1.8,Math.PI];
  for(const offset of offsets){let best=-Infinity,pick;
   for(const n of candidates){if(used.has(n))continue;const dx=n.x-seen.x,dz=n.z-seen.z,d=Math.hypot(dx,dz),occupied=plan.length===0?reserved.reduce((penalty,p)=>penalty+Math.max(0,24-Math.hypot(n.x-p.x,n.z-p.z))*1.6,0):0;
@@ -346,7 +590,7 @@ function worldSearchPlan(seen,radius=2.7,{role,reserved=[]}={}){
   }if(pick){used.add(pick);plan.push({...pick});}
  }return plan;
 }
-function localPatrol(a,m){m.patrol=(m.patrol??0)+1;const angle=m.patrol*2.399963,tx=a.x+Math.sin(angle)*45,tz=a.z+Math.cos(angle)*45;let best=Infinity,pick=a;for(const n of WORLD_NODES){const d=Math.hypot(n.x-a.x,n.z-a.z);if(d<20||d>70||!worldValid(n,(a.radius??2.7)+.2))continue;const score=Math.hypot(n.x-tx,n.z-tz)+Math.abs(n.y-a.y)*2;if(score<best){best=score;pick=n;}}return {...pick};}
+function localPatrol(a,m,cornerAccess){m.patrol=(m.patrol??0)+1;const angle=m.patrol*2.399963,tx=a.x+Math.sin(angle)*45,tz=a.z+Math.cos(angle)*45;let best=Infinity,pick=a;for(const n of WORLD_NODES){const d=Math.hypot(n.x-a.x,n.z-a.z);if(d<20||d>70||!worldValid(n,(a.radius??2.7)+.2)||cornerAccess!==undefined&&worldCornerIndex(n)>=0&&worldCornerIndex(n)!==cornerAccess)continue;const score=Math.hypot(n.x-tx,n.z-tz)+Math.abs(n.y-a.y)*2;if(score<best){best=score;pick=n;}}return {...pick};}
 // Inspect the real escape route, not just its endpoint. Only visible threats enter this planner.
 function worldEscapeClearance(a,threat,path,horizon=80){
  if(!path.length)return -Infinity;
@@ -392,7 +636,7 @@ function steeringRoom(a, goal, next) {
 function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
  if(!Number.isFinite(goal?.x)||!Number.isFinite(goal?.z))return {x:0,z:0,dash:false,jump:false};
  const dx=goal.x-a.x,dz=goal.z-a.z,d=Math.hypot(dx,dz),t=a.tuning??{};
- const top=(sprint?BODY.dash:BODY.max)*(t.speed??1);
+ const top=(sprint?BODY.dash*(a.dashScale??1):BODY.max)*(t.speed??1);
  // Pass through intermediate points; only the actual destination needs a full stop.
  let speed=next?top:Math.min(top,d*2);
  if(next&&d>1e-6) {
@@ -416,21 +660,52 @@ function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
  return {x,z,dash:!!sprint,jump:false};
 }
 // Roles choose destinations, never position corrections or knowledge through walls.
-function worldHuntAim(a,other,m){
- const gap=Math.hypot(a.x-other.x,a.z-other.z),speed=Math.hypot(other.vx??0,other.vz??0),top=BODY.dash*(a.tuning?.speed??1);
+function worldHuntAim(a,other,m,cornerAccess){
+ const gap=Math.hypot(a.x-other.x,a.z-other.z),speed=Math.hypot(other.vx??0,other.vz??0),top=BODY.dash*(a.dashScale??1)*(a.tuning?.speed??1);
  const lead=m.role==='intercept'?clamp(gap/top*.65,.35,2.4):m.role==='patrol'?clamp(gap/top*.4,.6,1.5):.18;
  let target={x:other.x+(other.vx??0)*lead,z:other.z+(other.vz??0)*lead,y:other.y};
- if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05))target={x:other.x,z:other.z,y:other.y};
+ if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,target,cornerAccess))target={x:other.x,z:other.z,y:other.y};
  if(m.role==='patrol'&&gap>24&&speed>3){
   const nx=(other.vz??0)/speed,nz=-(other.vx??0)/speed,candidates=[];
   for(const side of[14,-14,22,-22]){const p={x:target.x+nx*side,z:target.z+nz*side};p.y=worldHeight(p.x,p.z);
-   if(!worldValid(p,(a.radius??2.7)+.2)||!worldTraversable(other,p,(other.radius??2.7)-.05))continue;
+   if(!worldValid(p,(a.radius??2.7)+.2)||!worldTraversable(other,p,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,p,cornerAccess))continue;
    const occupied=(m.reservedTargets??[]).reduce((sum,q)=>sum+Math.max(0,24-Math.hypot(q.x-p.x,q.z-p.z))*3,0);
    candidates.push({p,score:Math.hypot(a.x-p.x,a.z-p.z)+occupied});
   }
   candidates.sort((a,b)=>a.score-b.score);if(candidates.length)return{target:candidates[0].p,mode:'flank'};
  }
  return{target,mode:m.role==='intercept'?'intercept':'pursuit'};
+}
+
+// Pick a reachable meeting point, using only the observed direction and
+// speed. A blocked prediction ends at the obstruction; it cannot cross it.
+function worldInterceptShortcut(a,observed,cornerAccess){
+ const vx=observed.vx??0,vz=observed.vz??0,speed=Math.hypot(vx,vz);
+ const gap=Math.hypot(a.x-observed.x,a.z-observed.z),pad=(a.radius??2.7)+.2,runnerPad=(observed.radius??2.7)-.05;
+ if(!a.grounded||!observed.grounded||gap<16||speed<5||Math.abs(a.y-observed.y)>2.2)return null;
+ const top=BODY.dash*(a.dashScale??1)*(a.tuning?.speed??1);
+ const previousLead=clamp(gap/top*.65,.35,2.4);
+ const samples=[];let from=observed;
+ for(const seconds of [.55,.85,1.2,1.55,1.9,2.3,2.7,3.1]){
+  const x=observed.x+vx*seconds,z=observed.z+vz*seconds,point={x,z,y:worldHeight(x,z)};
+  if(!worldValid(point,runnerPad)||!worldTraversable(from,point,runnerPad)||!worldCornerPathAllowed(from,point,cornerAccess))break;
+  from=point;
+  if(seconds<previousLead+.12||speed*seconds<11||!worldValid(point,pad)||!worldCornerPathAllowed(a,point,cornerAccess))continue;
+  const direct=worldRouteSeconds(a,[point]);
+  if(direct<=seconds+.32)samples.push({point,seconds});
+ }
+ // Use the first practical meeting, before waiting far ahead. Check a
+ // routed shortcut only if a direct crossing is blocked for the hunter.
+ let routeChecks=0;
+ for(const {point,seconds} of samples){
+  const clear=worldTraversable(a,point,pad);
+  if(!clear&&routeChecks++>=2)continue;
+  const path=clear?[point]:worldRoute(a,point,cornerAccess);
+  if(!path.length||Math.hypot(path.at(-1).x-point.x,path.at(-1).z-point.z)>1)continue;
+  const cost=worldRouteSeconds(a,path);
+  if(cost<=seconds+.32&&cost+.2<worldRouteSeconds(a,[observed,point]))return{target:point,path};
+ }
+ return null;
 }
 function huntContactApproach(a,observed){
  const radius=a.radius??2.7,padding=radius+.2;
@@ -453,28 +728,92 @@ function huntContactApproach(a,observed){
  }
  return observed;
 }
-function worldPilot(a,other,chasing,time,m,reachObserved=false){
+function worldPilot(a,other,chasing,time,m,reachObserved=false,cornerAccess,cornerRamps=false,stableRamps=false,interceptShortcut=false){
  if(time>=m.next||!m.path){m.next=time+(!chasing&&m.escapeThreats?.length ? .4 : .65);const spec=opponentSpec(m.profile)??OPPONENTS[1],style=m.role==='pursuit'?'direct':m.role==='intercept'?'cutoff':m.role==='patrol'?'patrol':spec.movement?.style??spec.id,visible=!m.suppressSight&&Math.hypot(a.x-other.x,a.z-other.z)<(m.role==='patrol'?70:140)&&worldSight({...a,y:a.y+3},{...other,y:other.y+3});
  const movement=m.lastDecision?Math.hypot(a.x-m.lastDecision.x,a.z-m.lastDecision.z):Infinity;m.stuck=movement<.4&&m.target&&Math.hypot(m.target.x-a.x,m.target.z-a.z)>10?(m.stuck??0)+1:0;m.lastDecision={x:a.x,z:a.z};
  if(visible){m.seen={x:other.x,z:other.z,y:other.y,vx:other.vx,vz:other.vz};m.seenAt=time;m.searchPlan=null;m.searchIndex=0;}m.visible=visible;let target,plannedPath;if(!chasing&&visible&&Math.hypot(a.x-other.x,a.z-other.z)<55)m.sprintUntil=time+1.6;
- if(chasing&&visible){if(['pursuit','intercept','patrol'].includes(m.role)){const aim=worldHuntAim(a,other,m);target=aim.target;m.mode=aim.mode;}else{const horizon=style==='cutoff'?clamp(Math.hypot(a.x-other.x,a.z-other.z)/(BODY.dash*(a.tuning?.speed??1))*.65,.35,2.8):style==='direct'?.18:.8;target={x:other.x+other.vx*horizon,z:other.z+other.vz*horizon,y:other.y};if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05))target={x:other.x,z:other.z,y:other.y};m.mode=style==='cutoff'?'intercept':'pursuit';}m.goalSince=time;}
+ if(chasing&&visible){if(['pursuit','intercept','patrol'].includes(m.role)){const aim=worldHuntAim(a,other,m,cornerAccess);target=aim.target;m.mode=aim.mode;}else{const horizon=style==='cutoff'?clamp(Math.hypot(a.x-other.x,a.z-other.z)/(BODY.dash*(a.tuning?.speed??1))*.65,.35,2.8):style==='direct'?.18:.8;target={x:other.x+other.vx*horizon,z:other.z+other.vz*horizon,y:other.y};if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,target,cornerAccess))target={x:other.x,z:other.z,y:other.y};m.mode=style==='cutoff'?'intercept':'pursuit';}m.goalSince=time;}
  else if(chasing&&m.seen&&time-m.seenAt<18){const last=m.seen,gap=Math.hypot(a.x-last.x,a.z-last.z),atLast=gap<12;
   // The pursuer checks the actual old contact. Other roles may investigate
   // different exits nearby, using only that observation's direction and age.
   const branch=m.role==='intercept'?gap<70&&time-m.seenAt>=.75:m.role==='patrol'?gap<80&&time-m.seenAt>=1.1:false;
   if(!m.searchPlan&&!atLast&&!branch&&m.stuck<3&&m.path?.length!==0){target={x:last.x,z:last.z,y:last.y};m.mode='last-seen';}
-  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius,{role:m.role,reserved:m.searchReservations});m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){
+  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius,{role:m.role,reserved:m.searchReservations,cornerAccess});m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){
    m.searchIndex++;for(let i=0;i<m.searchPlan.length;i++){const p=m.searchPlan[(m.searchIndex+i)%m.searchPlan.length];if((m.searchReservations??[]).every(q=>Math.hypot(p.x-q.x,p.z-q.z)>=20)){m.searchIndex+=i;break;}}m.goalSince=time;
   }target=m.searchPlan[m.searchIndex%m.searchPlan.length];m.mode='search';}
  }
  else if(!chasing&&m.escapeThreats?.length){const escape=worldEscapeTeamPlan(a,m.escapeThreats,m.target);target=escape.target;plannedPath=escape.path;m.mode='escape';m.goalSince=time;}
  else if(!chasing&&visible){let best=-Infinity;const candidates=[];for(let i=0;i<WORLD_NODES.length;i+=3){const n=WORLD_NODES[i],distance=Math.hypot(n.x-a.x,n.z-a.z);if(distance<22||distance>75||!worldValid(n,(a.radius??2.7)+.2))continue;candidates.push({n,score:Math.hypot(n.x-other.x,n.z-other.z)-distance*.35});}candidates.sort((a,b)=>b.score-a.score);for(const c of candidates.slice(0,24)){const score=c.score+(worldSight({...other,y:other.y+3},{...c.n,y:c.n.y+3})?0:12+spec.cover*4);if(score>best){best=score;target=c.n;}}if(target){const escape=worldEscapePlan(a,other,target);target=escape.target;plannedPath=escape.path;}m.mode='escape';m.goalSince=time;
  }
- if(!target){if(m.target&&time-(m.goalSince??0)<4&&Math.hypot(a.x-m.target.x,a.z-m.target.z)>8&&m.stuck<3)target=m.target;else{target=localPatrol(a,m);m.goalSince=time;}m.mode='patrol';}
+ if(!target){if(m.target&&time-(m.goalSince??0)<4&&Math.hypot(a.x-m.target.x,a.z-m.target.z)>8&&m.stuck<3)target=m.target;else{target=localPatrol(a,m,cornerAccess);m.goalSince=time;}m.mode='patrol';}
  if(chasing&&reachObserved&&['pursuit','intercept','last-seen'].includes(m.mode))target=huntContactApproach(a,target);
- m.path=plannedPath??worldRoute(a,target);m.target={...target};m.at=worldRouteLookahead(a,m.path,0,!chasing&&m.escapeThreats?.length?m.escapeThreats:!chasing&&visible?m.seen:null);
+ m.path=plannedPath??worldRoute(a,target,cornerAccess);
+ if(cornerRamps&&chasing){
+  // Keep the observed ramp route while the wall masks the target on approach.
+  const known=visible?m.seen:m.seen&&time-m.seenAt<18?m.seen:null;
+  const withinDeck=known&&Math.abs(known.x-WORLD_DECK.x)<=WORLD_DECK.w/2&&
+   Math.abs(known.z)<WORLD_DECK.length/2+WORLD_DECK.ramp&&worldHeight(known.x,known.z)>=2;
+  let ramps=null;
+  if(stableRamps){
+   let commitment=withinDeck?m.deckRamp:null;
+   // Once a slope is selected, keep the entry and its waypoints. A fresh
+   // sighting updates the final destination, so it cannot flip the entrance.
+   if(commitment&&m.stuck>=3){m.avoidDeckEnd=commitment.end;m.avoidDeckUntil=time+5;commitment=null;}
+   if(commitment&&Math.abs(a.x-WORLD_DECK.x)<WORLD_DECK.w/2-a.radius&&
+      worldTraversable(a,known,a.radius+.04))commitment=null;
+   if(!commitment&&withinDeck){
+    const planned=deckRampRoute(a,known,time<(m.avoidDeckUntil??0)?-m.avoidDeckEnd:0,true);
+    if(Array.isArray(planned))ramps=planned;
+    else if(planned)commitment={end:planned.end,points:planned.points.slice(0,-1),at:0};
+   }
+   m.deckRamp=commitment;
+   if(commitment){
+    const p=commitment.points;
+    while(commitment.at<p.length&&Math.hypot(a.x-p[commitment.at].x,a.z-p[commitment.at].z)<2.4)commitment.at++;
+    ramps=[...p.slice(commitment.at),known];
+   }
+  }else if(known)ramps=deckRampRoute(a,known);
+  if(!ramps&&known&&cornerAccess>=0&&worldCornerIndex(known)===cornerAccess){
+   const knownFloor={x:known.x,z:known.z,y:worldHeight(known.x,known.z)};
+   const ordinary=worldCornerIndex(target)===cornerAccess&&Math.hypot(known.x-target.x,known.z-target.z)<3
+    ?m.path:worldRoute(a,knownFloor,cornerAccess);
+   const cornerPath=cornerRampRoute(a,knownFloor,cornerAccess,ordinary);
+   if(cornerPath.length&&worldCornerIndex(cornerPath.at(-1))===cornerAccess)ramps=cornerPath;
+  }
+  if(ramps){m.path=ramps;target=known;}
+  if(stableRamps){
+   let sweep=!known?m.deckSweep:null;
+   if(sweep){
+    const p=sweep.points;
+    while(sweep.at<p.length&&Math.hypot(a.x-p[sweep.at].x,a.z-p[sweep.at].z)<2.4)sweep.at++;
+    if(sweep.at>=p.length||m.stuck>=3||time>=sweep.until){sweep=null;m.deckSweepAt=time+6;}
+   }
+   if(!sweep&&!known&&time>=(m.deckSweepAt??0)){
+    const points=deckPerimeterSearch(a,cornerAccess);
+    if(points)sweep={points,at:0,until:time+14};
+    else m.deckSweepAt=time+2;
+   }
+   m.deckSweep=sweep;
+   if(sweep){m.path=sweep.points.slice(sweep.at);target=m.path.at(-1);}
+  }
+  m.raisedApproach=!!ramps||!!m.deckSweep;
  }
- const path=m.path??[];while(m.at<path.length-1&&Math.hypot(path[m.at].x-a.x,path[m.at].z-a.z)<2.8)m.at++;const goal=path[m.at]??a,next=path[m.at+1];let memo=worldSteeringMemos.get(a);if(!memo||memo.path!==path||memo.at!==m.at||memo.radius!==a.radius){memo={path,at:m.at,radius:a.radius,room:steeringRoom(a,goal,next)};worldSteeringMemos.set(a,memo);}return worldSteering(a,goal,next,{sprint:chasing||time<(m.sprintUntil??0),room:memo.room});
+ if(interceptShortcut){
+  const cut=chasing&&visible&&m.role==='intercept'&&!m.raisedApproach?worldInterceptShortcut(a,other,cornerAccess):null;
+  m.interceptShortcut=!!cut;
+  if(cut){target=cut.target;m.path=cut.path;}
+ }
+ m.target={...target};m.at=stableRamps&&(m.deckRamp||m.deckSweep)?0:worldRouteLookahead(a,m.path,0,!chasing&&m.escapeThreats?.length?m.escapeThreats:!chasing&&visible?m.seen:null,cornerAccess);
+ }
+ const committed=stableRamps&&(m.deckRamp||m.deckSweep);
+ if(committed){
+  const p=committed.points,i=committed.at;
+  if(i<p.length&&Math.hypot(a.x-p[i].x,a.z-p[i].z)<2.4)m.next=time;
+  // Keep the approach slow only at the existing sharp geometric turn:
+  // steering and the shared movement limits still make the actual turn.
+  return steerHuntRoute(a,m.path,0,true);
+ }
+ const path=m.path??[];while(m.at<path.length-1&&Math.hypot(path[m.at].x-a.x,path[m.at].z-a.z)<2.8)m.at++;return steerHuntRoute(a,path,m.at,chasing||time<(m.sprintUntil??0));
 }
 function startSpec(id,name,hint,p,c,swap=false){const pair=(a,b)=>Object.freeze({player:Object.freeze([...a]),cpu:Object.freeze([...b])});return Object.freeze({id,name,hint,escape:pair(p,c),chase:swap?pair(c,p):pair(p,c)});}
 const WORLD_STARTS=Object.freeze([startSpec('boulevard','大通り','直線の勝負',[0,80],[8,-2]),startSpec('hill','氷の丘','坂とすべり',[-245,0],[-309,0],true),startSpec('courtyard','中庭','入口の読み合い',[0,-80],[0,0],true),startSpec('garden','庭のこみち','近道と氷',[-112,64],[-112,128],true),startSpec('basin','氷のくぼ地','勢いと切り返し',[112,132],[112,212],true)]);
@@ -495,7 +834,7 @@ function worldCameraPose(target,{yaw=0,pitch=.38,distance=31,minDistance=16,prev
 function worldCameraInput(memory,x,z,renderYaw){const length=Math.hypot(x,z);if(length>1){x/=length;z/=length;}const previous=Math.hypot(memory.x??0,memory.z??0),direction=length>1e-8&&previous>1e-8?(x*memory.x+z*memory.z)/(Math.hypot(x,z)*previous):1;if(length<.01||previous<.01||direction<.98)memory.yaw=renderYaw;memory.x=x;memory.z=z;const yaw=memory.yaw??renderYaw;return{x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)};}
 
 
-return {STEP,TAG_CHARACTERS,actor,opponentSpec,HUNT_REFERENCE_HEIGHT,HUNT_CHARACTER_HEIGHT,HUNT_MAP_SCALE,HUNT_JUMP,BODY,WORLD_RADII,WORLD_RULES,WORLD_DASH_FORCE,WORLD,WORLD_CORNER_STAIRS,WORLD_JUMP_STEPS,WORLD_HILL,WORLD_BASIN,WORLD_RISE,WORLD_ICE_LOOP,WORLD_DECK,WORLD_RIDGE,worldGroundHeight,worldGradient,worldBasinContours,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_PATHS,WORLD_COURTYARD,WORLD_BLOCKS,WORLD_TREES,worldHeight,worldSurface,worldValid,worldSight,worldMove,worldTraversable,WORLD_NAV_COUNT,worldRouteSeconds,worldRoute,worldRouteLookahead,worldSearchPlan,worldEscapeClearance,worldEscapePlan,worldEscapeTeamPlan,worldSteering,worldHuntAim,worldPilot,WORLD_STARTS,worldStart,worldNextStart,worldMatch,worldStep,worldCameraPose,worldCameraInput};
+return {STEP,TAG_CHARACTERS,actor,opponentSpec,HUNT_REFERENCE_HEIGHT,HUNT_CHARACTER_HEIGHT,HUNT_MAP_SCALE,HUNT_JUMP,BODY,WORLD_RADII,WORLD_RULES,WORLD_DASH_FORCE,WORLD,WORLD_CORNER_STAIRS,worldNearCornerStairs,worldCornerIndex,worldCornerPathAllowed,worldForwardBlocked,WORLD_JUMP_STEPS,WORLD_HILL,WORLD_BASIN,WORLD_RISE,WORLD_ICE_LOOP,WORLD_DECK,WORLD_RIDGE,worldGroundHeight,worldGradient,worldBasinContours,WORLD_GARDEN,WORLD_GARDEN_BEDS,WORLD_PATHS,WORLD_COURTYARD,WORLD_BLOCKS,WORLD_TREES,worldHeight,worldSurface,worldValid,worldSight,worldMove,worldTraversable,WORLD_NAV_COUNT,worldRouteSeconds,worldRoute,worldRouteLookahead,worldSearchPlan,worldEscapeClearance,worldEscapePlan,worldEscapeTeamPlan,worldSteering,worldHuntAim,worldPilot,WORLD_STARTS,worldStart,worldNextStart,worldMatch,worldStep,worldCameraPose,worldCameraInput};
 })();
 const __tagModule5=(()=>{
 const {HUNT_FIELDS,ITEM_DEFS}=__tagModule6;
@@ -626,25 +965,25 @@ function cloakDisappearanceMovement(hunter,time,runnerVisible){
 return {rememberCloakDisappearance,cloakDisappearanceMovement};
 })();
 const __tagModule11=(()=>{
-const {BODY,worldHeight,worldSight,worldValid}=__tagModule7;
+const {BODY,STEP,worldHeight,worldMove,worldSight,worldTraversable,worldValid}=__tagModule7;
 
-const RANGE=42,MIN_DROP=2.2;
-function dropLane(hunter,target){
+const RANGE=42,MIN_DROP=2.2,MIN_FOLLOW_DROP=.65;
+function dropLane(hunter,target,{minDrop=MIN_DROP,reach=26}={}){
  const dx=target.x-hunter.x,dz=target.z-hunter.z,distance=Math.hypot(dx,dz);
  if(distance<2||distance>RANGE+8)return null;
  const x=dx/distance,z=dz/distance,top=hunter.y,radius=hunter.radius+.1;
  const at=d=>({x:hunter.x+x*d,z:hunter.z+z*d});
  let previous=top,edge=-1;
- const limit=Math.min(26,distance);
+ const limit=Math.min(reach,distance);
  for(let d=.75;d<=limit;d+=.75){
   const p=at(d),floor=worldHeight(p.x,p.z);
   // We can run off a lip, but must not skip a wall or an uphill step.
   if(floor>top+.45||floor>previous+.45)return null;
-  if(previous-floor>=MIN_DROP){edge=d;break;}
+  if(previous-floor>=minDrop){edge=d;break;}
   previous=floor;
  }
  if(edge<0)return null;
- const speed=BODY.dash*(hunter.tuning?.speed??1);
+ const speed=BODY.dash*(hunter.dashScale??1)*(hunter.tuning?.speed??1);
  const landing=at(edge+speed*Math.sqrt(2*Math.max(0,top-target.floor)/BODY.gravity));
  const lip=at(edge);
  if(!worldSight({...hunter,y:top+2.5},{...lip,y:top+2.5},radius))return null;
@@ -655,42 +994,164 @@ function dropLane(hunter,target){
  for(let d=0;d<=span+.5;d+=.75){
   const p=at(edge+d),floor=worldHeight(p.x,p.z);
   const falling=top-BODY.gravity*(d/speed)**2/2;
-  if(floor>top+.45||(d<1.5&&floor>top-1))return null;
+  if(floor>top+.45||(d<1.5&&floor>top-Math.min(1,minDrop)))return null;
   if(airborne&&falling<=floor)airborne=false;
   if(!worldValid({...p,y:airborne?falling:floor},radius))return null;
  }
  return {x,z,edge};
 }
 
-// Only a personally seen descent can start this shortcut. A moment of terrain
-// occlusion can finish the committed run, but cannot redirect it to an unseen runner.
-function huntDropPursuit(s,hunter,runner,seen,{cancel=false}={}){
+const LEDGE_ANGLES=[0,15,-15,30,-30,45,-45,60,-60,75,-75,90,-90];
+function findLedge(hunter,x,z,reach){
+ const top=worldHeight(hunter.x,hunter.z);
+ let previous=top;
+ for(let d=.25;d<=reach;d+=.25){
+  const floor=worldHeight(hunter.x+x*d,hunter.z+z*d);
+  if(floor>previous+.6)return null;
+  if(previous-floor>=MIN_FOLLOW_DROP)return {x,z,edge:d,fall:previous-floor,rampLoss:Math.max(0,top-previous)};
+  previous=floor;
+ }
+ return null;
+}
+
+// Check the same body motion used by the match, including momentum at the rim.
+function previewDrop(hunter,lane,speed,dashDelay){
+ const probe={...hunter};
+ const limit=.6+dashDelay+lane.edge/speed+Math.sqrt(2*(hunter.y+6)/BODY.gravity);
+ let off=false;
+ for(let t=STEP;t<=limit;t+=STEP){
+  worldMove(probe,{x:lane.x,z:lane.z,dash:t>=dashDelay},STEP);
+  if(!off&&!probe.grounded){
+   const dx=probe.x-hunter.x,dz=probe.z-hunter.z;
+   const across=Math.abs(dx*lane.z-dz*lane.x);
+   if(across>hunter.radius||dx*lane.x+dz*lane.z<lane.edge-.75)return null;
+   off=true;
+  }
+  if(off&&probe.grounded){
+   const progress=(probe.x-hunter.x)*lane.x+(probe.z-hunter.z)*lane.z;
+   if(progress<lane.edge-.75||probe.y>hunter.y-MIN_FOLLOW_DROP)return null;
+   return {x:probe.x,y:probe.y,z:probe.z,time:t};
+  }
+ }
+ return null;
+}
+
+function directDropLane(hunter,target,time){
+ const dx=target.x-hunter.x,dz=target.z-hunter.z,distance=Math.hypot(dx,dz);
+ if(distance<1e-6)return null;
+ const yaw=Math.atan2(dx,dz),speed=BODY.dash*(hunter.dashScale??1)*(hunter.tuning?.speed??1);
+ const dashDelay=Math.max(0,(hunter.recoverUntil??0)-time);
+ // A straight bearing can stay on a ramp for its full length. Also look
+ // sideways for a nearby rim, and compare the route all the way to the runner.
+ const lanes=LEDGE_ANGLES.flatMap(angle=>{
+  const heading=yaw+angle*Math.PI/180;
+  const lane=findLedge(hunter,Math.sin(heading),Math.cos(heading),Math.min(RANGE,distance+4));
+  if(!lane)return [];
+  const travel=lane.edge+speed*Math.sqrt(2*lane.fall/BODY.gravity);
+  const remaining=Math.hypot(dx-lane.x*travel,dz-lane.z*travel);
+  return [{...lane,angle,cost:(travel+remaining)/speed+Math.abs(angle)*.005+lane.rampLoss/speed}];
+ }).sort((a,b)=>a.cost-b.cost||a.edge-b.edge);
+ let best=null,bestCost=Infinity;
+ const padding=hunter.radius-.05;
+ for(const lane of lanes){
+  // The runner is already below us. A rim beyond them would overshoot them.
+  if(lane.edge>distance+2)continue;
+  if(lane.angle!==0&&distance/speed+Math.abs(lane.angle)*.005>=bestCost)continue;
+  const landing=previewDrop(hunter,lane,speed,dashDelay);
+  if(!landing)continue;
+  const gap=Math.hypot(target.x-landing.x,target.z-landing.z);
+  if(gap>distance&&lane.angle!==0)continue;
+  if(!worldTraversable(landing,target,padding)){
+   // Landing on another tread is useful when it continues down toward the runner.
+   const x=(target.x-landing.x)/(gap||1),z=(target.z-landing.z)/(gap||1);
+   if(!findLedge(landing,x,z,Math.min(gap,12)))continue;
+  }
+  const plan={x:lane.x,z:lane.z,edge:lane.edge,duration:landing.time};
+  if(lane.angle===0&&lane.rampLoss<MIN_FOLLOW_DROP&&gap<distance)return plan;
+  const cost=landing.time+gap/speed+Math.abs(lane.angle)*.005+lane.rampLoss/speed;
+  if(cost<bestCost){bestCost=cost;best=plan;}
+ }
+ return best;
+}
+
+function rememberRunner(brain,runner,time){
+ brain.seen={x:runner.x,y:runner.y,z:runner.z,vx:runner.vx,vz:runner.vz};
+ brain.seenAt=time;
+ brain.searchPlan=null;
+ brain.searchIndex=0;
+}
+
+// Use a recent sighting when the lip briefly hides the runner.
+function dropTarget(hunter,time,point){
+ if(!point)return null;
+ const age=time-point.at;
+ if(age>1.25)return null;
+ if(worldHeight(point.x,point.z)<hunter.y-MIN_FOLLOW_DROP)return point;
+ // Only extrapolate the short observed run over the lip.
+ const lead=Math.min(.55,age+.15);
+ const x=point.x+point.vx*lead,z=point.z+point.vz*lead;
+ if(worldHeight(x,z)>=hunter.y-MIN_FOLLOW_DROP)return null;
+ return {...point,x,z};
+}
+function huntDropPursuit(s,hunter,runner,seen,{cancel=false,followLedges=false,rememberLedges=false,teamContact=null,directLedges=false}={}){
  const brain=hunter.brain;
- if(cancel||hunter.dive||(hunter.recoverUntil??0)>s.time){brain.dropPursuit=null;return null;}
- let plan=brain.dropPursuit;
+ if(cancel){
+  brain.dropPursuit=null;
+  if(rememberLedges)brain.dropSighting=null;
+  return null;
+ }
+ if(rememberLedges&&seen)brain.dropSighting={x:runner.x,y:runner.y,z:runner.z,vx:runner.vx,vz:runner.vz,vy:runner.vy,grounded:runner.grounded,at:s.time};
+ if(hunter.dive||(!directLedges&&(hunter.recoverUntil??0)>s.time)||(directLedges&&hunter.externalForce)){brain.dropPursuit=null;return null;}
+ const plan=brain.dropPursuit;
+ const dash=!directLedges||(hunter.recoverUntil??0)<=s.time;
  if(plan){
   if(!hunter.grounded)plan.airborne=true;
-  if((plan.airborne&&hunter.grounded)||s.time>=plan.until){brain.dropPursuit=null;plan=null;}
-  else return{x:plan.x,z:plan.z,dash:true,jump:false};
+  const landed=plan.airborne&&hunter.grounded;
+  const changedDirection=directLedges&&seen&&!plan.airborne&&
+    (runner.x-hunter.x)*plan.x+(runner.z-hunter.z)*plan.z<0;
+  if(landed||changedDirection||(s.time>=plan.until&&(!directLedges||!plan.airborne))){
+   brain.dropPursuit=null;
+   if(followLedges){brain.next=s.time;brain.closeChase=null;}
+   if(directLedges){brain.airPursuit=null;brain.nextDropCheck=s.time;}
+  }else{
+   if(followLedges&&seen)rememberRunner(brain,runner,s.time);
+   return{x:plan.x,z:plan.z,dash,jump:false};
+  }
  }
- if(!seen||!hunter.grounded||runner.grounded||runner.vy>1.5||
-    Math.hypot(runner.x-hunter.x,runner.z-hunter.z)>RANGE)return null;
- const floor=worldHeight(runner.x,runner.z),drop=hunter.y-floor;
- if(drop<MIN_DROP||runner.y<floor+.35||runner.y>hunter.y+4.5||s.time<(brain.nextDropCheck??0))return null;
- brain.nextDropCheck=s.time+.1;
- const lane=dropLane(hunter,{x:runner.x+runner.vx*.2,z:runner.z+runner.vz*.2,floor})??
-   dropLane(hunter,{x:runner.x,z:runner.z,floor});
+ let sighting=rememberLedges?brain.dropSighting:null;
+ if(rememberLedges&&!seen&&teamContact&&(teamContact.at>(sighting?.at??-Infinity))){
+  sighting={...teamContact.point,at:teamContact.at};
+ }
+ const target=seen?runner:dropTarget(hunter,s.time,sighting);
+ if(!target||!hunter.grounded||(!followLedges&&target.grounded)||(!directLedges&&target.vy>1.5)||
+    ((!directLedges||!seen)&&Math.hypot(target.x-hunter.x,target.z-hunter.z)>RANGE))return null;
+ const floor=worldHeight(target.x,target.z),drop=hunter.y-floor;
+ if(drop<(followLedges?MIN_FOLLOW_DROP:MIN_DROP)||(!followLedges&&target.y<floor+.35)||
+    target.y>hunter.y+4.5||s.time<(brain.nextDropCheck??0))return null;
+ brain.nextDropCheck=s.time+(directLedges?.2:.1);
+ const laneOptions=followLedges?{minDrop:MIN_FOLLOW_DROP,reach:RANGE}:undefined;
+ // An unseen target must keep the previously observed direction.
+ const lane=directLedges?directDropLane(hunter,target,s.time):
+   (seen?dropLane(hunter,{x:target.x+target.vx*.2,z:target.z+target.vz*.2,floor},laneOptions):null)??
+   dropLane(hunter,{x:target.x,z:target.z,floor},laneOptions);
  if(!lane)return null;
- brain.dropPursuit={...lane,airborne:false,until:s.time+Math.min(2.3,.85+lane.edge/18+Math.sqrt(2*drop/BODY.gravity))};
+ const fallTime=Math.sqrt(2*drop/BODY.gravity);
+ const dashSpeed=BODY.dash*(hunter.dashScale??1)*(hunter.tuning?.speed??1);
+ const limit=directLedges?lane.duration+.5:followLedges?.85+lane.edge/dashSpeed+fallTime:Math.min(2.3,.85+lane.edge/18+fallTime);
+ brain.dropPursuit={...lane,airborne:false,until:s.time+limit};
  brain.supply=null;
- return {x:lane.x,z:lane.z,dash:true,jump:false};
+ if(followLedges){
+  if(seen)rememberRunner(brain,runner,s.time);
+  else if(sighting.at>=(brain.seenAt??-Infinity))rememberRunner(brain,sighting,sighting.at);
+ }
+ return {x:lane.x,z:lane.z,dash,jump:false};
 }
 
 
 return {huntDropPursuit};
 })();
 const __tagModule12=(()=>{
-const {worldHeight,worldValid,worldTraversable,worldSteering,worldHuntAim}=__tagModule7;
+const {worldHeight,worldValid,worldTraversable,worldSteering,worldHuntAim,worldCornerPathAllowed}=__tagModule7;
 const HUNT_TEAM_CONTACT=Object.freeze({interval:.5,delay:.2,lifetime:4});
 // Input consists exclusively of real optical sightings. No hidden target,
 // radar, inventory, prediction of future inputs or player controls enter here.
@@ -710,15 +1171,15 @@ function receiveHuntTeamContact(a,contact,time){
 // Refresh the observed destination ten times a second. On open ground steer
 // towards it directly; walls, steps and narrow passages retain normal routing.
 // worldMove still supplies every acceleration, turn, speed limit and collision.
-function observedHuntChase(a,observed,time,m){
+function observedHuntChase(a,observed,time,m,cornerAccess){
  if(!observed){m.closeChase=null;return null;}
  if(!m.closeChase||time>=m.closeChase.next){
-  const gap=Math.hypot(observed.x-a.x,observed.z-a.z),aim=gap>55?worldHuntAim(a,observed,m).target:(()=>{
+  const gap=Math.hypot(observed.x-a.x,observed.z-a.z),aim=gap>55?worldHuntAim(a,observed,m,cornerAccess).target:(()=>{
    const lead=Math.min(.35,Math.max(.06,gap/120));return{x:observed.x+(observed.vx??0)*lead,z:observed.z+(observed.vz??0)*lead,y:observed.y};})();
   const padding=(a.radius??2.7)-.05,point={x:aim.x,z:aim.z,y:worldHeight(aim.x,aim.z)},current={x:observed.x,z:observed.z,y:worldHeight(observed.x,observed.z)};
   let goal=null;
-  if(gap<=60&&worldValid(point,padding)&&worldTraversable(a,point,padding))goal=point;
-  else if(gap<=60&&worldValid(current,padding)&&worldTraversable(a,current,padding))goal=current;
+  if(gap<=60&&worldValid(point,padding)&&worldTraversable(a,point,padding)&&worldCornerPathAllowed(a,point,cornerAccess))goal=point;
+  else if(gap<=60&&worldValid(current,padding)&&worldTraversable(a,current,padding)&&worldCornerPathAllowed(a,current,cornerAccess))goal=current;
   m.closeChase={goal,next:time+.1};
  }
  return m.closeChase.goal?worldSteering(a,m.closeChase.goal,null):null;
@@ -761,7 +1222,7 @@ return {RUNNER_STARTS,HUNTER_STARTS,RANDOM_START_LAYOUTS,MIN_OPPONENT_START_GAP,
 })();
 const __tagModule14=(()=>{
 const {RUNNER_STARTS}=__tagModule15;
-const {WORLD_CORNER_STAIRS,worldHeight,worldSight}=__tagModule7;
+const {WORLD,WORLD_CORNER_STAIRS,worldCornerIndex,worldCornerPathAllowed,worldHeight,worldRoute,worldSight,worldSteering,worldTraversable}=__tagModule7;
 // Only public, traversable locations and teammates' assignments are used.
 // There is deliberately no runner/target argument or read of hidden equipment.
 const SEARCH_PLACES=Object.freeze([
@@ -770,25 +1231,38 @@ const SEARCH_PLACES=Object.freeze([
 ].map(Object.freeze));
 const SEARCH_REFRESH_SECONDS=36;
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),offset={pursuit:0,intercept:7,patrol:14};
-function freshHuntSweep(a,{time,seed,coverage,team}){
+function freshHuntSweep(a,{time,seed,coverage,team,groundOnly=false,activePatrol=false}){
  const m=a.brain,visits=coverage.placeVisits??={},avoid=m.searchAvoid??={};
  for(const key of Object.keys(avoid))if(avoid[key]<=time)delete avoid[key];
  // A visit is physical and requires a clear view at the correct height.
  // Walking below a high step must not mark its top as checked.
- for(const p of SEARCH_PLACES)if(a.grounded&&Math.abs(a.y-p.y)<1.5&&distance(a,p)<14&&worldSight({...a,y:a.y+3},{...p,y:p.y+3}))visits[p.id]=time;
+ for(const p of SEARCH_PLACES)if((!groundOnly||worldCornerIndex(p)<0)&&a.grounded&&Math.abs(a.y-p.y)<1.5&&distance(a,p)<14&&worldSight({...a,y:a.y+3},{...p,y:p.y+3}))visits[p.id]=time;
  let goal=m.freshSweep;
- if(goal&&(distance(a,goal)<10&&Math.abs(a.y-goal.y)<1.5&&a.grounded||m.stuck>=3||time>=goal.until)){
+ if(goal&&(distance(a,goal)<10&&Math.abs(a.y-goal.y)<1.5&&a.grounded||m.stuck>=(activePatrol?2:3)||time>=goal.until)){
   if(distance(a,goal)<14&&Math.abs(a.y-goal.y)<1.5&&a.grounded)visits[goal.id]=time;
   else avoid[goal.id]=time+8;
   m.freshSweep=null;goal=null;
+  if(activePatrol){m.sweep=null;m.target=null;m.next=0;}
  }
  if(!goal){
+  if(activePatrol&&time<(m.nextSweepAt??0))return false;
   const reserved=team.filter(h=>h!==a&&!h.flight&&h.brain.freshSweep).map(h=>h.brain.freshSweep),speed=Math.max(8,20*(a.tuning?.speed??1)),n=SEARCH_PLACES.length,start=((seed>>>0)+(offset[a.role]??0))%n;let best=-Infinity;
+  const options=[],outer=activePatrol&&rimDepth(a)<44;
   for(let i=0;i<n;i++){
-   const p=SEARCH_PLACES[(start+i)%n];if(avoid[p.id]>time||visits[p.id]!==undefined&&time-visits[p.id]<8&&distance(a,p)<14||reserved.some(q=>q.id===p.id||distance(q,p)<28))continue;
+   const p=SEARCH_PLACES[(start+i)%n];if(groundOnly&&worldCornerIndex(p)>=0||avoid[p.id]>time||visits[p.id]!==undefined&&time-visits[p.id]<8&&distance(a,p)<14||reserved.some(q=>q.id===p.id||distance(q,p)<28))continue;
    const age=visits[p.id]===undefined?SEARCH_REFRESH_SECONDS*2:Math.min(SEARCH_REFRESH_SECONDS*2,Math.max(0,time-visits[p.id])),travel=distance(a,p)/speed;
    const score=age*2-travel*3+(p.edge&&a.role==='patrol'?4:0)-i*.001;
-   if(score>best){best=score;goal=p;}
+   if(activePatrol){
+    if(distance(a,p)>=14)options.push({point:p,score:score+(outer&&rimDepth(p)>=64?30:0)});
+   }else if(score>best){best=score;goal=p;}
+  }
+  if(activePatrol){
+   options.sort((a,b)=>b.score-a.score);
+   for(const {point} of options){
+    if(worldRoute(a,point,m.cornerAccess).length){goal=point;break;}
+    avoid[point.id]=time+8;
+   }
+   if(!goal)m.nextSweepAt=time+.5;
   }
   if(!goal)return false;
   const travel=distance(a,goal)/speed;m.freshSweep={...goal,until:time+Math.min(50,Math.max(12,travel*2.5+10))};
@@ -798,8 +1272,40 @@ function freshHuntSweep(a,{time,seed,coverage,team}){
  // acceleration and speed caps. No position correction or extra pathfinder.
  m.goalSince=time;return true;
 }
+function huntRimDepth(p){return Math.min(WORLD.width/2-Math.abs(p.x),WORLD.depth/2-Math.abs(p.z));}
+function rimDepth(p){return huntRimDepth(p);}
+// At the rim a route can end at its nearest graph node, or a steering line
+// can be blocked by the lip of a step. Recover via a local traversable line.
+// Keep this goal separate from sightings; it never uses the runner's position.
+function huntRimRecovery(a,time,cornerAccess,visible){
+ const m=a.brain;
+ if(!a.grounded||a.dive||huntRimDepth(a)>52){m.rimProgress=null;return null;}
+ const trace=m.rimProgress??={x:a.x,z:a.z,at:time};
+ if(trace.goal){
+  if(distance(a,trace.goal)>3&&time<trace.until){
+   if(!visible||trace.visible||distance(a,trace)>1.5)return worldSteering(a,trace.goal,null);
+  }
+  m.rimProgress={x:a.x,z:a.z,at:time};m.next=0;m.path=null;
+  return null;
+ }
+ if(distance(a,trace)>=1.25){Object.assign(trace,{x:a.x,z:a.z,at:time});return null;}
+ if(time-trace.at<.9)return null;
+ const {width,depth}=WORLD,nearSide=width/2-Math.abs(a.x)<depth/2-Math.abs(a.z);
+ const yaw=nearSide?-Math.sign(a.x)*Math.PI/2:a.z<0?0:Math.PI;
+ const padding=a.radius+.04;
+ for(const offset of [0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2])
+  for(const length of [20,12,7]){
+   const angle=yaw+offset,x=a.x+Math.sin(angle)*length,z=a.z+Math.cos(angle)*length,pt={x,z,y:worldHeight(x,z)};
+   if(!worldTraversable(a,pt,padding)||!worldCornerPathAllowed(a,pt,cornerAccess))continue;
+   Object.assign(trace,{goal:pt,until:time+2,visible});
+   m.supply=null;m.freshSweep=null;m.sweep=null;m.target=null;m.stuck=0;m.path=null;m.next=0;m.closeChase=null;m.airPursuit=null;
+   return worldSteering(a,pt,null);
+  }
+ trace.at=time-.6;m.next=0;m.path=null;
+ return null;
+}
 
-return {SEARCH_PLACES,SEARCH_REFRESH_SECONDS,freshHuntSweep};
+return {SEARCH_PLACES,SEARCH_REFRESH_SECONDS,freshHuntSweep,huntRimDepth,huntRimRecovery};
 })();
 const __tagModule13=(()=>{
 const {freshHuntSweep}=__tagModule14;
@@ -837,14 +1343,17 @@ function sweepCorner(a,time,coverage,team){
  setSweepDestination(m,cornerChecks[index]);
  return true;
 }
-function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false}){
+function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false,groundOnly=false,activePatrol=false}){
  const m=a.brain;
  if(visible||m.seen&&time-(m.seenAt??-Infinity)<18){
-  if(refresh){m.freshSweep=null;m.sweep=null;}
+  if(refresh){
+   if(activePatrol&&visible&&m.freshSweep)m.next=time;
+   m.freshSweep=null;m.sweep=null;
+  }
   if(coverage&&m.cornerIndex!==undefined){delete m.cornerIndex;m.sweep=null;}
   return false;
  }
- if(refresh&&coverage)return freshHuntSweep(a,{time,seed,coverage,team});
+ if(refresh&&coverage)return freshHuntSweep(a,{time,seed,coverage,team,groundOnly,activePatrol});
  if(coverage&&time>=45&&sweepCorner(a,time,coverage,team)){
   m.goalSince=time;
   return true;
@@ -861,7 +1370,223 @@ function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false
 
 return {huntSweepControl};
 })();
+const __tagModule19=(()=>{
+const HUNT_TURN_RATE=110*Math.PI/180;
+const PAD_TURN_TRAVEL=.75;
+const KEY_TURN_TRAVEL=.24;
+
+// The pad steers the actor independently of the viewing camera.
+function huntPadMovement(heading,{x,z},dt,turnTravel=PAD_TURN_TRAVEL,turnRate=HUNT_TURN_RATE){
+ const turn=Math.sign(x)*Math.max(0,(Math.abs(x)-.10)/.90);
+ const yaw=heading-turn*turnRate*dt;
+ const nextHeading=Math.atan2(Math.sin(yaw),Math.cos(yaw));
+ const travel=turnTravel*Math.abs(x)*(1-Math.abs(z))-z;
+ return {heading:nextHeading,x:Math.sin(nextHeading)*travel,z:Math.cos(nextHeading)*travel};
+}
+
+// Keyboard and pad share this single heading. Keep it while reversing so the
+// body's backward-facing pose cannot flip the next input. If a special move
+// took over the body, resume from its actual facing, never from turns queued
+// invisibly during the interruption.
+function huntKeyboardMovement(memory,heading,axis,dt,{keyboard=true,turnRate=HUNT_TURN_RATE}={}){
+ if(Number.isFinite(memory.facing)&&Math.abs(Math.atan2(Math.sin(heading-memory.facing),Math.cos(heading-memory.facing)))>.001)memory.heading=null;
+ // A digital sideways key is all-or-nothing. Reduce its travel so a
+ // small correction beside a pickup doesn't carry the body past it.
+ const move=huntPadMovement(memory.heading??heading,axis,dt,keyboard?KEY_TURN_TRAVEL:PAD_TURN_TRAVEL,turnRate);
+ memory.heading=axis.x||axis.z?move.heading:null;
+ memory.facing=Math.hypot(move.x,move.z)>.05?Math.atan2(move.x,move.z):null;
+ return {x:move.x,z:move.z};
+}
+
+return {HUNT_TURN_RATE,huntPadMovement,huntKeyboardMovement};
+})();
+const __tagModule18=(()=>{
+const {worldHeight,worldSight,worldValid}=__tagModule7;
+const {HUNT_TURN_RATE}=__tagModule19;
+const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+// Keep one approach side for the whole flight. Do not alternate between a
+// tangent and the opposite bearing whenever the runner crosses a distance band.
+function stableBalloonTarget(s,a,gap){
+ const f=a.flight??{},runner=s.player,aim={x:runner.x+runner.vx*.18,z:runner.z+runner.vz*.18};
+ const angle=f.stableBearing??Math.atan2(a.x-aim.x,a.z-aim.z),radius=a.radius+runner.radius+gap;
+ for(const offset of[0,.25,-.25,.5,-.5,.75,-.75,1,-1,1.5,-1.5,2,-2,2.5,-2.5,Math.PI]){
+  const bearing=angle+offset,p={x:aim.x+Math.sin(bearing)*radius,z:aim.z+Math.cos(bearing)*radius};p.y=worldHeight(p.x,p.z);
+  if(!worldValid(p,a.radius+.2))continue;
+  f.stableBearing=bearing;return p;
+ }
+ return null;
+}
+function stableBalloonSteer(a,goal,dt){
+ const f=a.flight,dx=goal.x-a.x,dz=goal.z-a.z,d=Math.hypot(dx,dz);
+ const requested=d>.5?Math.atan2(dx,dz):f.steerYaw??a.yaw;
+ const prior=f.steerYaw??a.yaw,delta=Math.atan2(Math.sin(requested-prior),Math.cos(requested-prior));
+ f.turnRate??=0;
+ const acceleration=clamp(delta*16-f.turnRate*8,-4.2,4.2);
+ f.turnRate=clamp(f.turnRate+acceleration*dt,-2.1,2.1);
+ f.steerYaw=prior+f.turnRate*dt;
+ return{x:a.x+Math.sin(f.steerYaw)*d,z:a.z+Math.cos(f.steerYaw)*d};
+}
+function stableBalloonHeight(f,wanted,dt){
+ f.hoverY??=f.launchY;
+ f.hoverY+=clamp(wanted-f.hoverY,-5*dt,12*dt);
+ return f.hoverY;
+}
+
+// The descent holds the landing column. Directional input can still turn
+// the monster and its follow camera while it comes down.
+function balloonDescentFacing(a,input,dt){
+ if(Math.hypot(input.x??0,input.z??0)<=.05)return;
+ const heading=Math.atan2(input.x,input.z);
+ const delta=Math.atan2(Math.sin(heading-a.yaw),Math.cos(heading-a.yaw));
+ a.yaw+=clamp(delta,-HUNT_TURN_RATE*dt,HUNT_TURN_RATE*dt);
+}
+
+// A raised street can split the walking graph even when there is room to
+// float across it. Keep the same building, tree and pole clearances as
+// balloon movement, and never use the air path as the descent footprint.
+function balloonAirApproach(a,target){
+ const dx=target.x-a.x,dz=target.z-a.z,distance=Math.hypot(dx,dz),floor=worldHeight(a.x,a.z);
+ if(distance<8||distance>190||a.y<floor+6)return null;
+ const pad=a.radius+.35,steps=Math.ceil(distance/2),cap=Math.max(a.y,floor+14.5);
+ let altitude=Math.max(floor,worldHeight(target.x,target.z))+.9;
+ for(let i=0;i<=steps;i++){
+  const u=i/steps,x=a.x+dx*u,z=a.z+dz*u;
+  altitude=Math.max(altitude,Math.max(worldHeight(x,z),worldHeight(x-pad,z),worldHeight(x+pad,z),worldHeight(x,z-pad),worldHeight(x,z+pad))+.9);
+  if(altitude>cap)return null;
+ }
+ if(!worldSight({...a,y:altitude},{...target,y:altitude},pad))return null;
+ for(let i=0;i<=steps;i++){
+  const u=i/steps;
+  if(!worldValid({x:a.x+dx*u,z:a.z+dz*u,y:altitude},pad))return null;
+ }
+ return altitude;
+}
+
+return {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonDescentFacing,balloonAirApproach};
+})();
 const __tagModule17=(()=>{
+const {balloonDescentFacing}=__tagModule18;
+const {huntCanObserve}=__tagModule5;
+const {worldHeight,worldSight,worldSurface,worldTraversable,worldValid}=__tagModule7;
+
+// The balloon sets down in its committed column. While descending, look
+// toward a genuinely visible runner; a turn or reverse always wins.
+function balloonLandingFacing(a,input,observed,dt){
+ if(input.manualSteering){balloonDescentFacing(a,input,dt);return;}
+ if(!observed)return;
+ balloonDescentFacing(a,{x:observed.x-a.x,z:observed.z-a.z},dt);
+}
+
+function balloonLandingObservation(s,a,runner){
+ if(!huntCanObserve(s,a,runner))return null;
+ // The view must not identify the original through a visible decoy.
+ if(s.gadgets.some(g=>g.kind==='clone'&&g.until>s.time&&huntCanObserve(s,a,g)))return null;
+ return {x:runner.x,z:runner.z};
+}
+
+function runnerThreatSight(s,runner,hunter){
+ const dx=hunter.x-runner.x,dz=hunter.z-runner.z,gap=Math.hypot(dx,dz);
+ const front=(dx*Math.sin(runner.yaw)+dz*Math.cos(runner.yaw))/(gap||1);
+ // Outside the forward arc, nearby visible motion can still startle the
+ // runner. A radar pickup is handled separately and still works all around.
+ const range=front>=.14?125:58;
+ return gap<range&&huntCanObserve(s,runner,hunter,range);
+}
+
+function escapeChaseRhythm(time){
+ const progress=Math.max(0,Math.min(1,(time-26)/40));
+ return {share:time>=28,allowBalloon:time>=26,closeAll:time>=40,
+  pursuit:.88+.08*progress,support:.72+.17*progress};
+}
+
+function balloonExitClear(spot,observed,radius){
+ const dx=observed.x-spot.x,dz=observed.z-spot.z;
+ const distance=Math.hypot(dx,dz);
+ const reach=Math.min(distance,18);
+ if(reach<1)return true;
+ return worldTraversable(spot,{
+  x:spot.x+dx*reach/distance,
+  z:spot.z+dz*reach/distance
+ },radius-.05);
+}
+
+function balloonExitPenalty(spot,target,radius){
+ const dx=target.x-spot.x,dz=target.z-spot.z,distance=Math.hypot(dx,dz);
+ if(distance<1)return 0;
+ let penalty=worldSurface(spot.x,spot.z)==='ice'?10:0;
+ for(let length=3;length<=Math.min(30,distance);length+=3){
+  const x=spot.x+dx*length/distance,z=spot.z+dz*length/distance;
+  const end={x,z,y:worldHeight(x,z)};
+  if(!worldValid(end,radius+.15)||!worldTraversable(spot,end,radius+.15)){
+   return penalty+Math.max(0,30-length)*1.1;
+  }
+  if(worldSurface(x,z)==='ice')penalty+=1.5;
+ }
+ return penalty;
+}
+
+function balloonTouchdownStride(a,input){
+ const magnitude=Math.hypot(input.x??0,input.z??0);
+ if(!input.dash||magnitude<.7||a.externalForce||a.slippery)return;
+ const x=input.x/magnitude,z=input.z/magnitude;
+ const next={x:a.x+x*5,z:a.z+z*5};
+ if(!worldValid(next,a.radius+.15)||!worldTraversable(a,next,a.radius+.15))return;
+ const speed=worldSurface(a.x,a.z)==='ice'?7:5;
+ a.vx=x*speed;
+ a.vz=z*speed;
+}
+
+// Pick a short, open glide once. Both the current and projected runner
+// need a full dive's worth of space, even on the inside of a turn.
+function balloonDescentGlide(s,a,runner,minimumGap){
+ if(a.externalForce||a.y-worldHeight(a.x,a.z)<6||!balloonLandingObservation(s,a,runner))return null;
+ const floor=worldHeight(a.x,a.z);
+ const ahead=balloonDescentLead(a,runner),radius=a.radius+.15;
+ const clear=(spot)=>balloonLandingObservation(s,spot,runner)&&balloonExitClear(spot,ahead,a.radius);
+ const gap=p=>Math.hypot(p.x-ahead.x,p.z-ahead.z);
+ const startsClear=clear({...a,y:floor});
+ let best=null,bestScore=gap(a)+(startsClear?0:18)+balloonExitPenalty(a,ahead,a.radius);
+ const bearing=Math.atan2(ahead.x-a.x,ahead.z-a.z);
+ for(const distance of [10,20,29])for(const angle of [0,-.5,.5,-1,1,-1.5,1.5]){
+  const x=a.x+Math.sin(bearing+angle)*distance,z=a.z+Math.cos(bearing+angle)*distance;
+  const y=worldHeight(x,z),spot={...a,x,y,z};
+  if(Math.abs(y-floor)>.85||gap(spot)<minimumGap||
+   Math.hypot(x-runner.x,z-runner.z)<minimumGap||
+   !worldValid(spot,radius)||!worldTraversable(a,spot,radius)||
+   !worldSight(a,{x,y:a.y,z},radius)||!clear(spot))continue;
+  const score=gap(spot)+distance*.16+balloonExitPenalty(spot,ahead,a.radius);
+  if(score+1<bestScore){best={x,z};bestScore=score;}
+ }
+ return best;
+}
+
+function balloonDescentLead(hunter,runner){
+ const height=Math.max(0,hunter.y-(runner.y??0));
+ const seconds=Math.min(1.55,.45+height/18);
+ const x=runner.vx*seconds,z=runner.vz*seconds;
+ for(const fraction of [1,.6,.3]){
+  const ahead={x:runner.x+x*fraction,z:runner.z+z*fraction};
+  if(worldTraversable(runner,ahead,runner.radius-.05))return ahead;
+ }
+ return {x:runner.x,z:runner.z};
+}
+
+function readableEscapeDive(runner,hunter,time,{movingOpening=false}={}){
+ if(movingOpening){
+  const aheadX=runner.x+(runner.vx??0)*.9-hunter.x,aheadZ=runner.z+(runner.vz??0)*.9-hunter.z;
+  const facingX=Math.sin(hunter.yaw),facingZ=Math.cos(hunter.yaw);
+  const along=aheadX*facingX+aheadZ*facingZ,side=Math.abs(aheadX*facingZ-aheadZ*facingX);
+  if(along<3||along>28||side>7)return false;
+ }
+ if(hunter.role==='pursuit'||time>=105)return true;
+ const dx=hunter.x-runner.x,dz=hunter.z-runner.z;
+ const front=dx*Math.sin(runner.yaw)+dz*Math.cos(runner.yaw);
+ return front>=Math.hypot(dx,dz)*.45;
+}
+
+return {balloonLandingFacing,balloonLandingObservation,runnerThreatSight,escapeChaseRhythm,balloonExitClear,balloonExitPenalty,balloonTouchdownStride,balloonDescentGlide,balloonDescentLead,readableEscapeDive};
+})();
+const __tagModule20=(()=>{
 const {worldHeight,worldValid,worldTraversable,worldSight,worldCameraPose}=__tagModule7;
 // Round layout only. Initial positions constrain the starting camera, just as
 // they constrain spawn spacing. Never called by CPU perception or during play.
@@ -889,7 +1614,7 @@ function huntStartFacing(a,others=[]){
 
 return {huntStartFacing};
 })();
-const __tagModule18=(()=>{
+const __tagModule21=(()=>{
 const {HUNT_FIELDS}=__tagModule6;
 const {worldSight,worldValid,worldHeight}=__tagModule7;
 const {usesCommittedBalloonDescent}=__tagModule3;
@@ -922,10 +1647,10 @@ function steerAroundHuntFans(s,a,input){const n=Math.hypot(input.x??0,input.z??0
 
 return {huntFanExposure,applyHuntWind,resolveHuntFans,steerAroundHuntFans};
 })();
-const __tagModule19=(()=>{
+const __tagModule22=(()=>{
 const {BODY,HUNT_JUMP,WORLD_COURTYARD,worldHeight,worldSteering,worldTraversable}=__tagModule7;
 const {huntCanObserve}=__tagModule5;
-const {huntFanExposure,steerAroundHuntFans}=__tagModule18;
+const {huntFanExposure,steerAroundHuntFans}=__tagModule21;
 
 const SCAN=.2,MEMORY=.45,REACTION=.24,DECIDE=.18;
 const offsets=[0,.4,-.4,.8,-.8,1.2,-1.2,1.57,-1.57];
@@ -1083,7 +1808,7 @@ function steerClearOfHuntWind(s,a,input,{visible=g=>huntCanObserve(s,a,g,72),cou
 
 return {steerClearOfHuntWind};
 })();
-const __tagModule20=(()=>{
+const __tagModule23=(()=>{
 const {huntJumpRestRemaining}=__tagModule2;
 const {worldSurface,worldTraversable,worldSight,worldHeight}=__tagModule7;
 const {huntCanObserve}=__tagModule5;
@@ -1130,19 +1855,19 @@ function cushionJumpControl(s,a,input,{visible=g=>huntCanObserve(s,a,g,55)}={}){
 
 return {cushionImpactTime,cushionJumpControl};
 })();
-const __tagModule22=(()=>{
+const __tagModule25=(()=>{
 // Generated from the actual normalized body and hand meshes; accessories are excluded.
 const HUNT_TOUCH_SHAPES=Object.freeze({"white-michi-road-saber-ren":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"hero-white-young-seed-walk-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-white-young-seed-walk-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-white-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-white-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-white-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-white-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-walk-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-walk-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-sky-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-sky-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-sky-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-sky-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-sky-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-sky-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-leaf-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-leaf-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-leaf-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-leaf-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-leaf-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-leaf-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-city-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-city-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-city-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-city-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-city-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-city-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-river-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-river-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-river-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-river-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-river-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-river-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-night-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-night-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-night-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-night-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-night-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-night-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"hero-young-seed-luck-walk-cute":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.36822938,2.84884615,5.4,2.18047072],"diveLift":1.87435005},"hero-young-seed-luck-walk-cool-a":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-1.73132687,4.49362325,5.4,3.12631563],"diveLift":2.52882125},"hero-young-seed-luck-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.34651995],"diveLift":1.95097106},"hero-young-seed-luck-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.32776931],"diveLift":1.90843987},"hero-young-seed-luck-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.61377401],"diveLift":2.23474176},"hero-young-seed-luck-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.35743531],"diveLift":2.00390454},"star-white-hero-young-seed-walk-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-white-hero-young-seed-walk-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-white-hero-young-seed-walk-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-white-hero-young-seed-walk-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-white-hero-young-seed-walk-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-white-hero-young-seed-walk-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-white-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-white-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-white-hero-young-seed-walk-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-white-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-white-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-white-hero-young-seed-walk-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-white-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-white-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-white-hero-young-seed-walk-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-white-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-white-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-white-hero-young-seed-walk-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-walk-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-walk-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-walk-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-walk-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-walk-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-walk-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-walk-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-walk-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-walk-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-walk-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-sky-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-sky-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-sky-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-sky-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-sky-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-sky-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-sky-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-sky-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-sky-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-sky-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-sky-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-sky-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-sky-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-sky-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-sky-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-sky-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-sky-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-sky-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-leaf-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-leaf-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-leaf-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-leaf-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-leaf-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-leaf-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-leaf-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-leaf-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-leaf-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-leaf-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-leaf-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-leaf-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-leaf-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-leaf-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-leaf-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-leaf-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-leaf-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-leaf-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-city-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-city-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-city-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-city-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-city-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-city-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-city-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-city-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-city-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-city-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-city-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-city-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-city-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-city-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-city-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-city-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-city-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-city-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-river-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-river-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-river-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-river-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-river-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-river-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-river-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-river-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-river-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-river-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-river-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-river-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-river-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-river-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-river-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-river-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-river-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-river-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-night-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-night-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-night-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-night-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-night-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-night-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-night-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-night-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-night-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-night-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-night-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-night-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-night-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-night-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-night-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-night-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-night-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-night-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"star-hero-young-seed-luck-walk-cute-comet":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-3.1525003,0,-1.36822938,3.1525003,5.4,2.18047072],"diveLift":1.87435005},"star-hero-young-seed-luck-walk-cute-crown":{"c":[0.00225498,2.28540425,0.33519258],"axes":[1.73396046,2.09503214,1.36893228],"inner":1.4884288,"head":{"c":[0.00225498,3.54209878,0.33519258],"axes":[1.36206176,0.94922729,1.13046943]},"hands":[{"c":[-2.06741184,2.01584371,1.06593598],"axes":[0.36017971,0.36017971,0.32035215]},{"c":[2.0457298,2.02873573,1.05538796],"axes":[0.36017971,0.36017971,0.32035215]}],"originY":-2.07209989,"bounds":[-2.43307652,0,-1.15813231,2.41139448,5.4,1.84565075],"diveLift":1.60189153},"star-hero-young-seed-luck-walk-cute-forest":{"c":[0.00266405,2.7,0.39599995],"axes":[2.04851866,2.47509244,1.61727063],"inner":1.75844504,"head":{"c":[0.00266405,4.1846718,0.39599995],"axes":[1.60915372,1.12142685,1.33554817]},"hands":[{"c":[-2.44246154,2.38153842,1.25930769],"axes":[0.42552,0.42552,0.37846731]},{"c":[2.41684615,2.39676919,1.24684615],"axes":[0.42552,0.42552,0.37846731]}],"originY":-2.44800004,"bounds":[-2.87446154,0,-1.80805673,2.84884615,5.4,2.53188185],"diveLift":2.26996929},"star-hero-young-seed-luck-walk-cool-a-comet":{"c":[0,2.50609961,0.4519196],"axes":[2.84958446,2.03275349,1.82373404],"inner":1.93350373,"head":{"c":[0,3.70368654,0.4519196],"axes":[2.12631424,0.87508157,1.43062783]},"hands":[{"c":[-3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]},{"c":[3.40440814,2.22404477,1.23013773],"axes":[0.48560813,0.48560813,0.43191107]}],"originY":-3.12235344,"bounds":[-3.89741132,0,-1.50161519,3.89741132,5.4,2.71151746],"diveLift":2.20656633},"star-hero-young-seed-luck-walk-cool-a-crown":{"c":[0,2.29178497,0.4132727],"axes":[2.60589596,1.8589181,1.6677734],"inner":1.76815589,"head":{"c":[0,3.38695762,0.4132727],"axes":[1.94447779,0.80024705,1.30828454]},"hands":[{"c":[-3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]},{"c":[3.11327268,2.03385068,1.12493979],"axes":[0.44408028,0.44408028,0.39497525]}],"originY":-2.85533851,"bounds":[-3.5641156,0,-1.37320126,3.5641156,5.4,2.47963607],"diveLift":2.02641866},"star-hero-young-seed-luck-walk-cool-a-forest":{"c":[0,2.88947369,0.52105263],"axes":[3.28550361,2.34371679,2.1027223],"inner":2.22928416,"head":{"c":[0,4.27026315,0.52105263],"axes":[2.45159013,1.0089484,1.64948011]},"hands":[{"c":[-3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]},{"c":[3.92520223,2.56427112,1.41831977],"axes":[0.55989471,0.55989471,0.49798327]}],"originY":-3.59999981,"bounds":[-4.49362325,0,-2.28814787,4.49362325,5.4,3.484454],"diveLift":2.98630093},"star-hero-young-seed-luck-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.21274684],"diveLift":1.84544877},"star-hero-young-seed-luck-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.95049612],"diveLift":1.63858137},"star-hero-young-seed-luck-walk-cool-b-forest":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-2.04071117,3.12279573,5.4,2.65549077],"diveLift":2.44810097},"star-hero-young-seed-luck-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.28905557],"diveLift":1.87836323},"star-hero-young-seed-luck-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.85469036],"diveLift":1.54090567},"star-hero-young-seed-luck-sky-cute-forest":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.9912421,3.10716419,5.4,2.77640748],"diveLift":2.48382479},"star-hero-young-seed-luck-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.55138766],"diveLift":2.1837891},"star-hero-young-seed-luck-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.22548736],"diveLift":1.91761728},"star-hero-young-seed-luck-sky-cool-a-forest":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-2.12713912,4.94776647,5.4,3.31279262],"diveLift":2.81996587},"star-hero-young-seed-luck-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.24524519],"diveLift":1.91329791},"star-hero-young-seed-luck-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90004951],"diveLift":1.63451205},"star-hero-young-seed-luck-sky-cool-b-forest":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-2.17976923,2.50072035,5.4,2.69376099],"diveLift":2.53676511},"companion-seed":{"c":[0,2.21993526,0],"axes":[1.65426045,2.11377725,1.37855038],"inner":1.43154194,"head":{"c":[0,3.44089965,0],"axes":[1.20901283,0.89125945,1.0591779]},"hands":[],"originY":-0.48259462,"bounds":[-1.73734064,0,-1.44778386,1.73734064,5.4,1.44778386],"diveLift":1.54778386},"companion-sprout":{"c":[0,2.4808205,0],"axes":[1.51854871,1.94036779,1.26545725],"inner":1.31410151,"head":{"c":[0,3.60161977,0],"axes":[1.10982818,0.81814257,0.97228537]},"hands":[{"c":[-1.77201465,2.21501831,0.17720146],"axes":[0.43635861,0.43635861,0.43635861]},{"c":[1.77201465,2.21501831,0.17720146],"axes":[0.43635861,0.43635861,0.43635861]}],"originY":0,"bounds":[-2.21501831,0,-1.32901098,2.21501831,5.4,1.37331135],"diveLift":1.45116117},"companion-young":{"c":[0,2.65263158,0],"axes":[1.62371693,2.07474941,1.35309744],"inner":1.40511059,"head":{"c":[0,3.85105263,0],"axes":[1.18669015,0.87480364,1.03962172]},"hands":[{"c":[-1.89473684,2.36842105,0.18947368],"axes":[0.46657895,0.46657895,0.46657895]},{"c":[1.89473684,2.36842105,0.18947368],"axes":[0.46657895,0.46657895,0.46657895]}],"originY":0,"bounds":[-2.36842105,0,-1.42105263,2.36842105,5.4,1.46842105],"diveLift":1.54473684}});
 
 return {HUNT_TOUCH_SHAPES};
 })();
-const __tagModule23=(()=>{
+const __tagModule26=(()=>{
 // Generated from current character meshes. Older match rules use the original shape table.
-const HUNT_RENDERED_TOUCH_UPDATES=Object.freeze({"hero-white-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-white-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-white-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-white-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-white-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-sky-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18927636],"diveLift":1.8742223},"hero-young-seed-sky-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-sky-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-sky-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-sky-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-leaf-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-leaf-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-leaf-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-leaf-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-leaf-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-city-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-city-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-city-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-city-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-city-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-river-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-river-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-river-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-river-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-river-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-night-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18997538],"diveLift":1.87457181},"hero-young-seed-night-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-night-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-night-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-night-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-luck-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-luck-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-luck-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-luck-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-luck-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"star-white-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-white-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-white-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-white-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-white-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-white-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-white-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-white-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60761685],"diveLift":2.21190369},"star-white-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-white-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-white-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-sky-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.18927636],"diveLift":1.8742223},"star-hero-young-seed-sky-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-hero-young-seed-sky-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-sky-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-sky-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-sky-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-sky-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-sky-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-sky-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-sky-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-sky-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-leaf-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-leaf-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-leaf-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-leaf-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-leaf-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-leaf-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-leaf-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-leaf-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-leaf-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-city-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-city-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-city-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-city-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-city-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-city-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-city-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-city-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-city-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-city-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-city-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-river-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-river-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-river-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-river-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-river-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-river-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-river-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-hero-young-seed-river-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-night-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-night-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-night-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-night-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-night-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-night-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-night-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-night-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60588799],"diveLift":2.21103926},"star-hero-young-seed-night-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-night-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-luck-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19147849],"diveLift":1.87532337},"star-hero-young-seed-luck-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-luck-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-luck-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-luck-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-luck-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-luck-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-luck-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-luck-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-luck-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-luck-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093}});
+const HUNT_RENDERED_TOUCH_UPDATES=Object.freeze({"hero-white-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-white-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-white-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-white-young-seed-walk-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-white-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-walk-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-walk-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-walk-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-walk-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-sky-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18927636],"diveLift":1.8742223},"hero-young-seed-sky-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-sky-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-sky-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-sky-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-leaf-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-leaf-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-leaf-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-leaf-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-leaf-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-city-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-city-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-city-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-city-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-city-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-river-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-river-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-river-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-river-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-river-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-night-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.18997538],"diveLift":1.87457181},"hero-young-seed-night-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-night-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-night-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-night-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"hero-young-seed-luck-walk-cute":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.35916825,2.8299796,5.4,2.19147849],"diveLift":1.87532337},"hero-young-seed-luck-walk-cool-b":{"c":[0.13398662,2.83296956,0.45544091],"axes":[2.11941295,2.27437501,1.60441485],"inner":1.80759073,"head":{"c":[0.13398662,4.21906688,0.45544091],"axes":[1.55829572,0.94714025,1.24013857]},"hands":[{"c":[-2.49138905,2.22943092,1.32730762],"axes":[0.48939194,0.48939194,0.43527648]},{"c":[2.62595113,2.23659694,1.39498677],"axes":[0.48939194,0.48939194,0.43527648]}],"originY":-3.37758784,"bounds":[-2.98823365,0,-1.35542218,3.12279573,5.4,2.35884552],"diveLift":1.95713385},"hero-young-seed-luck-sky-cute":{"c":[0,2.97003831,0.43818984],"axes":[2.17116573,2.35188069,1.67179762],"inner":1.7269929,"head":{"c":[0,4.30651724,0.43818984],"axes":[1.71240007,1.07015198,1.38616591]},"hands":[{"c":[-2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]},{"c":[2.62913893,2.21776142,1.47850762],"axes":[0.47085488,0.47085488,0.4187892]}],"originY":-3.12478371,"bounds":[-3.10716419,0,-1.28911043,3.10716419,5.4,2.33962802],"diveLift":1.91436922},"hero-young-seed-luck-sky-cool-a":{"c":[0.517429,2.83064512,0.47903225],"axes":[3.30088682,1.80916111,1.87892095],"inner":1.93280305,"head":{"c":[0.517429,4.13644643,0.47903225],"axes":[2.15708593,0.78782961,1.29081669]},"hands":[{"c":[-3.58771692,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]},{"c":[4.42518585,2.09032246,1.14900738],"axes":[0.51474191,0.51474191,0.45782333]}],"originY":-3.65806431,"bounds":[-4.11029753,0,-1.65570951,4.94776647,5.4,2.66784527],"diveLift":2.26177739},"hero-young-seed-luck-sky-cool-b":{"c":[0,2.91909743,0.41984506],"axes":[2.07129777,2.40418492,1.81238553],"inner":1.86885551,"head":{"c":[0,4.28359384,0.41984506],"axes":[1.63805831,1.09691405,1.50680362]},"hands":[{"c":[-2.29006384,2.11757505,1.45037376],"axes":[0.45114258,0.45114258,0.40125662]},{"c":[2.04270758,2.11757505,1.76745953],"axes":[0.45114258,0.45114258,0.40125662]}],"originY":-2.99690085,"bounds":[-2.7480766,0,-1.45037378,2.50072035,5.4,2.36879755],"diveLift":2.00958566},"star-white-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-white-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-white-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-white-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-white-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-white-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-white-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-white-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60761685],"diveLift":2.21190369},"star-white-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-white-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-white-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-walk-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.1660305],"diveLift":1.86259937},"star-hero-young-seed-walk-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-walk-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-walk-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-walk-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-walk-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-walk-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-walk-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-walk-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-walk-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-walk-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-sky-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.18927636],"diveLift":1.8742223},"star-hero-young-seed-sky-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.8568565],"diveLift":1.60424508},"star-hero-young-seed-sky-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-sky-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-sky-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-sky-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-sky-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-sky-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-sky-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-sky-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-sky-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-leaf-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-leaf-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-leaf-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-leaf-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-leaf-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-leaf-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-leaf-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-leaf-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-leaf-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-city-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-city-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-city-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-city-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-city-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-city-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-city-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-city-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-city-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-city-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-city-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-river-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19578764],"diveLift":1.87747795},"star-hero-young-seed-river-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-river-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-river-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-river-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-river-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-river-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27152611],"diveLift":1.94063665},"star-hero-young-seed-river-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-night-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.185967],"diveLift":1.87256763},"star-hero-young-seed-night-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-night-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-night-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-night-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-night-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-night-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-night-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60588799],"diveLift":2.21103926},"star-hero-young-seed-night-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-night-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"star-hero-young-seed-luck-walk-cute-comet":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-3.13162279,0,-1.35916825,3.13162279,5.4,2.19147849],"diveLift":1.87532337},"star-hero-young-seed-luck-walk-cute-crown":{"c":[0.00224232,2.30288123,0.33331171],"axes":[1.72423066,2.08327625,1.36125077],"inner":1.48007675,"head":{"c":[0.00224232,3.55252405,0.33331171],"axes":[1.3544188,0.94390088,1.12412601]},"hands":[{"c":[-2.05581094,2.03483328,1.05995468],"axes":[0.35815863,0.35815863,0.31855455]},{"c":[2.03425057,2.04765296,1.04946585],"axes":[0.35815863,0.35815863,0.31855455]}],"originY":-2.03017158,"bounds":[-2.41942376,0,-1.15163367,2.39786339,5.4,1.85399722],"diveLift":1.60281544},"star-hero-young-seed-luck-walk-cute-forest":{"c":[0.00264641,2.71788082,0.39337743],"axes":[2.0349523,2.45870108,1.60656021],"inner":1.74679969,"head":{"c":[0.00264641,4.19272034,0.39337743],"axes":[1.59849706,1.11400017,1.32670347]},"hands":[{"c":[-2.42628628,2.40152825,1.2509679],"axes":[0.42270198,0.42270198,0.3759609]},{"c":[2.40084053,2.41665816,1.23858888],"axes":[0.42270198,0.42270198,0.3759609]}],"originY":-2.39602647,"bounds":[-2.85542535,0,-1.79608283,2.8299796,5.4,2.5151144],"diveLift":2.25559861},"star-hero-young-seed-luck-walk-cool-b-comet":{"c":[0.12634816,2.67146437,0.42947661],"axes":[1.99858702,2.14471482,1.51294852],"inner":1.70454152,"head":{"c":[0.12634816,3.97854145,0.42947661],"axes":[1.4694586,0.89314459,1.16943932]},"hands":[{"c":[-2.34935707,2.10233295,1.25163894],"axes":[0.46149212,0.46149212,0.41046174]},{"c":[2.47624788,2.10909045,1.31545976],"axes":[0.46149212,0.46149212,0.41046174]}],"originY":-3.18503442,"bounds":[-3.5003343,0,-1.27815071,3.5003343,5.4,2.22436974],"diveLift":1.85126022},"star-hero-young-seed-luck-walk-cool-b-crown":{"c":[0.1113736,2.35484728,0.37857582],"axes":[1.76171813,1.89052713,1.33363662],"inner":1.50252236,"head":{"c":[0.1113736,3.50701197,0.37857582],"axes":[1.29530104,0.78729072,1.0308395]},"hands":[{"c":[-2.07091555,1.85316828,1.10329697],"axes":[0.40679691,0.40679691,0.36181456]},{"c":[2.1827675,1.85912489,1.15955387],"axes":[0.40679691,0.40679691,0.36181456]}],"originY":-2.80754994,"bounds":[-2.48390734,0,-1.12666662,2.59575928,5.4,1.96074149],"diveLift":1.64370405},"star-hero-young-seed-luck-sky-cute-comet":{"c":[0,2.92064283,0.43090219],"axes":[2.1350565,2.31276595,1.64399351],"inner":1.69827083,"head":{"c":[0,4.23489442,0.43090219],"axes":[1.68392069,1.052354,1.36311222]},"hands":[{"c":[-2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]},{"c":[2.58541303,2.18087725,1.45391817],"axes":[0.46302397,0.46302397,0.4118242]}],"originY":-3.07281461,"bounds":[-3.65262623,0,-1.2676709,3.65262623,5.4,2.30071705],"diveLift":1.88419397},"star-hero-young-seed-luck-sky-cute-crown":{"c":[0,2.36642927,0.34913532],"axes":[1.72991375,1.87390152,1.3320336],"inner":1.37601139,"head":{"c":[0,3.43129191,0.34913532],"axes":[1.3643843,0.85266205,1.1044516]},"hands":[{"c":[-2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]},{"c":[2.0948118,1.76703967,1.17802645],"axes":[0.37516175,0.37516175,0.33367752]}],"originY":-2.48972533,"bounds":[-2.47568667,0,-1.02712098,2.47568667,5.4,1.86413899],"diveLift":1.54562998},"star-hero-young-seed-luck-sky-cool-a-comet":{"c":[0.50507885,2.76308243,0.46759857],"axes":[3.22210026,1.7659795,1.8340743],"inner":1.88667032,"head":{"c":[0.50507885,4.03771648,0.46759857],"axes":[2.10559995,0.76902545,1.26000708]},"hands":[{"c":[-3.5020842,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]},{"c":[4.31956418,2.04043001,1.12158252],"axes":[0.50245589,0.50245589,0.44689586]}],"originY":-3.57075252,"bounds":[-4.18884962,0,-1.61619053,4.82967168,5.4,2.60416833],"diveLift":2.21017943},"star-hero-young-seed-luck-sky-cool-a-crown":{"c":[0.44056284,2.41014139,0.40787008],"axes":[2.8105268,1.54040294,1.59979968],"inner":1.64567737,"head":{"c":[0.44056284,3.52196067,0.40787008],"axes":[1.83664213,0.67079435,1.09906067]},"hands":[{"c":[-3.05474713,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]},{"c":[3.76780668,1.77979665,0.97831771],"axes":[0.43827492,0.43827492,0.38981183]}],"originY":-3.11464413,"bounds":[-3.49969629,0,-1.4097472,4.21275584,5.4,2.27453414],"diveLift":1.94214067},"star-hero-young-seed-luck-sky-cool-b-comet":{"c":[0,2.78017786,0.39986467],"axes":[1.97272491,2.28977,1.72613428],"inner":1.77991686,"head":{"c":[0,4.07973803,0.39986467],"axes":[1.56010327,1.04471202,1.43509499]},"hands":[{"c":[-2.18107992,2.01679986,1.38135062],"axes":[0.42967274,0.42967274,0.38216085]},{"c":[1.94549533,2.01679986,1.6833463],"axes":[0.42967274,0.42967274,0.38216085]}],"originY":-2.85427863,"bounds":[-3.4791691,0,-1.38135063,3.4791691,5.4,2.2560667],"diveLift":1.91870867},"star-hero-young-seed-luck-sky-cool-b-crown":{"c":[0,2.35273885,0.3383874],"axes":[1.66942791,1.93772884,1.46074941],"inner":1.50626318,"head":{"c":[0,3.45249787,0.3383874],"axes":[1.32024488,0.88409256,1.21445601]},"hands":[{"c":[-1.84574934,1.70672656,1.16897458],"axes":[0.36361262,0.36361262,0.32340546]},{"c":[1.64638475,1.70672656,1.42453988],"axes":[0.36361262,0.36361262,0.32340546]}],"originY":-2.41544698,"bounds":[-2.21489921,0,-1.1689746,2.01553462,5.4,1.90920727],"diveLift":1.63909093},"rival-sprout":{"c":[0,2.09838452,0],"axes":[1.34043287,1.39871256,0.99075473],"inner":1.02585954,"head":{"c":[0,2.89892428,0],"axes":[0.97577792,0.58742483,0.75821317]},"hands":[],"originY":-0.14555268,"bounds":[-1.39487988,0,-1.03099818,2.20902057,5.4,1.09874082],"diveLift":1.1648695},"rival-young-walk":{"c":[0,2.17011089,0],"axes":[1.2952496,1.33813671,1.02395529],"inner":1.05562401,"head":{"c":[0,3.11853252,0],"axes":[0.85472497,0.50943798,0.56828102]},"hands":[],"originY":-0.14074987,"bounds":[-1.66913609,0,-1.05562401,2.1361293,5.4,1.16218339],"diveLift":1.2089037},"rival-young-sky":{"c":[0,2.78510757,0],"axes":[2.02985024,1.72913169,1.3532335],"inner":1.40160325,"head":{"c":[0,3.77475956,0],"axes":[1.47764434,0.72619273,1.03561398]},"hands":[],"originY":-0.18776006,"bounds":[-3.00423361,0,-1.40820046,3.00456667,5.4,1.51381549],"diveLift":1.56100797}});
 
 return {HUNT_RENDERED_TOUCH_UPDATES};
 })();
-const __tagModule24=(()=>{
+const __tagModule27=(()=>{
 const {HUNT_JUMP,worldHeight,worldTraversable,worldValid}=__tagModule7;
 const TRAMPOLINE=Object.freeze({x:0,z:0,radius:9,matRadius:7.85,top:2.2,launch:HUNT_JUMP.launch*Math.sqrt(HUNT_JUMP.maxJumps*1.25),forwardMin:28,forwardMax:34,forwardAdded:8});
 function trampolineLaunchSpeed(speed){return Math.min(TRAMPOLINE.forwardMax,Math.max(TRAMPOLINE.forwardMin,(Number.isFinite(speed)?Math.max(0,speed):0)+TRAMPOLINE.forwardAdded));}
@@ -1166,7 +1891,7 @@ function trampolineEscapeControl(s,a,input,underPressure){const p=s.trampoline,m
 
 return {TRAMPOLINE,trampolineLaunchSpeed,createHuntTrampoline,trampolineJumpAccess,trampolineInput,trampolineSurface,trampolineClear,resolveTrampoline,trampolineObstacleJump,trampolineEscapeControl};
 })();
-const __tagModule25=(()=>{
+const __tagModule28=(()=>{
 const {BODY,worldMove,worldValid,worldHeight,worldGradient}=__tagModule7;
 function huntTerrainTilt(actor){
  if(!actor.grounded)return {pitch:0,roll:0};
@@ -1175,8 +1900,8 @@ function huntTerrainTilt(actor){
  return {pitch:-Math.atan(grade.x*sine+grade.z*cosine),roll:Math.atan(grade.x*cosine-grade.z*sine)};
 }
 const HUNT_DIVE=Object.freeze({prepare:.12,slide:.44,recover:.55,cooldown:5.7,speed:38});
-function startHuntDive(s,a,cooldown=HUNT_DIVE.cooldown,{aimFromFacing=false}={}){if(s.phase!=='playing'||a.owner==='player'||(a.effects?.dizzy??0)>s.time||!a.grounded||a.flight||a.pendingItem||a.dive||s.time<(a.nextDiveAt??0))return false;const speed=Math.hypot(a.vx,a.vz),yaw=!aimFromFacing&&speed>2?Math.atan2(a.vx,a.vz):a.yaw;a.dive={since:s.time,age:0,stage:'prepare',x:Math.sin(yaw),z:Math.cos(yaw),...(aimFromFacing?{aimFromFacing:true}:{})};a.nextDiveAt=s.time+cooldown;return true;}
-function moveHuntDive(s,a,input,dt){const d=a.dive;if(!d)return false;if(input.jump||a.flight){a.dive=null;return false;}d.age=s.time-d.since;const end=HUNT_DIVE.prepare+HUNT_DIVE.slide,total=end+HUNT_DIVE.recover;if(d.age>=total||!a.grounded){a.dive=null;return false;}const previous=d.stage;d.stage=d.age<HUNT_DIVE.prepare?'prepare':d.age<end?'slide':'recover';const tuning=a.tuning;a.tuning={...tuning};try{
+function startHuntDive(s,a,cooldown=HUNT_DIVE.cooldown,{aimFromFacing=false,prepare=HUNT_DIVE.prepare}={}){if(s.phase!=='playing'||a.owner==='player'||(a.effects?.dizzy??0)>s.time||!a.grounded||a.flight||a.pendingItem||a.dive||s.time<(a.nextDiveAt??0))return false;const speed=Math.hypot(a.vx,a.vz),yaw=!aimFromFacing&&speed>2?Math.atan2(a.vx,a.vz):a.yaw;a.dive={since:s.time,age:0,stage:'prepare',x:Math.sin(yaw),z:Math.cos(yaw),...(aimFromFacing?{aimFromFacing:true}:{}),...(prepare!==HUNT_DIVE.prepare?{prepare}:{})};a.nextDiveAt=s.time+cooldown;return true;}
+function moveHuntDive(s,a,input,dt){const d=a.dive;if(!d)return false;if(input.jump||a.flight){a.dive=null;return false;}d.age=s.time-d.since;const prepare=d.prepare??HUNT_DIVE.prepare,end=prepare+HUNT_DIVE.slide,total=end+HUNT_DIVE.recover;if(d.age>=total||!a.grounded){a.dive=null;return false;}const previous=d.stage;d.stage=d.age<prepare?'prepare':d.age<end?'slide':'recover';const tuning=a.tuning;a.tuning={...tuning};try{
  if(d.stage==='slide'){const speed=HUNT_DIVE.speed*Math.min(1.18,Math.max(.9,tuning.speed));a.vx=d.x*speed;a.vz=d.z*speed;a.tuning.speed=Math.max(a.tuning.speed,speed/BODY.dash);a.tuning.accel=0;const before={x:a.x,z:a.z};worldMove(a,{x:d.x,z:d.z,dash:true},dt);a.yaw=Math.atan2(d.x,d.z);if(Math.hypot(a.x-before.x,a.z-before.z)<speed*dt*.35){d.since=s.time-end;d.age=end;d.stage='recover';a.vx=a.vz=0;}}
  else{if(previous==='slide'){a.vx*=.32;a.vz*=.32;}a.tuning.speed*=d.stage==='recover'?.45:.65;worldMove(a,{...input,jump:false,dash:false},dt);
   // Aim with the visible body during the wind-up, even when ice is still
@@ -1189,20 +1914,20 @@ function moveHuntDive(s,a,input,dt){const d=a.dive;if(!d)return false;if(input.j
  return true;
 }
 function diveCanTouch(a,b){return a.dive?.stage!=='slide'||b.y<a.y+2;}
-function huntDiveTilt(d){if(!d)return 0;const {prepare,slide,recover}=HUNT_DIVE;if(d.age<prepare)return .35*Math.max(0,d.age/prepare);if(d.age<prepare+slide)return .35+1.1*Math.min(1,(d.age-prepare)/.08);return 1.45*Math.max(0,1-(d.age-prepare-slide)/recover);}
+function huntDiveTilt(d){if(!d)return 0;const {slide,recover}=HUNT_DIVE,prepare=d.prepare??HUNT_DIVE.prepare;if(d.age<prepare)return .35*Math.max(0,d.age/prepare);if(d.age<prepare+slide)return .35+1.1*Math.min(1,(d.age-prepare)/.08);return 1.45*Math.max(0,1-(d.age-prepare-slide)/recover);}
 
 return {huntTerrainTilt,HUNT_DIVE,startHuntDive,moveHuntDive,diveCanTouch,huntDiveTilt};
 })();
-const __tagModule21=(()=>{
-const {HUNT_TOUCH_SHAPES}=__tagModule22;
+const __tagModule24=(()=>{
+const {HUNT_TOUCH_SHAPES}=__tagModule25;
 const {usesRenderedContact}=__tagModule3;
-const {HUNT_RENDERED_TOUCH_UPDATES}=__tagModule23;
-const {trampolineSurface}=__tagModule24;
+const {HUNT_RENDERED_TOUCH_UPDATES}=__tagModule26;
+const {trampolineSurface}=__tagModule27;
 const {worldHeight,worldSight}=__tagModule7;
-const {huntDiveTilt,huntTerrainTilt}=__tagModule25;
+const {huntDiveTilt,huntTerrainTilt}=__tagModule28;
 const DEFAULT_TOUCH_SHAPE='white-michi-road-saber-ren';
 function huntTouchShapeKey(companion){return companion?['seed','sprout','young'].includes(companion.stage)?'companion-'+companion.stage:companion.artId:DEFAULT_TOUCH_SHAPE;}
-function validHuntTouchShape(key){return typeof key==='string'&&Object.hasOwn(HUNT_TOUCH_SHAPES,key);}
+function validHuntTouchShape(key){return typeof key==='string'&&(Object.hasOwn(HUNT_TOUCH_SHAPES,key)||Object.hasOwn(HUNT_RENDERED_TOUCH_UPDATES,key));}
 const cache=new WeakMap();
 const xyzPairs=[[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]];
 function rotate([x,y,z],yaw,pitch,roll){
@@ -1271,12 +1996,12 @@ function huntBodiesTouch(a,b,match){
 
 return {DEFAULT_TOUCH_SHAPE,huntTouchShapeKey,validHuntTouchShape,huntSolidBody,solidBodiesOverlap,huntBodiesTouch};
 })();
-const __tagModule26=(()=>{
-const {huntBodiesTouch}=__tagModule21;
+const __tagModule29=(()=>{
+const {huntBodiesTouch}=__tagModule24;
 const {worldHeight,worldValid,worldSight}=__tagModule7;
 const {HOOK_POLES}=__tagModule6;
-const {trampolineSurface,trampolineClear}=__tagModule24;
-const {diveCanTouch}=__tagModule25;
+const {trampolineSurface,trampolineClear}=__tagModule27;
+const {diveCanTouch}=__tagModule28;
 const HUNT_ZIP=Object.freeze({range:132,seconds:.28,loft:3,sweep:.65,exitSpeed:30});
 const surface=(s,x,z)=>s?trampolineSurface(s,x,z):worldHeight(x,z);
 function point(s,h,t){const x=h.fromX+(h.toX-h.fromX)*t,z=h.fromZ+(h.toZ-h.fromZ)*t;return{x,z,y:Math.max(surface(s,x,z),h.fromY+(h.toY-h.fromY)*t+Math.sin(Math.PI*t)*HUNT_ZIP.loft)};}
@@ -1306,108 +2031,14 @@ function moveHuntZip(s,a,dt){
 
 return {HUNT_ZIP,findHuntZipAnchor,startHuntZip,moveHuntZip};
 })();
-const __tagModule27=(()=>{
+const __tagModule30=(()=>{
 const MATCH_SECONDS=180;
 // 120 physics ticks/sec, including countdown and floating-point boundary margin.
 const TRACE_CAPACITY=(MATCH_SECONDS+2)*120+32;
 
 return {MATCH_SECONDS,TRACE_CAPACITY};
 })();
-const __tagModule29=(()=>{
-const HUNT_TURN_RATE=110*Math.PI/180;
-const PAD_TURN_TRAVEL=.75;
-const KEY_TURN_TRAVEL=.24;
-
-// The pad steers the actor independently of the viewing camera.
-function huntPadMovement(heading,{x,z},dt,turnTravel=PAD_TURN_TRAVEL){
- const turn=Math.sign(x)*Math.max(0,(Math.abs(x)-.10)/.90);
- const yaw=heading-turn*HUNT_TURN_RATE*dt;
- const nextHeading=Math.atan2(Math.sin(yaw),Math.cos(yaw));
- const travel=turnTravel*Math.abs(x)*(1-Math.abs(z))-z;
- return {heading:nextHeading,x:Math.sin(nextHeading)*travel,z:Math.cos(nextHeading)*travel};
-}
-
-// Keyboard and pad share this single heading. Keep it while reversing so the
-// body's backward-facing pose cannot flip the next input. If a special move
-// took over the body, resume from its actual facing, never from turns queued
-// invisibly during the interruption.
-function huntKeyboardMovement(memory,heading,axis,dt,{keyboard=true}={}){
- if(Number.isFinite(memory.facing)&&Math.abs(Math.atan2(Math.sin(heading-memory.facing),Math.cos(heading-memory.facing)))>.001)memory.heading=null;
- // A digital sideways key is all-or-nothing. Reduce its travel so a
- // small correction beside a pickup doesn't carry the body past it.
- const move=huntPadMovement(memory.heading??heading,axis,dt,keyboard?KEY_TURN_TRAVEL:PAD_TURN_TRAVEL);
- memory.heading=axis.x||axis.z?move.heading:null;
- memory.facing=Math.hypot(move.x,move.z)>.05?Math.atan2(move.x,move.z):null;
- return {x:move.x,z:move.z};
-}
-
-return {HUNT_TURN_RATE,huntPadMovement,huntKeyboardMovement};
-})();
-const __tagModule28=(()=>{
-const {worldHeight,worldSight,worldValid}=__tagModule7;
-const {HUNT_TURN_RATE}=__tagModule29;
-const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
-// Keep one approach side for the whole flight. Do not alternate between a
-// tangent and the opposite bearing whenever the runner crosses a distance band.
-function stableBalloonTarget(s,a,gap){
- const f=a.flight??{},runner=s.player,aim={x:runner.x+runner.vx*.18,z:runner.z+runner.vz*.18};
- const angle=f.stableBearing??Math.atan2(a.x-aim.x,a.z-aim.z),radius=a.radius+runner.radius+gap;
- for(const offset of[0,.25,-.25,.5,-.5,.75,-.75,1,-1,1.5,-1.5,2,-2,2.5,-2.5,Math.PI]){
-  const bearing=angle+offset,p={x:aim.x+Math.sin(bearing)*radius,z:aim.z+Math.cos(bearing)*radius};p.y=worldHeight(p.x,p.z);
-  if(!worldValid(p,a.radius+.2))continue;
-  f.stableBearing=bearing;return p;
- }
- return null;
-}
-function stableBalloonSteer(a,goal,dt){
- const f=a.flight,dx=goal.x-a.x,dz=goal.z-a.z,d=Math.hypot(dx,dz);
- const requested=d>.5?Math.atan2(dx,dz):f.steerYaw??a.yaw;
- const prior=f.steerYaw??a.yaw,delta=Math.atan2(Math.sin(requested-prior),Math.cos(requested-prior));
- f.turnRate??=0;
- const acceleration=clamp(delta*16-f.turnRate*8,-4.2,4.2);
- f.turnRate=clamp(f.turnRate+acceleration*dt,-2.1,2.1);
- f.steerYaw=prior+f.turnRate*dt;
- return{x:a.x+Math.sin(f.steerYaw)*d,z:a.z+Math.cos(f.steerYaw)*d};
-}
-function stableBalloonHeight(f,wanted,dt){
- f.hoverY??=f.launchY;
- f.hoverY+=clamp(wanted-f.hoverY,-5*dt,12*dt);
- return f.hoverY;
-}
-
-// The descent holds the landing column. Directional input can still turn
-// the monster and its follow camera while it comes down.
-function balloonDescentFacing(a,input,dt){
- if(Math.hypot(input.x??0,input.z??0)<=.05)return;
- const heading=Math.atan2(input.x,input.z);
- const delta=Math.atan2(Math.sin(heading-a.yaw),Math.cos(heading-a.yaw));
- a.yaw+=clamp(delta,-HUNT_TURN_RATE*dt,HUNT_TURN_RATE*dt);
-}
-
-// A raised street can split the walking graph even when there is room to
-// float across it. Keep the same building, tree and pole clearances as
-// balloon movement, and never use the air path as the descent footprint.
-function balloonAirApproach(a,target){
- const dx=target.x-a.x,dz=target.z-a.z,distance=Math.hypot(dx,dz),floor=worldHeight(a.x,a.z);
- if(distance<8||distance>190||a.y<floor+6)return null;
- const pad=a.radius+.35,steps=Math.ceil(distance/2),cap=Math.max(a.y,floor+14.5);
- let altitude=Math.max(floor,worldHeight(target.x,target.z))+.9;
- for(let i=0;i<=steps;i++){
-  const u=i/steps,x=a.x+dx*u,z=a.z+dz*u;
-  altitude=Math.max(altitude,Math.max(worldHeight(x,z),worldHeight(x-pad,z),worldHeight(x+pad,z),worldHeight(x,z-pad),worldHeight(x,z+pad))+.9);
-  if(altitude>cap)return null;
- }
- if(!worldSight({...a,y:altitude},{...target,y:altitude},pad))return null;
- for(let i=0;i<=steps;i++){
-  const u=i/steps;
-  if(!worldValid({x:a.x+dx*u,z:a.z+dz*u,y:altitude},pad))return null;
- }
- return altitude;
-}
-
-return {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonDescentFacing,balloonAirApproach};
-})();
-const __tagModule30=(()=>{
+const __tagModule31=(()=>{
 const {huntOpticalHidden}=__tagModule5;
 // Coarse sectors and three distance bands: no exact position, distance or route.
 // Both UI and CPU receive coarse information only while their own item is active.
@@ -1445,15 +2076,45 @@ function huntCompass(s,viewYaw){const a=s.config.mode==='hunt'?s.hunters[0]:s.pl
 
 return {huntRadarFor,huntRadar,radarObservations,huntCompass};
 })();
-const __tagModule32=(()=>{
-const {findHuntZipAnchor}=__tagModule26;
+const __tagModule33=(()=>{
+const {findHuntZipAnchor}=__tagModule29;
 const {worldHeight,worldValid,worldSight}=__tagModule7;
-const {trampolineSurface,trampolineClear}=__tagModule24;
+const {trampolineSurface,trampolineClear}=__tagModule27;
 const {HOOK_POLES,HUNT_FIELDS}=__tagModule6;
+const {usesEscapeBalanceRestore,LEDGE_PURSUIT_RULES,usesRaisedApproaches}=__tagModule3;
 const radii=Object.freeze({cushion:3,curtain:HUNT_FIELDS.curtainRadius,sheet:HUNT_FIELDS.sheetRadius,fan:HUNT_FIELDS.fanRadius});
 function huntGadgetRadius(type,a){return type==='clone'?a.radius:radii[type]??null;}
 // The same physical footprint is used by human placement and CPU planning.
-function huntGadgetPlacement(s,a,type,yaw=a.yaw){const radius=huntGadgetRadius(type,a);if(radius===null||s.gadgets.length>=12)return null;const direction=type==='cushion'?yaw+Math.PI:yaw,footprint=['curtain','sheet'].includes(type)?2:radius,distance=a.radius+Math.min(radius,9)+1.5,p={x:a.x+Math.sin(direction)*distance,z:a.z+Math.cos(direction)*distance};p.y=trampolineSurface(s,p.x,p.z);if(type==='fan'&&[s.player,...s.hunters??[]].filter(Boolean).some(b=>Math.hypot(b.x-p.x,b.z-p.z)<b.radius+radius&&b.y<p.y+HUNT_FIELDS.fanHeight&&b.y+5.4>p.y))return null;return worldValid(p,footprint+.15)&&trampolineClear(s,p,footprint+.15)&&Math.abs(p.y-a.y)<=3?{...p,radius}:null;}
+function huntGadgetPlacement(s,a,type,yaw=a.yaw){
+ const radius=huntGadgetRadius(type,a);
+ if(radius===null||s.gadgets.length>=12)return null;
+ const rearFan=type==='fan'&&usesRaisedApproaches(s.rules);
+ const direction=type==='cushion'||rearFan?yaw+Math.PI:yaw;
+ const footprint=['curtain','sheet'].includes(type)?2:radius;
+ const distance=a.radius+Math.min(radius,9)+1.5;
+ function placeAt(offset,angle=direction){
+  const p={x:a.x+Math.sin(angle)*offset,z:a.z+Math.cos(angle)*offset};
+  p.y=trampolineSurface(s,p.x,p.z);
+  if(type==='fan'&&[s.player,...s.hunters??[]].filter(Boolean).some(b=>
+   Math.hypot(b.x-p.x,b.z-p.z)<b.radius+radius&&b.y<p.y+HUNT_FIELDS.fanHeight&&b.y+5.4>p.y))return null;
+  return worldValid(p,footprint+.15)&&trampolineClear(s,p,footprint+.15)&&Math.abs(p.y-a.y)<=3?{...p,radius}:null;
+ }
+ const playerFan=type==='fan'&&s.config?.mode==='escape'&&a===s.player;
+ if(rearFan||playerFan&&usesEscapeBalanceRestore(s.rules)){
+  const gap=6,fanDistance=a.radius+radius+gap;
+  const start={x:a.x,y:a.y+2.5,z:a.z};
+  // Try accessible positions to either side if the aimed spot is obstructed.
+  const angles=rearFan?[0,Math.PI/6,-Math.PI/6,Math.PI/3,-Math.PI/3]:[0,Math.PI/6,-Math.PI/6,Math.PI/3,-Math.PI/3,Math.PI/2,-Math.PI/2];
+  for(const angle of angles){
+   const point=placeAt(fanDistance,direction+angle);
+   if(point&&worldSight(start,{x:point.x,y:point.y+2.5,z:point.z},.15))return rearFan?{...point,yaw:direction}:point;
+  }
+  return null;
+ }
+ const original=placeAt(distance);
+ if(playerFan&&s.rules===LEDGE_PURSUIT_RULES&&original)return placeAt(distance+1)??original;
+ return original;
+}
 function huntHookAnchor(a,s,allowed){return findHuntZipAnchor(a,s,allowed);}
 
 // Never put ink under the user or another hunter. Try nearby forward angles;
@@ -1461,10 +2122,10 @@ function huntHookAnchor(a,s,allowed){return findHuntZipAnchor(a,s,allowed);}
 
 return {huntGadgetRadius,huntGadgetPlacement,huntHookAnchor};
 })();
-const __tagModule31=(()=>{
+const __tagModule32=(()=>{
 const {worldHeight}=__tagModule7;
 const {HOOK_POLES}=__tagModule6;
-const {huntHookAnchor}=__tagModule32;
+const {huntHookAnchor}=__tagModule33;
 const key=p=>p.x+':'+p.z,gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const RUNNER_HOOK=Object.freeze({scan:.4,plan:.2,memory:6,sight:132,approach:21,urgent:26});
 // Observed poles and remembered threats only. Do not detour toward unseen poles.
@@ -1480,10 +2141,10 @@ function runnerHookControl(s,input,{poleVisible=()=>false}={}){
 
 return {RUNNER_HOOK,runnerHookControl};
 })();
-const __tagModule33=(()=>{
+const __tagModule34=(()=>{
 const {huntPermanentToolUseful}=__tagModule5;
 const {PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,EXTRA_BALLOON_COUNT}=__tagModule6;
-const {WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldHeight,worldValid,worldSight,worldTraversable}=__tagModule7;
+const {WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldCornerIndex,worldHeight,worldValid,worldSight,worldTraversable}=__tagModule7;
 
 // Both factions have a radar, alongside the existing props, spread over the world instead of a ring at the start.
 // Static geometry work is shared between rounds, never repeated every frame.
@@ -1554,6 +2215,30 @@ function addHuntBalloonSupplies(pickups, actors) {
  }
 }
 
+const escapeOpeningTypes=['cloak','clone','curtain','speed','cushion','fan','sheet'];
+const escapeOpeningRanges=[40,49,32,57,66];
+const escapeOpeningAngles=[0,.3,-.3,.6,-.6,.9,-.9,1.25,-1.25,1.7,-1.7];
+function placeRunnerOpeningSupply(pickups,runner,hunters,seed,{accessible=false}={}){
+ const lift=accessible?HUNT_CHARACTER_HEIGHT+1.1:PICKUP_LIFT;
+ const preferred=escapeOpeningTypes[seed%escapeOpeningTypes.length];
+ const candidates=pickups.filter(p=>p.audience==='player'&&escapeOpeningTypes.includes(p.type));
+ const forward=runner.yaw;
+ for(const offset of escapeOpeningAngles)for(const gap of escapeOpeningRanges){
+  const yaw=forward+offset,x=runner.x+Math.sin(yaw)*gap,z=runner.z+Math.cos(yaw)*gap;
+  const point={x,y:worldHeight(x,z),z};
+  if(!worldValid(point,padding)||!worldValid({...point,y:point.y+lift},padding)||
+     !worldTraversable(runner,point,runner.radius+.2)||!worldSight({...runner,y:runner.y+3},{...point,y:point.y+lift})||
+     hunters.some(a=>distance(a,point)<64))continue;
+  const neighbors=pickups.filter(p=>distance(p,point)<48);
+  const chosen=neighbors.length===1&&candidates.includes(neighbors[0])?neighbors[0]:
+   neighbors.length===0?candidates.find(p=>p.type===preferred):null;
+  if(!chosen)continue;
+  Object.assign(chosen,point,{home:point});
+  if(accessible)chosen.lift=lift;
+  return;
+ }
+}
+
 const approachDistances=[44,36,52,28,60,68];
 const approachAngles=[0,Math.PI/12,-Math.PI/12,Math.PI/6,-Math.PI/6];
 function onOpeningApproach(hunter,pickup){
@@ -1590,24 +2275,26 @@ function placeHuntOpeningSupply(pickups,hunter,actors){
 const preferences={pursuit:{scarf:5,ink:4,sunglasses:4,radar:4},intercept:{balloon:5,sunglasses:4},patrol:{sunglasses:5,ink:3,radar:4}};
 // A short, visible detour on the existing route; never replace a role's goal
 // with an item across the map, infer a hidden player, or run an extra pathfinder.
-function huntSupplySteering(s,a,control,{playerVisible=false,itemVisible=p=>worldSight({...a,y:a.y+3},{...p,y:p.y+1.8})}={}){
+function huntSupplySteering(s,a,control,{playerVisible=false,cornerSupplies=false,itemVisible=p=>worldSight({...a,y:a.y+3},{...p,y:p.y+1.8})}={}){
  const m=a.brain;if(a.item||a.pendingItem||a.flight||!a.grounded&&!m.supply){m.supply=null;return control;}
  if(playerVisible&&distance(a,s.player)<18){m.supply=null;return control;}
  const goal=m.path?.[m.at],gx=goal?goal.x-a.x:0,gz=goal?goal.z-a.z:0,length=Math.hypot(gx,gz);
+ // A visible tool on a stair may justify a short detour of its own.
+ const isCornerTool=(p,d)=>cornerSupplies&&d<=18&&worldCornerIndex(p)>=0;
+ const onApproach=(p,d)=>isCornerTool(p,d)||onRoute(a,p,goal,d,gx,gz,length);
  const prior=m.supply;if(prior&&s.time<prior.nextCheck){
   const p=s.pickups.find(p=>p.id===prior.id);
   const d=p?distance(a,p):Infinity;
-  if(p&&huntPermanentToolUseful(s,a,p.type)&&!p.pull&&p.readyAt<=s.time&&d<24&&(p.lift||Math.abs(p.y-a.y)<3)&&onRoute(a,p,goal,d,gx,gz,length)&&itemVisible(p))return steer(a,p,control,s.time);
+  if(p&&huntPermanentToolUseful(s,a,p.type)&&!p.pull&&p.readyAt<=s.time&&d<24&&(p.lift||Math.abs(p.y-a.y)<3)&&onApproach(p,d)&&itemVisible(p))return steer(a,p,control,s.time);
  }
  m.supply=null;
  if(s.time<(m.supplyScanAt??0))return control;m.supplyScanAt=s.time+.3;
- if(!goal)return control;
- if(length<4)return control;
+ if(!cornerSupplies&&(!goal||length<4))return control;
  let best=null,bestScore=-Infinity;
  for(const p of s.pickups){
   const d=distance(a,p);if(!huntPermanentToolUseful(s,a,p.type)||p.audience!==(a.owner==='player'?'player':'hunters')||p.readyAt>s.time||p.pull||d>24||!p.lift&&Math.abs(p.y-a.y)>3)continue;
   if(s.hunters.some(h=>h!==a&&h.brain.supply?.id===p.id&&h.brain.supply.nextCheck>s.time))continue;
-  if(!onRoute(a,p,goal,d,gx,gz,length))continue;
+  if(!onApproach(p,d))continue;
   if(p.type==='guard'&&!s.gadgets.some(g=>['cushion','fan'].includes(g.kind)&&distance(a,g)<(g.kind==='fan'?60:28)&&worldSight({...a,y:a.y+3},{...g,y:g.y+2}))&&!(playerVisible&&['sticky','cushion'].includes(s.player.item)))continue;
   if(!itemVisible(p)||!worldTraversable(a,p,a.radius+.2))continue;
   const score=(preferences[a.role]?.[p.type]??1)*2-d*.3+(prior?.id===p.id?3:0);
@@ -1623,12 +2310,12 @@ function steer(a,p,control,time){const d=distance(a,p);if(!p.lift)return{...cont
  if(d<a.radius+5){if(a.grounded){a.brain.supplyJumpAt=time+.24;out.jump=true;}else if(a.jumps===1&&time>=a.brain.supplyJumpAt)out.jump=!a.jumpHeld;else out.jump=a.vy>0;}return out;
 }
 
-return {PICKUP_LIFT,SUPPLY_ZONES,createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,huntSupplySteering};
+return {PICKUP_LIFT,SUPPLY_ZONES,createHuntSupplies,addHuntBalloonSupplies,placeRunnerOpeningSupply,placeHuntOpeningSupply,huntSupplySteering};
 })();
-const __tagModule34=(()=>{
+const __tagModule35=(()=>{
 const {huntJumpRestRemaining}=__tagModule2;
 const {BODY,worldPilot,worldTraversable,worldSight}=__tagModule7;
-const {trampolineLaunchSpeed}=__tagModule24;
+const {trampolineLaunchSpeed}=__tagModule27;
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 function observeRunnerThreats(s,observations){
  const a=s.player,m=a.brain,old=m.avoidMemory??{},memory={},gear=m.observedGlasses??{};
@@ -1684,10 +2371,11 @@ function runnerPressureControl(s,input){const a=s.player,m=a.brain,threats=(m.es
 
 return {observeRunnerThreats,runnerControl,runnerJumpControl,safeTrampolineApproach,runnerPressureControl};
 })();
-const __tagModule35=(()=>{
-const {huntFanExposure}=__tagModule18;
+const __tagModule36=(()=>{
+const {huntFanExposure}=__tagModule21;
 const {huntPermanentToolUseful}=__tagModule5;
-const {huntGadgetPlacement,huntGadgetRadius,huntHookAnchor}=__tagModule32;
+const {huntGadgetPlacement,huntGadgetRadius,huntHookAnchor}=__tagModule33;
+const {usesRaisedApproaches}=__tagModule3;
 const {BODY,worldHeight,worldSurface,worldSight,worldTraversable,worldRoute,worldRouteLookahead,worldSteering}=__tagModule7;
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const priority={radar:4,cloak:7,speed:6,curtain:5,clone:4,cushion:4,hook:6,fan:6,sheet:2};
@@ -1740,7 +2428,7 @@ function cushionThreatInLane(runner,threat,time){
  const back=-(dx*sin+dz*cos),across=Math.abs(dx*cos-dz*sin);
  return back>8&&across<3+(threat.radius??3)+1.5;
 }
-function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure=false}={}){const a=s.player,m=a.brain,item=a.item,threats=m.escapeThreats??[],t=threats[0],distance=t?gap(a,t):Infinity,now=s.time,active=k=>(a.effects[k]??0)>now;
+function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure=false,proactive=false}={}){const a=s.player,m=a.brain,item=a.item,threats=m.escapeThreats??[],t=threats[0],distance=t?gap(a,t):Infinity,now=s.time,active=k=>(a.effects[k]??0)>now;
  if(a.hook&&m.releaseHook&&!a.flight)return{yaw:a.yaw,item:'hook-release'};if(!item||a.flight||now<(m.nextToolAt??0)||item==='hook'&&!m.hookReady)return null;const speed=Math.hypot(a.vx,a.vz),n=Math.hypot(input.x,input.z),heading=n>.1?Math.atan2(input.x,input.z):a.yaw;
  const straight=worldTraversable(a,{x:a.x+Math.sin(heading)*24,z:a.z+Math.cos(heading)*24},a.radius+.2),visible=t&&!t.radar&&now-t.at<.15,closing=t?((a.vx-t.vx)*(t.x-a.x)+(a.vz-t.vz)*(t.z-a.z))/(distance||1):0;
  let yaw=heading,use=false;
@@ -1754,19 +2442,19 @@ function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure
   yaw=a.yaw;
   use=checkAllCushionThreats?threats.some(threat=>cushionThreatInLane(a,threat,now)):cushionThreatInLane(a,t,now);
  }
- else if(item==='clone'){if(distance<85&&(!visible||distance<38||!straight)){for(const offset of[(s.config.seed&1?1:-1)*.95,(s.config.seed&1?-1:1)*.95]){const p={x:a.x+Math.sin(heading+offset)*28,z:a.z+Math.cos(heading+offset)*28};if(worldTraversable(a,p,a.radius+.2)&&(!t||gap(p,t)>distance*.75)){yaw=heading+offset;use=true;break;}}}}
+ else if(item==='clone'){if(distance<85&&(!visible||distance<(proactive?52:38)||!straight)){for(const offset of[(s.config.seed&1?1:-1)*.95,(s.config.seed&1?-1:1)*.95]){const p={x:a.x+Math.sin(heading+offset)*28,z:a.z+Math.cos(heading+offset)*28};if(worldTraversable(a,p,a.radius+.2)&&(!t||gap(p,t)>distance*.75)){yaw=heading+offset;use=true;break;}}}}
  else if(item==='curtain'){
-  const p=threats.find(p=>fooledByCover(s,p)&&gap(a,p)>20&&gap(a,p)<75&&p.y-a.y<5);
+  const p=threats.find(p=>fooledByCover(s,p)&&gap(a,p)>(proactive?10:20)&&gap(a,p)<75&&p.y-a.y<5);
   if(p){yaw=Math.atan2(p.x-a.x,p.z-a.z);use=true;}
   else if(!usefulCover(s)&&safeReplacementSeen(s)){yaw=heading+Math.PI;use=true;}
  }
- else if(item==='sheet'){if(distance>20&&distance<75&&t.y-a.y<5){yaw=Math.atan2(t.x-a.x,t.z-a.z);use=true;}}
+ else if(item==='sheet'){if(distance>(proactive?10:20)&&distance<75&&t.y-a.y<5){yaw=Math.atan2(t.x-a.x,t.z-a.z);use=true;}}
  else if(item==='fan'&&checkFanExposure){
   for(const threat of threats){
    if(threat.radar||!(now-threat.at<.15))continue;
-   const aim=Math.atan2(threat.x-a.x,threat.z-a.z);
+   const aim=usesRaisedApproaches(s.rules)?a.yaw:Math.atan2(threat.x-a.x,threat.z-a.z);
    const placement=huntGadgetPlacement(s,a,item,aim);
-   if(placement&&huntFanExposure(threat,{...placement,kind:item,yaw:aim,until:now+1},now))return{yaw:aim,item};
+   if(placement&&huntFanExposure(threat,{...placement,kind:item,yaw:placement.yaw??aim,until:now+1},now))return{yaw:aim,item};
   }
   return null;
  }
@@ -1782,40 +2470,43 @@ return {runnerSupplyControl,runnerItemTactic};
 })();
 const __tagModule0=(()=>{
 const {CLOAK_INK_RULES,huntInkTrailSuppressed}=__tagModule1;
-const {BALLOON_DESCENT_TURN_RULES,usesTrainingStep,TRAINING_STEP_RULES,usesExtraBalloons,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,usesBalloonDropPursuit,usesOpeningSupply,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES}=__tagModule3;
+const {usesDirectDrop,usesInterceptLead,FASTEST_DASH_CAP_RULES,PERIMETER_ROUTE_RULES,INTERCEPT_LEAD_RULES,JUMP_REACTION_RULES,JUMP_ONSET_DELAY_RULES,DIRECT_DROP_RULES,HUNTER_DASH_RULES,usesHunterPursuit,HUNTER_PURSUIT_RULES,usesEscapeBalanceRestore,ESCAPE_BALANCE_RESTORE_RULES,usesLedgePursuit,LEDGE_PURSUIT_RULES,usesCpuChaseRestore,CPU_CHASE_RESTORE_RULES,usesChaseRestore,CHASE_RESTORE_RULES,ESCAPE_DASH_RULES,usesEscapeTurn,ESCAPE_TURN_RULES,usesBalloonCorner,BALLOON_CORNER_RULES,usesBalloonGlide,BALLOON_GLIDE_RULES,usesBalloonExit,BALLOON_EXIT_RULES,usesTrainingLedge,TRAINING_LEDGE_RULES,CORNER_EXIT_RULES,usesCornerExit,CONTINUOUS_CHASE_RULES,usesContinuousChase,LANDING_DIVE_RULES,usesLandingDive,BALLOON_PURSUIT_RULES,usesBalloonPursuit,CORNER_CHASE_RULES,usesCornerChase,FAIR_CHASE_RULES,usesFairChase,usesOpeningPickup,usesRunnerTactics,OPENING_PICKUP_RULES,RUNNER_TACTICS_RULES,usesRoleBalance,ROLE_BALANCE_RULES,BALLOON_DESCENT_TURN_RULES,usesTrainingStep,TRAINING_STEP_RULES,usesExtraBalloons,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,usesBalloonDropPursuit,usesOpeningSupply,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,usesDiveFacing,usesCloakWitness,usesBalloonAirApproach,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES}=__tagModule3;
 const {rememberCloakDisappearance,cloakDisappearanceMovement}=__tagModule4;
 const {huntDropPursuit}=__tagModule11;
 
 const {updateHuntTeamContact,receiveHuntTeamContact,observedHuntChase}=__tagModule12;
 const {JUMP_REST_CONTINUITY_RULES,usesContinuousJumpRest,huntJumpInput,huntJumpRestRemaining,recordHuntJumpLanding,HUNT_JUMP_QUICK_REST}=__tagModule2;
 const {huntSweepControl}=__tagModule13;
-const {huntStartFacing}=__tagModule17;
+const {balloonLandingFacing,balloonLandingObservation,runnerThreatSight,escapeChaseRhythm,balloonExitClear,balloonExitPenalty,balloonTouchdownStride,balloonDescentGlide,balloonDescentLead,readableEscapeDive}=__tagModule17;
+const {huntStartFacing}=__tagModule20;
 const {huntCanObserve,huntOpticalHidden,huntHasClearSight,huntPermanentToolUseful}=__tagModule5;
-const {applyHuntWind,resolveHuntFans}=__tagModule18;
-const {steerClearOfHuntWind}=__tagModule19;
-const {cushionJumpControl}=__tagModule20;
+const {applyHuntWind,resolveHuntFans}=__tagModule21;
+const {huntHunterDashBoost,usesRaisedApproaches,usesStableRamps}=__tagModule3;
+const {huntRimDepth,huntRimRecovery}=__tagModule14;
+const {steerClearOfHuntWind}=__tagModule22;
+const {cushionJumpControl}=__tagModule23;
 const {applyCushionDizzy,huntIsDizzy}=__tagModule9;
-const {huntBodiesTouch,DEFAULT_TOUCH_SHAPE,validHuntTouchShape}=__tagModule21;
-const {startHuntZip,moveHuntZip}=__tagModule26;
-const {MATCH_SECONDS,TRACE_CAPACITY}=__tagModule27;
-const {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonAirApproach,balloonDescentFacing}=__tagModule28;
+const {huntBodiesTouch,DEFAULT_TOUCH_SHAPE,validHuntTouchShape}=__tagModule24;
+const {startHuntZip,moveHuntZip}=__tagModule29;
+const {MATCH_SECONDS,TRACE_CAPACITY}=__tagModule30;
+const {stableBalloonTarget,stableBalloonSteer,stableBalloonHeight,balloonAirApproach,balloonDescentFacing}=__tagModule18;
 
-const {radarObservations}=__tagModule30;
-const {runnerHookControl}=__tagModule31;
-const {huntGadgetPlacement,huntHookAnchor}=__tagModule32;
-const {startHuntDive,moveHuntDive,diveCanTouch,HUNT_DIVE}=__tagModule25;
+const {radarObservations}=__tagModule31;
+const {runnerHookControl}=__tagModule32;
+const {huntGadgetPlacement,huntHookAnchor}=__tagModule33;
+const {startHuntDive,moveHuntDive,diveCanTouch,HUNT_DIVE}=__tagModule28;
 // Experimental simulation for the accepted multi-hunter redesign.
 // The normal trial uses this simulation; formal growth/rewards remain disabled.
-const {STEP,BODY,HUNT_JUMP,WORLD,WORLD_STARTS,WORLD_RADII,TAG_CHARACTERS,actor,opponentSpec,worldHeight,worldValid,worldSight,worldTraversable,worldMove,worldPilot,worldSteering,worldRoute,worldRouteSeconds}=__tagModule7;
+const {STEP,BODY,HUNT_JUMP,WORLD,WORLD_STARTS,WORLD_RADII,TAG_CHARACTERS,actor,opponentSpec,worldHeight,worldValid,worldSight,worldTraversable,worldNearCornerStairs,worldCornerIndex,worldCornerPathAllowed,worldForwardBlocked,worldMove,worldPilot,worldSteering,worldRoute,worldRouteSeconds}=__tagModule7;
 const {ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,INK,HUNT_FIELDS}=__tagModule6;
-const {createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,huntSupplySteering}=__tagModule33;
+const {createHuntSupplies,addHuntBalloonSupplies,placeHuntOpeningSupply,placeRunnerOpeningSupply,huntSupplySteering}=__tagModule34;
 const {movingItemContactRadius,huntSupplyContact}=__tagModule10;
 
 
-const {runnerControl,runnerJumpControl,runnerPressureControl,safeTrampolineApproach}=__tagModule34;
-const {runnerSupplyControl,runnerItemTactic}=__tagModule35;
+const {runnerControl,runnerJumpControl,runnerPressureControl,safeTrampolineApproach}=__tagModule35;
+const {runnerSupplyControl,runnerItemTactic}=__tagModule36;
 const {randomHuntStart,mixHuntStartSeed}=__tagModule15;
-const {trampolineJumpAccess,createHuntTrampoline,trampolineInput,resolveTrampoline,trampolineEscapeControl,trampolineSurface,trampolineClear,trampolineObstacleJump}=__tagModule24;
+const {trampolineJumpAccess,createHuntTrampoline,trampolineInput,resolveTrampoline,trampolineEscapeControl,trampolineSurface,trampolineClear,trampolineObstacleJump}=__tagModule27;
 const HUNT_RULES='tag-corner-reversal-v64';
 const CONTACT_APPROACH_RULES='tag-contact-approach-v65';
 const CORNER_SEARCH_RULES='tag-corner-search-v66';
@@ -1853,22 +2544,33 @@ const byId=new Map(TAG_CHARACTERS.map(c=>[c.id,c]));
 const visible=(a,b,range=140)=>near(a,b)<range&&worldSight(raised(a),raised(b));
 const alive=(s,a,key)=>(a.effects[key]??0)>s.time;
 function body(x,z,id,radius){const spec=opponentSpec(id),a=Object.assign(actor(x,z),{y:worldHeight(x,z),id,radius,keepInputFacing:true,contactKey:id==='player'?DEFAULT_TOUCH_SHAPE:id,baseTuning:{accel:1,speed:1,turn:1,brake:1,...spec?.movement},effects:{},item:null,flight:null,nextHop:0});a.tuning={...a.baseTuning};return a;}
+const FASTEST_DASH_FACTOR=.98;
 function random(s){s.randomState=(Math.imul(s.randomState,1664525)+1013904223)>>>0;return s.randomState/4294967296;}
-function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none'}={}, {rules=HUNT_RULES}={}){
+function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=12031,duration=MATCH_SECONDS,playerItem='none',playerRadius=2.7,playerShape=DEFAULT_TOUCH_SHAPE,mode='escape',hunterItem='none',matchSky}={}, {rules=HUNT_RULES}={}){
  if(hunterCount!==HUNTER_COUNT||!Number.isSafeInteger(seed)||seed<0||seed>0xffffffff||duration!==MATCH_SECONDS)throw Error('INVALID_HUNT_CONFIG');
  if(!validHuntTouchShape(playerShape))throw Error('INVALID_TOUCH_SHAPE');
  if(playerItem!=='none'&&!PLAYER_ITEMS.includes(playerItem)||!Number.isFinite(playerRadius)||playerRadius<2||playerRadius>6)throw Error('INVALID_PLAYER_CONFIG');
  if(!['escape','hunt'].includes(mode)||hunterItem!=='none'&&!HUNTER_ITEMS.includes(hunterItem))throw Error('INVALID_ROLE_CONFIG');
  if(startKey!=='random'&&!WORLD_STARTS.some(x=>x.id===startKey))throw Error('INVALID_START');startKey='random';
  const defaults=['walkBrave','rioSaber','walkCute'].map(p=>TAG_CHARACTERS.find(c=>c.profileKey===p).id),ids=opponents??defaults;
- if(!Array.isArray(ids)||ids.length!==3||ids.some(id=>!byId.has(id)))throw Error('INVALID_OPPONENTS');
+ const opponent=id=>byId.get(id)??(matchSky?.rival===id&&/^(?:white-sprout-seed-walk|sprout-seed-(?:walk|sky|leaf|city|river|night|luck)|(?:white-young-seed-walk|young-seed-(?:walk|sky|leaf|city|river|night|luck))-(?:walk|sky))$/.test(id)
+   ?{profileKey:id.endsWith('-sky')?'rioCute':'walkCute',touchKey:id.includes('sprout')?'rival-sprout':id.endsWith('-sky')?'rival-young-sky':'rival-young-walk'}:null);
+ if(matchSky!==undefined&&(!matchSky||!['blue','cloud','sunset','morning'].includes(matchSky.skyId)||matchSky.rival!==ids?.[0]))throw Error('INVALID_MATCH_SKY');
+ if(!Array.isArray(ids)||ids.length!==3||ids.some(id=>!opponent(id)))throw Error('INVALID_OPPONENTS');
  const initial={randomState:mixHuntStartSeed(seed)},layout=randomHuntStart(()=>random(initial),mode);
- const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[byId.get(ids[0]).profileKey]:playerRadius),s={rules,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
+ const player=body(layout.runner.x,layout.runner.z,mode==='hunt'?ids[0]:'player',mode==='hunt'?WORLD_RADII[opponent(ids[0]).profileKey]:playerRadius),s={rules,config:{hunterCount,opponents:[...ids],startKey,seed,duration,playerItem,playerRadius,playerShape,mode,hunterItem,...(matchSky?{matchSky:{skyId:matchSky.skyId,rival:matchSky.rival}}:{})},time:0,countdown:2,phase:'countdown',duration,randomState:initial.randomState,player,hunters:[],pickups:[],pools:[],footprints:[],gadgets:[],events:[],nextId:1,result:null,useHeld:false,inkUntil:0};
  const spawns=layout.hunters;
  if(mode==='hunt'){const costs=new Map(spawns.map(p=>{const a={...p,radius:playerRadius,tuning:{accel:1,speed:1,turn:1,brake:1},vx:0,vz:0},path=worldRoute(a,player);return[p,path.length?worldRouteSeconds(a,path):1000+near(a,player)];}));spawns.sort((a,b)=>costs.get(a)-costs.get(b));[spawns[1],spawns[2]]=[spawns[2],spawns[1]];}
  s.spawnLayout={runner:layout.runner.id,hunters:spawns.map(p=>p.id),positions:[layout.runner,...spawns].map(p=>({x:p.x,y:p.y,z:p.z}))};
- ids.forEach((id,i)=>{const human=mode==='hunt'&&i===0,c=byId.get(id),radius=human?playerRadius:WORLD_RADII[c.profileKey],p=spawns[i],a=body(p.x,p.z,human?'player':id,radius);a.owner='hunter-'+i;a.role=HUNTER_ROLES[i];a.brain={profile:id,role:a.role,next:0};s.hunters.push(a);});
- (mode==='hunt'?s.hunters[0]:player).contactKey=playerShape;player.owner='player';player.brain={profile:ids[0],next:0};
+ ids.forEach((id,i)=>{const human=mode==='hunt'&&i===0,c=opponent(id),radius=human?playerRadius:WORLD_RADII[c.profileKey],p=spawns[i],a=body(p.x,p.z,human?'player':id,radius);if(!human&&c.touchKey)a.contactKey=c.touchKey;a.owner='hunter-'+i;a.role=HUNTER_ROLES[i];a.brain={profile:id,role:a.role,next:0};s.hunters.push(a);});
+ (mode==='hunt'?s.hunters[0]:player).contactKey=playerShape;if(mode==='hunt'&&opponent(ids[0]).touchKey)player.contactKey=opponent(ids[0]).touchKey;player.owner='player';player.brain={profile:ids[0],next:0};
+ if(usesRaisedApproaches(rules)){
+  const controlled=controlledHuntActor(s),actors=[player,...s.hunters];
+  for(const a of actors){
+   const profile=byId.get(a===controlled?playerShape:a.id)?.profileKey;
+   if(profile==='rioBrave')a.dashSpeedFactor=a.dashScale=FASTEST_DASH_FACTOR;
+  }
+ }
  for(const[i,a]of s.hunters.entries()){worldPilot(a,player,true,0,a.brain);a.brain.next=.4+i*.16;}
  const human=controlledHuntActor(s);human.yaw=huntStartFacing(human,[player,...s.hunters].filter(a=>a!==human));
  const actors=[player,...s.hunters];
@@ -1876,13 +2578,40 @@ function createHunt({hunterCount=HUNTER_COUNT,opponents,startKey='random',seed=1
  s.pickups=createHuntSupplies(()=>random(s),actors);
  if(usesOpeningSupply(rules)&&mode==='hunt')placeHuntOpeningSupply(s.pickups,human,actors);
  if(usesExtraBalloons(rules))addHuntBalloonSupplies(s.pickups,actors);
+ if(!usesEscapeBalanceRestore(rules)&&usesRunnerTactics(rules))placeRunnerOpeningSupply(s.pickups,s.player,s.hunters,seed,{accessible:!usesChaseRestore(rules)&&usesOpeningPickup(rules)&&mode==='escape'});
  return s;
 }
 function controlledHuntActor(s){return s.config.mode==='hunt'?s.hunters[0]:s.player;}
-function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a),trainingStepJump:usesTrainingStep(s.rules)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
+function huntBalloonCornerSteering(s,a){
+ return usesBalloonCorner(s.rules)&&a===s.hunters[0]&&s.config.mode==='hunt'&&
+  s.time<(a.balloonCornerUntil??0)&&a.grounded&&!a.dive&&!a.flight&&
+  !a.slippery&&!a.externalForce&&worldNearCornerStairs(a,18);
+}
+function huntEscapeTurnRate(s,a,side){
+ if(!usesEscapeTurn(s.rules)||s.config.mode!=='escape'||a!==s.player||!side||!a.grounded||
+  a.flight||a.hook||a.externalForce||a.slippery||huntIsDizzy(s,a))return undefined;
+ if(Math.hypot(a.vx,a.vz)>=12){a.escapeTurnUntil=0;return undefined;}
+ if(worldForwardBlocked(a))a.escapeTurnUntil=s.time+.42;
+ return s.time<(a.escapeTurnUntil??0)?145*Math.PI/180:undefined;
+}
+function moveWithTrampoline(s,a,input,dt){if(huntIsDizzy(s,a))input={};const before={y:a.y,grounded:a.grounded,jumps:a.jumps};worldMove(a,huntJumpInput(s,a,{...trampolineInput(a,input),jumpAccess:input.jump&&!a.jumpHeld&&trampolineJumpAccess(s,a),trainingStepJump:usesTrainingStep(s.rules),cornerGrip:usesCornerChase(s.rules)&&a===controlledHuntActor(s),perimeterGrip:usesCornerExit(s.rules)&&a===controlledHuntActor(s),trainingLedge:usesTrainingLedge(s.rules),balloonCornerTurn:input.manualSteering&&input.dash&&huntBalloonCornerSteering(s,a)}),dt);if(resolveTrampoline(s,a,before)==='bounce')emit(s,'trampoline-bounce',a,{position:{x:s.trampoline.x,y:s.trampoline.y,z:s.trampoline.z}});}
 function participants(s){return[s.player,...s.hunters];}
 function emit(s,type,a,extra={}){s.events.push({id:s.nextId++,type,owner:a.owner,time:s.time,...extra});}
-function tune(s,a){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed','turn','brake'])t[k]=b[k];if(a===s.player)t.speed*=1.04;if(alive(s,a,'speed')){t.speed*=1.4;t.accel*=1.2;}if(s.gadgets.some(g=>g.kind==='sheet'&&near(g,a)<g.radius&&Math.abs(a.y-g.y)<.6)){t.brake*=.35;t.turn*=.65;a.slippery=true;}else a.slippery=false;}
+function usesEscapeOpeningDelay(s){return s.config.mode==='escape'&&!usesCpuChaseRestore(s.rules)&&usesBalloonPursuit(s.rules);}
+function applyChasePace(s,a,t){
+ const hunt=s.config.mode==='hunt', fair=usesFairChase(s.rules);
+ if(a===s.player){t.speed*=!usesChaseRestore(s.rules)&&fair&&!hunt?(usesBalloonPursuit(s.rules)?1.16:1.13):1.04;return;}
+ if(hunt&&a===s.hunters[0]&&usesOpeningPickup(s.rules)){
+  t.speed*=usesLandingDive(s.rules)?1.30:fair?1.20:1.08;return;
+ }
+ if(usesEscapeBalanceRestore(s.rules))return;
+ if(fair){
+  if(hunt)t.speed=Math.min(t.speed,.94);
+  else if(usesEscapeOpeningDelay(s)){const pace=escapeChaseRhythm(s.time);t.speed=Math.min(t.speed,a.role==='pursuit'?pace.pursuit:pace.support);}
+  else t.speed=Math.min(t.speed,a.role==='pursuit'?.96:.89);
+ }else if(!hunt&&usesRoleBalance(s.rules)&&a.role!=='pursuit')t.speed=Math.min(t.speed,1.04);
+}
+function tune(s,a,dash=false){const t=a.tuning,b=a.baseTuning;for(const k of['accel','speed','turn','brake'])t[k]=b[k];applyChasePace(s,a,t);if(dash&&s.rules===ESCAPE_DASH_RULES&&s.config.mode==='escape'&&a===s.player)t.speed*=1.05;if(alive(s,a,'speed')){t.speed*=1.4;t.accel*=1.2;}if(s.gadgets.some(g=>g.kind==='sheet'&&near(g,a)<g.radius&&Math.abs(a.y-g.y)<.6)){t.brake*=.35;t.turn*=.65;a.slippery=true;}else a.slippery=false;}
 // Leave more than one complete dive of room, measured between body radii.
 // A live lower bound also prevents an approaching runner shortening the landing.
 const BALLOON_GAP=28, BALLOON_MIN_GAP=26;
@@ -1915,7 +2644,7 @@ function emergencyBalloonPlan(s,a){
 function canSee(s,a,b,range=140){return huntCanObserve(s,a,b,range);}
 function addGadget(s,a,kind,life,radius=2){
  const p=huntGadgetPlacement(s,a,kind);if(!p)return null;
- const g={...actor(p.x,p.z),...p,id:s.nextId++,kind,owner:a.owner,radius,trampolineSupport:p.y>worldHeight(p.x,p.z)+.1,until:s.time+life,yaw:a.yaw,spawnedAt:s.time,tuning:{accel:1,speed:1,turn:1,brake:1}};s.gadgets.push(g);return g;
+ const g={...actor(p.x,p.z),...p,id:s.nextId++,kind,owner:a.owner,radius,trampolineSupport:p.y>worldHeight(p.x,p.z)+.1,until:s.time+life,yaw:p.yaw??a.yaw,spawnedAt:s.time,tuning:{accel:1,speed:1,turn:1,brake:1}};s.gadgets.push(g);return g;
 }
 function activateHuntItem(s,owner='player'){
  if(s.phase!=='playing')return false;const a=participants(s).find(a=>a.owner===owner);if(!a||huntIsDizzy(s,a)||a.flight||a.pendingItem)return false;if(a.hook){a.hook=null;const v=Math.hypot(a.vx,a.vz);if(v>30){a.vx*=30/v;a.vz*=30/v;}a.vy=clamp(a.vy,-8,8);emit(s,'hook-released',a);return true;}if(!a.item)return false;
@@ -1924,7 +2653,10 @@ function activateHuntItem(s,owner='player'){
   if(type==='scarf'&&s.hunters.some(h=>h!==a&&(h.flight||h.pendingItem||alive(s,h,'speed'))))return false;
  }
  if(type==='balloon'){
-  if(a===s.player)return false;const visibleTarget=landingFor(s,a,true),plan=visibleTarget?{target:visibleTarget,peak:Math.max(a.y,visibleTarget.y)+13}:emergencyBalloonPlan(s,a),{target,peak}=plan;
+  if(a===s.player)return false;
+  if(!usesChaseRestore(s.rules)&&usesLandingDive(s.rules)&&s.config.mode==='escape'&&
+    (s.time<(s.nextBalloonAt??0)||s.hunters.some(h=>h!==a&&h.flight)))return false;
+  const visibleTarget=landingFor(s,a,true),plan=visibleTarget?{target:visibleTarget,peak:Math.max(a.y,visibleTarget.y)+13}:emergencyBalloonPlan(s,a),{target,peak}=plan;
   a.flight={stage:'prepare',since:s.time,launchAt:s.time+.6,launchY:a.y,target,peak,nextTrack:s.time+.6,side:visibleTarget&&((a.x-s.player.x)*s.player.vz-(a.z-s.player.z)*s.player.vx<0)?-1:1,approachAngle:visibleTarget?Math.atan2(a.x-s.player.x,a.z-s.player.z):a.yaw+Math.PI,free:!visibleTarget};emit(s,'balloon-prepare',a,{target:{...target}});
  }else if(type==='ink'){
   s.inkUntil=s.player.effects.ink=s.duration+STEP;s.player.lastFoot=null;emit(s,'runner-inked',a,{target:s.player.owner,until:s.player.effects.ink});
@@ -1949,7 +2681,10 @@ function activateHuntItem(s,owner='player'){
 // Equipment answers terrain and visible events, not hidden current positions.
 function huntItemOpportunity(s,a,{playerVisible}={}){
  const item=a.item,seen=a.brain?.seen;if(!item||a.flight||a.pendingItem)return false;
- if(item==='balloon')return near(a,s.player)>a.radius+s.player.radius+BALLOON_GAP+4;
+ if(item==='balloon'){
+  if(usesEscapeOpeningDelay(s)&&!escapeChaseRhythm(s.time).allowBalloon)return false;
+  return near(a,s.player)>a.radius+s.player.radius+BALLOON_GAP+4;
+ }
 
  if(item==='radar')return!alive(s,a,'radar')&&playerVisible!==true;
  if(item==='sunglasses')return !huntHasClearSight(s,a);
@@ -2013,36 +2748,76 @@ function fastBalloonLanding(s,a,flight,elapsed,gap){
  if(!flight.landingRequested)return null;
  const here=balloonLandingSpot(a);
  if(flight.landingApproach)return near(a,flight.target)<=1?here:null;
- if(here&&gap>=BALLOON_MIN_GAP)return here;
+ const useGroundExit=usesLandingDive(s.rules)&&a===controlledHuntActor(s);
+ const observed=useGroundExit?balloonLandingObservation(s,a,s.player):null;
+ const anticipating=usesContinuousChase(s.rules)&&observed;
+ const runner=anticipating?balloonDescentLead(a,s.player):s.player;
+ const groundCosts=usesBalloonExit(s.rules)&&anticipating;
+ const exitClear=spot=>!observed||balloonExitClear(spot,anticipating?runner:observed,a.radius);
+ const seesLanding=spot=>!usesCornerExit(s.rules)||!observed||!!balloonLandingObservation(s,{...a,...spot},s.player);
+ const landable=spot=>exitClear(spot)&&seesLanding(spot)&&(!anticipating||near(spot,runner)>=a.radius+s.player.radius+BALLOON_MIN_GAP);
+ const readyHere=here&&gap>=BALLOON_MIN_GAP&&landable(here)&&(!anticipating||near(here,runner)<=BALLOON_GAP+a.radius+s.player.radius+9);
+ const herePenalty=readyHere&&groundCosts?balloonExitPenalty(here,runner,a.radius):0;
+ if(readyHere&&herePenalty<6)return here;
  if(s.time>=(flight.landingCheckAt??0)){
   flight.landingCheckAt=s.time+.15;
   const enoughSpace=p=>near(p,s.player)-a.radius-s.player.radius>=BALLOON_MIN_GAP+1;
+  let best=null,bestScore=readyHere?near(here,runner)+herePenalty:Infinity;
   findSpot:for(const distance of [3,6,10,15,22,30])for(let i=0;i<8;i++){
    const angle=i*Math.PI/4,x=a.x+Math.sin(angle)*distance,z=a.z+Math.cos(angle)*distance;
    const spot={x,z,y:worldHeight(x,z)},above={x,z,y:a.y},padding=a.radius+.05;
    if(spot.y>a.y+.05||!enoughSpace(spot)||!worldValid(spot,padding)||!worldValid(above,padding)||
      !worldSight({...a,y:a.y+.15},{...above,y:a.y+.15},padding))continue;
+   if(!landable(spot))continue;
+   if(anticipating){
+    const cost=groundCosts?balloonExitPenalty(spot,runner,a.radius):0;
+    const score=near(spot,runner)+distance*(groundCosts?.53:.28)+cost;
+    if(score<bestScore){best=spot;bestScore=score;}
+    continue;
+   }
    flight.target=spot;
    flight.landingApproach=true;
    flight.landingAltitude=a.y;
    flight.routeAt=0;
    break findSpot;
   }
+  if(best){
+   flight.target=best;
+   flight.landingApproach=true;
+   flight.landingAltitude=a.y;
+   flight.routeAt=0;
+  }
   // The current column is still a real landing if the runner has moved
   // right under the balloon and the surroundings offer no wider exit.
-  if(!flight.landingApproach&&here)return here;
+  if(!flight.landingApproach&&here&&(gap<BALLOON_MIN_GAP||observed))return here;
  }
  return null;
 }
 function descendBalloon(s,a,dt,input){
  const before={y:a.y,grounded:a.grounded,jumps:a.jumps};
  const floor=trampolineSurface(s,a.x,a.z);
- // Commit horizontally and ease into a controlled vertical descent.
- if(s.rules===BALLOON_DESCENT_TURN_RULES)balloonDescentFacing(a,input,dt);
+ // Turn toward a visible runner independently of the committed descent.
+ if(usesBalloonPursuit(s.rules)&&a===controlledHuntActor(s)){
+  balloonLandingFacing(a,input,input.manualSteering?null:balloonLandingObservation(s,a,s.player),dt);
+ }else if(s.rules===BALLOON_DESCENT_TURN_RULES||usesRoleBalance(s.rules))balloonDescentFacing(a,input,dt);
  a.vx=a.vz=0;
+ if(usesBalloonGlide(s.rules)&&a===controlledHuntActor(s)){
+  const flight=a.flight,minimumGap=BALLOON_MIN_GAP+a.radius+s.player.radius;
+  if(flight.glide===undefined)flight.glide=balloonDescentGlide(s,a,s.player,minimumGap);
+  const target=flight.glide;
+  if(target&&!a.externalForce&&a.y>floor+2){
+   const dx=target.x-a.x,dz=target.z-a.z,distance=Math.hypot(dx,dz);
+   const speed=Math.min(distance/dt,34);
+   const vx=dx/(distance||1)*speed,vz=dz/(distance||1)*speed;
+   const now=near(a,s.player),next=near({x:a.x+vx*dt,z:a.z+vz*dt},s.player);
+   if(next>=minimumGap||next>now){a.vx=vx;a.vz=vz;}
+   else flight.glide=null;
+  }else if(target)flight.glide=null;
+ }
  if(!a.grounded||a.y>floor){
   a.grounded=false;
-  const speed=-clamp((a.y-floor)*2.8,7,16);
+  const humanLanding=usesLandingDive(s.rules)&&a===controlledHuntActor(s);
+  const speed=-clamp((a.y-floor)*2.8,7,humanLanding?20:16);
   a.vy+=clamp(speed-a.vy,-38*dt,38*dt)+BODY.gravity*dt;
   worldMove(a,{},dt);
   resolveTrampoline(s,a,before);
@@ -2050,8 +2825,11 @@ function descendBalloon(s,a,dt,input){
  if(a.grounded){
   emit(s,'balloon-land',a);
   a.flight=null;
-  a.recoverUntil=s.time+.65;
-  a.noTagUntil=a.recoverUntil;
+  if(usesBalloonExit(s.rules)&&a===controlledHuntActor(s))balloonTouchdownStride(a,input);
+  if(usesBalloonCorner(s.rules)&&a===controlledHuntActor(s))a.balloonCornerUntil=s.time+9;
+  a.noTagUntil=s.time+.65;
+  a.recoverUntil=a.noTagUntil;
+  if(!usesChaseRestore(s.rules)&&usesLandingDive(s.rules)&&s.config.mode==='escape')s.nextBalloonAt=s.time+9;
  }
  return true;
 }
@@ -2071,13 +2849,23 @@ function floatMove(s,a,dt,input={}){const f=a.flight;if(!f)return false;
   forced=t>=BALLOON_TRACK_LIMIT||f.nearSince!=null&&s.time-f.nearSince>=8;
  }
  const seconds=clamp((a.y-worldHeight(a.x,a.z))/16+.35,.35,1.6);
- const predictedGap=Math.hypot(a.x-s.player.x-s.player.vx*seconds,a.z-s.player.z-s.player.vz*seconds)-a.radius-s.player.radius;
+ const anticipate=close&&!f.landingRequested&&usesContinuousChase(s.rules)&&a===controlledHuntActor(s);
+ if(anticipate&&s.time>=(f.descentLeadAt??0)){
+  f.descentLeadAt=s.time+.10;
+  f.descentLead=balloonDescentLead(a,s.player);
+ }
+ const predictedGap=(anticipate?near(a,f.descentLead):
+  Math.hypot(a.x-s.player.x-s.player.vx*seconds,a.z-s.player.z-s.player.vz*seconds))-a.radius-s.player.radius;
  const ready=close&&predictedGap>=BALLOON_MIN_GAP&&predictedGap<BALLOON_GAP+12;
  if(ready)f.closeSince??=s.time;
  else f.closeSince=null;
  if(forced||!f.landingRequested&&t>1.2&&f.closeSince!=null&&s.time-f.closeSince>=.18){
   const spot=balloonLandingSpot(a);
-  if(spot){
+  const checkExit=usesLandingDive(s.rules)&&a===controlledHuntActor(s);
+  const observed=checkExit?balloonLandingObservation(s,a,s.player):null;
+  const groundView=!observed||!usesCornerExit(s.rules)||spot&&balloonLandingObservation(s,{...a,...spot},s.player);
+  const groundCost=spot&&observed&&usesBalloonExit(s.rules)?balloonExitPenalty(spot,f.descentLead??observed,a.radius):0;
+  if(spot&&groundView&&groundCost<6&&(!observed||balloonExitClear(spot,anticipate?f.descentLead:observed,a.radius))){
    f.target=spot;
    f.stage='descend';
    return descendBalloon(s,a,dt,input);
@@ -2139,7 +2927,17 @@ function hopControl(s,a,input){
  const distance=a.radius+1.5+Math.hypot(a.vx,a.vz)*.12,p={x:a.x+input.x/n*distance,z:a.z+input.z/n*distance},h=worldHeight(p.x,p.z)-a.y;
  if(h>.65&&h<HUNT_JUMP.launch**2/(2*HUNT_JUMP.gravity)*.85&&worldValid({...p,y:worldHeight(p.x,p.z)},a.radius+.1)){a.nextHop=s.time+1;return{...input,jump:true};}return input;
 }
-function airbornePursuit(s,hunter,runner,visible,route){
+const HUNTER_JUMP_REACTION_SECONDS=.1;
+const runnerJumpCount=runner=>!runner.grounded&&!runner.flight&&!runner.hook?runner.jumps:0;
+function sawRunnerJumpLongEnough(s,hunter,runner,visible){
+ if(s.rules!==JUMP_REACTION_RULES)return true;
+ const brain=hunter.brain;
+ const jump=visible?runnerJumpCount(runner):0;
+ if(!jump){brain.runnerJumpSeen=null;return true;}
+ if(brain.runnerJumpSeen?.count!==jump)brain.runnerJumpSeen={count:jump,at:s.time};
+ return s.time+1e-9>=brain.runnerJumpSeen.at+HUNTER_JUMP_REACTION_SECONDS;
+}
+function airbornePursuit(s,hunter,runner,visible,route,cornerAccess){
  const brain=hunter.brain;
  const gap=near(hunter,runner);
  if(!visible||gap>36){
@@ -2157,8 +2955,8 @@ function airbornePursuit(s,hunter,runner,visible,route){
   const padding=hunter.radius-.05;
   const current={x:runner.x,z:runner.z};
   const forward=(ahead.x-hunter.x)*(current.x-hunter.x)+(ahead.z-hunter.z)*(current.z-hunter.z);
-  const currentClear=worldTraversable(hunter,current,padding);
-  const goal=currentClear?(forward>0&&worldTraversable(hunter,ahead,padding)?ahead:current):null;
+  const currentClear=worldTraversable(hunter,current,padding)&&worldCornerPathAllowed(hunter,current,cornerAccess);
+  const goal=currentClear?(forward>0&&worldTraversable(hunter,ahead,padding)&&worldCornerPathAllowed(hunter,ahead,cornerAccess)?ahead:current):null;
   brain.airPursuit={goal,next:s.time+.1};
  }
  const goal=brain.airPursuit.goal;
@@ -2171,10 +2969,25 @@ function airbornePursuitAction(s,hunter,runner,control){
  // When the runner is vaulting directly towards the hunter, stay low.
  // Jumping in that lane too puts the hunter directly into the passing arc.
  const headOn=usesCornerReversal(s)&&gap>0&&runner.vx*dx+runner.vz*dz<=-8*gap;
- const jump=gap<=14&&!headOn&&rise>=2&&rise<=5.2&&!hunter.jumpHeld&&
+ const canJump=gap<=14&&!headOn&&!hunter.jumpHeld&&
    huntJumpRestRemaining(s,hunter)===0&&hunter.jumps<HUNT_JUMP.maxJumps&&
    (hunter.grounded||hunter.vy<=1);
- if(jump)return {...control,jump:true};
+ const jump=canJump&&rise>=2&&rise<=5.2;
+ const jumpCount=s.rules===JUMP_ONSET_DELAY_RULES?runnerJumpCount(runner):0;
+ if(jumpCount){
+  const brain=hunter.brain;
+  if(brain.pendingJump?.count!==jumpCount||!canJump||control.jump)brain.pendingJump=null;
+  if(canJump&&!control.jump){
+   // Add the delay where the previous AI would commit, even if the
+   // runner has already been in the air for longer than one tenth of a second.
+   if(jump&&!brain.pendingJump)brain.pendingJump={count:jumpCount,at:s.time+HUNTER_JUMP_REACTION_SECONDS};
+   if(brain.pendingJump){
+    if(s.time+1e-9<brain.pendingJump.at)return control;
+    brain.pendingJump=null;
+    return {...control,jump:true};
+   }
+  }
+ }else if(jump)return {...control,jump:true};
  if(control.jump||!hunter.grounded||s.time<(hunter.nextDiveAt??0)||
     s.time<(hunter.noTagUntil??0)||s.time<(runner.trampolineSafeUntil??0))return control;
  const speed=Math.hypot(hunter.vx,hunter.vz);
@@ -2218,13 +3031,17 @@ function huntStep(s,input={},dt=STEP){
  s.gadgets=s.gadgets.filter(g=>['clone','cushion','curtain','sheet','fan'].includes(g.kind));
  s.zipTouch=null;s.time=Math.min(s.duration,s.time+dt);for(const h of s.hunters){delete h.effects.ink;} s.pools=[];s.footprints=s.footprints.filter(p=>p.owner===s.player.owner&&p.until>s.time&&!(p.trampolineSupport&&s.trampoline.used));
  const diveCooldown=usesShorterRest(s)?HUNT_DIVE.cooldown:6;
- const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown,{aimFromFacing:usesDiveFacing(s.rules)});s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player);
- let runnerInput=input;if(s.config.mode==='hunt'&&!huntIsDizzy(s,s.player)){const runner=s.player,observations=s.hunters.filter(a=>canSee(s,runner,a,140)),seenOwners=new Set(observations.map(a=>a.owner));if(alive(s,runner,'radar')){if(s.time>=(runner.brain.radarAt??0)){runner.brain.radarAt=s.time+.75;runner.brain.radarContacts=radarObservations(s,runner);}observations.push(...(runner.brain.radarContacts??[]).filter(p=>!seenOwners.has(p.owner)));}const threat=observations.sort((a,b)=>near(a,runner)-near(b,runner))[0];runnerInput=runnerControl(s,observations);runnerInput=runnerHookControl(s,runnerInput,{poleVisible:p=>canSee(s,runner,{...p,y:p.y-3},132)});runnerInput=runnerSupplyControl(s,runnerInput,{usableOnly:usesRunnerSupply(s),itemVisible:p=>canSee(s,runner,{...p,y:p.y+(p.lift??0)},72)});const tactic=runnerItemTactic(s,runnerInput,{checkAllCushionThreats:usesRunnerCushion(s),checkFanExposure:usesRunnerFan(s)});if(tactic){runner.brain.nextToolAt=s.time+.35;const yaw=runner.yaw;runner.yaw=tactic.yaw;if(activateHuntItem(s)){runner.brain.nextToolAt=s.time+.8;if(['cloak','clone','curtain'].includes(tactic.item)){runner.brain.next=0;runner.brain.target=null;}}runner.yaw=yaw;}const padSafe=!s.trampoline.used&&near(runner,s.trampoline)<48&&safeTrampolineApproach(s);if(!padSafe)runner.brain.trampolineApproach=false;else runnerInput=trampolineEscapeControl(s,runner,runnerInput,!!threat);runnerInput=runnerPressureControl(s,runnerInput);runnerInput=cushionJumpControl(s,runner,runnerJumpControl(s,hopControl(s,runner,runnerInput)));}if(!moveHuntZip(s,s.player,dt))moveWithTrampoline(s,s.player,runnerInput,dt);afterMove(s,s.player);collectAndPaint(s,s.player);
- const teamPressure=usesTeamPressure(s);
- if(teamPressure)updateHuntTeamContact(s,s.hunters.filter(a=>!huntIsDizzy(s,a)&&!a.flight&&canSee(s,a,s.player,a.role==='patrol'?70:140)).map(a=>({owner:a.owner,point:{x:s.player.x,y:s.player.y,z:s.player.z,vx:s.player.vx,vz:s.player.vz}})));
+ const human=controlledHuntActor(s);if(huntIsDizzy(s,human))input={};input=huntJumpInput(s,human,input,{releaseRequired:true});if(input.use&&!s.useHeld)activateHuntItem(s,human.owner);s.useHeld=!!input.use;if(input.dive&&!s.diveHeld&&!input.jump)startHuntDive(s,human,diveCooldown,{aimFromFacing:usesDiveFacing(s.rules)});s.diveHeld=!!input.dive;itemForces(s,s.player,dt);tune(s,s.player,input.dash);
+ let runnerInput=input;if(s.config.mode==='hunt'&&!huntIsDizzy(s,s.player)){const runner=s.player,observations=s.hunters.filter(a=>usesBalloonPursuit(s.rules)?runnerThreatSight(s,runner,a):canSee(s,runner,a,140)),seenOwners=new Set(observations.map(a=>a.owner));if(alive(s,runner,'radar')){if(s.time>=(runner.brain.radarAt??0)){runner.brain.radarAt=s.time+.75;runner.brain.radarContacts=radarObservations(s,runner);}observations.push(...(runner.brain.radarContacts??[]).filter(p=>!seenOwners.has(p.owner)));}const threat=observations.sort((a,b)=>near(a,runner)-near(b,runner))[0];runnerInput=runnerControl(s,observations);runnerInput=runnerHookControl(s,runnerInput,{poleVisible:p=>canSee(s,runner,{...p,y:p.y-3},132)});runnerInput=runnerSupplyControl(s,runnerInput,{usableOnly:usesRunnerSupply(s),itemVisible:p=>canSee(s,runner,{...p,y:p.y+(p.lift??0)},72)});const tactic=runnerItemTactic(s,runnerInput,{checkAllCushionThreats:usesRunnerCushion(s),checkFanExposure:usesRunnerFan(s),proactive:!usesEscapeBalanceRestore(s.rules)&&usesRunnerTactics(s.rules)});if(tactic){runner.brain.nextToolAt=s.time+.35;const yaw=runner.yaw;runner.yaw=tactic.yaw;if(activateHuntItem(s)){runner.brain.nextToolAt=s.time+.8;if(['cloak','clone','curtain'].includes(tactic.item)){runner.brain.next=0;runner.brain.target=null;}}runner.yaw=yaw;}const padSafe=!s.trampoline.used&&near(runner,s.trampoline)<48&&safeTrampolineApproach(s);if(!padSafe)runner.brain.trampolineApproach=false;else runnerInput=trampolineEscapeControl(s,runner,runnerInput,!!threat);runnerInput=runnerPressureControl(s,runnerInput);runnerInput=cushionJumpControl(s,runner,runnerJumpControl(s,hopControl(s,runner,runnerInput)));}if(!moveHuntZip(s,s.player,dt))moveWithTrampoline(s,s.player,runnerInput,dt);afterMove(s,s.player);collectAndPaint(s,s.player);
+ const teamPressure=usesTeamPressure(s),rhythm=usesEscapeOpeningDelay(s)?escapeChaseRhythm(s.time):null;
+ if(teamPressure&&(!rhythm||rhythm.share))updateHuntTeamContact(s,s.hunters.filter(a=>!huntIsDizzy(s,a)&&!a.flight&&canSee(s,a,s.player,a.role==='patrol'?70:140)).map(a=>({owner:a.owner,point:{x:s.player.x,y:s.player.y,z:s.player.z,vx:s.player.vx,vz:s.player.vz}})));
+ const changedPursuit=usesHunterPursuit(s.rules),directLedges=usesDirectDrop(s.rules);
+ const dashBoost=huntHunterDashBoost(s.rules,s.time);
  const coverage=usesCornerSearch(s)&&(usesTerritorySearch(s)||s.time>=45)?(s.cornerSearch??={visited:0}):null;
  for(const a of s.hunters){
+  if(changedPursuit)a.dashScale=(a.dashSpeedFactor??1)*(1+dashBoost/100);
   itemForces(s,a,dt);tune(s,a);if(huntIsDizzy(s,a)){moveWithTrampoline(s,a,{},dt);afterMove(s,a);continue;}const actualVisible=canSee(s,a,s.player,a.role==='patrol'?70:140),decoy=!actualVisible?s.gadgets.find(g=>g.kind==='clone'&&canSee(s,a,g,a.role==='patrol'?70:140)):null;
+  if(a.brain.pendingJump&&(!actualVisible||!runnerJumpCount(s.player)))a.brain.pendingJump=null;
   a.brain.suppressSight=!actualVisible&&!decoy;footprintAwareness(s,a);
   if(a!==human&&!actualVisible&&!decoy&&alive(s,a,'radar')&&s.time>=(a.brain.radarAt??0)){a.brain.radarAt=s.time+.75;const p=radarObservations(s,a).sort((x,y)=>near(a,x)-near(a,y)||x.x-y.x)[0];if(p){a.brain.seen={x:p.x,z:p.z,y:worldHeight(p.x,p.z),vx:0,vz:0};a.brain.seenAt=s.time;a.brain.next=0;a.brain.searchPlan=null;}}
 
@@ -2237,32 +3054,71 @@ function huntStep(s,input={},dt=STEP){
   const cloakReaction=cloakDisappearanceMovement(a,s.time,actualVisible);
   if(cloakReaction){
    if(usesBalloonDropPursuit(s.rules))a.brain.dropPursuit=null;
+   if(changedPursuit)a.brain.dropSighting=null;
    if(!a.dive||!moveHuntDive(s,a,cloakReaction,dt))moveWithTrampoline(s,a,cloakReaction,dt);
    afterMove(s,a);collectAndPaint(s,a);continue;
   }
   if(teamPressure){if(!actualVisible&&!decoy)receiveHuntTeamContact(a,s.teamContact,s.time);if(actualVisible)a.brain.next=Math.min(a.brain.next,s.time+.22);}
-  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:usesTerritorySearch(s)});
+   const updatedRoutes=usesRaisedApproaches(s.rules);
+   const sighting=actualVisible?s.player:a.brain.seenAt>s.time-(updatedRoutes?9:4)?a.brain.seen:null;
+  const cornerAccess=changedPursuit?sighting?worldCornerIndex(sighting):-1:undefined;
+  if(changedPursuit&&a.brain.cornerAccess!==cornerAccess){
+   a.brain.cornerAccess=cornerAccess;
+   a.brain.next=s.time;
+   a.brain.searchPlan=null;
+   a.brain.closeChase=null;
+   a.brain.airPursuit=null;
+  }
+   const activePatrol=updatedRoutes&&(huntRimDepth(a)<52||!!a.brain.freshSweep||s.config.mode==='escape'&&a.role==='patrol');
+  huntSweepControl(a,{time:s.time,seed:s.config.seed,visible:actualVisible||!!decoy,coverage,team:s.hunters,refresh:usesTerritorySearch(s),groundOnly:changedPursuit,activePatrol});
   const target=decoy??s.player;
-  const drop=usesBalloonDropPursuit(s.rules)?huntDropPursuit(s,a,s.player,actualVisible,{cancel:!!decoy||huntOpticalHidden(s,a,s.player)}):null;
+  const drop=usesBalloonDropPursuit(s.rules)?huntDropPursuit(s,a,s.player,actualVisible,{cancel:!!decoy||huntOpticalHidden(s,a,s.player),followLedges:usesLedgePursuit(s.rules),rememberLedges:changedPursuit,teamContact:s.teamContact,directLedges}):null;
   if(drop){
    // No ground-route or uphill hop until the committed fall finishes.
-   moveWithTrampoline(s,a,cushionJumpControl(s,a,drop),dt);
+   moveWithTrampoline(s,a,directLedges?drop:cushionJumpControl(s,a,drop),dt);
    afterMove(s,a);collectAndPaint(s,a);continue;
   }
-  const route=worldPilot(a,target,true,s.time,a.brain,usesContactApproach(s));
-  const pressure=s.rules!==PREVIOUS_HUNT_RULES?airbornePursuit(s,a,s.player,actualVisible,route):null;
+   const route=worldPilot(a,target,true,s.time,a.brain,usesContactApproach(s),cornerAccess,updatedRoutes,usesStableRamps(s.rules),usesInterceptLead(s.rules));
+   const rimRecovery=updatedRoutes&&!a.brain.raisedApproach?huntRimRecovery(a,s.time,cornerAccess,actualVisible||!!decoy):null;
+   if(a.brain.raisedApproach)a.brain.rimProgress=null;
+   if(rimRecovery){
+    if(s.time<(a.recoverUntil??0))rimRecovery.dash=false;
+    moveWithTrampoline(s,a,rimRecovery,dt);
+    afterMove(s,a);collectAndPaint(s,a);continue;
+   }
+  const jumpReactionReady=sawRunnerJumpLongEnough(s,a,s.player,actualVisible);
+  const pressure=s.rules!==PREVIOUS_HUNT_RULES?airbornePursuit(s,a,s.player,actualVisible&&jumpReactionReady,route,cornerAccess):null;
   if(pressure)a.brain.supply=null;
-  const closeChase=teamPressure?observedHuntChase(a,actualVisible?s.player:null,s.time,a.brain):null;
+  const closeChase=teamPressure&&(!rhythm||rhythm.closeAll||a.role==='pursuit')?observedHuntChase(a,actualVisible?s.player:null,s.time,a.brain,cornerAccess):null;
   const joining=teamPressure&&!actualVisible&&s.teamContact&&s.time-s.teamContact.at<4;
-  if(teamPressure&&(actualVisible||joining))a.brain.supply=null;
-  const control=pressure??closeChase??(teamPressure&&(actualVisible||joining)?route:huntSupplySteering(s,a,route,{playerVisible:actualVisible,itemVisible:p=>canSee(s,a,p,24)}));
+   const committedRoute=a.brain.raisedApproach||teamPressure&&(actualVisible||joining);
+   if(committedRoute)a.brain.supply=null;
+   const control=pressure??(a.brain.interceptShortcut&&actualVisible&&near(a,s.player)>=14?route:closeChase)??(committedRoute?route:huntSupplySteering(s,a,route,{playerVisible:actualVisible,cornerSupplies:changedPursuit&&!actualVisible,itemVisible:p=>canSee(s,a,{...p,y:p.y+(changedPursuit?p.lift??0:0)},24)}));
   if(s.time>(a.nextItemAt??2)&&huntItemOpportunity(s,a,{playerVisible:actualVisible})){a.nextItemAt=s.time+.35;if(activateHuntItem(s,a.owner))a.nextItemAt=s.time+12;}
   if(a.flight){floatMove(s,a,dt);afterMove(s,a);continue;}
   if(s.time<(a.recoverUntil??0))control.dash=false;
   let movement=hopControl(s,a,control);
-  if(pressure&&a.brain.airPursuit.goal||teamPressure&&actualVisible)movement=airbornePursuitAction(s,a,s.player,movement);
+  if(jumpReactionReady&&(pressure&&a.brain.airPursuit.goal||teamPressure&&actualVisible))movement=airbornePursuitAction(s,a,s.player,movement);
   movement=cushionJumpControl(s,a,movement);
-  if(movement.dive&&!movement.jump)startHuntDive(s,a,diveCooldown);
+  if(changedPursuit&&!a.brain.supply){
+   const distance=a.radius+1.5+Math.hypot(a.vx,a.vz)*.12;
+   const length=Math.hypot(movement.x??0,movement.z??0)||1;
+   const next={x:a.x+(movement.x??0)*distance/length,z:a.z+(movement.z??0)*distance/length};
+   if(!worldCornerPathAllowed(a,next,cornerAccess))movement={...movement,x:0,z:0,jump:false,dive:false};
+  }
+  if(movement.dive&&!movement.jump){
+   const coordinated=!usesEscapeBalanceRestore(s.rules)&&usesRoleBalance(s.rules)&&s.config.mode==='escape';
+   const hasDiveOpening=!usesLandingDive(s.rules)||!coordinated||readableEscapeDive(s.player,a,s.time,{movingOpening:usesContinuousChase(s.rules)});
+   if(hasDiveOpening&&(!coordinated||actualVisible&&s.time>=(s.nextTeamDiveAt??0))){
+    const readable=coordinated&&usesFairChase(s.rules);
+    const extendedWindup=readable&&!usesChaseRestore(s.rules);
+    const prepare=usesContinuousChase(s.rules)?.90:usesLandingDive(s.rules)?.74:.52;
+    if(startHuntDive(s,a,diveCooldown,extendedWindup?{prepare}:{})&&coordinated){
+     s.nextTeamDiveAt=s.time+(readable&&!usesCpuChaseRestore(s.rules)?6:3.5);
+     if(extendedWindup)emit(s,'dive-windup',a);
+    }
+   }
+  }
   if(!a.dive||!moveHuntDive(s,a,movement,dt))moveWithTrampoline(s,a,movement,dt);
   afterMove(s,a);collectAndPaint(s,a);
  }
@@ -2275,10 +3131,10 @@ function huntStep(s,input={},dt=STEP){
 function huntThreatCues(s){return s.hunters.filter(a=>canSee(s,s.player,a,52)).map(a=>({owner:a.owner,role:a.role,x:a.x,y:a.y+3,z:a.z,preparing:!!a.pendingItem||a.flight?.stage==='prepare'}));}
 // Display data is read-only and includes an always-visual counterpart to sounds.
 function huntPresentation(s){const view=a=>({owner:a.owner,character:a.id,role:a.role,x:a.x,y:a.y,z:a.z,yaw:a.yaw,item:a.item,grounded:a.grounded,jumps:a.jumps,vy:a.vy,cloaked:alive(s,a,'cloak'),speedUp:alive(s,a,'speed'),flight:a.flight?structuredClone(a.flight):null});return{time:s.time,phase:s.phase,player:view(s.player),hunters:s.hunters.map(view),events:s.events.map(e=>structuredClone(e)),pools:s.pools.map(p=>({...p})),footprints:s.footprints.map(f=>({...f}))};}
-function recordHunt(config,{rules=HUNT_RULES}={}){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config,{rules}),frames=[];return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
-function verifyHunt(proof){if(![BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config,{rules:proof.rules});let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>15)throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
+function recordHunt(config,{rules=HUNT_RULES}={}){if(![FASTEST_DASH_CAP_RULES,PERIMETER_ROUTE_RULES,INTERCEPT_LEAD_RULES,JUMP_REACTION_RULES,JUMP_ONSET_DELAY_RULES,DIRECT_DROP_RULES,HUNTER_DASH_RULES,HUNTER_PURSUIT_RULES,ESCAPE_BALANCE_RESTORE_RULES,LEDGE_PURSUIT_RULES,CPU_CHASE_RESTORE_RULES,CHASE_RESTORE_RULES,ESCAPE_DASH_RULES,ESCAPE_TURN_RULES,BALLOON_CORNER_RULES,BALLOON_GLIDE_RULES,BALLOON_EXIT_RULES,TRAINING_LEDGE_RULES,CORNER_EXIT_RULES,CONTINUOUS_CHASE_RULES,LANDING_DIVE_RULES,BALLOON_PURSUIT_RULES,CORNER_CHASE_RULES,FAIR_CHASE_RULES,OPENING_PICKUP_RULES,RUNNER_TACTICS_RULES,ROLE_BALANCE_RULES,BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES].includes(rules))throw Error('INVALID_HUNT_RULES');const s=createHunt(config,{rules}),frames=[];return{state:s,tick(input={}){if(s.phase==='finished')return s;if(frames.length>=TRACE_CAPACITY)throw Error('TRACE_FULL');const x=input.x??0,z=input.z??0;if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>1||Math.abs(z)>1)throw Error('INVALID_INPUT');frames.push([x,z,(input.jump?1:0)|(input.dash?2:0)|(input.use?4:0)|(input.dive?8:0)|(usesBalloonPursuit(rules)&&input.manualSteering?16:0)]);return huntStep(s,input);},proof(){if(s.phase!=='finished')throw Error('ROUND_UNFINISHED');return{rules,config:structuredClone(s.config),frames:frames.map(f=>[...f]),claim:{...s.result}};}};}
+function verifyHunt(proof){if(![FASTEST_DASH_CAP_RULES,PERIMETER_ROUTE_RULES,INTERCEPT_LEAD_RULES,JUMP_REACTION_RULES,JUMP_ONSET_DELAY_RULES,DIRECT_DROP_RULES,HUNTER_DASH_RULES,HUNTER_PURSUIT_RULES,ESCAPE_BALANCE_RESTORE_RULES,LEDGE_PURSUIT_RULES,CPU_CHASE_RESTORE_RULES,CHASE_RESTORE_RULES,ESCAPE_DASH_RULES,ESCAPE_TURN_RULES,BALLOON_CORNER_RULES,BALLOON_GLIDE_RULES,BALLOON_EXIT_RULES,TRAINING_LEDGE_RULES,CORNER_EXIT_RULES,CONTINUOUS_CHASE_RULES,LANDING_DIVE_RULES,BALLOON_PURSUIT_RULES,CORNER_CHASE_RULES,FAIR_CHASE_RULES,OPENING_PICKUP_RULES,RUNNER_TACTICS_RULES,ROLE_BALANCE_RULES,BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,BALLOON_AIR_APPROACH_RULES,BALLOON_FAN_DESCENT_RULES,RENDERED_CONTACT_RULES,JUMP_REST_CONTINUITY_RULES,CLOAK_INK_RULES,TEAM_PRESSURE_RULES,STABLE_BALLOON_RULES,TERRITORY_SEARCH_RULES,JUMP_RECOVERY_RULES,COURTYARD_TEAM_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_WIND_RULES,RUNNER_FAN_RULES,RUNNER_CUSHION_RULES,RUNNER_SUPPLY_RULES,CORNER_SEARCH_RULES,CONTACT_APPROACH_RULES,HUNT_RULES,SHORTER_REST_RULES,AIR_PURSUIT_RULES,PREVIOUS_HUNT_RULES].includes(proof?.rules)||proof?.config?.startKey!=='random'||!Array.isArray(proof.frames)||proof.frames.length>TRACE_CAPACITY)throw Error('INVALID_PROOF');const s=createHunt(proof.config,{rules:proof.rules});let movingTicks=0;for(const f of proof.frames){if(s.phase==='finished'||!Array.isArray(f)||f.length!==3||!Number.isFinite(f[0])||!Number.isFinite(f[1])||Math.abs(f[0])>1||Math.abs(f[1])>1||!Number.isInteger(f[2])||f[2]<0||f[2]>(usesBalloonPursuit(s.rules)?31:15))throw Error('INVALID_TRACE');const actor=controlledHuntActor(s),x=actor.x,z=actor.z,playing=s.phase==='playing';huntStep(s,{x:f[0],z:f[1],jump:!!(f[2]&1),dash:!!(f[2]&2),use:!!(f[2]&4),dive:!!(f[2]&8),manualSteering:!!(f[2]&16)});if(playing&&Math.hypot(f[0],f[1])>.15&&Math.hypot(actor.x-x,actor.z-z)>.005)movingTicks++;}if(s.phase!=='finished'||JSON.stringify(s.result)!==JSON.stringify(proof.claim))throw Error('RESULT_MISMATCH');return{rules:s.rules,...s.result,participation:{version:1,movingTicks}};}
 
-return {BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,CLOAK_INK_RULES,JUMP_REST_CONTINUITY_RULES,RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES,STABLE_BALLOON_RULES,TEAM_PRESSURE_RULES,HUNTER_COUNT,HUNTER_ROLES,createHunt,controlledHuntActor,activateHuntItem,huntItemOpportunity,huntStep,huntThreatCues,huntPresentation,recordHunt,verifyHunt};
+return {FASTEST_DASH_CAP_RULES,PERIMETER_ROUTE_RULES,INTERCEPT_LEAD_RULES,JUMP_REACTION_RULES,JUMP_ONSET_DELAY_RULES,DIRECT_DROP_RULES,HUNTER_DASH_RULES,HUNTER_PURSUIT_RULES,ESCAPE_BALANCE_RESTORE_RULES,LEDGE_PURSUIT_RULES,CPU_CHASE_RESTORE_RULES,CHASE_RESTORE_RULES,ESCAPE_DASH_RULES,ESCAPE_TURN_RULES,BALLOON_CORNER_RULES,BALLOON_GLIDE_RULES,BALLOON_EXIT_RULES,TRAINING_LEDGE_RULES,CORNER_EXIT_RULES,CONTINUOUS_CHASE_RULES,LANDING_DIVE_RULES,BALLOON_PURSUIT_RULES,CORNER_CHASE_RULES,FAIR_CHASE_RULES,OPENING_PICKUP_RULES,RUNNER_TACTICS_RULES,ROLE_BALANCE_RULES,BALLOON_DESCENT_TURN_RULES,TRAINING_STEP_RULES,EXTRA_BALLOONS_RULES,BALLOON_DROP_PURSUIT_RULES,OPENING_SUPPLY_RULES,DIVE_FACING_RULES,CLOAK_WITNESS_RULES,CLOAK_INK_RULES,JUMP_REST_CONTINUITY_RULES,RENDERED_CONTACT_RULES,BALLOON_FAN_DESCENT_RULES,BALLOON_AIR_APPROACH_RULES,STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HUNT_RULES,CONTACT_APPROACH_RULES,CORNER_SEARCH_RULES,RUNNER_SUPPLY_RULES,RUNNER_CUSHION_RULES,RUNNER_FAN_RULES,COURTYARD_WIND_RULES,COURTYARD_REACQUIRE_RULES,COURTYARD_TEAM_RULES,JUMP_RECOVERY_RULES,TERRITORY_SEARCH_RULES,STABLE_BALLOON_RULES,TEAM_PRESSURE_RULES,HUNTER_COUNT,HUNTER_ROLES,createHunt,controlledHuntActor,huntBalloonCornerSteering,huntEscapeTurnRate,activateHuntItem,huntItemOpportunity,huntStep,huntThreatCues,huntPresentation,recordHunt,verifyHunt};
 })();
 import*as __v3TagExternal0 from "./imasora-sliding-tag-model.mjs";
 import*as __v3TagExternal1 from "./imasora-construction-locomotion.mjs";
@@ -60978,4 +61834,4 @@ return {STEP,HUNT_JUMP,ITEM_TYPES,PLAYER_ITEMS,HUNTER_ITEMS,HUNT_RULES,HUNTER_CO
 return __tagModule0.verifyHunt;})();return __v60Verifier(data); }
 
 import{verifyRound as __legacyVerify}from'./imasora-sliding-tag-proof.mjs?v=120rk';
-self.onmessage=({data})=>{try{const receipt=(data?.rules===__tagModule0.BALLOON_DESCENT_TURN_RULES||data?.rules===__tagModule0.TRAINING_STEP_RULES||data?.rules===__tagModule0.EXTRA_BALLOONS_RULES||data?.rules===__tagModule0.BALLOON_DROP_PURSUIT_RULES||data?.rules===__tagModule0.OPENING_SUPPLY_RULES||data?.rules===__tagModule0.DIVE_FACING_RULES||data?.rules===__tagModule0.CLOAK_WITNESS_RULES||data?.rules===__tagModule0.BALLOON_AIR_APPROACH_RULES||data?.rules===__tagModule0.BALLOON_FAN_DESCENT_RULES||data?.rules===__tagModule0.RENDERED_CONTACT_RULES||data?.rules===__tagModule0.JUMP_REST_CONTINUITY_RULES||data?.rules===__tagModule0.CLOAK_INK_RULES||data?.rules===__tagModule0.TEAM_PRESSURE_RULES||data?.rules===__tagModule0.STABLE_BALLOON_RULES||data?.rules===__tagModule0.TERRITORY_SEARCH_RULES||data?.rules===__tagModule0.JUMP_RECOVERY_RULES||data?.rules===__tagModule0.COURTYARD_TEAM_RULES||data?.rules===__tagModule0.COURTYARD_REACQUIRE_RULES||data?.rules===__tagModule0.COURTYARD_WIND_RULES||data?.rules===__tagModule0.RUNNER_FAN_RULES||data?.rules===__tagModule0.RUNNER_CUSHION_RULES||data?.rules===__tagModule0.RUNNER_SUPPLY_RULES||data?.rules===__tagModule0.CORNER_SEARCH_RULES||data?.rules===__tagModule0.CONTACT_APPROACH_RULES||data?.rules===__tagModule0.HUNT_RULES||data?.rules==='tag-shorter-rest-v63'||data?.rules==='tag-air-pursuit-v62'||data?.rules==='tag-rear-mirror-v61')?__tagModule0.verifyHunt(data):data?.rules==='tag-balloon-committed-landing-v60'?__verifyV60(data):data?.rules==='tag-dive-head-contact-v59'?__verifyV59(data):data?.rules==='tag-balloon-dive-spacing-v58'?__verifyV58(data):data?.rules==='tag-cushion-dizzy-v57'?__verifyV57(data):data?.rules==='tag-dash-speed-v56'?__verifyV56(data):data?.rules==='tag-jump-access-v55'?__verifyV55(data):data?.rules==='tag-pole-descent-v54'?__verifyV54(data):data?.rules==='tag-balloon-detour-v53'?__verifyV53(data):data?.rules==='tag-trampoline-landing-v52'?__verifyV52(data):data?.rules==='tag-corner-stairs-v51'?__verifyV51(data):data?.rules==='tag-jump-rest-v50'?__verifyV50(data):data?.rules==='tag-boundary-escape-v49'?__verifyV49(data):data?.rules==='tag-search-coverage-v48'?__verifyV48(data):data?.rules==='tag-start-facing-v47'?__verifyV47(data):data?.rules==='tag-sheet-steering-v46'?__verifyV46(data):data?.rules==='tag-cushion-jump-v45'?__verifyV45(data):data?.rules==='tag-wind-budget-v44'?__verifyV44(data):data?.rules==='tag-visible-wind-v43'?__verifyV43(data):data?.rules==='tag-observed-counter-v42'?__verifyV42(data):data?.rules==='tag-balloon-spacing-v41'?__verifyV41(data):data?.rules==='tag-clear-sight-v40'?__verifyV40(data):data?.rules==='tag-field-fan-v39'?__verifyV39(data):data?.rules==='tag-rear-cushion-v38'?__verifyV38(data):data?.rules==='tag-random-starts-v37'?__verifyV37(data):data?.rules==='tag-no-gloves-v36'?__verifyV36(data):data?.rules==='tag-direct-ink-v35'?__verifyV35(data):data?.rules==='tag-body-touch-v34'?__verifyV34(data):data?.rules==='tag-zip-recoil-v33'?__verifyV33(data):data?.rules==='tag-wall-facing-v32'?__verifyV32(data):data?.rules==='tag-homing-balloon-v31'?__verifyV31(data):data?.rules==='tag-180-seconds-v30'?__verifyV30(data):data?.rules==='tag-item-targets-v29'?__verifyV29(data):data?.rules==='tag-radar-item-v28'?__verifyV28(data):data?.rules==='tag-runner-ink-v27'?__verifyV27(data):data?.rules==='tag-jump-pickups-v26'?__verifyV26(data):data?.rules==='tag-supply-corridor-v25'?__verifyV25(data):data?.rules==='tag-hunter-supply-v24'?__verifyV24(data):data?.rules==='tag-hunter-guard-v23'?__verifyV23(data):data?.rules==='tag-supply-risk-v22'?__verifyV22(data):data?.rules==='tag-magnet-escape-v21'?__verifyV21(data):data?.rules==='tag-hook-escape-v20'?__verifyV20(data):data?.rules==='tag-item-placement-v19'?__verifyV19(data):data?.rules==='tag-dive-120-v18'?__verifyV18(data):data?.rules==='tag-empty-start-balloon-v17'?__verifyV17(data):data?.rules==='tag-trampoline-flight-v16'?__verifyV16(data):data?.rules==='tag-decoy-bodies-v15'?__verifyV15(data):data?.rules==='tag-role-pickups-v14'?__verifyV14(data):data?.rules==='tag-skilled-evader-v13'?__verifyV13(data):data?.rules==='tag-compass-evader-v12'?__verifyV12(data):data?.rules==='tag-grounded-run-v11'?__verifyV11(data):data?.rules==='tag-solid-trampoline-v10'?__verifyV10(data):data?.rules==='tag-trampoline-v9'?__verifyV9(data):data?.rules==='tag-world-risk-v8'?__verifyV8(data):data?.rules==='tag-item-contact-v7'?__verifyV7(data):data?.rules==='tag-search-team-v6'?__verifyV6(data):data?.rules==='tag-route-supplies-v5'?__verifyV5(data):data?.rules==='tag-role-balance-v4'?__verifyV4(data):data?.rules==='tag-three-items-v3'?__verifyV3(data):__legacyVerify(data);self.postMessage({id:data?.id,ok:true,receipt});}catch{self.postMessage({id:data?.id,ok:false});}};
+self.onmessage=({data})=>{try{const receipt=(data?.rules===__tagModule0.JUMP_ONSET_DELAY_RULES||data?.rules===__tagModule0.JUMP_REACTION_RULES||data?.rules===__tagModule0.INTERCEPT_LEAD_RULES||data?.rules===__tagModule0.PERIMETER_ROUTE_RULES||data?.rules===__tagModule0.FASTEST_DASH_CAP_RULES||data?.rules===__tagModule0.DIRECT_DROP_RULES||data?.rules===__tagModule0.HUNTER_DASH_RULES||data?.rules===__tagModule0.HUNTER_PURSUIT_RULES||data?.rules===__tagModule0.ESCAPE_BALANCE_RESTORE_RULES||data?.rules===__tagModule0.LEDGE_PURSUIT_RULES||data?.rules===__tagModule0.CPU_CHASE_RESTORE_RULES||data?.rules===__tagModule0.CHASE_RESTORE_RULES||data?.rules===__tagModule0.ESCAPE_DASH_RULES||data?.rules===__tagModule0.ESCAPE_TURN_RULES||data?.rules===__tagModule0.BALLOON_CORNER_RULES||data?.rules===__tagModule0.BALLOON_GLIDE_RULES||data?.rules===__tagModule0.BALLOON_EXIT_RULES||data?.rules===__tagModule0.TRAINING_LEDGE_RULES||data?.rules===__tagModule0.CORNER_EXIT_RULES||data?.rules===__tagModule0.CONTINUOUS_CHASE_RULES||data?.rules===__tagModule0.LANDING_DIVE_RULES||data?.rules===__tagModule0.BALLOON_PURSUIT_RULES||data?.rules===__tagModule0.CORNER_CHASE_RULES||data?.rules===__tagModule0.FAIR_CHASE_RULES||data?.rules===__tagModule0.OPENING_PICKUP_RULES||data?.rules===__tagModule0.RUNNER_TACTICS_RULES||data?.rules===__tagModule0.ROLE_BALANCE_RULES||data?.rules===__tagModule0.BALLOON_DESCENT_TURN_RULES||data?.rules===__tagModule0.TRAINING_STEP_RULES||data?.rules===__tagModule0.EXTRA_BALLOONS_RULES||data?.rules===__tagModule0.BALLOON_DROP_PURSUIT_RULES||data?.rules===__tagModule0.OPENING_SUPPLY_RULES||data?.rules===__tagModule0.DIVE_FACING_RULES||data?.rules===__tagModule0.CLOAK_WITNESS_RULES||data?.rules===__tagModule0.BALLOON_AIR_APPROACH_RULES||data?.rules===__tagModule0.BALLOON_FAN_DESCENT_RULES||data?.rules===__tagModule0.RENDERED_CONTACT_RULES||data?.rules===__tagModule0.JUMP_REST_CONTINUITY_RULES||data?.rules===__tagModule0.CLOAK_INK_RULES||data?.rules===__tagModule0.TEAM_PRESSURE_RULES||data?.rules===__tagModule0.STABLE_BALLOON_RULES||data?.rules===__tagModule0.TERRITORY_SEARCH_RULES||data?.rules===__tagModule0.JUMP_RECOVERY_RULES||data?.rules===__tagModule0.COURTYARD_TEAM_RULES||data?.rules===__tagModule0.COURTYARD_REACQUIRE_RULES||data?.rules===__tagModule0.COURTYARD_WIND_RULES||data?.rules===__tagModule0.RUNNER_FAN_RULES||data?.rules===__tagModule0.RUNNER_CUSHION_RULES||data?.rules===__tagModule0.RUNNER_SUPPLY_RULES||data?.rules===__tagModule0.CORNER_SEARCH_RULES||data?.rules===__tagModule0.CONTACT_APPROACH_RULES||data?.rules===__tagModule0.HUNT_RULES||data?.rules==='tag-shorter-rest-v63'||data?.rules==='tag-air-pursuit-v62'||data?.rules==='tag-rear-mirror-v61')?__tagModule0.verifyHunt(data):data?.rules==='tag-balloon-committed-landing-v60'?__verifyV60(data):data?.rules==='tag-dive-head-contact-v59'?__verifyV59(data):data?.rules==='tag-balloon-dive-spacing-v58'?__verifyV58(data):data?.rules==='tag-cushion-dizzy-v57'?__verifyV57(data):data?.rules==='tag-dash-speed-v56'?__verifyV56(data):data?.rules==='tag-jump-access-v55'?__verifyV55(data):data?.rules==='tag-pole-descent-v54'?__verifyV54(data):data?.rules==='tag-balloon-detour-v53'?__verifyV53(data):data?.rules==='tag-trampoline-landing-v52'?__verifyV52(data):data?.rules==='tag-corner-stairs-v51'?__verifyV51(data):data?.rules==='tag-jump-rest-v50'?__verifyV50(data):data?.rules==='tag-boundary-escape-v49'?__verifyV49(data):data?.rules==='tag-search-coverage-v48'?__verifyV48(data):data?.rules==='tag-start-facing-v47'?__verifyV47(data):data?.rules==='tag-sheet-steering-v46'?__verifyV46(data):data?.rules==='tag-cushion-jump-v45'?__verifyV45(data):data?.rules==='tag-wind-budget-v44'?__verifyV44(data):data?.rules==='tag-visible-wind-v43'?__verifyV43(data):data?.rules==='tag-observed-counter-v42'?__verifyV42(data):data?.rules==='tag-balloon-spacing-v41'?__verifyV41(data):data?.rules==='tag-clear-sight-v40'?__verifyV40(data):data?.rules==='tag-field-fan-v39'?__verifyV39(data):data?.rules==='tag-rear-cushion-v38'?__verifyV38(data):data?.rules==='tag-random-starts-v37'?__verifyV37(data):data?.rules==='tag-no-gloves-v36'?__verifyV36(data):data?.rules==='tag-direct-ink-v35'?__verifyV35(data):data?.rules==='tag-body-touch-v34'?__verifyV34(data):data?.rules==='tag-zip-recoil-v33'?__verifyV33(data):data?.rules==='tag-wall-facing-v32'?__verifyV32(data):data?.rules==='tag-homing-balloon-v31'?__verifyV31(data):data?.rules==='tag-180-seconds-v30'?__verifyV30(data):data?.rules==='tag-item-targets-v29'?__verifyV29(data):data?.rules==='tag-radar-item-v28'?__verifyV28(data):data?.rules==='tag-runner-ink-v27'?__verifyV27(data):data?.rules==='tag-jump-pickups-v26'?__verifyV26(data):data?.rules==='tag-supply-corridor-v25'?__verifyV25(data):data?.rules==='tag-hunter-supply-v24'?__verifyV24(data):data?.rules==='tag-hunter-guard-v23'?__verifyV23(data):data?.rules==='tag-supply-risk-v22'?__verifyV22(data):data?.rules==='tag-magnet-escape-v21'?__verifyV21(data):data?.rules==='tag-hook-escape-v20'?__verifyV20(data):data?.rules==='tag-item-placement-v19'?__verifyV19(data):data?.rules==='tag-dive-120-v18'?__verifyV18(data):data?.rules==='tag-empty-start-balloon-v17'?__verifyV17(data):data?.rules==='tag-trampoline-flight-v16'?__verifyV16(data):data?.rules==='tag-decoy-bodies-v15'?__verifyV15(data):data?.rules==='tag-role-pickups-v14'?__verifyV14(data):data?.rules==='tag-skilled-evader-v13'?__verifyV13(data):data?.rules==='tag-compass-evader-v12'?__verifyV12(data):data?.rules==='tag-grounded-run-v11'?__verifyV11(data):data?.rules==='tag-solid-trampoline-v10'?__verifyV10(data):data?.rules==='tag-trampoline-v9'?__verifyV9(data):data?.rules==='tag-world-risk-v8'?__verifyV8(data):data?.rules==='tag-item-contact-v7'?__verifyV7(data):data?.rules==='tag-search-team-v6'?__verifyV6(data):data?.rules==='tag-route-supplies-v5'?__verifyV5(data):data?.rules==='tag-role-balance-v4'?__verifyV4(data):data?.rules==='tag-three-items-v3'?__verifyV3(data):__legacyVerify(data);self.postMessage({id:data?.id,ok:true,receipt});}catch{self.postMessage({id:data?.id,ok:false});}};

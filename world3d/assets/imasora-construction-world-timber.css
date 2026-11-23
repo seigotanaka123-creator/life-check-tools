@@ -104,6 +104,9 @@
 #viewport>.wt-console .wc-lift i{width:46px;height:24px;margin:-12px 0 0 -23px;border-radius:12px}
 #viewport>.wt-console .wc-task{display:grid;justify-items:center;gap:5px;text-align:center;min-width:0}
 #viewport>.wt-console .wc-note{font-size:14px;font-weight:700;line-height:1.35;margin:0;min-height:0;color:#36586b;text-wrap:balance}
+#viewport>.wt-console .wt-keyboard-guide{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:calc(148px + env(safe-area-inset-bottom));z-index:2;box-sizing:border-box;width:min(310px,calc(100vw - 150px));margin:0;padding:10px 12px;border:2px solid #efffff;border-radius:14px;background:#ecf8fff2;color:#244b60;box-shadow:0 4px 14px #214a6830;font:700 14px/1.55 sans-serif;white-space:pre-line;pointer-events:none}
+#viewport>.wt-console .wt-keyboard-guide[hidden]{display:none}
+@media(pointer:coarse){#viewport>.wt-console .wt-keyboard-guide{display:none}}
 #viewport>.wt-console .wc-primary{width:100%;max-width:164px;min-height:54px;border:3px solid #dfac47;border-bottom-width:5px;border-radius:19px;background:linear-gradient(#fff1a3,#ffd166)!important;color:#694413;font-size:17px;font-weight:900;line-height:1.25;padding:7px 8px;box-shadow:0 3px 7px #a27a2520}
 #viewport>.wt-console .wc-primary:disabled{opacity:1;background:linear-gradient(#f3f5f6,#dae5e9)!important;color:#576b77;border-color:#afc4cd;box-shadow:0 3px 0 #b7cbd2}
 #viewport>.wt-console .wc-head button:disabled{opacity:1;color:#627e74;background:#d8e9e0;border-color:#eef8f1;box-shadow:0 2px 4px #31566b15}

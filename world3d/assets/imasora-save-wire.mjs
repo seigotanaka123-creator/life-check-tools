@@ -1,4 +1,5 @@
 import {parseCapturedConstructionJson,parseCapturedConstructionJsonAsync,isCapturedConstructionJson,capturedSoilJson} from './imasora-construction-json-capture.mjs';
+import {isValidatedFrozenSoil,scoopTerrainDelta} from './imasora-construction-soil-transport.mjs?v=120pv';
 // Transfer immutable soil as exact JSON strings. The small actor/menu state
 // still uses native structured clone. No field, history, or voxel is removed.
 const encoded=new WeakMap(),decoded=new Map();let retained=0;
@@ -8,7 +9,7 @@ export function encodeSaveWire(value){
  const soils=[],paths=[],seen=new WeakMap();
  function walk(v,path){
   if(v===null||typeof v!=='object')return v;
-  if(isCapturedConstructionJson(v)&&typeof v.format==='string'&&v.journal&&v.containers){const text=soilText(v);if(text!==null){let index=soils.indexOf(text);if(index<0){index=soils.length;soils.push(text);}paths.push({path,index});return null;}}
+  if((isCapturedConstructionJson(v)||isValidatedFrozenSoil(v)&&scoopTerrainDelta(v))&&typeof v.format==='string'&&v.journal&&v.containers){const text=soilText(v);if(text!==null){let index=soils.indexOf(text);if(index<0){index=soils.length;soils.push(text);}paths.push({path,index});return null;}}
   // Uncaptured soil retains the original native-clone route and full checks.
   if(v.format&&v.journal&&v.containers)return v;
   if(seen.has(v))return seen.get(v);const proto=Object.getPrototypeOf(v);if(proto!==(Array.isArray(v)?Array.prototype:Object.prototype))return v;

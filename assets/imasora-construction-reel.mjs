@@ -16,7 +16,7 @@ export function newReel(){return{version:1,nextId:1,selected:null,rooms:[],past:
 export function reelRect(a,b){return{x0:snap(Math.min(a.x,b.x)),z0:snap(Math.min(a.z,b.z)),x1:snap(Math.max(a.x,b.x)),z1:snap(Math.max(a.z,b.z))};}
 export function reelRoomProblem(room,others=[],bounds={minX:-240,maxX:240,minZ:-240,maxZ:240}){
  if(!room||!['x0','z0','x1','z1'].every(k=>finite(room[k])&&room[k]%REEL.grid===0))return'床の場所をえらび直そう';
- if(Object.hasOwn(room,'floorMaterial')&&room.floorMaterial!=='steel')return'床の材料をえらび直そう';
+ if(Object.hasOwn(room,'floorMaterial')&&!['steel','tile'].includes(room.floorMaterial))return'床の材料をえらび直そう';
  const w=room.x1-room.x0,d=room.z1-room.z0;
  if(w<REEL.min||d<REEL.min)return'もう少し広げよう';
  if(w>REEL.max||d>REEL.max)return'この床はここまで広げられるよ';
@@ -30,7 +30,7 @@ export function reelDraft(state,action,bounds){
  const rooms=copy(state.rooms);let selected=state.selected,nextId=state.nextId,room;
  if(action.type==='FLOOR'){
   if(rooms.length>=REEL.rooms)return{problem:'床は16枚まで作れるよ'};
-  if(Object.hasOwn(action,'material')&&action.material!=='steel')return{problem:'床の材料をえらび直そう'};
+  if(Object.hasOwn(action,'material')&&!['steel','tile'].includes(action.material))return{problem:'床の材料をえらび直そう'};
   room={id:nextId++,...(action.material?{floorMaterial:action.material}:{}),...reelRect(action.start,action.end),...(action.baseY!==undefined?{y:action.baseY}:{}),walls:Object.fromEntries(REEL_SIDES.map(s=>[s,0]))};rooms.push(room);selected=room.id;
  }else if(action.type==='RESIZE'||action.type==='WALL'){
   room=rooms.find(r=>r.id===action.id);if(!room||!REEL_SIDES.includes(action.side))return{problem:'床の持ち手をえらび直そう'};

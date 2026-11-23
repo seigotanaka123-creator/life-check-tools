@@ -1,12 +1,12 @@
 import * as THREE from './three.module.min.js';
-import { buildWhiteMichiRoadSaberRen360, disposeMatureCharacterModel } from './imasora-character-360.js?v=120ob';
+import { applyMonsterEyeAppearance, buildWhiteMichiRoadSaberRen360, disposeMatureCharacterModel } from './imasora-character-360.js?v=121h1';
 
 // A reusable mesh character, not a camera-facing picture. +Z is the face direction.
 export const MARS_SHOPKEEPER_ID = 'mars-material-shopkeeper-jellyfish-lavender';
 export const MARS_SHOPKEEPER_DESCRIPTOR = Object.freeze({
   id: MARS_SHOPKEEPER_ID,
-  name: '火星素材ショップの店主（仮称）',
-  familyKey: 'mars', familyLabel: '火星の店主', bodyColorCss: '#c6a1e6',
+  name: 'アマネ星素材ショップの店主（仮称）',
+  familyKey: 'mars', familyLabel: 'アマネ星の店主', bodyColorCss: '#c6a1e6',
   profileKey: 'jellyfish', formKey: 'jellyfish', decoration: 'merchant',
   decorationLabel: 'エプロン・鉱石', stageKey: 'guest'
 });
@@ -140,6 +140,7 @@ export function buildMarsShopkeeper360(_id = MARS_SHOPKEEPER_ID, options = {}) {
   const sculpt = new THREE.Group();
   sculpt.name = 'shopkeeper-sculpt';
   model.add(sculpt);
+  const {eyeAppearance,facePlacement} = globalThis.ImasoraMonsterExpressions;
   const materials = {
     body: new THREE.MeshPhysicalMaterial({ color: 0xc8a5e2, roughness: .28, metalness: .02,
       clearcoat: .85, clearcoatRoughness: .2, sheen: .6, sheenColor: 0xeee0ff,
@@ -151,7 +152,7 @@ export function buildMarsShopkeeper360(_id = MARS_SHOPKEEPER_ID, options = {}) {
     rim: new THREE.MeshPhysicalMaterial({ color: 0xe6ccf2, roughness: .26, clearcoat: .9 }),
     core: new THREE.MeshStandardMaterial({ color: 0xffeada, emissive: 0xffdecc, emissiveIntensity: .24, roughness: .7 }),
     eye: new THREE.MeshPhysicalMaterial({ color: 0x1c1039, roughness: .17, clearcoat: 1 }),
-    glint: new THREE.MeshBasicMaterial({ color: 0xfff5ff }),
+    glint: new THREE.MeshBasicMaterial({ color: eyeAppearance.glintColor, toneMapped: false }),
     mouth: new THREE.MeshStandardMaterial({ color: 0x5a397b, roughness: .55 }),
     spots: new THREE.MeshStandardMaterial({ color: 0x8df9ed, emissive: 0x42d9d6, emissiveIntensity: .65, roughness: .36 }),
     apron: new THREE.MeshStandardMaterial({ color: 0x392269, roughness: .91 }),
@@ -203,15 +204,15 @@ export function buildMarsShopkeeper360(_id = MARS_SHOPKEEPER_ID, options = {}) {
   }
   const eyes = [];
   for (const side of [-1, 1]) {
-    const {point, normal} = faceSurface(side * 10.8, 87.8);
+    const {point, normal} = faceSurface(side * 10.8, 87.8 + facePlacement.eyeLift);
     const eye = ellipsoid(sculpt, `eye-${side < 0 ? 'left' : 'right'}`, materials.eye,
       [2.4, 3.85, 1.2], point.clone().addScaledVector(normal, .65).toArray());
     eye.quaternion.setFromUnitVectors(V(0, 0, 1), normal);
-    const glint = ellipsoid(eye, 'eye-highlight', materials.glint, [.21, .14, .20], [-.20, .34, .9], 16);
+    ellipsoid(eye, 'eye-highlight', materials.glint, [.21 * eyeAppearance.glintScale, .14 * eyeAppearance.glintScale, .20], [-.20, .34, .9], 16);
     eyes.push(eye);
   }
   const smilePoints = Array.from({length: 13}, (_, i) => {
-    const x = -3.7 + i * 7.4 / 12, y = 83.7 + 1.2 * Math.pow(x / 3.7, 2);
+    const x = -3.7 + i * 7.4 / 12, y = 83.7 + 1.2 * Math.pow(x / 3.7, 2) - facePlacement.mouthDrop;
     const hit = faceSurface(x, y);
     return hit.point.addScaledVector(hit.normal, .48);
   });
@@ -365,7 +366,7 @@ export function buildMarsShopkeeper360(_id = MARS_SHOPKEEPER_ID, options = {}) {
       footIdleMotions.forEach(update => update(time, enabled));
     }
   };
-  return model;
+  return applyMonsterEyeAppearance(model);
 }
 
 // Shop-local anchor: to the side of the 48-wide doorway, looking outward (+Z).

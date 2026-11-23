@@ -5,7 +5,18 @@ for(const e of entries){if(e.previousName)aliases.set(e.previousName,e);for(cons
 const normalizeId=value=>{const id=typeof value==='string'?value.replace(/^current-/,''):'';return id==='white-michi-road-saber-ren'?'star-white-hero-young-seed-walk-sky-cool-b-forest':id==='seed-white'?'white-seed-walk':id==='sprout-seed-white'?'white-sprout-seed-walk':id.replace(/^white-hero-/,'hero-white-').replace(/^young-white-/,'white-young-');};
 function get(value){return typeof value==='string'?(ids.get(normalizeId(value))||names.get(value)||aliases.get(value)||null):null;}
 function name(value,fallback=''){return get(value)?.name||fallback;}
-function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const selected=ids.get(m.evolutionArtId);
+const family=m.seedId.replace('seed-',''),stageNames=['タネ期','新芽期','青葉期','開花期','満開期'];
+if(selected?.family===family&&selected.stage===stageNames[m.evolutionStage]&&(m.evolutionStage!==4||Number(m.lifeExtensionUses||0)>=3))return selected.id;
+const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function followChosenLineage(monster,previousId){
+ const previous=ids.get(previousId),next=ids.get(currentId(monster));
+ if(!previous||!next||previousId!==monster.evolutionArtId||previous.family!==next.family)return;
+ const alternatives=children(previousId).filter(row=>row.stage===next.stage);
+ if(!alternatives.length)return;
+ const branch=alternatives.find(row=>row.id===next.id)||alternatives.find(row=>row.id.endsWith('-'+next.id.split('-').at(-1)));
+ if(branch)monster.evolutionArtId=branch.id;
+}
 function currentName(m,fallback=''){return name(currentId(m),fallback);}
 function record(value,fallback='記録モンスター'){if(!value||typeof value!=='object')return name(value,fallback);for(const key of [value.artId,value.characterId,value.monsterId,value.sourceMonsterId,value.appearance?.artId,value.art?.id,value.item?.id,value.profileId,value.id]){const e=get(key);if(e)return e.name;}if(/(?:playtest-retired-full-|記録テスト)1$/.test(String(value.id||value.name||'')))return name('star-white-hero-young-seed-walk-sky-cool-b-forest');const named=get(value.name)||get(value.baseName);if(named)return named.name;if(value.monster&&typeof value.monster==='object'){const id=currentId({...value.monster,seedId:value.monster.seedId||value.seedId,lifeExtensionUses:Number(value.monster.evolutionStage)===4?Math.max(3,Number(value.monster.lifeExtensionUses||0)):value.monster.lifeExtensionUses});if(ids.has(id))return ids.get(id).name;}return name(value.name||value.baseName,String(value.name||value.baseName||fallback));}
 const escape=s=>[...s].map(c=>[92,94,36,46,42,43,63,40,41,91,93,123,125,124].includes(c.codePointAt(0))?String.fromCharCode(92)+c:c).join('');
@@ -13,10 +24,12 @@ const textAliases=new Map([...aliases].map(([old,e])=>[old,e.name]));for(const [
 function text(value,{protect=[]}={}){const input=String(value??''),protectedNames=new Set(protect.filter(v=>typeof v==='string'&&v)),cacheKey=JSON.stringify([...protectedNames].sort());let regex=textCache.get(cacheKey);if(!regex){const tokens=[...new Set([...textAliases.keys(),...protectedNames])].sort((a,b)=>b.length-a.length);regex=new RegExp('(^|[^ァ-ヶー])('+tokens.map(escape).join('|')+')(?=$|[^ァ-ヶー])','g');if(textCache.size>=16)textCache.delete(textCache.keys().next().value);textCache.set(cacheKey,regex);}regex.lastIndex=0;return input.replace(regex,(match,prefix,token)=>prefix+(protectedNames.has(token)?token:textAliases.get(token)||token));}
 
 function children(value){const id=get(value)?.id;return id?entries.filter(e=>e.parentId===id):[];}
-return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,record,text,children});
+return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,followChosenLineage,record,text,children});
 });
 /* END MONSTER NAME REGISTRY */
 import * as THREE from "./three.module.min.js";
+import "./imasora-character-360.js";
+import {pulseGameMilestone} from '../world3d/assets/imasora-construction-guide-data.mjs?v=121gy';
 import * as CANNON from "./rapier-cannon-compat.js?v=20260916-pachicoin-many-coins-v1";
 import * as CANNON_MACHINE2 from "./cannon-es.js";
 import { PRODUCTION_JACKPOT_LAYOUT } from "./imasora-jackpot-production-layout.js?v=20260916-central-production-v1";
@@ -3965,7 +3978,7 @@ function sanitizeSvg(svg) {
 }
 
 function svgDataUrl(svg) {
-  const safe = sanitizeSvg(svg);
+  const safe = sanitizeSvg(globalThis.ImasoraMonsterExpressions.matteSvgEyes(svg));
   if (!safe.includes("<svg")) return "";
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(safe)}`;
 }
@@ -3988,9 +4001,23 @@ function createFallbackTexture(item) {
   context.fillRect(112, 330, 288, 30);
   context.fillStyle = "#1c2b3a";
   context.beginPath();
-  context.arc(198, 224, 18, 0, Math.PI * 2);
-  context.arc(314, 224, 18, 0, Math.PI * 2);
+  const { eyeAppearance, facePlacement } = globalThis.ImasoraMonsterExpressions;
+  const eyeRadius = 18 * eyeAppearance.scale;
+  const eyeY = 224 - facePlacement.eyeLift * canvas.height / 116;
+  for (const x of [198, 314]) {
+    context.moveTo(x + eyeRadius, eyeY);
+    context.arc(x, eyeY, eyeRadius, 0, Math.PI * 2);
+  }
   context.fill();
+  context.fillStyle = eyeAppearance.glintColor;
+  context.globalAlpha = eyeAppearance.glintOpacity;
+  const glintRadius = eyeRadius * .24 * eyeAppearance.glintScale;
+  for (const x of [198, 314]) {
+    context.beginPath();
+    context.arc(x - eyeRadius * .24, eyeY - eyeRadius * .28, glintRadius, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.globalAlpha = 1;
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
@@ -3999,7 +4026,7 @@ function createFallbackTexture(item) {
 function loadPosterCharacterImage(markup) {
   return new Promise((resolve, reject) => {
     const template = document.createElement("template");
-    template.innerHTML = String(markup || "");
+    template.innerHTML = globalThis.ImasoraMonsterExpressions.matteSvgEyes(String(markup || ""));
     const sourceSvg = template.content.querySelector("svg");
     if (!sourceSvg) {
       reject(new Error("The original character SVG was not supplied."));
@@ -4289,6 +4316,8 @@ function disposePachicoinSceneResources(scene, textures = []) {
 class ImasoraJackpotCoinPusherGame {
   constructor(root, options = {}) {
     this.root = root;
+    this.onPocketCoin = options.onPocketCoin;
+    this.playerLaunchedCoin = false;
     this.stationId = normalizePachicoinStationId(options.stationId);
     // One immutable snapshot for this visit, even if midnight passes during play.
     this.dailyAdjustment = resolvePachicoinDailyAdjustment(this.stationId, options.adjustmentDate);
@@ -11800,6 +11829,7 @@ class ImasoraJackpotCoinPusherGame {
     this.zeroCreditTimer = 0;
     this.launchCooldown = 0.12;
     this.spawnPachinkoToken();
+    this.playerLaunchedCoin = true;
     this.playLaunchSound();
     this.refreshHud();
     this.updateGameOver();
@@ -14204,6 +14234,7 @@ class ImasoraJackpotCoinPusherGame {
       "jackpot"
     );
     this.setSpinLabel("FLOATING RING JACKPOT");
+    this.highlightCabinetJackpot();
     this.cameraShake = Math.max(this.cameraShake, 0.12);
     this.refreshHud();
     return true;
@@ -15708,6 +15739,7 @@ class ImasoraJackpotCoinPusherGame {
     token.pin6667CreditTriggered = true;
     this.pin6667CreditPassCount += 1;
     this.credits += PIN_66_67_CREDIT_AWARD;
+    this.notifyEarnedCoin();
     this.zeroCreditTimer = 0;
     this.refreshHud();
     return true;
@@ -16402,6 +16434,7 @@ class ImasoraJackpotCoinPusherGame {
     this.setHakamaAttackerOpenProgress(1);
     this.jackpotRoundSound.start();
     this.setSpinLabel(`ATTACKER 1R 0/${HAKAMA_ATTACKER_COUNT_LIMIT}C`);
+    this.highlightCabinetJackpot();
     this.showCallout(
       `${outcome.code} ${totalRounds}R ATTACKER START`,
       1.5,
@@ -16600,6 +16633,7 @@ class ImasoraJackpotCoinPusherGame {
     // The 1/2 checkers award held coins directly. They do not feed the
     // physical payout chute used by red SPIN, attacker, and jackpot prizes.
     this.credits += HANE_CHUCKER_CREDIT_AWARD;
+    this.notifyEarnedCoin();
     this.zeroCreditTimer = 0;
     const openingCount = side === 2 ? 2 : 1;
     const opened = this.triggerHanemonoOpening(openingCount);
@@ -19215,6 +19249,13 @@ class ImasoraJackpotCoinPusherGame {
     this.credits += value;
     this.zeroCreditTimer = 0;
     this.refreshHud();
+    this.notifyEarnedCoin();
+  }
+
+  notifyEarnedCoin() {
+    if (this.playerLaunchedCoin && !this.previewOnly && !this.checkpointSuperseded) {
+      this.onPocketCoin?.();
+    }
   }
 
   openPrizeExchange() {
@@ -19516,6 +19557,8 @@ class ImasoraJackpotCoinPusherGame {
     this.credits += heldCoinAward;
     this.zeroCreditTimer = 0;
     this.refreshHud();
+    this.notifyEarnedCoin();
+    if(!this.firstPayoutCue){this.firstPayoutCue=true;pulseGameMilestone(this.els.credits?.parentElement);}
     return payoutCoin;
   }
 
@@ -19608,6 +19651,17 @@ class ImasoraJackpotCoinPusherGame {
     });
   }
 
+  highlightCabinetJackpot() {
+    this.cabinetJackpotCue = true;
+    this.refreshBoardLcd();
+    pulseGameMilestone(this.els.spinLabel);
+    clearTimeout(this.cabinetJackpotTimer);
+    this.cabinetJackpotTimer = setTimeout(() => {
+      this.cabinetJackpotCue = false;
+      if (!this.destroyed) this.refreshBoardLcd();
+    }, 1200);
+  }
+
   refreshBoardLcd() {
     const context = this.boardLcdContext;
     if (!context || !this.boardLcdTexture) return;
@@ -19639,6 +19693,18 @@ class ImasoraJackpotCoinPusherGame {
     const rightDigit = this.lcdDigitsVisible === false ? "" : code[1];
     drawBoardLcdDigit(context, leftDigit, 128, 82, 82, 160, palette);
     drawBoardLcdDigit(context, rightDigit, 270, 82, 82, 160, palette);
+    if (this.cabinetJackpotCue) {
+      context.save();
+      context.strokeStyle = "#fff394";
+      context.lineWidth = 6;
+      context.shadowColor = "#ff9d32";
+      context.shadowBlur = 18;
+      context.strokeRect(9, 9, width - 18, height - 18);
+      context.fillStyle = "#fff2a0";
+      context.font = "900 29px system-ui, sans-serif";
+      context.fillText("大当たり！", width / 2, height - 31, width - 42);
+      context.restore();
+    }
     this.boardLcdTexture.needsUpdate = true;
   }
 

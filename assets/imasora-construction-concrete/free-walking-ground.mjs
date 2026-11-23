@@ -12,13 +12,16 @@ export function walkingGroundAt(f,x,z,heightAt=()=>0,includeCured=false){
  const mean=points.reduce((s,p)=>s+p.h,0)/points.length;
  const a=points.reduce((s,p)=>s+p.dx*p.h,0)/points.reduce((s,p)=>s+p.dx*p.dx,0),b=points.reduce((s,p)=>s+p.dz*p.h,0)/points.reduce((s,p)=>s+p.dz*p.dz,0);
  const slope=Math.hypot(a,b),error=Math.max(...points.map(p=>Math.abs(p.h-mean-a*p.dx-b*p.dz)));
- if(slope>VEHICLE_GROUND.maxSlope+1e-8||error>VEHICLE_GROUND.maxPatchError+1e-8)return null;
+ if(slope>VEHICLE_GROUND.maxSlope+1e-8||error>VEHICLE_GROUND.maxPatchError+1e-8){
+  if(!heightAt.quarryHeight||!points.every(p=>Math.abs(p.h-heightAt.quarryHeight(f.location.x+x+p.dx,f.location.z+z+p.dz))<.05))return null;
+  return {height:points[12].h,normal:new T.Vector3(0,1,0),slope,error,samples:points.length,quarryDescent:true};
+ }
  return{height:points[12].h,normal:new T.Vector3(-a,1,-b).normalize(),slope,error,samples:points.length};
 }
 export function walkingGroundSegment(f,from,to,heightAt=()=>0,includeCured=false){
  const length=Math.hypot(to.x-from.x,to.z-from.z),n=Math.max(1,Math.ceil(length/2));let last=null;
  for(let i=0;i<=n;i++){const t=i/n,s=walkingGroundAt(f,from.x+(to.x-from.x)*t,from.z+(to.z-from.z)*t,heightAt,includeCured);
-  if(!s||i===0&&Number.isFinite(from.y)&&Math.abs(s.height-from.y)>.15||last!==null&&Math.abs(s.height-last)>VEHICLE_GROUND.maxSlope*length/n+.15)return false;last=s.height;
+  if(!s||i===0&&Number.isFinite(from.y)&&Math.abs(s.height-from.y)>.15||last!==null&&Math.abs(s.height-last)>VEHICLE_GROUND.maxSlope*length/n+.15&&!(s.quarryDescent&&s.height<last))return false;last=s.height;
  }return true;
 }
 export function walkingGroundRotation(s,heading){return new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),s.normal).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),heading));}

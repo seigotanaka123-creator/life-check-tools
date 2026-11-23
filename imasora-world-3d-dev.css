@@ -109,46 +109,243 @@ body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere 
 body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere small { color: #c7edff; }
 body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere strong { color: #f3fbff; text-shadow: 0 0 20px #9cdaffbb; }
 body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere i { background: linear-gradient(90deg, transparent, #95dcff 25% 75%, transparent); box-shadow: 0 0 20px #8dccff; }
-.sky-station-guide-dialog { position: absolute; z-index: 16; left: 50%; bottom: 14px; width: min(760px, calc(100% - 36px)); box-sizing: border-box; transform: translateX(-50%); padding: 14px 16px 15px; border: 2px solid rgba(154, 223, 255, .82); border-radius: 14px; background: linear-gradient(135deg, rgba(4, 17, 39, .96), rgba(10, 53, 82, .93)); box-shadow: 0 0 34px rgba(48, 191, 255, .28), inset 0 0 26px rgba(149, 235, 255, .09); color: #f2fcff; backdrop-filter: blur(8px); }
-.sky-station-guide-dialog[hidden] { display: none; }
-.sky-station-guide-dialog-name { display: inline-flex; align-items: center; min-height: 28px; margin: -29px 0 8px -2px; padding: 0 12px; border: 1px solid rgba(186, 237, 255, .82); border-radius: 8px 8px 8px 2px; background: linear-gradient(135deg, #1c78a6, #123a71); box-shadow: 0 0 17px rgba(86, 204, 255, .32); color: #ffffff; font-size: 14px; font-weight: 1000; letter-spacing: .05em; }
-.sky-station-guide-dialog-text { min-height: 2.95em; margin: 0; color: #f4fdff; font-size: clamp(16px, 2.15vw, 20px); font-weight: 800; line-height: 1.64; letter-spacing: .025em; text-shadow: 0 1px 0 rgba(0, 0, 0, .42); }
-.sky-station-guide-dialog-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
-.sky-station-guide-dialog-choices[hidden] { display: none; }
-.sky-station-guide-dialog-choices button { min-height: 42px; padding: 8px 12px; border: 1px solid rgba(181, 235, 255, .62); border-radius: 9px; background: linear-gradient(145deg, rgba(20, 82, 116, .96), rgba(10, 38, 71, .96)); box-shadow: inset 0 0 13px rgba(151, 236, 255, .09); color: #f6fdff; cursor: pointer; font: inherit; font-size: 14px; font-weight: 900; line-height: 1.35; text-align: left; transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease; }
-.sky-station-guide-dialog-choices button::before { content: "▶"; margin-right: 7px; color: #84e7ff; font-size: 11px; text-shadow: 0 0 8px #55dfff; }
-.sky-station-guide-dialog-choices button:hover, .sky-station-guide-dialog-choices button:focus-visible { border-color: #e9fbff; outline: none; background: linear-gradient(145deg, rgba(38, 121, 158, .98), rgba(15, 59, 102, .98)); box-shadow: 0 0 18px rgba(104, 218, 255, .34), inset 0 0 15px rgba(183, 244, 255, .16); transform: translateY(-1px); }
-.sky-station-guide-dialog-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 12px; }
-.sky-station-guide-dialog-footer[hidden] { display: none; }
-.sky-station-guide-dialog-page { margin-right: auto; color: rgba(197, 239, 255, .76); font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: .1em; }
-.sky-station-guide-dialog-next { min-width: 118px; min-height: 38px; padding: 7px 16px; border: 1px solid rgba(198, 242, 255, .78); border-radius: 9px; background: linear-gradient(145deg, #2d91bc, #164a83); box-shadow: 0 0 14px rgba(93, 210, 255, .22), inset 0 0 11px rgba(202, 246, 255, .14); color: #ffffff; cursor: pointer; font: inherit; font-size: 14px; font-weight: 1000; letter-spacing: .07em; transition: transform .12s ease, border-color .12s ease, background .12s ease; }
-.sky-station-guide-dialog-next::after { content: " ▶"; color: #b9f4ff; font-size: 11px; }
-.sky-station-guide-dialog-next[data-last-page="true"]::after { content: ""; }
-.sky-station-guide-dialog-next:hover, .sky-station-guide-dialog-next:focus-visible { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #43acd1, #1c5d9d); transform: translateY(-1px); }
-.sky-station-guide-dialog[data-typing="true"] .sky-station-guide-dialog-text::after { content: ""; display: inline-block; width: .52em; height: 1.12em; margin-left: .16em; vertical-align: -.18em; border-radius: 1px; background: #9ceeff; box-shadow: 0 0 9px rgba(129, 231, 255, .9); animation: sky-station-guide-dialog-caret .58s step-end infinite; }
-@keyframes sky-station-guide-dialog-caret { 50% { opacity: .12; } }
-.ufo-equipment-workshop-menu { position: absolute; z-index: 18; left: 50%; top: 50%; width: min(860px, calc(100% - 34px)); max-height: min(650px, calc(100% - 34px)); box-sizing: border-box; overflow: auto; transform: translate(-50%, -50%); padding: 18px; border: 1px solid rgba(161, 235, 255, .88); border-radius: 18px; background: radial-gradient(circle at 92% 3%, rgba(120, 223, 255, .18), transparent 32%), linear-gradient(145deg, rgba(3, 16, 39, .98), rgba(9, 47, 75, .96)); box-shadow: 0 0 54px rgba(70, 210, 255, .32), inset 0 0 35px rgba(145, 236, 255, .1); color: #f1fcff; backdrop-filter: blur(10px); }
-.ufo-equipment-workshop-menu[hidden] { display: none; }
-.ufo-equipment-workshop-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(161, 231, 255, .28); }
-.ufo-equipment-workshop-heading span { display: block; color: #8eeeff; font-size: 10px; font-weight: 1000; letter-spacing: .2em; }
-.ufo-equipment-workshop-heading h2 { margin: 4px 0 3px; color: #ffffff; font-size: clamp(21px, 3.2vw, 29px); line-height: 1.1; letter-spacing: .035em; }
-.ufo-equipment-workshop-heading p { margin: 0; color: rgba(211, 242, 255, .82); font-size: 13px; font-weight: 700; line-height: 1.55; }
-.ufo-equipment-workshop-heading button { flex: 0 0 auto; min-height: 36px; padding: 7px 14px; border: 1px solid rgba(202, 242, 255, .74); border-radius: 9px; background: linear-gradient(145deg, rgba(47, 127, 163, .98), rgba(18, 58, 100, .98)); color: #ffffff; cursor: pointer; font: inherit; font-size: 13px; font-weight: 1000; }
-.ufo-equipment-workshop-heading button:hover, .ufo-equipment-workshop-heading button:focus-visible { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #43acd1, #1c5d9d); }
-.ufo-equipment-workshop-resources { display: flex; flex-wrap: wrap; gap: 8px; margin: 13px 0; }
-.ufo-equipment-workshop-resources span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border: 1px solid rgba(181, 233, 255, .36); border-radius: 999px; background: rgba(8, 42, 68, .62); color: #c9efff; font-size: 12px; font-weight: 800; }
-.ufo-equipment-workshop-resources strong { color: #ffffff; font-size: 16px; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(132, 230, 255, .58); }
-.ufo-equipment-workshop-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ufo-equipment-workshop-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-height: 118px; padding: 13px; border: 1px solid rgba(154, 223, 255, .38); border-radius: 12px; background: linear-gradient(145deg, rgba(15, 67, 98, .72), rgba(7, 27, 58, .78)); box-shadow: inset 0 0 17px rgba(142, 238, 255, .06); }
-.ufo-equipment-workshop-card[data-status="crafted"] { border-color: rgba(133, 255, 201, .72); background: linear-gradient(145deg, rgba(22, 102, 89, .7), rgba(7, 55, 65, .8)); }
-.ufo-equipment-workshop-card[data-status="locked"] { filter: saturate(.62); }
-.ufo-equipment-workshop-card h3 { margin: 0; color: #ffffff; font-size: 16px; line-height: 1.35; letter-spacing: .02em; }
-.ufo-equipment-workshop-card p { margin: -2px 0 0; color: rgba(221, 245, 255, .85); font-size: 13px; font-weight: 700; line-height: 1.55; }
-.ufo-equipment-workshop-cost { justify-self: start; padding: 4px 8px; border: 1px solid rgba(218, 184, 255, .62); border-radius: 999px; color: #e6d2ff; font-size: 11px; font-weight: 1000; line-height: 1.4; text-align: left; }
-.ufo-equipment-workshop-card button { align-self: end; justify-self: start; min-height: 34px; padding: 6px 12px; border: 1px solid rgba(192, 240, 255, .72); border-radius: 8px; background: linear-gradient(145deg, #2f9fc5, #1a5c94); color: #ffffff; cursor: pointer; font: inherit; font-size: 13px; font-weight: 1000; }
-.ufo-equipment-workshop-card button:hover:not(:disabled), .ufo-equipment-workshop-card button:focus-visible:not(:disabled) { border-color: #ffffff; outline: none; background: linear-gradient(145deg, #4fb9d8, #2070ad); }
-.ufo-equipment-workshop-card button:disabled { border-color: rgba(183, 218, 232, .28); background: rgba(64, 87, 110, .58); color: rgba(219, 239, 247, .62); cursor: default; }
-.ufo-equipment-workshop-status { min-height: 1.5em; margin: 13px 1px 0; color: #a9eaff; font-size: 13px; font-weight: 800; }
+/* The speaker stays in the 3D shot. Keep this panel narrow and size its
+   scrolling area to the current page so short replies do not leave a blank card. */
+.sky-station-guide-dialog {
+  --conversation-edge:#65969d;
+  --conversation-accent:#eec989;
+  --conversation-ink:#fff7e6;
+  --conversation-option:#18394b;
+  --conversation-base:#0a202d;
+  --conversation-top:#244b5a;
+  position:absolute;z-index:16;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:11px;box-sizing:border-box;
+  width:min(420px,43%);max-height:calc(100% - 32px);padding:12px;
+  border:1px solid var(--conversation-edge);border-radius:18px 5px 18px 5px;
+  background:linear-gradient(155deg,var(--conversation-top),var(--conversation-base) 48%);
+  box-shadow:0 14px 32px #060c18b3,inset 0 0 0 3px #080e1966;
+  color:var(--conversation-ink);overflow:hidden;
+}
+.sky-station-guide-dialog[hidden]{display:none}
+#marsShopDialog{
+  --conversation-edge:#b1877d;
+  --conversation-accent:#ffd5a1;
+  --conversation-option:#452c44;
+  --conversation-base:#201428;
+  --conversation-top:#573a51;
+}
+#marsShopDialog[data-phase=player-response]{
+  --conversation-option:#29464b;
+  --conversation-base:#112e35;
+  --conversation-top:#32515c;
+  --conversation-accent:#d0eee8;
+  --conversation-edge:#7da2a7;
+}
+.conversation-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;
+  padding-bottom:8px;border-bottom:1px solid var(--conversation-edge);
+}
+.sky-station-guide-dialog-name{
+  margin:0;min-width:0;display:flex;align-items:center;gap:9px;
+  color:var(--conversation-accent);font:800 clamp(17px,1.8vw,21px)/1.18 system-ui,sans-serif;
+}
+.sky-station-guide-dialog-name::before{
+  content:"";display:block;width:13px;height:13px;flex:none;transform:rotate(45deg);
+  border:1px solid var(--conversation-accent);border-radius:3px;
+  background:linear-gradient(135deg,var(--conversation-accent) 42%,transparent 44%);
+}
+.conversation-body{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-color:var(--conversation-edge) transparent;padding:2px 4px 4px 2px}
+.sky-station-guide-dialog-text{
+  margin:0;padding:10px 12px;min-height:0;border:1px solid #ffffff20;border-radius:5px 12px 5px 12px;
+  background:#080d1677;color:var(--conversation-ink);font:650 clamp(16px,1.75vw,19px)/1.6 system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+.sky-station-guide-dialog-choices{display:grid;grid-template-columns:1fr;gap:7px;margin-top:10px}
+.sky-station-guide-dialog :is(.sky-station-guide-dialog-choices,.sky-station-guide-dialog-footer)[hidden]{display:none}
+.sky-station-guide-dialog button{
+  min-height:44px;padding:8px 10px;min-width:0;cursor:pointer;touch-action:manipulation;
+  border:1px solid var(--conversation-edge);border-bottom:3px solid #0a101c;border-radius:8px 3px 8px 3px;
+  background:linear-gradient(165deg,#ffffff12,transparent 50%),var(--conversation-option);
+  color:var(--conversation-ink);font:750 15px/1.35 system-ui,sans-serif;
+  transition:background-color .12s,transform .12s,box-shadow .12s;
+}
+.sky-station-guide-dialog button:hover{box-shadow:inset 0 0 0 1px #ffffff55}
+.sky-station-guide-dialog button:active{transform:translateY(2px);box-shadow:inset 0 2px 4px #080b16ab}
+.sky-station-guide-dialog button:focus-visible{outline:2px solid var(--conversation-accent);outline-offset:2px}
+.sky-station-guide-dialog .conversation-close{
+  flex:none;min-height:44px;font-size:13px;background:#0d152268;line-height:1.15;
+}
+.sky-station-guide-dialog-choices button{
+  display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:9px;
+  text-align:left;overflow-wrap:anywhere;
+}
+.sky-station-guide-dialog-choices button[hidden]{display:none}
+.sky-station-guide-dialog-choices button::before{
+  content:"";box-sizing:border-box;width:8px;height:8px;margin-right:3px;
+  border:solid var(--conversation-accent);border-width:1.5px 1.5px 0 0;transform:rotate(45deg);
+}
+.sky-station-guide-dialog button:is(.sky-station-guide-dialog-next,[data-guide-dialog-topic=cave-diagram],[data-guide-dialog-topic=amane-report],[data-guide-dialog-topic=water-delivery],[data-guide-dialog-topic=rain-works]){
+  background:linear-gradient(170deg,#ffe8b9,#edbd72);border-color:#e7bb78 #ce9a51 #8c5a28;
+  color:#2d2018;
+}
+.sky-station-guide-dialog-choices button:is([data-guide-dialog-topic=cave-diagram],[data-guide-dialog-topic=amane-report],[data-guide-dialog-topic=water-delivery],[data-guide-dialog-topic=rain-works])::before{border-color:#784b2b}
+.sky-station-guide-dialog-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:12px 2px 0}
+.sky-station-guide-dialog-page{margin-inline-end:auto;color:var(--conversation-accent);font:700 .85rem/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.sky-station-guide-dialog-next{min-width:104px!important}
+.sky-station-guide-dialog-next:not([data-last-page=true])::after{content:" ›";padding-inline-start:6px}
+#skyStationGuideDialog[data-typing=true] .sky-station-guide-dialog-text{cursor:pointer}
+#skyStationGuideDialog[data-typing=true] .sky-station-guide-dialog-text::after{content:"　タップで全文";color:var(--conversation-accent);font-size:12px}
+@media(orientation:portrait){
+  .sky-station-guide-dialog{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:min(380px,46dvh)}
+  .sky-station-guide-dialog-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #marsShopDialog .sky-station-guide-dialog-choices{grid-template-columns:1fr}
+}
+@media (max-height:420px) and (orientation:landscape){
+  .sky-station-guide-dialog{right:8px;bottom:8px;max-height:calc(100% - 16px);padding:8px;gap:6px}
+  .sky-station-guide-dialog-text{padding:7px 9px}
+}
+
+.ufo-equipment-workshop-menu {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(820px, calc(100% - 26px));
+  max-height: min(735px, calc(100% - 26px));
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #5aa5bc;
+  border-radius: 21px;
+  background: #0a1b2b;
+  box-shadow: 0 0 0 4px #081421c9, 0 16px 65px #02070ddc, 0 0 38px #3eb7cf28;
+  color: #f4fbff;
+}
+.ufo-equipment-workshop-menu:not([open]) { display: none; }
+.ufo-equipment-workshop-menu::backdrop { background: #050e19a6; }
+.ufo-equipment-workshop-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 19px;
+  border-bottom: 1px solid #5495a1;
+  background: repeating-linear-gradient(135deg, transparent 0 10px, #82e3fa08 10px 11px),
+    radial-gradient(ellipse at 5% 0%, #37717f, transparent 66%), linear-gradient(115deg, #19465b, #12283d);
+  box-shadow: inset 0 2px #9beeff48;
+}
+.ufo-equipment-workshop-heading h2 { margin: 0; font-size: clamp(20px, 3.5vw, 29px); line-height: 1.15; letter-spacing: .04em; }
+.ufo-equipment-workshop-heading p { margin: 5px 0 0; color: #d2e9f0; font-size: 13px; line-height: 1.45; }
+.ufo-equipment-workshop-heading button,
+.ufo-equipment-workshop-card button {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid #93e7de;
+  border-radius: 10px;
+  background: linear-gradient(#afeed8, #5acdaf);
+  box-shadow: inset 0 1px #effff4b3, 0 3px #236b6b;
+  color: #0a332c;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ufo-equipment-workshop-heading button { background: linear-gradient(#305771, #1a364b); border-color: #91b6d0; box-shadow: inset 0 1px #badaef52, 0 3px #0a2234; color: #f2faff; }
+.ufo-equipment-workshop-menu button:focus-visible { outline: 2px solid #ffdc91; outline-offset: 2px; }
+.ufo-equipment-workshop-menu button:hover:not(:disabled) { filter: brightness(1.15); }
+.ufo-equipment-workshop-menu button:active:not(:disabled) { box-shadow: inset 0 2px 5px #06172366; transform: translateY(2px); }
+.ufo-equipment-workshop-scroll { overflow: auto; overscroll-behavior: contain; touch-action: pan-y; min-height: 0; padding: 13px 19px 16px; scrollbar-color: #5b9da6 #0c2434; }
+.ufo-workshop-materials-title { margin: 0 0 7px; color: #c6e8ee; font-size: 13px; line-height: 1.35; }
+.ufo-equipment-workshop-resources { display: grid; grid-template-columns: repeat(3,minmax(0, 1fr)); gap: 8px; margin: 0 0 14px; }
+.ufo-equipment-workshop-resources div {
+  --material: #a6f2ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #4b7185;
+  border-left: 3px solid var(--material);
+  border-radius: 7px;
+  background: linear-gradient(110deg, #203e50, #122536);
+}
+.ufo-equipment-workshop-resources [data-material="skySightCrystal"] { --material: #dac8ff; }
+.ufo-equipment-workshop-resources [data-material="arcadeParts"] { --material: #f5ce87; }
+.ufo-equipment-workshop-resources dt { min-width: 0; color: var(--material); font-size: 13px; font-weight: 750; }
+.ufo-equipment-workshop-resources dd { margin: 0; font-size: 20px; font-weight: 850; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ufo-equipment-workshop-list { display: grid; grid-template-columns: repeat(2,minmax(0, 1fr)); gap: 10px; }
+.ufo-equipment-workshop-card {
+  --equip-accent: #83cde7;
+  display: grid;
+  grid-template-columns: minmax(92px, .65fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto auto;
+  gap: 6px 10px;
+  align-items: start;
+  padding: 11px 12px;
+  border: 1px solid #375568;
+  border-top-color: var(--equip-accent);
+  border-radius: 12px;
+  background: radial-gradient(ellipse at 4% 0%, #32576e7c, transparent 68%), linear-gradient(140deg, #162e42, #101e30 80%);
+  box-shadow: inset 0 -2px #050e19;
+}
+.ufo-equipment-workshop-card[data-status="crafted"] { --equip-accent: #a0e9c2; background: linear-gradient(144deg, #1b453e, #122d33 78%); }
+.ufo-equipment-workshop-card[data-status="locked"] { --equip-accent: #b5b8ce; }
+.ufo-equipment-workshop-card[data-status="ready"] { --equip-accent: #a9f4d8; border-color: #63bbab; }
+.ufo-equipment-workshop-card h3 { grid-column: 2; grid-row: 1; align-self: end; margin: 0; color: #eff9ff; font-size: 16px; line-height: 1.35; overflow-wrap: anywhere; }
+.ufo-equipment-workshop-card p { grid-column: 2; grid-row: 2; margin: 0; color: #cfe2ee; font-size: 13px; line-height: 1.5; }
+.ufo-workshop-glyph {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 39px;
+  border: 1px solid #547e93;
+  border-radius: 8px;
+  background: linear-gradient(#103044,#0c2034);
+  box-shadow: inset 0 0 9px #68c6e425;
+  color: var(--equip-accent, #aff7ea);
+}
+.ufo-workshop-glyph::before { content: ""; display: block; width: 24px; height: 24px; }
+.ufo-workshop-glyph--ship::before { background: currentColor; clip-path: polygon(0 64%, 16% 44%, 29% 41%, 34% 23%, 48% 12%, 65% 21%, 73% 42%, 88% 50%, 100% 64%, 86% 78%, 15% 78%); }
+.ufo-workshop-part-preview {
+  grid-area: 1 / 1 / span 2;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  min-height: 85px;
+  border: 1px solid #45677e;
+  border-radius: 8px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 58%, #23475a, transparent 76%),
+    linear-gradient(#94d5ef0d 1px, transparent 1px) center / 13px 13px,
+    linear-gradient(90deg, #94d5ef0d 1px, transparent 1px) center / 13px 13px, #0b1b2a;
+  box-shadow: inset 0 0 12px #071420;
+}
+.ufo-workshop-part-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 5px 4px #04101cbe);
+}
+.ufo-equipment-workshop-cost {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ufo-equipment-workshop-cost li { padding: 3px 7px; border: 1px solid #44687a; border-radius: 6px; background: #102538; color: #d0eaf1; font-size: 12px; line-height: 1.3; }
+.ufo-equipment-workshop-cost [data-missing] { border-color: #a27c5b; background: #35292c; color: #ffd7ac; }
+.ufo-equipment-workshop-card button { grid-column: 1 / -1; align-self: end; width: 100%; }
+.ufo-equipment-workshop-card button:disabled { border-color: #475b71; background: linear-gradient(#25354a,#18263a); box-shadow: inset 0 1px #7296b124; color: #c5d3e3; opacity: 1; cursor: default; }
+.ufo-equipment-workshop-card[data-status="crafted"] button:disabled { border-color: #648f7a; background: #163a32; color: #b6f1d0; }
+.ufo-equipment-workshop-status { margin: 12px 0 0; color: #bfdde9; font-size: 13px; line-height: 1.55; }
 .ufo-space-life { position: absolute; z-index: 5; top: 18px; right: 18px; width: min(240px, calc(100% - 36px)); padding: 10px 12px 9px; border: 1px solid rgba(159,225,255,.52); border-radius: 12px; background: linear-gradient(145deg, rgba(4,17,35,.9), rgba(8,40,57,.84)); box-shadow: 0 0 24px rgba(45,181,229,.16), inset 0 0 18px rgba(136,232,255,.06); pointer-events: none; }
 .ufo-space-life[hidden] { display: none; }
 .ufo-space-life-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: #e8fbff; font-size: 12px; font-weight: 900; }
@@ -233,6 +430,266 @@ body[data-ufo-space-origin="mars"] .space-transition-overlay.is-mars-atmosphere 
 .ufo-equipment-development-status[data-camera-active="true"] { color: #ffe1a6; }
 .ufo-flight-controls { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; width: 100%; box-sizing: border-box; padding: 4px 7px; border: 1px solid rgba(183,226,238,.5); border-bottom: 0; border-radius: 13px 13px 0 0; background: linear-gradient(155deg, rgba(18,32,43,.97), rgba(4,17,27,.96)); box-shadow: 0 -8px 28px rgba(0,0,0,.34), 0 0 22px rgba(80,207,238,.1), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(12px); }
 .ufo-flight-controls[hidden] { display: none; }
+.world-ufo-departure-button {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-height: 44px;
+  background: #fff0cf;
+  color: #243c42;
+  border-color: #d6a761;
+}
+.world-ufo-departure {
+  box-sizing: border-box;
+  width: min(440px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  padding: clamp(14px, 4vw, 24px);
+  border: 1px solid #b5d3d7;
+  border-radius: 18px;
+  background: #f7faf8;
+  color: #22393e;
+  box-shadow: 0 12px 48px #081f39a0;
+}
+.world-ufo-departure::backdrop { background: #102a3b9e; }
+.world-ufo-departure header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.world-ufo-departure h2 { margin: 0; font-size: clamp(18px, 5vw, 24px); }
+.world-ufo-departure button { min-height: 44px; background: #e4eff0; color: #22393e; border-color: #a7c6ca; line-height: 1.45; white-space: normal; }
+.world-ufo-departure > button { display: block; width: 100%; margin-top: 8px; }
+.world-ufo-departure button.primary-button { background: #245d64; color: #fff; border-color: #245d64; }
+.world-ufo-departure p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.rain-ending-start { background: #e8efda; color: #264040; border-color: #a4b39b; }
+.rain-return-dock { position:absolute;z-index:6;top:12px;left:50%;transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:calc(100% - 36px);padding:9px 13px;border:1px solid #adc6c7;border-radius:13px;background:#eaf2e9;color:#243f41;text-align:center; }
+.rain-return-dock p { margin:2px 0 7px;font-size:14px;line-height:1.45; }
+.rain-return-dock button { min-height:44px;border:1px solid #3a6967;background:#315f5e;color:#fff; }
+.rain-return-dock button:disabled { opacity:.63; }
+.rain-film-dialogue { position:absolute;z-index:1;left:50%;bottom:max(7%,env(safe-area-inset-bottom));transform:translateX(-50%);box-sizing:border-box;width:min(620px,calc(100% - 30px));padding:12px 17px;background:#101d2ee8;color:#fff5de;border:1px solid #b0c5cf;border-radius:13px;line-height:1.6;text-align:left; }
+.rain-film-dialogue b { display:block;color:#ffe3a2;font-size:13px; }
+.rain-film-dialogue p { margin:2px 0 0;font-weight:600;font-size:clamp(15px,3.4vw,21px); }
+.rain-ending {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: #060c13;
+  color: #f5f1e6;
+  font-family: "Noto Sans JP", system-ui, sans-serif;
+}
+.rain-ending::backdrop { background: #060c13; }
+.rain-ending-screen { position: absolute; inset: 0; }
+.rain-ending-screen video { display:block;width:100%;height:100%;object-fit:contain;background:#000; }
+.rain-rescue-film{position:absolute;z-index:45;inset:0;pointer-events:none;--matte:clamp(25px,8%,90px)}
+.rain-rescue-matte{position:absolute;left:0;right:0;height:var(--matte);background:#05070b}
+.rain-rescue-matte.top{top:0}.rain-rescue-matte.bottom{bottom:0}
+.rain-rescue-film p{position:absolute;bottom:var(--matte);left:50%;width:max-content;max-width:90%;transform:translateX(-50%);box-sizing:border-box;margin:0 0 9px;padding:.28em .65em;border-radius:.28em;background:#101923de;color:#fff9e9;text-align:center;font:650 clamp(14px,2vw,22px)/1.55 system-ui,sans-serif}
+.rain-rescue-film::after{content:"";position:absolute;inset:0;background:#05070b;opacity:var(--rescue-fade,0)}
+body:is([data-rain-rescue],[data-rain-delivery-farewell]) .viewport{position:fixed;inset:0;min-height:0!important;height:100dvh!important;width:100vw;z-index:2000}
+body:is([data-rain-rescue],[data-rain-delivery-farewell]) :is(.world-player-bar,.world-camera-controls,.world-direction-guide,.imasora-control-display-toggle,.camera-reticle,#touchPad,#ufoMovePad,#rainStoryHint,#buildMenuButton,#buildPlacementMenuButton,#walkDashButton,#constructionJumpButton,.sky-wind-action){visibility:hidden!important;pointer-events:none!important}
+body:is([data-rain-rescue],[data-rain-delivery-farewell]) .viewport::before,
+body:is([data-rain-rescue],[data-rain-delivery-farewell]) .viewport::after{display:none}
+body[data-rain-delivery-farewell] #viewport > :not(#worldCanvas,#rainRescuePresentation){visibility:hidden!important;pointer-events:none!important}
+body[data-rain-works] .viewport{position:fixed;inset:0;min-height:0!important;height:100dvh!important;width:100vw;z-index:2000}
+body[data-rain-works] :is(.world-player-bar,.viewport-footer),
+body[data-rain-works] #viewport > :not(#worldCanvas,#rainWorksPanel,#rainWorksBrief,.rain-works-preview-note){visibility:hidden!important;pointer-events:none!important}
+.rain-works-preview .viewport{background:radial-gradient(ellipse at 40% 15%,#456573,#172834 78%)}
+.rain-works-preview .world-header{display:none!important}
+.rain-works-preview canvas{width:100%;height:100%;display:block}
+.amane-repair-progress{position:absolute;z-index:18;left:50%;bottom:max(15%,56px);transform:translateX(-50%);width:min(56%,268px);height:12px;accent-color:#f4d197}
+.amane-repair-progress[hidden]{display:none}
+body[data-amane-repair-work] :is(.world-player-bar,.world-camera-controls){visibility:hidden!important;pointer-events:none!important}
+body[data-amane-repair-film] :is(.world-player-bar,.viewport-footer),
+body[data-amane-repair-film] #viewport>:not(#worldCanvas,.amane-repair-film){visibility:hidden!important;pointer-events:none!important}
+body[data-amane-repair-film] .viewport::before,body[data-amane-repair-film] .viewport::after{display:none}
+body[data-rain-works] .viewport::before,body[data-rain-works] .viewport::after{display:none}
+
+/* Chapter 15 work yard and vehicle briefing. */
+.rain-works-panel[hidden]{display:none}
+.rain-works-panel,#rainWorksBrief{
+  --works-ink:#fff7e2;
+  --works-night:#101c2a;
+  --works-steel:#21364b;
+  --works-edge:#587088;
+  --works-gold:#ffd478;
+  --works-shadow:0 9px 28px #08132180;
+  font-family:Inter,system-ui,sans-serif;
+}
+.rain-works-panel{
+  position:absolute;inset:0;z-index:44;pointer-events:none;color:var(--works-ink);
+  font-size:18px;font-weight:650;line-height:1.35;outline:none;
+}
+.rain-works-panel header,.rain-works-controls{
+  box-sizing:border-box;border:1px solid var(--works-edge);border-top:3px solid var(--works-gold);
+  border-radius:6px 6px 16px 16px;background:linear-gradient(135deg,#23374b,var(--works-night) 74%);
+  box-shadow:var(--works-shadow);
+}
+.rain-works-panel header{
+  width:min(calc(100% - 28px),690px);margin:clamp(9px,2vh,20px) auto;
+  padding:9px clamp(10px,1.4vw,18px) 12px;
+}
+.rain-works-panel p{margin:0}
+.rain-works-stage{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 16px}
+#rainWorksPhase{color:var(--works-gold);font-size:clamp(16px,1.4vw,19px);font-weight:820}
+.rain-works-vehicle:not([hidden]){display:flex;align-items:center;gap:.55em;color:#eaf4ff;font-size:clamp(16px,1.4vw,19px)}
+.rain-works-vehicle [data-works-stage-count]{
+  display:inline-block;padding:1px .45em;border:1px solid #728da0;border-radius:4px;color:#fff1c7;
+  font-variant-numeric:tabular-nums;font-weight:800;
+}
+#rainWorksPrompt{margin-top:5px;font-size:clamp(21px,2.4vw,32px);font-weight:860;line-height:1.22}
+#rainWorksControlsHint{margin-top:5px;color:#f8eccf;font-size:clamp(16px,1.45vw,20px)}
+#rainWorksStatus{margin-top:5px;color:#ffe195}
+#rainWorksWater{margin-top:5px;color:#d6f4ff;font-variant-numeric:tabular-nums}
+.rain-works-panel progress{display:block;width:100%;height:9px;margin-top:8px;accent-color:#ffd478}
+.rain-works-panel progress[hidden],.rain-works-controls[hidden]{display:none}
+.rain-works-controls{
+  position:absolute;left:50%;bottom:max(43px,calc(env(safe-area-inset-bottom) + 32px));
+  transform:translateX(-50%);width:min(calc(100% - 28px),1160px);
+  padding:7px 9px 10px;font-size:clamp(18px,1.65vw,22px);
+}
+.rain-works-controls-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 13px;margin:0 4px 7px}
+.rain-works-controls-title strong{font-size:clamp(19px,1.9vw,25px);font-weight:850}
+.rain-works-controls-title [data-works-device]{color:#e5eff8;font-size:clamp(15px,1.25vw,17px)}
+.rain-works-controls-title [data-works-gauge]{margin-inline-start:auto;color:#ffe2a0;font-variant-numeric:tabular-nums}
+.rain-works-controls dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(144px,100%),1fr));gap:6px;margin:0}
+.rain-works-controls dl>div{
+  min-width:0;padding:5px 8px 8px;border:1px solid #698198;border-radius:8px;
+  background:linear-gradient(150deg,#30485d,#1d2f42);box-shadow:inset 0 -3px #0c18274d;
+}
+.rain-works-controls dl>.is-relevant{
+  border-color:var(--works-gold);background:linear-gradient(134deg,#42442f,#233746 80%);
+  box-shadow:inset 0 3px #f2ba53,inset 0 -3px #0c18274d;
+}
+.rain-works-controls dt{margin-bottom:5px;color:#fff2cf;font-weight:840;line-height:1.15}
+.rain-works-controls dd{
+  display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;
+  gap:7px;margin:0;color:#fff;line-height:1.2;overflow-wrap:anywhere;
+}
+.rain-works-controls dd+dd{margin-top:5px}
+.rain-works-controls kbd{
+  box-sizing:border-box;display:grid;place-items:center;min-width:1.9em;min-height:1.62em;
+  padding:.1em .36em;border:1px solid #fff7e1;border-radius:5px;background:linear-gradient(#fff8e8,#e4dcc1);
+  box-shadow:0 3px #788894,inset 0 1px #fff;color:#152331;text-align:center;white-space:nowrap;
+  font:900 clamp(16px,1.6vw,22px)/1.15 Inter,system-ui,sans-serif;
+}
+.rain-works-controls kbd.is-pressed{
+  transform:translateY(2px);border-color:#ffe5a3;background:#ffc450;box-shadow:inset 0 2px #aa690c,inset 0 -1px #ffda8b;color:#211a11;
+}
+.rain-works-panel footer{
+  position:absolute;bottom:max(7px,env(safe-area-inset-bottom));left:0;right:0;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:6px;
+  padding:0 clamp(8px,2vw,24px);margin:0;color:#fff;
+}
+.rain-works-panel footer p{padding:.14em .55em;background:#111e2df2;border:1px solid #637b90;border-radius:5px;font-size:16px}
+.rain-works-panel [data-works-legend]{grid-column:1;justify-self:start}
+.rain-works-panel [data-works-command]{grid-column:3;justify-self:end}
+.rain-works-panel footer p:empty{display:none}
+#rainWorksBrief [hidden],.rain-works-panel [data-works-board][hidden]{display:none}
+#rainWorksBrief [data-works-accept],.rain-works-panel [data-works-board],#rainWorksAction:not([hidden]){
+  border:1px solid #ffe6a7;border-radius:8px;background:linear-gradient(#ffe39e,#f3b73f 82%);
+  box-shadow:0 5px #8d5e1f,inset 0 1px #fff7d5,0 10px 22px #08131d80;
+  color:#20190b;cursor:pointer;font-size:clamp(20px,2vw,26px);font-weight:880;line-height:1.2;
+}
+.rain-works-panel [data-works-board]{grid-column:2;pointer-events:auto;min-height:54px;padding:9px clamp(12px,2vw,24px);margin-bottom:4px}
+#rainWorksBrief [data-works-accept]:hover,.rain-works-panel [data-works-board]:hover,#rainWorksAction:not([hidden]):hover{background:linear-gradient(#fff2c2,#ffca60)}
+#rainWorksBrief [data-works-accept]:active,.rain-works-panel [data-works-board]:active{
+  transform:translateY(3px);box-shadow:0 2px #8d5e1f,inset 0 1px #fff7d5;
+}
+#rainWorksBrief button:focus-visible,.rain-works-panel [data-works-board]:focus-visible{
+  outline:3px solid #ecf9ff;outline-offset:2px;
+}
+.rain-works-panel [data-works-board] kbd{
+  margin-inline-start:.45em;padding:.12em .42em;border-radius:4px;background:#2a2330;color:#fff;
+  font:850 17px/1.25 Inter,system-ui,sans-serif;white-space:nowrap;
+}
+#rainWorksAction:not([hidden]){padding:10px 20px;min-height:52px}
+#rainWorksBrief[open]{
+  inset:0;margin:auto;width:min(710px,calc(100% - 26px));height:max-content;
+  max-height:calc(100dvh - 24px);overflow:auto;padding:clamp(12px,2.5vw,26px);
+  border:1px solid #7592a9;border-top:4px solid var(--works-gold);border-radius:10px 10px 19px 19px;
+  background:radial-gradient(ellipse at top right,#2f4860,transparent 63%),var(--works-night);
+  color:var(--works-ink);box-shadow:0 24px 74px #040b18ad;font-size:clamp(17px,1.7vw,21px);line-height:1.5;
+}
+#rainWorksBrief::backdrop{background:#091523a1;backdrop-filter:blur(4px)}
+#rainWorksBrief h2{margin:0 0 .32em;color:var(--works-ink);font-size:clamp(25px,3vw,42px);font-weight:900;line-height:1.2}
+#rainWorksBrief h2 span{color:var(--works-gold);font-size:.64em;white-space:nowrap}
+#rainWorksBrief .rain-works-brief-goal{color:#fff1c9;font-weight:740}
+#rainWorksBrief footer{margin:12px 0 4px}
+#rainWorksBrief footer button{min-height:52px;padding:8px 16px;font-size:clamp(18px,1.8vw,23px)}
+#rainWorksBrief footer button:disabled{cursor:wait;opacity:.65}
+.rain-works-plan{
+  margin:.45em 0 .75em;padding:.5em .65em .62em;border:1px solid #7b9baa;border-radius:8px;display:flex;
+  align-items:center;justify-content:space-between;gap:.4em;background:#233b4f;color:#fff6e3;font-size:clamp(16px,1.4vw,19px);
+}
+.rain-works-plan div{flex:1;display:flex;gap:3px;transform:rotate(3deg)}
+.rain-works-plan div span{flex:1;padding:.14em .2em;border-block:3px solid #8edbe3;background:#285e71;text-align:center}
+.rain-works-dialogue p{
+  display:grid;grid-template-columns:max-content 1fr;gap:.62em;padding:.36em .5em;
+  border-left:2px solid #6f9dbb;background:#172a3e;
+}
+.rain-works-dialogue strong{color:#ffe08e}
+.rain-works-preview #rainWorksBrief[open]{width:min(840px,calc(100% - 26px))}
+.rain-works-preview :is(.rain-works-plan,.rain-works-dialogue){display:none}
+.rain-works-garage{display:grid;grid-template-columns:minmax(0,1.33fr) minmax(0,1fr);gap:12px;margin:10px 0}
+.rain-works-showcase{
+  position:relative;overflow:hidden;display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0;min-height:0;
+  margin:0;border:1px solid #687f91;border-radius:9px;background:#17283b;
+}
+.rain-works-showcase canvas{width:100%;height:100%;min-height:0;aspect-ratio:auto}
+.rain-works-showcase figcaption{
+  position:relative;padding:9px 12px;background:linear-gradient(100deg,#2f4b62,#22384b);
+  border-top:1px solid #7d92a4;color:#fff0d1;font-size:clamp(16px,1.55vw,20px);font-weight:750;
+}
+.rain-works-choices{display:grid;gap:4px;align-content:start}
+#rainWorksBrief .rain-works-choice{
+  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;text-align:left;
+  min-height:44px;padding:5px 9px;border:1px solid #67849d;border-radius:6px;
+  background:linear-gradient(130deg,#395670,#23384f);color:#fff;font-size:clamp(17px,1.8vw,23px);font-weight:790;
+}
+#rainWorksBrief .rain-works-choice:hover{background:linear-gradient(130deg,#476780,#2e465c)}
+#rainWorksBrief .rain-works-choice[aria-pressed=true]{
+  border-color:#ffda7e;background:linear-gradient(130deg,#ffe0a0,#ecb449);color:#221909;
+}
+.rain-works-choice-number{
+  padding:1px .33em;border:1px solid #a4bfd2;border-radius:4px;background:#18283a;color:#fff2cd;
+  font:850 16px/1.2 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
+}
+#rainWorksBrief .rain-works-preview-note,#rainWorksBrief .rain-works-preview-save{margin:4px 0;color:#e3edf7;font-size:16px}
+#rainWorksBrief .rain-works-preview-feedback{color:#ffe0a0}
+#rainWorksBrief .rain-works-preview-feedback:empty{display:none}
+@media(max-width:700px){
+ .rain-works-controls dl{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .rain-works-panel footer{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+ .rain-works-panel footer p{font-size:15px}
+}
+@media(max-width:560px){
+ .rain-works-controls{font-size:16px}
+ .rain-works-garage{grid-template-columns:1fr;gap:8px}
+ .rain-works-showcase canvas{height:clamp(84px,20dvh,144px)}
+ .rain-works-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #rainWorksBrief .rain-works-choice{gap:6px;padding-inline:6px}
+ .rain-works-dialogue p{grid-template-columns:1fr;gap:.15em}
+}
+@media(max-height:600px){
+ .rain-works-panel header{padding-block:6px 8px}
+ .rain-works-controls{bottom:36px;padding:5px 7px 7px}
+ .rain-works-controls dl>div{padding:4px 6px 6px}
+ .rain-works-controls dd+dd{margin-top:4px}
+}
+.rain-ending-sound { position:absolute;inset:auto 1em max(1em,env(safe-area-inset-bottom));margin:0;text-align:center;text-shadow:0 0 .35em #000;pointer-events:none; }
+.rain-ending-save { position: absolute; inset: 0; z-index: 4; align-content: center; text-align: center; padding: 24px; }
+.rain-ending-save p { margin: 0 auto 16px; max-width: 36ch; line-height: 1.75; }
+.rain-ending-save button { min-height: 44px; }
+[hidden].rain-ending-save, .rain-ending [hidden] { display: none; }
+body.archive-world-viewing .world-shell,body.archive-world-viewing .world-layout,body.archive-world-viewing .viewport-card { width:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0; }
+body.archive-world-viewing .viewport { height:100dvh!important;min-height:0!important; }
+body.archive-world-viewing :is(.world-player-bar,.viewport-footer,.world-camera-controls,.world-build-open,.world-move-pad,.touch-pad,.world-hold-dash,#constructionJumpButton,.coast-hud,.coast-search-compass,#buildPlacementControls,.coast-observation-action,.sky-wind-action,#ufoDepartureButton,#rainReturnDock) { display:none!important; }
 .flight-lever-list { display: grid; grid-template-columns: repeat(4, minmax(58px, 1fr)) minmax(66px, .72fr) 78px; align-items: stretch; gap: 4px; min-height: 74px; }
 .space-shooter-control-list { display: none; grid-template-columns: minmax(108px, 1fr) minmax(116px, .8fr) minmax(108px, 1fr); align-items: stretch; gap: 6px; min-height: 74px; }
 .ufo-flight-controls.is-space-shooter .flight-lever-list { display: none; }
@@ -294,25 +751,18 @@ code { color: #8edfff; }
   .ufo-forward-scroll-reward-feed { top: 108px; right: 11px; width: min(205px, calc(100% - 22px)); gap: 6px; }
   .ufo-forward-scroll-reward { padding: 7px 10px 6px; }
   .ufo-forward-scroll-reward strong { font-size: 12px; }
-  .sky-station-guide-dialog { bottom: 9px; width: calc(100% - 22px); padding: 12px 12px 13px; border-radius: 11px; }
-  .sky-station-guide-dialog-name { min-height: 26px; margin-top: -26px; padding-inline: 10px; font-size: 12px; }
-  .sky-station-guide-dialog-text { min-height: 3.05em; font-size: 15px; line-height: 1.55; }
-  .sky-station-guide-dialog-choices { gap: 6px; margin-top: 9px; }
-  .sky-station-guide-dialog-choices button { min-height: 38px; padding: 7px 8px; font-size: 12px; }
-  .ufo-equipment-workshop-menu { width: calc(100% - 22px); max-height: calc(100% - 22px); padding: 13px; border-radius: 13px; }
-  .ufo-equipment-workshop-heading { gap: 9px; padding-bottom: 10px; }
+
+  .ufo-equipment-workshop-menu { width: calc(100% - 18px); max-height: calc(100% - 18px); border-radius: 13px; }
+  .ufo-equipment-workshop-heading { grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding: 11px 12px; }
+  .ufo-equipment-workshop-heading .ufo-workshop-glyph { display: none; }
   .ufo-equipment-workshop-heading h2 { font-size: 20px; }
-  .ufo-equipment-workshop-heading p { font-size: 11px; }
-  .ufo-equipment-workshop-heading button { min-height: 33px; padding: 6px 10px; font-size: 12px; }
-  .ufo-equipment-workshop-resources { gap: 5px; margin: 10px 0; }
-  .ufo-equipment-workshop-resources span { padding: 5px 8px; font-size: 10px; }
-  .ufo-equipment-workshop-resources strong { font-size: 14px; }
-  .ufo-equipment-workshop-list { grid-template-columns: 1fr; gap: 7px; }
-  .ufo-equipment-workshop-card { min-height: 0; gap: 7px 9px; padding: 10px; }
-  .ufo-equipment-workshop-card h3 { font-size: 14px; }
-  .ufo-equipment-workshop-card p { font-size: 12px; }
-  .ufo-equipment-workshop-cost { padding: 3px 6px; font-size: 10px; }
-  .ufo-equipment-workshop-card button { min-height: 31px; padding: 5px 10px; font-size: 12px; }
+  .ufo-equipment-workshop-heading button { padding-inline: 9px; }
+  .ufo-equipment-workshop-scroll { padding: 10px 12px 12px; }
+  .ufo-equipment-workshop-resources { gap: 5px; }
+  .ufo-equipment-workshop-resources div { flex-wrap: wrap; padding: 4px 6px; gap: 2px 6px; }
+  .ufo-equipment-workshop-resources dt { font-size: 12px; }
+  .ufo-equipment-workshop-resources dd { font-size: 17px; }
+  .ufo-equipment-workshop-list { grid-template-columns: 1fr; gap: 9px; }
   .flight-lever-list { grid-template-columns: repeat(4, minmax(0, 1fr)) 42px 66px; gap: 2px; min-height: 66px; }
   .space-shooter-control-list { grid-template-columns: minmax(84px, 1fr) minmax(82px, .7fr) minmax(84px, 1fr); gap: 3px; min-height: 66px; }
   .space-strafe-lever { min-width: 0; }
@@ -366,22 +816,6 @@ code { color: #8edfff; }
 .ground-design-size{margin-top:12px;padding:12px;border:2px solid #b6d6e3;border-radius:18px;background:#f3fbff;color:#284958;overflow-wrap:anywhere}.ground-design-size h3{margin-top:0}.ground-size-row{display:grid;grid-template-columns:52px minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;margin:8px 0}.ground-size-row button,.ground-design-shift button{min-height:44px;min-width:0;padding:7px;font:inherit}.ground-design-shift{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.free-grid[data-shape] button[data-supported=false]{background:#e8edf0!important;box-shadow:none;opacity:.5}.ground-design-size [data-footprint-size]{font-weight:800;font-size:1.05em}
 .viewport.is-conversing :is(.touch-pad,.world-move-pad,.look-pad,.camera-reticle,.world-hold-dash,.world-jump-button,.emergency-escape-control,#constructionJumpButton,#buildMenuButton){visibility:hidden;pointer-events:none}
 .viewport.is-conversing .camera-distance-control{top:12px;left:12px;bottom:auto;min-height:44px;z-index:17;transform:none}
-/* The close button stays outside the scrolling conversation in every phase. */
-body .sky-station-guide-dialog{left:auto;right:12px;bottom:12px;transform:none;width:min(360px,42vw);height:min(360px,calc(100% - 24px));max-height:calc(100% - 24px);box-sizing:border-box;padding:12px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
-body .sky-station-guide-dialog[hidden]{display:none}
-.conversation-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
-body .conversation-heading .sky-station-guide-dialog-name{margin:0;padding:6px 9px;min-width:0;font-size:14px}
-.conversation-heading>button{flex-shrink:0;min-width:82px;min-height:44px}
-.conversation-body{overflow:auto;overscroll-behavior:contain;min-height:0;padding:2px}
-body .sky-station-guide-dialog-choices{grid-template-columns:1fr}
-body .sky-station-guide-dialog-text{font-size:16px;line-height:1.6;min-height:0;margin:4px 0 12px}
-#skyStationGuideDialog[data-typing="true"] .sky-station-guide-dialog-text{cursor:pointer}
-#skyStationGuideDialog[data-typing="true"] .sky-station-guide-dialog-text:after{content:'　タップで全文';font-size:12px;opacity:.8;animation:none;border:0;width:auto;height:auto}
-@media(orientation:portrait){
- body .sky-station-guide-dialog{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));width:auto;height:min(320px,45dvh);max-height:45dvh}
- body .sky-station-guide-dialog-choices{grid-template-columns:1fr 1fr}
-}
-
 /* 120li: keep the shallow-water controls clear of the stick and dash. */
 .coast-snorkel-mode .coast-hud,.coast-snorkel-mode #buildMenuButton{visibility:hidden!important;pointer-events:none!important}
 .coast-snorkel-actions button{position:absolute;z-index:44;border:2px solid #fff;border-radius:23px;padding:12px 20px;background:#d4f4ef;color:#28505b;font:700 16px system-ui;box-shadow:0 3px 10px #16434a33;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -411,7 +845,712 @@ body .sky-station-guide-dialog-text{font-size:16px;line-height:1.6;min-height:0;
 .coast-snorkel-actions .coast-snorkel-kick{left:auto;right:calc(72px + env(safe-area-inset-right,0px));bottom:max(10px,env(safe-area-inset-bottom));width:68px;height:68px;min-width:68px;min-height:68px;padding:5px;border-radius:50%;box-sizing:border-box;background:#ffebb0;font-size:13px;line-height:1.3}
 .coast-snorkel-kick:disabled{opacity:.5;box-shadow:none}
 
+/* I sits above J–K–L, in the same order as the keyboard. */
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped:not([hidden]){
+ position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));z-index:44;
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:min(272px,calc(100% - 24px));
+ box-sizing:border-box;padding:8px;border:1px solid #9fbfc6;border-radius:14px;background:#122f39ec;
+}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > button{
+ position:static;inset:auto;transform:none;display:flex;flex-direction:column-reverse;align-items:center;justify-content:center;gap:4px;
+ width:100%;height:auto;min-width:0;min-height:54px;padding:5px 3px;border:1px solid #769fa9;border-radius:8px;
+ background:linear-gradient(#f6fcfc,#d6edef);color:#15333c;font:800 12px/1.2 system-ui,sans-serif;
+ white-space:nowrap;box-shadow:0 2px 0 #6f959e;
+}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > button::after{margin:0}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > .coast-snorkel-net{
+ grid-area:1 / 2;justify-self:center;width:max(100%,112px);
+}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > .coast-snorkel-rise{grid-area:2 / 1}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > .coast-snorkel-kick{
+ grid-area:2 / 2;background:linear-gradient(#fff2cc,#f9dda2);border-color:#c2a16a;
+}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > .coast-snorkel-dive{grid-area:2 / 3}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > .coast-snorkel-start{grid-area:3 / 1 / auto / -1;min-height:44px}
+html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > button:disabled{
+ background:#cdd9dd;border-color:#8fa6ae;color:#36545c;box-shadow:none;opacity:1;
+}
+@media(max-width:458px){
+ html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped:not([hidden]){
+  bottom:calc(max(10px,env(safe-area-inset-bottom)) + 82px);
+ }
+}
+@media(max-height:440px){
+ html[data-control-display="keyboard"] body.world-player-game .coast-snorkel-actions.is-equipped > button{min-height:48px}
+}
+
 /* During snorkeling the chart buttons are hidden; use their free corner for breath. */
 body.world-player-game.coast-snorkel-mode .coast-snorkel-info{left:auto;right:max(12px,env(safe-area-inset-right));top:calc(max(12px,env(safe-area-inset-top)) + 52px);max-width:160px;border:2px solid white;padding:7px 10px;box-shadow:0 2px 8px #244d6422}
 
 @media(max-height:400px){body.world-player-game.coast-snorkel-mode .coast-snorkel-info{top:max(12px,env(safe-area-inset-top));left:50%;right:auto;transform:translateX(-50%);padding:4px 8px;max-width:180px;font-size:11px}}
+
+.sky-wind-action {
+  position:absolute;z-index:14;left:50%;bottom:max(19%,calc(env(safe-area-inset-bottom) + 100px));
+  transform:translateX(-50%);white-space:nowrap;min-height:46px;
+  padding:8px 18px;border:1px solid #f5d6a0;border-radius:13px;
+  color:#1b2e44;background:#ffe4a9;box-shadow:0 4px 15px #16284570;
+  font:750 15px system-ui,sans-serif;cursor:pointer;touch-action:manipulation;
+}
+.sky-race-invitation[open] {
+  position: fixed;
+  inset: auto 0 max(20px, env(safe-area-inset-bottom));
+  margin: 0 auto;
+  width: min(400px, calc(100% - 32px));
+  box-sizing: border-box;
+  padding: 18px 19px;
+  color: #f0faff;
+  background: linear-gradient(150deg, #214e65, #132c46);
+  border: 1px solid #a1e7ea;
+  border-radius: 18px;
+  box-shadow: 0 12px 38px #0b233f70, inset 0 1px #d4ffff55;
+}
+.sky-race-invitation::backdrop { background: linear-gradient(0deg, #0d264c70, transparent 65%); }
+.sky-race-invitation h2 { margin: 0 0 15px; font: 800 clamp(19px, 4.6vw, 23px) / 1.3 system-ui, sans-serif; }
+.sky-race-invitation div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sky-race-invitation button {
+  min-height: 46px;
+  padding: 8px 10px;
+  border: 1px solid #9bc5d9;
+  border-radius: 10px;
+  color: #f3fbff;
+  background: #2c5873;
+  box-shadow: 0 3px #10263d;
+  font: 800 15px system-ui, sans-serif;
+  cursor: pointer;
+}
+.sky-race-invitation #skyRaceAccept { color: #153349; background: linear-gradient(#c5f7e8, #70ccb9); border-color: #c5f7e8; }
+.sky-race-invitation button:focus-visible { outline: 2px solid #ffd89a; outline-offset: 2px; }
+.sky-wind-dialog[open] {
+  position:fixed;inset:auto 0 max(14px,env(safe-area-inset-bottom));margin:0 auto;
+  box-sizing:border-box;width:min(540px,calc(100% - 24px));max-height:calc(100dvh - 28px);
+  padding:14px 19px;border:1px solid #bbab88;border-radius:16px;
+  color:#f7f4ed;background:linear-gradient(140deg,#1c3551,#15263e);
+  box-shadow:0 6px 28px #101d34a8;font:550 15px/1.55 system-ui,sans-serif;
+}
+.sky-wind-dialog::backdrop {background:linear-gradient(0deg,#11244085,transparent 50%)}
+.sky-wind-dialog h2 {margin:0 0 5px;font-size:19px;color:#ffe2a6}
+.sky-wind-dialog p {margin:7px 0}
+.sky-wind-dialog footer {display:flex;flex-wrap:wrap;gap:8px}
+.sky-wind-dialog footer {justify-content:flex-end;margin-top:8px}
+.sky-wind-dialog button {
+  min-height:44px;padding:5px 12px;border:1px solid #9aafc2;border-radius:10px;
+  color:#fbf5e6;background:#2f4863;font:700 14px system-ui,sans-serif;
+  cursor:pointer;touch-action:manipulation;
+}
+.sky-wind-dialog [aria-pressed="true"] {
+  color:#1a2d44;background:#ffe4a9;border-color:#ffe4a9;
+}
+.sky-wind-action:focus-visible,.sky-wind-dialog button:focus-visible {outline:3px solid #a2e5ff;outline-offset:3px}
+.rain-story-hint {
+  position:absolute;z-index:10;left:50%;top:max(12px,env(safe-area-inset-top));
+  transform:translateX(-50%);margin:0;max-width:min(78%,560px);padding:6px 13px;
+  border:1px solid #e9be81;border-radius:10px;background:#382620e8;color:#fff0d3;
+  text-align:center;font:650 14px/1.45 system-ui,sans-serif;pointer-events:none;
+}
+.rain-story-hint[hidden]{display:none}
+.rain-story-controls.is-construction {
+  position:absolute;z-index:14;inset-inline:0;bottom:max(19%,calc(env(safe-area-inset-bottom) + 48px));
+  width:min(25rem,calc(100% - 32px));margin-inline:auto;display:grid;justify-items:center;gap:10px;
+  pointer-events:none;
+}
+.native-door-walk {
+  position:absolute;top:76px;left:50%;transform:translateX(-50%);z-index:25;
+  box-sizing:border-box;max-width:calc(100% - 28px);display:flex;gap:10px;align-items:center;
+  padding:10px;border:2px solid #efc55a;border-radius:16px;background:#fff4ce;color:#22485b;
+  box-shadow:0 3px 12px #24465a25;font-weight:700;
+}
+.native-door-walk[hidden]{display:none}
+.native-door-walk button {
+  min-width:70px;min-height:44px;border-radius:12px;background:#fff;color:#24465b;border:2px solid #e9c055;
+}
+.rain-story-controls.is-construction > :is(.rain-story-hint,.sky-wind-action,.native-door-walk) {
+  position:static;transform:none;box-sizing:border-box;max-width:100%;
+}
+.rain-story-controls.is-construction > :is(.sky-wind-action,.native-door-walk) {
+  pointer-events:auto;white-space:normal;
+}
+@media (max-width:560px) {
+  .rain-story-controls.is-construction {
+    width:min(300px,calc(100% - 32px));bottom:calc(max(8px,env(safe-area-inset-bottom)) + 112px);
+  }
+}
+@media(max-height:500px){
+  .rain-story-hint{max-width:min(56%,470px);padding:5px 9px;font-size:12px}
+}
+.amane-record-visual {margin:.6rem 0;color:#ffe2a6}
+.amane-record-visual::after {
+  content:"";display:block;width:52%;height:.5rem;margin:.4rem 0;border-radius:6px;
+  background:repeating-linear-gradient(90deg,#67d1e2 0 11%,#153150 11% 13%);
+}
+.amane-record-visual[data-period="new"]::after {width:26%}
+.amane-source-evidence {
+  display:grid;justify-items:center;margin:.65rem 0;overflow:hidden;
+  border-radius:9px;background:#101e2b;box-shadow:0 3px 12px #0812207a;
+}
+.amane-source-evidence[hidden]{display:none}
+body:has(.amane-visit-dialog[open]) #toast{display:none}
+.amane-source-evidence canvas {
+  display:block;max-inline-size:100%;max-block-size:min(37dvh,230px);
+  block-size:auto;inline-size:auto;object-fit:contain;
+}
+.sky-wind-film[open]{
+  position:absolute;inset:0;box-sizing:border-box;width:100%;height:100%;max-width:none;max-height:none;
+  margin:0;padding:0;border:0;background:transparent;color:#fff9e9;pointer-events:none;overflow:hidden;
+  --lookout-bar:clamp(24px,8%,86px);
+}
+.sky-wind-film::backdrop{background:transparent}
+.sky-wind-fade{position:absolute;z-index:1;inset:0;background:#05070b}
+.sky-wind-film::before,.sky-wind-film::after{
+  content:'';position:absolute;left:0;right:0;height:var(--lookout-bar);background:#05070b;opacity:var(--lookout-matte,0);
+}
+.sky-wind-film::before{top:0}.sky-wind-film::after{bottom:0}
+.sky-wind-film p{
+  position:absolute;bottom:var(--lookout-bar);left:50%;width:max-content;max-width:90%;
+  box-sizing:border-box;transform:translateX(-50%);margin:0 0 9px;padding:.28em .65em;
+  border-radius:.28em;background:#101923e8;color:#fff9e9;text-align:center;
+  font:650 clamp(14px,2vw,22px)/1.55 system-ui,sans-serif;
+}
+body:has(.sky-wind-film[open]) :is(.world-player-bar,.viewport-toolbar,.viewport-footer){visibility:hidden}
+body:has(.sky-wind-film[open]) #viewport{position:fixed;inset:0;width:100%;height:100dvh!important;min-height:0!important;z-index:2000}
+body:has(.sky-wind-film[open]) #viewport>:not(#worldCanvas,.sky-wind-film){visibility:hidden!important;pointer-events:none!important}
+body:has(.sky-wind-film[open]) #viewport::before,body:has(.sky-wind-film[open]) #viewport::after{display:none}
+body:has(.sky-wind-dialog[open]) :is(.world-player-bar,.world-camera-controls,#buildMenuButton,#touchPad,#constructionJumpButton,#walkDashButton) {opacity:0!important;pointer-events:none!important}
+@media(max-height:500px){
+  .sky-wind-dialog[open]{padding:8px 12px;font-size:14px;line-height:1.35}
+  .sky-wind-dialog p,.sky-wind-dialog footer{margin-top:4px}
+}
+
+/* Reserve the original label space. Draw each shortcut on the same corner. */
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(
+ .transport-top,.transport-actions,.transport-exc-aux,.transport-note,.transport-sheet,.free-concrete,.gv-active
+) button:is([data-imasora-key-primary],:has(.imasora-inline-key)):not([data-hold-dash],[data-free-jump]){
+ position:relative;
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(
+ .transport-play,.free-concrete,.gv-active,#walkDashButton,#constructionJumpButton
+) :is(button[data-imasora-key-primary],.imasora-inline-key)::after,
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(#walkDashButton,#constructionJumpButton)[data-imasora-key-primary]::after{
+ visibility:hidden;
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(
+ .transport-play button[data-imasora-key-primary],.free-concrete button[data-imasora-key-primary],
+ .gv-active button[data-imasora-key-primary],#walkDashButton[data-imasora-key-primary],#constructionJumpButton[data-imasora-key-primary]
+)::before,
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(
+ .transport-play,.free-concrete,.gv-active
+) button .imasora-inline-key:not(.imasora-inline-key ~ .imasora-inline-key)::before{
+ content:attr(data-imasora-key-primary);
+ position:absolute;z-index:1;top:1px;right:3px;box-sizing:border-box;
+ display:grid;place-items:center;min-width:15px;height:11px;padding:0 2px;
+ background:#244652;color:#fff;border:1px solid #80a5ac;border-radius:3px;
+ font:850 10px/1 system-ui;white-space:nowrap;pointer-events:none;
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(.transport-play,.free-concrete,.gv-active) button .imasora-inline-key:not(.imasora-inline-key ~ .imasora-inline-key)::before{
+ content:attr(data-keycap);
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(.transport-play,.free-concrete,.gv-active)
+ button:is([data-key-held=true],[data-game-press=true],[data-hold-dash][aria-pressed=true])::before,
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] :is(.transport-play,.free-concrete,.gv-active)
+ button:is([data-key-held=true],[data-game-press=true]) .imasora-inline-key::before{
+ background:#73491f;border-color:#f6d28b;
+}
+
+.transport-keyboard-label{display:none}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] .transport-excavator button:has(>.transport-keyboard-label){
+ -webkit-text-fill-color:transparent;
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] .transport-excavator button:has(>.transport-keyboard-label)::before,
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] .transport-excavator button>.imasora-inline-key::before{
+ -webkit-text-fill-color:currentColor;
+}
+html[data-control-display=keyboard] body.world-player-game[data-ufo-world-map=construction] .transport-keyboard-label{
+ position:absolute;inset:8px 3px 2px;display:grid;place-items:center;pointer-events:none;
+ text-align:center;text-wrap:balance;line-height:1.14;-webkit-text-fill-color:currentColor;
+}
+.transport-keyboard-label::after{content:attr(data-label)}
+
+/* Work warnings stay in the existing notice area, out of the driving controls. */
+body.world-player-game[data-ufo-world-map=construction] [data-construction-notice]:not(:empty){
+ --notice-bg:#35251b;
+ --notice-edge:#ffbb59;
+ --notice-text:#fff2d9;
+ --notice-chip:#ffdb9b;
+ --notice-chip-ink:#3f2307;
+ --notice-label:"▲ 注意";
+ box-sizing:border-box;
+ background:var(--notice-bg)!important;
+ color:var(--notice-text)!important;
+ border:1px solid var(--notice-edge);
+ border-inline-start-width:4px;
+ border-radius:8px;
+ padding:6px 9px;
+ line-height:1.42;
+ overflow-wrap:anywhere;
+}
+body.world-player-game[data-ufo-world-map=construction] [data-construction-notice=error]:not(:empty){
+ --notice-bg:#441f30;
+ --notice-edge:#ff96a9;
+ --notice-text:#fff0f4;
+ --notice-chip:#ffc6d0;
+ --notice-chip-ink:#4c1225;
+ --notice-label:"! エラー";
+}
+body.world-player-game[data-ufo-world-map=construction] [data-construction-notice]:not(:empty)::before{
+ content:var(--notice-label);
+ display:inline-block;
+ margin-inline-end:.5em;
+ padding:.08em .45em;
+ border-radius:4px;
+ background:var(--notice-chip);
+ color:var(--notice-chip-ink);
+ font-weight:850;
+ font-size:.86em;
+ vertical-align:.07em;
+ white-space:nowrap;
+}
+body.world-player-game[data-ufo-world-map=construction] .gv-message[data-construction-notice]{
+ white-space:normal;
+ text-overflow:clip;
+ max-height:calc(4.26em + 14px);
+}
+
+/* Construction cab: chamfered caps, illuminated control symbols and pressed travel. */
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ width:min(164px,43vw);gap:5px;padding:0 0 3px;border:0;background:none;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys > [data-key-direction]{
+ position:relative;display:flex;align-items:flex-end;justify-content:center;
+ min-width:0;min-height:43px;padding:3px 2px;box-sizing:border-box;
+ border:1px solid #7496a4;border-radius:6px 13px 6px 13px;
+ background:linear-gradient(134deg,#a4d7e5 6px,transparent 7px) left top / 15px 15px no-repeat,
+  linear-gradient(180deg,#ffffff26,transparent 39%,#00000024 92%,#ffffff1f),linear-gradient(135deg,#344b5b,#172831);
+ box-shadow:inset 0 1px 0 #ffffff38,inset 0 -3px 0 #0007,0 3px 0 #0a1821;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys > [data-key-direction] > span{
+ color:#eff9fa!important;font-weight:800;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys kbd{
+ position:absolute;top:3px;right:5px;min-width:17px;min-height:16px;
+ color:#eff9fa;background:#142a39;border:1px solid #789dad;box-sizing:border-box;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys [data-game-action=secondary]{
+ display:block;position:absolute;inset:0;margin:0;padding:0;border:0;
+ background:none;box-shadow:none;transform:none;min-height:0;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys [data-game-action=secondary] > span{display:none}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys [data-game-action=back]:has(> [data-game-action=secondary]:not([hidden])) > kbd{right:25px}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys > :is([data-game-press=true],:has(> [data-game-press=true])){
+ transform:translateY(2px);background:linear-gradient(#131e25,#172831);border-color:#a4d7e5;
+ box-shadow:inset 0 3px 6px #040b12;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-drive-keys [data-key-direction][data-game-press=true] > kbd{
+ background:#a4d7e5;color:#142a39;
+}
+
+body.world-player-game[data-ufo-world-map=construction] .transport-play :is(.transport-top,.transport-actions,.transport-exc-aux) button,
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button{
+ --cab-top:#344b5b;
+ --cab-base:#172831;
+ --cab-edge:#7496a4;
+ --cab-ink:#eff9fa;
+ --cab-pip:#a4d7e5;
+ --cab-shelf:#0a1821;
+ --cab-cap:linear-gradient(134deg,var(--cab-pip) 6px,transparent 7px) left top / 15px 15px no-repeat,
+  linear-gradient(180deg,#ffffff26,transparent 39%,#00000024 92%,#ffffff1f),
+  linear-gradient(135deg,var(--cab-top),var(--cab-base));
+ background:var(--cab-cap)!important;
+ color:var(--cab-ink)!important;
+ border-color:var(--cab-edge)!important;
+ border-radius:6px 13px 6px 13px!important;
+ box-shadow:inset 0 1px 0 #ffffff38,inset 0 -3px 0 #0007,0 3px 0 var(--cab-shelf),0 5px 9px #08182765!important;
+ font-weight:800;
+ position:relative;
+ isolation:isolate;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play button:is([data-steer],[data-id=left],[data-id=right],[data-id=view],[data-id=excMode]){
+ --cab-pip:#8dddf2;
+ --cab-edge:#71abc3;
+ --cab-top:#315769;
+ --cab-base:#162d40;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play button:is([data-arm-joint],[data-id=digKind],[data-id=startTrial],.transport-sheet [data-id=save]){
+ --cab-pip:#ffcd78;
+ --cab-edge:#cf9754;
+ --cab-top:#664729;
+ --cab-base:#38291e;
+ --cab-ink:#fff4df;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play button:is([data-id=scoop],[data-id=board],[data-id=boardExc],[data-id=begin],.transport-sheet [data-id=resume],.transport-sheet [data-recovery=apply]){
+ --cab-pip:#aef8ce;
+ --cab-edge:#89d9b3;
+ --cab-top:#327974;
+ --cab-base:#1c4747;
+ --cab-ink:#f4fff3;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play button:is([data-id=leave],[data-id=leaveExc],[data-id=exit],[data-id=cancelTrial]){
+ --cab-pip:#ffac9c;
+ --cab-edge:#b87a6d;
+ --cab-top:#59413f;
+ --cab-base:#39272c;
+ --cab-ink:#ffefec;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play.transport-active .transport-actions button[data-id=scoop]:not(:disabled){
+ background:var(--cab-cap)!important;color:var(--cab-ink)!important;
+ border-color:var(--cab-edge)!important;
+ box-shadow:inset 0 0 0 2px #b3ffce34,inset 0 -3px 0 #0005,0 3px 0 #102c31,0 5px 10px #0b181c70!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play :is(.transport-top,.transport-actions,.transport-exc-aux) button:is(:active,[data-game-press=true],[data-key-held=true]):not(:disabled),
+body.world-player-game[data-ufo-world-map=construction] .transport-play.transport-active .transport-actions button[data-id=scoop]:is(:active,[data-game-press=true],[data-key-held=true]):not(:disabled){
+ background:linear-gradient(180deg,#131e25,var(--cab-base))!important;
+ color:var(--cab-ink)!important;
+ border-color:var(--cab-pip)!important;
+ box-shadow:inset 0 3px 6px #040b12,0 0 10px color-mix(in srgb,var(--cab-pip) 44%,transparent)!important;
+ transform:translateY(2px)!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play :is(.transport-top,.transport-actions,.transport-exc-aux) button:disabled,
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-actions button[data-work-blocked=true]:not([data-key-held=true]){
+ background:repeating-linear-gradient(132deg,#ffffff09 0 3px,transparent 3px 8px),linear-gradient(#34434b,#25333b)!important;
+ color:#dce9eb!important;border-color:#657880!important;opacity:1;
+ box-shadow:inset 0 1px 0 #ffffff16,inset 0 -2px 0 #0004!important;
+ --cab-pip:#98aab1;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-exc-aux button[aria-pressed=true]:not(:disabled){
+ --cab-top:#326d60;--cab-base:#1a413e;--cab-pip:#b5f7cf;--cab-edge:#8fd4b4;
+ background:var(--cab-cap)!important;color:#f3fff9!important;border-color:var(--cab-edge)!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-exc-aux{
+ border-radius:8px 15px 8px 15px;
+ box-shadow:0 0 0 4px #192731d9,0 0 0 5px #64808fa0,0 7px 15px #0d20256b;
+ background:#182932dc;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play.transport-active .transport-actions{
+ background:linear-gradient(135deg,#2b454fef,#121f2aed);
+ border-color:#7198a8;
+ box-shadow:inset 0 0 0 2px #112633,0 5px 13px #0b1c286f;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-actions:has([data-id=footActions]:not([hidden])):not(:has([data-id=footActions]>button:not([hidden],:disabled))){
+ box-shadow:none;background:none;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-note{
+ background:linear-gradient(#293e4bef,#182933f2)!important;
+ color:#edf8fa!important;border-color:#82a6b5!important;border-inline-start-color:#ffc671!important;
+ box-shadow:inset 0 1px 0 #ffffff22,0 4px 12px #0915206d;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-note strong,
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-note p{color:#edf8fa!important}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-note [data-construction-notice]:not(:empty){color:var(--notice-text)!important}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-note .transport-chapter-hint{
+ background:#3c321f;border:1px solid #795a34;color:#ffe7ac!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .construction-move-pad{
+ border-color:#9cb1bb;
+ background:repeating-conic-gradient(from 20deg,#4d6572 0 2deg,#152831 2deg 30deg)!important;
+ border-color:#9cb1bb!important;
+ box-shadow:inset 0 0 0 5px #0b1b26,inset 0 0 0 9px #4b6976,0 4px 0 #101d27,0 6px 16px #0a182775!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .construction-move-stick{
+ background:linear-gradient(145deg,#c8e8ed,#81afbd 50%,#45656f 53%,#293c48)!important;
+ border-color:#bae0e7!important;
+ box-shadow:inset 0 0 0 2px #d3eff6a0,0 3px 5px #081523d0;
+}
+
+/* A symbol and its caption share the existing cap; the live keyboard badge stays in the corner. */
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator button:has(>.transport-keyboard-label){
+ -webkit-text-fill-color:transparent;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator button:has(>.transport-keyboard-label)::before,
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator button>.imasora-inline-key::before{ -webkit-text-fill-color:currentColor }
+html[data-control-display] body.world-player-game[data-ufo-world-map=construction] .transport-excavator .transport-keyboard-label{
+ position:absolute;inset:3px 3px 3px;display:grid;grid-template-rows:13px minmax(0,1fr);place-items:center;
+ pointer-events:none;text-align:center;text-wrap:balance;line-height:1.04;
+ -webkit-text-fill-color:currentColor;
+}
+html[data-control-display] body.world-player-game[data-ufo-world-map=construction] .transport-excavator .transport-keyboard-label::before{
+ content:"";width:18px;height:13px;background:var(--cab-pip,#a4d7e5);
+ mask:var(--cab-symbol) center/contain no-repeat;
+ filter:drop-shadow(0 0 2px #ffffff2e);
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator .transport-keyboard-label::after{
+ max-width:100%;overflow-wrap:anywhere;
+ color:var(--cab-ink,#eff9fa)!important;-webkit-text-fill-color:var(--cab-ink,#eff9fa)!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator button:not(:disabled):is([data-key-held=true],[data-game-press=true],:active) .transport-keyboard-label::before{
+ background:#fffced;
+}
+@media(min-width:745px) and (min-height:481px){
+ html[data-control-display] body.world-player-game[data-ufo-world-map=construction] .transport-excavator .transport-keyboard-label{
+  grid-template-columns:21px minmax(0,1fr);grid-template-rows:1fr;inset:4px 6px;text-align:center;
+ }
+}
+
+/* The pause panel uses the same field-console material as the work controls. */
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet:not([data-parking-confirm]){
+ background:linear-gradient(156deg,#233c4b,#12212d 53%,#0e1b27)!important;
+ border-color:#819eaa!important;border-radius:13px 25px 13px 25px!important;
+ box-shadow:inset 0 0 0 2px #071927,inset 0 1px 0 #c4e8f0,0 14px 44px #071b28d8!important;
+ color:#edf7fa!important;scrollbar-color:#7295a3 #172b38;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet::backdrop{
+ background:#071624ba;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-menu-head{
+ background:linear-gradient(137deg,#325461,#203646 64%,#182636)!important;
+ border-bottom:2px solid #cc9857!important;border-radius:10px 22px 0 0;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-menu-head::after{
+ content:"";top:0;right:0;height:100%;width:88px;transform:none;pointer-events:none;
+ background:repeating-linear-gradient(133deg,transparent 0 10px,#edbd7540 10px 15px);
+ mask:linear-gradient(90deg,transparent,#000);
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet :is(h2,h3){
+ color:#fff5d9!important;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet :is(.transport-menu-head p,.transport-menu-sub,.transport-menu-foot,[data-id=storageStatus],small){
+ color:#cde2ea!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-menu-head .menu-kicker{color:#ffd393!important}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet :is(.storage-section,[data-recovery=work],.transport-record-name,[role=status]:not([data-construction-notice])){
+ color:#eff9f8!important;background:#27454e!important;border-color:#8cb6b9!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-play .transport-menu-icon{
+ background:#0c1d28;border:1px solid var(--cab-edge);color:var(--cab-pip)!important;box-shadow:inset 0 2px 4px #081726;
+ line-height:1.35;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet :is(.transport-recovery-content,.storage-section) :is(p,small,summary,td,th){color:#dcecf2!important}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:is(:active,[data-game-press=true]):not(:disabled){
+ background:linear-gradient(#152934,var(--cab-base))!important;color:var(--cab-ink)!important;
+ box-shadow:inset 0 3px 6px #07101a,0 0 9px var(--cab-edge)!important;transform:translateY(2px)!important;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:disabled{
+ background:repeating-linear-gradient(132deg,#ffffff09 0 3px,transparent 3px 8px),linear-gradient(#34434b,#25333b)!important;
+ color:#dce9eb!important;border-color:#657880!important;box-shadow:inset 0 -2px 0 #0004!important;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:focus-visible{
+ outline:3px solid #fbd696;outline-offset:3px;
+}
+
+/* Keep the accelerator's location and hit area, and make its pedal and light visible. */
+body.world-player-game[data-ufo-world-map=construction] :is(#walkDashButton,.hold-dash-button[data-hold-dash]){
+ background:
+  linear-gradient(135deg,#ffd38a 8px,transparent 9px) top left/19px 19px no-repeat,
+  repeating-linear-gradient(133deg,#fff1d114 0 2px,transparent 2px 7px),
+  linear-gradient(#745232,#3d2c20 52%,#201f20)!important;
+ color:#fff8e7!important;border-color:#ffc979!important;border-radius:8px 21px 8px 21px!important;
+ box-shadow:inset 0 0 0 2px #291900,inset 0 0 0 3px #ffdc9359,0 3px 0 #0d151b,0 6px 13px #09151795!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .hold-dash-button>span{
+ position:relative;color:#ffe299!important;-webkit-text-fill-color:transparent;
+}
+body.world-player-game[data-ufo-world-map=construction] .hold-dash-button>span::after{
+ content:"";position:absolute;inset:1px 0 0;display:block;
+ background:#ffe29c;mask:var(--pedal-icon) center/contain no-repeat;
+ filter:drop-shadow(0 0 4px #ffa9427c);
+}
+body.world-player-game[data-ufo-world-map=construction] .hold-dash-button:is([aria-pressed=true],[data-key-held=true],[data-game-press=true],:active):not(:disabled){
+ background:linear-gradient(#563c24,#271c13)!important;color:#fff8dc!important;
+ box-shadow:inset 0 3px 6px #070a0b,0 0 12px #ffd48a90!important;
+}
+body.world-player-game[data-ufo-world-map=construction] .transport-thumbs .construction-jump-button{
+ background:linear-gradient(#3b697a,#1c374a)!important;color:#e5f9ff!important;
+ border-color:#a6deec!important;border-radius:8px 21px 8px 21px;
+ box-shadow:inset 0 0 0 2px #183442,0 3px 0 #112839;
+}
+
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=excMode]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADMklEQVR4AeyWjVXjMBCElWvkQiUXKjmoBKgErhK4SoBKwnx+spHXcmR5RUIeyVtFf6vVzK5W1q9w5r8LgVMH8OdGYL/f71ReVWrlWQu2rSK3KgIRwLNArAGy07pmJFYREIBHFY9AnOKx0a2tJiDv32klXlTlkr+u1XFxFQGBx2v3cW1fvWwW/KR8rZLKTbSXjlW3qwjIeu7o3Gq8KOL4IqU3lVRwSNqvbk8IyCvcLiSZmmOR9dzRWXwTab0F7D5GEwLaBC/ngGqquXCMbjxWcwSslzz2l6x9VJxXk8gRWLJpa53VJIoElHxVImYkNTcVSatuIHFpP4UQbjGmmnnG1RwEEgrGrJCXk6NdJDCYLzS07VaFrzM5BMB+M44kbY4JIF9l6p8KhCwJDc8KNvgGjRSaEBBwDAOMTUYbZDoQgihTa0iwbihuAhE8Hh+MLmhAol/zIP2aSEj9U1wEBD4F8mk1BMBdx/N+FULgK8yYmiPhWL1J70olKyPtTMdFQPY476oGwZMAfxAaEjeoBiDPDTwNGXT6BVs1rA0NLZfVBOR9vLczW3HLdMDNeNeFjBrcUqoGIfmtnWGy1KggMDH124w8CeAs+F436pC8/RD1H/7WFA8Bwp/u+T/tFNpco6nKSSJgNy16P0Gc5gHD1hmMLSqeCCzaIKekY/QtCKwGES+AlJvNiXTuYNsTAXtkat72NmmtMw6CTic9BGzS8ra3eZHu1bXlfXS4grt+/HuPdXXlIYDXbBR4rAEwCySC799BvQ4fueMfoZiIk4+SUPHsvYtgg+ruQ6WaB58FL/XAF5p6VfFEIMyQAAjvHojs1eGVCnDG1B3JvWzYKI4USh0XgWgcADlwcXq2ArzL+1h2E5AHeawBxD7UsJ8r5A6vT9bk5qvG3AT63SCiNs9m8oKkJDIaCgCmTZR47AGesdDi14wAYCChwqMOoDyr1d0AmDZPbIih2qw0JdAMVYWhIgFdfyeVEpcigZKBU8/nCDRLsC8gN8GWI8AtMlH8AjC1JrnJwDZaNyGw2Wx4m3BzqPmthJsMEocJjGbPoDOJQBPMRzRyIXBEZ2e3ukQg65YjDp59BD4AAAD//4OxyrQAAAAGSURBVAMAlkPccCEdHaAAAAAASUVORK5CYII=")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=digKind]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADFklEQVR4AeyYjXHbMAyF1U6STFJnkraTxJkk6SRJJ0k2cd+nI3kQCfAkN5bknHOExR/8vAeIlJTvw5X/3QhsXcCvX4HT6XSQvEuWtlcZHC5doW4FBOBOAF4lXHVZ1AD/uMjiDOUuAfn7Kfmfdg7xRfFCAin7x0XeWuXf7dTnzoQEFKbO/sc35096DxKvPUj9zVv4zDmXQJD9lyDwszO/CnjiugS04GX/SfNeq+/z1cADpiGwMPv4mMgat40N2BDQ4pLsS33b5hHg/Laoonvf6mzW9wjU9/SfzdDNCOwRqI++uiIz3K6n4hH4W4X/UY13NfQIfFQIf1XjMtSJtXl1GgLpGJyQENB6XwyaAzwveoWQOhM7jS/eGgIpYncfBOAxvfi7D0GsRATqffAs0KXJQZ15TQ2rPoEJiEQEnFsB9VA2AQ8al4C3D1AO5CzwKuejhC895OwPH5dAAsrLW68S7JPF4AX6TvKuGHxrcDggR82dRSIkoCq8SO4lk5YCQ4zAs58RAghwQAIeW7maNEhQDW9tomgHIQGrRD8BYPPWmSMowFBzRbasAxxbVydNAp5/BqCfpvqXWQQMAM7+2iNBc/YmgWVH1nvAeVGkmtZn9jfxZRVsv0sgAchZt3ZePwceKyJbAACe+Vof0Owfnht8knqVyUnx7Iu/kIAAkG0AcC0GqcMG9oKyTEDWEMZWAH7UpmJv4WNQn29tDgxPH1/dWyokoKjet66mBwCQPYLeD8PgBR6cv3woYNcsiwjz+IOkXYdE+D7WI2Cd0CdjZI5AjG32CBwRARCEuV1Gu+hHJEZdrde+IKHptvUIABSHSM46/cYLgSXoZyKQRRc7SDNu7LwJ+bG3FD4Q9omnPoQE5CiXHACAcx3YSdmMwXUl47PtrI/cl48nCT6QMAEhgexo79cbga0rVCrAuS/hIaTLrhsYDzlxhYAmeHKGx5XW99LAWJ5RlsBeAM7BwdE66lkCHJXhcTVq7+MH8GAd0RQCOnPfJJzfuuy6TZ4LhcBI5wp/LkNgxUTcCKyYbDfUrQJuWlacvPoK/AMAAP//mFMArAAAAAZJREFUAwBWgOZw4RAFxgAAAABJRU5ErkJggg==")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=aimMode]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEUUlEQVR4AeyYjVHjMBCFo6sEKjmo5KASQiVwlcBVAp3k3ufIivxiyfIfM8zAeC1ZWu2+t7uSTX4dvvnfD4FSAk+n053kI8pdSW/t+J4ZeBK4mygvane59iSQRx0i347ALoDd6GYZUK3fSJ4kL5I3d8SYhLkHtZtlZDUBgQE0gD8E+ih5kOTlo8fuYow59kO/udkn3eTS22ICAt6dMnIMaMCpO+siC0fZgQzEZi3ulRcRkFOiSNQB0dta2mKD0lqUjVkEBJw6B3gpYp9iQUbu1frF2KMG3yVjV5eNsYna2CwCMkTkx8oF0LchBOQ5hHAFkjHJqwQit7LFGjWDiwCxlwaDtYdmAoo+kXfwRPxeoABNv+YrzUn/U/KsAYj4OkjgS9PTVxMBgR+L/LtAEPGraE+7PWtoPeDJyOt5JN05IPCZBkqdSQICT9S95gGP45JdxnNieZ+5JJEE2XAd3hf4TrpjnUkCWuSnA+mfAq9lhx4UUabP2KhEEmxwdHOdySxUCSj6RN6jgKPcyWhfoLosqW0qM+kB3gPDfgDDqA8GqwSk4NHnFPFUS22bK5Lw/eAYBs6mCPCSyRdUSyFXXNF3H2TBqyCZLxKI5ZMU1SH6pFnd/a6YBc+yBzIBKBKQxm9Jfv3LH3buO4E/JX81Asb6sHv0D5e/5mAlAioZXh58Gap7OsmW191bN3G5oes6WjbvkrmBXz3j29/E6DCFDPwmAnLLbveoa7h4oTt5ThdXXyZW+c0JXEy2976yrHJUyW9OgOPLN0++yPsYYY2Pz33GxmK/iYCOr/7NqW4IQuFG+eoM2V/TG1Z2qpfsDfzqGd/+RkaHKWTgNxGoejlP+rF6Ht3nzv7KLZPt/Dn1awT+Jq1zZ/WJczbTdPdzv3is1gh4CfFK98g0oZmjpHMSHx4sx5JMFgmo2EhbvhDDHHlp8U4d91H9hCkSiOCuykgR8uhE1fVNtO2fz8XywWOVgLLAp61ngZ9AyAbriwIYCW9NpJW0R5/TBwxFP1UCcRXndOx2DeD9Vd9N2A0w6CKTb2yRxaYTdd/m4nCYJKAskAH/CYQNTWQBd2U0DuRginoCjq0x8NQ+vqO58WaSQFzGXnBjgOIDLwca1dsawEtzDDyl0/SvaxMBZYETCYO08pkuSLAnEPppotYBuIQS40csX9f6o0HnookAmpEEr3jfVADg5CAblBW/Vl9lRYD5JGaOiAPcyxI3RJ4fu+g3STMBrEUSbKwx5xBBmAMkS3JhjLkrclGJmidA8bGtmUUAk5CQQAJnvi9QmSuUJR+KlOjctdOnUMmiSJBuSOB4CRGAH2Vn8HVZ8lcan50BNyQAfeqpXciwR8YIMcYcoLUsAJxMuslZz6sJ9N5CCJwekHkMIZCZfqprg8Ykj5LVoDuD8bYZgWjvy5s9CVAyPaG8349t0u5JgFIBOJuV/iaA3chuBFTr3Sml9lYCEfe9yfNuBDZB12DkPwAAAP//IZf5DQAAAAZJREFUAwCgE6dwVCo0UAAAAABJRU5ErkJggg==")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=leaveExc]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAB2klEQVR4AeyYjXHDIAyF407SbpJskk7SdpJ2k2STdhP3vdz5zgbEnyJs7shJiYNBvA9QIH45df4aAHtP4JiBMQPKERhLSDmA6ubmMzDP8xn+C9caY5xdYnMAdPgBf4VrjTG+3SAtANw+Nd8JsWnfAuALPd7hJlYNgAXNtY2PmWvzKqmbpukOv8CrTIq7lFcBzEhMBLjBaZxWrnNeN/diAEf8IpgQy3XTzyIAQTwFX/i2h2cDxMRjcZslaWpQsgCOKp5wSYAji08CHF18FKAH8SJAWDyrn7gh7ZawDwXOm5cDEfFsesP9Zxl3cO90yU5K3ANAY+/EhzIL4+an7isEYCFWivkn3cgtDwHw9JjbXlOP4tV9eQDYVX+g6h3uGjv8xP1n2RsCqX8QPACqRuAQBNfsFRm828mT2lwPArBSLxAiQC8QUYAeIJIAR4fIAsiAEP8Ts62lZwNQRCSxd/tlKgJIQPB2cy8GoMLVTHBzox//PzGFr50QcO6mdHFHxcbH50c8eeKy3NZ9hq6rZiAUKFLG/OAuHqlSf6sFQL06v6U30y0AeOL0Ova1JUuYa4y1qWgOgDxRPRtF+8WCuWYOsBkugy82AAZCpZADQBqZVuVjBlqNtNRP9zPwDwAA//9sL4y5AAAABklEQVQDAOvnUXDoFHZbAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=stickExtend]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACT0lEQVR4AeyYi1HrMBBFFSpJOkk6SSohVEKoJOkkdBLuYSyPsCUj2V4JZvJm93kR8uoe/fGL++f/ngBzB/DxeOzl2F3/vc7N03IE3jvRWz3PcyFaAnxKeGhAMBoAheWTcUuAj4gyxF9LRqMZwGazuQhgJx+OBBCMRta6aAYg4U4QiD8oPsuHBsSvUyoJoGFklyCBQjuT6rs8BqBix2hMTqkkgHOOISSBwqaGhmNKwRTAPvVSg3Igos1OAURfaFTIOok2nQ2gBWdmUsaOpMfIvhe5Gr6NftMVZAN09Vd9aGvYyq9KGpvjFwnfyZPi9Z5rBiDhrDF2IJ5oCf0k4aewIBU3A5AgfxdS2JufMqkp1Vf0QUsAxHodPLOmDBVDbwnAXQgIPHvKhOKJpwDCxRPGvLfYNcd9j7NQs6fMsOEpgDdVRjg9RKwf/54lAdRDN/lBTg8BUqSeXUaOcZ/iWlL0fm7lJMA4QXGJ32W4BhxFYgJhCRASm0FYAgzXjQmEGYDWDjvL8DRdHcIMgPlTA8IUoAaEOYA1RBUAS4hqAFYQIwAdOKZfIwTiDziFvfndKfaHTV8pFowAVIkTk4QKqxpt0nZRozGAogQrVwaiKGUMgBO0+PJW1Gq6cvLrQ+qVEYAOH38LVbi+SUhKJDff4o4bAagBM2ODUHK+Qujxw2aJJ0M1AAvx1QCsxFcBsBRvDmAt3hSghnhTACWPXRlm7zbKFzWbXSjalFtdPM1YAnCi800JNxFvCqAzPPzyVnzCIi7HLUcgp/3FdZ4Ai7twYYIvAAAA//8llCyKAAAABklEQVQDAErEhnDpsaNaAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=stickRetract]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACTUlEQVR4AeSYjXXCIBhFYyepm+gmdpLaSWon0U3sJvZdT+OJCDQQPsBTD88QQuDd8Ju8DE/++78Al8tlJxHO+tu1asisFpDhTxlGOgyvwzC8S01CEoCMv0pHOXWfOBBKrh9mA8g4ps+yuJHcsHUTap3PApB5ugtyfX0rYbtarU46NglRABkPdRnMHmR8LTUzj4kggMzTVUJdhnvHWUhZTQOzHF6o80FBAOX0dRklVw9MEEEvMQD6d3W3gQqB8F6KAXx57+gsMQigwXmQ17UUaom98pgF1TsrBAG4W+4wzxy/59zRXkOXARZsXie/yWkUgBqBkD4U90Fg/iiQ/rcSvxC+LgUEq7QY64c/W2BqSRChLgXENGu1eBIAroCQxi4FEGKccLm6kgFGh0BIbCWQxXZiWuY0Plq4HrMBrnfb/tHKGKeFiXtrMwPQzLSRCEy1yYNcrXuS2OlGWzgBwPsAvIlyzeaLFx+uM8DNptniAI55ABAQHIurKEDAPKbNZqliADHz6ssMRkCKqwhAK/M8jcUALc0vBmhtfhFAD+azAXoxnwUQMU95vBsoi0lgRWeBpJ6bcgZx8AvBrVSbCIvhQ905ADb25pXKxu4uZw5AcGd4V3L5E8w/1J0MoFWVrxVvHn9UYPmlwrsrTQbAeACCPsrnRrOdJ3W7ygKgkF4gsgF6gVgE0APEYoDWEEUAZkAkvxNT5hwVA6CyyMA2m5mKAtwghsFdJ5hiuVxcxQFwOGkJFjfU/zsxxqcCQmL1RH2/E0+N146bdKGaEE8P8AMAAP//wAnJFAAAAAZJREFUAwCiloxwb63Y2QAAAABJRU5ErkJggg==")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=boomRaise]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAC3klEQVR4AeyZjVHDMAyFUyaBTWASYBLKJLAJbAKblPf54pyiOomduA69KycltuWf9yTZcY+77sr/bgT2DuAtArUicDqdHqU/vb7kzvsvIiDQjwL8Jb3v9UNtWSR2JyCgEbywjySLxK4EZsBHJoskdiOQAT6LxC4ECsAvkmhOoAD8b0Tfv5Pp1JTADPinHqR9faqySKIZgTnwh8PhW2BHorZ3NSySaEZAYDjn9RrJk4CegY89ZJsi8Rb7tCTg02EWfAQ4QyJ0aUkAb0YSWeADQj16Enb8q5qDNCMgEJ/SBykymTYBVeKhQcnxzQgkMFVpqk6A00ZafKtcy6YqAQHnNslpwxvl48N7Lb7FcVUJaLUPqZdn31CzXkBgfll5n2sx6jsee5tvr1KvRkBoUt5Xc5CLpVIVAvIwX0af6/HMhwG2i6TSZgICD7gjKI1S5x5jmjpSib62bXN5MwEh8Knzq4/OOyqbjYKqXfVU2kRA3n8TKr9xh8+8bD4K9K2aSqsJCDzpQKoI5yDf8vxwTVCZ+4snUTWVVhMQ5FTqpH6YQMKnUrUorCIg75MKqHgM4j0dDIoC4L2NKPjxoX/pYxUBLZLyPp6W6VxEAhtErNFvaGu3ZTvmrFxMQN5n45L/djK7cW27LZNeFhhz2FRiDuzsIcp27GS5iIDAs6jfuEd5mEUnF8GgPoBLpRJzdrJzAPB7oejHThEBASlKHfUfiUDmpNJozFIlm4C8T+r4jZcdagPER4E5bSqZrsvFbAKayqcOIV9MHY0bSR+FFIlRv9xKCQFyOM7LdYFNGeulbzsXY8M+oFCqJQTwWlx4TeoEbEpFwPpoMnewlz4GApqY/5B86Z0UTcyiLK5iN9kvOdg0avCP1ArRZHPbtuzyQEAjOGHYUCo2ldXeB6UlQL21bvI+YC0B8jrmOLYWypqb1hkI6HjjWORLqOJGyR9efAx7tgMBb7iW+o3A3pG6RWDvCPwBAAD//4yTvYsAAAAGSURBVAMAn3pOcDTYZK0AAAAASUVORK5CYII=")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=boomLower]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAC1klEQVR4AeyZDVLjMAyF0z0JexM4CbsnoZwEOAncBG5S3ueJPIoap3YS0jITxqp/ZMnvSXKaDn+6X/63E7h2AvcMrJWB0+l0L3nv5b7W7y1l4EWgAY48aVzVbonAnUMMCTctD2+JQBnlhGYnMBGcTVR7BjYJ88QhewYmgrOJas/AJmGeOGTPwERwNlGtngG9TfJW+ake+ffTLFYlINC8kL0LND3y0q9p6WfaqgQEkVdidYP2yExEFmWmZN9AABhl4QBpx16Dj70uZqa6vEbs8++F1QgI/Fj0tZzamI7yukjCgU+O4scqBHQIEaHmvf8vNzGdX0M9SUJ+ySiZY6+X/zZZTECHAO5oDvue+Ws/9t2HJlUk5LcE/uFwOOBHrrpuMQF5ieXxpQOeEekiWMhyeFyPPmTajUV+AJ5NiwgoSpQOkcKXSU6vFmIW2At41um1pbqdgcdyNgGBJ5qUCn5MPhR5IpzmGj9rAFh1uWHzphnrtSRGwcvHohKKaad0HnAaBBIR6KMjF3XBvCuCZ+OsDCj6lAKCDxMiauPcCygAoy59N0gHOXTsyTZuMAmefbMIyHAs+oCR6rz1QCNIHqF3vW6MxEXwnNRMQNHn4lL/2Jv4i2trsae8PAl8pNeMngQBMH0VeA5oIiDwHMolxNbkKAD54tpi7LUHcETaqyglfHbSv0r+SmgX/ZmTJgIyaiod7R80IfNRNl0qJZu09tUEFH1KJ17cmtKJmGIW8JlKKW6smVcTkLNYOoNnvvRVrc/CGIkq+7iphQA1bPalZ77pL/XeF3vTPWDQKi0EiJodPKd0EjaVImBjNvGd9K0fmYAc84uJ/5BoeN7kmEM5XMOuuO/ccrgi40+Jb2STy+3XqseZgCx4wnChNNy0zY4+KD0B5lvLougD1hOgrq3G0W0hnLnonExAjzcei/ZNqOmCVm9a/Y1bYpkJlDbc+vpO4NoZ2jNw7Qx8AwAA//9Vb2vCAAAABklEQVQDAEVuQHD4nRtyAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=steerLeft]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACMUlEQVR4AeyYi3HCMBBERSpJOiGdhEpIKoFOoJOkE7LrsTWykE5/S5mY0YF/utt3kq3DL+qPf3aA3gP4f0fg8XgcYd+zffQaiawRgOgjBN9gr7Od8dulJQMY4rsItoMmAQjiT7bjrfajAQTx74fD4b6VYDtOFMCo4gkTBBhZfBBgdPEigCCe/W44X6vRV/Y6Ik0hPucptrVxTbkgG1kQEsBPa+WW/ywICeCKAMNDeAHwbP8CgA/ihPPFDf4/YXaSkkbCCwDHCgp9EElB6MtlNfyLAAxaIwj9+KzUfxCAgUuD0Idkgv9glRsFwOBCkNbTieG9Fg2glJLuiWCmVMRnThLvu+XGDla5SQDUMAfxPZ14SZHB/xX2BmMLVrnJAFQHz8wSLTpT7NfCsgAoBBBJmWKfFpYN0EJMjs8dICdrNft4RwDlLd/7sFbHZtdGDd5S2wkAuazR+X+AvzUTluOLGryL5ROAIT4nWMs+TogVwMDil8Q8QWgAQTzf++Cxv32Dat//BU4rnFZKA2DvArMbxQeXc7tTrX2kjKu9q2zRtZcJwBe1ZmzSnzEyXRsEMdtLyYLdqfHYtGECTAeMLz669IXG8a03RQ0SwNZCpXj27NDXSgCsxe2h0x033OA9SC3OkBIAFzIvudNbm4OcQtTi9C4BODuMdtAEGGG6xOZHazUBOM/0iVhPHa5b3RMaAIvGHbb8F8VmQWvbdbW4aoAOmawScgeoksYCJ/sIFCSvStdfAAAA//8UyMnwAAAABklEQVQDAOPWEX9oz4OHAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=steerRight]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACGElEQVR4AeyYAXKDIBBFsSdpb5LcpD1J2pMkN0lu0tzE/p8xDBBAhNW1M3SWYlCW/3YV0Dfzz/86gHYCewZqMzCO4wHldyqftX40M3CF6PepnAFSBaEJcId416ogNAEuUN8MoQYwDMMPAJoh1AAg3gwCEKoAEhDqAK0Q1QCY9jiPX1GLGEC+UTitovIsOztVAUDxAUNwHmeNw9XtlBphMYAjPuVz0/ZFAIriv1JRKQbIiD9iOmw2CDyixIz+b7ETbCsCmBGfdM4BSkqL/1mAFudri6f/WQBcxNkGlWfZtHpXZn5IBKcEINxw7UY8Y1MCwE3X3RhebkTEPzwZI5LZWQBMLxeUDxRa8wM7iWclktlZAI60UhHJrBoA0imSWTUAqax2AKlI1vpJZoCLDIrYfh++ao0akp9cogAYift8ztOsa4Mj1Y8aki81LwCOeCkBUn6iEB7AjsU/g/ACYQEy4rl9wLS9vUE135PDFZsQvK1w2hgLgF9nlNAoXnL7EPrP/kbIuFrHPn7Zd2QXIPwiQPoTMqNqIGS0wyywDaf8DDwanH+cuuyFTvvWh1kNbga2FrZkvPDusH1zAPwSEKbOdtzwgM8gtUSHzAFwIUuSR72t08hbiFqi3nMA0Q57a3QB9nC7lMbHanUBeJ/ZE6WeFK7zngkLgEXjhvJ898Vhg63b1VtcLYBCJEWG7AAiYWxw0jPQEDyRrn8AAAD//zz9rzIAAAAGSURBVAMA2P8Lf8hUe5MAAAAASUVORK5CYII=")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=left]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADCUlEQVR4AeyYDVLkIBCFZ/ckehO9iXsSx5OMexLdk+hNsu+joAqQBgKJxnKm6CGBpvs9utP5+X365r8rga8O4DUC1whM7sA1hSY3cHq5GYFlWe4kb17upj3tZMAkIH+PkhsvF/WHbDUC8a5D5NsROCTgHFQtArnuIc9/LgFVp1CldDjUqHAPs2GdiUCoUqMYKAyPoo6dURunGQJxlRoFAImHGRJDBGYcFphOkegmINDk7EX9IhBnSbH96vhp4R9J3IZJdBOQN+dEvdXeNXEvaTZxfJbSJiTWEJBPuwnUreTV1khnpFsj0V2dVhBIALDbycDISYVEd2WqESjtJsDPcnw7Ari0RrasSJTUP4zVCAA2XvAsZ6TJUzy4xbHsQmLIVI0AF21s9F98cpTjGoH8RlVKqS/nUSOQgFOY85RK5rk/zEhibMVJkYCA5OlTBb/C3+aqRQKdXvZMqW7bMwSoRt2OOjcFNaKNbY6bUiTg8x1DwcCN0iq5qKXzKrmXbN0o1d0bUyTgUccE/NDxuhqBfBe6b++fSbNGIL9x5ZXpM3GavkwCSmwigITFXAe7R4FrTULj/aP5VGoS8Kj/+j50vP7tFgmhxvaLd8Zxc8NaBOIIYBeje35mzG3jD7+mVAkojahE+ZsTn1OaO2N6NCa0+4BPSrVUm294VQIycBIJHnXzSJzlcDMSsgX4PN+5z+R+gZRIk4DXJgpEw5+6DhJcaM0wO+3Cn4BTGMj5HPy7Nq65+5jsIiBjgMcgPeuCAP5FQFZFQ/oAZ82bDOVpgw82TFPt1kUAMw0SIRp8dsl3k+UnD5oqFoCXPs048PLVTB1nVH/dBKTL9YADIlFyTjQAf1mEVo30CsK3JHabXC+txbyzvQY8i1YRYIEckJ88LVpAUEMgFIRzSwDuPhRg21KyxlcTCIbkDBJ8nYAIIMJUb8+aABxbvesSvWECWBGJEA3SCoGMlb8AZg4dHpmRYeD4R6YIYADxRKjbTzp27wgaJzpONEYDMHPoQEYq820TAiUYQkx0nJTmtxr7DwAA//8y4AzOAAAABklEQVQDAPZXf3CEPg4lAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=right]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADIklEQVR4AeyYAVLkIBBF2T2JnmTHm+hJHE8y7kn0JnqT+F9qoLCnmQBBjVWZooVA87s/3ZDg3/DLfzuBnw7gHoE9AitXYE+hlQu4evpmIzBN00HydpZDielmCcjhR8nNWU6q3bJlAvmqQ+TXEXAdtp1bjoD11X3eCeiUiKeFml2FkybPd3elS52rIiB3Mfwi8OIm09hSYW7xlFma3E0gc37JRs04JGr0LnS6CAx2fnZKmPdzo/FPMwEZimljTd39qfhp0rvEKydhsx+oJ0/B62siIAPXnH/1DDh9T+orkSCVmiJRTWCQ80FBehaBO8mQUk0ghMC3iTVK2tSufJorEqUIJJ3aRgsB0ifH7XI+BzDtWz0/SLwF8fqkGkILgXlC/KNVLIJGnZZaeO+SZwnpRZrl04u2ugnk6F/Q/m8wbfTT8FYJ2D3C6ZSczhvdBHQqrSq5E7atNIIAEofGE4jI31VrtVwSLREobqQBJLqxWwjwBu02dIUkqQK2VXFX3CpVE1Bevko4+1UNLbdC+7QwXrpIB6LW//73wAXS2A57bNr3QrJWHYE043sa/2rNbJWA/SK1L7bEb5GA8pE7r6qJb3ULnIBGNaZpsjb4xPi0R3JbiwSkHO+rnAqPMkCt7vHljB3tRQPeCRXHqjZxvvtxnkt8AhjcsM7H+0PRTE0EbP7daKW8u0HRSM2AMHHenj58Xl+dvkhA5y9HGJIDHWVwGAlh4bzNfd471m7uw9xeJDBrhUAe5qlENyS4gJNWPDeLHCeapKR1HlvYXMSsIqAoAMhFgzoHxfCLHGmKhvRxnDlvAjtI8oKNB9ksnjy5chUBJggQYI8EESAaHLNE5F4OWqeC+nCasej4EVwj2Kh2nrnVBFDOSHirAxEicgohEBUIRZk0n9Um1z3HNRzI+YvvorDwayIAFiQkRKLkCGoIhKLwXBJW/XjGLOkU+5sJRCQZZJPxnwSIeBGJqqU6Os6qg1XSu9rfTQBUkeA1/6SaiORkcA4VK/RDmM/yVY5H4FUEIgi1SCQyakMmiZ5jmZ3WQ0/EMHMhwwhYZDkJoVns2MjnDwAAAP//fSr7cgAAAAZJREFUAwBEEH5wX4siMAAAAABJRU5ErkJggg==")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=scoop]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADlklEQVR4AeyYi3HbMAyGlS7SZJNkkjqTxJ2k6STJJk0ncf+PJnUQzJckS77eOUeIL7x+AKTkfBv+8787gFsn8J6BewZWRmD3EjqdTs8i2h89Div9H3YFIIef5fCHiPaox5toVWsCwKjoQ0TEFhuUvHU+OQ2INF7UNwFIK05jHGNHOcJcy/1NMsinyFvBFztZMu4BgHGrGxBkA0B2PTuuOf/w8PCZFZqxWAUg4yUnWaes6IvmJA/4bOSv4TyGqwDEUHOQPUBkS2oP5+Vf8xbCSfgSfaVB7NmnpCYg9nIeH1oZgMcSAI52IY4BEc7Fns5juwXgO0yGvlS7PzXPgSAb1Dsklkl7kdzqAzvRGCctADgVWUNHBgY5A4gnrYS5+tQ8P+ubOY/yFgB4LP1NE4HAee7x97SW6Td1HnstALmIIhcogiAbuZI6an+TsgnG42MuAKIeRc+dnEznwmdi9Yfa2UL92QLgpS8AGAYyYabDY7yR7No4Zk/EzQXxwhv3GGiv66u1BcCU0MDhLQIgE8Mw+JJ5G8p/7KEf+mXZcF7zdJuxD6+WLlsLwKVEfWVOFmzUcTJods6HNT3GfY0nrQhAirxQMfpJo7JABqC0hI4fadLqZRNQKfKWndvOzsdxEYA4MK5ubE0AkfN37FOHU2lc7GvOx8BkZbcAYDOAUQ7zgUGDJucg8jbfIzUAUce8TtEiU/69UDyEFe1N55GtAfDfQfD3ki8jstAqJS4AwENdzuNMDcDSM5CuW19KPgt2/1OZexc9RbJ7+FmkGgAvNH4H+Y3CnIjaLZ8F9nGUiDO2vN3jGgCfgW6lMCqSOAcxhdDHLzhdOKeTFrguKavJeticPrJvasmHNgcAkQpCMx7+LMwQHVkBmLuhAkMNQGAwjyUAbAaMqtlDQGSFagC8UPcbNVlSGQGat+haIK9Jp+9rALzRg0rT3yRe38VcILhhuBY1bDcp8HaR95/qYju3GgBfv2RkEYizqfZTAeKNzcG2zNUbqghAsQK1T93WIPxh5d3gM2LB1f8vtCcIRZ9rdeKcJtXoa78OAIY9QMh5ygbCZKJX2eYSSPNsXywhyy1FW5eTvxyqB9f61gUAgQqIoyK4qkm/j36zdCQTWjcAuAsg2LomNQ+uNTYLAIJdIGBcTt3Rx8RsAAhFENd4w6IuEQeWFx59Wmv2iwCgVSA4aBjU8CqN3wLVOx+7nhYD8IpuNb8DuFXkk91/AAAA//9aejztAAAABklEQVQDAG77jnAhD7OWAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=pour]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAB7ElEQVR4AexYi1UCMRAEK9FOoBOsxGcl2ol0op3EGbzj5cJNSG6z70Diy5rLZ2dndnkk3NPmzv+6AFXAEMIO9j3YTu2zzntW4A3kngf7QO/SPAXEWaeQuxPgQjgF9axAGstl3AW4pLUCtFegIlkuWx+3AjhhedKiCzxteWhVZTj8ndToAv0PVc7RZksFxtOVh9QhhFAsAnt5yH0NPOhf7Dv4nDuLgDMIHkiiSERCHq6nRv/TQ+0/i4D3JBhJZEUI8oTZ898SWyxgu91+IuArLG5SRI48sI4xSM3zYgEMgsBSBNcTGz/z8fQeGIvJE8gkgAAgoERwOWdm8gQ3CyCIEMElZU3IE7yJAAJViGhGnnErBHB73gpENCVPNk0FEDAjojl5xmsugKCRiB+MaS7kgb1xEUBgioC9DGb6qiSeMjcBKmDreSmAJyeMN0V0qzZy4OVvVrsUgN28IfJqgMdVGzmMN98LIjkBUvUFiv8ERcxGyQmYdbi1yWIB+DaZtFTIZLFgcM0/XVfjYgEKYO35LqBXwJiB/hEyJtDs3itgTqERoFfAmECz++NUIP1FkKZusl4wuOafrqvxv66A2+9Ylc3MvOSSqwDfPkvHTLDWS3yrQS6zuFIArvRHGF+HoFu18c2GTKQUMCv3Bid/AQAA//80LJchAAAABklEQVQDAN+tSnBDZtohAAAAAElFTkSuQmCC")}
+body.world-player-game[data-ufo-world-map=construction] .transport-excavator [data-id=pourDump]{--cab-symbol:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACYklEQVR4AeyXDXKCMBCFS0/S3qQ9iXqSTk+iPYnepN7Evg9NZsGQQJCAUzq7Tczv+5INgdeXJ//7vwCXy+VDfrz5x1wbOWYH9hKNcPxL+VlsDMCbUQyE+VkuOwagnMrITCtAZHGKVK07UGSZI5OsOxBZnCJVyR3QTcuN+6sU36ZUqd2g9qnxUvVJAA1wlHNp4XsJ7IRQHReabT/5Dd0H4CwAa0EII962nTzfB+AgFXcQKmsbK98u27ULHv07CVBV1bcmDUGoOGqfVVWdoi0eUJkEYA4JGQpRRDzaegHQcABEMfHo6g1A4x4QRcWjaRAAHSIQxcWjZwAAza9+g+BcuKfTLOJRkwVAR0Ec5O9ybPTThntEzje2kqBRx2XK9N6zAfwIj8u4b+yuEetbXmgNCA+gCt5hoFS2iDEXopzghjBX2Eppg/tiD6CS1AqoyUMN8TnvShurwgI0yGyjCfNABIfnYOGq/JRb2yo+vFYLYBstJi8IHhDuaed0pQHUcRJzCgamQNguPowWvwM31T+31CU+jGYHUDzX5pSFUoUCOxAMo9kBQoI7yoCwVXUYLRWgvdoID4bREgFY6bsvua4w6gSoA3OCfyxlwrkbuKXvZlc///hUHtt0AlD7BL61AKG4WzrD2QIQd88GsfMAHBK5e79XtmnaCt5JOGDK1kaeD5lmw8xfGjFn/JMH0AApa7+tcthy3ia75skafwhAaOL2UyHUZkxZcvwhAO0zQghRNkag7ctY9gz2Gr83gEL7JLdnhPhnEivims/4r7Gzxu8NkKGpSJcVoMgyRyZZdyCyOEWq/gAAAP//DylH8AAAAAZJREFUAwC0zZpwZq6kHAAAAABJRU5ErkJggg==")}
+body.world-player-game[data-ufo-world-map=construction] .hold-dash-button{--pedal-icon:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADDElEQVR4AeyXgVEjMQxFN6nk6AQq4ajkcpVAJ9DJ0UnuP5JVtB7ba1ubMMwkY2e1tr/0v+zIsJ9++Ocu4Ls38L4D9x0IZqD7CB2Px0f1f+rv6r974wsTwqfxugXIwbv6L/VH9VcRwpbZ3KL4RaARAZ8LD9PEbvSIiOIX4UcEvC08nF44Tq0iovhTxPN3t4DdbvdX2IO6b5BvErEL4n1Q7G4BgCoknlt+E1E8HOY+JADwmcQHtuvszLN7L5pR/Ox4WAAOROJJz/RHedAu/NH4aoviCWACFJT6zDmWuWiMUTJZn+slEa13RAhvAsTsVT1HlLFiRpVFdiBHoumOiOK9APEvNqpMcfJM4kULEKOHtaY7IoL3AnIEYMIPlTnsYhcJ1g3X+FG8CcCB+oN62p40ALki+XlC625+R5iAmUT0WRFxlTticwEk4Cwi3bWr3BEdAqDW3iUiV5k2vyP2qvil+q+pbFu7F7zKkghKs19Xslfx7ECp/pecErx4L3iQdoGymiOxGR4BPmarXb0XMk7S9el7BrIYStfbOwKo8WRqgai88OMEU1lymtIBJBD/gZ0GLt+b4ffa5g/1XP3XcLY13wviy/FEhExrB3klCTZQMVbx7EAFPz6l7JN5fi/eyZvIc9n5sazdir+KAAUncyl5drr16DTjNxcg8lSY9E/pT2WeapTNth/sxZsAAUv3QXPdx4fIcOPqYQ3yD/ZWMUbwJkB+c9um4YmjQFan2uccnHPvl1HdWo8NcbrxXoAPnNppJVnMizzzaXDWvOjorFacCN4LIFNkjMC+Q4A5P2Z2JXhTuY3iTQCZUs/dB2tEOHrsgImSsWmtl79iMwHFFZUJZY9jw9n1qzav9d55ag8LEHkyn5K/Sq1PSfv3IQEiT1W6Wa33hFO7W4DIk/Wb1vqUtH/vFiAw514Pa1SuYpWyVRcjir94kjUiAMKCWmuq9bZ6mqL4yX9GBPDX5ExircT6WLMdxc9+vp7dAnRXUCbn+4JL7svR4qvyEsWnrrsFpA6++/0u4L4DwQz8+CP0HwAA//8fW0JZAAAABklEQVQDAHo9ynD/QxOtAAAAAElFTkSuQmCC")}
+
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:is([data-id=resume],[data-recovery=apply]){
+ --cab-top:#367f73;--cab-base:#1e4a49;--cab-pip:#bfffdb;--cab-edge:#a0d9bd;--cab-shelf:#113a38;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button[data-id=save]{
+ --cab-top:#79542d;--cab-base:#4c331e;--cab-pip:#ffda92;--cab-edge:#cf9e5e;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:is([data-id=recovery],.transport-return){
+ --cab-top:#315769;--cab-base:#1e3449;--cab-pip:#9fe5f4;--cab-edge:#76aec8;
+}
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button:is([data-id=exit],[data-id=cancelTrial]){
+ --cab-top:#684746;--cab-base:#392931;--cab-pip:#ffc1aa;--cab-edge:#c58e7f;
+}
+
+body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet button > span[aria-hidden]:not(.transport-menu-icon){
+ color:var(--cab-pip)!important;
+}
+@media (min-width:640px) and (max-height:480px){
+ body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet[data-id=sheet][open]:not(:has([data-id=fleet]:not([hidden]),[data-id=storageSection]:not([hidden]))){
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:9px;
+ }
+ body.world-player-game[data-ufo-world-map=construction] #viewport .transport-play .transport-sheet[data-id=sheet][open]
+  > :not([data-id=resume],[data-id=help]){
+  grid-column:1/-1;
+ }
+}
+
+/* Place the display switch inside the same flow as the work controls. */
+body.world-player-game .transport-play.transport-active .transport-header{
+  left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));
+  top:max(9px,env(safe-area-inset-top));
+}
+body.world-player-game .transport-play .transport-top>.imasora-control-display-toggle{
+  position:static!important;inset:auto!important;box-sizing:border-box;
+  min-inline-size:0;max-inline-size:100%;max-height:none;align-self:start;
+  white-space:normal;text-align:center;padding:6px 11px!important;min-height:44px!important;
+}
+body.world-player-game .transport-play .transport-note .transport-stock{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:7px 0 0;
+}
+body.world-player-game .transport-play .transport-note .transport-stock>div{
+  min-width:0;display:grid;gap:2px;padding:5px 8px;border:1px solid #7596a052;
+  border-radius:7px;background:#102535;color:#f1fbfd;
+}
+.transport-stock dt{font-size:13px;font-weight:700;line-height:1.28;color:#e6f5fd;overflow-wrap:anywhere}
+.transport-stock dd{margin:0;font-size:16px;font-weight:850;color:#ffe1a0;font-variant-numeric:tabular-nums}
+@media(max-width:560px){
+  body.world-player-game .transport-play.transport-active .transport-header{row-gap:7px}
+  body.world-player-game .transport-play .transport-top>.imasora-control-display-toggle{font-size:12px!important}
+}
+
+@media(max-width:740px) and (min-height:481px){
+  body.world-player-game .transport-play.transport-active:not(.transport-timed){padding-top:max(10px,env(safe-area-inset-top))}
+}
+@media(max-width:360px){
+  body.world-player-game .transport-play.transport-active .transport-top{gap:5px;width:100%}
+  body.world-player-game .transport-play.transport-active .transport-top>button:not(.imasora-control-display-toggle){padding-inline:7px;font-size:12px}
+}
+
+/* The Sky Station HUD uses the existing movement and camera controls. */
+body.world-player-game[data-ufo-world-map="sky"] {
+  --sky-button-top:#36617c;
+  --sky-button-base:#182e46;
+  --sky-button-trim:#8fc8da;
+  --sky-button-icon:#b7f2f6;
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(
+  [data-player-menu], #emergencyEscapeButton, #cameraDistanceButton, #cameraModeButton,
+  #walkDashButton:not(.ufo-dash), #constructionJumpButton
+) {
+  background:linear-gradient(118deg,#ffffff12 0 13%,transparent 13% 100%),
+             linear-gradient(var(--sky-button-top),var(--sky-button-base) 64%)!important;
+  color:#f9fcff!important;
+  border:1px solid var(--sky-button-trim)!important;
+  border-radius:10px 16px 10px 16px!important;
+  box-shadow:inset 0 1px #ffffff45,inset 0 -2px #06142670,0 3px 0 #122236,0 6px 12px #142e4d64!important;
+}
+body.world-player-game[data-ufo-world-map="sky"] .world-camera-controls.camera-distance-control {
+  gap:8px;
+  width:148px;
+  transform:none;
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(.world-camera-controls>button,.world-player-bar>[data-player-menu]){
+  display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:7px 10px;
+  min-height:44px;font-size:13px;line-height:1.25;font-weight:800;white-space:normal;
+  text-align:left;
+}
+body.world-player-game[data-ufo-world-map="sky"] .world-player-bar>[data-player-menu]{
+  --sky-button-top:#604e7d;--sky-button-base:#24213e;--sky-button-trim:#c8b8eb;--sky-button-icon:#f1dcff;
+}
+body.world-player-game[data-ufo-world-map="sky"] #emergencyEscapeButton{
+  --sky-button-top:#914c37;--sky-button-base:#4a261f;--sky-button-trim:#f2b16d;--sky-button-icon:#ffdb96;
+}
+body.world-player-game[data-ufo-world-map="sky"] #cameraModeButton{
+  --sky-button-top:#455b88;--sky-button-base:#252e53;--sky-button-trim:#9eb3e8;--sky-button-icon:#d3e0ff;
+}
+body.world-player-game[data-ufo-world-map="sky"] #walkDashButton:not(.ufo-dash){
+  --sky-button-top:#996231;--sky-button-base:#4c2e21;--sky-button-trim:#ffcb80;--sky-button-icon:#ffe8a7;
+}
+body.world-player-game[data-ufo-world-map="sky"] #constructionJumpButton{
+  --sky-button-top:#267d87;--sky-button-base:#163c54;--sky-button-trim:#99eddc;--sky-button-icon:#ccfff0;
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(
+  [data-player-menu], #emergencyEscapeButton, #cameraDistanceButton, #cameraModeButton
+)::before {
+  content:"";display:block;width:18px;height:18px;flex:0 0 18px;
+  color:var(--sky-button-icon);box-sizing:border-box;pointer-events:none;
+}
+body.world-player-game[data-ufo-world-map="sky"] [data-player-menu]::before {
+  background:
+    linear-gradient(currentColor,currentColor) 1px 1px/6px 6px,
+    linear-gradient(currentColor,currentColor) 11px 1px/6px 6px,
+    linear-gradient(currentColor,currentColor) 1px 11px/6px 6px,
+    linear-gradient(currentColor,currentColor) 11px 11px/6px 6px;
+  background-repeat:no-repeat;
+}
+body.world-player-game[data-ufo-world-map="sky"] #emergencyEscapeButton::before {
+  background:linear-gradient(#563122,#563122) center 6px/2px 5px no-repeat,
+             linear-gradient(#563122,#563122) center 13px/2px 2px no-repeat,currentColor;
+  clip-path:polygon(50% 0,100% 96%,0 96%);
+}
+body.world-player-game[data-ufo-world-map="sky"] #cameraDistanceButton::before {
+  background:
+    linear-gradient(currentColor,currentColor) left top/7px 2px,
+    linear-gradient(currentColor,currentColor) right top/7px 2px,
+    linear-gradient(currentColor,currentColor) left bottom/7px 2px,
+    linear-gradient(currentColor,currentColor) right bottom/7px 2px,
+    linear-gradient(currentColor,currentColor) left top/2px 7px,
+    linear-gradient(currentColor,currentColor) right top/2px 7px,
+    linear-gradient(currentColor,currentColor) left bottom/2px 7px,
+    linear-gradient(currentColor,currentColor) right bottom/2px 7px;
+  background-repeat:no-repeat;
+}
+body.world-player-game[data-ufo-world-map="sky"] #cameraModeButton::before {
+  height:13px;border:2px solid currentColor;border-radius:4px;
+  background:radial-gradient(circle,currentColor 0 2px,transparent 3px);
+}
+body.world-player-game[data-ufo-world-map="sky"] #viewport>:is(#walkDashButton:not(.ufo-dash),#constructionJumpButton)>span {
+  display:block;margin:0 auto 3px;width:27px;height:22px;font-size:0;line-height:0;
+  background:var(--sky-button-icon);
+}
+body.world-player-game[data-ufo-world-map="sky"] #viewport>#constructionJumpButton>span {
+  clip-path:polygon(50% 0,92% 46%,68% 46%,68% 81%,32% 81%,32% 46%,8% 46%,50% 0,50% 88%,84% 88%,84% 100%,16% 100%,16% 88%,50% 88%);
+}
+body.world-player-game[data-ufo-world-map="sky"] #viewport>#walkDashButton:not(.ufo-dash)>span {
+  clip-path:polygon(0 8%,23% 8%,54% 50%,23% 92%,0 92%,30% 50%,0 8%,
+    46% 8%,69% 8%,100% 50%,69% 92%,46% 92%,76% 50%,46% 8%);
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(
+  [data-player-menu], #emergencyEscapeButton, #cameraDistanceButton, #cameraModeButton,
+  #walkDashButton:not(.ufo-dash), #constructionJumpButton
+):is(:active,[data-game-press=true],[data-key-held=true],[aria-pressed=true],[aria-expanded=true]):not(:disabled){
+  background:linear-gradient(var(--sky-button-base),var(--sky-button-top))!important;
+  box-shadow:inset 0 3px 6px #040d1abe,0 1px 0 #121c2b!important;
+  transform:none!important;
+  translate:0 2px;
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(
+  [data-player-menu], #emergencyEscapeButton, #cameraDistanceButton, #cameraModeButton,
+  #walkDashButton:not(.ufo-dash), #constructionJumpButton
+):focus-visible{
+  outline:2px solid #e5fbff;outline-offset:3px;
+}
+body.world-player-game[data-ufo-world-map="sky"] :is(#cameraModeButton,#cameraDistanceButton):disabled{
+  background:#26374c!important;color:#c8d3df!important;border-color:#71859a!important;box-shadow:inset 0 -1px #182636!important;
+}
+@media(pointer:coarse),(max-width:700px),(max-height:500px){
+  body.world-player-game[data-ufo-world-map="sky"] #viewport{--thumb-step:62px}
+  body.world-player-game[data-ufo-world-map="sky"] #viewport>:is(#walkDashButton:not(.ufo-dash),#constructionJumpButton) span{
+    width:23px;height:18px;font-size:0;margin-bottom:2px;
+  }
+}
+@media(max-width:560px) and (min-height:501px){
+  body.world-player-game[data-ufo-world-map="sky"] #rainStoryHint{
+    inset-inline: auto 8px;
+    top:calc(160px + env(safe-area-inset-top));
+    max-width:min(250px,calc(100% - 178px));
+    margin-inline:0;
+    transform:none;
+  }
+}

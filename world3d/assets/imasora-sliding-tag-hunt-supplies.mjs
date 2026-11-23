@@ -1,6 +1,6 @@
 import{huntPermanentToolUseful}from'./imasora-sliding-tag-hunt-sight.mjs';
 import{PLAYER_ITEMS,HUNTER_ITEMS,HOOK_POLES,EXTRA_BALLOON_COUNT}from'./imasora-sliding-tag-hunt-items.mjs';
-import{WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldHeight,worldValid,worldSight,worldTraversable}from'./imasora-sliding-tag-hunt-world.mjs';
+import{WORLD_STARTS,HUNT_JUMP,HUNT_CHARACTER_HEIGHT,worldCornerIndex,worldHeight,worldValid,worldSight,worldTraversable}from'./imasora-sliding-tag-hunt-world.mjs';
 
 // Both factions have a radar, alongside the existing props, spread over the world instead of a ring at the start.
 // Static geometry work is shared between rounds, never repeated every frame.
@@ -71,6 +71,30 @@ export function addHuntBalloonSupplies(pickups, actors) {
  }
 }
 
+const escapeOpeningTypes=['cloak','clone','curtain','speed','cushion','fan','sheet'];
+const escapeOpeningRanges=[40,49,32,57,66];
+const escapeOpeningAngles=[0,.3,-.3,.6,-.6,.9,-.9,1.25,-1.25,1.7,-1.7];
+export function placeRunnerOpeningSupply(pickups,runner,hunters,seed,{accessible=false}={}){
+ const lift=accessible?HUNT_CHARACTER_HEIGHT+1.1:PICKUP_LIFT;
+ const preferred=escapeOpeningTypes[seed%escapeOpeningTypes.length];
+ const candidates=pickups.filter(p=>p.audience==='player'&&escapeOpeningTypes.includes(p.type));
+ const forward=runner.yaw;
+ for(const offset of escapeOpeningAngles)for(const gap of escapeOpeningRanges){
+  const yaw=forward+offset,x=runner.x+Math.sin(yaw)*gap,z=runner.z+Math.cos(yaw)*gap;
+  const point={x,y:worldHeight(x,z),z};
+  if(!worldValid(point,padding)||!worldValid({...point,y:point.y+lift},padding)||
+     !worldTraversable(runner,point,runner.radius+.2)||!worldSight({...runner,y:runner.y+3},{...point,y:point.y+lift})||
+     hunters.some(a=>distance(a,point)<64))continue;
+  const neighbors=pickups.filter(p=>distance(p,point)<48);
+  const chosen=neighbors.length===1&&candidates.includes(neighbors[0])?neighbors[0]:
+   neighbors.length===0?candidates.find(p=>p.type===preferred):null;
+  if(!chosen)continue;
+  Object.assign(chosen,point,{home:point});
+  if(accessible)chosen.lift=lift;
+  return;
+ }
+}
+
 const approachDistances=[44,36,52,28,60,68];
 const approachAngles=[0,Math.PI/12,-Math.PI/12,Math.PI/6,-Math.PI/6];
 function onOpeningApproach(hunter,pickup){
@@ -107,24 +131,26 @@ export function placeHuntOpeningSupply(pickups,hunter,actors){
 const preferences={pursuit:{scarf:5,ink:4,sunglasses:4,radar:4},intercept:{balloon:5,sunglasses:4},patrol:{sunglasses:5,ink:3,radar:4}};
 // A short, visible detour on the existing route; never replace a role's goal
 // with an item across the map, infer a hidden player, or run an extra pathfinder.
-export function huntSupplySteering(s,a,control,{playerVisible=false,itemVisible=p=>worldSight({...a,y:a.y+3},{...p,y:p.y+1.8})}={}){
+export function huntSupplySteering(s,a,control,{playerVisible=false,cornerSupplies=false,itemVisible=p=>worldSight({...a,y:a.y+3},{...p,y:p.y+1.8})}={}){
  const m=a.brain;if(a.item||a.pendingItem||a.flight||!a.grounded&&!m.supply){m.supply=null;return control;}
  if(playerVisible&&distance(a,s.player)<18){m.supply=null;return control;}
  const goal=m.path?.[m.at],gx=goal?goal.x-a.x:0,gz=goal?goal.z-a.z:0,length=Math.hypot(gx,gz);
+ // A visible tool on a stair may justify a short detour of its own.
+ const isCornerTool=(p,d)=>cornerSupplies&&d<=18&&worldCornerIndex(p)>=0;
+ const onApproach=(p,d)=>isCornerTool(p,d)||onRoute(a,p,goal,d,gx,gz,length);
  const prior=m.supply;if(prior&&s.time<prior.nextCheck){
   const p=s.pickups.find(p=>p.id===prior.id);
   const d=p?distance(a,p):Infinity;
-  if(p&&huntPermanentToolUseful(s,a,p.type)&&!p.pull&&p.readyAt<=s.time&&d<24&&(p.lift||Math.abs(p.y-a.y)<3)&&onRoute(a,p,goal,d,gx,gz,length)&&itemVisible(p))return steer(a,p,control,s.time);
+  if(p&&huntPermanentToolUseful(s,a,p.type)&&!p.pull&&p.readyAt<=s.time&&d<24&&(p.lift||Math.abs(p.y-a.y)<3)&&onApproach(p,d)&&itemVisible(p))return steer(a,p,control,s.time);
  }
  m.supply=null;
  if(s.time<(m.supplyScanAt??0))return control;m.supplyScanAt=s.time+.3;
- if(!goal)return control;
- if(length<4)return control;
+ if(!cornerSupplies&&(!goal||length<4))return control;
  let best=null,bestScore=-Infinity;
  for(const p of s.pickups){
   const d=distance(a,p);if(!huntPermanentToolUseful(s,a,p.type)||p.audience!==(a.owner==='player'?'player':'hunters')||p.readyAt>s.time||p.pull||d>24||!p.lift&&Math.abs(p.y-a.y)>3)continue;
   if(s.hunters.some(h=>h!==a&&h.brain.supply?.id===p.id&&h.brain.supply.nextCheck>s.time))continue;
-  if(!onRoute(a,p,goal,d,gx,gz,length))continue;
+  if(!onApproach(p,d))continue;
   if(p.type==='guard'&&!s.gadgets.some(g=>['cushion','fan'].includes(g.kind)&&distance(a,g)<(g.kind==='fan'?60:28)&&worldSight({...a,y:a.y+3},{...g,y:g.y+2}))&&!(playerVisible&&['sticky','cushion'].includes(s.player.item)))continue;
   if(!itemVisible(p)||!worldTraversable(a,p,a.radius+.2))continue;
   const score=(preferences[a.role]?.[p.type]??1)*2-d*.3+(prior?.id===p.id?3:0);

@@ -1,17 +1,50 @@
-import {loaderCab} from './imasora-construction-loader-physics.js?v=120ov';
-import {planFieldRoute,FIELD_RUN_SPEED,sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
+import {actorPose,loaderCab} from './imasora-construction-loader-physics.js?v=120ov';
+import {atDriverDoor} from './imasora-construction-boarding.js';
+import {fieldContains,planFieldRoute,FIELD_RUN_SPEED,sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=120ey';
 import {vehicleGroundFrame,groundPoint} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 
 // These are world-space door approaches, not new origins for saved works.
-export function nativeDoorTarget(record,origin,{busy=false,active=false,groundHeightAt=null}={}){
+export function nativeDoorTargets(record,origin,{busy=false,active=false,groundHeightAt=null,spots=false}={}){
  const w=record?.work,rig=w?.loader??w?.rig,v=rig?.vehicle;
- if(!v||!origin||busy||active)return null;
- if(rig.mode!=='foot'||rig.transition||w.task||w.held||w.rotation||w.joining||record.delivery||w.air?.length||Math.abs(v.speed)>.01||w.body?.grounded===false||rig.player?.grounded===false||Math.abs(rig.player?.vy??0)>.1)return null;
+ if(!v||!origin)return [];
+ if(!spots&&(busy||active||rig.mode!=='foot'||rig.transition||w.task||w.held||w.rotation||w.joining||record.delivery||w.air?.length||Math.abs(v.speed)>.01||w.body?.grounded===false||rig.player?.grounded===false||Math.abs(rig.player?.vy??0)>.1))return [];
  const c=Math.cos(v.heading),s=Math.sin(v.heading),doorZ=loaderCab(v).seatZ;
+ let ground=null;
+ if(record.schema===2&&groundHeightAt){try{const local=(x,z,h)=>groundHeightAt(origin.x+x,origin.z+z,h);if(groundHeightAt.quarryHeight)local.quarryHeight=(x,z)=>groundHeightAt.quarryHeight(origin.x+x,origin.z+z);ground=vehicleGroundFrame(v,local);}catch{return [];}}
  // Six units outside the door marker, within its eight-unit boarding zone.
  // This leaves the normal world's whole-body collider outside the side step.
- if(record.schema===2&&groundHeightAt){try{const g=vehicleGroundFrame(v,(x,z,reference)=>groundHeightAt(origin.x+x,origin.z+z,reference)),p=groundPoint(g,-64,0,doorZ),y=groundHeightAt(origin.x+p[0],origin.z+p[2],g.position[1]);if(!Number.isFinite(y)||Math.abs(y-p[1])>2.1)return null;return{x:origin.x+p[0],z:origin.z+p[2],y,heading:v.heading};}catch{return null;}}
- return{x:origin.x+v.x-64*c+doorZ*s,z:origin.z+v.z+64*s+doorZ*c,y:0,heading:v.heading};
+ const entries=[];
+ for(const side of [-1,1]){
+  const lateral=side*64;
+  const p=ground?groundPoint(ground,lateral,0,doorZ):[v.x+lateral*c+doorZ*s,0,v.z-lateral*s+doorZ*c];
+  const x=origin.x+p[0],z=origin.z+p[2],y=ground?groundHeightAt(x,z,ground.position[1]):0;
+  if(!Number.isFinite(y)||Math.abs(y-p[1])>2.1||v.field&&!fieldContains({x,z},15.6))continue;
+  entries.push({x,z,y,heading:v.heading,side});
+ }
+ return entries;
+}
+export function closestNativeDoor(doors,position){
+ if(!position)return doors[0]??null;
+ const distance=p=>(p.x-position.x)**2+(p.z-position.z)**2;
+ return doors.reduce((best,door)=>!best||distance(door)<distance(best)?door:best,null);
+}
+export function nativeDoorTarget(record,origin,{position=null,side=null,...options}={}){
+ const doors=nativeDoorTargets(record,origin,options);
+ // Legacy menu callers without a player pose continue to receive the driver door.
+ return Number.isInteger(side)||!position?doors.find(door=>door.side===(side??-1))??null:closestNativeDoor(doors,position);
+}
+export function isNativeDoorArrival(door,position){
+ const offset=door.side*6;
+ const actualStep={...door,x:door.x-offset*Math.cos(door.heading),z:door.z+offset*Math.sin(door.heading)};
+ return atDriverDoor(position,actualStep,door.heading);
+}
+export function completeNativeBoarding(record){
+ const key=record.work.loader?'loader':'rig',rig=record.work[key];
+ if(rig.mode!=='boarding'||!rig.transition)throw Error('乗降口の通路を空けてください。');
+ const seated={...rig,mode:'driving',transition:null};
+ seated.player={...rig.player,...actorPose(seated)};
+ seated.message='前進・後退とハンドルで走れます。';
+ return {...record,work:{...record.work,[key]:seated}};
 }
 
 // Provides movement input only. The ordinary character controller remains the
@@ -41,7 +74,7 @@ export function createNativeDoorNavigator({position,canStand,canStep,allowed=()=
   last={...p};
   if(stalled>.6){cancel('通り道がふさがったので止まったよ。');return null;}
   while(path.length&&Math.hypot(path[0].x-p.x,path[0].z-p.z)<.08)path.shift();
-  if(!path.length){const arrived=target;if(Number.isFinite(arrived.y)&&(!Number.isFinite(p.y)||Math.abs(arrived.y-p.y)>.25)){cancel('ドアと足元の高さが合わないので止まったよ。');return null;}cancel();onStatus('ドアに着いたよ！「運転席に乗る」を押してね。',false);onArrive(arrived);return null;}
+  if(!path.length){const arrived=target;if(Number.isFinite(arrived.y)&&(!Number.isFinite(p.y)||Math.abs(arrived.y-p.y)>.25)){cancel('ドアと足元の高さが合わないので止まったよ。');return null;}cancel();if(!arrived.rainWorksBoard)onStatus('ドアに着いたよ！「運転席に乗る」を押してね。',false);onArrive(arrived);return null;}
   const q=path[0],distance=Math.hypot(q.x-p.x,q.z-p.z),step=Math.min(distance,FIELD_RUN_SPEED*Math.max(0,dt)),scale=Math.min(1,distance/Math.max(.001,FIELD_RUN_SPEED*dt)),next={heading:Math.atan2(q.x-p.x,q.z-p.z),x:p.x+(q.x-p.x)/distance*step,z:p.z+(q.z-p.z)/distance*step};
   if(!canStand(next)||!canStep(p,next)){cancel('通り道が変わったので止まったよ。');return null;}
   return{x:(q.x-p.x)/distance*scale,z:(q.z-p.z)/distance*scale};

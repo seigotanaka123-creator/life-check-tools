@@ -25,7 +25,7 @@ export function createUpperPumpControls({host,service,project,ready,run,show,pau
   b('begin').hidden=!!pending;b('begin').disabled=!can||!!pending||!c||c.fill>=capacity||(f.hose<1&&!(upperLevelCasting(c)&&f.upperRemainder>0))||f.highPipe?.castingId!==selected;
   b('cancel').hidden=!pending;b('cancel').disabled=!can;b('disconnect').hidden=!f.highPipe;b('disconnect').disabled=!can||!!pending;
  }
- function tick(dt){const f=project()?.freeBuild,c=highCastings(f).find(c=>c.pending);if(!c){id=null;elapsed=0;clock.pause();clocks.delete(service);refresh();return;}if(id!==c.pending.id){id=c.pending.id;elapsed=c.pending.elapsedMs;lastNotice='';clock.pause();}elapsed=Math.max(elapsed,c.pending.elapsedMs);const advancing=!paused()&&!document.hidden,step=clock.step(advancing);
+ function tick(dt){const f=project()?.freeBuild,c=highCastings(f).find(c=>c.pending);if(!c){id=null;elapsed=0;clock.pause();clocks.delete(service);refresh();return;}if(id!==c.pending.id){id=c.pending.id;elapsed=c.pending.elapsedMs;lastNotice='';clock.pause();}elapsed=Math.max(elapsed,c.pending.elapsedMs);const advancing=!paused()&&!document.hidden,step=clock.step(advancing)*3.4;
   if(advancing){elapsed=Math.min(upperPourDuration(c),elapsed+step);if(!pendingCommit&&ready()){const delta=Math.floor(elapsed-c.pending.elapsedMs);if(delta>=2000||elapsed===upperPourDuration(c)&&delta>0)void act('FREE_HIGH_TICK',{elapsedMs:delta});else if(c.pending.elapsedMs===upperPourDuration(c))void act('FREE_HIGH_FLOW_FINISH');}}
   clocks.set(service,{id:c.pending.id,elapsed});refresh();
  }

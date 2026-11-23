@@ -10,3 +10,100 @@
 .world-play-menu [data-player-tools]>a[hidden]{display:none}
 
 .world-play-menu,.construction-guide-dialog{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+/* Construction shortcuts and movement have their own space below the world menu. */
+body.world-player-game.world-construction-menu #viewport>.world-build-open {
+  top:max(66px,calc(env(safe-area-inset-top) + 54px));
+  right:max(12px,env(safe-area-inset-right));
+}
+body.world-player-game.world-construction-menu #viewport>.world-reel-open {
+  top:max(122px,calc(env(safe-area-inset-top) + 110px));
+}
+@media (pointer:coarse),(max-width:740px),(max-height:520px) {
+  body.world-player-game.world-construction-menu #viewport { --thumb-step:64px; }
+}
+@media (max-width:375px) {
+  body.world-player-game.world-construction-menu #viewport>.world-build-open {
+    top:max(108px,calc(env(safe-area-inset-top) + 96px));
+  }
+  body.world-player-game.world-construction-menu #viewport>.world-reel-open {
+    top:max(164px,calc(env(safe-area-inset-top) + 152px));
+  }
+}
+
+/* The open dialog and any confirmation above it own the visible controls. */
+body.world-construction-menu:has(dialog:modal) :is(
+  .world-player-bar, .imasora-control-display-toggle, #viewport button,
+  #viewport .transport-note, #viewport .rain-story-hint, #viewport .world-nearby-guide,
+  #viewport .world-nearby-name, #viewport .transport-actions, #viewport .construction-move-pad, .world-direction-guide, #touchPad
+):not(:modal *) {
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+@media (max-width:560px) and (orientation:portrait) {
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden])) {
+    --construction-story-shelf:128px;
+  }
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>.world-direction-guide {
+    bottom:max(var(--construction-story-shelf),env(safe-area-inset-bottom));
+  }
+  body.world-player-game.world-construction-menu #viewport>.rain-story-controls.is-construction:has(>:not([hidden])) {
+    pointer-events:auto;
+    bottom:max(10px,env(safe-area-inset-bottom));
+    max-height:calc(var(--construction-story-shelf,128px) - 20px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    gap:6px;
+    touch-action:pan-y;
+  }
+  body.world-player-game.world-construction-menu #viewport>.rain-story-controls.is-construction .rain-story-hint {
+    margin:0;
+    padding:6px 10px;
+  }
+  html[data-touch-layout=portrait] body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>#touchPad {
+    top:min(var(--touch-pad-y),calc(100% - var(--construction-story-shelf) - 52px))!important;
+  }
+  html[data-touch-layout=portrait] body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>#constructionJumpButton {
+    bottom:max(var(--thumb-bottom),var(--construction-story-shelf))!important;
+  }
+  html[data-touch-layout=portrait] body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>#walkDashButton {
+    bottom:calc(max(var(--thumb-bottom),var(--construction-story-shelf)) + var(--thumb-rise))!important;
+  }
+  html[data-touch-layout=portrait] body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden])) .world-camera-controls.camera-distance-control {
+    top:max(101px,calc(env(safe-area-inset-top) + 89px))!important;
+    flex-direction:row;
+    gap:5px;
+  }
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>:is(.world-build-open,.world-reel-open) {
+    top:max(153px,calc(env(safe-area-inset-top) + 141px));
+    box-sizing:border-box;
+    width:88px;
+    padding:7px 4px;
+    font-size:12px;
+  }
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>.world-build-open {
+    right:calc(max(12px,env(safe-area-inset-right)) + 94px);
+  }
+}
+
+@media (max-width:340px) and (orientation:portrait) {
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>:is(.world-build-open,.world-reel-open) {
+    width:80px;
+  }
+  body.world-player-game.world-construction-menu #viewport:has(>.rain-story-controls.is-construction>:not([hidden]))>.world-build-open {
+    right:calc(max(12px,env(safe-area-inset-right)) + 86px);
+  }
+}
+
+body.world-construction-menu:has(.gv-menu:not([hidden]),.free-sheet-overlay:not([hidden], [data-menu-scene-peek=true]),.free-confirm-overlay:not([hidden])) :is(
+  .world-player-bar, .imasora-control-display-toggle, #viewport button,
+  #viewport .rain-story-hint, #viewport .construction-move-pad, .world-direction-guide, #touchPad
+):not(:is(.gv-menu,.free-sheet-overlay,.free-confirm-overlay) *) {
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+body.world-construction-menu:has(.free-confirm-overlay:not([hidden])) .free-sheet-overlay button {
+  visibility:hidden!important;
+  pointer-events:none!important;
+}

@@ -21,7 +21,7 @@ export function validateWorldTimber(s,received){
   ok(s&&Object.keys(s).sort().join('|')==='revision|schema|scope|siteIndex|work','木材作業の項目が不正です。');
   ok([1,2].includes(s.schema)&&s.scope===WORLD_TIMBER_SCOPE&&int(s.siteIndex)&&!!TIMBER_YARDS[s.siteIndex]&&int(s.revision),'木材作業の区画・版が不正です。');
   assertWorkField(s,TIMBER_YARDS[s.siteIndex]);
-  ok(int(received)&&received%FLOOR_VOLUME===0&&s.work?.source?.mode==='world'&&s.work.source.total*FLOOR_VOLUME<=received,'受取済みの火星木材だけを使えます。');
+  ok(int(received)&&received%FLOOR_VOLUME===0&&s.work?.source?.mode==='world'&&s.work.source.total*FLOOR_VOLUME<=received,'受取済みのアマネ星木材だけを使えます。');
   ok(!Object.hasOwn(s.work,'groundPose'),'地形から求める車の姿勢は保存しません。');validatePurchasedTimber(s.work);validateWorldAssembly(s.work);return s;
 }
 export function syncWorldTimber(s,received){validateWorldTimber(s,received);const delta=received/FLOOR_VOLUME-s.work.source.total;if(!delta)return s;const n=copy(s);n.work.source.total+=delta;n.work.stock+=delta;refreshTimberLedger(n.work);n.revision++;return validateWorldTimber(n,received);}

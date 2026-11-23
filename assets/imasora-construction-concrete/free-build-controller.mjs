@@ -1,3 +1,6 @@
+import {constructionVehicleLock} from '../imasora-construction-shared-field.mjs?v=120ey';
+import {createParkingReturn} from '../imasora-construction-parking-view.mjs?v=121cx';
+import {createConstructionAutoSaveGate} from '../imasora-construction-autosave-key.mjs?v=120es';
 import{createVehicleLoadGuard}from'../imasora-construction-structure-performance.mjs?v=120pv';
 import {groundLevels,groundCups,sizedGroundLayout} from './ground-grid.mjs?v=120hb';
 import {designFootprint,resizeDesign,shiftDesign,foundationDesignProblem} from './design-footprint.mjs?v=120hb';
@@ -6,11 +9,13 @@ import {designPicture} from './design-picture.mjs?v=120hb';
 import {createSavedDesignBook} from './saved-designs-ui.mjs?v=120pv';
 import{createPresentationCache}from'../imasora-construction-presentation-cache.mjs?v=120gi';
 import {sameConstructionRecordValue} from '../imasora-construction-record-equality.mjs';
-import {createUpperPumpControls} from './high-pump-controls.mjs?v=120hc';
+import {createUpperPumpControls} from './high-pump-controls.mjs?v=121ct';
 import {highCastings} from './high-casting-state.mjs?v=120hc';
 import {upperFeedPath,sampleUpperPath,upperWorkViewAngle} from '../imasora-construction-high-casting.mjs?v=120pv';
-import {bindJumpButton} from '../imasora-construction-locomotion.mjs?v=120od';
-import {commitConcreteDoorEntry} from './native-door.mjs?v=120pv';
+import {bindJumpButton,createTravelAcceleration} from '../imasora-construction-locomotion.mjs?v=121d1';
+import {walkFactor} from '../imasora-construction-travel-input.mjs?v=121d1';
+import {commitConcreteDoorEntry} from './native-door.mjs?v=121d1';
+import {closestNativeDoor} from '../imasora-construction-native-door.mjs?v=121d0';
 import {createVehicleSelector} from '../imasora-construction-vehicle-select.mjs?v=120pv';
 import {openConstructionGuide,constructionOverlayOpen} from '../imasora-construction-overlays.mjs?v=120gm';
 import {createStencilPlacement,placedStencilGuide,stencilPlacementLabel} from './stencil-placement.mjs?v=120dp';
@@ -37,11 +42,11 @@ import {constructionBase,preparedFrameBuild,RAISED_FRAME_ACTION,RAISED_BASE_MAX,
 import {inspectFormGround,requireFormGround} from './free-foundation-check.mjs?v=120pv';
 import {FOUNDATION_ACTIONS,foundationBoardCount,foundationAvailableBoards,foundationContains,foundationGeometry} from './free-foundation-state.mjs?v=120pv';
 import {foundationActionFromPlan,assertFoundationEnvironment} from './free-foundation-operation.mjs?v=120pv';
-import {createMonsterTravelInput,constructionTravelAllowed} from './monster-travel-input.mjs?v=120od';
-import {travelDirection} from '../imasora-construction-travel-input.mjs?v=120lb';
+import {createMonsterTravelInput,constructionTravelAllowed} from './monster-travel-input.mjs?v=121cw';
+import {travelDirection} from '../imasora-construction-travel-input.mjs?v=121cw';
 import {createConstructionMovePad} from './move-pad.mjs?v=119bf';
 import {FREE_PLAY_MODES,FREE_PLAY_LABELS,nextFreePlayMode,freePlayActions,freePlayTemplate,freeModeNavigationKey,freeStageGuide,freeConfirmation,freeMenuBlocked} from './free-play-ui.mjs?v=120pv';
-import {createFreeBuildView} from './free-build-view.mjs?v=120pv';
+import {createFreeBuildView} from './free-build-view.mjs?v=121gf';
 import {CONCRETE_CAMERA_MODES} from './monster-camera.mjs?v=120np';
 import {freeLocationProblem,emptySiteProblem,freePourProblem,freePaintCost,freeGeometry,freeFrameBoards,freeTruckLoad} from './free-build-state.mjs?v=120pv';
 import {transitionProfileProject,profileWorkUndoHistory} from '../imasora-construction-profile-project.js?v=120pv';
@@ -60,7 +65,7 @@ import {SUPPORTED_WORK_MOVE,supportedWorkMoveEnvironmentProblem} from './free-su
 import {freeWorkMoveEnvironmentProblem} from './free-work-move.mjs?v=120pv';
 import {freeWorkEnvironmentProblem} from './free-work-edit.mjs?v=120pv';
 
-import {createPumpDirectPlay} from './pump-direct-play.mjs?v=120pv';
+import {createPumpDirectPlay} from './pump-direct-play.mjs?v=121ct';
 
 export function createFreeBuildController({service,state,scene,camera,character,shadow,canvas,snapshot,clearInput,onExit,onLayoutChange,onError,launcher,canEnter}){
  const open=document.createElement('button');open.textContent='自由建築をはじめる';open.title='型枠・塗装・ミキサー車・ポンプ車で自由につくる';launcher.append(open);
@@ -71,8 +76,13 @@ export function createFreeBuildController({service,state,scene,camera,character,
  // Reserve the actual notice/header height, including wrapped text on small screens.
  if(typeof ResizeObserver!=='undefined'){const hudSize=new ResizeObserver(()=>{const h=Math.ceil(q('.free-hud-top').getBoundingClientRect().height);if(h>0)panel.style.setProperty('--free-hud-size',h+'px');const b=Math.ceil(q('.free-basics').getBoundingClientRect().height);if(b>0)panel.style.setProperty('--free-basics-size',b+'px');});hudSize.observe(q('.free-hud-top'));hudSize.observe(q('.free-basics'));}
  const doorActions=button('truck').parentElement,travel=q('.concrete-travel');
+ const vehicleKeyHelp=document.createElement('p');vehicleKeyHelp.dataset.vehicleKeyHelp='';vehicleKeyHelp.hidden=true;q('.free-hud-top').append(vehicleKeyHelp);
  const writeText=(selector,value)=>{const element=q(selector);if(element.textContent!==value)element.textContent=value;};
- let travelBoost=null,dashControl=null,driving=false,progressSaving=false,autoSaveOnFoot=false,groundPreview=false,workWatching=false;
+ let travelBoost=null,dashControl=null,driving=false,progressSaving=false,autoSaveOnFoot=false,automaticPlatformSave=false,groundPreview=false,workWatching=false;
+ const footAcceleration=createTravelAcceleration(),driveAcceleration=createTravelAcceleration({fastFactor:2});
+ let driveDirection=0,driveRate=1;
+ const WORKSITE_TRAVEL_RATE=1.75;
+ function resetAcceleration(){footAcceleration.reset();driveAcceleration.reset();}
  let paintTool='roller',vehicleJob='truck',moreActions=false,colorStudios=null;
  let buildPage='shape';let deckFolded=false;let mode='move',sheet=null,restoreFocus=null,swipe=null,suppressModeClick=false;
  let doorWalk=null,doorSearch=null;
@@ -81,6 +91,7 @@ export function createFreeBuildController({service,state,scene,camera,character,
   jumpControl?.cancel();
   view.releaseJump();
   stopDoorWalk();
+  resetAcceleration();
   travelBoost?.reset();
   globalThis.IMASORA_BUTTON_FEEDBACK?.releaseKeyboard?.();
  }
@@ -98,10 +109,15 @@ export function createFreeBuildController({service,state,scene,camera,character,
  let nativeEntry=false,nativeVehicle=null,doorEnvironmentKey=null;
  let active=false,entering=false,busy=false,paused=false,note='',draftMask=0,draftHeight=2,draftLevels=null,draftLayout=null,levelBrush=4,heightPage='uniform',cell=0,confirm=null,paintPointer=null,stroke=new Set(),cached=null,ledger=null,paintKey='',lastUI=0;
  let supportHeightAt=()=>null,placementHeightAt=()=>null,blockedAt=()=>true;const inert=new Map();
- const backgroundPresentation=createPresentationCache({sameSource:sameConstructionRecordValue});let readPresentationRevision=null;
+ const backgroundPresentation=createPresentationCache({sameSource:sameConstructionRecordValue});let readPresentationRevision=null,readContactRevision=null;
+ let contactProject=null,contactRevision=null,cachedContacts=null;
  const project=()=>{if(ledger!==service.ledger){ledger=service.ledger;cached=service.constructionConcreteProject;}return cached;};
  const free=()=>project().freeBuild;
- const loadGuard=createVehicleLoadGuard(()=>service.ledger?.world);view.setVehicleLoadProblem((f,name,v)=>{const moving=Math.hypot(v.x-f[name].x,v.z-f[name].z)>.001,pose=moving?{...v,speed:24}:v;return loadGuard('constructionProfileProject',{...project(),freeBuild:f},{...project(),freeBuild:{...f,[name]:pose}},{heightAt:supportHeightAt});});
+ const parkingReturn=createParkingReturn({panel,dock:panel.querySelector('[data-vehicle-quick]')??panel.querySelector('header')??panel,clear:clearFoot,
+  vehicle:()=>active&&free()?.parkingCorner&&free().aboard?{id:free().aboard,name:free().aboard==='truck'?'ミキサー車':'ポンプ車'}:null,
+  available:()=>ready()&&!pumpDirect?.working&&!pumpDirect?.pending?'':'作業や保存が終わってから戻ろう。',
+  notice:text=>{note=text;refresh();},returnVehicle:vehicle=>run('FREE_RETURN_PARKING',{vehicle},false)});
+ const loadGuard=createVehicleLoadGuard(()=>service.ledger?.world);view.setVehicleLoadProblem((f,name,v)=>{const moving=Math.hypot(v.x-f[name].x,v.z-f[name].z)>.001,pose=moving?{...v,speed:45}:v;return loadGuard('constructionProfileProject',{...project(),freeBuild:f},{...project(),freeBuild:{...f,[name]:pose}},{heightAt:supportHeightAt});});
  const ready=()=>active&&!busy&&!paused&&!service.blocked&&!service.busy&&!confirm;
  const menuBlocked=()=>freeMenuBlocked({busy,progressSaving:progressSaving||autoSaveOnFoot,confirm});
  const focusHigh=(anchor,detail=null)=>view.focusUpper(anchor,detail,anchor?upperWorkViewAngle(service.constructionHighBuild,anchor):null); const upperHost=document.createElement('div');q('.free-primary-actions').after(upperHost);
@@ -110,9 +126,9 @@ export function createFreeBuildController({service,state,scene,camera,character,
  let upperPipeBlockedAt=()=>true;
  const movementReady=()=>ready()&&!sheet;
  const vehicleSelector=createVehicleSelector({ids:['truck','pump'],onOpen:clearFoot,onClose:clearFoot,canWalk:()=>ready()&&!free().aboard&&!view.onAccess?true:'作業を終えて車を降りてから、ドアへ向かおう。',onWalk:walkToVehicle});
- const travelReady=()=>!constructionOverlayOpen()&&!pumpDirect?.working&&!pumpDirect?.pending&&!(free()?.aboard&&projectHistoryStatus(project()).full)&&constructionTravelAllowed({active,paused,blocked:service.blocked,confirm,sheet,busy,serviceBusy:service.busy,driving,progressSaving:progressSaving||autoSaveOnFoot});
+ const travelReady=()=>!constructionOverlayOpen()&&!pumpDirect?.working&&!pumpDirect?.pending&&!(free()?.aboard&&projectHistoryStatus(project()).full)&&constructionTravelAllowed({active,paused,blocked:service.blocked,confirm,sheet,busy,serviceBusy:service.busy,driving,progressSaving:progressSaving||automaticPlatformSave});
  const pedestrianReady=()=>!free()?.aboard&&travelReady();
- travelBoost=createMonsterTravelInput({enabled:travelReady,context:()=>free()?.aboard??'foot',onStop:()=>view.stopWalking(),fastHeld:()=>dashControl?.active===true,clearFast:()=>dashControl?.cancel()});
+ travelBoost=createMonsterTravelInput({enabled:travelReady,context:()=>free()?.aboard??'foot',onStop:()=>{resetAcceleration();view.stopWalking();},fastHeld:()=>dashControl?.active===true,clearFast:()=>dashControl?.cancel()});
  function tryJump(){if(!pedestrianReady())return false;stopDoorWalk();if(!view.jump())return false;note=view.jumpCount+'段ジャンプ！';refresh();return true;}
  const jumpControl=bindJumpButton({element:q('[data-free-jump]'),enabled:()=>pedestrianReady()&&view.jumpCount<3,canHold:pedestrianReady,activate:tryJump,release:()=>view.releaseJump()});
  const padAllowed=()=>!pumpDirect?.working&&!pumpDirect?.pending&&travelReady()&&(!free()?.aboard||!free().connected&&!free().hose&&!free()[free().aboard]?.legs);
@@ -126,20 +142,31 @@ export function createFreeBuildController({service,state,scene,camera,character,
  function checkPlacement(a,handTool=null){if(a.type==='FREE_HIGH_CONNECT'||a.type==='FREE_HIGH_BEGIN'){
  const f=free(),c=highCastings(f).find(c=>c.id===a.castingId);if(!c)throw Error('屋上の型枠をえらび直そう。');const next={...f,highPipe:f.highPipe??{castingId:c.id,pump:f.pump}},path=upperFeedPath(service.constructionHighBuild,next,c,supportHeightAt);sampleUpperPath(path.slice(0,4),p=>{if(upperPipeBlockedAt(p.x,p.z,1.3,p.y))throw Error('上階ホースの通り道がふさがっているよ。車を少し動かそう。');});}
  if(a.type==='FREE_UNDO_STEP'){const next=transitionProfileProject(project(),a,project().revision,service.constructionPackTrialStock).state;assertFreeStepUndoEnvironment(project(),next,{foot:free().aboard?null:view.footPosition,blockedAt,heightAt:placementHeightAt,step:coreUndoHistory().at(-1)});if(view.onAccess&&coreUndoHistory().at(-1)?.type!=='FREE_PAINT')throw Error('階段で地上へ降りてから戻そう。');const platform=view.exportWorkPlatform();if(platform)try{assertWorkPlatformRecord(platform,next);}catch{throw Error('作業台を片付けてから、この作業を戻そう。');}const issue=view.stepUndoProblem(next);if(issue)throw Error(issue);return;}if(handTool==='stencil'&&!service.constructionProjectPreview)assertStarterTool(service.constructionToolkit,{type:'STENCIL_PAINT'});if(!service.constructionProjectPreview&&requiredStarterTool(a))assertStarterTool(service.constructionToolkit,a);if(view.onAccess&&!['FREE_PAINT','FREE_UNDO_PAINT','FREE_MIX_TICK','FREE_CURE_TICK'].includes(a.type))throw Error('階段で地上へ降りてから作業してください。');if(a.type==='FREE_PAINT')assertRaisedPaintSupport(project(),a,placementHeightAt,blockedAt);if(project().foundation&&(['FREE_FRAME',RAISED_FRAME_ACTION].includes(a.type)||constructionBase(free())&&['FREE_POUR','FREE_FINISH','FREE_DEMOLD','FREE_UNFRAME','FREE_CURE','FREE_CURE_TICK'].includes(a.type)))assertFoundationSupport(project(),{heightAt:placementHeightAt,blockedAt});if(FOUNDATION_ACTIONS.has(a.type))assertFoundationEnvironment(project(),a,{heightAt:placementHeightAt,blockedAt,foot:view.footPosition});if(['FREE_DESIGN','FREE_DESIGN_LEVELS','FREE_DESIGN_SIZED'].includes(a.type)){const d=a.levels?{...levelDesign(a.levels),...(a.layout?{layout:a.layout}:{})}:a;requireFormGround({...free(),layout:d.layout},d.mask,d.height,supportHeightAt,blockedAt);}if(['FREE_MOVE_WORK','FREE_TRANSFORM_WORK',SUPPORTED_WORK_MOVE].includes(a.type)){const issue=workMoveProblem(a.work,a,a.quarterTurns??0);if(issue)throw Error(issue);}if(a.type==='FREE_SET_WORK_PARTS'){const issue=workEditProblem(a.work,a.mask);if(issue)throw Error(issue);}if(['FREE_PLACE','FREE_NEXT','FREE_CHANGE_EMPTY_SITE'].includes(a.type)&&(blockedAt(a.x,a.z,150)||freeLocationProblem(project(),a)))throw Error('施工区画が建物・作品と重なります。');if(['FREE_NEXT','FREE_CHANGE_EMPTY_SITE'].includes(a.type))view.siteEntryPose(transitionProfileProject(project(),a,project().revision,service.constructionPackTrialStock).state);}
- async function run(type,extra={},animate=true,rescuePlan=null,handTool=null){
+ async function run(type,extra={},animate=true,rescuePlan=null,handTool=null,instantBoard=false){
+  if(type==='FREE_BOARD'&&constructionVehicleLock(extra.vehicle)){note=constructionVehicleLock(extra.vehicle);refresh();return false;}
   if(view.airborne&&!['FREE_MIX_TICK','FREE_CURE_TICK'].includes(type)){note='着地してから作業しよう。';refresh();return false;}
-  if(busy||paused||document.hidden||service.blocked||service.busy)return false;const started=interruption;if(projectHistoryStatus(project()).full){clearFoot();note=projectHistoryStatus(project()).message;refresh();return false;}if(type==='FREE_PAINT'&&!await prepareSurfaceWork(extra))return false;if(paused||document.hidden||started!==interruption)return false;const fromDialog=!!document.activeElement?.closest('[data-confirm],[data-play-sheet]');progressSaving=['FREE_MIX_TICK','FREE_CURE_TICK','FREE_HIGH_TICK'].includes(type)&&!animate;if(type!=='FREE_MOVE'&&!progressSaving)clearFoot();const fast=travelBoost.fast;driving=type==='FREE_MOVE';workWatching=animate&&!driving;if(!progressSaving)sheet=null;const a={type,operationId:crypto.randomUUID(),...extra,...(FREE_STEP_ACTIONS.has(type)?{recordStep:'ten'}:{})},p=project(),undoSource=type==='FREE_UNDO_STEP'?coreUndoHistory().at(-1)?.type:null;busy=true;if(type==='FREE_BOARD')note='目の前のドアを開けて乗り込みます。';else if(type==='FREE_LEAVE')note=rescuePlan?'救助先を確認し、降車を保存しています。':'ドアを開けて降り、ドア前に立ちます。';else if(type==='FREE_PAINT')note='施工面へ近づき、選んだ部分を塗っています。';refresh();
+  if(busy||paused||document.hidden||service.blocked||service.busy)return false;const started=interruption;if(projectHistoryStatus(project()).full){clearFoot();note=projectHistoryStatus(project()).message;refresh();return false;}if(type==='FREE_PAINT'&&!await prepareSurfaceWork(extra))return false;if(paused||document.hidden||started!==interruption)return false;const fromDialog=!!document.activeElement?.closest('[data-confirm],[data-play-sheet]');progressSaving=['FREE_MIX_TICK','FREE_CURE_TICK','FREE_HIGH_TICK'].includes(type)&&!animate;if(type!=='FREE_MOVE'&&!progressSaving)clearFoot();const fast=type!=='FREE_MOVE'&&travelBoost.fast;driving=type==='FREE_MOVE';workWatching=animate&&!driving;if(!progressSaving)sheet=null;const a={type,operationId:crypto.randomUUID(),...extra,...(FREE_STEP_ACTIONS.has(type)?{recordStep:'ten'}:{})},p=project(),undoSource=type==='FREE_UNDO_STEP'?coreUndoHistory().at(-1)?.type:null;busy=true;if(type==='FREE_BOARD')note='目の前のドアを開けて乗り込みます。';else if(type==='FREE_LEAVE')note=rescuePlan?'救助先を確認し、降車を保存しています。':'ドアを開けて降り、ドア前に立ちます。';else if(type==='FREE_PAINT')note='施工面へ近づき、選んだ部分を塗っています。';refresh();
   let saved=false;
-  try{if(animate&&!driving){await new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));if(started!==interruption||paused||document.hidden)throw Error('作業を中止しました。材料は変更していません。');}if(!progressSaving){hoseFeedback.reset();if(HOSE_TRANSFER_ACTIONS.has(type))hoseFeedback.begin(a,p.freeBuild);}checkPlacement(a,handTool);const proposed=transitionProfileProject(p,a,p.revision,service.constructionPackTrialStock).state;const priorPlatform=['FREE_DESIGN','FREE_DESIGN_LEVELS','FREE_DESIGN_SIZED','FREE_FRAME','FREE_FRAME_RAISED','FREE_FOUNDATION_BUILD'].includes(type)?view.exportWorkPlatform():null;if(priorPlatform&&(type==='FREE_FOUNDATION_BUILD'||proposed.freeBuild.mask!==priorPlatform.anchor.mask||proposed.freeBuild.height!==priorPlatform.anchor.height||JSON.stringify(proposed.freeBuild.layout??null)!==JSON.stringify(priorPlatform.anchor.layout??null)))throw Error('型枠の形や高さ・土台を変える前に、メニューから作業台を片付けてください。');const preflight=rescuePlan?(view.verifyVehicleRescue(rescuePlan),''):view.vehicleProblem(a);if(preflight)throw Error(preflight);const result=rescuePlan?view.prepareVehicleRescue(a,rescuePlan):animate?await view.perform(a,{fast,deferredFoundation:true}):null;if(started!==interruption||paused||document.hidden)throw Error('作業を中止しました。材料は変更していません。');checkPlacement(a,handTool);const finalCheck=rescuePlan?(view.verifyVehicleRescue(rescuePlan),''):view.vehicleProblem(a);if(finalCheck)throw Error(finalCheck);view.verifyFooting();if(HOSE_TRANSFER_ACTIONS.has(type)){hoseFeedback.saving();refresh();}await service.saveConstructionConcreteProject(a,p.revision,snapshot(),a.type===SUPPORTED_WORK_MOVE||FOUNDATION_ACTIONS.has(a.type)||FREE_CONTACT_ACTIONS.has(a.type)||FREE_VEHICLE_ACTIONS.has(a.type)||PIPE_ACTIONS.has(a.type)?result:null,['FREE_NEXT','FREE_CHANGE_EMPTY_SITE','FREE_FOUNDATION_REMOVE'].includes(type)?null:view.exportWorkPlatform());saved=true;if(['FREE_HIGH_CONNECT','FREE_HIGH_BEGIN'].includes(type))focusHigh(highCastings(free()).find(c=>c.id===extra.castingId).anchor);if(type==='FREE_HIGH_DISCONNECT')focusHigh(null);if(type==='FREE_UNDO_STEP')undoCursor.consume(a.operationId);else if(FREE_STEP_ACTIONS.has(type))undoCursor.newWork();progress.sync(free());if(!progressSaving)note=rescuePlan?'車をその場に残し、安全な地面へ戻りました。作品と材料は保持しています。':({FREE_FRAME:'型枠ができました！ 生コンを注ぎましょう。',FREE_FRAME_RAISED:'型枠ができました！ 生コンを注ぎましょう。',FREE_POUR:'生コンを注ぎました。続けて注ぐ場所を選べます。',FREE_FINISH:'なめらかになりました！ 次は固めましょう。',FREE_CURE:'固めています。完成までもう少し！',FREE_DEMOLD:'完成！ 好きな色で仕上げましょう。',FREE_PAINT:'塗れました！ 次の場所も同じ道具で塗れます。',FREE_UNDO_STEP:'1つ前の作業に戻したよ。材料も戻っているよ。',FREE_UNDO_PAINT:'さっきの塗装を戻したよ。ペンキも戻っているよ。',FREE_BUCKET_LOAD:'バケツに生コンを汲みました。',FREE_SUPPLY:'原料を積みました。ドラムで練りましょう。',FREE_MIX_START:'ドラムで生コンを練っています。'})[type]??'作業ができました。';if(type==='FREE_PAINT'&&a.color===PAINT_REMOVE_COLOR)note='もとの色に戻ったよ！ ぬり直しても、そのままでも遊べるよ。';if(type==='FREE_BOARD'){mode='vehicle';if(nativeEntry)nativeVehicle=extra.vehicle;}if(type==='FREE_CURE_TICK'&&free().stage==='cured')note='固まりました！ 型枠を外すと完成です。';if(type==='FREE_MIX_TICK'&&!free().mixer.pending)note='生コンができました。注ぐ場所へ運びましょう。';
+  try{if(animate&&!driving&&!instantBoard){await new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));if(started!==interruption||paused||document.hidden)throw Error('作業を中止しました。材料は変更していません。');}if(!progressSaving){hoseFeedback.reset();if(HOSE_TRANSFER_ACTIONS.has(type))hoseFeedback.begin(a,p.freeBuild);}checkPlacement(a,handTool);const proposed=type==='FREE_MOVE'?null:transitionProfileProject(p,a,p.revision,service.constructionPackTrialStock).state;const priorPlatform=['FREE_DESIGN','FREE_DESIGN_LEVELS','FREE_DESIGN_SIZED','FREE_FRAME','FREE_FRAME_RAISED','FREE_FOUNDATION_BUILD'].includes(type)?view.exportWorkPlatform():null;if(priorPlatform&&(type==='FREE_FOUNDATION_BUILD'||proposed.freeBuild.mask!==priorPlatform.anchor.mask||proposed.freeBuild.height!==priorPlatform.anchor.height||JSON.stringify(proposed.freeBuild.layout??null)!==JSON.stringify(priorPlatform.anchor.layout??null)))throw Error('型枠の形や高さ・土台を変える前に、メニューから作業台を片付けてください。');const preflight=driving?'':rescuePlan?(view.verifyVehicleRescue(rescuePlan),''):view.vehicleProblem(a);if(preflight)throw Error(preflight);const result=rescuePlan?view.prepareVehicleRescue(a,rescuePlan):animate?await view.perform(a,{fast,deferredFoundation:true,instantBoard}):null;if(started!==interruption||paused||document.hidden)throw Error('作業を中止しました。材料は変更していません。');checkPlacement(a,handTool);const finalCheck=rescuePlan?(view.verifyVehicleRescue(rescuePlan),''):view.vehicleProblem(a);if(finalCheck)throw Error(finalCheck);view.verifyFooting();if(HOSE_TRANSFER_ACTIONS.has(type)){hoseFeedback.saving();refresh();}await service.saveConstructionConcreteProject(a,p.revision,snapshot(),a.type===SUPPORTED_WORK_MOVE||FOUNDATION_ACTIONS.has(a.type)||FREE_CONTACT_ACTIONS.has(a.type)||FREE_VEHICLE_ACTIONS.has(a.type)||PIPE_ACTIONS.has(a.type)?result:null,['FREE_NEXT','FREE_CHANGE_EMPTY_SITE','FREE_FOUNDATION_REMOVE'].includes(type)?null:view.exportWorkPlatform());saved=true;if(['FREE_HIGH_CONNECT','FREE_HIGH_BEGIN'].includes(type))focusHigh(highCastings(free()).find(c=>c.id===extra.castingId).anchor);if(type==='FREE_HIGH_DISCONNECT')focusHigh(null);if(type==='FREE_UNDO_STEP')undoCursor.consume(a.operationId);else if(FREE_STEP_ACTIONS.has(type))undoCursor.newWork();progress.sync(free());if(!progressSaving&&!driving)note=rescuePlan?'車をその場に残し、安全な地面へ戻りました。作品と材料は保持しています。':({FREE_FRAME:'型枠ができました！ 生コンを注ぎましょう。',FREE_FRAME_RAISED:'型枠ができました！ 生コンを注ぎましょう。',FREE_POUR:'生コンを注ぎました。続けて注ぐ場所を選べます。',FREE_FINISH:'なめらかになりました！ 次は固めましょう。',FREE_CURE:'固めています。完成までもう少し！',FREE_DEMOLD:'完成！ 好きな色で仕上げましょう。',FREE_PAINT:'塗れました！ 次の場所も同じ道具で塗れます。',FREE_UNDO_STEP:'1つ前の作業に戻したよ。材料も戻っているよ。',FREE_UNDO_PAINT:'さっきの塗装を戻したよ。ペンキも戻っているよ。',FREE_BUCKET_LOAD:'バケツに生コンを汲みました。',FREE_SUPPLY:'原料を積みました。ドラムで練りましょう。',FREE_MIX_START:'ドラムで生コンを練っています。'})[type]??'作業ができました。';if(type==='FREE_PAINT'&&a.color===PAINT_REMOVE_COLOR)note='もとの色に戻ったよ！ ぬり直しても、そのままでも遊べるよ。';if(type==='FREE_BOARD'){mode='vehicle';if(nativeEntry)nativeVehicle=extra.vehicle;}if(type==='FREE_CURE_TICK'&&free().stage==='cured')note='固まりました！ 型枠を外すと完成です。';if(type==='FREE_MIX_TICK'&&!free().mixer.pending)note='生コンができました。注ぐ場所へ運びましょう。';
    if(type==='FREE_UNDO_STEP'){draftMask=free().mask||0x0770;draftHeight=free().height;draftLevels=free().pourTargets?groundLevels(free()):null;draftLayout=free().layout?structuredClone(free().layout):null;heightPage=draftLevels?'cells':'uniform';drawing.clear();groundPreview=false;view.setFoundationPreview(null);if(['FREE_FRAME','FREE_FRAME_RAISED','FREE_UNFRAME','FREE_FINISH','FREE_CURE','FREE_DEMOLD'].includes(undoSource))mode='build';}
    if(FOUNDATION_ACTIONS.has(type)){groundPreview=false;view.setFoundationPreview(null);q('[data-ground-status]').textContent='選んだ場所の地面・穴・障害物を確認できます。';note=type==='FREE_FOUNDATION_BUILD'?'土台ができました。型枠を組めます。':'土台を片付け、板を戻しました。';}
    if(['FREE_HIGH_CONNECT','FREE_HIGH_DISCONNECT','FREE_HIGH_FLOW_FINISH'].includes(type)||type==='FREE_UNDO_STEP'||FOUNDATION_ACTIONS.has(type)||['FREE_CONNECT','FREE_PLACE','FREE_NEXT','FREE_CHANGE_EMPTY_SITE','FREE_DEMOLD','FREE_SET_WORK_PARTS','FREE_MOVE_WORK','FREE_TRANSFORM_WORK',SUPPORTED_WORK_MOVE].includes(type))onLayoutChange();return true;
-  }catch(e){clearFoot();note=e.message;if(service.blocked){if(type==='FREE_UNDO_STEP')pendingUndo=a.operationId;paused=true;onError(e);}return false;}finally{if(HOSE_TRANSFER_ACTIONS.has(type))hoseFeedback.finish({saved,blocked:service.blocked,f:free(),operationId:lastProjectOperation(project())?.operationId});busy=false;driving=false;progressSaving=false;workWatching=false;view.complete(saved,service.blocked);view.sync(project());refresh();if(!paused&&!sheet&&!confirm&&fromDialog)q(`[data-mode="${mode}"]`).focus();}
+  }catch(e){clearFoot();note=e.message;if(service.blocked){if(type==='FREE_UNDO_STEP')pendingUndo=a.operationId;paused=true;onError(e);}return false;}finally{if(HOSE_TRANSFER_ACTIONS.has(type))hoseFeedback.finish({saved,blocked:service.blocked,f:free(),operationId:lastProjectOperation(project())?.operationId});if(saved&&driving){lastPlatformCheckpoint=platformCheckpointKey();autoSaveGate.checked();}busy=false;driving=false;progressSaving=false;workWatching=false;view.complete(saved,service.blocked);view.sync(project());refresh();if(!paused&&!sheet&&!confirm&&fromDialog)q(`[data-mode="${mode}"]`).focus();}
  }
  function ask(type,extra,text,handTool=null){if(projectHistoryStatus(project()).full&&type!=='CLEAR_PLATFORM'&&type!=='MASK_UNDO'&&!(type==='SAFE_RETURN'&&!extra.vehicle)){note=projectHistoryStatus(project()).message;refresh();return;}clearFoot();sheet=null;confirm={type,extra,handTool};q('[data-confirm] p').textContent=text;const copy=handTool==='stencil'?{title:'型紙で塗る前に確認',label:'型紙で塗る',tone:'primary'}:freeConfirmation(type);writeText('[data-confirm-title]',copy.title);button('confirm').textContent=copy.label;button('confirm').dataset.tone=copy.tone;q('[data-confirm]').setAttribute('aria-label',copy.title);refresh();button('confirm').focus();}
  function syncDoorEnvironment(){view.sync(project());const key=String(project().revision)+':'+JSON.stringify(service.constructionWorkPlatform);if(key!==doorEnvironmentKey){view.restoreWorkPlatform(service.constructionWorkPlatform);doorEnvironmentKey=key;}}
  function canStartDoor(){return !active&&!busy&&!service.busy&&canEnter()&&state.map==='construction'&&!state.ufoBoarded&&!state.jumpY&&!state.falling&&!service.blocked&&!document.hidden;}
- function doorTarget(name){if(entering||!canStartDoor()||!free()?.location||free().aboard)return null;try{syncDoorEnvironment();return view.nativeDoor(name);}catch{return null;}}
+ function doorTargets(name){
+  if(entering||!canStartDoor()||!free()?.location||free().aboard)return [];
+  try{syncDoorEnvironment();}catch{return [];}
+  return [-1,1].flatMap(side=>{try{const door=view.nativeDoor(name,side);return door?[{...door,side}]:[];}catch{return [];}});
+ }
+ function doorTarget(name){return closestNativeDoor(doorTargets(name),state.position);}
+ function doorSpots(name){
+  if(state.map!=='construction'||!free()?.location)return [];
+  if(!active){try{syncDoorEnvironment();}catch{return [];}}
+  return [-1,1].flatMap(side=>{try{const door=view.nativeDoorSpot(name,side);return door?[door]:[];}catch{return [];}});
+ }
  function hostPose(){return{x:state.position.x,y:state.groundY,z:state.position.z,heading:state.heading};}
  function copyFootToHost(){const p=view.worldFootPose;if(!p)return;state.position.set(p.x,0,p.z);state.groundY=p.y;state.heading=state.viewHeading=p.heading;state.jumpY=state.jumpVelocity=0;state.falling=false;state.supportSurfaceId=null;state.moving=state.fastWalking=false;}
  function openView(arrival=null){upperPump.pause();
@@ -155,23 +182,45 @@ export function createFreeBuildController({service,state,scene,camera,character,
   await service.saveWorld(snapshot());paused=started!==interruption||document.hidden;openView();return true;
   }finally{entering=false;refresh();}
  }
- async function enterAtDoor(name){if(!doorTarget(name))return false;entering=true;clearInput();refresh();try{
-  return await commitConcreteDoorEntry(name,{allowed:canStartDoor,read:()=>({revision:project().revision,token:interruption,pose:hostPose()}),validate:pose=>view.nativeArrival(name,pose),save:()=>service.saveWorld(snapshot()),activate:pose=>{paused=false;openView({name,pose});}});
+ async function enterAtDoor(name,{board=false,overview=false}={}){
+  if(constructionVehicleLock(name))return false;
+  const door=doorTarget(name);if(!door)return false;entering=true;clearInput();refresh();try{
+   const entered=await commitConcreteDoorEntry(name,{allowed:canStartDoor,read:()=>({revision:project().revision,token:interruption,pose:hostPose()}),validate:pose=>view.nativeArrival(name,overview?door:pose),save:()=>service.saveWorld(snapshot()),activate:pose=>{paused=false;openView({name,pose:overview?door:pose});}});
+   return entered&&(!board||await run('FREE_BOARD',{vehicle:name},true,null,null,overview));
  }catch(e){note=e.message;if(service.blocked)onError(e);return false;}finally{entering=false;refresh();}}
  async function useStairs(up,target=null){
   if(view.airborne){note='着地してから階段を使おう。';refresh();return false;}
   if(!active||busy||service.busy||service.blocked||confirm)return false;clearFoot();sheet=null;paused=false;busy=true;workWatching=true;refresh();try{await view.access(up,target);view.verifyFooting();view.complete(true);view.sync(project());note=up?'土台に上がりました。スマホは丸いパッド、PCはWASDで歩けます。降りる時は階段ボタンを使います。':'地上へ戻り、階段と踊り場を片付けました。';return true;}catch(e){view.complete(false);view.sync(project());note=e.message;return false;}finally{busy=false;workWatching=false;refresh();}
  }
+ const autoSaveGate=createConstructionAutoSaveGate();
+ let lastPlatformCheckpoint='';
+ function platformCheckpointKey(){
+  return JSON.stringify([project().revision,free().aboard,view.worldFootPose,view.hasWorkPlatform,view.onAccess]);
+ }
+ const constructionWorkEngaged=()=>active&&(travelBoost.engaged||travelBoost.held||dashControl?.active||driving||view.airborne||view.busy||doorWalk||doorSearch||workWatching||pumpDirect?.working||pumpDirect?.pending);
+ function autoSaveReady(reason){
+  autoSaveGate.noteActivity(constructionWorkEngaged());
+  return active&&!busy&&!view.busy&&!view.airborne&&!service.busy&&!service.blocked&&autoSaveGate.ready(reason);
+ }
+ function autosave({reason='interval'}={}){
+  if(!autoSaveReady(reason))return false;
+  if(platformCheckpointKey()===lastPlatformCheckpoint){autoSaveGate.checked();return true;}
+  return savePlatform({automatic:true});
+ }
  async function savePlatform({automatic=false}={}){
   if(busy||service.busy||service.blocked)return false;
+  // Mounted idle saves must not borrow input while a physical press still owns driving.
+  if(automatic&&free().aboard&&(travelBoost.engaged||travelBoost.held||dashControl?.active))return false;
   if(view.airborne){if(!automatic){note='着地してからセーブしよう。';refresh();}return false;}
+  const captured=platformCheckpointKey();
   autoSaveOnFoot=automatic&&!free().aboard;
+  automaticPlatformSave=automatic;
   if(!automatic)clearFoot();
   busy=true;
-  if(!autoSaveOnFoot)refresh();
-  try{if(!free().aboard)copyFootToHost();await service.saveConstructionWorkPlatform(view.exportWorkPlatform(),project().revision,snapshot());note='保存しました。';return true;}
+  if(!automatic)refresh();
+  try{if(!free().aboard)copyFootToHost();await service.saveConstructionWorkPlatform(view.exportWorkPlatform(),project().revision,snapshot());lastPlatformCheckpoint=captured;autoSaveGate.checked();if(!automatic)note='保存しました。';return true;}
   catch(e){note=e.message;if(service.blocked){clearFoot();paused=true;sheet='menu';onError(e);}return false;}
-  finally{busy=false;autoSaveOnFoot=false;refresh();}
+  finally{busy=false;autoSaveOnFoot=false;automaticPlatformSave=false;if(!automatic||service.blocked)refresh();}
  }
  async function clearDoorStep(){
   if(!nativeEntry||!nativeVehicle)return true;
@@ -216,7 +265,7 @@ export function createFreeBuildController({service,state,scene,camera,character,
  }
  for(const el of panel.querySelectorAll('[data-size-axis],[data-design-shift]'))el.onclick=()=>{if(!ready())return;try{draftEdit(el.dataset.sizeAxis?footprintCandidate(el.dataset.sizeAxis,Number(el.dataset.sizeDelta)):shiftedDraft(draftPlan(),...el.dataset.designShift.split(',').map(Number)));}catch(e){note=e.message;}refresh();};
  function inspectDraft(){const value=q('[data-foundation-height]').value,requested=value==='auto'?null:Number(value),result=inspectFormGround({...free(),layout:draftLayout??undefined},draftMask,draftHeight,placementHeightAt,blockedAt,requested);groundPreview=true;view.setFoundationPreview(result);q('[data-ground-status]').textContent=result.issue+(result.deckY>0?` 水平な土台の予定位置を青い線で表示します。土台の板 ${foundationBoardCount(foundationActionFromPlan(result))}枚／利用できる板 ${foundationAvailableBoards(project(),service.constructionPackTrialStock)}枚。`:'');note=result.issue;return result;}
- function refresh(){
+ function refresh(){parkingReturn.sync();
   const f=free();open.disabled=!canEnter()||active||entering||state.ufoBoarded||service.blocked;open.hidden=state.map!=='construction';if(!active||!f)return;
   const can=ready(),p=project();if(pendingUndo&&!service.blocked&&lastProjectOperation(p)?.operationId===pendingUndo){undoCursor.consume(pendingUndo);pendingUndo=null;}panel.dataset.stage=f.stage;
   if(sheet==='menu'){const toolkit=service.constructionToolkit;writeText('[data-toolkit-summary]',toolkit?.received?'道具は何度でも使えるよ！':'建材受取所で、最初の道具をもらおう。');renderToolInventory(q('[data-toolkit-detail]'),toolkit);}
@@ -240,7 +289,7 @@ export function createFreeBuildController({service,state,scene,camera,character,
   q('[data-confirm]').hidden=!confirm;button('confirm').disabled=button('dismiss').disabled=busy;
   const notice=projectHistoryStatus(p).full?projectHistoryStatus(p).message:paused?'一時停止中です。メニューの「再開する」で続けられます。':view.phase||note||'';writeText('[data-note]',notice);q('[data-note]').hidden=!notice;q('[data-history-status]').textContent=projectHistoryStatus(p).remaining<=32?projectHistoryStatus(p).message:'';
   const guide=freeStageGuide(f),dismountProblem=f.aboard?view.vehicleProblem({type:'FREE_LEAVE'}):'';
-  writeText('[data-status]',paused?'一時停止中':(foundation&&f.stage==='complete'?'同じ土台で次の作品':guide.status)+(f.stage==='curing'?'・あと'+Math.max(0,Math.ceil((30000-f.elapsedMs)/1000))+'秒':''));
+  writeText('[data-status]',paused?'一時停止中':(foundation&&f.stage==='complete'?'同じ土台で次の作品':guide.status)+(f.stage==='curing'?'・あと'+Math.max(0,Math.ceil((30000-f.elapsedMs)/2000))+'秒':''));
   writeText('[data-material-status]','生コン：車 '+f.wet/4+'杯'+(f.bucket?'・バケツ '+f.bucket/4+'杯':'')+(f.hose?'・ホース '+f.hose/4+'杯':''));
   writeText('[data-actor-status]',f.aboard==='truck'?'ミキサー車':f.aboard==='pump'?'ポンプ車':'徒歩');
   writeText('[data-stock-detail]','生コン：車 '+f.wet/4+'杯／バケツ '+f.bucket/4+'杯／ホース '+f.hose/4+'杯'+(foundation?'。土台に板'+foundationBoardCount(foundation)+'枚を使用中。':''));
@@ -280,7 +329,7 @@ export function createFreeBuildController({service,state,scene,camera,character,
   button('frame').disabled=!!frameIssue||!can||!!f.aboard||!!raisedUnavailable||!draftMask||freeFrameBoards(draftMask,draftLayout?{layout:draftLayout}:null)+(foundation?foundationBoardCount(foundation):0)>(service.constructionPackTrialStock.quantities.auxiliaryUnits.formwork??0)-(p.site.formworkPanelsInUse??0);button('unframe').disabled=!can||!!f.aboard||!!f.connected||!!f.hose;button('frame').title=frameIssue|| (f.aboard?'車を降りてから型枠を組んでください。':raisedUnavailable?'高所施工は土台の高さ16までです。':'');
   q('[data-design]>p').textContent=foundation?`仮設土台の上面の高さ ${foundation.deckY}。使用中の板 ${foundationBoardCount(foundation)}枚／残り ${foundationAvailableBoards(p,service.constructionPackTrialStock)-foundationBoardCount(foundation)}枚。`:`4×4マスで形を選びます。必要な型枠 ${freeFrameBoards(draftMask,draftLayout?{layout:draftLayout}:null)}枚／所持 ${service.constructionPackTrialStock.quantities.auxiliaryUnits.formwork??0}枚。空けたマスには流れません。`;
   q('[data-build-help]').textContent=!foundation&&f.stage==='complete'?'同じ高さの土台を設置し、メニューの「作品を移動・保管」で位置を合わせると、保管作品を復元できます。':foundation&&f.stage==='complete'?'メニューの「作品を移動・保管」で土台上の作品を移動・回転できます。土台の回収前には作品を保管してください。':foundation?'「つくる」モードから、この土台の上に施工できます。片付ける場合は「仮設土台を回収する」を押し、内容を確認して実行してください。':'形を選んだら現場へ戻り、手もとの道具でつくりましょう。';
-  button('mix').textContent=f.mixer.pending?`練っています・あと${Math.ceil((5000-f.mixer.pending.elapsedMs)/1000)}秒`:'生コンを練る（5秒）';
+  button('mix').textContent=f.mixer.pending?`練っています・あと${Math.ceil((5000-f.mixer.pending.elapsedMs)/2000)}秒`:'生コンを練る（約2.5秒）';
   button('supply').disabled=!can||availableMixCells(p.mixer)<amount||freeTruckLoad(f)+amount>8;
   if(groundPreview&&(f.stage!=='design'||foundation)){groundPreview=false;view.setFoundationPreview(null);}q('[data-ui=ground]').hidden=f.stage!=='design';if(!busy)view.setDraft(f.stage==='design'||!!foundation&&f.stage==='complete'?draftPlan():null);
   workEditor.refresh(can&&!view.onAccess,sheet==='works'||['FREE_SET_WORK_PARTS','FREE_MOVE_WORK','FREE_TRANSFORM_WORK',SUPPORTED_WORK_MOVE].includes(confirm?.type));
@@ -314,7 +363,7 @@ export function createFreeBuildController({service,state,scene,camera,character,
   q('[data-paint-position]').disabled=!can||!freeWorkMask(w)||!!f.aboard;writeText('[data-paint-position]',stencilPlacementLabel(stencilPlacement.offset)==='中央'?'型紙を動かす':'型紙：'+stencilPlacementLabel(stencilPlacement.offset));
   const stencil=q('[data-ui=quick-stencil]');const maskButton=q('[data-ui=quick-mask]');maskButton.hidden=!painting;maskButton.disabled=!can||!freeWorkMask(w)||!!f.aboard;
   stencil.hidden=!painting||paintTool!=='stencil';stencil.disabled=!can||projectHistoryStatus(project()).full||!freeWorkMask(w)||!!f.aboard||!paintAction('brush',placedPixels()).pixels.length;stencil.textContent='型紙で塗る';stencil.title=placedGuide();
-  pumpDirect.refresh();if(pumpDirect.working)view.setWorkTarget({mode:null});
+  pumpDirect.refresh();if(pumpDirect.working)view.setWorkTarget({mode:null});refreshVehicleWorkKeys();
  }
 
  function stepQuickTarget(delta){if(!ready())return;if(mode==='paint'){const choices=[];free().completed.forEach((w,work)=>w.fill.forEach((_,cell)=>{if(freePlacedFill(w,cell))choices.push({work,cell});}));if(!choices.length)return;const i=choices.findIndex(x=>x.work===Number(q('[data-work]').value)&&x.cell===Number(q('[data-paint-cell]').value)),next=choices[(Math.max(0,i)+delta+choices.length)%choices.length];q('[data-work]').value=String(next.work);q('[data-paint-cell]').value=String(next.cell);}else{const choices=Array.from({length:16},(_,i)=>i).filter(i=>free().mask&(1<<i));if(!choices.length)return;cell=choices[(Math.max(0,choices.indexOf(cell))+delta+choices.length)%choices.length];view.select(cell);}refresh();}
@@ -374,15 +423,19 @@ export function createFreeBuildController({service,state,scene,camera,character,
   refreshDesignBook(ready());q('.free-deck').hidden=deckFolded;q('[data-ui=unfold]').hidden=!deckFolded;q('[data-ui=unfold]').disabled=false;q('[data-ui=fold]').disabled=false;panel.dataset.deckFolded=String(deckFolded);q('[data-quick-tools]').hidden=true;q('[data-pop-quick]').hidden=mode!=='build'||f.stage==='complete'&&!project().foundation||f.stage==='design'&&!draftMask;writeText('[data-quick-summary]',({build:'形・高さ・注ぐ場所',vehicle:'作業する量',paint:'色・塗る場所'})[mode]??'道具の設定');panel.dataset.playMode=mode;q('#free-mode-controls').setAttribute('aria-labelledby','free-mode-'+mode);
   const settings=q('[data-ui="settings"]');settings.hidden=mode==='move';settings.disabled=busy||paused||service.blocked||!!confirm;settings.textContent=({build:'型枠の道具箱',vehicle:'車の道具箱',paint:'塗る場所・道具'})[mode]??'';
   q('[data-build-progress]').hidden=true;
-  const buildHint=({design:project().foundation?'土台の上に型枠を組みます。':'形と高さを選んで、型枠を組もう。',framed:'注ぐマスを選び、生コンを流し込みます。',wet:'好きな高さまで注ぎ、コテでならします。',finished:'形がよければ、生コンを固めましょう。',curing:'固まるまであと'+Math.max(0,Math.ceil((30000-f.elapsedMs)/1000))+'秒。',cured:'型枠を外すと作品の完成です。',complete:'完成！「塗る」で色をつけられます。'})[f.stage];
-  writeText('[data-mode-note]',mode==='move'?(view.onAccess?'左パッド／WASDで土台の上を歩けます。':f.aboard?'上／W：アクセル　下／S：バック　左右／A・D：ハンドル。走りながら曲がるよ。':'左パッド／WASDで移動。Kかスペース＋WASDでダッシュ。ジャンプ／E・B・Jを押し直すと3段まで跳べるよ。'):mode==='build'?buildHint:mode==='vehicle'?(f.aboard==='truck'?'原料を積み、生コンを練ります。':f.aboard==='pump'?'支持脚を出して、ホースで生コンを送ります。':'バケツに汲むか、車に乗って作業します。'):(f.completed.length?'場所と色を選んで、そのまま塗ろう。':'作品が完成すると、色を塗れるようになります。'));
+  const buildHint=({design:project().foundation?'土台の上に型枠を組みます。':'形と高さを選んで、型枠を組もう。',framed:'注ぐマスを選び、生コンを流し込みます。',wet:'好きな高さまで注ぎ、コテでならします。',finished:'形がよければ、生コンを固めましょう。',curing:'固まるまであと'+Math.max(0,Math.ceil((30000-f.elapsedMs)/2000))+'秒。',cured:'型枠を外すと作品の完成です。',complete:'完成！「塗る」で色をつけられます。'})[f.stage];
+  writeText('[data-mode-note]',mode==='move'?(view.onAccess?'左パッド／WASDで土台の上を歩けます。':f.aboard?'上／W：アクセル　下／S：バック　左右／A・D：ハンドル。K＋移動でダッシュ。走りながら曲がるよ。':'WASD・左パッドで移動。Kでダッシュ、Spaceでジャンプ。'):mode==='build'?buildHint:mode==='vehicle'?(f.aboard==='truck'?'原料を積み、生コンを練ります。':f.aboard==='pump'?'支持脚を出して、ホースで生コンを送ります。':'バケツに汲むか、車に乗って作業します。'):(f.completed.length?'場所と色を選んで、そのまま塗ろう。':'作品が完成すると、色を塗れるようになります。'));
   const blockedAction=[...q('.free-primary-actions').querySelectorAll('[data-free]')].find(b=>!b.hidden&&b.disabled&&b.title);
   const hint=paused?'一時停止中です。メニューから再開できます。':service.blocked?'保存を確認しています。メニューから保存を再確認してください。':!busy&&blockedAction?blockedAction.title:'';
   writeText('[data-pour-reason]',hint);q('[data-pour-reason]').hidden=!hint;
   for(const b of q('.free-primary-actions').querySelectorAll('[data-free]')){if(!b.hidden&&b.disabled&&b.title)b.setAttribute('aria-describedby','free-action-help');else b.removeAttribute('aria-describedby');}
   button('stop').hidden=!view.busy;button('stop').disabled=!view.busy;
   q('[data-ui="menu"]').disabled=menuBlocked();q('[data-ui="menu"]').setAttribute('aria-expanded',String(sheet==='menu'));q('[data-ui="close"]').disabled=menuBlocked();
-  button('camera').disabled=busy||!!confirm;button('camera').setAttribute('aria-expanded',String(sheet==='camera'));button('camera').title='視点：'+CONCRETE_CAMERA_MODES[view.cameraMode];for(const b of panel.querySelectorAll('[data-camera-mode]'))b.setAttribute('aria-pressed',String(b.dataset.cameraMode===view.cameraMode));
+  const cameraButton=button('camera');
+  cameraButton.disabled=busy||!!confirm;cameraButton.setAttribute('aria-expanded',String(sheet==='camera'));
+  cameraButton.title='視点：'+CONCRETE_CAMERA_MODES[view.cameraMode];
+  if(view.cameraMode==='eye')delete cameraButton.dataset.gameAction;
+  else if(cameraButton.dataset.gameAction!=='camera')cameraButton.dataset.gameAction='camera';for(const b of panel.querySelectorAll('[data-camera-mode]'))b.setAttribute('aria-pressed',String(b.dataset.cameraMode===view.cameraMode));
   q('[data-overlay]').hidden=!sheet||!!confirm;q('.free-toolbox-tabs').hidden=!['build','vehicle','paint'].includes(sheet);for(const b of panel.querySelectorAll('[data-toolbox]')){b.setAttribute('aria-pressed',String(b.dataset.toolbox===sheet));b.disabled=busy;}
   const titles={camera:'どこから見よう？',works:'作品のおひっこし',menu:'ひとやすみ',build:'つくるノート',vehicle:'くるまの道具箱',paint:'おえかきの道具箱'};q('[data-sheet-title]').textContent=titles[sheet]??'';q('[data-play-sheet]').setAttribute('aria-label',titles[sheet]??'施工メニュー');
   for(const el of panel.querySelectorAll('[data-sheet-content]'))el.hidden=el.dataset.sheetContent!==sheet;
@@ -395,25 +448,52 @@ export function createFreeBuildController({service,state,scene,camera,character,
  function dismissConfirmation(){const edit=['FREE_SET_WORK_PARTS','FREE_MOVE_WORK','FREE_TRANSFORM_WORK',SUPPORTED_WORK_MOVE].includes(confirm?.type);confirm=null;if(edit)setSheet('works');else{refresh();q(`[data-mode="${mode}"]`).focus();}}
  function openKeyboardMenu(){
   if(!active)return false;
-  if(busy&&!progressSaving&&!autoSaveOnFoot)return true;
+  if(busy&&!progressSaving&&!automaticPlatformSave)return true;
   if(confirm)dismissConfirmation();else setSheet(sheet?null:'menu');
   return true;
  }
  function handleMenuKey(e){
-  if(e.key==='Escape'){e.preventDefault();return openKeyboardMenu();}
+  if(e.key==='F8'){e.preventDefault();return openKeyboardMenu();}
   if(e.key==='Tab'&&(sheet||confirm)){const modal=q(confirm?'[data-confirm]':'[data-play-sheet]'),items=[...modal.querySelectorAll('button,select,input,textarea,summary,[tabindex="0"]')].filter(el=>!el.disabled&&el.offsetWidth),i=items.indexOf(document.activeElement);if(items.length&&(i<0||(!e.shiftKey&&i===items.length-1)||(e.shiftKey&&i===0))){e.preventDefault();items[e.shiftKey?items.length-1:0].focus();}return true;}
   if(e.target.closest?.('[data-mode]')&&freeModeNavigationKey(e)){e.preventDefault();selectMode(e.key==='Home'?'move':e.key==='End'?'paint':nextFreePlayMode(mode,e.key==='ArrowRight'?1:-1));q(`[data-mode="${mode}"]`).focus();return true;}
   return !!sheet||!!confirm;
  }
+ function vehicleWorkKeyTarget(code,shift=false){
+  const aboard=free()?.aboard;if(!aboard)return null;
+  if(code==='KeyO')return button('dismount');if(code==='KeyN')return button('camera');if(code==='KeyY')return button('stop');
+  if(aboard==='truck')return code==='KeyJ'?button('mix'):code==='KeyH'?button('supply'):null;
+  if(aboard==='pump'){
+   if(code==='KeyJ')return q(pumpDirect?.working?'.pump-direct-action':'.pump-direct-mode');
+   if(code==='KeyH')return button('drain');if(code==='KeyU')return button('legs');if(code==='KeyL')return button('connect');
+   if(code==='KeyI')return q('.pump-direct-mode');if(code==='KeyM')return q('.pump-direct-look');if(code==='KeyP')return q(shift?'.pump-direct-target-prev':'.pump-direct-target-next');
+  }
+  return null;
+ }
+ function handleVehicleWorkKey(event){
+  if(!free()?.aboard||event.ctrlKey||event.metaKey||event.altKey||event.isComposing||event.target?.isContentEditable||event.target?.closest?.('input,select,textarea,[contenteditable=true],[role=textbox]'))return false;
+  const target=vehicleWorkKeyTarget(event.code,event.shiftKey);if(!target)return false;
+  event.preventDefault();event.stopImmediatePropagation?.();
+  if(!event.repeat&&ready()&&!sheet&&!constructionOverlayOpen()){if(!target.disabled)target.click();else if(target.title){note=target.title;refresh();}}
+  return true;
+ }
+ function refreshVehicleWorkKeys(){
+  const aboard=free()?.aboard,guide=q('[data-vehicle-key-help]');
+  for(const target of panel.querySelectorAll('[data-vehicle-work-key]')){target.removeAttribute('data-vehicle-work-key');target.removeAttribute('aria-keyshortcuts');target.title=target.title.replace(/ ?［[H-POUY／ ]+］$/,'');}
+  guide.hidden=!aboard||!!sheet||!!confirm||paused;
+  writeText('[data-vehicle-key-help]',aboard==='truck'?'J　練る　H　原料を積む　Y　停止':aboard==='pump'?'J　ポンプ操作　U　支持脚　L　接続\nH　ホース回収　I　運転・作業　Y　停止\nM　型枠を見る　P　次の注ぎ先（Shift＋Pで前）':'');
+  for(const key of ['KeyH','KeyJ','KeyL','KeyU','KeyI','KeyN','KeyM','KeyO','KeyP','KeyY']){const target=vehicleWorkKeyTarget(key);if(target){const keys=[...(target.getAttribute('data-vehicle-work-key')??'').split(' ').filter(Boolean),key.slice(3)];target.setAttribute('data-vehicle-work-key',keys.join(' '));target.setAttribute('aria-keyshortcuts',keys.join(' '));target.title=target.title.replace(/ ?［[H-POUY／ ]+］$/,'')+' ［'+keys.join('／')+'］';}}
+ }
  function handleKey(event){
+  if(event.target?.closest?.('dialog[data-parking-confirm][open]'))return;
   const {code}=event;
-  const jumpKey=code==='KeyE'||code==='KeyJ'||code==='KeyB';
+  const jumpKey=code==='KeyE'||code==='KeyJ'||code==='KeyB'||(code==='Space'&&(event.type==='keyup'||!free().aboard));
   if(event.type==='keyup'){
    if(jumpKey)jumpControl.key(event);
    travelBoost.key(event);
    return;
   }
   if(handleMenuKey(event))return;
+  if(handleVehicleWorkKey(event))return;
   if(jumpKey){
    event.preventDefault();
    jumpControl.key(event);
@@ -473,7 +553,23 @@ export function createFreeBuildController({service,state,scene,camera,character,
  const workEditor=createFreeWorkEditor({panel,getProject:project,problem:workEditProblem,moveProblem:workMoveProblem,ask,preview:value=>view.setWorkPreview(value)});
  q('[data-ui="works"]').onclick=()=>{workEditor.open();setSheet('works');};
  q('[data-ui="menu"]').onclick=()=>setSheet('menu');q('[data-ui="close"]').onclick=()=>setSheet(null);q('[data-ui="settings"]').onclick=()=>setSheet(mode);
- for(const b of panel.querySelectorAll('[data-camera-mode]'))b.onclick=()=>{view.setCameraMode(b.dataset.cameraMode);note=CONCRETE_CAMERA_MODES[view.cameraMode]+'に切り替えました。';setSheet(null);};
+ const sheetBackdrop=q('[data-overlay]');
+ let backdropStart=false;
+ sheetBackdrop.addEventListener('pointerdown',event=>{backdropStart=event.target===sheetBackdrop;});
+ sheetBackdrop.addEventListener('click',event=>{
+  if(backdropStart&&event.target===sheetBackdrop&&!confirm)setSheet(null);
+  backdropStart=false;
+ });
+ function changeCamera(mode){
+  view.setCameraMode(mode);
+  note=CONCRETE_CAMERA_MODES[view.cameraMode]+'に切り替えました。';
+  setSheet(null);
+ }
+ for(const b of panel.querySelectorAll('[data-camera-mode]'))b.onclick=()=>changeCamera(b.dataset.cameraMode);
+ function switchCamera(){
+  if(!travelReady()||view.cameraMode==='eye')return;
+  changeCamera(view.cameraMode==='above'?'overview':'above');
+ }
  q('[data-ui="camera-reset"]').onclick=()=>{view.resetCamera();setSheet(null);};
  for(const b of panel.querySelectorAll('[data-mode]'))b.onclick=()=>{if(suppressModeClick){suppressModeClick=false;return;}selectMode(b.dataset.mode);};
  for(const b of panel.querySelectorAll('[data-toolbox]'))b.onclick=()=>{mode=b.dataset.toolbox;setSheet(mode);};
@@ -557,10 +653,21 @@ export function createFreeBuildController({service,state,scene,camera,character,
  q('[data-ui=clear-platform]').onclick=()=>ask('CLEAR_PLATFORM',{},'作業台と階段を片付けます。作品・型枠・材料はそのままです。次の作業で必要な足場を用意します。');
  for(const b of panel.querySelectorAll('[data-free]'))b.onclick=()=>Promise.resolve(actions[b.dataset.free]()).catch(e=>{note=e.message;refresh();});
  function move(dx,dz,dt){
-  if(free().aboard){if(!movementReady())return;if(projectHistoryStatus(project()).full){clearFoot();return;}const name=free().aboard,action=chooseSteeredVehicleTravel(free()[name],name,-dz,dx,a=>view.vehicleProblem(a));if(action){try{const {type,...extra}=view.measuredVehicleMove(action);void run(type,extra);}catch(e){note=e.message;refresh();}}return;}
+  if(free().aboard){
+   if(!movementReady())return;
+   if(projectHistoryStatus(project()).full){clearFoot();return;}
+   view.withVehicleGroundChecks(()=>{
+    const name=free().aboard,action=chooseSteeredVehicleTravel(free()[name],name,-dz,dx,a=>view.vehicleProblem(a),15);
+    if(!action)return;
+    try{const {type,...extra}=view.measuredVehicleMove(action);void run(type,extra);}
+    catch(e){note=e.message;refresh();}
+   });
+   return;
+  }
   const world=view.travelVector(dx,dz);dx=world.x;dz=world.z;
   const strength=Math.min(1,Math.hypot(dx,dz));if(!strength)return;
-  view.walkFoot(dx,dz,dt*strength,travelBoost.fast);
+  const fast=travelBoost.fast,ratio=footAcceleration.step(dx,dz,dt,fast)/walkFactor({fast});
+  view.walkFoot(dx,dz,Math.min(dt,.05)*strength*ratio,fast);
  }
  open.onclick=()=>void enter().catch(e=>{note=e.message;open.textContent='入場できません：'+note;refresh();});
  function suspend(){upperPump.pause();interruption++;clearFoot();if(!active)return;paused=true;confirm=null;sheet='menu';clearBrush();view.cancel();refresh();}
@@ -568,23 +675,44 @@ export function createFreeBuildController({service,state,scene,camera,character,
  // the simulation; do not turn that internal focus change into a saved pause.
  // Actual background/page departure still suspends via visibility/pagehide.
  window.addEventListener('blur',()=>{if(constructionOverlayOpen()&&!document.hidden){clearFoot();return;}suspend();});document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});window.addEventListener('pagehide',suspend);
- function contactGeometry(){return{floors:[],walls:[...concreteVehicleGeometry(free(),supportHeightAt).walls,...pipeContactGeometry(free(),supportHeightAt).walls,...foundationGeometry(project()).walls]};}
- return{get resumePoint(){return active?{kind:'concrete',revision:project().revision,view:0,foot:view.worldFootPose}:null;},resumeSaved(point){if(point?.kind!=='concrete'||active||entering||busy||service.busy||service.blocked||state.map!=='construction'||!free()?.location||point.revision>project().revision)return false;paused=false;if(point.foot)view.setResumeFoot(point.foot);openView();return true;},autosave:()=>active&&!busy&&!view.busy?savePlatform({automatic:true}):false,contactGeometry,doorTarget,enterAtDoor,get busy(){return busy||entering;},pedestrianBlockedAt:(x,z)=>view.pedestrianBlockedAt(x,z),overlapsVehicle:(p,size)=>contactGeometry().walls.some(w=>overlaps({x:w.x,z:w.z,hx:w.localHalfX,hz:w.localHalfZ,heading:w.rotation},{x:p[0],z:p[2],hx:size[0]/2,hz:size[2]/2,heading:0})),get jumpMotion(){return active?view.jumpMotion:null;},get active(){return active;},leave,save:savePlatform,look:(...args)=>{if(!sheet&&!confirm&&!paused)view.look(...args);},
+ function contactGeometry(){
+  const current=project(),revision=readContactRevision?.();
+  if(revision!==undefined&&cachedContacts&&current===contactProject&&Object.is(revision,contactRevision))
+    return cachedContacts;
+  const shape={floors:[],walls:[...concreteVehicleGeometry(current.freeBuild,supportHeightAt).walls,
+    ...pipeContactGeometry(current.freeBuild,supportHeightAt).walls,...foundationGeometry(current).walls]};
+  contactProject=current;contactRevision=revision;cachedContacts=shape;
+  return shape;
+ }
+ return{switchCamera,get resumePoint(){return active?{kind:'concrete',revision:project().revision,view:0,foot:view.worldFootPose}:null;},resumeSaved(point){if(point?.kind!=='concrete'||active||entering||busy||service.busy||service.blocked||state.map!=='construction'||!free()?.location||point.revision>project().revision)return false;paused=false;if(point.foot)view.setResumeFoot(point.foot);openView();return true;},autosave,autoSaveReady,get autosaving(){return automaticPlatformSave||driving;},contactGeometry,doorSpots,doorTargets,doorTarget,enterAtDoor,enterFromOverview:name=>enterAtDoor(name,{board:true,overview:true}),get busy(){return busy||entering;},pedestrianBlockedAt:(x,z)=>view.pedestrianBlockedAt(x,z),overlapsVehicle:(p,size)=>contactGeometry().walls.some(w=>overlaps({x:w.x,z:w.z,hx:w.localHalfX,hz:w.localHalfZ,heading:w.rotation},{x:p[0],z:p[2],hx:size[0]/2,hz:size[2]/2,heading:0})),get jumpMotion(){return active?view.jumpMotion:null;},get active(){return active;},get missionDriver(){return active?free()?.aboard:null;},get aboard(){return active&&!!free()?.aboard;},leave,save:savePlatform,look:(...args)=>{if(!sheet&&!confirm&&!paused)view.look(...args);},
   handleKey,openKeyboardMenu,get keyboardScope(){return travelReady()?panel:null;},
-  install(options){readPresentationRevision=options.presentationRevision??null;backgroundPresentation.reset();upperPipeBlockedAt=options.upperPipeBlockedAt??(()=>true);blockedAt=options.blockedAt;const travelBlocked=options.travelBlockedAt??blockedAt;view.setBlockedAt(travelBlocked);supportHeightAt=options.supportHeightAt??(()=>null);placementHeightAt=options.placementHeightAt??supportHeightAt;view.setSupportHeightAt(supportHeightAt);view.setJumpCeilingAt(options.jumpCeilingAt??(()=>Infinity));view.setToolEnvironment({heightAt:toolHeightAt,blockedAt:(...args)=>supportedToolBlocked(project(),travelBlocked)(...args)});view.setFoundationEnvironment(()=>({heightAt:placementHeightAt,blockedAt}));view.root.visible=state.map==='construction';view.sync(project());if(!active&&!entering&&free()?.location)syncDoorEnvironment();const f=free();if(state.map==='construction'&&f?.location){// Pedestrians use the actual vehicles, wet forms, rack, hose and platform.
+  get renderQualityIdle(){
+   const {x,z}=travelBoost.vector;
+   return active&&!entering&&!busy&&!view.busy&&!view.airborne&&!x&&!z;
+  },
+  install(options){cachedContacts=null;readContactRevision=options.contactRevision??null;readPresentationRevision=options.presentationRevision??null;backgroundPresentation.reset();upperPipeBlockedAt=options.upperPipeBlockedAt??(()=>true);blockedAt=options.blockedAt;const travelBlocked=options.travelBlockedAt??blockedAt;view.setBlockedAt(travelBlocked);supportHeightAt=options.supportHeightAt??(()=>null);placementHeightAt=options.placementHeightAt??supportHeightAt;view.setSupportHeightAt(supportHeightAt);view.setJumpCeilingAt(options.jumpCeilingAt??(()=>Infinity));view.setToolEnvironment({heightAt:toolHeightAt,blockedAt:(...args)=>supportedToolBlocked(project(),travelBlocked)(...args)});view.setFoundationEnvironment(()=>({heightAt:placementHeightAt,blockedAt}));view.root.visible=state.map==='construction';view.sync(project());if(!active&&!entering&&free()?.location)syncDoorEnvironment();const f=free();if(state.map==='construction'&&f?.location){// Pedestrians use the actual vehicles, wet forms, rack, hose and platform.
 for(const w of contactGeometry().walls)options.collider(w.x,w.z,[w.localHalfX*2,w.localHalfZ*2],w.rotation,w.id,0,{...w,buildingId:'construction-concrete'});}},
-  update(dt){jumpControl.sync();if(!active&&!entering&&state.map!=='construction')return false;q('[data-free-jump]').hidden=!!free()?.aboard||!!sheet||!!confirm||paused||busy&&!progressSaving&&!autoSaveOnFoot;if(constructionOverlayOpen()){upperPump.pause();return active||entering;}dashControl.sync();movePad.sync();upperPump.tick(dt);pumpDirect.tick();if(active&&!paused&&!document.hidden){
-   progress.sync(free(),service.blocked?0:dt);
+  update(dt){jumpControl.sync();if(!active&&!entering&&state.map!=='construction')return false;q('[data-free-jump]').hidden=!!free()?.aboard||!!sheet||!!confirm||paused||busy&&!progressSaving&&!autoSaveOnFoot;if(constructionOverlayOpen()){upperPump.pause();return active||entering;}dashControl.sync();movePad.sync();autoSaveGate.noteActivity(constructionWorkEngaged());upperPump.tick(dt);pumpDirect.tick();if(active&&!paused&&!document.hidden){
+   progress.sync(free(),service.blocked?0:dt);progress.sync(free(),service.blocked?0:dt);
    if(!busy&&!service.busy&&!service.blocked&&!confirm&&!projectHistoryStatus(project()).full){const next=progress.next(free());if(next)void run(next.type,{elapsedMs:next.elapsedMs},false);}
    const v=travelBoost.vector;
    if(travelReady()){
-    if(v.x||v.z){
+    if(free().aboard){
+     const direction=Math.sign(v.z);
+     // An issued segment still settles if the key is released. No new
+     // segment starts until the steering and held direction are read again.
+     if(!direction||driving&&direction!==driveDirection)driveAcceleration.reset();
+     else{
+      driveRate=driveAcceleration.step(0,direction,dt,travelBoost.fast);
+      if(!driving){driveDirection=direction;move(v.x,v.z,dt);}
+     }
+    }else if(v.x||v.z){
      if(doorWalk||doorSearch){stopDoorWalk();note='自分で歩く操作に切り替えたよ。';}
      move(v.x,v.z,dt);
     }else if(doorWalk)advanceDoorWalk(dt);
     else view.stopWalking();
    }
-   view.tick(dt);if(HOSE_TRANSFER_ACTIONS.has(view.hoseTransferType))hoseFeedback.advance(view.hoseTransferProgress);
+   view.tick(dt,driveRate*WORKSITE_TRAVEL_RATE);if(HOSE_TRANSFER_ACTIONS.has(view.hoseTransferType))hoseFeedback.advance(view.hoseTransferProgress);
   }lastUI+=dt;if(lastUI>.15&&!autoSaveOnFoot){lastUI=0;const p=project();backgroundPresentation.draw({project:p,stock:service.constructionPackTrialStock},readPresentationRevision?.(),()=>{view.sync(p);refresh();},{live:active||entering});}return active||entering;}
  };
 }

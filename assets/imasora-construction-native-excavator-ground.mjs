@@ -3,11 +3,15 @@ export {nativeDumpHeightAt as excavatorGroundHeight};
 import {vehicleGroundFrame,groundPoint,groundLocal} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 export {groundPoint,groundLocal};
 const cache=new WeakMap();
+// Travel limits for the crawler. Working and dismounting still check support.
+export const EXCAVATOR_CLIMB_DEGREES=28;
+export const EXCAVATOR_CROSS_DEGREES=16;
 export function excavatorGroundFrame(frame){
  if(frame.version!==2)return null;
  let entry=cache.get(frame.decks??frame.soil);if(!entry||entry.soil!==frame.soil){entry={soil:frame.soil,entries:new Map()};cache.set(frame.decks??frame.soil,entry);}const entries=entry.entries;
- const v=frame.machineVehicle,key=[v.x,v.z,v.heading,v.groundY].join(',');if(entries.has(key))return entries.get(key);
- const g=vehicleGroundFrame(v,nativeDumpHeightReader(frame),{tracked:true,maxDegrees:8});
+ const v=frame.machineVehicle,read=nativeDumpHeightReader(frame),key=[v.x,v.z,v.heading,read.referenceIndependent?null:v.groundY].join(',');if(entries.has(key))return entries.get(key);
+ const samples=read.trackSamples?.(v)??read,continuousGround=samples===read.slopeAt;
+ const g=vehicleGroundFrame(v,samples,{tracked:true,maxDegrees:continuousGround?43:EXCAVATOR_CLIMB_DEGREES,maxCrossDegrees:continuousGround?34:EXCAVATOR_CROSS_DEGREES,trackSlopeTransition:true,continuousGround});
  Object.freeze(g.position);g.axes.forEach(Object.freeze);Object.freeze(g.axes);Object.freeze(g.suspension);Object.freeze(g);
  if(entries.size>=96)entries.delete(entries.keys().next().value);entries.set(key,g);return g;
 }

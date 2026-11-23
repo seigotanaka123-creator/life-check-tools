@@ -1,3 +1,6 @@
+import {outdoorSignObstacles,outdoorBoxesHit} from './imasora-construction-outdoor-sign-guard.mjs?v=120pv';
+import {reuseScoopSoilTransition,soilTransportCommand,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {dumpStoragePlan} from './imasora-construction-dump-work.mjs?v=120pv';
 import{reelWaterUsed}from'./imasora-construction-reel-furniture.mjs?v=120pl';
 import {SHOP_OFFERS} from './imasora-mars-construction-shop.js?v=503';
 import{assertStructuralChange}from'./imasora-construction-structure-performance.mjs?v=120pv';
@@ -25,6 +28,7 @@ import {transportGroundHeightAt,transportGroundHeightReader} from './imasora-con
 import {highMaterialCost,highWorldTimber,validateHighWorld,transitionHighWorld,assertHighFoundation} from './imasora-construction-high-world.mjs?v=120pv';
 import {prepareTransportParking} from './imasora-construction-transport-parking.mjs?v=120pv';
 import {serializedSaveSnapshot} from './imasora-save-wire.mjs';
+import {sameConstructionRecordValue} from './imasora-construction-record-equality.mjs';
 import {parseCapturedConstructionJson,capturedJsonInfo,isCapturedConstructionJson} from './imasora-construction-json-capture.mjs';
 import {assertWorkPlatformRecord,platformMatchesProject} from './imasora-construction-concrete/free-platform-record.mjs?v=120pv';
 // Shared transaction rules. Live and preview ledgers have incompatible formats.
@@ -33,8 +37,40 @@ import {IMASORA_WORLD_SCHEMA_VERSION} from './imasora-world-map-schema.js?v=120m
 import{transferReelGirder}from'./imasora-construction-girder-transfer.mjs?v=120pv';
 import{assertBuildingKitWorld,transferBuildingKit,assertKitSupportChange}from'./imasora-construction-kit-transfer.mjs?v=120pv';
 import {deliveryAccess} from './imasora-construction-delivery.js';
+import {interplanetaryRoute} from './imasora-ufo-interplanetary-route.js';
+import {constructionCourse,constructionMission,CONSTRUCTION_MISSIONS,advanceConstructionCourse,courseChapterStep,timedMissionComplete,validRainWorksPose,validRainWorksResult,constructionWorkshopJob,validPumpCheckpoints} from './imasora-construction-guide-data.mjs?v=121gv';
+import {completeSummitMission,RAIN_WORKS_JOBS,RAIN_WORKS_KIT,RAIN_WORKS_WATER_TESTS,RAIN_WORKS_CUT_CELLS,advanceRainWorksExcavation,completeRainConstructionTrial,rainWorksCutOrder,rainWorksWater,rainWorksDumpCompleted,RAIN_WORKS_HAUL_STEP,RAIN_WORKS_FOUNDATION_STEP,RAIN_WORKS_MIXER_STEP} from './imasora-construction-guide-data.mjs?v=121ew';
+
+// Story scenes record these checkpoints after their actions complete.
+const RAIN_STORY_V1 = Object.freeze([
+  'first-visit-return',
+  'water-delivery-return',
+  'cloud-rescue-complete',
+  'amane-water-restored',
+  'repair-trip-return',
+  'earth-rain-restored',
+  'credits-finished',
+]);
+const RAIN_SKY_STAGES = Object.freeze(['baseline', 'amane-visited', 'changed-wind', 'diagram-matched']);
+const RAIN_AMANE_STAGES = Object.freeze([
+  'outer-soil-cleared', 'archive-entry-open', 'records-compared',
+  'parents-visited', 'shortage-seen', 'sky-landed', 'baltia-reported',
+]);
+const RAIN_DELIVERY_STAGES = Object.freeze([
+  'water-loaded', 'water-landed', 'one-crate', 'crates-unloaded', 'water-delivered', 'source-matched', 'sky-returned',
+]);
+const RAIN_REPAIR_STAGES = Object.freeze([
+  'landed','surveyed','upstream-dug','dug','carrying-upstream','upstream-fitted','carrying-downstream','fitted',
+  'flowing','measured','reservoir-filled','supply-checked','parcel-received',
+]);
+
+function isRainStoryCleared(world) {
+  const progress = world?.rainStoryV1;
+  return Array.isArray(progress) && progress.length === RAIN_STORY_V1.length
+    && RAIN_STORY_V1.every((milestone, index) => progress[index] === milestone);
+}
 import {initialWorldWater,WATER_YARDS,validateWorldWater,validateWaterContinuation,waterCheckpoint} from './imasora-construction-world-water.js?v=120ov';
-import {initialWorldSoil,SOIL_YARDS,validateWorldSoil,validateSoilContinuation,soilCheckpoint,worldSoilTotals} from './imasora-construction-world-soil.js?v=120pv';
+import {initialWorldSoil,SOIL_YARDS,validateWorldSoil,validateSoilContinuation,soilCheckpoint,worldSoilTotals,worldSoilFloors,rainLoaderPlan} from './imasora-construction-world-soil.js?v=120pv';
 import {initialWorldTimber,TIMBER_YARDS,validateWorldTimber,validateTimberContinuation,timberCheckpoint,worldTimberTotals} from './imasora-construction-world-timber.js?v=120pv';
 import {EARTH_LIVE_SCOPE,createAuthorityExcavation,validateAuthorityExcavation,validateAuthorityExcavationContinuation,authorityExcavationWork,checkpointAuthorityExcavation} from './imasora-construction-earth-authority.js?v=120ov';
 import {stepWorldExcavation} from './imasora-construction-world-excavation.js?v=120ov';
@@ -56,17 +92,29 @@ import{assertGardenWorld,assertGardenAction}from'./imasora-construction-garden-g
 import {assertReelWorld,assertReelAction} from './imasora-construction-reel-guard.mjs?v=120pv';
 import{assertLightsWorld,assertLightAction}from'./imasora-construction-lights-guard.mjs?v=120pv';
 import{gardenEarthTransition}from'./imasora-construction-garden-earth.mjs?v=120pv';
-import{assertConcreteVehicleMove}from'./imasora-construction-concrete-elevation.mjs?v=120pv';
-import {assertNativeElevationWorld} from './imasora-construction-native-elevation.mjs?v=120pv';
+import{assertConcreteVehicleMove}from'./imasora-construction-concrete-elevation.mjs?v=121e6';
+import {assertNativeElevationWorld} from './imasora-construction-native-elevation.mjs?v=121if';
 import{assertTankGardenAction}from'./imasora-construction-tank-garden-guard.mjs?v=120pv';
 export function createWorldLedgerAPI({scope,kinds,verifiedPacketCacheBytes=0,immutablePackets=false}) {
 // Cache only exact immutable packet strings that completed every check.
-// Every read still parses a fresh object; mutable caller objects are never trusted.
+// Worker packets keep checked immutable values. Mutable caller objects are never trusted.
+const checkedTransportSources=new WeakMap();
+function hasCheckedTransport(record,earth,profileId){
+ const proof=record&&checkedTransportSources.get(record);
+ return !!proof&&proof.earth===earth&&proof.profileId===profileId;
+}
 kinds=Object.freeze([...kinds]);
+// An immutable, fully checked packet can serve as the parent of a new cut.
+// A cloned or newly supplied ledger still takes the complete validation path.
+const verifiedLedgerSnapshots=new WeakSet();
 const verifiedPackets=new Map(),packetCacheLimit=Math.max(0,Math.min(20*1024*1024,Number(verifiedPacketCacheBytes)||0));let packetCacheBytes=0;
 function rememberPacket(raw,state=true){
  if(!packetCacheLimit||raw.length*2>packetCacheLimit)return;
  if(verifiedPackets.has(raw)){verifiedPackets.delete(raw);packetCacheBytes-=raw.length*2;}
+ if(immutablePackets&&state&&typeof state==='object'&&Object.isFrozen(state))verifiedLedgerSnapshots.add(state);
+ if(immutablePackets&&state?.world?.constructionTransport&&state.world.constructionExcavation){
+  checkedTransportSources.set(state.world.constructionTransport,{earth:state.world.constructionExcavation,profileId:state.source.fingerprint});
+ }
  verifiedPackets.set(raw,state);packetCacheBytes+=raw.length*2;
  while(verifiedPackets.size>2||packetCacheBytes>packetCacheLimit){const oldest=verifiedPackets.keys().next().value;verifiedPackets.delete(oldest);packetCacheBytes-=oldest.length*2;}
 }
@@ -87,11 +135,71 @@ function validateWorld(world){
   ok(object(world)&&world.version===3&&world.mapSchemaVersion===IMASORA_WORLD_SCHEMA_VERSION,'本体セーブの版が対応外です。元のデータは変更しません。');
   ok(world.builtByMap===undefined||object(world.builtByMap),'建築データが不正です。');
   ok(world.ufoResources===undefined||object(world.ufoResources),'資源データが不正です。');
+  if(world.rainStoryV1!==undefined){
+    const progress=world.rainStoryV1;
+    ok(Array.isArray(progress)&&progress.length<=RAIN_STORY_V1.length
+      &&RAIN_STORY_V1.slice(0,progress.length).every((milestone,index)=>progress[index]===milestone),'物語の進行記録が不正です。');
+  }
+  if(world.rainSkyV1!==undefined){
+    const stage=RAIN_SKY_STAGES.indexOf(world.rainSkyV1);
+    ok(stage>=0&&(stage<2||world.rainStoryV1?.includes('first-visit-return')),'雲の観測記録が不正です。');
+  }
+  if(world.rainAmaneV1!==undefined){
+    const stage=RAIN_AMANE_STAGES.indexOf(world.rainAmaneV1);
+    ok(stage>=0&&RAIN_SKY_STAGES.indexOf(world.rainSkyV1)>=1
+      &&(stage<5||world.rainStoryV1?.includes('first-visit-return')),'アマネ星の訪問記録が不正です。');
+  }
+  if(world.rainDeliveryV1!==undefined){
+    const stage=RAIN_DELIVERY_STAGES.indexOf(world.rainDeliveryV1);
+    ok(stage>=0&&world.rainSkyV1==='diagram-matched'&&world.rainStoryV1?.includes('first-visit-return')&&
+      (stage<6||world.rainStoryV1?.includes('water-delivery-return')),'水を運んだ記録が不正です。');
+  }
+  if(world.constructionCourseV1!==undefined){
+    const course=world.constructionCourseV1;
+    ok(object(course)&&Number.isInteger(course.index)&&course.index>=0&&course.index<=CONSTRUCTION_MISSIONS.length&&typeof course.started==='boolean'&&(!course.started||CONSTRUCTION_MISSIONS[course.index]?.kind==='boarding'),'重機ミッションの記録が不正です。');
+    const mission=CONSTRUCTION_MISSIONS[course.index];
+    ok(validPumpCheckpoints(course,world.rainWorksV1?.step),'ポンプ車の作業記録が不正です。');
+    if(course.workshop!==undefined)ok(mission?.kind==='works'&&validRainWorksPose(mission.vehicle,course.workshop),'作業場の車両の記録が不正です。');
+  }
+  if(world.rainWorksV1!==undefined){
+    const job=world.rainWorksV1;
+    ok(world.rainStoryV1?.includes('cloud-rescue-complete')&&object(job)&&Number.isInteger(job.step)&&
+      job.step>=0&&job.step<=RAIN_WORKS_JOBS.length,'水路の作業記録が不正です。');
+    if(job.dumpArrival!==undefined)ok(job.dumpArrival===true,'採土場への到着記録が不正です。');
+    if(job.quarryArrival!==undefined)ok(job.quarryArrival===true&&job.dumpArrival,'山頂の採土場への到着記録が不正です。');
+    if(job.dumpAtStorage!==undefined)ok(job.dumpAtStorage===true&&job.excavatorTrial&&job.step===RAIN_WORKS_HAUL_STEP,'保管庫への運搬記録が不正です。');
+    if(job.excavatorScoop!==undefined){
+      keys(job.excavatorScoop,['id','cell']);
+      checkId(job.excavatorScoop.id);
+      ok(job.dumpArrival&&job.step<RAIN_WORKS_HAUL_STEP&&Number.isInteger(job.excavatorScoop.cell)&&
+        job.excavatorScoop.cell>=0&&job.excavatorScoop.cell<RAIN_WORKS_CUT_CELLS.length,'採土ミッションの記録が不正です。');
+    }
+    if(job.excavatorTrial!==undefined){
+      keys(job.excavatorTrial,['cell']);
+      ok(job.step>=RAIN_WORKS_HAUL_STEP&&Number.isInteger(job.excavatorTrial.cell)&&
+        job.excavatorTrial.cell>=0&&job.excavatorTrial.cell<RAIN_WORKS_CUT_CELLS.length,'ショベルカーのミッション記録が不正です。');
+    }
+    if(job.excavationOrder!==undefined){
+      const cells=job.excavationOrder,expected=rainWorksCutOrder({step:job.step}).length;
+      ok(Array.isArray(cells)&&(job.excavatorTrial?cells.length<=expected:cells.length===expected)&&new Set(cells).size===cells.length&&
+        cells.every(index=>Number.isInteger(index)&&index>=0&&index<RAIN_WORKS_CUT_CELLS.length),'掘った場所の記録が不正です。');
+    }
+    if(job.cargo){
+      ok(job.step===RAIN_WORKS_JOBS.length&&['ready','loaded'].includes(job.cargo.status)&&
+        canonical(job.cargo.kit)===canonical(RAIN_WORKS_KIT)&&
+        canonical(job.cargo.tests)===canonical(RAIN_WORKS_WATER_TESTS),'水路の積み荷の記録が不正です。');
+    }
+  }
+  if(world.rainRepairV1!==undefined){
+    const stage=RAIN_REPAIR_STAGES.indexOf(world.rainRepairV1);
+    ok(stage>=0&&world.rainWorksV1?.cargo?.status==='loaded'&&
+      (stage===RAIN_REPAIR_STAGES.length-1)===world.rainStoryV1?.includes('amane-water-restored'),'取水路の復旧記録が不正です。');
+  }
   if(world.coastPhysics!==undefined)validateCoastPlay(world.coastPhysics);validateCoastRig(world.coastRig);validateCoastRewards(world.coastRewards);validateCoastExploration(world.coastExploration);validateCoastVisits(world.coastVisits);
   if(world.coastToys!==undefined)validateCoastToys(world.coastToys);
   for(const key of RESOURCE_KEYS){const v=world.ufoResources?.[key];ok(v===undefined||int(v),`${key}が不正です。数値を丸めたり残高を補充したりせず停止します。`);}
   // Reject NaN/Infinity and unserializable values before any structured clone/write.
-  const seen=new Set(),stack=capturedJsonInfo(world)?[]:[world];while(stack.length){const v=stack.pop();if(v===null||typeof v==='string'||typeof v==='boolean')continue;if(typeof v==='number'){ok(Number.isFinite(v),'座標等に有限でない数があります。');continue;}ok(Array.isArray(v)||object(v),'保存できない値があります。');ok(!seen.has(v),'循環・共有参照を含む保存は使えません。');seen.add(v);stack.push(...Object.values(v));}
+  const seen=new Set(),stack=capturedJsonInfo(world)?[]:[world];while(stack.length){const v=stack.pop();if(v===null||typeof v==='string'||typeof v==='boolean')continue;if(typeof v==='number'){ok(Number.isFinite(v),'座標等に有限でない数があります。');continue;}ok(Array.isArray(v)||object(v),'保存できない値があります。');ok(!seen.has(v),'循環・共有参照を含む保存は使えません。');seen.add(v);for(const child of Object.values(v))stack.push(child);}
   const json=JSON.stringify(world);ok(json.length<=8000000,'本体セーブのサイズが大きすぎます。');
   return world;
 }
@@ -110,7 +218,8 @@ function validateOrder(event,statuses){
   const quote=quoteLinkedOrder(event.offerId,event.quantity);ok(quote.cost===event.cost&&quote.amount===event.amount,'保存した価格・数量が不正です。');
 }
 function parkingAdapters(){return PARKING_ADAPTERS.map((a,i)=>({...a,yards:[WATER_YARDS,SOIL_YARDS,TIMBER_YARDS][i],initial:[initialWorldWater,initialWorldSoil,initialWorldTimber][i],validate:[validateWorldWater,validateWorldSoil,validateWorldTimber][i]}));}
-function validateWorldPurchaseLedger(s){
+function validateWorldPurchaseLedger(s){return validateLedger(s,null);}
+function validateLedger(s,priorTransportWorld,checkedTransport=null){
   keys(s,['schemaVersion','scope','revision','worldWrites','source','world','materials','events','pending']);
   ok([1,2,3,4].includes(s.schemaVersion)&&s.scope===LINK_SCOPE,'接続保存の版・区分が不正です。');
   keys(s.source,['kind','fingerprint','world']);ok(kinds.includes(s.source.kind),'複製元の区分が不正です。');
@@ -188,10 +297,11 @@ function validateWorldPurchaseLedger(s){
   // including clients that do not recognize an excavation field at all.
   if(s.schemaVersion>=2)ok(LINK_SCOPE==='imasora-world-ledger-v1'&&s.world.constructionExcavation?.version===2&&s.world.constructionExcavation?.scope===EARTH_LIVE_SCOPE,'通常の掘削取得記録が欠けた新版保存は使用できません。');
   else ok(s.world.constructionExcavation?.scope!==EARTH_LIVE_SCOPE,'通常の掘削地形は新版保存で一度だけ取得してください。');
-  if(s.schemaVersion>=3){ok(s.world.constructionTransport!==undefined,'共有土の記録が欠けた保存は使用できません。');validateWorldTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint);}
+  if(s.schemaVersion>=3){ok(s.world.constructionTransport!==undefined,'共有土の記録が欠けた保存は使用できません。');if((!checkedTransport||s.world.constructionTransport!==checkedTransport)&&!hasCheckedTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint))validateWorldTransport(s.world.constructionTransport,s.world.constructionExcavation,s.source.fingerprint);}
   else ok(s.world.constructionTransport===undefined,'共有土は対応した新版保存へ一度だけ切り替えてください。');
   assertAllRoomWalkingWorld(s.world);assertAllRoomLayoutsWorld(s.world);assertHighWorkAccess(s.world);{const earthRead=transportGroundHeightReader(s.world.constructionTransport);assertUpperCastWorld(s.world,{heightAt:(x,z)=>earthRead(x,z)??0});}
-  if(s.world.constructionHighBuild)assertHighFoundation(s.world.constructionHighBuild,s.world.constructionTransport);assertOutdoorSignsWorld(s.world);assertOutdoorPaintBudget(s.world);assertGardenWorld(s.world);assertLightsWorld(s.world);assertReelWorld(s.world);assertNativeElevationWorld(s.world);
+  if(s.world.constructionHighBuild)assertHighFoundation(s.world.constructionHighBuild,s.world.constructionTransport);assertOutdoorSignsWorld(s.world);assertOutdoorPaintBudget(s.world);assertGardenWorld(s.world);assertLightsWorld(s.world);assertReelWorld(s.world);
+  assertNativeElevationWorld(s.world,priorTransportWorld,{match:priorTransportWorld!==null});
   if(transportNeedsShovel(s.world.constructionTransport))assertTransportShovel(projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint),s.source.fingerprint);
   return true;
 }
@@ -228,6 +338,155 @@ function awardLinkedFlightReward(s,resource,amount,id){
 function saveLinkedWorldDraft(s,draft,{craft=false}={}){
   validateWorldPurchaseLedger(s);const n=buildLinkedWorldDraft(s,draft,craft);validateWorldPurchaseLedger(n);return n;
 }
+function recordRainStoryMilestone(s,milestone,draft=s.world){
+  const progress=s.world.rainStoryV1??[];
+  if(progress.includes(milestone))return s;
+  ok(milestone&&milestone===RAIN_STORY_V1[progress.length],'前の物語を終えてから進めてね。');
+  if(milestone==='amane-water-restored'&&s.world.rainWorksV1)throw Error('水路を直して、両親から包みを預かってね。');
+  if(milestone==='repair-trip-return'&&s.world.rainRepairV1)
+    ok(s.world.rainRepairV1==='parcel-received'&&draft.map==='sky','包みを持って空駅へ戻ろう。');
+  const next=saveLinkedWorldDraft(s,draft);
+  next.world.rainStoryV1=[...progress,milestone];
+  validateWorldPurchaseLedger(next);
+  return next;
+}
+
+function recordRainRepairStage(s,stage,draft){
+  const index=RAIN_REPAIR_STAGES.indexOf(stage),current=RAIN_REPAIR_STAGES.indexOf(s.world.rainRepairV1);
+  ok(index>=0,'取水路の復旧記録が不正です。');
+  if(index<=current)return s;
+  ok(draft.map==='mars'&&index===current+1&&s.world.rainStoryV1?.at(-1)==='cloud-rescue-complete'&&
+    s.world.rainWorksV1?.cargo?.status==='loaded','接続部をアマネ星に運び、現地で作業を順に進めてね。');
+  const next=saveLinkedWorldDraft(s,draft);
+  next.world.rainRepairV1=stage;
+  if(stage==='parcel-received')next.world.rainStoryV1=[...s.world.rainStoryV1,'amane-water-restored'];
+  validateWorldPurchaseLedger(next);
+  return next;
+}
+function recordRainWorks(s,action,draft=s.world){
+  const current=s.world.rainWorksV1;
+  if(action.type==='resume-course'){
+    ok(draft.map==='construction','工事現場で再開してください。');
+    if(s.world.constructionCourseV1)return s;
+    const course=constructionCourse(s.world);
+    ok(course.index>0,'乗車ミッションを開始してください。');
+    const n=saveLinkedWorldDraft(s,draft);n.world.constructionCourseV1=course;
+    validateWorldPurchaseLedger(n);return n;
+  }
+  if(['activate-boarding','finish-boarding','finish-works'].includes(action.type)){
+    const mission=constructionMission(s.world),course=constructionCourse(s.world);
+    ok(draft.map==='construction'&&mission?.id===action.id,'現在の工事現場ミッションを確認してください。');
+    const n=saveLinkedWorldDraft(s,draft);
+    if(action.type==='activate-boarding'){
+      ok(mission.kind==='boarding','乗車ミッションを確認してください。');
+      n.world.constructionCourseV1={index:course.index,started:true};
+    }else{
+      const boarding=action.type==='finish-boarding';
+      const job=constructionWorkshopJob(mission);
+      ok(boarding?action.vehicle===mission.vehicle:timedMissionComplete(mission,action.elapsedMs)&&job?.id===action.operation&&validRainWorksResult(job,action.result),'作業の完了を確認できません。');
+      if(job?.id==='receive'||job?.id==='retract')ok(current?.step===mission.step&&!current.cargo,'ポンプ車の前の工程を確認してください。');
+      const next=advanceConstructionCourse(s.world,action.id,boarding?'boarding':'works');
+      const nextMission=CONSTRUCTION_MISSIONS[next.index];
+      if(!boarding&&nextMission?.kind==='works'&&nextMission.vehicle===mission.vehicle)next.workshop=clone(action.result.pose);
+      n.world.constructionCourseV1=next;
+      if(!boarding&&current&&!current.cargo)n.world.rainWorksV1={...current,step:courseChapterStep(next)};
+    }
+    validateWorldPurchaseLedger(n);return n;
+  }
+  const map=action.type==='accept'||action.type==='load'?'sky':'construction';
+  ok(draft.map===map&&s.world.rainStoryV1?.includes('cloud-rescue-complete'),'先に空駅で水路の依頼を確かめよう。');
+  let next;
+  if(action.type==='accept'){
+    if(current)return s;
+    ok(s.world.rainStoryV1.at(-1)==='cloud-rescue-complete','この依頼は終了しています。');
+    next={step:courseChapterStep(constructionCourse(s.world))};
+  }else if(action.type==='scoop-marked-soil'||action.type==='load-marked-soil'){
+    const job=RAIN_WORKS_JOBS[action.step];
+    ok(current&&job?.vehicle==='excavator','ショベルカーの作業を確認しよう。');
+    if(current.step>action.step)return s;
+    ok(current.step===action.step,'最新の工事の進み具合を確認しよう。');
+    next=advanceRainWorksExcavation(current,action);
+  }else if(action.type==='work'){
+    ok(!s.world.constructionCourseV1&&!current?.dumpArrival&&!current?.excavatorTrial,'現場のタイムアタックで次の工程へ進もう。');
+    const job=RAIN_WORKS_JOBS[action.step];
+    ok(job&&current,'現場で次の作業を確かめよう。');
+    if(current.step>action.step)return s;
+    ok(current.step===action.step&&action.operation===job.id,'現場の案内に沿って順番に作業しよう。');
+    if(job.vehicle==='water'&&job.id==='pour'){
+      const water=rainWorksWater(job.batch,'pour',1,2);
+      ok(water.catchTank===RAIN_WORKS_WATER_TESTS[job.batch]&&water.spill===0,'受け槽に水が届いていません。');
+    }
+    next={...current,step:current.step+1};
+    if(job.vehicle==='excavator'&&job.id==='scoop'&&current.excavationOrder){
+      const remaining=RAIN_WORKS_CUT_CELLS.findIndex((_,index)=>!current.excavationOrder.includes(index));
+      next.excavationOrder=[...current.excavationOrder,remaining];
+    }
+  }else if(action.type==='handover'){
+    if(current?.cargo)return s;
+    ok(current?.step===RAIN_WORKS_JOBS.length&&(!s.world.constructionCourseV1||!constructionMission(s.world)),'通水と回収を済ませてから部材を渡そう。');
+    next={...current,cargo:{status:'ready',kit:clone(RAIN_WORKS_KIT),tests:[...RAIN_WORKS_WATER_TESTS]}};
+  }else{
+    ok(action.type==='load'&&current?.cargo,'工事現場で部材を受け渡してから積み込もう。');
+    if(current.cargo.status==='loaded')return s;
+    next={...current,cargo:{...current.cargo,status:'loaded'}};
+  }
+  const n=saveLinkedWorldDraft(s,draft);n.world.rainWorksV1=next;
+  validateWorldPurchaseLedger(n);return n;
+}
+function recordRainAmaneStage(s,stage,draft){
+  const current=RAIN_AMANE_STAGES.indexOf(s.world.rainAmaneV1);
+  const index=RAIN_AMANE_STAGES.indexOf(stage);
+  ok(index>=0,'アマネ星の訪問記録が不正です。');
+  if(index<=current)return s;
+  ok(s.world.rainSkyV1==='amane-visited'&&index===current+1
+    &&draft.map===(index<5?'mars':'sky'),'現地で手掛かりを順に調べてね。');
+  const next=stage==='sky-landed'
+    ? recordRainStoryMilestone(s,'first-visit-return',draft)
+    : saveLinkedWorldDraft(s,draft);
+  // Older visits may already have recorded the return. Still save today's arrival and its position.
+  const saved=next===s?saveLinkedWorldDraft(s,draft):next;
+  saved.world.rainAmaneV1=stage;
+  validateWorldPurchaseLedger(saved);
+  return saved;
+}
+function recordRainDeliveryStage(s,stage,draft){
+  const index=RAIN_DELIVERY_STAGES.indexOf(stage);
+  const current=RAIN_DELIVERY_STAGES.indexOf(s.world.rainDeliveryV1);
+  ok(index>=0,'水を運んだ記録が不正です。');
+  if(index<=current)return s;
+  const map=index===0||stage==='sky-returned'?'sky':'mars';
+  ok(index===current+1&&draft.map===map&&s.world.rainSkyV1==='diagram-matched'&&
+    s.world.rainStoryV1?.at(-1)==='first-visit-return','水運びの手順を現地で順に進めてね。');
+  const next=stage==='sky-returned'
+    ? recordRainStoryMilestone(s,'water-delivery-return',draft)
+    : saveLinkedWorldDraft(s,draft);
+  next.world.rainDeliveryV1=stage;
+  validateWorldPurchaseLedger(next);
+  return next;
+}
+function recordRainSkyStage(s,stage,draft){
+  const current=RAIN_SKY_STAGES.indexOf(s.world.rainSkyV1);
+  const nextIndex=RAIN_SKY_STAGES.indexOf(stage);
+  ok(nextIndex>=0,'雲の観測記録が不正です。');
+  if(nextIndex<=current)return s;
+  ok(draft.map===(stage==='amane-visited'?'mars':'sky'),'現地で調べてから進めてね。');
+  // Returned saves from earlier versions can still record the missing baseline.
+  const returned=s.world.rainAmaneV1==='baltia-reported'
+    || (s.world.rainStoryV1?.length??0)>1;
+  // One completed lookout scene both reveals the reversal and matches the cave mark.
+  const canContinue=nextIndex===current+1||(returned&&((stage==='changed-wind'&&current===0)||(stage==='diagram-matched'&&current>=0)));
+  ok(canContinue&&(nextIndex<2||returned),'先にアマネ星から戻り、バルティアに報告してね。');
+  if(stage==='diagram-matched')ok(s.world.coastSkyDiagramRead===true,'先に洞窟で空の図を調べてね。');
+  const next=saveLinkedWorldDraft(s,draft);
+  next.world.rainSkyV1=stage;
+  validateWorldPurchaseLedger(next);
+  return next;
+}
+function savePostStoryUfoArrival(s,origin,draft){
+  ok(isRainStoryCleared(s.world),'本編をクリアすると、UFOの操縦を省略できます。');
+  ok((origin==='sky'||origin==='mars')&&draft.map===interplanetaryRoute(origin).destinationMap,'UFOの行き先を確認してね。');
+  return saveLinkedWorldDraft(s,draft);
+}
 // Private assembly only. Callers validate the original ledger first and the
 // finished ledger afterwards; no intermediate version is published or saved.
 function buildLinkedWorldDraft(s,draft,craft=false,transportRecord=undefined){
@@ -246,6 +505,20 @@ function buildLinkedWorldDraft(s,draft,craft=false,transportRecord=undefined){
   // The wallet/resource authority is never taken from a stale scene snapshot.
   // Other scene data is committed under the store's generation check.
   n.world={...n.world,...clone(lean?sceneWithTransportPlaceholder(draft):draft)};n.world.ufoResources=clone(s.world.ufoResources);
+  if(s.world.rainStoryV1!==undefined)n.world.rainStoryV1=clone(s.world.rainStoryV1);
+  else delete n.world.rainStoryV1;
+  if(s.world.rainSkyV1!==undefined)n.world.rainSkyV1=s.world.rainSkyV1;
+  else delete n.world.rainSkyV1;
+  if(s.world.rainAmaneV1!==undefined)n.world.rainAmaneV1=s.world.rainAmaneV1;
+  else delete n.world.rainAmaneV1;
+  if(s.world.rainDeliveryV1!==undefined)n.world.rainDeliveryV1=s.world.rainDeliveryV1;
+  else delete n.world.rainDeliveryV1;
+  if(s.world.constructionCourseV1)n.world.constructionCourseV1=clone(s.world.constructionCourseV1);
+  else delete n.world.constructionCourseV1;
+  if(s.world.rainWorksV1!==undefined)n.world.rainWorksV1=clone(s.world.rainWorksV1);
+  else delete n.world.rainWorksV1;
+  if(s.world.rainRepairV1!==undefined)n.world.rainRepairV1=s.world.rainRepairV1;
+  else delete n.world.rainRepairV1;
   if(draft.coastSnorkel!==undefined)assertSnorkelContinuation(s.world.coastSnorkel,draft.coastSnorkel);
   if(s.world.coastToys&&draft.coastToys){
     ok(draft.coastToys.edit>=s.world.coastToys.edit,'古い海辺の仕掛けで上書きせず停止しました。');
@@ -285,11 +558,25 @@ function buildLinkedWorldDraft(s,draft,craft=false,transportRecord=undefined){
   else delete n.world.constructionSoil;
   if(s.world.constructionTimber!==undefined)n.world.constructionTimber=clone(s.world.constructionTimber);
   else delete n.world.constructionTimber;
-  if(s.world.constructionExcavation!==undefined)n.world.constructionExcavation=clone(s.world.constructionExcavation);
+  // Reuse an unchanged transport and its exact, already checked source only
+  // inside the immutable packet workflow. New earth or mutable saves still
+  // take the complete validation path.
+  const keepCheckedTransport=immutablePackets&&transportRecord===sourceTransport&&hasCheckedTransport(sourceTransport,s.world.constructionExcavation,s.source.fingerprint);
+  if(s.world.constructionExcavation!==undefined)n.world.constructionExcavation=keepCheckedTransport?s.world.constructionExcavation:clone(s.world.constructionExcavation);
   else delete n.world.constructionExcavation;
-  if(transportRecord!==undefined){
+  if(keepCheckedTransport)n.world.constructionTransport=sourceTransport;
+  else if(transportRecord!==undefined){
     const soil=transportRecord?.work?.frame?.soil;
-    if(isCapturedConstructionJson(soil)){const shell=clone({...transportRecord,work:{...transportRecord.work,frame:{...transportRecord.work.frame,soil:null}}});shell.work.frame.soil=soil;n.world.constructionTransport=shell;}
+    if(isCapturedConstructionJson(soil)){
+      const work=transportRecord.work,scoop=work.scoop,plan=scoop?.plan;
+      // The worker already audited this cut and froze its exact path. A
+      // second copy would discard the plan's certificate and replay it again.
+      const keepPlan=immutablePackets&&plan&&Object.isFrozen(plan);
+      const shell=clone({...transportRecord,work:{...work,scoop:keepPlan?{...scoop,plan:null}:scoop,frame:{...work.frame,soil:null}}});
+      shell.work.frame.soil=soil;
+      if(keepPlan)shell.work.scoop.plan=plan;
+      n.world.constructionTransport=shell;
+    }
     else n.world.constructionTransport=snapshotWorldTransportWork(transportRecord);
   }
   else if(s.world.constructionTransport!==undefined){
@@ -437,12 +724,42 @@ function saveConstructionWaterDraft(s,work,draft,expectedRevision){
   validateWorldWater(work,received);validateWaterContinuation(old,work);
   const n=saveLinkedWorldDraft(s,draft);n.world.constructionWater=waterCheckpoint(work);assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
 }
-function saveConstructionSoilDraft(s,work,draft,expectedRevision){
+function saveConstructionSoilDraft(s,work,draft,expectedRevision,rainAction=null){
   validateWorldPurchaseLedger(s);const old=s.world.constructionSoil;
   ok((old?.revision??null)===expectedRevision,'別の土作業状態で更新されています。上書きしません。');
   const received=receivedConstructionMaterial(s,'mars-soil');
   validateWorldSoil(work,received);validateSoilContinuation(old,work);
-  const n=saveLinkedWorldDraft(s,draft);n.world.constructionSoil=soilCheckpoint(work);assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
+  const record=s.world.constructionTransport;
+  let transport, story;
+  if(rainAction){
+    const plan=rainLoaderPlan(s.world,work),before=record?.work,earth=before?.frame.soil;
+    ok(LINK_SCOPE==='imasora-world-ledger-v1'&&draft.map==='construction'&&plan&&
+      plan.step===rainAction.step&&earth.revision===rainAction.earthRevision&&
+      rainAction.type===plan.operation,'作業が更新されたよ。もう一度、次の作業を確認しよう。');
+    ok(!plan.reason,plan.reason);
+    const placing=rainAction.type==='place',target=plan.pad;
+    const structures=outdoorSignObstacles({...s.world,constructionSoil:null});
+    for(const b of worldSoilFloors(work))structures.push({x:b.x,z:b.z,y:(b.height+b.underside)/2,w:b.size[0],d:b.size[1],h:b.height-b.underside,angle:0});
+    const clearance=placing?[plan.path,{x:target.x,z:target.z,y:1,w:16,h:2,d:8,angle:0}]:[plan.path];
+    ok(!clearance.some(shape=>structures.some(b=>outdoorBoxesHit(shape,b))), 'バケットの前や台座の上に物があるよ。作業場所を空けよう。');
+    const soil=soilTransportCommand(earth,{type:placing?'rain-foundation-place':'rain-foundation-load',
+      id:rainAction.id,expectedRevision:earth.revision,...(placing?{batch:plan.batch}:{})});
+    transport={...record,work:{...before,revision:before.revision+1,frame:{...before.frame,revision:before.frame.revision+1,soil}}};
+    validateScoopDumpContinuation(before,transport.work);
+    const nextStep=placing?Math.min(RAIN_WORKS_MIXER_STEP,RAIN_WORKS_FOUNDATION_STEP+(plan.batch+1)*4):plan.step;
+    story={...s.world.rainWorksV1,step:nextStep};
+  }
+  const n=rainAction?buildLinkedWorldDraft(s,draft,false,transport):saveLinkedWorldDraft(s,draft);
+  n.world.constructionSoil=soilCheckpoint(work);
+  if(story){
+    if(s.world.rainWorksV1)n.world.rainWorksV1=story;
+    if(s.world.constructionCourseV1){
+      const mission=constructionMission(s.world);
+      ok(mission?.kind==='foundation'&&mission.id===rainAction.mission&&mission.op===rainAction.type&&timedMissionComplete(mission,rainAction.elapsedMs),'タイムアタックを開始してから作業してください。');
+      n.world.constructionCourseV1=advanceConstructionCourse(s.world,mission.id,'foundation');
+    }
+  }
+  assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
 }
 function applyConstructionHighBuild(s,action,draft,expectedRevision){
  validateWorldPurchaseLedger(s);ok(s.revision===expectedRevision,'別のセーブが進んだよ。古い内容では上書きしません。');
@@ -507,17 +824,54 @@ function enableConstructionTransportWork(s,draft,expectedEarthRevision){
   if(record===s.world.constructionTransport)return s;
   const n=saveLinkedWorldDraft(s,draft);n.schemaVersion=Math.max(3,n.schemaVersion);n.world.constructionTransport=record;assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
 }
+function buildConstructionTransportDraft(s,record,draft,rainTrial=null,checkedScoop=false){
+  const n=buildLinkedWorldDraft(s,draft,false,record),current=s.world.rainWorksV1,before=s.world.constructionTransport.work;
+  const chapter=LINK_SCOPE==='imasora-world-ledger-v1'&&n.world.map==='construction'&&
+    s.world.rainStoryV1?.at(-1)==='cloud-rescue-complete'&&
+    n.world.constructionParking?.corner===record.work.frame.soil.field?.corner;
+  if(rainTrial){
+    if(rainTrial.course){
+      const mission=constructionMission(s.world);
+      ok(n.world.map==='construction'&&mission?.kind==='transport'&&mission.id===rainTrial.type,'現在の工程を確認しよう。');
+      const step=courseChapterStep(constructionCourse(s.world));
+      const progress={step,...(step>=RAIN_WORKS_HAUL_STEP?{excavatorTrial:{cell:0}}:{}),...(mission.id!=='dump-arrival'?{dumpArrival:true,quarryArrival:true}:{}),...(mission.id==='dump-unload'?{dumpAtStorage:true}:{}),...current};
+      const result=completeSummitMission(mission.id,progress,before,record.work,rainTrial,SOIL_CAPACITY.dump,dumpStoragePlan);
+      ok(result,'山頂の作業と荷台の土量を確認してください。');
+      n.world.constructionCourseV1=advanceConstructionCourse(s.world,mission.id,'transport');
+      if(chapter&&current)n.world.rainWorksV1=result;
+    }else{
+      const result=chapter&&completeRainConstructionTrial(current,before,record.work,rainTrial,SOIL_CAPACITY.dump,dumpStoragePlan);
+      ok(result,'制限時間内の作業完了を確認できませんでした。');
+      n.world.rainWorksV1=result;
+    }
+  }else if(chapter&&!s.world.constructionCourseV1&&!current?.excavatorTrial&&rainWorksDumpCompleted(current,before,record.work)){
+    n.world.rainWorksV1={...current,step:RAIN_WORKS_FOUNDATION_STEP};
+  }
+  assertStructuralChange(s.world,n.world);
+  // A worker has already checked the reserved stroke and its source.
+  // Reuse that check only for this byte-equivalent physical record, while
+  // still auditing the floor, vehicle transition and rest of the draft.
+  const t=n.world.constructionTransport;
+  const checked=checkedScoop&&n.source.fingerprint===s.source.fingerprint&&
+    sameConstructionRecordValue(record,t)&&
+    sameConstructionRecordValue(s.world.constructionExcavation,n.world.constructionExcavation)?t:null;
+  validateLedger(n,s.world,checked);
+  return n;
+}
 // Pure candidate assembly for the save worker. It grants no physical receipt
 // and cannot commit. The service checks the private receipt before dispatch.
-function prepareConstructionTransportCandidate(s,record,draft,expectedRevision){
- validateWorldPurchaseLedger(s);ok(s.world.constructionTransport?.version===2&&s.world.constructionTransport.work.revision===expectedRevision,'別の作業が保存されました。');
- validateWorldTransport(record,s.world.constructionExcavation,s.source.fingerprint);validateScoopDumpContinuation(s.world.constructionTransport.work,record.work);
+function prepareConstructionTransportCandidate(s,record,draft,expectedRevision,rainTrial=null){
+ if(!verifiedLedgerSnapshots.has(s))validateWorldPurchaseLedger(s);
+ ok(s.world.constructionTransport?.version===2&&s.world.constructionTransport.work.revision===expectedRevision,'別の作業が保存されました。');
+ reuseScoopSoilTransition(s.world.constructionTransport.work.frame.soil,record?.work?.frame?.soil);
+ validateWorldTransport(record,s.world.constructionExcavation,s.source.fingerprint,{continuation:s.world.constructionTransport.work});
  if(transportNeedsShovel(record))assertTransportShovel(projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint),s.source.fingerprint);
- const n=buildLinkedWorldDraft(s,draft,false,record);assertNativeElevationWorld(n.world,s.world,{match:true});assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
+ const checkedScoop=immutablePackets&&!!record.work.scoop&&isCapturedConstructionJson(record.work.frame.soil);
+ return buildConstructionTransportDraft(s,record,draft,rainTrial,checkedScoop);
 }
-function prepareConstructionTransportWork(s,record,draft,expectedRevision){
+function prepareConstructionTransportWork(s,record,draft,expectedRevision,rainTrial=null){
   validateWorldPurchaseLedger(s);assertWorldTransportWorkReceipt(s.world.constructionTransport,record,expectedRevision,projectStarterToolkit(s.world.constructionPackTrialLedger,s.source.fingerprint));
-  const n=buildLinkedWorldDraft(s,draft,false,record);assertNativeElevationWorld(n.world,s.world,{match:true});assertStructuralChange(s.world,n.world);validateWorldPurchaseLedger(n);return n;
+  return buildConstructionTransportDraft(s,record,draft,rainTrial);
 }
 function receiveConstructionMaterial(s,offerId,quantity,id,context){
   validateWorldPurchaseLedger(s);checkId(id);const q=quoteLinkedOrder(offerId,quantity),old=existing(s,id);
@@ -576,7 +930,17 @@ function saveConstructionWorkPlatform(s,record,draft,expectedRevision){
   if(record===null)delete n.world.constructionWorkPlatform;else n.world.constructionWorkPlatform=clone(record);
   validateWorldPurchaseLedger(n);return n;
 }
-function packWorldPurchaseLedger(s){validateWorldPurchaseLedger(s);const raw=JSON.stringify({format:LINK_SCOPE,checksum:fingerprint(s),state:s});if(immutablePackets)rememberPacket(raw,serializedSaveSnapshot(s));return raw;}
+function encodeCheckedLedger(s){
+ const raw=JSON.stringify({format:LINK_SCOPE,checksum:fingerprint(s),state:s});
+ if(immutablePackets)rememberPacket(raw,serializedSaveSnapshot(s));
+ return raw;
+}
+function packWorldPurchaseLedger(s){validateWorldPurchaseLedger(s);return encodeCheckedLedger(s);}
+function packConstructionTransportCandidate(s,record,draft,expectedRevision,rainTrial=null){
+ // The candidate builder fully validates its result. Encoding privately here
+ // preserves the same packet without running the same world audit twice.
+ return encodeCheckedLedger(prepareConstructionTransportCandidate(s,record,draft,expectedRevision,rainTrial));
+}
 function unpackWorldPurchaseLedger(raw){ok(typeof raw==='string'&&raw.length<=20000000,'接続保存が不正です。');if(immutablePackets&&verifiedPackets.has(raw)){const state=verifiedPackets.get(raw);rememberPacket(raw,state);return state;}const p=immutablePackets?parseCapturedConstructionJson(raw):JSON.parse(raw);if(verifiedPackets.has(raw)){rememberPacket(raw);return p.state;}keys(p,['format','checksum','state']);ok(p.format===LINK_SCOPE&&p.checksum===fingerprint(p.state),'接続保存の整合性を確認できません。');validateWorldPurchaseLedger(p.state);rememberPacket(raw,immutablePackets?p.state:true);return p.state;}
-return {applyCoastPebbleFind,applyCoastFruit,applyCoastVisit,recordCoastExploration,applyCoastArrival,receiveSailingAwards,applyCoastRig,projectCoastForage,applyCoastForage,transferConstructionKit,applyConstructionHighBuild,prepareSharedConstruction,migrateTransportParking,migrateConcreteParking,migrateConstructionParking,LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,enableConstructionTransport,applyConstructionTransportCommand,enableConstructionTransportWork,saveConstructionTransportWork,prepareConstructionTransportWork,prepareConstructionTransportCandidate,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
+return {isRainStoryCleared,recordRainStoryMilestone,recordRainSkyStage,recordRainAmaneStage,recordRainDeliveryStage,recordRainWorks,recordRainRepairStage,savePostStoryUfoArrival,applyCoastPebbleFind,applyCoastFruit,applyCoastVisit,recordCoastExploration,applyCoastArrival,receiveSailingAwards,applyCoastRig,projectCoastForage,applyCoastForage,transferConstructionKit,applyConstructionHighBuild,prepareSharedConstruction,migrateTransportParking,migrateConcreteParking,migrateConstructionParking,LINK_SCOPE,LINK_PRICES,LINK_OFFERS,fingerprint,readWorldSource,quoteLinkedOrder,createWorldPurchaseLedger,validateWorldPurchaseLedger,prepareLinkedOrder,settleLinkedOrder,awardLinkedFlightReward,saveLinkedWorldDraft,saveConstructionWaterDraft,saveConstructionSoilDraft,saveConstructionTimberDraft,allocateConstructionExcavation,saveConstructionExcavationDraft,enableConstructionTransport,applyConstructionTransportCommand,enableConstructionTransportWork,saveConstructionTransportWork,prepareConstructionTransportWork,prepareConstructionTransportCandidate,packConstructionTransportCandidate,projectLinkedShop,projectConstructionStock,projectConstructionPackTrial,receiveConstructionMaterial,receiveConstructionPackTrial,projectConstructionProfileProject,projectConstructionProfileStock,applyConstructionProfileProject,saveConstructionWorkPlatform,packWorldPurchaseLedger,unpackWorldPurchaseLedger};
 }

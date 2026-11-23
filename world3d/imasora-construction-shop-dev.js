@@ -25,7 +25,7 @@ function renderBrowse(){
 }
 $('buy-selected').onclick=()=>choose(browsing);
 const guide=createSpaceMaterialGuide();
-$('open-guide').onclick=()=>guide.show('火星素材ショップ · 建設の説明書');
+$('open-guide').onclick=()=>guide.show('アマネ星素材ショップ · 建設の説明書');
 $('open-bag').onclick=()=>$('bag').showModal();$('open-dev').onclick=()=>$('development').showModal();
 for(const button of document.querySelectorAll('[data-close]'))button.onclick=()=>$(button.dataset.close).close();
 function render(){
@@ -101,4 +101,4 @@ try{
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');let frame,last=0;
   function animate(time){frame=requestAnimationFrame(animate);if(document.hidden||!active||time-last<33)return;last=time;model.userData.updateAnimation?.(time/1000,!reduced.matches);renderer.render(scene,camera);}frame=requestAnimationFrame(animate);
   addEventListener('pagehide',()=>{cancelAnimationFrame(frame);observer.disconnect();renderer.dispose();},{once:true});
-}catch{const label=document.createElement('span');label.textContent='火星素材ショップの店主';$('merchant').append(label);}
+}catch{const label=document.createElement('span');label.textContent='アマネ星素材ショップの店主';$('merchant').append(label);}

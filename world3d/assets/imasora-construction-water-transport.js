@@ -3,7 +3,7 @@ import {fieldWaterTotal,fieldWaterTarget,nearbyFieldPool,poolKey,validateFieldPo
 import {flowFieldWater,FIELD_WATER_TICK} from './imasora-construction-field-water-flow.mjs?v=120ov';
 import {inWorkArea,sharedSupply,assertVehicleField,workArea} from './imasora-construction-field-area.mjs?v=120ov';
 // 5-2b: closed water bucket, positional docking, finite transfers. No game wallet.
-import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints} from './imasora-construction-loader-physics.js?v=120ov';
+import {initialLoaderState,stepLoader,actLoader,vehicleBlocker,walkingClear,approach,localToWorld,transitionPoints,loaderDriveSpeedLimit} from './imasora-construction-loader-physics.js?v=120ov';
 import {waterWorkFrame,waterBucketPoint,waterFallTime,waterFallPrediction,waterParcelPoint,fieldWaterPathClear,waterTransferPathClear} from './imasora-construction-water-ground.mjs?v=120ov';
 import {initialWater,advanceWater,waterAction,waterTotal,validateWater} from './imasora-construction-water.js';
 export const TRANSPORT={scope:'mars-water-transport-development-v1',total:768,capacity:128,dt:1/120,rate:80}; // .25 L units; 20 L/s
@@ -129,7 +129,7 @@ export function stepTransport(state,input={},dt=TRANSPORT.dt,external=[],heightA
         let nozzle,g;try{g=waterWorkFrame(s,heightAt);nozzle=waterBucketPoint(s,s.bucket,g);}catch(e){s.task=null;s.message=e.message;}
         if(!s.task){s.water=advanceWater(s.water,dt);s.revision++;return s;}
         if(type==='field'){
-          const volumes=[...external,...waterTransportObstacles(s).map(b=>({x:b.x,z:b.z,y:0,w:b.width,d:b.depth,h:b.height}))],target=fieldWaterTarget(s,s.task.target,volumes,heightAt),duration=waterFallTime(nozzle.y,s.task.target.y,(g?.axes[2][1]??0)*12);
+          const volumes=[...external,...waterTransportObstacles(s).map(b=>({x:b.x,z:b.z,y:0,w:b.width,d:b.depth,h:b.height}))],target=fieldWaterTarget(s,s.task.target,volumes,heightAt,{allowPaved:true}),duration=waterFallTime(nozzle.y,s.task.target.y,(g?.axes[2][1]??0)*12);
           if(!target||distance(target,s.task.target)>.001||!fieldWaterPathClear({from:nozzle,to:target,duration},volumes,heightAt)){s.task=null;s.message='注ぐ先が変わったよ。水は車に残したので、場所を選び直そう。';s.water=advanceWater(s.water,dt);s.revision++;return s;}
         }
         let from,to,duration;
@@ -165,7 +165,7 @@ export function validateTransport(s){
   validateWater({...s.water,reservoir:s.water.reservoir+s.source+s.load+transferTotals(s).transit+fieldWaterTotal(s)});
   const l=s.loader,v=l?.vehicle,p=l?.player;
   check(l&&['foot','boarding','driving','exiting'].includes(l.mode)&&v&&p,'乗降状態が不正です。');
-  check(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&Math.abs(v.speed)<=200&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,waterTransportObstacles(s)),'車両位置が不正です。');
+  check(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&Math.abs(v.speed)<=loaderDriveSpeedLimit(v)&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,waterTransportObstacles(s)),'車両位置が不正です。');
   check(['x','y','z','heading'].every(k=>finite(p[k])),'乗員位置が不正です。');
   check(l.mode!=='foot'||walkingClear(p,v,waterTransportObstacles(s)),'乗員が障害物の中です。');
   check(!s.task||(['source','returned','pour','unload','field','field-return','build','build-return'].includes(s.task.type)&&finite(s.task.elapsed)&&s.task.elapsed>=0&&finite(s.task.clock)&&s.task.clock>=0&&s.task.clock<500&&l.mode==='driving'),'移送作業が不正です。');

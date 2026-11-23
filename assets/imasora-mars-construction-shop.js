@@ -5,13 +5,13 @@ export const SHOP_SCOPE = 'mars-construction-shop-development-v1';
 export const TRIAL_COINS = 60;
 export const MAX_ORDERS = 2000;
 export const SHOP_OFFERS = Object.freeze([
-  Object.freeze({id:'mars-water',name:'火星水',price:12,amount:32000,unit:'mL',pack:'32 Lの密閉容器',
+  Object.freeze({id:'mars-water',name:'アマネ星水',price:12,amount:32000,unit:'mL',pack:'32 Lの密閉容器',
     description:'矢印の方向へ流れる水。上を向ければ、天井へ向かう水路に。',
     vehicle:'ローダーで運び、バケットから注ぐ',look:'water'}),
-  Object.freeze({id:'mars-soil',name:'火星土',price:10,amount:8000,unit:'土量',pack:'8ブロック分',
+  Object.freeze({id:'mars-soil',name:'アマネ星土',price:10,amount:8000,unit:'土量',pack:'8ブロック分',
     description:'足元に敷くと、ジャンプの到達高が通常の3倍に。重ねても倍率は増えません。',
     vehicle:'土ローダーで運び、地面に敷く・回収する',look:'soil'}),
-  Object.freeze({id:'mars-timber',name:'火星木材',price:18,amount:26880,unit:'材積',pack:'浮遊床1枚分',
+  Object.freeze({id:'mars-timber',name:'アマネ星木材',price:18,amount:26880,unit:'材積',pack:'浮遊床1枚分',
     description:'離した高さに浮く木材。つなげれば、広い空中の床を作れます。',
     vehicle:'クレーンで吊り上げ、床同士を接合',look:'timber'}),
 ]);

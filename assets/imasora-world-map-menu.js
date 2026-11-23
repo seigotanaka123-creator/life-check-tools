@@ -129,12 +129,21 @@ export function createWorldMapMenu({mount=document.body,getContext,save,reset,re
     catch(error){plan=null;screen='home';notice=failure(error,'操作を完了できませんでした。保存状態を確認してから、もう一度お試しください。');}
     finally{localBusy=false;onMovePreview(null);changed();focusHeading();}
   }
-  button('save').onclick=()=>{if(!button('save').disabled)void execute('save');};button('reset').onclick=()=>inspect('reset');button('undo').onclick=()=>inspect('undo');button('confirm').onclick=()=>{if(!button('confirm').disabled&&plan)void execute(plan.kind);};button('cancel').onclick=cancel;button('close').onclick=close;
+  button('save').onclick=()=>{if(!button('save').disabled)globalThis.IMASORA_CONFIRM_ACTION('今の状態をセーブしますか？',()=>void execute('save'));};button('reset').onclick=()=>inspect('reset');button('undo').onclick=()=>inspect('undo');button('confirm').onclick=()=>{if(!button('confirm').disabled&&plan)void execute(plan.kind);};button('cancel').onclick=cancel;button('close').onclick=close;
+  let backdropStart=false;
+  box.addEventListener('pointerdown',event=>{backdropStart=event.target===box;});
+  box.addEventListener('click',event=>{
+    if(backdropStart&&event.target===box&&!document.querySelector('.imasora-action-confirm[open]')){
+      const resumes=screen==='build';
+      if(close()&&!resumes)void resumeButton.onclick();
+    }
+    backdropStart=false;
+  });
   reopenButton.onclick=show;
   resumeButton.onclick=async()=>{const c=context();if(opened||!paused||localBusy||c.busy||c.blocked)return;localBusy=true;changed();try{const result=await onResume();if(result===false)throw Error('再開できません。マップの状態を確認してください。');paused=false;notice='';}catch(error){notice='再開できません。'+failure(error,'メニューを開き直して、マップの状態を確認してください。');}finally{localBusy=false;changed();if(!paused&&returnFocus?.isConnected)returnFocus.focus?.({preventScroll:true});}};
   function handleKeyDown(event){
     if(!opened)return false;
-    if(event.key==='Escape'&&!event.isComposing){event.preventDefault();close();return true;}
+    if(event.key==='F8'&&!event.isComposing){event.preventDefault();close();return true;}
     if(event.key==='Tab'&&!event.altKey&&!event.ctrlKey&&!event.metaKey){const items=[...box.querySelectorAll('button,[tabindex]')].filter(element=>!element.disabled&&element.tabIndex>=0&&element.getClientRects().length),first=items[0],last=items.at(-1),current=document.activeElement;if(!first){event.preventDefault();heading.focus({preventScroll:true});}else if(event.shiftKey&&(current===first||!items.includes(current))){event.preventDefault();last.focus({preventScroll:true});}else if(!event.shiftKey&&(current===last||!items.includes(current))){event.preventDefault();first.focus({preventScroll:true});}}
     return true;
   }

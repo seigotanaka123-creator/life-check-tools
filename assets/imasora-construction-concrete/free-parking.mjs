@@ -11,3 +11,11 @@ export function parkedConcreteVehicles(f,corner){
  const layout=sharedParkingLayouts().find(p=>p.corner===corner);if(!layout)throw Error('駐車場の場所を確認できません。');
  return Object.fromEntries(['truck','pump'].map(name=>{const bay=layout.vehicles.find(v=>v.id===name);return[name,{...f[name],x:bay.x-f.location.x,z:bay.z-f.location.z,heading:bay.heading}];}));
 }
+export function concreteReturnBay(f,name){
+ if(!['truck','pump'].includes(name)||f.aboard!==name)throw Error('運転席に乗ってから戻そう。');
+ const bay=sharedParkingLayouts().find(p=>p.corner===f.parkingCorner)?.vehicles.find(v=>v.id===name);
+ if(!bay||!f.location)throw Error('先に共通駐車場をひらこう。');
+ if(f.connected||f.hose||f.highPipe||f[name].legs||f.mixer.pending||f.highCastings?.some(c=>c.pending))
+  throw Error('作業を止め、ホースと支持脚をしまってから戻ろう。');
+ return {...f[name],x:bay.x-f.location.x,z:bay.z-f.location.z,heading:bay.heading,groundY:0};
+}

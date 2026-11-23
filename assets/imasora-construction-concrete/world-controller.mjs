@@ -9,7 +9,7 @@ export function createWorldConcreteController({service,state,scene,camera,charac
  const fixture=service.constructionProjectPreview&&service.mode==='integration'&&service.store?.name===CONSTRUCTION_PROFILE_PROJECT_TEST_DB;
  const liveAuthority=profileAuthorityCheck&&service.mode==='live'&&service.excavationLive&&service.store?.name===LIVE_WORLD_DB;
  if(!fixture&&!liveAuthority)throw Error('施工確認には明示された専用プロフィールが必要です。');
- const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=120nx',import.meta.url).href;document.head.append(style);
+ const style=document.createElement('link');style.rel='stylesheet';style.href=new URL('./world-site.css?v=121d1',import.meta.url).href;document.head.append(style);
  const launcher=document.createElement('section');launcher.className='concrete-launcher';launcher.innerHTML=`<h3>手作業のコンクリート施工</h3><p>${liveAuthority?'この端末で施工記録の保存を確かめる練習区画です。いつもの世界とは別に保存されます。':'材料を使って作業を試せる練習区画です。いつもの世界や持ちものは変わりません。'}</p><button data-action="entrance">区画の入口へ</button><button data-action="enter">施工区画に入る</button><p class="entry-status" role="status"></p>`;
  document.querySelector('.control-card').prepend(launcher);
  const panel=document.createElement('section');panel.className='concrete-controls';panel.hidden=true;panel.setAttribute('aria-label','コンクリート手作業');

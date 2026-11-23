@@ -3,10 +3,11 @@ import {soilBedProfile,soilBedBaseAt,validSoilBed} from './imasora-construction-
 import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
 import {workArea,inWorkArea,sharedSupply,assertVehicleField} from './imasora-construction-field-area.mjs?v=120ov';
 import {walkFactor} from './imasora-construction-travel-input.mjs?v=120lb';
+import {parkingSurfaceOverlaps} from './imasora-construction-shared-field.mjs?v=121cw';
 // 8-3b1: purchased Mars-soil COPY. No loan ledger, wallet mutation, or main-world hooks.
 import {readPurchasedSource} from './imasora-construction-purchased-water.js?v=120pv';
 import {fingerprint} from './imasora-world-purchase-ledger.js?v=120pv';
-import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER} from './imasora-construction-loader-physics.js?v=120ov';
+import {initialLoaderState,stepLoader,actLoader,localToWorld,walkingClear,vehicleBlocker,polygon,polygonsOverlap,SITE,OBSTACLES,SAFE_ZONE,WALKER,loaderDriveSpeedLimit} from './imasora-construction-loader-physics.js?v=120ov';
 import {SOIL_BODY} from './imasora-construction-mars-soil.js';
 export const SOIL_COPY_SCOPE='construction-purchased-soil-copy-v1';
 export const SOIL_RECEIVER=Object.freeze({x:0,z:-80});
@@ -24,8 +25,12 @@ const int=n=>Number.isSafeInteger(n)&&n>=0,clamp=(n,a,b)=>Math.max(a,Math.min(b,
 const exact=(v,ks)=>ok(v&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join('|')===[...ks].sort().join('|'),'土の保存項目が不正です。');
 const horiz=(p,b,r=WALKER.radius)=>p.x+r>b.minX+eps&&p.x-r<b.maxX-eps&&p.z+r>b.minZ+eps&&p.z-r<b.maxZ-eps;
 const overlap=(p,b)=>horiz(p,b)&&p.y<b.maxY-eps&&p.y+WALKER.height>b.minY+eps;
-export const patchBox=p=>({id:'敷いた火星土',minX:p.x-16,maxX:p.x+16,minZ:p.z-16,maxZ:p.z+16,minY:p.heights?Math.min(...p.heights):p.baseY??0,maxY:(p.heights?Math.max(...p.heights):p.baseY??0)+2});
-export function soilSiteSolids(s){const p=sharedSupply(s.loader.vehicle,'material-store');return p?[{id:'資材容器',minX:p.x-10,maxX:p.x+10,minZ:p.z-12,maxZ:p.z+12,minY:0,maxY:20}]:SOIL_SITE_SOLIDS;}
+export const patchBox=p=>({id:'敷いたアマネ星土',minX:p.x-16,maxX:p.x+16,minZ:p.z-16,maxZ:p.z+16,minY:p.heights?Math.min(...p.heights):p.baseY??0,maxY:(p.heights?Math.max(...p.heights):p.baseY??0)+2});
+export function soilSiteSolids(s){
+  const p=sharedSupply(s.loader.vehicle,'material-store');
+  // Keep the loading position and rim height shared with the existing transfer.
+  return p?[{id:'資材容器',minX:p.x-23,maxX:p.x+23,minZ:p.z-22,maxZ:p.z+22,minY:0,maxY:20}]:SOIL_SITE_SOLIDS;
+}
 export const soilSiteBoxes=s=>soilSiteSolids(s).map(b=>({id:b.id,x:(b.minX+b.maxX)/2,z:(b.minZ+b.maxZ)/2,width:b.maxX-b.minX,depth:b.maxZ-b.minZ,height:b.maxY}));
 export function soilReceiver(s){const p=sharedSupply(s.loader.vehicle,'material-store');return p?{x:p.x-68,z:p.z-26}:SOIL_RECEIVER;}
 const surfaces=s=>[...soilSiteSolids(s),...(s.loader.vehicle.field?[]:s.patches.map(patchBox))];
@@ -33,7 +38,7 @@ const within=(p,s)=>inWorkArea(p,s.loader.vehicle,WALKER.radius-eps)&&p.y>=-eps;
 function bodyClear(s,p,external=[]){return !external.some(o=>p.y<o.height&&p.y+WALKER.height>(o.minY??0)&&polygonsOverlap(polygon({...p,heading:0},WALKER.radius*2,WALKER.radius*2),polygon({x:o.x,z:o.z,heading:o.angle??0},o.width,o.depth)))&&within(p,s)&&!surfaces(s).some(b=>overlap(p,b))&&(p.y>=55||walkingClear(p,s.loader.vehicle,[]));}
 function initial(source){return{schema:1,scope:SOIL_COPY_SCOPE,source,revision:0,time:0,phase:0,paused:false,stock:source.total,load:0,patches:[],task:null,nextId:1,operations:[],loader:initialLoaderState(),body:{vy:0,grounded:true,flight:null,jumpHeld:false,normal:null,mars:null},message:'運転席に乗り、受付で土を4ブロック分積み込もう。'};}
 export function initialPurchasedSoil(packet,kind){const meta=readPurchasedSource(packet,kind);ok(meta.inventory['mars-soil']%1000===0,'土の購入量がブロック単位ではありません。');const s=initial({mode:'copy',kind,packet,...meta,total:meta.inventory['mars-soil']/1000});validatePurchasedSoil(s);return s;}
-export function initialWorldSoilPhysics(total=0){const s=initial({mode:'world',total});s.paused=true;s.message='受取済みの火星土をローダーで4ブロックずつ使えます。';validatePurchasedSoil(s);return s;}
+export function initialWorldSoilPhysics(total=0){const s=initial({mode:'world',total});s.paused=true;s.message='受取済みのアマネ星土をローダーで4ブロックずつ使えます。';validatePurchasedSoil(s);return s;}
 export function initialSoilPractice(){const s=initial({mode:'practice',total:8});s.message='保存しない操作体験：貸出8ブロック。本体・購入品には入りません。';return s;}
 export function soilCopyTotals(s){const moving=s.task?4:0,ground=s.patches.length*4;return{stock:s.stock,bucket:s.load,ground,moving,total:s.stock+s.load+ground+moving,purchased:s.source.total};}
 function target(s){const p=localToWorld(s.loader.vehicle,0,64);return{x:Math.round(p.x/32)*32||0,z:Math.round(p.z/32)*32||0};}
@@ -50,9 +55,11 @@ function patchAllowed(s,p,placement=true,external=[]){
 }
 export function soilCopyOptions(s,external=[],heightAt=null){const v=s.loader.vehicle,p=target(s),ready=!s.paused&&!s.task&&s.loader.mode==='driving'&&Math.abs(v.speed)<.01;
   let supported=true,base=0,workIssue='';try{soilWorkFrame(s,heightAt);if(s.loader.vehicle.field&&typeof heightAt==='function'){const shape=ready&&s.load===4?soilBedProfile(p,heightAt):null;const center=heightAt(p.x,p.z);if(shape)Object.assign(p,shape);else{base=null;if(Number.isFinite(center))p.baseY=center;if(ready&&s.load===4)workIssue='ここは穴や急な段差があるよ。なだらかな場所へ向けよう。';}}}catch(e){supported=false;workIssue=e.message;}
+  const onPavement=v.field&&parkingSurfaceOverlaps(v.field.corner,p.x+v.field.origin[0],p.z+v.field.origin[1],16);
+  if(onPavement&&ready&&s.load===4)workIssue='車道を空けて、舗装の外に土を敷こう。';
   const near=Math.hypot(v.x-soilReceiver(s).x,v.z-soilReceiver(s).z)<32;
   const q=s.patches.filter(q=>Math.hypot(q.x-p.x,q.z-p.z)<20).sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];
-  return{ready:ready&&supported,near,target:p,workIssue:ready&&(!supported||s.load===4)?workIssue:'',load:ready&&supported&&near&&s.stock>=4&&s.load===0,store:ready&&supported&&near&&s.load===4,lay:ready&&supported&&base!==null&&s.load===4&&s.patches.length<64&&patchAllowed(s,p,true,external),recover:ready&&supported&&s.load===0&&!!q&&patchAllowed({...s,patches:s.patches.filter(p=>p!==q)},q,true,external),recoverId:q?.id??null};
+  return{ready:ready&&supported,near,target:p,workIssue:ready&&(!supported||s.load===4)?workIssue:'',load:ready&&supported&&near&&s.stock>=4&&s.load===0,store:ready&&supported&&near&&s.load===4,lay:ready&&supported&&!onPavement&&base!==null&&s.load===4&&s.patches.length<64&&patchAllowed(s,p,true,external),recover:ready&&supported&&s.load===0&&!!q&&patchAllowed({...s,patches:s.patches.filter(p=>p!==q)},q,true,external),recoverId:q?.id??null};
 }
 export function soilTransferVisual(s,ground=null){
   const t=s.task;if(!t)return{bucket:s.load*8,tiles:[]};
@@ -83,7 +90,7 @@ export function soilCopySurface(s,p=s.loader.player,absolute=false){
   return'normal';
 }
 function jump(s){const p=s.loader.player,b=s.body;if(s.paused||s.task||s.loader.mode!=='foot'||(!b.grounded&&(b.jumpCount??0)>=3))return;
-  const kind=soilCopySurface(s),boost=b.grounded&&kind==='mars'?3:1;beginThreeJump(b,SKY_JUMP_VELOCITY*Math.sqrt(boost));b.flight={kind,from:p.y,peak:0,hit:false};s.message=boost===3?'敷いた火星土からジャンプ！到達高は通常の3倍。':'普通の地面からジャンプ。';s.revision++;
+  const kind=soilCopySurface(s),boost=b.grounded&&kind==='mars'?3:1;beginThreeJump(b,SKY_JUMP_VELOCITY*Math.sqrt(boost));b.flight={kind,from:p.y,peak:0,hit:false};s.message=boost===3?'敷いたアマネ星土からジャンプ！到達高は通常の3倍。':'普通の地面からジャンプ。';s.revision++;
 }
 export function purchasedSoilAction(s,action,id,external=[],heightAt=null){validatePurchasedSoil(s);
   if(action==='pause'){return{...s,paused:!s.paused,revision:s.revision+1};}
@@ -157,7 +164,7 @@ export function validatePurchasedSoil(s){
   if(s.task){const t=s.task;exact(t,['id','kind','elapsed','duration','patch']);ok(ops.has(t.id)&&s.operations.at(-1).id===t.id&&s.operations.at(-1).kind===t.kind&&t.duration===2&&fin(t.elapsed)&&t.elapsed>=0&&t.elapsed<2&&s.loader.mode==='driving'&&Math.abs(s.loader.vehicle.speed)<.01,'移送状態が不正です。');
     if(['lay','recover'].includes(t.kind)){ok(validSoilBed(t.patch,!!s.loader.vehicle.field),'移送先の形状が不正です。');ok(int(t.patch.id)&&t.patch.id>0&&t.patch.id<s.nextId&&!ids.has(t.patch.id)&&patchAllowed(s,t.patch),'移送中の地面が不正です。');}else ok(t.patch===null,'不要な地面が移送に含まれています。');}
   ok(soilCopyTotals(s).total===s.source.total,'保管・車載・移送中・地面の土量が一致しません。');
-  const l=s.loader,v=l.vehicle,p=l.player;ok(['foot','driving','boarding','exiting'].includes(l.mode)&&['x','z','heading','speed','steering','wheelTravel'].every(k=>fin(v[k]))&&Math.abs(v.speed)<=200.001&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,[...soilSiteBoxes(s),...(v.field?[]:s.patches.map(q=>({id:'敷いた土',x:q.x,z:q.z,width:32,depth:32,height:2})))]),'車両の位置が不正です。');
+  const l=s.loader,v=l.vehicle,p=l.player;ok(['foot','driving','boarding','exiting'].includes(l.mode)&&['x','z','heading','speed','steering','wheelTravel'].every(k=>fin(v[k]))&&Math.abs(v.speed)<=loaderDriveSpeedLimit(v)+.001&&Math.abs(v.steering)<=.471&&!vehicleBlocker(v,[...soilSiteBoxes(s),...(v.field?[]:s.patches.map(q=>({id:'敷いた土',x:q.x,z:q.z,width:32,depth:32,height:2})))]),'車両の位置が不正です。');
   ok(['x','y','z','heading'].every(k=>fin(p[k]))&&p.y<=1200,'身体の座標が不正です。');if(l.mode==='foot')ok(bodyClear(s,p),'身体が床や障害物に入っています。');
   if(l.transition){ok(['boarding','exiting'].includes(l.mode)&&Array.isArray(l.transition.path)&&l.transition.path.length>=6&&l.transition.path.every(q=>['x','y','z','heading'].every(k=>fin(q[k])))&&fin(l.transition.elapsed)&&l.transition.elapsed>=0&&l.transition.elapsed<l.transition.duration,'乗降状態が不正です。');}else ok(!['boarding','exiting'].includes(l.mode),'乗降経路がありません。');
   exact(s.body,['vy','grounded','flight','jumpHeld','normal','mars',...(Object.hasOwn(s.body,'jumpCount')?['jumpCount']:[])]);if(Object.hasOwn(s.body,'jumpCount'))ok(Number.isInteger(s.body.jumpCount)&&s.body.jumpCount>=0&&s.body.jumpCount<=3,'ジャンプ回数が不正です。');ok(fin(s.body.vy)&&Math.abs(s.body.vy)<1000&&typeof s.body.grounded==='boolean'&&typeof s.body.jumpHeld==='boolean','ジャンプ状態が不正です。');if(s.body.flight){const f=s.body.flight;exact(f,['kind','from','peak','hit']);ok(['normal','mars'].includes(f.kind)&&fin(f.from)&&f.from>=0&&fin(f.peak)&&f.peak>=0&&typeof f.hit==='boolean','跳躍記録が不正です。');}

@@ -1,10 +1,12 @@
+import {FIELD,withinQuarry} from '../imasora-construction-shared-field.mjs?v=121cw';
+import {concreteReturnBay} from './free-parking.mjs?v=120ey';
 import{chooseVehicleHeight}from'../imasora-construction-vehicle-elevation.mjs?v=120ov';
 import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 import {freePlacedFill} from './free-work-parts.mjs?v=120hb';
 import {canonicalFreeAction,freeCell,freeVehicleProblem} from './free-build-state.mjs?v=120pv';
 import {FRAME_RACK} from './free-frames.mjs?v=120pv';
-import {VEHICLE_WHEELS,VEHICLE_GROUND,vehicleGroundPose,vehicleLevelWorkProblem} from './free-vehicle-ground.mjs?v=120ov';
-export {VEHICLE_WHEELS} from './free-vehicle-ground.mjs?v=120ov';
+import {VEHICLE_WHEELS,VEHICLE_GROUND,vehicleGroundPose,createVehicleGroundReader,vehicleLevelWorkProblem} from './free-vehicle-ground.mjs?v=121e6';
+export {VEHICLE_WHEELS} from './free-vehicle-ground.mjs?v=121e6';
 
 export const FREE_VEHICLE_ACTIONS=new Set(['FREE_MOVE','FREE_LEGS']);
 import {VEHICLE_CONTACT,VEHICLE_PADS,headingDelta,vehicleTravelHeading,vehicleContactPoint,vehiclePoseAt,vehicleSweepSteps,vehicleFootprints,liveVehicleFootprints,overlaps} from './free-vehicle-shape.mjs?v=120ov';
@@ -25,11 +27,12 @@ export function createConcreteSupportSampler({width,depth,hole=null,heightsAt=()
  };
 }
 function supports(v){return[...VEHICLE_WHEELS.map((p,i)=>({...p,id:'wheel-'+i,kind:'wheel',offsets:[-2.5,0,2.5],depths:[-1,0,1]})),...(v.legs?VEHICLE_PADS.map((p,i)=>({...p,id:'pad-'+i,kind:'pad',offsets:[-4.5,-2.25,0,2.25,4.5],depths:[-4.5,-2.25,0,2.25,4.5]})):[])];}
-export function vehiclePoseProblem(f,name,v,{blockedAt=()=>false,supportHeightAt=()=>0,terrainTravel=false,foundation=null,loadProblem=()=>''}={}){
+export function vehiclePoseProblem(f,name,v,{blockedAt=()=>false,supportHeightAt=()=>0,terrainTravel=false,foundation=null,loadProblem=()=>'',groundAt=null}={}){
  if(!f?.location||!['truck','pump'].includes(name)||![v.x,v.z,v.heading].every(Number.isFinite))return '車両の位置を確認できません。';
- if(Math.abs(f.location.x+v.x)>2600||Math.abs(f.location.z+v.z)>1700)return '工事現場の端です。';
- let ground=null,otherGround=null;try{ground=vehicleGroundPose(f,v,supportHeightAt);}catch(e){return e.message;}
- const otherVehicle=f[name==='truck'?'pump':'truck'];try{otherGround=vehicleGroundPose(f,otherVehicle,supportHeightAt);}catch{otherGround={padX:10,padZ:10};}
+ if(Math.abs(f.location.x+v.x)>FIELD.maxX-100||Math.abs(f.location.z+v.z)>FIELD.maxZ-100)return '工事現場の端です。';
+ const readGround=groundAt??(v=>vehicleGroundPose(f,v,supportHeightAt));
+ let ground=null,otherGround=null;try{ground=readGround(v);}catch(e){return e.message;}
+ const otherVehicle=f[name==='truck'?'pump':'truck'];try{otherGround=readGround(otherVehicle);}catch{otherGround={padX:10,padZ:10};}
  const bodies=liveVehicleFootprints(v,name,ground),other=liveVehicleFootprints(otherVehicle,name==='truck'?'pump':'truck',otherGround);
  if(foundation)for(let i=0;i<16;i++)if(foundation.mask&(1<<i)){const t=groundTile(i,foundation),r=rect({x:foundation.x-f.location.x+t.x,z:foundation.z-f.location.z+t.z,heading:0},t.w/2+.3,t.d/2+.3);if(bodies.some(body=>overlaps(body,r)))return '車体や注ぎ口が土台に当たります。少し離れて進もう。';}
  if(bodies.some(body=>other.some(part=>overlaps(body,part))))return '車体がもう1台に当たります。車間を空けてください。';
@@ -51,15 +54,20 @@ export function vehiclePoseProblem(f,name,v,{blockedAt=()=>false,supportHeightAt
  return loadProblem(f,name,v);
 }
 export function vehicleSweepProblem(f,name,from,to,environment,visit=()=>{}){
- if(to.groundY!==undefined&&from.groundY===undefined)try{from={...from,groundY:vehicleGroundPose(f,from,environment?.supportHeightAt).position.y};}catch(e){return e.message;}
- const n=vehicleSweepSteps(from,to);for(let i=0;i<=n;i++){const v=vehiclePoseAt(from,to,i/n),problem=vehiclePoseProblem(f,name,v,environment);if(problem)return problem;visit(v);}
+ const groundAt=environment?.groundAt??createVehicleGroundReader(f,environment?.supportHeightAt),sweep={...environment,groundAt};
+ if(to.groundY!==undefined&&from.groundY===undefined)try{from={...from,groundY:groundAt(from).position.y};}catch(e){return e.message;}
+ const n=vehicleSweepSteps(from,to);for(let i=0;i<=n;i++){const v=vehiclePoseAt(from,to,i/n),problem=vehiclePoseProblem(f,name,v,sweep);if(problem)return problem;visit(v); }
  return '';
 }
-export function vehicleActionProblem(f,a,environment){
+export function vehicleActionProblem(f,a,environment,visit){
+ if(a.type==='FREE_RETURN_PARKING'){
+  try{return vehiclePoseProblem(f,a.vehicle,concreteReturnBay(f,a.vehicle),environment);}
+  catch(error){return error.message;}
+ }
  // Removing an empty hose moves neither vehicle; leave recovery available on changed ground.
  if(a.type==='FREE_CONNECT'&&a.connected===false)return ''; 
- if(a.type==='FREE_MOVE'&&a.groundY!==undefined){let g;try{g=vehicleGroundPose(f,{...f[a.vehicle],x:a.x,z:a.z,heading:a.heading},environment?.supportHeightAt);}catch(e){return e.message;}if(Math.abs(g.position.y-a.groundY)>1e-5)return '車を支える床と、走る高さが合わないよ。';}
- if(a.type==='FREE_MOVE')return freeVehicleProblem(f,a.vehicle,a.x,a.z)||vehicleSweepProblem(f,a.vehicle,f[a.vehicle],{...f[a.vehicle],x:a.x,z:a.z,heading:a.heading,...(a.groundY===undefined?{}:{groundY:a.groundY})},{...environment,terrainTravel:true});
+ if(a.type==='FREE_MOVE'&&a.groundY!==undefined){let g;try{g=(environment?.groundAt??createVehicleGroundReader(f,environment?.supportHeightAt))({...f[a.vehicle],x:a.x,z:a.z,heading:a.heading});}catch(e){return e.message;}if(g.quarryDescent&&g.slope>VEHICLE_GROUND.maxSlope&&environment?.supportHeightAt){const old=f[a.vehicle],height=(v)=>environment.supportHeightAt(f.location.x+v.x,f.location.z+v.z,old.groundY??0);if(height(a)>height(old)+.05)return '登りは緩やかな坂から進もう。';}if(Math.abs(g.position.y-a.groundY)>1e-5)return '車を支える床と、走る高さが合わないよ。';}
+ if(a.type==='FREE_MOVE')return freeVehicleProblem(f,a.vehicle,a.x,a.z)||vehicleSweepProblem(f,a.vehicle,f[a.vehicle],{...f[a.vehicle],x:a.x,z:a.z,heading:a.heading,...(a.groundY===undefined?{}:{groundY:a.groundY})},{...environment,terrainTravel:true},visit);
  if(a.type==='FREE_BOARD'||a.type==='FREE_LEAVE'){const name=a.type==='FREE_BOARD'?a.vehicle:f.aboard;return name?vehiclePoseProblem(f,name,f[name],{...environment,terrainTravel:!f[name].legs}):'';}
  if(a.type==='FREE_LEGS')return vehiclePoseProblem(f,'pump',{...f.pump,legs:a.deployed},environment)||vehicleLevelWorkProblem(f,f.pump,environment?.supportHeightAt);
  const names=a.type==='FREE_BOARD'?[a.vehicle]:a.type==='FREE_LEAVE'&&f.aboard?[f.aboard]:a.type==='FREE_BUCKET_LOAD'||a.type==='FREE_MIX_START'?['truck']:a.type==='FREE_PRIME'||a.type==='FREE_CONNECT'?['truck','pump']:a.type==='FREE_POUR'&&a.source!=='bucket'?(a.source==='pump'?['truck','pump']:['truck']):[];
@@ -74,6 +82,7 @@ export function assertVehicleReceipt(a,p,revision,r){
  const expected=newVehicleReceipt(a,p),f=p.freeBuild,name=a.type==='FREE_MOVE'?a.vehicle:'pump',v={...f[name],...(a.type==='FREE_LEGS'?{legs:a.deployed}:{x:a.x,z:a.z,heading:a.heading})};
  const ids=supports(v).map(s=>s.id),n=a.type==='FREE_MOVE'?vehicleSweepSteps(f[name],v)+1:1;
  if(JSON.stringify(Object.keys(r).sort())!==JSON.stringify(Object.keys(expected).sort())||!Number.isSafeInteger(r.samples)||r.samples<3||!Number.isSafeInteger(r.checkedPoses)||r.checkedPoses<n||r.min!==0||r.max!==1||![r.maxPoseError,r.maxGroundError].every(x=>Number.isFinite(x)&&x>=0&&x<=1e-5)||JSON.stringify(r.supports)!==JSON.stringify(ids))throw Error('車体の通過と全ての車輪・支持脚の接地を確認できません。');
- if(!Number.isSafeInteger(r.terrainSamples)||r.terrainSamples<(a.type==='FREE_MOVE'?r.samples*6:0)||!['maxSlope','maxSuspension','maxPatchError'].every(k=>Number.isFinite(r[k])&&r[k]>=0&&r[k]<=VEHICLE_GROUND[k]+1e-8))throw Error('斜面と6輪の接地を確認できません。');
+ const maxSlope=a.type==='FREE_MOVE'&&withinQuarry(f.parkingCorner,f.location.x+v.x,f.location.z+v.z) ? .9 : VEHICLE_GROUND.maxSlope;
+ if(!Number.isSafeInteger(r.terrainSamples)||r.terrainSamples<(a.type==='FREE_MOVE'?r.samples*6:0)||!['maxSlope','maxSuspension','maxPatchError'].every(k=>Number.isFinite(r[k])&&r[k]>=0&&r[k]<=(k==='maxSlope'?maxSlope:VEHICLE_GROUND[k])+1e-8))throw Error('斜面と6輪の接地を確認できません。');
  return true;
 }

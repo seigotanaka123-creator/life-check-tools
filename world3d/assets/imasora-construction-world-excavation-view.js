@@ -1,12 +1,12 @@
-import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120od';
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=121cw';
 import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
-import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=120lb';
+import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=121cw';
 import {createEarthSurface} from './imasora-construction-earth-surface.mjs?v=120ov';
 import {excavatorAtDriverDoor} from './imasora-construction-excavator-access.js?v=120ov';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
 import {readyExcavation,beginOneTouch,stepOneTouch,stopOneTouch,allowedDigGuide} from './imasora-construction-excavator-one-touch.js?v=120ov';
-import {createExcavationKeyboard,EXCAVATION_KEYS} from './imasora-construction-excavation-keyboard.js?v=120lb';
+import {createExcavationKeyboard,EXCAVATION_KEYS,EXCAVATION_WORK_KEYS,excavationTravelRequested,excavationSlewInput} from './imasora-construction-excavation-keyboard.js?v=121ct';
 import {createExcavationLedgerView} from './imasora-construction-excavation-ledger-view.js?v=120pv';
 import {excavationFrameBudget} from './imasora-construction-excavation-frame.js';
 import {createExcavationPreviewController} from './imasora-construction-excavation-preview-controller.js?v=482';
@@ -17,7 +17,7 @@ import {totals,excavatorActorPose,armPose,scoopTargets} from './imasora-construc
 import {buildProgress} from './imasora-construction-excavator-build.js?v=120ov';
 import {createContactRestoreView} from './imasora-construction-excavation-restore-view.js?v=120ov';
 import {EXCAVATION_YARDS,EXCAVATION_GATE,EXCAVATION_HANDOFF_LOCAL_Z,chooseExcavationYard,excavationOpening,excavationReserved,excavationEntry,excavationCanLeave,enterExcavation,leaveExcavation,initialContactWorldExcavation,stepWorldExcavation,actWorldExcavation} from './imasora-construction-world-excavation.js?v=120ov';
-import {createWorldExcavationModel,updateWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120ov';
+import {createWorldExcavationModel,updateWorldExcavationModel,disposeWorldExcavationModel,EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=121cy';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=518';
 
 export function createWorldExcavationController({state,scene,camera,character,shadow,canvas,clearInput,onExit,readout,persistence=null}){
@@ -36,13 +36,13 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     <div class="we-active" hidden>
 
       <div class="we-move"><button data-hold="left">左へ</button><button data-hold="forward">前へ</button><button data-hold="right">右へ</button><button data-hold="back">後ろへ</button><button data-hold="brake">停止</button></div>
-      <div class="we-arm" role="group" aria-label="作業操作" hidden><button data-hold="slew-left" aria-label="左旋回" aria-keyshortcuts="A" title="A：押している間、左へ旋回">左旋回 <kbd aria-hidden="true">A</kbd></button><button data-hold="slew-right" aria-label="右旋回" aria-keyshortcuts="D" title="D：押している間、右へ旋回">右旋回 <kbd aria-hidden="true">D</kbd></button><button data-action="scoop" aria-label="すくう" aria-keyshortcuts="W" title="W：1回押すと、すくってブームを上げる">すくう <kbd aria-hidden="true">W</kbd></button><button data-action="dump" aria-label="こぼす" aria-keyshortcuts="S" title="S：1回押すと、こぼして基本姿勢へ戻る">こぼす <kbd aria-hidden="true">S</kbd></button></div>
-      <div class="we-quick" role="group" aria-label="モード・視点"><button data-action="work">作業モード</button><button data-action="camera">視点：斜め後ろ</button><button data-action="pause">一時停止</button></div>
+      <div class="we-arm" role="group" aria-label="作業操作" hidden><button data-hold="slew-left" aria-label="上部旋回体を左へ旋回" aria-keyshortcuts="A" title="A：押している間、上部旋回体を左へ旋回">左旋回 <kbd aria-hidden="true">A</kbd></button><button data-hold="slew-right" aria-label="上部旋回体を右へ旋回" aria-keyshortcuts="D" title="D：押している間、上部旋回体を右へ旋回">右旋回 <kbd aria-hidden="true">D</kbd></button><button data-action="scoop" aria-label="すくう" aria-keyshortcuts="J" title="J：1回押すと、すくってブームを上げる">すくう <kbd aria-hidden="true">J</kbd></button><button data-action="dump" aria-label="こぼす" aria-keyshortcuts="H" title="H：1回押すと、こぼして基本姿勢へ戻る">こぼす <kbd aria-hidden="true">H</kbd></button></div>
+      <div class="we-quick" role="group" aria-label="モード・視点"><button data-action="work">作業モード</button><button data-action="camera" data-game-action="camera">視点：斜め後ろ</button><button data-action="pause">一時停止</button></div>
       
       <button class="we-stop" data-action="stop" hidden>自動操作を止める</button>
       <div class="we-actions"><button data-action="interact">運転席に乗る</button><button data-action="jump">ジャンプ</button></div>
       <div class="we-forecast"><button data-action="prediction" aria-pressed="true">予測表示：ON</button><span class="we-preview" role="status"></span></div>
-      <details class="we-options"><summary>詳細・保存</summary><div class="we-details"><p class="we-message"></p><div class="we-stats"></div><p class="we-preview-detail"></p><p class="we-key-help" hidden>W・S：1回押す　A・D：長押しで旋回</p><footer><button data-action="entry-view">入口方向を見る</button><button data-action="bucket-view">バケットを横から見る</button><button data-action="slow">動作：通常</button><button data-action="export">作業を書き出す</button><button data-action="restore">バックアップを読み込む</button><button data-action="leave">工事現場の徒歩へ戻る</button></footer></div></details>
+      <details class="we-options"><summary>詳細・保存</summary><div class="we-details"><p class="we-message"></p><div class="we-stats"></div><p class="we-preview-detail"></p><p class="we-key-help">徒歩：WASD／矢印で移動。乗車中：Wで前進、S／Xで後退、その間のA・Dでハンドル操作。停止中のA・Dで上部旋回体を旋回。J：すくう　H：こぼす　K＋移動：ダッシュ。上部旋回体は安全に正面へ戻してから走行します。</p><footer><button data-action="entry-view">入口方向を見る</button><button data-action="bucket-view">バケットを横から見る</button><button data-action="slow">動作：通常</button><button data-action="export">作業を書き出す</button><button data-action="restore">バックアップを読み込む</button><button data-action="leave">工事現場の徒歩へ戻る</button></footer></div></details>
     </div>`;
   canvas.parentElement.append(panel);const b=a=>panel.querySelector(`[data-action="${a}"]`),q=s=>panel.querySelector(s);
   const forecast=createExcavationPreviewController({
@@ -92,6 +92,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
   }
   function action(a){
     if(a==='begin'){begin();return;}if(!active||locked()||ledgerUI?.open)return;
+    if((a==='scoop'||a==='dump')&&work.loader.mode==='driving'&&!paused&&!sequence&&!planning&&!work.action&&!work.loader.transition)work=actWorldExcavation(work,'work',contactVolumes());
     if((a==='scoop'||a==='dump')&&(paused||sequence||planning||work.action||work.loader.transition||work.loader.mode!=='working'||(a==='scoop'?work.load>0:!work.load)))return;
     clear();issue='';
     if(a==='prediction'){forecast.setEnabled(!forecast.enabled);refresh();return;}
@@ -103,7 +104,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
   travelBoost=bindTravelBoost({panel,enabled:()=>active&&!paused&&!locked()&&!ledgerUI?.open&&!restoreUI.open&&!sequence&&!planning&&!work.action&&!work.loader.transition,context:()=>work.loader.mode});
   panel.querySelectorAll('[data-action]:not([data-action=jump])').forEach(e=>e.onclick=()=>action(e.dataset.action));
   for(const e of panel.querySelectorAll('[data-hold]:not([data-hold=jump])')){
-    e.onpointerdown=event=>{if(!active||paused||locked()||sequence||work.action||work.loader.transition)return;event.preventDefault();forecast.invalidate();cancelPlan();held.set(event.pointerId,e.dataset.hold);e.setPointerCapture(event.pointerId);taps.set(e.dataset.hold,.15);e.classList.add('held');};
+    e.onpointerdown=event=>{if(!active||paused||locked()||sequence||work.action||work.loader.transition)return;event.preventDefault();if(e.dataset.hold.startsWith('slew-')&&work.loader.mode==='driving'){work=actWorldExcavation(work,'work',contactVolumes());if(work.loader.mode!=='working'){refresh();return;}}forecast.invalidate();cancelPlan();held.set(event.pointerId,e.dataset.hold);e.setPointerCapture(event.pointerId);taps.set(e.dataset.hold,.15);e.classList.add('held');};
     for(const type of['pointerup','pointercancel','lostpointercapture'])e.addEventListener(type,event=>{held.delete(event.pointerId);e.classList.remove('held');});
     e.onclick=event=>{if(event.detail===0&&active&&!paused&&!locked()&&!sequence&&!work.action&&!work.loader.transition){forecast.invalidate();cancelPlan();taps.set(e.dataset.hold,.16);}};
   }
@@ -118,12 +119,15 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     const modified=e.ctrlKey||e.altKey||e.metaKey||e.isComposing;
     if(!modified&&!(e.code==='Space'&&e.target.closest?.('button,summary')))e.preventDefault();
     else return;
-    if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB')&&work.loader.mode==='foot'){jumpControl.key(e);return;}
+    if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'||(e.code==='Space'&&(e.type==='keyup'||work.loader.mode==='foot')))&&work.loader.mode==='foot'){jumpControl.key(e);return;}
+    if(EXCAVATION_WORK_KEYS.includes(e.code)&&work.loader.mode==='driving'&&!paused&&!locked()&&!sequence&&!planning&&!work.action&&!work.loader.transition){
+      work=actWorldExcavation(work,'work',contactVolumes());refresh();
+    }
     const command=keyboard.press(e.code,{mode:work.loader.mode,repeat:e.repeat,blocked:paused||locked()||!!sequence||!!planning||!!work.action||!!work.loader.transition});
     if(command==='hold'){forecast.invalidate();cancelPlan();}
     else if(command)action(command);
   },true);
-  addEventListener('keyup',e=>{if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'))jumpControl.key(e);keyboard.release(e.code);if(active&&EXCAVATION_KEYS.includes(e.code))e.stopImmediatePropagation();},true);
+  addEventListener('keyup',e=>{if((e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'||(e.code==='Space'&&(e.type==='keyup'||work.loader.mode==='foot'))))jumpControl.key(e);keyboard.release(e.code);if(active&&EXCAVATION_KEYS.includes(e.code))e.stopImmediatePropagation();},true);
   addEventListener('focusin',e=>{if(active&&textEntry(e))clear();},true);
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',()=>{clear();keyboard.reset();if(active){cancelPlan();paused=true;pauseReason='画面からフォーカスが外れたため、安全のため一時停止しています。';refresh();}});
@@ -132,12 +136,12 @@ export function createWorldExcavationController({state,scene,camera,character,sh
   addEventListener('beforeunload',e=>{if(persistence?(persistence.record&&persistence.dirty(snapshot())):(work.revision>0||restoreUI.hasBefore)){e.preventDefault();e.returnValue='';}});
   function input(){return travelBoost.input(rawInput());}
   function rawInput(){
-    const actions=[...held.values(),...taps.keys()],on=(a,...k)=>actions.includes(a)||k.some(c=>keys.has(c)),axis=(a,b,...k)=>Number(on(a,k[0],k[2]))-Number(on(b,k[1],k[3]));
-    if(work.loader.mode==='working')return{slew:axis('slew-right','slew-left','KeyD','KeyA')};
-    if(work.loader.mode==='driving')return loaderDrivingInput(actions.map(a=>a==='forward'?'accelerate':a==='back'?'reverse':a),keys);
+    const actions=[...held.values(),...taps.keys()],on=(a,...k)=>actions.includes(a)||k.some(c=>keys.has(c)),axis=(a,b,...k)=>Number(on(a,k[0],k[2]))-Number(on(b,k[1],k[3])),driveKeys=keys.has('KeyX')?new Set([...keys,'KeyS']):keys;
+    if(work.loader.mode==='working')return excavationTravelRequested(keys,actions)?loaderDrivingInput(actions.map(a=>a==='forward'?'accelerate':a==='back'?'reverse':a),driveKeys):{slew:excavationSlewInput(keys,actions)};
+    if(work.loader.mode==='driving')return loaderDrivingInput(actions.map(a=>a==='forward'?'accelerate':a==='back'?'reverse':a),driveKeys);
     const f=axis('forward','back','KeyW','KeyS','ArrowUp','ArrowDown'),r=axis('right','left','KeyD','KeyA','ArrowRight','ArrowLeft'),yaw=walkYaw();return{x:r*Math.cos(yaw)-f*Math.sin(yaw),z:-r*Math.sin(yaw)-f*Math.cos(yaw),jump:jumpInput.read()};
   }
-  const walkYaw=()=>orbit.yaw(view===2?Math.PI:work.loader.vehicle.heading+(view===1?1.5:-2.4));
+  const walkYaw=()=>orbit.yaw(view===2?Math.PI:work.loader.vehicle.heading+((view===0||view===1)&&['driving','working'].includes(work.loader.mode)?work.arm.slew:0)+(view===1?1.5:-2.4));
   function refresh(){jumpControl?.sync();
     const menuButton=q('[data-earth-menu="open"]');if(menuButton){menuButton.hidden=!active;menuButton.disabled=!active;}
     const nearby=root&&state.map==='construction'&&Math.abs(state.position.x-root.position.x)<430&&Math.abs(state.position.z-root.position.z)<360;
@@ -159,7 +163,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     previewText.textContent=!forecast.enabled?'予測は非表示':result?(result.kind==='scoop'?'水色：削れる土 '+result.removed.length+'個':'橙色：盛土・受け箱 '+result.deposited.length+'個')+(result.status==='partial'?'（途中）':''):prediction.status==='calculating'?'予測中…':prediction.status==='error'?'予測エラー（詳細を確認）':'次の仕上がりを予測します';
     q('.we-message').textContent=issue||(!active?(paused?'作業はこの画面内に保持しています。黄色い入口で上のボタンから続きを行えます。':'黄色い入口から作業区画へどうぞ。掘削した土はこの確認画面内だけで扱います。'):paused?pauseReason+'「再開」で作業を続けます。':planning?'接触しない経路を確認中…（補助を止めて手動操作にも戻せます）':s.message);
     q('.we-stats').textContent=`地形 ${t.terrain} ｜積載 ${t.bucket} ｜受け箱 ${t.bin} ｜土の合計 ${t.total} / 1792 ｜掘削 ${p.removed}個`+(working?` ｜根元 ${(s.arm.boom*180/Math.PI).toFixed(0)}°・アーム ${(s.arm.stick*180/Math.PI).toFixed(0)}°・バケット ${(s.arm.curl*180/Math.PI).toFixed(0)}° ｜爪：${scoopTargets(s).length?'土に接触':'未接触'}`:` ｜足元 ${excavatorActorPose(s).y.toFixed(1)}`);
-    q('.we-move').hidden=working;q('.we-arm').hidden=!working;q('.we-key-help').hidden=!working;q('.we-actions').hidden=working;
+    q('.we-move').hidden=false;q('.we-arm').hidden=!['working','driving'].includes(l.mode);q('.we-key-help').hidden=false;q('.we-actions').hidden=working;
     for(const e of panel.querySelectorAll('[data-hold]:not([data-hold=jump])'))e.disabled=paused||!!l.transition||(working&&(!!s.action||!!sequence));
     b('pause').textContent=paused?'再開':'一時停止';b('camera').textContent=['視点：斜め後ろ','視点：アーム側','視点：入口方向','視点：区画全体','視点：バケット横'][view];b('slow').textContent=slow?'動作：4倍スロー':'動作：通常';
     b('interact').textContent=l.mode==='foot'?'運転席に乗る':l.transition?'乗り降り中…':'降りる';b('interact').disabled=paused||!!l.transition||working||Math.abs(l.vehicle.speed)>.8;
@@ -184,7 +188,7 @@ export function createWorldExcavationController({state,scene,camera,character,sh
     if(onFoot&&allowed<20){camera.position.copy(focus);camera.lookAt(focus.clone().add(new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw))));character.visible=false;}
     else{camera.position.copy(focus).addScaledVector(offset,allowed);camera.lookAt(focus);}readout();
   }
-  return{look(dx,dy,sensitivity){if(active&&!ledgerUI?.open)orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.loader.player;return active&&work?.loader.mode==='foot'&&b?{owner:'excavation',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get dirty(){return persistence?(persistence.record&&persistence.dirty(snapshot())):work.revision>0;},begin,leave,save,
+  return{switchCamera(){if(active&&!paused&&!ledgerUI?.open)b('camera').click();},look(dx,dy,sensitivity){if(active&&!ledgerUI?.open)orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.loader.player;return active&&work?.loader.mode==='foot'&&b?{owner:'excavation',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get dirty(){return persistence?(persistence.record&&persistence.dirty(snapshot())):work.revision>0;},begin,leave,save,
     install({group,blockedAt,reserved,collider,contactGeometry:readContactGeometry=null}){
       contactGeometry=typeof readContactGeometry==='function'?readContactGeometry:null;
       if(active)throw Error('掘削作業を中断してから再構築してください。');forecast.release();disposeExcavationPreviewModel(forecastModel);forecastModel=null;disposeWorldExcavationModel(root);root=null;panel.hidden=true;canvas.parentElement.classList.remove('world-excavation-near');if(state.map!=='construction')return null;
@@ -203,7 +207,12 @@ export function createWorldExcavationController({state,scene,camera,character,sh
       // original world's infinite y=0 floor never handles the tunnel interior.
       if(!active&&eligible()&&position().z-root.position.z>EXCAVATION_HANDOFF_LOCAL_Z)begin();
       if(active&&!paused&&!locked()&&!document.hidden){try{const frame=excavationFrameBudget(acc,dt,slow);acc=frame.remainder;const frameStarted=performance.now(),contacts=contactVolumes();for(let step=0;step<frame.steps;step++){if(step>0&&performance.now()-frameStarted>8)break;
-        if(!planning){if(work.guide?.phase==='plan-haul')requestPlan('plan-haul');else{const mode=work.loader.mode;({work,sequence}=stepOneTouch(work,sequence,input(),1/120,contacts));if(mode!==work.loader.mode)clear();}}
+        if(!planning){if(work.guide?.phase==='plan-haul')requestPlan('plan-haul');else{
+          const actions=[...held.values(),...taps.keys()],travel=excavationTravelRequested(keys,actions),slew=excavationSlewInput(keys,actions);
+          if(!sequence&&!work.action&&!work.loader.transition&&(travel&&work.loader.mode==='working'||!travel&&slew&&work.loader.mode==='driving'&&Math.abs(work.loader.vehicle.speed)<=.8))work=actWorldExcavation(work,'work',contacts);
+          const mode=work.loader.mode,workTicks=sequence||work.action||work.loader.transition||work.falling.length||!travel&&slew?2:1;for(let n=0;n<workTicks;n++){const beforeMode=work.loader.mode;({work,sequence}=stepOneTouch(work,sequence,input(),1/120,contacts));if(beforeMode!==work.loader.mode)break;}
+          if(mode!==work.loader.mode&&!(mode==='working'&&work.loader.mode==='driving'&&(travel||slew)))clear();
+        }}
         for(const[k,t]of taps){if(t<=1/120)taps.delete(k);else taps.set(k,t-1/120);}
       }}catch(e){cancelPlan();sequence=null;work=stopOneTouch(work);clear();acc=0;paused=true;issue=`安全のため停止：${e.message}`;}}
       else acc=0;

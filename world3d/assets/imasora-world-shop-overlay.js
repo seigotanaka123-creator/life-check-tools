@@ -1,6 +1,6 @@
 export function createWorldShopOverlay({service,onOpen,onClose,onError}){
-  const dialog=document.createElement('dialog');dialog.className='world-shop-overlay';dialog.setAttribute('aria-label','火星素材ショップ');
-  dialog.innerHTML='<header><strong>火星素材ショップ</strong><span>価格は調整中です</span><button type="button">お店を出る ×</button></header><iframe title="火星素材ショップの購入メニュー"></iframe><p role="status"></p>';
+  const dialog=document.createElement('dialog');dialog.className='world-shop-overlay';dialog.setAttribute('aria-label','アマネ星素材ショップ');
+  dialog.innerHTML='<header><strong>アマネ星素材ショップ</strong><span>価格は調整中です</span><button type="button">お店を出る ×</button></header><iframe title="アマネ星素材ショップの購入メニュー"></iframe><p role="status"></p>';
   const style=document.createElement('style');style.textContent='.world-shop-overlay{width:min(1120px,98vw);height:96dvh;max-height:96dvh;max-width:98vw;padding:0;border:2px solid #ccb87d;border-radius:16px;background:#172834;color:#fff;overflow:hidden}.world-shop-overlay::backdrop{background:#071018df}.world-shop-overlay[open]{display:flex;flex-direction:column}.world-shop-overlay header{display:flex;align-items:center;gap:12px;padding:8px 12px;flex:none;font:14px sans-serif}.world-shop-overlay header span{font-size:11px;flex:1;color:#c9bd9d}.world-shop-overlay button{min-height:42px;padding:6px 14px;border-radius:8px;background:#dac18c;color:#26313a;border:0}.world-shop-overlay iframe{border:0;flex:1;min-height:0;width:100%}.world-shop-overlay>p{margin:0 12px;font-size:12px}';document.head.append(style);document.body.append(dialog);
   const frame=dialog.querySelector('iframe'),close=dialog.querySelector('button'),status=dialog.querySelector('[role=status]');
   let opening=false,closing=false,token='';
@@ -35,4 +35,4 @@ export function createWorldShopOverlay({service,onOpen,onClose,onError}){
   };
 }
 
-export{createWorldSaveErrorUI}from'./imasora-world-save-notice.mjs?v=120pw';
+export{createWorldSaveErrorUI}from'./imasora-world-save-notice.mjs?v=121gg';

@@ -12,13 +12,26 @@ function cloudTexture(){
  if(bakedCloudCanvas)return textureFromCanvas(bakedCloudCanvas);
  const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d'),im=ctx.createImageData(c.width,c.height);
  const hash=(x,y)=>{let n=Math.imul(x,374761393)^Math.imul(y,668265263)^8917;n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;};
- const noise=(x,y,period)=>{const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),a=hash((ix+period)%period,iy),b=hash((ix+1+period)%period,iy),d=hash((ix+period)%period,iy+1),e=hash((ix+1+period)%period,iy+1);return a+(b-a)*u+(d-a)*v+(a-b-d+e)*u*v;};
- const densities=new Float32Array(c.width*c.height);
- for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
-  let value=0,weight=.54;
-  for(let k=0;k<5;k++){const f=2**k;value+=noise(x/c.width*24*f,y/c.height*9*f,24*f)*weight;weight*=.49;}
-  densities[y*c.width+x]=value;
+ // Each octave repeatedly reads the same lattice corners. Cache them before
+ // rasterizing, keeping the original interpolation and rounding per pixel.
+ const sum=new Float64Array(c.width*c.height);
+ for(let k=0,weight=.54;k<5;k++,weight*=.49){
+  const f=2**k,period=24*f,rows=9*f+1,stride=period+1;
+  const lattice=new Float64Array(stride*rows),ix=new Uint16Array(c.width),blend=new Float64Array(c.width);
+  for(let j=0;j<rows;j++)for(let i=0;i<=period;i++)lattice[j*stride+i]=hash(i%period,j);
+  for(let x=0;x<c.width;x++){
+   const col=x/c.width*24*f;ix[x]=Math.floor(col);
+   const frac=col-ix[x];blend[x]=frac*frac*(3-2*frac);
+  }
+  for(let y=0;y<c.height;y++){
+   const row=y/c.height*9*f,j=Math.floor(row),frac=row-j,v=frac*frac*(3-2*frac);
+   for(let x=0;x<c.width;x++){
+    const idx=j*stride+ix[x],u=blend[x],a=lattice[idx],b=lattice[idx+1],d=lattice[idx+stride],e=lattice[idx+stride+1];
+    sum[y*c.width+x]+=(a+(b-a)*u+(d-a)*v+(a-b-d+e)*u*v)*weight;
+   }
+  }
  }
+ const densities=new Float32Array(sum);
  for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
   const i=y*c.width+x,d=densities[i],edge=Math.max(0,Math.min(1,(d-.49)/.18));
   const up=densities[Math.max(0,y-3)*c.width+x],shade=Math.max(0,Math.min(1,.7+(d-up)*5));

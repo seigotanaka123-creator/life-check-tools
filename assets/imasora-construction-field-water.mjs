@@ -1,13 +1,16 @@
 import {waterBuildTotal,validateWaterBuilds} from './imasora-construction-water-build.mjs?v=120ov';
 import {inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
+import {parkingSurfaceOverlaps} from './imasora-construction-shared-field.mjs?v=121cw';
 
 // Water placed in the field belongs to the same finite tank circuit. A pool
 // keeps its measured volume and position through saving and recovery.
 export const fieldWaterTotal=s=>Object.values(s.pools??{}).reduce((n,p)=>n+p.q,0)+waterBuildTotal(s);
 export const poolKey=p=>[p.x,p.y,p.z].join(',');
-export function fieldWaterTarget(s,p,external=[],heightAt=()=>0){
- if(!s.loader.vehicle.field)return null;
+export function fieldWaterTarget(s,p,external=[],heightAt=()=>0,{allowPaved=false}={}){
+ const field=s.loader.vehicle.field;
+ if(!field)return null;
  const target={x:Math.round(p.x/8)*8,y:0,z:Math.round(p.z/8)*8};
+ if(!allowPaved&&parkingSurfaceOverlaps(field.corner,target.x+field.origin[0],target.z+field.origin[1],8))return null;
  const height=heightAt(target.x,target.z);
  if(!Number.isFinite(height)||height< -32||height>48)return null;
  target.y=height;

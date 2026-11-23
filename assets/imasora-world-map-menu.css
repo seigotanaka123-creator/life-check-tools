@@ -74,3 +74,8 @@ body.world-player-game[data-world-build-placement=true] #viewport{--thumb-bottom
 @media(max-height:500px){body.world-player-game[data-world-build-placement=true] #viewport{--thumb-bottom:calc(124px + env(safe-area-inset-bottom))}}
 
 @media(max-height:360px){.world-map-menu[data-screen=build] .wmm-header{padding:4px 12px}.world-map-menu[data-screen=build] .wmm-header p,.world-map-menu[data-screen=build] .building-steps{display:none}.world-map-menu[data-screen=build] .wmm-header h2{font-size:18px}.world-map-menu[data-screen=build] .building-card.build-choice{min-height:64px;grid-template-columns:65px minmax(0,1fr);gap:0 6px;padding:3px}.building-card svg{width:65px;height:50px}.world-map-menu[data-screen=build] .building-hero{grid-template-columns:100px 1fr}.building-hero-picture svg{height:76px}.world-map-menu[data-screen=build] .building-hero h3{font-size:17px}.world-map-menu[data-screen=build] .building-tags{display:none}.world-map-menu[data-screen=build] .building-description{margin:3px 0;line-height:1.3}.world-map-menu[data-screen=build] .wmm-footer{padding:4px 12px}.world-map-menu[data-screen=build] .wmm-footer-actions button{min-height:44px;padding:7px}}
+
+/* Keep play instructions legible in compact catalog layouts. */
+.world-map-menu :is(.building-description,.building-hint,.wmm-header p,.wmm-footer p){font-size:14px;line-height:1.48}
+.world-map-menu[data-screen=build] .building-hero :is(.building-description,.building-hint){font-size:14px;color:#294653}
+.world-map-menu .building-steps,.world-map-menu .building-card .building-card-state{font-size:13px}

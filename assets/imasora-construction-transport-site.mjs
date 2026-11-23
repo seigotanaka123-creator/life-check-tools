@@ -1,6 +1,6 @@
 import {nativeSoilLayers} from './imasora-construction-native-soil-layers.mjs?v=120pv';
 import {createBuildingGroundProbe} from './imasora-construction-building-ground.mjs?v=120et';
-import {earthBase,earthHoles,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120ov';
+import {earthBase,earthHoles,earthPatches,patchColumns,quarryRock} from './imasora-construction-field-earth.mjs?v=120ov';
 import {soilVoxel,soilTransportGeometry} from './imasora-construction-soil-transport.mjs?v=120pv';
 import {boxExtent} from './imasora-construction-native-dump-pose.mjs?v=120pv';
 import {fieldWorkOverlaps} from './imasora-construction-field-contact.mjs?v=120pv';
@@ -9,7 +9,7 @@ import {SITE,WALKER} from './imasora-construction-loader-physics.js?v=120ov';
 import {PLOT} from './imasora-construction-excavator.js?v=120ov';
 import {EXCAVATION_YARDS,EXCAVATION_GATE,excavationReserved} from './imasora-construction-world-excavation.js?v=120ov';
 import {worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
-import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody} from './imasora-construction-shovel-work.mjs?v=120pv';
+import {shovelSoilBoxes,shovelVisibleSource,shovelMachines,shovelDumpBody,shovelDumpObstacles} from './imasora-construction-shovel-work.mjs?v=120pv';
 export {SITE as TRANSPORT_SITE};
 const check=(ok,text)=>{if(!ok)throw Error('土運搬の現場：'+text);};
 export function createTransportSceneReadStore(store){
@@ -84,13 +84,46 @@ export function transportVehicleBlockedAt(record,x,z,r=0){
 // Prepare its actual chassis once, then discard the probe after that check.
 export function createTransportVehicleProbe(record){const o=transportSiteOrigin(record),f=record.work.frame,boxes=[...shovelMachines(f),shovelDumpBody(f)].flatMap(b=>{const h=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);return b.position[1]-h[1]>=80?[]:[{x:b.position[0],z:b.position[2],hx:h[0],hz:h[2],c:b.axes?1:Math.cos(b.heading??0),s:b.axes?0:Math.sin(b.heading??0)}];});return(x,z,r=0)=>{if(![x,z,r].every(Number.isFinite)||r<0)return true;const px=x-o[0],pz=z-o[2];return boxes.some(b=>{const dx=px-b.x,dz=pz-b.z;return Math.hypot(Math.max(0,Math.abs(b.c*dx-b.s*dz)-b.hx),Math.max(0,Math.abs(b.s*dx+b.c*dz)-b.hz))<=r;});};}
 
+// Walkers use the same vehicle geometry as the work controls. Keep it out
+// of the static scene so a vehicle never collides with its own parked body.
+export function createTransportWalkingColliders(record){
+ const frame=record.work.frame,[originX,,originZ]=transportSiteOrigin(record);
+ const footprints=(id,boxes)=>{
+  const colliders=boxes.map(box=>{
+   const tilt=box.axes&&(Math.abs(box.axes[1][0])+Math.abs(box.axes[1][2])>1e-8);
+   const [hx,hy,hz]=tilt?boxExtent(box):box.half??Array(3).fill(box.size/2);
+   const [x,y,z]=box.position,rotation=tilt?0:box.heading??0;
+   const c=Math.abs(Math.cos(rotation)),t=Math.abs(Math.sin(rotation));
+   return {id,x:originX+x,z:originZ+z,rotation,localHalfX:hx,localHalfZ:hz,
+    halfX:c*hx+t*hz,halfZ:t*hx+c*hz,minY:y-hy,maxY:y+hy};
+  });
+  return {
+   colliders,
+   minX:Math.min(...colliders.map(c=>c.x-c.halfX)),maxX:Math.max(...colliders.map(c=>c.x+c.halfX)),
+   minZ:Math.min(...colliders.map(c=>c.z-c.halfZ)),maxZ:Math.max(...colliders.map(c=>c.z+c.halfZ)),
+  };
+ };
+ const vehicles=[
+  footprints('ショベルカー',shovelMachines(frame).filter((_,index)=>index!==1)), // The storage bin is registered separately.
+  footprints('ダンプカー',[shovelDumpBody(frame),...shovelDumpObstacles(frame)]),
+ ];
+ return (fromX,fromZ,toX=fromX,toZ=fromZ)=>{
+  const margin=45; // Broad phase only. The caller applies the measured footprint.
+  return vehicles.flatMap(({colliders,minX,maxX,minZ,maxZ})=>
+   Math.min(fromX,toX)>maxX+margin||Math.max(fromX,toX)<minX-margin
+   ||Math.min(fromZ,toZ)>maxZ+margin||Math.max(fromZ,toZ)<minZ-margin?[]:colliders);
+ };
+}
+
 const siteHolesCache=new WeakMap();export function transportSiteHoles(record){const o=transportSiteOrigin(record),holes=earthHoles(record.work.frame.soil);let result=siteHolesCache.get(holes);if(!result){result=[transportSiteOpening(record),...holes.map(p=>({minX:p.minX+o[0],maxX:p.maxX+o[0],minZ:p.minZ+o[2],maxZ:p.maxZ+o[2]}))];siteHolesCache.set(holes,result);}return result;}
 
 // Conservative geometry bound, including every finite column intersecting the box.
 // It is only an early-out above ground; near-contact still checks the full load.
 export function transportGroundUpperBound(record,b){
  if(!b||![b.minX,b.maxX,b.minZ,b.maxZ].every(Number.isFinite)||b.maxX-b.minX>1000||b.maxZ-b.minZ>1000||b.maxX<b.minX||b.maxZ<b.minZ)return undefined;
- const o=transportSiteOrigin(record),f=record.work.frame,q={minX:b.minX-o[0],maxX:b.maxX-o[0],minZ:b.minZ-o[2],maxZ:b.maxZ-o[2]},index=columns(f.soil),boxes=new Set(visibleTransportSources(f));let top=0;
+ const o=transportSiteOrigin(record),f=record.work.frame,q={minX:b.minX-o[0],maxX:b.maxX-o[0],minZ:b.minZ-o[2],maxZ:b.maxZ-o[2]},index=columns(f.soil),boxes=new Set(visibleTransportSources(f));
+ const rock=quarryRock(f.soil);
+ let top=(rock?.surface??rock)?.upperBound(q.minX,q.maxX,q.minZ,q.maxZ)??0;
  for(let x=Math.floor(q.minX/8);x<=Math.floor(q.maxX/8);x++)for(let z=Math.floor(q.minZ/8);z<=Math.floor(q.maxZ/8);z++)for(const box of index.get(x+','+z)??[])boxes.add(box);
  for(const box of boxes){const r=box.size/2,p=box.position;if(p[0]+r>=q.minX&&p[0]-r<=q.maxX&&p[2]+r>=q.minZ&&p[2]-r<=q.maxZ)top=Math.max(top,p[1]+r);}return top;
 }

@@ -1,3 +1,4 @@
+import {nativeQuarryWorldHeight} from './imasora-construction-native-dump-support.mjs?v=120pv';
 import{chooseVehicleHeight}from'./imasora-construction-vehicle-elevation.mjs?v=120ov';
 import{reelWorldParts}from'./imasora-construction-reel-world.mjs?v=120ps';
 import{lightItems,lightParts}from'./imasora-construction-lights.mjs?v=120pl';
@@ -14,6 +15,7 @@ import{FIELD,sharedParkingLayouts}from'./imasora-construction-shared-field.mjs?v
 import{IMASORA_WORLD_MAPS,normalizedPoint}from'./imasora-world-map-schema.js?v=120mx';
 import{WATER_YARDS,SOIL_YARDS,TIMBER_YARDS}from'./imasora-construction-yard-origins.mjs?v=120gb';
 import{fieldGroundPose,fieldGroundBounds}from'./imasora-construction-field-contact.mjs?v=120pv';
+import{groundPoint}from'./imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 import{craneWalkVolumes}from'./imasora-construction-crane-walk.js?v=120pv';
 import{worldSoilFloors}from'./imasora-construction-world-soil.js?v=120pv';
 import{waterBuildLevel,waterBuildCellSize}from'./imasora-construction-water-build.mjs?v=120ov';
@@ -31,15 +33,27 @@ function checkedWorld(world){
  return earth===t&&beds===s?world:{...world,constructionTransport:earth,constructionSoil:beds};
 }
 export function outdoorSignObstacles(world,options){return signObstacles(checkedWorld(world),options);}
-function signObstacles(world,{includeReel=true,includeTransport=true}={}){
+function signObstacles(world,{includeReel=true,includeTransport=true,orientedFieldVehicles=false}={}){
  const bearingFloors=reelWorldParts(world.constructionHighBuild).filter(p=>p.kind==='floor'||p.kind==='ramp-tread'),soilFloors=world.constructionSoil?worldSoilFloors(world.constructionSoil):[],concreteFloors=(world.constructionProfileProject?.freeBuild?.completed??[]).filter(w=>!w.stored).flatMap(freeWorkCells);
  const earthRead=world.constructionTransport?transportGroundHeightReader(world.constructionTransport):()=>0,heightAt=(x,z,reference)=>{let ground=earthRead(x,z,reference)??0;for(const p of soilFloors)if(Math.abs(x-p.x)<=p.size[0]/2&&Math.abs(z-p.z)<=p.size[1]/2)ground=Math.max(ground,p.height);const tops=bearingFloors.filter(p=>Math.abs(x-p.x)<=p.w/2&&Math.abs(z-p.z)<=p.d/2).map(p=>p.y+p.h/2+(p.supportSlopeX??0)*(x-p.x)+(p.supportSlopeZ??0)*(z-p.z)).concat(concreteFloors.filter(p=>p.height>0&&Math.abs(x-p.x)<=(p.w??16)/2&&Math.abs(z-p.z)<=(p.d??16)/2).map(p=>(p.baseY??0)+p.height)).filter(y=>y>=ground-.15);return Number.isFinite(reference)?chooseVehicleHeight(ground,tops,reference):tops.length?Math.min(...tops):ground;},boxes=[];
+ heightAt.quarryHeight=(x,z)=>nativeQuarryWorldHeight(world.constructionTransport?.work?.frame,x,z);
  for(const p of highProjects(world.constructionHighBuild)){const b=highSiteBounds(p.record.site,p.record.work);boxes.push({...b,y:p.record.site.y+b.h/2,angle:0});}
  const map=IMASORA_WORLD_MAPS.construction;for(const b of world.builtByMap?.construction??[]){const spec=map.buildCatalog.find(c=>c.id===b.catalogId);ok(spec&&Array.isArray(b.position)&&b.position.every(Number.isFinite),'建物の場所をたしかめよう。');const scale=b.scale??[1,1,1];boxes.push({x:b.position[0],y:b.position[1]+spec.size[1]*2.5*scale[1]/2,z:b.position[2],w:spec.size[0]*2.5*scale[0],h:spec.size[1]*2.5*scale[1],d:spec.size[2]*2.5*scale[2],angle:b.rotation?.[1]??0});}
  const bridge=map.entry,at=normalizedPoint(map,bridge.point);boxes.push({x:at[0],y:5,z:at[2],w:bridge.footprint[0]*2.5,d:bridge.footprint[1]*2.5,h:10,angle:bridge.rotationDeg*Math.PI/180});
  const parking=sharedParkingLayouts().find(l=>l.corner===world.constructionParking?.corner);for(const f of parking?.facilities??[])boxes.push({x:f.x,z:f.z,y:30,w:f.hx*2,h:60,d:f.hz*2,angle:0});
  const tr=world.constructionTransport;if(tr&&includeTransport){const o=transportSiteOrigin(tr),f=tr.work.frame,native=shovelMachines(f).map((b,i)=>({...b,...(i!==1&&Number.isFinite(f.machineVehicle?.groundY)?{supportTop:f.machineVehicle.groundY}:{})})).concat({...shovelDumpBody(f),...(Number.isFinite(f.dump.groundY)?{supportTop:f.dump.groundY}:{})});for(const b of native){const r=b.axes?boxExtent(b):b.half??Array(3).fill(b.size/2);boxes.push({x:o[0]+b.position[0],y:b.position[1],z:o[2]+b.position[2],w:r[0]*2,h:r[1]*2,d:r[2]*2,angle:b.axes?0:b.heading??0,...(Number.isFinite(b.supportTop)?{supportTop:b.supportTop}:{})});}}
- for(const [record,yards]of[[world.constructionWater,WATER_YARDS],[world.constructionSoil,SOIL_YARDS]]){const o=yards[record?.siteIndex];if(!o)continue;const frame=fieldGroundPose(record.work,{x:o[0],z:o[1]},heightAt),g=fieldGroundBounds(frame,[44,38,65]);boxes.push({x:o[0]+g.x,y:(g.minY+g.maxY)/2,z:o[1]+g.z,w:g.width,h:g.maxY-g.minY,d:g.depth,angle:0,supportTop:frame.position[1]});}
+ for(const [record,yards] of [[world.constructionWater,WATER_YARDS],[world.constructionSoil,SOIL_YARDS]]){
+   const o=yards[record?.siteIndex];
+   if(!o)continue;
+   const frame=fieldGroundPose(record.work,{x:o[0],z:o[1]},heightAt),half=[44,38,65];
+   if(orientedFieldVehicles){
+     const [x,y,z]=groundPoint(frame,0,half[1],0);
+     boxes.push({x:o[0]+x,y,z:o[1]+z,w:half[0]*2,h:half[1]*2,d:half[2]*2,axes:frame.axes});
+   }else{
+     const g=fieldGroundBounds(frame,half);
+     boxes.push({x:o[0]+g.x,y:(g.minY+g.maxY)/2,z:o[1]+g.z,w:g.width,h:g.maxY-g.minY,d:g.depth,angle:0,supportTop:frame.position[1]});
+   }
+ }
  const timber=world.constructionTimber,to=TIMBER_YARDS[timber?.siteIndex];if(to){const v=timber.work.rig.vehicle,base=heightAt(to[0]+v.x,to[1]+v.z,v.groundY),parts=new Set(timber.work.parts.map(p=>p.id));for(const b of craneWalkVolumes(timber.work)){const vehicle=!parts.has(b.id);boxes.push({...b,x:to[0]+b.x,y:(vehicle?base:0)+b.y+b.h/2,z:to[1]+b.z,...(vehicle?{supportTop:base}:{})});}}
  if(world.constructionSoil)for(const b of worldSoilFloors(world.constructionSoil))boxes.push({x:b.x,y:(b.underside+b.height)/2,z:b.z,w:b.size[0],h:b.height-b.underside,d:b.size[1],angle:0});
  const water=world.constructionWater,wo=WATER_YARDS[water?.siteIndex];if(wo)for(const b of water.work.waterBuilds??[]){if(!b.q)continue;const level=waterBuildLevel(b),size=waterBuildCellSize(b);for(const c of b.cells)if(c.y<level)boxes.push({x:wo[0]+c.x,y:(c.y+level)/2,z:wo[1]+c.z,w:size,h:level-c.y,d:size,angle:0});}

@@ -6,12 +6,12 @@ import {CRANE_WALK} from './imasora-construction-crane-walk.js?v=120pv';
 import {floatingView,restoreFloatingFlags,stepFloating,releaseFloating,floatReadout,bindPlacedCargo,bindLandedCargo} from './imasora-construction-floating-physics.js?v=120pv';
 export {floatReadout};
 export const TIMBER_PARTS=Object.freeze([
-  {id:'mars-deck',materialId:'mars-timber',name:'火星木材・浮遊床',w:80,h:6,d:56,x:0,z:16,color:0xaa80bd},
+  {id:'mars-deck',materialId:'mars-timber',name:'アマネ星木材・浮遊床',w:80,h:6,d:56,x:0,z:16,color:0xaa80bd},
   {id:'earth-deck',materialId:'earth-timber',name:'普通の木材・比較床',w:80,h:6,d:56,x:-105,z:40,color:0xdab573},
   {id:'light-weight',materialId:'earth-iron',name:'普通の鉄・小さいおもり',w:20,h:12,d:20,x:85,z:18,color:0x819497},
   {id:'heavy-weight',materialId:'earth-iron',name:'普通の鉄・重いおもり',w:28,h:26,d:28,x:105,z:45,color:0x556970},
 ].map(Object.freeze));
-export const TIMBER_MATERIALS=Object.freeze({'mars-timber':'火星木材','earth-timber':'普通の木材','earth-iron':'普通の鉄'});
+export const TIMBER_MATERIALS=Object.freeze({'mars-timber':'アマネ星木材','earth-timber':'普通の木材','earth-iron':'普通の鉄'});
 export const RETURN_PAD=Object.freeze({x:0,z:16,w:116,d:84,maxBottom:8});
 const fresh=p=>({...p,y:0,angle:0,vx:0,vz:0,vy:0,fixed:false,hover:null,carrierId:null});
 export function materialLedger(s){
@@ -23,7 +23,7 @@ export function materialLedger(s){
   return rows;
 }
 const reconcile=s=>{s.ledger=materialLedger(s);return s;};
-export function initialTimber(){const s=initialCrane();s.materialVersion=2;s.parts=[fresh(TIMBER_PARTS[0])];s.stock=TIMBER_PARTS.slice(1).map(p=>p.id);s.message='火星木材を巻上げ、浮遊を開始してください。離した高さを覚えます。';return reconcile(s);}
+export function initialTimber(){const s=initialCrane();s.materialVersion=2;s.parts=[fresh(TIMBER_PARTS[0])];s.stock=TIMBER_PARTS.slice(1).map(p=>p.id);s.message='アマネ星木材を巻上げ、浮遊を開始してください。離した高さを覚えます。';return reconcile(s);}
 function touchingWalker(s,p){
   if(s.rig.mode!=='foot')return false;
   const a=s.rig.player,q=worldToLocal({x:p.x,z:p.z,heading:p.angle},a.x,a.z);
@@ -41,7 +41,7 @@ export function returnOption(s){
   let reason=!p?'戻したい部材に吊り索を掛けてください。':
     s.rig.mode!=='driving'||!s.work||s.deployment<1?'クレーン作業中に回収できます。':
     s.rotation?'回転が止まるまで待ってください。':
-    Math.abs(p.x-RETURN_PAD.x)>8||Math.abs(p.z-RETURN_PAD.z)>8?'最初の火星木材の位置にある、青い回収枠の中央へ運んでください。':
+    Math.abs(p.x-RETURN_PAD.x)>8||Math.abs(p.z-RETURN_PAD.z)>8?'最初のアマネ星木材の位置にある、青い回収枠の中央へ運んでください。':
     p.y>RETURN_PAD.maxBottom?'回収枠の上へ、部材の底を高さ8以下に巻き下げてください。':
     Math.hypot(p.vx,p.vz)>12?'部材の揺れが落ち着くまで待ってください。':'';
   return{ok:!reason,reason:reason||'素材置場に戻せます。',part:p};
@@ -72,7 +72,7 @@ export function actTimber(state,action){
   if(action==='pick'&&s.held){const q=s.parts.find(p=>p.id===s.held);q.hover=null;q.carrierId=null;}
   if(action==='place'&&p&&s.held===null)bindPlacedCargo(s,p);
   if(action==='release'&&p&&s.held===null)p.carrierId=null;
-  if(action==='release'&&p?.hover)s.message='火星木材がこの高さを覚えました。レンやおもりが乗ると沈み、降りると戻ります。';
+  if(action==='release'&&p?.hover)s.message='アマネ星木材がこの高さを覚えました。レンやおもりが乗ると沈み、降りると戻ります。';
   return reconcile(s);
 }
 export function stepTimber(s,input,dt){
@@ -109,6 +109,6 @@ export function floatingDemo(kind){
   Object.assign(earth,{x:-60,z:65,y:kind==='drop'?24:0});
   releaseFloating(mars);
   s.rig.player={...s.rig.player,x:60,z:5,y:0,heading:0};
-  s.message=kind==='drop'?'同じ高さ・同じ大きさ。普通の木材は落ち、火星木材は浮きます。':'前へ歩くと高さ8の浮遊床へ上がれます。降りると元の高さへ戻ります。';
+  s.message=kind==='drop'?'同じ高さ・同じ大きさ。普通の木材は落ち、アマネ星木材は浮きます。':'前へ歩くと高さ8の浮遊床へ上がれます。降りると元の高さへ戻ります。';
   return reconcile(s);
 }

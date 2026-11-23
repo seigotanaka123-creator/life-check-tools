@@ -1,4 +1,4 @@
-import {createIslandLandscapes} from './imasora-coast-island-landscape.mjs?v=120ne';
+import {createIslandLandscapes} from './imasora-coast-island-landscape.mjs?v=121gf';
 import {batchCoastScenery} from './imasora-coast-static-batches.mjs?v=120id';
 import {coastTree,coastSurfaceTexture} from './imasora-coast-scenery-detail.mjs?v=120mt';
 import {ISLAND_PORT_SOLIDS,ISLAND_PORT_DECKS,COAST_ISLAND_PORTS} from './imasora-coast-island-harbors.mjs?v=120lr';
@@ -6,14 +6,14 @@ import {ISLAND_PATH,ISLAND_PATH_SOLIDS} from './imasora-coast-island-path.mjs?v=
 import * as T from './three.module.min.js';
 import {COAST_ISLANDS} from './imasora-coast-sea-regions.mjs?v=120mu';
 import {coastHeight} from './imasora-coast-layout.mjs?v=120mx';
-export function createCoastIslandView({collider=()=>{},surface=()=>{},pebbleState}={}){
+export function createCoastIslandView({collider=()=>{},surface=()=>{},pebbleState,waterLight}={}){
  const root=new T.Group();root.name='沖の島';const geometries=new Set(),materials=new Set();
  const material=(color,extra={})=>{const m=new T.MeshStandardMaterial({color,roughness:.85,...extra});materials.add(m);return m;};
  const sand=material(0xffffff,{vertexColors:true}),ivory=material(0xf5e6c6),wood=material(0xb78a61),leaves=material(0x78ae8c),rock=material(0x9caeaa);
  const foliage=coastSurfaceTexture('foliage'),bark=coastSurfaceTexture('wood');leaves.color.setHex(0x67895b);leaves.map=foliage;leaves.bumpMap=foliage;leaves.bumpScale=.8;wood.map=bark;wood.bumpMap=bark;wood.bumpScale=.2;
  const add=(geometry,mat,x,y,z)=>{geometries.add(geometry);const m=new T.Mesh(geometry,mat);m.position.set(x,y,z);m.receiveShadow=true;root.add(m);return m;};
  const solid=(m,id)=>{m.updateWorldMatrix(true,true);const b=new T.Box3().setFromObject(m),s=b.getSize(new T.Vector3()),c=b.getCenter(new T.Vector3());collider(c.x,c.z,[s.x,s.z],0,'coast-island-'+id,0,{minY:b.min.y,maxY:b.max.y,obstacleHeight:b.max.y});};
- const landscapes=createIslandLandscapes({collider,pebbleState});root.add(landscapes.root);
+ const landscapes=createIslandLandscapes({collider,pebbleState,waterLight});root.add(landscapes.root);
  // Five real supports, a visible opening, and an open side route. Instancing
  // keeps the small playable extension at two draw calls before scenery batching.
  const natural=ISLAND_PORT_SOLIDS.filter(d=>d.id.startsWith('island-port-uncharted-')),built=ISLAND_PORT_SOLIDS.filter(d=>!natural.includes(d));

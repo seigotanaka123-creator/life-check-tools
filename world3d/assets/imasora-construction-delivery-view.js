@@ -13,16 +13,10 @@ export function createConstructionDeliveryDock(){
   function box(name,size,pos,material){const m=new THREE.Mesh(new THREE.BoxGeometry(...size),material);m.name=name;m.position.set(...pos);m.castShadow=true;m.receiveShadow=true;root.add(m);return m;}
   box('receiving-counter',[38,18,22],[0,9,0],metal);
   box('counter-top',[38,2,22],[0,19,0],rim);
-  for(const x of [-17,17])box('sign-post',[1.4,14,1.4],[x,27,-8],metal);
   box('stored-crate',[12,9,11],[-9,24.5,0],wood);
   for(const x of [-13,-5])box('crate-strap',[1,9.2,11.2],[x,24.5,0],rim);
   box('sealed-water-can',[8,10,8],[9,25,0],metal);
   box('water-can-cap',[4,1,4],[9,30.5,0],rim);
-  const c=document.createElement('canvas');c.width=768;c.height=192;
-  const ctx=c.getContext('2d');ctx.fillStyle='#15383e';ctx.fillRect(0,0,768,192);ctx.strokeStyle='#f5cb76';ctx.lineWidth=8;ctx.strokeRect(4,4,760,184);ctx.fillStyle='#fff2c8';ctx.textAlign='center';ctx.font='bold 72px sans-serif';ctx.fillText('建材受取所',384,86);ctx.font='38px sans-serif';ctx.fillText('購入品を保管 · 触れて開く',384,152);
-  const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
-  const signMaterial=new THREE.MeshBasicMaterial({map:texture});
-  for(const side of [-1,1]){const sign=new THREE.Mesh(new THREE.PlaneGeometry(36,9),signMaterial);sign.position.set(0,29.5,-8+side*.8);sign.rotation.y=side<0?Math.PI:0;root.add(sign);}
   return root;
 }
 
@@ -31,7 +25,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
   const dialog=document.createElement('dialog');dialog.className='construction-delivery-menu';dialog.setAttribute('aria-labelledby','delivery-title');
   dialog.innerHTML=`<header><span class="delivery-crest" aria-hidden="true">▤</span><div><small>工事現場の保管庫</small><h2 id="delivery-title">建材受取所</h2></div><button type="button" class="delivery-close" aria-label="受取所を閉じる">閉じる</button></header>
     <div class="delivery-body">
-    <p class="delivery-intro">おかえりなさい！<br>街や海辺から届いた建材と、火星で買った材料を大切に保管するよ。</p>
+    <p class="delivery-intro">おかえりなさい！<br>街や海辺から届いた建材と、アマネ星で買った材料を大切に保管するよ。</p>
     <p class="delivery-mode"></p><div class="delivery-stock-list"></div>
     <section class="delivery-pack-transfer" aria-labelledby="pack-transfer-title">
       <h3 id="pack-transfer-title">開封済み建築セットを受け取る</h3>
@@ -121,7 +115,7 @@ export function createConstructionDeliveryMenu({service,context,snapshot,onOpen=
     transferMessage.textContent=service.mode!=='live'?'接続確認・表示用の保存では受け取れません。':!near?'建材受取所の正面へ徒歩で来てから受け取れます。':working||opening||service.busy?'保存内容を確認しています…':success||'「街の建材をたしかめる」で、受け取れる中身を見られます。';
     projectMessage.textContent=service.mode!=='live'?'いつもの冒険で材料を運べます。':!service.excavationLive?'工事現場で材料を工房へ運べます。':!near?'建材受取所の正面へ徒歩で来てください。':working||opening||service.busy?'保存内容を確認しています…':projectSuccess||'受取済み建築セットのコンクリート分が対象です。';
     dialog.querySelector('.delivery-mode').textContent=service.mode==='integration'?'接続確認用の保存です。本体の素材とは別です。':service.mode==='readonly'?'表示確認中：素材の受取・保存は行いません。':'この冒険の保管庫';
-    message.textContent=service.blocked?'保存が停止しています。保存確認画面で記録を確認してください。':working||opening?'保管記録を確認中…':success||(!near?'建材受取所の正面へ、徒歩で来てください。':service.shopState?.pending?'先に火星ショップの保留注文を確認してください。':rows.some(({o})=>(stock?.unreceived[o.id]??0)>=o.amount)?'保管したい建材を選んでください。':'未受取の購入品はありません。購入した建材はここに表示されます。');
+    message.textContent=service.blocked?'保存が停止しています。保存確認画面で記録を確認してください。':working||opening?'保管記録を確認中…':success||(!near?'建材受取所の正面へ、徒歩で来てください。':service.shopState?.pending?'先にアマネ星ショップの保留注文を確認してください。':rows.some(({o})=>(stock?.unreceived[o.id]??0)>=o.amount)?'保管したい建材を選んでください。':'未受取の購入品はありません。購入した建材はここに表示されます。');
   }
   function close(){if(working||opening||service.busy)return false;if(dialog.open){dialog.close();sourceClient?.dispose();sourceClient=null;sourcePreview=null;onClose();}return true;}
   closeButton.addEventListener('click',close);

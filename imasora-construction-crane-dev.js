@@ -6,9 +6,9 @@ import {initialCrane,actCrane,stepCrane,hook,placement,pickOption,craneBoardOpti
 import {createCrane,updateCraneModel,createPart} from './assets/imasora-construction-crane-model.js?v=120pv';
 import {CraneSession} from './assets/imasora-construction-crane-storage.js?v=120pv';
 import {createCraneFloor} from './assets/imasora-construction-crane-floor.js?v=435';
-import {craneWorkInput,cranePlacementReadout} from './assets/imasora-construction-crane-controls.js?v=437';
+import {craneOperatorInput,cranePlacementReadout,CRANE_WORK_KEYS,CRANE_ACTION_KEYS,craneActionForKey,craneDriveNotice} from './assets/imasora-construction-crane-controls.js?v=121ct';
 const $=id=>document.getElementById(id),local=['localhost','127.0.0.1','[::1]'].includes(location.hostname),testMode=new URLSearchParams(location.search).get('craneTest')==='1';
-let state=initialCrane(),ready=false,roof=false,view=0,orbit=-2.6,pitch=.75,distance=285,time=0,walkPhase=0,dirtySince=0,loading=false,headContact='',headContactUntil=0,precision=false;
+let state=initialCrane(),ready=false,roof=false,view=0,orbit=-2.6,pitch=.75,distance=285,time=0,walkPhase=0,dirtySince=0,loading=false,headContact='',headContactUntil=0,precision=false,driveNotice='';
 const session=new CraneSession(),held=new Map(),keys=new Set(),scene=new THREE.Scene();scene.background=new THREE.Color(0xc6d8d2);scene.fog=new THREE.Fog(0xc6d8d2,800,1800);
 const camera=new THREE.PerspectiveCamera(46,1,.5,2200),renderer=new THREE.WebGLRenderer({canvas:$('scene'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 scene.add(new THREE.HemisphereLight(0xf9fff2,0x71867a,2.3));const sun=new THREE.DirectionalLight(0xffe3b1,3.2);sun.position.set(-190,330,-140);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-330,right:330,top:300,bottom:-300,near:1,far:800});sun.shadow.normalBias=.18;scene.add(sun);const fill=new THREE.DirectionalLight(0xd2ebee,1.1);fill.position.set(220,180,100);scene.add(fill);
@@ -49,7 +49,7 @@ for(const link of document.querySelectorAll('[data-example]'))link.onclick=async
   location.assign(link.href);
 };
 function controls(){const actions=new Set([...held.values()].map(v=>v.action)),has=(a,...codes)=>actions.has(a)||codes.some(k=>keys.has(k));
-  if(state.work&&state.rig.mode==='driving')return craneWorkInput(actions,keys,precision);
+  if(state.work&&state.rig.mode==='driving')return craneOperatorInput(actions,keys,precision,true);
   if(state.rig.mode==='driving')return loaderDrivingInput(actions,keys);
   const f=Number(has('forward','KeyW','ArrowUp'))-Number(has('back','KeyS','ArrowDown')),s=Number(has('right','KeyD','ArrowRight'))-Number(has('left','KeyA','ArrowLeft')),yaw=view===1?-Math.PI/2:orbit;
   return{x:s*Math.cos(yaw)-f*Math.sin(yaw),z:-s*Math.sin(yaw)-f*Math.cos(yaw),jump:has('jump','Space')};
@@ -59,7 +59,7 @@ for(const b of document.querySelectorAll('[data-action]')){
   b.onpointerup=e=>{const press=held.get(e.pointerId);if(press&&performance.now()-press.start<100&&(state.work||state.rig.mode==='foot')){const input=controls();for(let i=0;i<10;i++)state=stepCrane(state,input,1/120);}held.delete(e.pointerId);b.classList.remove('held');refresh();};
   for(const event of['pointercancel','lostpointercapture'])b.addEventListener(event,e=>{held.delete(e.pointerId);b.classList.remove('held');});
 }
-window.addEventListener('keydown',e=>{if($('help').open||!ready)return;if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE'].includes(e.code)){e.preventDefault();keys.add(e.code);if(e.code==='KeyE'&&!e.repeat)action('interact');}});
+window.addEventListener('keydown',e=>{if($('help').open||!ready)return;if(CRANE_ACTION_KEYS.includes(e.code)){e.preventDefault();if(!e.repeat){const command=craneActionForKey(e.code,state),id=command==='mode'?'mode-toggle':command;if(id&&!$(id).disabled)$(id).click();}return;}if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE',...CRANE_WORK_KEYS].includes(e.code)){e.preventDefault();driveNotice=['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)?craneDriveNotice(state):'';keys.add(e.code);if(e.code==='KeyE'&&state.rig.mode==='foot'&&!e.repeat)action('interact');refresh();}});
 window.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',clearInput);document.addEventListener('visibilitychange',clearInput);
 let drag=null;$('scene').onpointerdown=e=>{if(drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,orbit,pitch};$('scene').setPointerCapture(e.pointerId);};
 $('scene').onpointermove=e=>{if(drag?.id!==e.pointerId)return;view=0;$('camera').textContent='視点：作業';orbit=drag.orbit-(e.clientX-drag.x)*.006;pitch=THREE.MathUtils.clamp(drag.pitch+(e.clientY-drag.y)*.004,.22,1.45);};
@@ -69,7 +69,8 @@ new ResizeObserver(()=>{const r=$('scene').getBoundingClientRect();renderer.setS
 new ResizeObserver(([entry])=>document.documentElement.style.setProperty('--crane-controls-height',`${entry.target.getBoundingClientRect().height}px`)).observe(document.querySelector('footer'));
 function refresh(){
   const aboard=state.rig.mode==='driving',transition=!!state.rig.transition,work=state.work,p=state.parts.find(p=>p.id===state.held),candidate=pickOption(state),preview=placement(state),blocked=!ready||session.blocked||loading;
-  $('mode').textContent=aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:'床板には歩いて上がれます。ジャンプで頭上も確認できます。'):state.message||state.rig.message;
+  if(!work&&!state.deployment)driveNotice='';
+  $('mode').textContent=aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:'床板には歩いて上がれます。ジャンプで頭上も確認できます。'):driveNotice||state.message||state.rig.message;
   $('cargo').textContent=p?`吊り荷：${p.name}`:candidate?`フック下：${candidate.name}`:'吊り荷なし';$('count').textContent=`部材 ${state.parts.length} / 7 ・設置済み ${state.parts.filter(p=>p.fixed).length}`;
   $('height').textContent=state.rig.mode==='foot'?`足元の高さ ${state.rig.player.y.toFixed(1)} / ${state.rig.player.grounded?'接地':'空中'}`:work?`フック高さ ${hook(state).y.toFixed(1)} / 腕 ${state.boom.reach.toFixed(1)}`:Math.abs(state.rig.vehicle.speed)<.5?'停車中':`走行 ${Math.round(Math.abs(state.rig.vehicle.speed))}`;
   $('position').textContent=state.rig.mode==='foot'?`レン X ${state.rig.player.x.toFixed(1)} / Y ${state.rig.player.y.toFixed(1)} / Z ${state.rig.player.z.toFixed(1)}`:`車体 X ${state.rig.vehicle.x.toFixed(1)} / Z ${state.rig.vehicle.z.toFixed(1)}`;

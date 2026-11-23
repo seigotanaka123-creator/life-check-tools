@@ -2,7 +2,7 @@ export const MARS_SHOP_DIALOG_GREETING = 'ワレワレハ、ウチュウジン�
 export const MARS_SHOP_DIALOG_CHOICES = Object.freeze([
   Object.freeze({ id: 'buy', text: '買い物させて' }),
   Object.freeze({ id: 'sell', text: '物を売らせて' }),
-  Object.freeze({ id: 'features', text: '火星素材ショップの賞品の特徴は？' }),
+  Object.freeze({ id: 'features', text: 'アマネ星素材ショップの賞品の特徴は？' }),
   Object.freeze({ id: 'visit', text: '宇宙人に会いに来た！' }),
 ]);
 

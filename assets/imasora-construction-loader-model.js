@@ -2,6 +2,24 @@ import * as THREE from './three.module.min.js';
 import { measureCharacter } from './imasora-construction-layout.js?v=120ob';
 import { LOADER } from './imasora-construction-loader-physics.js?v=120ov';
 
+// Parts are rigid relative to their model pivot. Keep the same geometry and
+// material while submitting the entire set in one draw for each render pass.
+export function repeatVehiclePart(parent,geometry,material,name,poses){
+ const batch=new THREE.InstancedMesh(geometry,material,poses.length);
+ batch.name=name;
+ batch.castShadow=batch.receiveShadow=true;
+ const pivot=new THREE.Object3D();
+ for(const [index,{x,y,z,rx=0,ry=0,rz=0}] of poses.entries()){
+  pivot.position.set(x,y,z);
+  pivot.rotation.set(rx,ry,rz);
+  pivot.updateMatrix();
+  batch.setMatrixAt(index,pivot.matrix);
+ }
+ batch.computeBoundingSphere();
+ parent.add(batch);
+ return batch;
+}
+
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.62,...extra});
 function mesh(parent,geometry,material,name,x=0,y=0,z=0){const o=new THREE.Mesh(geometry,material);o.name=name;o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o;}
 function box(parent,w,h,d,x,y,z,material,name){return mesh(parent,new THREE.BoxGeometry(w,h,d),material,name,x,y,z);}
@@ -22,21 +40,23 @@ export function createLoader(){
   rounded(root,48,18,13,0,12.5,-33,yellow,'rounded-engine-cover',4);
   rounded(root,39,12,1.5,0,19.4,-34,trim,'engine-service-panel',2);
   box(root,44,6,1,0,12,-42,trim,'rear-grille');
-  for(let i=0;i<11;i++)box(root,1.2,5,.5,(i-5)*3.5,12,-42.6,steel,'grille-slat');
+  repeatVehiclePart(root,new THREE.BoxGeometry(1.2,5,.5),steel,'grille-slat',Array.from({length:11},(_,i)=>({x:(i-5)*3.5,y:12,z:-42.6})));
   box(root,50,3,2,0,5.5,-42,trim,'rear-bumper');
   const tail=mat(0xb93627,{emissive:0xb62413,emissiveIntensity:.4});
   for(const x of[-20,20])box(root,5,3,.8,x,16,-42.3,tail,'rear-lamp');
   rod(root,[22,19,-35],[22,32,-35],1.05,trim,'exhaust-stack');
   box(root,3.5,1,3.5,22,32.5,-35,trim,'exhaust-cap');
 
-  const wheels=[];
+  const wheels=[],treadGeometry=new THREE.BoxGeometry(8.8,.9,1.9),boltGeometry=new THREE.CylinderGeometry(.48,.48,.5,6);
+  const tread=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8;return{x:0,y:8.45*Math.cos(a),z:8.45*Math.sin(a),rx:a};});
   for(const z of[-31,18])for(const side of[-1,1]){
     const pivot=new THREE.Group();pivot.position.set(side*25.5,LOADER.wheelRadius,z);root.add(pivot);
     const spin=new THREE.Group();pivot.add(spin);
     const tire=mesh(spin,new THREE.CylinderGeometry(8.65,8.65,9,32),rubber,'tyre');tire.rotation.z=Math.PI/2;
     const hub=mesh(spin,new THREE.CylinderGeometry(4.8,4.8,9.02,24),hubMat,'wheel-hub');hub.rotation.z=Math.PI/2;
-    for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const t=box(spin,8.8,.9,1.9,0,8.45*Math.cos(a),8.45*Math.sin(a),treadMat,'tyre-tread');t.rotation.x=a;}
-    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;const bolt=mesh(spin,new THREE.CylinderGeometry(.48,.48,.5,6),steel,'hub-bolt',side*4.25,2.9*Math.cos(a),2.9*Math.sin(a));bolt.rotation.z=Math.PI/2;}
+    repeatVehiclePart(spin,treadGeometry,treadMat,'tyre-tread',tread);
+    const bolts=Array.from({length:6},(_,i)=>{const a=i*Math.PI/3;return{x:side*4.25,y:2.9*Math.cos(a),z:2.9*Math.sin(a),rz:Math.PI/2};});
+    repeatVehiclePart(spin,boltGeometry,steel,'hub-bolt',bolts);
     wheels.push({pivot,spin,front:z>0});
     rounded(root,10,21,1.2,side*24.5,19.1,z,yellow,'wheel-guard',2);
   }
@@ -82,13 +102,16 @@ export function createLoader(){
   // Reflecting the coordinate axes changes winding: render both sides of the cheeks.
   const cheekMat=mat(0xf69f01,{side:THREE.DoubleSide,metalness:.2});
   mesh(bucket,sideGeometry,cheekMat,'bucket-cheek',-28.5,0,0);mesh(bucket,sideGeometry.clone(),cheekMat,'bucket-cheek',27,0,0);
-  const steps=[];
+  const steps=[],stepGeometry=new THREE.BoxGeometry(8,3,26),gripGeometry=new THREE.BoxGeometry(7,.2,.8);
   for(const side of[-1,1]){
     const group=new THREE.Group();group.position.set(side*25,0,-8);root.add(group);
+    const treads=[],grips=[];
     for(let i=0;i<3;i++){
-      box(group,8,3,26,side*(11-i*4),1.5+i*3,0,trim,'boarding-step');
-      for(let j=0;j<4;j++)box(group,7,.2,.8,side*(11-i*4),3.1+i*3,-9+j*6,steel,'step-grip');
-    }steps.push(group);
+      const x=side*(11-i*4);treads.push({x,y:1.5+i*3,z:0});
+      for(let j=0;j<4;j++)grips.push({x,y:3.1+i*3,z:-9+j*6});
+    }
+    repeatVehiclePart(group,stepGeometry,trim,'boarding-step',treads);
+    repeatVehiclePart(group,gripGeometry,steel,'step-grip',grips);steps.push(group);
   }
   const pilotSocket=new THREE.Group();pilotSocket.name='driver-socket';pilotSocket.position.set(-14,LOADER.floor-m.footBottom,-8);root.add(pilotSocket);
   root.userData={wheels,roof,roofMat,steering,steps,pilotSocket,measurement:m,bucket};return root;
@@ -105,4 +128,4 @@ export function updateLoaderModel(root,vehicle,{steps=1,ground=null}={}){
   // The metal roof stays opaque in every view, including while riding.
   root.userData.steering.rotation.z=-vehicle.steering*2.8;
 }
-export function disposeLoader(root){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}
+export function disposeLoader(root){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.geometry)geometries.add(o.geometry);if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}

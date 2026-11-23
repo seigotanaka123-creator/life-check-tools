@@ -1,3 +1,29 @@
+// Bound queued construction draws while leaving enough frames for the GPU
+// pipeline. Input and simulation advance on every callback.
+export function createWorldDrawBackpressure(gl){
+ const fences=[],queueLimit=3;
+ let unavailable=typeof gl?.fenceSync!=='function'||typeof gl.clientWaitSync!=='function';
+ const release=()=>{for(const fence of fences)gl.deleteSync(fence);fences.length=0;};
+ return {
+  ready(active){
+   if(!active){release();return true;}
+   if(unavailable||fences.length<queueLimit)return true;
+   while(fences.length){
+    const status=gl.clientWaitSync(fences[0],0,0);
+    if(status===gl.TIMEOUT_EXPIRED)break;
+    gl.deleteSync(fences.shift());
+    if(status===gl.WAIT_FAILED){release();unavailable=true;return true;}
+   }
+   return fences.length<queueLimit;
+  },
+  submitted(active){
+   if(!active||unavailable)return;
+   const fence=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);
+   if(fence!==null){fences.push(fence);gl.flush();}
+  }
+ };
+}
+
 // Presentation only: lower expensive shadow/pixel work after sustained slow
 // frames. A single save, startup compilation or a hidden tab is not a signal.
 export function createRenderBudget({apply}={}) {

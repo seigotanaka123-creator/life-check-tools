@@ -221,7 +221,7 @@ function createPlayerEarthMenu({panel,session,snapshot,pause,replace,refresh}){
   session.onChange=()=>{if(opened&&session.message)notice=friendlyMessage(session.message);update();refresh();};
   function handleKeyDown(event){
     if(!opened)return false;
-    if(event.key==='Escape'&&!event.isComposing){event.preventDefault();if(screen==='home')close();else goBack();return true;}
+    if(event.key==='F8'&&!event.isComposing){event.preventDefault();if(screen==='home')close();else goBack();return true;}
     if(event.key==='Tab'){
       const focusable=[...box.querySelectorAll('button,input,textarea,select,summary,[tabindex]')].filter(element=>!element.disabled&&element.tabIndex>=0&&element.getClientRects().length);
       const first=focusable[0],last=focusable.at(-1),current=document.activeElement;

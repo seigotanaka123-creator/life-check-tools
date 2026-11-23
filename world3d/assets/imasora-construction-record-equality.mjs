@@ -3,12 +3,12 @@
 // the physical receipt. Never invoke getters or toJSON while comparing copies.
 // Use this version only after BOTH values passed the domain checks in the
 // current synchronous operation, or for privately owned validated frozen data.
-export function sameValidatedConstructionRecordValue(a,b){
- if(a===b)return true;
+export function sameValidatedConstructionRecordValue(a,b,preserveSignedZero=false){
+ if(a===b)return !preserveSignedZero||a!==0||Object.is(a,b);
  if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;
  const keys=Object.keys(a);if(keys.length!==Object.keys(b).length)return false;
  if(Array.isArray(a)&&a.length!==b.length)return false;
- for(const k of keys)if(!Object.hasOwn(b,k)||!sameValidatedConstructionRecordValue(a[k],b[k]))return false;
+ for(const k of keys)if(!Object.hasOwn(b,k)||!sameValidatedConstructionRecordValue(a[k],b[k],preserveSignedZero))return false;
  return true;
 }
 

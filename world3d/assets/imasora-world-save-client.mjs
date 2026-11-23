@@ -37,18 +37,18 @@ const checkedRestorePoints=new WeakSet();
 export const isCheckedTransportRestorePoint=point=>checkedRestorePoints.has(point);
 function workerFactory(){
  if(typeof Worker==='function'){
-  try{return new Worker(new URL('./imasora-world-save-worker.mjs?v=120pv',import.meta.url),{type:'module',name:'imasora-save'});}
+  try{return new Worker(new URL('./imasora-world-save-worker.mjs?v=121if',import.meta.url),{type:'module',name:'imasora-save'});}
   catch{throw Error('セーブの処理を開始できません。現在の作業を保持しています。保存を再試行してください。');}
  }
  if(typeof document==='undefined')return null;
  throw Error('この画面でセーブの処理を開始できません。現在の作業を保持しています。');
 }
-async function runTask(kind,args,{createWorker=workerFactory,signal}={}){
- if(!['scoop-plan','pack','pack-checked','unpack','restore-plan','restore-commit','soil-check','transport-check','prepare-transport','prepare-high','prepare-coast','prepare-adventure','prepare-kit-transfer','prepare-beam-unpack','prepare-world','read-transport','restore-plan-checked','restore-point-checked','restore-point-proof','restore-point-bound','restore-result-check'].includes(kind))throw Error('セーブの処理を確認できませんでした。');
+async function runTask(kind,args,{createWorker=workerFactory,signal,onProgress}={}){
+ if(!['scoop-plan','warm-scoop-base','bucket-dump-plan','pack','pack-checked','unpack','restore-plan','restore-commit','soil-check','transport-check','prepare-transport','prepare-high','prepare-coast','prepare-adventure','prepare-kit-transfer','prepare-beam-unpack','prepare-concrete-travel','prepare-world','read-transport','restore-plan-checked','restore-point-checked','restore-point-proof','restore-point-bound','restore-result-check'].includes(kind))throw Error('セーブの処理を確認できませんでした。');
  if(signal?.aborted)throw Error('控えの確認を中止しました。');
- if(createWorker===workerFactory&&typeof document!=='undefined')return runSharedSaveTask(kind,args,{signal});
+ if(createWorker===workerFactory&&typeof document!=='undefined')return runSharedSaveTask(kind,args,{signal,onProgress});
  const worker=createWorker();
- if(!worker){const {executeWorldSaveTask}=await import('./imasora-world-save-task.mjs?v=120pv');return structuredClone(executeWorldSaveTask(kind,args));}
+ if(!worker){const {executeWorldSaveTask}=await import('./imasora-world-save-task.mjs?v=121if');return structuredClone(executeWorldSaveTask(kind,args));}
  return new Promise((resolve,reject)=>{
   let settled=false;const abort=()=>done(Error('控えの確認を中止しました。'));
   const done=(error,result)=>{if(settled)return;settled=true;signal?.removeEventListener('abort',abort);worker.onmessage=worker.onerror=worker.onmessageerror=null;worker.terminate();error?reject(error):resolve(result);};

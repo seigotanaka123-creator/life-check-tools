@@ -2,12 +2,12 @@
  'use strict';
  // Run while the game is alive as well as on backgrounding. Unload alone is
  // not a reliable opportunity to finish an asynchronous database transaction.
- function create({save,urgent,ready=()=>true,dirty=()=>true,onError=()=>{},onSaved=()=>{},window:win=globalThis.window,document:doc=globalThis.document,interval=2000}){
+ function create({save,urgent,shouldTry=()=>true,ready=()=>true,dirty=()=>true,onError=()=>{},onSaved=()=>{},window:win=globalThis.window,document:doc=globalThis.document,interval=2000}){
   let stopped=false,urgentBusy=false,running=null,queued=null,lastError=null,callbackError=null,retryTimer=null,retries=0;
   function notify(callback,value){if(stopped)return;try{callback(value);}catch(error){callbackError=error;}}
   function report(error){const previous=lastError;lastError=error;if(previous?.message!==error?.message)notify(onError,error);}
   function retry(reason){if(stopped||reason==='interval'||retries++>=40)return;clearTimeout(retryTimer);retryTimer=setTimeout(()=>void flush('retry'),100);}
-  function inspect(reason){try{if(!ready()){retry(reason);return'blocked';}return dirty()?'write':'clean';}catch(error){report(error);return'blocked';}}
+  function inspect(reason){try{if(!shouldTry(reason))return'deferred';if(!ready(reason)){retry(reason);return'blocked';}return dirty(reason)?'write':'clean';}catch(error){report(error);return'blocked';}}
   function begin(reason,waiters){
    let acknowledge;
    const own=new Promise(resolve=>{acknowledge=resolve;});
@@ -20,8 +20,8 @@
     if(!queued)return;
     const next=queued;queued=null;
     if(stopped){next.resolve(false);return;}
-    const state=inspect('followup');
-    if(state==='write')begin('followup',next);
+    const reason=next.lifecycle??'followup',state=inspect(reason);
+    if(state==='write')begin(reason,next);
     else next.resolve(state==='clean'&&ok);
    }
    Promise.resolve(task).then(ok=>{
@@ -46,12 +46,12 @@
    finally{urgentBusy=false;}
   }
   function flush(reason='interval'){
-   if(stopped||urgentBusy)return Promise.resolve(false);
+   if(stopped||urgentBusy||!shouldTry(reason))return Promise.resolve(false);
    if(reason!=='retry'&&reason!=='interval')retries=0;
    if(urgent&&(reason==='pagehide'||reason==='hidden'))return flushUrgent(reason);
    // Each queued caller awaits the snapshot requested by that batch. The first
    // caller still completes when its own write is confirmed, without starvation.
-   if(running){if(!queued){let resolve;const promise=new Promise(done=>{resolve=done;});queued={promise,resolve};}return queued.promise;}
+   if(running){if(!queued){let resolve;const promise=new Promise(done=>{resolve=done;});queued={promise,resolve};}if(reason==='hidden'||reason==='pagehide')queued.lifecycle=reason;return queued.promise;}
    if(inspect(reason)!=='write')return Promise.resolve(false);
    // Start capture synchronously: pagehide must not wait for a microtask first.
    return begin(reason,null);

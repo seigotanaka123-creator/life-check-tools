@@ -3,12 +3,14 @@ import {vehiclePoint,walkingBlocked} from './free-contact.mjs?v=120pv';
 import * as T from '../three.module.min.js';
 import {vehicleGroundPose} from './free-vehicle-ground.mjs?v=120ov';
 import {walkingGroundAt,walkingGroundSegment,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120pv';
-export const concreteDoor=(v,f=null,heightAt=()=>0)=>f?boardingAccess(f,v,heightAt).door:vehiclePoint(v,{x:v.legs?-56:-50,y:0,z:21});
-export function boardingAccess(f,v,heightAt=()=>0){
+const sides=[-1,1];
+const sideAt=(v,p)=>(p.x-v.x)*Math.cos(v.heading)-(p.z-v.z)*Math.sin(v.heading)<0?-1:1;
+export const concreteDoor=(v,f=null,heightAt=()=>0,side=-1)=>f?boardingAccess(f,v,heightAt,side).door:vehiclePoint(v,{x:(v.legs?56:50)*side,y:0,z:21});
+export function boardingAccess(f,v,heightAt=()=>0,side=-1){
  const originalHeight=heightAt;const ground=vehicleGroundPose(f,v,originalHeight);heightAt=(x,z)=>originalHeight(x,z,ground.position.y);const point=p=>{if(ground.slope<1e-12){const q=vehiclePoint(v,p);return{...q,y:(p.y??0)+ground.position.y};}const q=new T.Vector3(p.x,p.y??0,p.z).applyQuaternion(ground.rotation).add(ground.position);return{x:q.x,y:q.y,z:q.z};};
- const door=point({x:(v.legs?-56:-50)-ground.padX,y:0,z:21}),support=walkingGroundAt(f,door.x,door.z,heightAt);
+ const door=point({x:((v.legs?56:50)+ground.padX)*side,y:0,z:21}),support=walkingGroundAt(f,door.x,door.z,heightAt);
  if(!support)throw Error(WALK_GROUND_MESSAGE);door.y=support.height;
- return{ground,door,support,point,steps:[door,point({x:-42,y:10,z:21}),point({x:-34,y:19,z:21}),point({x:-15,y:19,z:21})]};
+ return{side,ground,door,support,point,steps:[door,point({x:side*42,y:10,z:21}),point({x:side*34,y:19,z:21}),point({x:-15,y:19,z:21})]};
 }
 const pathIssue=(f,name,access,external,heightAt)=>{
  const {door,steps}=access;if(walkingBlocked(f,door.x,door.z,external,null,heightAt))return 'ドア前の通路を空けてください。';
@@ -17,8 +19,8 @@ const pathIssue=(f,name,access,external,heightAt)=>{
 };
 // The painted zone may be partly obstructed. Use a supported landing inside
 // that same driver-door zone; never expand it or bypass pedestrian clearance.
-export function resolveBoardingAccess(f,name,external=()=>false,heightAt=()=>0,preferred=null){
- const v=f[name],base=boardingAccess(f,v,heightAt),rawHeight=heightAt,rawExternal=external;heightAt=(x,z)=>rawHeight(x,z,base.ground.position.y);external=(x,z,m)=>rawExternal(x,z,m,base.ground.position.y);const issue=pathIssue(f,name,base,external,heightAt);if(!issue)return base;
+function resolveDoorSide(f,name,external,heightAt,preferred,side){
+ const v=f[name],base=boardingAccess(f,v,heightAt,side),rawHeight=heightAt,rawExternal=external;heightAt=(x,z)=>rawHeight(x,z,base.ground.position.y);external=(x,z,m)=>rawExternal(x,z,m,base.ground.position.y);const issue=pathIssue(f,name,base,external,heightAt);if(!issue)return base;
  const candidates=[];if(preferred&&atDriverDoor(preferred,base.door,v.heading))candidates.push(preferred);
  for(const [x,z]of [[2,0],[-2,0],[0,4],[0,-4],[2,4],[2,-4],[-2,4],[-2,-4]])candidates.push(vehiclePoint({...base.door,heading:v.heading},{x,z}));
  for(const p of candidates){
@@ -28,12 +30,18 @@ export function resolveBoardingAccess(f,name,external=()=>false,heightAt=()=>0,p
  }
  throw Error(issue);
 }
+export function resolveBoardingAccess(f,name,external=()=>false,heightAt=()=>0,preferred=null,side=null){
+ const candidates=side===null?preferred?[sideAt(f[name],preferred)]:sides:[side];
+ let failure;
+ for(const candidate of candidates){try{return resolveDoorSide(f,name,external,heightAt,preferred,candidate);}catch(e){failure??=e;}}
+ throw failure;
+}
 export function boardingPathProblem(f,name,external=()=>false,heightAt=()=>0,preferred=null){try{resolveBoardingAccess(f,name,external,heightAt,preferred);return '';}catch(e){return e.message;}}
 export const freeLeaveProblem=(f,external=()=>false,heightAt=()=>0)=>f.aboard?boardingPathProblem(f,f.aboard,external,heightAt):'';
 export function freeBoardProblem(f,player,name,external=()=>false,heightAt=()=>0){
  if(!['truck','pump'].includes(name)||f.aboard)return '車を降りてから乗り換えてください。';
- const v=f[name];let door;try{door=boardingAccess(f,v,heightAt).door;}catch(e){return '足元・車輪の地面を確認してください。'+e.message;}
- if(!atDriverDoor(player,door,v.heading))return '運転席横のドア前に立ってください。';
+ const v=f[name];let door;try{door=boardingAccess(f,v,heightAt,sideAt(v,player)).door;}catch(e){return '足元・車輪の地面を確認してください。'+e.message;}
+ if(!atDriverDoor(player,door,v.heading))return '車体横の空いているドア前に立ってください。';
  try{door=resolveBoardingAccess(f,name,external,heightAt,player).door;}catch(e){return e.message;}
  const count=Math.max(1,Math.ceil(Math.hypot(player.x-door.x,player.z-door.z)));
  if(!walkingGroundSegment(f,player,door,heightAt))return WALK_GROUND_MESSAGE;
@@ -41,7 +49,7 @@ export function freeBoardProblem(f,player,name,external=()=>false,heightAt=()=>0
  return '';
 }
 export function freeBoardStatus(f,player,name,external=()=>false,heightAt=()=>0){
- let near=false;try{near=!f.aboard&&atDriverDoor(player,boardingAccess(f,f[name],heightAt).door,f[name].heading);}catch{}
+ let near=false;try{near=!f.aboard&&atDriverDoor(player,boardingAccess(f,f[name],heightAt,sideAt(f[name],player)).door,f[name].heading);}catch{}
  return{near,problem:freeBoardProblem(f,player,name,external,heightAt)};
 }
 

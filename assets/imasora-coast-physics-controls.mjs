@@ -18,7 +18,7 @@ import {createCoastGangwayView} from './imasora-coast-gangway-view.mjs?v=120nz';
 import {coastMountChoice,coastMountPreview} from './imasora-coast-boat-fit.mjs?v=120nz';
 import {createCoastBoatBookHUD} from './imasora-coast-boat-book-ui.mjs?v=120nz';
 import {createCoastWinchHUD} from './imasora-coast-winch.mjs?v=120od';
-import {coastIslandStep,coastSteeringOars,coastNearbyPart,coastBoatInWater,coastRaftAground,coastCanHelm,coastSavedPilot,coastSavedCrew,coastSavedDeck,createCoastDirectHUD} from './imasora-coast-direct-play.mjs?v=120nz';
+import {coastIslandStep,coastSteeringOars,coastNearbyPart,coastBoatInWater,coastRaftAground,coastCanHelm,coastSavedPilot,coastSavedCrew,coastSavedDeck,createCoastDirectHUD} from './imasora-coast-direct-play.mjs?v=121fy';
 import * as T from './three.module.min.js';
 import {createCoastActivityEntry,coastActivityApproach} from './imasora-coast-activity-entry.mjs?v=120ny';
 import {coastHarborTimber,coastHarborSolids,coastStopWorkAlignment,coastIsLoadingRamp,coastSalvageSolids,coastUnloadOwner,coastWinchLines,COAST_SHORE_GOAL,initialCoastPlay,validateCoastPlay,editCoastPlay,stepCoastPlay,coastSupport,coastReadout,coastBodyPartContact,coastAssembly,coastConnections,coastConnectionFocus,coastOarsForTurns,coastPlayGuide,createCoastContactField,coastShoreMooring,coastRecovery,coastVoyageRetryPlan,coastVoyageReboard,recordCoastDryLand,coastLooseParts,coastMountFocus,coastMountRange,loadDeck,coastCrewSeats,canCoastMount,coastMountPoint,seaFloor,SEA_PARTS,SEA_PLAY,worldPoint,localPoint,rotate,add,mul,sub,length} from './imasora-coast-physics.mjs?v=120nz';
@@ -133,7 +133,7 @@ export function createCoastPlayController({host,getScene,getCharacter,camera:cam
  rescueButton.onclick=()=>openRecovery();
  rescue.querySelector('[data-rescue-close]').onclick=()=>rescue.close();rescue.addEventListener('close',()=>{recoveryPlan=null;recoveryId=null;recoveryShore=null;});
  rescue.querySelector('[data-rescue-go]').onclick=()=>{if(!recoveryPlan||service.blocked)return;try{recoveryDestination();}catch(e){set(rescue.querySelector('[data-rescue-message]'),e.message);return;}const id=recoveryPlan.board,port=recoveryPlan.port;if(edit({type:'recover',id,port})){selected=id;rescue.close();setOpen(true);say('いかだを岸へ戻したよ。渡り板で乗り、パッドを前へ倒すと出発できるよ。');toast('自分のいかだを、岸へ戻したよ！');}else set(rescue.querySelector('[data-rescue-message]'),status.textContent);};
- castOffButton.onclick=()=>{if(rider&&edit({type:'unmoor',id:rider.id})){release();say('ロープをほどいたよ！「こぐ」で進み、パッドの前後で進む・バック、左右で曲がろう。');}};
+ castOffButton.onclick=()=>{if(rider&&edit({type:'unmoor',id:rider.id})){release();say(globalThis.IMASORA_CONTROL_DISPLAY?.mode==='keyboard'?'ロープをほどいたよ。操縦キーで進もう！':'ロープをほどいたよ。パッドで進もう！');}};
  function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(disposed||service.blocked)return;if(service.busy){scheduleSave();return;}void persist().catch(()=>{});},450);}
  // Loan assembly edits only change this controller. A pending checkpoint owns
  // its earlier snapshot; autosave/retry will write the newer edit afterwards.

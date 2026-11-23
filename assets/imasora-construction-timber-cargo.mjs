@@ -1,8 +1,14 @@
 // A new warehouse output. Existing floor receipts keep their old meaning.
 export const BEAM_ISSUE='issue-beams-v1';
 export const BEAM_BUNDLE=Object.freeze({materialId:'mars-timber',w:28,h:12,d:80,x:0,z:16,color:0xaa80bd});
-export function beamTemplate(id){return{...BEAM_BUNDLE,id,name:`火星木材・角材4本の束 ${id.split('-').at(-1)}`};}
-export const isBeamBundle=p=>!!p&&typeof p.id==='string'&&p.w===28&&p.h===12&&p.d===80&&p.materialId==='mars-timber'&&p.name===beamTemplate(p.id).name;
+export function timberCargoNameMatches(name,expected){
+ return name===expected||/^アマネ星木材・(?:浮遊床|角材4本の束) [1-9][0-9]*$/.test(expected)&&name===expected.replace(/^アマネ星/,'火星');
+}
+export function displayTimberCargoText(text){
+ return String(text??'').replace(/火星木材・(浮遊床|角材4本の束) ([1-9][0-9]*)/g,'アマネ星木材・$1 $2');
+}
+export function beamTemplate(id){return{...BEAM_BUNDLE,id,name:`アマネ星木材・角材4本の束 ${id.split('-').at(-1)}`};}
+export const isBeamBundle=p=>!!p&&typeof p.id==='string'&&p.w===28&&p.h===12&&p.d===80&&p.materialId==='mars-timber'&&timberCargoNameMatches(p.name,beamTemplate(p.id).name);
 
 // The existing carriage is 56 x 84. A 28 x 80 bundle fits lengthways;
 // an 80 x 56 board fits sideways. Both are one equal-volume timber receipt.

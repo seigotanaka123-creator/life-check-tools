@@ -5,7 +5,7 @@ const SOURCE_KEY='imasora-world-foundation-v3';
 const $=id=>document.getElementById(id);
 export function makeWalletPreview(mode){
   if(!['copy','fixture'].includes(mode)||!['127.0.0.1','localhost'].includes(location.hostname))throw Error('接続確認はローカル専用です。');
-  document.title='火星素材ショップ';
+  document.title='アマネ星素材ショップ';
   const session=new WorldPurchaseSession(new WorldPurchaseStore(mode));
   const panel=document.createElement('section');panel.className='pending';panel.id='wallet-connection-panel';
   panel.innerHTML=`<h2>本体財布との接続確認 · 8-2a</h2><p id="wallet-origin"></p><p id="wallet-source-status" role="status"></p><div class="actions"><button id="wallet-check-source">元のセーブが変わっていないか確認</button><a id="wallet-alternate" class="wallet-alternate"></a></div><p class="scope">これは複製上の検証です。本体の金貨・建築・装備には書き戻しません。候補価格：水3枚／土2枚／木材4枚。実プレイヤーの収益計測はこれからです。</p>`;

@@ -2,7 +2,7 @@
 // excavation's local pedestrian solver. Carry only physical slabs and edges.
 const finite=(...values)=>values.every(Number.isFinite);
 const MATERIALS=new Set(['construction-timber','construction-soil','construction-concrete']);
-const displayName=id=>id==='construction-timber'?'木材':id==='construction-concrete'?'コンクリート':'火星土';
+const displayName=id=>id==='construction-timber'?'木材':id==='construction-concrete'?'コンクリート':'アマネ星土';
 
 export function constructionMaterialContactVolumes(origin,geometry={}){
   if(!Array.isArray(origin)||origin.length!==2||!finite(...origin))return[];

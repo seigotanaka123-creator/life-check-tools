@@ -19,6 +19,7 @@ export function createCraneConsole({panel,game,button,stop,clear}){
  const console=document.createElement('section');console.className='wc-console';console.setAttribute('aria-label','クレーンの直接操作');
  console.innerHTML='<div class="wc-stick-wrap"><span class="wc-pad-title">アーム</span><button class="wc-stick" aria-label="アーム操作パッド"><span class="wc-up">伸ばす</span><span class="wc-down">縮める</span><span class="wc-left">↶</span><span class="wc-right">↷</span><i></i></button></div><div class="wc-task"><span class="wc-picture">'+craneIcon+'</span><p class="wc-note"></p><button class="wc-primary"></button></div><div class="wc-lift-wrap"><span>フック</span><button class="wc-lift" aria-label="巻き上げ・巻き下げレバー"><span>上げる<br>▲</span><i></i><span>▼<br>下げる</span></button></div>';
  const extras=document.createElement('section');extras.className='wc-extras';extras.hidden=true;const close=document.createElement('button');close.className='wc-tools-close';close.textContent='× 操作にもどる';extras.append(close,nav,pages);active.prepend(console,extras);
+ const keyboardGuide=document.createElement('p');keyboardGuide.className='wt-keyboard-guide';keyboardGuide.setAttribute('aria-label','クレーンのキー操作');active.append(keyboardGuide);
  const originalJump=q('[data-hold=jump]');originalJump.classList.add('wc-jump');console.append(originalJump);
  const head=document.createElement('div');head.className='wc-head';head.innerHTML='<button class="wc-mode"></button><button class="wc-tools" aria-expanded="false">🧰 道具</button>';panel.querySelector('header').append(head);
  // Camera and lesser-used actions remain available, without occupying the dock.
@@ -30,7 +31,7 @@ export function createCraneConsole({panel,game,button,stop,clear}){
  function reset(){xy.reset();winch.reset();}
  function setTools(yes){reset();clear();tools=yes;extras.hidden=!yes;console.hidden=yes;panel.dataset.consoleTools=String(yes);toolsButton.setAttribute('aria-expanded',String(yes));if(yes)nav.children[2]?.click();}
  toolsButton.onclick=()=>setTools(!tools);close.onclick=()=>setTools(false);
- mode.onclick=()=>button('mode').click();primary.onclick=()=>{if(primarySource&&!primarySource.disabled)primarySource.click();};
+ mode.onclick=()=>button('mode').click();mode.setAttribute('aria-keyshortcuts','O');mode.title='O：作業と運転を切り替える';primary.onclick=()=>{if(primarySource&&!primarySource.disabled)primarySource.click();};
  const text=(e,t)=>{if(e.textContent!==t)e.textContent=t;};
  return{reset,read:()=>{const p=xy.read(),h=winch.read();return{x:p.x,y:p.y,hoist:-h.y};},refresh({crane,aboard,busy,direct,hasCargo,job,issue=''}){
   if(lastArm!==crane||lastAboard!==aboard){if(tools)setTools(false);reset();lastArm=crane;lastAboard=aboard;}arm=crane;blocked=busy;if(blocked||game.paused||game.menuOpen)reset();
@@ -44,5 +45,7 @@ export function createCraneConsole({panel,game,button,stop,clear}){
   text(console.querySelector('.wc-up'),crane?'伸ばす':'前へ');text(console.querySelector('.wc-down'),crane?'縮める':'後ろへ');
   console.querySelector('.wc-lift-wrap').hidden=!crane;originalJump.hidden=aboard;
   panel.dataset.consoleArm=String(crane);panel.dataset.consoleAboard=String(aboard);
+  keyboardGuide.hidden=tools||game.menuOpen||game.paused;
+  text(keyboardGuide,crane?'WASD／矢印：走行専用\nQ／E：左／右へ旋回\nJ／H：フックを上げる／下げる\nU／I：アームを伸ばす／縮める\nL（Nも可）：吊る／設置　M：微調整\nO：支持脚を格納して運転へ':aboard?'W／↑：前進　S／↓：後退\nA／←・D／→：ハンドル\nK＋移動：ダッシュ　Space：ブレーキ\nO：停車してクレーン作業へ':'WASD／矢印：移動\nK／Space＋移動：ダッシュ\nE／B／J：ジャンプ');
  }};
 }

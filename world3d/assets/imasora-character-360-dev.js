@@ -57,9 +57,9 @@ let studioEnvironment = null;
 const CATALOGS = Object.freeze({
   guest: Object.freeze({
     key:'guest', label:'店主', roster:[MARS_SHOPKEEPER_DESCRIPTOR],
-    families:[{key:'mars',label:'火星の店主',bodyColorCss:'#c6a1e6'}],
+    families:[{key:'mars',label:'アマネ星の店主',bodyColorCss:'#c6a1e6'}],
     defaultCharacterId:MARS_SHOPKEEPER_ID, buildModel:buildMarsShopkeeper360,
-    rosterEyebrow:'MARS SHOPKEEPER',
+    rosterEyebrow:'AMANE SHOPKEEPER',
     lead:'採用された紫色のクラゲ店主を立体化。指で回転して前後左右を確認できます。正式名称は未設定です。'
   }),
   flowering: Object.freeze({

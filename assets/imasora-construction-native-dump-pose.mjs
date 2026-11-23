@@ -23,7 +23,17 @@ export function nativeDumpAnchorPoint(frame,x,y,z){const p=nativeDumpPose(frame)
 export function nativeDumpLocal(frame,point){const p=nativeDumpPose(frame),d=point.map((v,i)=>v-p.position[i]);return p.axes.map(a=>dot(a,d));}
 export function nativeDumpBox(frame,centre,half,extra={}){const p=nativeDumpPose(frame);return{position:nativeDumpPoint(frame,...centre),half:[...half],heading:frame.dump.heading,...(Math.abs(p.pitch)+Math.abs(p.roll)>1e-12?{axes:p.axes}:{}),...extra};}
 export function boxAxes(b){if(b.axes)return b.axes;const c=Math.cos(b.heading??0),s=Math.sin(b.heading??0);return[[c,0,-s],[0,1,0],[s,0,c]];}
-export function boxExtent(b){const h=b.half??Array(3).fill(b.size/2),a=boxAxes(b);return[0,1,2].map(i=>h.reduce((n,v,j)=>n+v*Math.abs(a[j][i]),0));}
+export function boxExtent(b){
+ const half=b.half??[b.size/2,b.size/2,b.size/2];
+ if(!b.axes){
+  const heading=b.heading??0;
+  if(heading===0)return [half[0],half[1],half[2]];
+  const c=Math.abs(Math.cos(heading)),s=Math.abs(Math.sin(heading));
+  return[half[0]*c+half[2]*s,half[1],half[0]*s+half[2]*c];
+ }
+ const [x,y,z]=b.axes;
+ return [0,1,2].map(i=>half[0]*Math.abs(x[i])+half[1]*Math.abs(y[i])+half[2]*Math.abs(z[i]));
+}
 export function boxLocal(point,b){const d=point.map((v,i)=>v-b.position[i]);return boxAxes(b).map(a=>dot(a,d));}
 export function boxesOverlap3D(a,b,margin=.01){
  // Voxel-to-voxel checks dominate a large unload. With both boxes aligned

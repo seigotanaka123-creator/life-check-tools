@@ -2,11 +2,11 @@ import * as THREE from './three.module.min.js';
 
 const OUTBOUND = Object.freeze({
   id: 'earth-mars-forward-scroll', origin: 'earth', destination: 'mars',
-  originName: '地球', destinationName: '火星', destinationMap: 'mars',
+  originName: '地球', destinationName: 'アマネ星', destinationMap: 'mars',
 });
 const HOMEWARD = Object.freeze({
   id: 'mars-earth-forward-scroll', origin: 'mars', destination: 'earth',
-  originName: '火星', destinationName: '地球', destinationMap: 'sky',
+  originName: 'アマネ星', destinationName: '地球', destinationMap: 'sky',
 });
 
 export function interplanetaryRoute(launchMap) {

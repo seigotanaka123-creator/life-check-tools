@@ -154,7 +154,8 @@ function startHuntRecorder(Recorder,stream,types,preferred,bitrate){const ordere
 // before some destination tracks join the canvas stream; release their union.
 function stopHuntCaptureTracks(...streams){const tracks=new Set();for(const stream of streams)for(const method of['getTracks','getVideoTracks','getAudioTracks'])try{for(const track of stream?.[method]?.()??[])tracks.add(track);}catch{}for(const track of tracks)try{track.stop();}catch{}}
 export function createHuntReplayVideo({createCanvas=()=>document.createElement('canvas'),Recorder=globalThis.MediaRecorder,makeAudio=()=>null,setTimer=setTimeout,clearTimer=clearTimeout}={}){
- let current=null,preferredMime=null,sequence=0;
+ const verificationTimeout=4000;
+ let current=null,checking=null,preferredMime=null;
  function clean(c){
   if(c.cleaned)return;
   c.cleaned=true;
@@ -165,11 +166,83 @@ export function createHuntReplayVideo({createCanvas=()=>document.createElement('
   stopHuntCaptureTracks(c.stream,c.audio?.stream);
   try{c.audio?.release?.();}catch{}
  }
- // Every callback owns its recording; late work must never cancel a newer one.
- function abort(c){if(!c||c.cleaned)return;c.cancelled=true;try{if(c.recorder?.state!=='inactive')c.recorder?.stop();}catch{}clean(c);c.resolve(null);}
- function cancel(){abort(current);}
- function start(frame,summary,{scope='finish',seconds=6}={}){cancel();return new Promise(resolve=>{let c;try{const limits=huntVideoLimits(scope,seconds);const types=huntVideoMimes(Recorder);if(!types.length)throw Error('VIDEO_UNSUPPORTED');const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();Object.assign(canvas,size);const context=canvas.getContext('2d');if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');const stream=canvas.captureStream(VIDEO_FPS);const caption=summary?(summary.mode==="hunt"?"鬼役":"逃走役")+"  ·  "+summary.title+"  "+summary.time+"秒":"";c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};current=c;c.sequence=++sequence;c.audio=makeAudio();for(const t of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(t);const selected=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate),mime=selected.mime;c.recorder=selected.recorder;c.types=types;c.mime=mime;preferredMime=mime;c.recorder.ondataavailable=e=>{if(!e.data?.size||c.cancelled||c.cleaned)return;c.bytes+=e.data.size;if(c.bytes>limits.maxBytes){abort(c);return;}c.chunks.push(e.data);};c.recorder.onerror=()=>{if(c.cleaned||c.cancelled)return;preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];abort(c);};c.recorder.onstop=()=>{if(c.cleaned)return;const type=(c.recorder.mimeType||mime).startsWith('video/mp4')?'video/mp4':'video/webm',blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null,expected=((c.lastFrameAt??c.firstFrameAt??0)-(c.firstFrameAt??0))/1000;clean(c);if(!blob){resolve(null);return;}huntRecordedVideoDuration(blob).then(duration=>{if(c.sequence!==sequence){resolve(null);return;}if(expected>.5&&duration!==null&&Math.abs(duration-expected)>Math.max(.35,Math.min(.75,expected*.01))){preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];resolve(null);return;}resolve(blob);},()=>resolve(null));};c.timer=setTimer(()=>abort(c),limits.timeout);}catch{abort(c);resolve(null);}});}
- return{start,cancel,finish(){const c=current;if(!c||c.cancelled||c.complete)return false;c.complete=true;try{c.recorder.stop();return true;}catch{preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];c.cancelled=true;clean(c);c.resolve(null);return false;}},draw(frame,now){
+ function nextFormat(c){preferredMime=c.types[(c.types.indexOf(c.mime)+1)%c.types.length];}
+ function abort(c){
+  if(!c||c.cleaned)return;
+  c.cancelled=true;
+  try{if(c.recorder?.state!=='inactive')c.recorder?.stop();}catch{}
+  clean(c);
+  c.resolve(null);
+ }
+ function cancel(){
+  abort(current);
+  checking?.complete(null);
+ }
+ function verify(c,blob,expected){
+  const job={complete(result,retry=false){
+   if(checking!==job)return;
+   checking=null;
+   if(job.timer!==undefined)clearTimer(job.timer);
+   if(retry)nextFormat(c);
+   c.resolve(result);
+  }};
+  checking=job;
+  try{
+   job.timer=setTimer(()=>job.complete(null,true),verificationTimeout);
+   huntRecordedVideoDuration(blob).then(duration=>{
+    const tolerance=Math.max(.35,Math.min(.75,expected*.01));
+    const truncated=expected>.5&&duration!==null&&Math.abs(duration-expected)>tolerance;
+    job.complete(truncated?null:blob,truncated);
+   },()=>job.complete(null,true));
+  }catch{job.complete(null,true);}
+ }
+ function finishCapture(c){
+  if(c.cleaned)return;
+  const type=(c.recorder.mimeType||c.mime).startsWith('video/mp4')?'video/mp4':'video/webm';
+  const blob=c.complete&&!c.cancelled&&c.chunks.length?new Blob(c.chunks,{type}):null;
+  const expected=((c.lastFrameAt??c.firstFrameAt??0)-(c.firstFrameAt??0))/1000;
+  clean(c);
+  if(blob)verify(c,blob,expected);
+  else c.resolve(null);
+ }
+ function start(frame,summary,{scope='finish',seconds=6}={}){
+  cancel();
+  return new Promise(resolve=>{
+   let c;
+   try{
+    const limits=huntVideoLimits(scope,seconds);
+    const types=huntVideoMimes(Recorder);
+    if(!types.length)throw Error('VIDEO_UNSUPPORTED');
+    const size=huntVideoSize(frame.width,frame.height),canvas=createCanvas();
+    Object.assign(canvas,size);
+    const context=canvas.getContext('2d');
+    if(!context)throw Error('VIDEO_CONTEXT_UNAVAILABLE');
+    const stream=canvas.captureStream(VIDEO_FPS);
+    const caption=summary?(summary.mode==='hunt'?'鬼役':'逃走役')+'  ·  '+summary.title+'  '+summary.time+'秒':'';
+    c={caption,canvas,context,stream,resolve,chunks:[],bytes:0,lastSlot:-1,complete:false,cancelled:false};
+    current=c;
+    c.audio=makeAudio();
+    for(const track of c.audio?.stream?.getAudioTracks?.()??[])stream.addTrack(track);
+    const {recorder,mime}=startHuntRecorder(Recorder,stream,types,preferredMime,limits.bitrate);
+    Object.assign(c,{recorder,mime,types});
+    preferredMime=mime;
+    recorder.ondataavailable=e=>{
+     if(!e.data?.size||c.cancelled||c.cleaned)return;
+     c.bytes+=e.data.size;
+     if(c.bytes>limits.maxBytes){abort(c);return;}
+     c.chunks.push(e.data);
+    };
+    recorder.onerror=()=>{
+     if(c.cleaned||c.cancelled)return;
+     nextFormat(c);
+     abort(c);
+    };
+    recorder.onstop=()=>finishCapture(c);
+    c.timer=setTimer(()=>abort(c),limits.timeout);
+   }catch{abort(c);resolve(null);}
+  });
+ }
+ return{start,cancel,finish(){const c=current;if(!c||c.cancelled||c.complete)return false;c.complete=true;try{c.recorder.stop();return true;}catch{nextFormat(c);c.cancelled=true;clean(c);c.resolve(null);return false;}},draw(frame,now){
   const c=current;
   if(!c||c.complete||!Number.isFinite(now))return false;
   c.firstFrameAt??=now;

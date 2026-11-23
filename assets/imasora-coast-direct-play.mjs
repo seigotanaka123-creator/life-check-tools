@@ -216,7 +216,8 @@ export function createCoastDirectHUD({dock,host,onWalk,onLook,onDismiss=()=>{},o
   const undo=q('[data-sea-act="undo"]');if(aboard){undo.disabled=true;undo.title='船を降りると、組み立てを1つ前へ戻せるよ';}else undo.title='組み立てを10回前まで戻せるよ';
   // On board, construction is optional and still directly available.
   for(const name of['float','board']){const b=q('[data-sea-act="'+name+'"]');if(b.parentElement!==more)more.prepend(b);b.hidden=false;}
-  let text=editing?(mounting?'つなぐ辺をタップ → 見本をずらして決めよう':detaching?'はずすつなぎ目をタップ':'黄色い見本の場所に置く'):rider?(walking?(gangway?'渡り板を歩いて、岸と船を行き来できるよ':'船の上を歩けるよ'):anchored?(gangway?'渡り板で岸へ ·「船の上を歩く」':'停泊中 · 船の上を歩けるよ'):moored?'出発：パッドを前へ / W':'パッドで操船 · 下へ引くとバック'):grab?'✋ 引いているよ':rope?'つなぐ相手をタップ':gangway?'渡り板を歩いて、船に乗ろう':selected?.type==='board'?(waterBoard?'ジャンプで乗って、そのまま操船':'✋ つかんで引く'):selected?'✋ つかんで引く':'';
+  const keyboard=globalThis.IMASORA_CONTROL_DISPLAY?.mode==='keyboard';
+  let text=editing?(mounting?'つなぐ辺をタップ → 見本をずらして決めよう':detaching?'はずすつなぎ目をタップ':'黄色い見本の場所に置く'):rider?(walking?(gangway?'渡り板を歩いて、岸と船を行き来できるよ':'船の上を歩けるよ'):anchored?(gangway?'渡り板で岸へ ·「船の上を歩く」':'停泊中 · 船の上を歩けるよ'):moored?(keyboard?'前へこいで出発':'パッドを前へ倒して出発'):(keyboard?'操縦キーで進む・曲がる':'パッドで操船 · 下へ引くとバック')):grab?'✋ 引いているよ':rope?'つなぐ相手をタップ':gangway?'渡り板を歩いて、船に乗ろう':selected?.type==='board'?(waterBoard?'ジャンプで乗って、そのまま操船':'✋ つかんで引く'):selected?'✋ つかんで引く':'';
   if(crewRole==='mate'&&!editing)text='助手席：操船はお休み · 立つと甲板で作業';
   if(boarding&&!editing)text='船の中央へ歩こう';
   if(aground&&!editing)text='水が浅いよ。岸へ降りて、いかだを沖へ押そう';

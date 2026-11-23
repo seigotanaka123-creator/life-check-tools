@@ -14,7 +14,7 @@ const exact=(o,fields)=>ok(o&&Object.getPrototypeOf(o)===Object.prototype&&Objec
 const idOK=id=>typeof id==='string'&&/^[\w-]{8,96}$/.test(id);
 export function initialWorldWater(siteIndex=0){
   ok(Number.isInteger(siteIndex)&&!!WATER_YARDS[siteIndex],'給水区画が不正です。');
-  const work=initialTransport();work.source=0;work.paused=true;work.message='保管済みの火星水を32 Lずつ出庫して使えます。';
+  const work=initialTransport();work.source=0;work.paused=true;work.message='保管済みのアマネ星水を32 Lずつ出庫して使えます。';
   return {schema:1,scope:WORLD_WATER_SCOPE,revision:0,phase:0,siteIndex,allocated:0,events:[],delivery:null,work};
 }
 export function worldWaterTotals(s){
@@ -46,7 +46,7 @@ export function worldWaterAction(s,action,value,receivedML,external=[],heightAt=
     ok(idOK(value),'出庫番号が不正です。');const old=s.events.find(e=>e.id===value);
     if(old){ok(old.kind===action,'同じ出庫番号の操作が異なります。');return s;}
     ok(waterWarehouseAccess(s),'保管口の近くで降車し、移送を終えてください。');ok(s.events.length<2000,'出庫記録の上限です。');
-    if(action==='dispatch'){ok(receivedML/250-s.allocated>=128,'保管庫の火星水が32 Lありません。先に建材受取所で受け取ってください。');ok(s.allocated+128<=768,'この給水区画の上限は192 Lです。');}
+    if(action==='dispatch'){ok(receivedML/250-s.allocated>=128,'保管庫のアマネ星水が32 Lありません。先に建材受取所で受け取ってください。');ok(s.allocated+128<=768,'この給水区画の上限は192 Lです。');}
     else ok(s.work.source>=128,'給水槽に32 L必要です。車載・水路の水は先に回収してください。');
     const n=copy(breakWaterEdits(s));n.events.push({id:value,kind:action,q:128,status:'moving'});n.delivery={id:value,kind:action,moved:0,clock:0};
     if(action==='dispatch')n.allocated+=128;n.revision++;n.work.message=action==='dispatch'?'保管庫から給水槽へ移送中…':'給水槽から保管庫へ移送中…';return n;

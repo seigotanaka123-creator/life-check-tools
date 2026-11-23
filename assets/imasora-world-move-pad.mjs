@@ -1,5 +1,5 @@
 import {createMonsterTravelInput} from './imasora-construction-concrete/monster-travel-input.mjs?v=120od';
-import {createConstructionMovePad} from './imasora-construction-concrete/move-pad.mjs';
+import {createConstructionMovePad} from './imasora-construction-concrete/move-pad.mjs?v=121fy';
 
 // Main-world and UFO sticks use the same release rules as construction play.
 // A Safari finger has one Touch.identifier owner, never a second pointer owner.

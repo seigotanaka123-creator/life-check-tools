@@ -1,4 +1,5 @@
 import {createCaveCrossing,caveTime,caveExitNearby,cavePace} from './imasora-coast-cave-crossing.mjs?v=120mx';
+import {celebrateGameEvent} from './imasora-construction-guide-data.mjs?v=121gy';
 export function createCaveCrossingUI({host,service,context,snapshot,view,groundContact=()=>null,hidden=()=>document.hidden,modalOpen=()=>!!globalThis.document?.querySelector?.('dialog[open]'),now=()=>performance.now(),canSave=()=>true}){
  const tracker=createCaveCrossing(),note=document.createElement('p');note.className='coast-cave-record';note.setAttribute('role','status');note.hidden=true;host.append(note);
  let pending=null,saving=false,saveTask=null,saveRevision=0,retryAt=0,expires=0,clock=0,disposed=false,entryShown=false,celebrateUntil=0;
@@ -51,7 +52,7 @@ export function createCaveCrossingUI({host,service,context,snapshot,view,groundC
    const wasRunning=tracker.running,run=tracker.update(dt,{...c,groundContact:contact,paused},v.model.stones);
    if(c.map!=='coast'||tracker.armed){latest=null;tick=-1;pace='';paceRecord=null;paceStone=0;}
    if(tracker.running&&!paused){
-    if(!wasRunning){latest=null;tick=-1;paceRecord=benchmark();pace='';paceStone=0;}
+    if(!wasRunning){latest=null;tick=-1;paceRecord=benchmark();pace='';paceStone=0;celebrateGameEvent(host,'計測開始','coast');}
     if(tracker.visited!==paceStone){paceStone=tracker.visited;pace=cavePace(tracker.lastSplit,tracker.visited-2,paceRecord);paceUntil=clock+2.4;tick=-1;}
     if(pace&&clock>=paceUntil){pace='';tick=-1;}
     const now=Math.floor(tracker.elapsed/100),saved=paceRecord?.bestMs??Infinity;
@@ -59,7 +60,7 @@ export function createCaveCrossingUI({host,service,context,snapshot,view,groundC
    }else if(wasRunning&&!run&&!tracker.armed&&!paused&&c.map==='coast'&&!c.riding)say('もう一度なら、入口の石から。',4);
    // Keep only the finish evidence. A retry captures the CURRENT world, so a
    // late save never rewinds the walking player or replaces a newer boat pose.
-   if(run){celebrateUntil=clock+6;const previousBest=Math.min(best(),pending?.milliseconds??Infinity),finished={milliseconds:run.milliseconds,finish:{...run.finish},splitsMs:run.splitsMs.slice()};latest={run:finished,previousBest};if(needsSave(finished)&&(!pending||run.milliseconds<pending.milliseconds)){pending=finished;saveRevision++;}result();}
+   if(run){celebrateUntil=clock+6;const previousBest=Math.min(best(),pending?.milliseconds??Infinity),finished={milliseconds:run.milliseconds,finish:{...run.finish},splitsMs:run.splitsMs.slice()};latest={run:finished,previousBest};celebrateGameEvent(host,previousBest<Infinity&&run.milliseconds<previousBest?'完走・自己ベスト！':'潮の洞窟 完走！','coast');if(needsSave(finished)&&(!pending||run.milliseconds<pending.milliseconds)){pending=finished;saveRevision++;}result();}
    // The actual stone contacts drive the scene feedback. No separate buttons,
    // course numbers or persistent progress; returning to the entrance rearms it.
    v.crossing?.({visited:tracker.visited,running:tracker.running,armed:tracker.armed,complete:clock<celebrateUntil&&!tracker.armed&&!tracker.running});

@@ -19,7 +19,45 @@ export const WORLD_RULES='tag-hunt-foundation-v1';
 export const WORLD_DASH_FORCE=1.18;
 export const WORLD=Object.freeze({width:640,depth:480,duration:90,grid:16});
 export const WORLD_CORNER_STAIRS=makeCornerStairs(WORLD.width,WORLD.depth);
+export function worldNearCornerStairs(a,margin=0){
+ return cornerStairReserved(a.x,a.z,WORLD_CORNER_STAIRS,margin);
+}
+export function worldCornerIndex(point){
+ if(cornerStairHeight(point.x,point.z,WORLD_CORNER_STAIRS)<=0)return -1;
+ return (point.x<0?0:2)+(point.z<0?0:1);
+}
+export function worldCornerPathAllowed(from,to,allowed){
+ if(allowed===undefined)return true;
+ const minX=Math.min(from.x,to.x),maxX=Math.max(from.x,to.x);
+ const minZ=Math.min(from.z,to.z),maxZ=Math.max(from.z,to.z);
+ const steps=Math.max(1,Math.ceil(Math.hypot(to.x-from.x,to.z-from.z)/2));
+ let previous=cornerStairHeight(from.x,from.z,WORLD_CORNER_STAIRS);
+ if(!WORLD_CORNER_STAIRS.some((c,i)=>i!==allowed&&
+   (c.sx>0?maxX>=c.x-c.reach:minX<=c.x+c.reach)&&
+   (c.sz>0?maxZ>=c.z-c.reach:minZ<=c.z+c.reach)))return true;
+ for(let i=1;i<=steps;i++){
+  const x=from.x+(to.x-from.x)*i/steps,z=from.z+(to.z-from.z)*i/steps;
+  const height=cornerStairHeight(x,z,WORLD_CORNER_STAIRS);
+  if(height>previous+.001&&worldCornerIndex({x,z})!==allowed)return false;
+  previous=height;
+ }
+ return true;
+}
+export function worldForwardBlocked(a){
+ if(worldSurface(a.x,a.z)!=='grip')return false;
+ const dx=Math.sin(a.yaw),dz=Math.cos(a.yaw),radius=a.radius??BODY.radius;
+ const points=[2,5].map(distance=>({x:a.x+dx*distance,z:a.z+dz*distance,y:a.y}));
+ return points.some(p=>!worldValid(p,radius))||
+  points.some(p=>{const edge={x:p.x+dx*radius,z:p.z+dz*radius};
+   return worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);});
+}
 export const WORLD_JUMP_STEPS=Object.freeze([80,112,144].map((x,i)=>Object.freeze({x,z:-172,w:32,d:32,h:[1.5,4.5,8][i],ramp:32})));
+const trainingMinX=WORLD_JUMP_STEPS[0].x-WORLD_JUMP_STEPS[0].w/2;
+const trainingMaxX=WORLD_JUMP_STEPS.at(-1).x+WORLD_JUMP_STEPS.at(-1).w/2;
+const trainingNorth=WORLD_JUMP_STEPS[0].z-WORLD_JUMP_STEPS[0].d/2-WORLD_JUMP_STEPS[0].ramp;
+const trainingSouth=WORLD_JUMP_STEPS[0].z+WORLD_JUMP_STEPS[0].d/2;
+const nearTrainingSteps=(x,z,margin)=>
+ x>=trainingMinX-margin&&x<=trainingMaxX+margin&&z>=trainingNorth-margin&&z<=trainingSouth+margin;
 export const WORLD_HILL=Object.freeze({x:-267,z:-20,rx:44,rz:108,h:8,cell:4});
 export const WORLD_BASIN=Object.freeze({x:112,z:172,rx:54,rz:44,depth:5.5,brake:Object.freeze({x:112,z:172,w:16,d:24})});
 export const WORLD_RISE=Object.freeze({x:116,z:0,halfW:48,halfD:48,topW:16,topD:16,h:7.5});
@@ -104,16 +142,86 @@ function stairJumpAccess(a,x,z,n,radius,allowTrainingStep){
  if(n>.05)return probe(Math.abs(x)>.05?Math.sign(x):0,Math.abs(z)>.05?Math.sign(z):0);
  return probe(1,0)||probe(-1,0)||probe(0,1)||probe(0,-1)||probe(1,1)||probe(1,-1)||probe(-1,1)||probe(-1,-1);
 }
+
+function trainingLedgeRise(a,x,z,n,radius){
+ if(n<=.05||!nearTrainingSteps(a.x,a.z,radius+7))return 0;
+ const reach=radius+Math.max(3,Math.min(6,Math.hypot(a.vx,a.vz)*.3));
+ for(let distance=.5;distance<=reach+.5;distance+=.5){
+  const px=a.x+x/n*distance,pz=a.z+z/n*distance;
+  const platform=WORLD_JUMP_STEPS.find(step=>
+   Math.abs(px-step.x)<=step.w/2&&Math.abs(pz-step.z)<=step.d/2);
+  const rise=platform?worldHeight(px,pz)-a.y:0;
+  if(rise>.6&&!terrainContinuous(a,{x:px,z:pz}))return rise<=3.51?rise:0;
+ }
+ return 0;
+}
+// At a shallow contact, keep the player's sideways intent rather than letting
+// the wall eat nearly all of a dash. The solid collision still runs afterwards.
+function dashAlongBarrier(a,x,z,radius,dt,trainingLedge=false){
+ const reach=.12+Math.max(Math.hypot(a.vx,a.vz),18)*dt,ux=a.x+x*reach,uz=a.z+z*reach;
+ let blockX=false,blockZ=false;
+ if(Math.abs(ux)>WORLD.width/2-radius&&Math.abs(ux)>Math.abs(a.x))blockX=true;
+ if(Math.abs(uz)>WORLD.depth/2-radius&&Math.abs(uz)>Math.abs(a.z))blockZ=true;
+ for(const b of WORLD_BLOCKS){
+  const base=b.base??0;if(a.y>=base+b.h-.01||a.y+5.4<=base+.001)continue;
+  const minX=b.x-b.w/2-radius,maxX=b.x+b.w/2+radius,minZ=b.z-b.d/2-radius,maxZ=b.z+b.d/2+radius;
+  if(uz>minZ&&uz<maxZ&&(a.x<=minX&&ux>minX||a.x>=maxX&&ux<maxX))blockX=true;
+  if(ux>minX&&ux<maxX&&(a.z<=minZ&&uz>minZ||a.z>=maxZ&&uz<maxZ))blockZ=true;
+ }
+ // Use the same height/continuity test as the terrain collision below.
+ const onTrainingGround=trainingLedge&&nearTrainingSteps(a.x,a.z,radius+1);
+ if(!blockX&&Math.abs(x)>.12){const edge={x:ux+Math.sign(x)*radius,z:a.z};blockX=worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);}
+ if(!blockZ&&Math.abs(z)>.12){const edge={x:a.x,z:uz+Math.sign(z)*radius};blockZ=worldHeight(edge.x,edge.z)>a.y+.6&&!terrainContinuous(a,edge);}
+ if(blockX===blockZ)return null;
+ const tangent=blockX?z:x;if(Math.abs(tangent)<(onTrainingGround?.075:.18))return null;
+ const along=Math.sign(tangent)*Math.min(Math.hypot(x,z),.55+Math.abs(tangent)*.50);
+ return blockX?{x:0,z:along}:{x:along,z:0};
+}
+
+function steerAlongPerimeter(a,x,z,radius,dt){
+ const reach=.12+Math.max(Math.hypot(a.vx,a.vz),18)*dt;
+ const limitX=WORLD.width/2-radius,limitZ=WORLD.depth/2-radius;
+ const outsideX=Math.abs(a.x+x*reach)>limitX&&x*a.x>0;
+ const outsideZ=Math.abs(a.z+z*reach)>limitZ&&z*a.z>0;
+ if(!outsideX&&!outsideZ)return null;
+ const tangentX=outsideX?0:x,tangentZ=outsideZ?0:z;
+ const magnitude=Math.hypot(tangentX,tangentZ);
+ if(magnitude<.04)return {x:0,z:0,outsideX,outsideZ};
+ const scale=Math.min(Math.hypot(x,z)/magnitude,1.8);
+ return {x:tangentX*scale,z:tangentZ*scale,outsideX,outsideZ};
+}
 export function worldMove(a,input={},dt=STEP){
- const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash;let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
+ const radius=a.radius??2.7,dash=a.flight?LEGACY_BODY.dash:BODY.dash*(a.dive?1:a.dashScale??1);let x=Number.isFinite(input.x)?input.x:0,z=Number.isFinite(input.z)?input.z:0,n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}
  const intendedYaw=n>.05?Math.atan2(x,z):a.yaw;
+ const edgeInput=input.perimeterGrip&&!a.flight&&!a.externalForce&&n>.05?
+  steerAlongPerimeter(a,x,z,radius,dt):null;
+ if(edgeInput){
+  x=edgeInput.x;z=edgeInput.z;n=Math.hypot(x,z);
+  if(edgeInput.outsideX&&a.x*a.vx>0)a.vx=0;
+  if(edgeInput.outsideZ&&a.z*a.vz>0)a.vz=0;
+ }
 
  const t=a.tuning??{accel:1,speed:1,turn:1,brake:1},before={x:a.x,z:a.z,y:a.y},ground=a.grounded,grip=!a.slippery&&worldSurface(a.x,a.z)==='grip';
- if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){if(a.grounded&&(input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;else delete a.stepJump;a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;}if(!input.jump&&a.jumpHeld)a.vy=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);a.jumpHeld=!!input.jump;
+ if(input.jump&&!a.jumpHeld&&a.jumps<HUNT_JUMP.maxJumps){
+  const rise=a.grounded&&input.trainingLedge?trainingLedgeRise(a,x,z,n,radius):0;
+  if(a.grounded&&(rise||input.jumpAccess||stairJumpAccess(a,x,z,n,radius,input.trainingStepJump)))a.stepJump=true;
+  else delete a.stepJump;
+  if(rise) a.trainingJumpTop=a.y+rise+.26;
+  else delete a.trainingJumpTop;
+  a.vy=HUNT_JUMP.launch;a.jumps++;a.grounded=false;
+ }
+ if(!input.jump&&a.jumpHeld){
+  const release=a.stepJump&&a.vy>0?a.vy*HUNT_JUMP.tapRelease:releasedJumpVelocity(a.vy);
+  const clearance=a.trainingJumpTop==null?0:Math.max(0,a.trainingJumpTop-a.y);
+  a.vy=clearance>0&&a.vy>0?Math.min(a.vy,Math.max(release,Math.sqrt(2*BODY.gravity*clearance))):release;
+ }
+ a.jumpHeld=!!input.jump;
  const velocity=Math.hypot(a.vx,a.vz),running=ground&&grip&&!a.externalForce&&!['cushion','sticky'].includes(a.kind);
  if(running){
-  const amount=Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=x*limit,tz=z*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*x+a.vz*z)/(velocity*amount)<.95;
-  const rate=amount<.05?150*t.brake:100*t.accel*(turning?.5+.5*t.turn:1),step=Math.min(d,rate*dt);
+  const follow=input.cornerGrip&&input.dash&&n>.6&&a.grounded&&!a.flight?dashAlongBarrier(a,x,z,radius,dt,input.trainingLedge):null;
+  const driveX=follow?.x??x,driveZ=follow?.z??z,amount=follow?Math.hypot(driveX,driveZ):Math.min(1,n),limit=(input.dash?dash:BODY.max)*t.speed,tx=driveX*limit,tz=driveZ*limit,dx=tx-a.vx,dz=tz-a.vz,d=Math.hypot(dx,dz),turning=amount>.05&&velocity>1&&(a.vx*driveX+a.vz*driveZ)/(velocity*amount)<.95;
+  const steeringRate=input.balloonCornerTurn?150:100;
+  const rate=amount<.05?150*t.brake:steeringRate*t.accel*(turning?.5+.5*t.turn:1),step=Math.min(d,rate*dt);
   if(d>1e-9){a.vx+=dx/d*step;a.vz+=dz/d*step;}if(amount<.05&&Math.hypot(a.vx,a.vz)<.03){a.vx=0;a.vz=0;}
  }else{
   if(velocity>.1){const nx=a.vx/velocity,nz=a.vz/velocity,dot=x*nx+z*nz;x=dot*nx+(x-dot*nx)*t.turn;z=dot*nz+(z-dot*nz)*t.turn;}
@@ -135,7 +243,7 @@ export function worldMove(a,input={},dt=STEP){
  a.x=clamp(a.x,-WORLD.width/2+radius,WORLD.width/2-radius);a.z=clamp(a.z,-WORLD.depth/2+radius,WORLD.depth/2-radius);
  const floor=worldHeight(a.x,a.z);if(a.grounded){if(floor<=before.y+.6&&floor>=before.y-.6)a.y=floor;else if(floor>before.y+.6){a.x=before.x;a.z=before.z;a.vx=0;a.vz=0;}else a.grounded=false;}
  if(!a.grounded&&floor>before.y+(cornerStairHeight(a.x,a.z,WORLD_CORNER_STAIRS)>worldGroundHeight(a.x,a.z)?.01:.6)){a.x=before.x;a.z=before.z;}
- if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;}}
+ if(!a.grounded){a.y+=a.vy*dt-BODY.gravity*dt*dt/2;a.vy-=BODY.gravity*dt;for(const b of WORLD_BLOCKS){const base=b.base??0;if(base>0&&before.y+5.4<=base+.001&&a.y+5.4>base&&Math.abs(a.x-b.x)<b.w/2+radius&&Math.abs(a.z-b.z)<b.d/2+radius){a.y=base-5.4;a.vy=Math.min(0,a.vy);}}const landing=worldHeight(a.x,a.z);if(a.y<=landing&&a.vy<=0){a.y=landing;a.vy=0;a.grounded=true;a.jumps=0;delete a.stepJump;delete a.trainingJumpTop;}}
  if(a.keepInputFacing)a.yaw=intendedYaw;else if(Math.hypot(a.vx,a.vz)>.2)a.yaw=Math.atan2(a.vx,a.vz);return a;
 }
 function terrainContinuous(a,b){const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)*2));let h=worldHeight(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,next=worldHeight(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(Math.abs(next-h)>.3)return false;h=next;}return true;}
@@ -160,7 +268,7 @@ function worldWidthEdges(padding){
  return edges;
 }
 export const WORLD_NAV_COUNT=WORLD_NODES.length;
-function worldNear(p,padding){const candidates=[],gx=Math.round(p.x/16)*16,gz=Math.round(p.z/16)*16,h=worldHeight(p.x,p.z);for(let dz=-32;dz<=32;dz+=16)for(let dx=-32;dx<=32;dx+=16){const i=worldCell.get((gx+dx)+','+(gz+dz));if(i===undefined)continue;const n=WORLD_NODES[i];candidates.push({i,d:Math.hypot(n.x-p.x,n.z-p.z)+Math.abs(n.y-h)*4});}candidates.sort((a,b)=>a.d-b.d);for(const c of candidates)if(worldValid(WORLD_NODES[c.i],padding)&&worldTraversable(p,WORLD_NODES[c.i],Math.max(0,padding-.25)))return c.i;return -1;}
+function worldNear(p,padding,cornerAccess,reverse=false){const candidates=[],gx=Math.round(p.x/16)*16,gz=Math.round(p.z/16)*16,h=worldHeight(p.x,p.z);for(let dz=-32;dz<=32;dz+=16)for(let dx=-32;dx<=32;dx+=16){const i=worldCell.get((gx+dx)+','+(gz+dz));if(i===undefined)continue;const n=WORLD_NODES[i];candidates.push({i,d:Math.hypot(n.x-p.x,n.z-p.z)+Math.abs(n.y-h)*4});}candidates.sort((a,b)=>a.d-b.d);for(const c of candidates)if((!reverse||cornerAccess===undefined||worldCornerIndex(WORLD_NODES[c.i])<0||worldCornerIndex(WORLD_NODES[c.i])===cornerAccess)&&worldValid(WORLD_NODES[c.i],padding)&&worldCornerPathAllowed(reverse?WORLD_NODES[c.i]:p,reverse?p:WORLD_NODES[c.i],cornerAccess)&&worldTraversable(p,WORLD_NODES[c.i],Math.max(0,padding-.25)))return c.i;return -1;}
 // Geometry-only edge samples are shared across bodies; the cache is limited to graph edges.
 const worldTravelCache=new Map();
 function routeSamples(a,b){
@@ -171,7 +279,7 @@ function routeSamples(a,b){
  if(cacheable)worldTravelCache.set(key,rows);return rows;
 }
 const worldTravelMemos=new Map();
-function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(t.speed??1),accel=100*(t.accel??1),iceDrive=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,iceDrive,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
+function routeConfig(a){const t=a.tuning??{},top=BODY.dash*(a.dashScale??1)*(t.speed??1),accel=100*(t.accel??1),iceDrive=BODY.accel*(t.accel??1)*WORLD_DASH_FORCE,brake=t.brake??1,key=top+':'+accel+':'+brake;let memo=worldTravelMemos.get(key);if(!memo){if(worldTravelMemos.size>=4)worldTravelMemos.delete(worldTravelMemos.keys().next().value);memo=new WeakMap();worldTravelMemos.set(key,memo);}return{top,accel,iceDrive,turn:t.turn??1,brake,vx:a.vx??0,vz:a.vz??0,memo};}
 function segmentSeconds(config,a,b,prior,initial=false){
  const samples=routeSamples(a,b),cached=config.memo.get(samples);let seconds=cached?.seconds??0,cruise=cached?.cruise??config.top;if(!cached){for(const row of samples){const limit=config.top+clamp(-row.grade*10,0,3);cruise=row.grip?limit:clamp((config.iceDrive-row.grade*BODY.gravity)/(.6*config.brake),2,limit);seconds+=row.length/cruise;}config.memo.set(samples,{seconds,cruise});}
  const dx=b.x-a.x,dz=b.z-a.z,length=Math.hypot(dx,dz)||1;
@@ -182,34 +290,115 @@ function segmentSeconds(config,a,b,prior,initial=false){
 export function worldRouteSeconds(a,path){const config=routeConfig(a);let seconds=0,from=a,prior=null;for(const to of path){if(Math.hypot(to.x-from.x,to.z-from.z)<1e-6)continue;seconds+=segmentSeconds(config,from,to,prior,prior===null);prior=from;from=to;}return seconds;}
 function routePush(heap,item){let at=heap.length;heap.push(item);while(at){const parent=(at-1)>>1;if(heap[parent].f<=item.f)break;heap[at]=heap[parent];at=parent;}heap[at]=item;}
 function routePop(heap){const first=heap[0],last=heap.pop();if(heap.length){let at=0;while(at*2+1<heap.length){let child=at*2+1;if(child+1<heap.length&&heap[child+1].f<heap[child].f)child++;if(heap[child].f>=last.f)break;heap[at]=heap[child];at=child;}heap[at]=last;}return first;}
-export function worldRoute(a,b){
- const padding=(a.radius??2.7)+.2,start=worldNear(a,padding),end=worldNear(b,padding);if(start<0||end<0)return[];
+export function worldRoute(a,b,cornerAccess){
+ const padding=(a.radius??2.7)+.2,start=worldNear(a,padding,cornerAccess),end=worldNear(b,padding,cornerAccess,true);if(start<0||end<0)return[];
  const widthEdges=worldWidthEdges(padding),config=routeConfig(a),fastest=Math.max(config.top+3,Math.hypot(config.vx,config.vz)),heuristic=i=>Math.hypot(WORLD_NODES[i].x-WORLD_NODES[end].x,WORLD_NODES[i].z-WORLD_NODES[end].z)/fastest,cost=new Float64Array(WORLD_NODES.length).fill(Infinity),prev=new Int32Array(WORLD_NODES.length).fill(-1),heap=[];
  cost[start]=0;routePush(heap,{i:start,g:0,f:heuristic(start)});let at=-1,visits=0;
  while(heap.length&&visits<WORLD_NODES.length*3){const item=routePop(heap);if(item.g!==cost[item.i])continue;at=item.i;visits++;if(at===end)break;
   for(const i of WORLD_LINKS[at]){const edge=Math.min(at,i)+':'+Math.max(at,i);let clearance=worldEdgeCache.get(edge);if(clearance===undefined){clearance=segmentClearance(WORLD_NODES[at],WORLD_NODES[i]);worldEdgeCache.set(edge,clearance);}if(clearance<padding)continue;
-   let allowed=widthEdges.get(edge);if(allowed===undefined){allowed=worldTraversable(WORLD_NODES[at],WORLD_NODES[i],padding);widthEdges.set(edge,allowed);}if(!allowed)continue;
+   let allowed=widthEdges.get(edge);if(allowed===undefined){allowed=worldTraversable(WORLD_NODES[at],WORLD_NODES[i],padding);widthEdges.set(edge,allowed);}if(!allowed||!worldCornerPathAllowed(WORLD_NODES[at],WORLD_NODES[i],cornerAccess))continue;
    const from=WORLD_NODES[at],to=WORLD_NODES[i],prior=prev[at]>=0?WORLD_NODES[prev[at]]:a,c=cost[at]+segmentSeconds(config,from,to,prior,prev[at]<0);
    if(c<cost[i]){cost[i]=c;prev[i]=at;routePush(heap,{i,g:c,f:c+heuristic(i)});}
   }
  }
  if(at!==end)return[];const path=[WORLD_NODES[end]];while(at!==start){at=prev[at];if(at<0)return[];path.push(WORLD_NODES[at]);}
- const route=path.reverse(),endNode=route.at(-1),endHeight=worldHeight(b.x,b.z);if(worldValid(b,padding)&&Math.abs(endHeight-endNode.y)<=Math.hypot(b.x-endNode.x,b.z-endNode.z)*.32+.01&&worldTraversable(endNode,b,padding))route.push({x:b.x,z:b.z,y:endHeight});return route;
+ const route=path.reverse(),endNode=route.at(-1),endHeight=worldHeight(b.x,b.z);if(worldValid(b,padding)&&Math.abs(endHeight-endNode.y)<=Math.hypot(b.x-endNode.x,b.z-endNode.z)*.32+.01&&worldTraversable(endNode,b,padding)&&worldCornerPathAllowed(endNode,b,cornerAccess))route.push({x:b.x,z:b.z,y:endHeight});return route;
 }
 
+function cornerRampRoute(a,target,corner,ordinary){
+ const c=WORLD_CORNER_STAIRS[corner],padding=(a.radius??2.7)+.2;
+ if(!c||Math.hypot(a.x-c.x,a.z-c.z)>160)return ordinary;
+ const at=(u,v)=>{const x=c.x-c.sx*u,z=c.z-c.sz*v;return{x,z,y:worldHeight(x,z)};};
+ const clear=(from,to)=>worldTraversable(from,to,padding)&&worldCornerPathAllowed(from,to,corner);
+ if(clear(a,target))return [target];
+ const u=(c.x-a.x)*c.sx,v=(c.z-a.z)*c.sz;
+ let best=ordinary,bestTime=ordinary.length?worldRouteSeconds(a,ordinary):Infinity;
+ for(const acrossX of [true,false]){
+  const onRamp=(acrossX?u:v)<=c.rampWidth-padding;
+  const length=acrossX?v:u,lane=c.rampWidth/2;
+  const ramp=position=>acrossX?at(lane,position):at(position,lane);
+  const exits=[c.top,...Array.from({length:c.count},(_,i)=>c.top+i*c.tread+c.rampSlopeRun)];
+  const entries=onRamp?[Math.min(length,c.reach+2)]:[c.reach+2,...exits.map(distance=>distance+2)];
+  for(const entry of entries){
+   const entrance=ramp(entry);
+   if(!worldValid(entrance,padding)||!clear(a,entrance))continue;
+   for(const distance of [entry,...exits]){
+    if(distance>entry)continue;
+    const exit=ramp(distance);
+    if(!clear(entrance,exit)||!clear(exit,target))continue;
+    const path=[entrance,...(entry===distance?[]:[exit]),target];
+    const seconds=worldRouteSeconds(a,path);
+    if(seconds+.15<bestTime){best=path;bestTime=seconds;}
+   }
+  }
+ }
+ return best;
+}
 
-export function worldRouteLookahead(a,path,start=0,threat=null){
+function deckRampRoute(a,target,preferredEnd=0,stable=false){
+ const d=WORLD_DECK,half=d.length/2,foot=half+d.ramp,padding=(a.radius??2.7)+.2;
+ if(Math.abs(target.x-d.x)>d.w/2||Math.abs(target.z-d.z)>=foot||worldHeight(target.x,target.z)<2||
+    Math.abs(a.x-d.x)>66||Math.abs(a.z-d.z)>foot+34)return null;
+ const floor=(x,z)=>({x,z,y:worldHeight(x,z)});
+ const goal=floor(clamp(target.x,d.x-d.w/2+1,d.x+d.w/2-1),target.z);
+ if(worldTraversable(a,goal,padding)&&(!stable||!preferredEnd||Math.abs(a.x-d.x)<d.w/2-padding))return [goal];
+ let best=null,cost=Infinity,committed=null,committedCost=Infinity;
+ for(const side of [1,-1])for(const offset of [2,0,4]){
+  const z=d.z+side*(foot+offset),entry=floor(d.x,z),top=floor(d.x,d.z+side*half);
+  const flank=floor(d.x+(a.x>=d.x?1:-1)*(d.w/2+padding+3),z);
+  for(const lead of [[],[flank]]){
+   const points=[...lead,entry,...(Math.abs(goal.z-d.z)<=half||Math.sign(goal.z-d.z)!==side?[top]:[]),goal];
+   let from=a,ok=true;
+   for(const p of points){
+    if(!worldTraversable(from,p,padding)){ok=false;break;}
+    from=p;
+   }
+   if(ok){
+    const seconds=worldRouteSeconds(a,points);
+    if(seconds<cost){best=stable?{points,end:side}:points;cost=seconds;}
+    if(stable&&side===preferredEnd&&seconds<committedCost){committed={points,end:side};committedCost=seconds;}
+   }
+  }
+ }
+ return committed??best;
+}
+
+function steerHuntRoute(a,path,at,sprint){
+ const goal=path[at]??a,next=path[at+1];
+ let memo=worldSteeringMemos.get(a);
+ if(!memo||memo.path!==path||memo.at!==at||memo.radius!==a.radius){
+  memo={path,at,radius:a.radius,room:steeringRoom(a,goal,next)};worldSteeringMemos.set(a,memo);
+ }
+ return worldSteering(a,goal,next,{sprint,room:memo.room});
+}
+
+function deckPerimeterSearch(a,cornerAccess){
+ const d=WORLD_DECK,padding=(a.radius??2.7)+.2,foot=d.length/2+d.ramp;
+ if(a.x<d.x+d.w/2+padding||Math.abs(a.z-d.z)>foot-2)return null;
+ const floor=(x,z)=>({x,z,y:worldHeight(x,z)});
+ const clear=(from,to)=>worldTraversable(from,to,padding)&&worldCornerPathAllowed(from,to,cornerAccess);
+ let best=null,cost=Infinity;
+ for(const side of [1,-1])for(const offset of [2,0,4]){
+  const z=d.z+side*(foot+offset),edge=floor(d.x+d.w/2+padding+3,z),inside=floor(d.x-d.w/2-padding-7,z);
+  if(!clear(a,edge)||!clear(edge,inside))continue;
+  const points=[edge,inside],seconds=worldRouteSeconds(a,points);
+  if(seconds<cost){best=points;cost=seconds;}
+ }
+ return best;
+}
+
+export function worldRouteLookahead(a,path,start=0,threat=null,cornerAccess){
  if(!path.length)return 0;let at=start;const remaining=path.slice(start),threats=threat?(Array.isArray(threat)?threat:[threat]):[],clearance=p=>Math.min(...threats.map(t=>worldEscapeClearance(a,t,p))),margin=threats.length?clearance(remaining):-Infinity;
  for(let i=start+1;i<Math.min(path.length,start+5);i++){
-  if(!worldTraversable(a,path[i],(a.radius??2.7)-.05))break;
+  if(!worldTraversable(a,path[i],(a.radius??2.7)-.05)||!worldCornerPathAllowed(a,path[i],cornerAccess))break;
   if(threats.length&&clearance([path[i]])+.001<margin)break;
   if(worldRouteSeconds(a,[path[i]])>worldRouteSeconds(a,path.slice(start,i+1))*1.03+.02)break;
   at=i;
  }
  return at;
 }
-export function worldSearchPlan(seen,radius=2.7,{role,reserved=[]}={}){
- const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];
+export function worldSearchPlan(seen,radius=2.7,{role,reserved=[],cornerAccess}={}){
+ const candidates=WORLD_NODES.filter(n=>{const d=Math.hypot(n.x-seen.x,n.z-seen.z);return d>=22&&d<=62&&worldValid(n,radius+.2)&&(cornerAccess===undefined||worldCornerIndex(n)<0||worldCornerIndex(n)===cornerAccess);}),heading=Math.atan2(seen.vx??0,seen.vz??1),used=new Set(),plan=[];
  const offsets=role==='intercept'?[.8,-.8,0,1.8,-1.8,Math.PI]:role==='patrol'?[-1.8,1.8,Math.PI,-.8,.8,0]:[0,.8,-.8,1.8,-1.8,Math.PI];
  for(const offset of offsets){let best=-Infinity,pick;
   for(const n of candidates){if(used.has(n))continue;const dx=n.x-seen.x,dz=n.z-seen.z,d=Math.hypot(dx,dz),occupied=plan.length===0?reserved.reduce((penalty,p)=>penalty+Math.max(0,24-Math.hypot(n.x-p.x,n.z-p.z))*1.6,0):0;
@@ -218,7 +407,7 @@ export function worldSearchPlan(seen,radius=2.7,{role,reserved=[]}={}){
   }if(pick){used.add(pick);plan.push({...pick});}
  }return plan;
 }
-function localPatrol(a,m){m.patrol=(m.patrol??0)+1;const angle=m.patrol*2.399963,tx=a.x+Math.sin(angle)*45,tz=a.z+Math.cos(angle)*45;let best=Infinity,pick=a;for(const n of WORLD_NODES){const d=Math.hypot(n.x-a.x,n.z-a.z);if(d<20||d>70||!worldValid(n,(a.radius??2.7)+.2))continue;const score=Math.hypot(n.x-tx,n.z-tz)+Math.abs(n.y-a.y)*2;if(score<best){best=score;pick=n;}}return {...pick};}
+function localPatrol(a,m,cornerAccess){m.patrol=(m.patrol??0)+1;const angle=m.patrol*2.399963,tx=a.x+Math.sin(angle)*45,tz=a.z+Math.cos(angle)*45;let best=Infinity,pick=a;for(const n of WORLD_NODES){const d=Math.hypot(n.x-a.x,n.z-a.z);if(d<20||d>70||!worldValid(n,(a.radius??2.7)+.2)||cornerAccess!==undefined&&worldCornerIndex(n)>=0&&worldCornerIndex(n)!==cornerAccess)continue;const score=Math.hypot(n.x-tx,n.z-tz)+Math.abs(n.y-a.y)*2;if(score<best){best=score;pick=n;}}return {...pick};}
 // Inspect the real escape route, not just its endpoint. Only visible threats enter this planner.
 export function worldEscapeClearance(a,threat,path,horizon=80){
  if(!path.length)return -Infinity;
@@ -264,7 +453,7 @@ function steeringRoom(a, goal, next) {
 export function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
  if(!Number.isFinite(goal?.x)||!Number.isFinite(goal?.z))return {x:0,z:0,dash:false,jump:false};
  const dx=goal.x-a.x,dz=goal.z-a.z,d=Math.hypot(dx,dz),t=a.tuning??{};
- const top=(sprint?BODY.dash:BODY.max)*(t.speed??1);
+ const top=(sprint?BODY.dash*(a.dashScale??1):BODY.max)*(t.speed??1);
  // Pass through intermediate points; only the actual destination needs a full stop.
  let speed=next?top:Math.min(top,d*2);
  if(next&&d>1e-6) {
@@ -288,21 +477,52 @@ export function worldSteering(a, goal, next, {sprint=true,room=10}={}) {
  return {x,z,dash:!!sprint,jump:false};
 }
 // Roles choose destinations, never position corrections or knowledge through walls.
-export function worldHuntAim(a,other,m){
- const gap=Math.hypot(a.x-other.x,a.z-other.z),speed=Math.hypot(other.vx??0,other.vz??0),top=BODY.dash*(a.tuning?.speed??1);
+export function worldHuntAim(a,other,m,cornerAccess){
+ const gap=Math.hypot(a.x-other.x,a.z-other.z),speed=Math.hypot(other.vx??0,other.vz??0),top=BODY.dash*(a.dashScale??1)*(a.tuning?.speed??1);
  const lead=m.role==='intercept'?clamp(gap/top*.65,.35,2.4):m.role==='patrol'?clamp(gap/top*.4,.6,1.5):.18;
  let target={x:other.x+(other.vx??0)*lead,z:other.z+(other.vz??0)*lead,y:other.y};
- if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05))target={x:other.x,z:other.z,y:other.y};
+ if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,target,cornerAccess))target={x:other.x,z:other.z,y:other.y};
  if(m.role==='patrol'&&gap>24&&speed>3){
   const nx=(other.vz??0)/speed,nz=-(other.vx??0)/speed,candidates=[];
   for(const side of[14,-14,22,-22]){const p={x:target.x+nx*side,z:target.z+nz*side};p.y=worldHeight(p.x,p.z);
-   if(!worldValid(p,(a.radius??2.7)+.2)||!worldTraversable(other,p,(other.radius??2.7)-.05))continue;
+   if(!worldValid(p,(a.radius??2.7)+.2)||!worldTraversable(other,p,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,p,cornerAccess))continue;
    const occupied=(m.reservedTargets??[]).reduce((sum,q)=>sum+Math.max(0,24-Math.hypot(q.x-p.x,q.z-p.z))*3,0);
    candidates.push({p,score:Math.hypot(a.x-p.x,a.z-p.z)+occupied});
   }
   candidates.sort((a,b)=>a.score-b.score);if(candidates.length)return{target:candidates[0].p,mode:'flank'};
  }
  return{target,mode:m.role==='intercept'?'intercept':'pursuit'};
+}
+
+// Pick a reachable meeting point, using only the observed direction and
+// speed. A blocked prediction ends at the obstruction; it cannot cross it.
+function worldInterceptShortcut(a,observed,cornerAccess){
+ const vx=observed.vx??0,vz=observed.vz??0,speed=Math.hypot(vx,vz);
+ const gap=Math.hypot(a.x-observed.x,a.z-observed.z),pad=(a.radius??2.7)+.2,runnerPad=(observed.radius??2.7)-.05;
+ if(!a.grounded||!observed.grounded||gap<16||speed<5||Math.abs(a.y-observed.y)>2.2)return null;
+ const top=BODY.dash*(a.dashScale??1)*(a.tuning?.speed??1);
+ const previousLead=clamp(gap/top*.65,.35,2.4);
+ const samples=[];let from=observed;
+ for(const seconds of [.55,.85,1.2,1.55,1.9,2.3,2.7,3.1]){
+  const x=observed.x+vx*seconds,z=observed.z+vz*seconds,point={x,z,y:worldHeight(x,z)};
+  if(!worldValid(point,runnerPad)||!worldTraversable(from,point,runnerPad)||!worldCornerPathAllowed(from,point,cornerAccess))break;
+  from=point;
+  if(seconds<previousLead+.12||speed*seconds<11||!worldValid(point,pad)||!worldCornerPathAllowed(a,point,cornerAccess))continue;
+  const direct=worldRouteSeconds(a,[point]);
+  if(direct<=seconds+.32)samples.push({point,seconds});
+ }
+ // Use the first practical meeting, before waiting far ahead. Check a
+ // routed shortcut only if a direct crossing is blocked for the hunter.
+ let routeChecks=0;
+ for(const {point,seconds} of samples){
+  const clear=worldTraversable(a,point,pad);
+  if(!clear&&routeChecks++>=2)continue;
+  const path=clear?[point]:worldRoute(a,point,cornerAccess);
+  if(!path.length||Math.hypot(path.at(-1).x-point.x,path.at(-1).z-point.z)>1)continue;
+  const cost=worldRouteSeconds(a,path);
+  if(cost<=seconds+.32&&cost+.2<worldRouteSeconds(a,[observed,point]))return{target:point,path};
+ }
+ return null;
 }
 function huntContactApproach(a,observed){
  const radius=a.radius??2.7,padding=radius+.2;
@@ -325,28 +545,92 @@ function huntContactApproach(a,observed){
  }
  return observed;
 }
-export function worldPilot(a,other,chasing,time,m,reachObserved=false){
+export function worldPilot(a,other,chasing,time,m,reachObserved=false,cornerAccess,cornerRamps=false,stableRamps=false,interceptShortcut=false){
  if(time>=m.next||!m.path){m.next=time+(!chasing&&m.escapeThreats?.length ? .4 : .65);const spec=opponentSpec(m.profile)??OPPONENTS[1],style=m.role==='pursuit'?'direct':m.role==='intercept'?'cutoff':m.role==='patrol'?'patrol':spec.movement?.style??spec.id,visible=!m.suppressSight&&Math.hypot(a.x-other.x,a.z-other.z)<(m.role==='patrol'?70:140)&&worldSight({...a,y:a.y+3},{...other,y:other.y+3});
  const movement=m.lastDecision?Math.hypot(a.x-m.lastDecision.x,a.z-m.lastDecision.z):Infinity;m.stuck=movement<.4&&m.target&&Math.hypot(m.target.x-a.x,m.target.z-a.z)>10?(m.stuck??0)+1:0;m.lastDecision={x:a.x,z:a.z};
  if(visible){m.seen={x:other.x,z:other.z,y:other.y,vx:other.vx,vz:other.vz};m.seenAt=time;m.searchPlan=null;m.searchIndex=0;}m.visible=visible;let target,plannedPath;if(!chasing&&visible&&Math.hypot(a.x-other.x,a.z-other.z)<55)m.sprintUntil=time+1.6;
- if(chasing&&visible){if(['pursuit','intercept','patrol'].includes(m.role)){const aim=worldHuntAim(a,other,m);target=aim.target;m.mode=aim.mode;}else{const horizon=style==='cutoff'?clamp(Math.hypot(a.x-other.x,a.z-other.z)/(BODY.dash*(a.tuning?.speed??1))*.65,.35,2.8):style==='direct'?.18:.8;target={x:other.x+other.vx*horizon,z:other.z+other.vz*horizon,y:other.y};if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05))target={x:other.x,z:other.z,y:other.y};m.mode=style==='cutoff'?'intercept':'pursuit';}m.goalSince=time;}
+ if(chasing&&visible){if(['pursuit','intercept','patrol'].includes(m.role)){const aim=worldHuntAim(a,other,m,cornerAccess);target=aim.target;m.mode=aim.mode;}else{const horizon=style==='cutoff'?clamp(Math.hypot(a.x-other.x,a.z-other.z)/(BODY.dash*(a.tuning?.speed??1))*.65,.35,2.8):style==='direct'?.18:.8;target={x:other.x+other.vx*horizon,z:other.z+other.vz*horizon,y:other.y};if(!worldValid(target,(a.radius??2.7)+.2)||!worldTraversable(other,target,(other.radius??2.7)-.05)||!worldCornerPathAllowed(other,target,cornerAccess))target={x:other.x,z:other.z,y:other.y};m.mode=style==='cutoff'?'intercept':'pursuit';}m.goalSince=time;}
  else if(chasing&&m.seen&&time-m.seenAt<18){const last=m.seen,gap=Math.hypot(a.x-last.x,a.z-last.z),atLast=gap<12;
   // The pursuer checks the actual old contact. Other roles may investigate
   // different exits nearby, using only that observation's direction and age.
   const branch=m.role==='intercept'?gap<70&&time-m.seenAt>=.75:m.role==='patrol'?gap<80&&time-m.seenAt>=1.1:false;
   if(!m.searchPlan&&!atLast&&!branch&&m.stuck<3&&m.path?.length!==0){target={x:last.x,z:last.z,y:last.y};m.mode='last-seen';}
-  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius,{role:m.role,reserved:m.searchReservations});m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){
+  else{if(!m.searchPlan){m.searchPlan=worldSearchPlan(last,a.radius,{role:m.role,reserved:m.searchReservations,cornerAccess});m.searchIndex=0;m.goalSince=time;}if(m.target&&m.mode==='search'&&(Math.hypot(a.x-m.target.x,a.z-m.target.z)<8||time-m.goalSince>4||m.stuck>=3)){
    m.searchIndex++;for(let i=0;i<m.searchPlan.length;i++){const p=m.searchPlan[(m.searchIndex+i)%m.searchPlan.length];if((m.searchReservations??[]).every(q=>Math.hypot(p.x-q.x,p.z-q.z)>=20)){m.searchIndex+=i;break;}}m.goalSince=time;
   }target=m.searchPlan[m.searchIndex%m.searchPlan.length];m.mode='search';}
  }
  else if(!chasing&&m.escapeThreats?.length){const escape=worldEscapeTeamPlan(a,m.escapeThreats,m.target);target=escape.target;plannedPath=escape.path;m.mode='escape';m.goalSince=time;}
  else if(!chasing&&visible){let best=-Infinity;const candidates=[];for(let i=0;i<WORLD_NODES.length;i+=3){const n=WORLD_NODES[i],distance=Math.hypot(n.x-a.x,n.z-a.z);if(distance<22||distance>75||!worldValid(n,(a.radius??2.7)+.2))continue;candidates.push({n,score:Math.hypot(n.x-other.x,n.z-other.z)-distance*.35});}candidates.sort((a,b)=>b.score-a.score);for(const c of candidates.slice(0,24)){const score=c.score+(worldSight({...other,y:other.y+3},{...c.n,y:c.n.y+3})?0:12+spec.cover*4);if(score>best){best=score;target=c.n;}}if(target){const escape=worldEscapePlan(a,other,target);target=escape.target;plannedPath=escape.path;}m.mode='escape';m.goalSince=time;
  }
- if(!target){if(m.target&&time-(m.goalSince??0)<4&&Math.hypot(a.x-m.target.x,a.z-m.target.z)>8&&m.stuck<3)target=m.target;else{target=localPatrol(a,m);m.goalSince=time;}m.mode='patrol';}
+ if(!target){if(m.target&&time-(m.goalSince??0)<4&&Math.hypot(a.x-m.target.x,a.z-m.target.z)>8&&m.stuck<3)target=m.target;else{target=localPatrol(a,m,cornerAccess);m.goalSince=time;}m.mode='patrol';}
  if(chasing&&reachObserved&&['pursuit','intercept','last-seen'].includes(m.mode))target=huntContactApproach(a,target);
- m.path=plannedPath??worldRoute(a,target);m.target={...target};m.at=worldRouteLookahead(a,m.path,0,!chasing&&m.escapeThreats?.length?m.escapeThreats:!chasing&&visible?m.seen:null);
+ m.path=plannedPath??worldRoute(a,target,cornerAccess);
+ if(cornerRamps&&chasing){
+  // Keep the observed ramp route while the wall masks the target on approach.
+  const known=visible?m.seen:m.seen&&time-m.seenAt<18?m.seen:null;
+  const withinDeck=known&&Math.abs(known.x-WORLD_DECK.x)<=WORLD_DECK.w/2&&
+   Math.abs(known.z)<WORLD_DECK.length/2+WORLD_DECK.ramp&&worldHeight(known.x,known.z)>=2;
+  let ramps=null;
+  if(stableRamps){
+   let commitment=withinDeck?m.deckRamp:null;
+   // Once a slope is selected, keep the entry and its waypoints. A fresh
+   // sighting updates the final destination, so it cannot flip the entrance.
+   if(commitment&&m.stuck>=3){m.avoidDeckEnd=commitment.end;m.avoidDeckUntil=time+5;commitment=null;}
+   if(commitment&&Math.abs(a.x-WORLD_DECK.x)<WORLD_DECK.w/2-a.radius&&
+      worldTraversable(a,known,a.radius+.04))commitment=null;
+   if(!commitment&&withinDeck){
+    const planned=deckRampRoute(a,known,time<(m.avoidDeckUntil??0)?-m.avoidDeckEnd:0,true);
+    if(Array.isArray(planned))ramps=planned;
+    else if(planned)commitment={end:planned.end,points:planned.points.slice(0,-1),at:0};
+   }
+   m.deckRamp=commitment;
+   if(commitment){
+    const p=commitment.points;
+    while(commitment.at<p.length&&Math.hypot(a.x-p[commitment.at].x,a.z-p[commitment.at].z)<2.4)commitment.at++;
+    ramps=[...p.slice(commitment.at),known];
+   }
+  }else if(known)ramps=deckRampRoute(a,known);
+  if(!ramps&&known&&cornerAccess>=0&&worldCornerIndex(known)===cornerAccess){
+   const knownFloor={x:known.x,z:known.z,y:worldHeight(known.x,known.z)};
+   const ordinary=worldCornerIndex(target)===cornerAccess&&Math.hypot(known.x-target.x,known.z-target.z)<3
+    ?m.path:worldRoute(a,knownFloor,cornerAccess);
+   const cornerPath=cornerRampRoute(a,knownFloor,cornerAccess,ordinary);
+   if(cornerPath.length&&worldCornerIndex(cornerPath.at(-1))===cornerAccess)ramps=cornerPath;
+  }
+  if(ramps){m.path=ramps;target=known;}
+  if(stableRamps){
+   let sweep=!known?m.deckSweep:null;
+   if(sweep){
+    const p=sweep.points;
+    while(sweep.at<p.length&&Math.hypot(a.x-p[sweep.at].x,a.z-p[sweep.at].z)<2.4)sweep.at++;
+    if(sweep.at>=p.length||m.stuck>=3||time>=sweep.until){sweep=null;m.deckSweepAt=time+6;}
+   }
+   if(!sweep&&!known&&time>=(m.deckSweepAt??0)){
+    const points=deckPerimeterSearch(a,cornerAccess);
+    if(points)sweep={points,at:0,until:time+14};
+    else m.deckSweepAt=time+2;
+   }
+   m.deckSweep=sweep;
+   if(sweep){m.path=sweep.points.slice(sweep.at);target=m.path.at(-1);}
+  }
+  m.raisedApproach=!!ramps||!!m.deckSweep;
  }
- const path=m.path??[];while(m.at<path.length-1&&Math.hypot(path[m.at].x-a.x,path[m.at].z-a.z)<2.8)m.at++;const goal=path[m.at]??a,next=path[m.at+1];let memo=worldSteeringMemos.get(a);if(!memo||memo.path!==path||memo.at!==m.at||memo.radius!==a.radius){memo={path,at:m.at,radius:a.radius,room:steeringRoom(a,goal,next)};worldSteeringMemos.set(a,memo);}return worldSteering(a,goal,next,{sprint:chasing||time<(m.sprintUntil??0),room:memo.room});
+ if(interceptShortcut){
+  const cut=chasing&&visible&&m.role==='intercept'&&!m.raisedApproach?worldInterceptShortcut(a,other,cornerAccess):null;
+  m.interceptShortcut=!!cut;
+  if(cut){target=cut.target;m.path=cut.path;}
+ }
+ m.target={...target};m.at=stableRamps&&(m.deckRamp||m.deckSweep)?0:worldRouteLookahead(a,m.path,0,!chasing&&m.escapeThreats?.length?m.escapeThreats:!chasing&&visible?m.seen:null,cornerAccess);
+ }
+ const committed=stableRamps&&(m.deckRamp||m.deckSweep);
+ if(committed){
+  const p=committed.points,i=committed.at;
+  if(i<p.length&&Math.hypot(a.x-p[i].x,a.z-p[i].z)<2.4)m.next=time;
+  // Keep the approach slow only at the existing sharp geometric turn:
+  // steering and the shared movement limits still make the actual turn.
+  return steerHuntRoute(a,m.path,0,true);
+ }
+ const path=m.path??[];while(m.at<path.length-1&&Math.hypot(path[m.at].x-a.x,path[m.at].z-a.z)<2.8)m.at++;return steerHuntRoute(a,path,m.at,chasing||time<(m.sprintUntil??0));
 }
 function startSpec(id,name,hint,p,c,swap=false){const pair=(a,b)=>Object.freeze({player:Object.freeze([...a]),cpu:Object.freeze([...b])});return Object.freeze({id,name,hint,escape:pair(p,c),chase:swap?pair(c,p):pair(p,c)});}
 export const WORLD_STARTS=Object.freeze([startSpec('boulevard','大通り','直線の勝負',[0,80],[8,-2]),startSpec('hill','氷の丘','坂とすべり',[-245,0],[-309,0],true),startSpec('courtyard','中庭','入口の読み合い',[0,-80],[0,0],true),startSpec('garden','庭のこみち','近道と氷',[-112,64],[-112,128],true),startSpec('basin','氷のくぼ地','勢いと切り返し',[112,132],[112,212],true)]);

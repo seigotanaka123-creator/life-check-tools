@@ -384,3 +384,38 @@ body.world-player-game.imasora-pop-menus .free-concrete .paint-recent button{min
  }
 }
 .free-door-routes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.free-door-routes[hidden],[data-door-run][hidden]{display:none!important}.free-door-routes button{min-height:48px;white-space:normal;font-size:14px}.free-door-routes small{grid-column:1/-1;font-size:12px;color:#43505c}.free-concrete [data-door-run]{display:flex;align-items:center;justify-content:space-between;gap:8px;grid-column:1/-1;background:#fff5d8;border-radius:12px;padding:6px 10px;color:#493d32;font-size:13px}.free-concrete [data-door-run] button{min-height:44px;min-width:64px}
+
+.world-free-playing .free-concrete [data-vehicle-key-help]{
+ grid-column:1/-1;
+ margin:0;
+ padding:7px 10px;
+ color:#143746;
+ background:#e5f1f4;
+ border:1px solid #b4ccd4;
+ border-radius:8px;
+ font-size:15px;
+ font-weight:700;
+ line-height:1.6;
+ white-space:pre-line;
+}
+.world-free-playing .free-concrete .free-hud-info [data-status],
+.world-free-playing .free-concrete .free-hud-notice,
+.world-free-playing .free-concrete .free-stock-strip{
+ font-size:14px;
+}
+.world-free-playing .free-concrete .free-seat-actions button,
+.world-free-playing .free-concrete .free-deck-open{
+ font-size:15px;
+}
+@media(min-width:701px){
+ .world-free-playing .free-concrete .free-deck-open,
+ .world-free-playing .free-concrete .free-deck{
+  right:calc(max(var(--thumb-edge,12px),env(safe-area-inset-right)) + 88px);
+ }
+ .world-free-playing .free-concrete .free-deck{max-width:calc(100% - 255px)}
+}
+@media(max-width:700px){
+ html[data-control-display] .world-free-playing .free-concrete .free-hud-top{
+  top:calc(max(10px,env(safe-area-inset-top)) + 44px);
+ }
+}

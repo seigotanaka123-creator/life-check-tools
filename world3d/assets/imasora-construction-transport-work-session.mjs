@@ -17,21 +17,39 @@ export class WorldTransportWorkSession{
  // replaces the flow and makes state and saved identical again.
  get dirty(){return !!this.#flow&&this.state!==this.saved;}
  #accept(){const flow=new WorldTransportWorkFlow(this.service.ledger.world.constructionTransport,{toolkit:()=>this.service.constructionToolkit});if(this.#intent&&!sameChecked(flow.record,this.#intent))throw Error('保存待ちの作業と読み取った作業が違います。');flow.setDeckContext(()=>nativeDeckSnapshot(this.service.ledger.world));flow.setSoilGuard(createTransportSoilGuard(()=>this.service.ledger.world));flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;}
- async #acceptAsync(){
+ async #acceptAsync({inlineValidation=false}={}){
   const base=this.service.ledger,generation=this.generation,raw=this.service.raw.current,record=base.world.constructionTransport;
   if(this.#intent&&!sameChecked(record,this.#intent))throw Error('保存待ちの作業と読み取った作業が違います。');
   const point=this.service.transportRestorePoint,checkedRestorePoint=point?.appliedRaw===raw&&point?.appliedGeneration===generation?point:null;
-  const flow=this.#flow?.acceptConfirmed(record)?this.#flow:await WorldTransportWorkFlow.open(record,{toolkit:()=>this.service.constructionToolkit,checkedRestorePoint});
+  const options={toolkit:()=>this.service.constructionToolkit};
+  const flow=this.#flow?.acceptConfirmed(record)?this.#flow:inlineValidation?
+   new WorldTransportWorkFlow(record,options):await WorldTransportWorkFlow.open(record,{...options,checkedRestorePoint});
   this.service.adoptConstructionTransportSnapshot(flow.record,base,generation,raw);flow.setDeckContext(()=>nativeDeckSnapshot(this.service.ledger.world));flow.setSoilGuard(createTransportSoilGuard(()=>this.service.ledger.world));flow.setMovementGuard(this.#movementGuard);this.#flow=flow;this.#intent=null;this.#opening=false;return this.state;
  }
- async open(){if(this.busy||this.#flow||this.#opening)throw Error('現場は既に開いているか保存中です。');this.#busy=true;try{if(this.service.ledger.world.constructionTransport?.version!==2){this.#opening=true;await this.service.enableConstructionTransportWork(this.snapshot(),this.service.world.constructionExcavation.revision);}return await this.#acceptAsync();}catch(e){if(!this.service.blocked)this.#opening=false;throw e;}finally{this.#busy=false;}}
+ async open({inlineValidation=false}={}){if(this.busy||this.#flow||this.#opening)throw Error('現場は既に開いているか保存中です。');this.#busy=true;try{if(this.service.ledger.world.constructionTransport?.version!==2){this.#opening=true;await this.service.enableConstructionTransportWork(this.snapshot(),this.service.world.constructionExcavation.revision);}return await this.#acceptAsync({inlineValidation});}catch(e){if(!this.service.blocked)this.#opening=false;throw e;}finally{this.#busy=false;}}
  setMovementGuard(guard){if(typeof guard!=='function')throw Error('移動先の確認が不正です。');this.#movementGuard=guard;this.#flow?.setMovementGuard(guard);}
  move(name,...args){if(this.busy||this.blocked||this.#intent||!this.#flow)throw Error('保存を確認してから操作してください。');return this.#flow.move(name,...args);}
  advance(next){if(next!==this.state)throw Error('画面の接触操作から作った動きだけを使ってください。');return next;}
- async save(next=this.state){if(this.busy||this.blocked||this.#intent||!this.#flow||next!==this.state)throw Error('画面の途中作業をそのまま保存してください。');this.#busy=true;this.#intent=this.#flow.record;
-  try{await this.service.saveConstructionTransportWork(this.#intent,this.snapshot(),this.#flow.base.work.revision,{readback:false});return await this.#acceptAsync();}
-  catch(e){if(!this.service.blocked)this.#intent=null;throw e;}finally{this.#busy=false;}}
- async retry(){if(this.busy||!this.intent||!this.service.blocked)throw Error('保存待ちの作業がありません。');this.#busy=true;try{await this.service.retry();return await this.#acceptAsync();}finally{this.#busy=false;}}
+ discardUnsaved(){
+  if(this.busy||this.blocked||this.intent||!this.#flow||
+    !sameChecked(this.#flow.base,this.service.ledger.world.constructionTransport))throw Error('ミッションを始めたときの保存を確認できません。');
+  return this.#flow.discardUnsaved();
+ }
+ async save(next=this.state,{signal,rainTrial}={}){if(this.busy||this.blocked||this.#intent||!this.#flow||next!==this.state)throw Error('画面の途中作業をそのまま保存してください。');this.#busy=true;this.#intent=this.#flow.record;
+  let committed=false;
+  try{
+   await this.service.saveConstructionTransportWork(this.#intent,this.snapshot(),this.#flow.base.work.revision,{readback:false,signal,rainTrial});
+   committed=true;
+   return await this.#acceptAsync();
+  }catch(e){if(!committed&&!this.service.blocked)this.#intent=null;throw e;}
+  finally{this.#busy=false;}
+ }
+ async retry(){
+  if(this.busy||!this.intent)throw Error('保存待ちの作業がありません。');
+  this.#busy=true;
+  try{if(this.service.blocked)await this.service.retry();return await this.#acceptAsync();}
+  finally{this.#busy=false;}
+ }
  async rebaseAfterRestoreAsync(){
   if(this.busy||this.blocked||this.intent)throw Error('現場の保存結果を先に確認してください。');
   const p=this.service.transportRestorePoint;

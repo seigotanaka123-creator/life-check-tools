@@ -121,7 +121,7 @@ export function actCrane(state,action,external=[],landing=null){
   if(!s.work||s.deployment<1){s.message='作業モードの展開完了を待ってください。';return s;}
   if(action==='pick'){
     const p=pickOption(s);if(!p){s.message='フックを部材の中央の上へ。巻き下げて近づけてください。';return s;}
-    if(collides(s,p,{external})){s.message='部材が本体の火星土へ食い込んでいるため吊れません。先に接触を解消してください。';return s;}
+    if(collides(s,p,{external})){s.message='部材が本体のアマネ星土へ食い込んでいるため吊れません。先に接触を解消してください。';return s;}
     // Placement searches nearby heights for snapping; removal must only consider
     // actual bottom-to-top contact, not a lower floor within that search window.
     const dependent=s.parts.find(q=>q.id!==p.id&&q.fixed&&Math.abs(q.y-(p.y+p.h))<.05&&polygonsOverlap(bounds(q),bounds(p)));
@@ -216,7 +216,7 @@ function solveEmptyHookContact(s,prior,external=[]){
     }
   }
   s.boom=boom;
-  if(contact)s.message='フックが支持脚または本体火星土に接触中です。巻上げや離れる方向へ操作できます。';
+  if(contact)s.message='フックが支持脚または本体アマネ星土に接触中です。巻上げや離れる方向へ操作できます。';
   else if(s.message.startsWith('フックが支持脚'))s.message='接触を抜けました。引き続きクレーンを操作できます。';
 }
 function solveCargoContact(s,prior,dt,external=[]){

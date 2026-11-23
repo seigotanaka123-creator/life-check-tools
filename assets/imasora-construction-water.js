@@ -24,7 +24,7 @@ for(let z=1;z<=11;z++)for(const x of[11,13])solids.add(waterKey(x,1,z));
 export const WATER_SOLIDS=solids;
 const inside=([x,y,z])=>x>=0&&x<WATER.nx&&y>=0&&y<WATER.ny&&z>=0&&z<WATER.nz;
 const clone=s=>structuredClone(s);
-export function initialWater(){return{schemaVersion:1,scope:'mars-water-development-v1',revision:0,tick:0,phase:0,running:false,feeding:false,gate:false,reservoir:WATER.total,cells:{},directions:Object.fromEntries(WATER_REGIONS.map(r=>[r.id,r.dir])),recovered:0,message:'「注水を始める」で、火星水が上へ流れます。水路を選んで向きを変えてみてください。'};}
+export function initialWater(){return{schemaVersion:1,scope:'mars-water-development-v1',revision:0,tick:0,phase:0,running:false,feeding:false,gate:false,reservoir:WATER.total,cells:{},directions:Object.fromEntries(WATER_REGIONS.map(r=>[r.id,r.dir])),recovered:0,message:'「注水を始める」で、アマネ星水が上へ流れます。水路を選んで向きを変えてみてください。'};}
 export function waterTotal(s){return s.reservoir+Object.values(s.cells).reduce((n,c)=>n+c.q,0);}
 export function waterDirection(s,k){return WATER_REGION_AT.has(k)?s.directions[WATER_REGION_AT.get(k)]:(s.cells[k]?.dir??8);}
 export const directionName=mask=>DIRECTIONS.filter((_,i)=>mask&(1<<i)).map(d=>d.name).join('＋')||'停止';
@@ -81,7 +81,7 @@ export function advanceWater(s,dt,options={}){
   s={...s,phase:s.phase+dt};while(s.phase>=WATER.dt-1e-9){s={...s,phase:Math.max(0,s.phase-WATER.dt)};s=tickWater(s,options);}return s;
 }
 export function validateWater(s){
-  if(s?.schemaVersion!==1||s.scope!=='mars-water-development-v1'||!Number.isSafeInteger(s.revision)||s.revision<0||!Number.isSafeInteger(s.tick)||s.tick<0||!Number.isFinite(s.phase)||s.phase<0||s.phase>=WATER.dt+1e-9)throw Error('火星水の保存形式が不正です。');
+  if(s?.schemaVersion!==1||s.scope!=='mars-water-development-v1'||!Number.isSafeInteger(s.revision)||s.revision<0||!Number.isSafeInteger(s.tick)||s.tick<0||!Number.isFinite(s.phase)||s.phase<0||s.phase>=WATER.dt+1e-9)throw Error('アマネ星水の保存形式が不正です。');
   for(const key of['running','feeding','gate'])if(typeof s[key]!=='boolean')throw Error('水の操作状態が不正です。');
   if(!Number.isSafeInteger(s.reservoir)||s.reservoir<0||s.reservoir>WATER.total||!Number.isSafeInteger(s.recovered)||s.recovered<0||!s.cells||Array.isArray(s.cells)||Object.keys(s.cells).length>WATER.total)throw Error('水量の保存状態が不正です。');
   for(const [k,c] of Object.entries(s.cells)){if(!/^\d+,\d+,\d+$/.test(k)||waterCoord(k).join(',')!==k||!inside(waterCoord(k))||WATER_SOLIDS.has(k)||WATER_OUTLETS.has(k)||!Number.isInteger(c?.q)||c.q<1||c.q>WATER.capacity||!Number.isInteger(c.dir)||c.dir<0||c.dir>63)throw Error('水の位置・量・向きが不正です。');}
@@ -91,4 +91,4 @@ export function validateWater(s){
 }
 const checksum=text=>{let n=2166136261;for(let i=0;i<text.length;i++)n=Math.imul(n^text.charCodeAt(i),16777619);return(n>>>0).toString(16);};
 export function packWater(s){validateWater(s);const payload=JSON.stringify(s);return{kind:'mars-water-development-v1',payload,checksum:checksum(payload)};}
-export function unpackWater(p){if(p?.kind!=='mars-water-development-v1'||typeof p.payload!=='string'||p.checksum!==checksum(p.payload))throw Error('火星水の保存が壊れています。上書きせず停止しました。');return validateWater(JSON.parse(p.payload));}
+export function unpackWater(p){if(p?.kind!=='mars-water-development-v1'||typeof p.payload!=='string'||p.checksum!==checksum(p.payload))throw Error('アマネ星水の保存が壊れています。上書きせず停止しました。');return validateWater(JSON.parse(p.payload));}

@@ -178,3 +178,72 @@ body.world-player-game[data-ufo-world-map=coast] .world-build-open{left:max(12px
 @media(max-height:500px){body.world-player-game[data-ufo-world-map=coast] .coast-place-clock{padding:6px 10px}.coast-place-clock strong{font-size:14px}.coast-place-clock span{font-size:11px}body.world-player-game[data-ufo-world-map=coast] .world-camera-controls.camera-distance-control{top:calc(max(12px,env(safe-area-inset-top)) + 56px)}body.world-player-game[data-ufo-world-map=coast] .world-build-open{top:calc(max(12px,env(safe-area-inset-top)) + 208px)}}
 
 @media(max-height:400px){body.world-player-game[data-ufo-world-map=coast] .world-camera-controls.camera-distance-control{display:grid;grid-template-columns:120px 120px;grid-template-rows:44px 44px;gap:6px 12px;width:252px}body.world-player-game[data-ufo-world-map=coast] #emergencyEscapeButton{grid-column:2;grid-row:1}body.world-player-game[data-ufo-world-map=coast] #cameraDistanceButton{grid-column:1;grid-row:1}body.world-player-game[data-ufo-world-map=coast] #cameraModeButton{grid-column:1;grid-row:2}body.world-player-game[data-ufo-world-map=coast] .world-build-open{left:144px;top:calc(max(12px,env(safe-area-inset-top)) + 106px)}}
+.coast-rumor-action {
+  position:absolute;z-index:14;transform:translate(-50%,-100%);
+  min-height:44px;padding:7px 16px;border:2px solid #ffefc1;border-radius:18px;
+  background:#163947;color:#fff6d9;box-shadow:0 4px 12px #071c2e88;
+  font:700 14px system-ui,sans-serif;cursor:pointer;touch-action:manipulation;
+}
+.coast-rumor-action:focus-visible,.coast-rumor-dialog button:focus-visible {outline:3px solid #83ddfa;outline-offset:4px}
+.coast-rumor-dialog {
+  position:fixed;inset:auto 0 max(16px,env(safe-area-inset-bottom));margin:0 auto;
+  box-sizing:border-box;width:min(550px,calc(100% - 28px));max-height:88dvh;
+  padding:17px 20px;border:2px solid #e3b773;border-radius:20px;
+  background:linear-gradient(140deg,#153843,#0d2837);color:#fff6df;
+  box-shadow:0 8px 28px #05141f99;font:600 16px/1.65 system-ui,sans-serif;
+}
+.coast-rumor-dialog::backdrop {background:linear-gradient(0deg,#061d30a0,transparent 62%)}
+.coast-rumor-dialog[data-phase="view"]::backdrop {background:transparent}
+body.coast-rumor-active :is(.world-player-bar,.world-camera-controls,.coast-place-clock,.coast-hud,.coast-search-compass,#buildMenuButton,#touchPad,#constructionJumpButton,#walkDashButton) {visibility:hidden!important}
+#coast-rumor-speaker {color:#ffe3a6;font-weight:800}
+.coast-rumor-dialog p {margin:7px 0 14px}
+.coast-rumor-dialog footer {display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.coast-rumor-dialog button {
+  min-height:44px;padding:7px 16px;border:1px solid #9dbec3;border-radius:12px;
+  background:#254857;color:#fff9e9;font:700 14px system-ui,sans-serif;cursor:pointer;
+}
+.coast-rumor-dialog [data-listen] {border-color:#fff2c8;background:#ffe2a4;color:#1e3540}
+@media(max-height:470px){.coast-rumor-dialog{padding:9px 13px;line-height:1.45}.coast-rumor-dialog p{margin:3px 0 7px}}
+.coast-observation-action {
+  position:absolute;z-index:14;left:50%;bottom:max(19%,calc(env(safe-area-inset-bottom) + 48px));
+  transform:translateX(-50%);white-space:nowrap;min-height:46px;
+  border:1px solid #ffe3a6;border-radius:12px;padding:8px 18px;
+  color:#172c33;background:#ffe6aa;box-shadow:0 4px 18px #051727b3;
+  font:750 15px system-ui,sans-serif;cursor:pointer;touch-action:manipulation;
+}
+.coast-observation-dialog[open] {
+  position:fixed;inset:auto 0 max(14px,env(safe-area-inset-bottom));margin:0 auto;
+  box-sizing:border-box;width:min(520px,calc(100% - 24px));max-height:calc(100dvh - 28px);
+  padding:14px 19px;border:1px solid #a78c60;border-radius:15px;
+  color:#fcf1d6;background:linear-gradient(155deg,#17343e,#0b202c);
+  box-shadow:0 6px 28px #07141e9e;font:550 15px/1.55 system-ui,sans-serif;
+}
+.coast-observation-dialog:not(.is-reading)::backdrop {background:linear-gradient(0deg,#0717259e,transparent 48%)}
+.coast-observation-dialog.is-reading::backdrop {background:#071725ad}
+.coast-observation-dialog.is-reading {inset:0;margin:auto}
+.coast-observation-dialog h2 {margin:0 0 6px;font-size:19px;color:#ffe5aa}
+.coast-observation-dialog p {margin:8px 0}
+.coast-observation-dialog canvas {
+  display:block;margin:auto;max-width:100%;height:auto;max-height:38dvh;object-fit:contain;
+}
+.coast-observation-marks,.coast-observation-dialog footer {display:flex;gap:8px;flex-wrap:wrap}
+.coast-observation-marks {margin-top:8px}
+.coast-observation-dialog footer {justify-content:flex-end}
+.coast-observation-dialog button {
+  min-height:44px;padding:5px 12px;border:1px solid #9abfc2;border-radius:9px;
+  color:#fcf6e5;background:#244550;font:700 14px system-ui,sans-serif;cursor:pointer;touch-action:manipulation;
+}
+.coast-observation-dialog [data-observation-read],.coast-observation-dialog [aria-pressed="true"] {
+  border-color:#ffe6aa;background:#ffe6aa;color:#182a33;
+}
+.coast-observation-action:focus-visible,.coast-observation-dialog button:focus-visible {
+  outline:3px solid #98e9ef;outline-offset:3px;
+}
+.coast-observation-dialog [data-observation-found] {
+  color:#ffe4a2;border-left:2px solid #b39562;padding-left:10px;
+}
+body:has(.coast-observation-dialog[open]) :is(.world-player-bar,.world-camera-controls,.coast-place-clock,.coast-hud,.coast-search-compass,#buildMenuButton,#touchPad,#constructionJumpButton,#walkDashButton) {
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}

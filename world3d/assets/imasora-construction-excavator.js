@@ -72,16 +72,22 @@ function externalVehicleObstacles(s,external=[]){
     Math.abs(b.x-v.x)<175+Math.hypot(b.w,b.d)/2&&Math.abs(b.z-v.z)<175+Math.hypot(b.w,b.d)/2&&
     b.y<54&&b.y+b.h>8).map(b=>({id:b.name||'建材',x:b.x,z:b.z,width:b.w,depth:b.d,height:b.h,y:b.y,angle:b.angle||0}));
 }
-export function armIntersections(s,padding=0,external=[]){
-  const pose=armPose(s),hits=new Set(),materials=externalMachineVolumes(s,external),sample=(p,r)=>{
+export function armIntersections(s,padding=0,external=[],pose=armPose(s)){
+  const hits=new Set(),materials=externalMachineVolumes(s,external),bin=s.binCollider??BIN;
+  const ground=s.groundPose,hasTerrain=Object.keys(s.terrain).length>0;
+  const sample=(p,r)=>{
     r+=padding;
     if(p.y-r<PLOT.bottom)hits.add('岩盤');
     if((p.x<PLOT.minX||p.x>PLOT.maxX||p.z<PLOT.minZ||p.z>PLOT.maxZ)&&p.y-r<0&&!s.groundPatches?.has([Math.floor(p.x/32),Math.floor(p.z/32)].join(',')))hits.add('固定地面');
-    const q=s.groundPose?s.groundPose.axes.map(a=>a.reduce((n,v,i)=>n+v*([p.x,p.y,p.z][i]-s.groundPose.position[i]),0)):null,local=q?{x:q[0],y:q[1],z:q[2]}:{...localToWorld({x:0,z:0,heading:-s.loader.vehicle.heading},p.x-s.loader.vehicle.x,p.z-s.loader.vehicle.z),y:p.y};
+    let local;
+    if(ground){
+      const [x,y,z]=ground.position,[a,b,c]=ground.axes,dx=p.x-x,dy=p.y-y,dz=p.z-z;
+      local={x:a[0]*dx+a[1]*dy+a[2]*dz,y:b[0]*dx+b[1]*dy+b[2]*dz,z:c[0]*dx+c[1]*dy+c[2]*dz};
+    }else local={...localToWorld({x:0,z:0,heading:-s.loader.vehicle.heading},p.x-s.loader.vehicle.x,p.z-s.loader.vehicle.z),y:p.y};
     if(Math.abs(local.x)<35+r&&Math.abs(local.z)<43+r&&local.y-r<17)hits.add('クローラー');
-    const dx=Math.abs(p.x-BIN.x),dz=Math.abs(p.z-BIN.z);
-    if(p.y-r<BIN.height&&p.y+r>0&&dx<BIN.width/2+r&&dz<BIN.depth/2+r&&(dx>BIN.width/2-3-r||dz>BIN.depth/2-3-r))hits.add('受け箱の縁');
-    for(let x=Math.floor((p.x-r)/CELL);x<=Math.floor((p.x+r)/CELL);x++)for(let y=Math.floor((p.y-r)/CELL);y<=Math.floor((p.y+r)/CELL);y++)for(let z=Math.floor((p.z-r)/CELL);z<=Math.floor((p.z+r)/CELL);z++){
+    const dx=Math.abs(p.x-bin.x),dz=Math.abs(p.z-bin.z);
+    if(p.y-r<bin.height&&p.y+r>0&&dx<bin.width/2+r&&dz<bin.depth/2+r&&(dx>bin.width/2-3-r||dz>bin.depth/2-3-r))hits.add('受け箱の縁');
+    if(hasTerrain)for(let x=Math.floor((p.x-r)/CELL);x<=Math.floor((p.x+r)/CELL);x++)for(let y=Math.floor((p.y-r)/CELL);y<=Math.floor((p.y+r)/CELL);y++)for(let z=Math.floor((p.z-r)/CELL);z<=Math.floor((p.z+r)/CELL);z++){
       const id=x+','+y+','+z;if(s.terrain[id])hits.add(`土:${id}`);
     }
     for(const o of s.spoil)if(near(o,p,4+r))hits.add(`排土:${o.id}`);
@@ -92,7 +98,32 @@ export function armIntersections(s,padding=0,external=[]){
       if(dx*dx+dz*dz<=r*r)hits.add(b.name||'建材');
     }
   };
-  for(let n=0;n<2;n++){const a=pose.world[n],b=pose.world[n+1],steps=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/2);for(let i=1;i<=steps;i++)sample({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps,z:a.z+(b.z-a.z)*i/steps},2.2);}
+  const segmentRadius=2.2,verticalPadding=segmentRadius+padding+1e-7;
+  const bareArea=!hasTerrain&&materials.length===0&&s.spoil.length===0;
+  const localAxis=(p,axis)=>{
+    const [x,y,z]=ground.position,[ax,ay,az]=ground.axes[axis];
+    return ax*(p.x-x)+ay*(p.y-y)+az*(p.z-z);
+  };
+  const outside=(a,b,center,radius)=>Math.min(a,b)>center+radius||Math.max(a,b)<center-radius;
+  const clearOfCrawler=(a,b)=>{
+    const ya=ground?localAxis(a,1):a.y,yb=ground?localAxis(b,1):b.y;
+    if(Math.min(ya,yb)>=17+verticalPadding)return true;
+    if(!ground)return false;
+    return outside(localAxis(a,0),localAxis(b,0),0,35+verticalPadding)||
+      outside(localAxis(a,2),localAxis(b,2),0,43+verticalPadding);
+  };
+  for(let n=0;n<2;n++){
+    const a=pose.world[n],b=pose.world[n+1];
+    // The segment lies between its endpoints in both coordinate frames.
+    // Skip the detailed samples only when these bounds rule out every hit.
+    const minY=Math.min(a.y,b.y);
+    if(bareArea&&minY>=verticalPadding&&
+      (minY>=bin.height+verticalPadding||
+       outside(a.x,b.x,bin.x,bin.width/2+verticalPadding)||
+       outside(a.z,b.z,bin.z,bin.depth/2+verticalPadding))&&clearOfCrawler(a,b))continue;
+    const steps=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/2);
+    for(let i=1;i<=steps;i++)sample({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps,z:a.z+(b.z-a.z)*i/steps},segmentRadius);
+  }
   if(isContactDig(s)){for(const hit of bucketEnvironmentHits(s,pose))hits.add(hit);}else sample(pose.bucket,6);return hits;
 }
 function armSamples(pose){

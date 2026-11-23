@@ -5,11 +5,26 @@ export const CAMERA_DISTANCE_PRESETS = Object.freeze([
   Object.freeze({label:'引き', distance:250}),
   Object.freeze({label:'遠景', distance:330}),
 ]);
+export const WORLD_CAMERA_PRESETS = Object.freeze([
+  ...CAMERA_DISTANCE_PRESETS,
+  Object.freeze({label:'上方', distance:205, pitch:-1.02}),
+]);
 export function cameraDistanceIndex(index) {
-  return Number.isInteger(index) ? Math.max(0, Math.min(3,index)) : 1;
+  return Number.isInteger(index) ? Math.max(0, Math.min(WORLD_CAMERA_PRESETS.length-1,index)) : 1;
+}
+export function cameraOrbitPreset(index) {
+  return WORLD_CAMERA_PRESETS[cameraDistanceIndex(index)];
+}
+export function orbitCameraPitch(index,base,adjustment) {
+  const preset=cameraOrbitPreset(index);
+  return preset.pitch===undefined?base+adjustment:Math.max(-1.35,Math.min(-.74,preset.pitch+adjustment));
+}
+export function conversationCameraIndex(index) {
+  const distance=cameraDistanceIndex(index);
+  return distance<CAMERA_DISTANCE_PRESETS.length?distance:1;
 }
 export function worldCameraDistance(index,{aspect=1,base=190,fit=0}={}) {
-  const distance=CAMERA_DISTANCE_PRESETS[cameraDistanceIndex(index)].distance;
+  const distance=cameraOrbitPreset(index).distance;
   // Narrow screens retain room either side of the monster. A fitted subject
   // still fits at the nearest setting; all four settings remain distinct.
   const portrait=Math.max(1,Math.min(1.4,.8/Math.max(.2,aspect)));
@@ -28,7 +43,7 @@ export function createFirstPersonLens(){
 }
 export function nextCameraDistance(mode,index) {
   // Pressing distance from eye view first returns to the labelled orbit.
-  return {mode:'third',index:mode==='first'?cameraDistanceIndex(index):(cameraDistanceIndex(index)+1)%4};
+  return {mode:'third',index:mode==='first'?cameraDistanceIndex(index):(cameraDistanceIndex(index)+1)%WORLD_CAMERA_PRESETS.length};
 }
 export function conversationFraming({width,height,panel,index=1,fov=48}) {
   const portrait=height>=width;
@@ -36,6 +51,6 @@ export function conversationFraming({width,height,panel,index=1,fov=48}) {
   const usableHeight=portrait?Math.max(height*.4,panel.top-12):height;
   const fraction=Math.max(.25,Math.min(usableHeight/height,usableWidth/height));
   const fit=38/(Math.tan(fov*Math.PI/360)*fraction);
-  return {distance:Math.max(115,fit)*(1+(cameraDistanceIndex(index)-1)*.16),
+  return {distance:Math.max(115,fit)*(1+(conversationCameraIndex(index)-1)*.16),
     offsetX:(width-usableWidth)/2,offsetY:(height-usableHeight)/2};
 }

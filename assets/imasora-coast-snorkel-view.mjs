@@ -3,6 +3,41 @@ import * as T from './three.module.min.js';
 import {SNORKEL,REEF_FISH,reefFish} from './imasora-coast-snorkeling.mjs?v=120ob';
 import {coastWalkingHeight} from './imasora-coast-layout.mjs?v=120mx';
 import {coastWave} from './imasora-coast-waves.mjs?v=120mx';
+// Each tuft is rooted to the existing seabed. Two static instance batches
+// give the water depth without adding collision shapes or extra fish.
+function eelgrassGeometry(){
+ const positions=[];
+ for(let leaf=0;leaf<6;leaf++){
+  const angle=leaf*2.399,h=.48+(leaf*31%13)*.043,bend=.26+leaf*.027;
+  const pt=(t,side)=>{
+   const w=.043*Math.sin(Math.PI*t)*side;
+   return [Math.sin(angle)*bend*t*t+Math.cos(angle)*w,h*t,Math.cos(angle)*bend*t*t-Math.sin(angle)*w];
+  };
+  for(let row=0;row<5;row++){
+   const a=row/5,b=(row+1)/5;
+   positions.push(...pt(a,-1),...pt(a,1),...pt(b,-1),...pt(a,1),...pt(b,1),...pt(b,-1));
+  }
+ }
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.computeVertexNormals();return geo;
+}
+function fanCoralGeometry(){
+ const points=[],normals=[];
+ function branch(x,y,z,endX,endY,endZ,r){
+  const curve=new T.CatmullRomCurve3([new T.Vector3(x,y,z),new T.Vector3((x+endX)*.39,(y+endY)*.52,(z+endZ)*.46),new T.Vector3(endX,endY,endZ)]);
+  const indexed=new T.TubeGeometry(curve,5,r,5),shape=indexed.toNonIndexed();
+  indexed.dispose();
+  points.push(...shape.attributes.position.array);
+  normals.push(...shape.attributes.normal.array);
+  shape.dispose();
+ }
+ branch(0,0,0,0,.76,0,.043);
+ for(let arm=0;arm<6;arm++){
+  const side=arm%2?-1:1,y=.20+(arm>>1)*.12,x=side*(.29-(arm>>1)*.039),z=Math.sin(arm*2.399)*.14;
+  branch(0,y,0,x,y+.39,z,.024);
+  branch(x*.56,y+.18,z*.62,x*1.17,y+.26,z+.07,.014);
+ }
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(points,3));geo.setAttribute('normal',new T.Float32BufferAttribute(normals,3));return geo;
+}
 export function createSnorkelView(){
  const root=new T.Group();root.name='潮音の島のシュノーケリング';root.position.set(SNORKEL.x,0,SNORKEL.z);root.visible=false;const materials=[],geometries=[],batches=[],pose=new T.Object3D(),color=new T.Color(),fishFields=['slot','generation','species','size','x','y','z','heading','vy'],fishPose=new Float64Array(16*9);let fishCount=-1,fishClock=NaN,disposed=false;
  const mat=(c,extra={})=>{const m=new T.MeshStandardMaterial({color:c,roughness:.55,...extra});materials.push(m);return m;};
@@ -10,7 +45,43 @@ export function createSnorkelView(){
  const batch=(g,m,n)=>{const o=new T.InstancedMesh(geo(g),m,n);o.instanceMatrix.setUsage(T.DynamicDrawUsage);o.frustumCulled=false;batches.push(o);root.add(o);return o;};
  const bodies=batch(new T.SphereGeometry(1,12,8),bodyMat,16),tails=batch(new T.ConeGeometry(1,1,3),bodyMat,16),eyes=batch(new T.SphereGeometry(1,6,4),dark,32),fins=batch(new T.ConeGeometry(1,1,3),bodyMat,16),stripes=batch(new T.TorusGeometry(1,.14,4,12),dark,32);
  function stamp(mesh,n,x,y,z,sx,sy,sz,h=0,rx=0){pose.position.set(x-SNORKEL.x,y,z-SNORKEL.z);pose.scale.set(sx,sy,sz);pose.rotation.set(rx,h,0);pose.updateMatrix();mesh.setMatrixAt(n,pose.matrix);}
- const garden=batch(new T.IcosahedronGeometry(1,0),mat(0x8bd2b5),30);for(let n=0;n<30;n++){const f=reefFish(n%16,Math.floor(n/16)),x=f.x+(n%3)*9,z=f.z-14;stamp(garden,n,x,coastWalkingHeight(x,z)+2,z,3+n%3,2,5,n);garden.setColorAt(n,color.setHex([0x77bca4,0xf4b49d,0xb4a9dc][n%3]));}garden.instanceMatrix.needsUpdate=true;
+ const sway={value:0},grassMat=mat(0xffffff,{side:T.DoubleSide,emissive:0x213d37,emissiveIntensity:.34}),fanMat=mat(0xffffff,{roughness:.82,emissive:0x4b394a,emissiveIntensity:.3});
+ grassMat.onBeforeCompile=shader=>{
+  shader.uniforms.reefSway=sway;
+  shader.vertexShader='uniform float reefSway;\n'+shader.vertexShader.replace('#include <begin_vertex>',
+   '#include <begin_vertex>\ntransformed.x+=transformed.y*transformed.y*.18*sin(reefSway*1.12+instanceMatrix[3].x*.024+instanceMatrix[3].z*.013);');
+ };
+ const grass=batch(eelgrassGeometry(),grassMat,160),fans=batch(fanCoralGeometry(),fanMat,104);
+ grass.name='流れに揺れる海草';fans.name='岩礁の扇形サンゴ';
+ let grassCount=0,fanCount=0;
+ const grassColours=[0x68b698,0x82bd91,0x5b968c,0x539685],fanColours=[0xf4a88a,0xd88797,0x9e96d6,0xe7b38c];
+ for(let col=0;col<11;col++)for(let row=0;row<9;row++){
+  const seed=col*9+row,x=SNORKEL.x-328+col*84+Math.sin(seed*29)*31,z=SNORKEL.z-258+row*65+Math.cos(seed*13)*29,y=coastWalkingHeight(x,z);
+  if(y>-45||y< -514)continue;
+  const cluster=.5+.5*Math.sin(col*1.1+row*.75),scale=20+cluster*22;
+  stamp(grass,grassCount,x,y+.35,z,scale,scale,scale,seed*2.399);
+  grass.setColorAt(grassCount++,color.setHex(grassColours[seed%grassColours.length]));
+  if(cluster>.63&&grassCount<grass.instanceMatrix.count){
+   const gx=x-16,gz=z+11,gy=coastWalkingHeight(gx,gz);
+   stamp(grass,grassCount,gx,gy+.3,gz,scale*.81,scale*.81,scale*.81,seed*.53);
+   grass.setColorAt(grassCount++,color.setHex(grassColours[(seed+2)%grassColours.length]));
+  }
+  if(seed%3===0||cluster>.7&&seed%2===0){
+   const fx=x+13,fz=z-9,fy=coastWalkingHeight(fx,fz),size=19+cluster*21;
+   if(fy< -45&&fanCount+1<fans.instanceMatrix.count){
+    stamp(fans,fanCount,fx,fy+.45,fz,size,size,size,seed*1.13);
+    fans.setColorAt(fanCount++,color.setHex(fanColours[seed%fanColours.length]));
+    const nx=fx+8,nz=fz+8,ny=coastWalkingHeight(nx,nz),small=size*.67;
+    stamp(fans,fanCount,nx,ny+.45,nz,small,small,small,seed*1.13+1.6);
+    fans.setColorAt(fanCount++,color.setHex(fanColours[(seed+1)%fanColours.length]));
+   }
+  }
+ }
+ grass.count=grassCount;fans.count=fanCount;
+ for(const p of [grass,fans]){
+  p.instanceMatrix.setUsage(T.StaticDrawUsage);p.instanceMatrix.needsUpdate=true;p.instanceColor.needsUpdate=true;
+  p.computeBoundingSphere();p.frustumCulled=true;
+ }
  const mesh=(g,m,parent=root)=>{const o=new T.Mesh(geo(g),m);parent.add(o);return o;};
  const stand=new T.Group();stand.position.set(SNORKEL.entry.x-SNORKEL.x,coastWalkingHeight(SNORKEL.entry.x,SNORKEL.entry.z),SNORKEL.entry.z-SNORKEL.z);root.add(stand);
  mesh(new T.CylinderGeometry(13,15,1,12),mint,stand).position.y=.5;
@@ -27,13 +98,6 @@ export function createSnorkelView(){
  const mask=new T.Group();mask.name='マスクと曲がった呼吸管';mask.visible=false;const rim=mesh(new T.TorusGeometry(6,1,6,16),mint,mask);rim.scale.x=1.45;mesh(new T.CircleGeometry(5.8,16),glass,mask).scale.x=1.45;
  const pipeMat=mat(0xf08a69,{emissive:0x713b2c,emissiveIntensity:.18}),mouthMat=mat(0x31526c),pipeCurve=new T.CatmullRomCurve3([new T.Vector3(-7,-2,0),new T.Vector3(-10,-1,-1),new T.Vector3(-12,3,-2),new T.Vector3(-12,13,-2),new T.Vector3(-11,16,-2),new T.Vector3(-8,16,-2)]);
  const pipe=mesh(new T.TubeGeometry(pipeCurve,20,1.15,8,false),pipeMat,mask);pipe.name='サンゴ色の呼吸管';const mouth=mesh(new T.BoxGeometry(4,2.5,3),mouthMat,mask);mouth.position.set(-7,-2,0);const cap=mesh(new T.CylinderGeometry(1.65,1.65,2.5,8),mint,mask);cap.position.set(-8,16,-2);cap.rotation.z=Math.PI/2;root.add(mask);
- // A lightweight two-piece arm joins each authored shoulder to its real hand.
- const arms=[0,1].map(n=>{const g=new T.Group();g.name=n?'右腕（シュノーケリング）':'左腕（シュノーケリング）';root.add(g);return{group:g,upper:mesh(new T.CylinderGeometry(1,1,1,8),mint,g),lower:mesh(new T.CylinderGeometry(1,1,1,8),mint,g),joint:mesh(new T.SphereGeometry(1,8,6),mint,g),source:null};});
- const shoulder=new T.Vector3(),elbow=new T.Vector3(),wrist=new T.Vector3(),armDirection=new T.Vector3(),armUp=new T.Vector3(0,1,0),armBend=new T.Vector3();
- function joinArm(part,a,b,radius){part.position.copy(a).add(b).multiplyScalar(.5);part.position.x-=SNORKEL.x;part.position.z-=SNORKEL.z;armDirection.subVectors(b,a);part.scale.set(radius,Math.max(.01,armDirection.length()),radius);part.quaternion.setFromUnitVectors(armUp,armDirection.normalize());}
- function updateArms(character,firstPerson){const rig=character?.userData.walkRig;for(const[n,a]of arms.entries()){const h=rig?.hands?.[n];a.group.visible=!!h&&firstPerson;if(!h||!firstPerson)continue;const source=Array.isArray(h.part.material)?h.part.material[0]:h.part.material;if(a.source!==source){// Borrow the actual skin without owning or disposing it. Recolouring and
- // character swaps now stay consistent, with no accumulating material clones.
- for(const p of[a.upper,a.lower,a.joint])p.material=source;a.source=source;}const base=h.basePosition??h.part.position,sign=n?1:-1;shoulder.copy(base);shoulder.x-=sign*2/character.scale.x;shoulder.y+=2/character.scale.y;shoulder.z-=.5/character.scale.z;character.localToWorld(shoulder);h.part.getWorldPosition(wrist);elbow.copy(shoulder).add(wrist).multiplyScalar(.5).add(armBend.set(sign*1.4,-.6,0).applyQuaternion(character.quaternion));const radius=Math.max(.7,h.part.scale.x*character.scale.x*.48);joinArm(a.upper,shoulder,elbow,radius);joinArm(a.lower,elbow,wrist,radius*.9);a.joint.position.set(elbow.x-SNORKEL.x,elbow.y,elbow.z-SNORKEL.z);a.joint.scale.setScalar(radius);}}
  const marker=mesh(new T.TorusGeometry(11,.8,6,20),mat(0xffe78d,{emissive:0xffcb60,emissiveIntensity:.5}));marker.visible=false;
  const handPoint=new T.Vector3(),facePoint=new T.Vector3(),handScale=new T.Vector3();let hiddenCharacter=null,hiddenCharacterVisible=true;
  const handViews=[0,1].map(n=>{const m=mesh(new T.SphereGeometry(1,12,8),mint);m.name=n?'手元の右手':'手元の左手';m.visible=false;return m;});
@@ -41,7 +105,7 @@ export function createSnorkelView(){
 
  function highlight(target,character){if(disposed)return;marker.visible=!!target;if(target){marker.position.set(target.x-SNORKEL.x,target.y,target.z-SNORKEL.z);marker.quaternion.copy(character?.quaternion??new T.Quaternion());}}
  function update({visible,fish=[],target=null,active=false,character=null,time=0,waveTime=0,swing=0,aim=null,swimming=false,firstPerson=false}){
-  if(disposed)return;ownBody(character,visible&&active&&firstPerson);for(const h of handViews)h.visible=false;root.visible=visible;if(!visible)return;stand.visible=!active;garden.visible=boundary.visible=true;
+  if(disposed)return;ownBody(character,visible&&active&&firstPerson);for(const h of handViews)h.visible=false;root.visible=visible;if(!visible)return;stand.visible=!active;grass.visible=fans.visible=active;boundary.visible=true;sway.value=waveTime;
   // A paused swimmer (or an unused beach rack) must not upload identical fish
   // batches every frame. Compare real poses too: catches and restored fish can
   // change at the same clock. Live waves and the hand-held net stay independent.
@@ -54,7 +118,7 @@ export function createSnorkelView(){
   stripes.count=stripeCount;bodies.count=tails.count=fins.count=fish.length;eyes.count=fish.length*2;for(const m of[bodies,tails,eyes,fins,stripes]){m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;}fishCount=fish.length;fishClock=time;for(let n=0;n<fish.length;n++)for(let k=0;k<fishFields.length;k++)fishPose[n*9+k]=fish[n][fishFields[k]]??0;}
   for(let n=0;n<9;n++){const a=-Math.PI/2+n*Math.PI/8,x=SNORKEL.x+Math.cos(a)*(SNORKEL.rx-12),z=SNORKEL.z+Math.sin(a)*(SNORKEL.rz-12);stamp(boundary,n,x,coastWave(x,z,waveTime).height+1,z,4,4,4);}boundary.instanceMatrix.needsUpdate=true;
   highlight(target,character);
-  net.visible=active&&!!character;mask.visible=net.visible&&!firstPerson;for(const a of arms)a.group.visible=net.visible;bubbles.visible=false;if(!character||!active)return;character.updateMatrixWorld(true);updateArms(character,firstPerson);if(firstPerson)for(const[n,h]of (character.userData.walkRig?.hands??[]).entries()){const m=handViews[n];if(!m)continue;m.visible=true;m.geometry=h.part.geometry;m.material=h.part.material;h.part.getWorldPosition(handPoint);m.position.set(handPoint.x-SNORKEL.x,handPoint.y,handPoint.z-SNORKEL.z);h.part.getWorldQuaternion(m.quaternion);h.part.getWorldScale(handScale);m.scale.copy(handScale);}const rig=character.userData.walkRig,hand=rig?.hands?.[1]?.part;
+  net.visible=active&&!!character;mask.visible=net.visible&&!firstPerson;bubbles.visible=false;if(!character||!active)return;character.updateMatrixWorld(true);if(firstPerson)for(const[n,h]of (character.userData.walkRig?.hands??[]).entries()){const m=handViews[n];if(!m)continue;m.visible=true;m.geometry=h.part.geometry;m.material=h.part.material;h.part.getWorldPosition(handPoint);m.position.set(handPoint.x-SNORKEL.x,handPoint.y,handPoint.z-SNORKEL.z);h.part.getWorldQuaternion(m.quaternion);h.part.getWorldScale(handScale);m.scale.copy(handScale);}const rig=character.userData.walkRig,hand=rig?.hands?.[1]?.part;
   let tool=null;if(hand){hand.getWorldPosition(handPoint);tool=snorkelNetPose(handPoint,character.rotation.y,swing,aim);net.position.set(handPoint.x-SNORKEL.x,handPoint.y,handPoint.z-SNORKEL.z);net.rotation.set(tool.pitch,tool.yaw,0,'YXZ');}else net.visible=false;
   const b=character.userData.snorkelNeutralBody??character.userData.collisionFootprint,scale=character.scale.y,offset=character.userData.grounding?.verticalOffset??0;
   const faceEyes=character.userData.faceFeatures??[];if(faceEyes.length){facePoint.set(0,0,0);for(const eye of faceEyes)facePoint.add(eye.getWorldPosition(handPoint));facePoint.multiplyScalar(1/faceEyes.length);}else{facePoint.set(0,((b?.maxY??40)*.72-offset)/scale,((b?.halfZ??12)*.92)/scale);character.localToWorld(facePoint);}mask.position.set(facePoint.x-SNORKEL.x,facePoint.y,facePoint.z-SNORKEL.z);mask.quaternion.copy(character.quaternion);

@@ -1,5 +1,6 @@
 // The driver's feet in the cab are not the chassis support height.
-export const VEHICLE_MAX_Y = 516;
+// Covers the full quarry relief (605) and the chassis at a crest.
+export const VEHICLE_MAX_Y = 630;
 export function validVehicleHeight(v) {
   return v?.groundY === undefined || Number.isFinite(v.groundY)
     && v.groundY >= -64 && v.groundY <= VEHICLE_MAX_Y;

@@ -1,3 +1,4 @@
+import {quarryChassis} from '../imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 import * as T from '../three.module.min.js';
 
 export const VEHICLE_WHEELS=Object.freeze([-29,29].flatMap(x=>[-30,-13,26].map(z=>Object.freeze({x,z}))));
@@ -13,6 +14,32 @@ const problem=(reason='step')=>Error(({
 // Fit the chassis to the six wheel heights. Suspension absorbs small smooth
 // irregularities; it is never a fallback over missing ground or a cliff.
 export function vehicleGroundPose(f,v,heightAt=()=>0){
+ try{return sixWheelGroundPose(f,v,heightAt);}
+ catch(error){
+  if(!f?.parkingCorner||v.legs||!heightAt.quarryHeight)throw error;
+  const {x:ox,z:oz}=f.location;
+  const g=quarryChassis(v,36,44,(x,z,h)=>heightAt(ox+x,oz+z,h),(x,z)=>heightAt.quarryHeight(ox+x,oz+z));
+  if(!g)throw error;
+  const axes=g.axes.map(a=>new T.Vector3(...a));
+  const rotation=new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(...axes)),position=new T.Vector3(...g.position);
+  // A wheel can be unloaded over an edge. Only upward penetration means
+  // the supporting plane is too low. Measure every original tyre patch.
+  let lift=0;
+  const patch=[];
+  for(const wheel of VEHICLE_WHEELS)for(let dx=-3;dx<=3;dx++)for(const dz of [-1,0,1]){
+   const p=new T.Vector3(wheel.x+dx,0,wheel.z+dz).applyQuaternion(rotation).add(position);
+   const y=heightAt(ox+p.x,oz+p.z,v.groundY??0);
+   if(!Number.isFinite(y)||!(Math.abs(y-heightAt.quarryHeight(ox+p.x,oz+p.z))<.05))throw error;
+   patch.push(y-p.y);lift=Math.max(lift,y-p.y);
+  }
+  position.y+=lift;
+  const maxPatchError=Math.max(0,...patch.map(error=>error-lift));
+  const contacts=VEHICLE_WHEELS.map(({x,z})=>new T.Vector3(x,0,z).applyQuaternion(rotation).add(position));
+  const extra=64*(1-axes[1].y);
+  return {position,rotation,contacts,suspension:Array(6).fill(0),slope:g.slope,quarryDescent:true,maxPatchError,maxSuspension:0,padX:64*Math.abs(axes[1].x*Math.cos(v.heading)-axes[1].z*Math.sin(v.heading))+extra,padZ:64*Math.abs(axes[1].x*Math.sin(v.heading)+axes[1].z*Math.cos(v.heading))+extra};
+ }
+}
+function sixWheelGroundPose(f,v,heightAt){
  if(!f?.location||![v.x,v.z,v.heading].every(Number.isFinite))throw problem();
  const sample=(x,z)=>{const h=heightAt(f.location.x+x,f.location.z+z,v.groundY??0);if(!Number.isFinite(h))throw problem('missing');return h;};
  const yaw=new T.Quaternion().setFromAxisAngle(UP,v.heading),points=VEHICLE_WHEELS.map(p=>new T.Vector3(p.x,0,p.z).applyQuaternion(yaw).add(new T.Vector3(v.x,0,v.z)));
@@ -21,29 +48,45 @@ export function vehicleGroundPose(f,v,heightAt=()=>0){
  const b=VEHICLE_WHEELS.reduce((s,p,i)=>s+(p.z-meanZ)*(heights[i]-meanH),0)/VEHICLE_WHEELS.reduce((s,p)=>s+(p.z-meanZ)**2,0),slope=Math.hypot(a,b);
  if(slope>VEHICLE_GROUND.maxSlope+1e-8)throw problem('slope');
  const tilt=new T.Quaternion().setFromUnitVectors(UP,new T.Vector3(-a,1,-b).normalize()),rotation=yaw.clone().multiply(tilt),position=new T.Vector3(v.x,meanH-b*meanZ,v.z),up=UP.clone().applyQuaternion(rotation);
- const contacts=[],suspension=[];let maxPatchError=0;
+ const contacts=[],suspension=[],probe=new T.Vector3();let maxPatchError=0;
  for(const wheel of VEHICLE_WHEELS){
   let offset=0,p;
   // The suspension follows the tilted chassis normal, so changing its extension
   // also changes X/Z slightly. Resolve the contact against the same surface.
-  for(let i=0;i<6;i++){p=new T.Vector3(wheel.x,offset,wheel.z).applyQuaternion(rotation).add(position);offset+=(sample(p.x,p.z)-p.y)/up.y;}
+  for(let i=0;i<6;i++){
+   probe.set(wheel.x,offset,wheel.z).applyQuaternion(rotation).add(position);
+   const correction=(sample(probe.x,probe.z)-probe.y)/up.y;
+   if(correction===0)break;
+   offset+=correction;
+  }
   if(Math.abs(offset)>VEHICLE_GROUND.maxSuspension+1e-8)throw problem();
   p=new T.Vector3(wheel.x,offset,wheel.z).applyQuaternion(rotation).add(position);
   if(Math.abs(p.y-sample(p.x,p.z))>1e-5)throw problem();
   // A 2-unit soil cavity can fit between the former three lateral probes.
   // Resolve the full contact width at 1-unit spacing, including rotated tyres.
-  for(let dx=-3;dx<=3;dx++)for(const dz of [-1,0,1]){const q=new T.Vector3(wheel.x+dx,offset,wheel.z+dz).applyQuaternion(rotation).add(position);maxPatchError=Math.max(maxPatchError,Math.abs(q.y-sample(q.x,q.z)));}
+  for(let dx=-3;dx<=3;dx++)for(const dz of [-1,0,1]){const q=probe.set(wheel.x+dx,offset,wheel.z+dz).applyQuaternion(rotation).add(position);maxPatchError=Math.max(maxPatchError,Math.abs(q.y-sample(q.x,q.z)));}
   if(maxPatchError>VEHICLE_GROUND.maxPatchError+1e-8)throw problem();
   // Check the leading/trailing tire arc as well as the bottom contact patch.
   // A curb must not already pass through the wheel before its centre reaches it.
-  for(const dx of [-3,0,3])for(const dz of [-8,-6,-4,-2,2,4,6,8]){const rise=8-Math.sqrt(64-dz*dz),q=new T.Vector3(wheel.x+dx,offset+rise,wheel.z+dz).applyQuaternion(rotation).add(position);if(sample(q.x,q.z)>q.y+.15)throw problem();}
+  for(const dx of [-3,0,3])for(const dz of [-8,-6,-4,-2,2,4,6,8]){const rise=8-Math.sqrt(64-dz*dz),q=probe.set(wheel.x+dx,offset+rise,wheel.z+dz).applyQuaternion(rotation).add(position);if(sample(q.x,q.z)>q.y+.15)throw problem();}
   contacts.push(p);suspension.push(offset);
  }
  // A ridge between the axles can miss every tire but still hit the chassis.
- for(let x=-42;x<=42;x+=6)for(let z=-48;z<=48;z+=6){const q=new T.Vector3(x,7,z).applyQuaternion(rotation).add(position);if(sample(q.x,q.z)>q.y)throw problem('chassis');}
+ for(let x=-42;x<=42;x+=6)for(let z=-48;z<=48;z+=6){const q=probe.set(x,7,z).applyQuaternion(rotation).add(position);if(sample(q.x,q.z)>q.y)throw problem('chassis');}
  // Tilting the cab moves its roof beyond the old horizontal footprint.
  const normal=UP.clone().applyQuaternion(tilt),extra=61*(1-normal.y);
  return{position,rotation,contacts,suspension,slope,maxPatchError,maxSuspension:Math.max(...suspension.map(Math.abs)),padX:64*Math.abs(normal.x)+extra,padZ:64*Math.abs(normal.z)+extra};
+}
+
+// A verification pass can encounter the same parked car or pose repeatedly.
+// A new pass gets a new reader so contact changes are visible immediately.
+export function createVehicleGroundReader(f,heightAt){
+ const poses=new Map();
+ return v=>{
+  const key=[v.x,v.z,v.heading,v.groundY??0].join(',');
+  if(!poses.has(key))poses.set(key,vehicleGroundPose(f,v,heightAt));
+  return poses.get(key);
+ };
 }
 
 export function applyVehicleGround(model,ground){
@@ -56,7 +99,7 @@ export function vehicleGroundError(model,ground){
 }
 
 export function placeVehicleDriver(root,actor,model){
- root.updateMatrixWorld(true);actor.position.copy(root.worldToLocal(model.root.localToWorld(new T.Vector3(-15,19,21))));actor.quaternion.copy(model.root.quaternion);
+ actor.position.copy(root.worldToLocal(model.root.localToWorld(new T.Vector3(-15,19,21))));actor.quaternion.copy(model.root.quaternion);
 }
 
 export function vehicleLevelWorkProblem(f,v,heightAt=()=>0,allowRaised=true){
@@ -65,4 +108,4 @@ export function vehicleLevelWorkProblem(f,v,heightAt=()=>0,allowRaised=true){
 }
 
 // Persist only the measured chassis support, never the seated actor's feet.
-export function measuredVehicleMove(f,a,heightAt){if(a.type!=='FREE_MOVE')return a;const from=f[a.vehicle],v={...from,x:a.x,z:a.z,heading:a.heading},g=vehicleGroundPose(f,v,heightAt);return{...a,groundY:g.position.y};}
+export function measuredVehicleMove(f,a,heightAt,groundAt=null){if(a.type!=='FREE_MOVE')return a;const from=f[a.vehicle],v={...from,x:a.x,z:a.z,heading:a.heading},g=groundAt?groundAt(v):vehicleGroundPose(f,v,heightAt);return{...a,groundY:g.position.y};}

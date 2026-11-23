@@ -60,7 +60,7 @@ function fit(w,h,tile){
 
 export function createHuntBroadcastViews({renderer,scene,source,documentTarget=document}){
  let wideOffset=null,screenRival=null;
- let canvas,ctx,mode='multi',last=-Infinity,token,epoch,frame,screenCanvas,screenContext,screenEnabled=false,screenActive=false,desktopFrame=false;
+ let canvas,ctx,mode='multi',last=-Infinity,nextDesktopFrame=null,token,epoch,frame,screenCanvas,screenContext,screenEnabled=false,screenActive=false,desktopFrame=false;
  const viewport=new T.Vector4(),scissor=new T.Vector4(),opponentCamera=new T.PerspectiveCamera(56,1,.15,900),wideCamera=opponentCamera.clone();
  const projected=new T.Vector3();
  const opponentSmooth=createHuntReplayCamera(),screenOpponentSmooth=createHuntReplayCamera(),wideSmooth=createHuntReplayCamera();
@@ -98,13 +98,23 @@ export function createHuntBroadcastViews({renderer,scene,source,documentTarget=d
   if(!visible&&screenCanvas){screenCanvas.hidden=true;screenRival=null;}
   return visible;
  }
- function reset(){last=-Infinity;wideOffset=null;screenRival=null;opponentSmooth.reset();screenOpponentSmooth.reset();wideSmooth.reset();}
+ function reset(){last=-Infinity;nextDesktopFrame=null;wideOffset=null;screenRival=null;opponentSmooth.reset();screenOpponentSmooth.reset();wideSmooth.reset();}
  function setLayout(next){mode=next==='single'?'single':'multi';reset();}
  function begin(now,state,active,{round,replaying,paused,desktop=true,screen=false,mainCamera}){
   desktopFrame=desktop&&!!ctx;
   if(!desktopFrame&&!screen)return null;
   if(token!==round||epoch!==replaying){token=round;epoch=replaying;reset();}
-  if(now-last<1000/(desktopFrame?(mode==='multi'?15:30):10))return null;
+  if(desktopFrame){
+   const interval=1000/(mode==='multi'?15:30);
+   // Keep the cadence steady when callbacks arrive slightly early.
+   // Skip elapsed slots instead of rendering a backlog.
+   const due=nextDesktopFrame??now;
+   if(now+1<due)return null;
+   nextDesktopFrame=due+interval*(1+Math.floor(Math.max(0,now+1-due)/interval));
+  }else{
+   nextDesktopFrame=null;
+   if(now-last<100)return null;
+  }
   const dt=paused?0:Number.isFinite(last)?Math.min(.1,(now-last)/1000):0;
   last=now;
   if(desktopFrame){ctx.fillStyle='#102231';ctx.fillRect(0,0,W,H);}

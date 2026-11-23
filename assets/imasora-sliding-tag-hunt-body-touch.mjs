@@ -6,7 +6,7 @@ import{worldHeight,worldSight}from'./imasora-sliding-tag-hunt-world.mjs';
 import{huntDiveTilt,huntTerrainTilt}from'./imasora-sliding-tag-hunt-dive.mjs';
 export const DEFAULT_TOUCH_SHAPE='white-michi-road-saber-ren';
 export function huntTouchShapeKey(companion){return companion?['seed','sprout','young'].includes(companion.stage)?'companion-'+companion.stage:companion.artId:DEFAULT_TOUCH_SHAPE;}
-export function validHuntTouchShape(key){return typeof key==='string'&&Object.hasOwn(HUNT_TOUCH_SHAPES,key);}
+export function validHuntTouchShape(key){return typeof key==='string'&&(Object.hasOwn(HUNT_TOUCH_SHAPES,key)||Object.hasOwn(HUNT_RENDERED_TOUCH_UPDATES,key));}
 const cache=new WeakMap();
 const xyzPairs=[[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]];
 function rotate([x,y,z],yaw,pitch,roll){

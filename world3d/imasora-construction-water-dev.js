@@ -18,7 +18,7 @@ for(const b of document.querySelectorAll('[data-dir]'))b.onclick=()=>act('direct
 $('view').onclick=()=>{view=(view+1)%3;$('view').textContent=['視点：全体','視点：正面','視点：上から'][view];};
 $('help-open').onclick=()=>$('help').showModal();$('help-close').onclick=()=>$('help').close();
 $('export').onclick=()=>{try{$('export-data').textContent=JSON.stringify(session.blocked?session.raw:packWater(state),null,2);$('export-data').hidden=false;}catch(e){state.message=e.message;refresh();}};
-async function save(){if(testMode||!ready||session.busy||session.blocked)return;try{await session.save(state);$('save-status').textContent='火星水専用に保存済み';autosave=0;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();}
+async function save(){if(testMode||!ready||session.busy||session.blocked)return;try{await session.save(state);$('save-status').textContent='アマネ星水専用に保存済み';autosave=0;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();}
 $('save').onclick=save;
 function refresh(){
   const q=Object.values(state.cells).reduce((n,c)=>n+c.q,0);$('reservoir').textContent=(state.reservoir*.25).toFixed(1);$('in-course').textContent=(q*.25).toFixed(1);$('total').textContent=(waterTotal(state)*.25).toFixed(1);
@@ -45,4 +45,4 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   ui+=dt;if(ui>.1){ui=0;refresh();if(ready&&!testMode&&!session.blocked&&state.revision!==session.savedRevision){if(!session.busy)$('save-status').textContent='変更あり（自動保存待ち）';if(autosave>15&&!session.busy)save();}}
 }
 window.addEventListener('error',e=>{state.message='表示エラー：'+e.message;refresh();});window.addEventListener('unhandledrejection',e=>{state.message='処理エラー：'+(e.reason?.message||e.reason);refresh();});
-try{if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('この練習区画は、今の端末で開いてください。');if(!testMode){const loaded=await session.load();if(loaded)state=loaded;}ready=true;$('save-status').textContent=testMode?'確認用：保存しません':'火星水専用の保存を使用';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();requestAnimationFrame(frame);
+try{if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('この練習区画は、今の端末で開いてください。');if(!testMode){const loaded=await session.load();if(loaded)state=loaded;}ready=true;$('save-status').textContent=testMode?'確認用：保存しません':'アマネ星水専用の保存を使用';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();requestAnimationFrame(frame);

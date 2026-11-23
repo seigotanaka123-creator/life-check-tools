@@ -15,10 +15,61 @@ export function createLiveOutputAudio(audio){
 }
 // A separate, game-only live window. OBS captures this window, not the desktop.
 export function createLiveOutput({canvas,captureCanvas=()=>canvas,windowTarget=globalThis.window,makeAudio=()=>null,gameName='鬼ごっこ',onLost=()=>{},setTimer=setTimeout,clearTimer=clearTimeout}={}){
- const owner='imasora-live-'+Math.random().toString(36).slice(2);let child=null,stream=null,audio=null,check=null,video=null,ready=false,lastHud='',generation=0,audioRetryBlocked=false;
- function close(notify=false){generation++;const old=child,capture=stream,tap=audio,player=video;child=null;stream=null;audio=null;video=null;ready=false;audioRetryBlocked=false;if(check!==null)clearTimer(check);check=null;try{player?.pause();if(player)player.srcObject=null;}catch{}for(const track of capture?.getVideoTracks?.()??[])try{track.stop();}catch{}try{tap?.release();}catch{}try{old?.close();}catch{}if(notify&&old)onLost();}
- function attachAudio(){if(audio||!stream||audioRetryBlocked)return;let candidate;const added=[];try{candidate=makeAudio();for(const track of candidate?.stream?.getAudioTracks?.()??[]){added.push(track);stream.addTrack(track);}if(candidate&&ready&&!video?.muted)candidate.monitor?.(false);audio=candidate;}catch(error){for(const track of added)try{stream?.removeTrack?.(track);}catch{}try{candidate?.release();}catch{}audioRetryBlocked=true;throw error;}}
- function watch(){const id=generation;check=setTimer(()=>{if(id!==generation)return;check=null;if(!child||child.closed){close(true);return;}audioRetryBlocked=false;watch();},500);}
+ const owner='imasora-live-'+Math.random().toString(36).slice(2);
+ let child=null,stream=null,audio=null,check=null,video=null,ready=false,lastHud='',generation=0,audioRetryBlocked=false;
+ function close(notify=false){
+  generation++;
+  const old=child,capture=stream,tap=audio?.tap,player=video;
+  child=null;stream=null;audio=null;video=null;ready=false;audioRetryBlocked=false;
+  if(check!==null)clearTimer(check);
+  check=null;
+  try{player?.pause();if(player)player.srcObject=null;}catch{}
+  for(const track of capture?.getVideoTracks?.()??[])try{track.stop();}catch{}
+  try{tap?.release();}catch{}
+  try{old?.close();}catch{}
+  if(notify&&old)onLost();
+ }
+ function detachAudio(connection){
+  if(audio!==connection)return;
+  audio=null;
+  for(const track of connection.tracks)try{connection.capture.removeTrack?.(track);}catch{}
+  try{connection.tap.release();}catch{}
+ }
+ function attachAudio(){
+  if(audio||!stream||audioRetryBlocked)return;
+  const capture=stream,tracks=[];
+  let tap;
+  try{
+   tap=makeAudio();
+   if(!tap)return;
+   for(const track of tap.stream?.getAudioTracks?.()??[]){
+    if(track.readyState==='ended')throw Error('配信用の音声を取得できませんでした。');
+    tracks.push(track);
+    capture.addTrack(track);
+   }
+   if(ready&&!video?.muted)tap.monitor?.(false);
+   const connection={tap,tracks,capture};
+   for(const track of tracks)track.addEventListener?.('ended',()=>detachAudio(connection),{once:true});
+   audio=connection;
+  }catch(error){
+   for(const track of tracks)try{capture.removeTrack?.(track);}catch{}
+   try{tap?.release();}catch{}
+   audioRetryBlocked=true;
+   throw error;
+  }
+ }
+ function watch(){
+  const id=generation;
+  check=setTimer(()=>{
+   if(id!==generation)return;
+   check=null;
+   if(!child||child.closed){close(true);return;}
+   if(audio?.tracks.some(track=>track.readyState==='ended'))detachAudio(audio);
+   audioRetryBlocked=false;
+   try{attachAudio();}catch{}
+   watch();
+  },500);
+ }
  function open(){if(child&&!child.closed){child.focus();return true;}if(child)close(true);const source=captureCanvas();if(typeof source?.captureStream!=='function')throw Error('このブラウザでは配信用画面を作れません。OBSでゲームのウィンドウを選んでください。');
   child=windowTarget.open('about:blank','imasora_walk_live_output_v1','popup,width=1280,height=720');if(!child)throw Error('配信用画面が開けません。ポップアップの設定を確認してください。');
   try{const previous=child.document.documentElement?.dataset.liveOwner;if(previous&&previous!==owner){child=null;throw Error('別のゲームの配信用画面が開いています。先にそちらで配信を終了してください。');}}catch(e){child=null;throw e;}
@@ -30,34 +81,47 @@ export function createLiveOutput({canvas,captureCanvas=()=>canvas,windowTarget=g
    // A rejected play() may arrive after this popup is closed or replaced.
    // Both the output and the latest user activation must still own the reply.
    const current=attempt=>id===generation&&child===openedChild&&!openedChild.closed&&video===player&&attempt===playback;
-   const monitor=value=>{try{audio?.monitor?.(value);}catch{}};
+   const monitor=value=>{try{audio?.tap.monitor?.(value);}catch{}};
+   function showPlaying(){
+    ready=true;waiting.hidden=true;waiting.style.display='none';
+    enable.textContent='音を有効にする';enable.hidden=!player.muted;
+    monitor(!!player.muted);
+   }
+   function showInterrupted(){
+    ready=false;waiting.hidden=false;waiting.style.display='grid';
+    waiting.textContent='映像を再開するには、右下のボタンを押してください';
+    enable.textContent='映像を再開する';enable.hidden=false;
+    monitor(true);
+   }
+   player.addEventListener?.('pause',()=>{
+    if(!current(playback)||!player.paused)return;
+    playback++;
+    showInterrupted();
+   });
+   player.addEventListener?.('playing',()=>{
+    if(current(playback)&&!player.paused)showPlaying();
+   });
    async function play(){
     const attempt=++playback;
     try{
      await player.play();
      if(!current(attempt))return;
-     ready=true;waiting.hidden=true;waiting.style.display='none';enable.hidden=true;
-     monitor(false);
+     if(player.paused===true)showInterrupted();else showPlaying();
     }catch{
      if(!current(attempt))return;
      player.muted=true;
      try{
       await player.play();
       if(!current(attempt))return;
-      ready=true;waiting.hidden=true;waiting.style.display='none';
-      enable.textContent='音を有効にする';enable.hidden=false;
-      monitor(true);
+      if(player.paused===true)showInterrupted();else showPlaying();
      }catch{
       if(!current(attempt))return;
-      ready=false;waiting.hidden=false;waiting.style.display='grid';
-      waiting.textContent='映像を再開するには、右下のボタンを押してください';
-      enable.textContent='映像を再開する';enable.hidden=false;
-      monitor(true);
+      showInterrupted();
      }
     }
    }
    enable.onclick=()=>{player.muted=false;void play();};void play();for(const track of stream.getVideoTracks())track.addEventListener?.('ended',()=>{if(id===generation)close(true);},{once:true});watch();return true;
   }catch(e){close();throw Error('配信用画面を準備できませんでした。');}}
  function update(text){if(!child||child.closed)return;try{attachAudio();}catch{}const value=String(text).slice(0,160);if(value===lastHud)return;lastHud=value;try{child.document.querySelector('#live-hud').textContent=value;}catch{close(true);}}
- return{open,close,update,get ready(){return ready&&!!child&&!child.closed&&stream?.getVideoTracks?.().some(t=>t.readyState==='live');},get opened(){return!!child&&!child.closed;}};
+ return{open,close,update,get ready(){return ready&&!video?.paused&&!!child&&!child.closed&&stream?.getVideoTracks?.().some(t=>t.readyState==='live');},get opened(){return!!child&&!child.closed;}};
 }

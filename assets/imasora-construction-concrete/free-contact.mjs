@@ -1,3 +1,4 @@
+import {FIELD} from '../imasora-construction-shared-field.mjs?v=121cw';
 import {groundTile,groundHeight} from './ground-grid.mjs?v=120hb';
 import {ROUTE_EPS,pointBoxDistance,segmentBoxDistance,clearanceBlocked,hoseSegmentBlocked,externalSegmentBlocked} from './free-route-clearance.mjs';
 import {workVehicleState} from './work-vehicle-height.mjs?v=120ov';
@@ -81,7 +82,7 @@ function* walkingObstacles(f,ignoreVehicle){
  for(const name of ['truck','pump'])if(name!==ignoreVehicle){const v=f[name];yield{...v,hx:v.legs?40:33,hz:44};}
  if(!['design','complete'].includes(f.stage))for(let i=0;i<16;i++)if(f.mask&(1<<i)){const t=groundTile(i,f);yield{...t,hx:t.w/2+.3,hz:t.d/2+.3};};
 }
-const outside=(f,p)=>![p.x,p.z].every(Number.isFinite)||Math.abs(p.x+f.location.x)>2600||Math.abs(p.z+f.location.z)>1700;
+const outside=(f,p)=>![p.x,p.z].every(Number.isFinite)||Math.abs(p.x+f.location.x)>FIELD.maxX-16||Math.abs(p.z+f.location.z)>FIELD.maxZ-16;
 export function walkingObjectsBlocked(f,x,z,external=()=>false,ignoreVehicle=null,heightAt=null){
  const p={x,z};if(![x,z].every(Number.isFinite)||external(x+f.location.x,z+f.location.z,14-ROUTE_EPS)||hoseSegmentBlocked(pipeContactPath(f,heightAt),p,p,14))return true;
  for(const box of walkingObstacles(f,ignoreVehicle))if(clearanceBlocked(pointBoxDistance(p,box),14))return true;return false;

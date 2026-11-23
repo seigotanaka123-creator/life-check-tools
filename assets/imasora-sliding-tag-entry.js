@@ -5,7 +5,18 @@ for(const e of entries){if(e.previousName)aliases.set(e.previousName,e);for(cons
 const normalizeId=value=>{const id=typeof value==='string'?value.replace(/^current-/,''):'';return id==='white-michi-road-saber-ren'?'star-white-hero-young-seed-walk-sky-cool-b-forest':id==='seed-white'?'white-seed-walk':id==='sprout-seed-white'?'white-sprout-seed-walk':id.replace(/^white-hero-/,'hero-white-').replace(/^young-white-/,'white-young-');};
 function get(value){return typeof value==='string'?(ids.get(normalizeId(value))||names.get(value)||aliases.get(value)||null):null;}
 function name(value,fallback=''){return get(value)?.name||fallback;}
-function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const selected=ids.get(m.evolutionArtId);
+const family=m.seedId.replace('seed-',''),stageNames=['タネ期','新芽期','青葉期','開花期','満開期'];
+if(selected?.family===family&&selected.stage===stageNames[m.evolutionStage]&&(m.evolutionStage!==4||Number(m.lifeExtensionUses||0)>=3))return selected.id;
+const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function followChosenLineage(monster,previousId){
+ const previous=ids.get(previousId),next=ids.get(currentId(monster));
+ if(!previous||!next||previousId!==monster.evolutionArtId||previous.family!==next.family)return;
+ const alternatives=children(previousId).filter(row=>row.stage===next.stage);
+ if(!alternatives.length)return;
+ const branch=alternatives.find(row=>row.id===next.id)||alternatives.find(row=>row.id.endsWith('-'+next.id.split('-').at(-1)));
+ if(branch)monster.evolutionArtId=branch.id;
+}
 function currentName(m,fallback=''){return name(currentId(m),fallback);}
 function record(value,fallback='記録モンスター'){if(!value||typeof value!=='object')return name(value,fallback);for(const key of [value.artId,value.characterId,value.monsterId,value.sourceMonsterId,value.appearance?.artId,value.art?.id,value.item?.id,value.profileId,value.id]){const e=get(key);if(e)return e.name;}if(/(?:playtest-retired-full-|記録テスト)1$/.test(String(value.id||value.name||'')))return name('star-white-hero-young-seed-walk-sky-cool-b-forest');const named=get(value.name)||get(value.baseName);if(named)return named.name;if(value.monster&&typeof value.monster==='object'){const id=currentId({...value.monster,seedId:value.monster.seedId||value.seedId,lifeExtensionUses:Number(value.monster.evolutionStage)===4?Math.max(3,Number(value.monster.lifeExtensionUses||0)):value.monster.lifeExtensionUses});if(ids.has(id))return ids.get(id).name;}return name(value.name||value.baseName,String(value.name||value.baseName||fallback));}
 const escape=s=>[...s].map(c=>[92,94,36,46,42,43,63,40,41,91,93,123,125,124].includes(c.codePointAt(0))?String.fromCharCode(92)+c:c).join('');
@@ -13,7 +24,7 @@ const textAliases=new Map([...aliases].map(([old,e])=>[old,e.name]));for(const [
 function text(value,{protect=[]}={}){const input=String(value??''),protectedNames=new Set(protect.filter(v=>typeof v==='string'&&v)),cacheKey=JSON.stringify([...protectedNames].sort());let regex=textCache.get(cacheKey);if(!regex){const tokens=[...new Set([...textAliases.keys(),...protectedNames])].sort((a,b)=>b.length-a.length);regex=new RegExp('(^|[^ァ-ヶー])('+tokens.map(escape).join('|')+')(?=$|[^ァ-ヶー])','g');if(textCache.size>=16)textCache.delete(textCache.keys().next().value);textCache.set(cacheKey,regex);}regex.lastIndex=0;return input.replace(regex,(match,prefix,token)=>prefix+(protectedNames.has(token)?token:textAliases.get(token)||token));}
 
 function children(value){const id=get(value)?.id;return id?entries.filter(e=>e.parentId===id):[];}
-return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,record,text,children});
+return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,followChosenLineage,record,text,children});
 });
 /* END MONSTER NAME REGISTRY */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.ImasoraSlidingTagEntry=api;})(globalThis,function(){
@@ -33,14 +44,114 @@ return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,
 /* TAG_GROWTH_RUNTIME */
 (function(root,factory){const api=factory();root.ImasoraTagGrowth=api;})(globalThis,function(){
  'use strict';
- const POLICY=Object.freeze({id:'tag-common-growth-v2',rules:'tag-corner-reversal-v64',skyAgeMs:12*60*60*1000,xpSeconds:180,coinSeconds:180,materialSeconds:180,itemSeconds:900,evolutionSeconds:900,ticketSeconds:1800,seedSeconds:2700,boxSeconds:900,sailingSeconds:1800,victoryPoints:10,victoryMovingRatio:.3});
- const eligibleRules=rule=>rule===POLICY.rules||rule==='tag-balloon-descent-turn-v88'||rule==='tag-training-step-v87'||rule==='tag-extra-balloons-v86'||rule==='tag-balloon-drop-pursuit-v85'||rule==='tag-opening-supply-v84'||rule==='tag-dive-facing-v83'||rule==='tag-cloak-witness-v82'||rule==='tag-balloon-air-approach-v81'||rule==='tag-balloon-fan-descent-v80'||rule==='tag-rendered-contact-v79'||rule==='tag-jump-rest-continuity-v78'||rule==='tag-cloak-ink-v77'||rule==='tag-team-pressure-v76'||rule==='tag-stable-balloon-v75'||rule==='tag-territory-search-v74'||rule==='tag-jump-recovery-v73'||rule==='tag-courtyard-team-v72'||rule==='tag-courtyard-reacquire-v71'||rule==='tag-courtyard-wind-v70'||rule==='tag-runner-fan-v69'||rule==='tag-runner-cushion-v68'||rule==='tag-runner-supply-v67'||rule==='tag-corner-search-v66'||rule==='tag-contact-approach-v65'||rule==='tag-shorter-rest-v63'||rule==='tag-air-pursuit-v62'||rule==='tag-rear-mirror-v61'||rule==='tag-balloon-dive-spacing-v58'||rule==='tag-dive-head-contact-v59'||rule==='tag-balloon-committed-landing-v60';
+ const POLICY=Object.freeze({id:'tag-common-growth-v3',rules:'tag-corner-reversal-v64',skyAgeMs:12*60*60*1000,xpSeconds:180,coinSeconds:180,materialSeconds:180,itemSeconds:900,evolutionSeconds:900,ticketSeconds:1800,seedSeconds:2700,boxSeconds:900,sailingSeconds:1800,victoryPoints:10,victoryMovingRatio:.3});
+ const eligibleRules=rule=>rule===POLICY.rules||rule==='tag-hunter-dash-v109'||rule==='tag-intercept-lead-v113'||rule==='tag-jump-reaction-v114'||rule==='tag-jump-onset-delay-v115'||rule==='tag-perimeter-route-v112'||rule==='tag-fastest-dash-cap-v111'||rule==='tag-direct-drop-v110'||rule==='tag-hunter-pursuit-v108'||rule==='tag-escape-balance-restore-v107'||rule==='tag-ledge-pursuit-v106'||rule==='tag-cpu-chase-restore-v105'||rule==='tag-chase-restore-v104'||rule==='tag-escape-dash-v103'||rule==='tag-escape-turn-v102'||rule==='tag-balloon-corner-v101'||rule==='tag-balloon-glide-v100'||rule==='tag-balloon-exit-v99'||rule==='tag-training-ledge-v98'||rule==='tag-corner-exit-v97'||rule==='tag-continuous-chase-v96'||rule==='tag-landing-dive-v95'||rule==='tag-balloon-pursuit-v94'||rule==='tag-corner-chase-v93'||rule==='tag-fair-chase-v92'||rule==='tag-opening-pickup-v91'||rule==='tag-runner-tactics-v90'||rule==='tag-role-balance-v89'||rule==='tag-balloon-descent-turn-v88'||rule==='tag-training-step-v87'||rule==='tag-extra-balloons-v86'||rule==='tag-balloon-drop-pursuit-v85'||rule==='tag-opening-supply-v84'||rule==='tag-dive-facing-v83'||rule==='tag-cloak-witness-v82'||rule==='tag-balloon-air-approach-v81'||rule==='tag-balloon-fan-descent-v80'||rule==='tag-rendered-contact-v79'||rule==='tag-jump-rest-continuity-v78'||rule==='tag-cloak-ink-v77'||rule==='tag-team-pressure-v76'||rule==='tag-stable-balloon-v75'||rule==='tag-territory-search-v74'||rule==='tag-jump-recovery-v73'||rule==='tag-courtyard-team-v72'||rule==='tag-courtyard-reacquire-v71'||rule==='tag-courtyard-wind-v70'||rule==='tag-runner-fan-v69'||rule==='tag-runner-cushion-v68'||rule==='tag-runner-supply-v67'||rule==='tag-corner-search-v66'||rule==='tag-contact-approach-v65'||rule==='tag-shorter-rest-v63'||rule==='tag-air-pursuit-v62'||rule==='tag-rear-mirror-v61'||rule==='tag-balloon-dive-spacing-v58'||rule==='tag-dive-head-contact-v59'||rule==='tag-balloon-committed-landing-v60';
  const INBOX='imasora-tag-growth-inbox-v1',SKY_INBOX='imasora-tag-sky-inbox-v1',MAX_PENDING=8;
  const object=v=>!!v&&typeof v==='object'&&!Array.isArray(v),int=v=>Number.isSafeInteger(v)&&v>=0,check=(v,c)=>{if(!v)throw Error(c);},copy=v=>JSON.parse(JSON.stringify(v)),id=v=>typeof v==='string'&&/^tag:[A-Za-z0-9_-]{8,80}$/.test(v);
  function subject(s){const m=s?.monster;check(object(m)&&int(m.bornAt)&&m.bornAt>0&&/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId),'TAG_MONSTER_UNAVAILABLE');return JSON.stringify([m.bornAt,m.seedId]);}
  function progress(s){const p=s.tagGrowth===undefined?{version:1,receipts:[],stats:null,sky:null}:copy(s.tagGrowth);check(object(p)&&p.version===1&&Array.isArray(p.receipts)&&p.receipts.length<=50000&&p.receipts.every(id)&&new Set(p.receipts).size===p.receipts.length,'TAG_PROGRESS_UNREADABLE');if(p.stats!==null)check(object(p.stats)&&typeof p.stats.subject==='string'&&int(p.stats.ticks)&&int(p.stats.evolutions)&&(p.stats.lastFinishedAt===undefined||int(p.stats.lastFinishedAt))&&Array.isArray(p.stats.photos)&&p.stats.photos.every(x=>typeof x==='string')&&p.stats.photos.length<=5,'TAG_PROGRESS_UNREADABLE');for(const [key,max]of [['walkPhotos',50000],['usedEvolutionPhotos',5]])if(p[key]!==undefined)check(Array.isArray(p[key])&&p[key].length<=max&&p[key].every(x=>typeof x==='string'&&x.length>0&&x.length<=120)&&new Set(p[key]).size===p[key].length,'TAG_PROGRESS_UNREADABLE');if(p.victories!==undefined)validateVictories(p.victories);return p;}
  function skyValid(sky,who,now){return object(sky)&&sky.source==='camera-confirmed'&&sky.subject===who&&['blue','cloud','sunset','morning'].includes(sky.skyId)&&typeof sky.captureId==='string'&&sky.captureId.length>0&&sky.captureId.length<=120&&int(sky.capturedAt)&&sky.capturedAt>0&&int(sky.confirmedAt)&&sky.confirmedAt>=sky.capturedAt&&sky.confirmedAt<=now&&now>=sky.capturedAt&&now-sky.capturedAt<=POLICY.skyAgeMs;}
- function cameraCandidate(candidate,now){check(int(now)&&now>0,'TAG_PHOTO_UNCONFIRMED');check(candidate?.source==='camera-candidate'&&['blue','cloud','sunset'].includes(candidate.skyId)&&typeof candidate.captureId==='string'&&candidate.captureId.length>0&&candidate.captureId.length<=120&&int(candidate.capturedAt)&&candidate.capturedAt>0&&now>=candidate.capturedAt&&now-candidate.capturedAt<=5*60*1000&&Number.isFinite(candidate.score)&&candidate.score>=0&&candidate.score<=1,'TAG_PHOTO_UNCONFIRMED');}
+ function legacyTicket(t){return t.policy==='tag-common-growth-v1'||t.policy==='tag-common-growth-v2';}
+ function ticketSkyValid(t,who){return legacyTicket(t)?skyValid(t.sky,who,t.issuedAt):(t.policy===POLICY.id||t.policy===CARD_POLICY&&matchSkyValid(t.matchSky,t.config))&&t.sky===undefined;}
+ function tagEvolutionStatus(s,{rules,canGrow=true}={}){
+  const p=progress(s),who=subject(s),stage=s.monster.evolutionStage??0;
+  const stats=p.stats?.subject===who?p.stats:null,evolutions=stats?.evolutions??0;
+  const remainingTicks=Math.max(0,(evolutions+1)*POLICY.evolutionSeconds*120-(stats?.ticks??0));
+  const goal={stage,evolutions};
+  if(!canGrow)return{status:'growth-paused',goal,remainingTicks};
+  if(stage===4)return{status:'maximum',goal,remainingTicks};
+  if(remainingTicks>0)return{status:'playing',goal,remainingTicks};
+  const plan=rules?.plan(s.monster);
+  return{status:plan?.status==='needs-rest'?'needs-rest':'ready',goal,remainingTicks};
+ }
+ function prepareTagEvolutionPhoto(s,photo,ctx){
+  const milestone=tagEvolutionStatus(s,{rules:ctx.rules,canGrow:ctx.preview||ctx.canGrow!==false});
+  check(milestone.status==='ready'&&photo.goal?.stage===milestone.goal.stage&&photo.goal?.evolutions===milestone.goal.evolutions,'TAG_EVOLUTION_CHANGED');
+  check(int(photo.openedAt)&&photo.openedAt>0&&photo.openedAt<=photo.candidate.capturedAt,'TAG_EVOLUTION_CHANGED');
+  return prepareSky(s,photo.candidate,{...ctx,who:photo.subject,canGrow:!ctx.preview});
+ }
+ const SKY_CARDS=Object.freeze({blue:'青空',cloud:'曇り空',sunset:'夕焼け',morning:'朝空'});
+ const CARD_POLICY='tag-sky-cards-v1',CARDS_FOR_EVOLUTION=3,ESCAPES_FOR_CARD=2;
+ function evolutionBranches(artId,names=globalThis.ImasoraMonsterNames){
+  const children=names.children(artId);
+  if(children.length===1)return Object.keys(SKY_CARDS).map(skyId=>({skyId,artId:children[0].id}));
+  if(children.length===2){
+   const walk=children.find(x=>x.id.endsWith('-walk')),sky=children.find(x=>x.id.endsWith('-sky'));
+   check(walk&&sky,'TAG_EVOLUTION_BRANCHES');
+   return ['blue','cloud','sunset','morning'].map(skyId=>({skyId,artId:(skyId==='blue'||skyId==='morning'?sky:walk).id}));
+  }
+  if(children.length===3){
+   const keys=children[0].stage==='満開期'?['comet','crown','forest']:['cute','cool-a','cool-b'];
+   return ['blue','cloud','sunset'].map((skyId,index)=>{
+    const child=children.find(row=>row.id.endsWith('-'+keys[index]));
+    check(child,'TAG_EVOLUTION_BRANCHES');
+    return{skyId,artId:child.id};
+   });
+  }
+  return [];
+ }
+ function cardProgress(p,who){
+  const saved=p.skyCards;
+  if(saved==null||saved.subject!==who)return{subject:who,earned:0,spent:0,escape:0,cards:{}};
+  check(object(saved.cards)&&int(saved.earned)&&int(saved.spent)&&saved.spent<=Math.floor(saved.earned/CARDS_FOR_EVOLUTION)&&int(saved.escape)&&saved.escape<ESCAPES_FOR_CARD,'TAG_SKY_CARDS_UNREADABLE');
+  check(Object.entries(saved.cards).every(([sky,n])=>Object.hasOwn(SKY_CARDS,sky)&&int(n))&&Object.values(saved.cards).reduce((sum,n)=>sum+n,0)===saved.earned-saved.spent,'TAG_SKY_CARDS_UNREADABLE');
+  return saved;
+ }
+ function skyCardStatus(s){
+  const who=subject(s),book=cardProgress(progress(s),who);
+  return{...book,rights:Math.floor(book.earned/CARDS_FOR_EVOLUTION)-book.spent,untilRight:CARDS_FOR_EVOLUTION-book.earned%CARDS_FOR_EVOLUTION};
+ }
+ function matchSkyValid(sky,config){
+  return object(sky)&&Object.hasOwn(SKY_CARDS,sky.skyId)&&sky.rival===config?.opponents?.[0]&&config?.matchSky?.skyId===sky.skyId&&config.matchSky.rival===sky.rival&&typeof sky.rival==='string'&&sky.rival.length<=160;
+ }
+ function cardResult(p,t,receipt,ticks,finishedAt){
+  if(t.policy!==CARD_POLICY||!receipt.win||ticks<=0||finishedAt>(t.growthUntil??Infinity))return null;
+  const book=cardProgress(p,t.subject),hunt=t.config.mode==='hunt';
+  if(hunt&&receipt.catcher!=='hunter-0')return null;
+  // An idle escape cannot advance the card counter.
+  if(!hunt&&(receipt.caught||receipt.time!==180||receipt.participation?.version!==1||
+    receipt.participation.movingTicks<Math.ceil(180*120*POLICY.victoryMovingRatio)||ticks<Math.ceil(180*120*POLICY.victoryMovingRatio)))return null;
+  if(!hunt&&++book.escape<ESCAPES_FOR_CARD){p.skyCards=book;return{escape:book.escape};}
+  if(!hunt)book.escape=0;
+  const skyId=t.matchSky.skyId;
+  book.earned++;
+  check(int(book.earned),'TAG_SKY_CARDS_UNREADABLE');
+  book.cards[skyId]=(book.cards[skyId]??0)+1;
+  p.skyCards=book;
+  return{skyId,rights:Math.floor(book.earned/CARDS_FOR_EVOLUTION)-book.spent};
+ }
+ function cardEvolutionChoices(s,{names=globalThis.ImasoraMonsterNames,canGrow=true,rules}={}){
+  const book=skyCardStatus(s);
+  if(!canGrow)return{status:'growth-paused',...book,choices:[]};
+  const branches=evolutionBranches(names.currentId(s.monster),names);
+  let status=branches.length===0?'maximum':book.rights<1?'playing':'ready';
+  if(status==='ready'&&rules?.plan(s.monster).status==='needs-rest')status='needs-rest';
+  const choices=Object.entries(book.cards).filter(([,count])=>count>0).flatMap(([skyId,count])=>{
+   // Morning and blue share the sky branch. Earlier morning cards remain usable.
+   const branch=branches.find(row=>row.skyId===skyId)||branches.find(row=>row.skyId==='blue');
+   return branch?[{skyId,count,artId:branch.artId,name:names.name(branch.artId)}]:[];
+  });
+  return{status,...book,choices};
+ }
+ function useSkyCard(s,{skyId,artId,who,rules,catalog,names=globalThis.ImasoraMonsterNames,canGrow=true}={}){
+  if(subject(s)!==who)return{status:'changed'};
+  const view=cardEvolutionChoices(s,{names,canGrow,rules});
+  if(view.status!=='ready')return{status:view.status};
+  const choice=view.choices.find(row=>row.skyId===skyId);
+  if(!choice||choice.artId!==artId)return{status:'changed'};
+  const next=copy(s),plan=rules.plan(next.monster);
+  if(plan.status!=='evolve')return{status:plan.status};
+  const sky=catalog.sky(skyId);
+  check(sky,'TAG_SKY_UNAVAILABLE');
+  rules.applySky(next.monster,sky.type,sky.bias);
+  rules.apply(next.monster,plan);
+  next.monster.evolutionArtId=artId;
+  const book=cardProgress(next.tagGrowth,who);
+  book.cards[skyId]--;
+  book.spent++;
+  return{status:'ready',next,evolution:{stage:plan.stage,stageName:plan.stageName,skyId,artId}};
+ }
+ function cameraCandidate(candidate,now){check(int(now)&&now>0,'TAG_PHOTO_UNCONFIRMED');check(candidate?.source==='camera-candidate'&&['blue','cloud','sunset','morning'].includes(candidate.skyId)&&typeof candidate.captureId==='string'&&candidate.captureId.length>0&&candidate.captureId.length<=120&&int(candidate.capturedAt)&&candidate.capturedAt>0&&now>=candidate.capturedAt&&now-candidate.capturedAt<=5*60*1000&&Number.isFinite(candidate.score)&&candidate.score>=0&&candidate.score<=1,'TAG_PHOTO_UNCONFIRMED');}
  function photoEnvelope(photo,now){check(photo?.version===1&&int(photo.confirmedAt)&&photo.confirmedAt>=photo.candidate?.capturedAt&&photo.confirmedAt<=now,'TAG_PHOTO_UNCONFIRMED');cameraCandidate(photo.candidate,now);}
  function walkCaptureRequest(s,{now,id:requestId,mapKey}={}){const w=s.walkSession;check(int(now)&&now>0&&typeof requestId==='string'&&/^walk-sky:[A-Za-z0-9_-]{8,90}$/.test(requestId)&&typeof mapKey==='string'&&mapKey.length>0&&mapKey.length<=80,'WALK_CAPTURE_INVALID');check(w?.active&&w.stepChecked&&w.stopped&&!w.blocked&&!w.skyVerified&&int(w.startedAt)&&w.startedAt>0&&w.startedAt<=now&&int(w.stepCount)&&w.stepCount>0&&int(s.position),'WALK_CAPTURE_NOT_READY');return{version:1,id:requestId,subject:subject(s),issuedAt:now,sessionStartedAt:w.startedAt,stepCount:w.stepCount,position:s.position,mapKey};}
  function walkPhotoContext(s,photo,{now,mapKey}={}){photoEnvelope(photo,now);const request=s.walkSkyRequest,w=s.walkSession;check(photo.route==='walk'&&request?.version===1&&JSON.stringify(photo.request)===JSON.stringify(request)&&photo.subject===subject(s)&&request.subject===photo.subject,'WALK_CAPTURE_CHANGED');check(w?.active&&w.stepChecked&&w.stopped&&!w.blocked&&!w.skyVerified&&w.startedAt===request.sessionStartedAt&&w.stepCount===request.stepCount&&s.position===request.position&&mapKey===request.mapKey&&int(request.issuedAt)&&request.issuedAt<=photo.candidate.capturedAt,'WALK_CAPTURE_CHANGED');}
@@ -64,20 +175,27 @@ return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,
    const saved=s.pendingSky?.photo,samePending=s.pendingSky?.source==='camera-confirmed'&&saved?.version===photo.version&&saved.route===photo.route&&saved.subject===photo.subject&&saved.confirmedAt===photo.confirmedAt&&['source','captureId','capturedAt','skyId','score'].every(key=>saved.candidate?.[key]===candidate[key])&&JSON.stringify(saved.request)===JSON.stringify(photo.request);
    if(photo.route==='walk'&&(usedWalkPhoto(s,candidate.captureId)||samePending))return{status:'duplicate',route:photo.route};
    photoEnvelope(photo,ctx.now);
-   const result=photo.route==='walk'?prepareWalkPhoto(s,photo,ctx):prepareSky(s,candidate,{...ctx,who:photo.subject});
+   const result=photo.route==='walk'?prepareWalkPhoto(s,photo,ctx):photo.purpose==='tag-evolution'?prepareTagEvolutionPhoto(s,photo,ctx):prepareSky(s,candidate,{...ctx,who:photo.subject});
    return{...result,route:photo.route};
   }catch(error){
-   if(['TAG_PHOTO_UNCONFIRMED','TAG_OLDER_PHOTO','TAG_SUBJECT_CHANGED','WALK_CAPTURE_CHANGED'].includes(error.message))return{status:'retake',reason:error.message};
+   if(['TAG_PHOTO_UNCONFIRMED','TAG_OLDER_PHOTO','TAG_SUBJECT_CHANGED','WALK_CAPTURE_CHANGED','TAG_EVOLUTION_CHANGED'].includes(error.message))return{status:'retake',reason:error.message};
    throw error;
   }
  }
- function admission(s,{id:roundId,config,now,canGrow=true,growthUntil=Number.MAX_SAFE_INTEGER}={}){check(id(roundId)&&int(now)&&now>0,'TAG_ADMISSION_INVALID');const p=progress(s),who=subject(s);if(!canGrow||!int(growthUntil)||growthUntil<=now)return{status:'growth-paused'};if(!skyValid(p.sky,who,now))return{status:'awaiting-sky'};check(config?.duration===180&&config.hunterCount===3&&config.startKey==='random'&&['hunt','escape'].includes(config.mode)&&config.playerItem==='none'&&config.hunterItem==='none'&&Array.isArray(config.opponents)&&config.opponents.length===3,'TAG_CONFIG_UNAVAILABLE');return{status:'ready',ticket:{version:1,id:roundId,subject:who,policy:POLICY.id,issuedAt:now,growthUntil,sky:copy(p.sky),config:copy(config)}};}
+ function admission(s,{id:roundId,config,now,canGrow=true,growthUntil=Number.MAX_SAFE_INTEGER,matchSky}={}){check(id(roundId)&&int(now)&&now>0,'TAG_ADMISSION_INVALID');progress(s);const who=subject(s);if(!canGrow||!int(growthUntil)||growthUntil<=now)return{status:'growth-paused'};check(config?.duration===180&&config.hunterCount===3&&config.startKey==='random'&&['hunt','escape'].includes(config.mode)&&config.playerItem==='none'&&config.hunterItem==='none'&&Array.isArray(config.opponents)&&config.opponents.length===3,'TAG_CONFIG_UNAVAILABLE');if(matchSky){
+  check(matchSkyValid(matchSky,config),'TAG_SKY_CARD_MATCH');
+  const names=globalThis.ImasoraMonsterNames;
+  if(names){
+   const branches=evolutionBranches(names.currentId(s.monster),names);
+   check(!branches.length||branches.some(row=>row.skyId===matchSky.skyId&&row.artId===matchSky.rival),'TAG_SKY_CARD_MATCH');
+  }
+ }return{status:'ready',ticket:{version:1,id:roundId,subject:who,policy:matchSky?CARD_POLICY:POLICY.id,issuedAt:now,growthUntil,config:copy(config),...(matchSky?{matchSky:copy(matchSky)}:{})}};}
  function creditedTicks(envelope,verified,lastFinishedAt){const t=envelope.ticket;return Math.min(Math.max(0,Math.floor((Math.min(envelope.finishedAt,t.growthUntil??envelope.finishedAt)-Math.max(t.issuedAt,lastFinishedAt??t.issuedAt))/1000*120)),Math.round(Math.min(180,verified.time)*120),envelope.proof.frames.slice(240).filter(f=>Math.hypot(f[0],f[1])>.15||(f[2]&13)!==0).length);}
  // Match the existing home board's todayKey in every device timezone.
  function victoryDay(now){return new Date(now).toLocaleDateString('sv-SE');}
  function validateVictories(v){check(object(v)&&v.version===1&&typeof v.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v.date)&&int(v.hunt)&&int(v.escape)&&int(v.points)&&Number.isSafeInteger(v.hunt+v.escape)&&(v.hunt+v.escape)*POLICY.victoryPoints===v.points,'TAG_VICTORIES_UNREADABLE');}
  function victoryPlan(p,envelope,verified,ticks,now){
-  const empty={points:0,xp:0};if(envelope.ticket.policy!==POLICY.id)return{...empty,reason:'legacy'};
+  const empty={points:0,xp:0};if(envelope.ticket.policy==='tag-common-growth-v1')return{...empty,reason:'legacy'};
   if(!verified.win)return{...empty,reason:'defeat'};
   if(envelope.finishedAt>(envelope.ticket.growthUntil??Number.MAX_SAFE_INTEGER))return{...empty,reason:'growth-paused'};
   const moving=verified.participation?.version===1?verified.participation.movingTicks:0,required=Math.ceil(verified.time*120*POLICY.victoryMovingRatio-1e-6);
@@ -88,12 +206,22 @@ return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,
  }
 
  // Read-only display estimate. Home remains the sole reward writer.
- function describeResult(s,envelope,verified,{now}={}){const t=envelope?.ticket,who=subject(s),p=progress(s);check(object(t)&&id(t.id)&&t.version===1&&(t.policy===POLICY.id||t.policy==='tag-common-growth-v1')&&t.subject===who,'TAG_SUBJECT_CHANGED');if(p.receipts.includes(t.id))return{status:'received'};check(int(now)&&int(t.issuedAt)&&int(envelope.finishedAt)&&envelope.finishedAt<=now&&skyValid(t.sky,who,t.issuedAt),'TAG_ADMISSION_INVALID');check(eligibleRules(envelope.proof?.rules)&&verified?.rules===envelope.proof.rules&&Array.isArray(envelope.proof.frames)&&JSON.stringify(t.config)===JSON.stringify(envelope.proof.config)&&JSON.stringify(envelope.proof.claim)===JSON.stringify({caught:verified.caught,win:verified.win,time:verified.time,catcher:verified.catcher})&&Number.isFinite(verified.time)&&verified.time>0&&verified.time<=180+1/120&&envelope.finishedAt-t.issuedAt+100>=verified.time*1000,'TAG_RESULT_UNVERIFIED');const last=p.stats?.subject===who?p.stats.lastFinishedAt:undefined,ticks=creditedTicks(envelope,verified,last);check(int(ticks),'TAG_TIME_INVALID');return{status:'pending',activeSeconds:ticks/120,...(t.policy===POLICY.id&&verified.participation?{victory:victoryPlan(p,envelope,verified,ticks,now)}:{})};}
+ function describeResult(s,envelope,verified,{now}={}){const t=envelope?.ticket,who=subject(s),p=progress(s);check(object(t)&&id(t.id)&&t.version===1&&(t.policy===POLICY.id||t.policy===CARD_POLICY||legacyTicket(t))&&t.subject===who,'TAG_SUBJECT_CHANGED');if(p.receipts.includes(t.id))return{status:'received'};check(int(now)&&int(t.issuedAt)&&int(envelope.finishedAt)&&envelope.finishedAt<=now&&ticketSkyValid(t,who),'TAG_ADMISSION_INVALID');check(eligibleRules(envelope.proof?.rules)&&verified?.rules===envelope.proof.rules&&Array.isArray(envelope.proof.frames)&&JSON.stringify(t.config)===JSON.stringify(envelope.proof.config)&&JSON.stringify(envelope.proof.claim)===JSON.stringify({caught:verified.caught,win:verified.win,time:verified.time,catcher:verified.catcher})&&Number.isFinite(verified.time)&&verified.time>0&&verified.time<=180+1/120&&envelope.finishedAt-t.issuedAt+100>=verified.time*1000,'TAG_RESULT_UNVERIFIED');const last=p.stats?.subject===who?p.stats.lastFinishedAt:undefined,ticks=creditedTicks(envelope,verified,last);check(int(ticks),'TAG_TIME_INVALID');const card=cardResult(p,t,verified,ticks,envelope.finishedAt);return{status:'pending',activeSeconds:ticks/120,...(card?{card}:{}),...(t.policy!=='tag-common-growth-v1'&&verified.participation?{victory:victoryPlan(p,envelope,verified,ticks,now)}:{})};}
  function formatSeconds(value){const raw=Number(value);if(Number.isFinite(raw)&&raw>0&&raw<1)return'1秒未満';const seconds=Number.isFinite(raw)?Math.max(0,Math.floor(raw)):0,minutes=Math.floor(seconds/60);return minutes?minutes+'分'+(seconds%60?seconds%60+'秒':''):seconds+'秒';}
- function receivedSummary(rows){if(!Array.isArray(rows)||!rows.length)return'';const total={activeSeconds:0,xp:0,coin:0,items:0,materials:0,tickets:0,seeds:0,boxes:0,sailingParts:0};for(const r of rows){total.activeSeconds+=r.activeSeconds||0;for(const k of ['xp','coin','materials','tickets','seeds','boxes','sailingParts'])total[k]+=r.reward?.[k]||0;total.items+=r.reward?.items?.length||0;}const lines=[rows.length+'試合の成果を受け取りました。','育成時間 +'+formatSeconds(total.activeSeconds)+(total.xp?' ・ 経験値 +'+total.xp:'')+(total.coin?' ・ Coin +'+total.coin:'')],labels={items:'道具',materials:'素材',tickets:'大会券',seeds:'タネ',boxes:'建材箱',sailingParts:'航海材'},extras=Object.keys(labels).filter(k=>total[k]).map(k=>labels[k]+' +'+total[k]);if(extras.length)lines.push(extras.join(' ・ '));const victoryPoints=rows.reduce((n,r)=>n+(r.victory?.points||0),0),victoryXp=rows.reduce((n,r)=>n+(r.victory?.xp||0),0);if(victoryPoints)lines.push('勝利ポイント +'+victoryPoints+(victoryXp?'（初成功の経験値 +'+victoryXp+' は合計に含みます）':''));const evolved=rows.filter(r=>r.evolution?.status==='evolved').at(-1);if(evolved)lines.push(evolved.evolution.stageName+'へ進化しました。');else if(total.activeSeconds>0){const seconds=rows.at(-1).seconds;if(Number.isFinite(seconds))lines.push('次の時間報酬まで '+formatSeconds(POLICY.xpSeconds-seconds%POLICY.xpSeconds));}else lines.push('操作した時間が育成に貯まります。');return lines.join('\n');}
- function evolve(next,{rules,catalog,sky}){const p=next.tagGrowth,stats=p.stats;if(!stats||stats.subject!==subject(next)||Math.floor(stats.ticks/120/POLICY.evolutionSeconds)<=stats.evolutions||(stats.photos.includes(sky.captureId)||p.evolutionPhotoSubject===subject(next)&&(p.usedEvolutionPhotos??[]).includes(sky.captureId)))return null;check(rules&&catalog,'TAG_GROWTH_RULES_UNAVAILABLE');const plan=rules.plan(next.monster);if(plan.status!=='evolve')return{status:plan.status};const current=catalog.sky(sky.skyId);check(current,'TAG_SKY_UNAVAILABLE');rules.applySky(next.monster,current.type,current.bias);rules.apply(next.monster,plan);stats.evolutions++;stats.photos.push(sky.captureId);if(p.evolutionPhotoSubject!==subject(next)){p.evolutionPhotoSubject=subject(next);p.usedEvolutionPhotos=[];}p.usedEvolutionPhotos=p.usedEvolutionPhotos??[];if(!p.usedEvolutionPhotos.includes(sky.captureId))p.usedEvolutionPhotos.push(sky.captureId);return{status:'evolved',stage:plan.stage,stageName:plan.stageName};}
+ function receivedSummary(rows){if(!Array.isArray(rows)||!rows.length)return'';const total={activeSeconds:0,xp:0,coin:0,items:0,materials:0,tickets:0,seeds:0,boxes:0,sailingParts:0};for(const r of rows){total.activeSeconds+=r.activeSeconds||0;for(const k of ['xp','coin','materials','tickets','seeds','boxes','sailingParts'])total[k]+=r.reward?.[k]||0;total.items+=r.reward?.items?.length||0;}const lines=[rows.length+'試合の成果を受け取りました。','育成時間 +'+formatSeconds(total.activeSeconds)+(total.xp?' ・ 経験値 +'+total.xp:'')+(total.coin?' ・ Coin +'+total.coin:'')],labels={items:'道具',materials:'素材',tickets:'大会券',seeds:'タネ',boxes:'建材箱',sailingParts:'航海材'},extras=Object.keys(labels).filter(k=>total[k]).map(k=>labels[k]+' +'+total[k]);if(extras.length)lines.push(extras.join(' ・ '));
+  const receivedCards=new Map();
+  for(const {card} of rows){
+   const sky=card?.skyId;
+   if(Object.hasOwn(SKY_CARDS,sky))receivedCards.set(sky,(receivedCards.get(sky)??0)+1);
+  }
+  if(receivedCards.size){
+   const cards=[...receivedCards].map(([sky,count])=>SKY_CARDS[sky]+' ×'+count);
+   lines.push('空カードを受け取りました。'+cards.join(' ・ '));
+  }
+  const victoryPoints=rows.reduce((n,r)=>n+(r.victory?.points||0),0),victoryXp=rows.reduce((n,r)=>n+(r.victory?.xp||0),0);if(victoryPoints)lines.push('勝利ポイント +'+victoryPoints+(victoryXp?'（初成功の経験値 +'+victoryXp+' は合計に含みます）':''));const evolved=rows.filter(r=>r.evolution?.status==='evolved').at(-1);if(evolved)lines.push(evolved.evolution.stageName+'へ進化しました。');else if(total.activeSeconds>0){const seconds=rows.at(-1).seconds;if(Number.isFinite(seconds))lines.push('次の時間報酬まで '+formatSeconds(POLICY.xpSeconds-seconds%POLICY.xpSeconds));}else lines.push('操作した時間が育成に貯まります。');return lines.join('\n');}
+ function evolve(next,{rules,catalog,sky}){const p=next.tagGrowth,stats=p.stats;if(!stats||stats.subject!==subject(next)||Math.floor(stats.ticks/120/POLICY.evolutionSeconds)<=stats.evolutions||(stats.photos.includes(sky.captureId)||p.evolutionPhotoSubject===subject(next)&&(p.usedEvolutionPhotos??[]).includes(sky.captureId)))return null;check(rules&&catalog,'TAG_GROWTH_RULES_UNAVAILABLE');const plan=rules.plan(next.monster);if(plan.status!=='evolve')return{status:plan.status};const current=catalog.sky(sky.skyId);check(current,'TAG_SKY_UNAVAILABLE');const names=globalThis.ImasoraMonsterNames,chosenLineage=names?.currentId(next.monster);rules.applySky(next.monster,current.type,current.bias);rules.apply(next.monster,plan);names?.followChosenLineage?.(next.monster,chosenLineage);stats.evolutions++;stats.photos.push(sky.captureId);if(p.evolutionPhotoSubject!==subject(next)){p.evolutionPhotoSubject=subject(next);p.usedEvolutionPhotos=[];}p.usedEvolutionPhotos=p.usedEvolutionPhotos??[];if(!p.usedEvolutionPhotos.includes(sky.captureId))p.usedEvolutionPhotos.push(sky.captureId);return{status:'evolved',stage:plan.stage,stageName:plan.stageName};}
  function settle(s,envelope,verified,{now,catalog,receiveInventory,rules,creditConstruction,canGrow=true}={}){
-  check(object(envelope)&&envelope.version===1&&object(envelope.ticket)&&object(envelope.proof),'TAG_RESULT_UNREADABLE');const t=envelope.ticket,who=subject(s),p=progress(s);check(id(t.id)&&t.version===1&&(t.policy===POLICY.id||t.policy==='tag-common-growth-v1')&&t.subject===who,'TAG_SUBJECT_CHANGED');if(p.receipts.includes(t.id))return{status:'duplicate'};check(p.receipts.length<50000,'TAG_RECEIPTS_FULL');check(int(now)&&int(t.issuedAt)&&t.issuedAt>0&&int(envelope.finishedAt)&&envelope.finishedAt<=now&&skyValid(t.sky,who,t.issuedAt),'TAG_ADMISSION_INVALID');check(eligibleRules(envelope.proof.rules)&&verified?.rules===envelope.proof.rules&&JSON.stringify(t.config)===JSON.stringify(envelope.proof.config)&&t.config.duration===180&&t.config.hunterCount===3&&t.config.startKey==='random'&&t.config.playerItem==='none'&&t.config.hunterItem==='none','TAG_CONFIG_CHANGED');
+  check(object(envelope)&&envelope.version===1&&object(envelope.ticket)&&object(envelope.proof),'TAG_RESULT_UNREADABLE');const t=envelope.ticket,who=subject(s),p=progress(s);check(id(t.id)&&t.version===1&&(t.policy===POLICY.id||t.policy===CARD_POLICY||legacyTicket(t))&&t.subject===who,'TAG_SUBJECT_CHANGED');if(p.receipts.includes(t.id))return{status:'duplicate'};check(p.receipts.length<50000,'TAG_RECEIPTS_FULL');check(int(now)&&int(t.issuedAt)&&t.issuedAt>0&&int(envelope.finishedAt)&&envelope.finishedAt<=now&&ticketSkyValid(t,who),'TAG_ADMISSION_INVALID');check(eligibleRules(envelope.proof.rules)&&verified?.rules===envelope.proof.rules&&JSON.stringify(t.config)===JSON.stringify(envelope.proof.config)&&t.config.duration===180&&t.config.hunterCount===3&&t.config.startKey==='random'&&t.config.playerItem==='none'&&t.config.hunterItem==='none','TAG_CONFIG_CHANGED');
   check(Number.isFinite(verified.time)&&verified.time>0&&verified.time<=180+1/120&&typeof verified.caught==='boolean'&&typeof verified.win==='boolean'&&verified.win===(t.config.mode==='hunt'?verified.caught:!verified.caught)&&(verified.caught||verified.time>=180)&&JSON.stringify(envelope.proof.claim)===JSON.stringify({caught:verified.caught,win:verified.win,time:verified.time,catcher:verified.catcher}),'TAG_RESULT_UNVERIFIED');check(envelope.finishedAt-t.issuedAt+100>=verified.time*1000,'TAG_ELAPSED_MISMATCH');
   check(catalog&&typeof receiveInventory==='function'&&rules,'TAG_HOME_UNAVAILABLE');const next=copy(s);next.tagGrowth=p;if(!p.stats||p.stats.subject!==who)p.stats={subject:who,ticks:0,evolutions:0,photos:[],lastFinishedAt:0};const stats=p.stats,before=stats.ticks/120,ticks=creditedTicks(envelope,verified,stats.lastFinishedAt);check(int(ticks)&&ticks>=0&&int(stats.ticks+ticks),'TAG_TIME_INVALID');stats.ticks+=ticks;stats.lastFinishedAt=Math.max(stats.lastFinishedAt??0,envelope.finishedAt);const after=stats.ticks/120,count=seconds=>Math.floor(after/seconds)-Math.floor(before/seconds),safeAdd=(obj,key,n)=>{check(int(obj[key]??0)&&int(n)&&int((obj[key]??0)+n),'TAG_BALANCE_UNREADABLE');obj[key]=(obj[key]??0)+n;};
   const victory=victoryPlan(p,envelope,verified,ticks,now);if(victory.points)p.victories=victory.next;const reward={xp:count(POLICY.xpSeconds)+victory.xp,coin:count(POLICY.coinSeconds),items:[],materials:0,tickets:count(POLICY.ticketSeconds),seeds:0,boxes:count(POLICY.boxSeconds),sailingParts:count(POLICY.sailingSeconds)};safeAdd(next.monster,'xp',reward.xp);safeAdd(next,'coin',reward.coin);check(object(next.skyStock)&&object(next.skyStock.materials)&&object(next.skyStock.seeds)&&object(next.mapTickets),'TAG_STOCK_UNREADABLE');safeAdd(next.mapTickets,'major4',reward.tickets);
@@ -102,7 +230,7 @@ return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,
   pick(catalog.items,Math.floor(before/POLICY.itemSeconds),Math.floor(after/POLICY.itemSeconds),item=>reward.items.push(item.id));if(reward.items.length)receiveInventory(next,reward.items.map(id=>({id,at:now,reason:'鬼ごっこ'})));
   pick(catalog.seeds,Math.floor(before/POLICY.seedSeconds),Math.floor(after/POLICY.seedSeconds),seed=>{check(seed.id!=='seed-white','TAG_EXCLUSIVE_SEED');safeAdd(next.skyStock.seeds,seed.name,1);reward.seeds++;});
   if(reward.boxes||reward.sailingParts){check(typeof creditConstruction==='function','TAG_CONSTRUCTION_UNAVAILABLE');next.constructionRewardLedger=creditConstruction(next.constructionRewardLedger,{id:t.id,boxes:reward.boxes,sailingParts:reward.sailingParts});}
-  const evolution=canGrow?evolve(next,{rules,catalog,sky:t.sky}):null;p.receipts.push(t.id);return{status:'ready',next,reward,evolution,seconds:after,activeSeconds:ticks/120,receiptId:t.id,...(victory.points?{victory:{points:victory.points,xp:victory.xp,mode:victory.mode}}:{})};
+  const evolution=canGrow&&legacyTicket(t)?evolve(next,{rules,catalog,sky:t.sky}):null;const card=cardResult(p,t,verified,ticks,envelope.finishedAt);p.receipts.push(t.id);return{status:'ready',next,reward,evolution,...(card?{card}:{}),seconds:after,activeSeconds:ticks/120,receiptId:t.id,...(victory.points?{victory:{points:victory.points,xp:victory.xp,mode:victory.mode}}:{})};
  }
  function readInbox(session){const raw=session.getItem(INBOX);if(raw===null)return[];check(raw.length<=4*1024*1024,'TAG_INBOX_FULL');const rows=JSON.parse(raw);check(Array.isArray(rows)&&rows.length<=MAX_PENDING&&rows.every(r=>object(r)&&r.version===1&&id(r.ticket?.id))&&new Set(rows.map(r=>r.ticket.id)).size===rows.length,'TAG_INBOX_UNREADABLE');return rows;}
  function queue(session,row){const rows=readInbox(session);if(rows.some(r=>r.ticket.id===row.ticket.id))return;check(rows.length<MAX_PENDING,'TAG_INBOX_FULL');const text=JSON.stringify([...rows,row]);check(text.length<=4*1024*1024,'TAG_INBOX_FULL');session.setItem(INBOX,text);}
@@ -119,7 +247,7 @@ return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,
  const HANDOFF='imasora-tag-result:';
  function readHandoff(name){if(typeof name!=='string'||!name.startsWith(HANDOFF))return null;check(name.length<=2*1024*1024,'TAG_HANDOFF_TOO_LARGE');const value=JSON.parse(name.slice(HANDOFF.length));check(object(value)&&value.version===1&&typeof value.previous==='string'&&value.previous.length<=2000&&object(value.row)&&value.row.version===1&&id(value.row.ticket?.id),'TAG_HANDOFF_UNREADABLE');return value;}
  function makeHandoff(name,row){const existing=readHandoff(name);if(existing){check(existing.row.ticket.id===row.ticket.id,'TAG_HANDOFF_PENDING');return name;}const next=HANDOFF+JSON.stringify({version:1,previous:typeof name==='string'?name:'',row});readHandoff(next);return next;}
- return Object.freeze({POLICY,INBOX,SKY_INBOX,MAX_PENDING,subject,progress,describeResult,formatSeconds,receivedSummary,skyValid,cameraCandidate,photoEnvelope,prepareSkyInbox,walkCaptureRequest,prepareWalkPhoto,prepareWalkConfirmation,markWalkEvolution,prepareSky,admission,settle,readInbox,readResults,queue,acknowledge,readDurable,queueDurable,acknowledgeDurable,readHandoff,makeHandoff});
+ return Object.freeze({POLICY,INBOX,SKY_INBOX,MAX_PENDING,subject,progress,describeResult,formatSeconds,receivedSummary,skyValid,tagEvolutionStatus,SKY_CARDS,evolutionBranches,skyCardStatus,cardEvolutionChoices,useSkyCard,cameraCandidate,photoEnvelope,prepareSkyInbox,walkCaptureRequest,prepareWalkPhoto,prepareWalkConfirmation,markWalkEvolution,prepareSky,admission,settle,readInbox,readResults,queue,acknowledge,readDurable,queueDurable,acknowledgeDurable,readHandoff,makeHandoff});
 });
 
 

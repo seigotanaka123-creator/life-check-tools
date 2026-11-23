@@ -2,9 +2,29 @@ import {polygon,polygonsOverlap} from './imasora-construction-loader-physics.js?
 import {hasValidWorldFootprint} from './imasora-construction-world-yard-reservation.js?v=512';
 import {vehicleGroundFrame,groundPoint,flatGroundWork} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 import {actorPose,worldToLocal,transitionPoints} from './imasora-construction-loader-physics.js?v=120ov';
+import {sharedParkingLayouts} from './imasora-construction-shared-field.mjs?v=121cw';
 import {boxesOverlap3D} from './imasora-construction-native-dump-pose.mjs?v=120pv';
 const travelFrames=new WeakMap();
-export function fieldGroundPose(work,origin,heightAt){const v=(work.loader??work.rig).vehicle;if(origin.x===0&&origin.z===0&&typeof heightAt?.groundFrame==='function')return heightAt.groundFrame(v);return vehicleGroundFrame(v,typeof heightAt==='function'?(x,z,reference)=>heightAt(origin.x+x,origin.z+z,reference):()=>0);}
+export function returnFieldVehicleToParking(record,id,origin,heightAt,solids=[]){
+ const w=record.work,key=w.loader?'loader':'rig',rig=w[key],field=rig.vehicle.field;
+ const bay=sharedParkingLayouts().find(p=>p.corner===field?.corner)?.vehicles.find(v=>v.id===id);
+ if(!bay||rig.mode!=='driving'||rig.transition)throw Error('共通駐車場と運転席を確認しよう。');
+ if(record.delivery||w.task||w.air?.length||w.work||w.deployment||w.held||w.rotation||w.joining)
+  throw Error('作業を終え、荷を下ろして支持脚をしまってから戻ろう。');
+ const vehicle={...rig.vehicle,x:bay.x-field.origin[0],z:bay.z-field.origin[1],heading:bay.heading,speed:0,steering:0,groundY:0};
+ const nextRig={...rig,vehicle,hit:''};
+ nextRig.player={...rig.player,...actorPose(nextRig)};
+ const work={...w,revision:w.revision+1,[key]:nextRig};
+ const ground=fieldGroundPose(work,origin,heightAt);
+ if(!flatGroundWork(ground)||Math.abs(ground.position[1])>.05)throw Error('駐車枠の地面が平らではありません。');
+ const body={position:groundPoint(ground,0,30,0),half:[42,30,50],axes:ground.axes};
+ if(solids.some(o=>o.y+o.h>.05&&boxesOverlap3D(body,{position:[o.x,o.y+o.h/2,o.z],half:[o.w/2,o.h/2,o.d/2],heading:o.angle??0})))
+  throw Error('駐車枠が別の車や物でふさがっています。');
+ return {...record,revision:record.revision+1,work};
+}
+export function fieldGroundPose(work,origin,heightAt){const v=(work.loader??work.rig).vehicle;if(origin.x===0&&origin.z===0&&typeof heightAt?.groundFrame==='function')return heightAt.groundFrame(v);const local=typeof heightAt==='function'?(x,z,reference)=>heightAt(origin.x+x,origin.z+z,reference):()=>0;
+ if(heightAt?.quarryHeight)local.quarryHeight=(x,z)=>heightAt.quarryHeight(origin.x+x,origin.z+z);
+ return vehicleGroundFrame(v,local);}
 export function fieldActorPose(rig,origin,heightAt,frame=null){
  const p=actorPose(rig);if(typeof heightAt!=='function')return p;
  if(rig.mode==='foot')return{...p,y:p.y+(heightAt(origin.x+p.x,origin.z+p.z)??0)};
@@ -26,15 +46,23 @@ export function fieldGroundTravelAllowed(before,next,origin,heightAt,solids=[]){
   const delta=Math.atan2(Math.sin(b.vehicle.heading-a.vehicle.heading),Math.cos(b.vehicle.heading-a.vehicle.heading));
   const steps=Math.max(1,Math.ceil(Math.hypot(b.vehicle.x-a.vehicle.x,b.vehicle.z-a.vehicle.z)),Math.ceil(Math.abs(delta)/.01));
   let support=a.vehicle.groundY,lastFrame;try{support??=fieldGroundPose(before,origin,heightAt).position[1];}catch{return false;}for(let i=1;i<=steps;i++){
-   const t=i/steps,v={x:a.vehicle.x+(b.vehicle.x-a.vehicle.x)*t,z:a.vehicle.z+(b.vehicle.z-a.vehicle.z)*t,heading:a.vehicle.heading+delta*t,groundY:a.vehicle.groundY??0};
+   const t=i/steps,v={field:b.vehicle.field,x:a.vehicle.x+(b.vehicle.x-a.vehicle.x)*t,z:a.vehicle.z+(b.vehicle.z-a.vehicle.z)*t,heading:a.vehicle.heading+delta*t,groundY:a.vehicle.groundY??0};
    v.groundY=support;v.steering=(a.vehicle.steering??0)+((b.vehicle.steering??0)-(a.vehicle.steering??0))*t;
    try{const g=fieldGroundPose({rig:{vehicle:v}},origin,heightAt),body={position:groundPoint(g,0,b.vehicle.waterTruck?29:24,0),half:[34,b.vehicle.waterTruck?27:22,b.vehicle.waterTruck?46:43],axes:g.axes};
-    if(Math.abs(g.position[1]-support)>2.1||solids.some(o=>o.y+o.h>g.position[1]+.15&&boxesOverlap3D(body,{position:[o.x,o.y+o.h/2,o.z],half:[o.w/2,o.h/2,o.d/2],heading:o.angle??0})))return false;support=g.position[1];lastFrame=g;
+    const heightChange=g.position[1]-support;
+    if(g.quarryDescent&&g.slope>Math.tan(8*Math.PI/180)&&heightAt(origin.x+v.x,origin.z+v.z)>heightAt(origin.x+a.vehicle.x,origin.z+a.vehicle.z)+.05)return false;
+    const downhillRim=Math.abs(heightChange)>2.1&&heightAt.quarryHeight&&
+     Math.abs(heightAt.quarryHeight(origin.x+v.x,origin.z+v.z)-heightAt(origin.x+v.x,origin.z+v.z))<.05&&
+     heightAt(origin.x+v.x,origin.z+v.z)<=heightAt(origin.x+a.vehicle.x,origin.z+a.vehicle.z)+.05;
+    if((Math.abs(heightChange)>2.1&&!downhillRim)||solids.some(o=>o.y+o.h>g.position[1]+.15&&boxesOverlap3D(body,{position:[o.x,o.y+o.h/2,o.z],half:[o.w/2,o.h/2,o.d/2],heading:o.angle??0})))return false;support=g.position[1];lastFrame=g;
    }catch{return false;}
   }
   if(lastFrame)travelFrames.set(next,{heightAt,x:origin.x,z:origin.z,vehicle:JSON.stringify(b.vehicle),frame:lastFrame});
  }
- if(a.mode==='foot'&&b.mode==='foot'&&Math.hypot(a.player.x-b.player.x,a.player.z-b.player.z)>1e-6){const p=b.player,base=heightAt(origin.x+a.player.x,origin.z+a.player.z);for(const [dx,dz] of [[0,0],[-14,0],[14,0],[0,-14],[0,14]]){const h=heightAt(origin.x+p.x+dx,origin.z+p.z+dz);if(!Number.isFinite(h)||!Number.isFinite(base)||Math.abs(h-base)>3.1)return false;}const h=heightAt(origin.x+p.x,origin.z+p.z);if(solids.some(o=>o.y+o.h>h+.1&&boxesOverlap3D({position:[p.x,h+p.y+14,p.z],half:[14,14,14],heading:0},{position:[o.x,o.y+o.h/2,o.z],half:[o.w/2,o.h/2,o.d/2],heading:o.angle??0})))return false;}
+ if(a.mode==='foot'&&b.mode==='foot'&&Math.hypot(a.player.x-b.player.x,a.player.z-b.player.z)>1e-6){const p=b.player,base=heightAt(origin.x+a.player.x,origin.z+a.player.z);for(const [dx,dz] of [[0,0],[-14,0],[14,0],[0,-14],[0,14]]){const h=heightAt(origin.x+p.x+dx,origin.z+p.z+dz);if(!Number.isFinite(h)||!Number.isFinite(base))return false;
+  if(Math.abs(h-base)>3.1){const natural=heightAt.quarryHeight?.(origin.x+p.x+dx,origin.z+p.z+dz);
+   if(!(Math.abs(natural-h)<.05)||heightAt(origin.x+p.x,origin.z+p.z)>base+.05)return false;
+  }}const h=heightAt(origin.x+p.x,origin.z+p.z);if(solids.some(o=>o.y+o.h>h+.1&&boxesOverlap3D({position:[p.x,h+p.y+14,p.z],half:[14,14,14],heading:0},{position:[o.x,o.y+o.h/2,o.z],half:[o.w/2,o.h/2,o.d/2],heading:o.angle??0})))return false;}
  return true;
 }
 

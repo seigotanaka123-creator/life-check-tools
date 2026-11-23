@@ -1,10 +1,21 @@
 import * as T from '../three.module.min.js';
 import {pumpTargets,pumpDirectStep,stowPumpForDriving,pumpTargetVisible,pumpTargetViews} from './pump-direct-plan.mjs?v=120pv';
 
+// Selection is a view choice only; pouring remains the existing physical action.
+export function pumpTargetChoices(targets,f,inspection=null){
+ const at={x:(f?.location?.x??0)+(f?.pump?.x??0),y:f?.pump?.groundY??0,z:(f?.location?.z??0)+(f?.pump?.z??0)},distance=t=>(t.x-at.x)**2+(t.y-at.y)**2+(t.z-at.z)**2;
+ const grouped=new Map();for(const t of targets){if(!pumpTargetVisible(t,inspection))continue;const old=grouped.get(t.key);if(!old||distance(t)<distance(old))grouped.set(t.key,t);}
+ const visible=[...grouped.values()],unfinished=visible.filter(t=>t.fill<t.capacity);return unfinished.length?unfinished:visible;
+}
+export function nearestPumpTarget(targets,f,inspection=null){
+ const choices=pumpTargetChoices(targets,f,inspection),at={x:(f?.location?.x??0)+(f?.pump?.x??0),y:f?.pump?.groundY??0,z:(f?.location?.z??0)+(f?.pump?.z??0)};
+ return choices.reduce((best,t)=>!best||Math.hypot(t.x-at.x,t.y-at.y,t.z-at.z)<Math.hypot(best.x-at.x,best.y-at.y,best.z-at.z)?t:best,null);
+}
+
 export function createPumpDirectPlay({panel,canvas,camera,scene,project,high,visible,uncovered=()=>true,ready,run,selectCell,focusHigh,clearInput,onMode,notice,refresh:refreshHost}){
  const root=document.createElement('section');root.className='pump-direct-ui';root.hidden=true;root.setAttribute('aria-label','ポンプ車の直接操作');
- root.innerHTML='<button class="pump-direct-mode" type="button"></button><button class="pump-direct-look" type="button" hidden>型枠を見る</button><div class="pump-direct-panel"><p role="status"></p><button class="pump-direct-action" type="button"></button></div>';
- panel.append(root);const mode=root.querySelector('.pump-direct-mode'),look=root.querySelector('.pump-direct-look'),body=root.querySelector('.pump-direct-panel'),note=root.querySelector('p'),button=root.querySelector('.pump-direct-action');let lookIndex=0;
+ root.innerHTML='<button class="pump-direct-mode" type="button"></button><button class="pump-direct-look" type="button" hidden>型枠を見る［M］</button><div class="pump-direct-panel"><p role="status"></p><button class="pump-direct-action" type="button"></button><div class="pump-direct-targets" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px"><output style="grid-column:1/-1;text-align:center;font-weight:800"></output><button class="pump-direct-target-prev" type="button" aria-keyshortcuts="Shift+P">← 前［Shift＋P］</button><button class="pump-direct-target-next" type="button" aria-keyshortcuts="P">次［P］→</button></div></div>';
+ panel.append(root);const mode=root.querySelector('.pump-direct-mode'),look=root.querySelector('.pump-direct-look'),body=root.querySelector('.pump-direct-panel'),note=root.querySelector('p'),button=root.querySelector('.pump-direct-action');const targetControls=root.querySelector('.pump-direct-targets'),previousTarget=root.querySelector('.pump-direct-target-prev'),nextTarget=root.querySelector('.pump-direct-target-next'),targetCount=targetControls.querySelector('output');let lookIndex=0;
  const geo=new T.BoxGeometry(1,1,1),mat=new T.MeshBasicMaterial({color:0xffcf50,transparent:true,opacity:.32,depthWrite:false}),edgeGeo=new T.EdgesGeometry(geo),edgeMat=new T.LineBasicMaterial({color:0xe0a424});
  const marker=new T.Mesh(geo,mat),edge=new T.LineSegments(edgeGeo,edgeMat);marker.name='pump-direct-selected-form';marker.add(edge);scene.add(marker);marker.visible=false;
  let working=true,previousAboard=false,pending=false,stowing=false,selected=null,selectedPoint=null,targets=[],priorProject=null,priorHigh=null,gesture=null;const pointers=new Set(),raycaster=new T.Raycaster(),point=new T.Vector3(),hit=new T.Vector3(),box=new T.Box3();
@@ -12,23 +23,28 @@ export function createPumpDirectPlay({panel,canvas,camera,scene,project,high,vis
  function updateTargets(){const p=project(),h=high();if(p!==priorProject||h!==priorHigh){priorProject=p;priorHigh=h;targets=pumpTargets(p,h);}}
  function showForms(){updateTargets();if(!targets.some(t=>t.kind==='ground')){const t=targets.find(t=>t.kind==='upper');if(t)focusHigh(t.anchor,false);}}
  function target(){return targets.find(t=>t.key===selected&&t.x===selectedPoint?.x&&t.z===selectedPoint?.z)??targets.find(t=>t.key===selected)??null;}
+ function chooseTarget(t){if(!t)return false;selected=t.key;selectedPoint={x:t.x,z:t.z};clearInput();if(t.kind==='ground'){focusHigh(null);selectCell(t.cell);}else focusHigh(t.anchor,false);lookIndex=Math.max(0,pumpTargetViews(targets).findIndex(q=>t.kind==='ground'?q.kind==='ground':q.key===t.key));return true;}
+ function cycleTarget(direction){if(!can()||!working||free().highCastings?.some(c=>c.pending))return;updateTargets();const choices=pumpTargetChoices(targets,free(),scene.userData.upperInspection);if(!choices.length)return;const current=choices.findIndex(t=>t.key===selected),index=current<0?(direction<0?choices.length-1:0):(current+direction+choices.length)%choices.length;if(chooseTarget(choices[index]))refreshHost();}
+ previousTarget.onclick=()=>cycleTarget(-1);nextTarget.onclick=()=>cycleTarget(1);
+
  function resetGesture(){gesture=null;}
  function paintMarker(){const t=target();marker.visible=visible()&&uncovered()&&working&&!!t&&pumpTargetVisible(t,scene.userData.upperInspection);if(!marker.visible)return;marker.position.set(t.x,t.y+.1,t.z);marker.scale.set(t.w,.22,t.d);}
  function refresh(){
   const show=visible(),f=free();if(show&&!previousAboard){working=!!(f.pump.legs||f.connected||f.hose||f.highPipe);selected=f.highPipe?'upper:'+f.highPipe.castingId:null;onMode(working);if(working)showForms();}previousAboard=show;
   root.hidden=!show||!uncovered();panel.dataset.pumpDirect=String(show&&working);panel.dataset.pumpQuiet=String(panel.querySelector('[data-note]')?.textContent.trim()==='保存しました。');body.hidden=!working;
   if(!show){marker.visible=false;resetGesture();return;}
-  updateTargets();if(selected&&!target())selected=null;
+  updateTargets();if(selected&&!target())selected=null;if(working&&!target())chooseTarget(nearestPumpTarget(targets,free(),scene.userData.upperInspection));
   look.hidden=!working||pumpTargetViews(targets).length<2;look.disabled=!can()||free().highCastings?.some(c=>c.pending)===true;
-  const s=pumpDirectStep(f,target());mode.textContent=pending?(stowing?'片付け中…':'作業中…'):working?'🚚 運転へ':'🏗 作業へ';mode.disabled=!ready()||pending;
-  button.textContent=s.label;button.disabled=!can()||!s.type||!!s.reason;
+  const s=pumpDirectStep(f,target());mode.textContent=pending?(stowing?'片付け中…':'作業中…'):working?'🚚 運転へ［I］':'🏗 作業へ［J］';mode.disabled=!ready()||pending;
+  button.textContent=s.label+'［J］';button.disabled=!can()||!s.type||!!s.reason;
+  const choices=pumpTargetChoices(targets,free(),scene.userData.upperInspection),choiceIndex=choices.findIndex(t=>t.key===selected);targetControls.hidden=!working||!choices.length;previousTarget.disabled=nextTarget.disabled=!can()||!choices.length||choices.length===1&&choiceIndex===0||free().highCastings?.some(c=>c.pending)===true;targetCount.textContent=target()?(target().kind==='ground'?'マス '+(target().cell+1):target().label)+' · '+(choiceIndex<0?'—':choiceIndex+1)+' / '+choices.length:'注ぎ先の型枠を作ろう';
   const label=target()?.label,full=target()?Math.round(target().fill/target().capacity*100)+'％':'';
-  note.textContent=s.reason||(s.type==='FREE_HIGH_FLOW_CANCEL'?'生コンを送っているよ':label?label+' · '+full:'型枠をタップして、注ぎ先をえらぼう');
+  note.textContent=s.reason||(s.type==='FREE_HIGH_FLOW_CANCEL'?'生コンを送っているよ':label?label+' · '+full:'Pキーで、注ぎ先の型枠をえらぼう');
   if(!can())resetGesture();paintMarker();
  }
  async function act(){if(!can()||!working)return;updateTargets();const s=pumpDirectStep(free(),target());if(!s.type||s.reason)return;resetGesture();clearInput();pending=true;refresh();try{await run(s.type,s.extra,s.animate);}finally{pending=false;refreshHost();}}
  button.onclick=act;
- look.onclick=()=>{if(!can())return;updateTargets();const choices=pumpTargetViews(targets);if(!choices.length)return;clearInput();resetGesture();lookIndex=(lookIndex+1)%choices.length;const t=choices[lookIndex];selected=null;focusHigh(t.kind==='upper'?t.anchor:null,false);refreshHost();};
+ look.onclick=()=>{if(!can())return;updateTargets();const choices=pumpTargetViews(targets);if(!choices.length)return;clearInput();resetGesture();lookIndex=(lookIndex+1)%choices.length;const t=choices[lookIndex];chooseTarget(t);refreshHost();};
  mode.onclick=async()=>{
   if(!can())return;clearInput();resetGesture();
   if(!working){working=true;onMode(true);showForms();refreshHost();return;}

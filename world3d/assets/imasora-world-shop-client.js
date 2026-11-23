@@ -1,6 +1,6 @@
 import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
 export function createWorldShopClient(){
-  if(parent===window)throw Error('このショップは火星の店主から開いてください。');
+  if(parent===window)throw Error('このショップはアマネ星の店主から開いてください。');
   const token=location.hash.slice(1);if(!/^[\w-]{36}$/.test(token))throw Error('ショップ接続情報がありません。');
   const pending=new Map();let busy=false,blocked=false,state=null,raw=null,mode='live';
   addEventListener('message',event=>{const m=event.data;if(event.source!==parent||event.origin!==location.origin||m?.type!=='imasora-world-shop-response'||m.token!==token)return;const job=pending.get(m.id);if(!job)return;pending.delete(m.id);clearTimeout(job.timer);m.error?job.reject(Error(m.error)):job.resolve(m.result);});
@@ -10,7 +10,7 @@ export function createWorldShopClient(){
     catch(e){blocked=true;throw e;}finally{busy=false;}
   }
   const session={get state(){return state;},get raw(){return raw;},get busy(){return busy;},get blocked(){return blocked;},store:{},load:()=>call('read'),prepare:(offer,quantity,orderId)=>call('prepare',{offer,quantity,orderId}),settle:(orderId,options={})=>call('settle',{orderId,cancel:options.cancel===true}),export:()=>raw,exportRaw:()=>raw};
-  document.title='火星素材ショップ';document.getElementById('open-dev').textContent='保存の確認';
+  document.title='アマネ星素材ショップ';document.getElementById('open-dev').textContent='保存の確認';
   document.querySelector('#development h2').textContent='保存の確認';
   document.querySelector('#development>.scope').textContent='購入と航行報酬は同じ世界の保存へ記録されます。保存の再読込は金貨を補充する操作ではありません。';
   document.querySelector('#development .dev-panel>summary').textContent='保存記録を見る';

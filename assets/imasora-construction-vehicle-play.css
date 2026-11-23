@@ -28,20 +28,20 @@ body.world-vehicle-playing{overflow:hidden;overscroll-behavior:none}
 .world-vehicle-playing .world-vehicle-controls header strong{font-size:14px;white-space:nowrap}
 .world-vehicle-playing .world-vehicle-controls header span{grid-row:2;font-size:10px;line-height:1.2}
 .world-vehicle-controls .gv-load{grid-column:2;grid-row:1/3;color:#ffe4a0;font-size:12px;font-weight:bold;white-space:nowrap}
-.world-vehicle-playing .world-vehicle-controls .gv-message{margin:0;min-height:0;line-height:17px;max-height:34px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:11px;color:#d6e7dc}
+.world-vehicle-playing .world-vehicle-controls .gv-message{margin:0;min-height:0;line-height:1.35;max-height:4.05em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;font-size:14px;color:#f4fff8}
 .world-vehicle-controls .gv-active{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;min-height:0;gap:5px}
 .world-vehicle-controls .gv-nav,.world-vehicle-controls .gv-quick{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px}
-.world-vehicle-controls .gv-nav button{min-height:30px;padding:3px;font-size:11px;background:#284b48}
+.world-vehicle-controls .gv-nav button{min-height:44px;padding:5px 3px;font-size:14px;background:#284b48}
 .world-vehicle-controls .gv-nav button[aria-pressed=true]{background:#d6b875;color:#213b33;border-color:#f1d59a;font-weight:bold}
 .world-vehicle-controls .gv-pages{min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:2px;scrollbar-width:thin}
 .world-vehicle-controls .gv-page,.world-vehicle-controls .gv-page>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0}
 .world-vehicle-controls .gv-page>div{grid-column:1/-1}
 .world-vehicle-controls .gv-page[hidden]{display:none!important}
-.world-vehicle-controls .gv-page button,.world-vehicle-controls .gv-quick button{min-height:44px;min-width:0;white-space:normal;padding:4px;font-size:11px;line-height:1.3;font-weight:bold}
+.world-vehicle-controls .gv-page button,.world-vehicle-controls .gv-quick button{min-height:44px;min-width:0;white-space:normal;padding:5px;font-size:14px;line-height:1.3;font-weight:bold}
 .world-vehicle-controls .gv-page button{background:linear-gradient(#b4985d,#8c703e);color:#fff8df;border-color:#cab783}
 .world-vehicle-controls .gv-page label{display:flex;grid-column:span 2;gap:8px;align-items:center;justify-content:center}
 .world-vehicle-controls .gv-page select{min-height:36px}
-.world-vehicle-controls .gv-hint{grid-column:1/-1;margin:0;font-size:10px;line-height:1.4;color:#b5d4c9}
+.world-vehicle-controls .gv-hint{grid-column:1/-1;margin:0;font-size:14px;line-height:1.45;color:#eefcf4}
 .world-vehicle-controls .wt-crane:not([hidden])+.gv-hint{display:none}
 .world-vehicle-controls .gv-quick button{background:#284b48;border-color:#72948a;color:#f2f7e7}
 .world-vehicle-controls .gv-quick .gv-pause{color:#ffe1a5}
@@ -135,3 +135,5 @@ body.world-vehicle-playing{overflow:hidden;overscroll-behavior:none}
  .world-vehicle-controls .gv-menu-footer{padding:8px 14px}
  .world-vehicle-controls .gv-menu-footer p{margin-top:5px;font-size:11px}
 }
+
+.world-vehicle-controls .gv-menu-body p{font-size:14px;line-height:1.55}

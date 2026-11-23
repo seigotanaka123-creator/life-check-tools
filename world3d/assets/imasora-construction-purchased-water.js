@@ -37,7 +37,7 @@ export function purchasedWaterAction(s,action,value){
     if(previous){ok(previous.kind===action,'同じ番号で別の出庫はできません。');return s;}
     ok(receivingAvailable(s),'受付の近くで降車し、移送が終わってから操作してください。');
     ok(s.events.length<2000,'作業記録が上限です。保存を保護して停止しました。');
-    if(action==='dispatch'){ok(purchasedWaterTotals(s).stock>=WATER_PACKAGE,'未出庫の火星水が32 Lありません。');ok(s.allocated+WATER_PACKAGE<=768,'この確認区画の容量は192 Lです。');}
+    if(action==='dispatch'){ok(purchasedWaterTotals(s).stock>=WATER_PACKAGE,'未出庫のアマネ星水が32 Lありません。');ok(s.allocated+WATER_PACKAGE<=768,'この確認区画の容量は192 Lです。');}
     else ok(s.work.source>=WATER_PACKAGE,'給水槽に32 L必要です。水路や車載の水を遠くから戻すことはできません。');
     const n=copy(s);n.events.push({id:value,kind:action,q:WATER_PACKAGE,status:'moving'});n.delivery={id:value,kind:action,q:WATER_PACKAGE,moved:0,clock:0};
     if(action==='dispatch')n.allocated+=WATER_PACKAGE;

@@ -70,7 +70,7 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     },
     buildCatalog: [
       { id: "sky-garden", name: "空中庭園", note: "白レンが歩ける大型休憩所", color: 0xa8efcf, size: [74, 48, 62] },
-      { id: "ufo-pad", name: "UFO乗り場", note: "今いる場所に設置する着陸パッド", color: 0x8de9ff, size: [92, 8, 92], placement: "current" },
+      { id: "ufo-pad", name: "UFO乗り場", note: "空駅の常設乗り場", color: 0x8de9ff, size: [92, 8, 92], placement: "current", internal: true },
     ],
   }),
   mars: map({
@@ -80,24 +80,24 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     // 変えずに維持する。
     world: { width: 1500, depth: 1000 },
     source: {
-      title: "火星マップ",
-      description: "火星の赤い着陸地を歩いて探索し、火星素材ショップと常設のUFO乗り場から地球側へ帰還できます。",
-      layout: "拡張した火星歩行範囲・火星地表・外周柵・火星素材ショップ・常設UFO乗り場と顔認証システム",
+      title: "アマネ星マップ",
+      description: "アマネ星の赤い着陸地を歩いて探索し、アマネ星素材ショップと常設のUFO乗り場から地球側へ帰還できます。",
+      layout: "拡張したアマネ星歩行範囲・アマネ星地表・外周柵・アマネ星素材ショップ・常設UFO乗り場と顔認証システム",
       pixelSize: [1536, 1024],
       composite: "mars-surface-terrain-v1",
       references: [],
     },
     palette: { ground: 0xa64c2d, edge: 0x4a2119, fog: 0x01040d, accent: 0xffb36d },
-    // 到着演出を使わない内部フォールバック用の火星地表開始地点。UFOの
+    // 到着演出を使わない内部フォールバック用のアマネ星地表開始地点。UFOの
     // 外殻・床の中に生成されないよう、常設UFO乗り場の十分外側に置く。
-    // 開発タブの「火星マップ」は、この座標ではなく宇宙からの到着演出を
+    // 開発タブの「アマネ星マップ」は、この座標ではなく宇宙からの到着演出を
     // 再生して、操縦席から既存の引き戸・搭乗足場へ降りる経路を検証する。
     // 旧範囲での安全スポーン X -318.0 / Z 118.4 を保つよう、
     // 拡張後の正規化座標へ換算する。
     spawn: { point: [.288, .6184], heading: Math.PI / 2 },
     entry: {
       id: "mars-landing-site",
-      name: "火星着陸地",
+      name: "アマネ星着陸地",
       type: "landing-site",
       // 着陸地も同じワールド座標を保つ。
       point: [.3568, .6184],
@@ -108,10 +108,10 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     fixedStructures: [
       {
         id: "mars-material-shop",
-        name: "火星素材ショップ",
+        name: "アマネ星素材ショップ",
         type: "mars-material-shop",
         // X 280 / Z -160。常設UFO、顔認証、安全スポーンのいずれにも
-        // 重ならない火星側の空き地に置き、入口をUFO側へ向ける。
+        // 重ならないアマネ星側の空き地に置き、入口をUFO側へ向ける。
         point: [.6866667, .34],
         rotationDeg: -58,
         footprint: [104, 88],
@@ -122,19 +122,19 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
     decoration: { marsTerrain: true, perimeterFence: true },
     buildCatalog: [
       // 常設設備。UI の建造候補には出さず、再構築時に必ず同じ位置へ復元する。
-      { id: "ufo-pad", name: "UFO乗り場", note: "火星から帰還する常設乗り場", color: 0x8de9ff, size: [92, 8, 92], placement: "current", internal: true },
+      { id: "ufo-pad", name: "UFO乗り場", note: "アマネ星から帰還する常設乗り場", color: 0x8de9ff, size: [92, 8, 92], placement: "current", internal: true },
     ],
   }),
   space: map({
     // UFOで空マップの外周を越えた時だけ入る飛行専用マップ。
     // 前進スクロールはジェット機・ジェットコースター級の実移動速度に
-    // 引き上げる。そのままでは到着時間だけが短くなるため、火星の配置・
-    // 前進をさらに25%上げる分だけ、火星と境界も同じ比率で遠方へ広げる。
-    // 前進の体感速度を上げても、火星までの航行時間は実時間で約3分に固定する。
+    // 引き上げる。そのままでは到着時間だけが短くなるため、アマネ星の配置・
+    // 前進をさらに25%上げる分だけ、アマネ星と境界も同じ比率で遠方へ広げる。
+    // 前進の体感速度を上げても、アマネ星までの航行時間は実時間で約3分に固定する。
     world: { width: 3000000, depth: 2000000 },
     source: {
       title: "宇宙マップ",
-      description: "見えている星すべてが実座標を持つ立体星空を、UFOで自由に航行します。遠方の火星を目指せます。",
+      description: "見えている星すべてが実座標を持つ立体星空を、UFOで自由に航行します。遠方のアマネ星を目指せます。",
       layout: "UFO専用の境界遷移先・飛行空間",
       pixelSize: [1536, 1024],
       composite: "ufo-space-flight-foundation-v1",
@@ -198,10 +198,10 @@ export const IMASORA_WORLD_MAPS = Object.freeze({
   }),
   construction: map({
     // Expand walkable land, not the source-image coordinate system or saved buildings.
-    world: { width: 5400, depth: 3600, layoutWidth: 540, layoutDepth: 360 },
+    world: { width: 11800, depth: 3600, layoutWidth: 540, layoutDepth: 360 },
     source: {
       title: "工事現場",
-      description: "橋1と元の造成地を残して、四方へ縦横10倍・面積100倍（5,400×3,600）に広がった工事現場です。",
+      description: "橋1の先に、造成地と重機で登れる山の採土場が広がります。",
       layout: "工事現場ベース画像に描かれた左上の橋1接続路と造成地を同一比率で投影",
       pixelSize: [1536, 1024],
       texture: "./assets/imasora-land-map-base-v1.png",

@@ -26,6 +26,11 @@ export function editWorldReel(old,a){
 export const reelWorldParts=c=>reelParts(reelWorld(c)?.rooms??[]).map(p=>({...p,id:'reel-'+p.id+'-'+(p.key??p.side??p.kind),angle:0}));
 export const reelTimber=c=>reelVolume(reelWorld(c)?.rooms??[]);
 export const reelDecoration=c=>(reelWorld(c)?.rooms??[]).reduce((n,r)=>n+(r.structure?.items??[]).filter(i=>['door','window','furniture'].includes(i.kind)).length,0);
+// Tile is a finish on the usual wooden floor, not a different load-bearing slab.
+export const reelTilesUsed=rooms=>rooms.reduce((total,r)=>r.floorMaterial==='tile'
+ ?total+Math.ceil(floorParts(r).reduce((area,p)=>area+p.w*p.d,0)/256):total,0);
+export const reelTilesLeft=world=>(world.constructionPackTrialLedger?.quantities.auxiliaryUnits.tiles??0)
+ -reelTilesUsed(reelWorld(world.constructionHighBuild)?.rooms??[]);
 // Check the solid volume that this edit adds. An existing contact beside an
 // unchanged floor must not prevent extending its other end.
 export function reelAddedParts(before,after){const old=reelWorldParts(before),byId=new Map(old.map(p=>[p.id,p])),added=[];for(const p of reelWorldParts(after)){const same=byId.get(p.id);if(same&&['x','y','z','w','h','d'].every(k=>same[k]===p[k]))continue;let pending=[p];for(const b of old){const next=[];for(const q of pending){const lo=[q.x-q.w/2,q.y-q.h/2,q.z-q.d/2],hi=[q.x+q.w/2,q.y+q.h/2,q.z+q.d/2],cutLo=[b.x-b.w/2,b.y-b.h/2,b.z-b.d/2].map((v,i)=>Math.max(v,lo[i])),cutHi=[b.x+b.w/2,b.y+b.h/2,b.z+b.d/2].map((v,i)=>Math.min(v,hi[i]));if(cutLo.some((v,i)=>v>=cutHi[i]-.00001)){next.push(q);continue;}const put=(l,h)=>{if(h.every((v,i)=>v-l[i]>.00001))next.push({...q,x:(l[0]+h[0])/2,y:(l[1]+h[1])/2,z:(l[2]+h[2])/2,w:h[0]-l[0],h:h[1]-l[1],d:h[2]-l[2]});};for(let axis=0;axis<3;axis++){const l=lo.slice(),h=hi.slice();h[axis]=cutLo[axis];put(l,h);const l2=lo.slice(),h2=hi.slice();l2[axis]=cutHi[axis];put(l2,h2);lo[axis]=cutLo[axis];hi[axis]=cutHi[axis];}}pending=next;if(!pending.length)break;}added.push(...pending);}return added;}

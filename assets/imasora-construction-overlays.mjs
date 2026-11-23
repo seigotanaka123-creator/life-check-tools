@@ -17,7 +17,7 @@ export function closeConstructionGuide(){if(guide?.open)guide.close();}
 // becomes a new work/drive command while a player is reading the lesson.
 if(typeof window!=='undefined')for(const type of ['keydown','keyup'])window.addEventListener(type,e=>{
  if(!constructionOverlayOpen())return;
- if(e.key==='Escape'&&type==='keydown'){e.preventDefault();if(guide?.open)closeConstructionGuide();else [...live].at(-1)?.close?.();}
+ if(e.key==='F8'&&type==='keydown'){e.preventDefault();if(guide?.open)closeConstructionGuide();else [...live].at(-1)?.close?.();}
  if(['w','a','s','d','e','x','f','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)&&!e.target?.closest?.('button,input,select,textarea'))e.preventDefault();
  e.stopImmediatePropagation();
 },true);

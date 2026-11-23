@@ -3,15 +3,15 @@ import {nativeSoilLayers} from './imasora-construction-native-soil-layers.mjs?v=
 import {assertVehicleHeight} from './imasora-construction-vehicle-elevation.mjs?v=120ov';
 import {bucketContactGeometry} from './imasora-construction-excavator-contact.js?v=120fc';
 import {excavatorGroundFrame,groundPoint} from './imasora-construction-native-excavator-ground.mjs?v=120pv';
-import {earthBase,earthPatches} from './imasora-construction-field-earth.mjs?v=120ov';
-import {transportArea,transportFences,transportPoseKey,assertTransportField} from './imasora-construction-transport-field.mjs?v=120ov';
+import {earthBaseReader,earthPatches,patchColumns} from './imasora-construction-field-earth.mjs?v=120ov';
+import {transportArea,transportFences,transportPoseKey,assertTransportField,transportDigProtection,nativeStorageBin,storageBinBox} from './imasora-construction-transport-field.mjs?v=120ov';
 import {dumpCabLift} from './imasora-construction-dump-cab.mjs?v=120ov';
 import {nativeDumpPoint,nativeDumpLocal,nativeDumpBox,nativeDumpPose,boxLocal,boxExtent,boxesOverlap3D,nativeDumpWheelOffsets} from './imasora-construction-native-dump-pose.mjs?v=120pv';
 import {EXCAVATION_FENCES} from './imasora-construction-world-excavation-model.js?v=120ov';
 import {canonical} from './imasora-construction-state.js';
-import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilVoxel,soilLooseVoxel,soilTransportGeometry,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120pv';
+import {createNativeSoilTransport,validateSoilTransport,soilTransportCommand,soilVoxel,soilLooseVoxel,soilTransportGeometry,handEarthSoilDelta,handEarthPlacedPiece,scoopTerrainDelta,SOIL_LIMITS,SOIL_CAPACITY} from './imasora-construction-soil-transport.mjs?v=120pv';
 import {unpackExcavation} from './imasora-construction-excavator-save.js?v=120ov';
-import {armPose,PLOT,BIN} from './imasora-construction-excavator.js?v=120ov';
+import {armPose,PLOT} from './imasora-construction-excavator.js?v=120ov';
 import {WALKER,SITE} from './imasora-construction-loader-physics.js?v=120ov';
 
 export const SHOVEL_WORK_SCOPE='imasora-shared-soil-hand-work-isolated-v1';
@@ -23,34 +23,225 @@ export const SHOVEL_PLACE_REACH=48;
 const toolReach=kind=>kind==='drop'?SHOVEL_PLACE_REACH:SHOVEL_REACH;
 const withinReach=(kind,hand,tip,casting=false)=>Math.hypot(...tip.map((v,j)=>v-hand[j]))<=toolReach(kind)&&(kind!=='drop'||Math.abs(tip[1]-hand[1])<=(casting?SHOVEL_PLACE_REACH:SHOVEL_REACH));
 const check=(ok,msg)=>{if(!ok)throw Error('シャベル作業：'+msg);},copy=structuredClone;
+const nativeCoordinateLimits=[8400,650,5200];
+function workCoordinate(s,value,axis){
+ const limit=s.version===2?nativeCoordinateLimits[axis]:650;
+ return finite(value,-limit,limit);
+}
 const exact=(v,names)=>check(v&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join('|')===[...names].sort().join('|'),'保存の項目が不正です。');
 const finite=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,64}$/.test(v);
-const boxesCache=new WeakMap(),machineCache=new WeakMap(),certifiedSoil=new WeakMap();
-const machineSourceCache=new WeakMap();
-export function shovelMachineState(s){const source=s.soil.initial.source;let w=machineSourceCache.get(source);if(!w){w=freeze(unpackExcavation(source.excavation.packet));machineSourceCache.set(source,w);}const g=s.version===2?excavatorGroundFrame(s):null;return s.machineArm?{...w,...(g&&(g.slope>1e-12||Math.abs(g.position[1])>1e-12)?{groundPose:g}:{}),groundPatches:earthPatches(s.soil),arm:s.machineArm,load:s.soil.containers.bucket.amount/64,...(s.machineVehicle?{loader:{...w.loader,vehicle:{...w.loader.vehicle,...s.machineVehicle,field:s.soil.field,speed:0}}}:{})}:w;}
+const boxesCache=new WeakMap(),machineCache=new WeakMap(),certifiedSoil=new WeakMap(),machineSourceCache=new WeakMap();
+export function shovelMachineState(s){const source=s.soil.initial.source;let w=machineSourceCache.get(source);if(!w){w=freeze(unpackExcavation(source.excavation.packet));machineSourceCache.set(source,w);}const g=s.version===2?excavatorGroundFrame(s):null;return s.machineArm?{...w,...(g&&(g.slope>1e-12||Math.abs(g.position[1])>1e-12)?{groundPose:g}:{}),groundPatches:earthPatches(s.soil),binCollider:nativeStorageBin(s),arm:s.machineArm,load:s.soil.containers.bucket.amount/64,...(s.machineVehicle?{loader:{...w.loader,vehicle:{...w.loader.vehicle,...s.machineVehicle,field:s.soil.field,speed:0}}}:{})}:w;}
 function freeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){for(const v of Object.values(value))freeze(v);Object.freeze(value);}return value;}
 function certify(soil){if(!certifiedSoil.has(soil)){validateSoilTransport(soil);freeze(soil);certifiedSoil.set(soil,{site:canonical(soil.site),initial:canonical(soil.initial)});}return certifiedSoil.get(soil);}
 export const shovelForward=p=>({x:Math.sin(p.heading),z:Math.cos(p.heading)});
 export const shovelHand=p=>{const f=shovelForward(p);return[p.x+f.x*14,p.y+18,p.z+f.z*14];};
 export function createShovelWork(source){return validateShovelWork({format:SHOVEL_WORK_FORMAT,scope:SHOVEL_WORK_SCOPE,version:1,revision:0,soil:createNativeSoilTransport(source),player:{x:83,y:0,z:26,heading:-Math.PI/2,travel:0},dump:{x:135,z:0,heading:0},job:null});}
-export function shovelSoilBoxes(soil){let b=boxesCache.get(soil);if(!b){b=freeze(soilTransportGeometry(soil));boxesCache.set(soil,b);}return b;}
-export function shovelMachines(s){const key=s.machineArm??s.soil.initial.source;const source=s.soil.initial.source;let entry=machineCache.get(key),m=entry?.source===source&&entry.soil===s.soil&&entry.pose===transportPoseKey(s)&&entry.decks===s.decks?entry.boxes:null;if(!m){const w=shovelMachineState(s),v=w.loader.vehicle,pose=armPose(w);const g=s.version===2?excavatorGroundFrame(s):w.groundPose;m=[g?{position:groundPoint(g,0,24,0),half:[35,20,44],axes:g.axes,heading:v.heading}:{position:[v.x,22,v.z],half:[35,22,44],heading:v.heading},{position:[BIN.x,5,BIN.z],half:[BIN.width/2,5,BIN.depth/2],heading:0}];if(g)for(const x of[-28,28])m.push({position:groundPoint(g,x,8,0),half:[5.25,8,38.2],axes:g.axes,heading:v.heading});for(let k=0;k<2;k++){const a=pose.world[k],b=pose.world[k+1],n=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/4);for(let i=0;i<=n;i++){const t=i/n;m.push({position:[a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z+(b.z-a.z)*t],half:[5,5,5],heading:0});}}if(g){const parts=bucketContactGeometry(w,pose).all,min=[0,1,2].map(i=>Math.min(...parts.map(p=>p.min[i]))),max=[0,1,2].map(i=>Math.max(...parts.map(p=>p.max[i])));m.push({position:min.map((n,i)=>(n+max[i])/2),half:min.map((n,i)=>(max[i]-n)/2),heading:0});}else m.push({position:[pose.bucket.x,pose.bucket.y,pose.bucket.z],half:[12,8,13],heading:pose.heading});machineCache.set(key,{source,soil:s.soil,pose:transportPoseKey(s),decks:s.decks,boxes:m});}return m;}
+export function shovelSoilBoxes(soil){let b=boxesCache.get(soil);if(!b){const delta=scoopTerrainDelta(soil);b=(delta&&['release','reserve'].includes(delta.command.type)&&boxesCache.get(delta.previous))||freeze(soilTransportGeometry(soil));boxesCache.set(soil,b);}return b;}
+export function shovelExcavatorBody(vehicle,ground){
+ return ground?{position:groundPoint(ground,0,24,0),half:[35,20,44],axes:ground.axes,heading:vehicle.heading}:
+  {position:[vehicle.x,22,vehicle.z],half:[35,22,44],heading:vehicle.heading};
+}
+export function shovelMachines(s){const key=s.machineArm??s.soil.initial.source;const source=s.soil.initial.source;let entry=machineCache.get(key),m=entry?.source===source&&entry.soil===s.soil&&entry.pose===transportPoseKey(s)&&entry.decks===s.decks?entry.boxes:null;if(!m){const w=shovelMachineState(s),v=w.loader.vehicle,pose=armPose(w);const g=s.version===2?excavatorGroundFrame(s):w.groundPose;m=[shovelExcavatorBody(v,g),storageBinBox(s)];if(g)for(const x of[-28,28])m.push({position:groundPoint(g,x,8,0),half:[5.25,8,38.2],axes:g.axes,heading:v.heading});for(let k=0;k<2;k++){const a=pose.world[k],b=pose.world[k+1],n=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)/4);for(let i=0;i<=n;i++){const t=i/n;m.push({position:[a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z+(b.z-a.z)*t],half:[5,5,5],heading:0});}}if(g){const {min,max}=bucketContactGeometry(w,pose).bounds;m.push({position:min.map((n,i)=>(n+max[i])/2),half:min.map((n,i)=>(max[i]-n)/2),heading:0});}else m.push({position:[pose.bucket.x,pose.bucket.y,pose.bucket.z],half:[12,8,13],heading:pose.heading});machineCache.set(key,{source,soil:s.soil,pose:transportPoseKey(s),decks:s.decks,boxes:m});}return m;}
 const dumpBody=s=>{const p=nativeDumpPose(s),tilted=p.enabled;return nativeDumpBox(s,[0,(tilted?24.5:23)+dumpCabLift/2,0],[34,(tilted?20:23)+dumpCabLift/2,43]);};
 function local(point,b){return boxLocal(point,b);}
-export function shovelSegmentHits(a,b,box,padding=.25){const aa=local(a,box),bb=local(b,box),h=box.half??Array(3).fill(box.size/2);let lo=0,hi=1;for(let j=0;j<3;j++){const d=bb[j]-aa[j],min=-h[j]-padding,max=h[j]+padding;if(Math.abs(d)<1e-9){if(aa[j]<min||aa[j]>max)return false;}else{let u=(min-aa[j])/d,v=(max-aa[j])/d;if(u>v)[u,v]=[v,u];lo=Math.max(lo,u);hi=Math.min(hi,v);if(lo>hi)return false;}}if(box.kind==='wheel'){const dy=bb[1]-aa[1],dz=bb[2]-aa[2],den=dy*dy+dz*dz,t=den?Math.max(lo,Math.min(hi,-(aa[1]*dy+aa[2]*dz)/den)):lo;return Math.hypot(aa[1]+dy*t,aa[2]+dz*t)<=h[1]+padding;}return true;}
+export function shovelSegmentHits(a,b,box,padding=.25){
+ const p=box.position,aligned=!box.axes&&(box.heading??0)===0;
+ const start=aligned?a:local(a,box),end=aligned?b:local(b,box);
+ const half=box.half??[box.size/2,box.size/2,box.size/2];
+ let lo=0,hi=1;
+ for(let j=0;j<3;j++){
+  const offset=aligned?p[j]:0,from=start[j]-offset,to=end[j]-offset;
+  const d=to-from,min=-half[j]-padding,max=half[j]+padding;
+  if(Math.abs(d)<1e-9){
+   if(from<min||from>max)return false;
+  }else{
+   const u=(min-from)/d,v=(max-from)/d;
+   lo=Math.max(lo,Math.min(u,v));hi=Math.min(hi,Math.max(u,v));
+   if(lo>hi)return false;
+  }
+ }
+ if(box.kind==='wheel'){
+  const y=start[1]-(aligned?p[1]:0),z=start[2]-(aligned?p[2]:0);
+  const dy=end[1]-(aligned?p[1]:0)-y,dz=end[2]-(aligned?p[2]:0)-z;
+  const den=dy*dy+dz*dz,t=den?Math.max(lo,Math.min(hi,-(y*dy+z*dz)/den)):lo;
+  return Math.hypot(y+dy*t,z+dz*t)<=half[1]+padding;
+ }
+ return true;
+}
 function circleHits(p,r,b){if(b.axes)return boxesOverlap3D({position:[p.x,p.y+WALKER.height/2,p.z],half:[r,WALKER.height/2,r]},b,.05);const l=local([p.x,p.y,p.z],b),h=b.half??Array(3).fill(b.size/2);if(p.y+WALKER.height<=b.position[1]-h[1]+.05||p.y>=b.position[1]+h[1]-.05)return false;return Math.hypot(Math.max(0,Math.abs(l[0])-h[0]),Math.max(0,Math.abs(l[2])-h[2]))<r;}
-const groundColumns=new WeakMap();
-function soilColumns(soil){let index=groundColumns.get(soil);if(!index){index=new Map();for(const b of shovelSoilBoxes(soil)){const r=b.size/2;for(let i=Math.floor((b.position[0]-r)/8);i<=Math.floor((b.position[0]+r)/8);i++)for(let k=Math.floor((b.position[2]-r)/8);k<=Math.floor((b.position[2]+r)/8);k++){const key=i+","+k;if(!index.has(key))index.set(key,[]);index.get(key).push(b);}}groundColumns.set(soil,index);}return index;}
+const groundColumns=new WeakMap(),hardColumns=new WeakMap(),soilAreaQueries=new WeakMap(),looseContactBoxes=new WeakSet();
+function indexSoilBoxes(index,boxes){
+ for(const b of boxes){
+  const r=b.size/2;
+  for(let x=Math.floor((b.position[0]-r)/8);x<=Math.floor((b.position[0]+r)/8);x++)for(let z=Math.floor((b.position[2]-r)/8);z<=Math.floor((b.position[2]+r)/8);z++){
+   const key=x+','+z,parts=index.get(key)??[];parts.push(b);index.set(key,parts);
+  }
+ }
+}
+function hardSoilColumns(soil){
+ let index=hardColumns.get(soil);
+ if(index)return index;
+ // The scoop checks earth separately at each cut. Build the hard-contact
+ // index from non-earth material only; occupancy and cell bounds are exact.
+ const nonEarth=entries=>Object.fromEntries(Object.entries(entries).filter(([,b])=>b.materialId!=='earth-soil'));
+ index=new Map();
+ indexSoilBoxes(index,soilTransportGeometry({blocks:nonEarth(soil.blocks),loose:nonEarth(soil.loose??{})}));
+ hardColumns.set(soil,index);
+ return index;
+}
+function soilColumns(soil){
+ let index=groundColumns.get(soil);if(index)return index;
+ const scoop=scoopTerrainDelta(soil);
+ if(scoop&&['release','reserve'].includes(scoop.command.type)){
+  index=soilColumns(scoop.previous);groundColumns.set(soil,index);return index;
+ }
+ // A checked save may reconstruct the unchanged loose collection as a
+ // different object. Terrain-only deltas still leave every loose box intact.
+ const terrainOnly=scoop&&(scoop.command.type==='open-ground'||
+  scoop.command.type==='reserve-batch'&&soil.pending?.segments.every(part=>part.from==='terrain'));
+ if(scoop&&(scoop.previous.loose===soil.loose||terrainOnly)){
+  const prior=soilColumns(scoop.previous);
+  if((prior.depth??0)<24){
+   const keys=new Set(),changes=new Map();
+   if(scoop.command.type==='open-ground')for(const patch of scoop.command.patches){
+    for(const [x,z] of patchColumns(soil,patch))for(let y=-4;y<0;y++)keys.add([x,y,z].join(','));
+   }
+   if(scoop.command.type==='reserve-batch')for(const part of soil.pending.segments){
+    for(const p of part.positions)keys.add(p.map(n=>Math.floor(n/4)).join(','));
+   }
+   for(const key of keys){
+    const [x,,z]=key.split(',').map(Number);
+    for(let i=x;i<=x+1;i++)for(let k=z;k<=z+1;k++){
+     const cell=i+','+k;
+     if(!changes.has(cell))changes.set(cell,(prior.get(cell)??[]).filter(box=>
+      looseContactBoxes.has(box)||!keys.has(box.position.map(n=>Math.floor(n/8)).join(','))));
+    }
+   }
+   const blocks=Object.fromEntries([...keys].filter(key=>soil.blocks[key]).map(key=>[key,soil.blocks[key]]));
+   indexSoilBoxes(changes,freeze(soilTransportGeometry({blocks,loose:{}})));
+   index={get:key=>changes.has(key)?changes.get(key):prior.get(key),depth:(prior.depth??0)+1};
+   groundColumns.set(soil,index);return index;
+  }
+ }
+ const delta=handEarthSoilDelta(soil),previous=delta&&groundColumns.get(delta.previous);
+ if(previous&&(previous.depth??0)<24){
+  const changes=new Map(),[x,,z]=delta.base.map(n=>Math.floor(n/4)),keys=new Set(delta.keys);
+  for(const dx of [0,1])for(const dz of [0,1]){
+   const key=(x+dx)+','+(z+dz);
+   changes.set(key,(previous.get(key)??[]).filter(b=>looseContactBoxes.has(b)||!keys.has(b.position.map(n=>Math.floor(n/8)).join(','))));
+  }
+  // An earlier legacy loose fragment may use the same world cell as a
+  // tracked terrain key. The source list comes from the immutable blocks.
+  const changed=Object.fromEntries(delta.keys.filter(key=>soil.blocks[key]).map(key=>[key,soil.blocks[key]]));
+  indexSoilBoxes(changes,soilTransportGeometry({blocks:changed,loose:{}}));
+  index={get:key=>changes.has(key)?changes.get(key):previous.get(key),depth:(previous.depth??0)+1};
+ }else{
+  index=new Map();
+  const boxes=shovelSoilBoxes(soil);
+  if(Object.keys(soil.loose??{}).length){
+   const count=soilTransportGeometry({blocks:{},loose:soil.loose}).length;
+   if(count)for(const box of boxes.slice(-count))looseContactBoxes.add(box);
+  }
+  indexSoilBoxes(index,boxes);
+ }
+ groundColumns.set(soil,index);return index;
+}
 function groundColumn(soil,x,z){return soilColumns(soil).get(Math.floor(x/8)+","+Math.floor(z/8))??[];}
 // This is only a conservative broad phase. Keep the real cube faces, heights
 // and exact narrow-phase tests, including boxes spanning a column boundary.
 // The immutable soil reference changes with every reservation/completion, so
 // a new shape always gets a new index; old worlds are weakly held.
-export function shovelNearbySoil(soil,x,z,r){check(finite(x,-5200,5200)&&finite(z,-5200,5200)&&finite(r,0,640),'接触範囲が不正です。');const index=soilColumns(soil),found=new Set();for(let i=Math.floor((x-r)/8);i<=Math.floor((x+r)/8);i++)for(let k=Math.floor((z-r)/8);k<=Math.floor((z+r)/8);k++)for(const b of index.get(i+','+k)??[])found.add(b);return [...found];}
-function floorAt(s,x,z,y){let h=earthBase(s.soil,x,z);for(const b of groundColumn(s.soil,x,z)){const r=b.size/2,top=b.position[1]+r;if(top<=y+2.01&&x>=b.position[0]-r&&x<b.position[0]+r&&z>=b.position[2]-r&&z<b.position[2]+r)h=Math.max(h,top);}return nativeDeckHeight(s,x,z,h,y-5.99);}
-function standing(s,p){const SITE=transportArea(s);if(!finite(p.x,SITE.minX+WALKER.radius,SITE.maxX-WALKER.radius)||!finite(p.z,SITE.minZ+WALKER.radius,SITE.maxZ-WALKER.radius))return false;for(const b of [...shovelMachines(s),dumpBody(s),...nativeDeckBoxes(s,{footY:p.y,x:p.x,z:p.z,r:20}),...shovelNearbySoil(s.soil,p.x,p.z,WALKER.radius)])if(circleHits(p,WALKER.radius,b))return false;const h=floorAt(s,p.x,p.z,p.y);if(Math.abs(h-p.y)>.05)return false;for(const [dx,dz]of [[-8,0],[8,0],[0,-8],[0,8]])if(Math.abs(floorAt(s,p.x+dx,p.z+dz,p.y)-p.y)>2.01)return false;return true;}
-export function walkShovelWork(s,dx,dz,dt,{fast=false}={}){check(!s.job,'作業を終えるか戻してから歩いてください。');check([dx,dz,dt].every(Number.isFinite)&&dt>0&&dt<=.05,'移動の時間が不正です。');const len=Math.max(1,Math.hypot(dx,dz)),travel=WALKER.speed*(fast?2.5:1)*dt,n=Math.max(1,Math.ceil(travel/.5));let p={...s.player},distance=0;for(let i=0;i<n;i++){const x=p.x+dx/len*travel/n,z=p.z+dz/len*travel/n,y=floorAt(s,x,z,p.y),next={...p,x,y,z};if(Math.abs(y-p.y)>2.01||!standing(s,next))break;distance+=Math.hypot(next.x-p.x,next.z-p.z);p=next;}return distance?{...s,revision:s.revision+1,player:{...p,travel:p.travel+distance}}:s;}
+export function shovelNearbySoil(soil,x,z,r){
+ check(finite(x,-8400,8400)&&finite(z,-5200,5200)&&finite(r,0,640),'接触範囲が不正です。');
+ return shovelSoilContactCandidates(soil,x-r,x+r,z-r,z+r).slice();
+}
+const noSoilContact=Object.freeze([]);
+export function shovelSoilContactCandidates(soil,minX,maxX,minZ,maxZ,minY=-Infinity,ignoreEarth=false){
+ const index=ignoreEarth?hardSoilColumns(soil):soilColumns(soil);
+ if(index.size===0)return noSoilContact;
+ const left=Math.floor(minX/8),right=Math.floor(maxX/8),near=Math.floor(minZ/8),far=Math.floor(maxZ/8);
+ // Adjacent swept steps often query the same columns. Key by the exact
+ // inclusive column range and index identity so terrain edits invalidate it.
+ // Round down before rejecting soil below the lowest possible contact.
+ const bottom=Math.floor(minY/8)*8;
+ const key=left+','+right+','+near+','+far+','+bottom;
+ let cache=soilAreaQueries.get(index);
+ if(!cache){cache=new Map();soilAreaQueries.set(index,cache);}
+ if(cache.has(key))return cache.get(key);
+ const found=new Set();
+ for(let x=left;x<=right;x++)for(let z=near;z<=far;z++){
+  for(const box of index.get(x+','+z)??[]){
+   if(box.position[1]+box.size/2>=bottom)found.add(box);
+  }
+ }
+ const candidates=Object.freeze([...found]);
+ if(cache.size>=128)cache.delete(cache.keys().next().value);
+ cache.set(key,candidates);
+ return candidates;
+}
+function floorAt(s,x,z,y,legacy=false){
+ const base=earthBaseReader(s.soil);
+ // On the mountain, the steps and the walker must agree on the drawn slope.
+ // The old voxel height remains readable for saved walkers.
+ if(s.decks&&base.surface&&!legacy)
+  return nativeDeckHeight(s,x,z,nativeSoilLayers(s.soil).read(x,z,y,2.01),y-5.99);
+ let h=base(x,z);
+ for(const b of groundColumn(s.soil,x,z)){
+  const r=b.size/2,top=b.position[1]+r;
+  if(top<=y+2.01&&x>=b.position[0]-r&&x<b.position[0]+r&&z>=b.position[2]-r&&z<b.position[2]+r)h=Math.max(h,top);
+ }
+ return nativeDeckHeight(s,x,z,h,y-5.99);
+}
+function lowHandStep(s,p,b){
+ if(b.size!==2||looseContactBoxes.has(b))return false;
+ const [x,y,z]=b.position,top=y+1;
+ if(top<=p.y||top-p.y>2.01)return false;
+ return handEarthPlacedPiece(s.soil,[Math.floor(x/8)*4,(top-2)/2,Math.floor(z/8)*4])?.shape==='step';
+}
+function standing(s,p,legacy=false){
+ const area=transportArea(s);
+ if(!finite(p.x,area.minX+WALKER.radius,area.maxX-WALKER.radius)||!finite(p.z,area.minZ+WALKER.radius,area.maxZ-WALKER.radius))return false;
+ for(const b of [...shovelMachines(s),dumpBody(s),...nativeDeckBoxes(s,{footY:p.y,x:p.x,z:p.z,r:20}),...shovelNearbySoil(s.soil,p.x,p.z,WALKER.radius)])
+  if(circleHits(p,WALKER.radius,b)&&!lowHandStep(s,p,b))return false;
+ if(Math.abs(floorAt(s,p.x,p.z,p.y,legacy)-p.y)>.05)return false;
+ const mountain=!legacy&&earthBaseReader(s.soil).mountainHeight;
+ const onMountain=mountain&&p.y>0&&Math.abs(mountain(p.x,p.z)-p.y)<.05;
+ for(const [dx,dz]of [[-8,0],[8,0],[0,-8],[0,8]]){
+  const x=p.x+dx,z=p.z+dz,h=floorAt(s,x,z,p.y,legacy);
+  // Lower ground beside a supported foot is an edge, not a wall. On a
+  // continuous hillside a point uphill can also sit above the opposite foot.
+  if(h>p.y+2.01&&!(onMountain&&Math.abs(mountain(x,z)-h)<.05))return false;
+ }
+ return true;
+}
+export function walkShovelWork(s,dx,dz,dt,{fast=false}={}){
+ check(!s.job,'作業を終えるか戻してから歩いてください。');
+ check([dx,dz,dt].every(Number.isFinite)&&dt>0&&dt<=.05,'移動の時間が不正です。');
+ const len=Math.max(1,Math.hypot(dx,dz)),travel=WALKER.speed*(fast?2.5:1)*dt,n=Math.max(1,Math.ceil(travel/.5));
+ const sx=dx/len*travel/n,sz=dz/len*travel/n;
+ let p=s.player,distance=0;
+ function step(x,z){
+  const y=floorAt(s,p.x+x,p.z+z,p.y),candidate={...p,x:p.x+x,y,z:p.z+z};
+  if(y>p.y+2.01||!standing(s,candidate))return null;
+  if(y<p.y-2.01){
+   const low=y+WALKER.height,high=p.y;
+   // Check the space between the upper and lower stances on a sheer drop.
+   if(high>low&&[...shovelMachines(s),dumpBody(s),...nativeDeckBoxes(s,{x:candidate.x,z:candidate.z,r:20}),
+    ...shovelNearbySoil(s.soil,candidate.x,candidate.z,WALKER.radius)].some(b=>shovelSegmentHits(
+     [candidate.x,low,candidate.z],[candidate.x,high,candidate.z],b,WALKER.radius)))return null;
+  }
+  return candidate;
+ }
+ for(let i=0;i<n;i++){
+  let next=step(sx,sz);
+  if(!next&&sx&&sz)next=Math.abs(sx)>=Math.abs(sz)?step(sx,0)??step(0,sz):step(0,sz)??step(sx,0);
+  if(!next)break;
+  distance+=Math.hypot(next.x-p.x,next.z-p.z);p=next;
+ }
+ return distance?{...s,revision:s.revision+1,player:{...p,travel:p.travel+distance}}:s;
+}
 export function turnShovelWork(s,heading){check(finite(heading,-Math.PI,Math.PI),'向きが不正です。');check(!s.job,'作業中は向きを保持します。');return heading===s.player.heading?s:{...s,revision:s.revision+1,player:{...s.player,heading}};}
 function cubePositions(base){const p=[];for(let x=0;x<2;x++)for(let y=0;y<2;y++)for(let z=0;z<2;z++)p.push([base[0]+x,base[1]+y,base[2]+z]);return p;}
 function near(s,target,kind,casting=false){const hand=shovelHand(s.player),f=shovelForward(s.player),dx=target[0]-s.player.x,dz=target[2]-s.player.z,d=Math.hypot(dx,dz);return withinReach(kind,hand,target,casting)&&d>WALKER.radius&&d>0&&(dx*f.x+dz*f.z)/d>=.65;}
@@ -66,6 +257,13 @@ function omittedBoxes(s,t){const hand=shovelHand(s.player),source=t.from==='loos
 export function shovelDigTargets(s){
  if(s.job||s.soil.containers.shovel.amount||s.soil.pending)return[];
  const hand=shovelHand(s.player),area=transportArea(s),limit=s.soil.schema===3?2560:640;
+ const reach=SHOVEL_REACH+10,min=hand.map(n=>Math.ceil((n-reach-4)/8)),max=hand.map(n=>Math.floor((n+reach-4)/8));
+ const nearby=[];
+ for(let x=min[0];x<=max[0];x++)for(let y=min[1];y<=max[1];y++)for(let z=min[2];z<=max[2];z++){
+  const key=[x,y,z].join(','),block=s.soil.blocks[key];
+  if(block&&Math.hypot(x*8+4-hand[0],y*8+4-hand[1],z*8+4-hand[2])<=reach)nearby.push([key,block,[x,y,z]]);
+ }
+ let blockOrder;
  const voxelInside=p=>p[0]>=-limit&&p[0]<limit&&p[2]>=-limit&&p[2]<limit&&p[1]>=-80&&p[1]<=255&&(s.soil.schema!==3||p[0]*2>=area.minX&&p[0]*2+2<=area.maxX&&p[2]*2>=area.minZ&&p[2]*2+2<=area.maxZ);
  // Keep existing targets first. A deposited pile need not start on the old
  // four-unit grid: if that grid offers no clear stroke, try each voxel origin,
@@ -83,22 +281,27 @@ export function shovelDigTargets(s){
     const positions=scoopPositions([x,y,z]);if(positions.every(p=>soilLooseVoxel(s.soil,k,p)))targets.push({from:'loose',looseId:k,positions,materialId:b.materialId,target});
    }
   }
-  for(const[k,b]of Object.entries(s.soil.blocks)){
-   const c=k.split(',').map(Number),centre=c.map(n=>n*8+4);if(Math.hypot(...centre.map((v,j)=>v-hand[j]))>SHOVEL_REACH+10)continue;
+  for(const [k,b,c] of nearby){
    for(let x=0;x<4;x+=step)for(let y=0;y<4;y+=step)for(let z=0;z<4;z+=step){
     if(pass===1&&x%2===0&&y%2===0&&z%2===0)continue;
     const base=[x,y,z].map((v,j)=>c[j]*4+v),target=base.map((n,j)=>n*2+(flat&&j===1?1:2));if(!near(s,target))continue;
-    const positions=scoopPositions(base);if(positions.every(p=>voxelInside(p)&&soilVoxel(s.soil,p)===b.materialId))targets.push({from:'terrain',parent:k,positions,materialId:b.materialId,target});
+    const positions=scoopPositions(base);if(positions.every(p=>voxelInside(p)&&!transportDigProtection(s,p[0]*2+1,p[2]*2+1)&&soilVoxel(s.soil,p)===b.materialId))targets.push({from:'terrain',parent:k,positions,materialId:b.materialId,target});
    }
   }
-  targets.sort((a,b)=>Math.hypot(...a.target.map((v,j)=>v-hand[j]))-Math.hypot(...b.target.map((v,j)=>v-hand[j])));
+  targets.sort((a,b)=>{
+   const distance=Math.hypot(...a.target.map((v,j)=>v-hand[j]))-Math.hypot(...b.target.map((v,j)=>v-hand[j]));
+   if(distance||a.parent===b.parent)return distance;
+   if(!a.parent||!b.parent)return a.parent?1:-1;
+   blockOrder??=new Map(Object.keys(s.soil.blocks).map((key,i)=>[key,i]));
+   return blockOrder.get(a.parent)-blockOrder.get(b.parent);
+  });
   for(const t of targets){const obstacles=[...shovelMachines(s),dumpBody(s),...omittedBoxes(s,t)];if(!obstacles.some(b=>shovelSegmentHits(hand,t.target,b))&&strokeClear(s,'dig',t.target,obstacles))return[t];}
  }
  return[];
 }
 function dumpLocal(s,x,y,z){return nativeDumpPoint(s,x,y,z);}
 export function shovelBladeHits(tip,b){if(b.kind==='wheel'){const p=local(tip,b);return Math.abs(p[0])<=4.5+2&&Math.hypot(Math.max(0,Math.abs(p[1])-.35),Math.max(0,Math.abs(p[2])-2))<=8.65;}return shovelSegmentHits(tip,tip,{...b,half:(b.half??Array(3).fill(b.size/2)).map((v,j)=>v+(j===1?.35:2)-1e-6)},0);}
-export function shovelDumpObstacles(s){const offsets=nativeDumpWheelOffsets(s);return[nativeDumpBox(s,[0,26+dumpCabLift/2,18],[29,18+dumpCabLift/2,18]),nativeDumpBox(s,[0,16,-22],[27,1,18]),...[-27,27].map(x=>nativeDumpBox(s,[x,22,-22],[1,6,19])),...[-40,-4].map(z=>nativeDumpBox(s,[0,22,z],[27,6,1])),...[-31,18].flatMap((z,j)=>[-25.5,25.5].map((x,i)=>nativeDumpBox(s,[x,8.9+offsets[j*2+i],z],[4.5,8.65,8.65],{kind:'wheel'})))];}
+export function shovelDumpObstacles(s,{tailgate=true}={}){const offsets=nativeDumpWheelOffsets(s);return[nativeDumpBox(s,[0,26+dumpCabLift/2,18],[29,18+dumpCabLift/2,18]),nativeDumpBox(s,[0,16,-22],[27,1,18]),...[-27,27].map(x=>nativeDumpBox(s,[x,22,-22],[1,6,19])),...(tailgate?[-40,-4]:[-4]).map(z=>nativeDumpBox(s,[0,22,z],[27,6,1])),...[-31,18].flatMap((z,j)=>[-25.5,25.5].map((x,i)=>nativeDumpBox(s,[x,8.9+offsets[j*2+i],z],[4.5,8.65,8.65],{kind:'wheel'})))];}
 function strokeClear(s,kind,target,boxes,cast=null){const hand=shovelHand(s.player),test={...s,soil:{...s.soil,pending:{amount:8}},job:{kind,target,elapsed:0,...(cast?{cast}:{})}},poses=[],lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
  for(let i=0;i<=512;i++){test.job.elapsed=SHOVEL_STROKE*i/512;const pose=shovelToolPose(test);if(!withinReach(kind,pose.hand,pose.tip))return false;poses.push(pose);for(let j=0;j<3;j++){lo[j]=Math.min(lo[j],pose.hand[j],pose.tip[j]);hi[j]=Math.max(hi[j],pose.hand[j],pose.tip[j]);}}
  // The sweep bounds include every sample, both ends of the handle, and the
@@ -109,18 +312,19 @@ function strokeClear(s,kind,target,boxes,cast=null){const hand=shovelHand(s.play
 function loadPathClear(s,target){return strokeClear(s,'load',target,[...shovelDumpObstacles(s),...shovelMachines(s),...shovelSoilBoxes(s.soil)]);}
 // The walker still collides with the whole bin. A shovel reaches over its
 // actual rims and bottom; it must not pass through the walls or another hull.
-export function shovelStorageObstacles(s){return[
- ...shovelMachines(s).filter(b=>!(b.position[0]===BIN.x&&b.position[1]===5&&b.position[2]===BIN.z)),
- ...shovelDumpObstacles(s),...shovelSoilBoxes(s.soil),
- {position:[BIN.x,1.5,BIN.z],half:[BIN.width/2,1.5,BIN.depth/2]},
+export function shovelStorageObstacles(s,{dumpGateOpen=false}={}){const bin=nativeStorageBin(s);return[
+ ...shovelMachines(s).filter((_,i)=>i!==1),
+ ...shovelDumpObstacles(s,{tailgate:!dumpGateOpen}),...shovelSoilBoxes(s.soil),
+ {position:[bin.x,1.5,bin.z],half:[bin.width/2,1.5,bin.depth/2]},
  ...[-1,1].flatMap(side=>[
-  {position:[BIN.x+side*(BIN.width/2-1.5),5,BIN.z],half:[1.5,5,BIN.depth/2]},
-  {position:[BIN.x,5,BIN.z+side*(BIN.depth/2-1.5)],half:[BIN.width/2,5,1.5]}
+  {position:[bin.x+side*(bin.width/2-1.5),5,bin.z],half:[1.5,5,bin.depth/2]},
+  {position:[bin.x,5,bin.z+side*(bin.depth/2-1.5)],half:[bin.width/2,5,1.5]}
  ])];}
 function storageContact(s,kind){
- if(!['store','take'].includes(kind)||Math.abs(s.player.y)>.05||!standing(s,s.player))return null;
- const p=s.player,clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v)),x=clamp(p.x,BIN.x-BIN.width/2+8,BIN.x+BIN.width/2-8),z=clamp(p.z,BIN.z-BIN.depth/2+8,BIN.z+BIN.depth/2-8);
- const targets=[[-1,0],[1,0],[0,-1],[0,1]].map(([dx,dz])=>[dx?BIN.x+dx*(BIN.width/2-8):x,5.5,dz?BIN.z+dz*(BIN.depth/2-8):z]);
+ const p=s.player,bin=nativeStorageBin(s);
+ if(!['store','take'].includes(kind)||Math.abs(p.y)>.05||Math.hypot(Math.max(0,Math.abs(p.x-bin.x)-bin.width/2),Math.max(0,Math.abs(p.z-bin.z)-bin.depth/2))>72||!standing(s,p))return null;
+ const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v)),x=clamp(p.x,bin.x-bin.width/2+8,bin.x+bin.width/2-8),z=clamp(p.z,bin.z-bin.depth/2+8,bin.z+bin.depth/2-8);
+ const targets=[[-1,0],[1,0],[0,-1],[0,1]].map(([dx,dz])=>[dx?bin.x+dx*(bin.width/2-8):x,5.5,dz?bin.z+dz*(bin.depth/2-8):z]);
  const obstacles=shovelStorageObstacles(s),hand=shovelHand(p);
  for(const target of targets.filter(t=>near(s,t)).sort((a,b)=>Math.hypot(...a.map((v,i)=>v-hand[i]))-Math.hypot(...b.map((v,i)=>v-hand[i]))))if(strokeClear(s,kind,target,obstacles))return{target};
  return null;
@@ -137,11 +341,12 @@ export function shovelLoadTarget(s){if(s.job||s.soil.pending||!s.soil.containers
 // actual quantity into supported empty columns, lowest first; never replace
 // another voxel or send a falling portion through a legacy loose-soil ledge.
 function placementFloor(s,x,z){let h=floorAt(s,x,z,s.decks?s.player.y:256);if(s.decks){const c=nativeSoilLayers(s.soil).columnAt(x,z);for(const [lo,hi] of c?.intervals??[])if(lo<=h+.05&&hi>h)h=hi;}return h;}
-export function shovelDropSurface(s,point=null,{amount=s.soil.containers.shovel.amount,materialId=s.soil.containers.shovel.materialId}={}){
+export function shovelDropSurface(s,point=null,{amount=s.soil.containers.shovel.amount,materialId=s.soil.containers.shovel.materialId,allowProtected=false}={}){
  const SITE=transportArea(s);if(!Number.isSafeInteger(amount)||amount<1||amount>8||!materialId)return null;
  if(point!==null&&(!Array.isArray(point)||point.length!==2||!finite(point[0],SITE.minX,SITE.maxX)||!finite(point[1],SITE.minZ,SITE.maxZ)))return null;
  const f=shovelForward(s.player),x=point?Math.floor(point[0]/4)*4:Math.round((s.player.x+f.x*26)/4)*4,z=point?Math.floor(point[1]/4)*4:Math.round((s.player.z+f.z*26)/4)*4;
  if(x<SITE.minX||x+4>SITE.maxX||z<SITE.minZ||z+4>SITE.maxZ)return null;
+ if(!allowProtected&&transportDigProtection(s,x+2,z+2,2))return null;
  const boxes=shovelNearbySoil(s.soil,x+2,z+2,4),support=[0,1].flatMap(dx=>[0,1].map(dz=>placementFloor(s,x+dx*2+1,z+dz*2+1))),y=Math.max(...support);
  const empty=p=>{const b=s.soil.blocks[p.map(n=>Math.floor(n/4)).join(',')],world=p.map(v=>v*2+1);return !soilVoxel(s.soil,p)&&(!b||b.materialId===materialId)&&!boxes.some(b=>world.every((v,j)=>Math.abs(v-b.position[j])<1+b.size/2-.01));};
  const base=[x/2,Math.round(y/2),z/2],flat=cubePositions(base).slice(0,amount);
@@ -203,7 +408,7 @@ export function shovelDropTarget(s,point=null){return s.job||s.soil.pending?null
 const dropValidationCache=new WeakMap();
 function reservedDropMatches(s,p,j){
  const key=canonical([s.player,s.dump,s.machineArm??null,s.machineVehicle??null,j.target,j.cast??null]),cached=dropValidationCache.get(s.soil);if(cached?.key===key)return cached.matches;
- const point=[Math.floor(p.positions[0][0]/2)*4,Math.floor(p.positions[0][2]/2)*4],t=dropTarget(s,point,{amount:p.amount,materialId:p.materialId});
+ const point=[Math.floor(p.positions[0][0]/2)*4,Math.floor(p.positions[0][2]/2)*4],t=dropTarget(s,point,{amount:p.amount,materialId:p.materialId,allowProtected:true});
  const matches=!!t&&canonical(t.positions)===canonical(p.positions)&&canonical(t.target)===canonical(j.target)&&canonical(t.cast??null)===canonical(j.cast??null);dropValidationCache.set(s.soil,{key,matches});return matches;
 }
 const command=(s,type,job,extra={})=>soilTransportCommand(s.soil,{type,id:job.id+'_'+type,expectedRevision:s.soil.revision,transferId:job.id,...extra});
@@ -221,11 +426,11 @@ export function finishShovelWork(s){check(shovelJobReady(s),'道具が戻るま�
 export function shovelToolPose(s){const h=shovelHand(s.player),f=shovelForward(s.player),rest=[h[0]-f.x*.5,h[1]-9,h[2]-f.z*.5];if(!s.job)return{hand:h,tip:rest,soil:s.soil.containers.shovel.amount,contact:false};const j=s.job,u=j.elapsed/SHOVEL_STROKE,t=u<.45?u/.45:u<.6?1:1-(u-.6)/.4,tip=rest.map((v,i)=>v+((j.cast?.tip??j.target)[i]-v)*Math.max(0,t));if(['load','store','take'].includes(j.kind))tip[1]+=Math.sin(Math.PI*t)*22;else if(j.kind==='dig')tip[1]+=Math.sin(Math.PI*t)*8;else if(j.cast)tip[1]+=Math.sin(Math.PI*t)*4;if(['store','take'].includes(j.kind))h[1]+=9*Math.max(0,t);if(j.kind==='dig'&&s.soil.schema===3&&j.target[1]<0){const travel=Math.min(1,t/.6);for(const i of[0,2]){h[i]+=(j.target[i]-h[i])*travel;tip[i]=rest[i]+(j.target[i]-rest[i])*travel;}tip[1]=t<.6?rest[1]+(3-rest[1])*travel:3+(j.target[1]-3)*(t-.6)/.4;}
  const picked=u>=.55;return{hand:h,tip,soil:['dig','take'].includes(j.kind)?(picked?s.soil.pending.amount:0):(picked?s.soil.containers.shovel.amount:s.soil.containers.shovel.amount+s.soil.pending.amount),contact:t>=.95};}
 export function shovelVisibleSource(s){if(!s.job||s.job.kind!=='dig'||s.job.elapsed/SHOVEL_STROKE>=.55)return[];const p=s.soil.pending;if(p.from==='loose'){const b=s.soil.loose[p.looseId];return p.positions.map(q=>({position:q.map((n,j)=>b.position[j]-4+n*2+1),size:2,materialId:p.materialId}));}return p.positions.map(q=>({position:q.map(n=>n*2+1),size:2,materialId:p.materialId}));}
-export function validateShovelWork(s,{mobileDump=false,aboardDump=false,unloading=false,liveArm=false,aboardExcavator=false,bucketTransfer=false,storageTransfer=false}={}){const SITE=transportArea(s);exact(s,['format','scope','version','revision','soil','player','dump','job',...(liveArm?['machineArm']:[]),...(s.version===2?['machineVehicle']:[]),...(s.decks?['decks']:[])]);check(s.format===SHOVEL_WORK_FORMAT&&s.scope===SHOVEL_WORK_SCOPE&&[1,2].includes(s.version),'通常保存・練習用ダンプは読み込めません。');check(Number.isSafeInteger(s.revision)&&s.revision>=0&&s.revision<Number.MAX_SAFE_INTEGER-1000,'保存番号が不正です。');certify(s.soil);check(s.version===2?liveArm&&s.soil.schema===3:s.soil.schema===2,'由来付き地形が必要です。');if(s.decks){check(s.version===2,'建物の床に対応した保存が必要です。');validateNativeDecks(s.decks);}if(s.version===2){assertTransportField(s.soil);exact(s.machineVehicle,['x','z','heading','wheelTravel',...(s.machineVehicle.groundY===undefined?[]:['groundY'])]);assertVehicleHeight(s.machineVehicle);check(finite(s.machineVehicle.x,SITE.minX,SITE.maxX)&&finite(s.machineVehicle.z,SITE.minZ,SITE.maxZ)&&finite(s.machineVehicle.heading,-Math.PI,Math.PI)&&finite(s.machineVehicle.wheelTravel,-1e12,1e12),'ショベルの位置が不正です。');}exact(s.player,['x','y','z','heading','travel']);check(finite(s.player.x,SITE.minX,SITE.maxX)&&finite(s.player.z,SITE.minZ,SITE.maxZ)&&finite(s.player.y,-32,s.decks?600:256)&&finite(s.player.heading,-Math.PI,Math.PI)&&finite(s.player.travel,0,1e12),'人物の位置が不正です。');exact(s.dump,['x','z','heading',...(s.dump.groundY===undefined?[]:['groundY'])]);assertVehicleHeight(s.dump);check(mobileDump?finite(s.dump.x,SITE.minX,SITE.maxX)&&finite(s.dump.z,SITE.minZ,SITE.maxZ)&&finite(s.dump.heading,-Math.PI,Math.PI):canonical(s.dump)===canonical({x:135,z:0,heading:0}),'車両の位置が不正です。');if(!aboardDump&&!aboardExcavator)check(standing(s,s.player),'人物が土や車体と重なっています。');if(s.job){exact(s.job,['id','kind','elapsed','returning','target',...(s.job.cast?['cast']:[])]);if(s.job.cast){exact(s.job.cast,['tip','arc']);check(s.job.kind==='drop'&&Array.isArray(s.job.cast.tip)&&s.job.cast.tip.length===3&&s.job.cast.tip.every((v,i)=>finite(v,i===1?-650:s.version===2?-5200:-650,i===1?650:s.version===2?5200:650))&&[12,20,28].includes(s.job.cast.arc),'盛土へ置く動作が不正です。');}const j=s.job,p=s.soil.pending;check(id(j.id)&&['dig','load','drop','store','take'].includes(j.kind)&&finite(j.elapsed,0,SHOVEL_STROKE)&&typeof j.returning==='boolean'&&Array.isArray(j.target)&&j.target.length===3&&j.target.every((v,i)=>finite(v,i===1?-650:s.version===2?-5200:-650,i===1?650:s.version===2?5200:650)),'作業の途中状態が不正です。');check(p?.id===j.id&&p.phase==='reserved'&&near(s,j.target,j.kind,!!j.cast),'移送と道具の動きが一致しません。');check(j.kind==='dig'?['loose','terrain'].includes(p.from)&&p.to==='shovel':j.kind==='take'?p.from==='storage'&&p.to==='shovel':p.from==='shovel'&&p.to===(j.kind==='load'?'dump':j.kind==='store'?'storage':'terrain'),'移送先が不正です。');const reserve=s.soil.journal.at(-1);check(reserve.transferId===j.id&&['reserve','reserve-loose'].includes(reserve.type),'作業開始の履歴が不正です。');if(j.kind==='dig'){const positions=p.positions.map(q=>p.from==='loose'?q.map((v,i)=>s.soil.loose[p.looseId].position[i]-4+v*2+1):q.map(v=>v*2+1));const centre=[0,1,2].map(i=>positions.reduce((a,b)=>a+b[i],0)/positions.length);check(centre.every((v,i)=>Math.abs(v-j.target[i])<1e-9),'掘る場所と土が一致しません。');}else if(j.kind==='load'){const p=nativeDumpLocal(s,j.target);check(Math.abs(Math.abs(p[0])-22)<1e-8&&Math.abs(p[1]-38)<1e-8&&p[2]>=-34&&p[2]<=-10,'荷台の受取口が不正です。');}else if(j.kind==='store'||j.kind==='take'){
+export function validateShovelWork(s,{mobileDump=false,aboardDump=false,unloading=false,liveArm=false,aboardExcavator=false,bucketTransfer=false,storageTransfer=false}={}){const SITE=transportArea(s);exact(s,['format','scope','version','revision','soil','player','dump','job',...(liveArm?['machineArm']:[]),...(s.version===2?['machineVehicle']:[]),...(s.decks?['decks']:[])]);check(s.format===SHOVEL_WORK_FORMAT&&s.scope===SHOVEL_WORK_SCOPE&&[1,2].includes(s.version),'通常保存・練習用ダンプは読み込めません。');check(Number.isSafeInteger(s.revision)&&s.revision>=0&&s.revision<Number.MAX_SAFE_INTEGER-1000,'保存番号が不正です。');certify(s.soil);check(s.version===2?liveArm&&s.soil.schema===3:s.soil.schema===2,'由来付き地形が必要です。');if(s.decks){check(s.version===2,'建物の床に対応した保存が必要です。');validateNativeDecks(s.decks);}if(s.version===2){assertTransportField(s.soil);exact(s.machineVehicle,['x','z','heading','wheelTravel',...(s.machineVehicle.groundY===undefined?[]:['groundY'])]);assertVehicleHeight(s.machineVehicle);check(finite(s.machineVehicle.x,SITE.minX,SITE.maxX)&&finite(s.machineVehicle.z,SITE.minZ,SITE.maxZ)&&finite(s.machineVehicle.heading,-Math.PI,Math.PI)&&finite(s.machineVehicle.wheelTravel,-1e12,1e12),'ショベルの位置が不正です。');}exact(s.player,['x','y','z','heading','travel']);check(finite(s.player.x,SITE.minX,SITE.maxX)&&finite(s.player.z,SITE.minZ,SITE.maxZ)&&finite(s.player.y,-32,s.decks?600:256)&&finite(s.player.heading,-Math.PI,Math.PI)&&finite(s.player.travel,0,1e12),'人物の位置が不正です。');exact(s.dump,['x','z','heading',...(s.dump.groundY===undefined?[]:['groundY'])]);assertVehicleHeight(s.dump);check(mobileDump?finite(s.dump.x,SITE.minX,SITE.maxX)&&finite(s.dump.z,SITE.minZ,SITE.maxZ)&&finite(s.dump.heading,-Math.PI,Math.PI):canonical(s.dump)===canonical({x:135,z:0,heading:0}),'車両の位置が不正です。');if(!aboardDump&&!aboardExcavator)check(standing(s,s.player)||!!(s.decks&&earthBaseReader(s.soil).surface&&standing(s,s.player,true)),'人物が土や車体と重なっています。');if(s.job){exact(s.job,['id','kind','elapsed','returning','target',...(s.job.cast?['cast']:[])]);if(s.job.cast){exact(s.job.cast,['tip','arc']);check(s.job.kind==='drop'&&Array.isArray(s.job.cast.tip)&&s.job.cast.tip.length===3&&s.job.cast.tip.every((v,i)=>workCoordinate(s,v,i))&&[12,20,28].includes(s.job.cast.arc),'盛土へ置く動作が不正です。');}const j=s.job,p=s.soil.pending;check(id(j.id)&&['dig','load','drop','store','take'].includes(j.kind)&&finite(j.elapsed,0,SHOVEL_STROKE)&&typeof j.returning==='boolean'&&Array.isArray(j.target)&&j.target.length===3&&j.target.every((v,i)=>workCoordinate(s,v,i)),'作業の途中状態が不正です。');check(p?.id===j.id&&p.phase==='reserved'&&near(s,j.target,j.kind,!!j.cast),'移送と道具の動きが一致しません。');check(j.kind==='dig'?['loose','terrain'].includes(p.from)&&p.to==='shovel':j.kind==='take'?p.from==='storage'&&p.to==='shovel':p.from==='shovel'&&p.to===(j.kind==='load'?'dump':j.kind==='store'?'storage':'terrain'),'移送先が不正です。');const reserve=s.soil.journal.at(-1);check(reserve.transferId===j.id&&['reserve','reserve-loose'].includes(reserve.type),'作業開始の履歴が不正です。');if(j.kind==='dig'){const positions=p.positions.map(q=>p.from==='loose'?q.map((v,i)=>s.soil.loose[p.looseId].position[i]-4+v*2+1):q.map(v=>v*2+1));const centre=[0,1,2].map(i=>positions.reduce((a,b)=>a+b[i],0)/positions.length);check(centre.every((v,i)=>Math.abs(v-j.target[i])<1e-9),'掘る場所と土が一致しません。');}else if(j.kind==='load'){const p=nativeDumpLocal(s,j.target);check(Math.abs(Math.abs(p[0])-22)<1e-8&&Math.abs(p[1]-38)<1e-8&&p[2]>=-34&&p[2]<=-10,'荷台の受取口が不正です。');}else if(j.kind==='store'||j.kind==='take'){
  const t=storageContact(s,j.kind),from=s.soil.containers[p.from],to=s.soil.containers[p.to];
  check(t&&canonical(t.target)===canonical(j.target)&&p.positions.length===0&&reserve.type==='reserve'&&reserve.id===j.id+'_reserve'&&p.amount===Math.min(from.amount+p.amount,SOIL_CAPACITY[p.to]-to.amount,8)&&(j.kind!=='take'||to.amount===0),'保管箱の接触・量・予約が一致しません。');
  }else{check(p.positions.length===p.amount&&(!j.cast&&p.positions.every(q=>q.every((v,i)=>Math.abs(v*2+1-j.target[i])<=1.01))||reservedDropMatches(s,p,j)),'置く土と道具が一致しません。');}}
- else check(s.soil.pending===null||unloading&&s.soil.pending.from==='dump'&&['terrain','storage'].includes(s.soil.pending.to)&&s.soil.pending.phase==='reserved'||bucketTransfer&&s.soil.pending.from==='bucket'&&s.soil.pending.to==='dump'&&s.soil.pending.phase==='reserved'||storageTransfer&&s.soil.pending.from==='storage'&&s.soil.pending.to==='bucket'&&s.soil.pending.phase==='reserved','途中の土に道具がありません。');if(s.job?.kind==='dig'){const p=s.soil.pending,t={from:p.from,looseId:p.looseId,positions:p.positions,parent:p.from==='terrain'?p.positions[0].map(n=>Math.floor(n/4)).join(','):null};check(strokeClear(s,'dig',s.job.target,[...shovelMachines(s),dumpBody(s),...omittedBoxes(s,t)]),'掘削の通り道がふさがっています。');}if(s.job?.kind==='load')check(loadPathClear(s,s.job.target),'積込の通り道がふさがっています。');return s;}
+ else check(s.soil.pending===null||unloading&&s.soil.pending.from==='dump'&&['terrain','storage'].includes(s.soil.pending.to)&&s.soil.pending.phase==='reserved'||bucketTransfer&&s.soil.pending.from==='bucket'&&s.soil.pending.to===(bucketTransfer==='ground'?'terrain':bucketTransfer==='storage'?'storage':'dump')&&s.soil.pending.phase==='reserved'||storageTransfer&&s.soil.pending.from==='storage'&&s.soil.pending.to==='bucket'&&s.soil.pending.phase==='reserved','途中の土に道具がありません。');if(s.job?.kind==='dig'){const p=s.soil.pending,t={from:p.from,looseId:p.looseId,positions:p.positions,parent:p.from==='terrain'?p.positions[0].map(n=>Math.floor(n/4)).join(','):null};check(strokeClear(s,'dig',s.job.target,[...shovelMachines(s),dumpBody(s),...omittedBoxes(s,t)]),'掘削の通り道がふさがっています。');}if(s.job?.kind==='load')check(loadPathClear(s,s.job.target),'積込の通り道がふさがっています。');return s;}
 export function validateShovelContinuation(a,b){validateShovelWork(a);validateShovelWork(b);const ac=certify(a.soil),bc=certify(b.soil);check(a.soil.scope===b.soil.scope&&a.soil.format===b.soil.format&&ac.site===bc.site&&ac.initial===bc.initial,'別の現場へ切り替えられません。');check(b.soil.journal.length>=a.soil.journal.length&&a.soil.journal.every((c,i)=>canonical(c)===canonical(b.soil.journal[i])),'古い土の所有へ戻せません。');check(b.revision>=a.revision&&b.player.travel>=a.player.travel,'古い作業状態へ戻せません。');check(b.revision!==a.revision||canonical(a)===canonical(b),'同じ保存番号の内容が不正です。');return b;}
 function checksum(t){let h=2166136261;for(let i=0;i<t.length;i++)h=Math.imul(h^t.charCodeAt(i),16777619);return(h>>>0).toString(16).padStart(8,'0');}
 export function packShovelWork(s){validateShovelWork(s);return JSON.stringify({kind:SHOVEL_WORK_FORMAT,checksum:checksum(canonical(s)),state:s});}

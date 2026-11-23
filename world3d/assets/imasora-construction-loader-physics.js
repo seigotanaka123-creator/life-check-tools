@@ -1,9 +1,12 @@
 import {SKY_WALK_SPEED,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,beginThreeJump,landThreeJump,updateJumpHold} from './imasora-construction-locomotion.mjs?v=120od';
 import {LEGACY_WORK_AREA,workArea,inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 import {walkFactor,driveFactor} from './imasora-construction-travel-input.mjs?v=120lb';
+import {CONSTRUCTION_STEERING_FACTOR,steerVehicleClearOfContact} from './imasora-construction-shared-field.mjs?v=120ey';
 // Stage 3-1: flat-ground, kinematic vehicle/boarding prototype. No game-save access.
 import {atDriverDoor} from './imasora-construction-boarding.js';
-export const LOADER = Object.freeze({width:60,length:86,floor:9.12,seatZ:-8,seatX:-14,wheelbase:49,wheelRadius:8.9,maxSpeed:100,reverseSpeed:48,acceleration:65,coast:35,brake:190,steering:.47});
+export const LOADER = Object.freeze({width:60,length:86,floor:9.12,seatZ:-8,seatX:-14,wheelbase:49,wheelRadius:8.9,maxSpeed:180,reverseSpeed:86.4,acceleration:125,coast:70,brake:305,steering:.47});
+const SITE_DRIVE=Object.freeze({maxSpeed:248,reverseSpeed:117,acceleration:195,coast:101,brake:430});
+export const loaderDriveSpeedLimit=vehicle=>driveFactor({fast:true})*(vehicle?.field?SITE_DRIVE:LOADER).maxSpeed;
 export const loaderCab=v=>v?.waterTruck?{floor:20,seatZ:20,seatX:-14}:LOADER;
 export const WALKER = Object.freeze({radius:15.6,height:26.6,speed:SKY_WALK_SPEED});
 export const SITE = LEGACY_WORK_AREA;
@@ -66,14 +69,22 @@ export function stepVehicle(vehicle,input,dt,obstacles=OBSTACLES){
   const v={...vehicle},throttle=clamp(input.throttle||0,-1,1),steer=clamp(input.steer||0,-1,1);
   // The vehicle faces local +Z with +Y up: driver's right is -X.
   // Positive input is right, but Three's positive yaw turns +Z toward +X (left).
-  v.steering=approach(v.steering,-steer*LOADER.steering,dt*1.8);
-  const factor=driveFactor(input),target=throttle*(throttle>=0?LOADER.maxSpeed:LOADER.reverseSpeed)*factor;
-  v.speed=approach(v.speed,input.brake?0:target,dt*(input.brake?LOADER.brake:throttle?LOADER.acceleration*factor:LOADER.coast));
-  const travel=v.speed*dt,angle=travel*2*Math.tan(v.steering)/LOADER.wheelbase;
+  const maxSteering=LOADER.steering*(vehicle.field?CONSTRUCTION_STEERING_FACTOR:1);
+  v.steering=approach(v.steering,-steer*maxSteering,dt*1.8);
+  const limits=vehicle.field?SITE_DRIVE:LOADER,factor=driveFactor(input),target=throttle*(throttle>=0?limits.maxSpeed:limits.reverseSpeed)*factor;
+  v.speed=approach(v.speed,input.brake?0:target,dt*(input.brake?limits.brake:throttle?limits.acceleration*factor:limits.coast));
+  const nominalTravel=v.speed*dt,travel=nominalTravel*(input.climbFactor?.(v,nominalTravel)??1),angle=travel*2*Math.tan(v.steering)/LOADER.wheelbase;
   const count=Math.max(1,Math.ceil(Math.abs(travel)/.6),Math.ceil(Math.abs(angle)/.008));let hit='';
   for(let i=0;i<count;i++){
     const mid=v.heading+angle/count/2,candidate={...v,x:v.x+Math.sin(mid)*travel/count,z:v.z+Math.cos(mid)*travel/count,heading:v.heading+angle/count};
-    hit=vehicleBlocker(candidate,obstacles);if(hit){v.speed=0;break;}
+    hit=vehicleBlocker(candidate,obstacles);if(hit){
+      const turn=!input.brake&&throttle*travel>0&&steer*v.steering<0?steerVehicleClearOfContact(v,{
+        throttle,steer:-v.steering/LOADER.steering,dt,halfWidth:34,halfLength:v.waterTruck?47:43,
+        clear:pose=>!vehicleBlocker(pose,obstacles),
+      }):null;
+      if(turn){Object.assign(v,turn);hit='';}
+      v.speed=0;break;
+    }
     v.x=candidate.x;v.z=candidate.z;v.heading=candidate.heading;v.wheelTravel+=travel/count;
   }
   v.heading=Math.atan2(Math.sin(v.heading),Math.cos(v.heading));return{vehicle:v,hit};
@@ -102,11 +113,13 @@ export function routeClear(points,obstacles=OBSTACLES,vehicle=null){
 export function boardOption(state,obstacles=OBSTACLES){
   if(Math.abs(state.player.y??0)>.05||Math.abs(state.player.vy??0)>.1)return null;
   if(state.mode!=='foot'||state.transition||Math.abs(state.vehicle.speed)>.8)return null;
-  // Driver's left door only for boarding. Right door remains a safe exit alternative.
-  const points=transitionPoints(state.vehicle,-1),start=points[0];
-  if(!atDriverDoor(state.player,start,state.vehicle.heading))return null;
-  const path=[{...state.player,heading:state.vehicle.heading},...points];
-  return routeClear(path,obstacles,state.vehicle)?{side:-1,path}:null;
+  for(const side of [-1,1]){
+    const points=transitionPoints(state.vehicle,side),start=points[0];
+    if(!atDriverDoor(state.player,start,state.vehicle.heading))continue;
+    const path=[{...state.player,heading:state.vehicle.heading},...points];
+    if(routeClear(path,obstacles,state.vehicle))return{side,path};
+  }
+  return null;
 }
 export function exitOption(state,obstacles=OBSTACLES){
   if(state.mode!=='driving'||Math.abs(state.vehicle.speed)>.8)return null;
@@ -117,8 +130,9 @@ export function actLoader(state,action,obstacles=OBSTACLES){
   if(action==='home')return{...state,mode:'foot',vehicle:{...state.vehicle,speed:0,steering:0},player:{...SAFE_SPAWN},transition:null,hit:'',message:'レンだけ安全エリアへ戻りました。車両は停車した場所に残っています。'};
   if(action!=='interact')return state;
   const boarding=state.mode==='foot';const option=boarding?boardOption(state,obstacles):exitOption(state,obstacles);
-  if(!option)return{...state,message:state.mode==='driving'?(Math.abs(state.vehicle.speed)>.8?'ブレーキで停車してから降りてください。':'左右の降車経路が塞がっています。空いている場所まで移動してください。'):'運転席側のステップに近づいてください。'};
-  return{...state,mode:boarding?'boarding':'exiting',vehicle:{...state.vehicle,speed:0},transition:{path:option.path,elapsed:0,duration:boarding?1.9:2.1,side:option.side},message:boarding?'ステップから運転席へ乗り込みます。':`${option.side<0?'左':'右'}の開いた経路から降ります。`};
+  if(!option)return{...state,message:state.mode==='driving'?(Math.abs(state.vehicle.speed)>.8?'ブレーキで停車してから降りてください。':'左右の降車経路が塞がっています。空いている場所まで移動してください。'):'車体横の空いているステップに近づいてください。'};
+  const duration=state.vehicle.field?(boarding ? .95 : 1.05):(boarding ? 1.9 : 2.1);
+  return{...state,mode:boarding?'boarding':'exiting',vehicle:{...state.vehicle,speed:0},transition:{path:option.path,elapsed:0,duration,side:option.side},message:boarding?'ステップから運転席へ乗り込みます。':`${option.side<0?'左':'右'}の開いた経路から降ります。`};
 }
 export function actorPose(state){
   if(state.mode==='driving')return{...localToWorld(state.vehicle,loaderCab(state.vehicle).seatX,loaderCab(state.vehicle).seatZ),y:loaderCab(state.vehicle).floor,heading:state.vehicle.heading};

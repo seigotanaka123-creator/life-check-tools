@@ -67,7 +67,7 @@ function refreshStock(){
 $('stock-open').onclick=()=>{clearInput();refreshStock();$('stock-message').textContent='部材を選んで、色枠の置場へ出してください。';$('stock-dialog').showModal();};$('stock-close').onclick=()=>$('stock-dialog').close();
 $('return-stock').onclick=()=>action('return-stock');
 $('export').onclick=()=>{try{$('export-data').textContent=JSON.stringify(session.blocked?session.raw:packCrane(state),null,2);$('export-data').hidden=false;}catch(e){state.message=e.message;refresh();}};
-async function save(){clearInput();if(testMode){$('save-status').textContent='操作確認用：保存しません';return true;}if(!ready||loading||session.busy||session.blocked||state.rig.transition)return false;let saved=false;try{await session.save(state);$('save-status').textContent='保存済み（火星木材の作業記録）';dirtySince=0;saved=true;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();return saved;}
+async function save(){clearInput();if(testMode){$('save-status').textContent='操作確認用：保存しません';return true;}if(!ready||loading||session.busy||session.blocked||state.rig.transition)return false;let saved=false;try{await session.save(state);$('save-status').textContent='保存済み（アマネ星木材の作業記録）';dirtySince=0;saved=true;}catch(e){$('save-status').textContent='保存停止：'+e.message;state.message=e.message;}refresh();return saved;}
 $('save').onclick=save;
 for(const link of document.querySelectorAll('[data-example]'))link.onclick=async e=>{
   e.preventDefault();clearInput();
@@ -97,11 +97,11 @@ new ResizeObserver(()=>{const r=$('scene').getBoundingClientRect();renderer.setS
 new ResizeObserver(([entry])=>document.documentElement.style.setProperty('--crane-controls-height',`${entry.target.getBoundingClientRect().height}px`)).observe(document.querySelector('footer'));
 function refresh(){
   const aboard=state.rig.mode==='driving',transition=!!state.rig.transition,work=state.work,p=state.parts.find(p=>p.id===state.held),candidate=pickOption(state),preview=placement(state),blocked=!ready||session.blocked||loading;
-  $('mode').textContent=aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:dropDemo?'紫の火星木材は空中へ。茶色の普通の木材は地面へ。':'低い浮遊床へ歩いて乗ると、レンの重さで沈みます。'):state.message||state.rig.message;
+  $('mode').textContent=aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:dropDemo?'紫のアマネ星木材は空中へ。茶色の普通の木材は地面へ。':'低い浮遊床へ歩いて乗ると、レンの重さで沈みます。'):state.message||state.rig.message;
   $('cargo').textContent=p?`吊り荷：${p.name}`:candidate?`フック下：${candidate.name}`:'吊り荷なし';$('count').textContent=`置場 ${state.parts.filter(p=>!p.fixed&&!p.hover&&p.id!==state.held).length} ・吊り荷 ${p?1:0} ・浮遊 ${state.parts.filter(p=>p.hover).length} ・設置 ${state.parts.filter(p=>p.fixed).length} ・保管 ${state.stock.length}`;
-  $('material-summary').textContent=`貸出材積：火星木材 ${unit(state.ledger['mars-timber'].total)} ／ 普通木材 ${unit(state.ledger['earth-timber'].total)} ／ 鉄 ${unit(state.ledger['earth-iron'].total)}`;
+  $('material-summary').textContent=`貸出材積：アマネ星木材 ${unit(state.ledger['mars-timber'].total)} ／ 普通木材 ${unit(state.ledger['earth-timber'].total)} ／ 鉄 ${unit(state.ledger['earth-iron'].total)}`;
   const floating=floatReadout(state);
-  $('float-load').textContent=floating.active?`浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'火星木材を吊り、浮遊を開始すると高さを覚えます。';
+  $('float-load').textContent=floating.active?`浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'アマネ星木材を吊り、浮遊を開始すると高さを覚えます。';
   $('float-warning').textContent=floating.active?(floating.contact?`${floating.contact}に接触：安全停止`:floating.overload?'荷重オーバー：ゆっくり降下します':floating.rider?'レンの重さで沈んでいます。降りると戻ります。':'浮遊を保持しています。'):'';
   $('float-warning').classList.toggle('overload',floating.overload);
   $('release').textContent=p?.materialId==='mars-timber'?'浮遊を開始（吊り索解除）':'吊り索を外す';
@@ -127,7 +127,7 @@ async function boot(){
   const demo=new URLSearchParams(location.search).get('floatingDemo');
   if(testMode&&demo){state=floatingDemo(demo);orbit=Math.PI;pitch=.7;distance=230;}
   if(dropDemo){pitch=.65;distance=350;$('drop-demo').showModal();}
-  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しい火星木材の作業記録':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
+  try{if(!testMode){const saved=await session.load();if(saved)state=saved;}ready=true;$('save-status').textContent=testMode?'操作確認用：保存しません':session.savedRevision<0?'新しいアマネ星木材の作業記録':'保存を読み込みました';}catch(e){state.message=e.message;$('save-status').textContent='保存を保護して停止';}refresh();
 }
 const focus=new THREE.Vector3(0,18,-30);let last=0,accumulator=0,ui=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;if(document.hidden)return;time+=dt;

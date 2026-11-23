@@ -1,4 +1,5 @@
 import * as T from './three.module.min.js';
+import {FIELD_ROADS} from './imasora-construction-shared-field.mjs?v=121cw';
 import {eveningLight,createLightHalos,createLightPools} from './imasora-evening-light.mjs?v=120mx';
 
 // Scenery outside the existing playable rectangle: never replaces saved soil,
@@ -9,18 +10,49 @@ export function constructionSurroundingHeight(x,z,width=5400,depth=3600){
  // Existing town houses/road/water have their own real authored ground.
  if(z<=-1798&&z>=-2700&&Math.abs(x+1150)<=850)return -4;
  const inland=T.MathUtils.smoothstep(outside,180,1250);
- return -2+inland*(36+24*Math.sin(x*.0017)*Math.cos(z*.0021))+T.MathUtils.smoothstep(outside,1400,3500)*(100+90*Math.sin(x*.0008+z*.0007)**2);
+ return -2+inland*(68+54*Math.sin(x*.0017)*Math.cos(z*.0021))+T.MathUtils.smoothstep(outside,240,1500)*Math.pow(.5+.5*Math.sin(x*.0019+z*.0021),2)*228+T.MathUtils.smoothstep(outside,1400,3500)*(100+90*Math.sin(x*.0008+z*.0007)**2);
 }
 
 export function createConstructionSurroundings(config){
  const group=new T.Group();group.name='construction-industrial-landscape';
  group.userData.nonCollidable=true;
  const w=config.world.width/2,d=config.world.depth/2;
- const geometries=new Set(),materials=new Set(),meshes=[],batches=new Map(),lamps=[],roadPools=[];
+ const geometries=new Set(),materials=new Set(),textures=new Set(),meshes=[],batches=new Map(),lamps=[],roadPools=[];
  const own=g=>(geometries.add(g),g),material=p=>{const m=new T.MeshStandardMaterial(p);materials.add(m);return m;};
+ // Original, deterministic surface grain, projected at world scale. A tall
+ // tower and a narrow pipe therefore keep the same-sized material detail;
+ // stretching one little image over each primitive made them look like toys.
+ const grainData=new Uint8Array(128*128*4);let grainSeed=731;
+ for(let i=0;i<128*128;i++){grainSeed=(Math.imul(grainSeed,1664525)+1013904223)>>>0;const n=72+(grainSeed>>>24)*.58;grainData.set([n,n,n,255],i*4);}
+ const grain=new T.DataTexture(grainData,128,128,T.RGBAFormat);grain.wrapS=grain.wrapT=T.RepeatWrapping;grain.magFilter=T.LinearFilter;grain.minFilter=T.LinearMipmapLinearFilter;grain.generateMipmaps=true;grain.needsUpdate=true;textures.add(grain);
+ function surface(m,amount){
+  m.onBeforeCompile=shader=>{
+   shader.uniforms.constructionGrain={value:grain};shader.uniforms.constructionGrainAmount={value:amount};
+   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 constructionWorldPoint;').replace('#include <project_vertex>',`vec4 constructionPoint=vec4(transformed,1.);
+    #ifdef USE_INSTANCING
+    constructionPoint=instanceMatrix*constructionPoint;
+    #endif
+    constructionWorldPoint=(modelMatrix*constructionPoint).xyz;
+    #include <project_vertex>`);
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+    varying vec3 constructionWorldPoint;uniform sampler2D constructionGrain;uniform float constructionGrainAmount;
+    float constructionSurfaceGrain(vec3 p){vec3 n=abs(normalize(cross(dFdx(p),dFdy(p))));n=max(n,vec3(.0001));n/=n.x+n.y+n.z;
+     return dot(n,vec3(texture2D(constructionGrain,p.zy*.028).r,texture2D(constructionGrain,p.xz*.028).r,texture2D(constructionGrain,p.xy*.028).r));}`)
+    .replace('#include <color_fragment>',`#include <color_fragment>
+     float constructionGrainValue=constructionSurfaceGrain(constructionWorldPoint);
+     float constructionBroadGrain=constructionSurfaceGrain(constructionWorldPoint*.075);
+     diffuseColor.rgb*=1.+(constructionGrainValue-.56)*constructionGrainAmount+(constructionBroadGrain-.56)*constructionGrainAmount*.65;`)
+    .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+     roughnessFactor=clamp(roughnessFactor+(constructionGrainValue-.56)*constructionGrainAmount*.6,.16,1.);`);
+  };
+  m.customProgramCacheKey=()=>`construction-world-grain-${amount}`;return m;
+ }
  const stone=material({color:0x89978e,roughness:1,vertexColors:true});
- const metal=material({color:0xffffff,roughness:.47,metalness:.38,vertexColors:true,emissive:0x63838f,emissiveIntensity:0});
- const steel=material({color:0xffffff,roughness:.67,metalness:.25,vertexColors:true,emissive:0x2c505c,emissiveIntensity:0});
+ const metal=material({color:0xffffff,roughness:.4,metalness:.72,vertexColors:true,emissive:0x63838f,emissiveIntensity:0});
+ const steel=material({color:0xffffff,roughness:.7,metalness:.3,vertexColors:true,emissive:0x2c505c,emissiveIntensity:0});
+ const asphalt=material({color:0xffffff,roughness:1,metalness:0,vertexColors:true}),glazing=material({color:0xffffff,roughness:.22,metalness:.45,vertexColors:true,emissive:0xffd3a4,emissiveIntensity:0});
+ const roadPaint=material({color:0xffffff,roughness:.92,vertexColors:true,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-3});
+ surface(stone,.6);surface(metal,.16);surface(steel,.3);surface(asphalt,.8);
  const neon=new T.MeshBasicMaterial({color:0xffffff,vertexColors:true,toneMapped:false});materials.add(neon);
  // Basic material uses per-instance colours for lamp cores without adding lights.
  const cores=new T.MeshBasicMaterial({color:0xffffff,vertexColors:true,toneMapped:false});materials.add(cores);
@@ -31,7 +63,11 @@ export function createConstructionSurroundings(config){
  for(const geometry of[box,cylinder,rod,sphere,ring])geometry.setAttribute('color',new T.Float32BufferAttribute(new Float32Array(geometry.attributes.position.count*3).fill(1),3));
  const matrix=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0),v=new T.Vector3(),scale=new T.Vector3(),color=new T.Color();
  function add(g,m,x,y,z,sx,sy,sz,tint,rotation=null){
-  const key=g.uuid+'/'+m.uuid;if(!batches.has(key))batches.set(key,{g,m,rows:[]});
+  // Keep the full scenery, but cull each small batch independently. A single
+  // material batch spanning the map submits every distant refinery each frame.
+  const cellSize=900;
+  const key=[g.uuid,m.uuid,Math.floor(x/cellSize),Math.floor(z/cellSize)].join('/');
+  if(!batches.has(key))batches.set(key,{g,m,rows:[]});
   matrix.compose(v.set(x,y,z),rotation??q.identity(),scale.set(sx,sy,sz));
   batches.get(key).rows.push({matrix:matrix.clone(),tint});
  }
@@ -69,21 +105,21 @@ export function createConstructionSurroundings(config){
  const terrain=own(new T.BufferGeometry());terrain.setAttribute('position',new T.Float32BufferAttribute(terrainPositions,3));terrain.setAttribute('color',new T.Float32BufferAttribute(terrainColors,3));terrain.setIndex(terrainIndices);terrain.computeVertexNormals();
  const land=new T.Mesh(terrain,stone);land.name='continuous-outside-land';group.add(land);meshes.push(land);
 
- // Road, a low retaining edge and lamps visibly mark the edge without erecting
- // scenery inside any buildable position. North-west remains the town skyline.
- for(const side of[-1,1]){
-  cube(steel,side*(w+58),-.9,0,108,2,d*2,0x535f66);
-  cube(stone,side*(w+5),-1,0,4,2,d*2,0xb9b5a5);
-  if(side>0)cube(steel,0,-.9,side*(d+58),w*2,2,108,0x535f66);
+ // Put the full driving lanes on the actual supported work field.
+ for(const {minX,maxX,minZ,maxZ} of FIELD_ROADS){
+  const x=(minX+maxX)/2,z=(minZ+maxZ)/2,width=maxX-minX,depth=maxZ-minZ;
+  cube(asphalt,x,-.94,z,width,2,depth,0x42494c);
+  if(depth>width){
+   for(let p=minZ+54;p<maxZ-45;p+=110)cube(roadPaint,x,.075,p,2.4,.03,38,0xd2cbb8);
+  }else{
+   for(let p=minX+54;p<maxX-45;p+=110)cube(roadPaint,p,.075,z,38,.03,2.4,0xd2cbb8);
+  }
  }
- // Keep the creek and town approach open rather than laying a road across them.
- // The north road stops on either side of that visible waterway.
- for(const[x,len]of[[-2440,520],[1000,3400]])cube(steel,x,-.9,-(d+58),len,2,108,0x535f66);
  for(let side=0;side<4;side++)for(let i=-4;i<=4;i++){
   const x=side<2?(side===0?-w-116:w+116):i*w/4.5,z=side<2?i*d/4.5:(side===2?-d-116:d+116);
   if(side===2&&Math.abs(x+1150)<850)continue;
   pipe(P(x,-2,z),P(x,44,z),1.7,0x84999e);cube(metal,x,44,z,18,2,10,0xdae0d9);lamp(x,42,z,0xffd89d,42);
-  roadPools.push({x:side<2?Math.sign(x)*(w+57):x,z:side<2?z:Math.sign(z)*(d+57),radius:44});
+  roadPools.push({x:side<2?Math.sign(x)*(w-82):x,z:side<2?z:Math.sign(z)*(d-82),radius:44});
  }
 
  function refinery(cx,cz,seed){
@@ -131,6 +167,12 @@ export function createConstructionSurroundings(config){
   for(let i=0;i<3;i++){
    const x=cx-205+i*200,z=cz-180,r=48+i*5,h=48+(i%2)*25;
    add(cylinder,metal,x,y0+h/2,z,r,h,r,0xb9cbcb);add(sphere,metal,x,y0+h,z,r,12,r,0xc7d4ce);
+   // Welded shell courses, an access hatch and a real outlet connect each
+   // storage vessel to the plant instead of leaving a featureless cylinder.
+   for(let y=14;y<h;y+=16)add(ring,steel,x,y0+y,z,r+.25,r+.25,r+.25,0x879b9e,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2));
+   add(cylinder,metal,x,y0+h+12,z,9,3,9,0x81979a);
+   pipe(P(x,y0+10,z+r),P(x,y0+10,z+r+22),3.2,0xa1b6b8,metal);
+   pipe(P(x,y0+10,z+r+22),P(x,y0+10,cz+148),3.2,0xa1b6b8,metal);
    add(washShell,wash,x,y0+h/2,z,r+1.3,h,r+1.3,i%2?0xffc080:0x6be4d9);
    outline(x,y0+h+8,z,r*.65,r*.65,0xcbd4cc);
    for(let j=0;j<2;j++)add(ring,neon,x,y0+9+j*29,z,r+.5,r+.5,r+.5,j?0xc5e5fa:0x82d6c6,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2));
@@ -147,8 +189,29 @@ export function createConstructionSurroundings(config){
   lamp(sx,y0+sh,sz,0xff8174,36);
   for(let i=0;i<2;i++){
    const x=cx-170+i*300,z=cz+235;
-   cube(steel,x,y0+24,z,230,48,80,0x80999d);cube(metal,x,y0+50,z,240,6,92,0xb5c5c5);
-   for(let k=-4;k<=4;k++){cube(neon,x+k*23,y0+26,z-40.5,13,15,1,0xffd2a1);cube(steel,x+k*23,y0+26,z-41,1,48,2,0x9fb2b1);}
+   cube(stone,x,y0+3,z,234,6,84,0xa8aaa0);
+   cube(steel,x,y0+26,z,230,44,80,i?0x789092:0x899da0);cube(metal,x,y0+50,z,240,6,92,0x8c9fa2);
+   // Inset glazing, frame depth and horizontal cladding keep the industrial
+   // buildings legible in daylight without turning every window into neon.
+   for(let k=-4;k<=4;k++){
+    cube(steel,x+k*23,y0+29,z-41.6,16,18,2.4,0x34484e);
+    cube(glazing,x+k*23,y0+29,z-42.9,12,14,.4,k%3?0x557780:0x93a8a5);
+    cube(metal,x+k*23,y0+29,z-43.2,1,15,.8,0xaab9b7);
+    cube(metal,x+k*23,y0+21,z-43,17,1.1,3.4,0xb5bfba);
+   }
+   for(let h=10;h<46;h+=6)cube(steel,x,y0+h,z+40.6,228,.75,1.2,0x697f83);
+   for(const dx of[-116,116]){
+    cube(metal,x+dx,y0+25,z,2,44,80,0xa6b5b1);
+    pipe(P(x+dx,y0+49,z-44),P(x+dx,y0+5,z-44),1.3,0x829a9d,metal);
+   }
+   for(const dz of[-44,44])pipe(P(x-118,y0+49,z+dz),P(x+118,y0+49,z+dz),1.7,0x81969b,metal);
+   cube(steel,x+79,y0+15,z+41.3,28,24,1.7,0x344950);
+   for(let h=5;h<=24;h+=3)cube(metal,x+79,y0+h,z+42.4,25,.65,.8,0x80969a);
+   // Rooftop ventilation sits on the roof; no floating decorative props.
+   for(const dx of[-55,45]){
+    cube(steel,x+dx,y0+58,z+9,30,10,24,0x73878b);
+    for(let l=-2;l<=2;l++)cube(metal,x+dx+l*5,y0+63.5,z+9,1,.8,20,0xaebebb);
+   }
   }
  }
  // Broad industrial skyline on three sides; the established bridge/town view
@@ -174,12 +237,12 @@ export function createConstructionSurroundings(config){
  function update(date=new Date()){
   if(disposed||Math.abs(+date-last)<10000)return;last=+date;
   const strength=eveningLight(date).strength;
-  neon.color.setScalar(.3+strength*1.5);metal.emissiveIntensity=strength*.55;steel.emissiveIntensity=strength*.34;
+  neon.color.setScalar(.16+strength*1.25);metal.emissiveIntensity=strength*.12;steel.emissiveIntensity=strength*.08;glazing.emissiveIntensity=strength*.48;
   // Colored light lines and cores retain their hues rather than becoming white.
   cores.color.setScalar(.16+strength*.84);halos.strength(strength*2.);
-  wash.uniforms.strength.value=strength;pools.strength(strength);for(const mesh of meshes)if(mesh.material===wash)mesh.visible=strength>0;
+  wash.uniforms.strength.value=strength*.6;pools.strength(strength);for(const mesh of meshes)if(mesh.material===wash)mesh.visible=strength>0;
  }
  update();
  return{group,update,stats:{draws:meshes.length+2,lamps:lamps.length,lights:0,triangles:meshes.reduce((n,m)=>n+(m.geometry.index?.count??m.geometry.attributes.position.count)/3*(m.count??1),0)+roadPools.length*128+lamps.length*2},
-  dispose(){if(disposed)return;disposed=true;halos.dispose();pools.dispose();for(const m of meshes)if(m.isInstancedMesh)m.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());group.removeFromParent();}};
+  dispose(){if(disposed)return;disposed=true;halos.dispose();pools.dispose();for(const m of meshes)if(m.isInstancedMesh)m.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();}};
 }

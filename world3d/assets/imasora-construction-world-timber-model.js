@@ -1,7 +1,7 @@
 import {craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120ov';
 import * as THREE from './three.module.min.js';
 import {createGroundMark} from './imasora-construction-ground-mark.js?v=120ds';
-import {createCrane,updateCraneModel} from './imasora-construction-crane-model.js?v=120pv';
+import {createCrane,updateCraneModel} from './imasora-construction-crane-model.js?v=121e7';
 import {createFloatingPart,animateFloatingPart} from './imasora-construction-floating-model.js?v=120pv';
 import {hook,pickOption} from './imasora-construction-crane.js?v=120pv';
 import {assemblyState,floatingPlacement,joinOption} from './imasora-construction-world-timber-assembly.js?v=120pv';
@@ -15,13 +15,13 @@ export const TIMBER_FENCES=Object.freeze([
 export function createWorldTimberModel(state=null){
   const pad=state?timberReturnPad(state):RETURN_PAD;
   const root=new THREE.Group();root.name='construction-world-timber-yard';
+  const stockPad=new THREE.Group();
+  stockPad.position.set(pad.x,0,pad.z);root.add(stockPad);
   const cube=new THREE.BoxGeometry(1,1,1),mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.68}),teal=mat(0x32685e),gold=mat(0xe1c57f),blue=mat(0x5bbdc7);
   const box=(name,x,y,z,w,h,d,m)=>{const o=new THREE.Mesh(cube,m);o.name=name;o.position.set(x,y,z);o.scale.set(w,h,d);o.castShadow=o.receiveShadow=true;root.add(o);};
   // Paint only: preserve the unified construction ground, without a second floor.
   for(const b of state?.rig.vehicle.field?[]:TIMBER_FENCES)box('クレーン区画の柵',b.x,b.height/2,b.z,b.width,b.height,b.depth,teal);
   for(const side of[-1,1]){createGroundMark(root,{name:'回収枠',x:pad.x+side*pad.w/2,z:pad.z,width:.8,depth:pad.d,color:0x5bbdc7,y:.15});createGroundMark(root,{name:'回収枠',x:pad.x,z:pad.z+side*pad.d/2,width:pad.w,depth:.8,color:0x5bbdc7,y:.15});if(!state?.rig.vehicle.field)createGroundMark(root,{name:'駐車線',x:side*52,z:-80,width:.6,depth:120,color:0xe1c57f,y:.15});}
-  const c=document.createElement('canvas');c.width=768;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#23463f';ctx.fillRect(0,0,768,128);ctx.strokeStyle='#e1c57f';ctx.lineWidth=6;ctx.strokeRect(3,3,762,122);ctx.fillStyle='#fff5dc';ctx.font='bold 50px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('火星木材 ・ 出庫 / 回収枠',384,64,736);const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
-  const label=createGroundMark(root,{name:'木材回収の床案内',x:pad.x,z:pad.z+88,width:160,depth:160/6,map:texture,y:.16});
   const crane=createCrane();root.add(crane);
   const ghost=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0x77efb6,wireframe:true,transparent:true,opacity:.75,depthWrite:false}));root.add(ghost);
   const ring=new THREE.Mesh(new THREE.RingGeometry(9,10,32),new THREE.MeshBasicMaterial({color:0xffda70,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;root.add(ring);
@@ -31,7 +31,12 @@ export function createWorldTimberModel(state=null){
     for(const side of [-1,1]){const strip=new THREE.Mesh(new THREE.BoxGeometry(8,.28,3),jointMetal);strip.position.z=side*16;g.add(strip);for(const x of [-2.6,2.6]){const bolt=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,.45,8),boltMetal);bolt.position.set(x,.14,side*16);g.add(bolt);}}
     root.add(g);return g;
   });
-  root.userData={crane,parts:new Map(),ghost,ring,joints};return root;
+  root.userData={crane,stockPad,parts:new Map(),ghost,ring,joints};return root;
+}
+export function timberPlacementPreview(s,active,external=[],heightAt=null){
+ if(!active)return null;
+ if(s.joining){const part=s.parts.find(p=>p.id===s.joining.partId);return part?{ok:true,candidate:{...part,...s.joining.end}}:null;}
+ const join=joinOption(s);return join?.ok?join:floatingPlacement(timberPhysicsState(s),craneGroundObstacles(s,external,heightAt));
 }
 export function updateWorldTimberModel(root,s,{active=false,time=0,ground=null,heightAt=null,external=[]}={}){
   s=assemblyState(s);
@@ -39,7 +44,7 @@ export function updateWorldTimberModel(root,s,{active=false,time=0,ground=null,h
   const ids=new Set(s.parts.map(p=>p.id));for(const[id,m]of d.parts)if(!ids.has(id)){disposeSpaceMaterialBook(m);d.parts.delete(id);}
   const target=pickOption(s);for(const p of s.parts){let m=d.parts.get(p.id);if(!m){m=createFloatingPart(p);d.parts.set(p.id,m);root.add(m);}m.position.set(p.x,p.y,p.z);m.rotation.y=p.angle;animateFloatingPart(m,p,time);m.userData.edges.visible=active&&(p.id===s.held||p.id===target?.id);}
   const h=hook(s);d.ring.visible=active&&s.work;d.ring.position.set(h.x,(heightAt?.(h.x,h.z)??0)+.22,h.z);
-  const join=active?joinOption(s):null,preview=active&&!s.joining?(join?.ok?join:floatingPlacement(timberPhysicsState(s),craneGroundObstacles(s,external,heightAt))):null;d.ghost.visible=!!preview;
+  const preview=timberPlacementPreview(s,active,external,heightAt);d.ghost.visible=!!preview;
   if(preview){const p=preview.candidate;d.ghost.position.set(p.x,p.y+p.h/2,p.z);d.ghost.rotation.y=p.angle;d.ghost.scale.set(p.w,p.h,p.d);d.ghost.material.color.setHex(preview.ok?0x77efb6:0xf09c66);}
   d.joints.forEach(m=>m.visible=false);
   const links=s.joining?[...s.joints,{a:s.joining.targetId,b:s.joining.partId,pending:true}]:s.joints;

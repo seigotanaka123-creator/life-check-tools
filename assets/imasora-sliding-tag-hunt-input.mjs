@@ -123,7 +123,7 @@ export function createHuntActionInput(target, canPress, onButtonActivate = () =>
   const held = new Set();
   const pending = new Set();
   const accepted = Symbol('completed button activation');
-  const shortcut = Symbol('field shortcut');
+  let shortcutAt = Infinity;
   target.addEventListener('pointerdown', event => {
     if (!canPress() || held.has(event.pointerId) || !captureHuntPointer(target, event)) return;
     event.preventDefault();
@@ -149,10 +149,14 @@ export function createHuntActionInput(target, canPress, onButtonActivate = () =>
   target.addEventListener('pointercancel', cancel);
   target.addEventListener('lostpointercapture', cancel);
   return {
-    press() { pending.add(shortcut); },
-    releaseKeyboard() { pending.delete(shortcut); },
-    read() {
-      const active = pending.size > 0;
+    // Movement and one-shot keyboard actions must use the same time slice
+    // when one draw catches up several simulation steps.
+    press(at = 0) { shortcutAt = Math.min(shortcutAt, at); },
+    releaseKeyboard() { shortcutAt = Infinity; },
+    read(at = Infinity) {
+      const shortcut = Number.isFinite(shortcutAt) && shortcutAt <= at;
+      if (shortcut) shortcutAt = Infinity;
+      const active = pending.size > 0 || shortcut;
       pending.clear();
       return active;
     },
@@ -160,6 +164,7 @@ export function createHuntActionInput(target, canPress, onButtonActivate = () =>
       const captures = [...held].map(id => [target, id]);
       held.clear();
       pending.clear();
+      shortcutAt = Infinity;
       releaseHuntPointerCaptures(captures);
     },
   };

@@ -1,4 +1,12 @@
 import {openConstructionGuide,constructionOverlayOpen} from './imasora-construction-overlays.mjs?v=120gm';
+export function setConstructionNoticeTone(element,tone){
+  if(tone){
+    if(element.dataset.constructionNotice!==tone)element.dataset.constructionNotice=tone;
+  }else if(element.hasAttribute('data-construction-notice')){
+    element.removeAttribute('data-construction-notice');
+  }
+}
+
 // UI pause is local to this controller. It never rewrites a saved work record.
 export function createVehiclePlayGate(clearInput){
   let active=false,paused=false;
@@ -34,7 +42,7 @@ export function createVehiclePlayView({panel,canvas,prefix,groups,quick,clearInp
   const summary=document.createElement('summary');summary.textContent='操作の詳細';details.append(summary);
   const info=document.createElement('div');info.className='gv-info';details.append(info);
   const fullMessage=document.createElement('p');info.append(fullMessage,stats);
-  const help=document.createElement('p');help.textContent='WASD／矢印：移動。'+(prefix==='wt'?'クレーン作業中は既存の作業キーになります。':'')+'操作欄の見出しでボタンを切り替えます。';info.append(help);
+  const help=document.createElement('p');help.textContent='WASD／矢印：移動。作業のキーは操作欄で確認できます。操作欄の見出しでボタンを切り替えます。';info.append(help);
   for(const el of panel.querySelectorAll('.'+prefix+'-surface,.'+prefix+'-detail'))info.append(el);
   const choices=[];
   function choose(id){clearInput();for(const c of choices){const yes=c.id===id;c.page.hidden=!yes;c.button.setAttribute('aria-pressed',String(yes));}pages.scrollTop=0;}
@@ -59,20 +67,25 @@ export function createVehiclePlayView({panel,canvas,prefix,groups,quick,clearInp
   for(const el of active.querySelectorAll('button,select'))info.append(el.closest('label')||el);
   active.replaceChildren(nav,pages,quickRow,menu);
   const emergency=document.getElementById('emergencyEscapeButton'),emergencyParent=emergency?.parentElement,emergencyNext=emergency?.nextSibling;
-  let scroll=0,lastContext=null,menuOpened=false,lastBusy=false,restoreView=null;
+  let scroll=0,lastContext=null,menuOpened=false,lastBusy=false,restoreView=null,pausedBeforeMenu=false,backdropStart=false;
   function setPaused(yes){gate.setPaused(yes);if(!yes)details.open=false;refresh();}
   pause.addEventListener('click',()=>{if(!menuOpened&&!lastBusy&&!restoreView?.locked)setPaused(!gate.paused);});
   details.addEventListener('toggle',()=>{if(gate.active&&details.open)setPaused(true);});
   function syncMenu(){menu.hidden=!menuOpened;menuButton.setAttribute('aria-expanded',String(menuOpened));panel.classList.toggle('gv-menu-open',menuOpened);}
   function closeMenu({force=false,focus=true}={}){if((lastBusy||restoreView?.locked)&&!force)return false;if(!force&&restoreView?.close()===false)return false;menuOpened=false;details.open=false;syncMenu();if(focus&&gate.active)menuButton.focus({preventScroll:true});refresh();return true;}
-  menuButton.addEventListener('click',()=>{if(!gate.active||lastBusy||menuOpened)return;menuOpened=true;gate.setPaused(true);details.open=false;menu.querySelector('.gv-menu-vehicle').textContent=q('header strong').textContent.replace(/\s*v\d+(?:[.-]\S*)?\s*$/i,'');syncMenu();refresh();heading.focus({preventScroll:true});menu.querySelector('.gv-menu-body').scrollTop=0;});
+  menuButton.addEventListener('click',()=>{if(!gate.active||lastBusy||menuOpened)return;pausedBeforeMenu=gate.paused;menuOpened=true;gate.setPaused(true);details.open=false;menu.querySelector('.gv-menu-vehicle').textContent=q('header strong').textContent.replace(/\s*v\d+(?:[.-]\S*)?\s*$/i,'');syncMenu();refresh();heading.focus({preventScroll:true});menu.querySelector('.gv-menu-body').scrollTop=0;});
   closeButton.addEventListener('click',()=>closeMenu());
+  menu.addEventListener('pointerdown',event=>{backdropStart=event.target===menu;});
+  menu.addEventListener('click',event=>{
+    if(backdropStart&&event.target===menu&&closeMenu()&&!pausedBeforeMenu)setPaused(false);
+    backdropStart=false;
+  });
   // Only an explicit emergency exit resumes pending boarding long enough for
   // the existing save-and-exit handler to finish. Ordinary menu close never does.
   emergency?.addEventListener('click',event=>{if(!gate.active)return;if(lastBusy||restoreView?.locked||restoreView?.active||restoreView?.busy){event.preventDefault();event.stopImmediatePropagation();return;}menuOpened=false;details.open=false;restoreView?.close();syncMenu();setPaused(false);},true);
   function handleKeyDown(event){
     if(!menuOpened)return false;
-    if(event.key==='Escape'&&!event.isComposing){event.preventDefault();if(!restoreView?.handleEscape())closeMenu();return true;}
+    if(event.key==='F8'&&!event.isComposing){event.preventDefault();if(!restoreView?.handleEscape())closeMenu();return true;}
     if(event.key==='Tab'){
       const targets=[...menu.querySelectorAll('button,input,select,textarea,summary,[tabindex]')].filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length),first=targets[0],last=targets.at(-1),focused=document.activeElement;
       if(!first){event.preventDefault();heading.focus({preventScroll:true});}
@@ -94,9 +107,12 @@ export function createVehiclePlayView({panel,canvas,prefix,groups,quick,clearInp
       panel.classList.toggle('world-vehicle-controls-active',value);canvas.parentElement.classList.toggle('world-vehicle-operating',value);document.body.classList.toggle('world-vehicle-playing',value);
       if(!value)window.scrollTo(0,scroll);
     },
-    refresh({busy,blocked,context,loadText,menuHint:hint=''}){
+    refresh({busy,blocked,context,loadText,menuHint:hint='',noticeTone=blocked&&!busy?'error':''}){
       lastBusy=!!busy;menuButton.hidden=!gate.active;menuButton.disabled=busy;closeButton.disabled=busy;menuHint.textContent=hint||(busy?'作業を保存しています。終わるまでお待ちください。':blocked?'作業を停止しています。操作の詳細でお知らせを確認してください。':'');menuHint.hidden=!menuHint.textContent;
       load.hidden=!gate.active;load.textContent=loadText;message.title=message.textContent;fullMessage.textContent=message.textContent;
+      setConstructionNoticeTone(message,noticeTone);
+      setConstructionNoticeTone(fullMessage,noticeTone);
+      setConstructionNoticeTone(menuHint,blocked&&!busy?'error':'');
       if(gate.active&&context!==lastContext){lastContext=context;choose(context==='working'&&choices.some(c=>c.id==='arm')?'arm':groups[0].id);}
       pause.textContent=gate.paused?'再開':'一時停止';pause.disabled=busy||blocked||menuOpened;
       q('[data-action="camera"]').disabled=busy||blocked||menuOpened;

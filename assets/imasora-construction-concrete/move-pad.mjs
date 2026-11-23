@@ -12,12 +12,13 @@ export function constructionMovePadTemplate(){return `<div class="construction-m
 // Pointer capture is used only for mouse/pen. Release listeners run in capture.
 export function createConstructionMovePad({element,input,enabled,onChange=()=>{},windowTarget=globalThis.window,documentTarget=globalThis.document}){
  const thumb=element.querySelector('[data-move-stick]'),listeners=[];let gesture=null,disposed=false;
+ const allowed=()=>enabled()&&documentTarget?.documentElement?.dataset.controlDisplay!=='keyboard';
  const listen=(target,type,fn,options)=>{target?.addEventListener(type,fn,options);listeners.push(()=>target?.removeEventListener(type,fn,options));};
  const render=(x=0,y=0)=>{thumb.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;element.classList.toggle('is-moving',!!(x||y));};
  function end(){const g=gesture;if(!g)return;gesture=null;input.release(g.source);render();if(g.kind==='pointer'&&element.hasPointerCapture?.(g.id))element.releasePointerCapture(g.id);onChange();}
  function cancel(){end();}
- function update(point){const g=gesture;if(!g)return;if(!enabled()||documentTarget?.hidden||!input.hasStick(g.source)){cancel();return;}const v=movePadVector(element.getBoundingClientRect(),point.clientX,point.clientY);if(!input.setStick(g.source,v.x,v.z)){cancel();return;}render(v.thumbX,v.thumbY);onChange();}
- function begin(point,kind,id){if(disposed||gesture||!enabled()||documentTarget?.hidden)return false;const source=(kind==='touch'?'touch:':'pointer:')+id;if(!input.beginStick(source))return false;gesture={kind,id,source};update(point);return true;}
+ function update(point){const g=gesture;if(!g)return;if(!allowed()||documentTarget?.hidden||!input.hasStick(g.source)){cancel();return;}const v=movePadVector(element.getBoundingClientRect(),point.clientX,point.clientY);if(!input.setStick(g.source,v.x,v.z)){cancel();return;}render(v.thumbX,v.thumbY);onChange();}
+ function begin(point,kind,id){if(disposed||gesture||!allowed()||documentTarget?.hidden)return false;const source=(kind==='touch'?'touch:':'pointer:')+id;if(!input.beginStick(source))return false;gesture={kind,id,source};update(point);return true;}
  listen(element,'touchstart',e=>{const point=Array.from(e.changedTouches??[])[0];if(point&&begin(point,'touch',point.identifier))e.preventDefault();},{passive:false});
  listen(windowTarget,'touchmove',e=>{if(gesture?.kind!=='touch')return;const point=Array.from(e.changedTouches??[]).find(t=>t.identifier===gesture.id);if(point){update(point);e.preventDefault();}},{capture:true,passive:false});
  const touchEnd=e=>{if(gesture?.kind!=='touch')return;const point=Array.from(e.changedTouches??[]).find(t=>t.identifier===gesture.id);if(point)end(point,e.type==='touchcancel');else if(e.touches&&!Array.from(e.touches).some(t=>t.identifier===gesture.id))cancel();};
@@ -25,9 +26,9 @@ export function createConstructionMovePad({element,input,enabled,onChange=()=>{}
  listen(element,'pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0||!begin(e,'pointer',e.pointerId))return;e.preventDefault();try{element.setPointerCapture(e.pointerId);}catch{cancel();}});
  listen(windowTarget,'pointermove',e=>{if(gesture?.kind!=='pointer'||gesture.id!==e.pointerId)return;if(e.pointerType==='mouse'&&(e.buttons&1)===0){cancel();return;}update(e);e.preventDefault();},{capture:true,passive:false});
  const pointerEnd=e=>{if(gesture?.kind==='pointer'&&gesture.id===e.pointerId)end(e,e.type!=='pointerup');};for(const type of['pointerup','pointercancel','lostpointercapture'])listen(windowTarget,type,pointerEnd,true);
- for(const type of['blur','pagehide','resize'])listen(windowTarget,type,cancel);
+ for(const type of['blur','pagehide','resize','imasora-control-display-change'])listen(windowTarget,type,cancel);
  listen(documentTarget,'visibilitychange',()=>{if(documentTarget.hidden)cancel();});
  for(const type of['contextmenu','selectstart','dragstart'])listen(element,type,e=>e.preventDefault());
- function sync(){const allowed=!disposed&&enabled();element.setAttribute('aria-disabled',String(!allowed));if(!allowed||gesture&&!input.hasStick(gesture.source))cancel();}
+ function sync(){const active=!disposed&&allowed();element.setAttribute('aria-disabled',String(!active));if(!active||gesture&&!input.hasStick(gesture.source))cancel();}
  render();return{sync,cancel,dispose(){cancel();disposed=true;for(const remove of listeners)remove();}};
 }

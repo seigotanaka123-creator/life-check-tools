@@ -1,3 +1,4 @@
+import{HUNT_SKIES}from'./imasora-sliding-tag-hunt-sky-opening.mjs';
 import{cornerStairGeometry}from'./imasora-sliding-tag-hunt-corner-stairs.mjs';
 import{huntBuildingArchitecture}from'./imasora-sliding-tag-hunt-architecture.mjs';
 import * as T from './three.module.min.js';
@@ -163,14 +164,31 @@ const pineGeo=new T.ConeGeometry(1,1,6);
 batch(pineGeo,0x426371,pineLower).name='hunt-distant-conifer-lower';
 batch(pineGeo,0x64858b,pineMiddle).name='hunt-distant-conifer-middle';
 batch(pineGeo,0xaac2c6,pineTips).name='hunt-distant-conifer-tips';
-const barriers=[];for(let x=-320;x<=320;x+=20)for(const z of[-240,240])barriers.push([x,1,z,19,2,1]);for(let z=-220;z<=220;z+=20)for(const x of[-320,320])barriers.push([x,1,z,1,2,19]);batch(boxGeo,0x9aabb7,barriers);
+// Follow the two ramps and upper decks with the same ground samples used by
+// movement. Subdivide only where the old ground-level rail would be buried.
+const barriers=[],cornerRails=[];
+function perimeterRail(x,z,alongX){
+ const elevated=[-9,0,9].some(offset=>worldHeight(
+  x+(alongX?offset:0),z+(alongX?0:offset))>.05);
+ if(!elevated){barriers.push([x,1,z,alongX?19:1,2,alongX?1:19]);return;}
+ for(let offset=-8;offset<=8;offset+=4){
+  const px=x+(alongX?offset:0),pz=z+(alongX?0:offset);
+  if(Math.abs(px)>WORLD.width/2||Math.abs(pz)>WORLD.depth/2)continue;
+  const floor=worldHeight(px,pz);
+  cornerRails.push([px,floor+1.05,pz,alongX?3.7:1,2.1,alongX?1:3.7]);
+ }
+}
+for(let x=-320;x<=320;x+=20)for(const z of[-240,240])perimeterRail(x,z,true);
+for(let z=-230;z<=230;z+=20)for(const x of[-320,320])perimeterRail(x,z,false);
+batch(boxGeo,0x9aabb7,barriers);
+batch(boxGeo,0xb98c55,cornerRails).name='hunt-raised-corner-rails';
 
 // One small baked cloud texture, one sky draw and one star draw. No bloom or shadow maps.
 const cloudCanvas=document.createElement('canvas');cloudCanvas.width=512;cloudCanvas.height=128;const cloudCtx=cloudCanvas.getContext('2d');
 for(let i=0;i<18;i++)for(let j=0;j<5;j++)for(const wrap of[-512,0,512]){const x=(i*137)%512+j*8+wrap,y=28+(i*29)%60-(j%3)*5,r=12+(i+j)%14,g=cloudCtx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(255,255,255,0)');cloudCtx.fillStyle=g;cloudCtx.fillRect(x-r,y-r,r*2,r*2);}
 const cloudTex=new T.CanvasTexture(cloudCanvas);cloudTex.wrapS=T.RepeatWrapping;cloudTex.generateMipmaps=false;cloudTex.minFilter=T.LinearFilter;
-const skyUniforms={top:{value:new T.Color()},horizon:{value:new T.Color()},sun:{value:new T.Color()},sunDir:{value:new T.Vector3()},night:{value:0},time:{value:0},clouds:{value:cloudTex}};
-const skyMaterial=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,toneMapped:false,uniforms:skyUniforms,vertexShader:'varying vec3 worldPoint;void main(){vec4 w=modelMatrix*vec4(position,1.);worldPoint=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;gl_Position.z=gl_Position.w;}',fragmentShader:`varying vec3 worldPoint;uniform vec3 top,horizon,sun,sunDir;uniform float night,time;uniform sampler2D clouds;void main(){vec3 d=normalize(worldPoint-cameraPosition);vec3 col=mix(horizon,top,pow(max(d.y,0.),.6));float u=atan(d.z,d.x)/6.2831853+.5+time*.0015;vec4 c=texture2D(clouds,vec2(u,clamp(d.y*1.8,0.,1.)));float mask=smoothstep(.02,.12,d.y)*(1.-smoothstep(.5,.8,d.y));col=mix(col,mix(vec3(1.,.96,.9),vec3(.04,.075,.13),night),c.a*mask*.7);float facing=max(0.,dot(d,sunDir));float horizonGlow=pow(facing,9.)*exp(-max(d.y,0.)*8.);col+=sun*(pow(facing,100.)*.18+horizonGlow*(1.-night)*.15);float disc=smoothstep(.99945,.99975,facing);col=mix(col,sun,disc);gl_FragColor=vec4(col,1.);#include <colorspace_fragment>
+const skyUniforms={top:{value:new T.Color()},horizon:{value:new T.Color()},sun:{value:new T.Color()},sunDir:{value:new T.Vector3()},night:{value:0},overcast:{value:0},cloudAmount:{value:.7},lowGlow:{value:0},time:{value:0},clouds:{value:cloudTex}};
+const skyMaterial=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,toneMapped:false,uniforms:skyUniforms,vertexShader:'varying vec3 worldPoint;void main(){vec4 w=modelMatrix*vec4(position,1.);worldPoint=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;gl_Position.z=gl_Position.w;}',fragmentShader:`varying vec3 worldPoint;uniform vec3 top,horizon,sun,sunDir;uniform float night,time,overcast,cloudAmount,lowGlow;uniform sampler2D clouds;void main(){vec3 d=normalize(worldPoint-cameraPosition);vec3 col=mix(horizon,top,pow(max(d.y,0.),.6));float u=atan(d.z,d.x)/6.2831853+.5+time*.0015;vec4 c=texture2D(clouds,vec2(u,clamp(d.y*1.8,0.,1.)));float mask=smoothstep(.015,.14,d.y)*(1.-smoothstep(.52,.86,d.y));vec4 c2=texture2D(clouds,vec2(u*1.53-time*.0007+.29,clamp(d.y*1.3+.14,0.,1.)));float facing=max(0.,dot(d,sunDir));vec3 white=mix(vec3(.85,.93,1.),vec3(1.,.68,.42),lowGlow*pow(facing,2.));white=mix(white,vec3(.04,.075,.13),night);float cover=clamp(c.a*.86+c2.a*.3,0.,1.);col=mix(col,white,cover*mask*cloudAmount);col=mix(col,mix(vec3(.145,.17,.21),vec3(.40,.46,.53),cover),overcast*mask*.86);col+=sun*lowGlow*pow(facing,3.)*exp(-max(d.y,0.)*13.)*.17;float horizonGlow=pow(facing,9.)*exp(-max(d.y,0.)*8.);col+=sun*(pow(facing,100.)*.18+horizonGlow*(1.-night)*.15)*(1.-overcast);float disc=smoothstep(.99945,.99975,facing)*(1.-overcast);col=mix(col,sun,disc);gl_FragColor=vec4(col,1.);#include <colorspace_fragment>
 }`.replace(';#include',';\n#include')});
 const skyMesh=new T.Mesh(new T.SphereGeometry(800,24,12),skyMaterial);skyMesh.frustumCulled=false;
 // Its shader uses the far depth. Paint after opaque scenery so the depth test
@@ -199,16 +217,16 @@ const poolGeometry=new T.BufferGeometry();poolGeometry.setAttribute('position',n
 // Explicit preview parameter only changes this scene's lighting, never the device clock or game state.
 const reviewPhase=new URL(location.href).searchParams.get('tagLightingReview'),reviewHours={morning:7.5,day:12,evening:17,night:22};
 function lightingDate(){const d=new Date();if(Object.hasOwn(reviewHours,reviewPhase)){const hour=reviewHours[reviewPhase];d.setHours(Math.floor(hour),Math.round(hour%1*60),0,0);}return d;}
-const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6);let lastLighting=-Infinity,liveLighting=null,appliedLighting=null;
+const nightSkyLight=new T.Color(0xb9d4f4),nightGroundLight=new T.Color(0x6c8da6);let lastLighting=-Infinity,liveLighting=null,appliedLighting=null,matchLighting=null;
 function updateLighting(now,recorded){
  if(!recorded&&now-lastLighting>=10000){
   lastLighting=now;
   liveLighting=Object.freeze(tagAtmosphere(lightingDate()));
  }
- const l=recorded??liveLighting;
+ const l=recorded??matchLighting??liveLighting;
  if(l===appliedLighting)return;
  appliedLighting=l;
- skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;glass.update(l.lamps);castShadows.update(l);contactShadows.material.uniforms.opacity.value=.29-l.night*.075;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
+ skyUniforms.top.value.set(l.top);skyUniforms.horizon.value.set(l.horizon);skyUniforms.sun.value.set(l.sun);skyUniforms.night.value=l.night;skyUniforms.overcast.value=Number(l.phase==='cloud');skyUniforms.cloudAmount.value=l.cloudAmount??.7;skyUniforms.lowGlow.value=l.lowGlow??0;skyUniforms.sunDir.value.set(Math.sin(l.azimuth)*Math.cos(l.elevation),Math.sin(l.elevation),Math.cos(l.azimuth)*Math.cos(l.elevation));hemi.intensity=l.ambient;hemi.color.set(0xf1f6ff).lerp(nightSkyLight,l.night);hemi.groundColor.set(0x8ba7b8).lerp(nightGroundLight,l.night);sun.intensity=l.power;sun.color.set(l.sun);sun.position.copy(skyUniforms.sunDir.value).multiplyScalar(200);scene.fog.color.set(l.horizon);scene.background.set(l.horizon);starMat.opacity=l.night*.9;stars.visible=l.night>.01;glass.update(l.lamps);castShadows.update(l);contactShadows.material.uniforms.opacity.value=.29-l.night*.075;lampCores.material.emissiveIntensity=l.lamps;glowMaterial.uniforms.strength.value=l.lamps;lampHalos.visible=l.lamps>.01;poolMaterial.uniforms.strength.value=l.lamps;pools.visible=l.lamps>.01;canvas.dataset.lightPhase=l.phase;}
 for(const p of WORLD_JUMP_STEPS){
  box(p.x,p.h/2,p.z,p.w,p.h,p.d,0xc5dcd8);
  box(p.x,p.h+.03,p.z,p.w,.06,p.d,0xf2d6a8);
@@ -218,5 +236,6 @@ for(const p of WORLD_JUMP_STEPS){
 const stairGeometry=cornerStairGeometry(WORLD_CORNER_STAIRS),stairSlabs=batch(boxGeo,0x7196a3,stairGeometry.slabs);stairSlabs.name='corner-stair-slabs';const stairEdges=batch(boxGeo,0xffdba0,stairGeometry.edges);stairEdges.name='corner-stair-tread-edges';const rampGeometry=new T.BufferGeometry();rampGeometry.setAttribute('position',new T.Float32BufferAttribute(stairGeometry.positions,3));rampGeometry.computeVertexNormals();const rampMaterial=material(0x8eabb0);rampMaterial.side=T.DoubleSide;rampMaterial.polygonOffset=true;rampMaterial.polygonOffsetFactor=-1;rampMaterial.polygonOffsetUnits=-1;const stairRamps=new T.Mesh(rampGeometry,rampMaterial);stairRamps.name='corner-stair-side-ramps';scene.add(stairRamps);canvas.dataset.cornerStairs=JSON.stringify({corners:4,count:WORLD_CORNER_STAIRS[0].count,rise:WORLD_CORNER_STAIRS[0].rise,tread:WORLD_CORNER_STAIRS[0].tread,top:WORLD_CORNER_STAIRS[0].top,rampWidth:WORLD_CORNER_STAIRS[0].rampWidth,extraDrawBatches:3});
 let boxCount=0;for(const[key,{color,masonry,style,rows}]of staticBoxes){let shared=staticBoxMaterials.get(style);if(!shared){shared=material(color);if(masonry)applyHuntWallDetail(shared,masonryTexture);staticBoxMaterials.set(style,shared);}const mesh=batch(boxGeo,color,rows,shared);mesh.name='hunt-static-boxes-'+key;boxCount+=rows.length;}canvas.dataset.staticBoxes=JSON.stringify({boxes:boxCount,batches:staticBoxes.size,colours:staticBoxMaterials.size,cell:96,savedDrawBatches:boxCount-staticBoxes.size,savedMaterials:boxCount-staticBoxMaterials.size});
 function centerSky(view=camera){skyMesh.position.copy(view.position);stars.position.copy(view.position);}
-return{centerSky,get lighting(){return appliedLighting;},update(now,recordedLighting){updateLighting(now,recordedLighting);centerSky();skyUniforms.time.value=now/1000;}};
+function setMatchSky(id){matchLighting=HUNT_SKIES[id]??null;}
+return{centerSky,setMatchSky,get lighting(){return appliedLighting;},update(now,recordedLighting){updateLighting(now,recordedLighting);centerSky();skyUniforms.time.value=now/1000;}};
 }

@@ -8,14 +8,14 @@ import {joinOption,detachOption,beginJoin,stepJoining,alignCable,touchingFaces,J
 export {joinOption,detachOption,component};
 export {floatReadout};
 export const TIMBER_PARTS=Object.freeze([
-  {id:'mars-deck',materialId:'mars-timber',name:'火星木材・浮遊床 A',w:80,h:6,d:56,x:0,z:16,color:0xaa80bd},
-  {id:'mars-deck-b',materialId:'mars-timber',name:'火星木材・浮遊床 B',w:80,h:6,d:56,x:-85,z:56,color:0xa180bd},
-  {id:'mars-deck-c',materialId:'mars-timber',name:'火星木材・浮遊床 C',w:80,h:6,d:56,x:85,z:56,color:0xb98bbc},
+  {id:'mars-deck',materialId:'mars-timber',name:'アマネ星木材・浮遊床 A',w:80,h:6,d:56,x:0,z:16,color:0xaa80bd},
+  {id:'mars-deck-b',materialId:'mars-timber',name:'アマネ星木材・浮遊床 B',w:80,h:6,d:56,x:-85,z:56,color:0xa180bd},
+  {id:'mars-deck-c',materialId:'mars-timber',name:'アマネ星木材・浮遊床 C',w:80,h:6,d:56,x:85,z:56,color:0xb98bbc},
   {id:'earth-deck',materialId:'earth-timber',name:'普通の木材・比較床',w:80,h:6,d:56,x:0,z:90,color:0xdab573},
   {id:'light-weight',materialId:'earth-iron',name:'普通の鉄・小さいおもり',w:20,h:12,d:20,x:-85,z:-5,color:0x819497},
   {id:'heavy-weight',materialId:'earth-iron',name:'普通の鉄・重いおもり',w:28,h:26,d:28,x:85,z:-5,color:0x556970},
 ].map(Object.freeze));
-export const TIMBER_MATERIALS=Object.freeze({'mars-timber':'火星木材','earth-timber':'普通の木材','earth-iron':'普通の鉄'});
+export const TIMBER_MATERIALS=Object.freeze({'mars-timber':'アマネ星木材','earth-timber':'普通の木材','earth-iron':'普通の鉄'});
 export const RETURN_PAD=Object.freeze({x:0,z:16,w:116,d:84,maxBottom:8});
 const fresh=p=>({...p,y:0,angle:0,vx:0,vz:0,vy:0,fixed:false,hover:null,carrierId:null});
 export function materialLedger(s){
@@ -27,7 +27,7 @@ export function materialLedger(s){
   return rows;
 }
 const reconcile=s=>{s.ledger=materialLedger(s);return s;};
-export function initialTimber(){const s=initialCrane();s.materialVersion=3;s.joints=[];s.parts=[fresh(TIMBER_PARTS[0])];s.stock=TIMBER_PARTS.slice(1).map(p=>p.id);s.message='火星木材を巻上げ、浮遊を開始してください。離した高さを覚えます。';return reconcile(s);}
+export function initialTimber(){const s=initialCrane();s.materialVersion=3;s.joints=[];s.parts=[fresh(TIMBER_PARTS[0])];s.stock=TIMBER_PARTS.slice(1).map(p=>p.id);s.message='アマネ星木材を巻上げ、浮遊を開始してください。離した高さを覚えます。';return reconcile(s);}
 function touchingWalker(s,p){
   if(s.rig.mode!=='foot')return false;
   const a=s.rig.player,q=worldToLocal({x:p.x,z:p.z,heading:p.angle},a.x,a.z);
@@ -45,7 +45,7 @@ export function returnOption(s){
   let reason=!p?'戻したい部材に吊り索を掛けてください。':
     s.rig.mode!=='driving'||!s.work||s.deployment<1?'クレーン作業中に回収できます。':
     s.rotation?'回転が止まるまで待ってください。':
-    Math.abs(p.x-RETURN_PAD.x)>8||Math.abs(p.z-RETURN_PAD.z)>8?'最初の火星木材の位置にある、青い回収枠の中央へ運んでください。':
+    Math.abs(p.x-RETURN_PAD.x)>8||Math.abs(p.z-RETURN_PAD.z)>8?'最初のアマネ星木材の位置にある、青い回収枠の中央へ運んでください。':
     p.y>RETURN_PAD.maxBottom?'回収枠の上へ、部材の底を高さ8以下に巻き下げてください。':
     Math.hypot(p.vx,p.vz)>12?'部材の揺れが落ち着くまで待ってください。':'';
   return{ok:!reason,reason:reason||'素材置場に戻せます。',part:p};
@@ -89,7 +89,7 @@ export function actTimber(state,action){
   }
   if(action==='place'&&p&&s.held===null)bindPlacedCargo(s,p);
   if(action==='release'&&p&&s.held===null)p.carrierId=null;
-  if(action==='release'&&p?.hover)s.message='この高さに浮かせました。別の火星木材を辺へ運ぶと接合できます。';
+  if(action==='release'&&p?.hover)s.message='この高さに浮かせました。別のアマネ星木材を辺へ運ぶと接合できます。';
   return reconcile(s);
 }
 export function stepTimber(s,input,dt){

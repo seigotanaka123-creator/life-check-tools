@@ -33,14 +33,17 @@ function sweepCorner(a,time,coverage,team){
  setSweepDestination(m,cornerChecks[index]);
  return true;
 }
-export function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false}){
+export function huntSweepControl(a,{time,seed,visible=false,coverage,team,refresh=false,groundOnly=false,activePatrol=false}){
  const m=a.brain;
  if(visible||m.seen&&time-(m.seenAt??-Infinity)<18){
-  if(refresh){m.freshSweep=null;m.sweep=null;}
+  if(refresh){
+   if(activePatrol&&visible&&m.freshSweep)m.next=time;
+   m.freshSweep=null;m.sweep=null;
+  }
   if(coverage&&m.cornerIndex!==undefined){delete m.cornerIndex;m.sweep=null;}
   return false;
  }
- if(refresh&&coverage)return freshHuntSweep(a,{time,seed,coverage,team});
+ if(refresh&&coverage)return freshHuntSweep(a,{time,seed,coverage,team,groundOnly,activePatrol});
  if(coverage&&time>=45&&sweepCorner(a,time,coverage,team)){
   m.goalSince=time;
   return true;

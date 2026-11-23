@@ -1,9 +1,10 @@
-import {createTideCaveView} from './imasora-coast-tide-cave-view.mjs?v=120mx';
+import {createTideCaveView} from './imasora-coast-tide-cave-view.mjs?v=121il-story-guide';
 import {createCoastWildlife} from './imasora-coast-wildlife-view.mjs?v=120oe';
 import {coastSurfaceTexture,coastTree,coastRidgeGeometry,coastTownHouse} from './imasora-coast-scenery-detail.mjs?v=120mt';
 import {coastWave} from './imasora-coast-waves.mjs?v=120mx';
 import {coastOceanTime} from './imasora-coast-tidal-finds.mjs?v=120mx';
-import {createCoastIslandView} from './imasora-coast-island-view.mjs?v=120ne';
+import {createCoastIslandView} from './imasora-coast-island-view.mjs?v=121gf';
+import {SNORKEL} from './imasora-coast-snorkeling.mjs?v=120ob';
 import {createTownBridge} from './imasora-town-bridge.mjs?v=120mt';
 import {batchCoastScenery,splitCoastSurface} from './imasora-coast-static-batches.mjs?v=120id';
 import{eveningLight,createLightHalos,createLightPools,WARM_LIGHT}from'./imasora-evening-light.mjs?v=120mx';
@@ -14,6 +15,179 @@ import {createTownDetails}from './imasora-town-detail.mjs?v=120pr';
 import {COAST_WAVE_GLSL,coastSeaState,WAVE} from './imasora-coast-waves.mjs?v=120mx';
 import {COAST_PLACES,COAST_WATER_Y,COAST_DOCK_FENDERS,COAST_TOWN_CANAL,coastHeight,coastMainlandHeight,coastShore,coastLighting,coastPierContains} from './imasora-coast-layout.mjs?v=120mx';
 import {COAST_HOME_MOOR_POSTS} from './imasora-coast-island-harbors.mjs?v=120lr';
+import {UNCHARTED_ISLAND} from './imasora-coast-geography.mjs?v=120mx';
+import {buildFloweringHeroCharacter360, disposeFloweringCharacterModel} from './imasora-character-360.js';
+
+const coastRumors = [
+ {id:'shore', name:'海を眺める住民', art:'hero-young-seed-leaf-walk-cute', x:-223, z:155,
+  line:'地図に載ってない島があるって、聞いたことある？'},
+ {id:'sailor', name:'航海に詳しい住民', art:'hero-young-seed-river-walk-cute', x:113, z:255,
+  line:'よく晴れた日は、風に乗った雲の下に、沖の島影が見えるよ。'},
+ {id:'elder', name:'昔の話に詳しい住民', art:'hero-young-seed-walk-walk-cool-b', x:241, z:182,
+  line:'あの島の洞窟には、空の図が残っているそうだよ。'}
+];
+
+function createCoastRumorResidents(parent) {
+ const residents = coastRumors.map(info => {
+  const model = buildFloweringHeroCharacter360(info.art);
+  const bounds = new T.Box3().setFromObject(model);
+  const scale = 33 / (bounds.max.y - bounds.min.y);
+  const ground = coastMainlandHeight(info.x, info.z);
+  model.scale.multiplyScalar(scale);
+  model.position.set(info.x, ground - bounds.min.y * scale, info.z);
+  const seaHeading = Math.atan2(UNCHARTED_ISLAND.x - info.x, UNCHARTED_ISLAND.z - info.z);
+  model.rotation.y = seaHeading + (info.id === 'shore' ? .8 : 1.65);
+  model.name = info.name;
+  parent.add(model);
+  return {...info, model, ground, seaHeading};
+ });
+ function dispose() {
+  for (const {model} of residents) {
+   disposeFloweringCharacterModel(model);
+   model.removeFromParent();
+  }
+ }
+ return {residents,dispose};
+}
+
+export function createCoastRumorScene({host, canvas, context, clearInput}) {
+ const button = document.createElement('button');
+ button.type = 'button';
+ button.className = 'coast-rumor-action';
+ button.textContent = '話を聞く';
+ button.hidden = true;
+ button.setAttribute('aria-haspopup','dialog');
+ host.append(button);
+ const dialog = document.createElement('dialog');
+ dialog.className = 'coast-rumor-dialog';
+ dialog.setAttribute('aria-labelledby', 'coast-rumor-speaker');
+ dialog.innerHTML = '<div id="coast-rumor-speaker"></div><p></p><footer><button type="button" data-listen>沖を眺める</button><button type="button" data-close>閉じる</button></footer>';
+ document.body.append(dialog);
+ const speaker = dialog.querySelector('div'), line = dialog.querySelector('p');
+ const listen = dialog.querySelector('[data-listen]'), close = dialog.querySelector('[data-close]');
+ const projection = new T.Vector3(), eye = new T.Vector3(), target = new T.Vector3();
+ const cameraPose = new T.PerspectiveCamera();
+ let nearby, active, origin, time = 0, phase = 'talk', heading = 0;
+ let returnPose;
+ const duration = 5.4;
+ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+ function update(dt=0) {
+  const c = context();
+  if (active) {
+   if (!dialog.open || c.map !== 'coast' || c.blocked || !c.residents?.includes(active)) {
+    finish();
+    return;
+   }
+   time += dt;
+   if (phase === 'view' && time >= duration) finish();
+   return;
+  }
+  nearby = null;
+  if (c.map === 'coast' && !c.blocked && !c.airborne && c.camera) {
+   let best = 73;
+   for (const resident of c.residents) {
+    const distance = Math.hypot(resident.x - c.x, resident.z - c.z);
+    if (distance < best && Math.abs(resident.ground - c.y) < 18) {
+     best = distance;
+     nearby = resident;
+    }
+   }
+  }
+  if (nearby) {
+   projection.set(nearby.x, nearby.ground+41, nearby.z).project(c.camera);
+   if (projection.z < -1 || projection.z > 1 || Math.abs(projection.x)> .92 || Math.abs(projection.y) > .91) nearby = null;
+  }
+  button.hidden = !nearby;
+  if (nearby) {
+   button.style.left = ((projection.x + 1) * 50) + '%';
+   button.style.top = ((1 - projection.y) * 50) + '%';
+   button.setAttribute('aria-label', nearby.name + 'の話を聞く');
+  }
+ }
+
+ function open() {
+  update();
+  if (!nearby || active) return;
+  const c = context();
+  active = nearby;
+  origin = {eye:c.camera.position.clone(), rotation:c.camera.quaternion.clone(), modelYaw:active.model.rotation.y};
+  returnPose = {eye:origin.eye.clone(), rotation:origin.rotation.clone()};
+  heading = Math.atan2(c.x-active.x,c.z-active.z);
+  active.model.rotation.y = heading;
+  time = 0;
+  phase = 'talk';
+  dialog.dataset.phase = phase;
+  speaker.textContent = active.name;
+  line.textContent = active.line;
+  listen.hidden = false;
+  close.textContent = '閉じる';
+  button.hidden = true;
+  clearInput();
+  dialog.showModal();
+  document.body.classList.add('coast-rumor-active');
+  listen.focus();
+ }
+
+ function lookOut() {
+  if (!active) return;
+  clearInput();
+  const {camera} = context();
+  origin.eye.copy(camera.position);
+  origin.rotation.copy(camera.quaternion);
+  time = 0;
+  phase = 'view';
+  dialog.dataset.phase = phase;
+  listen.hidden = true;
+  close.textContent = '戻る';
+  active.model.rotation.y = active.seaHeading;
+  close.focus();
+ }
+
+ function finish() {
+  if (!active) return;
+  active.model.rotation.y = origin.modelYaw;
+  const {camera} = context();
+  camera.position.copy(returnPose.eye);
+  camera.quaternion.copy(returnPose.rotation);
+  active = null;
+  origin = null;
+  returnPose = null;
+  document.body.classList.remove('coast-rumor-active');
+  if (dialog.open) dialog.close();
+  clearInput();
+  canvas.focus({preventScroll:true});
+ }
+
+ function cameraFrame(camera) {
+  if (!active) return false;
+  const {x,z,ground,seaHeading} = active;
+  const portrait = camera.aspect < .9;
+  const distance = portrait ? 108 : 83;
+  if (phase === 'talk') {
+   eye.set(x+Math.sin(heading+.42)*distance,ground+32,z+Math.cos(heading+.42)*distance);
+   target.set(x,ground+22,z);
+  } else {
+   // The offshore bearing comes from the existing island coordinates. Keep the
+   // real horizon and its normal visibility distance throughout the shot.
+   const fx = Math.sin(seaHeading), fz = Math.cos(seaHeading);
+   eye.set(x-fx*92+fz*38,ground+42,z-fz*92-fx*38);
+   target.set(x+fx*500,ground+39,z+fz*500);
+  }
+  cameraPose.position.copy(eye);
+  cameraPose.lookAt(target);
+  const blend = reducedMotion.matches ? 1 : T.MathUtils.smoothstep(time,0,phase==='talk'? .6 : 1.25);
+  camera.position.lerpVectors(origin.eye,eye,blend);
+  camera.quaternion.slerpQuaternions(origin.rotation,cameraPose.quaternion,blend);
+  return true;
+ }
+ button.addEventListener('click',open);
+ listen.addEventListener('click',lookOut);
+ close.addEventListener('click',finish);
+ dialog.addEventListener('cancel',event=>{event.preventDefault();finish();});
+ dialog.addEventListener('close',finish);
+ return {update,cameraFrame,get open(){return !!active;}};
+}
 
 const vertex=`
 varying vec3 vWorld;
@@ -23,11 +197,56 @@ float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+1.),f.x),f.y);}`;
 const colors=['top','horizon','sea','deep','sun'];
 function lightUniforms(){return Object.fromEntries(colors.map(k=>[k,{value:new T.Color()}]));}
+// One small batch of light volumes. The sources stay over the reef as the lens moves.
+function reefLightShafts(uniforms,waterLight){
+ const positions=[],profiles=[],order=[[-1,0],[1,0],[-1,1],[1,0],[1,1],[-1,1]];
+ let index=0;
+ for(const x of [-320,-70,150,335,515]){
+  for(const z of [-182,-22,164]){
+   const phase=index++*1.618,length=235+55*Math.sin(phase)+Math.max(0,x)*.35;
+   for(const [side,down] of order){
+    positions.push(SNORKEL.x+x+Math.sin(phase)*59,0,SNORKEL.z+z+Math.cos(phase)*49);
+    profiles.push(side,down,phase,length);
+   }
+  }
+ }
+ const geo=new T.BufferGeometry();
+ geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+ geo.setAttribute('rayProfile',new T.Float32BufferAttribute(profiles,4));
+ const mat=new T.ShaderMaterial({
+  transparent:true,depthWrite:false,side:T.DoubleSide,forceSinglePass:true,blending:T.AdditiveBlending,
+  uniforms:{reefTime:waterLight.time,reefSurface:waterLight.surface,reefStrength:waterLight.strength,sunDir:uniforms.sunDir,sun:uniforms.sun},
+  vertexShader:`
+   uniform float reefSurface;uniform vec3 sunDir;attribute vec4 rayProfile;
+   varying vec4 ray;varying float distanceToEye;
+   void main(){
+    vec3 axis=normalize(vec3(sunDir.x*.47,1.,sunDir.z*.47));
+    vec3 top=vec3(position.x,reefSurface-6.,position.z);
+    vec3 center=top-axis*rayProfile.y*rayProfile.w;
+    vec3 lateral=normalize(cross(axis,normalize(cameraPosition-center))+vec3(.0001,0.,0.));
+    vec3 p=center+lateral*rayProfile.x*mix(10.,43.,rayProfile.y);
+    ray=rayProfile;distanceToEye=length(cameraPosition-p);
+    gl_Position=projectionMatrix*viewMatrix*vec4(p,1.);
+   }`,
+  fragmentShader:`
+   uniform float reefTime,reefStrength;uniform vec3 sun;varying vec4 ray;varying float distanceToEye;
+   void main(){
+    float fade=exp(-ray.x*ray.x*5.)*smoothstep(0.,.12,ray.y)*(1.-smoothstep(.5,1.,ray.y));
+    float flicker=.66+.20*sin(reefTime*.97+ray.z+ray.x*2.4)+.14*sin(reefTime*1.41+ray.y*5.-ray.z);
+    float range=smoothstep(35.,100.,distanceToEye)*(1.-smoothstep(540.,900.,distanceToEye));
+    gl_FragColor=vec4(mix(vec3(.29,.76,.71),sun,.32),fade*flicker*range*reefStrength*.24);
+   }`
+ });
+ const shafts=new T.Mesh(geo,mat);shafts.name='水面から届く光';shafts.visible=false;shafts.frustumCulled=false;
+ return shafts;
+}
 export function createCoastWorld({collider=()=>{},surface=()=>{},ceiling=()=>{},reserved=[],pebbleState}={}){
  const group=new T.Group();group.name='imasora-coast-open-world';
  const forage=createCoastForageView(group,{collider});
+ const rumors=createCoastRumorResidents(group);
  const toys=null;
- const islands=createCoastIslandView({collider,surface,pebbleState});group.add(islands.root);
+ const waterLight={active:{value:0},time:{value:0},strength:{value:0},surface:{value:COAST_WATER_Y}};
+ const islands=createCoastIslandView({collider,surface,pebbleState,waterLight});group.add(islands.root);
  const cave=createTideCaveView({collider,surface,ceiling});group.add(cave.root);
  const materials=new Set(),geometries=new Set(),textures=new Set(),scenery=[];
  const mat=(c,extra={})=>{const m=new T.MeshStandardMaterial({color:c,roughness:.82,...extra});materials.add(m);return m;};
@@ -64,10 +283,12 @@ export function createCoastWorld({collider=()=>{},surface=()=>{},ceiling=()=>{},
  let grainSeed=47;for(let i=0;i<grain.data.length;i+=4){grainSeed=(Math.imul(grainSeed,1664525)+1013904223)>>>0;const g=223+(grainSeed%31);grain.data[i]=grain.data[i+1]=grain.data[i+2]=g;grain.data[i+3]=255;}
  grainContext.putImageData(grain,0,0);const grainTexture=new T.CanvasTexture(grainCanvas);grainTexture.wrapS=grainTexture.wrapT=T.RepeatWrapping;grainTexture.repeat.set(84,60);grainTexture.colorSpace=T.SRGBColorSpace;textures.add(grainTexture);landMat.map=grainTexture;landMat.needsUpdate=true;
 
- const uniforms={...lightUniforms(),time:{value:0},waveTime:{value:0},oceanPhase:{value:new T.Vector4()},raftLight:{value:new T.Vector3()},raftForward:{value:new T.Vector2()},raftGlow:{value:0},night:{value:0},lampGlow:{value:0},warmReflection:{value:new T.Color(WARM_LIGHT.reflection)},lampSources:{value:Array.from({length:4},()=>new T.Vector2())},reflectionCount:{value:0},sunDir:{value:new T.Vector3()},snorkelActive:{value:0},snorkelUnderwater:{value:0},snorkelPoint:{value:new T.Vector2()},underwaterFog:{value:new T.Color()},underwaterUpper:{value:new T.Color()},underwaterLower:{value:new T.Color()}};
- // Owned colours are reused per frame. Only the coast's submerged view uses
- // these blue depth tones; the shared sky and all dry-land palettes stay intact.
- const waterColours=[0x287eae,0x185d92,0x214c78,0x14385f,0x83cde9,0x507ea8,0x174c77,0x102e50].map(c=>new T.Color(c));
+ const uniforms={...lightUniforms(),time:{value:0},waveTime:{value:0},oceanPhase:{value:new T.Vector4()},raftLight:{value:new T.Vector3()},raftForward:{value:new T.Vector2()},raftGlow:{value:0},night:{value:0},lampGlow:{value:0},warmReflection:{value:new T.Color(WARM_LIGHT.reflection)},lampSources:{value:Array.from({length:4},()=>new T.Vector2())},reflectionCount:{value:0},sunDir:{value:new T.Vector3()},snorkelActive:{value:0},snorkelUnderwater:waterLight.active,snorkelPoint:{value:new T.Vector2()},underwaterFog:{value:new T.Color()},underwaterUpper:{value:new T.Color()},underwaterLower:{value:new T.Color()}};
+ // The horizon and the suspended water share these colours, so the
+ // underwater distance fades continuously instead of ending in a blue wall.
+ const waterColours=[0x5bb1ad,0x356f7f,0x2f6178,0x203f60,0xc0ead7,0x90bace,0x468c83,0x284f63].map(c=>new T.Color(c));
+ const shafts=reefLightShafts(uniforms,waterLight);group.add(shafts);
+ geometries.add(shafts.geometry);materials.add(shafts.material);
  // Keep the sky behind even the distant islands. Its dome radius must not
  // become an opaque wall halfway across the expanded sea.
  const atmosphere=createScenicSky({uniforms,radius:8500,infinite:true});
@@ -79,8 +300,10 @@ export function createCoastWorld({collider=()=>{},surface=()=>{},ceiling=()=>{},
  const skyMat=atmosphere.sky.material;
  skyMat.fragmentShader=skyMat.fragmentShader.replace('uniform sampler2D clouds;', 'uniform sampler2D clouds;uniform float snorkelUnderwater;uniform vec3 underwaterFog,underwaterUpper,underwaterLower;').replace('vec3 d=normalize(vWorld-cameraPosition);', `vec3 d=normalize(vWorld-cameraPosition);
   if(snorkelUnderwater>.5){
-   vec3 water=mix(underwaterFog,underwaterUpper,smoothstep(0.,1.,d.y));
-   water=mix(water,underwaterLower,smoothstep(0.,1.,-d.y));
+   float skyward=smoothstep(-.07,.85,d.y);
+   vec3 water=mix(underwaterFog,underwaterUpper,skyward);
+   water=mix(water,underwaterLower,smoothstep(0.,.9,-d.y));
+   water+=underwaterUpper*pow(max(0.,dot(d,sunDir)),8.)*skyward*.16;
    gl_FragColor=vec4(water,1.);
    #include <tonemapping_fragment>
    #include <colorspace_fragment>
@@ -122,7 +345,14 @@ export function createCoastWorld({collider=()=>{},surface=()=>{},ceiling=()=>{},
   col=mix(col,mix(vec3(.93,.98,.96),vec3(.35,.52,.66),night),max(foam*(.3+.7*b),crest*.72));
   col+=(a+b-1.)*.018;
   float haze=smoothstep(1700.,7000.,length(cameraPosition.xz-p));col=mix(col,horizon,haze*.85);
-  if(!gl_FrontFacing)col=snorkelUnderwater>.5?mix(underwaterFog,underwaterUpper,.55+.2*surfaceNormal.y)+sun*spec*.06:mix(vec3(.27,.65,.69),horizon,.3)+sun*spec*.15;
+  if(!gl_FrontFacing){
+   if(snorkelUnderwater>.5){
+    float depth=max(0.,vWorld.y-cameraPosition.y),ripple=.5+.5*sin(p.x*.064+p.y*.034+time*.91+a*2.6);
+    float gleam=pow(max(0.,dot(refract(-sunDir,n,.75),v)),8.);
+    col=mix(underwaterFog,underwaterUpper,(.40+.34*c)*exp(-depth*.0025));
+    col+=sun*(gleam*.12+pow(ripple,5.)*.10)*(1.-night*.62)*exp(-depth*.004);
+   }else col=mix(vec3(.27,.65,.69),horizon,.3)+sun*spec*.15;
+  }
   // Clear shallow water keeps the swimmer and fish visible when terrain lifts
   // a third-person camera above the surface. The rest of the ocean stays solid.
   float clearWater=gl_FrontFacing?snorkelActive*(1.-smoothstep(130.,240.,distance(p,snorkelPoint))):0.;
@@ -267,6 +497,10 @@ uniform float waveTime;uniform vec2 waterCenter;varying vec3 vWorld;varying vec3
   const lensDepth=snorkeling?coastWave(camera.position.x,camera.position.z,waveTime).height-camera.position.y:0;
   const submerged=snorkeling&&lensDepth>1;
   uniforms.snorkelUnderwater.value=submerged?1:0;
+  shafts.visible=submerged;
+  waterLight.time.value=waveTime;
+  waterLight.surface.value=COAST_WATER_Y+sea.tide;
+  waterLight.strength.value=1-uniforms.night.value*.61;
   if(submerged){
    if(!scene.userData.snorkelFog)scene.userData.snorkelFog={near:scene.fog.near,far:scene.fog.far};
    const depth=T.MathUtils.smoothstep(lensDepth,10,420),night=uniforms.night.value;
@@ -277,12 +511,13 @@ uniform float waveTime;uniform vec2 waterCenter;varying vec3 vWorld;varying vec3
    uniforms.underwaterFog.value.lerp(uniforms.underwaterLower.value,night*.34);
    uniforms.underwaterUpper.value.copy(waterColours[4]).lerp(waterColours[5],night).lerp(waterColours[6],depth*.2);
    uniforms.underwaterLower.value.copy(waterColours[6]).lerp(waterColours[7],depth).multiplyScalar(1.-night*.18);
-   scene.fog.near=100;scene.fog.far=590;
+   scene.fog.near=T.MathUtils.lerp(170,115,depth);
+   scene.fog.far=T.MathUtils.lerp(1040,770,depth)*(1-night*.12);
    scene.fog.color.copy(uniforms.underwaterFog.value);scene.background.copy(uniforms.underwaterFog.value);
   }
   else if(scene.userData.snorkelFog){Object.assign(scene.fog,scene.userData.snorkelFog);delete scene.userData.snorkelFog;scene.fog.color.copy(uniforms.horizon.value);scene.background.copy(uniforms.horizon.value);}
   wildlife.update({camera,time,waveTime,date,actor:actorPoint,raft,level:coastSeaState(actorPoint.x,actorPoint.z,waveTime).level,waterY:COAST_WATER_Y+sea.tide,paused:wildlifePaused||(typeof document!=='undefined'&&document.hidden),watchWhale});
  }
- function dispose(){if(disposed)return;disposed=true;townDetails.dispose();wildlife.dispose();townBridge.dispose();halos.dispose();pools.dispose();forage.dispose();islands.dispose();cave.dispose();atmosphere.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();}
- return {group,forage,toys,cave,wildlife,pebbles:islands.pebbles,trees:islands.trees,prepare:islands.prepare,update,dispose,get phase(){return lastPhase;},places:COAST_PLACES};
+ function dispose(){if(disposed)return;disposed=true;rumors.dispose();townDetails.dispose();wildlife.dispose();townBridge.dispose();halos.dispose();pools.dispose();forage.dispose();islands.dispose();cave.dispose();atmosphere.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();}
+ return {group,forage,toys,cave,wildlife,residents:rumors.residents,pebbles:islands.pebbles,trees:islands.trees,prepare:islands.prepare,update,dispose,get phase(){return lastPhase;},places:COAST_PLACES};
 }

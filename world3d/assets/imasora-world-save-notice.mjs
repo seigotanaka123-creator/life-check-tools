@@ -7,6 +7,10 @@ export function createWorldSaveErrorUI({retry,reopen=()=>location.reload(),expor
  const flow=createWorldSaveNoticeFlow({retry,reopen,changed:s=>{
   if(s.opened!==previousOpen){pause();if(s.opened)previousFocus=document.activeElement;}
   const issue=s.issue;q('h2').textContent=s.working?'セーブをたしかめているよ':issue?.title??'セーブをたしかめよう';q('[data-save-message]').textContent=s.working?'作品と材料を大切にしまっているよ。':issue?.message??'';
+  const message=q('[data-save-message]');
+  const tone=s.working||!issue?'':issue.kind==='newer'?'warning':'error';
+  if(tone)message.dataset.constructionNotice=tone;
+  else delete message.dataset.constructionNotice;
   q('[data-save-safe]').hidden=s.working;q('[data-save-progress]').hidden=!s.busy;
   q('[data-save-choices]').hidden=s.working||s.confirming;q('[data-save-confirm]').hidden=!s.confirming;
   q('[data-save-reopen]').textContent=issue?.reopen??'セーブから開きなおす';q('[data-save-detail]').textContent=issue?.detail??'';q('[data-save-details]').hidden=s.working||s.confirming;

@@ -1,3 +1,7 @@
+import {constructionMission,RAIN_WORKS_FOUNDATION_STEP,RAIN_WORKS_JOBS,rainWorksDepositRecorded,rainFoundationPad,RAIN_FOUNDATION_LOAD,RAIN_FOUNDATION_NAMES} from './imasora-construction-guide-data.mjs?v=121fc';
+import {nativeStorageBin} from './imasora-construction-transport-field.mjs?v=120ov';
+import {gardenEarthReserved} from './imasora-construction-garden.mjs?v=120ps';
+
 import {assertWorkField,inWorkArea} from './imasora-construction-field-area.mjs?v=120ov';
 // Received soil in the authoritative world. No purchase-copy import or storage API.
 import {initialWorldSoilPhysics,purchasedSoilAction,advancePurchasedSoil,validatePurchasedSoil,soilCopyTotals,soilCopySurface,SOIL_SITE_SOLIDS} from './imasora-construction-purchased-soil.js?v=120pv';
@@ -13,7 +17,7 @@ export function validateWorldSoil(s,received){
   ok(s&&Object.keys(s).sort().join('|')==='revision|schema|scope|siteIndex|work','土作業の項目が不正です。');
   ok([1,2].includes(s.schema)&&s.scope===WORLD_SOIL_SCOPE&&int(s.revision)&&int(s.siteIndex)&&!!SOIL_YARDS[s.siteIndex],'土作業の区画・版が不正です。');
   assertWorkField(s,SOIL_YARDS[s.siteIndex]);
-  ok(int(received)&&received%1000===0&&s.work.source.mode==='world'&&s.work.source.total*1000<=received,'受取済みの火星土だけを使えます。');
+  ok(int(received)&&received%1000===0&&s.work.source.mode==='world'&&s.work.source.total*1000<=received,'受取済みのアマネ星土だけを使えます。');
   validatePurchasedSoil(s.work);
   let reserved=0,laid=0;
   for(const o of s.work.operations){if(o.kind==='load')reserved+=4;if(o.kind==='store'&&s.work.task?.id!==o.id)reserved-=4;if(o.kind==='lay')laid++;ok(reserved>=0&&reserved<=s.work.source.total,'土の出庫履歴が不正です。');}
@@ -58,3 +62,50 @@ export function worldSoilContactGeometry(s){
   return{floors,walls};
 }
 export {SOIL_SITE_SOLIDS};
+
+export function rainLoaderPlan(world,work){
+ const mission=world?.constructionCourseV1&&constructionMission(world);
+ if(world?.constructionCourseV1&&mission?.kind!=='foundation')return null;
+ const story=mission?{step:mission.step}:world?.rainWorksV1,job=RAIN_WORKS_JOBS[story?.step],transport=world?.constructionTransport?.work,soil=transport?.frame.soil;
+ if(world?.map!=='construction'||!mission&&world.rainStoryV1?.at(-1)!=='cloud-rescue-complete'||story?.cargo||soil?.schema!==3||
+    !(job?.vehicle==='soil'||job?.vehicle==='dump'&&!story.excavatorTrial&&rainWorksDepositRecorded(soil)))return null;
+ const rig=work?.work.loader,v=rig?.vehicle,field=soil.field,cargo=soil.containers.rainLoader?.amount??0;
+ // Let a player finish unloading any purple soil already in the bucket.
+ if(work?.work.load||work?.work.task)return null;
+ const batch=job.vehicle==='soil'?job.batch:0,operation=cargo?'place':'load';
+ const pad=rainFoundationPad(field,batch),name=RAIN_FOUNDATION_NAMES[batch],bin=nativeStorageBin(soil),[ox,oz]=field.origin;
+ const binX=ox+bin.x,binZ=oz+bin.z;
+ const sign=bin.approachSign??1,east=field.corner.endsWith('west')?1:-1;
+ const x=v?.field?v.x+v.field.origin[0]:null,z=v?.field?v.z+v.field.origin[1]:null;
+ const front={x:binX,z:binZ-sign*(bin.depth/2+60),heading:sign>0?0:Math.PI};
+ const side={x:binX-east*(bin.width/2+66),z:binZ-sign*12};
+ side.heading=Math.atan2(binX-side.x,binZ-side.z);
+ // Keep the original approach usable while guiding new drivers to the open aisle.
+ const atFront=v?.field&&Math.hypot(x-front.x,z-front.z)<38&&Math.cos(v.heading-front.heading)>.87;
+ const target=cargo?pad:bin.clustered&&!atFront?side:front;
+ const stored=Math.max(0,soil.containers.storage.amount-gardenEarthReserved(world.constructionHighBuild));
+ const plan={batch,operation,name,target,pad,cargo,stored,step:Math.max(story.step,RAIN_WORKS_FOUNDATION_STEP)};
+ let reason='';
+ if(work?.schema!==2||v?.field?.corner!==field.corner||rig.mode!=='driving')reason='土ローダーの運転席に乗ろう。';
+ else if(transport.mode!=='foot'||transport.link||transport.scoop||transport.unload||soil.pending)reason='ショベルカーとダンプの作業を終えてから土を運ぼう。';
+ else if(work.work.paused||Math.abs(v.speed)>=.01)reason='停車してから土を扱おう。';
+ else if(Math.abs(v.groundY??0)>.1)reason='地面の作業位置へ戻ろう。';
+ else if(!cargo&&stored<RAIN_FOUNDATION_LOAD)reason='台座3つ分の土が足りないよ。ダンプで保管庫に土を運ぼう。';
+ else{
+  const s=Math.sin(v.heading),c=Math.cos(v.heading);
+  const dx=(cargo?target.x:binX)-x,dz=(cargo?target.z:binZ)-z;
+  const forward=dx*s+dz*c,lateral=dx*c-dz*s;
+  if(cargo){
+   if(forward<54||forward>75||Math.abs(lateral)>17)reason=name+'の枠をバケットの正面に合わせよう。';
+   else plan.path={x:x+dx*.83,z:z+dz*.83,y:7,w:28,h:14,d:forward*.34+5,angle:v.heading};
+  }else{
+   const isSide=target===side,halfDepth=(isSide?bin.width:bin.depth)/2;
+   const across=isSide?Math.abs(z-binZ):Math.abs(x-binX);
+   if(!bin.clustered||forward<halfDepth+(isSide?46:52)||forward>halfDepth+(isSide?73:68)||
+      across>(isSide?bin.depth:bin.width)/2-8||Math.abs(lateral)>16||Math.cos(v.heading-target.heading)<.94)
+    reason='保管庫の青い枠に停車し、バケットを保管庫に向けよう。';
+   else plan.path={x:x+s*47,z:z+c*47,y:11,w:28,h:20,d:14,angle:v.heading};
+  }
+ }
+ return {...plan,reason};
+}

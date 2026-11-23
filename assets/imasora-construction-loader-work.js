@@ -1,6 +1,6 @@
 // Stage 3-2: a closed 32-unit loan, separate from every existing terrain save.
 import {createConstructionState,reduceConstruction,validateConstructionState,canonical,SOIL_UNIT} from './imasora-construction-state.js';
-import {initialLoaderState,stepLoader,actLoader,actorPose,localToWorld,worldToLocal,polygon,polygonsOverlap,vehicleBlocker,walkingClear,SITE,OBSTACLES,SAFE_ZONE,approach} from './imasora-construction-loader-physics.js?v=120ov';
+import {initialLoaderState,stepLoader,actLoader,actorPose,localToWorld,worldToLocal,polygon,polygonsOverlap,vehicleBlocker,walkingClear,SITE,OBSTACLES,SAFE_ZONE,approach,loaderDriveSpeedLimit} from './imasora-construction-loader-physics.js?v=120ov';
 export const GRAIN=4, VOLUME=SOIL_UNIT/8, CAPACITY=48, WORK_SCOPE='development-loader-work-v1';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),key=(x,z)=>`${x},${z}`,sum=g=>Object.values(g).reduce((a,b)=>a+b,0),finite=n=>Number.isFinite(n);
 export function soilColumns(w){return Object.entries(w.ground).map(([k,n])=>{const [x,z]=k.split(',').map(Number);return{x:(x+.5)*GRAIN,z:(z+.5)*GRAIN,width:GRAIN,depth:GRAIN,height:n*GRAIN,id:'普通の土の山',gx:x,gz:z,n};});}
@@ -137,7 +137,7 @@ export function validateWork(w){
   require(t.total===32000&&a.vehicle===t.bucket&&a.loose===t.ground+t.air&&a.storage===0&&a.held===0,'土の形と台帳の量が一致しません。');
   const v=w.loader?.vehicle,p=w.loader?.player;
   require(v&&p&&['foot','driving'].includes(w.loader.mode)&&w.loader.transition===null,'乗降中は保存できません。');
-  require(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&['x','y','z','heading'].every(k=>finite(p[k]))&&Math.abs(v.speed)<=200&&Math.abs(v.steering)<=.471,'車両・乗員の状態が不正です。');
+  require(['x','z','heading','speed','steering','wheelTravel'].every(k=>finite(v[k]))&&['x','y','z','heading'].every(k=>finite(p[k]))&&Math.abs(v.speed)<=loaderDriveSpeedLimit(v)&&Math.abs(v.steering)<=.471,'車両・乗員の状態が不正です。');
   require(!vehicleBlocker(v)&&!bodyHits(v,soilColumns(w)),'車体が障害物に重なっています。');
   require(w.loader.mode==='driving'||walkingClear(p,v,[...OBSTACLES,...soilColumns(w)]),'乗員の復帰地点が塞がっています。');
   require(w.bucket&&finite(w.bucket.lift)&&w.bucket.lift>=0&&w.bucket.lift<=1&&finite(w.bucket.tilt)&&w.bucket.tilt>=-.42&&w.bucket.tilt<=.95&&bucketClear(v,w.bucket),'バケット位置が不正です。');

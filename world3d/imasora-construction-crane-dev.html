@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>クレーンで組み立てる｜イマソラーズウォーク</title><link rel="stylesheet" href="./imasora-construction-crane-dev.css?v=437">  <script src="./assets/imasora-game-touch-guard.js?v=119bb"></script>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>クレーンで組み立てる｜イマソラーズウォーク</title><link rel="stylesheet" href="./imasora-construction-crane-dev.css?v=437">  <script src="./assets/imasora-game-touch-guard.js?v=121fz"></script>
 </head>
 <body><canvas id="scene" aria-label="クレーン車と試験用部材の練習区画"></canvas>
 <header><div><small>工事現場 · クレーン</small><h1>クレーンで組み立てる</h1></div><nav><button id="save">保存</button><button id="camera">視点：作業</button><button id="roof" hidden disabled aria-hidden="true" style="display:none">屋根</button><button id="help-open">使い方</button><button id="home">緊急帰還</button></nav></header>
@@ -10,9 +10,9 @@
 <footer><div class="main-actions"><button id="interact" class="primary">運転席に乗る</button><button id="mode-toggle">クレーン作業へ</button><button id="jump" data-action="jump">ジャンプ</button><span id="position"></span></div>
 <div id="drive-controls" class="controls"><div class="group"><span id="move-label">歩く</span><div class="pad"><button data-action="forward">前へ</button><button data-action="left">左</button><button data-action="back">後ろへ</button><button data-action="right">右</button></div></div><div class="group" id="pedals" hidden><span>ペダル</span><div><button data-action="accelerate">前進</button><button data-action="brake">ブレーキ</button><button data-action="reverse">後退</button></div></div><p id="drive-hint">正式なレンが運転席に乗ります。車体・部材はドラッグで見回せます。</p></div>
 <div id="work-controls" class="controls" hidden>
-<div class="group"><span>アーム旋回</span><div><button data-action="slew-left">左へ回す</button><button data-action="slew-right">右へ回す</button></div></div>
-<div class="group"><span>アーム伸縮</span><div><button data-action="extend">伸ばす</button><button data-action="retract">縮める</button></div></div>
-<div class="group"><span>フック</span><div><button data-action="raise">巻上げ</button><button data-action="lower">巻下げ</button></div></div>
+<div class="group"><span>アーム旋回</span><div><button data-action="slew-left" aria-keyshortcuts="H">左へ回す［H］</button><button data-action="slew-right" aria-keyshortcuts="L">右へ回す［L］</button></div></div>
+<div class="group"><span>アーム伸縮</span><div><button data-action="extend" aria-keyshortcuts="U">伸ばす［U］</button><button data-action="retract" aria-keyshortcuts="I">縮める［I］</button></div></div>
+<div class="group"><span>フック</span><div><button data-action="raise" aria-keyshortcuts="J">巻上げ［J］</button><button data-action="lower" aria-keyshortcuts="K">巻下げ［K］</button></div></div>
 <div class="work-actions"><button id="pick" class="primary">吊り索を掛ける</button><button id="rotate">部材を90°回す</button><button id="place" class="primary">ここに設置</button><button id="release">吊り索を外す</button><button id="snap" aria-pressed="true">面合わせ ON</button><button id="precision" aria-pressed="false">微調整 OFF</button></div></div></footer>
 <dialog id="help">
 <h2>吊って、回して、組み立てて、歩く</h2>
@@ -22,6 +22,6 @@
 <p>「部材を90°回す」は約1.8秒かけて加速・減速しながら回転します。回転が止まってから設置や吊り索の解除ができます。連打による追加回転の予約はしません。</p>
 <p>歩行確認用：<a data-example href="./imasora-construction-crane-dev.html?check=crane-walk-v436&amp;craneTest=1&amp;craneAssemblyTest=bridge">組立済みの橋</a> ／ <a data-example href="./imasora-construction-crane-dev.html?check=crane-walk-v436&amp;craneTest=1&amp;craneAssemblyTest=house">屋根と壁のある家</a>。今の作業場を保存してから確認画面へ切り替えます。確認例での操作は保存されません。</p>
 <p><a data-example href="./imasora-construction-crane-dev.html?check=crane-walk-v436">保存した作業場に戻る</a></p>
-<p>キーボード：徒歩は W/S 前後・A/D 左右・スペース ジャンプ。運転中は W/S 前後進・A/D ハンドル・スペース ブレーキ。E 乗降。作業時は A/D 旋回、W/S 伸縮、↑/↓ 巻上げ・巻下げ。タブを離れると入力を止めます。</p>
+<p>キーボード：WASD／矢印は移動専用。徒歩はスペースでジャンプ、運転中はスペースでブレーキ。E 乗降。クレーン作業は H/L 旋回、J/K 巻上げ・巻下げ、U/I 伸ばす・縮める。N 吊る・設置、M 微調整、O 作業・走行切り替え。走行する前に部材を置いて支持脚を格納します。タブを離れると入力を止めます。</p>
 <button id="export">保存データを書き出す</button><button id="help-close" class="primary">閉じる</button><pre id="export-data" hidden></pre></dialog>
-<script type="module" src="./imasora-construction-crane-dev.js?v=120pv"></script></body></html>
+<script type="module" src="./imasora-construction-crane-dev.js?v=121co"></script></body></html>

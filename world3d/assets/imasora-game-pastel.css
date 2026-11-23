@@ -49,15 +49,3 @@ body.world-player-game .hold-dash-button{border-radius:50%!important;background:
 body.world-player-game .hold-dash-button[aria-pressed=true]{background:#bce6d1!important;border-color:#73ae98!important;color:#244d47!important}
 body.world-player-game .hold-dash-button:disabled{background:#eef0f2!important;color:#495d68!important}
 
-/* Other 3D dialogs using the former dark panel family. */
-body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu){background:#fffaf4!important;color:#263e4e!important;border-color:#b8d8db!important;box-shadow:0 8px 24px #729baf33!important}
-body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) :is(h2,h3,p,span,strong,small){color:#263e4e!important;text-shadow:none!important}
-body.world-player-game .sky-station-guide-dialog-name{background:#d2eddf!important;color:#294c43!important;box-shadow:none!important;border-color:#a6ccc1!important}
-body.world-player-game .ufo-equipment-workshop-card{background:#eef5ff!important;border-color:#bfd6e3!important;box-shadow:none!important}
-body.world-player-game .ufo-equipment-workshop-card[data-status=crafted]{background:#def3e8!important;border-color:#90c5ae!important}
-body.world-player-game .ufo-equipment-workshop-resources span{background:#fff0ce!important;border-color:#dfc791!important}
-body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button{background:#deeffb!important;color:#263e4e!important;border-color:#b4d4e5!important;border-radius:14px;min-height:44px;box-shadow:none!important}
-body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button:disabled{background:#edf0f2!important;color:#495b66!important;border-color:#cad5dc!important}
-body.world-player-game .sky-station-guide-dialog button::before,body.world-player-game .sky-station-guide-dialog button::after{color:#527788!important;text-shadow:none!important}
-
-body.world-player-game :is(.sky-station-guide-dialog,.ufo-equipment-workshop-menu) button:disabled{opacity:1!important}

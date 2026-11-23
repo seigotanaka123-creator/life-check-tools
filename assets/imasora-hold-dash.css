@@ -1,11 +1,19 @@
 /* A momentary right-hand speed control; movement remains on the left pad. */
-.hold-dash-button{display:none;position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(28px,env(safe-area-inset-bottom));width:76px;height:76px;min-width:76px;min-height:76px;padding:6px;border:2px solid #b0e9ee;border-radius:50%;background:#174856e8;color:#eaffff;box-shadow:0 3px 14px #09252e80;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;pointer-events:auto;text-align:center;z-index:4}
+.hold-dash-button{display:block;position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(28px,env(safe-area-inset-bottom));width:76px;height:76px;min-width:76px;min-height:76px;padding:6px;border:2px solid #b0e9ee;border-radius:50%;background:#174856e8;color:#eaffff;box-shadow:0 3px 14px #09252e80;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;pointer-events:auto;text-align:center;z-index:4}
 .hold-dash-button span{display:block;font-size:25px;line-height:25px;font-weight:900;pointer-events:none}
 .hold-dash-button b{display:block;font-size:12px;line-height:18px;pointer-events:none}
-.hold-dash-button[aria-pressed=true]{background:#eac66a;color:#173c36;border-color:#fff1b0;box-shadow:0 0 18px #f4d47788}
+:is(.hold-dash-button[data-hold-dash],.gv-quick .hold-dash-button[data-hold-dash]){background:#ffdf99;color:#273c46;border-color:#fff1ca;box-shadow:0 4px 0 #a97737,0 6px 14px #09252e70}
+:is(.hold-dash-button[data-hold-dash],.gv-quick .hold-dash-button[data-hold-dash])[aria-pressed=true]{background:#eac66a;color:#192f35;border-color:#fff1b0;box-shadow:0 1px 0 #a97737,inset 0 2px 4px #835c3260;transform:translateY(3px)}
 .hold-dash-button:disabled{opacity:.4}
 .hold-dash-button[hidden]{display:none!important}
-@media(pointer:coarse){.hold-dash-button{display:block}}
+body.archive-world-viewing #walkDashButton{display:none!important}
+#viewport > #walkDashButton.ufo-dash{
+  right:max(12px,env(safe-area-inset-right))!important;bottom:calc(90px + env(safe-area-inset-bottom))!important;
+  left:auto!important;top:auto!important;z-index:7;
+}
+.gv-active .work-foot-dash{position:relative;inset:auto;width:min(58px,100%);height:50px;min-width:0;min-height:46px;margin:0;padding:3px;align-self:center;justify-self:center}
+.gv-active .work-foot-dash span{font-size:19px;line-height:19px}
+.gv-active .work-foot-dash b{font-size:11px;line-height:14px}
 
 /* Dash is upper-left; jump is lower-right, inside the device safe area. */
 @media(pointer:coarse),(max-width:700px),(max-height:500px){

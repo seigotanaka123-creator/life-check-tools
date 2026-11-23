@@ -1,4 +1,5 @@
-import {openArcadeCheckpoint,bindTriLinkSave} from './imasora-arcade-autosave.mjs?v=120qq';
+import {openArcadeCheckpoint,bindTriLinkSave} from './imasora-arcade-autosave.mjs?v=121gx';
+import {CONSTRUCTION_MISSION_INTRO_MS,constructionMissionIntroText,advanceConstructionMissionIntro,createGameCue} from '../world3d/assets/imasora-construction-guide-data.mjs?v=121gx';
 import * as THREE from "./three.module.min.js";
 import {
   ALL_FLOWERING_HERO_CHARACTERS,
@@ -648,6 +649,7 @@ class ImasoraTriLink3D {
     this.participants = [0, 1, 2].map(index => cleanParticipant(supplied[index], index));
     this.memories = Array.isArray(options.memories) ? options.memories.slice(0, 12) : [];
     this.onRecord = typeof options.onRecord === "function" ? options.onRecord : null;
+    this.onReturnToArcade = typeof options.onReturnToArcade === "function" ? options.onReturnToArcade : null;
     this.testMode = Boolean(options.testMode);
     this.previewOnly = Boolean(options.previewOnly);
     this.autoStart = Boolean(options.autoStart);
@@ -4330,6 +4332,7 @@ class ImasoraTriLink3D {
     this.root.querySelector("[data-itl3-result]")?.remove();
     if (this.clock) this.clock.textContent = String(MATCH_SECONDS);
     this.updateScoreboard();
+    this.roundCue?.show();
     this.beginKickoffCountdown(null, "initial");
   }
 
@@ -4358,6 +4361,7 @@ class ImasoraTriLink3D {
     this.pendingServeSpeed = randomBetween(SERVE_SPEED_MIN, SERVE_SPEED_MAX);
     this.kickoffTurntableTransitLock = false;
     this.countdown = this.kickoffCountdownDuration;
+    this.openingRemaining = source === "initial" ? CONSTRUCTION_MISSION_INTRO_MS : 0;
     this.countdownMark = 3;
     this.serveTimer = 0;
     this.resetPuck(false);
@@ -4386,7 +4390,13 @@ class ImasoraTriLink3D {
     this.root.dataset.itl3KickoffFirstTerritory = "none";
     this.root.dataset.itl3KickoffFirstTerritoryMatched = "pending";
     this.root.dataset.itl3KickoffPropellerHitBeforeTerritory = "pending";
-    this.showMessage(source === "initial" ? "KICKOFF" : "RESTART", "3");
+    if (this.openingRemaining > 0) {
+      this.roundCue ??= createGameCue(this.root, "tri");
+      this.message?.classList.remove("is-visible");
+      this.roundCue.show("3");
+    } else {
+      this.showMessage("RESTART", "3");
+    }
     this.beep(360, .075, .045);
   }
 
@@ -4598,10 +4608,12 @@ class ImasoraTriLink3D {
     if(document.hidden||document.body.classList.contains('new-opening-active')||document.body.classList.contains('loading-screen-active')||this.autosaveBlocked){this.lastTimestamp=timestamp;this.keyState.clear();this.dragging=false;this.frame=requestAnimationFrame(this.boundLoop);return;}
     const delta = this.lastTimestamp ? Math.min(.05, Math.max(0, (timestamp - this.lastTimestamp) / 1000)) : 0;
     this.lastTimestamp = timestamp;
-    this.elapsed += delta;
-    this.cameraModeTime += delta;
+    const opening = this.running && !this.finished && this.openingRemaining > 0;
+    const gameDelta = opening ? this.advanceOpening(delta) : delta;
+    this.elapsed += gameDelta;
+    this.cameraModeTime += gameDelta;
 
-    if (this.running && !this.finished) {
+    if (this.running && !this.finished && !opening) {
       if (this.countdown > 0) this.updateCountdown(delta);
       else {
         this.accumulator = Math.min(this.accumulator + delta, FIXED_STEP * 10);
@@ -4615,9 +4627,50 @@ class ImasoraTriLink3D {
       this.characterNamesHideAt = null;
       this.charactersLayer?.classList.add("are-names-hidden");
     }
-    this.updateVisuals(delta);
+    this.updateVisuals(gameDelta);
     this.renderScene();
     this.frame = requestAnimationFrame(this.boundLoop);
+  }
+
+  advanceOpening(delta) {
+    this.roundCue ??= createGameCue(this.root, "tri");
+    const previous = this.openingRemaining;
+    this.openingRemaining = advanceConstructionMissionIntro(previous, delta * 1000);
+    // Fit the existing turntable alignment into the three numerals, then hold it during START.
+    const signalMs = CONSTRUCTION_MISSION_INTRO_MS - 3000;
+    const numeralMs = Math.max(0, previous - Math.max(signalMs, this.openingRemaining));
+    const gameDelta = numeralMs * this.kickoffCountdownDuration / 3000;
+    this.countdown = Math.max(Number.EPSILON, this.countdown - gameDelta);
+    if (this.openingRemaining === 0) {
+      this.roundCue.show();
+      this.countdown = 0;
+      this.countdownMark = 0;
+      this.finishKickoff(false);
+    } else {
+      const label = constructionMissionIntroText(this.openingRemaining);
+      const mark = Number(label) || 0;
+      this.roundCue.show(label);
+      if (mark !== this.countdownMark) {
+        this.countdownMark = mark;
+        this.root.dataset.itl3KickoffCountdownStage = label;
+        if (mark) this.beep(330 + (3 - mark) * 100, .07, .045);
+        else this.beep(720, .16, .06);
+      }
+    }
+    return gameDelta;
+  }
+
+  finishKickoff(announce) {
+    this.root.dataset.itl3KickoffCountdownStage = announce ? "ＧＯ！" : "live";
+    this.completeKickoffTurntableSync();
+    if (announce) {
+      this.showMessage("KICKOFF", "ＧＯ！");
+      this.beep(720, .16, .06);
+    }
+    this.cameraMode = "match";
+    this.cameraModeTime = 0;
+    this.resetPuck(true);
+    this.characterNamesHideAt = this.elapsed + CHARACTER_NAME_VISIBLE_AFTER_SERVE;
   }
 
   updateCountdown(delta) {
@@ -4638,14 +4691,7 @@ class ImasoraTriLink3D {
         this.showMessage(this.kickoffSource === "initial" ? "KICKOFF" : "RESTART", String(mark));
         this.beep(330 + (3 - mark) * 100, .07, .045);
       } else {
-        this.root.dataset.itl3KickoffCountdownStage = "ＧＯ！";
-        this.completeKickoffTurntableSync();
-        this.showMessage("KICKOFF", "ＧＯ！");
-        this.beep(720, .16, .06);
-        this.cameraMode = "match";
-        this.cameraModeTime = 0;
-        this.resetPuck(true);
-        this.characterNamesHideAt = this.elapsed + CHARACTER_NAME_VISIBLE_AFTER_SERVE;
+        this.finishKickoff(true);
       }
     }
   }
@@ -6662,6 +6708,7 @@ class ImasoraTriLink3D {
     if (this.postUniforms) this.postUniforms.uFlash.value = 1;
     this.flashLights.push({ light: this.goalLights[defender.index], life: 1.1, maxLife: 1.1, peak: 82 });
     const counts = this.territoryCounts();
+    if (scorer) this.roundCue?.show("ゴール！", true);
     this.showMessage(
       scorer ? (testTriggered ? "CAPTURE TEST" : "TERRITORY CAPTURE") : "NO COUNT",
       scorer ? `${scorer.name} ${counts[scorer.index]}/${TERRITORY_SECTOR_COUNT}` : "得点者なしのため\nノーカウント"
@@ -7531,6 +7578,7 @@ class ImasoraTriLink3D {
     this.cameraModeTime = 0;
     this.victoryFocus = { index: winner.index };
     this.showMessage("TERRITORY COMPLETE", `${winner.name} WIN!`);
+    this.roundCue?.show(winner.index === 0 ? "勝利！" : "決着！", true);
     this.react(winner.index, "cheer", "勝ったよ！", 2400);
     this.spawnVictory(winner);
     this.beep(620, .16, .07);
@@ -7630,10 +7678,14 @@ class ImasoraTriLink3D {
       : Number(record.constructionRewardBoxesAwarded) > 0
       ? `<p class="itl3-result-reward">建築セット +${Math.floor(Number(record.constructionRewardBoxesAwarded))}箱${Number(record.arcadePartsAwarded) > 0 ? ` / 整備パーツ +${Math.floor(Number(record.arcadePartsAwarded))}個` : ""}</p>`
       : "";
-    panel.innerHTML = `<div class="itl3-result-card"><div class="itl3-result-rank">TERRITORY RESULT <b>01</b></div><small>COMMEMORATIVE MATCH CARD</small><h2>${escapeHtml(record.winnerName)}<em>TERRITORY CHAMPION</em></h2><p>${escapeHtml(formatDate(record.playedAt))}　//　${escapeHtml(record.reason)}</p>${constructionReward}<div class="itl3-photo">${record.participants.map((participant, index) => `<div class="itl3-photo-person${participant.id === record.winnerId ? " is-winner" : ""}"><span>0${index + 1}</span><div>${participant.art || fallbackArt(participant.name, participant.color)}</div><strong>${escapeHtml(participant.name)}</strong><small>AREA ${Number(participant.territory) || 0}/${record.territoryTotal || TERRITORY_SECTOR_COUNT}</small></div>`).join("")}</div><div class="itl3-result-actions"><button type="button" class="itl3-primary" data-itl3-rematch><span>REPLAY</span><b>もう一度対戦</b><i>›</i></button><button type="button" class="itl3-secondary" data-itl3-close-result>アリーナを見る</button></div></div>`;
+    const returnToArcade = this.onReturnToArcade
+      ? '<button type="button" class="itl3-secondary" data-itl3-return-arcade>ゲームセンターに戻る</button>'
+      : "";
+    panel.innerHTML = `<div class="itl3-result-card"><div class="itl3-result-rank">TERRITORY RESULT <b>01</b></div><small>COMMEMORATIVE MATCH CARD</small><h2>${escapeHtml(record.winnerName)}<em>TERRITORY CHAMPION</em></h2><p>${escapeHtml(formatDate(record.playedAt))}　//　${escapeHtml(record.reason)}</p>${constructionReward}<div class="itl3-photo">${record.participants.map((participant, index) => `<div class="itl3-photo-person${participant.id === record.winnerId ? " is-winner" : ""}"><span>0${index + 1}</span><div>${participant.art || fallbackArt(participant.name, participant.color)}</div><strong>${escapeHtml(participant.name)}</strong><small>AREA ${Number(participant.territory) || 0}/${record.territoryTotal || TERRITORY_SECTOR_COUNT}</small></div>`).join("")}</div><div class="itl3-result-actions"><button type="button" class="itl3-primary" data-itl3-rematch><span>REPLAY</span><b>もう一度対戦</b><i>›</i></button><button type="button" class="itl3-secondary" data-itl3-close-result>アリーナを見る</button>${returnToArcade}</div></div>`;
     this.stage.appendChild(panel);
     panel.querySelector("[data-itl3-rematch]")?.addEventListener("click", () => this.startMatch());
     panel.querySelector("[data-itl3-close-result]")?.addEventListener("click", () => panel.remove());
+    panel.querySelector("[data-itl3-return-arcade]")?.addEventListener("click", () => this.onReturnToArcade());
   }
 
   renderMemories() {
@@ -7937,6 +7989,7 @@ class ImasoraTriLink3D {
     this.postQuad?.geometry?.dispose?.();
     this.postQuad?.material?.dispose?.();
     this.renderer?.dispose?.();
+    this.roundCue?.remove();
     this.root.innerHTML = "";
   }
 }

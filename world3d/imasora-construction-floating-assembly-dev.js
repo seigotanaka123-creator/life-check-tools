@@ -109,12 +109,12 @@ function refresh(){
   const aboard=state.rig.mode==='driving',transition=!!state.rig.transition,work=state.work,p=state.parts.find(p=>p.id===state.held),candidate=pickOption(state),preview=placement(state),blocked=!ready||session.blocked||loading;
   $('mode').textContent=aboard?(work?'クレーン作業':'運転中'):transition?'乗り降り中':'徒歩';$('message').textContent=state.rig.mode==='foot'?(time<headContactUntil?`頭上に接触：${headContact}`:state.rig.hit?`接触：${state.rig.hit}`:dropDemo?'床の枚数によって、同じ重い鉄を支えられるか比べてください。':'接合した床の継ぎ目も、歩いて渡れます。'):state.message||state.rig.message;
   $('cargo').textContent=p?`吊り荷：${p.name}`:candidate?`フック下：${candidate.name}`:'吊り荷なし';$('count').textContent=`置場 ${state.parts.filter(p=>!p.fixed&&!p.hover&&p.id!==state.held).length} ・吊り荷 ${p?1:0} ・浮遊 ${state.parts.filter(p=>p.hover).length} ・設置 ${state.parts.filter(p=>p.fixed).length} ・保管 ${state.stock.length}`;
-  $('material-summary').textContent=`貸出材積：火星木材 ${unit(state.ledger['mars-timber'].total)} ／ 普通木材 ${unit(state.ledger['earth-timber'].total)} ／ 鉄 ${unit(state.ledger['earth-iron'].total)}`;
+  $('material-summary').textContent=`貸出材積：アマネ星木材 ${unit(state.ledger['mars-timber'].total)} ／ 普通木材 ${unit(state.ledger['earth-timber'].total)} ／ 鉄 ${unit(state.ledger['earth-iron'].total)}`;
   const joinPreview=joinOption(state),detach=detachOption(state),floating=floatReadout(state,candidate?.hover?candidate.id:undefined);
   $('join').disabled=blocked||!joinPreview.ok;$('join').title=joinPreview.reason;$('join').textContent=state.joining?`接合中 ${Math.round(state.joining.elapsed/1.2*100)}%`:'床に接合';
   $('detach').disabled=blocked||!detach.ok;$('detach').title=detach.reason;
   $('joint-count').textContent=`接合金具 ${state.joints.length}組${state.joining?' ｜ 面合わせ中':''}`;
-  $('float-load').textContent=floating.active?`${floating.count}枚の浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'火星木材を吊り、浮遊を開始すると高さを覚えます。';
+  $('float-load').textContent=floating.active?`${floating.count}枚の浮遊床：基準 ${floating.target.toFixed(1)} / 現在 ${floating.height.toFixed(1)}｜荷重 ${floating.load.toFixed(2)} / ${floating.capacity.toFixed(1)}`:'アマネ星木材を吊り、浮遊を開始すると高さを覚えます。';
   $('float-warning').textContent=floating.active?(floating.contact?`${floating.contact}に接触：安全停止`:floating.overload?'荷重オーバー：ゆっくり降下します':floating.rider?'レンの重さで沈んでいます。降りると戻ります。':'浮遊を保持しています。'):'';
   $('float-warning').classList.toggle('overload',floating.overload);
   $('release').textContent=p?.materialId==='mars-timber'?'浮遊を開始（吊り索解除）':'吊り索を外す';

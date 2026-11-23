@@ -94,7 +94,7 @@ function enhanceDetails(details){
  details.addEventListener('toggle',()=>{if(details.open)openPage(details);else if(dialog.open)closePage(details,false);});
  back.onclick=()=>closePage(details);dialog.addEventListener('cancel',e=>{e.preventDefault();closePage(details);});dialog.addEventListener('close',()=>{details.open=false;setAttr(summary,'aria-expanded',false);});
  for(const type of ['keydown','keyup','pointerdown','pointerup','click'])dialog.addEventListener(type,e=>e.stopPropagation());
- // A child page is a native modal: Escape and focus trapping work on Safari too.
+ // A native modal keeps focus within the child page.
  scan(content);
 }
 function scan(root){if(root.nodeType!==1)return;for(const select of [...(root.matches('select')?[root]:[]),...root.querySelectorAll('select')])enhanceSelect(select);for(const input of [...(root.matches('input[type="checkbox"]')?[root]:[]),...root.querySelectorAll('input[type="checkbox"]')])enhanceCheck(input);for(const details of [...(root.matches('details')?[root]:[]),...root.querySelectorAll('details')])enhanceDetails(details);}

@@ -16,7 +16,7 @@ export function floatingPlacement(s,external=[],landing=null){
   const o=placement(floatingView(s),external,landing);if(!o?.ok)return o;
   const roots=new Set(o.support.ids.map(id=>component(s,id)[0]?.id).filter(Boolean));
   if(roots.size>1)return{...o,ok:false,reason:'別々に浮いている床です。先に床同士を接合してください。'};
-  if(o.candidate.materialId==='mars-timber'&&roots.size)return{...o,ok:false,reason:'火星木材の床は上に重ねず、横へ近づけて接合してください。'};
+  if(o.candidate.materialId==='mars-timber'&&roots.size)return{...o,ok:false,reason:'アマネ星木材の床は上に重ねず、横へ近づけて接合してください。'};
   return o;
 }
 function horizontalPerson(p,b){const q=worldToLocal({x:b.x,z:b.z,heading:b.angle},p.x,p.z);return Math.hypot(Math.max(0,Math.abs(q.x)-b.w/2),Math.max(0,Math.abs(q.z)-b.d/2))<CRANE_WALK.radius;}

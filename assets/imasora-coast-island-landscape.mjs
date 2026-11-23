@@ -15,22 +15,50 @@ export function coastIslandVisibility(i,point,detail){
 // Fixed pixel coverage fades opaque land without transparency sorting or
 // depth fighting. Both LODs use complementary masks, not two blended floors.
 // The mask is spatial only: a stationary camera never animates or blinks it.
-function islandHaze(material,sight,detail,far=false){
+function islandHaze(material,sight,detail,far=false,waterLight=null,reef=false){
  material.onBeforeCompile=shader=>{
   shader.uniforms.islandSight=sight;shader.uniforms.islandDetail=detail;shader.uniforms.islandFar={value:far?1:0};
-  shader.fragmentShader='uniform float islandSight,islandDetail,islandFar;\n'+shader.fragmentShader;
+  shader.uniforms.reefView=waterLight?.active??{value:0};
+  shader.fragmentShader='uniform float islandSight,islandDetail,islandFar,reefView;\n'+shader.fragmentShader;
+  if(reef&&waterLight){
+   shader.uniforms.reefTime=waterLight.time;
+   shader.uniforms.reefStrength=waterLight.strength;
+   shader.uniforms.reefSurface=waterLight.surface;
+   shader.vertexShader='varying vec3 reefWorld;\n'+shader.vertexShader.replace('#include <project_vertex>',
+    '#include <project_vertex>\nreefWorld=(modelMatrix*vec4(transformed,1.)).xyz;');
+   shader.fragmentShader='varying vec3 reefWorld;uniform float reefTime,reefStrength,reefSurface;\n'+shader.fragmentShader;
+   shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>', `
+    #include <emissivemap_fragment>
+    if(reefView>.5 && reefWorld.y < reefSurface-4.){
+     float depth=reefSurface-reefWorld.y;
+     vec2 p=(reefWorld.xz+vec2(.3,-.16)*depth)*.085;
+     float t=reefTime*.75;
+     p+=vec2(sin(p.y*.72+t),cos(p.x*.6-t))*.72;
+     float lattice=sin(p.x-t)*sin(p.y+t*.72)+.52*sin(.64*p.x+.74*p.y+t*.66);
+     float glint=1.-smoothstep(.015,.24,abs(lattice-.23));
+     glint=glint*glint*exp(-depth*.0038);
+     vec2 bed=reefWorld.xz*.024;
+     float bands=sin(bed.x+.64*sin(bed.y*1.7))+.58*cos(bed.y*1.17+sin(bed.x*.7));
+     float sand=smoothstep(-.64,.74,bands);
+     float grain=sin(p.x*6.2)*cos(p.y*4.9);
+     diffuseColor.rgb=mix(diffuseColor.rgb*vec3(.51,.78,.84),
+       mix(diffuseColor.rgb,vec3(.48,.52,.42),.47),sand)+.009*grain;
+     diffuseColor.rgb*=mix(vec3(.71,.94,.94),vec3(.46,.72,.75),smoothstep(32.,410.,depth));
+     totalEmissiveRadiance += vec3(.36,.73,.65)*(glint*.88+.032+sand*.068)*reefStrength;
+    }`);
+  }
   shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
    float islandPixel=fract(52.9829189*fract(dot(floor(gl_FragCoord.xy),vec2(.06711056,.00583715))));
    if(islandPixel>=islandSight)discard;
    if(islandFar>.5 ? islandPixel<islandDetail : islandPixel>=islandDetail)discard;`);
   // Keep the existing real-time sky/fog colour. Only the islands' haze range
   // changes; the shore, water and close depth precision remain untouched.
-  shader.fragmentShader=shader.fragmentShader.replace('#include <fog_fragment>',T.ShaderChunk.fog_fragment.replace('fogNear, fogFar','(fogFar <= 600.0 ? fogNear : 1800.0), (fogFar <= 600.0 ? fogFar : 10500.0)'));
+  shader.fragmentShader=shader.fragmentShader.replace('#include <fog_fragment>',T.ShaderChunk.fog_fragment.replace('fogNear, fogFar','(reefView > .5 ? fogNear : 1800.0), (reefView > .5 ? fogFar : 10500.0)'));
  };
- material.customProgramCacheKey=()=> 'coast-island-haze-120nc';
+ material.customProgramCacheKey=()=> reef&&waterLight?'coast-island-reef-121ge':'coast-island-haze-121ge';
  return material;
 }
-export function createIslandLandscapes({collider=()=>{},now=()=>performance.now(),budgetMs=1.5,pebbleState}={}){
+export function createIslandLandscapes({collider=()=>{},now=()=>performance.now(),budgetMs=1.5,pebbleState,waterLight=null}={}){
  const root=new T.Group(),geometries=new Set(),materials=new Set(),textures=new Set(),islands=[];
  const texture=coastSurfaceTexture('foliage');textures.add(texture);
  const grit=new Uint8Array(128*128*4);for(let k=0;k<128*128;k++){const v=235+rnd(k)*20;grit[k*4]=grit[k*4+1]=grit[k*4+2]=v;grit[k*4+3]=255;}const grain=new T.DataTexture(grit,128,128);grain.wrapS=grain.wrapT=T.RepeatWrapping;grain.magFilter=T.LinearFilter;grain.minFilter=T.LinearMipmapLinearFilter;grain.generateMipmaps=true;grain.colorSpace=T.SRGBColorSpace;grain.needsUpdate=true;textures.add(grain);
@@ -38,9 +66,9 @@ export function createIslandLandscapes({collider=()=>{},now=()=>performance.now(
  const bark=coastSurfaceTexture('wood');textures.add(bark);
  const trunkMat=new T.MeshStandardMaterial({color:0x745c43,map:bark,roughness:1});materials.add(trunkMat);
  const spray=leafSpray();textures.add(spray);const leafMat=new T.MeshStandardMaterial({color:0xffffff,map:spray,roughness:.94,alphaTest:.45,side:T.DoubleSide});materials.add(leafMat);
- const fruitGeo=new T.SphereGeometry(4.5,8,6),fruitMat=new T.MeshStandardMaterial({color:0xffffff,roughness:.6});geometries.add(fruitGeo);materials.add(fruitMat);islandHaze(fruitMat,{value:1},{value:1});
+ const fruitGeo=new T.SphereGeometry(4.5,8,6),fruitMat=new T.MeshStandardMaterial({color:0xffffff,roughness:.6});geometries.add(fruitGeo);materials.add(fruitMat);islandHaze(fruitMat,{value:1},{value:1},false,waterLight);
  const stoneMat=new T.MeshStandardMaterial({color:0xb5b8ad,map:texture,roughness:.96});materials.add(stoneMat);
- for(const m of[terrainMaterial,trunkMat,leafMat,stoneMat])islandHaze(m,{value:1},{value:1});
+ for(const m of[terrainMaterial,trunkMat,leafMat,stoneMat])islandHaze(m,{value:1},{value:1},false,waterLight);
  const treeGeo=new T.CylinderGeometry(.7,2.5,1,7),leafGeo=new T.PlaneGeometry(1,1),stoneGeo=new T.SphereGeometry(1,10,7);
  for(const [g,k]of[[stoneGeo,9]]){const a=g.attributes.position;for(let n=0;n<a.count;n++){const x=a.getX(n),y=a.getY(n),z=a.getZ(n),r=1+.16*Math.sin(x*7+k)*Math.cos(y*9-k)+.1*Math.sin(z*13+y*8);a.setXYZ(n,x*r,y*r,z*r);}g.computeVertexNormals();}for(const g of[treeGeo,leafGeo,stoneGeo])geometries.add(g);
  // The existing initial renderer.compile traverses hidden objects too. Keep
@@ -50,7 +78,7 @@ export function createIslandLandscapes({collider=()=>{},now=()=>performance.now(
  for(const [g,m,colored]of[[treeGeo,trunkMat,false],[leafGeo,leafMat,true],[fruitGeo,fruitMat,true],[stoneGeo,stoneMat,false]]){const o=new T.InstancedMesh(g,m,1);if(colored)o.setColorAt(0,new T.Color(0xffffff));warmup.add(o);}root.add(warmup);
  for(const i of COAST_ISLANDS){
   const group=new T.Group();group.position.set(i.x,0,i.z);group.name=i.name;root.add(group);
-  const sight={value:0},blend={value:0},farMat=islandHaze(terrainMaterial.clone(),sight,blend,true);materials.add(farMat);
+  const sight={value:0},blend={value:0},farMat=islandHaze(terrainMaterial.clone(),sight,blend,true,waterLight,i.id==='tide-island');materials.add(farMat);
   const close=new T.Group(),farGeo=finishIslandTerrain(i,28),far=new T.Mesh(farGeo,farMat);geometries.add(farGeo);group.add(close,far);
   const title=new T.Group();title.name=i.name;title.position.set(0,islandRelief(i,i.x,i.landingZ),i.landingZ-i.z);title.userData.nearbyName={id:'coast:'+i.id,name:i.name,hx:150,hz:150,height:42};group.add(title);
   const trees=islandTreeRecords(i);
@@ -69,9 +97,9 @@ export function createIslandLandscapes({collider=()=>{},now=()=>performance.now(
  const release=e=>{if(!e.detail)return;for(const t of e.trees)treeBases.delete(t.id);for(const o of e.detail.meshes)o.dispose?.();e.detail.geometry.dispose();for(const m of e.detail.materials){m.dispose();materials.delete(m);}e.close.clear();e.detail=null;};
  function* detail(e){
   const {i,trees,stones}=e,close=new T.Group(),meshes=[],detailMaterials=[];let geometry,complete=false;
-  const own=base=>{const m=islandHaze(base.clone(),e.sight,e.blend);detailMaterials.push(m);materials.add(m);return m;};
+  const own=(base,reef=false)=>{const m=islandHaze(base.clone(),e.sight,e.blend,false,waterLight,reef);detailMaterials.push(m);materials.add(m);return m;};
   try{
-   geometry=yield* buildIslandTerrain(i,112);const land=new T.Mesh(geometry,own(terrainMaterial));land.receiveShadow=true;close.add(land);yield;
+   geometry=yield* buildIslandTerrain(i,112);const land=new T.Mesh(geometry,own(terrainMaterial,i.id==='tide-island'));land.receiveShadow=true;close.add(land);yield;
   const trunks=new T.InstancedMesh(treeGeo,own(trunkMat),trees.length*5),leaves=new T.InstancedMesh(leafGeo,own(leafMat),trees.length*28),pose=new T.Object3D(),col=new T.Color();
   meshes.push(trunks,leaves);yield;
   for(const [n,t]of trees.entries()){

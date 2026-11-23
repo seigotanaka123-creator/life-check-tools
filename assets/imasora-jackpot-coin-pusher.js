@@ -5,7 +5,18 @@ for(const e of entries){if(e.previousName)aliases.set(e.previousName,e);for(cons
 const normalizeId=value=>{const id=typeof value==='string'?value.replace(/^current-/,''):'';return id==='white-michi-road-saber-ren'?'star-white-hero-young-seed-walk-sky-cool-b-forest':id==='seed-white'?'white-seed-walk':id==='sprout-seed-white'?'white-sprout-seed-walk':id.replace(/^white-hero-/,'hero-white-').replace(/^young-white-/,'white-young-');};
 function get(value){return typeof value==='string'?(ids.get(normalizeId(value))||names.get(value)||aliases.get(value)||null):null;}
 function name(value,fallback=''){return get(value)?.name||fallback;}
-function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function currentId(m){if(!m||!/^seed-(walk|sky|leaf|city|river|night|luck|white)$/.test(m.seedId||''))return'';const selected=ids.get(m.evolutionArtId);
+const family=m.seedId.replace('seed-',''),stageNames=['タネ期','新芽期','青葉期','開花期','満開期'];
+if(selected?.family===family&&selected.stage===stageNames[m.evolutionStage]&&(m.evolutionStage!==4||Number(m.lifeExtensionUses||0)>=3))return selected.id;
+const white=m.seedId==='seed-white',seed=white?'seed-walk':m.seedId;let stage=Math.min(4,Math.max(0,Number(m.evolutionStage||0)));if(stage===4&&Number(m.lifeExtensionUses||0)<3)stage=3;const branch=Number(m.sky||0)>=Math.max(Number(m.nature||0),Number(m.city||0))?'sky':'walk';return stage===0?(white?'white-':'')+seed:stage===1?(white?'white-':'')+'sprout-'+seed:stage===2?(white?'white-':'')+'young-'+seed+'-'+branch:stage===3?'hero-'+(white?'white-':'')+'young-'+seed+'-'+branch+'-cute':'star-'+(white?'white-':'')+'hero-young-'+seed+'-'+branch+'-cute-comet';}
+function followChosenLineage(monster,previousId){
+ const previous=ids.get(previousId),next=ids.get(currentId(monster));
+ if(!previous||!next||previousId!==monster.evolutionArtId||previous.family!==next.family)return;
+ const alternatives=children(previousId).filter(row=>row.stage===next.stage);
+ if(!alternatives.length)return;
+ const branch=alternatives.find(row=>row.id===next.id)||alternatives.find(row=>row.id.endsWith('-'+next.id.split('-').at(-1)));
+ if(branch)monster.evolutionArtId=branch.id;
+}
 function currentName(m,fallback=''){return name(currentId(m),fallback);}
 function record(value,fallback='記録モンスター'){if(!value||typeof value!=='object')return name(value,fallback);for(const key of [value.artId,value.characterId,value.monsterId,value.sourceMonsterId,value.appearance?.artId,value.art?.id,value.item?.id,value.profileId,value.id]){const e=get(key);if(e)return e.name;}if(/(?:playtest-retired-full-|記録テスト)1$/.test(String(value.id||value.name||'')))return name('star-white-hero-young-seed-walk-sky-cool-b-forest');const named=get(value.name)||get(value.baseName);if(named)return named.name;if(value.monster&&typeof value.monster==='object'){const id=currentId({...value.monster,seedId:value.monster.seedId||value.seedId,lifeExtensionUses:Number(value.monster.evolutionStage)===4?Math.max(3,Number(value.monster.lifeExtensionUses||0)):value.monster.lifeExtensionUses});if(ids.has(id))return ids.get(id).name;}return name(value.name||value.baseName,String(value.name||value.baseName||fallback));}
 const escape=s=>[...s].map(c=>[92,94,36,46,42,43,63,40,41,91,93,123,125,124].includes(c.codePointAt(0))?String.fromCharCode(92)+c:c).join('');
@@ -13,7 +24,7 @@ const textAliases=new Map([...aliases].map(([old,e])=>[old,e.name]));for(const [
 function text(value,{protect=[]}={}){const input=String(value??''),protectedNames=new Set(protect.filter(v=>typeof v==='string'&&v)),cacheKey=JSON.stringify([...protectedNames].sort());let regex=textCache.get(cacheKey);if(!regex){const tokens=[...new Set([...textAliases.keys(),...protectedNames])].sort((a,b)=>b.length-a.length);regex=new RegExp('(^|[^ァ-ヶー])('+tokens.map(escape).join('|')+')(?=$|[^ァ-ヶー])','g');if(textCache.size>=16)textCache.delete(textCache.keys().next().value);textCache.set(cacheKey,regex);}regex.lastIndex=0;return input.replace(regex,(match,prefix,token)=>prefix+(protectedNames.has(token)?token:textAliases.get(token)||token));}
 
 function children(value){const id=get(value)?.id;return id?entries.filter(e=>e.parentId===id):[];}
-return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,record,text,children});
+return Object.freeze({VERSION,entries:Object.freeze(entries),get,name,currentId,currentName,followChosenLineage,record,text,children});
 });
 /* END MONSTER NAME REGISTRY */
 import * as THREE from "./three.module.min.js";

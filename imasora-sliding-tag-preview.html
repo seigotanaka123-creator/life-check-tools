@@ -1,18 +1,18 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>イマソラ鬼ごっこ｜イマソラーズウォーク</title><link rel="stylesheet" href="./assets/imasora-sliding-tag.css?v=12189"><link rel="stylesheet" href="./assets/imasora-keyboard-settings.css?v=1211o"><style>
-*{box-sizing:border-box}[hidden]{display:none!important}html,body,main{margin:0;width:100%;height:100%;overflow:hidden}body{background:#b8dce8;color:#345b69;font-family:system-ui,sans-serif}#rink{display:block;width:100vw;height:100dvh;touch-action:none;outline:none}button,a{touch-action:manipulation}button{font:700 17px system-ui;color:#345b69;border:2px solid #fff;border-radius:20px;background:#d8f1e8;box-shadow:0 4px 0 #83b9b760;min-height:48px;padding:10px 16px;cursor:pointer}button[aria-pressed=true]{background:#ffe0a0;border-color:#e4a548;box-shadow:0 4px 0 #d89e4260}button:disabled{opacity:.65;cursor:default}.game-hud{position:fixed;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:5}.game-hud>*{pointer-events:auto}#hud{display:block;background:#f7fcffeb;border:2px solid #fff;border-radius:20px;padding:10px 15px;font-size:15px;font-weight:bold}#pause{min-height:44px;padding:8px 16px}#count{position:fixed;top:23%;left:50%;transform:translateX(-50%);font-size:60px;font-weight:900;color:#fff;text-shadow:0 3px #588994;pointer-events:none;z-index:6}#notice{position:fixed;bottom:25%;left:50%;transform:translateX(-50%);border:2px solid #fff;border-radius:20px;background:#fff7dfec;padding:10px 16px;max-width:70vw;font-weight:bold;pointer-events:none;z-index:6}.controls{display:none}.playing #pad.controls,.playing #pair.controls{display:block}#pad{position:fixed;transform:translate(-50%,-50%);width:126px;height:126px;border:3px solid #fff;border-radius:50%;background:#d7f0f870;touch-action:none;z-index:7}#pad i{position:absolute;left:40px;top:40px;width:40px;height:40px;border:2px solid #fff;border-radius:50%;background:#e6f8ff}#pair{position:fixed;transform:translate(-50%,-50%);width:130px;height:116px;pointer-events:none;z-index:7}#dash,#jump{position:absolute;width:72px;height:72px;min-height:72px;border-radius:50%;padding:6px;pointer-events:auto;font-size:15px;touch-action:none}#dash{left:0;top:0;right:auto;bottom:auto;background:#ffdf99}#jump{left:54px;top:40px;right:auto;bottom:auto;background:#c9eafa}#use{position:absolute;left:-8px;bottom:132px;width:120px;min-height:58px;font-size:14px;background:#f5d6ed;pointer-events:auto;touch-action:none;padding:5px 8px}#use b{font-size:24px;display:block;line-height:1.2}#use small{font-size:12px;font-weight:bold}
-#panel{position:fixed;inset:0;display:grid;place-items:center;background:#92bdce55;z-index:10;padding:10px}#panel .card{background:#fffdf2f5;border:3px solid #fff;border-radius:30px;padding:22px;width:min(840px,96vw);max-height:90dvh;overflow:auto;box-shadow:0 8px 24px #35556938;text-align:center}#panel h1{font-size:27px;margin:0 0 8px}#panel p{line-height:1.5;margin:9px 0}#note{font-size:15px}#roles{font-weight:bold;color:#5d6d89}#areas{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0}#areas button{min-height:44px;font-size:15px;padding:7px 12px}#opponent-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}.opponent-slot{padding:10px 8px;background:#ffddc4}.opponent-slot:nth-child(2){background:#cdeaf8}.opponent-slot:nth-child(3){background:#d7efcf}.opponent-slot b{display:block;font-size:17px;margin-bottom:5px}.opponent-slot strong{font-size:14px;display:block;overflow-wrap:anywhere}.opponent-slot small{display:block;font-size:12px;margin-top:5px}.opponent-slot span{font-size:12px;display:block;margin-top:6px}#begin,#resume{background:#ffdf9a;margin:10px 5px;font-size:20px;min-width:200px}#resume{background:#c8eddc}#panel details{border:2px solid #dfebe8;border-radius:20px;padding:10px;margin-top:10px;background:#f3faf5}#panel summary{font-size:16px;font-weight:bold;cursor:pointer}#start-items{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:12px}#start-items button{padding:7px 4px;min-height:74px;background:#ecf2ff}#start-items button[aria-pressed=true]{background:#ffe4a6}#start-items span{font-size:27px;display:block}#start-items small{font-size:11px;font-weight:bold}#item-hint{font-size:14px}#best,#companion-note,.practice-note{font-size:13px;color:#53737d}#home-return{min-height:44px}#keys{max-height:420px;overflow:auto}.tag-select header{position:static;pointer-events:auto}.tag-select .ts-grid button{min-height:80px}.tag-select{z-index:30}
-@media(max-width:600px){#panel .card{padding:15px 12px}#panel h1{font-size:23px}#start-items{grid-template-columns:repeat(4,minmax(0,1fr))}.opponent-slot{padding:8px 5px}.opponent-slot strong{font-size:12px}.opponent-slot b{font-size:15px}.opponent-slot span{font-size:11px}#opponent-slots{gap:6px}#begin,#resume{min-width:170px;font-size:18px}#panel p{margin:7px 0}#hud{font-size:14px;padding:9px 12px}}
-@media(max-height:480px){#panel .card{max-height:95dvh;padding:14px}#panel h1{font-size:22px}#opponent-slots{margin:10px 0}.opponent-slot{padding:7px}#areas{margin:7px 0}}
+*{box-sizing:border-box}[hidden]{display:none!important}html,body,main{margin:0;width:100%;height:100%;overflow:hidden}body{background:#b8dce8;color:#345b69;font-family:system-ui,sans-serif}#rink{display:block;width:100vw;height:100dvh;touch-action:none;outline:none}button,a{touch-action:manipulation}button{font:700 17px system-ui;color:#345b69;border:2px solid #fff;border-radius:20px;background:#d8f1e8;box-shadow:0 4px 0 #83b9b760;min-height:48px;padding:10px 16px;cursor:pointer}button[aria-pressed=true]{background:#ffe0a0;border-color:#e4a548;box-shadow:0 4px 0 #d89e4260}button:disabled{opacity:.65;cursor:default}.game-hud{position:fixed;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:5}.game-hud>*{pointer-events:auto}#hud{display:block;background:#f7fcffeb;border:2px solid #fff;border-radius:20px;padding:10px 15px;font-size:15px;font-weight:bold}#pause{min-height:44px;padding:8px 16px}#count{position:fixed;top:23%;left:50%;transform:translateX(-50%);font-size:60px;font-weight:900;color:#fff;text-shadow:0 3px #588994;pointer-events:none;z-index:6}#notice{position:fixed;bottom:25%;left:50%;transform:translateX(-50%);border:2px solid #fff;border-radius:20px;background:#fff7dfec;padding:10px 16px;max-width:70vw;font-weight:bold;pointer-events:none;z-index:6}.controls{display:none}.playing #pad.controls,.playing #pair.controls{display:block}#pad{position:fixed;transform:translate(-50%,-50%);width:126px;height:126px;border:3px solid #fff;border-radius:50%;background:#d7f0f870;touch-action:none;z-index:7}#pad i{position:absolute;left:40px;top:40px;width:40px;height:40px;border:2px solid #fff;border-radius:50%;background:#e6f8ff}#pair{position:fixed;transform:translate(-50%,-50%);width:130px;height:116px;pointer-events:none;z-index:7}#dash,#jump{position:absolute;width:72px;height:72px;min-height:72px;border-radius:50%;padding:6px;pointer-events:auto;font-size:15px;touch-action:none}#dash{left:0;top:0;right:auto;bottom:auto;background:#ffdf99}#jump{left:54px;top:40px;right:auto;bottom:auto;background:#c9eafa}#use{position:absolute;left:-8px;bottom:132px;width:120px;min-height:58px;font-size:14px;background:#f5d6ed;pointer-events:auto;touch-action:none;padding:5px 8px}
+#panel{position:fixed;inset:0;display:grid;place-items:center;background:#92bdce55;z-index:10;padding:10px}#panel .card{background:#fffdf2f5;border:3px solid #fff;border-radius:30px;padding:22px;width:min(840px,96vw);max-height:90dvh;overflow:auto;box-shadow:0 8px 24px #35556938;text-align:center}#panel h1{font-size:27px;margin:0 0 8px}#panel p{line-height:1.5;margin:9px 0}#note{font-size:15px}#areas{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0}#areas button{min-height:44px;font-size:15px;padding:7px 12px}#begin,#resume{background:#ffdf9a;margin:10px 5px;font-size:20px;min-width:200px}#resume{background:#c8eddc}#panel details{border:2px solid #dfebe8;border-radius:20px;padding:10px;margin-top:10px;background:#f3faf5}#panel summary{font-size:16px;font-weight:bold;cursor:pointer}#start-items{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:12px}#start-items button{padding:7px 4px;min-height:74px;background:#ecf2ff}#start-items button[aria-pressed=true]{background:#ffe4a6}#start-items span{font-size:27px;display:block}#start-items small{font-size:11px;font-weight:bold}#item-hint{font-size:14px}#best,#companion-note,.practice-note{font-size:13px;color:#53737d}#home-return{min-height:44px}#keys{max-height:420px;overflow:auto}.tag-select header{position:static;pointer-events:auto}.tag-select .ts-grid button{min-height:80px}.tag-select{z-index:30}
+@media(max-width:600px){#panel .card{padding:15px 12px}#panel h1{font-size:23px}#start-items{grid-template-columns:repeat(4,minmax(0,1fr))}#begin,#resume{min-width:170px;font-size:18px}#panel p{margin:7px 0}#hud{font-size:14px;padding:9px 12px}}
+@media(max-height:480px){#panel .card{max-height:95dvh;padding:14px}#panel h1{font-size:22px}#areas{margin:7px 0}}
 .playing #pair.controls{display:block!important}
 
 @media(max-width:1000px),(pointer:coarse){.playing #pad.controls,.playing #pair.controls,.playing #dash,.playing #jump,.playing #use{display:block!important}}
-body.hunt #pair #dash,body.hunt #pair #jump{width:72px;height:72px;min-height:72px;transform:none;border-radius:50%;padding:4px;font-size:14px;line-height:1.1;letter-spacing:0;white-space:nowrap}body.hunt #pair #use{width:120px;height:auto;min-height:62px;transform:none;border-radius:18px;padding:5px 8px;font-size:14px;line-height:1.1}body.hunt #pair #use small{font-size:11px;font-weight:bold;line-height:1.25;display:block;white-space:nowrap}.item-icon{display:block;width:32px;height:32px;margin:0 auto 3px}#start-items .item-icon{width:30px;height:30px}
+body.hunt #pair #dash,body.hunt #pair #jump{width:72px;height:72px;min-height:72px;transform:none;border-radius:50%;padding:4px;font-size:14px;line-height:1.1;letter-spacing:0;white-space:nowrap}body.hunt #pair #use{width:120px;height:auto;min-height:62px;transform:none;border-radius:18px;padding:5px 8px;font-size:14px;line-height:1.1}.item-icon{display:block;width:32px;height:32px;margin:0 auto 3px}#start-items .item-icon{width:30px;height:30px}
 body.hunt #pair #use{left:-8px;right:auto;top:auto;bottom:132px}
-@media(pointer:fine) and (min-width:1001px){body.hunt.playing #pair.controls{left:auto!important;right:22px;top:auto!important;bottom:26px;transform:none}body.hunt #pair #use{bottom:0;left:0}body.hunt #pad,body.hunt #pair #dash,body.hunt #pair #jump{display:none!important}}
+@media(pointer:fine) and (min-width:1001px){html:not([data-control-display="touch"]) body.hunt.playing #pair.controls{left:auto!important;right:22px;top:auto!important;bottom:26px;transform:none}html:not([data-control-display="touch"]) body.hunt #pair #use{bottom:0;left:0}html:not([data-control-display="touch"]) body.hunt #pad,html:not([data-control-display="touch"]) body.hunt #pair #dash,html:not([data-control-display="touch"]) body.hunt #pair #jump{display:none!important}}
 #notice{top:76px;bottom:auto;font-size:14px;max-width:min(72vw,360px)}
 
 #radar{position:fixed;left:12px;top:65px;width:92px;height:92px;z-index:3;pointer-events:none;border-radius:50%;box-shadow:0 2px 10px #152e4933}#radar[data-danger=danger]{box-shadow:0 0 12px #ff555588}#radar[data-danger=warning]{box-shadow:0 0 9px #ffd65a66}#play-roles{display:flex;justify-content:center;gap:8px;margin:10px 0}#play-roles button{padding:10px 18px;border-radius:16px;font-weight:bold}#play-roles [aria-pressed=true]{background:#356d87;color:white}@media(max-width:500px){#radar{width:78px;height:78px;top:61px}}
-body.hunt :is(#pad,#pair,#dash,#jump,#use){touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body.hunt #dive{position:absolute;left:62px;bottom:132px;width:64px;height:72px;min-height:72px;padding:4px;font-size:14px;pointer-events:auto;touch-action:none;background:linear-gradient(#ffd8ac,#f5b28e)}body.hunt[data-playing-role=hunt] #pair #use{left:-8px;width:64px;height:72px;min-height:72px;padding:4px;overflow:hidden}body.hunt[data-playing-role=hunt] #use .item-icon{width:26px;height:26px;margin-bottom:2px}body.hunt[data-playing-role=hunt] #pair #use small{white-space:normal;font-size:10.5px;line-height:1.15}body.hunt #dive:disabled{opacity:.5}@media(pointer:fine) and (min-width:1001px){body.hunt #pair #dive{bottom:76px;left:0;width:120px;height:62px;min-height:62px;font-size:17px}body.hunt[data-playing-role=hunt] #pair #use{left:0;width:120px;height:62px;min-height:62px}body.hunt[data-playing-role=hunt] #use .item-icon{width:30px;height:30px}}body.hunt #dive{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.tag-radar-time{position:fixed;left:78px;top:67px;z-index:4;padding:2px 4px;border-radius:6px;background:#123b4e;color:#fff;font:700 11px system-ui;pointer-events:none}.tag-radar-time[hidden]{display:none}
+body.hunt :is(#pad,#pair,#dash,#jump,#use){touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body.hunt #dive{position:absolute;left:62px;bottom:132px;width:64px;height:72px;min-height:72px;padding:4px;font-size:14px;pointer-events:auto;touch-action:none;background:linear-gradient(#ffd8ac,#f5b28e)}body.hunt[data-playing-role=hunt] #pair #use{left:-8px;width:64px;height:72px;min-height:72px;padding:4px;overflow:hidden}body.hunt #dive:disabled{opacity:.5}@media(pointer:fine) and (min-width:1001px){html:not([data-control-display="touch"]) body.hunt #pair #dive{bottom:76px;left:0;width:120px;height:62px;min-height:62px;font-size:17px}html:not([data-control-display="touch"]) body.hunt[data-playing-role=hunt] #pair #use{left:0;width:120px;height:62px;min-height:62px}}body.hunt #dive{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.tag-radar-time{position:fixed;left:78px;top:67px;z-index:4;padding:2px 4px;border-radius:6px;background:#123b4e;color:#fff;font:700 11px system-ui;pointer-events:none}.tag-radar-time[hidden]{display:none}
 
 body.hunt{--rear-mirror-top:calc(max(12px, env(safe-area-inset-top)) + 52px);--rear-mirror-width:min(352px, calc(52vw + 24px), calc(100vw - 164px - 2 * max(env(safe-area-inset-left), env(safe-area-inset-right))));--rear-mirror-height:max(48px, calc(var(--rear-mirror-width) / 3.25));--radar-diameter:92px}
 .tag-rear-mirror{position:fixed;top:var(--rear-mirror-top);left:max(50%, calc(max(12px, env(safe-area-inset-left)) + var(--radar-diameter) + 8px + var(--rear-mirror-width) / 2));transform:translateX(-50%);width:var(--rear-mirror-width);height:var(--rear-mirror-height);pointer-events:none;z-index:4}
@@ -23,6 +23,11 @@ body.hunt:has(.tag-rear-mirror:not([hidden])) #notice{top:calc(var(--rear-mirror
 body.hunt:has(.tag-rear-mirror:not([hidden])) .tag-ink-paint{top:calc(var(--rear-mirror-top) + var(--rear-mirror-height) + 12px)}
 
 body.hunt .game-hud{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right))}
+.game-hud{align-items:start;gap:8px}
+.hunt-clock{display:grid;justify-items:start;gap:3px;min-width:0;pointer-events:none}
+#hunt-dash-boost:not(:empty){display:block;padding:2px 8px;border:1px solid #ffc480;border-radius:8px;background:#55341f;color:#fff4d6;font:800 12px/17px system-ui;white-space:nowrap}
+body.hunt:has(#hunt-dash-boost:not(:empty)){--rear-mirror-top:calc(max(12px,env(safe-area-inset-top)) + 76px)}
+body.hunt:has(#hunt-dash-boost:not(:empty)):not(:has(.tag-rear-mirror:not([hidden]))) #notice{top:calc(var(--rear-mirror-top) + 12px)}
 body.hunt #radar{left:max(12px,env(safe-area-inset-left));top:var(--rear-mirror-top);width:var(--radar-diameter);height:var(--radar-diameter)}
 body.hunt .tag-radar-time{left:max(12px,env(safe-area-inset-left));top:calc(var(--rear-mirror-top) + var(--radar-diameter) + 2px)}
 @media(max-width:1000px),(pointer:coarse){
@@ -38,4 +43,191 @@ body.hunt .tag-radar-time{left:max(12px,env(safe-area-inset-left));top:calc(var(
 .tag-replay-controls span{white-space:nowrap;font-variant-numeric:tabular-nums}
 .tag-replay-controls select{min-height:44px;max-width:105px;padding:5px 4px;border:1px solid #d9ebed;border-radius:12px;background:#dceff3;color:#214b5c;font:inherit}
 @media(max-width:430px){.tag-replay-controls{display:grid;grid-template-columns:auto minmax(35px,1fr) auto}.tag-replay-controls input{grid-column:2/4;width:100%}.tag-replay-controls span{grid-column:1;padding-left:5px}.tag-replay-controls [data-replay-rate]{grid-column:2;justify-self:end}.tag-replay-controls [data-replay-highlights]{grid-column:3;justify-self:end}}
-body.hunt :is(#rink,#pad,#pair,#pad *,#pair *),body.hunt.playing .game-hud,body.hunt.playing .game-hud *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}.tag-screen-broadcast{position:fixed;top:var(--rear-mirror-top);right:max(12px,env(safe-area-inset-right));width:min(60vw,300px);height:auto;border:1px solid #cfe9f0;border-radius:10px;background:#102231;box-shadow:0 2px 8px #173e4d80;pointer-events:none;user-select:none;z-index:3}body.hunt:has(.tag-rear-mirror:not([hidden])) .tag-screen-broadcast{top:calc(var(--rear-mirror-top) + var(--rear-mirror-height) + 8px)}@media(orientation:landscape){.tag-screen-broadcast{width:min(32vw,240px)}body.hunt:has(.tag-rear-mirror:not([hidden])) .tag-screen-broadcast{right:auto;left:50%;transform:translateX(-50%)}}</style></head><body class="hunt"><main><canvas id="rink" tabindex="0" aria-label="広い氷の街で鬼3匹から逃げるフィールド"></canvas><header class="game-hud"><output id="hud">鬼3匹</output><button id="pause">ひと休み</button></header><canvas id="radar" width="96" height="96" aria-label="レーダー" hidden></canvas><div id="count" hidden></div><output id="notice" hidden></output><div class="controls" id="pad" aria-label="移動パッド"><i></i></div><div class="controls" id="pair"><button id="dash">ダッシュ</button><button id="jump">ジャンプ</button><button id="use">道具</button><button id="dive" hidden title="ヘッドスライディング（Hキー）">ダイブ</button></div><section id="panel" aria-busy="true" aria-label="鬼ごっこの準備"><div class="card"><h1 id="title">イマソラ鬼ごっこ</h1><p id="note">跳ぶ・曲がる・道具を使う。3匹を出し抜こう！</p><p id="roles">追跡役・先回り役・巡回役</p><div id="play-roles" role="group" aria-label="遊ぶ役"><button data-role="escape">逃げる</button><button data-role="hunt">鬼になる</button></div><div id="opponent-slots"></div><p class="start-auto">開始位置は毎回ランダム</p><button id="resume" hidden>つづける</button><button id="begin" disabled>あそぶ</button><br><p id="best"></p><details><summary>音・操作設定</summary><button id="sound-toggle" aria-pressed="true">🔊 効果音：オン</button><div id="keys"></div></details><details class="victory-help"><summary>勝利ポイントと育成</summary><p>勝つたびに10ポイント！ 鬼と逃走者、それぞれでその日初めて勝つと、相棒経験値も+1。両方で勝てば1日合計+2です。</p><p>自分で操作して移動した時間が、試合の30%以上ある勝利が対象です。180秒の試合なら54秒以上。早く決着した試合は、その試合時間に合わせて判定します。仲間CPUに任せきりの勝利や、壁に向けてキーを押したまま止まっている時間は対象になりません。</p><p>育成する時はホームから始めてね。操作時間で貯まる育成と、撮影した今の空による進化は共通です。</p></details><p id="companion-note"></p><button id="home-return" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>ホームへ戻る</button><p class="practice-note">ホームで今の空を撮ると、同じモンスターを育成できます。</p></div></section></main><script src="./assets/imasora-keyboard-settings.js"></script><script src="./assets/imasora-sliding-tag-entry.js?v=121a1"></script><script type="module" src="./assets/imasora-sliding-tag-view.mjs?v=121a1"></script></body></html>
+body.hunt :is(#rink,#pad,#pair,#pad *,#pair *),body.hunt.playing .game-hud,body.hunt.playing .game-hud *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}.tag-screen-broadcast{position:fixed;top:var(--rear-mirror-top);right:max(12px,env(safe-area-inset-right));width:min(60vw,300px);height:auto;border:1px solid #cfe9f0;border-radius:10px;background:#102231;box-shadow:0 2px 8px #173e4d80;pointer-events:none;user-select:none;z-index:3}body.hunt:has(.tag-rear-mirror:not([hidden])) .tag-screen-broadcast{top:calc(var(--rear-mirror-top) + var(--rear-mirror-height) + 8px)}@media(orientation:landscape){.tag-screen-broadcast{width:min(32vw,240px)}body.hunt:has(.tag-rear-mirror:not([hidden])) .tag-screen-broadcast{right:auto;left:50%;transform:translateX(-50%)}}
+.hunt-sky-opening[hidden]{display:none!important}.hunt-sky-opening{position:fixed;inset:0;z-index:5;overflow:hidden;pointer-events:none;color:#fff;text-align:left}.hunt-sky-matte{position:absolute;inset:0;background:linear-gradient(0deg,#061426e0,transparent 51%),linear-gradient(100deg,#071a2c45,transparent 67%)}.hunt-sky-title{position:absolute;left:clamp(22px,7vw,118px);bottom:clamp(70px,13vh,165px);display:grid;gap:8px;text-shadow:0 3px 15px #07182a}.hunt-sky-title>span{justify-self:start;border-bottom:2px solid var(--opening-accent);padding:0 2px 5px;color:var(--opening-accent);font-weight:800;font-size:clamp(12px,1.4vw,18px);letter-spacing:.12em}.hunt-sky-title>strong{font-size:clamp(44px,8vw,116px);font-weight:900;letter-spacing:.1em;line-height:1.05}.hunt-sky-title>p{margin:0;font-size:clamp(14px,2vw,23px);font-weight:750}.hunt-sky-opening-visible #count{top:auto;bottom:clamp(70px,13vh,165px);left:auto;right:clamp(22px,7vw,118px);transform:none}.hunt-sky-opening-visible:not(.hunt-sky-gallery-mode) .game-hud,.hunt-sky-opening-visible #pad,.hunt-sky-opening-visible #pair,.hunt-sky-opening-visible #use,.hunt-sky-opening-visible #dive{visibility:hidden}
+.hunt-sky-gallery-mode #panel,.hunt-sky-gallery-mode .game-hud,.hunt-sky-gallery-mode #count{display:none!important}.hunt-sky-gallery-mode .hunt-sky-title{bottom:clamp(110px,18vh,210px)}.hunt-sky-gallery{position:fixed;z-index:12;display:flex;flex-wrap:wrap;justify-content:center;gap:7px;left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));padding:0 14px}.hunt-sky-gallery button,.hunt-sky-gallery a{min-height:42px;padding:8px 13px;border-radius:12px;border:1px solid #abc8d6;background:#143046;color:#f0faff;font:inherit;font-weight:750;text-decoration:none;display:inline-grid;place-items:center}.hunt-sky-gallery button[aria-pressed=true]{background:var(--sky-tab);color:#102635;border-color:#fff}.hunt-sky-gallery button:focus-visible,.hunt-sky-gallery a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+</style><style>body.hunt #panel .card :is(#note,.practice-note,#companion-note,.victory-help p){font-size:15px;line-height:1.55}body.hunt #panel .card details summary{font-size:15px;min-height:40px;align-content:center}
+/* The keyboard view keeps every action readable in two deliberate rows. */
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls{
+ left:auto!important;top:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:min(224px,calc(100vw - 160px));height:auto;
+ transform:none;padding:6px;background:#122f39ec;border:1px solid #9fbfc6;border-radius:14px;box-sizing:border-box
+}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls :is(#dash,#jump,#use,#dive):not([hidden]){
+ display:block!important;position:relative;inset:auto;width:100%;height:auto;min-height:44px;padding:4px 3px;
+ box-sizing:border-box;border:1px solid #769fa9;border-radius:8px;font:800 13px/1.25 system-ui;color:#15333c;overflow:visible
+}
+
+
+
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls #use{grid-row:2}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls #dive{grid-row:2;grid-column:2}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls:not(:has(#dive:not([hidden]))) #use{grid-column:1/-1}
+html[data-control-display="keyboard"] body.hunt.playing .hunt-sky-title{bottom:clamp(116px,18vh,210px)}
+@media(max-width:430px){
+ html[data-control-display="keyboard"] body.hunt.playing .hunt-direction-guide{bottom:max(126px,env(safe-area-inset-bottom))}
+ html[data-control-display="keyboard"] body.hunt.playing .hunt-sky-title{bottom:232px}
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #jump{left:58px;top:44px}
+@media(max-width:419px){
+ html[data-control-display="keyboard"] body.hunt.playing #pair.controls{width:min(192px,calc(100vw - 146px))}
+ html[data-control-display="keyboard"] body.hunt.playing #pair.controls :is(#dash,#jump,#use,#dive)::after{margin-inline-start:.18em}
+}
+
+
+/* Keep the touch controls within thumb reach and let color and symbols identify each action. */
+html[data-control-display="touch"] body.hunt.playing #pair.controls :is(#dash,#jump,#dive){
+ --button-face:#bde8db;
+ --button-edge:#75a99f;
+ --button-base:#254e54;
+ --button-ink:#123d42;
+ padding:5px;
+ border:2px solid var(--button-edge);
+ background:linear-gradient(160deg,#ffffff7a,transparent 62%),var(--button-face);
+ color:var(--button-ink);
+ box-shadow:0 4px 0 var(--button-base),0 0 0 1px #17364a,0 6px 10px #112a4b52;
+ font:800 14px/1.15 system-ui,sans-serif;
+ text-align:center;
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #dash{
+ --button-face:#fbc36c;
+ --button-edge:#c68b49;
+ --button-base:#73481d;
+ --button-ink:#4d2c0f;
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #jump{
+ --button-face:#a3def2;
+ --button-edge:#5da5c5;
+ --button-base:#285873;
+ --button-ink:#173952;
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #dive{
+ --button-face:#f0b8a0;
+ --button-edge:#c07f6d;
+ --button-base:#773f42;
+ --button-ink:#562b2e;
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls :is(#dash,#jump,#dive)::before{
+ content:"";display:block;width:22px;height:20px;margin:0 auto 4px;background:currentColor;pointer-events:none;
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #dash::before{
+ clip-path:polygon(0 6%,24% 6%,52% 50%,24% 94%,0 94%,27% 50%,0 6%,49% 6%,73% 6%,100% 50%,73% 94%,49% 94%,76% 50%,49% 6%);
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #jump::before{
+ clip-path:polygon(50% 0,100% 48%,68% 48%,68% 100%,32% 100%,32% 48%,0 48%);
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls #dive::before{
+ clip-path:polygon(15% 0,64% 46%,82% 28%,100% 100%,28% 82%,46% 64%,0 15%);
+}
+html[data-control-display="touch"] body.hunt.playing #pair.controls button:is([data-game-press="true"],[data-latched="true"]):not(:disabled){
+ box-shadow:inset 0 3px 6px #0e223c55,0 0 0 1px #17364a!important;
+}
+html[data-control-display="touch"] body.hunt.playing #pad.controls{
+ border:2px solid #a2c4d1;
+ background:
+  radial-gradient(closest-side,transparent 66%,#b4d6e679 67% 70%,transparent 71%),
+  linear-gradient(#cfe8f5aa,#cfe8f5aa) center/1px 76% no-repeat,
+  linear-gradient(90deg,#cfe8f5aa,#cfe8f5aa) center/76% 1px no-repeat,
+  #112e42d6;
+ box-shadow:inset 0 0 0 4px #0e263974,0 3px 0 #142a40,0 7px 13px #112a4b52;
+}
+html[data-control-display="touch"] body.hunt.playing #pad.controls i{
+ border:2px solid #c4eaf4;background:radial-gradient(circle at 35% 28%,#e2f7fc,#82b6c9 68%,#558ba7);
+ box-shadow:0 3px 4px #071a2a9e;
+}
+html[data-control-display="touch"] body.hunt.playing .game-hud :is(#pause,#live-open){
+ min-width:44px;min-height:44px;padding:6px 10px;border:1px solid #91b4c5;border-radius:11px;
+ background:#153449ed;color:#f5fbff;box-shadow:0 3px 0 #102637;
+ font:750 13px/1.2 system-ui,sans-serif;
+}
+html[data-control-display] body.hunt.playing #pair.controls #dive:disabled{
+ border:2px solid #879ba5;background:#c6d2d7;color:#293f49;opacity:1;translate:none;
+ box-shadow:inset 0 1px 3px #1a34452e!important;filter:none!important;cursor:default;
+}
+/* The recessed inventory slot shares the actual button and keeps its hit area when empty. */
+html[data-control-display] body.hunt.playing #pair.controls #use{
+ --tool-accent:#94dfd9;
+ display:grid!important;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"art name";
+ align-items:center;justify-items:center;gap:5px;min-height:64px;height:64px;padding:4px 6px;
+ border:1px solid #709baa;border-radius:12px;background:linear-gradient(145deg,#31515f,#112d3d);
+ color:#f4fbff;box-shadow:0 3px 0 #0c2534,inset 0 1px #e8fcff35,0 6px 12px #091b2c50;
+ overflow:hidden;text-align:center;
+}
+html[data-control-display] body.hunt.playing #pair.controls #use:not(:disabled){
+ border-color:var(--tool-accent);border-color:color-mix(in srgb,var(--tool-accent) 70%,#394e62);
+}
+.hunt-tool-art{
+ grid-area:art;position:relative;display:grid;place-items:center;
+ width:100%;max-width:46px;aspect-ratio:1;border:1px solid #749ead69;border-radius:8px;
+ background:#122b3e;background:radial-gradient(ellipse at 50% 46%,color-mix(in srgb,var(--tool-accent) 33%,#193951),#112d3d 78%);
+ box-shadow:inset 0 1px 3px #0b2434ae;pointer-events:none;
+}
+.hunt-tool-art canvas{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 1px #071e2c90)}
+.hunt-tool-name{
+ grid-area:name;width:100%;color:inherit;font:800 12px/1.18 system-ui,sans-serif;
+ word-break:keep-all;overflow-wrap:anywhere;text-wrap:balance;pointer-events:none;
+}
+html[data-control-display] body.hunt.playing #pair.controls #use:disabled{
+ cursor:default;opacity:1;translate:none;filter:none!important;
+ box-shadow:inset 0 2px 6px #081e2b70!important;
+}
+html[data-control-display] body.hunt.playing #pair.controls #use[data-tool="empty"]{
+ border-color:#65818b;background:linear-gradient(150deg,#213a4a,#163141);color:#c2d6db;
+}
+#use[data-tool="empty"] .hunt-tool-art{
+ background:linear-gradient(140deg,#112939,#1b3647);border-color:#58727f;
+}
+#use[data-tool="empty"] .hunt-tool-art::before{
+ content:"";width:56%;height:39%;border:1px solid #809ba5;border-radius:4px;
+ background:linear-gradient(#7c99a3,#7c99a3) center/36% 1px no-repeat,#132e3e;
+ box-shadow:inset 0 2px 1px #0b2435;
+}
+html[data-control-display] body.hunt.playing #pair.controls #use[data-tool="empty"]::after{content:none}
+#use:disabled:not([data-tool="empty"]) .hunt-tool-art{filter:saturate(.45) brightness(.82)}
+html[data-control-display] body.hunt.playing #pair.controls #use[data-item-cue="pickup"]:not(:disabled){
+ border-color:#b9ecd9;box-shadow:0 3px 0 #0c2534,inset 0 0 0 1px #b9ecd978,0 0 12px #8fdbc34d;
+}
+html[data-control-display] body.hunt.playing #pair.controls #use[data-item-cue="full"]:not(:disabled){
+ border-color:#f1c580;box-shadow:0 3px 0 #0c2534,inset 0 0 0 1px #f1c58075;
+}
+body.hunt #notice[data-kind="pickup"]{
+ top:calc(max(12px,env(safe-area-inset-top)) + 122px);padding:7px 13px;border:1px solid #83bdba;
+ border-radius:9px;background:#17394aef;color:#edfbf8;font:750 14px/1.35 system-ui,sans-serif;
+ box-shadow:0 3px 9px #122c4690;
+}
+body.hunt:has(.tag-rear-mirror:not([hidden])) #notice[data-kind="pickup"]{
+ top:max(calc(max(12px,env(safe-area-inset-top)) + 122px),calc(var(--rear-mirror-top) + var(--rear-mirror-height) + 6px));
+}
+html[data-control-display] body.hunt.playing #pair.controls #use[data-game-press="true"]:not(:disabled){
+ box-shadow:inset 0 2px 6px #061c2aaf!important;
+}
+html[data-control-display="touch"] body.hunt.playing[data-playing-role="hunt"] #pair.controls #use{
+ grid-template-columns:minmax(0,1fr);grid-template-areas:"art" "name";grid-template-rows:32px minmax(0,1fr);
+ justify-content:center;gap:2px;min-height:72px;height:72px;padding:3px 2px;
+}
+html[data-control-display="touch"] body.hunt.playing[data-playing-role="hunt"] #pair.controls #use .hunt-tool-art{width:35px}
+html[data-control-display="touch"] body.hunt.playing[data-playing-role="hunt"] #pair.controls #use .hunt-tool-name{font-size:11.4px}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls #use{
+ grid-template-columns:32px minmax(0,1fr);grid-template-areas:"art name" "art key";
+ grid-template-rows:auto auto;min-height:58px;height:auto;padding:3px;gap:2px 4px;
+}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls #use[data-tool="empty"]{
+ grid-template-areas:"art name";grid-template-rows:auto;
+}
+html[data-control-display="keyboard"] body.hunt.playing #pair.controls #use::after{
+ grid-area:key;margin:0;justify-self:center;
+}
+@media(max-width:430px){
+ html[data-control-display="keyboard"] body.hunt.playing .hunt-direction-guide{bottom:max(152px,env(safe-area-inset-bottom))}
+ html[data-control-display="keyboard"] body.hunt.playing[data-playing-role="hunt"] #pair.controls #use{
+  grid-template-columns:25px minmax(0,1fr);grid-template-areas:"art name" "key key";row-gap:3px;
+ }
+ html[data-control-display="keyboard"] body.hunt.playing[data-playing-role="hunt"] #pair.controls #use[data-tool="empty"]{
+  grid-template-areas:"art name";
+ }
+}
+@media(prefers-reduced-motion:no-preference){
+ #use[data-item-cue="pickup"] .hunt-tool-art canvas{animation:hunt-tool-equipped 230ms ease-out both}
+ @keyframes hunt-tool-equipped{from{transform:scale(.86);opacity:.7}to{transform:scale(1);opacity:1}}
+}
+</style></head><body class="hunt"><main><canvas id="rink" tabindex="0" aria-label="広い氷の街で鬼3匹から逃げるフィールド"></canvas><header class="game-hud"><div class="hunt-clock"><output id="hud">鬼3匹</output><span id="hunt-dash-boost" role="status" aria-live="polite"></span></div><button id="pause">ひと休み</button></header><canvas id="radar" width="96" height="96" aria-label="レーダー" hidden></canvas><div id="count" hidden></div><output id="notice" hidden></output><div class="controls" id="pad" aria-label="移動パッド"><i></i></div><div class="controls" id="pair"><button id="dash">ダッシュ</button><button id="jump">ジャンプ</button><button id="use" type="button" data-tool="empty" disabled aria-disabled="true" aria-label="道具なし"><span class="hunt-tool-art" aria-hidden="true"><canvas width="96" height="96" hidden></canvas></span><span class="hunt-tool-name">道具なし</span></button><button id="dive" hidden title="ヘッドスライディング（Hキー）">ダイブ</button></div><section id="panel" aria-busy="true" aria-label="鬼ごっこの準備"><div class="card"><h1 id="title">イマソラ鬼ごっこ</h1><p id="note">跳ぶ・曲がる・道具を使う。3匹を出し抜こう！</p><div id="play-roles" role="group" aria-label="遊ぶ役"><button data-role="escape">逃げる</button><button data-role="hunt">鬼になる</button></div><p class="start-auto">開始位置は毎回ランダム</p><button id="resume" hidden>つづける</button><button id="begin" disabled>あそぶ</button><br><p id="best"></p><details><summary>音・操作設定</summary><button id="sound-toggle" aria-pressed="true">🔊 効果音：オン</button><div id="keys"></div></details><details class="victory-help"><summary>勝利ポイントと育成</summary><p>勝つたびに10ポイント！ 鬼と逃走者、それぞれでその日初めて勝つと、相棒経験値も+1。両方で勝てば1日合計+2です。</p><p>自分で操作して移動した時間が、試合の30%以上ある勝利が対象です。180秒の試合なら54秒以上。早く決着した試合は、その試合時間に合わせて判定します。仲間CPUに任せきりの勝利や、壁に向けてキーを押したまま止まっている時間は対象になりません。</p><p>育成する時はホームから始めてね。操作時間で貯まる育成と、撮影した今の空による進化は共通です。</p></details><p id="companion-note"></p><button id="home-return" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>ホームへ戻る</button><p class="practice-note">ホームから相棒を連れて遊ぶと、空カードを集められます。</p></div></section></main><script src="./assets/imasora-keyboard-settings.js?v=121gm"></script><script src="./assets/imasora-sliding-tag-entry.js?v=121gb"></script><script type="module" src="./assets/imasora-sliding-tag-view.mjs?v=121gx"></script></body></html>

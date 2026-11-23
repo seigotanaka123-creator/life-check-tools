@@ -1,9 +1,10 @@
 import{unpackDeliveredBeam}from'./imasora-construction-beam-unpack.mjs?v=120pv';
-import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=120pv';
+import {WORLD_LEDGER as L} from './imasora-world-live-ledger.js?v=121if';
 import {prepareTransportRestorePlan,prepareTransportRestoreCommit,compactCheckedRestorePoints,validateTransportRestoreJournal,validateAndCompactTransportRestoreJournal,snapshotTransportRestoreJournal,sameTransportRestoreValue} from './imasora-construction-transport-restore.mjs?v=120pv';
 import {validateSoilTransport} from './imasora-construction-soil-transport.mjs?v=120pv';
 import {validateWorldTransport,worldTransportSoil} from './imasora-construction-transport-authority.mjs?v=120pv';
 import {validateScoopDumpContinuation,basinScoopPlan,scoopDumpPlan} from './imasora-construction-fragment-scoop.mjs?v=120pv';
+import {bucketDumpPlan} from './imasora-construction-bucket-dump.mjs?v=120pv';
 import {sameValidatedConstructionRecordValue as sameChecked} from './imasora-construction-record-equality.mjs';
 
 const exactValues=(a,b)=>{if(Object.is(a,b))return true;if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;if(Array.isArray(a)&&a.length===3&&b.length===3&&Object.keys(a).length===3&&Object.keys(b).length===3&&typeof a[0]==='number'&&typeof a[1]==='number'&&typeof a[2]==='number'&&typeof b[0]==='number'&&typeof b[1]==='number'&&typeof b[2]==='number')return Object.is(a[0],b[0])&&Object.is(a[1],b[1])&&Object.is(a[2],b[2]);const keys=Object.keys(a);return keys.length===Object.keys(b).length&&(!Array.isArray(a)||a.length===b.length)&&keys.every(k=>Object.hasOwn(b,k)&&exactValues(a[k],b[k]));};
@@ -16,6 +17,14 @@ export function executeWorldSaveTask(kind,args){
   const checked=executeWorldSaveTask('pack-checked',{ledger:unchanged?base:L.saveConstructionTimberDraft(base,work,args.draft,args.expectedRevision)}),before=base.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,unchanged,exactSoil:!!before&&!!after&&exactValues(before,after)};
  }
 
+ if(kind==='prepare-concrete-travel'){
+  const base=L.unpackWorldPurchaseLedger(args.raw);
+  if(args.action?.type!=='FREE_MOVE')throw Error('走行のセーブを確認してください。');
+  const next=L.applyConstructionProfileProject(base,args.action,args.expectedRevision,args.draft,args.platform);
+  const checked=executeWorldSaveTask('pack-checked',{ledger:next});
+  const before=base.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;
+  return {...checked,unchanged:next===base,exactSoil:!!before&&!!after&&exactValues(before,after)};
+ }
  if(kind==='prepare-kit-transfer'){
   const next=L.transferConstructionKit(args.ledger,args.action,args.draft,args.expectedRevision),checked=executeWorldSaveTask('pack-checked',{ledger:next});
   const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;return{...checked,exactSoil:before&&after?exactValues(before,after):false};
@@ -33,10 +42,24 @@ export function executeWorldSaveTask(kind,args){
   const before=args.ledger.world.constructionTransport?.work?.frame.soil,after=checked.ledger.world.constructionTransport?.work?.frame.soil;
   return {...checked,exactSoil:before&&after?exactValues(before,after):false};
  }
- if(kind==='scoop-plan')return args.basin===true?basinScoopPlan(args.work):scoopDumpPlan(args.work);
+ if(kind==='scoop-plan')return args.basin===true?basinScoopPlan(args.work):scoopDumpPlan(args.work,args.aimed===true);
+ if(kind==='bucket-dump-plan')return bucketDumpPlan(args.work);
  if(kind==='soil-check'){validateSoilTransport(args.soil);return true;}
  if(kind==='transport-check'){const r=args.record;validateWorldTransport(r,worldTransportSoil(r).initial.source,r.profileId);return true;}
- if(kind==='prepare-transport'){const next=L.prepareConstructionTransportCandidate(args.ledger,args.record,args.draft,args.expectedRevision),checked=executeWorldSaveTask('pack-checked',{ledger:next});return {...checked,exactTransport:exactValues(checked.ledger.world.constructionTransport,args.record)};}
+ if(kind==='warm-scoop-base'){L.unpackWorldPurchaseLedger(args.raw);return true;}
+ if(kind==='prepare-transport'){
+  const base=args.basePacket===undefined?args.ledger:L.unpackWorldPurchaseLedger(args.basePacket);
+  const packet=L.packConstructionTransportCandidate(base,args.record,args.draft,args.expectedRevision,args.rainTrial);
+  const ledger=L.unpackWorldPurchaseLedger(packet);
+  const transport=ledger.world.constructionTransport,exactTransport=exactValues(transport,args.record);
+  if(!args.compactTransport||!exactTransport)return {packet,ledger,exactTransport};
+  // The exact packet still owns the durable reservation. The caller
+  // already holds the certified physical record, including the full sweep.
+  if(args.compactScoopRecord===true&&transport.work.scoop)return {packet,exactTransport,ledger:{...ledger,world:{...ledger.world,constructionTransport:null}}};
+  const {soil,...frame}=transport.work.frame;
+  return {packet,exactTransport,ledger:{...ledger,world:{...ledger.world,
+   constructionTransport:{...transport,work:{...transport.work,frame}}}}};
+ }
  if(kind==='prepare-world'){
   const {ledger,draft,event,craft}=args;let next=ledger;if(event)next=L.awardLinkedFlightReward(next,event.resource,event.amount,event.id);
   const checked=executeWorldSaveTask('pack-checked',{ledger:L.saveLinkedWorldDraft(next,draft,{craft})});

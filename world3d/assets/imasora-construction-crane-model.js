@@ -1,7 +1,7 @@
 import {craneChassisFrame} from './imasora-construction-crane-ground.mjs?v=120ov';
 import {groundLocal} from './imasora-construction-vehicle-ground-frame.mjs?v=120ou';
 import * as THREE from './three.module.min.js';
-import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js?v=120ov';
+import {createLoader,updateLoaderModel,disposeLoader} from './imasora-construction-loader-model.js?v=121e7';
 import {tip,hook} from './imasora-construction-crane.js?v=120pv';
 import {worldToLocal} from './imasora-construction-loader-physics.js?v=120ov';
 import {outriggerLocalVolumes,craneOutriggerVolumes} from './imasora-construction-crane-outriggers.js?v=120pv';

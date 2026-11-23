@@ -1,5 +1,9 @@
+import {fieldDriveInput} from './imasora-construction-locomotion.mjs?v=121gf';
+import {constructionVehicleLock} from './imasora-construction-shared-field.mjs?v=120ey';
+import {createParkingReturn} from './imasora-construction-parking-view.mjs?v=121cx';
+import {returnFieldVehicleToParking} from './imasora-construction-field-contact.mjs?v=121cx';
 import{beamUnpackChoices,beamUnpackCue}from'./imasora-construction-beam-unpack.mjs?v=120pv';
-import{createCraneConsole}from'./imasora-construction-crane-console.mjs?v=120oz';
+import{createCraneConsole}from'./imasora-construction-crane-console.mjs?v=121ct';
 import{directGirderAction,startGirderDock,directReelObstacles}from'./imasora-construction-girder-direct.mjs?v=120pv';
 import{createVehicleLoadGuard}from'./imasora-construction-structure-performance.mjs?v=120pv';
 import{girderPickupOption,girderInstallOption}from'./imasora-construction-girder-transfer.mjs?v=120pv';
@@ -7,34 +11,34 @@ import{structuralPlacement}from'./imasora-construction-structure-performance.mjs
 import{isKitCargo}from'./imasora-construction-kit-cargo.mjs?v=120pl';
 import{kitPickupOption,kitTransferOption,kitHandlingObstacles}from'./imasora-construction-kit-transfer.mjs?v=120pv';
 import{createPresentationCache}from'./imasora-construction-presentation-cache.mjs?v=120gi';
-import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=120od';
+import{bindJumpButton,createJumpIntent}from'./imasora-construction-locomotion.mjs?v=121cw';
 import{boardLiftChoices,startBoardLift,advanceBoardLift}from'./imasora-construction-board-lift.mjs?v=120pv';
 import{createBoardLiftView,boardLiftContactGeometry}from'./imasora-construction-board-lift-view.mjs?v=120pv';
 import{liftState}from'./imasora-construction-board-lift-state.mjs?v=120pv';
 import {createConstructionWalkGait} from './imasora-construction-walk-gait.mjs?v=120fb';
-import {constructionWorkAutoSaveKey} from './imasora-construction-autosave-key.mjs?v=120es';
+import {constructionWorkAutoSaveKey,constructionWorkMovingForAutoSave,createConstructionAutoSaveGate} from './imasora-construction-autosave-key.mjs?v=120es';
 import {createFrameHeightSampler} from './imasora-construction-frame-height.mjs?v=120ou';
 import {craneGroundContext,craneChassisFrame,craneGroundObstacles} from './imasora-construction-crane-ground.mjs?v=120ov';
 import {fieldExitSafe,fieldRememberGround,fieldWorkOverlaps,fieldGroundTravelAllowed,fieldGroundPose,fieldActorPose,fieldWorkGroundProblem,fieldGroundBounds} from './imasora-construction-field-contact.mjs?v=120pv';
-import {nativeDoorTarget,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=120ov';
+import {nativeDoorTargets,closestNativeDoor,isNativeDoorArrival,completeNativeBoarding,nativeSavedWorkPending} from './imasora-construction-native-door.mjs?v=121d0';
 import {constructionOverlayOpen,openConstructionGuide} from './imasora-construction-overlays.mjs?v=120gm';
-import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=120lb';
+import {bindTravelBoost} from './imasora-construction-travel-input.mjs?v=121d1';
 import {setBoardPrompt} from './imasora-construction-boarding.js';
 import {createOrbitLook} from './imasora-world-look-controls.js?v=492';
-import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=120gm';
+import {createVehiclePlayView} from './imasora-construction-vehicle-play-view.js?v=121gg';
 import {VehicleRestoreSession} from './imasora-construction-vehicle-restore-session.js?v=120pv';
 import {createVehicleRestoreView} from './imasora-construction-vehicle-restore-view.js?v=502';
 import * as THREE from './three.module.min.js';
 import {overlapsWorldYardBuild} from './imasora-construction-world-yard-reservation.js?v=512';
 import {actorPose,loaderDrivingInput} from './imasora-construction-loader-physics.js?v=120ov';
 import {hook,pickOption,craneBoardOption,craneExitOption} from './imasora-construction-crane.js?v=120pv';
-import {craneWorkInput} from './imasora-construction-crane-controls.js';
-import{BEAM_ISSUE,isBeamBundle}from'./imasora-construction-timber-cargo.mjs?v=120pv';
+import {craneOperatorInput,CRANE_WORK_KEYS,CRANE_ACTION_KEYS,craneActionForKey,craneDriveNotice} from './imasora-construction-crane-controls.js?v=121ct';
+import{BEAM_ISSUE,isBeamBundle,displayTimberCargoText}from'./imasora-construction-timber-cargo.mjs?v=120pv';
 import {issueOption,returnOption,timberPhysicsState} from './imasora-construction-purchased-timber.js?v=120pv';
 import {assemblyState,floatReadout,floatingPlacement,joinOption,detachOption,component} from './imasora-construction-world-timber-assembly.js?v=120pv';
 import {TIMBER_YARDS,FLOOR_VOLUME,initialWorldTimber,enterWorldTimber,syncWorldTimber,worldTimberAction,advanceWorldTimber,idleWorldTimber,worldTimberTotals,worldTimberGeometry,timberEdges,worldTimberVehicleVolumes,worldTimberMaterialObstacles} from './imasora-construction-world-timber.js?v=120pv';
 import {constructionMaterialContactVolumes} from './imasora-construction-world-contact.js?v=523';
-import {createWorldTimberModel,updateWorldTimberModel,TIMBER_FENCES} from './imasora-construction-world-timber-model.js?v=120pv';
+import {createWorldTimberModel,updateWorldTimberModel,TIMBER_FENCES} from './imasora-construction-world-timber-model.js?v=121e7';
 import {disposeSpaceMaterialBook} from './imasora-space-material-book.js?v=120ds';
 import {worldTimberJoinPractice} from './imasora-construction-world-timber-practice.js?v=120pv';
 import {timberCheckpoint} from './imasora-construction-world-timber.js?v=120pv';
@@ -63,15 +67,16 @@ export function createWorldTimberController({service,practice=false,preview=fals
   const upperMarker=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffd34e,transparent:true,opacity:.2,depthTest:false,depthWrite:false}));upperMarker.name='上階の床板の置き先';upperMarker.renderOrder=30;upperMarker.visible=false;
   const upperOutline=new THREE.LineSegments(new THREE.EdgesGeometry(upperMarker.geometry),new THREE.LineBasicMaterial({color:0xffbf27,depthTest:false,depthWrite:false}));upperOutline.renderOrder=31;upperMarker.add(upperOutline);scene.add(upperMarker);
   const heightCache=createFrameHeightSampler((x,z,reference)=>typeof fieldHeightAt==='function'?fieldHeightAt(x,z,reference):0),localHeight=(x,z,reference)=>heightCache.heightAt(root.position.x+x,root.position.z+z,reference);
+  localHeight.quarryHeight=(x,z)=>root?fieldHeightAt?.quarryHeight?.(root.position.x+x,root.position.z+z):undefined;
   localHeight.upperBound=b=>fieldUpperBound?.({minX:b.minX+root.position.x,maxX:b.maxX+root.position.x,minZ:b.minZ+root.position.z,maxZ:b.maxZ+root.position.z});
   const held=new Map(),taps=new Map(),keys=new Set(),inert=new Map();
-  const panel=document.createElement('section');panel.className='world-timber-controls';panel.hidden=true;panel.setAttribute('aria-label','工事現場の火星木材クレーン');
-  panel.innerHTML=`<header><strong>火星木材クレーン</strong><span class="wt-mode"></span><button data-action="begin">木材の作業を始める</button></header>
+  const panel=document.createElement('section');panel.className='world-timber-controls';panel.hidden=true;panel.setAttribute('aria-label','工事現場のアマネ星木材クレーン');
+  panel.innerHTML=`<header><strong>アマネ星木材クレーン</strong><span class="wt-mode"></span><button data-action="begin">木材の作業を始める</button></header>
     <p class="wt-message" role="status"></p><div class="wt-stats"></div><div class="wt-active" hidden>
     <div class="wt-drive wt-pad"><button data-hold="left">左へ</button><button data-hold="accelerate">前へ</button><button data-hold="right">右へ</button><button data-hold="reverse">後ろへ</button><button data-hold="brake">ブレーキ</button><button data-hold="jump">ジャンプ</button></div>
     <div class="wt-crane wt-pad" hidden><button data-hold="slew-left">左旋回</button><button data-hold="slew-right">右旋回</button><button data-hold="extend">アームを伸ばす</button><button data-hold="retract">アームを縮める</button><button data-hold="raise">巻き上げる</button><button data-hold="lower">巻き下げる</button></div>
     <div class="wt-work"><button data-action="issue">床板を1枚出す</button><button data-action="issue-beams-v1">📦 角材4本の束を出す</button><small class="wt-stock-help">どちらも木材1組分。角材の束は吊って運び、床や地面に置こう。回収枠で保管にもどせるよ。</small><button data-action="interact">運転席に乗る</button><button data-action="mode">クレーン作業へ</button><button data-action="pick">吊り索を掛ける</button><button data-action="rotate">部材を90°回す</button><button data-action="release">浮遊を開始</button><button data-action="place">地面・支持面に設置</button><button data-action="return-stock">回収枠から保管へ</button><button data-action="precision">微調整 OFF</button><button data-action="snap">面合わせ ON</button></div>
-    <div class="wt-detail"></div><footer><button data-action="camera">視点：作業</button><button data-action="save">木材作業を保存</button><button data-action="leave">作業を終えて徒歩に戻る</button></footer></div>`;
+    <div class="wt-detail"></div><footer><button data-action="camera" data-game-action="camera">視点：作業</button><button data-action="save">木材作業を保存</button><button data-action="leave">作業を終えて徒歩に戻る</button></footer></div>`;
   panel.querySelector('[data-action="release"]').insertAdjacentHTML('afterend','<button data-action="join">床に接合</button><button data-action="detach">接合を外して吊る</button>');
   panel.querySelector('[data-action="place"]').insertAdjacentHTML('afterend','<button data-action="upper">上の階へ運ぶ</button><div class="wt-upper" hidden><strong>どこへ運ぶ？</strong><small>吊った木材を黄色い枠へ運ぶよ。途中で止めても荷は残るよ。</small><div class="wt-upper-choices"></div><button data-action="upper-close">とじる</button></div><button data-action="upper-stop" hidden>運ぶのを止める</button>');
   panel.querySelector('.wt-upper-choices').insertAdjacentHTML('afterend','<div class="wt-point" hidden><strong class="wt-point-title"></strong><small>床をタップして置き先をえらぼう。画面をなぞると見回せるよ。</small><div class="wt-point-steps" aria-label="木材の置き先を動かす"><button data-point-step="0,-2" aria-label="置き先を建物の奥へ">奥へ ↑</button><button data-point-step="-2,0" aria-label="置き先を建物の左へ">← 左へ</button><button data-point-step="2,0" aria-label="置き先を建物の右へ">右へ →</button><button data-point-step="0,2" aria-label="置き先を建物の手前へ">↓ 手前へ</button></div><p class="wt-point-note" role="status"></p><button data-action="upper-go">📦 ここへ運ぶ</button><button data-action="upper-back">別の階・受取台をえらぶ</button></div>');
@@ -89,8 +94,21 @@ export function createWorldTimberController({service,practice=false,preview=fals
   function suspendUpper(){bayClock.pause();if(upper||bay){upperSuspended=true;issue='ひと休み中。「運ぶのをつづける」で再開できるよ。';}clear();}
   // Clearing held input (for a menu or checkpoint) is not cancelling a job.
   function clear(){playConsole?.reset();pointInput?.cancel();jumpControl?.cancel();jumpInput.reset();travelBoost?.reset();held.clear();taps.clear();keys.clear();clearInput();panel.querySelectorAll('.held').forEach(b=>b.classList.remove('held'));}
-  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"wt",groups:[{"id":"move","label":"移動","selectors":[".wt-drive"],"hint":"WASD／矢印で移動。徒歩はKかスペース＋WASDでダッシュ、E／B／Jでジャンプ。同方向を素早く2回でも加速。停車してクレーン作業へ。"},{"id":"arm","label":"アーム","selectors":[".wt-crane",".wt-direct"],"hint":"クレーン作業へ切り替えると操作できます。"},{"id":"load","label":"荷物","selectors":["[data-action=\"pick\"]","[data-action=\"rotate\"]","[data-action=\"release\"]","[data-action=\"place\"]","[data-action=\"join\"]","[data-action=\"detach\"]","[data-action=\"upper\"]",".wt-upper","[data-action=\"girder-pick\"]","[data-action=\"girder-install\"]","[data-action=\"girder-return\"]","[data-action=\"kit-pickup\"]",".wt-kit","[data-action=\"kit-give\"]","[data-action=\"kit-return\"]","[data-action=\"bay\"]",".wt-bay"]},{"id":"stock","label":"保管・調整","selectors":["[data-action=\"issue\"]","[data-action=\"issue-beams-v1\"]",".wt-stock-help","[data-action=\"return-stock\"]","[data-action=\"precision\"]","[data-action=\"snap\"]"]}],quick:["interact","mode","camera","upper-stop","bay-resume"]});
+  const game=createVehiclePlayView({panel,canvas,clearInput:clear,refresh,prefix:"wt",groups:[{"id":"move","label":"移動","selectors":[".wt-drive"],"hint":"WASD／矢印で移動。K＋WASDでダッシュ、Space／E／B／Jでジャンプ。同方向を素早く2回でも加速。停車してクレーン作業へ。"},{"id":"arm","label":"アーム","selectors":[".wt-crane",".wt-direct"],"hint":"クレーン作業へ切り替えると操作できます。"},{"id":"load","label":"荷物","selectors":["[data-action=\"pick\"]","[data-action=\"rotate\"]","[data-action=\"release\"]","[data-action=\"place\"]","[data-action=\"join\"]","[data-action=\"detach\"]","[data-action=\"upper\"]",".wt-upper","[data-action=\"girder-pick\"]","[data-action=\"girder-install\"]","[data-action=\"girder-return\"]","[data-action=\"kit-pickup\"]",".wt-kit","[data-action=\"kit-give\"]","[data-action=\"kit-return\"]","[data-action=\"bay\"]",".wt-bay"]},{"id":"stock","label":"保管・調整","selectors":["[data-action=\"issue\"]","[data-action=\"issue-beams-v1\"]",".wt-stock-help","[data-action=\"return-stock\"]","[data-action=\"precision\"]","[data-action=\"snap\"]"]}],quick:["interact","mode","camera","upper-stop","bay-resume"]});
   playConsole=createCraneConsole({panel,game,button,clear,stop:()=>{if(upper||bay)stopUpper();}});
+  const parkingReturn=createParkingReturn({panel,dock:panel.querySelector('.gv-quick')??panel,clear,
+    vehicle:()=>active&&work?.work.rig.mode==='driving'&&work.work.rig.vehicle.field?{id:'crane',name:'クレーン車'}:null,
+    available:()=>busy||saving||blocked||restoreLocked()?'保存や作業が終わってから戻ろう。':'',
+    notice:text=>{issue=text;refresh();},
+    async returnVehicle(id){
+      const before=work;
+      work=returnFieldVehicleToParking(work,id,root.position,fieldHeightAt,externalVolumes());
+      orbit.reset();render(0);
+      const saved=await save();
+      if(!saved&&!service.blocked){work=before;render(0);refresh();}
+      return saved;
+    }});
+
   if(!practice&&!preview&&service.mode==='live'){
     restoreSession=new VehicleRestoreSession({service,kind:'timber',origin:globalThis.location?.origin,getWork:()=>work,getExpectedRevision:()=>expected,
       available:()=>{if(!active||state.map!=='construction')return 'この車両の作業を始めてから復元してください。';if(busy||saving||blocked)return '先に保存の結果を確認してください。';if(work?.work.rig.transition)return 'ゲームへ戻って再開し、乗り降りが終わってから復元してください。';return '';},
@@ -113,19 +131,30 @@ export function createWorldTimberController({service,practice=false,preview=fals
   function fresh(){const saved=service.readConstructionVehicleWork('timber');if(saved&&!practice){work=structuredClone(saved);expected=saved.revision;savedWorkAwaitingResume=!practice&&!preview&&service.mode==='live';}}
   let kitGeometryHigh=null,kitGeometry=[],kitGeometryOrigin='';
   function externalVolumes(){const high=service.ledger?.world.constructionHighBuild,at=root?root.position.x+'/'+root.position.z:'';if(root&&(kitGeometryHigh!==high||kitGeometryOrigin!==at)){kitGeometryHigh=high;kitGeometryOrigin=at;kitGeometry=[...kitHandlingObstacles(high,root.position),...directReelObstacles(high,root.position)];}return root?[...kitGeometry,...(contactGeometry?constructionMaterialContactVolumes([root.position.x,root.position.z],contactGeometry()):[]),...(work.schema===2&&readFieldSolids?readFieldSolids(root.position):[])]:[];}
-  function begin(joinPractice=false,{automatic=false}={}){if((!automatic&&!near()&&!resumeAvailable())||busy||saving||blocked||restoreLocked()||active)return;clear();try{
+  function begin(joinPractice=false,{automatic=false}={}){if(constructionVehicleLock('crane'))return false;if((!automatic&&!near()&&!resumeAvailable())||busy||saving||blocked||restoreLocked()||active)return;clear();try{
     const resumeSaved=!practice&&!preview&&service.mode==='live'&&service.hasConstructionVehicleWork('timber');
     const resumed=resumeSaved?syncWorldTimber(work,received()):null;
     if(joinPractice){if(work.work.parts.length)throw Error('貸出床を回収してから接合練習を始めてください。');work=worldTimberJoinPractice(work.siteIndex,{practice,saveMode:service.mode});}
     else work=resumeSaved?{...resumed,revision:resumed.revision+1,work:{...resumed.work,paused:false}}:enterWorldTimber(work,{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z,heading:state.heading},received());
     active=true;upperPlaced=recoverUpperLanding(service.constructionHighBuild,posedWork(),root.position);const waiting=[...boardBayChoices(service.ledger?.world.constructionHighBuild,posedWork(),{origin:root.position}),...boardLiftChoices(service.constructionHighBuild,posedWork(),{origin:root.position})];bayView=waiting[0]??null;issue=waiting.length?(beamUnpackCue(kitWorld())?'部屋へ運んだ角材を、建築用の木材にできるよ。':'木材はその場にあるよ。「道具」から運び先をえらぼう。'):'';if(waiting.length)work={...work,work:{...work.work,message:issue}};auto=0;owns(true);if(resumeSaved&&!automatic){savedWorkAwaitingResume=true;game.pause();menuSaveNote='保存した作業を一時停止で開きました。「再開」で続けられます。';}render(0);refresh();
   }catch(e){issue=e.message;refresh();}}
+  const autoSaveGate=createConstructionAutoSaveGate();
+  const saveMovement=()=>active&&(held.size||keys.size||constructionWorkMovingForAutoSave(work)||!!bay||!!upper||!!unpackPending);
+  function autoSaveReady(reason){
+    autoSaveGate.noteActivity(saveMovement());
+    return !!work&&!busy&&!saving&&!blocked&&!restoreLocked()&&!service.busy&&!service.blocked&&!practice&&service.mode!=='readonly'&&autoSaveGate.ready(reason);
+  }
+  function autosave({reason='interval'}={}){
+    if(!autoSaveReady(reason))return false;
+    if(constructionWorkAutoSaveKey(work,view)===lastAutomaticKey){autoSaveGate.checked();auto=0;return true;}
+    return save({automatic:true});
+  }
   async function save({automatic=false}={}){
     if(saving){if(automatic)return false;await pendingSave;if(blocked)return false;return save({automatic});}
     if(!work||busy||blocked||restoreLocked())return false;if(work.work.rig.transition){if(!automatic){issue='乗り降りが終わると保存できるよ。';refresh();}return false;}if(practice||service.mode==='readonly')return true;
     let draft,world,revision,key,checkpoint;try{checkpoint=checkpointGeneration;draft=structuredClone(work);world=snapshot();revision=expected;key=constructionWorkAutoSaveKey(draft,view);}catch(e){fail(e);return false;}
-    menuSaveNote='';saving=true;busy=!automatic;if(!automatic)clear();refresh();
-    pendingSave=(async()=>{try{await service.flush();const saved=await service.saveConstructionTimber(draft,world,revision);expected=saved.revision;lastAutomaticKey=key;auto=checkpointGeneration===checkpoint?0:9;menuSaveNote='作業を保存しました。';return true;}catch(e){fail(e);return false;}finally{busy=false;saving=false;pendingSave=null;refresh();}})();return pendingSave;
+    saving=true;busy=!automatic;if(!automatic){menuSaveNote='';clear();refresh();}
+    pendingSave=(async()=>{try{await service.flush();const saved=await service.saveConstructionTimber(draft,world,revision);expected=saved.revision;lastAutomaticKey=key;auto=checkpointGeneration===checkpoint?0:9;autoSaveGate.checked();if(!automatic)menuSaveNote='作業を保存しました。';return true;}catch(e){fail(e);return false;}finally{busy=false;saving=false;pendingSave=null;if(!automatic||blocked)refresh();}})();return pendingSave;
   }
   async function leave({force=false,then=null}={}){
     if(restoreLocked())return false;
@@ -214,18 +243,20 @@ export function createWorldTimberController({service,practice=false,preview=fals
   }
   const jumpReady=()=>active&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!game.menuOpen&&work.work.rig.mode==='foot';
   jumpControl=bindJumpButton({element:panel.querySelector('[data-hold=jump]'),enabled:()=>jumpReady()&&(work.work.rig.player.grounded||(work.work.rig.player.jumpCount??0)<3),canHold:jumpReady,activate:()=>jumpInput.press(),release:()=>jumpInput.release()});
-  const codes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','KeyJ','KeyB','KeyK'];
-  addEventListener('keydown',e=>{if(!active||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest?.('dialog[open],input,select,textarea,[contenteditable=true],[role=textbox]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){if(upper||bay){stopUpper();clear();}e.preventDefault();e.stopImmediatePropagation();if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,time+.1);keys.add(e.code);}},true);
-  addEventListener('keyup',e=>{if(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB')jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
+  let driveNotice='';
+  const driveCodes=['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  const codes=[...driveCodes,'Space','KeyE','KeyJ','KeyB','KeyK',...CRANE_WORK_KEYS,...CRANE_ACTION_KEYS];
+  addEventListener('keydown',e=>{if(!active||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest?.('dialog[open],input,select,textarea,[contenteditable=true],[role=textbox]'))return;if(game.menuOpen){game.handleKeyDown(e);e.stopImmediatePropagation();return;}if(restoreLocked()){e.preventDefault();e.stopImmediatePropagation();return;}if(game.paused){if(codes.includes(e.code)||e.code==='KeyE'){if(e.code!=='Space'||!e.target.closest('button,summary,select'))e.preventDefault();e.stopImmediatePropagation();}return;}if(CRANE_ACTION_KEYS.includes(e.code)){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&!busy&&!blocked&&!restoreLocked()){const action=craneActionForKey(e.code,work.work),target=action&&button(action);if(target&&!target.disabled)target.click();}return;}if(work.work.rig.mode==='foot'&&(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'||(e.code==='Space'&&(e.type==='keyup'||work.work.rig.mode==='foot')))){e.preventDefault();e.stopImmediatePropagation();jumpControl.key(e);return;}if(codes.includes(e.code)){if(upper||bay){stopUpper();clear();}e.preventDefault();e.stopImmediatePropagation();driveNotice=driveCodes.includes(e.code)?craneDriveNotice(work.work):'';if(!keys.has(e.code)&&!busy&&!blocked&&!restoreLocked())taps.set(e.code,time+.1);keys.add(e.code);}},true);
+  addEventListener('keyup',e=>{if(e.code==='KeyE'||e.code==='KeyJ'||e.code==='KeyB'||(e.code==='Space'&&(e.type==='keyup'||work.work.rig.mode==='foot')))jumpControl.key(e);keys.delete(e.code);if(e.target.closest?.('dialog[open]'))return;if(active&&codes.includes(e.code))e.stopImmediatePropagation();},true);
   document.addEventListener('pointerdown',e=>{if(!constructionOverlayOpen()&&active&&!service.blocked&&!panel.contains(e.target)&&e.target!==canvas&&!e.target.closest?.('#emergencyEscapeButton')){e.preventDefault();e.stopImmediatePropagation();}},true);
   addEventListener('blur',suspendUpper);document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendUpper();else clear();});
   const yaw=()=>orbit.yaw(view===1?-Math.PI/2:view===2?Math.PI:-2.6);
-  function input(consumeJump=true){
+  function input(consumeJump,dt){
     if(bay)return{brake:true};
     if(upperOpen&&!panel.querySelector('.wt-upper').closest('.gv-page')?.hidden)return{brake:true};
-    if(!upper)return travelBoost.input(rawInput(consumeJump));if(upperSuspended)return{brake:true};
+    if(!upper)return travelBoost.input(rawInput(consumeJump),dt);if(upperSuspended)return{brake:true};
     const key=upperDeliveryProjectKey(service.ledger?.world.constructionHighBuild,upper.target);
-    const step=stepUpperDelivery(upper,posedWork(),Math.min(.1,Math.max(.001,currentStep)),key);upper=step.job;issue=step.reason||step.message||'';
+    const step=stepUpperDelivery(upper,posedWork(),Math.min(.1,Math.max(.001,currentStep*3.4)),key);upper=step.job;issue=step.reason||step.message||'';
     if(step.place){upperPlace=upper.target.target;upperPlaced=upper.target;upper=null;}else if(!upper)directDock=false;
     return step.input;
   }
@@ -239,11 +270,11 @@ export function createWorldTimberController({service,practice=false,preview=fals
     }catch(e){issue='荷は吊ったまま止めたよ。'+(e.message||'置き先をもう一度たしかめよう。');}
   }
   function rawInput(consumeJump=true){const actions=[...held.values()],pressed=[...keys];for(const[k,t]of taps)if(t>time)(codes.includes(k)?pressed:actions).push(k);
-    const touch=playConsole?.read()??{x:0,y:0,hoist:0};if(work.work.rig.mode==='driving'){const k=work.work.work?craneWorkInput(actions,pressed,precision):loaderDrivingInput(actions,pressed);return work.work.work?{...k,slew:k.slew||-touch.x*(precision?.25:1),extend:k.extend||-touch.y*(precision?.25:1),hoist:k.hoist||touch.hoist*(precision?.25:1)}:{...k,steer:k.steer||touch.x,throttle:k.throttle||-touch.y,brake:k.brake||(!k.throttle&&!touch.y)};}
+    const touch=playConsole?.read()??{x:0,y:0,hoist:0};if(work.work.rig.mode==='driving'){const k=craneOperatorInput(actions,pressed,precision,work.work.work);return work.work.work?{...k,slew:k.slew||-touch.x*(precision?.25:1),extend:k.extend||-touch.y*(precision?.25:1),hoist:k.hoist||touch.hoist*(precision?.25:1)}:{...k,steer:k.steer||touch.x,throttle:k.throttle||-touch.y,brake:k.brake||(!k.throttle&&!touch.y)};}
     const on=(a,...k)=>actions.includes(a)||k.some(x=>pressed.includes(x)),f=(Number(on('accelerate','KeyW','ArrowUp'))-Number(on('reverse','KeyS','ArrowDown')))||-touch.y,r=(Number(on('right','KeyD','ArrowRight'))-Number(on('left','KeyA','ArrowLeft')))||touch.x,a=yaw();
     return{x:r*Math.cos(a)-f*Math.sin(a),z:-r*Math.sin(a)-f*Math.cos(a),jump:jumpInput.read(consumeJump)};
   }
-  function refresh(){if(!root){panel.hidden=!(active&&restoreLocked());if(!panel.hidden){message.textContent=restoreSession.message;game.refresh({busy:true,blocked:true,context:'stopped',loadText:'停止中',menuHint:restoreSession.message});}return;}const close=!!root&&state.map==='construction'&&(work.schema===2?near():Math.abs(state.position.x-root.position.x)<380&&Math.abs(state.position.z-root.position.z)<320);panel.hidden=!close&&!active&&!resumeAvailable();canvas.parentElement.classList.toggle('world-timber-near',!panel.hidden);if(panel.hidden)return;
+  function refresh(){parkingReturn.sync();if(!root){panel.hidden=!(active&&restoreLocked());if(!panel.hidden){message.textContent=restoreSession.message;game.refresh({busy:true,blocked:true,context:'stopped',loadText:'停止中',menuHint:restoreSession.message});}return;}const close=!!root&&state.map==='construction'&&(work.schema===2?near():Math.abs(state.position.x-root.position.x)<380&&Math.abs(state.position.z-root.position.z)<320);panel.hidden=!close&&!active&&!resumeAvailable();canvas.parentElement.classList.toggle('world-timber-near',!panel.hidden);if(panel.hidden)return;
     button('begin').hidden=active;button('begin').disabled=(!near()&&!resumeAvailable())||busy||blocked||restoreLocked();button('begin').textContent=resumeAvailable()?'保存したクレーンを再開':'作業を始める';panel.querySelector('.wt-active').hidden=!active;
     if(button('join-practice')){button('join-practice').hidden=active;button('join-practice').disabled=!near()||busy||blocked||restoreLocked()||work.work.parts.length>0;}
     panel.querySelector('.wt-mode').textContent=practice?'貸出2枚・保存しません':service.mode==='readonly'?'表示確認・保存なし':service.mode==='integration'?'本体とは別の接続確認保存':'作業を保存できます';
@@ -252,7 +283,8 @@ export function createWorldTimberController({service,practice=false,preview=fals
     if(!active){const nextMessage=blocked?issue:busy?'セーブしているよ…':issue||(resumeAvailable()?'保存した作業の続きから再開できるよ。':near()?'クレーンの左側から作業を始められます。':'');if(message.textContent!==nextMessage)message.textContent=nextMessage;game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:work.work.rig.mode,loadText:'',menuHint:menuSaveNote});return;}
     const w=assemblyState(posedWork()),t=worldTimberTotals(work),rig=w.rig,aboard=rig.mode==='driving',moving=!!rig.transition,crane=aboard&&w.work,p=w.parts.find(p=>p.id===w.held),materialObstacles=craneGroundObstacles(w,worldTimberMaterialObstacles(rig,externalVolumes()),localHeight),candidate=pickOption(w),placementPreview=floatingPlacement(timberPhysicsState(w),materialObstacles),join=joinOption(w),detach=detachOption(w);
     panel.querySelector('.wt-stats').textContent=`保管 ${practice?received()/FLOOR_VOLUME-w.parts.length:(service.constructionStock?.stored['mars-timber']??0)/FLOOR_VOLUME}組 ｜置場 ${w.parts.filter(p=>!p.fixed&&!p.hover&&p.id!==w.held).length}個 ｜吊り荷 ${Number(!!w.held)}個 ｜浮遊 ${t.floating}枚 ｜設置 ${w.parts.filter(p=>p.fixed).length}個`;
-    message.textContent=blocked?issue:busy?'セーブしているよ…':issue||(active?(w.message||rig.message):resumeAvailable()?'保存した作業の続きから再開できるよ。':near()?'クレーンの左側から作業を始められます。':`火星木材区画 X ${root.position.x} / Z ${root.position.z}`);
+    if(!crane&&!w.deployment)driveNotice='';
+    message.textContent=displayTimberCargoText(blocked?issue:busy?'セーブしているよ…':driveNotice||issue||(active?(w.message||rig.message||''):resumeAvailable()?'保存した作業の続きから再開できるよ。':near()?'クレーンの左側から作業を始められます。':`アマネ星木材区画 X ${root.position.x} / Z ${root.position.z}`));
     const off=busy||blocked||restoreLocked()||moving||!!w.joining;for(const b of panel.querySelectorAll('.wt-active button'))b.disabled=off;
     panel.querySelector('.wt-drive').hidden=crane;panel.querySelector('.wt-crane').hidden=!crane;panel.querySelector('[data-hold="jump"]').hidden=rig.mode!=='foot';
 
@@ -290,8 +322,8 @@ export function createWorldTimberController({service,practice=false,preview=fals
     const floating=w.parts.find(p=>p.hover),f=floatReadout(w,floating?.id),h=hook(w);
     panel.querySelector('.wt-detail').textContent=(rig.mode==='foot'?`足元 ${rig.player.y.toFixed(1)} ｜ `:`フック高さ ${h.y.toFixed(1)} ｜ `)+(f.active?`浮遊床 ${f.count}枚：基準 ${f.target.toFixed(1)} / 現在 ${f.height.toFixed(1)} ｜荷重 ${f.load.toFixed(2)} / 支持力 ${f.capacity} ｜ `:'')+`接合 ${w.joints.length}組 ｜ `+(w.joining?'接合金具で引き寄せ中。次の操作は予約しません。':p?`${join.reason} ／ ${returnOption(w).reason}`:detach.ok?detach.reason:'浮遊床の辺へもう1枚を寄せて「床に接合」。外すときは床中央へフックを下ろします。');
     if(upper||bay)for(const b of panel.querySelectorAll('[data-hold],[data-action]'))if(!['upper-stop','camera',...(upperSuspended?[bay?'bay':'upper',...(bay?['bay-resume']:[])]:[])].includes(b.dataset.action))b.disabled=true;
-    game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:crane?'working':rig.mode,loadText:'吊り荷 '+Number(!!w.held)+' 個',menuHint:moving?'乗り降りの途中です。ゲームに戻って再開し、乗り降りが終わると保存できます。':menuSaveNote});
-    playConsole.refresh({crane,aboard,busy:off,direct:directCue,hasCargo:!!p,job:!!upper||!!bay,issue:blocked?issue:unpackPending?'角材をほどいているよ':unpackFeedback|| (upper?'柱の上へ合わせているよ':/接触/.test(w.message)?'当たる方向は止まるよ。離す方向へ動かそう':'')});
+    game.refresh({busy:busy||restoreLocked(),blocked:blocked||!!restoreSession?.invalid,context:crane?'working':rig.mode,noticeTone:blocked||restoreSession?.invalid?'error':!busy&&!restoreLocked()&&(driveNotice||rig.hit||upperPreview?.reason)?'warning':'',loadText:'吊り荷 '+Number(!!w.held)+' 個',menuHint:moving?'乗り降りの途中です。ゲームに戻って再開し、乗り降りが終わると保存できます。':menuSaveNote});
+    playConsole.refresh({crane,aboard,busy:off,direct:directCue,hasCargo:!!p,job:!!upper||!!bay,issue:blocked?issue:driveNotice||(unpackPending?'角材をほどいているよ':unpackFeedback|| (upper?'柱の上へ合わせているよ':/接触/.test(w.message)?'当たる方向は止まるよ。離す方向へ動かそう':''))});
   }
   let lastContext=null,posed=null,posedSource=null;
   function posedWork(){if(work?.schema!==2||!root)return work.work;if(posedSource===work&&posed)return posed;try{lastContext=craneGroundContext(work.work,localHeight);}catch(e){issue=e.message;}posedSource=work;posed={...work.work,groundPose:lastContext};return posed;}
@@ -310,7 +342,7 @@ export function createWorldTimberController({service,practice=false,preview=fals
     camera.position.copy(target).addScaledVector(new THREE.Vector3(Math.sin(a)*Math.cos(pitch),Math.sin(pitch),Math.cos(a)*Math.cos(pitch)),dist);camera.lookAt(target);readout();
   }
   function install({group,presentationRevision=null,blockedAt,collider,physics,contactGeometry:readContactGeometry=null,fieldSolids=null,groundHeightAt=null,groundUpperBound=null}){readPresentationRevision=presentationRevision;presentation.reset();
-    if(active)throw Error('木材作業中は区画を再構築できません。');stopUpper();upperOpen=false;if(root){disposeSpaceMaterialBook(root);root=null;}bindings=[];panel.hidden=true;canvas.parentElement.classList.remove('world-timber-near');if(state.map!=='construction')return;
+    if(active)throw Error('木材作業中は区画を再構築できません。');stopUpper();upperOpen=false;if(root){root.traverse(o=>{if(o.isInstancedMesh)o.dispose();});disposeSpaceMaterialBook(root);root=null;}bindings=[];panel.hidden=true;canvas.parentElement.classList.remove('world-timber-near');if(state.map!=='construction')return;
     contactGeometry=typeof readContactGeometry==='function'?readContactGeometry:null;readFieldSolids=fieldSolids;fieldHeightAt=groundHeightAt;fieldUpperBound=groundUpperBound;heightCache.reset();lastContext=null;posed=null;posedSource=null;
     if(!work){fresh();if(!work){const site=TIMBER_YARDS.findIndex(([x,z])=>!blockedAt(x,z,390));if(site<0)return;work=initialWorldTimber(site,received());}}
     const[x,z]=TIMBER_YARDS[work.siteIndex];if(work.schema!==2&&blockedAt(x,z,390)){issue='保存済み建物と木材区画が重なっています。建物を動かさず停止しました。';return;}
@@ -322,31 +354,47 @@ export function createWorldTimberController({service,practice=false,preview=fals
     render(0);refresh();
   }
   function syncPhysics(){const all=worldTimberGeometry(work);for(const b of bindings){const g=all.find(p=>p.id===b.id);if(!g)continue;Object.assign(b.floor,g);Object.assign(b.ceiling,g);timberEdges(g).forEach((e,i)=>Object.assign(b.edges[i],e));}}
-  return{look(dx,dy,sensitivity){if(active&&!game.menuOpen&&!restoreLocked())orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.work.rig.player;return active&&work?.work.rig.mode==='foot'&&b?{owner:'timber',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get movingGround(){const w=work?.work;return !!w&&(!!w.held||!!w.rotation||!!w.joining||!!w.rig.transition||Math.abs(w.rig.vehicle.speed)>.001||w.parts.some(p=>!p.fixed));},get autoSaveKey(){return active?constructionWorkAutoSaveKey(work,view):null;},get resumePoint(){return active?{kind:'timber',revision:work.revision,view}:null;},resumeSaved(point){if(!point||point.kind!=='timber'||point.revision!==expected||!Number.isInteger(point.view)||point.view<0||point.view>2||active||!root||busy||blocked||restoreLocked()||practice||preview||service.mode!=='live'||state.map!=='construction'||!canResume({kind:'timber',savedDriver:work.work.rig.mode==='driving'}))return false;view=point.view;begin(false,{automatic:true});return active;},get busy(){return busy||saving||restoreLocked();},get dirty(){return !!work&&work.revision!==expected;},install,save,autosave:()=>work&&!restoreLocked()?save({automatic:true}):false,leave,begin,get parkingSite(){return work?.siteIndex??null;},reloadSaved(){if(active||busy||saving)throw Error('作業を終えてから移設してください。');work=null;fresh();},
+  return{switchCamera(){if(active&&!game.menuOpen&&!button('camera').disabled)button('camera').click();},look(dx,dy,sensitivity){if(active&&!game.menuOpen&&!restoreLocked())orbit.drag(dx,dy,sensitivity);},get jumpMotion(){const b=work?.work.rig.player;return active&&work?.work.rig.mode==='foot'&&b?{owner:'timber',stage:b.jumpCount??0,velocity:b.vy??0,height:b.y,airborne:b.grounded===false,handsFree:false}:null;},get active(){return active;},get missionDriver(){return active&&work?.work.rig.mode==='driving'?'crane':null;},get aboard(){return active&&!!work&&work.work.rig.mode!=='foot';},get movingGround(){const w=work?.work;return !!w&&(!!w.held||!!w.rotation||!!w.joining||!!w.rig.transition||Math.abs(w.rig.vehicle.speed)>.001||w.parts.some(p=>!p.fixed));},get autoSaveKey(){return active?constructionWorkAutoSaveKey(work,view):null;},get resumePoint(){return active?{kind:'timber',revision:work.revision,view}:null;},resumeSaved(point){if(!point||point.kind!=='timber'||point.revision!==expected||!Number.isInteger(point.view)||point.view<0||point.view>2||active||!root||busy||blocked||restoreLocked()||practice||preview||service.mode!=='live'||state.map!=='construction'||!canResume({kind:'timber',savedDriver:work.work.rig.mode==='driving'}))return false;view=point.view;begin(false,{automatic:true});return active;},get busy(){return busy||saving||restoreLocked();},get dirty(){return !!work&&work.revision!==expected;},install,save,autosave,autoSaveReady,get autosaving(){return saving&&!busy;},leave,begin,get parkingSite(){return work?.siteIndex??null;},reloadSaved(){if(active||busy||saving)throw Error('作業を終えてから移設してください。');work=null;fresh();},
     overlapsBuild(p,size){return !!root&&(work.schema===2?fieldWorkOverlaps(root.position,p,size,[{...work.work.rig.vehicle,width:88,depth:90},...work.work.parts]):overlapsWorldYardBuild([root.position.x,root.position.z],p,size));},
     contactGeometry(){const floors=work?[...worldTimberGeometry(work),...boardLiftContactGeometry(service.constructionHighBuild,work.work)]:[];return{floors,walls:floors.flatMap(timberEdges)};},
-    doorTarget(){return state.map==='construction'?nativeDoorTarget(work,root?.position,{busy:busy||blocked||restoreLocked(),active,groundHeightAt:fieldHeightAt}):null;},
-    enterAtDoor(){
-      const door=nativeDoorTarget(work,root?.position,{busy:busy||blocked||restoreLocked(),active,groundHeightAt:fieldHeightAt});
-      if(!door||Math.hypot(state.position.x-door.x,state.position.z-door.z)>.6||state.jumpY||state.falling)return false;
-      clear();
-      try{
-        work=enterWorldTimber(work,{x:state.position.x,y:work.schema===2?0:state.groundY,z:state.position.z,heading:door.heading},received());
-        active=true;auto=0;savedWorkAwaitingResume=false;issue='';
-        owns(true);render(0);refresh();return true;
-      }catch(e){issue=e.message;refresh();return false;}
+    doorTargets(){return state.map==='construction'?nativeDoorTargets(work,root?.position,{busy:busy||blocked||restoreLocked(),active,groundHeightAt:fieldHeightAt}):[];},
+    doorSpots(){return state.map==='construction'?nativeDoorTargets(work,root?.position,{spots:true,groundHeightAt:fieldHeightAt}):[];},
+    doorTarget(){return closestNativeDoor(this.doorTargets(),state.position);},
+    enterFromOverview(){return this.enterAtDoor(null,{board:true,overview:true});},
+    enterAtDoor(_id,{board=false,overview=false}={}){
+      if(constructionVehicleLock('crane'))return false;
+      if(state.ufoBoarded||state.jumpY||state.falling||service.busy||service.blocked)return false;
+      const arrival={x:state.position.x,y:state.groundY,z:state.position.z};
+      const doors=this.doorTargets();
+      const candidates=overview?[closestNativeDoor(doors,arrival),...doors].filter((door,index,list)=>door&&list.indexOf(door)===index):doors.filter(door=>isNativeDoorArrival(door,arrival));
+      for(const door of candidates){
+        try{
+          const source=overview?door:arrival,pose={...source,y:work.schema===2?0:source.y,heading:door.heading};
+          let next=enterWorldTimber(work,pose,received());
+          if(board){
+            if(!fieldExitSafe(next.work,root.position,fieldHeightAt,door.side))throw Error('乗降口の足元に広い平らな場所が必要です。');
+            next=acceptLoad(worldTimberAction(next,'interact',crypto.randomUUID(),received(),externalVolumes(),localHeight));
+            const rig=next.work.loader??next.work.rig;
+            if(rig.mode!=='boarding')throw Error(rig.message||'乗降口の通路を空けてください。');
+            if(overview)next=completeNativeBoarding(next);
+          }
+          clear();work=next;active=true;auto=0;savedWorkAwaitingResume=false;issue='';
+          owns(true);render(0);refresh();return true;
+        }catch(e){issue=e.message;}
+      }
+      refresh();return false;
     },
     previewSpawn(){return preview&&root?{x:root.position.x-58,z:root.position.z-88,heading:0}:null;},
     update(dt){jumpControl.sync();liftView.root.visible=state.map==='construction'&&!!root;const baySeconds=bayClock.step(active&&state.map==='construction'&&!!root&&!!bay&&!upperSuspended&&!busy&&!blocked&&!restoreLocked()&&!game.paused&&!document.hidden)/1000;currentStep=dt;heightCache.reset();posed=null;posedSource=null;if(active&&restoreLocked()&&!root){refresh();return true;}if(state.map!=='construction'||!root)return false;if(!game.paused)time+=dt;
       if(!restoreLocked()&&blocked&&retryPending&&service.blocked===false){fresh();onKitChange();blocked=false;retryPending=false;issue='';if(active)work={...work,revision:work.revision+1,work:{...work.work,paused:false}};}
       if(!busy&&!blocked&&!restoreLocked()&&!game.paused&&!document.hidden&&(!savedWorkAwaitingResume||active)){if(active)savedWorkAwaitingResume=false;menuSaveNote='';try{
-        if(active){const mode=work.work.rig.mode,joining=work.work.joining;const controls=input(work.work.phase+dt>=1/120-1e-9),quiet=(bay||bayOpen||bayView)&&!upper&&boardBayQuietInput(work.work,controls);if(!quiet){const next=advanceWorldTimber(work,controls,dt,externalVolumes(),localHeight);const loadProblem=loadGuard('constructionTimber',work,next,{heightAt:fieldHeightAt});if(loadProblem){const rig=work.work.loader??work.work.rig,key=work.work.loader?'loader':'rig';work={...work,work:{...work.work,message:loadProblem,[key]:{...rig,vehicle:{...rig.vehicle,speed:0}}}};}else if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,root.position,fieldHeightAt,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work={...next,work:fieldRememberGround(next.work,root.position,fieldHeightAt,work.work)};}if(work.work.rig.mode!==mode)clear();if(joining&&!work.work.joining){clear();checkpointGeneration++;auto=9;}}
+        if(active){const mode=work.work.rig.mode,joining=work.work.joining;const controls=input(work.work.phase+dt>=1/120-1e-9,dt),quiet=(bay||bayOpen||bayView)&&!upper&&boardBayQuietInput(work.work,controls);if(!quiet){const next=advanceWorldTimber(work,fieldDriveInput(controls,work.work.rig,root.position,fieldHeightAt),Math.min(.1,dt*(work.work.work||work.work.joining||work.work.rotation||work.work.deployment?3.4:1)),externalVolumes(),localHeight);const loadProblem=loadGuard('constructionTimber',work,next,{heightAt:fieldHeightAt});if(loadProblem){const rig=work.work.loader??work.work.rig,key=work.work.loader?'loader':'rig';work={...work,work:{...work.work,message:loadProblem,[key]:{...rig,vehicle:{...rig.vehicle,speed:0}}}};}else if(work.schema===2&&!fieldGroundTravelAllowed(work.work,next.work,root.position,fieldHeightAt,externalVolumes())){const oldRig=work.work.loader??work.work.rig,newRig=next.work.loader??next.work.rig;newRig.vehicle={...oldRig.vehicle,speed:0};newRig.player={...oldRig.player};next.work.message='ここは急な坂や穴があるよ。ゆるやかな道を通ろう。';work=next;}else work={...next,work:fieldRememberGround(next.work,root.position,fieldHeightAt,work.work)};}if(work.work.rig.mode!==mode)clear();if(joining&&!work.work.joining){clear();checkpointGeneration++;auto=9;}}
         else{const r=idleWorldTimber(work,{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z,heading:state.heading,grounded:!state.falling&&state.jumpY===0,vy:state.jumpVelocity},dt);work=r.state;if(r.carry.y||r.carry.x||r.carry.z){state.position.x+=r.carry.x;state.position.z+=r.carry.z;state.groundY+=r.carry.y;}syncPhysics();}
-        finishUpper();if(active&&bay&&!upperSuspended){const operation=bay,out=bay.direction==='outside',r=(bay.kind==='lift'?advanceBoardLift:advanceBoardBay)(bay,work,baySeconds,{collection:service.ledger.world.constructionHighBuild,external:externalVolumes(),heightAt:bayHeight()});work=r.state;bay=r.job;bayProgress=r.progress??bayProgress;issue=r.reason||(operation.kind==='lift'?r.arrived?operation.mode==='vertical'?operation.target===0?'リフトが地上に着いたよ！':(operation.target/40+1)+'階に着いたよ！「受取台へ運ぶ」で渡そう。':operation.mode==='unload'?'受取台へ運んだよ！ 次はローラーで部屋へ。':'リフトにのせたよ！ 行き先をえらぼう。':'荷物リフト｜'+(operation.mode==='vertical'?(operation.target/40+1)+'階へ':'受け渡し')+' '+Math.round(bayProgress*100)+'％':r.arrived?out?'外の受取台へ床板を戻したよ！':'部屋へ床板を運び終わったよ！':'床板を運んでいるよ '+Math.round(bayProgress*100)+'％');if(!bay){checkpointGeneration++;auto=9;}}auto+=dt;
+        finishUpper();if(active&&bay&&!upperSuspended){const operation=bay,out=bay.direction==='outside',r=(bay.kind==='lift'?advanceBoardLift:advanceBoardBay)(bay,work,baySeconds*2,{collection:service.ledger.world.constructionHighBuild,external:externalVolumes(),heightAt:bayHeight()});work=r.state;bay=r.job;bayProgress=r.progress??bayProgress;issue=r.reason||(operation.kind==='lift'?r.arrived?operation.mode==='vertical'?operation.target===0?'リフトが地上に着いたよ！':(operation.target/40+1)+'階に着いたよ！「受取台へ運ぶ」で渡そう。':operation.mode==='unload'?'受取台へ運んだよ！ 次はローラーで部屋へ。':'リフトにのせたよ！ 行き先をえらぼう。':'荷物リフト｜'+(operation.mode==='vertical'?(operation.target/40+1)+'階へ':'受け渡し')+' '+Math.round(bayProgress*100)+'％':r.arrived?out?'外の受取台へ床板を戻したよ！':'部屋へ床板を運び終わったよ！':'床板を運んでいるよ '+Math.round(bayProgress*100)+'％');if(!bay){checkpointGeneration++;auto=9;}}auto+=dt;
       }catch(e){fail(e);}}
       render(game.paused?0:dt);ui+=dt;if(ui>.15){ui=0;refresh();}
       if(pendingExit&&!work.work.rig.transition&&!busy&&!blocked&&!restoreLocked()){const next=pendingExit;pendingExit=null;void leave(next);}
-      if(!game.menuOpen&&auto>8&&!saving&&constructionWorkAutoSaveKey(work,view)!==lastAutomaticKey&&!busy&&!blocked&&!restoreLocked()&&!practice&&service.mode!=='readonly'&&!work.work.rig.transition&&Math.abs(work.work.rig.vehicle.speed)<.01&&!held.size&&!keys.size)void save({automatic:true});return active;
+      autoSaveGate.noteActivity(saveMovement());if((practice||preview)&&!game.menuOpen&&auto>8&&autoSaveGate.ready())void autosave();return active;
     },
   };
 }

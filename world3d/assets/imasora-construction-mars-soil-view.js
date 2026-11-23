@@ -13,7 +13,7 @@ export function createMarsSoilLab(){
     for(const z of[p.minZ,p.maxZ])box(root,'区画の縁',p.maxX-p.minX,.07,.8,(p.minX+p.maxX)/2,.035,z,side);
   }
   for(const b of SOIL_SOLIDS)box(root,b.id,b.maxX-b.minX,b.maxY-b.minY,b.maxZ-b.minZ,(b.minX+b.maxX)/2,(b.minY+b.maxY)/2,(b.minZ+b.maxZ)/2,b.id==='ceiling'?yellow:b.id==='balcony'||b.id.startsWith('step')?green:metal);
-  label(root,'普通の土',-100,9,114,84);label(root,'火星土',100,9,114,84);label(root,'頭が当たる天井',-110,58,-100,110);label(root,'跳んで乗れる足場',125,39,-81,114);
+  label(root,'普通の土',-100,9,114,84);label(root,'アマネ星土',100,9,114,84);label(root,'頭が当たる天井',-110,58,-100,110);label(root,'跳んで乗れる足場',125,39,-81,114);
   box(root,'踏切ライン',72,.08,1,100,.04,5,yellow);label(root,'ここで奥へジャンプ',100,5,8,75);
   // These signs are fixed in the scene; they never follow the camera.
   for(const [x,z] of[[-28,48],[170,48]]){box(root,'高さのものさし',1.2,66,1.2,x,33,z,metal);for(const h of[NORMAL_HEIGHT,NORMAL_HEIGHT*3]){box(root,'足の高さの目盛',14,.8,1.5,x,h,z,h===NORMAL_HEIGHT?yellow:mars);label(root,h.toFixed(1),x+16,h,z+1,21);}}

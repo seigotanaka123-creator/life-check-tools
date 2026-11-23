@@ -2,7 +2,7 @@ import * as T from '../three.module.min.js';
 import {PAINT_REMOVE_COLOR} from './free-paint-removal.mjs?v=120dm';
 import {freeCell} from './free-build-state.mjs?v=120pv';
 import {newFreeReceipt,assertFreeReceipt,assertPaintAccess,paintPatch,vehiclePoint,walkPath,walkingSurface,walkingSegmentBlocked} from './free-contact.mjs?v=120pv';
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120pv';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=121d1';
 import {vehicleGroundError} from './free-vehicle-ground.mjs?v=120ov';
 import {walkingGroundAt,walkingGroundRotation,walkingGroundSegment,soleClearance,assertLandingSoles,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120pv';
 
@@ -21,7 +21,7 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
  function walk(route,scaffold=null){for(let i=1;i<route.length;i++)stages.push({kind:'walk',from:route[i-1],to:route[i],scaffold,duration:Math.max(.08,distance(route[i-1],route[i])/60)});}
  const resetFeet=()=>feet.forEach(e=>e.o.position.copy(e.position));
  const from={x:actor.position.x,y:actor.position.y,z:actor.position.z};
- let endPose,paintPose,access=null,vehicle=null,cameraAngle,boarding=null,landingRotation=null,clearance=null;
+ let endPose,paintPose,access=null,vehicle=null,door=null,cameraAngle,boarding=null,landingRotation=null,clearance=null;
  if(a.type==='FREE_PAINT'){
   // On a supported deck a sparse square ground sample can miss a concrete
   // corner touched by a real rotated shoe. Reject that candidate before walking
@@ -36,19 +36,21 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
   else{endPose=paintPose;for(const pixel of a.pixels)stages.push({kind:'paint',pixel,duration:a.tool==='roller'?.32:.28});}
  }else{
   const name=a.type==='FREE_BOARD'?a.vehicle:f.aboard;vehicle=vehicles[name];const v=f[name];
-  cameraAngle=v.heading-.9;
   boarding=resolveBoardingAccess(f,name,external,supportHeightAt,a.type==='FREE_BOARD'?from:null);const {door:approach,steps}=boarding,seat=steps.at(-1);
+  cameraAngle=v.heading+boarding.side*.9;
+  door=boarding.side<0?vehicle.driverDoor:vehicle.cab.getObjectByName('passenger-door');
+  const openAngle=-boarding.side*Math.PI/2;
   landingRotation=walkingGroundRotation(boarding.support,v.heading);clearance=soleClearance(root,actor,feet);
   if(a.type==='FREE_BOARD'){const problem=freeBoardProblem(f,from,name,external,supportHeightAt);if(problem)throw Error(problem);walk([from,approach]);}
-  stages.push({kind:'door',from:0,to:Math.PI/2,duration:.35});
+  stages.push({kind:'door',from:0,to:openAngle,duration:.35});
   const order=a.type==='FREE_BOARD'?steps:[...steps].reverse();
   for(let i=1;i<order.length;i++){const entering=a.type==='FREE_BOARD';stages.push({kind:'step',from:order[i-1],to:order[i],rotationFrom:entering&&i===1?landingRotation:boarding.ground.rotation,rotationTo:!entering&&i===order.length-1?landingRotation:boarding.ground.rotation,duration:.4});}
-  stages.push({kind:'door',from:Math.PI/2,to:0,duration:.35});
+  stages.push({kind:'door',from:openAngle,to:0,duration:.35});
   if(a.type==='FREE_LEAVE')endPose={...approach,heading:v.heading};
   else endPose={...seat,heading:v.heading};
  }
  function verifyBoarding(checkSoles=true){
-  if(!vehicle)return;const name=a.type==='FREE_BOARD'?a.vehicle:f.aboard,now=resolveBoardingAccess(f,name,external,supportHeightAt,boarding.door),poseError=vehicleGroundError(vehicle,now.ground);
+  if(!vehicle)return;const name=a.type==='FREE_BOARD'?a.vehicle:f.aboard,now=resolveBoardingAccess(f,name,external,supportHeightAt,boarding.door,boarding.side),poseError=vehicleGroundError(vehicle,now.ground);
   if(distance(now.door,boarding.door)>1e-5||poseError>1e-5)throw Error('乗降中に車体やドア前の地面が変わりました。安全な場所へ停め直してください。');
   const b=r.boarding;b.samples++;b.terrainSamples+=now.ground.contacts.length+now.support.samples;b.maxSlope=Math.max(b.maxSlope,now.ground.slope,now.support.slope);b.maxPatchError=Math.max(b.maxPatchError,now.ground.maxPatchError,now.support.error);b.maxPoseError=Math.max(b.maxPoseError,poseError);
   if(checkSoles&&actor.position.distanceTo(vec(boarding.door))<1e-5){const s=walkingGroundAt(f,actor.position.x,actor.position.z,supportHeightAt);b.maxSoleError=Math.max(b.maxSoleError,assertLandingSoles(f,root,actor,feet,s,supportHeightAt,clearance));b.landingSamples++;}
@@ -86,7 +88,7 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
   if(s.kind==='scaffold-open'||s.kind==='scaffold-close'){resetFeet();actor.position.copy(vec(s.stance));actor.rotation.set(0,s.stance.heading,0);footing=groundGuard();footing.stand();scaffold[s.kind==='scaffold-open'?'open':'close'](access.scaffold,t);return;}
   if(s.kind==='climb'){resetFeet();scaffold.climb(s,t);if(frameBlocked(f,access.scaffold.panels,actor.position,external,14))throw Error('足場の通路がふさがったため止めました。');return;}
   if(s.kind==='paint'){paint(s.pixel,t);return;}
-  if(s.kind==='door'){vehicle.driverDoor.rotation.y=s.from+(s.to-s.from)*t;if(vehicle.driverDoor.rotation.y>=Math.PI/2-1e-5)r.doorOpened=true;resetFeet();return;}
+  if(s.kind==='door'){door.rotation.y=s.from+(s.to-s.from)*t;if(Math.abs(door.rotation.y)>=Math.PI/2-1e-5)r.doorOpened=true;resetFeet();return;}
   const prior={x:actor.position.x,z:actor.position.z};actor.position.copy(vec(s.from).lerp(vec(s.to),t));
   resetFeet();const delta=vec(s.to).sub(vec(s.from));if(delta.length()>.001)actor.rotation.set(0,Math.atan2(delta.x,delta.z),0);
   if(s.kind==='walk'&&!s.scaffold){if(footing)footing.walk(phase);else{const support=walkingGroundAt(f,actor.position.x,actor.position.z,supportHeightAt);if(!support||!walkingGroundSegment(f,s.from,{x:actor.position.x,z:actor.position.z},supportHeightAt))throw Error(WALK_GROUND_MESSAGE);actor.position.y=support.height;}}
@@ -108,13 +110,13 @@ export function createFreeContactMotion({a,p,root,actor,model,hand,feet,vehicles
     if(a.type!=='FREE_PAINT'){
      const actual=root.worldToLocal(model.getWorldPosition(new T.Vector3()));
      actual.sub(model.position.clone().applyQuaternion(actor.quaternion));
-     r.endpointError=distance(actual,endPose);r.doorClosedError=Math.abs(vehicle.driverDoor.rotation.y);
+     r.endpointError=distance(actual,endPose);r.doorClosedError=Math.abs(door.rotation.y);
     }
     else delete r.travelSamples;
     assertFreeReceipt(a,p,p.revision,r);finished=true;head.geometry.dispose();head.getObjectByName('tape-roll-core')?.geometry.dispose();return true;
    }}return false;
   },
   settle(){cleanup();},
-  cancel(){cleanup();if(vehicle)vehicle.driverDoor.rotation.y=0;resetFeet();tools.clear();if(!finished){head.geometry.dispose();head.getObjectByName('tape-roll-core')?.geometry.dispose();}finished=true;}
+  cancel(){cleanup();if(door)door.rotation.y=0;resetFeet();tools.clear();if(!finished){head.geometry.dispose();head.getObjectByName('tape-roll-core')?.geometry.dispose();}finished=true;}
  };
 }

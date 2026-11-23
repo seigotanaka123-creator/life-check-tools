@@ -49,11 +49,11 @@ export function createWorkTarget({root,camera,host}){
  const invalidate=()=>{layoutDirty=true;};
  const resize=new ResizeObserver(invalidate);resize.observe(host);
  const mutations=new MutationObserver(records=>{
-  if(!records.some(r=>r.target!==label&&!label.contains(r.target)))return;
+  if(!enabled||!target||!records.some(r=>r.target!==label&&!label.contains(r.target)&&r.oldValue!==r.target.getAttribute(r.attributeName)))return;
   invalidate();
   if(host.querySelector('.free-sheet-overlay:not([hidden]):not([data-menu-scene-peek="true"]),.free-confirm-overlay:not([hidden])'))label.hidden=true;
  });
- mutations.observe(host,{subtree:true,attributes:true,attributeFilter:['hidden','class','data-menu-scene-peek']});
+ mutations.observe(host,{subtree:true,attributes:true,attributeOldValue:true,attributeFilter:['hidden','class','data-menu-scene-peek']});
  // Scrolling a tool panel or resizing Safari can move its controls without
  // changing the target. Cache those bounds instead of measuring every frame.
  host.addEventListener('scroll',invalidate,true);
@@ -84,7 +84,7 @@ export function createWorkTarget({root,camera,host}){
    const line=new T.LineSegments(edge,edgeMat);line.rotation.copy(m.rotation);line.position.copy(m.position);line.scale.copy(m.scale);group.add(line);rim(m,p.w-.2,p.d-.2);
   }
  }
- return{group,update,get target(){return target;},setVisible(v){enabled=v;group.visible=v;if(!v||!target)label.hidden=true;},
+ return{group,update,get target(){return target;},setVisible(v){if(enabled!==v)invalidate();enabled=v;group.visible=v;if(!v||!target)label.hidden=true;},
  tick(){if(!enabled||!target){label.hidden=true;return;}root.updateWorldMatrix(true,false);world.copy(point.set(target.point.x,target.point.y,target.point.z));root.localToWorld(world);point.copy(world).project(camera);
   const behind=toward.copy(world).sub(camera.position).dot(camera.getWorldDirection(direction))<=0;
   if(behind||point.z<-1||point.z>1||Math.abs(point.x)>1||Math.abs(point.y)>1){label.hidden=true;return;}

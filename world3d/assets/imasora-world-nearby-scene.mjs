@@ -1,14 +1,29 @@
 import * as T from './three.module.min.js';
+const facilityHelp={
+ 'water-supply':['給水口','給水車を水色の区画へ。給水口に合わせると水を汲めます。余った水もここへ戻せます。'],
+ 'soil-supply':['アマネ星土の補給口','ローダーを受け口に合わせて土を積めます。広げた土も回収して、ここへ戻せます。'],
+ 'timber-stock':['木材の出庫・回収枠','木材作業で「床板を1枚出す」か「角材4本の束を出す」を選びます。返す木材はクレーンで枠の中央へ。'],
+ 'earth-storage':['土の保管庫','ダンプの荷台を箱に向けて後退し、土を下ろしましょう。預けた土は、降りて「土でつくる」で使えます。'],
+};
 // Keep references to actual moving models; never use initial parking coordinates.
 export function nearbySceneObjects(scene,mapGroup) {
  const targets=[];
  mapGroup.traverse(o=>{if(o.userData.nearbyName){const meta=o.userData.nearbyName;targets.push({object:o,...meta,anchor:localNameAnchor(o,meta)});}});
  const yard=name=>mapGroup.getObjectByName(name);
  const water=yard('construction-world-water-yard'),soil=yard('construction-world-soil-yard'),timber=yard('construction-world-timber-yard');
- const concrete=scene.getObjectByName('free-concrete-workshop');
- if(water?.userData.sourceWater?.parent)targets.push({object:water.userData.sourceWater.parent,id:'facility:water-supply',name:'給水ステーション',hx:36,hz:27,height:60});
+ const excavation=yard('construction-transport-yard')??yard('construction-excavation-yard'),concrete=scene.getObjectByName('free-concrete-workshop');
+ for(const [id,object,hx,hz,height] of [
+  ['water-supply',water?.userData.sourceWater?.parent,36,27,60],
+  ['soil-supply',soil?.userData.store,23,22,20],
+  ['timber-stock',timber?.userData.stockPad,42,36,18],
+  ['earth-storage',excavation?.userData.stockBin,32,24,10],
+ ]){
+  if(!object)continue;
+  const [name,guide]=facilityHelp[id];
+  targets.push({id:'facility:'+id,name,guide,object,hx,hz,height,kind:'facility'});
+ }
  for(const [id,name,object,hx,hz] of [
-  ['water','給水車',water?.userData.loader,36,50],['soil','火星土ローダー',soil?.userData.loader,36,50],
+  ['water','給水車',water?.userData.loader,36,50],['soil','アマネ星土ローダー',soil?.userData.loader,36,50],
   ['crane','クレーン車',timber?.userData.crane,36,50],
   ['truck','ミキサー車',concrete?.getObjectByName('concrete-truck'),34,66],['pump','ポンプ車',concrete?.getObjectByName('concrete-pump'),34,66],
  ])if(object)targets.push({id:'vehicle:'+id,name,object,hx,hz,height:55,kind:'vehicle'});
@@ -35,6 +50,8 @@ export function readNearbySceneTargets(objects,scene) {
   forward.set(0,0,1).applyQuaternion(rotation);
   const anchorObject=t.anchorObject??t.object;anchorObject.updateWorldMatrix(true,false);
   const anchor=new T.Vector3(...(t.anchor??[0,t.height+8,0])).applyMatrix4(anchorObject.matrixWorld);
-  return [{id:t.id,name:t.name,kind:t.kind||'building',x:point.x,y:point.y,z:point.z,heading:Math.atan2(forward.x,forward.z),hx:t.hx*Math.abs(scale.x),hz:t.hz*Math.abs(scale.z),minY:point.y,maxY:point.y+t.height*Math.abs(scale.y),enterDistance:t.kind==='vehicle'?48:Math.max(48,Math.min(144,t.height*Math.abs(scale.y)*.75)),labelAnchor:anchor.toArray()}];
+  const height=t.height*Math.abs(scale.y);
+  const enterDistance=t.kind==='vehicle'?110:t.kind==='facility'?125:Math.max(80,Math.min(170,height*.95));
+  return [{id:t.id,name:t.name,kind:t.kind||'building',guide:t.guide,x:point.x,y:point.y,z:point.z,heading:Math.atan2(forward.x,forward.z),hx:t.hx*Math.abs(scale.x),hz:t.hz*Math.abs(scale.z),minY:point.y,maxY:point.y+height,enterDistance,labelAnchor:anchor.toArray()}];
  });
 }

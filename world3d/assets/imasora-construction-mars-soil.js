@@ -4,8 +4,8 @@ export const NORMAL_HEIGHT=44*44/(2*90);
 export const SOIL_MODES=Object.freeze({single:['earth-soil','earth-soil','mars-soil'],stacked:['mars-soil','mars-soil','mars-soil'],covered:['mars-soil','mars-soil','earth-soil']}); // bottom → top
 export const SOIL_PADS=Object.freeze([
   {id:'earth',name:'普通の土',minX:-160,maxX:-40,minZ:-10,maxZ:110},
-  {id:'mars',name:'火星土',minX:40,maxX:160,minZ:-10,maxZ:110},
-  {id:'ceiling',name:'天井の下の火星土',minX:-170,maxX:-50,minZ:-150,maxZ:-60}
+  {id:'mars',name:'アマネ星土',minX:40,maxX:160,minZ:-10,maxZ:110},
+  {id:'ceiling',name:'天井の下のアマネ星土',minX:-170,maxX:-50,minZ:-150,maxZ:-60}
 ].map(Object.freeze));
 export const SOIL_SPAWNS=Object.freeze({earth:{x:-100,y:0,z:50,heading:Math.PI},mars:{x:100,y:0,z:50,heading:Math.PI},ceiling:{x:-110,y:0,z:-95,heading:Math.PI}});
 export const SOIL_SOLIDS=Object.freeze([
@@ -31,13 +31,13 @@ export function supportSoil(s,p=s.player){
   }
   return contacts.find(c=>c.material==='mars-soil')??contacts[0]??{material:'earth-soil',pad:'edge'};
 }
-export function initialMarsSoil(){return{schema:1,mode:'single',player:{...SOIL_SPAWNS.earth,vy:0,grounded:true,jumpHeld:false,ceilingHit:false},time:0,phase:0,paused:false,flight:null,records:{},jumpCount:0,headContacts:0,roofVisits:0,hit:'',message:'まず普通の土でジャンプ。次に火星土へ移って、高さを比べてみましょう。'};}
+export function initialMarsSoil(){return{schema:1,mode:'single',player:{...SOIL_SPAWNS.earth,vy:0,grounded:true,jumpHeld:false,ceilingHit:false},time:0,phase:0,paused:false,flight:null,records:{},jumpCount:0,headContacts:0,roofVisits:0,hit:'',message:'まず普通の土でジャンプ。次にアマネ星土へ移って、高さを比べてみましょう。'};}
 function vertical(p,dy){let d=dy,hit='';if(dy<0&&p.y+dy<=0){d=-p.y;hit='地面';}for(const b of SOIL_SOLIDS){if(!horizontal(p,b))continue;if(dy>0&&p.y+26.6<=b.minY+EPS){const gap=b.minY-p.y-26.6;if(gap<=d+EPS){d=Math.max(0,gap);hit=b.name;}}if(dy<0&&p.y>=b.maxY-EPS){const gap=b.maxY-p.y;if(gap>=d-EPS){d=Math.min(0,gap);hit=b.name;}}}p.y+=d;return hit;}
 const grounded=p=>{const copy={...p};return !!vertical(copy,-.001);};
-function launch(s){if(!s.player.grounded||s.paused)return false;const surface=supportSoil(s),boost=surface.material==='mars-soil'?3:1;const key=surface.pad==='ceiling'?'ceiling':surface.pad==='mars'?s.mode:'normal';s.player.vy=SOIL_BODY.jump*Math.sqrt(boost);s.player.grounded=false;s.flight={from:s.player.y,peak:0,boost,key,material:surface.material,hit:false,elapsed:0};s.jumpCount++;s.message=boost===3?'火星土から踏み切りました。上昇量は通常の3倍です。':'普通の土から踏み切りました。';return true;}
+function launch(s){if(!s.player.grounded||s.paused)return false;const surface=supportSoil(s),boost=surface.material==='mars-soil'?3:1;const key=surface.pad==='ceiling'?'ceiling':surface.pad==='mars'?s.mode:'normal';s.player.vy=SOIL_BODY.jump*Math.sqrt(boost);s.player.grounded=false;s.flight={from:s.player.y,peak:0,boost,key,material:surface.material,hit:false,elapsed:0};s.jumpCount++;s.message=boost===3?'アマネ星土から踏み切りました。上昇量は通常の3倍です。':'普通の土から踏み切りました。';return true;}
 export function marsSoilAction(state,action,value){const s=structuredClone(state);if(action==='jump'){launch(s);return s;}if(action==='pause'){s.paused=!s.paused;s.message=s.paused?'一時停止中です。':'再開しました。';return s;}
-  if(action==='place'){if(!SOIL_SPAWNS[value])throw Error('不明な比較場所です。');s.player={...initialMarsSoil().player,...SOIL_SPAWNS[value]};s.flight=null;s.hit='';s.message=value==='ceiling'?'天井の下です。ジャンプで頭が止まることを試せます。':`${value==='earth'?'普通の土':'火星土'}の比較位置です。「ジャンプ」で試してください。`;return s;}
-  if(action==='mode'){if(!Object.hasOwn(SOIL_MODES,value))throw Error('不明な土の断面です。');if(!s.player.grounded){s.message='着地してから土の断面を切り替えてください。';return s;}s.mode=value;s.message=value==='covered'?'火星土を普通の土で覆いました。表面が普通の土なので、ジャンプは通常に戻ります。':value==='stacked'?'火星土を3層にしました。厚くしても到達高は3倍のままです。':'火星土1層へ戻しました。表面で踏み切ると3倍です。';return s;}
+  if(action==='place'){if(!SOIL_SPAWNS[value])throw Error('不明な比較場所です。');s.player={...initialMarsSoil().player,...SOIL_SPAWNS[value]};s.flight=null;s.hit='';s.message=value==='ceiling'?'天井の下です。ジャンプで頭が止まることを試せます。':`${value==='earth'?'普通の土':'アマネ星土'}の比較位置です。「ジャンプ」で試してください。`;return s;}
+  if(action==='mode'){if(!Object.hasOwn(SOIL_MODES,value))throw Error('不明な土の断面です。');if(!s.player.grounded){s.message='着地してから土の断面を切り替えてください。';return s;}s.mode=value;s.message=value==='covered'?'アマネ星土を普通の土で覆いました。表面が普通の土なので、ジャンプは通常に戻ります。':value==='stacked'?'アマネ星土を3層にしました。厚くしても到達高は3倍のままです。':'アマネ星土1層へ戻しました。表面で踏み切ると3倍です。';return s;}
   throw Error('不明な操作です。');
 }
 function horizontalMove(p,axis,delta){if(!delta)return'';const q={...p,[axis]:clamp(p[axis]+delta,SOIL_BODY['min'+axis.toUpperCase()]+18,SOIL_BODY['max'+axis.toUpperCase()]-18)},blocks=SOIL_SOLIDS.filter(b=>overlap(q,b));
@@ -63,4 +63,4 @@ export function stepMarsSoil(state,input={},dt=SOIL_BODY.dt){
   return s;
 }
 export function advanceMarsSoil(s,input,dt){if(!finite(dt)||dt<0||dt>.1)throw Error('更新時間が不正です。');if(s.paused||!dt)return s;s={...s,phase:s.phase+dt};while(s.phase>=1/120-1e-9){s={...s,phase:Math.max(0,s.phase-1/120)};s=stepMarsSoil(s,input);}if(s.phase<1e-9)s.phase=0;return s;}
-export function validateMarsSoil(s){if(s.schema!==1||!Object.hasOwn(SOIL_MODES,s.mode)||!finite(s.time)||s.time<0||!finite(s.phase)||s.phase<0||s.phase>=1/120+1e-8)throw Error('火星土の実験状態が不正です。');if(!['x','y','z','heading','vy'].every(k=>finite(s.player[k]))||soilBodyBlocked(s.player))throw Error('身体が床・壁・天井に入りました。');if(s.flight&&(![1,3].includes(s.flight.boost)||!finite(s.flight.peak)||s.flight.peak<0))throw Error('ジャンプの記録が不正です。');return s;}
+export function validateMarsSoil(s){if(s.schema!==1||!Object.hasOwn(SOIL_MODES,s.mode)||!finite(s.time)||s.time<0||!finite(s.phase)||s.phase<0||s.phase>=1/120+1e-8)throw Error('アマネ星土の実験状態が不正です。');if(!['x','y','z','heading','vy'].every(k=>finite(s.player[k]))||soilBodyBlocked(s.player))throw Error('身体が床・壁・天井に入りました。');if(s.flight&&(![1,3].includes(s.flight.boost)||!finite(s.flight.peak)||s.flight.peak<0))throw Error('ジャンプの記録が不正です。');return s;}

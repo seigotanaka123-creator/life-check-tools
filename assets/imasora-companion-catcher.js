@@ -1,5 +1,7 @@
-import {openArcadeCheckpoint,bindCatcherSave} from './imasora-arcade-autosave.mjs?v=120qq';
+import {celebrateGameEvent} from '../world3d/assets/imasora-construction-guide-data.mjs?v=121gy';
+import {openArcadeCheckpoint,bindCatcherSave} from './imasora-arcade-autosave.mjs?v=121he';
 import * as THREE from "./three.module.min.js";
+import { MonsterNames, buildEarlyMonsterCharacter360, buildFloweringHeroCharacter360, buildMatureStarCharacter360, disposeWhiteMichiModel } from "./imasora-character-360.js?v=121hd";
 import * as CANNON from "./cannon-es.js";
 import { CatcherControlSound } from "./imasora-catcher-control-sound.js?v=20260917-control-sound-v1";
 
@@ -21,7 +23,7 @@ const BELT_RX = 3.18;
 const BELT_RZ = 1.95;
 const BELT_HALF_WIDTH = 0.76;
 const BELT_SURFACE_Y = 0.62;
-const BELT_SPEED = 0.40;
+const BELT_SPEED = 0.20;
 const BELT_MINIMUM_SPEED_RATIO = 0.9;
 const CLOUD_PUFF_HEIGHT_SCALE = 1.12;
 const CLOUD_PUFF_Y_OFFSET = 0.025;
@@ -48,9 +50,35 @@ const CLAW_CABLE_MAX_SLACK = 0.12;
 const CLAW_HEAD_PLUSH_CLEARANCE = 0.025 * CLAW_SIZE_SCALE;
 const CLAW_HEAD_ESCAPE_TOLERANCE = 0.035 * CLAW_SIZE_SCALE;
 const PRONG_SHAFT_VISUAL_RADIUS = 0.069 * CLAW_SIZE_SCALE;
+const CLAW_PRONG_COUNT = 3;
 const PRONG_SHAFT_COLLIDER_RADIUS = 0.11 * CLAW_SIZE_SCALE;
-const ROUND_PRONG_TIP_RADIUS = 0.14 * CLAW_SIZE_SCALE;
+const PRONG_PADDLE_HALF_WIDTH = 0.30 * CLAW_SIZE_SCALE;
+const PRONG_PADDLE_DEPTH = 0.011 * CLAW_SIZE_SCALE;
+const PRONG_PADDLE_BEVEL = 0.0017 * CLAW_SIZE_SCALE;
+const PRONG_PADDLE_EDGE = 0.008 * CLAW_SIZE_SCALE;
+const PRONG_PADDLE_INSET = 0.075 * CLAW_SIZE_SCALE;
+// Across half the plate: width fraction, reach inward, reach outward.
+const PRONG_PADDLE_HALF_PROFILE = [
+  [0, 0.296, 0.069],
+  [0.34, 0.301, 0.069],
+  [0.68, 0.315, 0.066],
+  [0.86, 0.325, 0.054],
+  [1, 0.277, 0.013]
+];
+const PRONG_PADDLE_PROFILE = [
+  ...PRONG_PADDLE_HALF_PROFILE.slice(1).reverse().map(([x, inner, outer]) => [-x, inner, outer]),
+  ...PRONG_PADDLE_HALF_PROFILE
+].map(([x, inner, outer]) => ({
+  x: x * PRONG_PADDLE_HALF_WIDTH,
+  innerZ: -inner * CLAW_SIZE_SCALE,
+  outerZ: outer * CLAW_SIZE_SCALE
+}));
+const GRIP_TARGET_ABOVE_PRONG_TIP = 0.14 * CLAW_SIZE_SCALE;
 const PRONG_TIP_COLLISION_MARGIN = 0.012 * CLAW_SIZE_SCALE;
+// Each flat plate must fit inside its 120-degree sector at full closure.
+const PRONG_PADDLE_MIN_RADIUS = Math.max(...PRONG_PADDLE_PROFILE.map(({ x, innerZ }) => (
+  -innerZ + Math.abs(x) / Math.tan(Math.PI / CLAW_PRONG_COUNT)
+))) + PRONG_TIP_COLLISION_MARGIN;
 const PRONG_TIP_SOLVER_EPSILON = 0.002;
 const ARM_PLUSH_CORRECTION_BUDGET_PER_FRAME = 0.1;
 const ARM_MOUND_CLEARANCE = 0.015 * CLAW_SIZE_SCALE;
@@ -60,24 +88,32 @@ const ARM_MOUND_SAMPLE_DIRECTIONS = 8;
 const HELD_PLUSH_VISUAL_SCALE_XZ = 0.9;
 const HELD_PLUSH_VISUAL_SCALE_Y = 0.96;
 const HELD_PLUSH_COMPRESSION_RATE = 14;
-const TURNER_PRONG_INDEX = 0;
-const TURNER_PRONG_INWARD_OFFSET = 0.13 * CLAW_SIZE_SCALE;
-const TURNER_PRONG_COLLISION_MARGIN = 0.015;
-const TURNER_PRONG_THICKNESS_COLLISION_MARGIN = 0.01;
-const TURNER_PRONG_WIDTH = 0.5 * CLAW_SIZE_SCALE;
-const TURNER_PRONG_LENGTH = 0.53 * CLAW_SIZE_SCALE;
-const TURNER_PRONG_FACE_DEPTH = 0.011 * CLAW_SIZE_SCALE;
-const TURNER_PRONG_BEVEL_THICKNESS = 0.0017 * CLAW_SIZE_SCALE;
-const TURNER_PRONG_TOTAL_THICKNESS = TURNER_PRONG_FACE_DEPTH
-  + TURNER_PRONG_BEVEL_THICKNESS * 2;
 const CARRIAGE_Y = 6.05;
 const MAX_GRAB_CABLE_LENGTH = 3.9;
 const DESCENT_TRAVEL_SECONDS = 3.23;
 const DESCENT_AUTO_CLOSE_SECONDS = 3.41;
 const GRIP_EARLY_MONITOR_START_SECONDS = 0.45;
 const GRIP_CONTACT_HISTORY_SECONDS = 0.2;
-const GRIP_CONTACT_CHECK_SECONDS = 1.2;
-const ENCLOSED_TWO_ARM_GRIP_MIN_QUALITY = 0.58;
+const STANDARD_CLOSE_SECONDS = 1.08;
+const NARROW_CLOSE_SECONDS = 0.38;
+const NARROW_PRIZE_EXTRA_DESCENT = 0.24;
+const NARROW_PINCH_MIN_QUALITY = 0.70;
+const CENTERED_GRIP_RECOVERY_SECONDS = 0.44;
+const CLAW_REGRIP_RATE = 1.5;
+const HELD_WEIGHT_SUPPORT_RATIO = 0.78;
+const MAX_PRONG_CLOSURE = 2;
+const STANDARD_LIFT_SECONDS = 1.28;
+const GRIP_CONTACT_CHECK_SECONDS = STANDARD_CLOSE_SECONDS + NARROW_CLOSE_SECONDS + 0.1;
+const EMPTY_LIFT_SECONDS = GRIP_CONTACT_CHECK_SECONDS + 0.08;
+const ENCLOSED_TWO_ARM_GRIP_MIN_QUALITY = 0.56;
+const PLUSH_GRIP_INTEGRITY_BONUS = 0.018;
+const PLUSH_FABRIC_CONTACT_ALLOWANCE = 0.028;
+const PLUSH_HOLD_RECOVERY_SECONDS = 0.32;
+const SEHARUNE_PRIZE_ID = "star-white-hero-young-seed-walk-sky-cool-b-forest";
+const MICHIME_PRIZE_ID = "sprout-seed-walk";
+const MICHIME_PLUSH_GROWTH = Object.freeze({ width: 1.06, height: 1.08, depth: 1.12 });
+const PLUSH_TORSO_DEPTH_TO_WIDTH = 0.9;
+const PLUSH_TORSO_DEPTH_TO_HEIGHT = 0.68;
 const SLIP_RELEASE_MAX_INITIAL_DROP_SPEED = 0.18;
 const SLIP_RELEASE_CONTACT_TILT_SPEED = 0.48;
 const SLIP_RELEASE_MAX_TILT_SPEED = 0.5;
@@ -94,6 +130,15 @@ const INITIAL_PLUSH_FENCE_CLEARANCE = OUTER_FENCE_HALF_THICKNESS + 0.05;
 const OUTER_FENCE_BOTTOM_Y = BELT_SURFACE_Y - 0.04;
 const OUTER_FENCE_TOP_Y = BELT_SURFACE_Y + 0.92;
 const OUTER_FENCE_COLLISION_MARGIN = 0.008;
+const CONVEYOR_RETURN_SEGMENTS = 42;
+const CONVEYOR_RETURN_STEP = Math.PI * 2 / CONVEYOR_RETURN_SEGMENTS;
+const CONVEYOR_RETURN_CHORD = Math.cos(CONVEYOR_RETURN_STEP / 2);
+const CONVEYOR_RETURN_INNER_SCALE = 0.88;
+const CONVEYOR_RETURN_OUTER_SCALE = 0.985;
+const CONVEYOR_RETURN_BASE_Y = BELT_SURFACE_Y - 0.06;
+const CONVEYOR_RETURN_RISE = 0.29;
+const CONVEYOR_RETURN_START_OFFSET = 0.065;
+const CONVEYOR_RETURN_MAX_SPEED = 0.29;
 const HOME_POSITION = Object.freeze({ x: -1.7, z: 3.22 });
 const PRIZE_HOLE_POSITION = HOME_POSITION;
 const PRIZE_HOLE_RADIUS_X = 1.08;
@@ -101,6 +146,8 @@ const PRIZE_HOLE_RADIUS_Z = 0.86;
 const PRIZE_HOLE_TRIGGER_SCALE = 0.74;
 const PRIZE_HOLE_UNLIFTED_TRIGGER_SCALE = 0.48;
 const PRIZE_HOLE_GUARANTEE_SCALE = 0.92;
+const PRIZE_HOLE_RELEASE_SCALE = 0.30;
+const PRIZE_DROP_START_SPEED = 2.1;
 const PRIZE_HOLE_REQUIRED_LIFT_DISTANCE = 1.2;
 const PRIZE_HOLE_ENTRY_Y = BELT_SURFACE_Y + 1.15;
 const PRIZE_HOLE_AWARD_Y = BELT_SURFACE_Y - 0.74;
@@ -269,13 +316,13 @@ const CLAW_STAR_NEON_PALETTES = Object.freeze({
 });
 
 const PLUSH_PROFILES = Object.freeze({
-  balanced: { width: 1.48, height: 1.67, depth: 0.7, mass: 1.04, grip: 0.48, friction: 0.62, shape: "box", roundness: 0.28 },
-  box: { width: 1.55, height: 1.56, depth: 0.78, mass: 1.28, grip: 0.53, friction: 0.78, shape: "box", roundness: 0.17 },
-  round: { width: 1.5, height: 1.5, depth: 0.82, mass: 0.9, grip: 0.37, friction: 0.4, shape: "sphere", roundness: 0.48 },
-  float: { width: 1.72, height: 1.34, depth: 0.65, mass: 0.74, grip: 0.41, friction: 0.48, shape: "box", roundness: 0.38 },
-  slippery: { width: 1.68, height: 1.36, depth: 0.63, mass: 0.9, grip: 0.27, friction: 0.12, shape: "box", roundness: 0.36 },
-  heavy: { width: 1.44, height: 1.76, depth: 0.78, mass: 1.58, grip: 0.29, friction: 0.72, shape: "box", roundness: 0.24 },
-  wide: { width: 1.86, height: 1.3, depth: 0.69, mass: 1.14, grip: 0.33, friction: 0.66, shape: "box", roundness: 0.32 }
+  balanced: { width: 1.48, height: 1.67, depth: 0.7, mass: 1.04, grip: 0.48, friction: 0.62 },
+  box: { width: 1.55, height: 1.56, depth: 0.78, mass: 1.28, grip: 0.53, friction: 0.78 },
+  round: { width: 1.5, height: 1.5, depth: 0.82, mass: 0.9, grip: 0.37, friction: 0.4 },
+  float: { width: 1.72, height: 1.34, depth: 0.65, mass: 0.74, grip: 0.41, friction: 0.48 },
+  slippery: { width: 1.68, height: 1.36, depth: 0.63, mass: 0.9, grip: 0.27, friction: 0.12 },
+  heavy: { width: 1.44, height: 1.76, depth: 0.78, mass: 1.58, grip: 0.29, friction: 0.72 },
+  wide: { width: 1.86, height: 1.3, depth: 0.69, mass: 1.14, grip: 0.33, friction: 0.66 }
 });
 
 const gameMarkup = `
@@ -349,6 +396,32 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function getProngAngle(index) {
+  return Math.PI / 6 + index * (2 * Math.PI / CLAW_PRONG_COUNT);
+}
+
+function makeProngPaddlePart(left, right) {
+  const footprint = [
+    [left.x, left.innerZ], [right.x, right.innerZ],
+    [right.x, right.outerZ], [left.x, left.outerZ]
+  ];
+  const center = new CANNON.Vec3(
+    (left.x + right.x) / 2,
+    0,
+    (left.innerZ + right.innerZ + left.outerZ + right.outerZ) / 4
+  );
+  const height = PRONG_PADDLE_DEPTH / 2 + PRONG_PADDLE_BEVEL;
+  const vertices = [-height, height].flatMap(y => footprint.map(([x, z]) => (
+    new CANNON.Vec3(x - center.x, y, z - center.z)
+  )));
+  const faces = [[0, 1, 2, 3], [7, 6, 5, 4]];
+  for (let index = 0; index < footprint.length; index += 1) {
+    const next = (index + 1) % footprint.length;
+    faces.push([index, index + 4, next + 4, next]);
+  }
+  return { center, shape: new CANNON.ConvexPolyhedron({ vertices, faces }) };
+}
+
 function lerp(from, to, amount) {
   return from + (to - from) * amount;
 }
@@ -419,16 +492,6 @@ function moundRestingCenterY(body, clearance = 0) {
     body.aabb.upperBound.z
   );
   return CENTER_MOUND_BASE_Y + moundHeight + extentBelowCenter + clearance;
-}
-
-function plushRestingYAt(spec, x, z) {
-  const mainExtent = spec.shape === "sphere"
-    ? Math.max(spec.width, spec.height) * 0.5 + 0.045 * PLUSH_ACCESSORY_SCALE
-    : spec.height * 0.5 + 0.04 * PLUSH_ACCESSORY_SCALE;
-  const footExtent = spec.height * 0.55 + 0.12 * PLUSH_ACCESSORY_SCALE;
-  return CENTER_MOUND_BASE_Y
-    + centerMoundHeightAt(x, z)
-    + Math.max(mainExtent, footExtent);
 }
 
 function isInsideCenterMoundTransition(x, z) {
@@ -535,11 +598,6 @@ function safeCatchSound() {
   }
 }
 
-function cssColor(value, fallback = "#9ed8ff") {
-  const color = String(value || "").trim();
-  return /^#[0-9a-f]{3,8}$/i.test(color) ? color : fallback;
-}
-
 function ellipsePoint(angle, rx = BELT_RX, rz = BELT_RZ) {
   return {
     x: Math.cos(angle) * rx,
@@ -604,58 +662,126 @@ function setMeshBetween(mesh, start, end) {
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
 }
 
-function makeRoundedShape(width, height, radius) {
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
-  const r = Math.min(radius, halfWidth, halfHeight);
-  const shape = new THREE.Shape();
-  shape.moveTo(-halfWidth + r, -halfHeight);
-  shape.lineTo(halfWidth - r, -halfHeight);
-  shape.quadraticCurveTo(halfWidth, -halfHeight, halfWidth, -halfHeight + r);
-  shape.lineTo(halfWidth, halfHeight - r);
-  shape.quadraticCurveTo(halfWidth, halfHeight, halfWidth - r, halfHeight);
-  shape.lineTo(-halfWidth + r, halfHeight);
-  shape.quadraticCurveTo(-halfWidth, halfHeight, -halfWidth, halfHeight - r);
-  shape.lineTo(-halfWidth, -halfHeight + r);
-  shape.quadraticCurveTo(-halfWidth, -halfHeight, -halfWidth + r, -halfHeight);
-  return shape;
+function resolveCatcherPrize(item) {
+  const source = MonsterNames.get(item.characterId) || MonsterNames.get(item.id) || MonsterNames.get(item.name);
+  const seed = source?.stage === "タネ期";
+  const character = (seed ? MonsterNames.children(source.id).find(entry => entry.stage === "新芽期") : source)
+    || MonsterNames.get(MICHIME_PRIZE_ID);
+  return {
+    ...item,
+    characterId: character.id,
+    name: !source || seed ? character.name : item.name || character.name
+  };
 }
 
-function makeRoundedLoop(width, height, radius, z) {
-  const points = [];
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
-  const r = Math.min(radius, halfWidth, halfHeight);
-  const corners = [
-    { cx: halfWidth - r, cy: halfHeight - r, start: 0 },
-    { cx: -halfWidth + r, cy: halfHeight - r, start: Math.PI / 2 },
-    { cx: -halfWidth + r, cy: -halfHeight + r, start: Math.PI },
-    { cx: halfWidth - r, cy: -halfHeight + r, start: Math.PI * 1.5 }
-  ];
-  corners.forEach(corner => {
-    for (let step = 0; step < 8; step += 1) {
-      const angle = corner.start + (step / 8) * (Math.PI / 2);
-      points.push(new THREE.Vector3(
-        corner.cx + Math.cos(angle) * r,
-        corner.cy + Math.sin(angle) * r,
-        z
-      ));
+const PLUSH_HULL_DIRECTIONS = [];
+for (const x of [-1, 0, 1]) {
+  for (const y of [-1, 0, 1]) {
+    for (const z of [-1, 0, 1]) {
+      if (x || y || z) PLUSH_HULL_DIRECTIONS.push(new THREE.Vector3(x, y, z));
     }
-  });
-  return new THREE.CatmullRomCurve3(points, true, "centripetal");
+  }
 }
 
-function sanitizeSvg(svg) {
-  let value = String(svg || "");
-  value = value
-    .replace(/<animateTransform\b[^>]*\/>/gi, "")
-    .replace(/<animate\b[^>]*\/>/gi, "")
-    .replace(/<animateTransform\b[^>]*>[\s\S]*?<\/animateTransform>/gi, "")
-    .replace(/<animate\b[^>]*>[\s\S]*?<\/animate>/gi, "");
-  if (!/\bxmlns=/.test(value)) {
-    value = value.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+function makePlushHull(mesh) {
+  const position = mesh.geometry.attributes.position;
+  const best = PLUSH_HULL_DIRECTIONS.map(() => ({ projection: -Infinity, point: new THREE.Vector3() }));
+  const vertex = new THREE.Vector3();
+  for (let index = 0; index < position.count; index += 1) {
+    vertex.fromBufferAttribute(position, index).applyMatrix4(mesh.matrixWorld);
+    for (let j = 0; j < best.length; j += 1) {
+      const projection = vertex.dot(PLUSH_HULL_DIRECTIONS[j]);
+      if (projection <= best[j].projection) continue;
+      best[j].projection = projection;
+      best[j].point.copy(vertex);
+    }
   }
-  return value;
+
+  const tolerance = 0.00001;
+  const points = [];
+  for (const { point } of best) {
+    if (!points.some(other => point.distanceToSquared(other) < tolerance * tolerance)) points.push(point);
+  }
+  if (points.length < 4) return null;
+  const center = points.reduce((sum, point) => sum.add(point), new THREE.Vector3()).divideScalar(points.length);
+  const faces = new Map();
+  const normal = new THREE.Vector3();
+  const side = new THREE.Vector3();
+  // Use the outer planes of the sampled geometry. One face per plane keeps
+  // coplanar triangles from creating an artificial collision edge.
+  for (let a = 0; a < points.length - 2; a += 1) {
+    for (let b = a + 1; b < points.length - 1; b += 1) {
+      for (let c = b + 1; c < points.length; c += 1) {
+        normal.subVectors(points[b], points[a]).cross(side.subVectors(points[c], points[a]));
+        if (normal.lengthSq() < tolerance * tolerance) continue;
+        normal.normalize();
+        const plane = normal.dot(points[a]);
+        let positive = false;
+        let negative = false;
+        const indices = [];
+        for (let i = 0; i < points.length; i += 1) {
+          const distance = normal.dot(points[i]) - plane;
+          if (distance > tolerance) positive = true;
+          else if (distance < -tolerance) negative = true;
+          else indices.push(i);
+          if (positive && negative) break;
+        }
+        if (positive === negative) continue;
+        const key = indices.join(",");
+        if (faces.has(key)) continue;
+        if (positive) normal.negate();
+        const faceCenter = indices.reduce((sum, i) => sum.add(points[i]), new THREE.Vector3()).divideScalar(indices.length);
+        const axis = points[indices[0]].clone().sub(faceCenter).normalize();
+        const tangent = new THREE.Vector3().crossVectors(normal, axis);
+        const corners = indices.map(i => {
+          side.subVectors(points[i], faceCenter);
+          return { i, angle: Math.atan2(side.dot(tangent), side.dot(axis)) };
+        });
+        corners.sort((left, right) => left.angle - right.angle);
+        faces.set(key, corners.map(({ i }) => i));
+      }
+    }
+  }
+  if (faces.size < 4) return null;
+  return {
+    points: points.map(point => new CANNON.Vec3(point.x, point.y, point.z)),
+    offset: new CANNON.Vec3(center.x, center.y, center.z),
+    shape: new CANNON.ConvexPolyhedron({
+      vertices: points.map(point => new CANNON.Vec3(point.x - center.x, point.y - center.y, point.z - center.z)),
+      faces: [...faces.values()]
+    })
+  };
+}
+
+function plushCollisionParts(model) {
+  const { body, hands, feet, soraDama, primaryDecoration } = model.userData;
+  const meshes = new Set([body, ...(hands || []), ...(feet || []), soraDama]);
+  primaryDecoration?.traverse(part => {
+    if (!part.isMesh) return;
+    part.geometry.computeBoundingBox();
+    const size = part.geometry.boundingBox.getSize(new THREE.Vector3());
+    if (Math.max(size.x, size.y, size.z) >= 12) meshes.add(part);
+  });
+  for (const name of ["cloud-wings", "new-leaf"]) meshes.add(model.getObjectByName(name));
+  return [...meshes].filter(mesh => mesh?.isMesh).map(makePlushHull).filter(Boolean);
+}
+
+function fitMichimeEyesToPlushFace(model) {
+  const { body, faceFeatures } = model.userData;
+  const forward = new THREE.Vector3(0, 0, 1);
+  const normalMatrix = new THREE.Matrix3().getNormalMatrix(body.matrixWorld);
+  const probe = new THREE.Raycaster(new THREE.Vector3(), forward.clone().negate());
+  for (const eye of faceFeatures) {
+    probe.ray.origin.copy(eye.position).addScaledVector(forward, body.scale.z);
+    const surface = probe.intersectObject(body, false)[0];
+    if (!surface) continue;
+
+    // Lay the rounded eye against the fabric instead of projecting it straight out.
+    const normal = (surface.normal ?? surface.face.normal).clone().applyNormalMatrix(normalMatrix);
+    eye.position.copy(surface.point);
+    eye.quaternion.setFromUnitVectors(forward, normal);
+    eye.scale.z *= 0.42;
+  }
 }
 
 function createFabricTexture() {
@@ -917,58 +1043,6 @@ function createMachineControlPlaqueGlowTexture() {
   return texture;
 }
 
-function svgToFabricTexture(svg, renderer) {
-  return new Promise((resolve, reject) => {
-    const source = sanitizeSvg(svg);
-    if (!source.includes("<svg")) {
-      reject(new Error("SVG texture is missing"));
-      return;
-    }
-    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = 512;
-        canvas.height = 512;
-        const context = canvas.getContext("2d");
-        context.clearRect(0, 0, 512, 512);
-        context.drawImage(image, 0, 0, 512, 512);
-        context.globalCompositeOperation = "multiply";
-        context.globalAlpha = 0.08;
-        context.strokeStyle = "#334047";
-        context.lineWidth = 1;
-        for (let position = 3; position < 512; position += 7) {
-          context.beginPath();
-          context.moveTo(position, 0);
-          context.lineTo(position + 2, 512);
-          context.stroke();
-          context.beginPath();
-          context.moveTo(0, position);
-          context.lineTo(512, position + 2);
-          context.stroke();
-        }
-        context.globalAlpha = 1;
-        context.globalCompositeOperation = "source-over";
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-        resolve(texture);
-      } catch (error) {
-        reject(error);
-      } finally {
-        URL.revokeObjectURL(url);
-      }
-    };
-    image.onerror = error => {
-      URL.revokeObjectURL(url);
-      reject(error);
-    };
-    image.src = url;
-  });
-}
-
 class ImasoraCompanionCatcherGame {
   constructor(root, options = {}) {
     this.root = root;
@@ -981,7 +1055,7 @@ class ImasoraCompanionCatcherGame {
     this.automaticControlSound = false;
     this.controlSoundKey = null;
     this.roster = Array.isArray(options.roster)
-      ? options.roster.filter(item => item?.id && item?.frontSvg)
+      ? options.roster.filter(item => item?.id).map(resolveCatcherPrize)
       : [];
     this.destroyed = false;
     this.frame = 0;
@@ -1013,15 +1087,12 @@ class ImasoraCompanionCatcherGame {
     this.prongContactHold = [0, 0, 0];
     this.prongContactStrength = [0, 0, 0];
     this.prongStopClawY = null;
-    this.moundSampleLocalPoint = new CANNON.Vec3();
-    this.moundSampleWorldPoint = new CANNON.Vec3();
     this.plushMoundShapePoint = new CANNON.Vec3();
     this.plushMoundBodyPoint = new CANNON.Vec3();
     this.plushMoundWorldPoint = new CANNON.Vec3();
     this.plushMoundVisualHalfExtents = new CANNON.Vec3();
     this.plushMoundIdentity = new CANNON.Quaternion();
     this.timers = new Set();
-    this.textureTasks = new Set();
     this.machineControlNumberPlaques = {};
     this.controlPointerId = null;
     this.activeHandle = null;
@@ -1058,12 +1129,13 @@ class ImasoraCompanionCatcherGame {
     this.clawBasePointOffset = new CANNON.Vec3();
     this.clawTiltedPointOffset = new CANNON.Vec3();
     this.armCollisionNormal = new CANNON.Vec3();
+    this.prongPaddleOrientation = new CANNON.Quaternion();
+    this.prongPaddleCenterOffset = new CANNON.Vec3();
+    this.prongSupportAxis = new CANNON.Vec3();
+    this.prongLocalAxis = new CANNON.Vec3();
+    this.prongSurfacePoint = new CANNON.Vec3();
+    this.prongWorldPoint = new CANNON.Vec3();
     this.armLocalSupportDirection = new CANNON.Vec3();
-    this.armTipLocalNormal = new CANNON.Vec3();
-    this.fenceWorldNormal = new CANNON.Vec3();
-    this.fenceLocalNormal = new CANNON.Vec3();
-    this.fenceLocalUp = new CANNON.Vec3();
-    this.fenceUpAxis = new CANNON.Vec3(0, 1, 0);
     this.clawContactLiftY = 0;
     this.boundLoop = this.loop.bind(this);
     this.boundClick = this.handleClick.bind(this);
@@ -1170,7 +1242,6 @@ class ImasoraCompanionCatcherGame {
     this.controlSound.dispose();
     this.timers.forEach(timer => clearTimeout(timer));
     this.timers.clear();
-    this.textureTasks.clear();
     if (this.scene) {
       this.scene.traverse(object => {
         object.geometry?.dispose?.();
@@ -1501,7 +1572,77 @@ class ImasoraCompanionCatcherGame {
     this.cloudConveyorPuffs.instanceColor.needsUpdate = true;
     this.scene.add(this.cloudConveyorPuffs);
     this.updateBeltVisuals(0);
+    this.createConveyorReturnRamp();
     this.createOuterFence();
+  }
+
+  createConveyorReturnRamp() {
+    const faces = [
+      [0, 1, 2, 3], [7, 6, 5, 4],
+      [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0]
+    ];
+    const renderVertices = [];
+    this.conveyorReturnSections = new Array(CONVEYOR_RETURN_SEGMENTS);
+    const ringPoint = (angle, scale) => ellipsePoint(angle, OUTER_FENCE_RX * scale, OUTER_FENCE_RZ * scale);
+    for (let index = 0; index < CONVEYOR_RETURN_SEGMENTS; index += 1) {
+      const angle = index * CONVEYOR_RETURN_STEP;
+      const nextAngle = (index + 1) * CONVEYOR_RETURN_STEP;
+      const inner = ringPoint(angle, CONVEYOR_RETURN_INNER_SCALE);
+      const outer = ringPoint(angle, CONVEYOR_RETURN_OUTER_SCALE);
+      const innerNext = ringPoint(nextAngle, CONVEYOR_RETURN_INNER_SCALE);
+      const outerNext = ringPoint(nextAngle, CONVEYOR_RETURN_OUTER_SCALE);
+      const footprint = [inner, outer, outerNext, innerNext];
+      const overlapsChute = Math.min(...footprint.map(point => point.x)) < PRIZE_HOLE_POSITION.x + PRIZE_HOLE_RADIUS_X
+        && Math.max(...footprint.map(point => point.x)) > PRIZE_HOLE_POSITION.x - PRIZE_HOLE_RADIUS_X
+        && Math.min(...footprint.map(point => point.z)) < PRIZE_HOLE_POSITION.z + PRIZE_HOLE_RADIUS_Z
+        && Math.max(...footprint.map(point => point.z)) > PRIZE_HOLE_POSITION.z - PRIZE_HOLE_RADIUS_Z;
+      if (overlapsChute) continue;
+      const midpoint = angle + CONVEYOR_RETURN_STEP / 2;
+      this.conveyorReturnSections[index] = { x: Math.cos(midpoint), z: Math.sin(midpoint) };
+      const bottom = footprint.map(point => new CANNON.Vec3(point.x, CONVEYOR_RETURN_BASE_Y - 0.08, point.z));
+      const top = footprint.map((point, i) => new CANNON.Vec3(
+        point.x,
+        CONVEYOR_RETURN_BASE_Y + (i === 1 || i === 2 ? CONVEYOR_RETURN_RISE : 0),
+        point.z
+      ));
+      const vertices = [...bottom, ...top];
+      const center = new CANNON.Vec3(
+        (inner.x + outerNext.x) / 2,
+        CONVEYOR_RETURN_BASE_Y,
+        (inner.z + outerNext.z) / 2
+      );
+      const shape = new CANNON.ConvexPolyhedron({
+        vertices: vertices.map(vertex => vertex.vsub(center)),
+        faces
+      });
+      const body = new CANNON.Body({
+        mass: 0,
+        shape,
+        position: center,
+        material: this.beltMaterial,
+        collisionFilterGroup: 0x0008,
+        collisionFilterMask: 0x0001
+      });
+      this.world.addBody(body);
+      // Share the ramp surface between the collision shapes and the rendered strip.
+      for (const face of faces.slice(1)) {
+        for (const vertexIndex of [face[0], face[1], face[2], face[0], face[2], face[3]]) {
+          const vertex = vertices[vertexIndex];
+          renderVertices.push(vertex.x, vertex.y, vertex.z);
+        }
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(renderVertices, 3));
+    geometry.computeVertexNormals();
+    const ramp = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+      color: 0xa9ded6,
+      roughness: 0.64,
+      metalness: 0.07
+    }));
+    ramp.name = "conveyor-return-ramp";
+    ramp.receiveShadow = true;
+    this.scene.add(ramp);
   }
 
   createOuterFence() {
@@ -2475,27 +2616,21 @@ class ImasoraCompanionCatcherGame {
       { segment: "lower", amount: 0.04 },
       { segment: "lower", amount: 0.28 },
       { segment: "lower", amount: 0.52 },
-      { segment: "lower", amount: 0.76 },
-      { segment: "lower", amount: 1 }
+      { segment: "lower", amount: 0.76 }
     ];
-    for (let prongIndex = 0; prongIndex < 3; prongIndex += 1) {
-      colliderSamples.forEach(sample => {
-        if (
-          prongIndex === TURNER_PRONG_INDEX
-          && sample.segment === "lower"
-          && sample.amount >= 0.95
-        ) return;
-        const roundTip = prongIndex !== TURNER_PRONG_INDEX
-          && sample.segment === "lower"
-          && sample.amount >= 0.95;
-        const colliderRadius = roundTip
-          ? ROUND_PRONG_TIP_RADIUS + PRONG_TIP_COLLISION_MARGIN
-          : PRONG_SHAFT_COLLIDER_RADIUS;
+    for (let prongIndex = 0; prongIndex < CLAW_PRONG_COUNT; prongIndex += 1) {
+      const paddleSamples = PRONG_PADDLE_PROFILE.slice(1).map((right, index) => ({
+        segment: "lower",
+        amount: 1,
+        paddle: makeProngPaddlePart(PRONG_PADDLE_PROFILE[index], right)
+      }));
+      [...colliderSamples, ...paddleSamples].forEach(sample => {
+        const shape = sample.paddle?.shape ?? new CANNON.Sphere(PRONG_SHAFT_COLLIDER_RADIUS);
         const body = new CANNON.Body({
           mass: 0,
           type: CANNON.Body.KINEMATIC,
           material: this.prongMaterial,
-          shape: new CANNON.Sphere(colliderRadius),
+          shape,
           collisionFilterGroup: 0x0002,
           collisionFilterMask: 0x0001
         });
@@ -2505,40 +2640,12 @@ class ImasoraCompanionCatcherGame {
           prongIndex,
           segment: sample.segment,
           amount: sample.amount,
-          roundTip,
+          isGripTip: Boolean(sample.paddle),
+          paddleCenter: sample.paddle?.center,
           previousPosition: new CANNON.Vec3(),
           initialized: false
         });
       });
-      if (prongIndex === TURNER_PRONG_INDEX) {
-        const body = new CANNON.Body({
-          mass: 0,
-          type: CANNON.Body.KINEMATIC,
-          material: this.prongMaterial,
-          shape: new CANNON.Box(new CANNON.Vec3(
-            TURNER_PRONG_WIDTH / 2 + TURNER_PRONG_COLLISION_MARGIN,
-            TURNER_PRONG_TOTAL_THICKNESS / 2 + TURNER_PRONG_THICKNESS_COLLISION_MARGIN,
-            TURNER_PRONG_LENGTH / 2 + TURNER_PRONG_COLLISION_MARGIN
-          )),
-          collisionFilterGroup: 0x0002,
-          collisionFilterMask: 0x0001
-        });
-        const localQuaternion = new CANNON.Quaternion();
-        localQuaternion.setFromEuler(
-          0,
-          Math.PI / 2 - (prongIndex / 3) * Math.PI * 2,
-          0
-        );
-        this.world.addBody(body);
-        this.prongBodies.push({
-          body,
-          prongIndex,
-          turnerBlade: true,
-          localQuaternion,
-          previousPosition: new CANNON.Vec3(),
-          initialized: false
-        });
-      }
     }
   }
 
@@ -2587,74 +2694,62 @@ class ImasoraCompanionCatcherGame {
       5,
       10
     );
-    const tipGeometry = new THREE.SphereGeometry(ROUND_PRONG_TIP_RADIUS, 16, 12);
-    const turnerMaterial = new THREE.MeshStandardMaterial({
+    const paddleMaterial = new THREE.MeshStandardMaterial({
       color: 0xa9eee2,
       emissive: 0x4abda9,
       emissiveIntensity: 0.08,
       roughness: 0.3,
-      metalness: 0.58,
-      depthTest: true,
-      depthWrite: true
+      metalness: 0.58
     });
-    const turnerShape = new THREE.Shape();
-    const turnerWidth = TURNER_PRONG_WIDTH;
-    const turnerLength = TURNER_PRONG_LENGTH;
-    const turnerRadius = 0.075 * CLAW_SIZE_SCALE;
-    const halfWidth = turnerWidth / 2;
-    const halfLength = turnerLength / 2;
-    turnerShape.moveTo(-halfWidth + turnerRadius, -halfLength);
-    turnerShape.lineTo(halfWidth - turnerRadius, -halfLength);
-    turnerShape.quadraticCurveTo(halfWidth, -halfLength, halfWidth, -halfLength + turnerRadius);
-    turnerShape.lineTo(halfWidth, halfLength - turnerRadius);
-    turnerShape.quadraticCurveTo(halfWidth, halfLength, halfWidth - turnerRadius, halfLength);
-    turnerShape.lineTo(-halfWidth + turnerRadius, halfLength);
-    turnerShape.quadraticCurveTo(-halfWidth, halfLength, -halfWidth, halfLength - turnerRadius);
-    turnerShape.lineTo(-halfWidth, -halfLength + turnerRadius);
-    turnerShape.quadraticCurveTo(-halfWidth, -halfLength, -halfWidth + turnerRadius, -halfLength);
-    const turnerGeometry = new THREE.ExtrudeGeometry(turnerShape, {
-      depth: TURNER_PRONG_FACE_DEPTH,
+    const paddle = new THREE.Shape();
+    PRONG_PADDLE_PROFILE.forEach(({ x, innerZ }, index) => {
+      if (index === 0) paddle.moveTo(x, innerZ);
+      else paddle.lineTo(x, innerZ);
+    });
+    for (let index = PRONG_PADDLE_PROFILE.length - 1; index >= 0; index -= 1) {
+      const { x, outerZ } = PRONG_PADDLE_PROFILE[index];
+      paddle.lineTo(x, outerZ);
+    }
+    paddle.closePath();
+    const paddleGeometry = new THREE.ExtrudeGeometry(paddle, {
+      depth: PRONG_PADDLE_DEPTH,
       bevelEnabled: true,
       bevelSegments: 2,
-      bevelSize: 0.011 * CLAW_SIZE_SCALE,
-      bevelThickness: TURNER_PRONG_BEVEL_THICKNESS,
-      curveSegments: 8,
+      bevelSize: PRONG_PADDLE_EDGE,
+      bevelOffset: -PRONG_PADDLE_EDGE,
+      bevelThickness: PRONG_PADDLE_BEVEL,
       steps: 1
     });
-    turnerGeometry.center();
-    turnerGeometry.rotateX(Math.PI / 2);
+    paddleGeometry.rotateX(Math.PI / 2);
+    paddleGeometry.translate(0, PRONG_PADDLE_DEPTH / 2, 0);
     const slotGeometry = new THREE.BoxGeometry(
       0.045 * CLAW_SIZE_SCALE,
       0.018 * CLAW_SIZE_SCALE,
-      0.25 * CLAW_SIZE_SCALE
+      0.17 * CLAW_SIZE_SCALE
     );
-    for (let index = 0; index < 3; index += 1) {
+    for (let index = 0; index < CLAW_PRONG_COUNT; index += 1) {
+      const angle = getProngAngle(index);
       const upper = new THREE.Mesh(segmentGeometry, metal);
       const lower = new THREE.Mesh(segmentGeometry, metal);
-      const isTurner = index === TURNER_PRONG_INDEX;
-      const tip = isTurner ? new THREE.Group() : new THREE.Mesh(tipGeometry, rubber);
-      if (isTurner) {
-        const blade = new THREE.Mesh(turnerGeometry, turnerMaterial);
-        blade.castShadow = true;
-        blade.receiveShadow = true;
-        tip.add(blade);
-        [-0.11, 0, 0.11].forEach(offset => {
-          const slot = new THREE.Mesh(slotGeometry, rubber);
-          slot.position.set(offset * CLAW_SIZE_SCALE, 0.034 * CLAW_SIZE_SCALE, 0);
-          slot.castShadow = true;
-          tip.add(slot);
-        });
+      const tip = new THREE.Group();
+      tip.rotation.y = Math.PI / 2 - angle;
+      const blade = new THREE.Mesh(paddleGeometry, paddleMaterial);
+      blade.castShadow = true;
+      blade.receiveShadow = true;
+      tip.add(blade);
+      for (const offset of [-0.11, 0, 0.11]) {
+        const slot = new THREE.Mesh(slotGeometry, rubber);
+        slot.position.set(offset * CLAW_SIZE_SCALE, 0.0165 * CLAW_SIZE_SCALE, -0.10 * CLAW_SIZE_SCALE);
+        tip.add(slot);
       }
       upper.castShadow = true;
       lower.castShadow = true;
-      tip.castShadow = true;
       this.clawVisual.add(upper, lower, tip);
       this.prongVisuals.push({
         upper,
         lower,
         tip,
-        isTurner,
-        angle: (index / 3) * Math.PI * 2
+        angle
       });
     }
   }
@@ -2724,6 +2819,7 @@ class ImasoraCompanionCatcherGame {
     this.plushes.forEach(plush => {
       if (this.world?.bodies.includes(plush.body)) this.world.removeBody(plush.body);
       this.scene?.remove(plush.visual);
+      disposeWhiteMichiModel(plush.visual);
     });
     this.plushes = [];
   }
@@ -2734,104 +2830,6 @@ class ImasoraCompanionCatcherGame {
     previousPlushStartLayoutIndex = layoutIndex;
     this.lastPlushStartLayoutIndex = layoutIndex;
     return PLUSH_START_LAYOUTS[layoutIndex];
-  }
-
-  createPlushMoundContactPoints(visual) {
-    let cushion = null;
-    visual.traverse(node => {
-      if (node.userData?.isPlushCushion) cushion = node;
-    });
-    const positionAttribute = cushion?.geometry?.attributes?.position;
-    if (!cushion || !positionAttribute) return [];
-
-    visual.updateMatrixWorld(true);
-    const rootInverse = new THREE.Matrix4().copy(visual.matrixWorld).invert();
-    const toVisualRoot = new THREE.Matrix4().multiplyMatrices(
-      rootInverse,
-      cushion.matrixWorld
-    );
-    const candidateMap = new Map();
-    const point = new THREE.Vector3();
-    for (let index = 0; index < positionAttribute.count; index += 1) {
-      point.fromBufferAttribute(positionAttribute, index).applyMatrix4(toVisualRoot);
-      const key = `${Math.round(point.x * 10000)}:${Math.round(point.y * 10000)}:${Math.round(point.z * 10000)}`;
-      if (!candidateMap.has(key)) candidateMap.set(key, point.clone());
-    }
-
-    const directions = [
-      new THREE.Vector3(1, 0, 0),
-      new THREE.Vector3(-1, 0, 0),
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, -1, 0),
-      new THREE.Vector3(0, 0, 1),
-      new THREE.Vector3(0, 0, -1)
-    ];
-    const directionCount = 96;
-    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-    for (let index = 0; index < directionCount; index += 1) {
-      const y = 1 - (2 * (index + 0.5)) / directionCount;
-      const radius = Math.sqrt(Math.max(0, 1 - y * y));
-      const angle = index * goldenAngle;
-      directions.push(new THREE.Vector3(
-        Math.cos(angle) * radius,
-        y,
-        Math.sin(angle) * radius
-      ));
-    }
-
-    const contactPointMap = new Map();
-    const addContactPoint = candidate => {
-      const key = `${Math.round(candidate.x * 10000)}:${Math.round(candidate.y * 10000)}:${Math.round(candidate.z * 10000)}`;
-      if (!contactPointMap.has(key)) {
-        contactPointMap.set(key, new CANNON.Vec3(candidate.x, candidate.y, candidate.z));
-      }
-    };
-    directions.forEach(direction => {
-      let bestPoint = null;
-      let bestProjection = Number.NEGATIVE_INFINITY;
-      candidateMap.forEach(candidate => {
-        const projection = candidate.dot(direction);
-        if (projection > bestProjection) {
-          bestProjection = projection;
-          bestPoint = candidate;
-        }
-      });
-      if (bestPoint) addContactPoint(bestPoint);
-    });
-
-    // Rounded corners have no fabric. Add only real face-center samples so an
-    // imaginary bounding-box corner can no longer hold the plush above the mound.
-    cushion.geometry.computeBoundingBox();
-    const bounds = cushion.geometry.boundingBox;
-    if (bounds) {
-      const center = bounds.getCenter(new THREE.Vector3());
-      const half = bounds.getSize(new THREE.Vector3()).multiplyScalar(0.5);
-      const faceSamples = [];
-      [-1, 1].forEach(side => {
-        faceSamples.push(
-          new THREE.Vector3(center.x + side * half.x, center.y, center.z),
-          new THREE.Vector3(center.x + side * half.x, center.y + half.y * 0.25, center.z),
-          new THREE.Vector3(center.x + side * half.x, center.y - half.y * 0.25, center.z),
-          new THREE.Vector3(center.x + side * half.x, center.y, center.z + half.z * 0.25),
-          new THREE.Vector3(center.x + side * half.x, center.y, center.z - half.z * 0.25),
-          new THREE.Vector3(center.x, center.y + side * half.y, center.z),
-          new THREE.Vector3(center.x + half.x * 0.25, center.y + side * half.y, center.z),
-          new THREE.Vector3(center.x - half.x * 0.25, center.y + side * half.y, center.z),
-          new THREE.Vector3(center.x, center.y + side * half.y, center.z + half.z * 0.25),
-          new THREE.Vector3(center.x, center.y + side * half.y, center.z - half.z * 0.25),
-          new THREE.Vector3(center.x, center.y, center.z + side * half.z),
-          new THREE.Vector3(center.x + half.x * 0.25, center.y, center.z + side * half.z),
-          new THREE.Vector3(center.x - half.x * 0.25, center.y, center.z + side * half.z),
-          new THREE.Vector3(center.x, center.y + half.y * 0.25, center.z + side * half.z),
-          new THREE.Vector3(center.x, center.y - half.y * 0.25, center.z + side * half.z)
-        );
-      });
-      faceSamples.forEach(facePoint => {
-        facePoint.applyMatrix4(toVisualRoot);
-        addContactPoint(facePoint);
-      });
-    }
-    return [...contactPointMap.values()];
   }
 
   createPlushes() {
@@ -2863,7 +2861,16 @@ class ImasoraCompanionCatcherGame {
           BELT_RX + startSlot.lane * 0.08,
           BELT_RZ + startSlot.lane * 0.05
         );
+      const visual = this.createPlushVisual(item, spec);
+      if (visual.children[0].userData.characterId === MICHIME_PRIZE_ID) {
+        // Keep the grip envelope in step with the enlarged collision hull.
+        spec.width *= MICHIME_PLUSH_GROWTH.width;
+        spec.height *= MICHIME_PLUSH_GROWTH.height;
+        spec.depth *= MICHIME_PLUSH_GROWTH.depth;
+      }
+      const parts = plushCollisionParts(visual.children[0]);
       const body = this.createPlushBody(
+        parts,
         spec,
         item,
         point,
@@ -2872,9 +2879,8 @@ class ImasoraCompanionCatcherGame {
         startsOnMound
       );
       this.ensureInitialPlushInsideOuterFence(body);
-      const visual = this.createPlushVisual(item, spec);
       this.scene.add(visual);
-      const moundContactPoints = this.createPlushMoundContactPoints(visual);
+      const moundContactPoints = parts.flatMap(part => part.points);
       const plush = {
         ...item,
         constructionRewardEventId: `${this.rewardSessionId}-p${index + 1}`,
@@ -2992,7 +2998,7 @@ class ImasoraCompanionCatcherGame {
     body.aabbNeedsUpdate = true;
   }
 
-  createPlushBody(spec, item, point, angle, index, startsOnMound = false) {
+  createPlushBody(parts, spec, item, point, angle, index, startsOnMound = false) {
     const itemMaterial = new CANNON.Material(`plush-${item.id}-${index}`);
     this.world.addContactMaterial(new CANNON.ContactMaterial(
       this.beltMaterial,
@@ -3032,43 +3038,7 @@ class ImasoraCompanionCatcherGame {
     });
     body.imasoraProngContactMaterial = prongContactMaterial;
     body.imasoraProngFriction = prongFriction;
-    if (spec.shape === "sphere") {
-      body.addShape(new CANNON.Sphere(
-        Math.max(spec.width, spec.height) * 0.5 + 0.045 * PLUSH_ACCESSORY_SCALE
-      ));
-    } else {
-      body.addShape(new CANNON.Box(new CANNON.Vec3(
-        spec.width * 0.5 + 0.045 * PLUSH_ACCESSORY_SCALE,
-        spec.height * 0.5 + 0.04 * PLUSH_ACCESSORY_SCALE,
-        spec.depth * 0.5 + 0.065 * PLUSH_ACCESSORY_SCALE
-      )));
-    }
-    const armRadius = 0.14 * PLUSH_ACCESSORY_SCALE;
-    const footRadius = 0.12 * PLUSH_ACCESSORY_SCALE;
-    body.addShape(
-      new CANNON.Sphere(armRadius),
-      new CANNON.Vec3(-spec.width * 0.55, -spec.height * 0.02, 0)
-    );
-    body.addShape(
-      new CANNON.Sphere(armRadius),
-      new CANNON.Vec3(spec.width * 0.55, -spec.height * 0.02, 0)
-    );
-    body.addShape(
-      new CANNON.Sphere(footRadius),
-      new CANNON.Vec3(
-        -spec.width * 0.26,
-        -spec.height * 0.55,
-        0.04 * PLUSH_ACCESSORY_SCALE
-      )
-    );
-    body.addShape(
-      new CANNON.Sphere(footRadius),
-      new CANNON.Vec3(
-        spec.width * 0.26,
-        -spec.height * 0.55,
-        0.04 * PLUSH_ACCESSORY_SCALE
-      )
-    );
+    for (const { shape, offset } of parts) body.addShape(shape, offset);
     const tangent = ellipseTangent(angle);
     const heading = Math.atan2(tangent.x, tangent.z) + ((index % 4) - 1.5) * 0.07;
     if (startsOnMound) {
@@ -3082,12 +3052,14 @@ class ImasoraCompanionCatcherGame {
       body.position.y = moundRestingCenterY(body, MOUND_PLUSH_START_CLEARANCE);
       body.angularVelocity.set(0, 0, 0);
     } else {
-      body.position.set(point.x, plushRestingYAt(spec, point.x, point.z) + 0.025, point.z);
+      body.position.set(point.x, 0, point.z);
       body.quaternion.setFromEuler(
         (index % 2 ? 1 : -1) * 0.035,
         heading,
         ((index % 4) - 1.5) * 0.025
       );
+      body.aabbNeedsUpdate = true;
+      body.position.y = moundRestingCenterY(body, 0.025);
       body.angularVelocity.set(0, 0.012 * (index % 2 ? 1 : -1), 0);
     }
     body.userData = { itemId: item.id };
@@ -3097,137 +3069,56 @@ class ImasoraCompanionCatcherGame {
 
   createPlushVisual(item, spec) {
     const group = new THREE.Group();
-    const bodyColor = new THREE.Color(cssColor(item.bodyColor));
-    const accentColor = new THREE.Color(cssColor(item.accentColor, "#55ae73"));
-    const bodyMaterial = new THREE.MeshStandardMaterial({
-      color: bodyColor,
-      roughness: 0.96,
-      metalness: 0,
-      bumpMap: this.fabricTexture,
-      bumpScale: 0.075,
-      depthTest: true,
-      depthWrite: true
-    });
-    const cushionGeometry = new THREE.ExtrudeGeometry(
-      makeRoundedShape(spec.width, spec.height, Math.min(spec.width, spec.height) * spec.roundness),
-      {
-        depth: spec.depth,
-        steps: 1,
-        bevelEnabled: true,
-        bevelSegments: 5,
-        bevelSize: 0.105 * PLUSH_ACCESSORY_SCALE,
-        bevelThickness: 0.105 * PLUSH_ACCESSORY_SCALE,
-        curveSegments: 10
+    const character = MonsterNames.get(item.characterId);
+    const buildModel = character.stage === "満開期" ? buildMatureStarCharacter360
+      : character.stage === "開花期" ? buildFloweringHeroCharacter360 : buildEarlyMonsterCharacter360;
+    const model = buildModel(character.id, { handColor: item.handColor, footColor: item.footColor });
+    model.userData.characterId = character.id;
+    const bounds = new THREE.Box3().setFromObject(model);
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const faceScale = Math.min(spec.width / size.x, spec.height / size.y);
+    const isSeharune = character.id === SEHARUNE_PRIZE_ID;
+    const body = model.userData.body;
+    // Accessories can be deeper than the torso. Fit the torso itself so the
+    // side view retains its volume even when the overall model fits the cabinet.
+    const torsoSize = new THREE.Box3().setFromObject(body, true).getSize(new THREE.Vector3());
+    const paddedTorsoDepth = Math.max(
+      torsoSize.x * PLUSH_TORSO_DEPTH_TO_WIDTH,
+      torsoSize.y * PLUSH_TORSO_DEPTH_TO_HEIGHT
+    );
+    const minimumDepthScale = faceScale * (isSeharune ? 0.88 : paddedTorsoDepth / torsoSize.z);
+    const fit = new THREE.Vector3(faceScale, faceScale, Math.max(spec.depth / size.z, minimumDepthScale));
+    if (character.id === MICHIME_PRIZE_ID) {
+      fit.x *= 1.12 * MICHIME_PLUSH_GROWTH.width;
+      fit.y *= MICHIME_PLUSH_GROWTH.height;
+      fit.z *= 1.28 * MICHIME_PLUSH_GROWTH.depth;
+      fitMichimeEyesToPlushFace(model);
+    }
+    model.scale.multiply(fit);
+    const bodyMaterial = body.material;
+    if (isSeharune) {
+      // The white fabric needs a shaded side and enough depth to read against the cape.
+      bodyMaterial.color.setHex(0xe4e8ed);
+    } else {
+      bodyMaterial.toneMapped = true;
+    }
+    bodyMaterial.emissiveIntensity = 0;
+    model.position.sub(center.multiply(fit));
+    model.traverse(mesh => {
+      if (!mesh.isMesh || mesh.name.includes("eye") || mesh.name.includes("expression")) return;
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        material.roughness = 0.96;
+        material.metalness = 0;
+        material.bumpMap = this.fabricTexture;
+        material.bumpScale = 0.045;
+        if ("clearcoat" in material) material.clearcoat = 0;
       }
-    );
-    cushionGeometry.center();
-    const cushion = new THREE.Mesh(cushionGeometry, bodyMaterial);
-    cushion.userData.isPlushCushion = true;
-    cushion.castShadow = true;
-    cushion.receiveShadow = true;
-    group.add(cushion);
-
-    const limbMaterial = bodyMaterial.clone();
-    limbMaterial.color.copy(bodyColor).offsetHSL(0, -0.03, -0.045);
-    const limbGeometry = new THREE.SphereGeometry(0.5, 20, 14);
-    const limbData = [
-      { x: -spec.width * 0.55, y: -spec.height * 0.02, z: 0, scale: [0.26, 0.43, 0.22], rotate: -0.25 },
-      { x: spec.width * 0.55, y: -spec.height * 0.02, z: 0, scale: [0.26, 0.43, 0.22], rotate: 0.25 },
-      { x: -spec.width * 0.26, y: -spec.height * 0.55, z: 0.04 * PLUSH_ACCESSORY_SCALE, scale: [0.34, 0.21, 0.31], rotate: -0.08 },
-      { x: spec.width * 0.26, y: -spec.height * 0.55, z: 0.04 * PLUSH_ACCESSORY_SCALE, scale: [0.34, 0.21, 0.31], rotate: 0.08 }
-    ];
-    limbData.forEach(entry => {
-      const limb = new THREE.Mesh(limbGeometry, limbMaterial);
-      limb.position.set(entry.x, entry.y, entry.z);
-      limb.scale.set(...entry.scale.map(value => value * PLUSH_ACCESSORY_SCALE));
-      limb.rotation.z = entry.rotate;
-      limb.castShadow = true;
-      group.add(limb);
     });
-
-    const loop = new THREE.Mesh(
-      new THREE.TorusGeometry(
-        0.14 * PLUSH_ACCESSORY_SCALE,
-        0.027 * PLUSH_ACCESSORY_SCALE,
-        8,
-        20,
-        Math.PI * 1.55
-      ),
-      new THREE.MeshStandardMaterial({
-        color: accentColor,
-        roughness: 0.82,
-        metalness: 0.02
-      })
-    );
-    loop.position.set(0, spec.height * 0.53, 0);
-    loop.rotation.z = Math.PI * 0.22;
-    loop.castShadow = true;
-    group.add(loop);
-
-    const seamMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf4ead8,
-      roughness: 0.88,
-      metalness: 0
-    });
-    const radius = Math.min(spec.width, spec.height) * Math.max(0.14, spec.roundness - 0.025);
-    [-1, 1].forEach(side => {
-      const curve = makeRoundedLoop(
-        spec.width * 0.93,
-        spec.height * 0.93,
-        radius,
-        side * (spec.depth * 0.5 + 0.075 * PLUSH_ACCESSORY_SCALE)
-      );
-      const seam = new THREE.Mesh(
-        new THREE.TubeGeometry(curve, 48, 0.021 * PLUSH_ACCESSORY_SCALE, 6, true),
-        seamMaterial
-      );
-      seam.castShadow = true;
-      group.add(seam);
-    });
-
-    const patchGeometry = new THREE.PlaneGeometry(spec.width * 1.02, spec.height * 1.02);
-    const frontMaterial = new THREE.MeshStandardMaterial({
-      transparent: true,
-      opacity: 0,
-      roughness: 1,
-      metalness: 0,
-      alphaTest: 0.015,
-      side: THREE.DoubleSide,
-      depthTest: true,
-      depthWrite: true
-    });
-    const backMaterial = frontMaterial.clone();
-    const front = new THREE.Mesh(patchGeometry, frontMaterial);
-    front.position.z = spec.depth * 0.5 + 0.13 * PLUSH_ACCESSORY_SCALE;
-    const back = new THREE.Mesh(patchGeometry, backMaterial);
-    back.position.z = -spec.depth * 0.5 - 0.13 * PLUSH_ACCESSORY_SCALE;
-    back.rotation.y = Math.PI;
-    group.add(front, back);
-    this.assignPlushTexture(frontMaterial, item.frontSvg);
-    this.assignPlushTexture(backMaterial, item.backSvg || item.frontSvg);
-
-    group.userData.bodyMaterial = bodyMaterial;
+    group.add(model);
     group.userData.itemName = item.name;
+    group.updateMatrixWorld(true);
     return group;
-  }
-
-  assignPlushTexture(material, svg) {
-    const task = svgToFabricTexture(svg, this.renderer)
-      .then(texture => {
-        this.textureTasks.delete(task);
-        if (this.destroyed) {
-          texture.dispose();
-          return;
-        }
-        material.map = texture;
-        material.opacity = 0.96;
-        material.needsUpdate = true;
-      })
-      .catch(error => {
-        this.textureTasks.delete(task);
-        console.warn("ぬいぐるみ刺繍テクスチャの生成を省略しました。", error);
-      });
-    this.textureTasks.add(task);
   }
 
   handleClick(event) {
@@ -3560,6 +3451,7 @@ class ImasoraCompanionCatcherGame {
     this.setClawStarNeonMode("descending");
     this.phaseTime = 0;
     this.grabCableLength = MAX_GRAB_CABLE_LENGTH;
+    this.deepMichimeGrab = false;
     this.refreshHud();
     this.refreshControls();
     return true;
@@ -3683,21 +3575,48 @@ class ImasoraCompanionCatcherGame {
       return;
     }
     if (this.phase === "descending") {
+      if (this.phaseTime >= DESCENT_TRAVEL_SECONDS * 0.62
+        && !this.deepMichimeGrab
+        && this.plushes.some(plush => this.isLowMichimeUnderClaw(plush))) {
+        // Lower the open tips first so they reach below the rounded body.
+        this.deepMichimeGrab = true;
+        this.grabCableLength += NARROW_PRIZE_EXTRA_DESCENT;
+      }
       this.cableTarget = lerp(
         1.25,
-        MAX_GRAB_CABLE_LENGTH,
+        this.grabCableLength,
         smoothStep(this.phaseTime / DESCENT_TRAVEL_SECONDS)
       );
       this.prongClosure = 0;
       if (this.phaseTime >= DESCENT_AUTO_CLOSE_SECONDS) {
-        this.grabCableLength = MAX_GRAB_CABLE_LENGTH;
         this.setPhase("closing");
       }
       return;
     }
     if (this.phase === "closing") {
+      // Keep the usual first sweep. When it has not found a grip, the
+      // three visible tips continue closing around smaller prizes.
+      const standardClosure = smoothStep(this.phaseTime / STANDARD_CLOSE_SECONDS);
+      const extraClosure = smoothStep((this.phaseTime - STANDARD_CLOSE_SECONDS) / NARROW_CLOSE_SECONDS);
+      const requestedClosure = standardClosure + extraClosure;
+      if (!this.grip) {
+        this.grabCableLength = Math.max(
+          this.grabCableLength,
+          MAX_GRAB_CABLE_LENGTH + NARROW_PRIZE_EXTRA_DESCENT * extraClosure
+        );
+      } else if (this.grip.seatingOnBelt && this.isPlushInsideClawEnvelope(this.grip.plush)) {
+        this.grip.holdClosure = Math.max(this.grip.holdClosure, requestedClosure);
+        this.gripClosureLock = this.grip.holdClosure;
+      } else if (this.grip.holdClosure < 1 && this.isPlushInsideClawEnvelope(this.grip.plush)) {
+        const contacts = this.getGripProngContacts(this.grip.plush);
+        // An initial contact can rock away as the cable starts lifting. Finish
+        // seating a shallow grip while the prize is still on the surface.
+        if (contacts.supportiveIndices.size < 2 && contacts.contactIndices.size < CLAW_PRONG_COUNT) {
+          this.grip.holdClosure = Math.max(this.grip.holdClosure, standardClosure);
+          this.gripClosureLock = this.grip.holdClosure;
+        }
+      }
       this.cableTarget = this.grabCableLength;
-      const requestedClosure = smoothStep(this.phaseTime / 1.08);
       this.prongClosure = this.gripClosureLock ?? requestedClosure;
       if (
         !this.gripAttempted
@@ -3707,18 +3626,28 @@ class ImasoraCompanionCatcherGame {
         const gripped = this.tryGrip({ deferFailure: !finalCheck });
         if (gripped || finalCheck) this.gripAttempted = true;
       }
-      if (this.phaseTime >= 1.28) this.setPhase("lifting");
+      const liftAt = this.grip
+        ? (this.grip.seatingOnBelt ? GRIP_CONTACT_CHECK_SECONDS : STANDARD_LIFT_SECONDS)
+        : EMPTY_LIFT_SECONDS;
+      if (this.phaseTime >= liftAt) this.setPhase("lifting");
       return;
     }
     if (this.phase === "lifting") {
       this.cableTarget = lerp(this.grabCableLength, 1.34, smoothStep(this.phaseTime / 3.1));
-      this.prongClosure = this.gripClosureLock ?? 1;
-      if (this.phaseTime >= 3.28) this.setPhase("carrying");
+      this.prongClosure = this.gripClosureLock ?? Math.max(1, this.prongClosure);
+      if (this.phaseTime >= 3.28) {
+        const { position, velocity } = this.clawBody;
+        const sway = Math.hypot(position.x - this.carriage.position.x, position.z - this.carriage.position.z);
+        const movingSideways = Math.hypot(velocity.x, velocity.z) > 0.55;
+        // Seat the load before moving the carriage; a swinging cable can pull it out.
+        const settlingLowGrip = this.grip?.seatingOnBelt && (sway > 0.28 || movingSideways);
+        if (!settlingLowGrip || this.phaseTime >= 5.4) this.setPhase("carrying");
+      }
       return;
     }
     if (this.phase === "carrying") {
       this.cableTarget = 1.34;
-      this.prongClosure = this.gripClosureLock ?? 1;
+      this.prongClosure = this.gripClosureLock ?? Math.max(1, this.prongClosure);
       const heldBody = this.grip?.plush?.body || null;
       if (heldBody) {
         const holeLevel = Math.max(
@@ -3728,6 +3657,10 @@ class ImasoraCompanionCatcherGame {
         if (holeLevel <= PRIZE_HOLE_GUARANTEE_SCALE) {
           this.grip.holeDropGuaranteed = true;
           this.grip.plush.prizeLiftQualified = true;
+        }
+        if (holeLevel <= PRIZE_HOLE_RELEASE_SCALE) {
+          this.setPhase("releasing");
+          return;
         }
         const heldOffsetX = heldBody.position.x - this.carriage.position.x;
         const heldOffsetZ = heldBody.position.z - this.carriage.position.z;
@@ -3742,14 +3675,11 @@ class ImasoraCompanionCatcherGame {
           PRIZE_HOLE_POSITION.z - heldOffsetZ,
           alignmentBlend
         );
+        return;
       }
       const distance = this.carriage.position.distanceTo(this.carriage.target);
-      const plushAligned = !heldBody || (
-        Math.abs(heldBody.position.x - PRIZE_HOLE_POSITION.x) < 0.055
-        && Math.abs(heldBody.position.z - PRIZE_HOLE_POSITION.z) < 0.055
-      );
       const carriageSettled = distance < 0.08 && this.carriage.velocity.length() < 0.14;
-      if (plushAligned && carriageSettled && this.phaseTime >= 1.8) {
+      if (carriageSettled && this.phaseTime >= 1.8) {
         this.setPhase("releasing");
       }
       return;
@@ -3758,7 +3688,7 @@ class ImasoraCompanionCatcherGame {
       this.cableTarget = 1.34;
       this.prongClosure = this.releaseProngClosure
         * (1 - smoothStep(this.phaseTime / 0.48));
-      if (!this.releaseStarted && this.phaseTime >= 0.12) {
+      if (!this.releaseStarted && this.phaseTime >= 0.08) {
         this.releaseStarted = true;
         this.releaseGrip(false, true);
       }
@@ -3828,8 +3758,9 @@ class ImasoraCompanionCatcherGame {
     const force = direction.scale(-tension);
     const cableVelocity = direction.scale(alongCable);
     const lateralVelocity = relativeVelocity.vsub(cableVelocity);
-    force.x -= lateralVelocity.x * 3.4;
-    force.z -= lateralVelocity.z * 3.4;
+    const lateralDamping = this.grip?.seatingOnBelt ? 7.2 : 3.4;
+    force.x -= lateralVelocity.x * lateralDamping;
+    force.z -= lateralVelocity.z * lateralDamping;
     this.clawBody.applyForce(force, this.clawBody.position);
   }
 
@@ -3873,7 +3804,7 @@ class ImasoraCompanionCatcherGame {
   }
 
   applyConveyorForces(delta) {
-    this.plushes.forEach((plush, index) => {
+    this.plushes.forEach(plush => {
       if (
         !plush.active
         || plush.won
@@ -3951,11 +3882,9 @@ class ImasoraCompanionCatcherGame {
       const driveGain = tangentSpeed < targetSpeed * 0.72 ? 14.5 : 8.4;
       const centeringStrength = data.distance > TRACK_SOFT_LIMIT ? 9.5 : 4.2;
       const speedError = targetSpeed - tangentSpeed;
-      const forceX = data.tangent.x * speedError * body.mass * driveGain
-        + data.dx * body.mass * centeringStrength;
-      const forceZ = data.tangent.z * speedError * body.mass * driveGain
-        + data.dz * body.mass * centeringStrength;
-      body.applyForce(new CANNON.Vec3(forceX, 0, forceZ), body.position);
+      const forceX = body.mass * (data.tangent.x * speedError * driveGain + data.dx * centeringStrength);
+      const forceZ = body.mass * (data.tangent.z * speedError * driveGain + data.dz * centeringStrength);
+      body.applyForce(new CANNON.Vec3(forceX, 0, forceZ));
       const minimumSpeed = targetSpeed * BELT_MINIMUM_SPEED_RATIO;
       if (tangentSpeed < minimumSpeed) {
         const correction = (minimumSpeed - tangentSpeed) * clamp(delta * 12, 0, 0.22);
@@ -3976,15 +3905,10 @@ class ImasoraCompanionCatcherGame {
   }
 
   getPlushRestingY(plush) {
-    if (isInsideCenterMoundTransition(plush.body.position.x, plush.body.position.z)) {
-      const correction = this.getPlushMoundContactCorrection(plush);
-      if (Number.isFinite(correction)) return plush.body.position.y + correction;
-    }
-    return plushRestingYAt(
-      plush.spec,
-      plush.body.position.x,
-      plush.body.position.z
-    );
+    const correction = this.getPlushMoundContactCorrection(plush);
+    return Number.isFinite(correction)
+      ? plush.body.position.y + correction
+      : moundRestingCenterY(plush.body);
   }
 
   markArmContact(plush, duration = 0.2) {
@@ -3992,6 +3916,14 @@ class ImasoraCompanionCatcherGame {
       plush.armContactBaseY = plush.body.position.y;
     }
     plush.armContactTime = Math.max(plush.armContactTime, duration);
+  }
+
+  isLowMichimeUnderClaw(plush) {
+    if (!plush.active || plush.won || plush.inPrizeHole || plush.characterId !== MICHIME_PRIZE_ID) return false;
+    const { x, y, z } = plush.body.position;
+    return y <= BELT_SURFACE_Y + plush.spec.height
+      && centerMoundHeightAt(x, z) === 0
+      && Math.hypot(x - this.carriage.position.x, z - this.carriage.position.z) <= 0.8 * CLAW_SIZE_SCALE;
   }
 
   isPlushInsideClawEnvelope(plush) {
@@ -4124,76 +4056,22 @@ class ImasoraCompanionCatcherGame {
       );
     }
     const direction = this.armLocalSupportDirection;
-    let solidSupport = 0;
-    plush.body.shapes.forEach((shape, index) => {
-      const offset = plush.body.shapeOffsets[index];
-      let shapeSupport = shape.boundingSphereRadius || 0;
-      if (shape instanceof CANNON.Sphere) {
-        shapeSupport = shape.radius;
-      } else if (shape instanceof CANNON.Box) {
-        shapeSupport = Math.abs(direction.x) * shape.halfExtents.x
-          + Math.abs(direction.y) * shape.halfExtents.y
-          + Math.abs(direction.z) * shape.halfExtents.z;
-      }
-      solidSupport = Math.max(
-        solidSupport,
-        offset.dot(direction) + shapeSupport
-      );
-    });
-
-    // Include the visible fabric, image patches, and hanging loop that extend
-    // beyond the simplified rigid body used for the general plush physics.
-    const visualScaleX = plush.visual?.scale?.x || 1;
-    const visualScaleY = plush.visual?.scale?.y || 1;
-    const visualScaleZ = plush.visual?.scale?.z || 1;
-    const absX = Math.abs(direction.x);
-    const absY = Math.abs(direction.y);
-    const absZ = Math.abs(direction.z);
-    const cushionPadding = 0.105 * PLUSH_ACCESSORY_SCALE;
-    const cushionSupport = absX * (plush.spec.width * 0.5 + cushionPadding) * visualScaleX
-      + absY * (plush.spec.height * 0.5 + cushionPadding) * visualScaleY
-      + absZ * (plush.spec.depth * 0.5 + cushionPadding) * visualScaleZ;
-    const patchSupport = absX * plush.spec.width * 0.51 * visualScaleX
-      + absY * plush.spec.height * 0.51 * visualScaleY
-      + absZ * (plush.spec.depth * 0.5 + 0.13 * PLUSH_ACCESSORY_SCALE) * visualScaleZ;
-    const loopRadius = (0.14 + 0.027) * PLUSH_ACCESSORY_SCALE
-      * Math.max(visualScaleX, visualScaleY, visualScaleZ);
-    const loopSupport = direction.y * plush.spec.height * 0.53 * visualScaleY
-      + loopRadius;
-    return Math.max(solidSupport, cushionSupport, patchSupport, loopSupport);
+    let support = 0;
+    for (const point of plush.moundContactPoints) support = Math.max(support, point.dot(direction));
+    return support;
   }
 
   getPlushArmClearance(plush, normalX, normalY, normalZ) {
     const solidSupport = this.getPlushArmSupport(plush, normalX, normalY, normalZ);
     return clamp(
       solidSupport + PRONG_SHAFT_COLLIDER_RADIUS + PRONG_TIP_COLLISION_MARGIN,
-      0.38,
+      0,
       1.1
     );
   }
 
-  getProngTipSupport(entry, normalX, normalY, normalZ) {
-    const shape = entry.body.shapes[0];
-    if (shape instanceof CANNON.Sphere) return shape.radius;
-    this.armCollisionNormal.set(normalX, normalY, normalZ);
-    entry.body.vectorToLocalFrame(this.armCollisionNormal, this.armTipLocalNormal);
-    const localLength = this.armTipLocalNormal.length();
-    if (localLength > 0.001) {
-      this.armTipLocalNormal.scale(1 / localLength, this.armTipLocalNormal);
-    } else {
-      this.armTipLocalNormal.set(0, 1, 0);
-    }
-    if (shape instanceof CANNON.Box) {
-      const half = shape.halfExtents;
-      return Math.abs(this.armTipLocalNormal.x) * half.x
-        + Math.abs(this.armTipLocalNormal.y) * half.y
-        + Math.abs(this.armTipLocalNormal.z) * half.z;
-    }
-    return shape.boundingSphereRadius || ROUND_PRONG_TIP_RADIUS;
-  }
-
   resolveProngTipPlushPenetration(passes = 10) {
-    const tipEntries = this.prongBodies.filter(entry => entry.roundTip || entry.turnerBlade);
+    const tipEntries = this.prongBodies.filter(entry => entry.isGripTip);
     if (!tipEntries.length) return;
     for (let pass = 0; pass < passes; pass += 1) {
       let changed = false;
@@ -4201,39 +4079,13 @@ class ImasoraCompanionCatcherGame {
         if (!plush.active || plush.won || plush.inPrizeHole) return;
         const body = plush.body;
         tipEntries.forEach(entry => {
-          let normalX = body.position.x - entry.body.position.x;
-          let normalY = body.position.y - entry.body.position.y;
-          let normalZ = body.position.z - entry.body.position.z;
-          let distance = Math.hypot(normalX, normalY, normalZ);
-          if (distance > 1.65) return;
-          if (distance > 0.001) {
-            normalX /= distance;
-            normalY /= distance;
-            normalZ /= distance;
-          } else {
-            const lowerSegment = this.prongSegments.find(segment => (
-              segment.prongIndex === entry.prongIndex && segment.kind === "lower"
-            ));
-            normalX = lowerSegment?.inward.x || 0;
-            normalY = lowerSegment?.inward.y || 0;
-            normalZ = lowerSegment?.inward.z || 1;
-            distance = 0;
-          }
-          const plushSupport = this.getPlushArmSupport(
-            plush,
-            normalX,
-            normalY,
-            normalZ
-          );
-          const tipSupport = this.getProngTipSupport(
-            entry,
-            normalX,
-            normalY,
-            normalZ
-          );
-          const clearance = plushSupport + tipSupport + PRONG_TIP_SOLVER_EPSILON;
-          if (distance >= clearance) return;
-          const correction = clearance - distance;
+          const contact = this.getPlushTipContact(plush, entry);
+          if (!contact || contact.gap >= 0) return;
+          const { x, y, z } = contact.outward;
+          const normalX = -x;
+          const normalY = -y;
+          const normalZ = -z;
+          const correction = Math.min(-contact.gap + PRONG_TIP_SOLVER_EPSILON, 0.055);
           body.position.x += normalX * correction;
           body.position.y += normalY * correction;
           body.position.z += normalZ * correction;
@@ -4592,11 +4444,12 @@ class ImasoraCompanionCatcherGame {
   }
 
   limitArmPressDepth(plush) {
+    const held = this.grip?.plush === plush;
     if (
       !plush.active
       || plush.won
-      || this.grip?.plush === plush
-      || plush.armContactTime <= 0
+      || plush.inPrizeHole
+      || (held ? !this.grip.seatingOnBelt : plush.armContactTime <= 0)
     ) return;
     const body = plush.body;
     const prizeHoleDistance = Math.hypot(
@@ -4617,13 +4470,14 @@ class ImasoraCompanionCatcherGame {
       ? MOUND_ARM_PRESS_SURFACE_TOLERANCE
       : 0.022;
     const maximumSink = onCenterMound ? MOUND_ARM_PRESS_MAX_SINK : 0.032;
-    const minimumY = Math.max(
-      restingY - surfaceTolerance,
-      plush.armContactBaseY - maximumSink
-    );
+    // The closing claw can still press down after it registers a valid grip.
+    // Leave the real floor under the toy until the claws have lifted it clear.
+    const minimumY = held
+      ? restingY
+      : Math.max(restingY - surfaceTolerance, plush.armContactBaseY - maximumSink);
     if (body.position.y < minimumY) {
       body.position.y = minimumY;
-      body.velocity.y = onCenterMound
+      body.velocity.y = held || onCenterMound
         ? Math.max(body.velocity.y, 0)
         : Math.max(body.velocity.y, -0.08);
       body.aabbNeedsUpdate = true;
@@ -4706,7 +4560,7 @@ class ImasoraCompanionCatcherGame {
     }
   }
 
-  maintainConveyorMotion() {
+  maintainConveyorMotion(delta) {
     this.plushes.forEach(plush => {
       if (
         !plush.active
@@ -4737,6 +4591,17 @@ class ImasoraCompanionCatcherGame {
         const correction = minimumSpeed - tangentSpeed;
         body.velocity.x += data.tangent.x * correction;
         body.velocity.z += data.tangent.z * correction;
+      }
+      const outwardX = data.tangent.z;
+      const outwardZ = -data.tangent.x;
+      const edgeOffset = -data.dx * outwardX - data.dz * outwardZ - CONVEYOR_RETURN_START_OFFSET;
+      if (edgeOffset > 0) {
+        const outwardSpeed = body.velocity.x * outwardX + body.velocity.z * outwardZ;
+        const inwardSpeed = Math.min(CONVEYOR_RETURN_MAX_SPEED, edgeOffset * 3);
+        // Restore the inner lane after friction and collisions have been solved.
+        const returnStep = Math.max(0, outwardSpeed + inwardSpeed) * Math.min(1, delta * 24);
+        body.velocity.x -= outwardX * returnStep;
+        body.velocity.z -= outwardZ * returnStep;
       }
       body.angularVelocity.x = clamp(body.angularVelocity.x, -0.065, 0.065);
       body.angularVelocity.y = clamp(body.angularVelocity.y, -0.105, 0.105);
@@ -4818,20 +4683,16 @@ class ImasoraCompanionCatcherGame {
 
   updateRigidClawContactTransform() {
     const pose = this.getProngPose();
-    const tipRadii = [0, 1, 2].map(index => this.getProngTipRadius(pose, index));
-    const radius = Math.max(
-      0.2,
-      tipRadii.reduce((total, value) => total + value, 0) / tipRadii.length
-    );
+    const radius = Math.max(0.2, pose.tipRadius);
     let slopeX = 0;
     let slopeZ = 0;
-    for (let index = 0; index < 3; index += 1) {
-      const angle = (index / 3) * Math.PI * 2;
+    for (let index = 0; index < CLAW_PRONG_COUNT; index += 1) {
+      const angle = getProngAngle(index);
       const lift = this.prongContactLift[index] || 0;
       slopeX += lift * Math.cos(angle);
       slopeZ += lift * Math.sin(angle);
     }
-    const planeScale = 2 / (3 * radius);
+    const planeScale = 2 / (CLAW_PRONG_COUNT * radius);
     slopeX *= planeScale;
     slopeZ *= planeScale;
     const maximumSlope = Math.tan(0.36);
@@ -4854,12 +4715,11 @@ class ImasoraCompanionCatcherGame {
     for (let index = 0; index < 3; index += 1) {
       const lift = this.prongContactLift[index] || 0;
       if (lift <= 0.0001) continue;
-      const angle = (index / 3) * Math.PI * 2;
-      const pointRadius = tipRadii[index];
+      const angle = getProngAngle(index);
       this.clawContactLocalPoint.set(
-        Math.cos(angle) * pointRadius,
+        Math.cos(angle) * pose.tipRadius,
         pose.tipY,
-        Math.sin(angle) * pointRadius
+        Math.sin(angle) * pose.tipRadius
       );
       this.clawYawBaseOrientation.vmult(this.clawContactLocalPoint, this.clawBasePointOffset);
       this.clawOrientation.vmult(this.clawContactLocalPoint, this.clawTiltedPointOffset);
@@ -4875,32 +4735,42 @@ class ImasoraCompanionCatcherGame {
   }
 
   getProngPose() {
+    const closure = clamp(this.prongClosure, 0, 1);
+    const extra = clamp(this.prongClosure - 1, 0, 1);
+    const openTipRadius = lerp(1.1, 0.67, closure) * CLAW_SIZE_SCALE - PRONG_PADDLE_INSET;
+    let elbowRadius = (lerp(1.27, 0.91, closure) - 0.06 * extra) * CLAW_SIZE_SCALE;
+    let tipRadius = lerp(openTipRadius, PRONG_PADDLE_MIN_RADIUS, extra);
+    if (this.deepMichimeGrab && ["descending", "closing", "lifting"].includes(this.phase)) {
+      // Keep the low sweep clear of the rail before letting the tips close.
+      const { x, z } = this.carriage.position;
+      const edge = nearestEllipseData(x, z, OUTER_FENCE_RX, OUTER_FENCE_RZ);
+      const railClearance = OUTER_FENCE_HALF_THICKNESS + PRONG_SHAFT_COLLIDER_RADIUS + 0.06;
+      const openRadius = Math.max(PRONG_PADDLE_MIN_RADIUS, edge.distance - railClearance);
+      const heightAboveRail = this.clawBody.position.y - 1.4 * CLAW_SIZE_SCALE - OUTER_FENCE_TOP_Y;
+      const openingClearance = this.phase === "lifting" ? smoothStep(heightAboveRail / 0.35) : 0;
+      const radius = lerp(openRadius, Math.max(openRadius, elbowRadius), openingClearance);
+      tipRadius = Math.max(PRONG_PADDLE_MIN_RADIUS, tipRadius * Math.min(1, radius / elbowRadius));
+      elbowRadius = Math.min(elbowRadius, radius);
+    }
     return {
       startRadius: 0.2 * CLAW_SIZE_SCALE,
-      elbowRadius: lerp(1.27, 0.91, this.prongClosure) * CLAW_SIZE_SCALE,
-      tipRadius: lerp(1.1, 0.67, this.prongClosure) * CLAW_SIZE_SCALE,
+      elbowRadius,
+      tipRadius,
       startY: -0.06 * CLAW_SIZE_SCALE,
       elbowY: -0.72 * CLAW_SIZE_SCALE,
       tipY: -1.4 * CLAW_SIZE_SCALE
     };
   }
 
-  getProngTipRadius(pose, prongIndex) {
-    const inwardOffset = prongIndex === TURNER_PRONG_INDEX
-      ? TURNER_PRONG_INWARD_OFFSET
-      : 0;
-    return Math.max(pose.startRadius, pose.tipRadius - inwardOffset);
-  }
-
   getGripTargetY() {
-    return this.getProngPose().tipY + ROUND_PRONG_TIP_RADIUS;
+    return this.getProngPose().tipY + GRIP_TARGET_ABOVE_PRONG_TIP;
   }
 
   isPlushFullyBelowProngTips(plush) {
-    const tipHeights = this.prongSegments
-      .filter(segment => segment.kind === "lower")
-      .map(segment => segment.end.y);
-    if (tipHeights.length < 3) return false;
+    const tipHeights = this.prongBodies
+      .filter(entry => entry.isGripTip)
+      .map(entry => entry.body.position.y - this.getProngSupportDistance(entry, 0, -1, 0));
+    if (tipHeights.length < CLAW_PRONG_COUNT) return false;
     const lowestTipY = Math.min(...tipHeights);
     const topSupport = this.getPlushArmSupport(plush, 0, -1, 0);
     return plush.body.position.y + topSupport
@@ -4924,8 +4794,8 @@ class ImasoraCompanionCatcherGame {
     const pose = this.getProngPose();
     this.appliedProngClosure = this.prongClosure;
     const worldProngs = [];
-    for (let prongIndex = 0; prongIndex < 3; prongIndex += 1) {
-      const angle = (prongIndex / 3) * Math.PI * 2;
+    for (let prongIndex = 0; prongIndex < CLAW_PRONG_COUNT; prongIndex += 1) {
+      const angle = getProngAngle(prongIndex);
       const radialX = Math.cos(angle);
       const radialZ = Math.sin(angle);
       const localStart = new CANNON.Vec3(
@@ -4938,11 +4808,10 @@ class ImasoraCompanionCatcherGame {
         pose.elbowY,
         radialZ * pose.elbowRadius
       );
-      const tipRadius = this.getProngTipRadius(pose, prongIndex);
       const localTip = new CANNON.Vec3(
-        radialX * tipRadius,
+        radialX * pose.tipRadius,
         pose.tipY,
-        radialZ * tipRadius
+        radialZ * pose.tipRadius
       );
       const inward = this.clawOrientation.vmult(new CANNON.Vec3(-radialX, 0, -radialZ));
       inward.normalize();
@@ -4971,19 +4840,25 @@ class ImasoraCompanionCatcherGame {
     });
     this.prongBodies.forEach(entry => {
       const prong = worldProngs[entry.prongIndex];
-      let next;
-      if (entry.turnerBlade) {
-        next = prong.tip.clone();
-      } else {
-        const from = entry.segment === "upper" ? prong.start : prong.middle;
-        const to = entry.segment === "upper" ? prong.middle : prong.tip;
-        next = new CANNON.Vec3(
-          lerp(from.x, to.x, entry.amount),
-          lerp(from.y, to.y, entry.amount),
-          lerp(from.z, to.z, entry.amount)
-        );
-      }
+      const from = entry.segment === "upper" ? prong.start : prong.middle;
+      const to = entry.segment === "upper" ? prong.middle : prong.tip;
+      const next = new CANNON.Vec3(
+        lerp(from.x, to.x, entry.amount),
+        lerp(from.y, to.y, entry.amount),
+        lerp(from.z, to.z, entry.amount)
+      );
       const body = entry.body;
+      if (entry.isGripTip) {
+        this.prongPaddleOrientation.setFromAxisAngle(
+          this.clawUpAxis,
+          Math.PI / 2 - getProngAngle(entry.prongIndex)
+        );
+        this.clawOrientation.mult(this.prongPaddleOrientation, body.quaternion);
+        const offset = this.prongPaddleCenterOffset;
+        offset.copy(entry.paddleCenter);
+        body.quaternion.vmult(offset, offset);
+        next.vadd(offset, next);
+      }
       const previous = body.position.clone();
       if (entry.initialized && delta > 0) {
         entry.previousPosition.copy(previous);
@@ -5001,42 +4876,53 @@ class ImasoraCompanionCatcherGame {
         body.velocity.set(0, 0, 0);
         entry.initialized = true;
       }
-      if (entry.turnerBlade) {
-        this.clawOrientation.mult(entry.localQuaternion, body.quaternion);
-      } else {
-        body.quaternion.copy(this.clawOrientation);
-      }
       body.aabbNeedsUpdate = true;
     });
   }
 
-  getProngFenceExtents(entry, outwardX, outwardZ) {
+  getProngSupportDistance(entry, x, y, z) {
     const shape = entry.body.shapes[0];
-    if (shape instanceof CANNON.Sphere) {
-      return { horizontal: shape.radius, vertical: shape.radius };
+    if (!entry.isGripTip) return shape.radius;
+    this.prongSupportAxis.set(x, y, z);
+    entry.body.vectorToLocalFrame(this.prongSupportAxis, this.prongLocalAxis);
+    let reach = 0;
+    for (const point of shape.vertices) {
+      reach = Math.max(reach, this.prongLocalAxis.dot(point));
     }
-    if (shape instanceof CANNON.Box) {
-      this.fenceWorldNormal.set(outwardX, 0, outwardZ);
-      entry.body.vectorToLocalFrame(this.fenceWorldNormal, this.fenceLocalNormal);
-      entry.body.vectorToLocalFrame(this.fenceUpAxis, this.fenceLocalUp);
-      const half = shape.halfExtents;
-      return {
-        horizontal: Math.abs(this.fenceLocalNormal.x) * half.x
-          + Math.abs(this.fenceLocalNormal.y) * half.y
-          + Math.abs(this.fenceLocalNormal.z) * half.z,
-        vertical: Math.abs(this.fenceLocalUp.x) * half.x
-          + Math.abs(this.fenceLocalUp.y) * half.y
-          + Math.abs(this.fenceLocalUp.z) * half.z
-      };
-    }
-    const radius = shape.boundingSphereRadius || 0.12 * CLAW_SIZE_SCALE;
-    return { horizontal: radius, vertical: radius };
+    return reach;
+  }
+
+  getConveyorReturnSurfaceY(x, z) {
+    const scaledX = x / OUTER_FENCE_RX;
+    const scaledZ = z / OUTER_FENCE_RZ;
+    const radiusSquared = scaledX * scaledX + scaledZ * scaledZ;
+    if (
+      radiusSquared < (CONVEYOR_RETURN_INNER_SCALE * CONVEYOR_RETURN_CHORD) ** 2
+      || radiusSquared > CONVEYOR_RETURN_OUTER_SCALE ** 2
+    ) return CONVEYOR_RETURN_BASE_Y;
+    const angle = Math.atan2(scaledZ, scaledX);
+    const turn = angle < 0 ? angle + Math.PI * 2 : angle;
+    const section = this.conveyorReturnSections[Math.floor(turn / CONVEYOR_RETURN_STEP)];
+    if (!section) return CONVEYOR_RETURN_BASE_Y;
+    const level = (scaledX * section.x + scaledZ * section.z) / CONVEYOR_RETURN_CHORD;
+    if (level > CONVEYOR_RETURN_OUTER_SCALE) return CONVEYOR_RETURN_BASE_Y;
+    return CONVEYOR_RETURN_BASE_Y + CONVEYOR_RETURN_RISE * clamp(
+      (level - CONVEYOR_RETURN_INNER_SCALE) / (CONVEYOR_RETURN_OUTER_SCALE - CONVEYOR_RETURN_INNER_SCALE),
+      0,
+      1
+    );
   }
 
   getArmMoundPointPenetration(x, y, z) {
     const moundHeight = centerMoundHeightAt(x, z);
-    if (moundHeight <= 0) return 0;
-    const surfaceY = CENTER_MOUND_BASE_Y + moundHeight + ARM_MOUND_CLEARANCE;
+    const aboveChute = Math.abs(x - PRIZE_HOLE_POSITION.x) < PRIZE_HOLE_RADIUS_X
+      && Math.abs(z - PRIZE_HOLE_POSITION.z) < PRIZE_HOLE_RADIUS_Z;
+    if (moundHeight <= 0 && aboveChute) return 0;
+    const surfaceY = Math.max(
+      BELT_SURFACE_Y,
+      CENTER_MOUND_BASE_Y + moundHeight,
+      this.getConveyorReturnSurfaceY(x, z)
+    ) + ARM_MOUND_CLEARANCE;
     return Math.max(0, surfaceY - y);
   }
 
@@ -5185,47 +5071,21 @@ class ImasoraCompanionCatcherGame {
     return penetration;
   }
 
-  getBoxMoundPenetration(body, halfExtents) {
-    let penetration = 0;
-    for (let xIndex = -1; xIndex <= 1; xIndex += 1) {
-      for (let yIndex = -1; yIndex <= 1; yIndex += 2) {
-        for (let zIndex = -1; zIndex <= 1; zIndex += 1) {
-          this.moundSampleLocalPoint.set(
-            halfExtents.x * xIndex,
-            halfExtents.y * yIndex,
-            halfExtents.z * zIndex
-          );
-          body.quaternion.vmult(this.moundSampleLocalPoint, this.moundSampleWorldPoint);
-          this.moundSampleWorldPoint.vadd(body.position, this.moundSampleWorldPoint);
-          penetration = Math.max(
-            penetration,
-            this.getArmMoundPointPenetration(
-              this.moundSampleWorldPoint.x,
-              this.moundSampleWorldPoint.y,
-              this.moundSampleWorldPoint.z
-            )
-          );
-        }
-      }
-    }
-    return penetration;
-  }
-
   getProngMoundPenetration(entry) {
-    const shape = entry.body.shapes[0];
-    if (shape instanceof CANNON.Sphere) {
-      const includesRoundTip = entry.segment === "lower" && entry.amount >= 0.95;
-      const visualRadius = includesRoundTip ? ROUND_PRONG_TIP_RADIUS : 0;
-      return this.getSphereMoundPenetration(
-        entry.body.position,
-        Math.max(shape.radius, visualRadius)
-      );
+    const { body } = entry;
+    const shape = body.shapes[0];
+    if (!entry.isGripTip) return this.getSphereMoundPenetration(body.position, shape.radius);
+    let penetration = 0;
+    for (const vertex of shape.vertices) {
+      body.pointToWorldFrame(vertex, this.prongWorldPoint);
+      const point = this.prongWorldPoint;
+      penetration = Math.max(penetration, this.getArmMoundPointPenetration(point.x, point.y, point.z));
     }
-    if (shape instanceof CANNON.Box) {
-      return this.getBoxMoundPenetration(entry.body, shape.halfExtents);
-    }
-    const radius = shape.boundingSphereRadius || 0.12 * CLAW_SIZE_SCALE;
-    return this.getSphereMoundPenetration(entry.body.position, radius);
+    this.prongSurfacePoint.set(0, -PRONG_PADDLE_DEPTH / 2 - PRONG_PADDLE_BEVEL, 0);
+    body.pointToWorldFrame(this.prongSurfacePoint, this.prongWorldPoint);
+    const point = this.prongWorldPoint;
+    penetration = Math.max(penetration, this.getArmMoundPointPenetration(point.x, point.y, point.z));
+    return penetration;
   }
 
   resolveArmMoundPenetration() {
@@ -5274,18 +5134,17 @@ class ImasoraCompanionCatcherGame {
       const previous = entry.previousPosition || position;
       const previousSignedDistance = (previous.x - data.point.x) * outwardX
         + (previous.z - data.point.z) * outwardZ;
-      const extents = this.getProngFenceExtents(entry, outwardX, outwardZ);
       const inner = -OUTER_FENCE_HALF_THICKNESS
-        - extents.horizontal
+        - this.getProngSupportDistance(entry, outwardX, 0, outwardZ)
         - OUTER_FENCE_COLLISION_MARGIN;
       const outer = OUTER_FENCE_HALF_THICKNESS
-        + extents.horizontal
+        + this.getProngSupportDistance(entry, -outwardX, 0, -outwardZ)
         + OUTER_FENCE_COLLISION_MARGIN;
       const bottom = OUTER_FENCE_BOTTOM_Y
-        - extents.vertical
+        - this.getProngSupportDistance(entry, 0, 1, 0)
         - OUTER_FENCE_COLLISION_MARGIN;
       const top = OUTER_FENCE_TOP_Y
-        + extents.vertical
+        + this.getProngSupportDistance(entry, 0, -1, 0)
         + OUTER_FENCE_COLLISION_MARGIN;
       const insideNow = signedDistance >= inner
         && signedDistance <= outer
@@ -5568,19 +5427,18 @@ class ImasoraCompanionCatcherGame {
             normalY /= normalLength;
             normalZ /= normalLength;
           }
-          const clearance = this.getPlushArmClearance(
-            plush,
-            normalX,
-            normalY,
-            normalZ
-          );
-          if (distance >= clearance) return;
+          // Before a grab, correct only overlap with a real part of the toy.
+          // Its silhouette cannot be treated as solid space between its parts.
+          const penetration = plush.clawContained
+            ? this.getPlushArmClearance(plush, normalX, normalY, normalZ) - distance
+            : -(this.getPlushPartContact(plush, closest, PRONG_SHAFT_COLLIDER_RADIUS)?.gap ?? 0);
+          if (penetration <= 0) return;
           this.markArmContact(plush);
           if (supportFromBelow) {
             this.markPlushSupportedByArm(plush);
             plush.liftSupportTime = Math.max(plush.liftSupportTime, 0.2);
           }
-          const desiredCorrection = (clearance - distance) * 0.78 + 0.003;
+          const desiredCorrection = penetration * 0.78 + 0.003;
           const correctionBudget = Number.isFinite(plush.armCorrectionRemaining)
             ? plush.armCorrectionRemaining
             : ARM_PLUSH_CORRECTION_BUDGET_PER_FRAME;
@@ -5665,6 +5523,54 @@ class ImasoraCompanionCatcherGame {
     plush.body.wakeUp();
   }
 
+  getPlushTipContact(plush, entry) {
+    return this.getPlushPartContact(
+      plush,
+      entry.body.position,
+      entry.body.shapes[0].boundingSphereRadius,
+      entry
+    );
+  }
+
+  getPlushPartContact(plush, position, radius, entry = null) {
+    const body = plush.body;
+    this.armCollisionNormal.set(position.x, position.y, position.z);
+    const localTip = body.pointToLocalFrame(this.armCollisionNormal);
+    const tipReach = radius + PLUSH_FABRIC_CONTACT_ALLOWANCE;
+    let closest = null;
+    for (let index = 0; index < body.shapes.length; index += 1) {
+      const shape = body.shapes[index];
+      const localPoint = localTip.vsub(body.shapeOffsets[index]);
+      const range = shape.boundingSphereRadius + tipReach;
+      if (localPoint.lengthSquared() > range * range) continue;
+      let separation = -Infinity;
+      let contactNormal = null;
+      for (let face = 0; face < shape.faces.length; face += 1) {
+        const normal = shape.faceNormals[face];
+        const vertex = shape.vertices[shape.faces[face][0]];
+        const distance = normal.dot(localPoint) - normal.dot(vertex);
+        if (distance > separation) {
+          separation = distance;
+          contactNormal = normal;
+        }
+      }
+      if (!contactNormal) continue;
+      const outward = body.vectorToWorldFrame(contactNormal);
+      const reach = entry
+        ? this.getProngSupportDistance(entry, -outward.x, -outward.y, -outward.z)
+        : radius;
+      const gap = separation - reach;
+      if (gap > PLUSH_FABRIC_CONTACT_ALLOWANCE || (closest && gap >= closest.gap)) continue;
+      closest = {
+        gap,
+        outward,
+        upwardSupport: -outward.y,
+        offsetY: position.y - reach * outward.y - body.position.y
+      };
+    }
+    return closest;
+  }
+
   getGripProngContacts(plush, { includeRecent = false } = {}) {
     const prongEntryByBody = new Map(
       this.prongBodies.map(entry => [entry.body, entry])
@@ -5701,6 +5607,21 @@ class ImasoraCompanionCatcherGame {
       supportScore = Math.max(supportScore, contactSupport);
       if (contactSupport >= 0.07) supportiveIndices.add(prongEntry.prongIndex);
     });
+    // The penetration solver leaves a small cloth clearance before the next
+    // physics step. Check that gap on the actual rounded hull at the claw tips.
+    for (const entry of this.prongBodies) {
+      if (!entry.isGripTip || supportiveIndices.has(entry.prongIndex)) continue;
+      const contact = this.getPlushTipContact(plush, entry);
+      if (!contact) continue;
+      const index = entry.prongIndex;
+      contactIndices.add(index);
+      const lowerDepth = -contact.offsetY / plush.spec.height;
+      const support = clamp((lowerDepth - 0.1) / 0.35, 0, 1)
+        * clamp((contact.upwardSupport - 0.16) / 0.64, 0, 1);
+      supportScores[index] = Math.max(supportScores[index], support);
+      supportScore = Math.max(supportScore, support);
+      if (support >= 0.07) supportiveIndices.add(index);
+    }
     if (includeRecent) {
       const now = this.elapsed;
       for (let index = 0; index < 3; index += 1) {
@@ -5804,7 +5725,7 @@ class ImasoraCompanionCatcherGame {
       return {
         distance,
         clearance: this.getPlushArmSupport(plush, normalX, normalY, normalZ)
-          + this.getProngTipSupport(entry, normalX, normalY, normalZ)
+          + this.getProngSupportDistance(entry, normalX, normalY, normalZ)
           + PRONG_TIP_SOLVER_EPSILON
       };
     };
@@ -5812,7 +5733,7 @@ class ImasoraCompanionCatcherGame {
     const initialSegments = this.prongSegments.map(segment => (
       getSegmentState(start, segment)
     ));
-    const tipEntries = this.prongBodies.filter(entry => entry.roundTip || entry.turnerBlade);
+    const tipEntries = this.prongBodies.filter(entry => entry.isGripTip);
     const initialTips = tipEntries.map(entry => getTipState(start, entry));
     for (let sample = 1; sample <= sampleCount; sample += 1) {
       const time = horizon * sample / sampleCount;
@@ -5937,7 +5858,7 @@ class ImasoraCompanionCatcherGame {
         ? this.appliedProngClosure
         : this.prongClosure,
       0,
-      1
+      MAX_PRONG_CLOSURE
     );
     const localTipOffset = this.clawOrientation.vmult(
       new CANNON.Vec3(0, this.getGripTargetY(), 0)
@@ -5961,6 +5882,8 @@ class ImasoraCompanionCatcherGame {
           vertical,
           quality,
           contactCount: prongContacts.contactIndices.size,
+          narrowPinch: holdClosure > 1 && prongContacts.contactIndices.size >= 2
+            && quality >= NARROW_PINCH_MIN_QUALITY,
           supportContactCount: prongContacts.supportiveIndices.size,
           supportScore: prongContacts.supportScore
         };
@@ -5980,7 +5903,7 @@ class ImasoraCompanionCatcherGame {
       const threeArmGrip = entry.contactCount === 3 && entry.quality >= 0.2;
       const centeredTwoArmGrip = entry.contactCount === 2
         && entry.quality >= ENCLOSED_TWO_ARM_GRIP_MIN_QUALITY;
-      return entry.supportContactCount >= 1
+      return (entry.supportContactCount >= 1 || entry.narrowPinch)
         && (threeArmGrip || centeredTwoArmGrip);
     });
     if (!candidate) {
@@ -6003,7 +5926,7 @@ class ImasoraCompanionCatcherGame {
     const noise = 0.88 + Math.random() * 0.18;
     const supportFactor = lerp(0.72, 1, smoothStep(candidate.supportScore));
     const integrity = clamp(
-      candidate.plush.spec.grip * candidate.quality * supportFactor * noise + 0.08,
+      candidate.plush.spec.grip * candidate.quality * supportFactor * noise + 0.08 + PLUSH_GRIP_INTEGRITY_BONUS,
       0.12,
       0.56
     );
@@ -6014,6 +5937,7 @@ class ImasoraCompanionCatcherGame {
       transportVelocity: this.clawBody.velocity.clone(),
       slipOffsetY: 0,
       physicalHoldLossTime: 0,
+      weightSupport: 0,
       lastContactOffset: new CANNON.Vec3(),
       lastContactNormal: new CANNON.Vec3(),
       lastContactStrength: 0,
@@ -6025,6 +5949,10 @@ class ImasoraCompanionCatcherGame {
       maximumLiftDistance: 0,
       holeDropGuaranteed: false,
       quality: candidate.quality,
+      // A low Michime can make early contact before the tips are seated.
+      seatingOnBelt: candidate.plush.characterId === MICHIME_PRIZE_ID
+        && nearestEllipseData(body.position.x, body.position.z).distance <= TRACK_HARD_LIMIT
+        && centerMoundHeightAt(body.position.x, body.position.z) === 0,
       contactCount: candidate.contactCount,
       supportScore: candidate.supportScore,
       holdClosure,
@@ -6099,10 +6027,12 @@ class ImasoraCompanionCatcherGame {
       const prongContacts = this.getGripProngContacts(grip.plush);
       const insideClaw = this.isPlushInsideClawEnvelope(grip.plush);
       const supportContactCount = prongContacts.supportiveIndices.size;
+      const contactCount = prongContacts.contactIndices.size;
+      const fullyEnclosed = insideClaw && contactCount === CLAW_PRONG_COUNT;
       const supportWeakness = 1 - clamp(prongContacts.supportScore, 0, 1);
-      const unstableHold = supportContactCount <= 1
-        || supportWeakness > 0.55
-        || grip.centerOffsetRatio > 0.4;
+      const unstableHold = !fullyEnclosed && (
+        supportContactCount <= 1 || supportWeakness > 0.55 || grip.centerOffsetRatio > 0.4
+      );
       if (unstableHold) {
         grip.midairInstabilityTime += delta;
       } else {
@@ -6127,22 +6057,36 @@ class ImasoraCompanionCatcherGame {
         + supportWeakness * 0.008
         + grip.centerOffsetRatio * 0.006
       );
+      const canRegrip = insideClaw && grip.quality >= ENCLOSED_TWO_ARM_GRIP_MIN_QUALITY;
+      const supportedPinch = canRegrip && grip.holdClosure > 1;
       const physicallyHeld = insideClaw
-        && prongContacts.contactIndices.size >= 2
-        && prongContacts.supportiveIndices.size >= 1;
+        && contactCount >= 2
+        && (supportContactCount >= 1 || fullyEnclosed || supportedPinch);
+      const recoverySeconds = canRegrip
+        ? CENTERED_GRIP_RECOVERY_SECONDS
+        : PLUSH_HOLD_RECOVERY_SECONDS;
+      const weightBlend = 1 - Math.exp(-22 * delta);
+      grip.weightSupport = lerp(grip.weightSupport, physicallyHeld ? 1 : 0, weightBlend);
       if (physicallyHeld) {
         grip.physicalHoldLossTime = Math.max(0, grip.physicalHoldLossTime - delta * 3);
       } else {
         grip.physicalHoldLossTime += delta;
-      }
-      if (!physicallyHeld) {
-        holdForceScale = 0.78 * clamp(
-          1 - grip.physicalHoldLossTime / 0.26,
+        // A prize can shift as it leaves the mound. Close the gap only while
+        // it is still centered between the claws, then hold its new position.
+        if (canRegrip) {
+          grip.holdClosure = Math.min(
+            MAX_PRONG_CLOSURE,
+            grip.holdClosure + CLAW_REGRIP_RATE * delta
+          );
+          this.gripClosureLock = grip.holdClosure;
+        }
+        holdForceScale = 0.86 * clamp(
+          1 - grip.physicalHoldLossTime / recoverySeconds,
           0,
           1
         );
       }
-      if (grip.physicalHoldLossTime >= 0.26) {
+      if (grip.physicalHoldLossTime >= recoverySeconds) {
         if (grip.holeDropGuaranteed) {
           this.releaseGrip(false, true);
           return;
@@ -6160,6 +6104,10 @@ class ImasoraCompanionCatcherGame {
     const springForce = displacement.scale(34 * holdForceScale);
     const dampingForce = relativeVelocity.scale(-5.2 * holdForceScale);
     const totalForce = springForce.vadd(dampingForce);
+    // Load is transmitted through confirmed prong contacts rather than
+    // waiting for gravity to pull the plush down far enough to stretch the spring.
+    totalForce.y -= this.world.gravity.y * body.mass
+      * HELD_WEIGHT_SUPPORT_RATIO * grip.weightSupport;
     const maximumForce = 16.5 + grip.integrity * 24;
     const forceLength = totalForce.length();
     if (forceLength > maximumForce) {
@@ -6316,31 +6264,30 @@ class ImasoraCompanionCatcherGame {
 
   releaseGrip(showMessage = false, dropImmediately = false) {
     if (!this.grip) return;
-    const releasedPlush = this.grip.plush;
-    if (dropImmediately && releasedPlush) {
-      const body = releasedPlush.body;
-      releasedPlush.clawContained = false;
-      releasedPlush.liftSupportTime = 0;
-      releasedPlush.stackSupportTime = 0;
-      releasedPlush.armContactTime = 0;
-      releasedPlush.softArmFallActive = false;
-      releasedPlush.directArmSupport = false;
-      releasedPlush.preserveDropPosition = false;
-      releasedPlush.inPrizeHole = true;
-      body.position.x = PRIZE_HOLE_POSITION.x;
-      body.position.z = PRIZE_HOLE_POSITION.z;
-      body.velocity.x = 0;
-      body.velocity.z = 0;
-      body.velocity.y = Math.min(body.velocity.y, -0.52);
-      body.angularVelocity.scale(0.3, body.angularVelocity);
-      body.collisionFilterMask = 0;
-      body.collisionResponse = false;
-      body.linearDamping = 0.2;
-      body.angularDamping = 0.94;
-      body.aabbNeedsUpdate = true;
-      body.wakeUp();
-    }
+    if (dropImmediately) this.beginPrizeDrop(this.grip.plush);
     this.grip = null;
+  }
+
+  beginPrizeDrop(plush) {
+    plush.clawContained = false;
+    plush.liftSupportTime = 0;
+    plush.stackSupportTime = 0;
+    plush.armContactTime = 0;
+    plush.softArmFallActive = false;
+    plush.directArmSupport = false;
+    plush.preserveDropPosition = false;
+    plush.inPrizeHole = true;
+    const body = plush.body;
+    body.velocity.set(0, Math.min(body.velocity.y, -PRIZE_DROP_START_SPEED), 0);
+    // Keep the release pose. The cabinet and the opening must not add spin.
+    body.angularVelocity.set(0, 0, 0);
+    body.torque.set(0, 0, 0);
+    body.collisionFilterMask = 0;
+    body.collisionResponse = false;
+    body.linearDamping = 0.2;
+    body.angularDamping = 0.94;
+    body.aabbNeedsUpdate = true;
+    body.wakeUp();
   }
 
   detectPrizes(delta) {
@@ -6353,8 +6300,7 @@ class ImasoraCompanionCatcherGame {
         const targetVelocityZ = (PRIZE_HOLE_POSITION.z - body.position.z) * 2.4;
         body.velocity.x = lerp(body.velocity.x, targetVelocityX, pullAmount);
         body.velocity.z = lerp(body.velocity.z, targetVelocityZ, pullAmount);
-        body.velocity.y = Math.min(body.velocity.y, -0.28);
-        body.angularVelocity.scale(0.9, body.angularVelocity);
+        body.velocity.y = Math.min(body.velocity.y, -PRIZE_DROP_START_SPEED);
         if (body.position.y <= PRIZE_HOLE_AWARD_Y) this.markPrizeWon(plush);
         return;
       }
@@ -6367,18 +6313,7 @@ class ImasoraCompanionCatcherGame {
         ? PRIZE_HOLE_TRIGGER_SCALE
         : PRIZE_HOLE_UNLIFTED_TRIGGER_SCALE;
       if (holeLevel > triggerScale) return;
-      plush.inPrizeHole = true;
-      plush.clawContained = false;
-      body.collisionFilterMask = 0;
-      body.collisionResponse = false;
-      body.linearDamping = 0.2;
-      body.angularDamping = 0.94;
-      body.velocity.x *= 0.3;
-      body.velocity.z *= 0.3;
-      body.velocity.y = Math.min(body.velocity.y, -0.38);
-      body.angularVelocity.scale(0.45, body.angularVelocity);
-      body.aabbNeedsUpdate = true;
-      body.wakeUp();
+      this.beginPrizeDrop(plush);
     });
   }
 
@@ -6397,6 +6332,7 @@ class ImasoraCompanionCatcherGame {
     this.caughtNames.push(plush.name);
     void this.autoSaver?.flush('capture');
     this.refreshHud();
+    celebrateGameEvent(this.root,plush.name+" 獲得！","arcade");
     safeCatchSound();
     if (this.onPrizeCaptured && plush.constructionRewardEventId) {
       const rewardSessionId = this.rewardSessionId;
@@ -6677,7 +6613,7 @@ class ImasoraCompanionCatcherGame {
     this.cableGeometry.attributes.position.needsUpdate = true;
 
     const pose = this.getProngPose();
-    this.prongVisuals.forEach((prong, prongIndex) => {
+    this.prongVisuals.forEach(prong => {
       const radialX = Math.cos(prong.angle);
       const radialZ = Math.sin(prong.angle);
       const start = new THREE.Vector3(
@@ -6690,18 +6626,14 @@ class ImasoraCompanionCatcherGame {
         pose.elbowY,
         radialZ * pose.elbowRadius
       );
-      const tipRadius = this.getProngTipRadius(pose, prongIndex);
       const tipPoint = new THREE.Vector3(
-        radialX * tipRadius,
+        radialX * pose.tipRadius,
         pose.tipY,
-        radialZ * tipRadius
+        radialZ * pose.tipRadius
       );
       setMeshBetween(prong.upper, start, middle);
       setMeshBetween(prong.lower, middle, tipPoint);
       prong.tip.position.copy(tipPoint);
-      if (prong.isTurner) {
-        prong.tip.rotation.set(0, Math.PI / 2 - prong.angle, 0);
-      }
     });
   }
 
@@ -6919,7 +6851,7 @@ class ImasoraCompanionCatcherGame {
       this.resolveArmPlushPenetration(8);
       this.suppressOutsideClawLift();
       this.suppressUnsupportedLift(delta);
-      this.maintainConveyorMotion();
+      this.maintainConveyorMotion(delta);
       this.enforceClawHeadClearance();
       this.detectPrizes(delta);
       this.confinePlushesToOuterFence();

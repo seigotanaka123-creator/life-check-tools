@@ -12,12 +12,14 @@ export const EXCAVATION_FENCES=Object.freeze([
 export function createWorldExcavationModel({shared=false}={}){
   const root=new THREE.Group();root.name='construction-excavation-yard';
   const soil=new THREE.MeshStandardMaterial({color:0xbe9159,roughness:1}),metal=new THREE.MeshStandardMaterial({color:0x478b92,roughness:.7}),dark=new THREE.MeshStandardMaterial({color:0x465c51,roughness:1}),yellow=new THREE.MeshStandardMaterial({color:0xe7bd55});
-  const cube=new THREE.BoxGeometry(1,1,1),box=(x,y,z,w,h,d,m,name)=>{const o=new THREE.Mesh(cube,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.name=name;o.castShadow=o.receiveShadow=true;root.add(o);return o;};
+  const cube=new THREE.BoxGeometry(1,1,1),box=(x,y,z,w,h,d,m,name,parent=root)=>{const o=new THREE.Mesh(cube,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.name=name;o.castShadow=o.receiveShadow=true;parent.add(o);return o;};
   box(32,-36,112,128,8,128,dark,'岩盤');
   for(const f of shared?[]:EXCAVATION_FENCES){box(f.x,20,f.z,f.w,40,f.d,dark,'掘削外柵');box(f.x,40,f.z,f.w,2,f.d+1,yellow,'柵の上端');}
-  box(BIN.x,1.5,BIN.z,BIN.width,3,BIN.depth,metal,'受け箱底');
-  for(const x of[-1,1])box(BIN.x+x*(BIN.width/2-1.5),5,BIN.z,3,10,BIN.depth,metal,'受け箱の縁');
-  for(const z of[-1,1])box(BIN.x,5,BIN.z+z*(BIN.depth/2-1.5),BIN.width,10,3,metal,'受け箱の縁');
+  const stockBin=new THREE.Group();stockBin.name='土の保管箱';
+  stockBin.position.set(BIN.x,0,BIN.z);root.add(stockBin);
+  box(0,1.5,0,BIN.width,3,BIN.depth,metal,'受け箱底',stockBin);
+  for(const x of[-1,1])box(x*(BIN.width/2-1.5),5,0,3,10,BIN.depth,metal,'受け箱の縁',stockBin);
+  for(const z of[-1,1])box(0,5,z*(BIN.depth/2-1.5),BIN.width,10,3,metal,'受け箱の縁',stockBin);
   // Entry markings lie outside the editable soil: no plane across the tunnel.
   const entry=createGroundMark(root,{name:'作業区画の出入口',x:-230,z:-232,width:72,depth:34,color:0xe7bd55,y:.13});
   const canvas=document.createElement('canvas');canvas.width=768;canvas.height=160;const ctx=canvas.getContext('2d');ctx.fillStyle='#264b44';ctx.fillRect(0,0,768,160);ctx.fillStyle='#fff2ca';ctx.font='bold 55px sans-serif';ctx.textAlign='center';ctx.fillText('ショベルカー作業区画',384,98);
@@ -28,7 +30,7 @@ export function createWorldExcavationModel({shared=false}={}){
   for(const o of[particles,pile]){o.frustumCulled=false;o.castShadow=o.receiveShadow=true;root.add(o);}
   // Keep the bucket unobstructed: the old floating ring was a debug guide,
   // not a machine part or a collider. Digging remains in the physics module.
-  root.userData={machine,particles,pile,entry,texture,terrain:null,terrainSource:null,terrainRevision:-1,binCount:-1,machinePose:null,spoilSource:null,fallingSource:null,matrix:new THREE.Matrix4()};return root;
+  root.userData={machine,stockBin,particles,pile,entry,texture,terrain:null,terrainSource:null,terrainRevision:-1,binCount:-1,machinePose:null,spoilSource:null,fallingSource:null,matrix:new THREE.Matrix4()};return root;
 }
 export function updateWorldExcavationModel(root,s,active,roof=false){
   const d=root.userData,v=s.loader.vehicle,a=s.arm,pose=[v.x,v.z,v.heading,v.wheelTravel,a.boom,a.stick,a.slew,a.curl,s.load,!!s.loader.transition,roof,s.bucketStyle,s.digMode];
@@ -50,5 +52,5 @@ export function disposeWorldExcavationModel(root){
   // Cabin material singletons are shared with other excavators: dispose only
   // this instance's geometry and private terrain/label/particle materials.
   if(!root)return;const geometries=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);});geometries.forEach(g=>g.dispose());root.userData.texture.dispose();
-  const materials=new Set();for(const o of root.children)if(o.material)materials.add(o.material);materials.forEach(m=>m.dispose());root.removeFromParent();
+  const materials=new Set();for(const o of [...root.children,...root.userData.stockBin.children])if(o.material)materials.add(o.material);materials.forEach(m=>m.dispose());root.removeFromParent();
 }

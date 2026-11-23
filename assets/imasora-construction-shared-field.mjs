@@ -1,21 +1,50 @@
 // Shared-field planning primitives. No game save, inventory, or legacy origin is
 // changed here. Existing works must keep their world coordinates on migration.
-export const FIELD = Object.freeze({minX:-2700,maxX:2700,minZ:-1800,maxZ:1800});
+export const FIELD = Object.freeze({minX:-5900,maxX:5900,minZ:-1800,maxZ:1800});
+export const QUARRY_EXTENT=Object.freeze({edge:2692,entryZ:-1232,width:3112,near:-408,far:2896});
+export function withinQuarry(corner,x,z){
+ if(!corner)return false;
+ const u=(corner.endsWith("west")?-x:x)-QUARRY_EXTENT.edge,v=(corner.startsWith("north")?z:-z)-QUARRY_EXTENT.entryZ;
+ return u>=0&&u<=QUARRY_EXTENT.width&&v>=QUARRY_EXTENT.near&&v<=QUARRY_EXTENT.far;
+}
+// All lanes are on the working ground. The north lane loops south of the
+// pedestrian bridge deck and its arrival area, keeping both routes usable.
+export const FIELD_ROADS=Object.freeze([
+ {id:'west-road',minX:-2671,maxX:-2565,minZ:-1718,maxZ:1718},
+ {id:'east-road',minX:2565,maxX:2671,minZ:-1718,maxZ:1718},
+ {id:'south-road',minX:-2618,maxX:2618,minZ:1665,maxZ:1771},
+ {id:'north-west-road',minX:-2618,maxX:-1330,minZ:-1771,maxZ:-1665},
+ {id:'north-east-road',minX:-970,maxX:2618,minZ:-1771,maxZ:-1665},
+ {id:'bridge-west-turn',minX:-1383,maxX:-1277,minZ:-1718,maxZ:-1430},
+ {id:'bridge-east-turn',minX:-1023,maxX:-917,minZ:-1718,maxZ:-1430},
+ {id:'bridge-bypass',minX:-1330,maxX:-970,minZ:-1483,maxZ:-1377},
+].map(Object.freeze));
 export const FIELD_RUN_SPEED=68*2.5;
+export const CONSTRUCTION_STEERING_FACTOR=.74;
 export const PARKING = Object.freeze({minX:-2650,maxX:-1730,minZ:-1740,maxZ:-980});
+// A shared plan for the paved surface, traffic markings, and protection.
+// Keep the saved bay coordinates. The two rows open onto a broad aisle;
+// the side lane bypasses their ends and opens onto the work area.
+const PARKING_PAVEMENT = Object.freeze([
+ Object.freeze({id:'apron',minX:-2700,maxX:-1400,minZ:-1800,maxZ:-900}),
+ Object.freeze({id:'exit',minX:-1856,maxX:-1604,minZ:-900,maxZ:-680})
+]);
+const PARKING_LANES = Object.freeze([
+ Object.freeze({id:'aisle',minX:-2586,maxX:-1730,minZ:-1460,maxZ:-1250}),
+ Object.freeze({id:'gate',minX:-1830,maxX:-1630,minZ:-1450,maxZ:-680})
+]);
 export const FLEET = Object.freeze([
  ['excavator','ショベルカー','🚜','土を掘る・ダンプへ積む',-2460,-1540,0,-58,-8,18.12],
  ['dump','ダンプカー','🚚','たくさん運ぶ・土を下ろす',-2260,-1540,0,-58,18,23.5],
- ['soil','火星土ローダー','🟣','火星土を敷く・回収する',-2060,-1540,0,-58,-8,9.12],
+ ['soil','アマネ星土ローダー','🟣','アマネ星土を敷く・回収する',-2060,-1540,0,-58,-8,9.12],
  ['water','給水車','💧','水を運ぶ・池をつくる',-1860,-1540,0,-58,20,20],
  ['crane','クレーン車','🏗️','部材を吊る・組み立てる',-2460,-1170,Math.PI,-58,-8,9.12],
  ['truck','ミキサー車','🟡','材料を練る・生コンを運ぶ',-2260,-1170,Math.PI,-50,21,19],
  ['pump','ポンプ車','🩵','ホースで生コンを注ぐ',-2060,-1170,Math.PI,-50,21,19]
 ].map(([id,name,icon,purpose,x,z,heading,doorX,doorZ,floor])=>Object.freeze({id,name,icon,purpose,x,z,heading,doorX,doorZ,floor})));
 export const FACILITIES=Object.freeze([
- {id:'water-supply',name:'給水・回収ステーション',x:-1550,z:-1570,hx:70,hz:66},
- {id:'material-store',name:'土・木材の保管所',x:-1550,z:-1340,hx:70,hz:66},
- {id:'mix-supply',name:'生コンの材料・型枠',x:-1550,z:-1110,hx:70,hz:66}
+ {id:'water-supply',name:'給水・回収ステーション',x:-1550,z:-1472,hx:70,hz:66},
+ {id:'material-store',name:'土・木材の保管所',x:-1550,z:-1340,hx:70,hz:66}
 ].map(Object.freeze));
 const finite=p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z);
 export function fieldContains(p,radius=0){return finite(p)&&Number.isFinite(radius)&&radius>=0&&p.x-radius>=FIELD.minX&&p.x+radius<=FIELD.maxX&&p.z-radius>=FIELD.minZ&&p.z+radius<=FIELD.maxZ;}
@@ -75,15 +104,46 @@ export function advanceFieldRoute(actor,path,dt,{canStand,speed=FIELD_RUN_SPEED}
  return{actor:p,path:points,moving:points.length>0,blocked:false,travel};
 }
 
+// When an advancing wheel meets a wall, steering can still turn the chassis
+// against the contact. Sweep the whole body at the same resolution as driving.
+// A corner is fixed during the turn; it never drives the vehicle in reverse.
+export function steerVehicleClearOfContact(vehicle,{throttle,steer,dt,halfWidth,halfLength,clear,swept=false}){
+ if(!throttle||!steer||!dt)return null;
+ const angle=-Math.sign(throttle)*steer*dt*.95;
+ // Concrete moves are serialized on a one-unit grid and their clear callback
+ // validates the entire swept action; only the final pose can be rounded.
+ const count=swept?1:Math.max(1,Math.ceil(Math.abs(angle)/.006));
+ const side=-Math.sign(angle)*Math.sign(throttle),end=Math.sign(throttle);
+ const pivots=[[0,0],[side,end],[-side,end],[side,-end],[-side,-end]];
+ let best=null,bestSteps=0;
+ for(const [sx,sz] of pivots){
+  const x=sx*halfWidth,z=sz*halfLength,pivot=fieldPoint(vehicle,x,z);
+  for(let i=1;i<=count;i++){
+   const heading=vehicle.heading+angle*i/count,offset=fieldPoint({x:0,z:0,heading},x,z);
+   const pose={...vehicle,x:pivot.x-offset.x,z:pivot.z-offset.z,heading};
+   if(!clear(pose))break;
+   if(i===count)return pose;
+   if(i>bestSteps){best=pose;bestSteps=i;}
+  }
+ }
+ return best;
+}
+
 export function sharedVehicleStep(v,input,dt,{obstacles=[],canSupport=()=>true}={}){
  if(!Number.isFinite(dt)||dt<0||dt>.05||![v.x,v.z,v.heading,v.speed,v.steering,v.travel].every(Number.isFinite)||![input.throttle??0,input.steer??0].every(n=>Number.isFinite(n)&&Math.abs(n)<=1))throw Error('車両の入力を確認してください。');
  const approach=(a,b,n)=>a<b?Math.min(b,a+n):Math.max(b,a-n),n={...v},throttle=input.throttle??0,factor=input.fast?2:1;
- n.steering=approach(n.steering,-(input.steer??0)*.47,dt*1.8);n.speed=approach(n.speed,input.brake?0:throttle*(throttle>=0?100:48)*factor,dt*(input.brake?190:throttle?65*factor:35));
+ n.steering=approach(n.steering,-(input.steer??0)*.47,dt*1.8);n.speed=approach(n.speed,input.brake?0:throttle*(throttle>=0?180:86.4)*factor,dt*(input.brake?305:throttle?125*factor:70));
  const distance=n.speed*dt,angle=distance*2*Math.tan(n.steering)/49,count=Math.max(1,Math.ceil(Math.abs(distance)/.5),Math.ceil(Math.abs(angle)/.008));let blocked=false;
+ // Corners and interior wheels, with swept steps. Both seats stay in the cab.
+ const samples=[[-35,-48],[35,-48],[-35,48],[35,48],[0,0],[-28,-28],[28,-28],[-28,28],[28,28]];
+ const clear=q=>!samples.some(([x,z])=>{const p=fieldPoint(q,x,z);return!fieldContains(p,2)||!canSupport(p)||obstacles.some(o=>fieldCircleHits(p,3,o));})&&!obstacles.some(o=>fieldCircleHits(o,Math.min(o.hx,o.hz),{...q,hx:35,hz:48}));
  for(let i=0;i<count;i++){const mid=n.heading+angle/count/2,q={...n,x:n.x+Math.sin(mid)*distance/count,z:n.z+Math.cos(mid)*distance/count,heading:n.heading+angle/count};
-  // Corners and interior wheels, with swept steps. Both seats stay in the cab.
-  const samples=[[-35,-48],[35,-48],[-35,48],[35,48],[0,0],[-28,-28],[28,-28],[-28,28],[28,28]];
-  if(samples.some(([x,z])=>{const p=fieldPoint(q,x,z);return!fieldContains(p,2)||!canSupport(p)||obstacles.some(o=>fieldCircleHits(p,3,o));})||obstacles.some(o=>fieldCircleHits(o,Math.min(o.hx,o.hz),{...q,hx:35,hz:48}))){n.speed=0;blocked=true;break;}
+  if(!clear(q)){
+   const steer=input.steer??0;
+   const turn=!input.brake&&throttle*distance>0&&steer*n.steering<0?steerVehicleClearOfContact(n,{throttle,steer:-n.steering/.47,dt,halfWidth:38,halfLength:51,clear}):null;
+   if(turn)Object.assign(n,turn);
+   n.speed=0;blocked=!turn;break;
+  }
   Object.assign(n,q);n.travel+=distance/count;
  }n.heading=Math.atan2(Math.sin(n.heading),Math.cos(n.heading));return{vehicle:n,blocked};
 }
@@ -97,19 +157,34 @@ export function proposeSharedParking(records,{clear=()=>true}={}){
 
 // Whole parking/facility footprint, including the aisle. Choose another corner
 // when an existing authored object occupies it; never delete or move the work.
-export function sharedParkingLayouts(){return [0,1,2,3].map(index=>{
+const parkingLayouts=[0,1,2,3].map(index=>{
  const mirrorX=index%2===1,mirrorZ=index>=2,sx=mirrorX?-1:1,sz=mirrorZ?-1:1;
  const heading=h=>Math.atan2(sx*Math.sin(h),sz*Math.cos(h));
  const vehicles=initialFleet().map(v=>({...v,x:v.x*sx,z:v.z*sz,heading:heading(v.heading)}));
  const facilities=FACILITIES.map(f=>({...f,x:f.x*sx,z:f.z*sz}));
  const bound=(a,b,s)=>[a*s,b*s].sort((a,b)=>a-b),[minX,maxX]=bound(PARKING.minX,PARKING.maxX,sx),[minZ,maxZ]=bound(PARKING.minZ,PARKING.maxZ,sz);
- return{corner:['north-west','north-east','south-west','south-east'][index],parking:{minX,maxX,minZ,maxZ},vehicles,facilities};
-});}
+ const rect=r=>{const [minX,maxX]=bound(r.minX,r.maxX,sx),[minZ,maxZ]=bound(r.minZ,r.maxZ,sz);return {...r,minX,maxX,minZ,maxZ};};
+ return{corner:['north-west','north-east','south-west','south-east'][index],parking:{minX,maxX,minZ,maxZ},vehicles,facilities,
+  pavement:PARKING_PAVEMENT.map(rect),lanes:PARKING_LANES.map(rect),exit:{x:-1730*sx,z:-680*sz},orientation:{sx,sz}};
+});
+export function sharedParkingLayouts(){return parkingLayouts;}
+export function parkingSurfaceOverlaps(corner,x,z,hx=0,hz=hx){
+ const layout=parkingLayouts.find(l=>l.corner===corner);
+ const overlaps=r=>x+hx>=r.minX&&x-hx<=r.maxX&&z+hz>=r.minZ&&z-hz<=r.maxZ;
+ return FIELD_ROADS.some(overlaps)||(layout?.pavement.some(overlaps)??false);
+}
 export function selectSharedParking({isClear,isGroundSafe}={}){
  if(typeof isClear!=='function'||typeof isGroundSafe!=='function')throw Error('作品と地面をたしかめてから駐車場を置いてください。');
  for(const layout of sharedParkingLayouts()){
-  const p=layout.parking,rects=[{x:(p.minX+p.maxX)/2,z:(p.minZ+p.maxZ)/2,hx:(p.maxX-p.minX)/2,hz:(p.maxZ-p.minZ)/2},...layout.facilities];
+  const rects=layout.pavement.map(p=>({x:(p.minX+p.maxX)/2,z:(p.minZ+p.maxZ)/2,hx:(p.maxX-p.minX)/2,hz:(p.maxZ-p.minZ)/2}));
   if(rects.every(r=>isClear(r))&&rects.every(r=>isGroundSafe(r)))return layout;
  }
  return null;
 }
+
+// Standalone vehicle practice has its own progression. Only the linked world installs this reader.
+let readLock=()=>'',readAttempt=()=>null;
+export function installConstructionMissionAccess(lock,attempt){readLock=lock;readAttempt=attempt;}
+export function constructionVehicleLock(id){return readLock(id);}
+export function foundationAttempt(){return readAttempt();}
+

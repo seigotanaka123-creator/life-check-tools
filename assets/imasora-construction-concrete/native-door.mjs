@@ -1,16 +1,16 @@
-import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=120pv';
+import {resolveBoardingAccess,freeBoardProblem} from './free-boarding.mjs?v=121d1';
 import {walkingGroundAt} from './free-walking-ground.mjs?v=120pv';
 
 const valid=(f,name)=>f?.location&&!f.aboard&&['truck','pump'].includes(name);
-export function concreteWorldDoor(f,name,{blockedAt=()=>false,heightAt=()=>0}={}){
+export function concreteWorldDoor(f,name,{blockedAt=()=>false,heightAt=()=>0,side=null}={}){
  if(!valid(f,name))return null;
- const access=resolveBoardingAccess(f,name,blockedAt,heightAt),v=f[name];
+ const access=resolveBoardingAccess(f,name,blockedAt,heightAt,null,side),v=f[name];
  // The ordinary world's whole-body collider includes the arms. Stop 7.75 units
  // outside the marker, still inside its existing eight-unit boarding zone.
- const door={...access.door,x:access.door.x-7.75*Math.cos(v.heading),z:access.door.z+7.75*Math.sin(v.heading)};
+ const offset=access.side*7.75,door={...access.door,x:access.door.x+offset*Math.cos(v.heading),z:access.door.z-offset*Math.sin(v.heading)};
  const support=walkingGroundAt(f,door.x,door.z,heightAt);if(!support)throw Error('ドア前の足元をたしかめてね。');door.y=support.height;
  const issue=freeBoardProblem(f,door,name,blockedAt,heightAt);if(issue)throw Error(issue);
- return{...door,x:door.x+f.location.x,z:door.z+f.location.z,heading:f[name].heading+Math.PI/2};
+ return{...door,x:door.x+f.location.x,z:door.z+f.location.z,heading:v.heading-access.side*Math.PI/2};
 }
 // Accept only the actual arrived pedestrian. No placement action, material edit,
 // fallback spawn, or implicit boarding is part of this coordinate handoff.

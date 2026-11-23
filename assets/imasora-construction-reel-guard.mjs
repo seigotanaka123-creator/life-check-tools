@@ -2,7 +2,7 @@ import {nativeFloatingSoilBoxes} from './imasora-construction-native-soil-layers
 import{rampItems,rampParts,rampPoint}from'./imasora-construction-reel-ramp.mjs?v=120oz';
 import{girders,rebarLeft,girderSupply}from'./imasora-construction-girder-shape.mjs?v=120pl';
 import{floorSupported}from'./imasora-construction-reel-levels.mjs?v=120pm';
-import{reelWorld,reelWorldParts,reelAddedParts,validateWorldReel}from'./imasora-construction-reel-world.mjs?v=120ps';
+import{reelWorld,reelWorldParts,reelAddedParts,validateWorldReel,reelTilesLeft}from'./imasora-construction-reel-world.mjs?v=120ps';
 import{outdoorSignObstacles,outdoorBoxesHit}from'./imasora-construction-outdoor-sign-guard.mjs?v=120pv';
 import{outdoorSignItems,outdoorSignParts}from'./imasora-construction-outdoor-signs.mjs?v=120hh';
 import{gardenItems,gardenParts}from'./imasora-construction-garden.mjs?v=120ps';
@@ -16,7 +16,7 @@ import{FIELD}from'./imasora-construction-shared-field.mjs?v=120ey';
 import{detailPoint}from'./imasora-construction-reel-structure.mjs?v=120pm';
 const ok=(v,m)=>{if(!v)throw Error(m);},supportCache=new WeakMap();
 export function assertReelWorld(world){
- const reel=reelWorld(world.constructionHighBuild);if(!reel)return true;validateWorldReel(reel);ok(rebarLeft(world)>=0,'鉄骨や歩廊の材料が足りないよ。建築セットの鉄筋材を受け取ろう。');ok(girders(reel.rooms).filter(g=>g.item.stage==='ready').length<=1,'用意した梁を運んでから、次の梁を用意しよう。');if(!reel.rooms.length)return true;
+ const reel=reelWorld(world.constructionHighBuild);if(!reel)return true;validateWorldReel(reel);ok(reelTilesLeft(world)>=0,'タイルが足りないよ。街で建築セットを開け、建材受取所で受け取ろう。');ok(rebarLeft(world)>=0,'鉄骨や歩廊の材料が足りないよ。建築セットの鉄筋材を受け取ろう。');ok(girders(reel.rooms).filter(g=>g.item.stage==='ready').length<=1,'用意した梁を運んでから、次の梁を用意しよう。');if(!reel.rooms.length)return true;
  const original=world.constructionTransport,soil=original?.work?.frame.soil;ok(soil,'足元の地面をたしかめよう。');
  const trusted=isCapturedConstructionJson(soil),terrain=trusted?original:structuredClone(original),patches=world.constructionSoil?.work.patches??[],tops=world.constructionSoil?worldSoilFloors(world.constructionSoil):[];
  // Only immutable captured earth with no extra soil patches shares a support result.

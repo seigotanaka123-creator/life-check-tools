@@ -2,127 +2,158 @@ import {installWorldColour} from './assets/imasora-world-colour.mjs?v=120pp';
 import{chooseVehicleHeight,createVehicleSurfaceIndex}from'./assets/imasora-construction-vehicle-elevation.mjs?v=120ov';
 import {coastTerrainBodySamples,coastTerrainBodyFloor,coastTerrainBodyBlocked,coastTerrainBodyContact} from './assets/imasora-coast-terrain-contact.mjs?v=120mx';
 import {createCoastGroundCamera} from './assets/imasora-coast-camera-ground.mjs?v=120mx';
-import {createCoastPebbleUI} from './assets/imasora-coast-pebble-ui.mjs?v=120nd';
-import {createCoastFruitUI} from './assets/imasora-coast-fruit-ui.mjs?v=120ne';
-import {createSnorkelController} from './assets/imasora-coast-snorkel-ui.mjs?v=120od';
+import {createCoastPebbleUI} from './assets/imasora-coast-pebble-ui.mjs?v=121gy';
+import {createCoastFruitUI} from './assets/imasora-coast-fruit-ui.mjs?v=121gz';
+import {createSnorkelController} from './assets/imasora-coast-snorkel-ui.mjs?v=121gy';
 import {createCoastWhaleScene} from './assets/imasora-coast-whale-scene.mjs?v=120oe';
 let coastWhaleScene=null;
 let coastPebbles=null,crabCameraRestore=null,coastFruits=null,coastSnorkel=null;
 import {createCoastCrabCamera} from './assets/imasora-coast-crab-view.mjs?v=120nd';
 const coastCrabCamera=createCoastCrabCamera();
 const coastGroundCamera=createCoastGroundCamera();
-import {createCoastRewardsUI} from './assets/imasora-coast-rewards-ui.mjs?v=120nd';
-import {createCoastRigUI} from './assets/imasora-coast-rig-ui.mjs?v=120nk';
+import {createCoastRewardsUI} from './assets/imasora-coast-rewards-ui.mjs?v=121gy';
+import {createCoastRigUI} from './assets/imasora-coast-rig-ui.mjs?v=121gy';
 import {positionCoastCrewCharacter} from './assets/imasora-coast-crew-character.mjs?v=120oc';
 import {createCoastLandmarkControls} from './assets/imasora-coast-landmark-controls.mjs?v=120od';
 import {COAST_TOYS} from './assets/imasora-coast-landmark-play.mjs?v=120io';
 let coastLandmarks=null;
 import {coastTerrainStep} from './assets/imasora-coast-direct-play.mjs?v=120nz';
-import {firstPersonFov,CAMERA_DISTANCE_PRESETS,worldCameraDistance,nextCameraDistance,conversationFraming} from './assets/imasora-world-camera-distance.mjs?v=120np';
-import {createConstructionTownBridge,constructionTownArrival} from './assets/imasora-construction-town-bridge.mjs?v=120pr';
-import {createConstructionSurroundings} from './assets/imasora-construction-surroundings.mjs?v=120pn';
+import {firstPersonFov,CAMERA_DISTANCE_PRESETS,WORLD_CAMERA_PRESETS,worldCameraDistance,orbitCameraPitch,nextCameraDistance,conversationCameraIndex,conversationFraming} from './assets/imasora-world-camera-distance.mjs?v=121fx';
+import {createConstructionTownBridge,constructionTownArrival} from './assets/imasora-construction-town-bridge.mjs?v=121cz';
+import {createConstructionSurroundings} from './assets/imasora-construction-surroundings.mjs?v=121d2';
 import {createConstructionBridgeUI} from './assets/imasora-construction-bridge-ui.mjs?v=120pr';
 let constructionTownBridge=null,constructionBridgeUI=null,constructionSurroundings=null;
 import{createCoastForageUI}from'./assets/imasora-coast-forage-ui.mjs?v=120ps';
-import {createSkyCloudGround} from './assets/imasora-sky-cloud-ground.mjs?v=120gr';
-import {createSkyMapAtmosphere} from './assets/imasora-sky-map-atmosphere.mjs?v=120pc';
-import {createCoastWorld} from './assets/imasora-coast-world.mjs?v=120ps';
+import {createSkyCloudGround, skyRaceEntryZ, skyRaceShoreContains} from './assets/imasora-sky-cloud-ground.mjs?v=121it-race-island';
+import {createSkyMapAtmosphere,createSkyWindObservation} from './assets/imasora-sky-map-atmosphere.mjs?v=121id-station';
+let skyWindObservation=null;
+import {createCoastWorld,createCoastRumorScene} from './assets/imasora-coast-world.mjs?v=121il-story-guide';
+import {createTideCaveObservation,createCaveDiagramCanvas,tideCaveObservationPoint} from './assets/imasora-coast-tide-cave-view.mjs?v=121c2';
+let coastRumors = null;
+let coastObservation = null;
+let coastSkyDiagramRead = false;
+let skyMarsObservatoryClue = false;
 import {createCoastUI} from './assets/imasora-coast-ui.mjs?v=120ni';
-import {createCoastPlayController} from './assets/imasora-coast-physics-controls.mjs?v=120pt';
+import {createCoastPlayController} from './assets/imasora-coast-physics-controls.mjs?v=121fy';
 import {coastCarryClearAt,coastCarryClearanceBatch} from './assets/imasora-coast-carry-clearance.mjs?v=120nu';
 import {coastHeight,coastWalkingHeight,coastCanWade,coastPierContains} from './assets/imasora-coast-layout.mjs?v=120mx';
-import {createCaveCrossingUI} from './assets/imasora-coast-cave-crossing-ui.mjs?v=120mx';
+import {createCaveCrossingUI} from './assets/imasora-coast-cave-crossing-ui.mjs?v=121gy';
 let caveCrossing=null;
 let skyCloudGround=null,skyAtmosphere=null,constructionAtmosphere=null,coastWorld=null,coastUI=null,coastForageUI=null,coastRigUI=null,coastRewardsUI=null,coastPlay=null,worldSun=null,worldHemi=null;
-import {createRenderBudget} from './assets/imasora-world-render-budget.mjs?v=120gg';
+import {createRenderBudget,createWorldDrawBackpressure} from './assets/imasora-world-render-budget.mjs?v=121eh';
 import {createWorldShadowCache,suspendHiddenDebugMatrices} from './assets/imasora-world-shadow-cache.mjs?v=120ld';
 import {createHighLive} from './assets/imasora-construction-high-live.mjs?v=120pv';
-import './assets/imasora-autosave.js?v=120qq';
-import {bindJumpButton,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,releasedJumpVelocity} from './assets/imasora-construction-locomotion.mjs?v=120od';
+import './assets/imasora-autosave.js?v=121e3';
+import {createConstructionAutoSaveGate} from './assets/imasora-construction-autosave-key.mjs?v=121ed';
+import {bindJumpButton,SKY_JUMP_VELOCITY,SKY_JUMP_GRAVITY,releasedJumpVelocity,createTravelAcceleration} from './assets/imasora-construction-locomotion.mjs?v=121d1';
+import {trackConstructionOverlay} from './assets/imasora-construction-overlays.mjs?v=120gm';
+import {constructionCourse,constructionMission,constructionVehicleUnlocked,CONSTRUCTION_MISSIONS,RAIN_WORKS_JOBS,rainWorksCutZones,rainWorksDepositRecorded,rainDumpArrivalRoute,CONSTRUCTION_MISSION_INTRO_MS,constructionMissionIntroText,advanceConstructionMissionIntro,showConstructionIntroCue,celebrateGameEvent} from './assets/imasora-construction-guide-data.mjs?v=121gy';
+import {installConstructionMissionAccess} from './assets/imasora-construction-shared-field.mjs?v=120ey';
+
 import {createCharacterJumpAction} from './assets/imasora-character-jump-action.mjs?v=120lt';
 import {doorSpatialIndex} from './assets/imasora-construction-door-spatial.mjs?v=120eb';
-import {selectSharedParking,sharedParkingLayouts} from './assets/imasora-construction-shared-field.mjs?v=120ey';
-import {drawSharedParking} from './assets/imasora-construction-parking-view.mjs?v=120ov';
+import {FIELD_ROADS,FLEET,selectSharedParking,sharedParkingLayouts,parkingSurfaceOverlaps} from './assets/imasora-construction-shared-field.mjs?v=121cw';
+import {drawSharedParking,createConstructionBoardingMarkers,createConstructionCutMarkers} from './assets/imasora-construction-parking-view.mjs?v=121ew';
 import {fieldStaticVolumes} from './assets/imasora-construction-field-contact.mjs?v=120pv';
 import {constructionContactCacheRevision} from './assets/imasora-construction-contact-cache.mjs?v=120ex';
-import {createNativeDoorNavigator} from './assets/imasora-construction-native-door.mjs?v=120ov';
+import {createNativeDoorNavigator,closestNativeDoor} from './assets/imasora-construction-native-door.mjs?v=121cr';
 import {createDoorGroundProbe,createDoorSurfaceReader} from './assets/imasora-construction-door-ground.mjs?v=120ez';
 import {createConcreteVehicleProbe,concreteWorldColliderBlocks} from './assets/imasora-construction-concrete/workshop-fence.mjs?v=120ov';
-import {createWorldPlayerUI} from './assets/imasora-world-player-ui.mjs?v=120pv';
+import {createWorldPlayerUI} from './assets/imasora-world-player-ui.mjs?v=121ir-cloud-start';
 import {townReturnUrl,saveThenReturnToTown} from './assets/imasora-world-town-return.mjs?v=120go';
 import {createHeldDashButton,bindContextSpaceAction} from './assets/imasora-hold-dash.mjs?v=120od';
 import {concreteWorldPreview,concreteWorldProfileCheck} from './assets/imasora-construction-concrete/world-contract.mjs?v=116';
 import {createWorldConcreteController} from './assets/imasora-construction-concrete/world-controller.mjs?v=120pv';
 import {createReelLive} from './assets/imasora-construction-reel-live.mjs?v=120pv';
 import {reelGeometry,reelWorld,reelTop,reelLanding,reelStep,reelStairPass,reelStairGround} from './assets/imasora-construction-reel-world.mjs?v=120ps';
-import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=12175';
+import {createLiveConcreteController} from './assets/imasora-construction-concrete/live-controller.mjs?v=121gf';
 import {parkedConcreteVehicles} from './assets/imasora-construction-concrete/free-parking.mjs?v=120ey';
 import {vehiclePoseProblem,createConcreteSupportSampler} from './assets/imasora-construction-concrete/free-vehicle-contact.mjs?v=120pv';
-import {createWorldMapMenu,createBuildingCatalog} from './assets/imasora-world-map-menu.js?v=120ni';
+import {createWorldMapMenu,createBuildingCatalog} from './assets/imasora-world-map-menu.js?v=121d1';
 import {createBuildingGroundProbe,constructionBuildingCandidate} from './assets/imasora-construction-building-ground.mjs?v=120et';
 import {buildingCameraFrame} from './assets/imasora-construction-building-camera.mjs?v=120et';
-import {nearbySceneObjects,readNearbySceneTargets} from './assets/imasora-world-nearby-scene.mjs?v=120ey';
-import {createNearbyNamesView} from './assets/imasora-world-nearby-view.mjs?v=120mt';
-import {createWorldMovePad} from './assets/imasora-world-move-pad.mjs?v=120od';
+import {nearbySceneObjects,readNearbySceneTargets} from './assets/imasora-world-nearby-scene.mjs?v=121e3';
+import {createNearbyNamesView} from './assets/imasora-world-nearby-view.mjs?v=121cz';
+import {createWorldMovePad} from './assets/imasora-world-move-pad.mjs?v=121fy';
 let nearbyNamesView=null,nearbyNameObjects=[];
-function nameWorldObject(object,id,name,footprint,height=60,kind='building'){
-  object.userData.nearbyName={id,name,hx:(footprint?.[0]||0)/2,hz:(footprint?.[1]||0)/2,height,kind};
+function nameWorldObject(object,id,name,footprint,height=60,kind='building',guide){
+  object.userData.nearbyName={id,name,hx:(footprint?.[0]||0)/2,hz:(footprint?.[1]||0)/2,height,kind,guide};
 }
 function constructionWaterGroundReadRevision(){
+  if(worldExcavationController?.active&&worldExcavationController.resumePoint?.kind==='transport')return constructionGeometryRevision();
   const revision=constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]);
   if(revision===undefined||ufoDoorControls.length||state.jumpY||state.jumpVelocity)return undefined;
   return [revision,state.map,state.position.x,state.position.z,state.groundY].join('/');
 }
+function constructionWaterContactRevision(){
+  if(worldExcavationController?.active&&worldExcavationController.resumePoint?.kind==='transport')return constructionGeometryRevision();
+  return constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]);
+}
 // Inactive display reuse is independent of the avatar's jump. Moving real
 // floors, an active tool or an unversioned scene always require a fresh draw.
 function constructionPresentationRevision(){
- const key=constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldWaterController,worldTimberController,worldConcreteController,worldExcavationController]);
- return ufoDoorControls.length||worldTimberController?.movingGround?undefined:key;
+ // Parked vehicles do not change merely because the native excavator drives.
+ // Their exact supports must refresh when that excavator changes the soil.
+ return constructionGeometryRevision();
+}
+let lastConstructionContacts=null;
+function constructionGeometryRevision(){
+ if(state.map!=='construction'||ufoDoorControls.length||
+   worldExcavationController?.active&&worldExcavationController.resumePoint?.kind!=='transport'||
+   [worldReelController,worldHighController,worldSoilController,worldWaterController,worldTimberController,worldConcreteController].some(c=>c?.active)||
+   worldTimberController?.movingGround)return undefined;
+ const frame=transportPlaySession?.state?.frame,world=worldSaveService?.ledger?.world;
+ const sources=[constructionContactRevision,colliders.length,walkableSurfaces.length,
+   frame?.soil,frame?.decks,frame?.job,world?.constructionProfileProject,
+   world?.constructionWater,world?.constructionSoil,world?.constructionTimber,world?.constructionHighBuild];
+ if(!lastConstructionContacts||sources.some((source,i)=>source!==lastConstructionContacts[i]))
+   lastConstructionContacts=sources;
+ return lastConstructionContacts;
 }
 function updateNearbyNames(){
   const now=performance.now();
   nearbyNamesView??=createNearbyNamesView({canvas:els.canvas,camera});
   nearbyNamesView.update({map:state.map,actor:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},targets:readNearbySceneTargets(nearbyNameObjects,scene),now,
-    enabled:worldBooted&&state.labels&&!document.hidden&&!state.ufoBoarded&&!state.selectedBuildId&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]')});
+    enabled:worldBooted&&state.labels&&!document.hidden&&!state.ufoBoarded&&!state.selectedBuildId&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!openWorldDialog()});
 }
-let constructionBuildingGroundProbe=null;
+let constructionBuildingGroundProbe=null,constructionBuildingGroundSource=null;
 import {isResettableBuilding} from './assets/imasora-world-map-reset-store.js?v=120pv';
 import {createLookControls} from './assets/imasora-world-look-controls.js?v=492';
-import {buildWorldSceneSteps,shouldApplyTownArrival,completedTownArrivalUrl} from './assets/imasora-world-startup.mjs?v=120of';
+import {buildWorldSceneSteps,shouldApplyTownArrival,completedTownArrivalUrl,hasTownStationStoryAccess,rainArcadeProgress,canStartRainWindChapter,markRainArcadeScene,skyInspectionAccess} from './assets/imasora-world-startup.mjs?v=121c5';
 import * as THREE from "./assets/three.module.min.js";
-import {observeWorldCanvasSize} from './assets/imasora-world-canvas-size.js?v=490';
-import {createWorldTransportPlayController} from './assets/imasora-construction-transport-play-view.mjs?v=120pv';
-import {openSavedTransportWork} from './assets/imasora-construction-transport-runtime.mjs?v=120pv';
+import {observeWorldCanvasSize} from './assets/imasora-world-canvas-size.js?v=121ea';
+import {createWorldTransportPlayController} from './assets/imasora-construction-transport-play-view.mjs?v=121ie';
+import {openSavedTransportWork} from './assets/imasora-construction-transport-runtime.mjs?v=121fa';
 import {createTransportMigrationView} from './assets/imasora-construction-transport-migration-view.mjs?v=120pv';
 import {createWorldTransportSceneBridge} from './assets/imasora-construction-transport-site-view.mjs?v=120pv';
 import {createTransportSceneReadStore} from './assets/imasora-construction-transport-site.mjs?v=120pv';
 import {EXCAVATION_YARDS} from './assets/imasora-construction-world-excavation.js?v=120ov';
-import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=120pv';
+import {createWorldExcavationController} from './assets/imasora-construction-world-excavation-view.js?v=121fv';
 import {ExcavationAuthoritySession,excavationAuthorityPreview} from './assets/imasora-construction-earth-session.js?v=120pv';
 import {ExcavationLedgerSession,excavationLedgerPreview} from './assets/imasora-construction-excavation-session.js?v=120pv';
 import {createUfoFlightSurveyView} from './assets/imasora-ufo-flight-survey.js?v=464';
-import {WorldSaveService,WorldAuthorityStore,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=120pv';
-import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=120pv';
-import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=120pv';
+import {WorldSaveService,WorldAuthorityStore,worldSaveMode,WORKSHOP_MATERIAL_KEY,ExcavationAuthorityStore,ConstructionProfileProjectPreviewStore} from './assets/imasora-world-save-service.js?v=121if';
+import {createWorldTimberController} from './assets/imasora-construction-world-timber-view.js?v=121gg';
+import {createWorldSoilController} from './assets/imasora-construction-world-soil-view.js?v=121ig';
 import {soilStartupResume} from './assets/imasora-construction-soil-startup.mjs?v=120pv';
-import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=120pv';
+import {createWorldWaterController} from './assets/imasora-construction-world-water-view.js?v=121gg';
 import {DELIVERY_SITES,DELIVERY_SIZE,deliveryAccess,chooseDeliverySite} from './assets/imasora-construction-delivery.js?v=456';
-import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=120hq';
-import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=120pw';
+import {createConstructionDeliveryDock,createConstructionDeliveryMenu} from './assets/imasora-construction-delivery-view.js?v=121ew';
+import {createWorldShopOverlay,createWorldSaveErrorUI} from './assets/imasora-world-shop-overlay.js?v=121gg';
 import { createSpaceMaterialGuide } from './assets/imasora-space-material-guide.js?v=20260924-c1';
 import { createMaterialBookContact } from './assets/imasora-space-material-catalog.js?v=441';
 import { createSpaceMaterialBook, disposeSpaceMaterialBook, MATERIAL_BOOK_SIZE } from './assets/imasora-space-material-book.js?v=120ds';
-import { createConstructionGround, disposeConstructionGround } from './assets/imasora-construction-ground.js?v=120ds';
+import { createConstructionGround, disposeConstructionGround } from './assets/imasora-construction-ground.js?v=121gj';
 import { createMarsSky, updateMarsSky } from './assets/imasora-mars-sky.js?v=20260905-mars-landscape-v424';
-import { createMarsLandscape, disposeMarsLandscape } from './assets/imasora-mars-landscape.js?v=120ds';
-import { addSkyStationInterior, skyStationRampHeightAt, updateSkyStationCutaway } from './assets/imasora-sky-station-interior.js?v=120gs';
+import { createMarsLandscape, disposeMarsLandscape, createAmaneVisitSite, createAmaneVisitActions, createAmaneRepairActions, AMANE_REPAIR_SITES } from './assets/imasora-mars-landscape.js?v=121iw-farewell';
+import { createSkyStationActivities,addSkyStationInterior, skyStationRampHeightAt, updateSkyStationCutaway,addSkyStationInspectionWorks,createSkyRescuePlayback,createSkyDeliveryFarewell,SKY_DELIVERY_FAREWELL_SECONDS,SKY_RESCUE_ENTRY,SKY_RESCUE_EXIT,SKY_RESCUE_EXIT_HEADING } from './assets/imasora-sky-station-interior.js?v=121iw-farewell';
 import { interplanetaryRoute, interplanetaryForward, planetDeparturePath, planetSurfaceArrival } from './assets/imasora-ufo-interplanetary-route.js?v=20260905-return-v416';
 import {
   WHITE_MICHI_ROAD_SABER_REN_ID,
   buildMatureStarCharacter360,
   disposeMatureCharacterModel,
 } from "./assets/imasora-character-360.js?v=120ob";
-import { buildMarsShopkeeperAtEntrance360 } from './assets/imasora-mars-shopkeeper-360.js?v=120ob';
+import { buildMarsShopkeeperAtEntrance360 } from './assets/imasora-mars-shopkeeper-360.js?v=121h1';
 import { buildMarsShopDisplays, disposeMarsShopDisplays } from './assets/imasora-mars-shop-displays.js?v=120ds';
 import { createMarsShopDialogState, MARS_SHOP_DIALOG_GREETING, MARS_SHOP_DIALOG_CHOICES } from './assets/imasora-mars-shop-dialog.js?v=20260905-greeting-v417';
 import {
@@ -131,7 +162,7 @@ import {
   mapBuildZone,
   mapSpawn,
   normalizedPoint,
-} from "./assets/imasora-world-map-schema.js?v=120mx";
+} from "./assets/imasora-world-map-schema.js?v=121is-race-shore";
 
 const CONSTRUCTION_CONCRETE_PREVIEW=concreteWorldPreview(location.search,location.hostname);
 const CONSTRUCTION_CONCRETE_PROFILE_CHECK=concreteWorldProfileCheck(location.search,location.hostname,location.port);
@@ -145,6 +176,10 @@ const MATERIAL_GUIDE_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostn
 const SAVE_KEY = MATERIAL_GUIDE_PREVIEW ? 'imasora-material-guide-preview-v440' : "imasora-world-foundation-v3";
 const WORLD_SHOP_PREVIEW = ['127.0.0.1','localhost'].includes(location.hostname) && new URLSearchParams(location.search).get('worldShopPreview') === '1';
 let worldSaveService=null,worldShopOverlay=null,worldSaveErrorUI=null,worldBooted=false,worldSaveReloadRequested=false;
+const archiveSceneId=new URLSearchParams(location.search).get('sceneArchivePreview');
+const coastControlsPreview=['127.0.0.1','localhost'].includes(location.hostname)
+  ? ['raft','snorkel'].find(activity=>activity===new URLSearchParams(location.search).get('coastControls')) : undefined;
+let archiveWorldRecord=null;
 let worldPlayerUI=null,transportMigrationUI=null;
 let worldMapMenu=null,mapMenuLoading=false,mapMenuReadError='',mapResetPoint=null,mapResetPending=null,mapMovePreviewGroup=null;
 const CONSTRUCTION_WATER_PREVIEW=['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionWaterPreview')==='1';
@@ -161,6 +196,8 @@ const CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW=!CONSTRUCTION_EXCAVATION_AUTHORITY_
 const CONSTRUCTION_EXCAVATION_PREVIEW=CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW||CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW||(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('constructionExcavationPreview')==='1');
 let excavationLedgerSession=null;
 const CONSTRUCTION_EXCAVATION_LIVE=!CONSTRUCTION_EXCAVATION_PREVIEW&&worldSaveMode(location.search,location.hostname)==='live';
+const chapter15Preview=['127.0.0.1','localhost'].includes(location.hostname)
+  &&new URLSearchParams(location.search).get('check')==='rain-works-121c7';
 const CONSTRUCTION_TRANSPORT_SCENE_PREVIEW=location.hostname==='127.0.0.1'&&location.port==='9079'&&new URLSearchParams(location.search).get('constructionTransportScenePreview')==='1';
 const CONSTRUCTION_TRANSPORT_PLAY_PREVIEW=location.hostname==='127.0.0.1'&&['9081','9083','9084','9085','9087','9089','9091','9093','9095'].includes(location.port)&&new URLSearchParams(location.search).get('constructionTransportPlayPreview')==='1';
 let transportPlaySession=null;
@@ -208,6 +245,7 @@ const CHARACTER_STRUCTURE_CONTACT_SKIN = .35;
 const VERTICAL_STRUCTURE_COLLISION_CLEARANCE = 6;
 const PLAYER_SPEED = 68;
 const FAST_WALK_MULTIPLIER = 2.5;
+const constructionFootAcceleration=createTravelAcceleration({fastFactor:FAST_WALK_MULTIPLIER});
 const MAX_JUMPS = 3;
 const JUMP_VELOCITY = SKY_JUMP_VELOCITY;
 const JUMP_GRAVITY = SKY_JUMP_GRAVITY;
@@ -261,6 +299,13 @@ const SKY_STATION_GUIDE_DIALOG_TYPE_INTERVAL_MS = 34;
 const SKY_STATION_GUIDE_DIALOG_GREETING = "やあ、長旅ごくろうさま！今日は何しに来たの？";
 // 詳しい本文は後から差し替える前提で、現段階では選択した話題を
 // バルティアが受け取る最小限の会話だけを表示する。
+const SKY_STATION_WATER_DELIVERY_DIALOG = Object.freeze([
+  ['バルティア','この水、アマネ星まで運んでくれる？　両親に届けたいんだ'],
+  ['セハルネ','全部、家まで運べるかな'],
+  ['バルティア','着陸場の荷車が使えるよ。一つずつ下ろせるように分けてある'],
+  ['セハルネ','これ、どこで集めたの？'],
+  ['バルティア','海沿いの集水所にたまった雨水だよ。……僕が用意した'],
+]);
 const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
   "sky-map": {
     label: "空マップについて",
@@ -274,7 +319,7 @@ const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
     pages: [
       "UFOに乗るには、近くの顔認証システムの前に立って、カメラへ顔を向けて認証に合格しないとだめなんだ！認証が通ると、UFOの足場が下りるよ。",
       "操縦は、画面下の飛行操縦レバーとパッドを使うんだ。機体の向きと動きを調整しながら、行きたい方向へ進んでね。",
-      "宇宙マップでは、画面の「射撃」ボタンで星を撃てるよ。照準に星をとらえるとロックONできるから、エネルギーや宇宙金貨、素材を回収しながら、残りのエネルギーにも気をつけて火星を目指してね！",
+      "宇宙マップでは、画面の「射撃」ボタンで星を撃てるよ。照準に星をとらえるとロックONできるから、エネルギーや宇宙金貨、素材を回収しながら、残りのエネルギーにも気をつけてアマネ星を目指してね！",
     ],
   },
   "ufo-equipment": {
@@ -282,7 +327,7 @@ const SKY_STATION_GUIDE_DIALOG_TOPICS = Object.freeze({
     pages: [
       "UFO装備倉庫では、日々の散歩とゲームセンターで手に入れた素材を使って、UFOの装備を作成できるよ。",
       "散歩では雲繊維と空見結晶が、ゲームセンターのどのゲームでも整備パーツが集まるんだ。無理に急がず、遊びたい時に集めてね。",
-      "作成した装備はすぐにUFOへ装着されるよ。エネルギー回復を増やすタンク、同時発射弾丸、ロックONを広げるレーダーをそろえて、火星への旅に備えよう！",
+      "作成した装備はすぐにUFOへ装着されるよ。エネルギー回復を増やすタンク、同時発射弾丸、ロックONを広げるレーダーをそろえて、アマネ星への旅に備えよう！",
     ],
   },
   visit: {
@@ -408,19 +453,22 @@ const LOOK_MOUSE_SENSITIVITY = .006;
 const LOOK_TOUCH_SENSITIVITY = .0085;
 const LOOK_PITCH_MIN = -.72;
 const LOOK_PITCH_MAX = .62;
-// 三人称カメラは距離だけを切り替え、上下の見下ろし角は共通にする。
-// 標準を従来値に合わせ、近景・引き・遠景を順番に選べるようにする。
-const THIRD_PERSON_DISTANCE_PRESETS = CAMERA_DISTANCE_PRESETS;
+// Existing distances keep their framing. Upper view is another third-person orbit.
+const THIRD_PERSON_DISTANCE_PRESETS = WORLD_CAMERA_PRESETS;
 const DEFAULT_THIRD_PERSON_DISTANCE_INDEX = 1;
 const UFO_CAMERA_BASE_FOV = 48;
-// UFO操縦時の画角は、空間の流れを読みやすい後方固定と、
-// セハルネの目線の2種類だけにする。遠めの画角は設けない。
+// The original cockpit toggle remains a choice between fixed rear and eye view.
 const UFO_CAMERA_PRESETS = Object.freeze([
   { id: "fixed", label: "固定", back: 320, up: 230, targetForward: 14, targetUp: 27 },
   { id: "monster-eye", label: "モンスター目線", back: 0, up: 0, targetForward: 20, targetUp: 7 },
 ]);
+const UFO_FIXED_FRAMINGS = Object.freeze([
+  UFO_CAMERA_PRESETS[0],
+  {...UFO_CAMERA_PRESETS[0],label:'近景',back:250,up:178},
+  {...UFO_CAMERA_PRESETS[0],label:'上方',back:205,up:320},
+]);
 // 宇宙マップの固定画角だけ、地球側の床へ落ち込みすぎないように
-// 注視点を少し上げ、火星側から来るチリの接近を先に読める角度にする。
+// 注視点を少し上げ、アマネ星側から来るチリの接近を先に読める角度にする。
 const UFO_SPACE_FIXED_CAMERA_TARGET_UP = 92;
 const THIRD_PERSON_BASE_PITCH = -Math.atan2(55, 112);
 const THIRD_PERSON_PITCH_MIN = -.56;
@@ -472,7 +520,7 @@ const UFO_ENGINE_SEAT_TOUCH_SKIN = .55;
 const UFO_ENGINE_SEAT_PHASE_SECONDS = 1.8;
 const UFO_ENGINE_CLOSING_PHASE_SECONDS = 2.5;
 const UFO_ENGINE_LIGHT_PHASE_SECONDS = 2.2;
-// 火星到着は離陸と逆の順序にする。始動演出を再利用せず、停止を見せて
+// アマネ星到着は離陸と逆の順序にする。始動演出を再利用せず、停止を見せて
 // から既存の引き戸と搭乗足場を展開するための短い専用フェーズ。
 const UFO_MARS_ARRIVAL_SHUTDOWN_PHASE_SECONDS = 1.05;
 const UFO_ENGINE_DOOR_CLOSE_RESPONSE = 1.6;
@@ -517,17 +565,17 @@ const UFO_SPACE_FREE_FLIGHT_FORWARD_MULTIPLIER = 1.45;
 const UFO_SPACE_FREE_FLIGHT_STRAFE_MULTIPLIER = 1.8;
 const UFO_SPACE_FREE_FLIGHT_LIFT_MULTIPLIER = 1.65;
 const UFO_SPACE_FREE_FLIGHT_TURN_MULTIPLIER = 1.65;
-// 地球から火星へ向かう前進スクロール航行。前進を主役の高速巡航にし、
+// 地球からアマネ星へ向かう前進スクロール航行。前進を主役の高速巡航にし、
 // 左右・上下はGが掛かる機体の「軌道補正」として遅く、慣性を伴わせる。
 // ルート所要時間を勝手に縮めず、体感は画角・機体姿勢・相対操作量で高める。
 const UFO_FORWARD_SCROLL_LAUNCH_SECONDS = 3.8;
 const UFO_FORWARD_SCROLL_LAUNCH_CLIMB_WORLD = 330;
-// 火星到着は大気圏へ触れた瞬間に画面を切り替えず、地球離脱と対になる
-// 降下カットを経由して火星マップへ着地する。各距離モードの総所要時間は
+// アマネ星到着は大気圏へ触れた瞬間に画面を切り替えず、地球離脱と対になる
+// 降下カットを経由してアマネ星マップへ着地する。各距離モードの総所要時間は
 // この演出も含むため、3分／2分30秒という約束は変わらない。
 const UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS = 4.6;
-// 火星までの距離は出発ごとに変動する。選択された距離・到着時間・
-// 火星の実座標を同じ航路モードから決めるため、HUDだけが変わったり
+// アマネ星までの距離は出発ごとに変動する。選択された距離・到着時間・
+// アマネ星の実座標を同じ航路モードから決めるため、HUDだけが変わったり
 // 時間だけを縮めて早く到着したりしない。
 const UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES = Object.freeze([
   Object.freeze({
@@ -543,7 +591,7 @@ const UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES = Object.freeze([
 ]);
 const UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE = UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES[0];
 const UFO_FORWARD_SCROLL_TARGET_SECONDS = UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE.totalSeconds;
-// 各モードの総所要時間には地球離脱・火星降下の両アニメーションを含める。
+// 各モードの総所要時間には地球離脱・アマネ星降下の両アニメーションを含める。
 // 巡航距離はその正味時間に対して実時間で同期し、更新回数やローカル座標の
 // 倍率で到着が早まらないようにする。
 const UFO_FORWARD_SCROLL_CRUISE_SECONDS = UFO_FORWARD_SCROLL_TARGET_SECONDS
@@ -554,8 +602,8 @@ const UFO_FORWARD_SCROLL_REFERENCE_CRUISE_SECONDS = UFO_FORWARD_SCROLL_REFERENCE
   - UFO_FORWARD_SCROLL_LAUNCH_SECONDS
   - UFO_FORWARD_SCROLL_MARS_DESCENT_SECONDS;
 const UFO_FORWARD_SCROLL_CRUISE_SPEED_REFERENCE_RATIO = .97;
-// 火星の見た目と到達判定を別々のタイミングにしない。航路終端の少し前から
-// 火星大気圏の縁を薄く見せ、終端を越えた瞬間に同じ層を強く発光させる。
+// アマネ星の見た目と到達判定を別々のタイミングにしない。航路終端の少し前から
+// アマネ星大気圏の縁を薄く見せ、終端を越えた瞬間に同じ層を強く発光させる。
 const UFO_FORWARD_SCROLL_MARS_ATMOSPHERE_APPROACH_START = .84;
 const UFO_FORWARD_SCROLL_MARS_ATMOSPHERE_FLASH_SECONDS = 2.8;
 const UFO_FORWARD_SCROLL_MARS_ATMOSPHERE_OVERLAY_SECONDS = 2.1;
@@ -807,7 +855,7 @@ const UFO_GRAVITY_MAZE_TILT_FORCE = 304;
 const UFO_GRAVITY_MAZE_PULSE_FORCE = 242;
 const UFO_GRAVITY_MAZE_PULSE_COOLDOWN = .72;
 const UFO_GRAVITY_MAZE_REQUIRED_CHECKPOINTS = 3;
-// 7案目の試作「火星航路・慣性スリング」。宇宙の実座標に置かれた
+// 7案目の試作「アマネ星航路・慣性スリング」。宇宙の実座標に置かれた
 // 大質量岩塊へテザーを接続し、張力と慣性でUFOそのものの航路を変える。
 // これは画面上の別盤面ではなく、飛行中のUFOの flight state に直接力を加える。
 const UFO_INERTIA_SLINGSHOT_DURATION = 74;
@@ -820,7 +868,7 @@ const UFO_INERTIA_SLINGSHOT_CAPTURE_DISTANCE = 3180;
 const UFO_INERTIA_SLINGSHOT_CAPTURE_RADIUS = 308;
 const UFO_INERTIA_SLINGSHOT_ESCAPE_DISTANCE = 3670;
 // 太陽帆サーフィン試作。宇宙空間に流れる太陽風へ帆を展開して乗り、
-// 風圧をそのまま実UFOの加速度として受け取る。帆を畳まないと火星側の
+// 風圧をそのまま実UFOの加速度として受け取る。帆を畳まないとアマネ星側の
 // 捕獲軌道へ入れないため、ただの移動演出ではなく航行判断になる。
 const UFO_SOLAR_SAIL_DURATION = 86;
 const UFO_SOLAR_SAIL_WIND_RADIUS = 248;
@@ -829,8 +877,8 @@ const UFO_SOLAR_SAIL_CAPTURE_RADIUS = 332;
 const UFO_SOLAR_SAIL_REQUIRED_CHARGE = 72;
 const UFO_SOLAR_SAIL_IDLE_DRIFT = 34;
 const UFO_SOLAR_SAIL_MAX_SPEED = 410;
-  // 火星突入航路。これはリングを抜けるだけのレースではなく、UFOの実体に
-// 慣性・重力流・デブリ衝突・残像航法を返す、地球から火星までの突破ゲーム。
+  // アマネ星突入航路。これはリングを抜けるだけのレースではなく、UFOの実体に
+// 慣性・重力流・デブリ衝突・残像航法を返す、地球からアマネ星までの突破ゲーム。
 // 約3分で到着できるが、速度を維持しながら航路を読まなければ生還できない。
 const UFO_MARS_RACE_DURATION = 210;
 const UFO_MARS_RACE_FINISH_DISTANCE = 42000;
@@ -914,12 +962,12 @@ const UFO_SPACE_TRANSITION_DURATION_MS = 900;
 const UFO_SPACE_EARTH_RADIUS = 900;
 const UFO_SPACE_MARS_RADIUS = UFO_SPACE_EARTH_RADIUS * 11;
 const UFO_SPACE_MARS_EDGE_INSET = UFO_SPACE_MARS_RADIUS * .35;
-// 火星航路の離陸カットで使う、地球中心から出発機までの位置関係。
+// アマネ星航路の離陸カットで使う、地球中心から出発機までの位置関係。
 // 地球の表面上に「空マップ由来の雲の発進地点」を正確に置くため、地球
 // 表示と雲の発進地点で同じ値を共有する。
 const UFO_FORWARD_SCROLL_DEPARTURE_EARTH_FORWARD_OFFSET = 780;
 const UFO_FORWARD_SCROLL_DEPARTURE_EARTH_UP_OFFSET = 1040;
-// 火星は前方のマップ端に置いたまま、空間の上方向へ大きく持ち上げる。
+// アマネ星は前方のマップ端に置いたまま、空間の上方向へ大きく持ち上げる。
 // X/Z の進行方向は変えず、飛行中に見上げて目指せる高さだけを分離して管理する。
 const UFO_SPACE_MARS_HEIGHT_OFFSET = 0;
 // 地球を大型化しても、宇宙初期位置から地表までの距離は従来と同じ
@@ -973,7 +1021,7 @@ const UFO_SPACE_DUST_COLLISION_RESTITUTION = .62;
 const UFO_SPACE_DUST_COLLISION_SKIN = 1.2;
 const UFO_SPACE_DUST_COLLISION_COOLDOWN = .10;
 const UFO_SPACE_DUST_COLLISION_IMPACT_SPEED = 72;
-// 宇宙戦はランダムな障害物の流れではなく、火星から飛来する固定編隊を
+// 宇宙戦はランダムな障害物の流れではなく、アマネ星から飛来する固定編隊を
 // 撃ち抜く迎撃戦として扱う。各編隊の進路は出現時に確定し、追従しない。
 const UFO_SPACE_COMBAT_START_DELAY = 1.05;
 const UFO_SPACE_COMBAT_WAVE_INTERVAL = 4.15;
@@ -1118,6 +1166,7 @@ const state = {
   cameraMode: "third",
   cameraDistanceIndex: DEFAULT_THIRD_PERSON_DISTANCE_INDEX,
   ufoCameraPresetIndex: 0,
+  ufoFixedFramingIndex: 0,
   fastWalking: false,
   position: new THREE.Vector3(0, 0, 28),
   groundY: 0,
@@ -1223,7 +1272,7 @@ const state = {
   ufoStarMiningVisited: 0,
   ufoStarMiningNearest: "--",
   ufoStarMiningDashCharges: UFO_STAR_MINING_DASH_CHARGES,
-  // 火星航路で回収したもの。航行中のエネルギー・宇宙金貨・星素材の
+  // アマネ星航路で回収したもの。航行中のエネルギー・宇宙金貨・星素材の
   // 保存だけを担当する。UFO装備倉庫の作成素材には流用しない。
   ufoResources: {
     energyCells: 0,
@@ -1247,6 +1296,7 @@ const state = {
 
 const els = {
   canvas: document.getElementById("worldCanvas"),
+  rainStoryHint: document.getElementById("rainStoryHint"),
   viewport: document.getElementById("viewport"),
   statusText: document.getElementById("statusText"),
   saveState: document.getElementById("saveState"),
@@ -1263,6 +1313,19 @@ const els = {
   cancelBuildButton: document.getElementById("cancelBuildButton"),
   ufoDoorButton: document.getElementById("ufoDoorButton"),
   ufoBoardButton: document.getElementById("ufoBoardButton"),
+  ufoDepartureButton: document.getElementById("ufoDepartureButton"),
+  rainStoryEnding: document.getElementById("rainStoryEnding"),
+  rainReturnDock: document.getElementById("rainReturnDock"),
+  rainStoryEndingFilm: document.getElementById("rainStoryEndingFilm"),
+  rainStoryEndingSound: document.getElementById("rainStoryEndingSound"),
+  rainStoryEndingSave: document.getElementById("rainStoryEndingSave"),
+  rainStoryEndingRetry: document.getElementById("rainStoryEndingRetry"),
+  ufoDepartureDialog: document.getElementById("ufoDepartureDialog"),
+  ufoDepartureTitle: document.getElementById("ufoDepartureTitle"),
+  ufoDepartureClose: document.getElementById("ufoDepartureClose"),
+  ufoDeparturePilot: document.getElementById("ufoDeparturePilot"),
+  ufoDepartureSkip: document.getElementById("ufoDepartureSkip"),
+  ufoDepartureStatus: document.getElementById("ufoDepartureStatus"),
   ufoActions: document.getElementById("ufoActions"),
   ufoEquipmentDevelopmentProfiles: document.getElementById("ufoEquipmentDevelopmentProfiles"),
   ufoEquipmentComparisonCameraButton: document.getElementById("ufoEquipmentComparisonCameraButton"),
@@ -1278,6 +1341,7 @@ const els = {
   skyStationGuideDialogClose: document.getElementById("skyStationGuideDialogClose"),
   skyStationGuideDialogText: document.getElementById("skyStationGuideDialogText"),
   skyStationGuideDialogChoices: document.getElementById("skyStationGuideDialogChoices"),
+  skyStationGuideDiagramTopic: document.getElementById("skyStationGuideDiagramTopic"),
   skyStationGuideDialogFooter: document.getElementById("skyStationGuideDialogFooter"),
   skyStationGuideDialogPage: document.getElementById("skyStationGuideDialogPage"),
   skyStationGuideDialogNext: document.getElementById("skyStationGuideDialogNext"),
@@ -1334,6 +1398,15 @@ const els = {
 };
 
 let renderer;
+let rainStoryPlayback = null;
+let ufoSkyReturnLandingPending = false;
+let rainReturnMilestonePending = null;
+let rainAmaneLandingPending = false;
+let rainDeliveryLandingPending = false;
+let rainRepairLandingPending = false;
+let amaneVisitSite=null;
+let amaneVisitActions=null;
+let amaneRepairActions=null,amaneRepairAge=0;
 let updateWorldColour=()=>{};
 let scene;
 let camera;
@@ -1342,7 +1415,7 @@ let spaceExplorableStarSpriteTexture = null;
 const spaceExplorableStarSurfaceTextures = new Map();
 const ufoForwardScrollHintTextures = new Map();
 let worldGroup;
-let mapGroup;
+let mapGroup, parkingBoardingMarks;
 // 物理は表示グループと別の近似箱を増やすのではなく、表示メッシュと
 // 同じ world matrix / geometry を持つ専用レイヤーを一つだけ持つ。
 let physicsMeshGroup;
@@ -1367,6 +1440,7 @@ const skyStationGuideDialogState = {
   pageIndex: 0,
   isTyping: false,
   typeTimer: null,
+  story: null,
 };
 const ufoEquipmentWorkshopMenuState = {
   open: false,
@@ -1545,7 +1619,7 @@ function makeMarsSurfaceTexture() {
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, width, height);
 
-  // 固定シードにより、再描画しても同じ火星地形を保つ。
+  // 固定シードにより、再描画しても同じアマネ星地形を保つ。
   let seed = 0x5a17c9d3;
   const random = () => {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -2030,12 +2104,13 @@ function stopUfoGroundTakeoffAudio() {
   ufoGroundTakeoffAudio.currentTime = 0;
 }
 
-function worldStateSnapshot() {
+function worldStateSnapshot({safeAmaneLanding=false}={}) {
   // A flight is transient. Reloads resume safely at its departure surface,
   // rather than restoring astronomical flight coordinates on the cloud map.
   const resumeMap = state.map === 'space' ? ufoEmergencyReturnMap() : state.map;
   const resume = state.map === 'space'
-    ? (resumeMap === 'sky' ? SKY_EMERGENCY_START : mapSpawn(MAPS[resumeMap])) : null;
+    ? (resumeMap === 'sky' ? SKY_EMERGENCY_START : mapSpawn(MAPS[resumeMap]))
+    : safeAmaneLanding&&resumeMap==='mars'?mapSpawn(MAPS.mars):null;
   if (resume) restoreUfoReturnFacility(resumeMap);
   const draft = {
     version: 3,
@@ -2055,6 +2130,8 @@ function worldStateSnapshot() {
     ufoEquipment: { ...state.ufoEquipment },
     updatedAt: Date.now(),
   };
+  if(coastSkyDiagramRead)draft.coastSkyDiagramRead=true;
+  if(skyMarsObservatoryClue)draft.skyMarsObservatoryClue=true;
   const sea=coastPlay?.snapshot();if(sea!==undefined)draft.coastPhysics=sea;
   const toys=coastLandmarks?.snapshot();if(toys!==undefined)draft.coastToys=toys;
   const snorkeling=coastSnorkel?.snapshot();if(snorkeling!==undefined)draft.coastSnorkel=snorkeling;
@@ -2079,13 +2156,14 @@ function mapEntryStart(mapKey = "sky") {
 }
 
 function resetPlayerToMapSpawn(mapKey = state.map, options = {}) {
+  state.skyStationActivities?.reset();
   walkDashControl?.cancel();
   const skyArrival = mapKey === "sky";
-  const spawn = options.fromEntry || (skyArrival && !options.fromEmergency)
+  const spawn = options.spawn ?? (options.fromEntry || (skyArrival && !options.fromEmergency)
     ? mapEntryStart(mapKey)
     : options.fromEmergency && mapKey === "sky"
     ? SKY_EMERGENCY_START
-    : mapSpawn(MAPS[mapKey]);
+    : mapSpawn(MAPS[mapKey]));
   state.position.set(spawn.x, spawn.y ?? 0, spawn.z);
   state.heading = spawn.heading;
   state.viewHeading = spawn.heading;
@@ -2118,34 +2196,45 @@ function ufoEmergencyReturnMap(control = ufoDoorControls[0]) {
   return control?.spaceLaunchMap === 'mars' ? 'mars' : 'sky';
 }
 
-function restoreUfoReturnFacility(mapKey, control = ufoDoorControls[0]) {
-  if (!['sky','mars'].includes(mapKey)) return false;
-  const items = Array.isArray(builtByMap[mapKey]) ? builtByMap[mapKey] : [];
-  if (items.some(item => item?.catalogId === 'ufo-pad')) return false;
-  // The ship already exists in this flight. Restore its landing place and
-  // scanner as one unit if a legacy/missing surface record omitted them.
+function restoreUfoReturnFacility(mapKey, control = ufoDoorControls[0], buildings = builtByMap) {
+  if (mapKey !== 'sky' && mapKey !== 'mars') return false;
+  const items = Array.isArray(buildings[mapKey]) ? buildings[mapKey] : [];
+  const pads = items.filter(item => item?.catalogId === 'ufo-pad');
+  const saved = pads.find(item => typeof item.id === 'string' && item.id.length > 0);
+  const position = [UFO_PLACEMENT_POSITION.x, 0, UFO_PLACEMENT_POSITION.z];
+  const scanner = [UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x, UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z];
+  const matches = (actual, expected) => Array.isArray(actual)
+    && actual.length === expected.length && expected.every((value, index) => actual[index] === value);
+  if (pads.length === 1 && saved?.fixed === true && saved.faceAuthAnchorLocked === true
+    && matches(saved.position, position) && matches(saved.faceAuthPosition, scanner)) return false;
+
+  // Both surface maps own one fixed pad. Its scene creates the ship and scanner together.
   const remembered = control?.spaceLaunchMap === mapKey ? control.spaceLaunchFacility : null;
-  const item = remembered ? structuredClone(remembered) : {
-    id: mapKey === 'mars' ? 'mars-return-ufo-pad' : 'sky-return-ufo-pad',
-    catalogId:'ufo-pad',name:'UFO乗り場',...(mapKey==='mars'?{fixed:true}:{}),
+  const item = {
+    ...(saved ?? remembered),
+    id: saved?.id || remembered?.id || (mapKey === 'mars' ? 'mars-return-ufo-pad' : 'sky-return-ufo-pad'),
+    catalogId: 'ufo-pad',
+    name: 'UFO乗り場',
+    fixed: true,
+    position,
+    faceAuthPosition: scanner,
+    faceAuthAnchorLocked: true,
   };
-  item.position=[UFO_PLACEMENT_POSITION.x,0,UFO_PLACEMENT_POSITION.z];
-  item.faceAuthPosition=[UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x,UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z];
-  item.faceAuthAnchorLocked=true;
-  builtByMap[mapKey]=[...items,item];
+  buildings[mapKey] = items.filter(candidate => candidate?.catalogId !== 'ufo-pad');
+  buildings[mapKey].splice(saved ? items.indexOf(pads[0]) : buildings[mapKey].length, 0, item);
   return true;
 }
 
 function updateEmergencyReturnControl() {
   if (!els.emergencyEscapeButton) return;
   els.emergencyEscapeButton.hidden=!!coastPlay?.rescuing;
-  // 火星と工事現場では、そのマップ内で復帰する。作業途中の資材は
+  // アマネ星と工事現場では、そのマップ内で復帰する。作業途中の資材は
   // 各作業の保存を完了させてから停止し、復帰先へ持ち運んだり消したりしない。
   const returnMap = state.map === 'space' ? ufoEmergencyReturnMap() : state.map;
   const destination = returnMap === "mars"
-    ? "火星マップの安全地点へ戻ります"
+    ? "アマネ星マップの安全地点へ戻ります"
     : returnMap === "construction"
-    ? "作業中の資材を残して工事現場の安全地点へ戻ります"
+    ? (worldSaveService?.ledger?.world.constructionParking ? "作業中の資材を残して工事現場の駐車場へ戻ります" : "工事現場の入口へ戻ります")
     : returnMap === "coast" ? "海岸の入口へ戻ります"
     : "雲マップの空駅入口へ戻ります";
   els.emergencyEscapeButton.title = destination;
@@ -2153,19 +2242,45 @@ function updateEmergencyReturnControl() {
   setWorldText(els.emergencyEscapeButton,state.map==='coast'?'入口に戻る':'緊急帰還');
 }
 
-let worldAutoSave=null,lastAutoScene='',worldRenderBudget=null,pendingRenderQuality=null,worldShadowCache=null;
+let worldAutoSave=null,lastAutoScene='',worldRenderBudget=null,pendingRenderQuality=null,worldShadowCache=null,worldDrawBackpressure=null;
 function setWorldText(element,value){if(element&&element.textContent!==value)element.textContent=value;}
 
-function autoSceneKey(){const cs=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];return JSON.stringify([state.map,state.position.x,state.position.z,state.heading,state.viewHeading,state.viewPitch,state.cameraMode,state.cameraDistanceIndex,state.labels,state.ufoResources,state.ufoEquipment,coastLandmarks?.autoSaveKey,coastPlay?.autoSaveKey,coastPebbles?.autoSaveKey,coastSnorkel?.autoSaveKey,coastUI?.destination,caveCrossing?.autoSaveKey,(()=>{const c=cs.find(c=>c?.active);return c?.autoSaveKey??c?.resumePoint;})()]);}
+function autoSceneKey(){const cs=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];return JSON.stringify([state.map,state.position.x,state.position.z,state.heading,state.viewHeading,state.viewPitch,state.cameraMode,state.cameraDistanceIndex,state.labels,state.ufoResources,state.ufoEquipment,coastLandmarks?.autoSaveKey,coastPlay?.autoSaveKey,coastPebbles?.autoSaveKey,coastSnorkel?.autoSaveKey,coastUI?.destination,caveCrossing?.autoSaveKey,coastSkyDiagramRead,skyMarsObservatoryClue,(()=>{const c=cs.find(c=>c?.active);return c?.autoSaveKey??c?.resumePoint;})()]);}
+let quietConstructionSave=false;
 function setupWorldAutoSave(){
  if(worldAutoSave||worldSaveService.mode!=='live'||CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW||CONSTRUCTION_DELIVERY_PREVIEW||CONSTRUCTION_EXPANSION_PREVIEW||SKY_STATION_INTERIOR_PREVIEW||MARS_RETURN_PREVIEW||MARS_SHOPKEEPER_PREVIEW||WORLD_SHOP_PREVIEW)return;
  lastAutoScene='';
+ const controllers=()=>[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController];
+ const currentController=()=>{const list=controllers();return list.find(c=>c?.active)??list.find(c=>c?.dirty);};
+ const lifecycle=reason=>document.hidden?'hidden':reason;
+ const constructionSaveGate=createConstructionAutoSaveGate();
  worldAutoSave=globalThis.ImasoraAutoSave.create({
-  ready:()=>worldBooted&&!worldSaveService.blocked&&!worldSaveService.busy&&!mapResetPending&&!worldSaveService.crafting&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&c?.busy),
-  dirty:()=>[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>!c?.active&&c?.dirty)||autoSceneKey()!==lastAutoScene,
-  save:async()=>{const cs=[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController],ctrl=cs.find(c=>c?.active)??cs.find(c=>c?.dirty);if(ctrl?.busy)return false;const capturedScene=autoSceneKey();if(!ctrl&&await caveCrossing?.flushPending?.()===false)return false;const ok=ctrl?await (ctrl.autosave?.()??ctrl.save()):await persistWorldSnapshot().then(()=>true);if(ok!==false)lastAutoScene=capturedScene;return ok;},
+  shouldTry:reason=>{
+   if(state.map!=='construction')return true;
+   const ctrl=currentController();
+   if(ctrl?.saveNeedsRetry)return false;
+   if(['hidden','pagehide'].includes(lifecycle(reason)))return true;
+   // On the construction map, a key or button release is part of play.
+   if(reason==='release')return false;
+   const moving=state.moving||state.jumpY||state.falling;
+   constructionSaveGate.noteActivity(moving);
+   return constructionSaveGate.ready(reason)&&(ctrl?.autoSaveReady?.(reason)??!moving);
+  },
+  ready:()=>worldBooted&&!rainStoryPlayback&&!rainRescue&&!worldSaveService.blocked&&!worldSaveService.busy&&!mapResetPending&&!worldSaveService.crafting&&!currentController()?.busy,
+  dirty:()=>controllers().some(c=>!c?.active&&c?.dirty)||autoSceneKey()!==lastAutoScene,
+  save:async reason=>{
+   const ctrl=currentController(),capture=autoSceneKey(),construction=state.map==='construction';
+   if(!ctrl&&await caveCrossing?.flushPending?.()===false)return false;
+   quietConstructionSave=construction;
+   try{
+    const saveReason=lifecycle(reason);
+    const ok=ctrl?(ctrl.autosave?await ctrl.autosave(ctrl===worldExcavationController?saveReason:{reason:saveReason}):await ctrl.save()):await persistWorldSnapshot().then(()=>true);
+    if(ok!==false){lastAutoScene=capture;if(construction)constructionSaveGate.checked();}
+    return ok;
+   }finally{quietConstructionSave=false;}
+  },
   onError:error=>{els.saveState.textContent='セーブを確認してね';reportWorldSaveError(error);},
-  onSaved:()=>{state.saved=true;els.saveState.textContent='オートセーブ済み';}
+  onSaved:()=>{state.saved=true;if(state.map!=='construction')els.saveState.textContent='オートセーブ済み';}
  });
 }
 
@@ -2183,11 +2298,66 @@ function persistWorldSnapshot(reward=null) {
   return pending;
 }
 
-async function openMapRace(){
- if(!worldBooted||!['sky','mars'].includes(state.map)||state.ufoBoarded||mapResetPending||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting)return false;
- clearMarsShopDialogInput();lookControls?.cancel();
- if(worldSaveService.mode!=='readonly'){await persistWorldSnapshot();await worldSaveService.flush();}
- location.assign(new URL('./imasora-bounce-race-preview.html?game='+state.map,location.href).href);return true;
+let enteringSkyRace = false;
+let skyRaceShoreVisited = null;
+const skyRaceInvitation = document.getElementById("skyRaceInvitation");
+
+function atSkyRaceShore() {
+  const { x, z } = state.position;
+  const world = MAPS.sky.world;
+  return state.map === "sky" && z >= skyRaceEntryZ(world) && skyRaceShoreContains(world, x, z);
+}
+
+function canStartSkyRace() {
+  return atSkyRaceShore() && worldSaveService?.mode === "live" && worldInputAvailable()
+    && !state.ufoBoarded && !state.selectedBuildId && !state.falling
+    && !state.jumpY && !state.jumpVelocity && Math.abs(state.groundY) < .5;
+}
+
+function updateSkyRaceInvitation() {
+  if (state.map !== "sky") return;
+  const atShore = atSkyRaceShore();
+  if (skyRaceShoreVisited === null) {
+    // A reload or a return from a race starts at the saved shore position.
+    skyRaceShoreVisited = atShore;
+    return;
+  }
+  if (!atShore) {
+    if (state.position.z < skyRaceEntryZ(MAPS.sky.world) - 12) skyRaceShoreVisited = false;
+    return;
+  }
+  if (skyRaceShoreVisited || !canStartSkyRace()) return;
+  skyRaceShoreVisited = true;
+  clearMarsShopDialogInput();
+  lookControls?.cancel();
+  state.moving = state.fastWalking = false;
+  skyRaceInvitation.showModal();
+}
+
+async function openMapRace({ fromSkyRaceInvitation = false } = {}) {
+  const map = state.map;
+  if (!worldBooted || !["sky", "mars"].includes(map) || state.ufoBoarded || mapResetPending
+    || worldSaveService.blocked || worldSaveService.crafting) return false;
+  const sky = map === "sky";
+  if (sky ? !fromSkyRaceInvitation || !canStartSkyRace() : worldSaveService.busy) return false;
+  enteringSkyRace = sky;
+  clearMarsShopDialogInput();
+  lookControls?.cancel();
+  try {
+    if (worldSaveService.mode !== "readonly") {
+      await persistWorldSnapshot();
+      await worldSaveService.flush();
+    }
+    const destination = new URL("./imasora-bounce-race-preview.html", location.href);
+    destination.searchParams.set("game", map);
+    location.assign(destination.href);
+    return true;
+  } catch (error) {
+    if (!sky) throw error;
+    enteringSkyRace = false;
+    showToast("出発位置を保存できませんでした。セーブを確認して、もう一度試してください。");
+    return false;
+  }
 }
 
 async function returnToTownFromConstruction() {
@@ -2203,6 +2373,31 @@ async function returnToTownFromConstruction() {
   },navigate:destination=>{worldPlayerUI?.close();location.assign(destination);}});
 }
 
+let returningFromSkyStation=false;
+function canBoardTownTrainFromSky(){
+  if(state.map!=='sky'||returningFromSkyStation||state.ufoBoarded||state.falling||
+    state.jumpY||state.jumpVelocity||worldSaveService?.mode!=='live'||!worldInputAvailable())return false;
+  const platform=walkableSurfaces.find(surface=>surface.id==='sky-train-platform-surface');
+  return !!platform&&Math.abs(state.groundY-platform.height)<.5&&
+    surfaceContainsPoint(state.position.x,state.position.z,platform);
+}
+async function boardTownTrainFromSky(){
+  if(!canBoardTownTrainFromSky())return false;
+  returningFromSkyStation=true;
+  clearMarsShopDialogInput();
+  try{
+    const url=townReturnUrl(location.href,undefined,'sky-return');
+    await persistWorldSnapshot();
+    await worldSaveService.flush();
+    location.assign(url);
+    return true;
+  }catch(error){
+    showToast('出発前のセーブを確認できませんでした。もう一度ためしてね。');
+    returningFromSkyStation=false;
+    return false;
+  }
+}
+
 function saveState() {
   if(worldHighController?.active){void worldHighController.save();return;}
   if(worldConcreteController?.active){void worldConcreteController.save();return;}
@@ -2212,7 +2407,7 @@ function saveState() {
   if(typeof worldTimberController!=='undefined'&&worldTimberController?.dirty&&state.map==='construction'){void worldTimberController.save();return;}
   if (CONSTRUCTION_EXPANSION_PREVIEW) { els.saveState.textContent = '工事現場の拡張確認中（保存しません）'; return; }
   if (SKY_STATION_INTERIOR_PREVIEW) { els.saveState.textContent = '駅内部の確認中（保存しません）'; return; }
-  if (MARS_RETURN_PREVIEW) { els.saveState.textContent = '火星帰路の確認中（保存しません）'; return; }
+  if (MARS_RETURN_PREVIEW) { els.saveState.textContent = 'アマネ星帰路の確認中（保存しません）'; return; }
   if (MARS_SHOPKEEPER_PREVIEW) { els.saveState.textContent='店主の配置確認中（保存しません）'; return; }
   void persistWorldSnapshot().then(()=>showToast(worldSaveService.mode==='readonly'?'確認中のため本体へ保存しません':'建造状態と位置を保存しました')).catch(()=>{});
 }
@@ -2229,7 +2424,15 @@ function loadState(saved) {
   const map=['sky','mars','coast','construction'].includes(saved.map)?saved.map:'sky';
   state.map=map;resetPlayerToMapSpawn(map,{fromEntry:map==='sky'});
   if(saved.map===map&&Number.isFinite(saved.position?.x)&&Number.isFinite(saved.position?.z)){
-    state.position.set(saved.position.x,0,saved.position.z);state.pendingSafeEntry=false;state.groundY=Number.isFinite(saved.position.y)?saved.position.y:0;
+    const { x, y, z } = saved.position;
+    const sky = MAPS.sky.world;
+    const lastCloudRow = sky.depth / 2 - PLAYER_RADIUS;
+    // Older saves can be on the former outlook, outside the narrower path.
+    const beyondNewShore = map === "sky" && z > lastCloudRow
+      && !skyRaceShoreContains(sky, x, z, PLAYER_RADIUS);
+    state.position.set(x, 0, beyondNewShore ? lastCloudRow - 1 : z);
+    state.pendingSafeEntry = false;
+    state.groundY = !beyondNewShore && Number.isFinite(y) ? y : 0;
     state.heading=state.viewHeading=Number.isFinite(saved.heading)?saved.heading:0;
   }
   state.cameraDistanceIndex=Number.isInteger(saved.cameraDistanceIndex)?clamp(saved.cameraDistanceIndex,0,THIRD_PERSON_DISTANCE_PRESETS.length-1):DEFAULT_THIRD_PERSON_DISTANCE_INDEX;
@@ -2267,6 +2470,22 @@ function loadState(saved) {
   els.saveState.textContent = "保存済み";
 }
 
+function constructionParkingReturnSpot(layout, canStand) {
+  const aisle=layout.lanes.find(lane=>lane.id==='aisle');
+  const {minX,maxX,minZ,maxZ}=aisle;
+  const {sx}=layout.orientation;
+  const centreZ=(minZ+maxZ)/2;
+  // Start inside the open end of the aisle. Check the installed vehicles,
+  // buildings and ground in case something is parked there right now.
+  const startX=sx===1?maxX-55:minX+55;
+  for(let x=startX;x>=minX+25&&x<=maxX-25;x-=sx*32){
+    for(const z of [centreZ,centreZ-40,centreZ+40,centreZ-72,centreZ+72]){
+      if(canStand(x,z))return {x,z,heading:-sx*Math.PI/2};
+    }
+  }
+  return null;
+}
+
 function emergencyEscape() {
   if(worldHighController?.active){void worldHighController.leave({then:emergencyEscape});return;}
   if(worldConcreteController?.active){void worldConcreteController.leave({then:emergencyEscape});return;}
@@ -2281,7 +2500,14 @@ function emergencyEscape() {
   // on the current surface. The controllers above checkpoint cargo first.
   const returnMap = ["mars", "construction", "coast"].includes(state.map)
     ? state.map : state.map === 'space' ? ufoEmergencyReturnMap() : 'sky';
-  if (state.map === 'space') restoreUfoReturnFacility(returnMap);
+  const parking=returnMap==='construction'?worldSaveService?.ledger?.world.constructionParking:null;
+  const layout=parking&&sharedParkingLayouts().find(candidate=>candidate.corner===parking.corner);
+  const parkingSpot=layout&&constructionParkingReturnSpot(layout,(x,z)=>
+    Math.abs(getVehicleGroundHeight(x,z,0))<.25&&groundCollisionPenetrationAt(x,z,0,0)<.01);
+  if(parking&&!parkingSpot){showToast('駐車場に空いている場所を見つけられませんでした。');return;}
+  if(returnMap==='construction'){nativeDoorNavigator?.cancel();nativeDoorMove=null;state.moving=false;}
+  const ufoTripActive = state.map === 'space' || state.ufoBoarded || state.ufoEngineMode !== 'idle';
+  if (ufoTripActive) restoreUfoReturnFacility(returnMap);
   resetUfoSpaceHazardState();
   // 移動入力と視点ドラッグを同時に解除し、ワープ直後に同じ入力で
   // 再び壁へ押し付けられないようにする。
@@ -2304,22 +2530,25 @@ function emergencyEscape() {
   cancelBuild();
   resetPlayerToMapSpawn(
     returnMap,
-    returnMap === "sky" ? { fromEmergency: true } : {},
+    parkingSpot ? {spawn:parkingSpot} : returnMap === "sky" ? { fromEmergency: true } : {},
   );
-  if (scene) {
-    scene.background = color(MAPS[returnMap].palette.fog);
-    scene.fog = returnMap === 'mars' ? null : new THREE.Fog(MAPS[returnMap].palette.fog, 360, 780);
+  if(returnMap!=='construction'){
+    if(scene){
+      scene.background=color(MAPS[returnMap].palette.fog);
+      scene.fog=returnMap==='mars'?null:new THREE.Fog(MAPS[returnMap].palette.fog,360,780);
+    }
+    rebuildMap();
   }
-  rebuildMap();
   updateCharacter(0);
   updateCamera();
   updateEmergencyReturnControl();
   updateUfoControls();
-  saveState();
+  if(returnMap==='construction')void persistWorldSnapshot().catch(()=>{});
+  else saveState();
   showToast(returnMap === "mars"
-    ? "緊急帰還：火星マップの安全地点へ戻りました"
+    ? "緊急帰還：アマネ星マップの安全地点へ戻りました"
     : returnMap === "construction"
-    ? "緊急帰還：資材を残して工事現場の安全地点へ戻りました"
+    ? (parkingSpot ? "緊急帰還：工事現場の駐車場へ戻りました" : "緊急帰還：工事現場の入口へ戻りました")
     : returnMap === "coast" ? "海岸の入口へ戻りました"
     : "緊急帰還：雲マップの空駅入口へ戻りました");
 }
@@ -2499,7 +2728,7 @@ function addCloudCluster(parent, x, z, scale = 1, tint = 0xf6fbff) {
   parent.add(group);
 }
 
-function makeGround(config) {
+function makeGround(config,holes=[]) {
   if(config.decoration.coastOpenWorld){
     coastWorld=createCoastWorld({collider:addRotatedCollider,surface:registerPhysicsFloor,ceiling:addRotatedCeiling,reserved:buildItemsForMap(),pebbleState:coastPebbles?.snapshot()??worldSaveService?.ledger?.world.coastPebbles});
     scene.fog=new THREE.Fog(config.palette.fog,1800,6500);
@@ -2509,13 +2738,18 @@ function makeGround(config) {
     camera.near=4;camera.far=18000;camera.updateProjectionMatrix();
     return coastWorld.group;
   }
-  if (config.decoration.expandedConstruction){const ground=createConstructionGround(config);constructionAtmosphere=createSkyMapAtmosphere({cloudSea:false,lightWorld:true});scene.add(constructionAtmosphere.group);constructionSurroundings=createConstructionSurroundings(config);scene.add(constructionSurroundings.group);return ground;}
+  if (config.decoration.expandedConstruction){const ground=createConstructionGround(config,{holes,pavement:FIELD_ROADS});constructionAtmosphere=createSkyMapAtmosphere({cloudSea:false,lightWorld:true});scene.add(constructionAtmosphere.group);constructionSurroundings=createConstructionSurroundings(config);scene.add(constructionSurroundings.group);return ground;}
   const group = new THREE.Group();
   const { width, depth } = config.world;
-  if(state.map==='sky'){skyAtmosphere=createSkyMapAtmosphere();group.add(skyAtmosphere.group);}
+  if(state.map==='sky'){
+    skyAtmosphere=createSkyMapAtmosphere();
+    const lookout=skyAtmosphere.addWindLookout();
+    group.add(skyAtmosphere.group);
+    addVisualBuildingColliders(lookout.root,'sky-wind-lookout',{meshSurfaceFootprint:true});
+  }
   const sourceTexture = state.map==='sky'?null:sourceTextureFor(config);
   if(state.map==='sky'){
-    skyCloudGround=createSkyCloudGround(config.world);
+    skyCloudGround=createSkyCloudGround(config.world,{raceShore:true});
     group.add(skyCloudGround.group);
   }else{
   const ground = new THREE.Mesh(
@@ -2979,7 +3213,7 @@ function registerSurfacePerimeterColliders({
   return edgeIds;
 }
 
-function meshFootprintPolygon(object) {
+function meshFootprintPolygon(object, minimumY = -Infinity) {
   const attribute = object.geometry?.getAttribute?.("position");
   if (!attribute || attribute.count < 3) return null;
   object.updateWorldMatrix(true, false);
@@ -2987,7 +3221,7 @@ function meshFootprintPolygon(object) {
   const vertex = new THREE.Vector3();
   for (let index = 0; index < attribute.count; index += 1) {
     vertex.fromBufferAttribute(attribute, index).applyMatrix4(object.matrixWorld);
-    if (Number.isFinite(vertex.x) && Number.isFinite(vertex.z)) points.push({ x: vertex.x, z: vertex.z });
+    if (vertex.y >= minimumY && Number.isFinite(vertex.x) && Number.isFinite(vertex.z)) points.push({ x: vertex.x, z: vertex.z });
   }
   const hull = convexHull(points);
   return hull.length >= 3 ? hull : null;
@@ -3521,7 +3755,8 @@ function getStepTransition(fromX, fromZ, toX, toZ) {
     // ascent. The bounded look-ahead is used only by the adjacent-wall rule;
     // making it a global ascent would falsely block walking away from a step
     // whenever a higher roof or landing happened to be visible ahead.
-    ascending: Math.max(toHeight, probeHeight) > fromHeight + .2,
+    ascending: Math.max(toHeight, probeHeight) > fromHeight + .2
+      && !(state.map==='construction'&&toHeight<geometricFromHeight&&Math.abs((worldExcavationController?.groundHeightAt(toX,toZ)??NaN)-toHeight)<.05),
     descending: Math.min(toHeight, probeHeight) < fromHeight - .2,
     airborne: state.jumpVelocity !== 0 || state.jumpY > 0,
     availableJumpRise: getAvailableJumpRise(),
@@ -3845,6 +4080,10 @@ function addVisualBuildingColliders(group, id, options = {}) {
     // 床として扱うのは、建築側が明示した物理面だけ。低い箱や横長の
     // 装飾を自動で床へ昇格させると、何もない空間に足場が生まれる。
     const isWalkableSurface = object.userData?.walkableSurface === true;
+    if (registerSurfaces && object.userData?.physicsCeiling) {
+      addRotatedCeiling(center.x, center.z, [orientedSize.x, orientedSize.z], worldEuler.y,
+        bounds.min.y, `${id}-ceiling-${object.id}`, { buildingId: id });
+    }
     if (registerSurfaces && isWalkableSurface) {
       const surfaceId = object.userData?.physicsSurfaceId
         ? `${id}-${object.userData.physicsSurfaceId}`
@@ -3859,6 +4098,7 @@ function addVisualBuildingColliders(group, id, options = {}) {
         halfZ: orientedSize.z / 2,
         height: Math.max(0, bounds.max.y),
         physicsSource: object.userData?.physicsSource || "visual-surface",
+        ...(options.meshSurfaceFootprint ? {polygon:meshFootprintPolygon(object,bounds.max.y-.025)} : {}),
       });
       // A visible raised floor has two physical parts: its top surface and
       // the thin vertical faces around that surface. The complete footprint
@@ -3901,6 +4141,7 @@ function addVisualBuildingColliders(group, id, options = {}) {
       // 自動生成された細部は形状そのものを基準にし、全建物へ
       // 一律の大きな見えない壁を足さない。
       clearance: 0,
+      isOpen:object.userData.stationGate?.isOpen,
       polygon: meshFootprintPolygon(object),
     });
   });
@@ -4047,6 +4288,39 @@ function surfaceContainsPoint(x, z, surface, edgeEpsilon = 0.02) {
     && Math.abs(local.z) < surface.halfZ + edgeEpsilon;
 }
 
+function openUfoRampSurfaceHeight(control, local) {
+  const halfLength = ((control.rampLength || 84) - 3) / 2;
+  const halfWidth = ((control.rampWidth || 18) - 4) / 2;
+  const offsetX = local.x - control.rampOpenPosition.x;
+  if (Math.abs(offsetX) > halfLength + .001
+    || Math.abs(local.z - control.rampOpenPosition.z) > halfWidth + .001) return null;
+  const rotation = control.rampOpenRotation || 0;
+  const surfaceY = control.rampOpenPosition.y + Math.sin(rotation) * offsetX + Math.cos(rotation) * (1.55 + .55 / 2);
+  return Math.max(0, (control.originY || 0) + surfaceY * (control.scale || BUILDING_SCALE));
+}
+
+function ufoRampSideBlocksWalk(fromX, fromZ, toX, toZ) {
+  if (!state.ufoDoorOpen || state.ufoBoarded
+    || (state.jumpCount > 0 && (state.jumpY > 0 || state.jumpVelocity > 0))) return false;
+  return ufoDoorControls.some(control => {
+    if (control.amount < .82) return false;
+    const from = ufoWorldToLocal(control, fromX, fromZ);
+    const height = openUfoRampSurfaceHeight(control, from);
+    if (height === null || Math.abs(state.groundY - height) > 1.5) return false;
+    const to = ufoWorldToLocal(control, toX, toZ);
+    const { x: centerX, z: centerZ } = control.rampOpenPosition;
+    const halfWidth = ((control.rampWidth || 18) - 4) / 2;
+    const toSide = to.z - centerZ;
+    if (Math.abs(toSide) <= halfWidth) return false;
+    const edgeZ = centerZ + Math.sign(toSide) * halfWidth;
+    const crossing = THREE.MathUtils.clamp((edgeZ - from.z) / (to.z - from.z), 0, 1);
+    const edgeX = THREE.MathUtils.lerp(from.x, to.x, crossing);
+    // A diagonal step can also leave through the open end. Block it only
+    // when the side is the first edge it crosses.
+    return Math.abs(edgeX - centerX) <= ((control.rampLength || 84) - 3) / 2;
+  });
+}
+
 function authoredUfoRampHeightAt(x, z) {
   if (!Number.isFinite(x) || !Number.isFinite(z)) return null;
   let highest = state.map === 'sky' ? skyStationRampHeightAt(skyStationBuilding, x, z) : null;
@@ -4057,25 +4331,7 @@ function authoredUfoRampHeightAt(x, z) {
     const isOpen = (control.amount || 0) > .001 || (control.target || 0) > .001;
     const local = ufoWorldToLocal(control, x, z);
     if (isOpen) {
-      const rampLength = control.rampLength || 84;
-      const rampWidth = control.rampWidth || 18;
-      const surfaceLength = rampLength - 3;
-      const surfaceWidth = rampWidth - 4;
-      const centerX = control.rampOpenPosition?.x || 0;
-      const centerZ = control.rampOpenPosition?.z || 0;
-      const localX = local.x - centerX;
-      if (Math.abs(localX) <= surfaceLength / 2 + .001
-        && Math.abs(local.z - centerZ) <= surfaceWidth / 2 + .001) {
-        const rampRotationZ = control.rampOpenRotation || 0;
-        const surfaceTopY = 1.55 + .55 / 2;
-        includeHeight(Math.max(
-          0,
-          (control.originY || 0)
-            + (control.rampOpenPosition.y
-              + Math.sin(rampRotationZ) * localX
-              + Math.cos(rampRotationZ) * surfaceTopY) * (control.scale || BUILDING_SCALE),
-        ));
-      }
+      includeHeight(openUfoRampSurfaceHeight(control, local));
 
       // The short board inside the hull is also a single authored slope. Its
       // physics strips are only a debug representation; movement uses this
@@ -4189,7 +4445,11 @@ function highestReachableSurface(candidates, referenceHeight, availableRise = ge
 let vehicleSurfaceIndex=null,vehicleSurfaceEpoch=-1,vehicleSurfaceCount=-1,vehicleSurfaceTick=0,vehicleSurfaceReadTick=-1;
 let concreteVehicleProbe=null,concreteVehicleProbeEpoch=-1,concreteVehicleProbeCount=-1;
 function concreteVehicleWorldBlocked(x,z,r,y,h){if(!concreteVehicleProbe||concreteVehicleProbeEpoch!==constructionContactRevision||concreteVehicleProbeCount!==colliders.length){concreteVehicleProbe=createConcreteVehicleProbe(colliders,pointInsideCollider);concreteVehicleProbeEpoch=constructionContactRevision;concreteVehicleProbeCount=colliders.length;}return concreteVehicleProbe(x,z,r,y,h);}
-function getVehicleGroundHeight(x,z,reference,excludeBuilding=''){if(!Number.isFinite(reference))return getGroundHeight(x,z,excludeBuilding);if(!vehicleSurfaceIndex||vehicleSurfaceEpoch!==constructionContactRevision||vehicleSurfaceCount!==walkableSurfaces.length||worldTimberController?.movingGround&&vehicleSurfaceReadTick!==vehicleSurfaceTick){vehicleSurfaceIndex=createVehicleSurfaceIndex(walkableSurfaces,surfaceContainsPoint);vehicleSurfaceEpoch=constructionContactRevision;vehicleSurfaceCount=walkableSurfaces.length;vehicleSurfaceReadTick=vehicleSurfaceTick;}const earth=worldExcavationController?.groundHeightAt(x,z,reference)??0;return vehicleSurfaceIndex.heightAt(x,z,earth,reference,excludeBuilding);}
+function quarryGroundReader(read){
+  read.quarryHeight=(x,z)=>worldExcavationController?.quarryHeightAt?.(x,z);
+  return read;
+}
+function getVehicleGroundHeight(x,z,reference,excludeBuilding=''){if(!Number.isFinite(reference))return getGroundHeight(x,z,excludeBuilding);if(!vehicleSurfaceIndex||vehicleSurfaceEpoch!==constructionContactRevision||vehicleSurfaceCount!==walkableSurfaces.length||vehicleSurfaceReadTick!==vehicleSurfaceTick&&worldTimberController?.movingGround){vehicleSurfaceIndex=createVehicleSurfaceIndex(walkableSurfaces,surfaceContainsPoint);vehicleSurfaceEpoch=constructionContactRevision;vehicleSurfaceCount=walkableSurfaces.length;vehicleSurfaceReadTick=vehicleSurfaceTick;}const earth=worldExcavationController?.groundHeightAt(x,z,reference)??0;return vehicleSurfaceIndex.heightAt(x,z,earth,reference,excludeBuilding);}
 function getGroundHeight(x, z, excludeBuilding = '') {
   if(state.map==='construction'&&excludeBuilding!=='construction-reel'){
     const reel=reelWorld(worldSaveService.ledger?.world.constructionHighBuild),plank=reelStep(reel,x,z,state.groundY);
@@ -4264,6 +4524,10 @@ function getLandingGroundHeight(x, z, takeoffHeight) {
 }
 
 function hasAuthoritativeSupportAt(x, z, height) {
+  if(state.map==='construction'){
+    const soil=worldExcavationController?.groundHeightAt(x,z,height);
+    if(Number.isFinite(soil)&&Math.abs(soil-height)<=.24)return true;
+  }
   const seaDeck = state.map === 'coast' ? coastPlay?.surfaceAt(x,z) : undefined;
   if (Number.isFinite(seaDeck) && Math.abs(seaDeck-height) <= .24) return true;
   // Natural island terrain is a real landing surface too. Treating only
@@ -4354,7 +4618,7 @@ function getFootSupportSurface(
   if (!boxes.length) return null;
   return walkableSurfaces.reduce((best, surface) => {
     if (surface.physicsSource === "ufo-opening-ramp") return best;
-    if (!Number.isFinite(surface.height)) return best;
+    if (!Number.isFinite(surface.height) || (options.accept && !options.accept(surface))) return best;
     const delta = surface.height - referenceHeight;
     if (!allowHigher && Math.abs(delta) > .24) return best;
     if (allowHigher && delta > .24 && delta > maxRise + STEP_JUMP_CLEARANCE) return best;
@@ -4541,7 +4805,7 @@ function movePlayerOutsideBuildingColliders(fromX = state.position.x, fromZ = st
   let adjusted = false;
   for (let pass = 0; pass < 24; pass += 1) {
     let deepest = null;
-    colliders.forEach(collider => {
+    walkingWorldColliders(state.position.x, state.position.z).forEach(collider => {
       // Step risers are crossed conditionally by the jump/height solver. A
       // static depenetration pass must not turn their upper airspace into a
       // permanent wall after the movement solver has accepted the jump.
@@ -4771,6 +5035,7 @@ function polygonContact(first, polygon, margin = 0) {
 }
 
 function characterVerticallyOverlapsCollider(collider, groundY = state.groundY, jumpY = state.jumpY) {
+  if(collider.isOpen?.())return false;
   const footprint = character?.userData?.collisionFootprint;
   const characterMinY = groundY + jumpY + (footprint?.minY ?? 0);
   const characterMaxY = groundY + jumpY + (footprint?.maxY ?? 30);
@@ -4843,8 +5108,13 @@ function isHigherOverlappingSurfaceEdge(collider, x, z, groundY) {
   return Math.abs(local.x) < support.halfX && Math.abs(local.z) < support.halfZ;
 }
 
+function walkingWorldColliders(fromX,fromZ,toX=fromX,toZ=fromZ){
+  const movingParts=state.map==='construction'?worldExcavationController?.walkingColliders?.(fromX,fromZ,toX,toZ):null;
+  return movingParts?.length?[...colliders,...movingParts]:colliders;
+}
+
 function hasGroundCollisionAt(x, z, groundY) {
-  return colliders.some(collider => {
+  return walkingWorldColliders(x,z).some(collider => {
     if (isColliderPassage(x, z, collider)) return false;
     if (isHigherOverlappingSurfaceEdge(collider, x, z, groundY)) return false;
     return characterColliderContact(x, z, collider, groundY, 0).intersects;
@@ -4852,7 +5122,7 @@ function hasGroundCollisionAt(x, z, groundY) {
 }
 
 function groundCollisionPenetrationAt(x, z, groundY, jumpY = state.jumpY) {
-  return colliders.reduce((maximum, collider) => {
+  return walkingWorldColliders(x,z).reduce((maximum, collider) => {
     if (isColliderPassage(x, z, collider)) return maximum;
     if (isHigherOverlappingSurfaceEdge(collider, x, z, groundY)) return maximum;
     // The final movement guard runs during jumps too. Evaluating an airborne
@@ -5081,11 +5351,14 @@ function addStationRailing(group, startX, endX, z, y, stone, gold) {
 }
 
 function addStationBench(group, x, y, z, wood, gold) {
-  addBox(group, [20, 1.8, 5.6], [x, y + 5.4, z], wood);
-  addBox(group, [20, 7.4, 1.4], [x, y + 8.8, z - 2.2], wood);
+  const seat = addWalkableBox(group, [20, 1.8, 8], [x, y + 5.4, z], wood);
+  seat.name = 'sky-station-plaza-seat';
+  seat.userData.physicsSource = 'sky-station-bench';
+  seat.userData.physicsSurfaceId = 'plaza-seat';
+  addBox(group, [20, 7.4, 1.4], [x, y + 8.8, z - 4], wood).name = 'sky-station-plaza-back';
   [-8, 8].forEach(dx => {
-    addBox(group, [1.3, 6, 1.3], [x + dx, y + 2.6, z], gold);
-    addBox(group, [1.2, 1.2, 7], [x + dx, y + 1, z], gold);
+    addBox(group, [1.3, 6, 1.3], [x + dx, y + 2.6, z], gold).name = "sky-station-plaza-leg-" + dx;
+    addBox(group, [1.2, 1.2, 7], [x + dx, y + 1, z], gold).name = "sky-station-plaza-foot-" + dx;
   });
 }
 
@@ -5294,7 +5567,7 @@ function buildSkyStation(entry) {
     addStationRailing(group, rail.startX, rail.endX, rail.z, 2, stone, gold);
   });
   addStationRailing(group, -48, 48, -37, 2, stone, gold);
-  addStationBench(group, -35, 2, 34, wood, gold);
+  addStationBench(group, -35, 0, 47, wood, gold);
 
   // 屋根・柵の尖塔。
   [[-43, -27], [43, -27], [-43, 25], [43, 25], [-18, -24], [18, -24], [-18, 6], [18, 6]].forEach(([x, z]) => {
@@ -5666,7 +5939,7 @@ function buildMarsMaterialShop(structure) {
   const group = new THREE.Group();
   group.name = "mars-material-shop";
 
-  // 火星の荒地に建つ素材ショップ。店主は入口の脇に常設し、
+  // アマネ星の荒地に建つ素材ショップ。店主は入口の脇に常設し、
   // 商品棚は奥と左右に限定。中央48幅の通路は什器で塞がない。
   const wallHeight = height * .78;
   const roofWidth = width - 8;
@@ -5709,7 +5982,7 @@ function buildMarsMaterialShop(structure) {
   };
 
   // 地面と段差を作らない薄い外床と、店内全体の内床。
-  // 床は火星の地面と同じ高さに扱うため、見えていない台座判定は足さない。
+  // 床はアマネ星の地面と同じ高さに扱うため、見えていない台座判定は足さない。
   addDecorationBox([width, .18, depth], [0, .09, 0], floor);
   const clearInteriorFloor = addDecorationBox(
     [shopkeeperReserve[0], .18, shopkeeperReserve[1]],
@@ -5741,7 +6014,7 @@ function buildMarsMaterialShop(structure) {
   // 引き戸はまだ置かず、将来の店主や来客が出入りできる開放入口のままにする。
   addSolidBox([entranceWidth, 7, 8], [0, entranceHeight + 3.5, frontWallZ], frame);
 
-  // 表示上の入口フレーム、窓、火星用の暖色灯。これらは壁の表面装飾で、
+  // 表示上の入口フレーム、窓、アマネ星用の暖色灯。これらは壁の表面装飾で、
   // 入口の空間に余計なコライダーを作らない。
   [-1, 1].forEach(side => {
     addDecorationBox([2.2, entranceHeight + 2, 2.4], [side * (entranceWidth / 2 + .7), (entranceHeight + 2) / 2, frontWallZ + .55], trim);
@@ -5858,7 +6131,7 @@ function addFixedStructure(parent, config, structure) {
       includeObject: object => object.userData?.skyTrainRollingStockCollider === true,
     });
   } else if (structure.type === "mars-material-shop") {
-    // 火星素材ショップは入口を持つ建物。壁・梁だけを表示メッシュから
+    // アマネ星素材ショップは入口を持つ建物。壁・梁だけを表示メッシュから
     // 物理化し、店内の空き床や入口まで箱の当たり判定で塞がない。
     addVisualBuildingColliders(group, structure.id, {
       registerObstacles: true,
@@ -5972,7 +6245,11 @@ function addFixedStructure(parent, config, structure) {
 }
 
 function addMapEntry(parent, config) {
-  if(state.map === "construction"){constructionTownBridge=createConstructionTownBridge({collider:addRotatedCollider,surface:registerPhysicsFloor});parent.add(constructionTownBridge.group);return;}
+  if(state.map === "construction"){
+    constructionTownBridge=createConstructionTownBridge({collider:addRotatedCollider,surface:registerPhysicsFloor});
+    parent.add(constructionTownBridge.group);
+    return;
+  }
   const entry = config.entry;
   const [x, , z] = normalizedPoint(config, entry.point);
   if (entry.terrainOnly) {
@@ -5981,6 +6258,7 @@ function addMapEntry(parent, config) {
     return;
   }
   const group = entry.type === "rail-station" ? buildSkyStation(entry) : new THREE.Group();
+  if(entry.type==='rail-station')addSkyStationInspectionWorks(group);
   const entryScale = entry.type === "rail-station" ? BUILDING_SCALE : 1;
   group.scale.setScalar(entryScale);
   group.position.set(x, 0, z);
@@ -8104,7 +8382,7 @@ function nextUfoSpaceRouteSeed() {
 function getUfoForwardScrollMarsDistanceMode(routeSeed) {
   const modes = UFO_FORWARD_SCROLL_MARS_DISTANCE_MODES;
   // 航路シードから一度だけ選ぶ。飛行中に再抽選されないため、表示距離・
-  // 実際の火星位置・到着時間は、出発から到着まで常に同じモードのままになる。
+  // 実際のアマネ星位置・到着時間は、出発から到着まで常に同じモードのままになる。
   const index = mixUfoSpaceRouteSeed(routeSeed, 0x4d415253) % modes.length;
   return modes[index] || UFO_FORWARD_SCROLL_DEFAULT_MARS_DISTANCE_MODE;
 }
@@ -8887,7 +9165,7 @@ function makeUfoForwardScrollMarsAtmosphereEntry(mars, forward) {
   group.name = "ufo-forward-scroll-mars-atmosphere-entry";
   group.userData.nonCollidable = true;
   group.visible = false;
-  // 火星の手前側に、実際の大気圏外縁と同じ向きの発光層を置く。航路の
+  // アマネ星の手前側に、実際の大気圏外縁と同じ向きの発光層を置く。航路の
   // 終端はこの面を通過する位置から算出されるため、画面だけの演出にはしない。
   group.position.copy(normal).multiplyScalar(-radius * 1.037);
   group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
@@ -9115,7 +9393,7 @@ function makeUfoForwardScrollMission(control, entryCraftCenter, craft, mars, sta
     1,
     baseForwardDistanceToMars * getUfoForwardScrollRouteDistanceRatio(routeMode),
   );
-  // 火星の表示、当たり判定、ゴール判定、回収星の距離を同じ実コースへ揃える。
+  // アマネ星の表示、当たり判定、ゴール判定、回収星の距離を同じ実コースへ揃える。
   // そのため、見えない短縮コースで先に到着することはない。
   const marsApproachDistance = forwardDistanceToMars
     + (mars.userData.radius || UFO_SPACE_MARS_RADIUS)
@@ -10314,7 +10592,7 @@ function applyUfoForwardScrollMarsDistanceMode(control, mission, routeMode) {
     ? mars.parent.worldToLocal(plannedMarsWorld.clone())
     : plannedMarsWorld;
 
-  // 表示中の火星・大気圏エフェクト・当たり判定が同じ実座標を共有する。
+  // 表示中のアマネ星・大気圏エフェクト・当たり判定が同じ実座標を共有する。
   // ラベルだけを切り替えるのではなく、選ばれた億km距離に比例して
   // 実際のコースを再配置する。
   mars.position.copy(plannedMarsLocal);
@@ -10375,7 +10653,7 @@ function synchronizeUfoForwardScrollCruisePosition(control, mission, craft) {
   let craftCenter = craft.getWorldPosition(new THREE.Vector3());
   const currentProgress = craftCenter.clone().sub(mission.origin).dot(mission.forward);
   const correction = scheduledProgress - currentProgress;
-  // 前進だけは「時間」と「正規の火星までの距離」に同期する。横・上下の
+  // 前進だけは「時間」と「正規のアマネ星までの距離」に同期する。横・上下の
   // 操作は先に通常の物理入力で反映済みなので、ここではその成分に触れない。
   if (Math.abs(correction) > .0001) {
     const correctedWorld = craftCenter.clone().addScaledVector(mission.forward, correction);
@@ -10533,8 +10811,8 @@ function beginUfoForwardScrollMarsDescent(control, mission, craftCenter) {
   mars.updateWorldMatrix(true, true);
   const marsCenter = mars.getWorldPosition(new THREE.Vector3());
   const radius = mars.userData.radius || UFO_SPACE_MARS_RADIUS;
-  // 巡航中に上下左右へ避けていても、着陸カットではその実位置から火星の
-  // 手前側の着陸点へ滑らかに収束する。火星面の内側へ埋めない余白も残す。
+  // 巡航中に上下左右へ避けていても、着陸カットではその実位置からアマネ星の
+  // 手前側の着陸点へ滑らかに収束する。アマネ星面の内側へ埋めない余白も残す。
   const surfaceClearance = Math.max(20, mission.craftRadius * .32);
   entry.descentStartWorld.copy(craftCenter);
   entry.descentEndWorld.copy(marsCenter)
@@ -10547,8 +10825,8 @@ function beginUfoForwardScrollMarsDescent(control, mission, craftCenter) {
   }
   entry.descentStarted = true;
   entry.descentElapsed = 0;
-  // この関数を呼んだ時点で、必ず火星降下フェーズへ切り替える。
-  // 通常航路では呼び出し元も同じ代入をしているが、開発用の「火星マップ」
+  // この関数を呼んだ時点で、必ずアマネ星降下フェーズへ切り替える。
+  // 通常航路では呼び出し元も同じ代入をしているが、開発用の「アマネ星マップ」
   // 直行経路ではここで確定しないと、地球離脱フェーズが残ってしまう。
   mission.phase = "mars-descent";
   mission.phaseElapsed = 0;
@@ -10579,7 +10857,7 @@ function beginUfoForwardScrollMarsDescent(control, mission, craftCenter) {
     `${mission.route.destinationName}大気圏を降下中`,
     mission.route.destination === 'earth'
       ? '地球の雲海へ降下しています。まもなく空マップへ帰還します。'
-      : '火星の着陸地へ降下しています。まもなく火星マップに着陸します。',
+      : 'アマネ星の着陸地へ降下しています。まもなくアマネ星マップに着陸します。',
   );
   els.spaceTransitionOverlay?.classList.add("is-mars-atmosphere", "is-active");
   return true;
@@ -10591,6 +10869,14 @@ function completeUfoForwardScrollMarsLanding(mission, sequence) {
     || state.map !== "space") return false;
 
   const wasAtmospherePreviewTest = Boolean(mission?.marsAtmospherePreviewTest);
+  const isFirstStoryVisit = !wasAtmospherePreviewTest && mission?.route?.origin === 'earth'
+    && worldSaveService?.mode === 'live' && worldSaveService.ledger?.world.rainSkyV1 === 'baseline'
+    && !worldSaveService.rainStoryStep
+    && (skyMarsObservatoryClue || worldSaveService.ledger?.world.skyMarsObservatoryClue === true);
+  const isWaterDelivery=!wasAtmospherePreviewTest&&mission?.route?.origin==='earth'&&
+    worldSaveService?.mode==='live'&&worldSaveService.ledger?.world.rainDeliveryV1==='water-loaded';
+  const isRepairFlight=!wasAtmospherePreviewTest&&mission?.route?.origin==='earth'&&mission.route.destination==='mars'&&
+    rainWorksStepAllowed()&&rainWorksRecord()?.cargo?.status==='loaded'&&!worldSaveService.ledger.world.rainRepairV1;
   keys.clear();
   touchVector.set(0, 0);
   resetUfoForwardScrollMission(mission);
@@ -10602,9 +10888,12 @@ function completeUfoForwardScrollMarsLanding(mission, sequence) {
   state.ufoFaceAuth = false;
   state.ufoFaceAuthLatched = false;
   state.fastWalking = false;
-  // 再構築中だけ、火星のUFO中心へ誤って救済ワープされないようにする。
+  // 再構築中だけ、アマネ星のUFO中心へ誤って救済ワープされないようにする。
   // 再構築後に実在する椅子の床面へ配置してから降車経路を開く。
   state.ufoMarsArrivalExitPending = true;
+  rainAmaneLandingPending = isFirstStoryVisit;
+  rainDeliveryLandingPending = isWaterDelivery;
+  rainRepairLandingPending = isRepairFlight;
   state.ufoMarsHatchRequiresFaceAuth = false;
   state.pendingSafeEntry = false;
   cancelBuild();
@@ -10676,7 +10965,8 @@ function completeUfoForwardScrollMarsLanding(mission, sequence) {
   updateCharacter(0);
   updateCamera();
   updateUfoControls();
-  showToast("火星へ着陸しました。エンジンを停止しています");
+  if(!wasAtmospherePreviewTest)celebrateGameEvent(document.body,"アマネ星に到着","ufo");
+  showToast("アマネ星へ着陸しました。エンジンを停止しています");
   return true;
 }
 
@@ -10689,7 +10979,7 @@ function updateUfoForwardScrollMarsDescent(control, mission, delta) {
     0,
     1,
   );
-  // 出発の加速感とは逆に、火星へ近づくにつれて減速して着地へ収束する。
+  // 出発の加速感とは逆に、アマネ星へ近づくにつれて減速して着地へ収束する。
   const eased = THREE.MathUtils.smoothstep(progress, 0, 1);
   const nextWorld = entry.descentStartWorld.clone().lerp(entry.descentEndWorld, eased);
   const nextLocal = ufoWorldToLocal(control, nextWorld.x, nextWorld.z);
@@ -10707,7 +10997,7 @@ function updateUfoForwardScrollMarsDescent(control, mission, delta) {
   if (mission.route.destination === 'earth') {
     const sequence = entry.descentSequence;
     resetUfoForwardScrollMission(mission);
-    returnUfoToSkyMap(sequence);
+    returnUfoToSkyMap(sequence,mission.route.origin,!mission.marsAtmospherePreviewTest);
     return true;
   }
   return completeUfoForwardScrollMarsLanding(mission, entry.descentSequence);
@@ -10874,7 +11164,7 @@ function updateUfoForwardScrollHud() {
           ? `${lockedPickup.type.label}をロックON中。${lockedHitLabel}命中済みで、残り${Math.max(0, lockedPickup.hitsRequired - lockedPickup.hitCount)}発で報酬を獲得します。`
           : "大型の青いエネルギー星、金色の宇宙金貨星、紫色の素材星を照準内でロックONできます。各星は追尾ミサイルを3発命中させると回収できます。"
         : mission.phase === "mars-descent"
-          ? `${route.destinationName}大気圏を降下中です。まもなく${route.destination === 'earth' ? '空マップへ帰還' : '火星マップへ着陸'}します。`
+          ? `${route.destinationName}大気圏を降下中です。まもなく${route.destination === 'earth' ? '空マップへ帰還' : 'アマネ星マップへ着陸'}します。`
         : mission.phase === "complete"
           ? `${route.destinationName}に到着しました。${route.originName}から再出発して、別の回収ルートを走れます。`
           : energyReturnPending
@@ -10890,7 +11180,7 @@ function updateUfoForwardScrollHud() {
   }
   setUfoSpaceReturnButtonVisible(canRestart);
   if (els.ufoSpaceReturnButton) {
-    const name=ufoEmergencyReturnMap(control)==='mars'?'火星マップ':'雲マップ';
+    const name=ufoEmergencyReturnMap(control)==='mars'?'アマネ星マップ':'雲マップ';
     els.ufoSpaceReturnButton.textContent=name+'に戻る';
     els.ufoSpaceReturnButton.setAttribute('aria-label',name+'の安全地点へ戻る');
   }
@@ -10999,7 +11289,7 @@ function triggerUfoForwardScrollEnergyEmergencyReturn(control, mission) {
   setSpaceTransitionMessage(
     "ENERGY EMPTY",
     "エネルギー切れのため緊急帰還します",
-    `${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`,
+    `${ufoEmergencyReturnMap(control) === 'mars' ? 'アマネ星マップ' : '雲マップ'}へ帰還します。`,
   );
   els.spaceTransitionOverlay?.classList.remove("is-earth-departure", "is-mars-atmosphere");
   els.spaceTransitionOverlay?.classList.add("is-energy-empty", "is-active");
@@ -11037,7 +11327,7 @@ function updateUfoForwardScrollEnergyHud() {
     const energyReturnPending = mission.phase === "empty" && mission.energyEmergencyReturnPending;
     const energyRecoveryAmount = getUfoEquipmentEnergyRecoveryAmount();
     els.ufoSpaceLifeNote.textContent = mission.phase === "mars-descent"
-      ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '降下後は空マップへ帰還します。' : '着陸後は火星マップを徒歩で探索できます。'}`
+      ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '降下後は空マップへ帰還します。' : '着陸後はアマネ星マップを徒歩で探索できます。'}`
       : mission.phase === "complete"
       ? `${mission.route.destinationName}到着。回収した素材は空マップの整備に使えます。`
       : mission.phase === "empty"
@@ -11098,8 +11388,8 @@ function activateUfoForwardScrollMission(control, {
   mission.departurePreviewSpeed = MARS_RETURN_PREVIEW
     && new URLSearchParams(location.search).get('ufoDepartureSlowPreview') === '1' ? .025 : 1;
   mission.energySystemEnabled = true;
-  // 火星到着だけを確認する開発経路では、地球離脱を再生しない。
-  // 地球→火星の通常航路プレビューとは別物として扱う。
+  // アマネ星到着だけを確認する開発経路では、地球離脱を再生しない。
+  // 地球→アマネ星の通常航路プレビューとは別物として扱う。
   mission.marsArrivalDevelopmentPreview = Boolean(marsArrivalPreview);
   mission.marsAtmospherePreviewTest = Boolean(marsArrivalPreview) || (testMode
     && new URLSearchParams(location.search).get("ufoMarsAtmosphereEntryTest") === "1")
@@ -11128,7 +11418,7 @@ function activateUfoForwardScrollMission(control, {
     departurePlanet.userData.departureActive = true;
     departurePlanet.userData.departureProgress = 0;
   } else if (departurePlanet) {
-    // 到着確認中は地球を表示も移動もさせない。火星降下だけを見せる。
+    // 到着確認中は地球を表示も移動もさせない。アマネ星降下だけを見せる。
     departurePlanet.visible = false;
     departurePlanet.userData.departureActive = false;
     departurePlanet.userData.departureProgress = 0;
@@ -11152,7 +11442,7 @@ function activateUfoForwardScrollMission(control, {
   document.body.dataset.ufoForwardScrollEnergy = mission.energy.toFixed(2);
   document.body.dataset.ufoSpaceShooting = "lock-on";
   if (mission.marsArrivalDevelopmentPreview) {
-    setUfoSpaceControlLabels("火星大気圏降下", "降下演出後、操縦席から降車");
+    setUfoSpaceControlLabels("アマネ星大気圏降下", "降下演出後、操縦席から降車");
     els.spaceTransitionOverlay?.classList.remove("is-earth-departure");
   } else {
     setUfoSpaceControlLabels(`高速${mission.route.destinationName}航行`, "自動前進・G軌道補正・近距離ロック射撃");
@@ -11160,8 +11450,8 @@ function activateUfoForwardScrollMission(control, {
       `${mission.route.origin.toUpperCase()} ATMOSPHERE EXIT`,
       `${mission.route.originName}大気圏を離脱`,
       mission.route.origin === 'mars'
-        ? '火星の赤い大気を抜けて上昇し、地球への帰路へ加速します。'
-        : '空マップの雲海を抜けて上昇し、火星航路へ加速します。',
+        ? 'アマネ星の赤い大気を抜けて上昇し、地球への帰路へ加速します。'
+        : '空マップの雲海を抜けて上昇し、アマネ星航路へ加速します。',
     );
     els.spaceTransitionOverlay?.classList.remove("is-mars-atmosphere");
     els.spaceTransitionOverlay?.classList.add("is-earth-departure", "is-active");
@@ -11482,7 +11772,7 @@ function updateUfoForwardScrollMission(delta) {
       if (mission.marsAtmospherePreviewTest) {
         document.body.dataset.ufoMarsAtmosphereEntryTest = "descent";
       }
-      showToast(`${mission.route.destinationName}大気圏へ突入。${mission.route.destination === 'earth' ? '地球の雲海' : '火星の着陸地'}へ降下します`);
+      showToast(`${mission.route.destinationName}大気圏へ突入。${mission.route.destination === 'earth' ? '地球の雲海' : 'アマネ星の着陸地'}へ降下します`);
     }
     // 長押しだけは一定間隔の連射にする。手動入力はkeydown時に即時発射済みで、
     // ここでは予約弾や待機中の入力を処理しない。
@@ -11515,7 +11805,7 @@ function makeLegacySpaceDustStream(earth, mars, control) {
     : new THREE.Vector3(1, 0, 0);
   const side = direction.clone().cross(reference).normalize();
   const vertical = side.clone().cross(direction).normalize();
-  // チリの流れは一本の細い帯ではなく、火星から地球へ広がる3Dの流れにする。
+  // チリの流れは一本の細い帯ではなく、アマネ星から地球へ広がる3Dの流れにする。
   // side / vertical は経路に直交するため、同じ高さ・同じ横幅へ固まり続けない。
   const spreadSide = 5000;
   const spreadVertical = 3600;
@@ -11605,8 +11895,8 @@ function makeLegacySpaceDustStream(earth, mars, control) {
         typeId: type.id,
         mesh,
         meshIndex: index,
-        // 初期位置は火星側の32〜64%に限定する。宇宙マップへ入った
-        // 瞬間にUFOの近くへ現れず、火星側から接近する様子を見せる。
+        // 初期位置はアマネ星側の32〜64%に限定する。宇宙マップへ入った
+        // 瞬間にUFOの近くへ現れず、アマネ星側から接近する様子を見せる。
         baseDistance: (0.32 + random() * .32) * travelLength,
         spawnDelay: random() * UFO_SPACE_DUST_HAZARD_SPAWN_STAGGER,
         sideOffset: (sideSlot - .5) * spreadSide * 2 * crossSectionScale
@@ -17513,11 +17803,11 @@ function activateUfoInertiaSlingshotTestMode(control) {
   document.body.dataset.ufoSpaceCombatMode = "mars-inertia-slingshot-prototype";
   document.body.dataset.ufoSpaceMission = "mars-inertia-slingshot-ready";
   document.body.dataset.ufoSpaceShooting = "disabled";
-  setUfoSpaceControlLabels("火星航路・慣性スリング", "左右で軌道補正 / Fでテザー");
+  setUfoSpaceControlLabels("アマネ星航路・慣性スリング", "左右で軌道補正 / Fでテザー");
   updateUfoInertiaSlingshotHud();
   updateUfoInertiaSlingshotLifeHud();
   updateUfoControls();
-  showToast("火星航路・慣性スリング。岩塊へテザーを接続し、張力が乗った瞬間に解放して火星側の捕獲軌道へ抜けます。");
+  showToast("アマネ星航路・慣性スリング。岩塊へテザーを接続し、張力が乗った瞬間に解放してアマネ星側の捕獲軌道へ抜けます。");
   return true;
 }
 
@@ -17689,7 +17979,7 @@ function updateUfoInertiaSlingshotMission(delta) {
     const captureDistance = captureDelta.length();
     if (captureDistance <= UFO_INERTIA_SLINGSHOT_CAPTURE_RADIUS) {
       if (mission.releaseQualified && mission.maxTension >= 112) {
-        finishUfoInertiaSlingshotMission(mission, "complete", "火星側の捕獲軌道へ進入。テザーの張力と慣性でUFO本体を正しい進行方向へ導けました。");
+        finishUfoInertiaSlingshotMission(mission, "complete", "アマネ星側の捕獲軌道へ進入。テザーの張力と慣性でUFO本体を正しい進行方向へ導けました。");
       } else if (!mission.captureMissed) {
         mission.captureMissed = true;
         showToast("捕獲軌道へ近づきましたが、慣性解放が不足しています。岩塊へ接続して張力を作り、解放後に再進入してください。");
@@ -17700,7 +17990,7 @@ function updateUfoInertiaSlingshotMission(delta) {
     } else if (mission.timeRemaining <= 0) {
       finishUfoInertiaSlingshotMission(mission, "failed", "航路時間切れです。テザーを張る位置と解放のタイミングを変えて再挑戦できます。");
     } else if (next.y > UFO_INERTIA_SLINGSHOT_ESCAPE_DISTANCE) {
-      finishUfoInertiaSlingshotMission(mission, "failed", "火星捕獲軌道を通り過ぎました。張力を作ってから横方向の慣性を残す必要があります。");
+      finishUfoInertiaSlingshotMission(mission, "failed", "アマネ星捕獲軌道を通り過ぎました。張力を作ってから横方向の慣性を残す必要があります。");
     }
   }
 
@@ -17747,7 +18037,7 @@ function updateUfoInertiaSlingshotLifeHud() {
           ? `テザー接続中。張力 ${Math.round(mission.tension)}。外側まで引かれた瞬間に解放します。`
           : "左右で軌道を補正し、岩塊のテザー圏へ入ってください。"
         : mission.phase === "complete"
-          ? "火星側の捕獲軌道へ進入しました。"
+          ? "アマネ星側の捕獲軌道へ進入しました。"
           : "航路が崩れました。再展開して慣性の作り方を変えられます。";
   }
   els.ufoSpaceLife.dataset.danger = mission.phase === "playing" && (mission.timeRemaining <= 15 || mission.integrity <= 38) ? "true" : "false";
@@ -17758,9 +18048,9 @@ function updateUfoInertiaSlingshotHud() {
   const visible = state.map === "space" && state.ufoInSpace && state.ufoBoarded && state.ufoEngineMode === "ready" && mission?.active && !state.ufoSpaceEscapePending;
   if (els.ufoSpaceCombat) els.ufoSpaceCombat.hidden = !visible;
   if (!visible || !mission) return;
-  setUfoSpaceHudLabels({ title: "火星航路・慣性スリング", first: "航路", second: "張力", third: "解放" });
+  setUfoSpaceHudLabels({ title: "アマネ星航路・慣性スリング", first: "航路", second: "張力", third: "解放" });
   const phaseLabel = mission.phase === "ready" ? "航路待機"
-    : mission.phase === "playing" ? `火星へ ${Math.max(0, Math.round(mission.craftLocal.y))}`
+    : mission.phase === "playing" ? `アマネ星へ ${Math.max(0, Math.round(mission.craftLocal.y))}`
       : mission.phase === "complete" ? "捕獲成功"
         : "再展開";
   if (els.ufoSpaceWave) els.ufoSpaceWave.textContent = phaseLabel;
@@ -17776,10 +18066,10 @@ function updateUfoInertiaSlingshotHud() {
         ? mission.tetheredAnchor
           ? "テザーを張っています。岩塊との距離が伸びるほど張力が増え、解放した瞬間の速度が航路に残ります。"
           : mission.releaseQualified
-            ? "張力を解放済みです。火星側のオレンジ捕獲軌道へ姿勢を合わせて進入してください。"
+            ? "張力を解放済みです。アマネ星側のオレンジ捕獲軌道へ姿勢を合わせて進入してください。"
             : "岩塊のテザー圏でFを押し、外側へ回り込んで張力を作ります。"
         : mission.phase === "complete"
-          ? "火星へ直接ぶつけるのではなく、捕獲軌道へ入れて減速できました。"
+          ? "アマネ星へ直接ぶつけるのではなく、捕獲軌道へ入れて減速できました。"
           : "同じUFOの慣性・接触・テザー物理で、航路を最初から再展開できます。";
   }
   if (els.ufoSpaceStartButton) {
@@ -17787,7 +18077,7 @@ function updateUfoInertiaSlingshotHud() {
     els.ufoSpaceStartButton.hidden = !canStart;
     els.ufoSpaceStartButton.disabled = !canStart;
     els.ufoSpaceStartButton.textContent = mission.phase === "ready" ? "航路へ出る" : "航路を再展開";
-    els.ufoSpaceStartButton.setAttribute("aria-label", "火星航路・慣性スリングを開始する");
+    els.ufoSpaceStartButton.setAttribute("aria-label", "アマネ星航路・慣性スリングを開始する");
   }
   if (els.ufoSpaceFireButton) {
     const inRange = mission.phase === "playing" && (mission.tetheredAnchor || mission.anchors.some(anchor => mission.craftLocal.distanceTo(anchor.position) <= UFO_INERTIA_SLINGSHOT_GRAPPLE_RANGE));
@@ -18030,7 +18320,7 @@ function activateUfoSolarSailTestMode(control) {
   updateUfoSolarSailHud();
   updateUfoSolarSailLifeHud();
   updateUfoControls();
-  showToast("太陽帆サーフィン。帆を開いて光る太陽風へ乗ると、UFO本体が風圧で火星方向へ加速します。捕獲軌道の前では帆を畳んでください。");
+  showToast("太陽帆サーフィン。帆を開いて光る太陽風へ乗ると、UFO本体が風圧でアマネ星方向へ加速します。捕獲軌道の前では帆を畳んでください。");
   return true;
 }
 
@@ -18062,7 +18352,7 @@ function useUfoSolarSailAction() {
   mission.sailsDeployed = !mission.sailsDeployed;
   mission.sail.target = mission.sailsDeployed ? 1 : 0;
   document.body.dataset.ufoSolarSailAction = mission.sailsDeployed ? "reef" : "deploy";
-  showToast(mission.sailsDeployed ? "太陽帆を展開。光る太陽風へ入ると風圧がUFOの慣性に加わります。" : "太陽帆を収納。慣性を残したまま火星側の捕獲軌道へ進入できます。");
+  showToast(mission.sailsDeployed ? "太陽帆を展開。光る太陽風へ入ると風圧がUFOの慣性に加わります。" : "太陽帆を収納。慣性を残したままアマネ星側の捕獲軌道へ進入できます。");
   return true;
 }
 
@@ -18200,7 +18490,7 @@ function updateUfoSolarSailMission(delta) {
         document.body.dataset.ufoSolarSail = "complete";
         document.body.dataset.ufoSolarSailPhase = "complete";
         document.body.dataset.ufoSolarSailAction = "complete";
-        showToast("火星側の捕獲軌道へ進入。太陽風で得た推進力を残し、帆を畳んで火星接近へ切り替えました。");
+        showToast("アマネ星側の捕獲軌道へ進入。太陽風で得た推進力を残し、帆を畳んでアマネ星接近へ切り替えました。");
       } else if (!mission.captureMissed) {
         mission.captureMissed = true;
         showToast(mission.sailsDeployed ? "捕獲軌道の手前です。帆を開いたままでは減速できません。Fで収納して進入してください。" : "推進力が不足しています。太陽風へ戻り、帆を開いて蓄光を増やしてください。");
@@ -18249,7 +18539,7 @@ function updateUfoSolarSailLifeHud() {
             : "帆を展開中ですが、太陽風の流れから外れています。左右で光る帯へ入り直してください。"
           : "帆を収納中。慣性だけで進みます。強い加速が必要なら風路内でFを押して帆を開きます。"
         : mission.phase === "complete"
-          ? "太陽帆を畳んで火星側の捕獲軌道へ進入しました。"
+          ? "太陽帆を畳んでアマネ星側の捕獲軌道へ進入しました。"
           : "太陽風航路が閉じました。再展開して風路を選び直せます。";
   }
   els.ufoSpaceLife.dataset.danger = mission.phase === "playing" && mission.timeRemaining <= 16 ? "true" : "false";
@@ -18262,8 +18552,8 @@ function updateUfoSolarSailHud() {
   if (!visible || !mission) return;
   setUfoSpaceHudLabels({ title: "太陽帆サーフィン", first: "帆圧", second: "蓄光", third: "波乗り" });
   const phaseLabel = mission.phase === "ready" ? "帆を待機"
-    : mission.phase === "playing" ? `火星へ ${Math.max(0, Math.round(mission.craftLocal.y))}`
-      : mission.phase === "complete" ? "火星接近"
+    : mission.phase === "playing" ? `アマネ星へ ${Math.max(0, Math.round(mission.craftLocal.y))}`
+      : mission.phase === "complete" ? "アマネ星接近"
         : "再展開";
   if (els.ufoSpaceWave) els.ufoSpaceWave.textContent = phaseLabel;
   if (els.ufoSpaceDustDestroyed) els.ufoSpaceDustDestroyed.textContent = String(Math.round(mission.pressure));
@@ -18277,13 +18567,13 @@ function updateUfoSolarSailHud() {
       : mission.phase === "playing"
         ? mission.sailsDeployed
           ? mission.pressure > 0
-            ? "帆が太陽風を受けています。左右で帯の中心を保つほど、慣性を強く火星方向へ残せます。"
+            ? "帆が太陽風を受けています。左右で帯の中心を保つほど、慣性を強くアマネ星方向へ残せます。"
             : "帆を開いたまま風路外へ出ています。横移動で青・金・紫の流れへ戻してください。"
           : mission.charge >= UFO_SOLAR_SAIL_REQUIRED_CHARGE
-            ? "蓄光は十分です。火星側のオレンジ捕獲軌道に近づいたら、帆を畳んだまま進入してください。"
+            ? "蓄光は十分です。アマネ星側のオレンジ捕獲軌道に近づいたら、帆を畳んだまま進入してください。"
             : "蓄光が不足しています。太陽風へ戻り、帆を開いて推進力を蓄えてください。"
         : mission.phase === "complete"
-          ? "火星接近用の帆走を終えました。到着ではなく、火星へ安全に近づくための推進航行です。"
+          ? "アマネ星接近用の帆走を終えました。到着ではなく、アマネ星へ安全に近づくための推進航行です。"
           : "太陽風の帯・帆の展開・収納の判断を最初からやり直せます。";
   }
   if (els.ufoSpaceStartButton) {
@@ -18856,11 +19146,11 @@ function activateUfoMarsRaceTestMode(control) {
   document.body.dataset.ufoSpaceCombatMode = "mars-entry-operation";
   document.body.dataset.ufoSpaceMission = "mars-entry-ready";
   document.body.dataset.ufoSpaceShooting = "disabled";
-  setUfoSpaceControlLabels("火星突入航路", "左右で慣性を操縦");
+  setUfoSpaceControlLabels("アマネ星突入航路", "左右で慣性を操縦");
   updateUfoMarsRaceHud();
   updateUfoMarsRaceLifeHud();
   updateUfoControls();
-  showToast("火星突入航路。左右の慣性を制御し、重力流と残骸帯を抜けて火星へ到達します。");
+  showToast("アマネ星突入航路。左右の慣性を制御し、重力流と残骸帯を抜けてアマネ星へ到達します。");
   return true;
 }
 
@@ -18880,7 +19170,7 @@ function startUfoMarsRace() {
   mission.dashCooldown = 0;
   document.body.dataset.ufoMarsRace = "playing";
   document.body.dataset.ufoMarsRacePhase = "playing";
-  showToast("発進。入力を離してもUFOは滑ります。切り返しと残像航法を使い、航路ラインを捉えて火星へ向かってください。");
+  showToast("発進。入力を離してもUFOは滑ります。切り返しと残像航法を使い、航路ラインを捉えてアマネ星へ向かってください。");
   updateUfoMarsRaceHud();
   updateUfoMarsRaceLifeHud();
   return true;
@@ -19010,11 +19300,11 @@ function updateUfoMarsBreakthroughMission(control, mission, frameDelta) {
   if (next.y >= UFO_MARS_RACE_FINISH_DISTANCE) {
     mission.phase = "complete";
     mission.speed = 0;
-    showToast(`火星重力圏へ到達。${Math.round(mission.integrity)}%の船体で航路を突破しました。`);
+    showToast(`アマネ星重力圏へ到達。${Math.round(mission.integrity)}%の船体で航路を突破しました。`);
   } else if (mission.integrity <= 0) {
     mission.phase = "failed";
     mission.speed = 0;
-    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`);
+    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? 'アマネ星マップ' : '雲マップ'}へ帰還します。`);
     window.setTimeout(() => { if (state.map === "space" && mission.phase === "failed") emergencyEscape(); }, 700);
   } else if (mission.timeRemaining <= 0) {
     mission.phase = "failed";
@@ -19104,7 +19394,7 @@ function updateUfoMarsBreakthroughMissionV2(control, mission, frameDelta) {
       mission.dashCharges = Math.min(UFO_MARS_RACE_DASH_CHARGE_MAX, mission.dashCharges + (precision > .72 ? 1 : 0));
       mission.decisionPulse = 1;
       showToast(gate.isFinish
-        ? "火星到着ラインを捕捉。最終進入姿勢を維持します。"
+        ? "アマネ星到着ラインを捕捉。最終進入姿勢を維持します。"
         : `航路ライン捕捉。精度 ${Math.round(precision * 100)}%、推進が跳ね上がりました。`);
     } else {
       gate.flash = .35;
@@ -19153,7 +19443,7 @@ function updateUfoMarsBreakthroughMissionV2(control, mission, frameDelta) {
   }
 
   const sector = Math.min(3, Math.floor((Math.max(0, next.y) / UFO_MARS_RACE_FINISH_DISTANCE) * 4));
-  const sectorNames = ["地球圏離脱", "重力流航路", "残骸帯突破", "火星最終進入"];
+  const sectorNames = ["地球圏離脱", "重力流航路", "残骸帯突破", "アマネ星最終進入"];
   if (sector !== mission.sector) {
     mission.sector = sector;
     mission.phaseName = sectorNames[sector];
@@ -19167,11 +19457,11 @@ function updateUfoMarsBreakthroughMissionV2(control, mission, frameDelta) {
   if (next.y >= UFO_MARS_RACE_FINISH_DISTANCE && mission.gates[mission.gates.length - 1]?.passed) {
     mission.phase = "complete";
     mission.speed = 0;
-    showToast(`火星へ到達。${Math.round(mission.integrity)}%の船体で航路を完走しました。`);
+    showToast(`アマネ星へ到達。${Math.round(mission.integrity)}%の船体で航路を完走しました。`);
   } else if (mission.integrity <= 0) {
     mission.phase = "failed";
     mission.speed = 0;
-    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`);
+    showToast(`船体耐久が尽きました。緊急帰還で${ufoEmergencyReturnMap(control) === 'mars' ? 'アマネ星マップ' : '雲マップ'}へ帰還します。`);
     window.setTimeout(() => { if (state.map === "space" && mission.phase === "failed") emergencyEscape(); }, 700);
   } else if (mission.timeRemaining <= 0) {
     mission.phase = "failed";
@@ -19265,7 +19555,7 @@ function updateUfoMarsRaceMission(delta) {
         if (gate.isFinish) {
           mission.phase = "complete";
           mission.speed *= .28;
-          showToast(`火星到着ゲートへ進入。${mission.gatesPassed}/${UFO_MARS_RACE_GATE_COUNT}ゲートを通過して完走しました。`);
+          showToast(`アマネ星到着ゲートへ進入。${mission.gatesPassed}/${UFO_MARS_RACE_GATE_COUNT}ゲートを通過して完走しました。`);
         } else if (mission.combo >= 3 && mission.combo % 3 === 0) {
           showToast(`連続ゲート ×${mission.combo}。UFO推進器が強く加速しています。`);
         }
@@ -19301,7 +19591,7 @@ function updateUfoMarsRaceMission(delta) {
     if (mission.phase === "playing" && next.y >= UFO_MARS_RACE_FINISH_DISTANCE + 560 && !finalGate.passed) {
       mission.phase = "failed";
       mission.speed *= .22;
-      showToast("火星到着ゲートを外しました。入口の中心へ合わせ直して再挑戦できます。");
+      showToast("アマネ星到着ゲートを外しました。入口の中心へ合わせ直して再挑戦できます。");
     }
     if (mission.integrity <= 0 && mission.phase === "playing") {
       mission.phase = "failed";
@@ -19311,7 +19601,7 @@ function updateUfoMarsRaceMission(delta) {
     if (mission.timeRemaining <= 0 && mission.phase === "playing") {
       mission.phase = "failed";
       mission.speed *= .18;
-      showToast("火星到着制限時間を超えました。ゲートを連続で抜けて推進速度を維持してください。");
+      showToast("アマネ星到着制限時間を超えました。ゲートを連続で抜けて推進速度を維持してください。");
     }
   }
 
@@ -19336,11 +19626,11 @@ function updateUfoMarsRaceLifeHud() {
   if (els.ufoSpaceLifeFill) els.ufoSpaceLifeFill.style.width = `${integrityPercent}%`;
   if (els.ufoSpaceLifeNote) {
     els.ufoSpaceLifeNote.textContent = mission.phase === "ready"
-      ? "地球から火星へ。左右の慣性を操り、航路ラインをつないで突破します。"
+      ? "地球からアマネ星へ。左右の慣性を操り、航路ラインをつないで突破します。"
       : mission.phase === "playing"
-        ? `${mission.phaseName}｜火星まで ${Math.max(0, Math.round(UFO_MARS_RACE_FINISH_DISTANCE - mission.distance)).toLocaleString("ja-JP")}m。`
+        ? `${mission.phaseName}｜アマネ星まで ${Math.max(0, Math.round(UFO_MARS_RACE_FINISH_DISTANCE - mission.distance)).toLocaleString("ja-JP")}m。`
         : mission.phase === "complete"
-          ? "火星重力圏へ到達しました。突破航路を完了しています。"
+          ? "アマネ星重力圏へ到達しました。突破航路を完了しています。"
           : "再挑戦すると、地球側の発進位置から再出発できます。";
   }
   els.ufoSpaceLife.dataset.danger = mission.phase === "playing" && mission.integrity <= 34 ? "true" : "false";
@@ -19351,12 +19641,12 @@ function updateUfoMarsRaceHud() {
   const visible = state.map === "space" && state.ufoInSpace && state.ufoBoarded && state.ufoEngineMode === "ready" && mission?.active && !state.ufoSpaceEscapePending;
   if (els.ufoSpaceCombat) els.ufoSpaceCombat.hidden = !visible;
   if (!visible || !mission) return;
-  setUfoSpaceHudLabels({ title: "火星突入航路", first: "速度", second: "進行", third: "船体" });
+  setUfoSpaceHudLabels({ title: "アマネ星突入航路", first: "速度", second: "進行", third: "船体" });
   const distanceLeft = Math.max(0, Math.round(UFO_MARS_RACE_FINISH_DISTANCE - mission.distance));
   if (els.ufoSpaceWave) {
     els.ufoSpaceWave.textContent = mission.phase === "ready" ? "地球・発進待機"
       : mission.phase === "playing" ? mission.phaseName
-        : mission.phase === "complete" ? "火星到着"
+        : mission.phase === "complete" ? "アマネ星到着"
           : "再挑戦";
   }
   if (els.ufoSpaceDustDestroyed) els.ufoSpaceDustDestroyed.textContent = String(Math.round(mission.speed));
@@ -19366,21 +19656,21 @@ function updateUfoMarsRaceHud() {
   if (els.ufoSpaceWaveFill) els.ufoSpaceWaveFill.style.width = `${Math.round(progress * 100)}%`;
   if (els.ufoSpaceCombatNote) {
     els.ufoSpaceCombatNote.textContent = mission.phase === "ready"
-      ? "同じUFOで地球から火星へ。慣性・重力流・残骸衝突・残像航法が実際の機体へ作用します。"
+      ? "同じUFOで地球からアマネ星へ。慣性・重力流・残骸衝突・残像航法が実際の機体へ作用します。"
       : mission.phase === "playing"
         ? mission.combo > 1
           ? `航路ライン連続捕捉 ×${mission.combo}。速度が上がっています。次の危険帯へ備えてください。`
           : "左右で慣性を抑え、流れの芯を通ります。残骸への衝突角度で速度と船体が変わります。"
         : mission.phase === "complete"
-          ? `火星到着。船体 ${Math.round(mission.integrity)}%で航路を完走しました。`
-          : "火星突入航路を再展開すると、地球側の同じ発進位置から再挑戦できます。";
+          ? `アマネ星到着。船体 ${Math.round(mission.integrity)}%で航路を完走しました。`
+          : "アマネ星突入航路を再展開すると、地球側の同じ発進位置から再挑戦できます。";
   }
   if (els.ufoSpaceStartButton) {
     const canStart = ["ready", "failed", "complete"].includes(mission.phase);
     els.ufoSpaceStartButton.hidden = !canStart;
     els.ufoSpaceStartButton.disabled = !canStart;
-    els.ufoSpaceStartButton.textContent = mission.phase === "ready" ? "火星突入航路を開始" : "地球側から再挑戦";
-    els.ufoSpaceStartButton.setAttribute("aria-label", "火星突入航路を開始する");
+    els.ufoSpaceStartButton.textContent = mission.phase === "ready" ? "アマネ星突入航路を開始" : "地球側から再挑戦";
+    els.ufoSpaceStartButton.setAttribute("aria-label", "アマネ星突入航路を開始する");
   }
   if (els.ufoSpaceFireButton) {
     const canDash = mission.phase === "playing" && mission.dashCooldown <= 0 && mission.dashCharges > 0;
@@ -20198,7 +20488,7 @@ function startUfoSpaceCombat() {
   document.body.dataset.ufoSpaceCombat = "started";
   updateUfoSpaceLifeHud();
   updateUfoSpaceCombatHud();
-  showToast("火星航路を開始。接近する第1波を迎撃してください");
+  showToast("アマネ星航路を開始。接近する第1波を迎撃してください");
   return true;
 }
 
@@ -20671,7 +20961,7 @@ function updateUfoSpaceLifeHud() {
       : !state.ufoSpaceCombatStarted
         ? "シューティング開始を選ぶまで安全です"
       : state.ufoSpaceHazardGrace > 0
-        ? `火星編隊を捕捉中：${state.ufoSpaceHazardGrace.toFixed(1)}秒`
+        ? `アマネ星編隊を捕捉中：${state.ufoSpaceHazardGrace.toFixed(1)}秒`
         : stream?.activeCount
           ? `${stream.waveLabel}が接近中。被弾前に迎撃してください`
           : "次の編隊を索敵中です";
@@ -20692,7 +20982,7 @@ function triggerUfoSpaceEmergencyEscape() {
   setSpaceTransitionMessage(
     "UFO DAMAGE",
     "緊急帰還",
-    `宇宙のチリでUFOのライフが尽きました。${ufoEmergencyReturnMap() === 'mars' ? '火星マップ' : '雲マップ'}へ帰還します。`,
+    `宇宙のチリでUFOのライフが尽きました。${ufoEmergencyReturnMap() === 'mars' ? 'アマネ星マップ' : '雲マップ'}へ帰還します。`,
   );
   els.spaceTransitionOverlay?.classList.add("is-active");
   updateUfoSpaceLifeHud();
@@ -21205,7 +21495,7 @@ function enterUfoSpaceMap(control, exit, sequence) {
   updateMapReadout();
   updateUfoControls();
   if (!isUfoForwardScrollActive(control)) {
-    showToast(`${launchMap === "mars" ? "火星" : "空"}の外周を越え、宇宙マップへ移動しました`);
+    showToast(`${launchMap === "mars" ? "アマネ星" : "空"}の外周を越え、宇宙マップへ移動しました`);
   }
 }
 
@@ -21230,10 +21520,10 @@ function beginUfoSpaceTransition(control, exit) {
   document.body.dataset.ufoSpaceTransition = "starting";
   document.body.dataset.ufoSpaceExitSide = exit.side;
   setSpaceTransitionMessage(
-    launchMap === "mars" ? "MARS LIMIT PASSED" : "SKY LIMIT PASSED",
+    launchMap === "mars" ? "AMANE LIMIT PASSED" : "SKY LIMIT PASSED",
     "宇宙マップへ移動",
     launchMap === "mars"
-      ? "火星の外周を越えました。UFOの航行状態を維持したまま宇宙へ接続します。"
+      ? "アマネ星の外周を越えました。UFOの航行状態を維持したまま宇宙へ接続します。"
       : "空の外周を越えました。UFOの航行状態を維持したまま宇宙へ接続します。",
   );
   els.spaceTransitionOverlay?.classList.add("is-active");
@@ -21303,7 +21593,7 @@ function ufoEarthApproachAt(control) {
   };
 }
 
-function returnUfoToSkyMap(sequence) {
+function returnUfoToSkyMap(sequence,origin,storyFlight=true) {
   if (sequence !== ufoSpaceTransitionSequence
     || !state.ufoSpaceTransitioning
     || state.map !== "space") return;
@@ -21378,6 +21668,9 @@ function returnUfoToSkyMap(sequence) {
   updateCharacter(0);
   updateCamera();
   updateUfoControls();
+  ufoSkyReturnLandingPending = true;
+  rainReturnMilestonePending = storyFlight && origin === "mars" ? expectedRainReturnMilestone() : null;
+  if(storyFlight)celebrateGameEvent(document.body,"地球へ帰還","ufo");
   showToast("地球への接近を検知し、空マップ上空へ帰還しました");
 }
 
@@ -21406,7 +21699,8 @@ function beginUfoSkyReturn(control, approach) {
   );
   els.spaceTransitionOverlay?.classList.add("is-active");
   const sequence = ++ufoSpaceTransitionSequence;
-  window.setTimeout(() => returnUfoToSkyMap(sequence), UFO_SPACE_TRANSITION_DURATION_MS);
+  const origin = control.spaceLaunchMap;
+  window.setTimeout(() => returnUfoToSkyMap(sequence,origin), UFO_SPACE_TRANSITION_DURATION_MS);
   return true;
 }
 
@@ -21605,10 +21899,18 @@ function addBuilding(parent, item, source = item) {
 }
 
 function constructionBuildGround(position,size) {
+  if(parkingSurfaceOverlaps(worldSaveService.ledger?.world.constructionParking?.corner,position[0],position[2],size[0]*BUILDING_SCALE/2,size[2]*BUILDING_SCALE/2)){
+    return {valid:false,y:null,issue:'駐車場や車道を空けて、舗装の外に建てよう。'};
+  }
   constructionBuildingGroundProbe??=createBuildingGroundProbe({
     heightAt:(x,z)=>{const h=worldExcavationController?.groundHeightAt(x,z);return h===undefined?0:h;},
     bounds:{minX:-MAPS.construction.world.width/2,maxX:MAPS.construction.world.width/2,minZ:-MAPS.construction.world.depth/2,maxZ:MAPS.construction.world.depth/2},
   });
+  const earth=worldExcavationController?.groundRevision;
+  if(earth!==constructionBuildingGroundSource){
+    constructionBuildingGroundSource=earth;
+    constructionBuildingGroundProbe.reset();
+  }
   return constructionBuildingGroundProbe.inspect(position,size.map(v=>v*BUILDING_SCALE));
 }
 
@@ -21652,31 +21954,6 @@ function buildPlacementPosition(source) {
 
 function buildItemsForMap() {
   return Array.isArray(builtByMap[state.map]) ? builtByMap[state.map] : [];
-}
-
-function ensureMarsReturnUfoPad() {
-  if (state.map !== "mars") return false;
-  const items = Array.isArray(builtByMap.mars) ? builtByMap.mars : [];
-  if (items.some(item => item?.catalogId === "ufo-pad")) return false;
-  // 火星のUFO乗り場と顔認証システムは、空マップと同じ世界座標を
-  // そのまま使用する常設設備。ユーザー配置物ではないため、初期化後も
-  // 次の再構築で必ず戻る。
-  builtByMap.mars = [
-    ...items,
-    {
-      id: "mars-return-ufo-pad",
-      catalogId: "ufo-pad",
-      name: "UFO乗り場",
-      fixed: true,
-      position: [UFO_PLACEMENT_POSITION.x, 0, UFO_PLACEMENT_POSITION.z],
-      faceAuthPosition: [
-        UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x,
-        UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z,
-      ],
-      faceAuthAnchorLocked: true,
-    },
-  ];
-  return true;
 }
 
 function currentUfoPadItem() {
@@ -21748,6 +22025,11 @@ function setUfoCabinLightAmount(control, amount) {
 }
 
 function resetUfoEngineRuntime({ resetCraft = true } = {}) {
+  ufoSkyReturnLandingPending = false;
+  rainReturnMilestonePending = null;
+  rainAmaneLandingPending = false;
+  rainDeliveryLandingPending = false;
+  rainRepairLandingPending = false;
   ufoFlightSurvey?.finish(ufoDoorControls[0]?.spaceForwardScroll, 'interrupted');
   cancelUfoForwardScrollEnergyEmergencyReturn();
   ufoSpaceTransitionSequence += 1;
@@ -21977,7 +22259,9 @@ function updateUfoEngineOverlay() {
   if (!active) return;
   if (mode === "arrival-shutdown") {
     els.ufoEnginePhase.textContent = "ENGINE OFF";
-    els.ufoEngineDetail.textContent = "火星へ着陸。エンジンを停止してから降車用の引き戸を開きます";
+    els.ufoEngineDetail.textContent = state.map === "mars"
+      ? "アマネ星へ着陸。エンジンを停止してから降車用の引き戸を開きます"
+      : "地球へ着陸。エンジンを停止してから降車用の引き戸を開きます";
   } else if (mode === "seating") {
     els.ufoEnginePhase.textContent = "着座位置を固定";
     els.ufoEngineDetail.textContent = "セハルネを操縦席へ固定しています";
@@ -22024,6 +22308,15 @@ function beginUfoEngineStart() {
   return true;
 }
 
+function resumeSavedSkyUfoSeat(saved) {
+  const control = ufoDoorControls[0];
+  if (!control || saved.map !== "sky" || state.map !== "sky" || !saved.position) return false;
+  const seat = ufoSeatWorldAnchor(control);
+  const { x, y, z } = saved.position;
+  // An exact saved pilot position is already inside the closed cabin.
+  return Math.hypot(x - seat.x, y - seat.y, z - seat.z) <= .25 && beginUfoEngineStart();
+}
+
 function detectUfoEngineSeatArrival() {
   if (state.ufoEngineMode !== "idle" || state.ufoBoarded || !state.ufoDoorOpen) return false;
   const control = ufoDoorControls[0];
@@ -22038,19 +22331,46 @@ function updateUfoEngineSequence(delta) {
     return;
   }
   if (mode === "arrival-shutdown") {
-    // 火星到着は「停止 → 開放」。離陸用の着座・密閉・始動シーケンスへ
+    // アマネ星到着は「停止 → 開放」。離陸用の着座・密閉・始動シーケンスへ
     // 入らず、エンジンと車内灯を停止したまま短く停止演出を見せる。
+    // The ramp and cockpit floors are built at the pad's parked pose. Settle into
+    // that pose during shutdown, with the pilot still following the physical seat.
+    if (state.map === "sky" && ufoSkyReturnLandingPending && state.ufoBoarded) {
+      const remaining = UFO_MARS_ARRIVAL_SHUTDOWN_PHASE_SECONDS - state.ufoEngineTimer;
+      const step = delta >= remaining ? 1 : delta / remaining;
+      const yaw = Math.atan2(Math.sin(state.ufoFlightHeading), Math.cos(state.ufoFlightHeading));
+      state.ufoFlightHeading = yaw * (1 - step);
+      state.ufoFlightX *= 1 - step;
+      state.ufoFlightY *= 1 - step;
+      state.ufoFlightZ *= 1 - step;
+      state.ufoFlightPitch *= 1 - step;
+      state.ufoFlightRoll *= 1 - step;
+      state.ufoFlightDirectionalYaw *= 1 - step;
+      state.heading -= yaw * step;
+      state.viewHeading -= yaw * step;
+      applyUfoCraftWorldTransform(control);
+      enforceUfoTurbineAttachment(control);
+    }
     state.ufoEngineTimer += delta;
     state.ufoEngineRunning = false;
     state.ufoCabinLightAmount = 0;
     setUfoCabinLightAmount(control, 0);
     if (state.ufoEngineTimer >= UFO_MARS_ARRIVAL_SHUTDOWN_PHASE_SECONDS) {
+      if (state.map === "sky" && ufoSkyReturnLandingPending && state.ufoBoarded) {
+        const seat = ufoSeatWorldAnchor(control);
+        state.position.set(seat.x, 0, seat.z);
+        state.groundY = seat.y;
+        state.jumpY = state.jumpVelocity = 0;
+        state.falling = false;
+        state.supportSurfaceId = null;
+        state.ufoBoarded = false;
+      }
       state.ufoEngineMode = "arrival-disembark";
       state.ufoEngineTimer = 0;
       // 到着時も顔認証で使う既存の引き戸と、同じ既存の搭乗足場を一緒に開く。
       // 新しい足場や別の開口は作らない。
       setUfoDoorState(true);
-      document.body.dataset.ufoMarsArrivalHatch = "open-for-disembark";
+      if (state.map === "mars") document.body.dataset.ufoMarsArrivalHatch = "open-for-disembark";
       updateUfoEngineOverlay();
       updateUfoControls();
       showToast("エンジンを停止しました。UFO本体の引き戸と搭乗足場を開きました");
@@ -22093,6 +22413,7 @@ function updateUfoEngineSequence(delta) {
       setUfoCabinLightAmount(control, 1);
       updateUfoEngineOverlay();
       updateUfoControls();
+      celebrateGameEvent(document.body,"発進","ufo");
       showToast("エンジン始動完了。UFOを操縦できます");
     }
   }
@@ -22167,6 +22488,7 @@ function accelerateHeldUfoFlightInput(input, delta, options = {}) {
   const liftHoldSeconds = options.liftHoldSeconds ?? UFO_FLIGHT_ACCEL_HOLD_SECONDS;
   const liftMultiplier = options.liftMultiplier ?? UFO_FLIGHT_ACCEL_MULTIPLIER;
   const acceleratedInput = { ...input };
+  const dashHeld = options.dashHeld === true;
   let highestStage = 0;
   let highestMultiplier = 1;
 
@@ -22198,7 +22520,7 @@ function accelerateHeldUfoFlightInput(input, delta, options = {}) {
       : axis === "lift"
         ? liftMultiplier
         : UFO_FLIGHT_ACCEL_MULTIPLIER;
-    const stage = hold.seconds >= holdSeconds ? 1 : 0;
+    const stage = dashHeld || hold.seconds >= holdSeconds ? 1 : 0;
     highestStage = Math.max(highestStage, stage);
     if (stage) highestMultiplier = Math.max(highestMultiplier, multiplier);
     acceleratedInput[axis] = value * (stage ? multiplier : 1);
@@ -22432,14 +22754,15 @@ function updateUfoFlight(delta) {
   const acceleratedInput = accelerateHeldUfoFlightInput(
     input,
     delta,
-    forwardScroll
-      ? {
+    {
+      dashHeld: walkDashControl?.active === true,
+      ...(forwardScroll ? {
         strafeHoldSeconds: UFO_FORWARD_SCROLL_STRAFE_HOLD_SECONDS,
         strafeMultiplier: UFO_FORWARD_SCROLL_STRAFE_ACCEL_MULTIPLIER,
         liftHoldSeconds: UFO_FORWARD_SCROLL_LIFT_HOLD_SECONDS,
         liftMultiplier: UFO_FORWARD_SCROLL_LIFT_ACCEL_MULTIPLIER,
-      }
-      : undefined,
+      } : {}),
+    },
   );
   const rescueMission = control.spaceRescue;
   const rescueAutopilot = ["acquire", "towing"].includes(state.ufoSpaceRescueState);
@@ -22480,7 +22803,7 @@ function updateUfoFlight(delta) {
   const turnSpeed = UFO_FLIGHT_TURN_SPEED
     * (responsiveSpaceFlight ? UFO_SPACE_FREE_FLIGHT_TURN_MULTIPLIER : 1);
   // 前進スクロール中の前進成分は下の通常移動では扱わない。
-  // updateUfoForwardScrollMission が実時間と火星距離から一度だけ位置を
+  // updateUfoForwardScrollMission が実時間とアマネ星距離から一度だけ位置を
   // 決めるため、ここで重ねて移動させると所要時間が崩れてしまう。
   const forwardSpeed = forwardScroll ? 0 : manualForwardSpeed;
   const strafeSpeed = forwardScroll ? UFO_FORWARD_SCROLL_STRAFE_SPEED : manualStrafeSpeed;
@@ -23042,28 +23365,6 @@ function constrainCharacterBelowAuthoredCeilings() {
   return true;
 }
 
-function isUfoFaceAuthAnchorOutside(control, worldPosition) {
-  if (!Array.isArray(worldPosition) || worldPosition.length < 2) return false;
-  const local = ufoWorldToLocal(control, Number(worldPosition[0]), Number(worldPosition[1]));
-  if (!Number.isFinite(local.x) || !Number.isFinite(local.z)) return false;
-  // The hull radius is 42 local units. The ramp occupies roughly x=35..119
-  // and is 18 units wide. Leave clearance so the device never lands in the
-  // craft or on the boarding ramp.
-  const insideHull = Math.hypot(local.x, local.z) <= 50;
-  const onRamp = local.x >= 26 && local.x <= 128 && Math.abs(local.z) <= 16;
-  return !insideHull && !onRamp;
-}
-
-function resolveUfoFaceAuthAnchor(control, savedPosition) {
-  const currentPosition = [state.position.x, state.position.z];
-  if (isUfoFaceAuthAnchorOutside(control, currentPosition)) return currentPosition;
-  if (isUfoFaceAuthAnchorOutside(control, savedPosition)) return savedPosition;
-  const currentLocal = ufoWorldToLocal(control, state.position.x, state.position.z);
-  const safeLocalZ = clamp(currentLocal.z, -30, 30);
-  const safeWorld = ufoLocalToWorld(control, 150, safeLocalZ);
-  return [safeWorld.x, safeWorld.z];
-}
-
 function isCameraFacingFaceScanner(control) {
   const faceAuth = control?.faceAuth;
   if (!faceAuth?.assembly) return false;
@@ -23127,10 +23428,10 @@ function setUfoDoorState(open, message = null) {
   return true;
 }
 
-function hasReachedMarsGroundAfterDisembark(control) {
-  if (!control || state.map !== "mars") return false;
+function hasReachedGroundAfterDisembark(control) {
+  if (!control) return false;
   // 体の一部が出口を抜けたかではなく、両足が落下もジャンプもしていない
-  // 実在の火星地面に着地したことを閉鎖条件にする。
+  // 乗り場の床に着地したことを閉鎖条件にする。
   const grounded = state.jumpY <= .001
     && state.jumpVelocity === 0
     && !state.falling;
@@ -23151,6 +23452,24 @@ function hasReachedMarsGroundAfterDisembark(control) {
 }
 
 function updateMarsArrivalHatchExit() {
+  if(rainRepairLandingPending&&state.map==='mars'&&!worldSaveService.busy&&!worldSaveService.blocked){
+    rainRepairLandingPending=false;
+    void worldSaveService.recordRainRepairStage('landed',worldStateSnapshot({safeAmaneLanding:state.ufoMarsArrivalExitPending})).catch(error=>{
+      if(!worldSaveService.blocked)rainRepairLandingPending=true;
+      reportWorldSaveError(error);
+    });
+  }
+  if(rainAmaneLandingPending && state.map==='mars' && !state.ufoMarsArrivalExitPending && !worldSaveService.busy){
+    rainAmaneLandingPending=false;
+    void worldSaveService.recordRainSkyStage('amane-visited',worldStateSnapshot()).catch(reportWorldSaveError);
+  }
+  if(rainDeliveryLandingPending&&state.map==='mars'&&!state.ufoMarsArrivalExitPending&&!worldSaveService.busy){
+    rainDeliveryLandingPending=false;
+    void worldSaveService.recordRainDeliveryStage('water-landed',worldStateSnapshot()).catch(error=>{
+      if(!worldSaveService.blocked)rainDeliveryLandingPending=true;
+      reportWorldSaveError(error);
+    });
+  }
   if (!state.ufoMarsArrivalExitPending) return;
   const control = ufoDoorControls[0];
   if (state.map !== "mars" || !control) {
@@ -23160,8 +23479,8 @@ function updateMarsArrivalHatchExit() {
   // 停止演出中はまだ開かないが、降車待ち状態は維持する。
   if (!state.ufoDoorOpen) return;
   // 既存の引き戸と足場が十分に開いた後、身体が出口を抜けたことではなく
-  // 足が火星地面へ着地したことを確認してから初めて閉じる。
-  if ((control.amount || 0) < .82 || !hasReachedMarsGroundAfterDisembark(control)) return;
+  // 足がアマネ星地面へ着地したことを確認してから初めて閉じる。
+  if ((control.amount || 0) < .82 || !hasReachedGroundAfterDisembark(control)) return;
   state.ufoMarsArrivalExitPending = false;
   state.ufoMarsHatchRequiresFaceAuth = true;
   // 降車後は通常の徒歩状態へ戻す。以後の再搭乗は顔認証だけが入口になる。
@@ -23169,7 +23488,7 @@ function updateMarsArrivalHatchExit() {
   state.ufoEngineTimer = 0;
   state.ufoEngineRunning = false;
   state.ufoCabinLightAmount = 0;
-  setUfoDoorState(false, "火星の地面への降車を確認。UFOの引き戸と搭乗足場を収納しました");
+  setUfoDoorState(false, "アマネ星の地面への降車を確認。UFOの引き戸と搭乗足場を収納しました");
   document.body.dataset.ufoMarsArrivalHatch = "closed-after-exit";
   updateUfoControls();
 }
@@ -23219,7 +23538,7 @@ function updateUfoFlightControlPresentation(forwardScroll, mission = null) {
     setUfoFlightLeverText("turn-left", "◀", "左へ", "左へ移動");
     setUfoFlightLeverText("turn-right", "▶", "右へ", "右へ移動");
     const marsDescent = mission?.phase === "mars-descent";
-    const destinationName = mission?.route?.destinationName || '火星';
+    const destinationName = mission?.route?.destinationName || 'アマネ星';
     if (title) title.textContent = marsDescent ? `${destinationName}大気圏降下` : `高速${destinationName}航行`;
     if (pad) {
       pad.setAttribute(
@@ -23237,6 +23556,258 @@ function updateUfoFlightControlPresentation(forwardScroll, mission = null) {
   setUfoFlightLeverText("turn-right", "↷", "右回転", "右回転");
   if (title) title.textContent = "飛行操縦";
   if (pad) pad.setAttribute("aria-label", "UFO前後左右移動パッド");
+}
+
+function canOpenUfoDeparture() {
+  if (!worldSaveService?.rainStoryCleared || !isUfoSpaceLaunchMap()
+    || state.ufoBoarded || state.ufoEngineMode !== "idle" || state.selectedBuildId) return false;
+  const pad = currentUfoPadItem();
+  if (!pad) return false;
+  const [x, , z] = pad.position;
+  const scanner = pad.faceAuthPosition;
+  return Math.hypot(state.position.x - x, state.position.z - z) <= 160
+    || (scanner && Math.hypot(state.position.x - scanner[0], state.position.z - scanner[1]) <= 55);
+}
+
+function expectedRainReturnMilestone() {
+  if(worldSaveService?.mode!=='live')return null;
+  if(worldSaveService.rainStoryStep==='amane-water-restored')return 'repair-trip-return';
+  const world=worldSaveService.ledger?.world;
+  if(world?.rainDeliveryV1==='source-matched')return 'water-delivery-return';
+  if(world?.rainSkyV1==='amane-visited'&&(world.rainStoryV1?.length??0)<2){
+    return world.rainAmaneV1==='shortage-seen'?'first-visit-return':'first-visit-early';
+  }
+  return null;
+}
+
+function updateUfoSkyReturnLanding() {
+  const returning = ufoSkyReturnLandingPending && state.map === "sky";
+  const approaching = returning && state.ufoBoarded && state.ufoEngineMode === "ready";
+  if (els.rainReturnDock.hidden === approaching) els.rainReturnDock.hidden = !approaching;
+  if (!returning || !worldBooted || state.ufoSpaceTransitioning) return;
+  const control = ufoDoorControls[0];
+  if (state.ufoBoarded) {
+    const centered = control && Math.hypot(state.ufoFlightX, state.ufoFlightZ) * (control.scale || BUILDING_SCALE) <= 20;
+    if (!approaching || !centered || state.ufoFlightY > UFO_GROUND_TAKEOFF_ALTITUDE_EPSILON) return;
+    clearMarsShopDialogInput();
+    stopUfoFlightLoopAudio();
+    state.ufoEngineRunning = false;
+    state.ufoEngineMode = "arrival-shutdown";
+    state.ufoEngineTimer = 0;
+    updateUfoControls();
+    return;
+  }
+  if (worldSaveService.busy || worldSaveService.blocked) return;
+  const milestone = rainReturnMilestonePending === expectedRainReturnMilestone() ? rainReturnMilestonePending : null;
+  if (state.ufoEngineMode!=="arrival-disembark" || !state.ufoDoorOpen
+    || (control?.amount||0)<.82 || !hasReachedGroundAfterDisembark(control)) return;
+  state.ufoEngineMode="idle";
+  state.ufoEngineTimer=0;
+  setUfoDoorState(false);
+  updateUfoControls();
+  ufoSkyReturnLandingPending = false;
+  rainReturnMilestonePending = null;
+  const snapshot = worldStateSnapshot();
+  let saved;
+  switch (milestone) {
+    case 'first-visit-return':
+      saved = worldSaveService.recordRainAmaneStage('sky-landed', snapshot);
+      break;
+    case 'water-delivery-return':
+      saved = worldSaveService.recordRainDeliveryStage('sky-returned', snapshot);
+      break;
+    case 'repair-trip-return':
+      saved = worldSaveService.recordRainStoryMilestone(milestone, snapshot);
+      break;
+    default:
+      saved = worldSaveService.saveWorld(snapshot);
+  }
+  void saved
+    .then(()=>{
+      if(milestone==='first-visit-return')showToast('空駅へ戻った。アマネ星で見たことを、バルティアに話そう。');
+      if(milestone==='water-delivery-return')showToast('街へ戻り、荷札の集水所を見渡せる場所を探そう。');
+    })
+    .catch(error=>{
+      // A transient inability to enqueue leaves the landed ship ready to be saved again.
+      if (!worldSaveService.blocked && state.map === "sky" && state.ufoEngineMode === "idle") {
+        ufoSkyReturnLandingPending = true;
+        rainReturnMilestonePending = milestone;
+        state.ufoEngineMode="arrival-disembark";
+        setUfoDoorState(true);
+      }
+      reportWorldSaveError(error);
+    });
+}
+
+function canStartRainStoryEnding() {
+  if (!worldBooted || !worldSaveService?.rainStoryEndingReady || worldSaveService.busy || state.map !== "sky"
+    || state.ufoBoarded || state.ufoSpaceTransitioning || state.ufoEngineMode !== "idle"
+    || state.falling || state.jumpY > .05 || state.selectedBuildId
+    || !worldInputAvailable()) return false;
+  // The return is saved after disembarking. The player may have built their
+  // UFO pad outside the station entrance's walking area.
+  return true;
+}
+
+async function rainStoryFilmUrl() {
+  const movie=new URL("./assets/imasora-rain-story-finale.mp4",import.meta.url).href;
+  // The protected PC preview keeps its original route table for its lifetime.
+  // The existing loopback media service serves this identical movie in that preview.
+  const pcPreview=location.hostname==="127.0.0.1"&&location.port==="57763";
+  if (pcPreview && !await fetch(movie,{method:"HEAD"}).then(response=>response.ok).catch(()=>false)) {
+    return "http://127.0.0.1:65030/chapter17-18.mp4";
+  }
+  return movie;
+}
+
+function rainStoryFailure(playback,saveError) {
+  if (!playback || playback !== rainStoryPlayback) return;
+  playback.failure=saveError?"save":"film";
+  els.rainStoryEndingSound.hidden=true;
+  els.rainStoryEndingSave.hidden=false;
+  els.rainStoryEndingSave.querySelector("p").textContent=saveError
+    ?"物語をセーブできませんでした。"
+    :"映像を読み込めませんでした。";
+  const retry=els.rainStoryEndingRetry;
+  retry.textContent=saveError?"セーブをやり直す":"映像を読み込み直す";
+  retry.hidden=false;
+  retry.focus();
+}
+
+async function playRainStoryFilm(playback) {
+  if (playback !== rainStoryPlayback || playback.failure || document.hidden) return;
+  const film=els.rainStoryEndingFilm;
+  try { await film.play(); }
+  catch (error) {
+    if (playback !== rainStoryPlayback || error.name === "AbortError") return;
+    if (error.name !== "NotAllowedError" || film.muted) {
+      rainStoryFailure(playback,false);
+      return;
+    }
+    film.muted=true;
+    els.rainStoryEndingSound.hidden=film.volume===0;
+    try { await film.play(); }
+    catch (fallback) { if (fallback.name!=="AbortError")rainStoryFailure(playback,false); }
+  }
+}
+
+async function loadRainStoryFilm(playback) {
+  const film=els.rainStoryEndingFilm;
+  playback.failure=null;
+  els.rainStoryEndingSave.hidden=true;
+  els.rainStoryEndingRetry.hidden=true;
+  els.rainStoryEndingSound.hidden=true;
+  film.muted=film.volume===0;
+  const source=await rainStoryFilmUrl();
+  if (playback!==rainStoryPlayback) return;
+  film.src=source;
+  film.currentTime=playback.offset;
+  void playRainStoryFilm(playback);
+}
+
+function startRainStoryEnding() {
+  if (rainStoryPlayback || !canStartRainStoryEnding()) return;
+  const destination=townReturnUrl(location.href,undefined,"rain-story-ending");
+  const offset=worldSaveService.rainStoryStep==="earth-rain-restored"?49.5:0;
+  const film=els.rainStoryEndingFilm;
+  try {
+    const volumes=JSON.parse(localStorage.getItem("lifeQuestWalkV1")||"{}").soundVolumes;
+    film.volume=clamp(Number(volumes?.sfx??1)||0,0,5)/5;
+  } catch { film.volume=.2; }
+  clearMarsShopDialogInput();
+  nearbyNamesView?.hide();
+  rainStoryPlayback={destination,offset,saving:false,failure:null};
+  els.rainStoryEnding.showModal();
+  void loadRainStoryFilm(rainStoryPlayback);
+}
+
+async function saveRainStoryEnding() {
+  const playback=rainStoryPlayback;
+  if (!playback || playback.saving || !els.rainStoryEndingFilm.ended) return;
+  playback.saving=true;
+  playback.failure=null;
+  els.rainStoryEndingSound.hidden=true;
+  els.rainStoryEndingSave.hidden=false;
+  els.rainStoryEndingRetry.hidden=true;
+  els.rainStoryEndingSave.querySelector("p").textContent="物語をセーブしています。";
+  try {
+    if (worldSaveService.blocked) await worldSaveService.retry();
+    if (!worldSaveService.rainStoryCleared) await worldSaveService.completeRainStoryEnding();
+    if (!worldSaveService.rainStoryCleared) throw Error("本編のクリアを保存できませんでした。");
+  } catch {
+    playback.saving=false;
+    rainStoryFailure(playback,true);
+    return;
+  }
+  location.assign(playback.destination);
+}
+
+function openUfoDeparture() {
+  if (!worldInputAvailable() || !canOpenUfoDeparture()) return;
+  const route = interplanetaryRoute(state.map);
+  clearMarsShopDialogInput();
+  els.ufoDepartureTitle.textContent = `${route.destinationName}へ出発`;
+  els.ufoDepartureStatus.hidden = true;
+  els.ufoDepartureDialog.showModal();
+}
+
+function chooseWorldMap(key) {
+  if (key === state.map) return;
+  if(key==='sky'&&['coast','construction'].includes(state.map)&&worldSaveService?.mode==='live'
+    && document.body.classList.contains('world-player-game')&&!canReachSkyFromTown()){
+    showToast('海岸で空の図を見つけ、街の駅から空駅へ向かおう。');
+    return;
+  }
+  if (worldSaveService?.mode !== 'live' || (key !== 'mars' && !['mars', 'space'].includes(state.map))) {
+    setMap(key);
+    return;
+  }
+  worldPlayerUI?.close();
+  if (canOpenUfoDeparture()) {
+    openUfoDeparture();
+    return;
+  }
+  showToast(state.map === 'space' ? '航行中は操縦を続けるか、緊急帰還してください。'
+    : state.map === 'mars' ? 'UFO乗り場から地球へ出発できます。'
+    : '空マップのUFO乗り場からアマネ星へ出発できます。');
+}
+
+async function travelWithoutUfoRewards() {
+  if (!els.ufoDepartureDialog.open || els.ufoDepartureSkip.disabled || !canOpenUfoDeparture()) return;
+  const origin = state.map;
+  const route = interplanetaryRoute(origin);
+  const destination = route.destinationMap;
+  const controls = [els.ufoDepartureSkip, els.ufoDeparturePilot, els.ufoDepartureClose];
+  for (const control of controls) control.disabled = true;
+  els.ufoDepartureStatus.hidden = false;
+  els.ufoDepartureStatus.textContent = "到着先をセーブしています。";
+  try {
+    const buildings = { ...builtByMap };
+    restoreUfoReturnFacility(destination, null, buildings);
+    // Arrive on foot next to the destination's existing departure scanner.
+    const [x, z] = buildings[destination].find(item => item.catalogId === 'ufo-pad').faceAuthPosition
+      ?? [UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x, UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z];
+    const arrival = worldSaveService.deriveDraft(worldStateSnapshot(), {
+      map: destination,
+      position: { x, y: 0, z: z + 38 },
+      heading: 0,
+      playCamera: { mode: 'third', heading: 0, pitch: 0 },
+      builtByMap: buildings,
+    });
+    await worldSaveService.savePostStoryUfoArrival(origin, arrival);
+    resetUfoEngineRuntime();
+    loadState(worldSaveService.world);
+    cancelBuild();
+    scene.background = color(MAPS[destination].palette.fog);
+    scene.fog = destination === 'mars' ? null : new THREE.Fog(MAPS.sky.palette.fog, 360, 780);
+    rebuildMap();
+    els.ufoDepartureDialog.close();
+    showToast(`${route.destinationName}に到着しました。持ちものはそのままです。`);
+  } catch {
+    els.ufoDepartureStatus.textContent = "移動を完了できませんでした。セーブを確認して、もう一度お試しください。";
+  } finally {
+    for (const control of controls) control.disabled = false;
+  }
 }
 
 function updateUfoControls() {
@@ -23265,7 +23836,6 @@ function updateUfoControls() {
     const forwardScrollMission = forwardScroll ? ufoDoorControls[0]?.spaceForwardScroll : null;
     updateUfoFlightControlPresentation(forwardScroll, forwardScrollMission);
   }
-  if (els.touchPad) els.touchPad.hidden = cockpitActive;
   if (els.touchHint) els.touchHint.hidden = true;
   const marsArrivalHatchOpen = state.map === "mars"
     && state.ufoDoorOpen
@@ -23294,7 +23864,7 @@ function updateUfoControls() {
       : mission.phase === "playing"
         ? "高速自動前進中。左右・上下はGの掛かる軌道補正です。急な切り返しではなく、先を読んで機体を流してください。"
         : mission.phase === "mars-descent"
-          ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '空マップへ帰還' : '火星の着陸地へ自動降下'}しています。`
+          ? `${mission.route.destinationName}大気圏を降下中です。${mission.route.destination === 'earth' ? '空マップへ帰還' : 'アマネ星の着陸地へ自動降下'}しています。`
         : mission.phase === "complete"
           ? `${mission.route.destinationName}大気圏へ到達しました。`
           : mission.energyEmergencyReturnPending
@@ -23307,11 +23877,11 @@ function updateUfoControls() {
       ? `星間採掘航行。${star.name}へ自由飛行で近づき、採掘圏内でFキーを押してください。`
       : "星間採掘航行。前後・左右・上昇・下降・旋回で自由にプラネタリウムを飛行できます。");
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceMarsRace?.active) {
-    setWorldText(els.ufoStatus, "火星突入航路中。左右で慣性を操り、航路ラインをつないで残骸帯を突破します。");
+    setWorldText(els.ufoStatus, "アマネ星突入航路中。左右で慣性を操り、航路ラインをつないで残骸帯を突破します。");
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceSolarSail?.active) {
     setWorldText(els.ufoStatus, "左右で光る太陽風の帯へ乗り、Fで太陽帆を開閉します。帆の風圧が実際のUFO航路へ加わります。");
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceInertiaSlingshot?.active) {
-    setWorldText(els.ufoStatus, "左右で実際のUFO軌道を補正し、Fで岩塊へテザーを接続・解放して火星側の捕獲軌道へ進みます。");
+    setWorldText(els.ufoStatus, "左右で実際のUFO軌道を補正し、Fで岩塊へテザーを接続・解放してアマネ星側の捕獲軌道へ進みます。");
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceGravityMaze?.active) {
     setWorldText(els.ufoStatus, "左右操縦で重力を傾け、重力コアを実体の迷路の開口部へ通します。");
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spaceCranePort?.active) {
@@ -23325,16 +23895,16 @@ function updateUfoControls() {
   } else if (flightReady && state.map === "space" && ufoDoorControls[0]?.spacePinball?.active) {
     setWorldText(els.ufoStatus, "左右操縦で下部磁場を動かし、重力コアを受け止めて連鎖させます。");
   } else if (flightReady && state.map === "space") {
-    setWorldText(els.ufoStatus, "プラネタリウム航行。火星を目印に、前後・左右・上昇・下降・回転で自由に飛行できます。");
+    setWorldText(els.ufoStatus, "プラネタリウム航行。アマネ星を目印に、前後・左右・上昇・下降・回転で自由に飛行できます。");
   }
   else if (flightReady) setWorldText(els.ufoStatus, "エンジン始動完了。前後左右はパッド、上昇・下降・回転はレバーで操縦できます。");
-  else if (!hasPad) setWorldText(els.ufoStatus, "UFO乗り場を建造してください。");
+  else if (!hasPad) setWorldText(els.ufoStatus, "UFO乗り場は空マップとアマネ星にあります。");
   else if (state.ufoEngineMode === "lighting") setWorldText(els.ufoStatus, "エンジン始動。カプセル内部の車内灯を点灯しています。");
   else if (state.ufoEngineMode === "closing") setWorldText(els.ufoStatus, "搭乗足場を収納し、UFOの入口を閉じています。");
   else if (state.ufoEngineMode === "seating") setWorldText(els.ufoStatus, "セハルネを固定着座位置へ合わせています。");
-  else if (state.ufoEngineMode === "arrival-shutdown") setWorldText(els.ufoStatus, "火星へ到着。エンジンを停止してから、UFO本体の引き戸を開きます。");
-  else if (marsArrivalHatchOpen) setWorldText(els.ufoStatus, "火星へ到着。火星の地面に足が着くまで、UFO本体の引き戸と搭乗足場は開いたままです。");
-  else if (marsFaceAuthOnly) setWorldText(els.ufoStatus, "火星のUFO本体の引き戸は、顔認証で開けられます。");
+  else if (state.ufoEngineMode === "arrival-shutdown") setWorldText(els.ufoStatus, "エンジンを停止してから、UFO本体の引き戸を開きます。");
+  else if (marsArrivalHatchOpen) setWorldText(els.ufoStatus, "アマネ星へ到着。アマネ星の地面に足が着くまで、UFO本体の引き戸と搭乗足場は開いたままです。");
+  else if (marsFaceAuthOnly) setWorldText(els.ufoStatus, "アマネ星のUFO本体の引き戸は、顔認証で開けられます。");
   else if (state.ufoFaceAuth) setWorldText(els.ufoStatus, "顔認証済み。右側搭乗足場を引き出しています。");
   else if (!nearPad) setWorldText(els.ufoStatus, "顔認証装置の前まで移動してください。");
   else if (!state.ufoDoorOpen) setWorldText(els.ufoStatus, "顔認証装置の前に立つと、搭乗足場が自動で引き出されます。");
@@ -23346,7 +23916,7 @@ function toggleUfoDoor() {
   if (state.map === "mars"
     && !state.ufoDoorOpen
     && (state.ufoMarsArrivalExitPending || state.ufoMarsHatchRequiresFaceAuth)) {
-    showToast("火星のUFO本体の引き戸は、顔認証で開けられます");
+    showToast("アマネ星のUFO本体の引き戸は、顔認証で開けられます");
     return;
   }
   const open = !state.ufoDoorOpen;
@@ -23421,7 +23991,7 @@ function installConstructionDeliveryDock(){
   if(constructionDeliverySite<0)return; // Never move/destroy a saved building to make room.
   const [x,z]=DELIVERY_SITES[constructionDeliverySite];
   constructionDeliveryDock=createConstructionDeliveryDock();constructionDeliveryDock.position.set(x,0,z);mapGroup.add(constructionDeliveryDock);
-  nameWorldObject(constructionDeliveryDock,'construction-delivery-dock','建材受取所',[DELIVERY_SIZE[0],DELIVERY_SIZE[2]],DELIVERY_SIZE[1]);
+  nameWorldObject(constructionDeliveryDock,'construction-delivery-dock','建材受取所',[DELIVERY_SIZE[0],DELIVERY_SIZE[2]],DELIVERY_SIZE[1],'facility','街や海岸から届いた材料と道具を受け取れます。近くで「建材受取所」を開いて、受け取る物を選びます。');
   addRotatedCollider(x,z,[DELIVERY_SIZE[0],DELIVERY_SIZE[2]],0,'construction-delivery-dock',0,{minY:0,maxY:DELIVERY_SIZE[1],obstacleHeight:DELIVERY_SIZE[1]});
   constructionDeliveryCollider=colliders[colliders.length-1];
 }
@@ -23469,7 +24039,7 @@ function showSpaceMaterialGuide() {
   if(constructionDeliveryMenu?.open)return;
   constructionDeliveryWalk=null;
   if (marsShopDialogState.open || isSkyStationGuideDialogOpen() || isUfoEquipmentWorkshopMenuOpen()) return;
-  spaceMaterialGuide?.show(state.map==='mars'?'火星素材ショップ · 入口の図鑑台':'工事現場 · 入口の図鑑台');
+  spaceMaterialGuide?.show(state.map==='mars'?'アマネ星素材ショップ · 入口の図鑑台':'工事現場 · 入口の図鑑台');
 }
 
 function updateSpaceMaterialBook() {
@@ -23485,8 +24055,9 @@ function updateSpaceMaterialBook() {
 
 function rebuildMap(options) {for(const step of rebuildMapSteps(options)){} }
 
-function* rebuildMapSteps({saveRepairs=true}={}) {
+function* rebuildMapSteps({saveRepairs=true,restoreVehicleSeat=false}={}) {
   if (!mapGroup) return;
+  if(constructionSurroundings&&state.map!=='construction'){camera.near=.1;camera.far=6000;camera.updateProjectionMatrix();}
   if(coastWorld&&state.map!=='coast'){camera.near=.1;camera.far=6000;camera.updateProjectionMatrix();}
   coastWorld?.dispose();coastWorld=null;
   skyAtmosphere?.dispose();skyAtmosphere=null;
@@ -23495,14 +24066,17 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   constructionTownBridge?.dispose();constructionTownBridge=null;
   skyCloudGround?.dispose();skyCloudGround=null;
   if(worldSun&&worldHemi){worldSun.color.set(0xffffff);worldSun.intensity=3.4;worldSun.position.set(-160,320,220);worldHemi.intensity=2.2;worldHemi.color.set(0xd9f4ff);worldHemi.groundColor.set(0x37506b);}
+  constructionBuildingGroundSource=null;
   constructionBuildingGroundProbe?.reset();
   constructionDeliveryWalk=null;
   constructionDeliveryMenu?.close();constructionDeliveryContact.reset();
   disposeSpaceMaterialBook(constructionDeliveryDock);constructionDeliveryDock=null;constructionDeliveryCollider=null;constructionDeliverySite=-1;
   spaceMaterialGuide?.close();spaceMaterialBookContact.reset();
   disposeSpaceMaterialBook(spaceMaterialBook);spaceMaterialBook=null;spaceMaterialBookCollider=null;
+  delete mapGroup.userData.syncEarthGround;
   disposeConstructionGround(mapGroup.getObjectByName('construction-expanded-ground'));
   if(marsDistantLandscape) { disposeMarsLandscape(marsDistantLandscape); marsDistantLandscape=null; }
+  amaneVisitSite?.dispose();amaneVisitSite=null;
   closeMarsShopDialog({ resetTouchLatch: true });
   if (marsShopDisplays) { disposeMarsShopDisplays(marsShopDisplays); marsShopDisplays=null; }
   if (marsShopkeeper) { disposeMatureCharacterModel(marsShopkeeper); marsShopkeeper=null; }
@@ -23511,7 +24085,10 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   while (mapGroup.children.length) mapGroup.remove(mapGroup.children[0]);
   skyStationClock = null;
   skyStationBuilding = null;
+  skyRaceShoreVisited = null;
+  if (skyRaceInvitation.open) skyRaceInvitation.close();
   skyStationGuide = null;
+  state.skyStationActivities?.reset();
   ufoDoorControls.length = 0;
   ufoRampPhysicsIds.length = 0;
   // 物理の情報源は常にこの再構築で全消去してから作り直す。
@@ -23525,48 +24102,42 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   physicsElements.ceilings.length = 0;
   clearThreeGroup(physicsMeshGroup);
   clearThreeGroup(physicsDebugGroup);
-  ensureMarsReturnUfoPad();
+  const restoredUfoFacility = restoreUfoReturnFacility(state.map);
   labelsGroup = new THREE.Group();
-  let worldGround=makeGround(MAPS[state.map]);mapGroup.add(worldGround);
-  if(coastWorld)yield* coastWorld.prepare(state.position);
+  // The yard floor needs the excavation openings supplied by install() below.
+  if(state.map!=='construction')mapGroup.add(makeGround(MAPS[state.map]));
+  if(coastWorld){
+    for(const resident of coastWorld.residents) addStationaryCharacterColliders(resident.model, `coast-resident-${resident.id}`);
+    yield* coastWorld.prepare(state.position);
+  }
   addMarsBoundaryFence(mapGroup, MAPS[state.map]);
   addMapEntry(mapGroup, MAPS[state.map]);
+  if(state.map==='mars'){
+    amaneVisitSite=createAmaneVisitSite({
+      collider:addRotatedCollider,
+      clearSoil:()=>{
+        const id='amane-archive-soil';
+        for(const list of [colliders,physicsElements.walls]){
+          const index=list.findIndex(item=>item.id===id);
+          if(index>=0)list.splice(index,1);
+        }
+        constructionContactRevision++;
+        const replica=physicsMeshGroup?.getObjectByName(`physics-solid-${id}`);
+        if(replica){replica.removeFromParent();replica.geometry.dispose();replica.material.dispose();}
+      },
+    });
+    mapGroup.add(amaneVisitSite.group);
+    const world=worldSaveService?.ledger?.world;
+    amaneRepairAge=amaneVisitSite.update(world?.rainAmaneV1,performance.now(),-1,world?.rainDeliveryV1,world?.rainRepairV1);
+  }
   if (state.map === "sky") {
     skyStationGuide = makeSkyStationGuide();
     mapGroup.add(skyStationGuide);
     addSkyStationGuidePhysics(skyStationGuide);
   }
   (MAPS[state.map].fixedStructures || []).forEach(structure => addFixedStructure(mapGroup, MAPS[state.map], structure));
-  let faceAuthAnchorRepaired = false;
-  let ufoPlacementRepaired = false;
   buildItemsForMap().forEach(item => {
     const source = MAPS[state.map].buildCatalog.find(candidate => candidate.id === item.catalogId);
-    if (source?.id === "ufo-pad") {
-      const restoredPosition = [UFO_PLACEMENT_POSITION.x, 0, UFO_PLACEMENT_POSITION.z];
-      if (!Array.isArray(item.position)
-        || Number(item.position[0]) !== restoredPosition[0]
-        || Number(item.position[2]) !== restoredPosition[2]) {
-        item.position = restoredPosition;
-        ufoPlacementRepaired = true;
-      }
-      const fixedAnchor = [
-        UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.x,
-        UFO_FACE_AUTH_FIXED_WORLD_ANCHOR.z,
-      ];
-      // 保存値が過去の誤配置でも、今回指定された座標を唯一の正とする。
-      // 以後は同じ座標を保存し、内部床の追加や再構築で移動させない。
-      if (!Array.isArray(item.faceAuthPosition)
-        || Number(item.faceAuthPosition[0]) !== fixedAnchor[0]
-        || Number(item.faceAuthPosition[1]) !== fixedAnchor[1]) {
-        item.faceAuthPosition = fixedAnchor;
-        item.faceAuthAnchorLocked = true;
-        faceAuthAnchorRepaired = true;
-      } else if (!item.faceAuthAnchorLocked) {
-        // 座標は変えず、今後の再構築で再計算されないようロックだけ付ける。
-        item.faceAuthAnchorLocked = true;
-        faceAuthAnchorRepaired = true;
-      }
-    }
     if (source) addBuilding(mapGroup, item, source);
   });
   yield;
@@ -23575,26 +24146,50 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   yield;
   installConstructionDeliveryDock();
   yield;
-  worldWaterController?.install({group:mapGroup,contactRevision:()=>constructionContactCacheRevision(constructionContactRevision,[worldReelController,worldHighController,worldSoilController,worldTimberController,worldConcreteController,worldExcavationController]),groundReadRevision:constructionWaterGroundReadRevision,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-water-'),groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
+  worldWaterController?.install({group:mapGroup,contactRevision:constructionWaterContactRevision,groundReadRevision:constructionWaterGroundReadRevision,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-water-'),groundHeightAt:quarryGroundReader((x,z,reference)=>getVehicleGroundHeight(x,z,reference)),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  worldSoilController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-soil-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-soil'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-soil'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,surface:addAuthoritativeSurface,ceiling:addRotatedCeiling,
+  worldSoilController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-soil-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:quarryGroundReader((x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-soil')),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-soil'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,surface:addAuthoritativeSurface,ceiling:addRotatedCeiling,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  worldTimberController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-timber-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-timber'),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-timber'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,physics:{floor:registerPhysicsFloor,ceiling:registerPhysicsCeiling,collider:registerPhysicsCollider},
+  worldTimberController?.install({presentationRevision:constructionPresentationRevision,group:mapGroup,fieldSolids:origin=>[...fieldStaticVolumes(origin,colliders,'construction-timber-'),...(worldWaterController?.waterVolumes(origin)??[])],groundHeightAt:quarryGroundReader((x,z,reference)=>getVehicleGroundHeight(x,z,reference,'construction-timber')),groundUpperBound:b=>constructionGroundUpperBound(b,'construction-timber'),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,physics:{floor:registerPhysicsFloor,ceiling:registerPhysicsCeiling,collider:registerPhysicsCollider},
     contactGeometry:()=>{const soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};}});
   yield;
-  const excavationHole=worldExcavationController?.install({group:mapGroup,fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-excavation-'),fieldBlocked:(position,size)=>[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.overlapsBuild?.(position,size))||!!worldConcreteController?.overlapsVehicle?.(position,size),fieldHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
+  const excavationHole=worldExcavationController?.install({group:mapGroup,moveCollider:(c,x,z)=>{
+    if(c.x===x&&c.z===z)return;
+    c.x=x;c.z=z;c.polygon=rectanglePolygon(x,z,[c.localHalfX*2,c.localHalfZ*2],c.rotation);
+    constructionContactRevision++;
+    physicsMeshGroup?.getObjectByName('physics-solid-'+c.id)?.position.set(x,(c.minY+c.maxY)/2,z);
+  },fieldSolids:origin=>fieldStaticVolumes(origin,colliders,'construction-excavation-'),fieldBlocked:(position,size)=>[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.overlapsBuild?.(position,size))||!!worldConcreteController?.overlapsVehicle?.(position,size),fieldHeightAt:(x,z,reference)=>getVehicleGroundHeight(x,z,reference),blockedAt:(x,z,margin)=>colliders.some(c=>pointInsideCollider(x,z,c,margin)),collider:addRotatedCollider,
     contactGeometry:()=>{const timber=worldTimberController?.contactGeometry?.()||{floors:[],walls:[]},soil=worldSoilController?.contactGeometry?.()||{floors:[],walls:[]};return{floors:[...timber.floors,...soil.floors,...(worldConcreteController?.contactGeometry?.().floors??[])],walls:[...timber.walls,...soil.walls,...(worldConcreteController?.contactGeometry?.().walls??[])]};},
     reserved:(p,size)=>!!(worldHighController?.overlapsBuild(p,size)||worldWaterController?.overlapsBuild(p,size)||worldSoilController?.overlapsBuild(p,size)||worldTimberController?.overlapsBuild(p,size)||worldConcreteController?.overlapsBuild(p,size))});
   yield;
-  worldConcreteController?.install({presentationRevision:constructionPresentationRevision,jumpCeilingAt:(x,z,head)=>{let lowest=Infinity;for(const ceiling of ceilingSurfaces){if(ceiling.underside>=head-.05&&pointInsideCollider(x,z,ceiling,14))lowest=Math.min(lowest,ceiling.underside);}return lowest;},upperPipeBlockedAt:(x,z,margin,y)=>colliders.some(c=>c.buildingId!=='upper-concrete'&&(!Number.isFinite(c.minY)||y+margin>c.minY)&&(!Number.isFinite(c.maxY)||y-margin<c.maxY)&&concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider)),travelBlockedAt:(x,z,margin,y,height)=>Number.isFinite(y)?concreteVehicleWorldBlocked(x,z,margin,y,height??30):colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2]))||!!worldExcavationController?.vehicleBlockedAt(x,z,margin),blockedAt:(x,z,margin,y)=>colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2])),collider:addRotatedCollider,surface:addAuthoritativeSurface,placementHeightAt:createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:(x,z)=>groundHeightCandidates(x,z,true)}),supportHeightAt:(()=>{const read=createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:groundHeightCandidates});return(x,z,reference)=>Number.isFinite(reference)?getVehicleGroundHeight(x,z,reference):read(x,z);})()});
+  worldConcreteController?.install({contactRevision:constructionGeometryRevision,presentationRevision:constructionPresentationRevision,jumpCeilingAt:(x,z,head)=>{let lowest=Infinity;for(const ceiling of ceilingSurfaces){if(ceiling.underside>=head-.05&&pointInsideCollider(x,z,ceiling,14))lowest=Math.min(lowest,ceiling.underside);}return lowest;},upperPipeBlockedAt:(x,z,margin,y)=>colliders.some(c=>c.buildingId!=='upper-concrete'&&(!Number.isFinite(c.minY)||y+margin>c.minY)&&(!Number.isFinite(c.maxY)||y-margin<c.maxY)&&concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider)),travelBlockedAt:(x,z,margin,y,height)=>Number.isFinite(y)?concreteVehicleWorldBlocked(x,z,margin,y,height??30):colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2]))||!!worldExcavationController?.vehicleBlockedAt(x,z,margin),blockedAt:(x,z,margin,y)=>colliders.some(c=>concreteWorldColliderBlocks(c,x,z,margin,y,pointInsideCollider))||[worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController].some(controller=>controller?.overlapsBuild([x,0,z],[margin*2,0,margin*2])),collider:addRotatedCollider,surface:addAuthoritativeSurface,placementHeightAt:createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:(x,z)=>groundHeightCandidates(x,z,true)}),supportHeightAt:(()=>{const read=createConcreteSupportSampler({width:MAPS[state.map].world.width,depth:MAPS[state.map].world.depth,hole:excavationHole,earthHeightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),heightsAt:groundHeightCandidates});return quarryGroundReader((x,z,reference)=>Number.isFinite(reference)?getVehicleGroundHeight(x,z,reference):read(x,z));})()});
   yield;
   worldHighController?.install({group:mapGroup,surface:addAuthoritativeSurface,collider:addRotatedCollider,ceiling:addRotatedCeiling});
   worldReelController?.install({group:mapGroup});
   if(state.map==='construction')drawSharedParking(mapGroup,worldSaveService.ledger?.world.constructionParking);
-  let groundSignature='';const groundHost=mapGroup;groundHost.userData.syncEarthGround=()=>{const holes=worldExcavationController?.groundHoles?.();if(!holes)return;const sig=JSON.stringify(holes);if(sig===groundSignature)return;groundSignature=sig;groundHost.remove(worldGround);disposeConstructionGround(worldGround);worldGround=createConstructionGround(MAPS.construction,{holes});groundHost.add(worldGround);};
-  if(excavationHole){mapGroup.remove(worldGround);disposeConstructionGround(worldGround);worldGround=createConstructionGround(MAPS[state.map],{holes:worldExcavationController?.groundHoles?.()??[excavationHole]});mapGroup.add(worldGround);}
+  parkingBoardingMarks=mapGroup.getObjectByName('construction-parking-boarding-paint');
+  if(state.map==='construction'){
+    const groundHost=mapGroup;
+    let openings=worldExcavationController?.groundHoles?.()??(excavationHole?[excavationHole]:[]);
+    let groundSignature=JSON.stringify(openings);
+    let worldGround=makeGround(MAPS.construction,openings);
+    groundHost.add(worldGround);
+    groundHost.userData.syncEarthGround=()=>{
+      const holes=worldExcavationController?.groundHoles?.();
+      if(!holes||holes===openings)return;
+      openings=holes;
+      const signature=JSON.stringify(holes);
+      if(signature===groundSignature)return;
+      const replacement=createConstructionGround(MAPS.construction,{holes,pavement:FIELD_ROADS});
+      groundHost.remove(worldGround);
+      disposeConstructionGround(worldGround);
+      groundHost.add(replacement);
+      worldGround=replacement;
+      groundSignature=signature;
+    };
+  }
   mapGroup.add(labelsGroup);
   (state.map==='coast'?[]:MAPS[state.map].buildZones).forEach((zone, index) => {
     const plot = mapBuildZone(MAPS[state.map], index);
@@ -23610,7 +24205,7 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   // placement UFO pad exists, it is the intended safe landing point for that
   // recovery instead of an arbitrary SAT escape direction.
   const currentUfoPad = buildItemsForMap().find(item => item.catalogId === "ufo-pad");
-  const currentPenetration = groundCollisionPenetrationAt(
+  const currentPenetration = restoreVehicleSeat ? 0 : groundCollisionPenetrationAt(
     state.position.x,
     state.position.z,
     state.groundY,
@@ -23625,7 +24220,11 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
     state.pendingSafeEntry = false;
   } else if (currentPenetration > 1.5
     && !(state.map === "mars" && state.ufoMarsArrivalExitPending)) {
-    if (currentUfoPad?.position?.length >= 3) {
+    const insideUfo = currentUfoPad && colliders.some(collider =>
+      collider.buildingId === currentUfoPad.id
+      && !isColliderPassage(state.position.x, state.position.z, collider)
+      && characterColliderContact(state.position.x, state.position.z, collider).penetration > 1.5);
+    if (insideUfo) {
       state.position.set(currentUfoPad.position[0], 0, currentUfoPad.position[2]);
       state.groundY = 0;
       state.jumpY = 0;
@@ -23648,7 +24247,7 @@ function* rebuildMapSteps({saveRepairs=true}={}) {
   // A repaired position is the new authoritative save state. Without this,
   // every reload would restore the same obsolete embedded coordinate and rely
   // on another visual snap during map construction.
-  if (saveRepairs && (recoveredPosition || faceAuthAnchorRepaired || ufoPlacementRepaired) && !CONSTRUCTION_EXPANSION_PREVIEW) {
+  if (saveRepairs && (recoveredPosition || restoredUfoFacility) && !CONSTRUCTION_EXPANSION_PREVIEW) {
     void persistWorldSnapshot();
   }
   updateBuildList();
@@ -23678,7 +24277,7 @@ function updateMapReadout() {
 function updateBuildList() {
   buildingCatalogUI??=createBuildingCatalog({host:els.buildList,onPlace:selectBuild,allowed:()=>!!worldMapMenu?.opened&&!mapMenuLoading&&!mapMenuReadError&&worldSaveService?.mode==='live'&&!worldSaveService.busy&&!worldSaveService.blocked&&!coastPlay?.rescuing});
   buildingCatalogUI.update({mapKey:state.map,items:(MAPS[state.map].buildCatalog||[]).filter(item=>!item.internal),built:buildItemsForMap().map(b=>b.catalogId),selected:state.selectedBuildId});
-  if(!MAPS[state.map].buildCatalog.some(item=>!item.internal)){if(state.map==='space')els.buildMessage.textContent=ufoEmergencyReturnMap()==='mars'?'緊急帰還で火星マップの安全地点へ戻れます。':'緊急帰還で雲マップの空駅入口へ戻れます。';else if(state.map==='mars')els.buildMessage.textContent='顔認証システムから搭乗して、UFOで帰還できます。';}
+  if(!MAPS[state.map].buildCatalog.some(item=>!item.internal)){if(state.map==='space')els.buildMessage.textContent=ufoEmergencyReturnMap()==='mars'?'緊急帰還でアマネ星マップの安全地点へ戻れます。':'緊急帰還で雲マップの空駅入口へ戻れます。';else if(state.map==='mars')els.buildMessage.textContent='顔認証システムから搭乗して、UFOで帰還できます。';}
 }
 
 function selectBuild(id) {
@@ -23756,7 +24355,7 @@ function isValidBuildPosition(position, size, sourceId = null, {ignoreBuildingId
 function placeSelectedBuild() {
   if(coastPlay?.rescuing)return;
   if(worldMapMenu?.paused||worldSaveService.mode!=='live'||worldSaveService.busy||worldSaveService.blocked||mapMenuUnavailableReason())return;
-  const source = MAPS[state.map].buildCatalog.find(item => item.id === state.selectedBuildId);
+  const source = MAPS[state.map].buildCatalog.find(item => item.id === state.selectedBuildId && !item.internal);
   if (!source) return;
   if(buildItemsForMap().some(item=>item.catalogId===source.id)){cancelBuild();showToast('建築済みの建物を保持しました。');return;}
   const position = buildPlacementPosition(source);
@@ -23767,11 +24366,6 @@ function placeSelectedBuild() {
     name: source.name,
     position,
   };
-  if (source.id === "ufo-pad") {
-    const anchorControl = { originX: position[0], originZ: position[2], rotation: 0, scale: BUILDING_SCALE };
-    newBuild.faceAuthPosition = resolveUfoFaceAuthAnchor(anchorControl, [state.position.x, state.position.z]);
-    newBuild.faceAuthAnchorLocked = true;
-  }
   builtByMap[state.map] = [...buildItemsForMap().filter(item => item.catalogId !== source.id), newBuild];
   state.selectedBuildId = null;
   if (previewGroup) { mapGroup.remove(previewGroup); previewGroup = null; }
@@ -23861,6 +24455,7 @@ function makeCharacter() {
 
 function makeSkyStationGuide() {
   const guide = buildMatureStarCharacter360(SKY_STATION_GUIDE.characterId, { scale: .36 });
+  if(guide.userData.soraDama)guide.userData.soraDama.visible=false;
   guide.name = SKY_STATION_GUIDE.id;
   guide.traverse(object => {
     if (object.isMesh) {
@@ -23921,28 +24516,30 @@ function makeSkyStationGuideMotionRig(guide) {
   };
 }
 
-function addSkyStationGuidePhysics(guide) {
-  // 手と羽根は待機アニメーションで常に位置が変わる。固定した見えない
-  // 箱を残さないため、衝突面には停止している胴体・足の表示メッシュだけを
-  // 使う。各メッシュの実際の world matrix と輪郭から当たり面を作る。
-  const stableParts = [
-    guide?.userData?.body,
-    ...(guide?.userData?.feet ?? []),
-  ].filter(part => part?.isMesh);
-  if (!stableParts.length) return;
-  const physicalParts = new Set(stableParts);
+function addStationaryCharacterColliders(model, id) {
+  // Use the visible body and feet. Idle hands and wings must not create
+  // obstacles in the empty space they swing through.
+  const physicalParts = new Set([model.userData.body, ...(model.userData.feet ?? [])].filter(part => part?.isMesh));
+  if (!physicalParts.size) return [];
   const colliderStart = colliders.length;
-  addVisualBuildingColliders(guide, `${SKY_STATION_GUIDE.id}-body`, {
+  addVisualBuildingColliders(model, id, {
     registerSurfaces: false,
     registerSurfaceEdges: false,
     includeObject: object => physicalParts.has(object),
   });
-  // 会話を始める対象も、別の近似範囲ではなく上で登録した実表示メッシュの
-  // 当たり面だけを参照する。案内人の物理と会話開始判定を同じ形状に保つ。
-  guide.userData.guideColliders = colliders.slice(colliderStart);
+  return colliders.slice(colliderStart);
+}
+
+function addSkyStationGuidePhysics(guide) {
+  // The conversation still uses the guide's physical body as its trigger.
+  guide.userData.guideColliders = addStationaryCharacterColliders(guide, `${SKY_STATION_GUIDE.id}-body`);
 }
 
 function updateSkyStationGuideAnimation(delta) {
+  if (skyStationGuideDialogState.story) {
+    updateSkyStationDiagramStory(delta);
+    return;
+  }
   const guide = skyStationGuide;
   const rig = guide?.userData?.guideMotionRig;
   if (!guide || !rig || state.map !== "sky") return;
@@ -23989,6 +24586,800 @@ function isSkyStationGuideDialogOpen() {
   return skyStationGuideDialogState.open;
 }
 
+function knowsCaveDiagram() {
+  return coastSkyDiagramRead || worldSaveService?.ledger?.world.coastSkyDiagramRead === true;
+}
+
+function skyObservationProgress() {
+  const world=archiveWorldRecord??worldSaveService?.ledger?.world;
+  const stage=world?.rainSkyV1;
+  const chapters=world?.rainStoryV1??[];
+  return {
+    baseline:!!stage,
+    returned:canStartRainWindChapter(world,readWorldRainArcade()),
+    observed:stage==='changed-wind'||stage==='diagram-matched',
+    matched:stage==='diagram-matched',
+    restored:chapters.includes('earth-rain-restored'),
+  };
+}
+
+let worldRainArcadeSnapshot;
+window.addEventListener('storage',event=>{
+  if(event.key===null||event.key.startsWith('imasora.rain.arcade.v1.'))worldRainArcadeSnapshot=undefined;
+});
+window.addEventListener('pageshow',()=>{worldRainArcadeSnapshot=undefined;});
+function readWorldRainArcade(){
+  if(worldRainArcadeSnapshot)return worldRainArcadeSnapshot;
+  try{worldRainArcadeSnapshot=rainArcadeProgress(localStorage);}
+  catch{worldRainArcadeSnapshot={};}
+  return worldRainArcadeSnapshot;
+}
+
+function coastCaveNextHint(){
+  const world=worldSaveService?.ledger?.world;
+  if(world?.rainSkyV1)return '';
+  const arcade=readWorldRainArcade();
+  if(arcade.stationBriefed)return '街に戻り、駅から空駅へ。駅がまだなければ、街づくり工房で建てよう。';
+  if(arcade.catcher)return '街に戻り、ゲームセンターで島の話をしてくれた住民に、この図のことを聞こう。';
+  return '街に戻り、ゲームセンターのキャッチャーで景品を一つ取ってプレイを終えよう。';
+}
+
+function rainInspectionStage(){
+  return state.map==='sky'&&worldSaveService?.mode==='live'&&archiveSceneId===null
+    ? skyInspectionAccess(worldSaveService.ledger?.world,readWorldRainArcade()) : null;
+}
+
+// Allow a conversation from just outside the train driver’s solid body.
+const RAIN_STATION_DRIVER_TALK_DISTANCE = 32;
+const rainStationDriverAction=document.getElementById('rainStationDriverAction');
+const rainStationDriverDialog=document.getElementById('rainStationDriverDialog');
+const inspectionAction=document.getElementById('rainInspectionAction');
+const rescuePresentation=document.getElementById('rainRescuePresentation');
+const rescueCaption=document.getElementById('rainRescueCaption');
+let rainStationDriver=null;
+let rainRescue=null;
+let rainDeliveryFarewell=null;
+const rainStoryControls=document.getElementById('rainStoryControls');
+const courseButton=document.getElementById('constructionMissionAction');
+const courseNote=document.getElementById('constructionMissionNote');
+const courseCabStrip=document.createElement('div');
+courseCabStrip.className='construction-mission-cab';courseCabStrip.hidden=true;document.body.append(courseCabStrip);
+let missionMigrationFailed=false,missionSaving=false,boardingError=null,foundationClock=null,missionIntro=null,workshopOpen=false;
+function liveCourseWorld(){return state.map==='construction'&&worldSaveService?.mode==='live'?worldSaveService.ledger?.world:null;}
+function vehicleName(id){return FLEET.find(v=>v.id===id)?.name??id;}
+function missionLock(id){
+ const world=liveCourseWorld();
+ if(!world||constructionVehicleUnlocked(world,id))return '';
+ return vehicleName(id)+'は「'+vehicleName(id)+'に乗ってみよう。」を始めると運転できます。';
+}
+function currentDriver(){
+ if(worldExcavationController?.aboard)return transportPlaySession?.state.mode==='driving'?'dump':transportPlaySession?.state.mode==='excavating'?'excavator':null;
+ return worldSoilController?.missionDriver||worldConcreteController?.missionDriver||worldTimberController?.missionDriver||worldWaterController?.missionDriver||null;
+}
+function runningFoundation(){
+ if(!foundationClock||!liveCourseWorld()||foundationClock.from>performance.now())return null;
+ const elapsedMs=performance.now()-foundationClock.from;
+ return elapsedMs<foundationClock.mission.seconds*1000?{mission:foundationClock.mission.id,elapsedMs}:null;
+}
+installConstructionMissionAccess(missionLock,runningFoundation);
+function displayCourse(element,text){
+ if(element.hidden===!!text)element.hidden=!text;
+ if(text&&element.textContent!==text)element.textContent=text;
+}
+function startConstructionIntro(mission){
+ missionIntro={mission,remaining:CONSTRUCTION_MISSION_INTRO_MS,at:performance.now()};
+}
+async function unlockBoardingMission(mission){
+ missionSaving=true;
+ try{await worldSaveService.recordRainWorks({type:'activate-boarding',id:mission.id},worldStateSnapshot());}
+ catch(error){showToast(error.message);}
+ finally{missionSaving=false;}
+}
+function updateConstructionIntro(mission,visible){
+ if(!missionIntro)return '';
+ const {mission:starting}=missionIntro;
+ if(mission?.id!==starting.id){
+  if(starting.kind==='foundation')worldSoilController?.finishFoundation(true);
+  missionIntro=null;return '';
+ }
+ const now=performance.now();
+ if(visible&&!document.hidden&&!document.querySelector('dialog[open]'))
+  missionIntro.remaining=advanceConstructionMissionIntro(missionIntro.remaining,now-missionIntro.at);
+ missionIntro.at=now;
+ if(missionIntro.remaining>0)return constructionMissionIntroText(missionIntro.remaining);
+ missionIntro=null;
+ if(starting.kind==='boarding')void unlockBoardingMission(starting);
+ else foundationClock={mission:starting,from:now};
+ return '';
+}
+let lastCourseMilestone=null;
+function updateConstructionMission(){
+ const world=liveCourseWorld(),mission=world&&constructionMission(world),driver=world&&currentDriver();
+ let label='',note='';
+ const course=world?.constructionCourseV1;
+ if(course){
+   const last=lastCourseMilestone;
+   if(last&&last.mission&&state.map==='construction'&&
+       (course.index>last.index||course.index===last.index&&last.mission.id!==mission?.id)){
+     const summary=last.mission.vehicle==='water'&&RAIN_WORKS_JOBS[last.mission.step]?.id==='pour'?'水路の通水を確認！':'ミッション完了！';
+     if(!workshopOpen)celebrateGameEvent(document.body,summary,'work');
+   }
+   lastCourseMilestone={index:course.index,mission};
+ }else lastCourseMilestone=null;
+ if(world&&!world.constructionCourseV1&&constructionCourse(world).index>0&&!missionMigrationFailed&&!worldSaveService.busy&&!missionSaving){
+   missionSaving=true;
+   worldSaveService.recordRainWorks({type:'resume-course'},worldStateSnapshot()).catch(error=>{missionMigrationFailed=true;showToast(error.message);}).finally(()=>{missionSaving=false;});
+ }
+ if(foundationClock){
+   if(mission?.id!==foundationClock.mission.id){worldSoilController?.finishFoundation(false);foundationClock=null;}
+   else if(!worldSoilController?.busy&&performance.now()>=foundationClock.from+mission.seconds*1000){
+     worldSoilController.finishFoundation(true);foundationClock=null;showToast('時間切れ。作業開始時の位置と土量に戻りました。');
+   }
+ }
+ const visible=!!world&&!workshopOpen&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldExcavationController?.handEarthActive;
+ const intro=updateConstructionIntro(mission,visible);
+ if(visible){
+  if(intro)note=intro;
+  else if(mission?.kind==='boarding'){
+    const active=constructionCourse(world).started;
+    if(!active)label=mission.title;
+    else if(driver===mission.vehicle){
+      if(!missionSaving&&!worldSaveService.busy&&boardingError!==mission.id)void saveBoarded(mission);
+      if(boardingError===mission.id)label='乗車の記録を保存する';
+    }else if(driver)note=vehicleName(driver)+'を降りて、'+vehicleName(mission.vehicle)+'に乗ろう。';
+    else if(world.constructionParking?.version!==3)label='みんなの駐車場を準備する';
+    else label=vehicleName(mission.vehicle)+'に乗る';
+  }else if(mission){
+    if(driver!==mission.vehicle){
+      note=mission.title;
+      if(!driver)label=vehicleName(mission.vehicle)+'に乗る';
+      else note+='　'+vehicleName(driver)+'を降りて、'+vehicleName(mission.vehicle)+'に乗ろう。';
+    }
+    else if(mission.kind==='foundation'){
+      if(!foundationClock)label=mission.title;
+      else{const seconds=Math.max(0,Math.ceil((mission.seconds*1000+foundationClock.from-performance.now())/1000));
+        note='残り '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')+'　'+mission.title;}
+    }else if(mission.kind==='works')label=mission.title;
+  }else if(world.rainWorksV1?.step===RAIN_WORKS_JOBS.length&&!world.rainWorksV1.cargo)label='完成した接続部を引き渡す';
+ }
+ const operator=!!world&&[worldExcavationController,worldSoilController,worldTimberController,worldWaterController,worldConcreteController].some(c=>c?.active);
+ const host=operator?courseCabStrip:document.getElementById('rainStoryControls');
+ if(courseButton.parentElement!==host){host.prepend(courseButton);courseButton.classList.toggle('sky-wind-action',!operator);}
+ const cue=visible&&!document.querySelector('dialog[open]')?intro:'';
+ const noteHost=cue?document.body:host;
+ if(courseNote.parentElement!==noteHost)noteHost.append(courseNote);
+ courseNote.classList.toggle('rain-story-hint',!cue&&!operator);
+ const hideCab=!operator||(!label&&(!note||intro))||workshopOpen||!!document.querySelector('dialog[open]');
+ if(courseCabStrip.hidden!==hideCab)courseCabStrip.hidden=hideCab;
+ const hint=document.documentElement.dataset.controlDisplay==='touch'?'':'［1］';
+ displayCourse(courseButton,label?label+hint:'');
+ showConstructionIntroCue(courseNote,cue);
+ displayCourse(courseNote,cue||(!intro?note:''));
+ if(courseButton.disabled!==missionSaving)courseButton.disabled=missionSaving;
+}
+async function saveBoarded(mission){
+ missionSaving=true;
+ try{await worldSaveService.recordRainWorks({type:'finish-boarding',id:mission.id,vehicle:mission.vehicle},worldStateSnapshot());boardingError=null;}
+ catch(error){boardingError=mission.id;showToast(error.message);}
+ finally{missionSaving=false;}
+}
+async function openCourseWorkshop(mission){
+ const dialog=document.createElement('dialog'),frame=document.createElement('iframe');
+ dialog.className='construction-mission-workshop';frame.title=mission.title;
+ dialog.append(frame);document.body.append(dialog);workshopOpen=true;clearMarsShopDialogInput();
+ let closed=false;
+ const close=message=>{
+   if(closed)return;
+   closed=true;trackConstructionOverlay(dialog,false);
+   dialog.close();dialog.remove();workshopOpen=false;clearMarsShopDialogInput();els.canvas.focus({preventScroll:true});
+   if(message){
+    if(message==='工程クリア！'||message==='水路の通水を確認！')celebrateGameEvent(document.body,message,'work');
+    showToast(message);
+   }
+ };
+ dialog.addEventListener('close',()=>close(''),{once:true});
+ dialog.addEventListener('cancel',event=>event.preventDefault());
+ frame.addEventListener('load',async()=>{
+   try{await frame.contentWindow.startConstructionWork({mission,workshop:constructionCourse(liveCourseWorld()).workshop,
+     touch:document.documentElement.dataset.controlDisplay==='touch'},async(id,operation,elapsedMs,result)=>{
+     const current=constructionMission(liveCourseWorld());
+     if(current?.kind!=='works'||current.vehicle!==mission.vehicle||current.id!==id)throw Error('作業の進み具合を確認してください。');
+     await worldSaveService.recordRainWorks({type:'finish-works',id,operation,elapsedMs,result},worldStateSnapshot());
+     return {mission:constructionMission(liveCourseWorld()),workshop:constructionCourse(liveCourseWorld()).workshop};
+   },close);frame.focus();}
+   catch(error){close('作業場を開けませんでした。'+error.message);}
+ },{once:true});
+ frame.srcdoc=document.getElementById('constructionMissionWorkshop').innerHTML;trackConstructionOverlay(dialog,true);dialog.showModal();
+}
+async function boardCourseVehicle(id){
+ const active=[worldExcavationController,worldSoilController,worldTimberController,worldWaterController,worldConcreteController].find(c=>c?.active);
+ if(active&&!currentDriver()&&!await active.leave()){showToast('降車と保存が終わってから、もう一度乗車を選んでください。');return;}
+ await enterSelectedConstructionVehicle(id);
+}
+async function activateConstructionMission(){
+ const world=liveCourseWorld(),mission=world&&constructionMission(world);
+ if(!world||missionSaving||missionIntro||courseButton.hidden)return;
+ if(mission?.kind==='boarding'&&currentDriver()===mission.vehicle&&constructionCourse(world).started){await saveBoarded(mission);return;}
+ missionSaving=true;
+ try{
+   if(!mission){
+     await worldSaveService.recordRainWorks({type:'handover'},worldStateSnapshot());
+     showToast('接続部を2つ引き渡したよ。空駅のUFO乗り場で積み込もう。');
+     return;
+   }
+   if(mission.kind==='boarding'){
+     if(!constructionCourse(world).started)startConstructionIntro(mission);
+     else if(world.constructionParking?.version!==3){document.querySelector('[data-player-parking]')?.click();return;}
+     else await boardCourseVehicle(mission.vehicle);
+   }else if(!currentDriver())await boardCourseVehicle(mission.vehicle);
+   else if(currentDriver()===mission.vehicle){
+     if(mission.kind==='works')await openCourseWorkshop(mission);
+     else if(mission.kind==='foundation'&&!foundationClock){
+       if(await worldSoilController.beginFoundation())startConstructionIntro(mission);
+       else showToast('車を止めて、保存が終わってから開始してください。');
+     }
+   }
+ }catch(error){showToast(error.message);}
+ finally{missionSaving=false;updateConstructionMission();}
+}
+courseButton.onclick=()=>void activateConstructionMission();
+window.addEventListener('keydown',event=>{
+ if(event.code!=='Digit1'||event.repeat||event.ctrlKey||event.altKey||event.metaKey||event.isComposing||courseButton.hidden||courseButton.disabled||worldExcavationController?.handEarthActive||document.querySelector('dialog[open]')||event.target?.closest?.('input,select,textarea,[contenteditable=true]'))return;
+ event.preventDefault();event.stopImmediatePropagation();void activateConstructionMission();
+},true);
+
+const rainWorksAction=document.getElementById('rainWorksAction');
+const rainWorksBrief=document.getElementById('rainWorksBrief');
+let rainWorksSaving=false;
+
+function rainWorksRecord(){return worldSaveService?.ledger?.world.rainWorksV1;}
+function rainWorksStepAllowed(){
+  return worldSaveService?.mode==='live'&&worldSaveService.rainStoryStep==='cloud-rescue-complete';
+}
+function activeConstructionTrialKind(){
+  const world=liveCourseWorld(),mission=world&&constructionMission(world);
+  return mission?.kind==='transport'?mission.id:null;
+}
+function activeRainWorksEarthwork(){
+  if(activeConstructionTrialKind()!=='summit-load'||!transportPlaySession)return [];
+  return rainWorksCutZones(transportPlaySession.state.frame.soil.field.corner);
+}
+function rainWorksActionId(){
+  if(!worldInputAvailable()||state.falling||state.ufoBoarded||
+     state.jumpY||state.jumpVelocity||worldSaveService.busy)return null;
+  const job=rainWorksRecord();
+  const door=nearbyConstructionBoarding();
+  if(door&&!missionLock(door))return door;
+  if(rainWorksStepAllowed()&&state.map==='sky'&&job?.cargo?.status==='ready'){
+    const pad=currentUfoPadItem();
+    if(pad&&Math.hypot(state.position.x-pad.position[0],state.position.z-pad.position[2])<154)return 'load';
+  }
+  return null;
+}
+function updateRainWorksAction(){
+  updateConstructionMission();
+  const action=rainWorksActionId();
+  if(rainWorksAction.hidden===!!action)rainWorksAction.hidden=!action;
+
+  if(!action)return;
+  const key=globalThis.IMASORA_KEYS?.describe('tool')??'F';
+  const vehicle=FLEET.find(v=>v.id===action);
+  const label=vehicle?`${vehicle.name}に乗る［${key}］`:'水路の部材をUFOに積む';
+  if(rainWorksAction.textContent!==label)rainWorksAction.textContent=label;
+}
+let displayedBoardingDoors=null;
+function nearbyConstructionBoarding(){
+  if(state.map!=='construction'||!nativeDoorWalkAllowed()||nativeDoorNavigator?.active){displayedBoardingDoors=null;return null;}
+  const revision=constructionGeometryRevision();
+  const transport=transportPlaySession?.state, generation=worldSaveService.generation;
+  // Use unchanged parked-door results to pick a nearby vehicle. Boarding
+  // still checks the selected door and its walk/entry path before moving.
+  if(revision&&(displayedBoardingDoors?.revision!==revision||displayedBoardingDoors.transport!==transport||displayedBoardingDoors.generation!==generation)){
+    displayedBoardingDoors={revision,transport,generation,doors:FLEET.map(({id})=>nativeDoorController(id)?.doorTargets?.(id)??[])};
+  }
+  let nearest=null,distance=65;
+  for(const [index,{id}] of FLEET.entries()){
+    const door=revision?closestNativeDoor(displayedBoardingDoors.doors[index],state.position):nativeDoorController(id)?.doorTarget?.(id);
+    if(!door||Math.abs(state.groundY-door.y)>.25)continue;
+    const d=Math.hypot(state.position.x-door.x,state.position.z-door.z);
+    if(d<=distance){nearest=id;distance=d;}
+  }
+  return nearest;
+}
+function boardNearbyConstructionVehicle(id){
+  const lock=missionLock(id);if(lock){showToast(lock);return true;}
+  const controller=nativeDoorController(id),door=controller?.doorTarget?.(id);
+  if(!door||nativeDoorNavigator?.active)return false;
+  const distance=Math.hypot(state.position.x-door.x,state.position.z-door.z);
+  if(distance<=9&&Math.abs(state.groundY-door.y)<=.05){
+    const result=controller.enterAtDoor(id,{board:true,near:true});
+    if(result instanceof Promise){void result.catch(reportWorldSaveError);return true;}
+    if(result)return true;
+  }
+  prepareNativeDoorRoute();
+  void nativeDoorNavigator.start(id,{...door,rainWorksBoard:true});
+  return true;
+}
+window.addEventListener('keydown',event=>{
+  if(!['KeyF','KeyV'].includes(event.code)||event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.isComposing||
+    event.target?.isContentEditable||event.target?.closest?.('input,select,textarea,[contenteditable=true],[role=textbox]'))return;
+  if(event.code==='KeyV'){
+    if(state.map==='construction'&&!worldExcavationController?.active&&nativeDoorWalkAllowed()){event.preventDefault();event.stopImmediatePropagation();enterConstructionEarthBuild();}
+    return;
+  }
+  const action=rainWorksActionId();
+  if(action&&action!=='load'&&boardNearbyConstructionVehicle(action)){
+    event.preventDefault();event.stopImmediatePropagation();
+  }
+},true);
+rainWorksAction.addEventListener('click',async()=>{
+  const action=rainWorksActionId();
+  if(action&&action!=='load'){boardNearbyConstructionVehicle(action);return;}
+  if(action!=='load'||rainWorksSaving)return;
+  rainWorksSaving=true;
+  try{
+    await worldSaveService.recordRainWorks({type:'load'},worldStateSnapshot());
+    showToast('水路の接続部を二つ積んだよ。三便目の準備ができた。');
+  }catch(error){reportWorldSaveError(error);}
+  finally{rainWorksSaving=false;updateRainWorksAction();}
+});
+const rainWorksAccept=rainWorksBrief.querySelector('[data-works-accept]');
+rainWorksBrief.querySelector('[data-works-decline]').onclick=()=>rainWorksBrief.close();
+rainWorksBrief.addEventListener('cancel',event=>{if(rainWorksSaving)event.preventDefault();});
+rainWorksAccept.onclick=async()=>{
+  if(rainWorksSaving||!rainWorksStepAllowed())return;
+  rainWorksSaving=true;
+  for(const button of rainWorksBrief.querySelectorAll('button'))button.disabled=true;
+  try{
+    await worldSaveService.recordRainWorks({type:'accept'},worldStateSnapshot());
+    rainWorksBrief.close();
+    showToast('依頼を引き受けた。列車で街へ戻り、橋を渡って工事現場へ。');
+  }catch(error){rainWorksBrief.close();reportWorldSaveError(error);}
+  finally{
+    rainWorksSaving=false;
+    for(const button of rainWorksBrief.querySelectorAll('button'))button.disabled=false;
+  }
+};
+
+function inspectionEntryAvailable(){
+  if(!skyStationBuilding||rainInspectionStage()!=='inspection'||!worldInputAvailable()||state.ufoBoarded||
+     state.falling||Math.abs(state.jumpY)>.1)return false;
+  const [x,y,z]=SKY_RESCUE_ENTRY;
+  const here=skyStationBuilding.worldToLocal(new THREE.Vector3(state.position.x,state.groundY,state.position.z));
+  // The gate is on the cinematic deck beyond the cloud edge. Start the
+  // scene from the playable approach in front of it.
+  return Math.abs(here.y-y)<.55&&here.x>=x-6&&here.x<=x+1&&here.z>=z-4&&here.z<=z+11;
+}
+
+const DELIVERY_HOUSE_SHOT_SECONDS = 5.1;
+
+function makeDeliveryCloudSet(){
+  const skyScene=new THREE.Scene();
+  skyScene.background=new THREE.Color();
+  const previousClock=skyStationClock;
+  let station;
+  try{station=buildSkyStation(MAPS.sky.entry);}
+  finally{skyStationClock=previousClock;}
+  addSkyStationInspectionWorks(station);
+  const [x,,z]=normalizedPoint(MAPS.sky,MAPS.sky.entry.point);
+  station.position.set(x,0,z);
+  station.scale.setScalar(BUILDING_SCALE);
+  station.rotation.y=THREE.MathUtils.degToRad(MAPS.sky.entry.rotationDeg||0);
+  const clouds=createSkyCloudGround(MAPS.sky.world);
+  const atmosphere=createSkyMapAtmosphere();
+  const light=new THREE.DirectionalLight(0xffe6cd,2.7);
+  const deck=station.localToWorld(new THREE.Vector3(135,5,-74));
+  light.position.copy(deck).add(new THREE.Vector3(47,105,177));
+  light.target.position.copy(deck);
+  light.castShadow=true;
+  light.shadow.mapSize.set(2048,2048);
+  light.shadow.normalBias=.12;light.shadow.bias=-.0002;
+  Object.assign(light.shadow.camera,{left:-85,right:85,top:85,bottom:-85,far:260});
+  light.shadow.camera.updateProjectionMatrix();
+  skyScene.add(station,clouds.group,atmosphere.group,light,light.target,new THREE.HemisphereLight(0xeaf7ff,0x516774,1.8));
+  const actor=createSkyDeliveryFarewell(station,{makeModel:buildMatureStarCharacter360,disposeModel:disposeMatureCharacterModel,
+    baltiaId:SKY_STATION_GUIDE.characterId,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches});
+  return {
+    render(time,screen){
+      actor.sample(time,screen);
+      atmosphere.update({scene:skyScene,camera:screen,time:time*1000});
+      renderer.shadowMap.needsUpdate=true;
+      renderer.render(skyScene,screen);
+    },
+    dispose(){
+      actor.dispose();clouds.dispose();atmosphere.dispose();light.shadow.dispose();
+      const geometries=new Set(),materials=new Set(),maps=new Set();
+      station.traverse(node=>{
+        if(node.geometry)geometries.add(node.geometry);
+        for(const material of [].concat(node.material||[])){
+          materials.add(material);
+          if(material.map?.isCanvasTexture)maps.add(material.map);
+        }
+      });
+      for(const geometry of geometries)geometry.dispose();
+      for(const material of materials)material.dispose();
+      for(const map of maps)map.dispose();
+    },
+  };
+}
+
+function playAmaneDeliveryFarewell(){
+  if(rainDeliveryFarewell||rainRescue||state.map!=='mars'||!amaneVisitSite)
+    return Promise.reject(new Error('見送りの場面を始められません。'));
+  const cloud=makeDeliveryCloudSet();
+  clearMarsShopDialogInput();
+  nearbyNamesView?.hide();
+  rescueCaption.hidden=true;
+  rescuePresentation.hidden=false;
+  document.body.dataset.rainDeliveryFarewell='amane';
+  const lens=camera.clone();
+  return new Promise((resolve,reject)=>{
+    rainDeliveryFarewell={cloud,lens,time:0,resolve,reject};
+  });
+}
+
+function finishDeliveryFarewell(play,error){
+  rainDeliveryFarewell=null;
+  delete document.body.dataset.rainDeliveryFarewell;
+  rescuePresentation.hidden=true;
+  rescuePresentation.style.removeProperty('--rescue-fade');
+  clearMarsShopDialogInput();
+  try{play.cloud.dispose();}
+  finally{if(error)play.reject(error);else play.resolve();}
+}
+
+function renderDeliveryFarewell(delta){
+  const play=rainDeliveryFarewell;
+  try{
+    const t=play.time+=Math.min(.25,delta);
+    const total=DELIVERY_HOUSE_SHOT_SECONDS+SKY_DELIVERY_FAREWELL_SECONDS;
+    const ease=THREE.MathUtils.smoothstep;
+    const onAmane=t<DELIVERY_HOUSE_SHOT_SECONDS;
+    const fade=onAmane?ease(t,4.55,DELIVERY_HOUSE_SHOT_SECONDS):
+      Math.max(1-ease(t,DELIVERY_HOUSE_SHOT_SECONDS,DELIVERY_HOUSE_SHOT_SECONDS+.46),ease(t,total-.62,total));
+    rescuePresentation.style.setProperty('--rescue-fade',String(fade));
+    const lens=play.lens;
+    lens.aspect=camera.aspect;
+    lens.fov=lens.aspect<1?54:44;
+    lens.updateProjectionMatrix();
+    if(onAmane){
+      const step=ease(t,.34,2.24);
+      lens.position.set(-456,35,lens.aspect<1?-213+11*step:-243+11*step);
+      lens.lookAt(-452,16,-340);
+      const world=archiveWorldRecord??worldSaveService.ledger?.world;
+      amaneVisitSite.update(world?.rainAmaneV1,performance.now(),-1,world?.rainDeliveryV1,null,null,null,3);
+      amaneVisitSite.farewellPose(t);
+      const body=character?.visible,shadow=characterShadow?.visible;
+      if(character)character.visible=false;
+      if(characterShadow)characterShadow.visible=false;
+      try{renderer.render(scene,lens);}
+      finally{
+        if(character)character.visible=body;
+        if(characterShadow)characterShadow.visible=shadow;
+      }
+    }else{
+      document.body.dataset.rainDeliveryFarewell='earth';
+      play.cloud.render(t-DELIVERY_HOUSE_SHOT_SECONDS,lens);
+    }
+    if(t>=total)finishDeliveryFarewell(play);
+  }catch(error){if(rainDeliveryFarewell===play)finishDeliveryFarewell(play,error);}
+}
+
+function closeRainRescue(play){
+  play.animation?.dispose();play.town?.dispose();
+  if(character)character.visible=play.characterVisible;
+  if(characterShadow)characterShadow.visible=play.shadowVisible;
+  if(skyStationGuide)skyStationGuide.visible=play.guideVisible;
+  rescuePresentation.hidden=true;rescueCaption.hidden=true;
+  delete document.body.dataset.rainRescue;
+  rainRescue=null;clearMarsShopDialogInput();
+  updateRainStoryHint();
+}
+
+async function startRainRescue(replay=false){
+  if(rainRescue||!skyStationBuilding||(!replay&&!inspectionEntryAvailable()))return false;
+  const station=skyStationBuilding,play={
+    station,replay,time:0,characterVisible:character?.visible,shadowVisible:characterShadow?.visible,guideVisible:skyStationGuide?.visible,
+    openingCamera:camera.clone(),filmCamera:camera.clone(),
+  };
+  rainRescue=play;inspectionAction.hidden=true;clearMarsShopDialogInput();
+  try{
+    const town=await import('./assets/imasora-town-detail.mjs?v=121c6');
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start=replay?new THREE.Vector3(...SKY_RESCUE_ENTRY):
+      station.worldToLocal(new THREE.Vector3(state.position.x,state.groundY,state.position.z));
+    const guidePosition=station.worldToLocal(new THREE.Vector3(SKY_STATION_GUIDE.x,0,SKY_STATION_GUIDE.z));
+    const guideExit={x:guidePosition.x,z:guidePosition.z,heading:(skyStationGuide?.rotation.y??station.rotation.y)-station.rotation.y};
+    play.town=town.createRainStoryEnding({baltiaId:SKY_STATION_GUIDE.characterId,reducedMotion:reduced,stationWaiting:true});
+    play.animation=createSkyRescuePlayback(station,{start,heading:state.heading-station.rotation.y,
+      makeModel:buildMatureStarCharacter360,disposeModel:disposeMatureCharacterModel,
+      heroId:CHARACTER_ID,baltiaId:SKY_STATION_GUIDE.characterId,guideExit,reduced});
+    if(character)character.visible=false;
+    if(characterShadow)characterShadow.visible=false;
+    if(skyStationGuide)skyStationGuide.visible=false;
+    nearbyNamesView?.hide();
+    document.body.dataset.rainRescue='witness';
+    rescuePresentation.hidden=false;
+    return true;
+  }catch(error){
+    closeRainRescue(play);console.warn('点検路の場面を表示できませんでした。',error);
+    if(!replay)showToast('点検路の場面を開けませんでした。もう一度進んでね。');
+    return false;
+  }
+}
+inspectionAction.addEventListener('click',()=>{void startRainRescue();});
+
+async function finishRainRescue(play){
+  play.saving=true;
+  try{
+    if(play.replay){
+      closeRainRescue(play);
+      if(window.parent!==window)window.parent.postMessage({type:'imasora-archive-close'},location.origin);
+      return;
+    }
+    const exit=play.station.localToWorld(new THREE.Vector3(...SKY_RESCUE_EXIT)),heading=play.station.rotation.y+SKY_RESCUE_EXIT_HEADING;
+    const draft=worldSaveService.deriveDraft(worldStateSnapshot(),{
+      position:{x:exit.x,y:exit.y,z:exit.z},heading,
+      playCamera:{mode:state.cameraMode,heading,pitch:state.viewPitch},
+    });
+    await worldSaveService.recordRainStoryMilestone('cloud-rescue-complete',draft);
+    state.position.set(exit.x,0,exit.z);state.groundY=exit.y;state.heading=state.viewHeading=heading;
+    state.jumpY=state.jumpVelocity=0;state.falling=state.moving=state.fastWalking=false;
+    closeRainRescue(play);updateCharacter(0);updateCamera();updateMapReadout();renderWorldFrame();
+  }catch(error){
+    console.warn('救出後の進行を保存できませんでした。',error);
+    closeRainRescue(play);reportWorldSaveError(error);
+  }
+}
+
+function renderRainRescue(delta){
+  const play=rainRescue;
+  if(!play.animation)return;
+  play.time+=play.saving?0:Math.min(.5,delta);
+  const screen=play.filmCamera;
+  screen.aspect=camera.aspect;screen.fov=screen.aspect<1?53:42;screen.updateProjectionMatrix();
+  const shot=play.animation.sample(play.time,screen);
+  if(shot.line!==rescueCaption.textContent)rescueCaption.textContent=shot.line;
+  rescueCaption.hidden=!shot.line;document.body.dataset.rainRescue=shot.part;
+  rescuePresentation.style.setProperty('--rescue-fade',String(THREE.MathUtils.smoothstep(shot.t,78.45,79)));
+  if(shot.part==='town-wait')play.town.render(renderer,shot.t-14.7);
+  else if(shot.part==='town-return')play.town.render(renderer,shot.t-71,true);
+  else{
+    if(!play.replay&&shot.t<1.45){
+      const blend=THREE.MathUtils.smoothstep(shot.t,0,1.45);
+      screen.position.lerp(play.openingCamera.position,1-blend);
+      screen.quaternion.slerp(play.openingCamera.quaternion,1-blend);
+    }
+    if(!play.replay&&shot.part==='handoff'&&state.cameraMode==='third'){
+      const target=play.station.localToWorld(new THREE.Vector3(...SKY_RESCUE_EXIT));
+      target.y+=38;
+      const heading=play.station.rotation.y+SKY_RESCUE_EXIT_HEADING;
+      const pitch=orbitCameraPitch(state.cameraDistanceIndex,THIRD_PERSON_BASE_PITCH,state.viewPitch);
+      const distance=worldCameraDistance(state.cameraDistanceIndex,{aspect:screen.aspect});
+      const back=Math.cos(pitch)*distance;
+      const position=new THREE.Vector3(target.x-Math.sin(heading)*back,
+        Math.max(6,target.y-Math.sin(pitch)*distance),target.z-Math.cos(heading)*back);
+      const orbit=play.returnCamera??=camera.clone();
+      orbit.position.copy(keepThirdPersonCameraOutsideBuildings(target,position));
+      orbit.lookAt(target);
+      const blend=THREE.MathUtils.smoothstep(shot.t,77.72,79);
+      screen.position.lerp(orbit.position,blend);
+      screen.quaternion.slerp(orbit.quaternion,blend);
+      screen.fov=THREE.MathUtils.lerp(screen.fov,camera.fov,blend);
+      screen.updateProjectionMatrix();
+    }
+    skyAtmosphere?.update({scene,camera:screen,sun:worldSun,hemi:worldHemi,actor:state.position,changedWind:true});
+    updateWorldColour('sky');renderer.render(scene,screen);
+  }
+  if(shot.done&&!play.saving)void finishRainRescue(play);
+}
+
+function updateRainStationDriver(){
+  const stage=rainInspectionStage();
+  const station=skyStationBuilding;
+  if(!station||(stage!=='driver'&&stage!=='inspection')){
+    rainStationDriverAction.hidden=true;
+    return;
+  }
+  if(rainStationDriver?.station!==station){
+    const position=station.localToWorld(new THREE.Vector3(18,0,59));
+    const actor=buildMatureStarCharacter360('star-hero-young-seed-leaf-walk-cool-b-forest',{scale:.36});
+    const grounding=measureCharacterGrounding(actor,actor.userData.feet??[]);
+    actor.position.copy(position);
+    actor.position.y+=grounding.verticalOffset;
+    actor.rotation.y=station.rotation.y+.19;
+    actor.name='rain-story-train-driver';
+    actor.traverse(part=>{if(part.isMesh)part.castShadow=true;});
+    station.parent.add(actor);
+    const stableParts=new Set([actor.userData.body,...(actor.userData.feet??[])]);
+    addVisualBuildingColliders(actor,'rain-story-train-driver',{
+      registerSurfaces:false,registerSurfaceEdges:false,includeObject:part=>stableParts.has(part),
+    });
+    rainStationDriver={station,position,actor};
+  }
+  const {position}=rainStationDriver;
+  rainStationDriverAction.hidden=rainStationDriverDialog.open||state.ufoBoarded||state.falling||
+    Math.abs(state.groundY-position.y)+Math.abs(state.jumpY)>.7||
+    Math.hypot(state.position.x-position.x,state.position.z-position.z)>RAIN_STATION_DRIVER_TALK_DISTANCE||
+    !worldInputAvailable();
+  rainStationDriverAction.textContent=stage==='driver'?'運転士に行き先を伝える':'運転士に話す';
+}
+
+rainStationDriverAction.addEventListener('click',()=>{
+  updateRainStationDriver();
+  if(rainStationDriverAction.hidden)return;
+  clearMarsShopDialogInput();
+  rainStationDriverDialog.showModal();
+});
+rainStationDriverDialog.addEventListener('cancel',event=>{
+  event.preventDefault();
+  rainStationDriverDialog.close();
+});
+rainStationDriverDialog.querySelector('button').addEventListener('click',()=>{
+  if(rainInspectionStage()==='driver'){
+    try{
+      markRainArcadeScene(localStorage,'station-driver');
+      worldRainArcadeSnapshot=undefined;
+    }catch{showToast('行き先の記録を保存できませんでした。もう一度話してね。');}
+  }
+  rainStationDriverDialog.close();
+  updateRainStationDriver();
+  updateRainStoryHint();
+});
+
+function rainStoryHintText(){
+  if(liveCourseWorld()&&(constructionMission(liveCourseWorld())||rainWorksRecord()?.step===RAIN_WORKS_JOBS.length&&!rainWorksRecord()?.cargo))return '';
+  if(worldSaveService?.mode!=='live'||!worldInputAvailable())return '';
+  const world=worldSaveService.ledger?.world;
+  if(!world)return '';
+  if(rainWorksStepAllowed()){
+    const work=rainWorksRecord();
+    if(state.map==='construction'&&work){
+      if(work.cargo)return '橋から街へ戻り、空駅のUFO乗り場へ行こう。';
+      if(!transportPlaySession)return 'メニューの「みんなの駐車場をひらく」で重機を用意しよう。';
+      if(!worldExcavationController?.active&&!worldSoilController?.active&&!nativeDoorNavigator?.active){
+        const kind=activeConstructionTrialKind();
+        if(kind)return '';
+        const job=RAIN_WORKS_JOBS[work.step],terrain=world.constructionTransport?.work.frame.soil;
+        if(work.excavatorTrial&&job?.vehicle==='dump')return '';
+        if(job?.vehicle==='soil'||job?.vehicle==='dump'&&rainWorksDepositRecorded(terrain)){
+          return '土ローダーに乗り、保管庫の土で水路の台座を作ろう。';
+        }
+        if(job?.vehicle==='dump')return 'ダンプカーに乗り、積んだ土を保管庫へ運ぼう。';
+        if(job?.vehicle==='truck')return '台座ができたよ。次はミキサー車で接続部の生コンを練ろう。';
+        const action=rainWorksActionId(),key=globalThis.IMASORA_KEYS?.describe('tool')??'F';
+        if(action==='excavator'||action==='dump')
+          return `${key}で${action==='excavator'?'ショベルカー':'ダンプ'}のドアへ歩き、そのまま乗り込もう。`;
+        if(worldSaveService.busy)return '現場の記録を保存しています。少し待ってね。';
+        if(state.jumpY||state.jumpVelocity||state.falling)return '着地してから車に近づこう。';
+        return 'ショベルカーかダンプに近づこう。乗れる車のボタンが出るよ。';
+      }
+      return '';
+    }
+    if(state.map==='sky'){
+      if(!work)return 'バルティアと、水路の古い図を見よう。';
+      if(!work.cargo)return '列車で街へ。橋1を渡って工事現場へ行こう。';
+      if(work.cargo.status==='ready')return 'UFO乗り場で、水路の接続部を二つ積み込もう。';
+      return world.rainRepairV1?'UFOを操縦してアマネ星に戻り、水路の作業を続けよう。':'接続部を二つ積んだ。UFOを操縦してアマネ星へ向かおう。';
+    }
+  }
+  if(!['coast','sky'].includes(state.map))return '';
+  if(world.rainStoryV1?.length>1){
+    const stage=rainInspectionStage();
+    if(stage==='arcade')return '空駅から街行きの列車に乗り、ゲームセンターで荷札の行き先を聞こう。';
+    if(stage==='driver')return '空駅の正面、坂の脇にいる運転士に行き先を伝えよう。';
+    if(stage==='inspection')return '空駅の正面から坂の右手に回り、駅裏の点検路へ向かおう。';
+    return '';
+  }
+  if(state.map==='coast'){
+    if(coastPlay?.riding||coastPlay?.crewWalking||coastPlay?.hauling||coastSnorkel?.active)return '';
+    if(world.rainSkyV1)return '';
+    if(knowsCaveDiagram())return coastCaveNextHint();
+    return '海岸の住民から、地図にない島と潮の洞窟の話を聞こう。';
+  }
+  if(state.ufoBoarded||!knowsCaveDiagram())return '';
+  if(world.rainDeliveryV1==='source-matched')
+    return ufoSkyReturnLandingPending?'UFOの足場を下りて、空駅に戻ろう。':'';
+  if(world.rainDeliveryV1==='water-loaded')return '水を積んだUFOで、アマネ星へ向かおう。';
+  const progress=skyObservationProgress();
+  if(progress.matched)return 'バルティアから両親に届ける水を預かろう。';
+  if(world.rainAmaneV1==='sky-landed')return '空駅にいるバルティアに、アマネ星で見たことを話そう。';
+  if(progress.returned)return '';
+  if(world.rainAmaneV1==='baltia-reported')return '街へ戻って、トライリンクで自分で1ゴールを決め、試合を終えよう。';
+  if(world.rainSkyV1==='amane-visited')return 'アマネ星の観測所とバルティアの両親の家を訪ねよう。';
+  if(!progress.baseline)return '';
+  if(!skyMarsObservatoryClue)return '空駅にいるバルティアに、洞窟の図を見せよう。';
+  return 'UFO乗り場からアマネ星へ。着いたら、観測所を探そう。';
+}
+
+function updateRainStoryHint(){
+  if(!els.rainStoryHint)return;
+  rainStoryControls.classList.toggle('is-construction',!!liveCourseWorld());
+  const text=rainStoryHintText();
+  if(els.rainStoryHint.hidden===!!text)els.rainStoryHint.hidden=!text;
+  if(text&&els.rainStoryHint.textContent!==text)els.rainStoryHint.textContent=text;
+}
+
+function beginSkyStationDiagramStory(report=false) {
+  const guide = skyStationGuide;
+  if (!guide?.parent) return [];
+  const canvas = createCaveDiagramCanvas();
+  if (!canvas) return [];
+  // Keep the guide that owns collision and the usual expression in place.
+  // Only the rendered actor changes during this conversation.
+  const actor = buildMatureStarCharacter360(SKY_STATION_GUIDE.characterId, {scale:.36,baseExpression:false});
+  actor.position.copy(guide.position);
+  actor.rotation.copy(guide.rotation);
+  actor.rotation.x = .15;
+  actor.rotation.y -= .37;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const stand = new THREE.Group(), tablet = new THREE.Group();
+  tablet.name = '洞窟の空の図';
+  const stone = new THREE.MeshStandardMaterial({color:0x4d5654,roughness:.82});
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(23,14.4,1.6),stone);
+  const art = new THREE.Mesh(new THREE.PlaneGeometry(21.8,13.3), new THREE.MeshBasicMaterial({map:texture,toneMapped:false}));
+  art.position.z = .83;
+  const otherSide = art.clone();
+  otherSide.position.z = -.83;
+  otherSide.rotation.y = Math.PI;
+  tablet.add(frame,art,otherSide);
+  tablet.position.y = 15;
+  tablet.rotation.x = -.17;
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(13,1.6,7),stone);
+  foot.position.y = .8;
+  const support = new THREE.Mesh(new THREE.BoxGeometry(2.3,9,2.3),stone);
+  support.position.y = 4.5;
+  stand.add(foot,support,tablet);
+  stand.position.set(-14,0,32).applyAxisAngle(new THREE.Vector3(0,1,0),guide.rotation.y).add(guide.position);
+  stand.position.y = 0;
+  stand.rotation.y = guide.rotation.y;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const observed = skyObservationProgress().baseline;
+  const visitor = character?.userData.characterName ?? '相棒';
+  skyStationGuideDialogState.story = {
+    actor,guide,tablet,guideVisible:guide.visible,reduced,visitor,disclosurePage:report?null:3,
+    report,visitorPages:report?[1,3]:[0,2],
+    dispose() {
+      guide.visible = this.guideVisible;
+      actor.removeFromParent();
+      stand.removeFromParent();
+      disposeMatureCharacterModel(actor);
+      disposeMatureCharacterModel(stand);
+      texture.dispose();
+    },
+  };
+  guide.parent.add(actor);
+  if(!report)guide.parent.add(stand);
+  guide.visible = false;
+  if(report)return [
+    '父さんと母さんに会えた？　元気そうだった？',
+    '二人とも、大丈夫だって。',
+    '……そっか。',
+    'でも、家のタンクに水がほんの少ししか残ってなかった。',
+    '見てくれたんだね。',
+  ];
+  return [
+    'この図、何か知ってる？ 街に雨が降らないことと、関係があるのかな。',
+    '……その模様、どこで見つけたの？',
+    observed ? '海の、地図にない島で。雲の観測台にも、同じ刻みがあったよ。' : '海の、地図にない島で。',
+    'アマネ星の観測所にも、同じ模様があるんだ。',
+    '昔の空を調べた記録が、残っているはずだよ。雨の手掛かりも見つかるかもしれない。',
+    '観測所から坂を下りたところに、僕の両親が住んでるんだ。もし会ったら、僕は元気だって伝えてくれる？',
+  ];
+}
+
+function updateSkyStationDiagramStory(delta) {
+  const {story,pageIndex} = skyStationGuideDialogState;
+  if (!story) return;
+  const examining = story.report?pageIndex>=3:pageIndex<2;
+  const pitch = examining ? .15 : 0;
+  const yaw = story.guide.rotation.y - (examining ? .37 : 0);
+  const {rotation} = story.actor;
+  rotation.x = story.reduced ? pitch : THREE.MathUtils.damp(rotation.x,pitch,8,delta);
+  rotation.y = story.reduced ? yaw : THREE.MathUtils.damp(rotation.y,yaw,8,delta);
+}
+
 function stopSkyStationGuideDialogTyping() {
   if (skyStationGuideDialogState.typeTimer !== null) {
     window.clearInterval(skyStationGuideDialogState.typeTimer);
@@ -24021,13 +25412,41 @@ function updateSkyStationGuideDialogFooter() {
   }
 }
 
+function setSkyStationStorySpeaker() {
+  const {story,pageIndex,waterDelivery} = skyStationGuideDialogState;
+  const label = els.skyStationGuideDialogSpeaker;
+  if (!label) return;
+  if (waterDelivery) {
+    label.textContent = SKY_STATION_WATER_DELIVERY_DIALOG[pageIndex][0];
+  } else if (story) {
+    label.textContent = story.visitorPages.includes(pageIndex) ? story.visitor : SKY_STATION_GUIDE.name;
+  }
+}
+
 function finishSkyStationGuideDialogPage() {
   const page = skyStationGuideDialogState.pages[skyStationGuideDialogState.pageIndex] ?? "";
   stopSkyStationGuideDialogTyping();
   skyStationGuideDialogState.isTyping = false;
+  setSkyStationStorySpeaker();
   if (els.skyStationGuideDialogText) els.skyStationGuideDialogText.textContent = page;
   if (els.skyStationGuideDialog) els.skyStationGuideDialog.dataset.typing = "false";
   updateSkyStationGuideDialogFooter();
+  const {story,pageIndex} = skyStationGuideDialogState;
+  if (story?.disclosurePage === pageIndex && !skyMarsObservatoryClue) {
+    skyMarsObservatoryClue = true;
+    void persistWorldSnapshot();
+  }
+  if(story?.report&&pageIndex===skyStationGuideDialogState.pages.length-1
+    &&worldSaveService.ledger?.world.rainAmaneV1==='sky-landed'){
+    void worldSaveService.recordRainAmaneStage('baltia-reported',worldStateSnapshot())
+      .then(()=>showToast(rainStoryHintText()||'街行きの列車は空駅から乗れるよ。'))
+      .catch(reportWorldSaveError);
+  }
+  if(skyStationGuideDialogState.waterDelivery&&pageIndex===skyStationGuideDialogState.pages.length-1&&canLoadWaterDelivery()){
+    void worldSaveService.recordRainDeliveryStage('water-loaded',worldStateSnapshot())
+      .then(()=>showToast('水を積んだ。UFOでアマネ星へ向かおう。'))
+      .catch(reportWorldSaveError);
+  }
 }
 
 function showSkyStationGuideDialogPage(pageIndex) {
@@ -24037,9 +25456,13 @@ function showSkyStationGuideDialogPage(pageIndex) {
   skyStationGuideDialogState.pageIndex = Math.max(0, Math.min(pages.length - 1, pageIndex));
   const page = String(pages[skyStationGuideDialogState.pageIndex] ?? "");
   const chars = [...page];
+  const {story} = skyStationGuideDialogState;
+  const glance = !!story && pageIndex === 0;
+  const start = glance ? performance.now() + 440 : 0;
+  if (!glance) setSkyStationStorySpeaker();
   let charIndex = 0;
   skyStationGuideDialogState.isTyping = chars.length > 0;
-  els.skyStationGuideDialogText.textContent = "";
+  els.skyStationGuideDialogText.textContent = glance ? "…" : "";
   if (els.skyStationGuideDialog) els.skyStationGuideDialog.dataset.typing = String(skyStationGuideDialogState.isTyping);
   updateSkyStationGuideDialogFooter();
 
@@ -24047,6 +25470,11 @@ function showSkyStationGuideDialogPage(pageIndex) {
     if (!skyStationGuideDialogState.open || skyStationGuideDialogState.phase !== "reply") {
       stopSkyStationGuideDialogTyping();
       return;
+    }
+    if (glance && performance.now() < start) return;
+    if (glance && charIndex === 0) {
+      setSkyStationStorySpeaker();
+      els.skyStationGuideDialogText.textContent = "";
     }
     els.skyStationGuideDialogText.textContent += chars[charIndex];
     if (charIndex % SKY_STATION_GUIDE_DIALOG_TYPE_INTERVAL === 0) playSkyStationGuideDialogTypeSfx();
@@ -24080,6 +25508,8 @@ function advanceSkyStationGuideDialogPage() {
 function closeSkyStationGuideDialog({ resetTouchLatch = false } = {}) {
   if(skyStationGuideDialogState.open){clearMarsShopDialogInput();if(els.skyStationGuideDialog?.contains(document.activeElement))document.activeElement.blur();}
   stopSkyStationGuideDialogTyping();
+  skyStationGuideDialogState.story?.dispose();
+  skyStationGuideDialogState.story = null;
   skyStationGuideDialogState.open = false;
   skyStationGuideDialogState.phase = "idle";
   skyStationGuideDialogState.pages = [];
@@ -24094,9 +25524,16 @@ function closeSkyStationGuideDialog({ resetTouchLatch = false } = {}) {
   updateSkyStationGuideDialogFooter();
 }
 
+function canLoadWaterDelivery(){
+  const world=worldSaveService?.ledger?.world;
+  return worldSaveService?.mode==='live'&&world?.rainSkyV1==='diagram-matched'&&
+    worldSaveService.rainStoryStep==='first-visit-return'&&!world.rainDeliveryV1;
+}
+
 function openSkyStationGuideDialog() {
   if (!els.skyStationGuideDialog || skyStationGuideDialogState.open) return;
   clearMarsShopDialogInput();
+  skyStationGuideDialogState.waterDelivery=false;
   skyStationGuideDialogState.open = true;
   skyStationGuideDialogState.phase = "greeting";
   skyStationGuideDialogState.pages = [];
@@ -24106,8 +25543,19 @@ function openSkyStationGuideDialog() {
   els.skyStationGuideDialog.dataset.phase = "greeting";
   els.skyStationGuideDialog.dataset.typing = "false";
   if (els.skyStationGuideDialogSpeaker) els.skyStationGuideDialogSpeaker.textContent = SKY_STATION_GUIDE.name;
-  if (els.skyStationGuideDialogText) els.skyStationGuideDialogText.textContent = SKY_STATION_GUIDE_DIALOG_GREETING;
+  if (els.skyStationGuideDialogText) {
+    const awaitingReport=worldSaveService.ledger?.world.rainAmaneV1==='sky-landed';
+    els.skyStationGuideDialogText.textContent=awaitingReport?'おかえり。父さんと母さんには、会えた？'
+      : SKY_STATION_GUIDE_DIALOG_GREETING;
+  }
   if (els.skyStationGuideDialogChoices) els.skyStationGuideDialogChoices.hidden = false;
+  if (els.skyStationGuideDiagramTopic) els.skyStationGuideDiagramTopic.hidden = !knowsCaveDiagram();
+  els.skyStationGuideDialogChoices.querySelector('[data-guide-dialog-topic="amane-report"]').hidden
+    = worldSaveService.ledger?.world.rainAmaneV1!=='sky-landed';
+  els.skyStationGuideDialogChoices.querySelector('[data-guide-dialog-topic="water-delivery"]').hidden
+    = !canLoadWaterDelivery();
+  els.skyStationGuideDialogChoices.querySelector('[data-guide-dialog-topic="rain-works"]').hidden
+    = !rainWorksStepAllowed()||!!rainWorksRecord();
   updateSkyStationGuideDialogFooter();
   window.requestAnimationFrame(() => {
     if(skyStationGuideDialogState.open)els.skyStationGuideDialogChoices?.querySelector("button")?.focus({ preventScroll: true });
@@ -24115,16 +25563,31 @@ function openSkyStationGuideDialog() {
 }
 
 function selectSkyStationGuideDialogTopic(topicId) {
+  if (!skyStationGuideDialogState.open || skyStationGuideDialogState.phase !== "greeting") return;
+  if(topicId==='rain-works'&&rainWorksStepAllowed()&&!rainWorksRecord()){
+    closeSkyStationGuideDialog();rainWorksBrief.showModal();return;
+  }
+  const isDelivery=topicId==='water-delivery';
+  if(isDelivery&&!canLoadWaterDelivery())return;
+  const isDiagram = topicId === 'cave-diagram';
+  const isReport = topicId === 'amane-report';
+  if (isDiagram && !knowsCaveDiagram()) return;
+  if(isReport&&worldSaveService.ledger?.world.rainAmaneV1!=='sky-landed')return;
   const topic = SKY_STATION_GUIDE_DIALOG_TOPICS[topicId];
-  if (!topic || !skyStationGuideDialogState.open || skyStationGuideDialogState.phase !== "greeting") return;
-  const pages = Array.isArray(topic.pages) && topic.pages.length ? topic.pages : [topic.reply];
+  if (!topic && !isDiagram && !isReport && !isDelivery) return;
+  const pages = isDelivery
+    ? SKY_STATION_WATER_DELIVERY_DIALOG.map(([, line]) => line)
+    : isDiagram||isReport ? beginSkyStationDiagramStory(isReport) : topic.pages;
+  skyStationGuideDialogState.waterDelivery=isDelivery;
   skyStationGuideDialogState.pages = pages.map(page => String(page || "")).filter(Boolean);
   if (!skyStationGuideDialogState.pages.length) return;
   skyStationGuideDialogState.phase = "reply";
   skyStationGuideDialogState.pageIndex = 0;
   if (els.skyStationGuideDialogChoices) els.skyStationGuideDialogChoices.hidden = true;
   if (els.skyStationGuideDialog) els.skyStationGuideDialog.dataset.phase = "reply";
+  if ((isDiagram||isReport) && els.skyStationGuideDialogSpeaker) els.skyStationGuideDialogSpeaker.textContent = SKY_STATION_GUIDE.name;
   showSkyStationGuideDialogPage(0);
+  if (isDiagram||isReport||isDelivery) els.skyStationGuideDialogNext?.focus({preventScroll:true});
 }
 
 function isTouchingSkyStationGuide() {
@@ -24134,7 +25597,8 @@ function isTouchingSkyStationGuide() {
   return guideColliders.some(collider => {
     if (!characterVerticallyOverlapsCollider(collider)) return false;
     if (collider.polygon?.length >= 3) {
-      return polygonContact(playerObb, collider.polygon, SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN)?.intersects;
+      const margin = CHARACTER_STRUCTURE_CONTACT_SKIN + SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN;
+      return polygonContact(playerObb, collider.polygon, margin)?.intersects;
     }
     const guideObb = structureCollisionObb(collider);
     guideObb.halfX += SKY_STATION_GUIDE_DIALOG_CONTACT_MARGIN;
@@ -24166,6 +25630,7 @@ function renderMarsShopDialog() {
 }
 
 function clearMarsShopDialogInput() {
+  constructionFootAcceleration.reset();
   constructionJumpControl?.cancel();
   nativeDoorNavigator?.cancel();nativeDoorMove=null;
   walkDashControl?.cancel();
@@ -24348,7 +25813,7 @@ function startUfoEquipmentDevelopmentSpaceTest() {
   if (CONSTRUCTION_EXPANSION_PREVIEW) return;
   const control = ufoDoorControls[0];
   if (!control?.craftAssembly) {
-    showToast("UFO乗り場を建造してから実機テストを開始してください");
+    showToast("空マップかアマネ星のUFO乗り場で実機テストを開始してください");
     return false;
   }
   ufoEquipmentDevelopmentTestState.comparisonCamera = false;
@@ -24360,7 +25825,7 @@ function startUfoEquipmentDevelopmentSpaceTest() {
   }
   if (!isUfoSpaceLaunchMap()) {
     renderUfoEquipmentDevelopmentTestPanel();
-    showToast("空マップまたは火星マップで実機テストを開始してください");
+    showToast("空マップまたはアマネ星マップで実機テストを開始してください");
     return false;
   }
 
@@ -24483,12 +25948,6 @@ function getUfoEquipmentRecipeCostEntries(recipe) {
     .filter(entry => entry.amount > 0);
 }
 
-function formatUfoEquipmentRecipeCost(recipe) {
-  return getUfoEquipmentRecipeCostEntries(recipe)
-    .map(entry => `${entry.label} ×${entry.amount}`)
-    .join(" / ");
-}
-
 function getUfoEquipmentRecipeAvailability(recipe, materials = readUfoWorkshopMaterialLedger()) {
   const crafted = isUfoEquipmentRecipeCrafted(recipe);
   const prerequisite = recipe.requires ? getUfoEquipmentRecipe(recipe.requires) : null;
@@ -24535,9 +25994,30 @@ function renderUfoEquipmentWorkshopMenu() {
           : "missing-material";
     const title = document.createElement("h3");
     title.textContent = recipe.label;
-    const cost = document.createElement("span");
+    const preview = document.createElement("div");
+    preview.className = "ufo-workshop-part-preview";
+    const thumbnail = document.createElement("img");
+    thumbnail.alt = "";
+    thumbnail.width = 384;
+    thumbnail.height = 224;
+    thumbnail.decoding = "async";
+    // These renders use the same meshes and materials as the equipped parts.
+    const previewImage = document.getElementById(`ufoWorkshopPart-${recipe.id}`);
+    if (previewImage) thumbnail.src = `data:image/webp;base64,${previewImage.textContent.replace(/\s/g, "")}`;
+    preview.appendChild(thumbnail);
+    const cost = document.createElement("ul");
     cost.className = "ufo-equipment-workshop-cost";
-    cost.textContent = `必要素材：${formatUfoEquipmentRecipeCost(recipe)}`;
+    cost.setAttribute("aria-label", "必要素材");
+    getUfoEquipmentRecipeCostEntries(recipe).forEach(entry => {
+      const item = document.createElement("li");
+      const shortfall = availability.missingCosts.find(resource => resource.id === entry.id)?.missing;
+      item.textContent = `${entry.label} ×${entry.amount}`;
+      if (!availability.crafted && shortfall) {
+        item.dataset.missing = "";
+        item.textContent += `（あと${shortfall}）`;
+      }
+      cost.appendChild(item);
+    });
     const effect = document.createElement("p");
     effect.textContent = recipe.effect;
     const button = document.createElement("button");
@@ -24545,10 +26025,8 @@ function renderUfoEquipmentWorkshopMenu() {
     button.dataset.ufoEquipmentRecipe = recipe.id;
     button.disabled = !availability.canCraft;
     if (availability.crafted) button.textContent = "装備済み";
-    else if (availability.prerequisiteMissing) button.textContent = "Iを先に作成";
-    else if (availability.missingCosts.length > 0) {
-      button.textContent = `素材不足（${availability.missingCosts.map(entry => `${entry.label}あと${entry.missing}`).join(" / ")}）`;
-    }
+    else if (availability.prerequisiteMissing) button.textContent = "タンク I の装備が必要";
+    else if (availability.missingCosts.length > 0) button.textContent = "素材不足";
     else button.textContent = "作成して装備";
     button.addEventListener("click", () => {
       void craftUfoEquipment(recipe.id).catch(error => {
@@ -24556,7 +26034,7 @@ function renderUfoEquipmentWorkshopMenu() {
       });
     });
     button.addEventListener("pointerdown", event => event.stopPropagation());
-    card.append(title, cost, effect, button);
+    card.append(preview, title, effect, cost, button);
     list.appendChild(card);
   });
   if (els.ufoEquipmentWorkshopStatus) {
@@ -24628,6 +26106,7 @@ function openUfoEquipmentWorkshopMenu() {
   ufoEquipmentWorkshopMenuState.open = true;
   els.ufoEquipmentWorkshopMenu.hidden = false;
   renderUfoEquipmentWorkshopMenu();
+  els.ufoEquipmentWorkshopMenu.showModal();
   window.requestAnimationFrame(() => {
     const firstAction = els.ufoEquipmentWorkshopList?.querySelector("button:not(:disabled)");
     (firstAction || els.ufoEquipmentWorkshopClose)?.focus({ preventScroll: true });
@@ -24637,7 +26116,10 @@ function openUfoEquipmentWorkshopMenu() {
 function closeUfoEquipmentWorkshopMenu({ resetTouchLatch = false } = {}) {
   ufoEquipmentWorkshopMenuState.open = false;
   if (resetTouchLatch) ufoEquipmentWorkshopMenuState.touchLatched = false;
-  if (els.ufoEquipmentWorkshopMenu) els.ufoEquipmentWorkshopMenu.hidden = true;
+  if (els.ufoEquipmentWorkshopMenu) {
+    els.ufoEquipmentWorkshopMenu.close();
+    els.ufoEquipmentWorkshopMenu.hidden = true;
+  }
 }
 
 function isTouchingUfoEquipmentWarehouse() {
@@ -24661,14 +26143,16 @@ function updateUfoEquipmentWorkshopMenu() {
     if (ufoEquipmentWorkshopMenuState.open) closeUfoEquipmentWorkshopMenu({ resetTouchLatch: true });
     return;
   }
-  const touching = isTouchingUfoEquipmentWarehouse();
-  if (!touching) {
-    ufoEquipmentWorkshopMenuState.touchLatched = false;
+  // A jump can open the menu while the player is still settling on the
+  // platform. Rearm only after the menu is closed and the player is clear.
+  if (ufoEquipmentWorkshopMenuState.open) return;
+  if (!isTouchingUfoEquipmentWarehouse()) {
+    if (!state.jumpY && !state.jumpVelocity && !state.falling) {
+      ufoEquipmentWorkshopMenuState.touchLatched = false;
+    }
     return;
   }
-  if (!ufoEquipmentWorkshopMenuState.touchLatched
-    && !ufoEquipmentWorkshopMenuState.open
-    && !isSkyStationGuideDialogOpen()) {
+  if (!ufoEquipmentWorkshopMenuState.touchLatched && !isSkyStationGuideDialogOpen()) {
     ufoEquipmentWorkshopMenuState.touchLatched = true;
     openUfoEquipmentWorkshopMenu();
   }
@@ -24766,7 +26250,10 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
   const config = MAPS[state.map];
   const limitX = config.world.width / 2 - PLAYER_RADIUS;
   const limitZ = config.world.depth / 2 - PLAYER_RADIUS;
-  if (Math.abs(x) > limitX || Math.abs(z) > limitZ) return true;
+  if (Math.abs(x) > limitX || Math.abs(z) > limitZ) {
+    if (state.map !== "sky" || !skyRaceShoreContains(config.world, x, z, PLAYER_RADIUS)) return true;
+  }
+  if (ufoRampSideBlocksWalk(fromX, fromZ, x, z)) return true;
   // If the loaded/previous position is already embedded, do not let the
   // normal upward-step gate turn the recovery path into a permanent trap.
   // The collider loop below still requires the attempted move to reduce the
@@ -24794,7 +26281,7 @@ function isBlocked(x, z, fromX = state.position.x, fromZ = state.position.z) {
       reportPhysicsBlock('島の斜面');return true;
     }
   }
-  return colliders.some(c => {
+  return walkingWorldColliders(fromX,fromZ,x,z).some(c => {
     if (characterSweepIsFarFromCollider(fromX, fromZ, x, z, c)) return false;
     if (isColliderPassage(x, z, c)) return false;
     if (state.map==='coast'&&coastPlay?.floorPassageAt?.(c,fromX,fromZ,x,z)) return false;
@@ -24909,10 +26396,11 @@ function updateStationWalkPreview(delta) {
 }
 
 function isFastWalking() {
-  return !!nativeDoorMove || state.fastWalking || (state.moving && (keys.has(' ') || keys.has('k') || walkDashControl?.active === true));
+  return !!nativeDoorMove || state.fastWalking || (state.moving && (keys.has('k') || walkDashControl?.active === true));
 }
 
 function triggerJump() {
+  if(state.skyStationActivities?.resting){state.skyStationActivities.stand();return false;}
   if(coastPlay?.rescuing)return false;
   if(coastSnorkel?.active)return coastSnorkel.surface();
   if(coastPebbles?.busy||coastPlay?.watchingWhale)return false;
@@ -25003,7 +26491,32 @@ function resolveReelLanding(previousFeet){
  state.groundY=y;state.jumpY=0;state.jumpVelocity=0;state.falling=false;state.jumpCount=0;return true;
 }
 
+function resolveSkyBenchLanding(previousFeet) {
+  if (state.map !== 'sky' || state.jumpVelocity > 0) return false;
+  const feet = state.groundY + state.jumpY;
+  const surface = getFootSupportSurface(state.position.x, state.position.z, {
+    referenceHeight: previousFeet,
+    allowHigher: true,
+    maxRise: 0,
+    accept: candidate => candidate.physicsSource === 'sky-station-bench'
+      && candidate.height >= feet - .02 && candidate.height <= previousFeet + .02,
+  });
+  if (!surface) return false;
+  state.groundY = surface.height;
+  state.jumpY = state.jumpVelocity = state.jumpCount = 0;
+  state.falling = false;
+  return true;
+}
+
 function updateCharacter(delta) {
+  if(state.skyStationActivities?.resting){
+    if(state.skyStationActivities.seated&&readMoveVector().lengthSq()>.001)state.skyStationActivities.stand();
+    if(state.skyStationActivities.step(delta)){
+      state.moving=state.fastWalking=false;
+      if(characterShadow)characterShadow.visible=false;
+      return;
+    }
+  }
   if(coastSnorkel?.characterPose()){if(characterShadow)characterShadow.visible=false;return;}
   if(coastPebbles?.busy){state.moving=state.fastWalking=false;updateCharacterWalkAnimation(delta,false);character.rotation.y=state.heading;return;}
   const coastRescuePose=coastPlay?.rescuePose;
@@ -25040,6 +26553,8 @@ function updateCharacter(delta) {
   // The route's final fractional step is precise movement, not pad drift.
   state.moving = move.lengthSq() > (nativeDoorMove ? 1e-12 : .001);
   if (!state.moving) state.fastWalking = false;
+  const rampsSpeed=state.map==='construction'&&!nativeDoorMove;
+  if(!state.moving||!rampsSpeed)constructionFootAcceleration.reset();
   if (state.cameraMode === "first") {
     state.heading = state.viewHeading;
     character.rotation.y = state.heading;
@@ -25047,7 +26562,8 @@ function updateCharacter(delta) {
   const movementOrigin = { x: state.position.x, z: state.position.z };
   if (state.moving) {
     const rotationBeforeMove = character.rotation.y;
-    const movementScale = isFastWalking() ? FAST_WALK_MULTIPLIER : 1;
+    const fast=isFastWalking();
+    const movementScale=rampsSpeed?constructionFootAcceleration.step(move.x,move.z,delta,fast):fast?FAST_WALK_MULTIPLIER:1;
     const speed = PLAYER_SPEED * movementScale * (state.map==='coast'?(coastPlay?.walkScale??1):1);
     const distance = speed * delta;
     const substeps = Math.max(1, Math.ceil(distance / 2.5));
@@ -25162,7 +26678,9 @@ function updateCharacter(delta) {
   // partly over the next surface is the authoritative support point for this
   // frame, even when the character root is already beyond the platform edge.
   updateCharacterWalkAnimation(delta, state.moving, isFastWalking() ? FAST_WALK_MULTIPLIER : 1);
-  let exactGroundY = landedThisFrame
+  const landedOnBench = state.map === 'sky' && wasAirborne && resolveSkyBenchLanding(reelPreviousFeet);
+  if (landedOnBench) landedThisFrame = true;
+  let exactGroundY = landedOnBench ? state.groundY : landedThisFrame
     ? getLandingGroundHeight(state.position.x, state.position.z, state.groundY)
     : getGroundHeight(state.position.x, state.position.z);
   // 着地時は過去の位置へ戻さない。現在の足元に実在する床だけを採用し、
@@ -25365,7 +26883,7 @@ function applyUfoForwardScrollDepartureCamera(control, mission, cameraPosition, 
   const departureCamera = mission.departureCamera;
   const departureTarget = mission.departureTarget;
 
-  // 火星側・やや右上から、まず雲海を見下ろす構図。UFOは雲とカメラの間を
+  // アマネ星側・やや右上から、まず雲海を見下ろす構図。UFOは雲とカメラの間を
   // 上昇し、雲を抜けた後だけ地球が遠景として現れる。
   departureCamera.copy(craftCenter)
     .addScaledVector(forward, 940 - progress * 130)
@@ -25400,8 +26918,8 @@ function applyUfoForwardScrollMarsDescentCamera(control, mission, cameraPosition
   craft.updateWorldMatrix(true, true);
   mars.updateWorldMatrix(true, true);
   const craftCenter = craft.getWorldPosition(new THREE.Vector3());
-  // 地球離脱とは逆に、地球側の真後ろ上空からUFOが火星へ沈み込む様子を
-  // 映す。注視点を火星中心へ寄せすぎると巨大な火星面に引っ張られ、機体が
+  // 地球離脱とは逆に、地球側の真後ろ上空からUFOがアマネ星へ沈み込む様子を
+  // 映す。注視点をアマネ星中心へ寄せすぎると巨大なアマネ星面に引っ張られ、機体が
   // 画面端へ逃げてしまうため、機体の進行方向を中心に構図を固定する。
   entry.descentCamera.copy(craftCenter)
     .addScaledVector(mission.forward, -780 + progress * 130)
@@ -25446,17 +26964,18 @@ function applyUfoEquipmentDevelopmentComparisonCamera() {
 // preferences. Measure the bubble only when it opens/changes size, not per frame.
 let conversationCamera=null,conversationLayoutRevision=0,conversationActorVisibility=null;
 const conversationResize=new ResizeObserver(()=>conversationLayoutRevision++);
-for(const el of [els.viewport,els.skyStationGuideDialog,els.marsShopDialog])if(el)conversationResize.observe(el);
+for(const el of [els.viewport,els.skyStationGuideDialog,els.marsShopDialog,rainStationDriverDialog])if(el)conversationResize.observe(el);
 function applyConversationCamera(){
-  const npc=isSkyStationGuideDialogOpen()?skyStationGuide:marsShopDialogState.open?marsShopkeeper:null;
-  const dialog=isSkyStationGuideDialogOpen()?els.skyStationGuideDialog:els.marsShopDialog;
+  const atStationDriver=rainStationDriverDialog.open;
+  const npc=atStationDriver?rainStationDriver?.actor:isSkyStationGuideDialogOpen()?skyStationGuide:marsShopDialogState.open?marsShopkeeper:null;
+  const dialog=atStationDriver?rainStationDriverDialog:isSkyStationGuideDialogOpen()?els.skyStationGuideDialog:els.marsShopDialog;
   if(!npc||!dialog||dialog.hidden){
     if(conversationCamera){camera.clearViewOffset();conversationCamera=null;els.viewport.classList.remove('is-conversing');}
     if(conversationActorVisibility){conversationActorVisibility.actor.visible=conversationActorVisibility.visible;conversationActorVisibility=null;}
     els.cameraModeButton.disabled=false;
     return false;
   }
-  const key=state.map+'/'+state.cameraDistanceIndex+'/'+conversationLayoutRevision;
+  const key=state.map+'/'+npc.name+'/'+state.cameraDistanceIndex+'/'+conversationLayoutRevision;
   if(conversationCamera?.key!==key){
     npc.updateWorldMatrix(true,true);
     const face=new THREE.Vector3(),tmp=new THREE.Vector3(),features=npc.userData.faceFeatures??[];
@@ -25480,12 +26999,19 @@ function applyConversationCamera(){
   els.cameraModeButton.disabled=true;
   els.viewport.classList.add('is-conversing');els.viewport.classList.remove('is-first-person');
   setWorldText(els.cameraModeButton,'視点：会話');setWorldText(els.viewReadout,'会話');
-  setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);
+  setWorldText(els.cameraDistanceButton,'距離：'+CAMERA_DISTANCE_PRESETS[conversationCameraIndex(state.cameraDistanceIndex)].label);
   return true;
 }
 function updateCamera() {
+  const framingAvailable=state.ufoBoarded
+    ? state.ufoEngineMode==='ready'&&state.ufoCameraPresetIndex===0
+    : state.cameraMode==='third';
+  setCameraKeyHint(els.cameraDistanceButton,framingAvailable);
+
+  if(amaneRepairActions?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');return;}
+  if (amaneVisitActions?.cameraFrame(camera)||skyWindObservation?.cameraFrame(camera)||coastObservation?.cameraFrame(camera)||coastRumors?.cameraFrame(camera)) { els.viewport.classList.remove('is-first-person'); return; }
   if(coastWhaleScene?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');return;}
-  if(coastSnorkel?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');setWorldText(els.cameraModeButton,state.cameraMode==='first'?'視点：目線':'視点：三人称');setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);return;}
+  if(coastSnorkel?.cameraFrame(camera)){els.viewport.classList.remove('is-first-person');setWorldText(els.cameraModeButton,state.cameraMode==='first'?'視点：目線':'視点：三人称');setWorldText(els.cameraDistanceButton,state.cameraMode==='first'?'後方視点に戻す':orbitFramingLabel());return;}
   const crabFocus=coastPebbles?.focus;
   if(crabFocus){
     if(!crabCameraRestore)crabCameraRestore={position:camera.position.clone(),rotation:camera.quaternion.clone()};
@@ -25516,7 +27042,20 @@ function updateCamera() {
   if(applyConversationCamera())return;
   if(['construction','coast'].includes(state.map)&&state.selectedBuildId&&previewGroup?.userData.buildBounds&&state.cameraMode==='third'){
     const b=previewGroup.userData.buildBounds,shift=previewGroup.position.toArray(),frame=buildingCameraFrame({min:b.min.map((v,i)=>v+shift[i]),max:b.max.map((v,i)=>v+shift[i]),actor:[state.position.x,state.groundY+state.jumpY,state.position.z],yaw:state.viewHeading,pitch:.7-state.viewPitch,fov:camera.fov,aspect:camera.aspect});
-    if(frame){const target=new THREE.Vector3(...frame.target),offset=new THREE.Vector3(...frame.position).sub(target);offset.setLength(worldCameraDistance(state.cameraDistanceIndex,{fit:offset.length(),base:0}));camera.position.copy(target).add(offset);camera.lookAt(target);setWorldText(els.viewReadout,'建てる場所');setWorldText(els.cameraDistanceButton,'距離：'+THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label);return;}
+    if(frame){
+      const target=new THREE.Vector3(...frame.target),offset=new THREE.Vector3(...frame.position).sub(target);
+      const distance=worldCameraDistance(state.cameraDistanceIndex,{fit:offset.length(),base:0});
+      const pitch=THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].pitch;
+      if(pitch===undefined)offset.setLength(distance);
+      else{
+        offset.y=0;
+        offset.setLength(Math.cos(pitch)*distance);
+        offset.y=-Math.sin(pitch)*distance;
+      }
+      camera.position.copy(target).add(offset);camera.lookAt(target);
+      setWorldText(els.viewReadout,'建てる場所');setWorldText(els.cameraDistanceButton,orbitFramingLabel());
+      return;
+    }
   }
   const target = new THREE.Vector3(state.position.x, 38 + state.groundY + state.jumpY, state.position.z);
   if (applyUfoEquipmentDevelopmentComparisonCamera()) return;
@@ -25546,7 +27085,8 @@ function updateCamera() {
     const seat = new THREE.Vector3(state.position.x, state.groundY, state.position.z);
     const forward = new THREE.Vector3(Math.sin(state.heading), 0, Math.cos(state.heading));
     const selectedPreset = UFO_CAMERA_PRESETS[state.ufoCameraPresetIndex] || UFO_CAMERA_PRESETS[0];
-    const activePreset = state.ufoEngineMode === "ready" ? selectedPreset : UFO_CAMERA_PRESETS[0];
+    const activePreset = state.ufoEngineMode !== 'ready' ? UFO_CAMERA_PRESETS[0]
+      : selectedPreset.id==='fixed' ? UFO_FIXED_FRAMINGS[state.ufoFixedFramingIndex] : selectedPreset;
     const cockpitTarget = seat.clone()
       .addScaledVector(forward, activePreset.targetForward)
       .add(new THREE.Vector3(0, activePreset.targetUp, 0));
@@ -25569,7 +27109,7 @@ function updateCamera() {
       cockpitTarget.copy(cockpitCamera).addScaledVector(forward, activePreset.targetForward);
       cockpitTarget.y += activePreset.targetUp;
     } else if (state.map === "space") {
-      // 固定画角は少し上向きにし、到着直後から火星側の流れを視界へ入れる。
+      // 固定画角は少し上向きにし、到着直後からアマネ星側の流れを視界へ入れる。
       cockpitTarget.y = seat.y + UFO_SPACE_FIXED_CAMERA_TARGET_UP;
     }
     const forwardScrollMission = state.map === "space"
@@ -25614,6 +27154,7 @@ function updateCamera() {
     camera.lookAt(cockpitTarget);
     els.viewport.classList.remove("is-first-person");
     document.body.dataset.ufoCameraPreset = activePreset.id;
+    document.body.dataset.ufoCameraFraming = activePreset.label;
     document.body.dataset.ufoCameraDistance = camera.position.distanceTo(seat).toFixed(1);
     if (state.map === "space") {
       document.body.dataset.ufoSpaceCameraPreset = activePreset.id;
@@ -25633,7 +27174,8 @@ function updateCamera() {
 
   if (state.cameraMode === "third" || coastEditFocus) {
     const seaPlaying=state.map==='coast'&&!!coastPlay?.hauling;
-    const orbitPitch = coastEditFocus?-.65:(seaPlaying?-.58:state.map==='coast'&&coastPlay?.steering?-.22:state.map==='coast'&&coastPlay?.riding?-.4:state.map==='coast'?-.13:THIRD_PERSON_BASE_PITCH) + state.viewPitch;
+    const basePitch=seaPlaying?-.58:state.map==='coast'&&coastPlay?.steering?-.22:state.map==='coast'&&coastPlay?.riding?-.4:state.map==='coast'?-.13:THIRD_PERSON_BASE_PITCH;
+    const orbitPitch=coastEditFocus?-.65:orbitCameraPitch(state.cameraDistanceIndex,basePitch,state.viewPitch);
     if(seaPlaying){target.y=state.groundY+state.jumpY+(window.innerHeight<500?-6:10);target.x+=Math.sin(state.viewHeading)*25;target.z+=Math.cos(state.viewHeading)*25;}
     const seaFocus=coastEditFocus;if(seaFocus)target.fromArray(seaFocus.center);
     const cameraDistance=worldCameraDistance(state.cameraDistanceIndex,{aspect:camera.aspect,fit:seaFocus?seaFocus.radius/(Math.tan(camera.fov*Math.PI/360)*Math.min(1,camera.aspect)):0});
@@ -25675,12 +27217,12 @@ function updateCamera() {
   const cameraLabel = coastEditFocus ? (coastEditFocus.label || "置き先の見本") : state.cameraMode === "third" ? "三人称" : "一人称・目線";
   setWorldText(els.viewReadout, cameraLabel);
   setWorldText(els.cameraModeButton, `視点：${cameraLabel}`);
-  setWorldText(els.cameraDistanceButton, state.cameraMode==="first"&&!coastEditFocus ? "後方視点に戻す" : `距離：${THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex].label}`);
+  setWorldText(els.cameraDistanceButton,state.cameraMode==='first'&&!coastEditFocus?'後方視点に戻す':orbitFramingLabel());
   els.viewport.classList.toggle("is-first-person", state.cameraMode === "first" && !coastEditFocus);
 }
 
 function startMarsArrivalDevelopmentPreview() {
-  // 火星タブでの開発確認も、地表へ置いて始めるのではなく、プレイヤーが
+  // アマネ星タブでの開発確認も、地表へ置いて始めるのではなく、プレイヤーが
   // 実際に使う「操縦席 → 大気圏降下 → 停止 → 引き戸・足場を開く」経路を
   // そのまま再生する。これで降車までを一続きで検証できる。
   resetUfoEngineRuntime();
@@ -25701,7 +27243,7 @@ function startMarsArrivalDevelopmentPreview() {
 
   const control = ufoDoorControls[0];
   if (!control?.craftAssembly) {
-    showToast("火星到着演出用のUFOを準備できませんでした");
+    showToast("アマネ星到着演出用のUFOを準備できませんでした");
     return false;
   }
 
@@ -25765,17 +27307,17 @@ function startMarsArrivalDevelopmentPreview() {
     marsArrivalPreview: true,
   });
   if (!started) {
-    showToast("火星到着演出を開始できませんでした");
+    showToast("アマネ星到着演出を開始できませんでした");
     return false;
   }
   control.craftAssembly.updateWorldMatrix(true, true);
   const craftCenter = control.craftAssembly.getWorldPosition(new THREE.Vector3());
   if (!beginUfoForwardScrollMarsDescent(control, control.spaceForwardScroll, craftCenter)) {
-    showToast("火星の降下演出を開始できませんでした");
+    showToast("アマネ星の降下演出を開始できませんでした");
     return false;
   }
   document.body.dataset.ufoMarsArrivalDevelopment = "descending";
-  showToast("火星到着の降下演出を開始しました。着陸後は操縦席から降車できます");
+  showToast("アマネ星到着の降下演出を開始しました。着陸後は操縦席から降車できます");
   return true;
 }
 
@@ -25803,21 +27345,101 @@ function setMap(key) {
   rebuildMap(); showToast(`${MAPS[key].source.title}へ移動しました`);
 }
 
+function updateWorldDashHint(){
+  const keyboard=globalThis.IMASORA_KEYS;
+  els.dashButton.dataset.gameAction=state.ufoBoarded?'touch-only':'dash';
+  if(state.ufoBoarded){
+    els.dashButton.removeAttribute('aria-keyshortcuts');
+    els.dashButton.title='移動操作と一緒に押すとUFOが加速します';
+  }else{
+    els.dashButton.setAttribute('aria-keyshortcuts',keyboard?.bindings.dash.filter(Boolean).map(keyboard.label).join(' ')??'K');
+    els.dashButton.title=(keyboard?.describe('dash')??'K')+'を押しながら移動でもダッシュできます';
+  }
+}
+function worldWalkHasDash(){
+  return state.map!=='space'&&!coastSnorkel?.active&&!coastPlay?.rescuing&&
+    ![worldReelController,worldHighController,worldConcreteController,worldExcavationController,
+      worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
+}
+const WORLD_DIRECTION_ROWS=Object.freeze({
+  walk:[['forward','前へ'],['left','左へ'],['back','後ろへ'],['right','右へ']],
+  raft:[['forward','前へこぐ'],['left','左へ曲がる'],['back','バック'],['right','右へ曲がる']],
+  swim:[['forward','前へ'],['left','左へ'],['back','後ろへ'],['right','右へ']],
+  scroll:[['forward','上へ'],['left','左へ'],['back','下へ'],['right','右へ']],
+  lateral:[['left','左へ'],['right','右へ']],
+  flight:[['forward','上昇',0],['left','左へ移動',0],['back','下降',0],['right','右へ移動',0],
+    ['forward','前進',1],['left','左回転',1],['back','後進',1],['right','右回転',1]],
+});
+let worldDirectionGuide=null;
+function updateWorldDirectionGuide(walking){
+  if(!worldDirectionGuide)return;
+  let context=null;
+  if(worldInputAvailable()&&!rainStoryPlayback&&!coastObservation?.open&&!coastRumors?.open&&!skyWindObservation?.open&&
+    !coastPlay?.modalOpen&&!coastUI?.open&&!coastRigUI?.open&&!coastForageUI?.open){
+    if(state.ufoBoarded&&state.ufoEngineMode==='ready'){
+      if(isUfoForwardScrollActive()){
+        if(ufoDoorControls[0]?.spaceForwardScroll?.phase==='playing')context='scroll';
+      }else context=state.map==='space'&&state.ufoInSpace&&isUfoSpaceLateralLegacyMissionActive()?'lateral':'flight';
+    }else if(walking)context=coastPlay?.steering?'raft':coastSnorkel?.active?'swim':'walk';
+  }
+  worldDirectionGuide.element.classList.toggle('is-raft',context==='raft');
+  worldDirectionGuide.show(WORLD_DIRECTION_ROWS[context],context==='raft'?'いかだの操縦キー':context==='swim'?'泳ぐときの移動キー':'移動キー');
+}
 function setupTouchPad() {
+  worldDirectionGuide=globalThis.IMASORA_BUTTON_FEEDBACK?.createDirections(els.viewport,'world-direction-guide');
   const button=document.getElementById('constructionJumpButton');let jumpOwner=null;
-  const jumpReady=()=>worldInputAvailable()&&!state.ufoBoarded&&!worldMapMenu?.paused&&!mapResetPending&&!worldPlayerUI?.open&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!constructionDeliveryMenu?.open&&!document.querySelector('dialog[open]')&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
-  constructionJumpControl=bindJumpButton({element:button,enabled:()=>jumpReady()&&(worldHighController?.roaming?worldHighController.canJump:state.jumpCount<MAX_JUMPS),canHold:()=>jumpReady()||worldInputAvailable()&&worldHighController?.jumpPreparing,activate:()=>{if(worldHighController?.roaming){jumpOwner=worldHighController;return jumpOwner.jump(true);}jumpOwner=null;if(nativeDoorNavigator?.active)nativeDoorNavigator.cancel('自分でジャンプするよ。');nativeDoorMove=null;return triggerJump();},release:()=>{if(jumpOwner)jumpOwner.releaseJump();else state.jumpVelocity=releasedJumpVelocity(state.jumpVelocity);jumpOwner=null;}});
-  walkDashControl=createHeldDashButton({element:els.dashButton,jump:{element:button,control:constructionJumpControl},context:()=>state.map,enabled:()=>!state.ufoBoarded&&!coastSnorkel?.active&&state.map!=='space'&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]')&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming))});
+  const jumpReady=()=>ownsWorldWalkPad()&&!coastSnorkel?.active&&worldInputAvailable();
+  constructionJumpControl=bindJumpButton({element:button,enabled:()=>jumpReady()&&(worldHighController?.roaming?worldHighController.canJump:state.jumpCount<MAX_JUMPS),canHold:()=>jumpReady()||worldHighController?.jumpPreparing&&worldInputAvailable(),activate:()=>{if(worldHighController?.roaming){jumpOwner=worldHighController;return jumpOwner.jump(true);}jumpOwner=null;if(nativeDoorNavigator?.active)nativeDoorNavigator.cancel('自分でジャンプするよ。');nativeDoorMove=null;return triggerJump();},release:()=>{if(jumpOwner)jumpOwner.releaseJump();else state.jumpVelocity=releasedJumpVelocity(state.jumpVelocity);jumpOwner=null;}});
+  walkDashControl=createHeldDashButton({
+    element:els.dashButton,jump:{element:button,control:constructionJumpControl},
+    context:()=>state.map+(state.ufoBoarded?'/ufo':'/foot'),
+    enabled:()=>(state.ufoBoarded?state.ufoEngineMode==='ready':worldWalkHasDash())&&worldInputAvailable(),
+  });
   els.touchStick.setAttribute('data-move-stick','');
-  worldWalkPad=createWorldMovePad({element:els.touchPad,enabled:()=>worldInputAvailable()&&!state.ufoBoarded&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming)),context:()=>state.map+'/foot',onVector:(x,y)=>touchVector.set(x,y)});
+  worldWalkPad=createWorldMovePad({element:els.touchPad,enabled:()=>ownsWorldWalkPad()&&coastMoveControlsAvailable()&&worldInputAvailable(),context:()=>state.map+'/foot',onVector:(x,y)=>touchVector.set(x,y)});
 }
 
-function worldInputAvailable(){return worldBooted&&!coastPlay?.watchingWhale&&!coastPlay?.rescuing&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!document.querySelector('dialog[open]');}
+function coastMoveControlsAvailable(){
+  return !coastPlay?.crewWalking&&(!coastPlay?.seated||coastPlay.steering);
+}
+
+function ownsWorldWalkPad(){
+  return !state.ufoBoarded&&![worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
+}
+// The live collection also sees dialogs added by activities after startup.
+// Check the few dialog elements directly instead of scanning the entire HUD.
+const worldDialogs=document.getElementsByTagName('dialog');
+function openWorldDialog(){
+  for(let i=0;i<worldDialogs.length;i++)if(worldDialogs[i].open)return worldDialogs[i];
+  return null;
+}
+function orbitFramingLabel(){
+  const preset=THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex];
+  return preset.pitch===undefined?'距離：'+preset.label:'画角：'+preset.label;
+}
+function setCameraKeyHint(button,enabled){
+  if(enabled&&button.dataset.gameAction!=='camera')button.dataset.gameAction='camera';
+  else if(!enabled&&button.dataset.gameAction==='camera')delete button.dataset.gameAction;
+}
+function switchWorldCamera(){
+  if(!worldInputAvailable()||coastPlay?.modalOpen||coastUI?.open||coastRigUI?.open||coastForageUI?.open)return;
+  const controller=[worldReelController,worldHighController?.roaming?null:worldHighController,worldConcreteController,
+    worldExcavationController,worldWaterController,worldSoilController,worldTimberController].find(item=>item?.active);
+  if(controller){controller.switchCamera?.();return;}
+  if(state.ufoBoarded){
+    if(state.ufoEngineMode!=='ready'||state.ufoCameraPresetIndex!==0)return;
+    state.ufoFixedFramingIndex=(state.ufoFixedFramingIndex+1)%UFO_FIXED_FRAMINGS.length;
+    showToast('UFOカメラ：'+UFO_FIXED_FRAMINGS[state.ufoFixedFramingIndex].label);
+    return;
+  }
+  if(state.cameraMode==='third'&&!els.cameraDistanceButton.disabled)els.cameraDistanceButton.click();
+}
+function worldInputAvailable(){return worldBooted&&!returningFromSkyStation&&!enteringSkyRace&&archiveSceneId===null&&!rainRescue&&!rainDeliveryFarewell&&!amaneVisitActions?.leaving&&!amaneRepairActions?.open&&!coastPlay?.watchingWhale&&!coastPlay?.rescuing&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&!worldShopOverlay?.open&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!constructionDeliveryMenu?.open&&!spaceMaterialGuide?.open&&!isSkyStationGuideDialogOpen()&&!marsShopDialogState.open&&!isUfoEquipmentWorkshopMenuOpen()&&!openWorldDialog();}
 
 function setupLookControls() {
   lookControls = createLookControls({element:els.canvas,indicator:els.viewport,
     context(){
-      if(worldMapMenu?.paused||marsShopDialogState.open||document.querySelector('dialog[open]')||(state.ufoBoarded&&state.ufoEngineMode!=='idle'))return null;
+      if(worldMapMenu?.paused||marsShopDialogState.open||openWorldDialog()||(state.ufoBoarded&&state.ufoEngineMode!=='idle'))return null;
       return [worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].find(controller=>controller?.active)||state.map+'/'+state.cameraMode;
     },
     onDelta(dx,dy,type,owner){
@@ -26142,12 +27764,12 @@ function startUfoSpaceTransitionTestIfRequested() {
 function setupMarsReturnDevelopmentPreview() {
   if (!MARS_RETURN_PREVIEW) return;
   const button = document.createElement('button');
-  button.textContent = '火星から地球へ出発';
+  button.textContent = 'アマネ星から地球へ出発';
   button.id = 'marsReturnPreviewStart';
   button.addEventListener('pointerdown', event => event.stopPropagation());
   els.viewport.prepend(button);
   Object.assign(button.style, { position: 'absolute', top: '12px', left: '12px', zIndex: '30', padding: '12px' });
-  els.saveState.textContent = '火星帰路の確認中（保存しません）';
+  els.saveState.textContent = 'アマネ星帰路の確認中（保存しません）';
   button.addEventListener('click', () => {
     if (state.map !== 'mars') return;
     const control = ufoDoorControls[0];
@@ -26244,7 +27866,7 @@ function updateConstructionWalkPreview(delta) {
   test.status.textContent = `徒歩で旧境界を確認中：X ${state.position.x.toFixed(1)} / 床 ${state.groundY.toFixed(1)}`;
 }
 
-async function setupScene() {
+async function setupScene({restoreVehicleSeat=false}={}) {
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK){resetUfoEngineRuntime();state.map='construction';state.pendingSafeEntry=false;state.ufoBoarded=false;}
   if (MATERIAL_GUIDE_PREVIEW) {
     resetUfoEngineRuntime();state.map=MATERIAL_GUIDE_PREVIEW;resetPlayerToMapSpawn(state.map);state.pendingSafeEntry=false;
@@ -26291,8 +27913,12 @@ async function setupScene() {
   suspendHiddenDebugMatrices(physicsDebugGroup);
   worldHemi=new THREE.HemisphereLight(0xd9f4ff,0x37506b,2.2);scene.add(worldHemi);
   const sun = new THREE.DirectionalLight(0xffffff, 3.4); sun.position.set(-160, 320, 220); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -380; sun.shadow.camera.right = 380; sun.shadow.camera.top = 380; sun.shadow.camera.bottom = -380; sun.shadow.camera.far = 900; scene.add(sun);worldSun=sun;
-  worldRenderBudget=createRenderBudget({apply:level=>{pendingRenderQuality={level,ratio:Math.min(window.devicePixelRatio||1,level===1?1.25:1)};}});
+  worldRenderBudget=createRenderBudget({apply:level=>{
+    const cap=chapter15Preview ? (level===1 ? 0.82 : 0.66) : (level===1 ? 1.25 : 1);
+    pendingRenderQuality={ratio:Math.min(window.devicePixelRatio||1,cap)};
+  }});
   worldShadowCache=createWorldShadowCache({renderer});
+  worldDrawBackpressure=createWorldDrawBackpressure(renderer.getContext());
 
   character = makeCharacter(); scene.add(character);coastPebbles?.prepare(scene);coastFruits?.prepare(scene);
   const shadowMaterial = new THREE.MeshBasicMaterial({ color: 0x19355b, transparent: true, opacity: .24, depthWrite: false }); characterShadow = new THREE.Mesh(new THREE.CircleGeometry(12, 32), shadowMaterial); characterShadow.rotation.x = -Math.PI / 2; scene.add(characterShadow);
@@ -26301,7 +27927,7 @@ async function setupScene() {
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
     }});
-  worldSoilController=createWorldSoilController({canResume:nativeDoorWalkAllowed,service:worldSaveService,practice:CONSTRUCTION_SOIL_PRACTICE,preview:CONSTRUCTION_SOIL_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
+  worldSoilController=createWorldSoilController({onEarthCommit:()=>worldExcavationController?.syncGardenCommit?.(),canResume:nativeDoorWalkAllowed,service:worldSaveService,practice:CONSTRUCTION_SOIL_PRACTICE,preview:CONSTRUCTION_SOIL_PREVIEW,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
     onRestoreRebuild:()=>rebuildMap({saveRepairs:false}),onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},onError:error=>worldSaveErrorUI?.show(error),readout:()=>{
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
@@ -26311,18 +27937,18 @@ async function setupScene() {
       els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;
       els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;
     }});
-  if(transportPlaySession)worldExcavationController=createWorldTransportPlayController({onGarden:()=>worldHighController?.showGarden(),service:worldSaveService,session:transportPlaySession,resumeAtSavedPose:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||worldSaveService.ledger?.world.constructionResume?.kind==='transport'||transportPlaySession.state.mode!=='foot'||!!transportPlaySession.state.frame.soil.pending||transportPlaySession.state.frame.soil.containers.shovel.amount>0,verification:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&new URLSearchParams(location.search).get('transportVerification')==='1',state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
-  else if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldExcavationController=createWorldTransportSceneBridge({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
+  if(transportPlaySession)worldExcavationController=createWorldTransportPlayController({onFleet:()=>worldPlayerUI?.showFleet(),onBlockedSave:error=>worldSaveErrorUI?.show(error),onSaveRecovered:()=>worldSaveErrorUI?.endWork(),contactRevision:constructionGeometryRevision,chapterTrialKind:activeConstructionTrialKind,chapterHint:()=>rainWorksStepAllowed()&&!rainWorksRecord()?.excavatorTrial&&RAIN_WORKS_JOBS[rainWorksRecord()?.step]?.vehicle==='dump'?'荷台を保管庫に向けて停車し、Hで土を下ろそう。':'',service:worldSaveService,session:transportPlaySession,progressiveQuarry:chapter15Preview,resumeAtSavedPose:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||worldSaveService.ledger?.world.constructionResume?.kind==='transport'||transportPlaySession.state.mode!=='foot'||!!transportPlaySession.state.frame.soil.pending||transportPlaySession.state.frame.soil.containers.shovel.amount>0,verification:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&new URLSearchParams(location.search).get('transportVerification')==='1',state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},readout:()=>{const x=state.position.x.toFixed(1),z=state.position.z.toFixed(1);setWorldText(els.coords,`X ${x} / Z ${z}`);setWorldText(els.positionReadout,`${x}, ${z}`);}});
+  else if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldExcavationController=createWorldTransportSceneBridge({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,readout:()=>{const x=state.position.x.toFixed(1),z=state.position.z.toFixed(1);setWorldText(els.coords,`X ${x} / Z ${z}`);setWorldText(els.positionReadout,`${x}, ${z}`);}});
   else if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)worldExcavationController=createWorldExcavationController({state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,clearInput:clearMarsShopDialogInput,persistence:excavationLedgerSession,
-    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{els.coords.textContent=`X ${state.position.x.toFixed(1)} / Z ${state.position.z.toFixed(1)}`;els.positionReadout.textContent=`${state.position.x.toFixed(1)}, ${state.position.z.toFixed(1)}`;}});
+    onExit:()=>{rebuildMap();updateCharacter(0);updateCamera();},readout:()=>{const x=state.position.x.toFixed(1),z=state.position.z.toFixed(1);setWorldText(els.coords,`X ${x} / Z ${z}`);setWorldText(els.positionReadout,`${x}, ${z}`);}});
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE){const createConcrete=CONSTRUCTION_CONCRETE_PREVIEW?createWorldConcreteController:createLiveConcreteController;worldConcreteController=createConcrete({service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,onExit:()=>{updateCharacter(0);updateCamera();},onLayoutChange:()=>rebuildMap(),onError:error=>worldSaveErrorUI?.show(error)});}
   worldHighController=createHighLive({openPouch:()=>coastForageUI?.show(),syncSoil:()=>worldExcavationController?.syncGardenCommit?.(),service:worldSaveService,state,scene,camera,character,shadow:characterShadow,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,
-    readInput:()=>worldInputAvailable()?{x:(keys.has('d')?1:0)-(keys.has('a')?1:0)+touchVector.x,y:(keys.has('w')?1:0)-(keys.has('s')?1:0)-touchVector.y,fast:state.fastWalking||keys.has(' ')||keys.has('k')||walkDashControl?.active===true}:{},
+    readInput:()=>worldInputAvailable()?{x:(keys.has('d')?1:0)-(keys.has('a')?1:0)+touchVector.x,y:(keys.has('w')?1:0)-(keys.has('s')?1:0)-touchVector.y,fast:state.fastWalking||keys.has('k')||walkDashControl?.active===true}:{},
     allowed:nativeDoorWalkAllowed,rebuild:()=>rebuildMap({saveRepairs:false}),onExit:()=>{updateCharacter(0);updateCamera();},walkTo:goal=>{prepareNativeDoorRoute();void nativeDoorNavigator.start('high',goal);},
     environment:()=>({actor:{x:state.position.x,z:state.position.z},bounds:{minX:-MAPS.construction.world.width/2,maxX:MAPS.construction.world.width/2,minZ:-MAPS.construction.world.depth/2,maxZ:MAPS.construction.world.depth/2},heightAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z)??0,
       blocked:(p,size)=>colliders.some(c=>Math.abs(p[0]-c.x)<size[0]/2+c.halfX&&Math.abs(p[2]-c.z)<size[2]/2+c.halfZ)||[worldConcreteController,worldSoilController,worldWaterController,worldTimberController].some(c=>c?.overlapsBuild(p,size))||worldConcreteController?.overlapsVehicle?.(p,size)||worldExcavationController?.overlapsBuild(p,size,{terrainSupport:true})})});
   if(CONSTRUCTION_EXCAVATION_LIVE)worldReelController=createReelLive({service:worldSaveService,state,scene,camera,character,canvas:els.canvas,snapshot:worldStateSnapshot,clearInput:clearMarsShopDialogInput,allowed:nativeDoorWalkAllowed,heightAt:(x,z)=>getGroundHeight(x,z,'construction-reel'),syncGarden:()=>worldHighController?.syncGarden(),replaceContacts:replaceReelContacts,onExit:()=>{updateCharacter(0);updateCamera();}});
-  await buildWorldSceneSteps(rebuildMapSteps());
+  await buildWorldSceneSteps(rebuildMapSteps({restoreVehicleSeat}),chapter15Preview&&globalThis.scheduler?.yield?{yieldTask:()=>scheduler.yield(),sliceMs:12}:undefined);
   setupConstructionExpansionPreview();
   setupConstructionDeliveryPreview();
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK){void Promise.resolve(worldConcreteController.toEntrance()).then(()=>{if(CONSTRUCTION_DELIVERY_DOCK_CHECK&&constructionDeliveryDock){state.position.set(constructionDeliveryDock.position.x,0,constructionDeliveryDock.position.z+24);state.heading=Math.PI;state.viewHeading=Math.PI;state.viewPitch=.08;state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);updateCamera();updateMapReadout();}if(CONSTRUCTION_CONCRETE_PREVIEW)els.saveState.textContent='手作業施工の本体接続確認（通常保存とは別）';}).catch(error=>worldSaveErrorUI?.show(error));}
@@ -26340,12 +27966,12 @@ async function setupScene() {
   if(CONSTRUCTION_SOIL_PREVIEW){
     const p=worldSoilController.previewSpawn();
     if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
-    els.saveState.textContent=CONSTRUCTION_SOIL_PRACTICE?'火星土ローダーの貸出練習（保存しません）':'火星土ローダーの本体接続確認';
+    els.saveState.textContent=CONSTRUCTION_SOIL_PRACTICE?'アマネ星土ローダーの貸出練習（保存しません）':'アマネ星土ローダーの本体接続確認';
   }
   if(CONSTRUCTION_TIMBER_PREVIEW){
     const p=worldTimberController.previewSpawn();
     if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
-    els.saveState.textContent=CONSTRUCTION_TIMBER_PRACTICE?'火星木材クレーンの貸出練習（保存しません）':'火星木材クレーンの本体接続確認';
+    els.saveState.textContent=CONSTRUCTION_TIMBER_PRACTICE?'アマネ星木材クレーンの貸出練習（保存しません）':'アマネ星木材クレーンの本体接続確認';
   }
   if(CONSTRUCTION_EXCAVATION_PREVIEW||CONSTRUCTION_TRANSPORT_PLAY_PREVIEW){
     const p=worldExcavationController.previewSpawn();if(p){state.position.set(p.x,0,p.z);state.heading=p.heading;state.viewHeading=p.heading;state.viewPitch=.08;state.cameraMode='third';state.groundY=CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?p.y:0;state.jumpY=0;state.jumpVelocity=0;state.falling=false;updateCharacter(0);}
@@ -26390,32 +28016,76 @@ async function setupScene() {
   startUfoSpaceTransitionTestIfRequested();
   startUfoActualAscentTestIfRequested();
   updateCamera();
-  observeWorldCanvasSize({canvas:els.canvas,renderer,camera});
+  observeWorldCanvasSize({canvas:els.canvas,renderer,camera,layoutBox:()=>document.body.classList.contains('world-transport-playing')});
   clearMarsShopDialogInput();
   els.statusText.textContent = "準備OK";
   requestAnimationFrame(frame);
 }
 
 function renderWorldFrame(delta=0){
+  state.skyStationActivities?.update(delta);
+  const walking=ownsWorldWalkPad();
+  const next=walking?'walk':state.ufoBoarded?'ufo':'activity';
+  if(document.body.dataset.worldControlOwner!==next)document.body.dataset.worldControlOwner=next;
+  const movement=walking&&coastMoveControlsAvailable();
+  if(els.touchPad.hidden===movement)els.touchPad.hidden=!movement;
+  updateWorldDirectionGuide(movement);
+  if(amaneVisitSite){
+    const world=archiveSceneId==='amane-repair'?archiveWorldRecord:worldSaveService?.ledger?.world;
+    amaneRepairAge=amaneVisitSite.update(world?.rainAmaneV1,performance.now(),amaneVisitActions?.familyLine,world?.rainDeliveryV1,
+      world?.rainRepairV1,amaneRepairActions?.activity,amaneRepairActions?.film,amaneVisitActions?.deliveryLine);
+  }
   constructionAtmosphere?.update({scene,camera,sun:worldSun,hemi:worldHemi});
   constructionSurroundings?.update();
-  if(skyAtmosphere){skyAtmosphere.group.visible=state.map==='sky';if(state.map==='sky')skyAtmosphere.update({scene,camera,sun:worldSun,hemi:worldHemi});}
-  coastWorld?.update({scene,camera,sun:worldSun,hemi:worldHemi,waveTime:coastPlay?.waveTime,actor:state.position,raft:coastPlay?.lanternPose,snorkeling:coastSnorkel?.active,wildlifePaused:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||worldSaveService?.blocked||mapResetPending,watchWhale:worldBooted&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!coastUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPlay?.rescuing&&!coastSnorkel?.active&&!coastPebbles?.busy&&!coastFruits?.busy&&!state.jumpY&&!state.jumpVelocity&&!state.falling});
+  if (state.map === "sky") skyCloudGround?.updateRaceShore(performance.now() / 1000);
+  if(skyAtmosphere){
+    skyAtmosphere.group.visible=state.map==='sky';
+    if(state.map==='sky')skyAtmosphere.update({
+      scene,camera,sun:worldSun,hemi:worldHemi,actor:state.position,changedWind:skyWindObservation?.changedWind===true,observingWind:skyWindObservation?.open===true,
+    });
+  }
+  coastWorld?.update({scene,camera,sun:worldSun,hemi:worldHemi,waveTime:coastPlay?.waveTime,actor:state.position,raft:coastPlay?.lanternPose,snorkeling:coastSnorkel?.active,wildlifePaused:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||worldSaveService?.blocked||mapResetPending,watchWhale:worldBooted&&!coastObservation?.open&&!coastRumors?.open&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!coastUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPlay?.rescuing&&!coastSnorkel?.active&&!coastPebbles?.busy&&!coastFruits?.busy&&!state.jumpY&&!state.jumpVelocity&&!state.falling});
   coastWorld?.cave?.cutaway({x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},state.map==='coast'&&state.cameraMode==='third');
   caveCrossing?.refreshVisibility();
   constructionTownBridge?.update();constructionBridgeUI?.update();coastUI?.update();coastForageUI?.update();coastRigUI?.update();coastRewardsUI?.update();
   coastPlay?.render({overlay:worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastRigUI?.open});
   // Resolution/lighting buffers change only at rest, never halfway through a jump.
   const controllers=[worldReelController,worldHighController,worldConcreteController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController];
-  if(pendingRenderQuality&&!state.jumpY&&!state.jumpVelocity&&!state.moving&&!controllers.some(c=>c?.active)){
-    const {level,ratio}=pendingRenderQuality;
+  if(pendingRenderQuality&&!state.jumpY&&!state.jumpVelocity&&!state.moving&&
+    !controllers.some(c=>c?.active&&!(state.map==='construction'&&c.renderQualityIdle))){
+    const {ratio}=pendingRenderQuality;
     if(renderer.getPixelRatio()!==ratio)renderer.setPixelRatio(ratio);
     // Keep the same shadow shader variant. Disabling it here used to compile
     // new programs synchronously on landing and caused a visible freeze.
     pendingRenderQuality=null;
   }
   updateNearbyNames();
-  const draw=()=>{updateWorldColour(state.map);if(worldShadowCache)worldShadowCache.render(scene,camera);else renderer.render(scene,camera);};
+  if(state.map==='construction')boardingMarkers??=createConstructionBoardingMarkers(scene,FLEET,id=>nativeDoorController(id)?.doorSpots?.(id)??[]);
+  if(boardingMarkers){
+    const aboard=state.map==='construction'&&controllers.some(controller=>controller?.aboard);
+    boardingMarkers.update(state.map,state.position,performance.now(),aboard);
+    if(parkingBoardingMarks)parkingBoardingMarks.visible=!aboard;
+  }
+  const earthwork=activeRainWorksEarthwork();
+  if(earthwork.length)worksCutMarkers??=createConstructionCutMarkers(scene,(x,z)=>worldExcavationController?.groundHeightAt(x,z));
+  worksCutMarkers?.update(earthwork);
+  const quarryVehicle=state.map==='construction'&&!!worldExcavationController?.aboard;
+  const draw=()=>{
+    if(worldDrawBackpressure&&!worldDrawBackpressure.ready(quarryVehicle))return;
+    if(state.map==='construction'&&!constructionOverview){
+      const near=state.cameraMode==='first'?.6:2.5;
+      if(camera.near!==near||camera.far!==14000){
+        camera.near=near;camera.far=14000;camera.updateProjectionMatrix();
+      }
+    }
+    updateWorldColour(state.map);
+    if(worldShadowCache)worldShadowCache.render(scene,camera);else renderer.render(scene,camera);
+    worldDrawBackpressure?.submitted(quarryVehicle);
+    if(worldBooted&&chapter15Preview&&window.rainWorksOpeningPending){
+      document.getElementById('rainWorksOpening')?.remove();
+      delete window.rainWorksOpeningPending;
+    }
+  };
   if(character){
     if(jumpActionModel!==character){characterJumpAction?.reset();jumpActionModel=character;characterJumpAction=createCharacterJumpAction(character);}
     const owner=controllers.find(c=>c?.active),motion=owner?owner.jumpMotion:!state.ufoBoarded&&!coastPlay?.seated&&!coastPlay?.crewWalking&&!coastSnorkel?.active&&!coastPebbles?.busy?{owner:'main-'+state.map,stage:state.jumpCount,velocity:state.jumpVelocity,height:state.jumpY,airborne:state.jumpCount>0&&(state.jumpY>0||state.jumpVelocity>0)}:null;
@@ -26424,14 +28094,65 @@ function renderWorldFrame(delta=0){
   worldRenderBudget?.observe(performance.now(),{active:worldBooted&&!document.hidden&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldSaveService?.blocked&&!worldSaveService?.crafting});
 }
 
+let lastStoryActivityMap=null;
 function frame() {
   vehicleSurfaceTick++;
   if(document.hidden){clock.getDelta();requestAnimationFrame(frame);return;}
+  if(rainRescue){renderRainRescue(clock.getDelta());requestAnimationFrame(frame);return;}
+  if(rainDeliveryFarewell){renderDeliveryFarewell(clock.getDelta());requestAnimationFrame(frame);return;}
+  updateUfoSkyReturnLanding();
+  if (!rainStoryPlayback && canStartRainStoryEnding()) startRainStoryEnding();
+  if (rainStoryPlayback) {
+    clock.getDelta();
+    requestAnimationFrame(frame);
+    return;
+  }
+  const departureHidden = !canOpenUfoDeparture();
+  if (els.ufoDepartureButton.hidden !== departureHidden) els.ufoDepartureButton.hidden = departureHidden;
+  if (els.ufoDepartureDialog.open) {
+    clock.getDelta();
+    renderWorldFrame();
+    requestAnimationFrame(frame);
+    return;
+  }
   worldWalkPad?.sync();ufoMovePad?.sync();
   constructionJumpControl?.sync();document.getElementById('constructionJumpButton').hidden=!!coastPlay?.rescuing||state.ufoBoarded||[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active&&!(c===worldHighController&&c.roaming));
-  walkDashControl?.sync();els.dashButton.hidden=!!coastPlay?.rescuing||!!coastSnorkel?.active||state.ufoBoarded||state.map==='space';
+  globalThis.IMASORA_KEYS?.syncContext?.();
+  if(els.dashButton.classList.contains('ufo-dash')!==state.ufoBoarded){
+    els.dashButton.classList.toggle('ufo-dash',state.ufoBoarded);
+    updateWorldDashHint();
+  }
+  els.dashButton.hidden=state.ufoBoarded?state.ufoEngineMode!=='ready':!worldWalkHasDash();
+  walkDashControl?.sync();
   const frameDelta=clock.getDelta(),delta=Math.min(.05,frameDelta);
-  coastWhaleScene?.update();
+  // On leaving a map, give its UI one update to release focus and hide hints.
+  // While driving in the yard these scenes have no work or player input.
+  const visitOtherMaps=state.map!=='construction'||lastStoryActivityMap!==state.map;
+  lastStoryActivityMap=state.map;
+  if(visitOtherMaps){
+    coastWhaleScene?.update();
+    coastRumors?.update(delta);
+    coastObservation?.update(delta);
+    skyWindObservation?.update(Math.min(.25,frameDelta));
+    amaneVisitActions?.update();
+  }
+  if(visitOtherMaps||amaneRepairActions?.open)amaneRepairActions?.update(Math.min(.25,frameDelta));
+  updateRainStationDriver();
+  updateRainWorksAction();
+  inspectionAction.hidden=!inspectionEntryAvailable();
+  updateRainStoryHint();
+  if (enteringSkyRace || skyRaceInvitation.open || state.skyStationActivities?.reading) {renderWorldFrame();requestAnimationFrame(frame);return;}
+  if (amaneRepairActions?.open||rainStationDriverDialog.open||amaneVisitActions?.open||skyWindObservation?.open||coastObservation?.open||coastRumors?.open) {
+    if (skyWindObservation?.open){state.moving=false;updateSkyStationGuideAnimation(delta);}
+    updateCamera();
+    // These shots use Seharune's view. Keep the player in place and omit
+    // the near body only for the first-person render.
+    const lookingThroughHero=character?.visible&&(amaneRepairActions?.film>=3.1||amaneVisitActions?.deliveryLine>=0||amaneVisitActions?.viewingSource);
+    if(lookingThroughHero)character.visible=false;
+    try{renderWorldFrame(delta);}finally{if(lookingThroughHero)character.visible=true;}
+    requestAnimationFrame(frame);
+    return;
+  }
   if(coastPlay?.watchingWhale){coastPlay.beforeWalk(0);state.moving=state.fastWalking=false;updateCharacterWalkAnimation(0,false);updateCamera();renderWorldFrame();requestAnimationFrame(frame);return;}
   // The brief crab scene uses elapsed time; slower drawing must not prolong the input lock.
   coastSnorkel?.update(delta);coastPebbles?.update(Math.min(.25,frameDelta));coastFruits?.update(Math.min(.25,frameDelta));
@@ -26468,7 +28189,8 @@ function frame() {
     marsShopkeeper.userData.updateAnimation(marsShopkeeper.userData.idleElapsed);
   }
   updateMarsShopDialog();
-  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); coastLandmarks?.update(delta); coastPlay?.beforeWalk(delta); updateCoastCaveSupport(); updateCharacter(delta); coastPlay?.afterWalk(); caveCrossing?.update(delta); updateMarsArrivalHatchExit(); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updateMarsSky(marsSky, camera, state.map); updatePhysicsDebugContact(); renderWorldFrame(delta);
+  updateUfoEngineSequence(delta); updateUfoDoorAnimation(delta); updateUfoFlight(delta); updateUfoForwardScrollMission(delta); updateUfoStarMiningMission(delta); updateUfoMarsRaceMission(delta); updateUfoSolarSailMission(delta); updateUfoInertiaSlingshotMission(delta); updateUfoJetAnimation(delta); updateSpaceEarthAnimation(delta); updateSpaceExplorableStarfield(delta); updateUfoGravityPinballMission(delta); updateUfoSalvagePortMission(delta); updateUfoPlanetBowlingMission(delta); updateUfoRingBattleMission(delta); updateUfoCranePortMission(delta); updateUfoGravityMazeMission(delta); updateUfoSpaceRescueMission(delta); updateSpaceDustAnimation(delta); updateUfoSpaceCombat(delta); coastLandmarks?.update(delta); coastPlay?.beforeWalk(delta); updateCoastCaveSupport(); updateCharacter(delta); updateSkyRaceInvitation(); coastPlay?.afterWalk(); caveCrossing?.update(delta); updateMarsArrivalHatchExit(); updateSkyStationGuideAnimation(delta); updateSkyStationGuideDialog(); updateUfoEquipmentWorkshopMenu(); updateCamera(); updateMarsSky(marsSky, camera, state.map); updatePhysicsDebugContact(); renderWorldFrame(delta);
+
   requestAnimationFrame(frame);
 }
 
@@ -26479,10 +28201,12 @@ function updateCoastCaveSupport(time=coastPlay?.waveTime){
   const lift=coastWorld.cave.update(time,{x:state.position.x,z:state.position.z,groundY:state.groundY+state.jumpY,grounded});
   if(grounded&&Number.isFinite(lift))state.groundY+=lift;
 }
+let boardingMarkers=null,worksCutMarkers=null;
 function nativeDoorController(id){return {high:worldHighController,water:worldWaterController,soil:worldSoilController,crane:worldTimberController,excavator:worldExcavationController,dump:worldExcavationController,truck:worldConcreteController,pump:worldConcreteController}[id];}
 // A verified saved driver is already supported by the saved cab, not by the ground.
 function nativeDoorWalkAllowed(context){const savedDriver=context?.kind==='timber'&&context.savedDriver===true;return state.map==='construction'&&!state.ufoBoarded&&(savedDriver||!state.jumpY&&!state.falling)&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!mapResetPending&&![worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active||c?.busy);}
 function nativeDoorWalkReason(id){
+ const lock=missionLock(id);if(lock)return lock;
  const ctrl=nativeDoorController(id);
  if(!ctrl)return ['truck','pump'].includes(id)?'「自由につくる」の車えらびから、ドアへ行けるよ。':'この車の土の現場へ歩いて行ってね。';
  if([worldReelController,worldHighController,worldWaterController,worldSoilController,worldTimberController,worldExcavationController,worldConcreteController].some(c=>c?.active))return '作業をセーブして徒歩に戻ってからえらぼう。';
@@ -26490,6 +28214,26 @@ function nativeDoorWalkReason(id){
  return ctrl.doorTarget(id)?true:'作業の途中や乗車中の記録は、先にその続きを終えよう。';
 }
 
+function enterConstructionEarthBuild(){
+ if(!nativeDoorWalkAllowed()||!worldExcavationController?.beginHandEarth?.()){showToast('重機の作業を終えてから、地面の広い場所で「土でつくる」を開いてください。');return false;}
+ return true;
+}
+let constructionBoardingPending=false;
+async function enterSelectedConstructionVehicle(id){
+ const lock=missionLock(id);if(lock){showToast(lock);return;}
+ if(constructionBoardingPending)return;
+ constructionBoardingPending=true;
+ try{
+  // The picker closes before the controller acquires input. Wait for a
+  // checkpoint already queued while it was open before checking ownership.
+  await worldSaveService.flush();
+  const controller=nativeDoorController(id);
+  if(!nativeDoorWalkAllowed()||!controller?.enterFromOverview){showToast('地面で作業を終えてから、車を選んでください。');return;}
+  nativeDoorNavigator?.cancel();
+  if(!await controller.enterFromOverview(id))showToast('この車に乗れません。車の周りと進行中の作業を確認してください。');
+ }catch(error){reportWorldSaveError(error);}
+ finally{constructionBoardingPending=false;}
+}
 function setupSharedParkingPlay(){
  const parent=document.querySelector('[data-player-fleet]');if(!parent)return;
  const button=document.createElement('button');button.type='button';button.dataset.playerParking='';button.textContent='みんなの駐車場をひらく';parent.before(button);
@@ -26557,8 +28301,8 @@ function coastGroundWalk(fromX,fromZ,toX,toZ){return state.map==='coast'&&coastT
 function nativeDoorGroundWalk(fromX,fromZ,toX,toZ){return state.map==='construction'&&!!nativeDoorMove&&!state.jumpY&&!state.jumpVelocity&&!!nativeDoorGroundProbe?.step({x:fromX,z:fromZ},{x:toX,z:toZ},{contact:false});}
 
 function setupNativeDoorWalk(){
- const notice=document.createElement('div');notice.className='native-door-walk';notice.hidden=true;notice.style.cssText='position:absolute;top:76px;left:50%;transform:translateX(-50%);z-index:25;background:#fff4ce;color:#22485b;border:2px solid #efc55a;border-radius:16px;padding:10px;max-width:calc(100% - 28px);box-shadow:0 3px 12px #24465a25;display:flex;gap:10px;align-items:center;font-weight:700';
- const label=document.createElement('span'),stop=document.createElement('button');label.setAttribute('role','status');stop.type='button';stop.textContent='止まる';stop.style.cssText='min-width:70px;min-height:44px;border-radius:12px;background:#fff;color:#24465a;border:2px solid #e9c055';notice.append(label,stop);els.canvas.parentElement.append(notice);
+ const notice=document.createElement('div');notice.className='native-door-walk';notice.hidden=true;
+ const label=document.createElement('span'),stop=document.createElement('button');label.setAttribute('role','status');stop.type='button';stop.textContent='止まる';notice.append(label,stop);rainStoryControls.append(notice);
  let nearby=()=>[],routeHeightAt=(x,z)=>groundHeightCandidates(x,z).length?getGroundHeight(x,z):null;
  prepareNativeDoorRoute=()=>{nearby=doorSpatialIndex(colliders);routeHeightAt=createDoorSurfaceReader({groundAt:(x,z)=>worldExcavationController?.groundHeightAt(x,z),surfaces:walkableSurfaces,containsPoint:surfaceContainsPoint,referenceHeight:()=>state.groundY,atRoot:(x,z)=>Math.hypot(x-state.position.x,z-state.position.z)<.01,rampAt:authoredUfoRampHeightAt});nativeDoorGroundProbe.reset();};
  nativeDoorGroundProbe=createDoorGroundProbe({
@@ -26568,29 +28312,53 @@ function setupNativeDoorWalk(){
  });
  const stand=p=>nativeDoorGroundProbe.stand(p),step=(a,b)=>nativeDoorGroundProbe.step(a,b);
  nativeDoorNavigator=createNativeDoorNavigator({position:()=>({x:state.position.x,y:state.groundY,z:state.position.z}),allowed:nativeDoorWalkAllowed,canStand:stand,canStep:step,
- onStatus:(text,moving)=>{label.textContent=nativeDoorNavigator?.destination?.id==='high'?text.replaceAll('車のドア','作業台').replaceAll('ドア','作業台'):text;notice.hidden=!text;stop.textContent=moving?'止まる':'とじる';},
- onArrive:target=>{nativeDoorMove=null;state.moving=state.fastWalking=false;const ctrl=nativeDoorController(target.id);Promise.resolve(ctrl?.enterAtDoor?.(target.id)).then(entered=>{if(entered)notice.hidden=true;else{label.textContent='ドアに着いたよ。入れないときは通り道や保存の状態をたしかめてね。';notice.hidden=false;}}).catch(error=>{label.textContent='作業をはじめられなかったよ。'+error.message;notice.hidden=false;});}});
+ onStatus:(text,moving)=>{label.textContent=nativeDoorNavigator?.destination?.id==='high'?text.replaceAll('車のドア','作業台').replaceAll('ドア','作業台'):text;notice.hidden=!text||!!(moving&&nativeDoorNavigator?.destination?.rainWorksBoard);stop.textContent=moving?'止まる':'とじる';},
+ onArrive:target=>{nativeDoorMove=null;state.moving=state.fastWalking=false;const ctrl=nativeDoorController(target.id);Promise.resolve(ctrl?.enterAtDoor?.(target.id,target.rainWorksBoard?{board:true,near:true}:undefined)).then(entered=>{if(entered)notice.hidden=true;else{label.textContent='ドアに着いたよ。入れないときは通り道や保存の状態をたしかめてね。';notice.hidden=false;}}).catch(error=>{label.textContent='作業をはじめられなかったよ。'+error.message;notice.hidden=false;});}});
  const stopWalk=()=>{if(nativeDoorNavigator.active){nativeDoorNavigator.cancel('移動を止めたよ。');nativeDoorMove=null;state.moving=false;state.fastWalking=false;}};
  stop.onclick=()=>{stopWalk();notice.hidden=true;};
  document.addEventListener('pointerdown',stopWalk,true);
- window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','KeyJ','KeyB','KeyK','Escape'].includes(e.code))stopWalk();},true);
+ window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','KeyJ','KeyB','KeyK','F8'].includes(e.code))stopWalk();},true);
  window.addEventListener('blur',stopWalk);document.addEventListener('visibilitychange',()=>{if(document.hidden)stopWalk();});
 }
 
 function wireUI() {
+  els.rainStoryEndingFilm.addEventListener("ended",saveRainStoryEnding);
+  els.rainStoryEndingFilm.addEventListener("error",()=>rainStoryFailure(rainStoryPlayback,false));
+  els.rainStoryEndingRetry.addEventListener("click",()=>{
+    const playback=rainStoryPlayback;
+    if (playback?.failure==="film") void loadRainStoryFilm(playback);
+    else if (playback?.failure==="save") void saveRainStoryEnding();
+  });
+  const enableRainStorySound=event=>{
+    if (!event.isTrusted || !rainStoryPlayback || els.rainStoryEndingSound.hidden) return;
+    els.rainStoryEndingSound.hidden=true;
+    els.rainStoryEndingFilm.muted=false;
+    void playRainStoryFilm(rainStoryPlayback);
+  };
+  els.rainStoryEnding.addEventListener("pointerdown",enableRainStorySound);
+  els.rainStoryEnding.addEventListener("keydown",enableRainStorySound);
+  els.rainStoryEnding.addEventListener("cancel",event=>event.preventDefault());
+  document.addEventListener("visibilitychange",()=>{
+    if (!rainStoryPlayback || els.rainStoryEndingFilm.ended) return;
+    if (document.hidden) els.rainStoryEndingFilm.pause();
+    else void playRainStoryFilm(rainStoryPlayback);
+  });
   globalThis.IMASORA_KEYS?.connect({
     enabled:()=>worldBooted,
+    camera:switchWorldCamera,
     context:()=>coastSnorkel?.active?'swim':coastPlay?.steering?'raft':state.ufoBoarded?'ufo':'walk',
     clearInput:clearMarsShopDialogInput,
     menu:()=>{
       if(worldPlayerUI?.open){worldPlayerUI.close();return;}
-      if(document.querySelector('dialog[open]')||worldMapMenu?.paused||worldSaveService?.blocked||worldSaveService?.crafting)return;
+      if(openWorldDialog()||worldMapMenu?.paused)return false;
+      if(worldSaveService?.blocked||worldSaveService?.crafting)return true;
+      if(worldExcavationController?.openKeyboardMenu?.())return true;
       if(!worldConcreteController?.openKeyboardMenu?.())worldPlayerUI?.show();
     }
   });
   globalThis.IMASORA_BUTTON_FEEDBACK?.setKeyboardScope?.(event=>{
-    if(state.map!=='construction')return document;
     if(!worldInputAvailable()||event.target?.closest?.('[role=dialog],[role=alertdialog],[data-color-hue],[data-color-tone]'))return null;
+    if(state.map!=='construction')return document;
     const workshopScope=worldConcreteController?.keyboardScope;
     if(workshopScope!==undefined)return workshopScope;
     if(worldReelController?.active)return document.querySelector('.reel-live');
@@ -26607,7 +28375,7 @@ function wireUI() {
     buttons:()=>[worldReelController?.doorButton],clearInput:clearMarsShopDialogInput
   });
   bindContextSpaceAction({
-    enabled:()=>worldBooted&&state.map==='coast'&&!state.ufoBoarded&&!state.jumpY&&!state.jumpVelocity&&!state.falling&&!document.hidden&&!mapResetPending&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldShopOverlay?.open&&!coastUI?.open&&!coastForageUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPebbles?.busy&&!coastFruits?.busy&&!document.querySelector('dialog[open]'),
+    enabled:()=>worldBooted&&state.map==='coast'&&!state.ufoBoarded&&!state.jumpY&&!state.jumpVelocity&&!state.falling&&!document.hidden&&!mapResetPending&&!worldSaveService?.blocked&&!worldSaveService?.crafting&&!worldPlayerUI?.open&&!worldMapMenu?.paused&&!worldShopOverlay?.open&&!coastUI?.open&&!coastForageUI?.open&&!coastRigUI?.open&&!coastPlay?.modalOpen&&!coastPebbles?.busy&&!coastFruits?.busy&&!openWorldDialog(),
     buttons:()=>[coastFruits?.button,coastPebbles?.button,document.querySelector('.coast-find-action'),document.querySelector('.coast-snorkel-start'),document.querySelector('.coast-rig-entry[data-mode="craft"]')],
     clearInput:clearMarsShopDialogInput
   });
@@ -26653,7 +28421,9 @@ function wireUI() {
   });
   window.addEventListener("keydown", event => {
     if(event.ctrlKey||event.metaKey||event.altKey||event.isComposing||event.target?.closest?.('input,textarea,select,[contenteditable=true],[role=textbox]'))return;
-    if(event.key===' '&&event.target?.closest?.('button,[role=button]')&&(document.querySelector('dialog[open]')||event.target.closest?.('[role=dialog]')))return;
+    if(amaneRepairActions?.open||rainDeliveryFarewell||amaneVisitActions?.leaving){if(['Space','KeyW','KeyA','KeyS','KeyD','KeyE','KeyJ','KeyK','F8'].includes(event.code)||event.code.startsWith('Arrow'))event.preventDefault();return;}
+    if (skyWindObservation?.open||coastObservation?.open||coastRumors?.open) return;
+    if(event.key===' '&&event.target?.closest?.('button,[role=button]')&&(openWorldDialog()||event.target.closest?.('[role=dialog]')))return;
     if(worldReelController?.active){worldReelController.handleKey(event);return;}
     if(worldConcreteController?.active){worldConcreteController.handleKey(event);return;}
     if(constructionDeliveryMenu?.open)return;
@@ -26675,6 +28445,10 @@ function wireUI() {
       if((key===' '||key==='enter')&&skyStationGuideDialogState.isTyping&&!event.target?.closest?.('button')){event.preventDefault();finishSkyStationGuideDialogPage();return;}
       const gameInput = ["w", "a", "s", "d", "x", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
       if (gameInput) event.preventDefault();
+      return;
+    }
+    if (event.code === 'KeyF' && state.map === 'sky' && !state.ufoBoarded && !event.repeat && state.skyStationActivities?.useKey()) {
+      event.preventDefault();
       return;
     }
     if (state.ufoEngineMode === "ready" && key === "f" && !event.repeat) {
@@ -26723,12 +28497,14 @@ function wireUI() {
       event.preventDefault();
       return;
     }
-    if (key === " " || key === "k") {
+    if (key === "k") {
       event.preventDefault();
       if(!event.repeat||keys.has(key))keys.add(key);
       return;
     }
-    if (event.code === 'KeyE' || event.code === 'KeyJ' || event.code === 'KeyB' || key === 'e' || key === 'j' || key === 'b') {
+    // J belongs to the left oar while the player is at the raft's helm.
+    if(event.code==='KeyJ'&&coastPlay?.steering)return;
+    if (event.code === 'Space' || key === ' ' || event.code === 'KeyE' || event.code === 'KeyJ' || event.code === 'KeyB' || key === 'e' || key === 'j' || key === 'b') {
       constructionJumpControl?.key(event);event.preventDefault();return;
     }
     const movementKey = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key);
@@ -26752,8 +28528,8 @@ function wireUI() {
     keys.add(key);
     if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault();
   });
-  window.addEventListener("keyup", event => {if((event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB')&&!(event.code==='KeyJ'&&state.map==='space'&&state.ufoEngineMode==='ready'))constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.code==='KeyJ'?'j':event.key.toLowerCase());});
-  document.querySelectorAll("[data-map]").forEach(button => button.addEventListener("click", () => setMap(button.dataset.map)));
+  window.addEventListener("keyup", event => {if((event.code==='Space'||event.code==='KeyE'||event.code==='KeyJ'||event.code==='KeyB')&&!(event.code==='KeyJ'&&state.map==='space'&&state.ufoEngineMode==='ready'))constructionJumpControl?.key(event);if(worldConcreteController?.active)worldConcreteController.handleKey(event);keys.delete(event.code==='KeyJ'?'j':event.key.toLowerCase());});
+  document.querySelectorAll("[data-map]").forEach(button => button.addEventListener("click", () => chooseWorldMap(button.dataset.map)));
   els.cameraModeButton.addEventListener("click", () => {
     if(isSkyStationGuideDialogOpen()||marsShopDialogState.open)return;
     state.cameraMode = state.cameraMode === "third" ? "first" : "third";
@@ -26771,7 +28547,7 @@ function wireUI() {
       return;
     }
     const talking=isSkyStationGuideDialogOpen()||marsShopDialogState.open;
-    const selection=talking?{mode:state.cameraMode,index:(state.cameraDistanceIndex+1)%THIRD_PERSON_DISTANCE_PRESETS.length}:nextCameraDistance(state.cameraMode,state.cameraDistanceIndex);
+    const selection=talking?{mode:state.cameraMode,index:(conversationCameraIndex(state.cameraDistanceIndex)+1)%CAMERA_DISTANCE_PRESETS.length}:nextCameraDistance(state.cameraMode,state.cameraDistanceIndex);
     state.cameraMode=selection.mode;state.cameraDistanceIndex=selection.index;
     lookControls?.cancel();
     const preset = THIRD_PERSON_DISTANCE_PRESETS[state.cameraDistanceIndex];
@@ -26863,25 +28639,98 @@ function wireUI() {
   els.cancelBuildButton.addEventListener("click", ()=>{cancelBuild();updateBuildPlacementControls();document.getElementById('buildMenuButton').focus({preventScroll:true});});
   els.ufoDoorButton.addEventListener("click", toggleUfoDoor);
   els.ufoBoardButton.addEventListener("click", toggleUfoBoarding);
+  els.ufoDepartureButton.addEventListener("click", openUfoDeparture);
+  els.ufoDepartureClose.addEventListener("click", () => els.ufoDepartureDialog.close());
+  els.ufoDeparturePilot.addEventListener("click", () => {
+    els.ufoDepartureDialog.close();
+    showToast("UFOに乗り込んで、操縦席から出発しよう。");
+  });
+  els.ufoDepartureSkip.addEventListener("click", travelWithoutUfoRewards);
+  els.ufoDepartureDialog.addEventListener("cancel", event => {
+    if (els.ufoDepartureSkip.disabled) event.preventDefault();
+  });
   setupTouchPad();
   setupLookControls();
+  const stationButton=document.getElementById('skyStationActivity');
+  state.skyStationActivities=createSkyStationActivities({
+    button:stationButton,label:stationButton.firstElementChild,guide:document.getElementById('skyStationLocalGuide'),
+    canvas:els.canvas,station:()=>skyStationBuilding,camera:()=>camera,character:()=>character,state,
+    allowed:()=>state.map==='sky'&&!state.ufoBoarded&&!state.selectedBuildId&&!state.falling&&
+      !state.jumpY&&!state.jumpVelocity&&worldInputAvailable(),
+    clearInput:clearMarsShopDialogInput,walk:updateCharacterWalkAnimation,notify:showToast,
+    ticketPreview:document.getElementById('skyStationTicket'),
+    trainAvailable:canBoardTownTrainFromSky,boardTrain:boardTownTrainFromSky,
+    isClear(target){
+      const steps=Math.max(1,Math.ceil(Math.hypot(target.x-state.position.x,target.z-state.position.z)/2));
+      for(let step=1;step<=steps;step++){
+        const x=lerp(state.position.x,target.x,step/steps),z=lerp(state.position.z,target.z,step/steps);
+        const supported=groundHeightCandidates(x,z).some(height=>Math.abs(height-target.y)<1);
+        if(!supported||groundCollisionPenetrationAt(x,z,target.y,0)>.18)return false;
+      }
+      return true;
+    },
+  });
+
+  const skyRaceAccept = document.getElementById("skyRaceAccept");
+  const skyRaceDecline = document.getElementById("skyRaceDecline");
+  skyRaceDecline.addEventListener("click", () => {
+    clearMarsShopDialogInput();
+    skyRaceInvitation.close();
+  });
+  skyRaceAccept.addEventListener("click", () => {
+    if (!skyRaceInvitation.open) return;
+    skyRaceInvitation.close();
+    void openMapRace({ fromSkyRaceInvitation: true });
+  });
+  skyRaceInvitation.addEventListener("cancel", event => event.preventDefault());
+  skyRaceInvitation.addEventListener("keydown", event => {
+    if (event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
+    const button = event.code === "KeyY" ? skyRaceAccept : event.code === "KeyN" ? skyRaceDecline : null;
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    button.click();
+  });
   setupUfoFlightControls();
   setupUfoFlightPad();
 }
 
 async function prepareSavedConstruction() {
   if(!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW&&(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_EXCAVATION_LIVE)){
-    transportPlaySession=await openSavedTransportWork({service:worldSaveService,snapshot:worldStateSnapshot,session:transportPlaySession});
+    transportPlaySession=await openSavedTransportWork({service:worldSaveService,snapshot:worldStateSnapshot,session:transportPlaySession,inlineValidation:chapter15Preview});
     if(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!transportPlaySession)throw Error('確認ページで専用データを用意してください。');
   }
   if(CONSTRUCTION_EXCAVATION_SAVED&&!transportPlaySession){excavationLedgerSession??=new ExcavationAuthoritySession({service:worldSaveService,origin:location.origin,snapshot:worldStateSnapshot});excavationLedgerSession.initialize();}
 }
 async function startSavedWorld() {
+  let archiveSeed=null;
+  if(archiveSceneId!==null){
+    const scenes={cave:'coastSkyDiagramRead',wind:'rainSkyV1',baltia:'skyMarsObservatoryClue',rescue:'rainStoryV1','amane-farewell':'rainDeliveryV1','amane-repair':'rainRepairV1'};
+    const flag=Object.hasOwn(scenes,archiveSceneId)?scenes[archiveSceneId]:null;
+    const {WORLD_LEDGER:L}=await import('./assets/imasora-world-live-ledger.js?v=121c8');
+    const packet=flag?await new WorldAuthorityStore('live').read():null;
+    archiveWorldRecord=packet?L.unpackWorldPurchaseLedger(packet.current).world:null;
+    const seen=archiveSceneId==='wind'?skyObservationProgress().observed:
+      archiveSceneId==='rescue'?archiveWorldRecord?.rainStoryV1?.includes('cloud-rescue-complete'):
+      archiveSceneId==='amane-farewell'?['water-delivered','source-matched','sky-returned'].includes(archiveWorldRecord?.rainDeliveryV1):
+      archiveSceneId==='amane-repair'?archiveWorldRecord?.rainRepairV1==='parcel-received':archiveWorldRecord?.[flag]===true;
+    if(!seen){
+      if(window.parent!==window)window.parent.postMessage({type:'imasora-archive-status',available:false},location.origin);
+      return;
+    }
+    const cave=archiveSceneId==='cave';
+    const atParents=['amane-repair','amane-farewell'].includes(archiveSceneId),door=AMANE_REPAIR_SITES.door;
+    const position=cave?tideCaveObservationPoint:atParents?{x:door.x,y:0,z:door.z}:{x:-74.5,y:0,z:-103};
+    archiveSeed={...worldStateSnapshot(),map:cave?'coast':atParents?'mars':'sky',position,builtByMap:{},
+      coastSkyDiagramRead:archiveSceneId==='baltia'||(archiveSceneId==='wind'&&skyObservationProgress().matched)};
+    document.body.classList.add('archive-world-viewing');
+  }
   // Preview modes keep their own storage boundary. Live excavation uses the
   // normal world authority only after native acquisition at the construction site.
-  const mode=CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?'live':CONSTRUCTION_CONCRETE_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
+  const mode=chapter15Preview||coastControlsPreview?'live':archiveSceneId!==null?'readonly':CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?'live':CONSTRUCTION_CONCRETE_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?'integration':CONSTRUCTION_EXCAVATION_PREVIEW?'readonly':worldSaveMode(location.search,location.hostname);
   worldSaveErrorUI=createWorldSaveErrorUI({retry:async()=>{
-    if(transportPlaySession?.intent)await transportPlaySession.retry();
+    if(worldExcavationController?.saveNeedsRetry)await worldExcavationController.retrySave();
+    else if(transportPlaySession?.intent)await transportPlaySession.retry();
     else if(CONSTRUCTION_EXCAVATION_SAVED&&excavationLedgerSession?.pending){if(!await excavationLedgerSession.retry())throw Error(excavationLedgerSession.message);}
     else await worldSaveService.retry();
     await worldHighController?.recoverSaved?.();
@@ -26893,14 +28742,18 @@ async function startSavedWorld() {
     if(!worldBooted)await activateSavedWorld(worldSaveService.readWorldScene());
     else{const scene=worldSaveService.readWorldScene();Object.assign(state.ufoEquipment,scene.ufoEquipment);Object.assign(state.ufoResources,scene.ufoResources);refreshUfoEquipmentVisuals();renderUfoEquipmentWorkshopMenu();}
   },pause:clearMarsShopDialogInput,reopen:()=>{clearMarsShopDialogInput();worldSaveReloadRequested=true;location.reload();},developer:new URLSearchParams(location.search).get('developer')==='1',exportRecord:()=>worldSaveService.exportRecovery()});
+  const previewStore=chapter15Preview?await prepareRainWorksPreview():coastControlsPreview?await prepareCoastControlsPreview(coastControlsPreview):null;
   worldSaveService=new WorldSaveService({mode,guardedDrafts:true,
     ...(CONSTRUCTION_TRANSPORT_PLAY_PREVIEW?{store:new WorldAuthorityStore('live'),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{store:createTransportSceneReadStore(new WorldAuthorityStore('live')),excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:CONSTRUCTION_CONCRETE_PREVIEW?{store:new ConstructionProfileProjectPreviewStore(),constructionProjectPreview:true}:CONSTRUCTION_EXCAVATION_AUTHORITY_PREVIEW?{store:new ExcavationAuthorityStore(),excavationPreview:true,excavationOrigin:location.origin}:CONSTRUCTION_EXCAVATION_LIVE?{excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:{}),readLegacy:()=>CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK?null:localStorage.getItem(SAVE_KEY),
-    materialsIO:mode==='live'&&!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
-    onError:error=>{if(!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!transportMigrationUI?.open)worldSaveErrorUI.show(error);},
-    onChange:s=>{state.saved=!s.busy&&!s.blocked;els.saveState.textContent=s.blocked?'保存の確認が必要':s.busy?'保存中…':mode==='integration'?'保存済み（接続確認専用）':'保存済み';constructionDeliveryMenu?.refresh();},
+    ...(archiveSeed?{readLegacy:()=>null}:{}),
+    ...(previewStore?{store:previewStore,workshopLock:task=>task(),readLegacy:()=>null}:{}),
+    ...(chapter15Preview?{excavationLive:true,excavationOrigin:location.origin,transportAuthority:true,transportWork:true}:{}),
+    materialsIO:mode==='live'&&!previewStore&&!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!CONSTRUCTION_TRANSPORT_SCENE_PREVIEW?{read:()=>localStorage.getItem(WORKSHOP_MATERIAL_KEY),write:raw=>localStorage.setItem(WORKSHOP_MATERIAL_KEY,raw)}:null,
+    onError:error=>{if(!CONSTRUCTION_TRANSPORT_PLAY_PREVIEW&&!transportMigrationUI?.open&&!(worldExcavationController?.active&&transportPlaySession?.intent))worldSaveErrorUI.show(error);},
+    onChange:s=>{state.saved=!s.busy&&!s.blocked;const quiet=state.map==='construction'&&(quietConstructionSave||[worldExcavationController,worldWaterController,worldSoilController,worldTimberController,worldConcreteController].some(c=>c?.autosaving));if(!quiet||s.blocked)els.saveState.textContent=s.blocked?'保存の確認が必要':s.busy?'保存中…':mode==='integration'?'保存済み（接続確認専用）':'保存済み';constructionDeliveryMenu?.refresh();},
   });
   if(CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_CONCRETE_PROFILE_CHECK){state.map='construction';state.position.set(632,0,1570);}
-  const saved=await worldSaveService.initialize(worldStateSnapshot(),{sceneOnly:true});
+  const saved=await worldSaveService.initialize(archiveSeed??worldStateSnapshot(),{sceneOnly:true});
   // The dedicated scene bridge reads and validates the normal-format packet,
   // then uses existing readonly UI guards. Its store also rejects every commit.
   if(CONSTRUCTION_TRANSPORT_SCENE_PREVIEW)worldSaveService.mode='readonly';
@@ -26915,18 +28768,53 @@ async function startSavedWorld() {
   if(CONSTRUCTION_EXCAVATION_LEDGER_PREVIEW){excavationLedgerSession=new ExcavationLedgerSession();await excavationLedgerSession.initialize(saved);}
   await activateSavedWorld(saved);
 }
+function canReachSkyFromTown(){
+  if(!hasTownStationStoryAccess(worldSaveService?.ledger?.world,readWorldRainArcade()))return false;
+  try{
+    const town=JSON.parse(localStorage.getItem('lifeQuestWalkV1')||'null');
+    return Array.isArray(town?.townBuildings)&&town.townBuildings.includes('station');
+  }catch{return false;}
+}
+
 function applyTownConstructionArrival() {
-  if(new URLSearchParams(location.search).get('arrival')==='town-bridge2'){
+  const arrival=new URLSearchParams(location.search).get('arrival');
+  if(arrival==='town-station'){
+    if(!canReachSkyFromTown()){
+      showToast('海岸で空の図を見つけ、街の駅から空駅へ向かおう。');
+      return false;
+    }
+    if(state.map!=='sky')setMap('sky');
+    return state.map==='sky';
+  }
+  if(arrival==='town-bridge2'){
     if(!worldBooted||worldSaveService.mode!=='live'||worldSaveService.blocked||worldSaveService.busy)return false;
     if(state.map!=='coast')setMap('coast');
     return state.map==='coast';
   }
   // Use the same guarded map transition as the menu after the saved world is ready.
   // Keep the existing safe-entry restart policy. An already active construction map is unchanged.
-  if(new URLSearchParams(location.search).get('arrival')!=='town-bridge1')return false;
+  if(arrival!=='town-bridge1')return false;
   if(!worldBooted||worldSaveService.mode!=='live'||worldSaveService.blocked||worldSaveService.busy)return false;
   setMap('construction');
   return state.map==='construction';
+}
+
+function transportSeatAtStartup(saved,arrival){
+  const work=transportPlaySession?.state;
+  if(worldSaveService.mode!=='live'||saved.map!=='construction'||
+    (arrival&&arrival!=='town-bridge1')||!work||work.mode==='foot')return null;
+  const point=saved.constructionResume;
+  if(point?.kind==='transport'&&point.revision===work.revision)return point;
+
+  // Older builds repaired the seated position as if it were a walker.
+  // Recover only the nearby dump seat left by that save after unloading.
+  const mission=constructionMission(worldSaveService.ledger.world);
+  const position=saved.position,{player,soil}=work.frame,origin=soil.field?.origin;
+  if(point||arrival||work.mode!=='driving'||!['board-soil','foundation-load'].includes(mission?.id)||
+    !origin||!position||work.frame.soil.containers.dump.amount||
+    !(Math.hypot(position.x-origin[0]-player.x,position.z-origin[1]-player.z)<=40)||
+    !(Math.abs(position.y-player.y)<=.1))return null;
+  return {kind:'transport',revision:work.revision,view:0};
 }
 
 async function activateSavedWorld(saved) {
@@ -26941,7 +28829,7 @@ async function activateSavedWorld(saved) {
     move:(context,targetId,position)=>commitMapResetOperation('move',context,targetId,position),canMove:worldMapBuildingMoveCheck,onMovePreview:updateWorldMapBuildingMovePreview,undo:context=>commitMapResetOperation('undo',context),
     onPause:clearMarsShopDialogInput,onResume:clearMarsShopDialogInput,onChange:syncWorldMapMenuPause});
   setupNativeDoorWalk();setupParkingMigrationCheck();
-  worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput,getMap:()=>state.map,onReturnTown:returnToTownFromConstruction,onRace:openMapRace,canWalkVehicle:nativeDoorWalkReason,onWalkVehicle:id=>{const ctrl=nativeDoorController(id);prepareNativeDoorRoute();const goal=ctrl?.doorTarget?.(id);if(goal&&['truck','pump'].includes(id))goal.approach={x:goal.x-Math.sin(goal.heading)*60,z:goal.z-Math.cos(goal.heading)*60,heading:goal.heading};void nativeDoorNavigator.start(id,goal);}});
+  worldPlayerUI=createWorldPlayerUI({clearInput:clearMarsShopDialogInput,getMap:()=>state.map,onReturnTown:returnToTownFromConstruction,onRace:openMapRace,canWalkVehicle:nativeDoorWalkReason,onWalkVehicle:enterSelectedConstructionVehicle,onEarthBuild:enterConstructionEarthBuild});
   constructionBridgeUI=createConstructionBridgeUI({host:els.canvas.parentElement,clearInput:clearMarsShopDialogInput,returnTown:returnToTownFromConstruction,
     context:()=>({map:state.map,x:state.position.x,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.groundY>6,
       blocked:!worldBooted||worldSaveService.busy||worldSaveService.blocked||worldSaveService.crafting||state.ufoBoarded||[worldReelController,worldHighController,worldConcreteController,worldExcavationController,worldWaterController,worldSoilController,worldTimberController].some(c=>c?.active||c?.busy),
@@ -26973,7 +28861,7 @@ async function activateSavedWorld(saved) {
   swimClear.cameraFloor=coastWalkingHeight;
   coastSnorkel=createSnorkelController({host:els.canvas.parentElement,state,saved:saved.coastSnorkel,getScene:()=>scene,getCharacter:()=>character,clearInput:clearMarsShopDialogInput,persist:persistWorldSnapshot,clear:swimClear,
     animateWalk:(dt,moving,scale)=>updateCharacterWalkAnimation(dt,moving,scale),
-    input:()=>{const v=readMoveVector();return{x:v.x,z:v.z,fast:isFastWalking()};},
+    input:()=>{const v=readMoveVector();return{x:v.x,z:v.z,fast:state.fastWalking};},
     context:()=>({ready:worldBooted,map:state.map,waveTime:coastPlay?.waveTime??0,grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking||coastPlay?.hauling,
       blocked:!worldBooted||coastPebbles?.busy||coastFruits?.busy||coastForageUI?.open||worldSaveService?.blocked||worldSaveService?.crafting||worldPlayerUI?.open||worldMapMenu?.paused||worldShopOverlay?.open||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||mapResetPending})});
   coastRewardsUI=createCoastRewardsUI({host:els.canvas.parentElement,service:worldSaveService,navigation:()=>coastPlay?.navigation,snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),
@@ -26985,14 +28873,74 @@ async function activateSavedWorld(saved) {
     groundContact:()=>coastTerrainBodyContact(state.position.x,state.position.z,character.rotation.y,character.userData.terrainBody),
     snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),
     context:()=>({map:state.map,position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z},grounded:!state.jumpY&&!state.jumpVelocity&&!state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,
-    paused:!worldBooted||worldSaveService.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||worldShopOverlay?.open||mapResetPending})});
+    paused:state.map!=='coast'||!worldBooted||worldSaveService.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||coastRigUI?.open||worldShopOverlay?.open||mapResetPending})});
   coastRigUI=createCoastRigUI({host:els.canvas.parentElement,service:worldSaveService,clearInput:clearMarsShopDialogInput,attach:b=>coastUI.addAction(b),snapshot:()=>worldSaveService.deriveDraft(worldStateSnapshot(),{position:{x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z}}),context:()=>({map:state.map,x:state.position.x,y:state.groundY+state.jumpY,z:state.position.z,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.falling,riding:coastPlay?.riding||coastPlay?.seated||coastPlay?.crewWalking,blocked:!worldBooted||coastPebbles?.busy||coastFruits?.busy||coastSnorkel?.active||coastPlay?.rescuing,overlay:worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||worldShopOverlay?.open||mapResetPending})});
-  coastWhaleScene=createCoastWhaleScene({view:()=>coastWorld?.wildlife,clearInput:clearMarsShopDialogInput,context:()=>({map:state.map,interrupted:coastPlay?.rescuing||mapResetPending||worldSaveService?.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||!!document.querySelector('dialog[open]')})});
-  const refreshKeyboardHints=()=>{const keyboard=globalThis.IMASORA_KEYS;for(const button of[coastFruits?.button,coastPebbles?.button,document.querySelector('.coast-find-action'),document.querySelector('.coast-snorkel-start'),document.querySelector('.coast-rig-entry')])if(button){button.setAttribute('aria-keyshortcuts',keyboard?keyboard.bindings.confirm.filter(Boolean).map(keyboard.label).join(' '):'Space');button.title=(keyboard?.describe('confirm')??'Space')+'でも操作できます';}if(els.dashButton)els.dashButton.title=(keyboard?.describe('dash')??'Space ／ K')+'を押しながら移動でダッシュ';};
+  coastWhaleScene=createCoastWhaleScene({view:()=>coastWorld?.wildlife,clearInput:clearMarsShopDialogInput,context:()=>({map:state.map,interrupted:coastPlay?.rescuing||mapResetPending||worldSaveService?.blocked||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastRigUI?.open||!!openWorldDialog()})});
+  const refreshKeyboardHints=()=>{const keyboard=globalThis.IMASORA_KEYS;for(const button of[coastFruits?.button,coastPebbles?.button,document.querySelector('.coast-find-action'),document.querySelector('.coast-snorkel-start'),document.querySelector('.coast-rig-entry')])if(button){button.setAttribute('aria-keyshortcuts',keyboard?keyboard.bindings.confirm.filter(Boolean).map(keyboard.label).join(' '):'Space');button.title=(keyboard?.describe('confirm')??'Space')+'でも操作できます';}updateWorldDashHint();};
   globalThis.IMASORA_KEYS?.onChange(refreshKeyboardHints);refreshKeyboardHints();
   coastLandmarks=createCoastLandmarkControls({interactive:false,host:els.canvas.parentElement,service:worldSaveService,saved:saved.coastToys,view:()=>coastWorld?.toys,persist:persistWorldSnapshot,clearInput:clearMarsShopDialogInput,toast:showToast,
     context:()=>({map:state.map,x:state.position.x,z:state.position.z,workshop:coastForageUI?.nearWorkshop,airborne:state.jumpY>.001||state.jumpVelocity!==0,camera,canvas:els.canvas,overlay:!worldBooted||worldPlayerUI?.open||worldMapMenu?.paused||coastUI?.open||coastPlay?.modalOpen||worldShopOverlay?.open||mapResetPending}),
     look:id=>{coastLandmarks?.focus();state.cameraMode='third';state.viewHeading=id==='rocks'?0:Math.PI;state.viewPitch=0;}});
+  const coastStoryContext = () => ({
+      map: state.map, x: state.position.x, z: state.position.z, y: state.groundY, camera,
+      airborne: state.jumpY > .001 || state.jumpVelocity !== 0 || state.falling,
+      blocked: !worldBooted || worldSaveService?.blocked || mapResetPending || worldPlayerUI?.open ||
+        worldMapMenu?.paused || coastUI?.open || worldShopOverlay?.open || coastRigUI?.open ||
+        coastPlay?.modalOpen || coastPlay?.riding || coastPlay?.crewWalking || coastPlay?.hauling ||
+        coastPlay?.rescuing || coastPlay?.watchingWhale || coastSnorkel?.active || coastPebbles?.busy ||
+        coastFruits?.busy || coastForageUI?.open
+  });
+  coastRumors = createCoastRumorScene({
+    host: els.canvas.parentElement, canvas: els.canvas, clearInput: clearMarsShopDialogInput,
+    context: () => ({...coastStoryContext(),residents:coastWorld?.residents??[]})
+  });
+  coastSkyDiagramRead=saved.coastSkyDiagramRead===true;
+  skyMarsObservatoryClue=saved.skyMarsObservatoryClue===true;
+  coastObservation=createTideCaveObservation({
+    host:els.canvas.parentElement,view:()=>coastWorld?.cave?.skyDiagram,
+    context:coastStoryContext,clearInput:clearMarsShopDialogInput,
+    known:knowsCaveDiagram,nextHint:coastCaveNextHint,
+    onRead:()=>{coastSkyDiagramRead=true;void persistWorldSnapshot();}
+  });
+  skyWindObservation=createSkyWindObservation({
+    host:els.canvas.parentElement,view:()=>skyAtmosphere?.lookout,actor:()=>character,
+    context:()=>({map:state.map,airborne:state.jumpY>.001||state.jumpVelocity!==0||state.falling,
+      blocked:state.ufoBoarded||ufoSkyReturnLandingPending||!!state.skyStationActivities?.reading||worldSaveService?.mode!=='live'||!worldInputAvailable()}),
+    clearInput:clearMarsShopDialogInput,knowsDiagram:knowsCaveDiagram,
+    progress:skyObservationProgress,
+    record:stage=>worldSaveService.recordRainSkyStage(stage,worldStateSnapshot()),onError:reportWorldSaveError
+  });
+  amaneVisitActions=createAmaneVisitActions({
+    host:els.canvas.parentElement,
+    farewell:playAmaneDeliveryFarewell,
+    clearInput:clearMarsShopDialogInput,
+    context:()=>{
+      const world=worldSaveService.ledger?.world;
+      const delivery=world?.rainDeliveryV1;
+      const carrying=!!delivery&&delivery!=='water-loaded'&&delivery!=='sky-returned';
+      return {
+        active:state.map==='mars'&&!world?.rainRepairV1&&(carrying||(world?.rainSkyV1==='amane-visited'&&(world.rainStoryV1?.length??0)<2)),
+        x:state.position.x,z:state.position.z,stage:carrying?delivery:world?.rainAmaneV1,
+        blocked:state.ufoBoarded||state.ufoMarsArrivalExitPending||!worldInputAvailable(),
+        airborne:!!state.jumpY||!!state.jumpVelocity||state.falling,
+      };
+    },
+    record:stage=>{
+      const progressingDelivery=!!worldSaveService.ledger?.world.rainDeliveryV1;
+      return progressingDelivery
+        ?worldSaveService.recordRainDeliveryStage(stage,worldStateSnapshot())
+        :worldSaveService.recordRainAmaneStage(stage,worldStateSnapshot());
+    },
+  });
+  amaneRepairActions=createAmaneRepairActions({host:els.viewport,clearInput:clearMarsShopDialogInput,
+    context:()=>{
+      const stage=worldSaveService.ledger?.world.rainRepairV1;
+      return {stage,age:amaneRepairAge,x:state.position.x,z:state.position.z,
+        active:state.map==='mars'&&worldSaveService.mode==='live'&&!!stage&&['cloud-rescue-complete','amane-water-restored'].includes(worldSaveService.rainStoryStep),
+        blocked:!worldInputAvailable()||state.ufoBoarded||state.ufoMarsArrivalExitPending,
+        airborne:!!state.jumpY||!!state.jumpVelocity||state.falling};
+    },record:stage=>worldSaveService.recordRainRepairStage(stage,worldStateSnapshot()),
+  });
   setupSharedParkingPlay();
   if(CONSTRUCTION_EXCAVATION_LIVE&&saved.constructionExcavation&&worldSaveService.constructionTransportVersion===null){
     transportMigrationUI=createTransportMigrationView({service:worldSaveService,clearInput:clearMarsShopDialogInput,beforeCompare:async()=>{
@@ -27005,24 +28953,162 @@ async function activateSavedWorld(saved) {
   const root=els.canvas.closest('main'),wasInert=root?.inert,wasBusy=root?.getAttribute('aria-busy');
   if(root){root.inert=true;root.setAttribute('aria-busy','true');}
   try{
-    await setupScene();renderer.compile(scene,camera);renderWorldFrame();await worldSaveService.flush();worldBooted=true;const raceReturn=new URLSearchParams(location.search).get('race-return');if(['sky','mars'].includes(raceReturn)&&state.map!==raceReturn)setMap(raceReturn);
-    const resume=soilStartupResume(saved,{mode,arrival:new URLSearchParams(location.search).get('arrival'),preview:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW});
+    const arrival=new URLSearchParams(location.search).get('arrival');
+    const transportSeat=transportSeatAtStartup(saved,arrival);
+    const soilResume=soilStartupResume(saved,{mode,arrival,preview:CONSTRUCTION_TRANSPORT_PLAY_PREVIEW||CONSTRUCTION_TRANSPORT_SCENE_PREVIEW||CONSTRUCTION_CONCRETE_PREVIEW||CONSTRUCTION_SOIL_PREVIEW||CONSTRUCTION_WATER_PREVIEW||CONSTRUCTION_TIMBER_PREVIEW});
+    const soilSeat=saved.constructionSoil?.work?.loader?.mode==='driving'&&soilResume;
+    // The vehicle controller owns the seated character before the first frame.
+    await setupScene({restoreVehicleSeat:!!(transportSeat||soilSeat)});
+    const seated=transportSeat
+      ?worldExcavationController?.resumeSaved?.(transportSeat)
+      :soilSeat&&worldSoilController?.resumeSaved?.(soilSeat);
+    renderer.compile(scene,camera);
+    if(state.map==='construction'){
+      // Three links programs during compile, then looks up their uniforms
+      // on first draw. Finish reflection before the first uphill camera turn.
+      for(const program of renderer.info.programs??[])
+        if(program.type==='MeshStandardMaterial')program.getUniforms?.();
+    }
+    renderWorldFrame();await worldSaveService.flush();worldBooted=true;const raceReturn=new URLSearchParams(location.search).get('race-return');if(['sky','mars'].includes(raceReturn)&&state.map!==raceReturn)setMap(raceReturn);
+    const resume=!seated&&soilResume;
     if(resume){if(state.map!=='construction')setMap('construction');worldSoilController.resumeSaved(resume);}
     else{
-      const point=saved.constructionResume,arrival=new URLSearchParams(location.search).get('arrival'),ctrl={high:worldHighController,water:worldWaterController,timber:worldTimberController,transport:worldExcavationController,concrete:worldConcreteController}[point?.kind];
-      const auto=mode==='live'&&saved.map==='construction'&&(!arrival||arrival==='town-bridge1')&&ctrl?.resumeSaved?.(point);
-      if(shouldApplyTownArrival(saved,{arrival,auto}))applyTownConstructionArrival();
+      const point=saved.constructionResume,ctrl={high:worldHighController,water:worldWaterController,timber:worldTimberController,transport:worldExcavationController,concrete:worldConcreteController}[point?.kind];
+      const auto=seated||mode==='live'&&saved.map==='construction'&&(!arrival||arrival==='town-bridge1')&&ctrl?.resumeSaved?.(point);
+      if(!chapter15Preview&&!coastControlsPreview&&shouldApplyTownArrival(saved,{arrival,auto}))applyTownConstructionArrival();
     }
     // Consume the completed trip. Later in-game map changes must survive reload.
     const arrived=mode==='live'&&completedTownArrivalUrl(location.href,state.map);
     if(arrived)history.replaceState(history.state,'',arrived);
+    if(mode==='live'&&!arrival&&!raceReturn)resumeSavedSkyUfoSeat(saved);
     setupWorldAutoSave();
     updateMapReadout();
   }finally{if(root){root.inert=wasInert;if(wasBusy===null)root.removeAttribute('aria-busy');else root.setAttribute('aria-busy',wasBusy);}}
+  if(archiveSceneId!==null){
+    let playing=false;
+    if(archiveSceneId==='cave'){
+      const {x,y,z}=tideCaveObservationPoint;
+      state.position.set(x,0,z);state.groundY=y;
+      updateCoastCaveSupport();
+      playing=coastObservation.showReplay();
+    }
+    if(archiveSceneId==='rescue')playing=await startRainRescue(true);
+    if(archiveSceneId==='baltia'){
+      openSkyStationGuideDialog();selectSkyStationGuideDialogTopic('cave-diagram');
+      playing=isSkyStationGuideDialogOpen();
+    }
+    const close=()=>{if(window.parent!==window)window.parent.postMessage({type:'imasora-archive-close'},location.origin);};
+    if(archiveSceneId==='wind')playing=skyWindObservation.showReplay(close);
+    if(archiveSceneId==='amane-repair')playing=amaneRepairActions.replay(close);
+    if(archiveSceneId==='amane-farewell'){
+      playing=true;
+      void Promise.resolve().then(playAmaneDeliveryFarewell).then(close,()=>{
+        if(window.parent!==window)window.parent.postMessage({type:'imasora-archive-status',available:false},location.origin);
+      });
+    }
+    if(archiveSceneId==='baltia')els.skyStationGuideDialog?.addEventListener('click',()=>{if(!isSkyStationGuideDialogOpen())close();});
+    else if(archiveSceneId==='cave'){
+      const dialog=document.querySelector('.coast-observation-dialog');
+      setWorldText(dialog?.querySelector('[data-observation-close]'),'シアターへ戻る');
+      dialog?.addEventListener('close',close);
+    }
+    if(window.parent!==window)window.parent.postMessage({type:'imasora-archive-status',available:playing},location.origin);
+  }
   if(mode==='live'){
     const notice=document.createElement('p');notice.id='world-save-version-notice';notice.textContent='保存形式を更新しました。以前から開いている画面は、開き直してから遊んでください。これまでの記録は残しています。';notice.style.cssText='padding:8px;color:#ead79f;font-size:12px';document.querySelector('.control-card').prepend(notice);
     window.addEventListener('storage',event=>{if(event.key===SAVE_KEY)notice.textContent='古い画面が旧保存を更新しました。現在の金貨・建築は上書きされません。古い画面を再読み込みしてください。';});
   }
   window.addEventListener('beforeunload',event=>{if(worldSaveReloadRequested)return;if(mapResetPending||worldSaveService.blocked||worldAutoSave?.error){event.preventDefault();event.returnValue='';}});
 }
-startSavedWorld().catch(error=>{els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);});
+async function prepareCoastControlsPreview(activity){
+  const {WORLD_LEDGER:L}=await import('./assets/imasora-world-live-ledger.js?v=121c8');
+  const world={...worldStateSnapshot(),map:'coast',builtByMap:{}};
+  let heading=0;
+  if(activity==='raft'){
+    // Start on the pier so boarding and launch use the regular game controls.
+    world.position={x:340,y:0,z:570};
+  }else{
+    const {emptySnorkel,SNORKEL}=await import('./assets/imasora-coast-snorkeling.mjs');
+    world.position={x:SNORKEL.x+100,y:-150,z:SNORKEL.z};
+    world.coastSnorkel={...emptySnorkel(),active:true,diving:true,position:world.position};
+    heading=-.92;
+  }
+  world.heading=heading;
+  world.playCamera={mode:'third',heading,pitch:activity==='snorkel'?.18:0};
+  return rainWorksMemoryStore(L.packWorldPurchaseLedger(L.createWorldPurchaseLedger(JSON.stringify(world),'new-world')));
+}
+
+async function prepareRainWorksPreview(){
+  // The checked starter packet already includes the mountain and storage bay.
+  // Each opening still starts a fresh, private in-memory save.
+  const prepared=await window.rainWorksStarterPacket;
+  if(prepared){
+    const site=new URLSearchParams(location.search).get('site');
+    if(site==='summit'||site==='summit-load'){
+      const {WORLD_LEDGER:L}=await import('./assets/imasora-world-live-ledger.js?v=121c8');
+      const seed=L.unpackWorldPurchaseLedger(prepared),world=seed.world;
+      const index=site==='summit-load'?CONSTRUCTION_MISSIONS.findIndex(mission=>mission.id==='summit-load'):CONSTRUCTION_MISSIONS.length;
+      world.constructionCourseV1={index,started:false};
+      if(site==='summit-load'){
+        const {nativeDumpSupport}=await import('./assets/imasora-construction-native-dump-support.mjs?v=120pv');
+        const work=world.constructionTransport.work,bay=rainDumpArrivalRoute(work).bay;
+        const [ox,oz]=work.frame.soil.field.origin;
+        work.frame.dump={...work.frame.dump,x:bay.x-ox,z:bay.z-oz,heading:bay.heading,groundY:bay.height};
+        work.frame.dump.groundY=nativeDumpSupport(work.frame).y;
+        world.rainWorksV1={step:0,dumpArrival:true,quarryArrival:true};
+      }
+      return rainWorksMemoryStore(L.packWorldPurchaseLedger(seed));
+    }
+    return rainWorksMemoryStore(prepared);
+  }
+  const [{WORLD_LEDGER:ledger},{transportSiteOrigin},{transportDoorApproach}]=await Promise.all([
+    import('./assets/imasora-world-live-ledger.js?v=121c8'),
+    import('./assets/imasora-construction-transport-site.mjs?v=120pv'),
+    import('./assets/imasora-construction-transport-door.mjs?v=120pv'),
+  ]);
+  const world={...worldStateSnapshot(),map:'construction',builtByMap:{},
+    rainStoryV1:['first-visit-return','water-delivery-return','cloud-rescue-complete'],rainWorksV1:{step:0}};
+  const empty=ledger.createWorldPurchaseLedger(JSON.stringify(world),'new-world');
+  const shared=ledger.prepareSharedConstruction(empty,{corner:'north-west',
+    sites:{water:0,soil:0,crane:0},earthSite:0,origin:location.origin,freeLocation:{x:600,z:1090}},
+    world,empty.revision);
+  const transport=shared.world.constructionTransport;
+  const origin=transportSiteOrigin(transport),door=transportDoorApproach(transport.work,'dump');
+  const heading=door.heading;
+  const x=origin[0]+door.x;
+  const z=origin[2]+door.z;
+  const start=ledger.saveLinkedWorldDraft(shared,{...shared.world,
+    position:{x,y:door.y,z},heading,playCamera:{mode:'third',heading,pitch:0}});
+  return rainWorksMemoryStore(ledger.packWorldPurchaseLedger(start));
+}
+function rainWorksMemoryStore(packet){
+  let record={generation:1,current:packet,backups:[]};
+  return {
+    name:new WorldAuthorityStore('live').name,
+    async read(){return structuredClone(record);},
+    async commit(expected,current){
+      if(expected!==record.generation)throw Error('作業の保存が変わりました。');
+      record={generation:expected+1,current,backups:[record.current,...record.backups].slice(0,5)};
+      return structuredClone(record);
+    },
+  };
+}
+startSavedWorld().catch(error=>{
+  if(chapter15Preview){
+    delete window.rainWorksOpeningPending;
+    document.getElementById('rainWorksOpening')?.remove();
+    console.error('第15章の確認画面を開けませんでした。',error);
+  }
+  if(archiveSceneId!==null&&window.parent!==window){
+    console.warn('思い出の場面を準備できませんでした。',error);
+    window.parent.postMessage({type:'imasora-archive-status',available:false},location.origin);
+  }
+  else if(/WebGL context|WebGLRenderer/i.test(error?.message||'')){
+    els.saveState.textContent='3D画面を表示できません';
+    const notice=document.createElement('aside');notice.className='rain-story-hint';notice.setAttribute('role','alert');
+    notice.textContent='このブラウザでは冒険マップの3Dを表示できません。セーブの異常ではありません。';
+    const link=document.createElement('a');link.href='?check=rain-works-121c7';link.textContent='第15章の工事を試す';
+    if(['127.0.0.1','localhost'].includes(location.hostname))notice.append(' ',link);
+    els.canvas.after(notice);
+  }else {els.saveState.textContent='保存の確認が必要';worldSaveErrorUI?.show(error);}
+});

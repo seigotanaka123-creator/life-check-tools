@@ -1,7 +1,7 @@
 import {groundTile,groundHeight,frameLength,frameFastener} from './ground-grid.mjs?v=120hb';
 import {createThreeJump} from '../imasora-construction-locomotion.mjs?v=120od';
 import {walkingObjectsBlocked} from './free-contact.mjs?v=120pv';
-import {concreteWorldDoor,concreteDoorArrival} from './native-door.mjs?v=120pv';
+import {concreteWorldDoor,concreteDoorArrival} from './native-door.mjs?v=121d1';
 import {planConcreteDoorRoute} from './free-door-route.mjs?v=120pv';
 import {FIELD_RUN_SPEED} from '../imasora-construction-shared-field.mjs?v=120ey';
 import {rebaseFieldPose,retainsFieldPositions} from './free-shared-origin.mjs?v=120eh';
@@ -25,16 +25,16 @@ import {freeCell,freeFramePanels} from './free-build-state.mjs?v=120pv';
 import {FLOOR_COLORS} from './floor-parts.mjs?v=120hb';
 import {createConcreteVehicle} from './vehicle-models.mjs?v=120pv';
 import {FREE_CONTACT_ACTIONS,walkingBlocked,walkingSurface} from './free-contact.mjs?v=120pv';
-import {concreteDoor,freeBoardProblem,freeBoardStatus,freeEntryPose,freeLeaveProblem} from './free-boarding.mjs?v=120pv';
+import {concreteDoor,freeBoardProblem,freeBoardStatus,freeEntryPose,freeLeaveProblem} from './free-boarding.mjs?v=121d1';
 import {walkingGroundAt,walkingGroundSegment,walkingGroundRotation,WALK_GROUND_MESSAGE} from './free-walking-ground.mjs?v=120pv';
-import {createFreeContactMotion} from './free-contact-motion.mjs?v=120pv';
+import {createFreeContactMotion} from './free-contact-motion.mjs?v=121d1';
 import {FREE_CAST_ACTIONS,CAST_PORTS,castPoint} from './free-casting.mjs?v=120pv';
 import {createFreeCastingMotion} from './free-casting-motion.mjs?v=120pv';
 import {FREE_FRAME_ACTIONS,FRAME_RACK} from './free-frames.mjs?v=120pv';
 import {createFreeFrameMotion,frameRackPose} from './free-frame-motion.mjs?v=120pv';
-import {FREE_VEHICLE_ACTIONS,vehicleActionProblem,vehiclePoseProblem} from './free-vehicle-contact.mjs?v=120pv';
-import {createFreeVehicleMotion} from './free-vehicle-motion.mjs?v=120pv';
-import {measuredVehicleMove,vehicleGroundPose,applyVehicleGround,placeVehicleDriver} from './free-vehicle-ground.mjs?v=120ov';
+import {FREE_VEHICLE_ACTIONS,vehicleActionProblem,vehiclePoseProblem} from './free-vehicle-contact.mjs?v=121e6';
+import {createFreeVehicleMotion} from './free-vehicle-motion.mjs?v=121gf';
+import {measuredVehicleMove,vehicleGroundPose,createVehicleGroundReader,applyVehicleGround,placeVehicleDriver} from './free-vehicle-ground.mjs?v=121e6';
 import {PIPE_ACTIONS,pipeRoute,pipeProblem,pipeContactPath,pipeWalkingBlocked,retainInstalledPipe,supplyHoseMotion,advanceSupplyHose} from './free-boom-contact.mjs?v=120pv';
 import {hoseBlocks} from './free-hose-shape.mjs';
 import {FOUNDATION_ACTIONS,foundationParts} from './free-foundation-state.mjs?v=120pv';
@@ -46,6 +46,23 @@ import {createPipeMotion} from './free-boom-motion.mjs?v=120pv';
 import {HOSE_TRANSFER_ACTIONS,createHoseTransferMotion} from './free-hose-meter.mjs?v=120d';
 import {createWorkPlatformSession} from './free-work-session.mjs?v=120pv';
 
+
+// Keep the accepted physical target visible until its motion and save settle.
+export function createAcceptedWorkTarget(){
+ let selected=null,accepted=null;
+ return{select(value){selected=value?structuredClone(value):null;},accept(frame,action){
+  let selection=selected?structuredClone(selected):null;
+  if(action.type==='FREE_POUR')selection={...selection,mode:'build',cell:action.cell};
+  if(action.type==='FREE_PAINT')selection={...selection,mode:'paint',paint:{work:action.work,cell:action.cell,face:action.face},pixels:[...action.pixels]};
+  accepted={frame,action,selection};
+ },read(frame,action){if(accepted&&accepted.action===action)return accepted;accepted=null;return{frame,selection:selected};},clear(){selected=accepted=null;}};
+}
+// Playback advances all existing contact samples; vehicle travel keeps its own clock.
+export function advanceWorkMotion(motion,seconds,rate=2,groundAt){
+ let remaining=Math.min(.05,Math.max(0,seconds))*rate;
+ while(remaining>1e-9){const step=Math.min(1/120,remaining);if(motion.tick(step,groundAt))return true;remaining-=step;}
+ return false;
+}
 
 export const FREE_WALK_SPEED=84;
 export function createFreeBuildView({scene,camera,model,host}){
@@ -63,7 +80,7 @@ export function createFreeBuildView({scene,camera,model,host}){
  for(const v of Object.values(vehicles))root.add(v.root);
  let supportedPipeRoute=null,pipeMotion=null;const pipes=new T.Group();pipes.name='concrete-supply-hose';root.add(pipes);
  const doorMarks=new T.Group();doorMarks.name='driver-door-markers';root.add(doorMarks);const doorReady=surfaceMaterial('#92deb3',true),doorWaiting=surfaceMaterial('#e4bc59',true),doorPlane=new T.PlaneGeometry(16,20);
- const doorTiles=Object.fromEntries(['truck','pump'].map(name=>{const tile=surfaceMesh(doorPlane,doorWaiting);tile.rotation.x=-Math.PI/2;const group=new T.Group();group.name='driver-door-'+name;group.add(tile);doorMarks.add(group);return[name,{group,tile}];}));
+ const doorTiles=['truck','pump'].flatMap(name=>[-1,1].map(side=>{const tile=surfaceMesh(doorPlane,doorWaiting);tile.rotation.x=-Math.PI/2;const group=new T.Group();group.name='door-zone-'+name+'-'+side;group.add(tile);doorMarks.add(group);return{name,side,group,tile};}));
  function restPosition(o,kind){const rig=model.userData.walkRig,entry=rig?.[kind]?.find(e=>e.part===o),p=(entry?.basePosition??o.position).clone();if(kind==='feet'&&Number.isFinite(rig?.neutralFootZ))p.z=rig.neutralFootZ;return p;}
  const hands=model.userData.hands.map(o=>({o,position:restPosition(o,'hands')})),feet=model.userData.feet.map(o=>({o,position:restPosition(o,'feet')}));
  const saved={position:model.position.clone(),rotation:model.rotation.clone()},baseY=model.userData.grounding.verticalOffset;
@@ -71,14 +88,22 @@ export function createFreeBuildView({scene,camera,model,host}){
  let foundationPlan=null,workDraft=null,current=null,project=null,key='',active=false,work=null,angle=2.6,height=190,selected=0,draft=null;
  let upperFocus=null,upperDetail=false;let footNote='',external=()=>false,readSupportHeightAt=()=>0,toolHeightAt=(...args)=>supportHeightAt(...args),toolBlocked=(...args)=>external(...args),settling=null,cameraHold=null,lastCamera=null,walkPhase=0,walking=false,footPose={x:0,y:0,z:116,heading:Math.PI};
  const jump=createThreeJump();let jumpCeilingAt=()=>Infinity;
- let accessState=null,rescuePending=null;
+ let accessState=null,rescuePending=null;const workTargetState=createAcceptedWorkTarget();
+ function syncWorkTarget(){const t=workTargetState.read(current,work?.a??settling?.action);targetCue?.update(t.frame,t.selection??{});targetCue?.setVisible(active&&!!t.selection?.mode);targetCue?.tick();}
  const workPlatform=createWorkPlatformSession({root,actor,feet,box,mats,heightAt:(...args)=>toolHeightAt(...args),external:(...args)=>toolBlocked(...args)});
  const supportHeightAt=(x,z,reference)=>readSupportHeightAt(x,z,reference??(current?.aboard?(current[current.aboard].groundY??0):footPose.y));
+ supportHeightAt.quarryHeight=(x,z)=>readSupportHeightAt.quarryHeight?.(x,z);
  const walkHeight=(x,z)=>accessState?foundationWalkHeight(project,x,z,supportHeightAt,accessState.plan):supportHeightAt(x,z,footPose.y);
+ walkHeight.quarryHeight=(x,z)=>accessState?undefined:supportHeightAt.quarryHeight(x,z);
  const groundExternal=(x,z,m,y=(current?.aboard?(current[current.aboard].groundY??footPose.y):footPose.y))=>external(x,z,m,y)||workPlatform.blocked(x,z,m)||(!accessState&&!!project?.foundation&&foundationContains(project.foundation,x-project.foundation.x,z-project.foundation.z,m));
  const pipeExternal=(...args)=>external(...args)||workPlatform.blocked3D(...args);
- let vehicleLoadProblem=()=>'';
- const environment={loadProblem:(...args)=>vehicleLoadProblem(...args),get foundation(){return project?.foundation??null;},blockedAt:(...args)=>external(...args)||workPlatform.blocked(...args),supportHeightAt:(...args)=>supportHeightAt(...args)};
+ let vehicleLoadProblem=()=>'',checkedGround=null;
+ function withVehicleGroundChecks(check){
+  if(checkedGround)return check(checkedGround);
+  checkedGround=createVehicleGroundReader(current,supportHeightAt);
+  try{return check(checkedGround);}finally{checkedGround=null;}
+ }
+ const environment={get groundAt(){return checkedGround;},loadProblem:(...args)=>vehicleLoadProblem(...args),get foundation(){return project?.foundation??null;},blockedAt:(...args)=>external(...args)||workPlatform.blocked(...args),supportHeightAt};
  function siteEntryPose(p){
   const f=p.freeBuild,keep=active&&current?.location&&retainsFieldPositions(p),preferred=keep?rebaseFieldPose(footPose,current.location,f.location):{x:0,y:0,z:116,heading:Math.PI};
   for(const vehicle of ['truck','pump']){const issue=vehicleActionProblem(f,{type:'FREE_BOARD',vehicle},environment);if(issue)throw Error(issue);}
@@ -147,7 +172,16 @@ export function createFreeBuildView({scene,camera,model,host}){
   else{actor.position.set(footPose.x,footPose.y+jump.height,footPose.z);const support=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(support)actor.quaternion.copy(walkingGroundRotation(support,footPose.heading));else actor.rotation.set(0,footPose.heading,0);walkingPose();}
  }
  function resetTool(){tools.clear();restoreLimbs();}
- function updateDoorMarks(){if(!current)return;doorMarks.visible=active&&!current.aboard;for(const name of ['truck','pump']){const {group,tile}=doorTiles[name];try{const door=concreteDoor(current[name],current,supportHeightAt),support=walkingGroundAt(current,door.x,door.z,supportHeightAt);group.visible=true;group.position.set(door.x,door.y+.08,door.z);group.quaternion.copy(walkingGroundRotation(support,current[name].heading));tile.material=freeBoardProblem(current,actor.position,name,groundExternal,supportHeightAt)?doorWaiting:doorReady;}catch{group.visible=false;}}}
+ function updateDoorMarks(){
+  if(!current)return;
+  doorMarks.visible=active&&!current.aboard&&!work&&!settling;
+  if(!doorMarks.visible)return;
+  for(const {name,side,group,tile} of doorTiles){try{
+   const door=concreteDoor(current[name],current,supportHeightAt,side),support=walkingGroundAt(current,door.x,door.z,supportHeightAt);
+   group.visible=true;group.position.set(door.x,door.y+.08,door.z);group.quaternion.copy(walkingGroundRotation(support,current[name].heading));
+   tile.material=Math.hypot(door.x-actor.position.x,door.z-actor.position.z)<15&&!freeBoardProblem(current,actor.position,name,groundExternal,supportHeightAt)?doorReady:doorWaiting;
+  }catch{group.visible=false;}}
+ }
  function walkFoot(dx,dz,dt,fast=false){
   if(!active||work||settling||current.aboard||!Number.isFinite(dt)||dt<=0)return false;
   const length=Math.hypot(dx,dz);if(!Number.isFinite(length)||!length){stopWalking();return false;}
@@ -157,6 +191,7 @@ export function createFreeBuildView({scene,camera,model,host}){
   footNote='';if(accessState)try{assertFoundationSupport(project,foundationEnvironment());}catch(e){stopWalking();placeActor();footNote=e.message;return false;}const initialSupport=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(!initialSupport||Math.abs(initialSupport.height-footPose.y)>.15){stopWalking();placeActor();footNote=WALK_GROUND_MESSAGE;return false;}
   const step=FREE_WALK_SPEED*walkFactor({fast})*Math.min(.05,dt),nx=dx/length,nz=dz/length,start={...footPose},count=Math.max(1,Math.ceil(step/.5));
   for(let i=0;i<count;i++){let x=footPose.x+nx*step/count,z=footPose.z+nz*step/count;if(!walkingBlocked(current,x,footPose.z,groundExternal,null,supportHeightAt)){if((accessState?footingSegment:walkingGroundSegment)(current,footPose,{x,z:footPose.z},walkHeight))footPose.x=x;else footNote=accessState?'土台の端や穴には進めません。階段で地上へ戻ってください。':WALK_GROUND_MESSAGE;}if(!walkingBlocked(current,footPose.x,z,groundExternal,null,supportHeightAt)){if((accessState?footingSegment:walkingGroundSegment)(current,footPose,{x:footPose.x,z},walkHeight))footPose.z=z;else footNote=accessState?'土台の端や穴には進めません。階段で地上へ戻ってください。':WALK_GROUND_MESSAGE;}footPose.y=walkingGroundAt(current,footPose.x,footPose.z,walkHeight)?.height??footPose.y;}
+  const descent=start.y-footPose.y;if(descent>2.01||jump.airborne&&descent>0)jump.descend(descent);
   const moved=Math.hypot(footPose.x-start.x,footPose.z-start.z);walking=moved>1e-7;
   if(walking)walkPhase=(walkPhase+moved*.24/(fast?1.5:1))%(Math.PI*2);
   placeActor();if(moved<step*.9&&pipeWalkingBlocked(current,start.x+nx*step,start.z+nz*step,14,supportHeightAt))footNote="ホースが通っています。外側へ回り込むか、残りを回収して接続を外してください。";updateDoorMarks();return walking;
@@ -178,15 +213,16 @@ export function createFreeBuildView({scene,camera,model,host}){
  function access(up,target=null){
   if(work||settling)throw Error('作業中です。');stopWalking();if(up===!!accessState)throw Error(up?'すでに土台にいます。':'すでに地上にいます。');placeActor();const motion=createFoundationAccessMotion({up,target,p:project,prior:accessState,root,actor,feet,heightAt:supportHeightAt,external,box,mats});if(!lastCamera)cameraTick();cameraHold={...lastCamera,focus:{...lastCamera.focus}};return new Promise((resolve,reject)=>{work={a:{type:up?'FOUNDATION_ACCESS_UP':'FOUNDATION_ACCESS_DOWN'},motion,resolve,reject};});
  }
- function perform(a,{fast=false,deferredFoundation=false,masking=null}={}){
-  if(work||settling)throw Error('作業中です。');stopWalking();footNote='';
+ function perform(a,{fast=false,deferredFoundation=false,masking=null,instantBoard=false}={}){
+  if(work||settling)throw Error('作業中です。');stopWalking();footNote='';workTargetState.accept(current,a);
   if(a.type===SUPPORTED_WORK_MOVE){placeActor();const env=()=>({foot:{x:actor.position.x,y:actor.position.y,z:actor.position.z},blockedAt:external,supportHeightAt:foundationEnvironment().heightAt}),receipt=newSupportedWorkMoveReceipt(project,a,env());settling={action:a,motion:{verifyFooting(){const issue=supportedWorkMoveEnvironmentProblem(project,a.work,a,env(),a.quarterTurns);if(issue)throw Error(issue);}}};return Promise.resolve(receipt);}
   if(FOUNDATION_ACTIONS.has(a.type)){
    placeActor();const motion=(deferredFoundation?createDeferredFoundationHandMotion:createFoundationHandMotion)({p:project,a,root,actor,model,hands,feet,tools,mats,line,environment:()=>foundationEnvironment(),installedFoundation});
    if(!lastCamera)cameraTick();cameraHold={...lastCamera,focus:{...lastCamera.focus}};
    return new Promise((resolve,reject)=>{work={a,motion,focus:cameraHold.focus,resolve,reject};});
   }
-  const vehicleProblem=vehicleActionProblem(current,a,environment)||(a.type==='FREE_LEAVE'?freeLeaveProblem(current,groundExternal,supportHeightAt):'');if(vehicleProblem)throw Error(vehicleProblem);
+  // The driving motion checks the complete route before starting.
+  const vehicleProblem=a.type==='FREE_MOVE'?'':vehicleActionProblem(current,a,environment)||(a.type==='FREE_LEAVE'?freeLeaveProblem(current,groundExternal,supportHeightAt):'');if(vehicleProblem)throw Error(vehicleProblem);
   const hoseProblem=pipeProblem(current,a,pipeExternal,supportHeightAt)||connectionFootProblem(a);if(hoseProblem)throw Error(hoseProblem);
   if(HOSE_TRANSFER_ACTIONS.has(a.type)){
    const motion=createHoseTransferMotion(a,current,()=>{const check={type:'FREE_PRIME'},issue=vehicleActionProblem(current,check,environment)||pipeProblem(current,check,pipeExternal,supportHeightAt);if(issue)throw Error(issue);});if(!lastCamera)cameraTick();cameraHold={...lastCamera,focus:{...lastCamera.focus}};
@@ -210,12 +246,22 @@ export function createFreeBuildView({scene,camera,model,host}){
    // Casting keeps the player's current framing through walking, work, save and rest.
    // In particular, individual trowel strokes must never drag or jump the camera.
    if(FREE_CAST_ACTIONS.has(a.type)||FREE_FRAME_ACTIONS.has(a.type)||a.type==='FREE_PAINT'||a.type==='FREE_BOARD'||a.type==='FREE_LEAVE'){if(!lastCamera)cameraTick();cameraHold={...lastCamera,focus:{...lastCamera.focus}};}else cameraHold=null;
+   if(instantBoard&&a.type==='FREE_BOARD'){
+    try{
+     for(let sample=0;sample<240;sample++){
+      if(!motion.tick(.025))continue;
+      settling={action:a,pose:motion.endPose,motion,masking};
+      resetTool();return Promise.resolve(motion.receipt);
+     }
+     throw Error('乗車を安全に完了できませんでした。');
+    }catch(e){motion.cancel();throw e;}
+   }
    return new Promise((resolve,reject)=>{work={a,motion,masking,focus:motion.focus,resolve,reject};});
   }
   return Promise.resolve();
  }
  function performMasking(plan){assertMaskingPlan(current,plan);if(work||settling)throw Error('作業中です。');const a=maskingContactAction(plan,crypto.randomUUID());paintLayer.beginMask(plan);try{return perform(a,{masking:plan});}catch(e){paintLayer.finishMask(false);throw e;}}
- function cancel(error=null){if(!work)return;const w=work;work=null;w.motion?.cancel();if(!workPlatform.visible)workPlatform.clear();paintLayer.finish(false);paintLayer.finishMask(false);resetTool();sync(project);w.reject(error??Error('作業を中止しました。材料は変更していません。'));}
+ function cancel(error=null){if(!work)return;const w=work;work=null;w.motion?.cancel();if(!workPlatform.visible)workPlatform.clear();paintLayer.finish(false);paintLayer.finishMask(false);resetTool();sync(project);syncWorkTarget();w.reject(error??Error('作業を中止しました。材料は変更していません。'));}
  function evacuationPlan(){
   if(!active||work||settling)throw Error('作業を止め、保存の確認を終えてから戻ってください。');
   restoreLimbs();const position=actor.position.clone(),rotation=actor.quaternion.clone(),clearance=soleClearance(root,actor,feet);
@@ -243,21 +289,22 @@ export function createFreeBuildView({scene,camera,model,host}){
   if(accessState){accessState.scaffold.dispose();root.remove(accessState.group);accessState=null;}
   footPose={...plan.pose};footNote='';cameraHold=lastCamera=null;placeActor();updateDoorMarks();cameraTick();
  }
- function tick(dt){if(!active)return;
+ function tick(dt,driveRate=1){if(!active)return;
   if(!work&&!settling&&!current.aboard){const ceiling=jumpCeilingAt(footPose.x+current.location.x,footPose.z+current.location.z,footPose.y+jump.height+26.6);jump.tick(dt,Number.isFinite(ceiling)?ceiling-footPose.y-26.6-.02:Infinity);placeActor();updateDoorMarks();}
   if(current.connected&&pipeMotion&&!PIPE_ACTIONS.has(work?.a?.type)){const route=advanceSupplyHose(current,dt,work?.a?.type==='FREE_POUR'&&work.a.source==='pump'||work?.a?.type==='FREE_PRIME');if(route&&pipes.children.length===route.length-1)for(let i=1;i<route.length;i++){const mesh=pipes.children[i-1],a=route[i-1],b=route[i],delta=new T.Vector3(b.x-a.x,b.y-a.y,b.z-a.z);mesh.position.set((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);mesh.scale.y=delta.length();mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());}}
  preview.visible=foundationGroup.visible=!work&&!settling;if(current.mixer.pending)vehicles.truck.drum.rotation.z+=dt*2;
-  if(work?.motion){const w=work;try{if(project.foundation&&(['FREE_FRAME','FREE_FRAME_RAISED'].includes(w.a.type)||constructionBase(current)&&[...FREE_FRAME_ACTIONS,...FREE_CAST_ACTIONS].includes(w.a.type)))assertFoundationSupport(project,foundationEnvironment());if(!FREE_VEHICLE_ACTIONS.has(w.a.type)&&!HOSE_TRANSFER_ACTIONS.has(w.a.type)){const problem=vehicleActionProblem(current,w.a,environment)||pipeProblem(current,w.a,pipeExternal,supportHeightAt);if(problem)throw Error(problem);}if(w.masking)assertMaskingPlan(current,w.masking);if(w.a.type==='FREE_PAINT')assertRaisedPaintSupport(project,w.a,foundationEnvironment().heightAt,foundationEnvironment().blockedAt);if(w.motion.tick(dt)){settling={action:w.a,pose:w.motion.endPose,motion:w.motion,masking:w.masking};work=null;resetTool();w.resolve(w.motion.receipt);}}catch(e){cancel(e);}cameraTick(dt);targetCue?.setVisible(false);return;}
-  cameraTick(dt);targetCue?.tick();
+  if(work?.motion){const w=work;try{if(project.foundation&&(['FREE_FRAME','FREE_FRAME_RAISED'].includes(w.a.type)||constructionBase(current)&&[...FREE_FRAME_ACTIONS,...FREE_CAST_ACTIONS].includes(w.a.type)))assertFoundationSupport(project,foundationEnvironment());if(!FREE_VEHICLE_ACTIONS.has(w.a.type)&&!HOSE_TRANSFER_ACTIONS.has(w.a.type)){const problem=vehicleActionProblem(current,w.a,environment)||pipeProblem(current,w.a,pipeExternal,supportHeightAt);if(problem)throw Error(problem);}if(w.masking)assertMaskingPlan(current,w.masking);if(w.a.type==='FREE_PAINT')assertRaisedPaintSupport(project,w.a,foundationEnvironment().heightAt,foundationEnvironment().blockedAt);if((w.a.type==='FREE_MOVE'?withVehicleGroundChecks(groundAt=>advanceWorkMotion(w.motion,dt,driveRate,groundAt)):advanceWorkMotion(w.motion,dt,3.4))){settling={action:w.a,pose:w.motion.endPose,motion:w.motion,masking:w.masking};work=null;resetTool();w.resolve(w.motion.receipt);}}catch(e){cancel(e);}cameraTick(dt);syncWorkTarget();return;}
+  cameraTick(dt);syncWorkTarget();
  }
- return{root,vehicles,measuredVehicleMove:a=>measuredVehicleMove(current,a,supportHeightAt),focusUpper(anchor,detail=null,startAngle=null){const changed=JSON.stringify(anchor)!==JSON.stringify(upperFocus);upperFocus=anchor;if(detail!==null)upperDetail=detail;cameraHold=null;if(anchor&&changed)angle=startAngle??(.84+anchor.turn*Math.PI/2);if(active)cameraTick();},stepUndoProblem,jump(){if(!active||work||settling||current.aboard)return false;const supported=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(!supported||Math.abs(supported.height-footPose.y)>.15)return false;cameraHold=null;stopWalking();return jump.start();},releaseJump(){jump.release();},get jumpMotion(){return active&&!current.aboard?{owner:'concrete',stage:jump.count,velocity:jump.velocity,height:jump.height,airborne:jump.airborne,handsFree:false}:null;},get airborne(){return jump.airborne;},get jumpCount(){return jump.count;},setJumpCeilingAt:fn=>{jumpCeilingAt=fn;},
-  nativeDoor(name){return concreteWorldDoor(current,name,{blockedAt:groundExternal,heightAt:supportHeightAt});},
+ return{root,vehicles,withVehicleGroundChecks,measuredVehicleMove:a=>measuredVehicleMove(current,a,supportHeightAt,checkedGround),focusUpper(anchor,detail=null,startAngle=null){const changed=JSON.stringify(anchor)!==JSON.stringify(upperFocus);upperFocus=anchor;if(detail!==null)upperDetail=detail;cameraHold=null;if(anchor&&changed)angle=startAngle??(.84+anchor.turn*Math.PI/2);if(active)cameraTick();},stepUndoProblem,jump(){if(!active||work||settling||current.aboard)return false;const supported=walkingGroundAt(current,footPose.x,footPose.z,walkHeight);if(!supported||Math.abs(supported.height-footPose.y)>.15)return false;cameraHold=null;stopWalking();return jump.start();},releaseJump(){jump.release();},get jumpMotion(){return active&&!current.aboard?{owner:'concrete',stage:jump.count,velocity:jump.velocity,height:jump.height,airborne:jump.airborne,handsFree:false}:null;},get airborne(){return jump.airborne;},get jumpCount(){return jump.count;},setJumpCeilingAt:fn=>{jumpCeilingAt=fn;},
+  nativeDoor(name,side=null){return concreteWorldDoor(current,name,{blockedAt:groundExternal,heightAt:supportHeightAt,side});},
+  nativeDoorSpot(name,side){if(!current?.location||!current[name])return null;const door=concreteDoor(current[name],current,supportHeightAt,side);return{...door,x:door.x+current.location.x,z:door.z+current.location.z,heading:current[name].heading,side};},
   nativeArrival(name,pose){return concreteDoorArrival(current,name,pose,{blockedAt:groundExternal,heightAt:supportHeightAt});},
   pedestrianBlockedAt(x,z){if(!current?.location)return false;return walkingObjectsBlocked(current,x-current.location.x,z-current.location.z,(a,b,m)=>workPlatform.blocked(a,b,m)||!!project?.foundation&&foundationContains(project.foundation,a-project.foundation.x,b-project.foundation.z,m),null,supportHeightAt);},
-  setResumeFoot(p){if(!p||!['x','y','z','heading'].every(k=>Number.isFinite(p[k]))||!current?.location)return false;footPose={x:p.x-current.location.x,y:p.y,z:p.z-current.location.z,heading:p.heading};return true;},get worldFootPose(){return current?.location&&!current.aboard?{...footPose,x:footPose.x+current.location.x,z:footPose.z+current.location.z}:null;},setWorkTarget(selection){targetCue?.update(current,selection);targetCue?.setVisible(active&&!work&&!settling&&!!selection?.mode);targetCue?.tick();},get hasTarget(){return !!targetCue?.target;},focusTarget(){const t=targetCue?.target;if(!t)return;monsterCamera.select("overview");cameraHold=workTargetCamera(t,angle);cameraTick();targetCue.tick();},setPaintMaskPreview:value=>paintLayer.setMask(value),perform,performMasking,access,cancel,tick,sync,exportWorkPlatform:()=>workPlatform.exportRecord(project),restoreWorkPlatform(record){if(work||settling||accessState)throw Error('作業中です。');const issue=workPlatform.restore(record,project);footNote=issue;if(active&&!current.aboard){footPose=freeEntryPose(current,footPose,groundExternal,supportHeightAt);placeActor();}return issue;},get hasWorkPlatform(){return workPlatform.visible;},get workPlatformPlan(){return workPlatform.plan;},clearWorkPlatform(){if(work||settling||accessState)throw Error('作業を終えて地上へ降りてから片付けてください。');workPlatform.clear();},siteEntryPose,walkFoot,planDoorWalk:(name,options)=>{if(!active||work||settling||accessState)throw Error('作業を終えて地上からドアへ向かおう。');return planConcreteDoorRoute(current,name,footPose,{blockedAt:groundExternal,heightAt:walkHeight,...options});},walkDoorStep(goal,dt){const dx=goal.x-footPose.x,dz=goal.z-footPose.z,d=Math.hypot(dx,dz);return walkFoot(dx,dz,Math.min(Math.max(0,dt),.05,d/FIELD_RUN_SPEED)*FIELD_RUN_SPEED/(FREE_WALK_SPEED*walkFactor({fast:true})),true);},evacuationPlan,evacuate,prepareVehicleRescue,verifyVehicleRescue,get onAccess(){return !!accessState;},get accessProblem(){return accessState?'':foundationAccessProblem(project);},get accessRecord(){return accessState?{plan:accessState.plan,record:accessState.record,footing:accessState.footing}:null;},verifyFooting(){settling?.motion?.verifyFooting?.();workPlatform.verify(current,toolHeightAt,toolBlocked);},stopWalking,travelVector:(dx,dz)=>viewRelativeTravel(camera.getWorldDirection(new T.Vector3()),dx,dz),get footPosition(){return{x:actor.position.x,y:actor.position.y,z:actor.position.z};},boardStatus:name=>{const status=freeBoardStatus(current,actor.position,name,groundExternal,supportHeightAt);if(jump.airborne)return{...status,problem:'着地してから乗ろう。'};return {...status,problem:status.problem||vehicleActionProblem(current,{type:'FREE_BOARD',vehicle:name},environment)};},boardProblem:name=>jump.airborne?'着地してから乗ろう。':freeBoardProblem(current,actor.position,name,groundExternal,supportHeightAt)||vehicleActionProblem(current,{type:'FREE_BOARD',vehicle:name},environment),vehicleProblem:a=>vehicleActionProblem(current,a,environment)||(a.type==='FREE_LEAVE'?freeLeaveProblem(current,groundExternal,supportHeightAt):'')||pendingPipeProblem(a)||pipeProblem(current,a,pipeExternal,supportHeightAt)||connectionFootProblem(a),get phase(){return work?.motion?.phase??footNote;},setToolEnvironment:({heightAt,blockedAt})=>{toolHeightAt=heightAt;toolBlocked=blockedAt;},get hoseTransferType(){return work?.a?.type??settling?.action.type;},get hoseTransferProgress(){return work?.motion?.progress??settling?.motion?.progress??0;},get hoseMotion(){return pipeMotion?.dynamics.stats??null;},setBlockedAt:fn=>{external=fn;pipeMotion=null;key="";},setVehicleLoadProblem:fn=>{vehicleLoadProblem=fn;},setSupportHeightAt:fn=>{readSupportHeightAt=fn;},complete(success,retainRescue=false){paintLayer.finish(success);paintLayer.finishMask(success);if(settling?.rescue&&!success&&!retainRescue)rescuePending=null;if(success&&settling?.action.type==='FOUNDATION_ACCESS_UP')accessState=settling.motion.access;if(success&&settling?.action.type==='FOUNDATION_ACCESS_DOWN')accessState=null;if(success&&settling?.pose&&!settling.rescue&&settling.action.type!=='FREE_BOARD'&&(!current.aboard||settling.action.type==='FREE_LEAVE'))footPose={...settling.pose};settling?.motion?.settle?.(success);settling=null;},setFoundationPreview:value=>{foundationPlan=value;drawPreview();},setWorkPreview:value=>{workDraft=value;drawPreview();},setDraft:value=>{draft=value;drawPreview();},select:i=>{selected=i;drawPreview();},get busy(){return!!work;},
+  setResumeFoot(p){if(!p||!['x','y','z','heading'].every(k=>Number.isFinite(p[k]))||!current?.location)return false;footPose={x:p.x-current.location.x,y:p.y,z:p.z-current.location.z,heading:p.heading};return true;},get worldFootPose(){return current?.location&&!current.aboard?{...footPose,x:footPose.x+current.location.x,z:footPose.z+current.location.z}:null;},setWorkTarget(selection){workTargetState.select(selection);syncWorkTarget();},get hasTarget(){return !!targetCue?.target;},focusTarget(){const t=targetCue?.target;if(!t)return;monsterCamera.select("overview");cameraHold=workTargetCamera(t,angle);cameraTick();targetCue.tick();},setPaintMaskPreview:value=>paintLayer.setMask(value),perform,performMasking,access,cancel,tick,sync,exportWorkPlatform:()=>workPlatform.exportRecord(project),restoreWorkPlatform(record){if(work||settling||accessState)throw Error('作業中です。');const issue=workPlatform.restore(record,project);footNote=issue;if(active&&!current.aboard){footPose=freeEntryPose(current,footPose,groundExternal,supportHeightAt);placeActor();}return issue;},get hasWorkPlatform(){return workPlatform.visible;},get workPlatformPlan(){return workPlatform.plan;},clearWorkPlatform(){if(work||settling||accessState)throw Error('作業を終えて地上へ降りてから片付けてください。');workPlatform.clear();},siteEntryPose,walkFoot,planDoorWalk:(name,options)=>{if(!active||work||settling||accessState)throw Error('作業を終えて地上からドアへ向かおう。');return planConcreteDoorRoute(current,name,footPose,{blockedAt:groundExternal,heightAt:walkHeight,...options});},walkDoorStep(goal,dt){const dx=goal.x-footPose.x,dz=goal.z-footPose.z,d=Math.hypot(dx,dz);return walkFoot(dx,dz,Math.min(Math.max(0,dt),.05,d/FIELD_RUN_SPEED)*FIELD_RUN_SPEED/(FREE_WALK_SPEED*walkFactor({fast:true})),true);},evacuationPlan,evacuate,prepareVehicleRescue,verifyVehicleRescue,get onAccess(){return !!accessState;},get accessProblem(){return accessState?'':foundationAccessProblem(project);},get accessRecord(){return accessState?{plan:accessState.plan,record:accessState.record,footing:accessState.footing}:null;},verifyFooting(){settling?.motion?.verifyFooting?.();workPlatform.verify(current,toolHeightAt,toolBlocked);},stopWalking,travelVector:(dx,dz)=>viewRelativeTravel(camera.getWorldDirection(new T.Vector3()),dx,dz),get footPosition(){return{x:actor.position.x,y:actor.position.y,z:actor.position.z};},boardStatus:name=>{const status=freeBoardStatus(current,actor.position,name,groundExternal,supportHeightAt);if(jump.airborne)return{...status,problem:'着地してから乗ろう。'};return {...status,problem:status.problem||vehicleActionProblem(current,{type:'FREE_BOARD',vehicle:name},environment)};},boardProblem:name=>jump.airborne?'着地してから乗ろう。':freeBoardProblem(current,actor.position,name,groundExternal,supportHeightAt)||vehicleActionProblem(current,{type:'FREE_BOARD',vehicle:name},environment),vehicleProblem:a=>vehicleActionProblem(current,a,environment)||(a.type==='FREE_LEAVE'?freeLeaveProblem(current,groundExternal,supportHeightAt):'')||pendingPipeProblem(a)||pipeProblem(current,a,pipeExternal,supportHeightAt)||connectionFootProblem(a),get phase(){return work?.motion?.phase??footNote;},setToolEnvironment:({heightAt,blockedAt})=>{toolHeightAt=heightAt;toolBlocked=blockedAt;},get hoseTransferType(){return work?.a?.type??settling?.action.type;},get hoseTransferProgress(){return work?.motion?.progress??settling?.motion?.progress??0;},get hoseMotion(){return pipeMotion?.dynamics.stats??null;},setBlockedAt:fn=>{external=fn;pipeMotion=null;key="";},setVehicleLoadProblem:fn=>{vehicleLoadProblem=fn;},setSupportHeightAt:fn=>{readSupportHeightAt=fn;},complete(success,retainRescue=false){paintLayer.finish(success);paintLayer.finishMask(success);if(settling?.rescue&&!success&&!retainRescue)rescuePending=null;if(success&&settling?.action.type==='FOUNDATION_ACCESS_UP')accessState=settling.motion.access;if(success&&settling?.action.type==='FOUNDATION_ACCESS_DOWN')accessState=null;if(success&&settling?.pose&&!settling.rescue&&settling.action.type!=='FREE_BOARD'&&(!current.aboard||settling.action.type==='FREE_LEAVE'))footPose={...settling.pose};settling?.motion?.settle?.(success);settling=null;syncWorkTarget();},setFoundationPreview:value=>{foundationPlan=value;drawPreview();},setWorkPreview:value=>{workDraft=value;drawPreview();},setDraft:value=>{draft=value;drawPreview();},select:i=>{selected=i;drawPreview();},get busy(){return!!work;},
   setFoundationEnvironment:fn=>{foundationEnvironment=fn;},
   enter(arrival=null){jump.reset();stopWalking();if(arrival){footPose=this.nativeArrival(arrival.name,arrival.pose);}else if(!current.aboard)footPose=freeEntryPose(current,footPose,external,supportHeightAt);active=true;cameraHold=lastCamera=null;actor.visible=true;saved.position.copy(model.position);saved.rotation.copy(model.rotation);actor.add(model);model.position.set(0,baseY,0);model.rotation.set(0,0,0);placeActor();monsterCamera.enter();},
-  exit(){scene.userData.upperInspection=null;upperFocus=null;jump.reset();targetCue?.setVisible(false);cancel();paintLayer.setMask(null);stopWalking();workPlatform.clear();paintLayer.finish(false);if(accessState){accessState.scaffold.dispose();root.remove(accessState.group);accessState=null;}monsterCamera.exit();active=false;cameraHold=lastCamera=null;actor.visible=false;scene.add(model);model.position.copy(saved.position);model.rotation.copy(saved.rotation);resetTool();draft=workDraft=null;},
+  exit(){active=false;workTargetState.clear();scene.userData.upperInspection=null;upperFocus=null;jump.reset();targetCue?.setVisible(false);cancel();paintLayer.setMask(null);stopWalking();workPlatform.clear();paintLayer.finish(false);if(accessState){accessState.scaffold.dispose();root.remove(accessState.group);accessState=null;}monsterCamera.exit();active=false;cameraHold=lastCamera=null;actor.visible=false;scene.add(model);model.position.copy(saved.position);model.rotation.copy(saved.rotation);resetTool();draft=workDraft=null;},
   get cameraMode(){return monsterCamera.mode;},setCameraMode(mode){if(work||settling)throw Error('作業が終わってから視点を選んでください。');monsterCamera.select(mode);cameraHold=lastCamera=null;if(active)cameraTick();},
   look(dx,dy,sensitivity){if(monsterCamera.look(dx,dy,sensitivity))return;angle-=dx*sensitivity;height=T.MathUtils.clamp(height+dy*.25,85,230);if(cameraHold){cameraHold.viewAngle-=dx*sensitivity;cameraHold.elevation=T.MathUtils.clamp(cameraHold.elevation+dy*.25,85,230);}},resetCamera(){upperFocus=null;cameraHold=lastCamera=null;angle=2.6;height=190;monsterCamera.reset();if(active)cameraTick();}
  };

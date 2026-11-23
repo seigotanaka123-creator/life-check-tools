@@ -71,7 +71,7 @@ function defaultHint(){return mode==='view'?'画面を引いて見まわそう':
 function syncHandles(){
  const room=selected(),items=mode==='view'?[]:room?reelHandles(draft?.room??room,mode):mode==='floor'?[{side:'new',x:-48,y:3,z:48}]:[];
  for(const [id,b]of buttons){if(!items.some(i=>i.side===id)){b.remove();q('#leaders [data-side="'+id+'"]')?.remove();buttons.delete(id);}}
- for(const item of items){let b=buttons.get(item.side);if(!b){b=document.createElement('button');b.type='button';b.dataset.handle=item.side;q('#handles').append(b);buttons.set(item.side,b);b.addEventListener('pointerdown',e=>beginHandle(e,b));b.addEventListener('keydown',e=>{if(e.key==='Escape')cancelGesture();});}b.dataset.mode=mode;b.dataset.x=String(item.x);b.dataset.y=String(item.y);b.dataset.z=String(item.z);b.textContent=item.side==='new'?'＋ 床':mode==='wall'?'↑':({north:'↖',east:'↗',south:'↘',west:'↙'})[item.side];b.setAttribute('aria-label',item.side==='new'?'床のはじめを引く':({north:'奥',east:'右',south:'手前',west:'左'})[item.side]+(mode==='wall'?'の壁を引き上げる':'の床を伸ばす'));}
+ for(const item of items){let b=buttons.get(item.side);if(!b){b=document.createElement('button');b.type='button';b.dataset.handle=item.side;q('#handles').append(b);buttons.set(item.side,b);b.addEventListener('pointerdown',e=>beginHandle(e,b));b.addEventListener('keydown',e=>{if(e.key==='F8')cancelGesture();});}b.dataset.mode=mode;b.dataset.x=String(item.x);b.dataset.y=String(item.y);b.dataset.z=String(item.z);b.textContent=item.side==='new'?'＋ 床':mode==='wall'?'↑':({north:'↖',east:'↗',south:'↘',west:'↙'})[item.side];b.setAttribute('aria-label',item.side==='new'?'床のはじめを引く':({north:'奥',east:'右',south:'手前',west:'左'})[item.side]+(mode==='wall'?'の壁を引き上げる':'の床を伸ばす'));}
  positionHandles();
 }
 function positionHandles(){
@@ -127,7 +127,7 @@ for(const type of['pointercancel','lostpointercapture'])window.addEventListener(
 for(const type of['blur','pagehide'])window.addEventListener(type,cancelGesture);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelGesture();});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();cancelGesture();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.repeat){e.preventDefault();undo();}});
+document.addEventListener('keydown',e=>{if(e.key==='F8'){e.preventDefault();cancelGesture();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.repeat){e.preventDefault();undo();}});
 function undo(){if(gesture)return;const next=undoReel(state);if(next===state)return;state=next;stats.undo++;paintKey='';renderParts();say('1つ前にもどしたよ');save();metrics();}
 q('#undo').onclick=undo;
 for(const b of document.querySelectorAll('[data-tool]'))b.onclick=()=>{cancelGesture();stats.toolChoices++;mode=b.dataset.tool;for(const other of document.querySelectorAll('[data-tool]'))other.setAttribute('aria-pressed',String(other===b));canvas.style.cursor=mode==='view'?'grab':'crosshair';paintKey='';renderParts();say(defaultHint());metrics();};

@@ -1,6 +1,7 @@
 import{huntFanExposure}from'./imasora-sliding-tag-hunt-fan.mjs';
 import{huntPermanentToolUseful}from'./imasora-sliding-tag-hunt-sight.mjs';
 import{huntGadgetPlacement,huntGadgetRadius,huntHookAnchor}from'./imasora-sliding-tag-hunt-placement.mjs';
+import{usesRaisedApproaches}from'./imasora-sliding-tag-hunt-contact-rules.mjs';
 import{BODY,worldHeight,worldSurface,worldSight,worldTraversable,worldRoute,worldRouteLookahead,worldSteering}from'./imasora-sliding-tag-hunt-world.mjs';
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const priority={radar:4,cloak:7,speed:6,curtain:5,clone:4,cushion:4,hook:6,fan:6,sheet:2};
@@ -53,7 +54,7 @@ function cushionThreatInLane(runner,threat,time){
  const back=-(dx*sin+dz*cos),across=Math.abs(dx*cos-dz*sin);
  return back>8&&across<3+(threat.radius??3)+1.5;
 }
-export function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure=false}={}){const a=s.player,m=a.brain,item=a.item,threats=m.escapeThreats??[],t=threats[0],distance=t?gap(a,t):Infinity,now=s.time,active=k=>(a.effects[k]??0)>now;
+export function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanExposure=false,proactive=false}={}){const a=s.player,m=a.brain,item=a.item,threats=m.escapeThreats??[],t=threats[0],distance=t?gap(a,t):Infinity,now=s.time,active=k=>(a.effects[k]??0)>now;
  if(a.hook&&m.releaseHook&&!a.flight)return{yaw:a.yaw,item:'hook-release'};if(!item||a.flight||now<(m.nextToolAt??0)||item==='hook'&&!m.hookReady)return null;const speed=Math.hypot(a.vx,a.vz),n=Math.hypot(input.x,input.z),heading=n>.1?Math.atan2(input.x,input.z):a.yaw;
  const straight=worldTraversable(a,{x:a.x+Math.sin(heading)*24,z:a.z+Math.cos(heading)*24},a.radius+.2),visible=t&&!t.radar&&now-t.at<.15,closing=t?((a.vx-t.vx)*(t.x-a.x)+(a.vz-t.vz)*(t.z-a.z))/(distance||1):0;
  let yaw=heading,use=false;
@@ -67,19 +68,19 @@ export function runnerItemTactic(s,input,{checkAllCushionThreats=false,checkFanE
   yaw=a.yaw;
   use=checkAllCushionThreats?threats.some(threat=>cushionThreatInLane(a,threat,now)):cushionThreatInLane(a,t,now);
  }
- else if(item==='clone'){if(distance<85&&(!visible||distance<38||!straight)){for(const offset of[(s.config.seed&1?1:-1)*.95,(s.config.seed&1?-1:1)*.95]){const p={x:a.x+Math.sin(heading+offset)*28,z:a.z+Math.cos(heading+offset)*28};if(worldTraversable(a,p,a.radius+.2)&&(!t||gap(p,t)>distance*.75)){yaw=heading+offset;use=true;break;}}}}
+ else if(item==='clone'){if(distance<85&&(!visible||distance<(proactive?52:38)||!straight)){for(const offset of[(s.config.seed&1?1:-1)*.95,(s.config.seed&1?-1:1)*.95]){const p={x:a.x+Math.sin(heading+offset)*28,z:a.z+Math.cos(heading+offset)*28};if(worldTraversable(a,p,a.radius+.2)&&(!t||gap(p,t)>distance*.75)){yaw=heading+offset;use=true;break;}}}}
  else if(item==='curtain'){
-  const p=threats.find(p=>fooledByCover(s,p)&&gap(a,p)>20&&gap(a,p)<75&&p.y-a.y<5);
+  const p=threats.find(p=>fooledByCover(s,p)&&gap(a,p)>(proactive?10:20)&&gap(a,p)<75&&p.y-a.y<5);
   if(p){yaw=Math.atan2(p.x-a.x,p.z-a.z);use=true;}
   else if(!usefulCover(s)&&safeReplacementSeen(s)){yaw=heading+Math.PI;use=true;}
  }
- else if(item==='sheet'){if(distance>20&&distance<75&&t.y-a.y<5){yaw=Math.atan2(t.x-a.x,t.z-a.z);use=true;}}
+ else if(item==='sheet'){if(distance>(proactive?10:20)&&distance<75&&t.y-a.y<5){yaw=Math.atan2(t.x-a.x,t.z-a.z);use=true;}}
  else if(item==='fan'&&checkFanExposure){
   for(const threat of threats){
    if(threat.radar||!(now-threat.at<.15))continue;
-   const aim=Math.atan2(threat.x-a.x,threat.z-a.z);
+   const aim=usesRaisedApproaches(s.rules)?a.yaw:Math.atan2(threat.x-a.x,threat.z-a.z);
    const placement=huntGadgetPlacement(s,a,item,aim);
-   if(placement&&huntFanExposure(threat,{...placement,kind:item,yaw:aim,until:now+1},now))return{yaw:aim,item};
+   if(placement&&huntFanExposure(threat,{...placement,kind:item,yaw:placement.yaw??aim,until:now+1},now))return{yaw:aim,item};
   }
   return null;
  }

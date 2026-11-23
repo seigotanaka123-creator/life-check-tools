@@ -1,4 +1,4 @@
-import {createSkyCamera} from './imasora-sky-camera.mjs?v=120qh';
+import {createSkyCamera} from './imasora-sky-camera.mjs?v=121bg';
 export async function openBrowserSkyPreview({video,snapshot,signal,environment=globalThis}){
  const env=environment;if(!env.isSecureContext||!env.navigator?.mediaDevices?.getUserMedia)throw Error('CAMERA_SECURE_CONTEXT_REQUIRED');if(signal.aborted)throw Error('CANCELLED');let stream=null;
  function stop(){
@@ -40,7 +40,7 @@ export function skyCaptureMessage(result){
 
 export function skyConfirmMessage(error){
  if(error?.message==='SKY_PHOTO_PENDING')return'まだ受け取っていない空の写真があります。「閉じる」でホームへ戻り、受け取りを確かめてね。';
- if(['MONSTER_CHANGED','WALK_CAPTURE_CHANGED'].includes(error?.message))return'育成や散歩の状況が変わりました。ホームに戻り、撮影を開き直してね。';
+ if(['MONSTER_CHANGED','WALK_CAPTURE_CHANGED','TAG_EVOLUTION_CHANGED'].includes(error?.message))return'育成や散歩の状況が変わりました。ホームに戻り、撮影を開き直してね。';
  if(error?.message==='TAG_PHOTO_UNCONFIRMED')return'写真を確認できる時間を過ぎました。今の空を撮り直してね。';
  return'空を記録できませんでした。もう一度ためすか、閉じてホームで受け取りを確かめてね。';
 }
